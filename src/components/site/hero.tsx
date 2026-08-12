@@ -13,8 +13,8 @@ type HeroProps = {
 /** Ana səhifənin hero bölməsi — LCP elementi burada yerləşir. */
 export function Hero({ types, cities }: HeroProps) {
   return (
-    <section className="on-dark relative isolate">
-      {/* Fon şəkli — hero başlığın altında sticky header-in üstünə uzanır */}
+    <section className="on-dark relative isolate -mt-[var(--header-h)]">
+      {/* Fon şəkli — hero başlığın altında fixed header-in arxasına uzanır */}
       <div className="absolute inset-0 -z-10">
         <Image
           src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2400&q=80"
@@ -36,7 +36,7 @@ export function Hero({ types, cities }: HeroProps) {
         />
       </div>
 
-      <Container className="flex min-h-[calc(100dvh-73px)] flex-col justify-center py-20 lg:py-28">
+      <Container className="flex min-h-dvh flex-col justify-center pt-[calc(var(--header-h)+2rem)] pb-20 lg:pb-28 lg:pt-[calc(var(--header-h)+3rem)]">
         <div className="max-w-3xl">
           <p className="flex items-center gap-3 text-xs font-medium tracking-[0.28em] text-gold-soft uppercase">
             <span aria-hidden="true" className="h-px w-10 bg-gold-soft/60" />

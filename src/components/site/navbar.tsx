@@ -10,14 +10,16 @@ import { ButtonAnchor, ButtonLink, IconButton } from "@/components/ui/button";
 import { Logo } from "./logo";
 
 /**
- * Sticky header.
+ * Fixed header — hero şəklinin üstündə oturur.
  *
  * Davranış:
- * - Səhifənin başında şəffaf (hero şəklinin üstündə oturur)
+ * - Səhifənin başında şəffaf (hero şəklinin üstündə overlay kimi dayanır)
  * - Scroll ≥ 24px olduqda ivory fona keçir və kölgə alır
  * - Mobil versiyada tam ekran drawer açılır
  *
- * Header `fixed` deyil, `sticky` olduğu üçün kontentin üstünə düşmür.
+ * Header `fixed` olduğu üçün kontentin üstünə düşür — `<main>` elementinə
+ * `pt-[--header-h]` əlavə edilir ki, kontentlər header-in altında qalmasın.
+ * Ana səhifədə hero bölməsi öz daxili padding-i ilə bunu idarə edir.
  */
 export function Navbar() {
   const pathname = usePathname();
@@ -65,10 +67,10 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-colors duration-300",
+        "fixed top-0 z-40 w-full transition-[background-color,box-shadow] duration-300",
         isOverlay
-          ? "on-dark border-b border-white/10 bg-transparent"
-          : "border-b border-line bg-ivory/95 backdrop-blur-md",
+          ? "border-b border-white/10 bg-transparent"
+          : "border-b border-line bg-ivory/95 shadow-sm backdrop-blur-md",
       )}
     >
       {/* Klaviatura istifadəçiləri üçün keçid linki */}
@@ -79,7 +81,10 @@ export function Navbar() {
         Əsas məzmuna keç
       </a>
 
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-6 lg:px-10">
+      <div className={cn(
+        "mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-6 lg:px-10",
+        isOverlay && "on-dark",
+      )}>
         <Logo tone={isOverlay ? "dark" : "light"} />
 
         {/* Desktop naviqasiya */}
@@ -175,7 +180,7 @@ export function Navbar() {
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="animate-fade-in fixed inset-x-0 top-[73px] bottom-0 z-40 overflow-y-auto border-t border-line bg-ivory lg:hidden"
+          className="animate-fade-in fixed inset-x-0 top-[var(--header-h)] bottom-0 z-40 overflow-y-auto border-t border-line bg-ivory lg:hidden"
         >
           <nav aria-label="Mobil naviqasiya" className="px-5 py-4">
             <ul className="flex flex-col">

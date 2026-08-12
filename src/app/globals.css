@@ -83,6 +83,9 @@
   --z-modal: 80;
   --z-toast: 100;
 
+  /* Header hündürlüyü — fixed header-in altında kontentə boşluq vermək üçün */
+  --header-h: 73px;
+
   color-scheme: light;
 }
 
@@ -95,8 +98,8 @@
 
 html {
   scroll-behavior: smooth;
-  /* Sticky header-in altında qalmasın deyə anchor offset */
-  scroll-padding-top: 6rem;
+  /* Fixed header-in altında qalmasın deyə anchor offset */
+  scroll-padding-top: calc(var(--header-h) + 1.5rem);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
