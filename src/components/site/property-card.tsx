@@ -43,7 +43,7 @@ export function PropertyCard({ property, priority = false, className }: Property
     <article
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-md border border-line bg-paper",
-        "transition-shadow duration-300 hover:shadow-md",
+        "transition-all duration-300 ease-out-soft hover:-translate-y-1 hover:shadow-lg",
         className,
       )}
     >
@@ -58,7 +58,7 @@ export function PropertyCard({ property, priority = false, className }: Property
             loading={priority ? undefined : "lazy"}
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className={cn(
-              "object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]",
+              "object-cover transition-transform duration-700 ease-out-soft group-hover:scale-105",
               isClosed && "opacity-70 grayscale-[0.35]",
             )}
           />
@@ -112,7 +112,7 @@ export function PropertyCard({ property, priority = false, className }: Property
             {/* Bütün kart klikləndikdə detala keçir; overlay link fokus sırasını pozmur */}
             <Link
               href={`/emlaklar/${property.slug}`}
-              className="after:absolute after:inset-0 after:content-[''] hover:text-gold-deep"
+              className="after:absolute after:inset-0 after:content-[''] transition-colors duration-300 ease-out-soft hover:text-gold-deep"
             >
               {property.title}
             </Link>
@@ -201,7 +201,7 @@ export function PropertyRow({ property }: { property: PropertyCardData }) {
         <h3 className="truncate font-display text-base text-ink">
           <Link
             href={`/emlaklar/${property.slug}`}
-            className="after:absolute after:inset-0 after:content-[''] hover:text-gold-deep"
+            className="after:absolute after:inset-0 after:content-[''] transition-colors duration-300 ease-out-soft hover:text-gold-deep"
           >
             {property.title}
           </Link>

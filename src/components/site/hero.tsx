@@ -23,7 +23,7 @@ export function Hero({ types, cities }: HeroProps) {
           priority
           fetchPriority="high"
           sizes="100vw"
-          className="object-cover object-center"
+          className="animate-slow-zoom object-cover object-center"
         />
         {/* İkiqat overlay — mətnin kontrastını hər şəkil üzərində təmin edir */}
         <div
@@ -38,21 +38,21 @@ export function Hero({ types, cities }: HeroProps) {
 
       <Container className="flex min-h-dvh flex-col justify-center pt-[calc(var(--header-h)+2rem)] pb-20 lg:pb-28 lg:pt-[calc(var(--header-h)+3rem)]">
         <div className="max-w-3xl">
-          <p className="flex items-center gap-3 text-xs font-medium tracking-[0.28em] text-gold-soft uppercase">
+          <p className="animate-fade-in flex items-center gap-3 text-xs font-medium tracking-[0.28em] text-gold-soft uppercase">
             <span aria-hidden="true" className="h-px w-10 bg-gold-soft/60" />
             {siteConfig.legalName}
           </p>
 
-          <h1 className="mt-6 font-display text-[2.5rem] leading-[1.08] text-white sm:text-6xl lg:text-7xl">
+          <h1 className="animate-slide-up mt-6 font-display text-[2.5rem] leading-[1.08] text-white sm:text-6xl lg:text-7xl" style={{ animationDelay: "100ms" }}>
             {siteConfig.slogan}
           </h1>
 
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
+          <p className="animate-slide-up mt-6 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg" style={{ animationDelay: "200ms" }}>
             LuxeHome ilə sizin üçün uyğun daşınmaz əmlakı kəşf edin. Mənzil,
             villa, həyət evi, torpaq və kommersiya obyektləri üzrə geniş seçim.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <div className="animate-slide-up mt-9 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "300ms" }}>
             <ButtonLink href="/emlaklar" variant="primary" size="lg">
               Əmlaklara bax
               <ArrowRight className="size-4" aria-hidden="true" />
@@ -75,7 +75,7 @@ export function Hero({ types, cities }: HeroProps) {
         </div>
 
         {/* Axtarış paneli */}
-        <div className="mt-12 lg:mt-16">
+        <div className="animate-slide-up mt-12 lg:mt-16" style={{ animationDelay: "400ms" }}>
           <SearchPanel types={types} cities={cities} />
         </div>
       </Container>

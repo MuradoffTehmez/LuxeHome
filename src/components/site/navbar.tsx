@@ -83,7 +83,8 @@ export function Navbar() {
       </a>
 
       <div className={cn(
-        "mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-6 lg:px-10",
+        "mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 transition-[padding] duration-300 ease-out-soft sm:px-6 lg:px-10",
+        scrolled ? "py-2 sm:py-3" : "py-4",
         isOverlay && "on-dark",
       )}>
         <Logo tone={isOverlay ? "dark" : "light"} />
@@ -99,7 +100,7 @@ export function Navbar() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-3 text-sm font-medium transition-colors duration-200",
+                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-3 text-sm font-medium transition-colors duration-300",
                       isOverlay
                         ? active
                           ? "text-gold-soft"
@@ -110,15 +111,14 @@ export function Navbar() {
                     )}
                   >
                     {item.label}
-                    {active && (
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "absolute inset-x-3 bottom-1.5 h-px",
-                          isOverlay ? "bg-gold-soft" : "bg-gold",
-                        )}
-                      />
-                    )}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute inset-x-3 bottom-1.5 h-px transition-transform duration-300 ease-out-soft origin-left",
+                        isOverlay ? "bg-gold-soft" : "bg-gold-deep",
+                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                      )}
+                    />
                   </Link>
                 </li>
               );
