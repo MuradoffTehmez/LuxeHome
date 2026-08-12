@@ -50,7 +50,7 @@ export function Logo({
           className={cn(
             "font-display text-lg font-semibold tracking-[0.18em] transition-colors duration-200 sm:text-xl",
             isDark
-              ? "text-ink-invert group-hover:text-gold-soft"
+              ? "text-white group-hover:text-gold-soft"
               : "text-ink group-hover:text-gold-deep",
           )}
         >

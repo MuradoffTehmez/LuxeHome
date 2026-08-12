@@ -24,7 +24,7 @@ const VARIANTS: Record<Variant, string> = {
   dark: "bg-navy text-ink-invert hover:bg-navy-soft border border-transparent",
   // Tünd fon üzərində ikincili düymə
   onDark:
-    "bg-transparent text-ink-invert border border-white/25 hover:border-gold-soft hover:text-gold-soft",
+    "bg-transparent text-white border border-white/25 hover:border-gold-soft hover:text-gold-soft",
   danger: "bg-danger text-paper hover:opacity-90 border border-transparent",
 };
 

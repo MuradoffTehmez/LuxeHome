@@ -19,13 +19,13 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="on-dark border-t border-line-dark bg-charcoal text-ink-invert">
+    <footer className="on-dark border-t border-zinc-800 bg-zinc-900 text-zinc-50">
       <Container className="py-14 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           {/* Brend */}
           <div className="flex flex-col gap-5">
             <Logo tone="dark" />
-            <p className="max-w-xs text-sm leading-relaxed text-ink-invert-soft">
+            <p className="max-w-xs text-sm leading-relaxed text-zinc-300">
               {siteConfig.slogan.charAt(0) + siteConfig.slogan.slice(1).toLowerCase()}.
               Mənzil, villa, torpaq və kommersiya obyektləri üzrə peşəkar daşınmaz
               əmlak xidmətləri.
@@ -35,7 +35,7 @@ export function Footer() {
               href={siteConfig.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 w-fit items-center gap-2 text-sm text-ink-invert-soft transition-colors hover:text-gold-soft"
+              className="inline-flex min-h-11 w-fit items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-gold-soft"
             >
               <InstagramIcon className="size-4" />
               @{siteConfig.instagram}
@@ -55,7 +55,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="inline-flex min-h-9 items-center text-sm text-ink-invert-soft transition-colors hover:text-ink-invert"
+                    className="inline-flex min-h-9 items-center text-sm text-zinc-300 transition-colors hover:text-zinc-50"
                   >
                     {item.label}
                   </Link>
@@ -77,7 +77,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="inline-flex min-h-9 items-center text-sm text-ink-invert-soft transition-colors hover:text-ink-invert"
+                    className="inline-flex min-h-9 items-center text-sm text-zinc-300 transition-colors hover:text-zinc-50"
                   >
                     {item.label}
                   </Link>
@@ -92,7 +92,7 @@ export function Footer() {
               Əlaqə
             </h2>
 
-            <address className="flex flex-col gap-3 text-sm not-italic text-ink-invert-soft">
+            <address className="flex flex-col gap-3 text-sm not-italic text-zinc-300">
               <a
                 href={siteConfig.phoneHref}
                 className="flex min-h-11 items-center gap-3 transition-colors hover:text-gold-soft"
@@ -123,8 +123,8 @@ export function Footer() {
         </div>
 
         {/* Alt sətir */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-line-dark pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-ink-invert-soft">
+        <div className="mt-12 flex flex-col gap-4 border-t border-zinc-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-zinc-300">
             © {year} {siteConfig.legalName}. Bütün hüquqlar qorunur.
           </p>
 
@@ -133,7 +133,7 @@ export function Footer() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="inline-flex min-h-9 items-center text-xs text-ink-invert-soft transition-colors hover:text-ink-invert"
+                  className="inline-flex min-h-9 items-center text-xs text-zinc-300 transition-colors hover:text-zinc-50"
                 >
                   {item.label}
                 </Link>

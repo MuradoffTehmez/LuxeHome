@@ -28,11 +28,11 @@ export function Hero({ types, cities }: HeroProps) {
         {/* İkiqat overlay — mətnin kontrastını hər şəkil üzərində təmin edir */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-charcoal/62"
+          className="absolute inset-0 bg-zinc-900/62"
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-b from-charcoal/75 via-charcoal/25 to-charcoal/85"
+          className="absolute inset-0 bg-gradient-to-b from-zinc-900/75 via-zinc-900/25 to-zinc-900/85"
         />
       </div>
 

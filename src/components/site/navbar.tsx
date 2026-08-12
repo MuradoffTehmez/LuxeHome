@@ -103,7 +103,7 @@ export function Navbar() {
                       isOverlay
                         ? active
                           ? "text-gold-soft"
-                          : "text-ink-invert hover:text-gold-soft"
+                          : "text-white hover:text-gold-soft"
                         : active
                           ? "text-gold-deep"
                           : "text-ink-soft hover:text-ink",
@@ -137,7 +137,7 @@ export function Navbar() {
             className={cn(
               "hidden size-11 items-center justify-center rounded-xs transition-colors duration-200 sm:inline-flex",
               isOverlay
-                ? "text-ink-invert hover:text-gold-soft"
+                ? "text-white hover:text-gold-soft"
                 : "text-ink-soft hover:text-gold-deep",
             )}
           >
