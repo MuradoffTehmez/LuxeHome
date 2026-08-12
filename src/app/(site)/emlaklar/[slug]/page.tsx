@@ -33,7 +33,7 @@ import { Container, Section } from "@/components/ui/container";
 import { Badge, DemoBadge } from "@/components/ui/badge";
 import { ButtonLink, ButtonAnchor } from "@/components/ui/button";
 import { Gallery } from "@/components/site/gallery";
-import { PropertyRow } from "@/components/site/property-card";
+import { PropertyCard } from "@/components/site/property-card";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { ContactForm } from "@/app/(site)/elaqe/contact-form";
@@ -296,24 +296,28 @@ export default async function PropertyDetailPage({ params }: Props) {
 
                 <ContactForm />
               </div>
-
-              {/* Bənzər Əmlaklar */}
-              {similarProperties.length > 0 && (
-                <div className="flex flex-col gap-4 rounded-md border border-line bg-paper p-5 sm:p-6">
-                  <h3 className="font-display text-lg text-ink">Oxşar əmlaklar</h3>
-                  <div className="flex flex-col gap-4 divide-y divide-line">
-                    {similarProperties.map((prop) => (
-                      <div key={prop.id} className="pt-4 first:pt-0">
-                        <PropertyRow property={prop} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </Container>
       </div>
+
+      {/* Bənzər Əmlaklar */}
+      {similarProperties.length > 0 && (
+        <Section tone="paper" className="py-12 sm:py-16">
+          <Container>
+            <div className="mb-8 flex flex-col gap-2">
+              <h2 className="font-display text-2xl text-ink sm:text-3xl">Oxşar əmlaklar</h2>
+              <p className="text-sm text-ink-soft">Bu əmlaka oxşar digər təkliflərə göz atın.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {similarProperties.map((prop) => (
+                <PropertyCard key={prop.id} property={prop} />
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
     </>
   );
 }
