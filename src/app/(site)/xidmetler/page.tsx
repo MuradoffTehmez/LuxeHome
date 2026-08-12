@@ -44,7 +44,7 @@ export default async function ServicesPage() {
               {services.map((service, index) => (
                 <Reveal key={service.id} delay={index * 50}>
                   <div className="group flex h-full flex-col gap-5 rounded-md border border-line bg-paper p-7 transition-shadow duration-300 hover:shadow-md">
-                    <span className="flex size-12 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
+                    <span className="flex size-12 items-center justify-center rounded-xs bg-zinc-900 text-gold-soft">
                       <ServiceIcon name={service.icon} className="size-5" />
                     </span>
 

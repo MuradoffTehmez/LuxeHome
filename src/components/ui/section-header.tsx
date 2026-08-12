@@ -59,7 +59,7 @@ export function SectionHeader({
         <Heading
           className={cn(
             "font-display text-3xl sm:text-4xl lg:text-[2.75rem]",
-            isDark ? "text-ink-invert" : "text-ink",
+            isDark ? "text-white" : "text-ink",
           )}
         >
           {title}
@@ -69,7 +69,7 @@ export function SectionHeader({
           <p
             className={cn(
               "text-base leading-relaxed",
-              isDark ? "text-ink-invert-soft" : "text-ink-soft",
+              isDark ? "text-zinc-300" : "text-ink-soft",
             )}
           >
             {description}

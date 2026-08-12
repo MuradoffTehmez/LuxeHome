@@ -334,7 +334,7 @@ export default async function HomePage() {
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.title} delay={index * 50}>
                 <div className="flex h-full flex-col gap-4 rounded-md border border-line bg-paper p-6">
-                  <span className="flex size-11 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
+                  <span className="flex size-11 items-center justify-center rounded-xs bg-zinc-900 text-gold-soft">
                     <item.icon className="size-5" aria-hidden="true" />
                   </span>
                   <h3 className="font-display text-lg text-ink">{item.title}</h3>
@@ -442,7 +442,7 @@ export default async function HomePage() {
             sizes="100vw"
             className="object-cover"
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-charcoal/85" />
+          <div aria-hidden="true" className="absolute inset-0 bg-zinc-900/85" />
         </div>
 
         <Container className="flex flex-col items-center gap-6 text-center">

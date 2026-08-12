@@ -74,7 +74,7 @@ export default async function ServiceDetailPage({ params }: Props) {
               title={service.title}
               description={service.shortDescription}
             />
-            <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-charcoal text-gold-soft shadow-sm lg:size-20">
+            <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-zinc-900 text-gold-soft shadow-sm lg:size-20">
               <ServiceIcon name={service.icon} className="size-8 lg:size-10" />
             </div>
           </div>

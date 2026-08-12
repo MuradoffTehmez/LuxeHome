@@ -147,7 +147,7 @@ export default function AboutPage() {
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.title} delay={index * 50}>
                 <div className="flex h-full flex-col gap-4 rounded-md border border-line bg-ivory p-6">
-                  <span className="flex size-11 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
+                  <span className="flex size-11 items-center justify-center rounded-xs bg-zinc-900 text-gold-soft">
                     <item.icon className="size-5" aria-hidden="true" />
                   </span>
                   <h3 className="font-display text-lg text-ink">{item.title}</h3>
