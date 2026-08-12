@@ -37,7 +37,7 @@ const SIZES: Record<Size, string> = {
 
 const BASE =
   "inline-flex items-center justify-center rounded-xs font-medium tracking-wide whitespace-nowrap " +
-  "transition-all duration-300 ease-out-soft hover:-translate-y-0.5 hover:shadow-sm active:scale-95 " +
+  "transition-all duration-300 ease-out-soft hover:-translate-y-1 hover:shadow-md active:scale-95 " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 " +
   "disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed";
 

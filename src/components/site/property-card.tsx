@@ -43,7 +43,7 @@ export function PropertyCard({ property, priority = false, className }: Property
     <article
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-md border border-line bg-paper",
-        "transition-all duration-300 ease-out-soft hover:-translate-y-1 hover:shadow-lg",
+        "transition-all duration-300 ease-out-soft hover:-translate-y-2 hover:shadow-xl",
         className,
       )}
     >
@@ -58,7 +58,7 @@ export function PropertyCard({ property, priority = false, className }: Property
             loading={priority ? undefined : "lazy"}
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className={cn(
-              "object-cover transition-transform duration-700 ease-out-soft group-hover:scale-105",
+              "object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.07]",
               isClosed && "opacity-70 grayscale-[0.35]",
             )}
           />
