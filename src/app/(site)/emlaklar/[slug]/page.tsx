@@ -168,12 +168,12 @@ export default async function PropertyDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Qalereya */}
-          <Gallery images={property.images} title={property.title} />
-
           <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-14">
-            {/* Sol tərəf: Əsas məlumatlar */}
+            {/* Sol tərəf: Qalereya və Əsas məlumatlar */}
             <div className="flex flex-col gap-10">
+              {/* Qalereya */}
+              <Gallery images={property.images} title={property.title} />
+
               {/* Sürətli parametrlər */}
               <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-4">
                 {property.rooms != null && (
@@ -272,7 +272,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             {/* Sağ tərəf: Əlaqə və Oxşar */}
             <div className="flex flex-col gap-8">
               {/* Əlaqə Forması */}
-              <div className="rounded-md border border-line bg-paper p-5 sm:p-6">
+              <div className="rounded-md border border-line bg-paper p-5 sm:p-6 lg:sticky lg:top-28 lg:shadow-sm">
                 <div className="mb-6 flex flex-col gap-2">
                   <h3 className="font-display text-xl text-ink">Əlaqə saxlayın</h3>
                   <p className="text-sm text-ink-soft">
