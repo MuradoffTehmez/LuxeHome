@@ -98,7 +98,7 @@ export function Navbar() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "relative inline-flex min-h-11 items-center rounded-xs px-3 text-sm font-medium transition-colors duration-200",
+                      "relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-3 text-sm font-medium transition-colors duration-200",
                       isOverlay
                         ? active
                           ? "text-gold-soft"
