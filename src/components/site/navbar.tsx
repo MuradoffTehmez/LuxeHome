@@ -148,7 +148,7 @@ export function Navbar() {
             href={siteConfig.phoneHref}
             variant={isOverlay ? "onDark" : "outline"}
             size="sm"
-            className="hidden xl:inline-flex"
+            className="hidden shrink-0 xl:inline-flex"
           >
             <Phone className="size-4" aria-hidden="true" />
             {siteConfig.phone}
