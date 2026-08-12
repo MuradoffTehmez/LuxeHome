@@ -46,6 +46,41 @@
   --color-danger-bg: #fbeae9;
   --color-info: #1f4e79;
   --color-info-bg: #e8f0f7;
+}
+
+/* --------------------------------------------------------------------------
+   Dark Mode Override
+   -------------------------------------------------------------------------- */
+.dark {
+  /* --- Rənglər: səth (qara və göy tonları) --- */
+  --color-ivory: #101a28;
+  --color-paper: #1a2738;
+  --color-beige: #23272d;
+  --color-beige-deep: #2b3440;
+
+  /* --- Rənglər: tünd (açıq tonlarla əvəzlənir) --- */
+  --color-charcoal: #fbf9f6;
+  --color-charcoal-soft: #f2ece3;
+  --color-navy: #fbf9f6;
+  --color-navy-soft: #f2ece3;
+
+  /* --- Rənglər: mətn --- */
+  --color-ink: #f7f4ef;
+  --color-ink-soft: #b9c0c9;
+  --color-ink-muted: #6a7178;
+  --color-ink-invert: #14181c;
+  --color-ink-invert-soft: #454c54;
+
+  /* --- Rənglər: kənar və sərhəd --- */
+  --color-line: #2b3440;
+  --color-line-strong: #454c54;
+  --color-line-dark: #e4ddd2;
+  
+  /* --- Rənglər: champagne gold accent (daha yumşaq tonlar) --- */
+  --color-gold: #c9a870;
+  --color-gold-soft: #b08d57;
+  --color-gold-deep: #d9c7a6;
+}
 
   /* --- Şrift ailələri --- */
   --font-display: var(--font-playfair), "Playfair Display", Georgia, serif;

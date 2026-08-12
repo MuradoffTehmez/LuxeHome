@@ -75,11 +75,13 @@ export const viewport: Viewport = {
   themeColor: "#16191d",
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="az" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="az" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
       <body className="min-h-dvh antialiased">
         <script
           type="application/ld+json"
@@ -88,7 +90,9 @@ export default function RootLayout({
             __html: JSON.stringify(organizationSchema()),
           }}
         />
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

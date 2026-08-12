@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { navigation, siteConfig } from "@/config/site";
 import { ButtonAnchor, ButtonLink, IconButton } from "@/components/ui/button";
 import { Logo } from "./logo";
+import { ThemeToggle } from "./theme-toggle";
 
 /**
  * Fixed header — hero şəklinin üstündə oturur.
@@ -127,6 +128,8 @@ export function Navbar() {
 
         {/* Sağ tərəf — hərəkətlər */}
         <div className="flex items-center gap-2">
+          <ThemeToggle />
+          
           <Link
             href="/favoritler"
             aria-label="Favorit əmlaklarım"
