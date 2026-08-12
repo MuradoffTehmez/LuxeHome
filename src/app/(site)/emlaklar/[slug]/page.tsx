@@ -272,7 +272,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             {/* Sağ tərəf: Əlaqə və Oxşar */}
             <div className="flex flex-col gap-8">
               {/* Əlaqə Forması */}
-              <div className="sticky top-24 rounded-md border border-line bg-paper p-5 sm:p-6 shadow-sm">
+              <div className="rounded-md border border-line bg-paper p-5 sm:p-6">
                 <div className="mb-6 flex flex-col gap-2">
                   <h3 className="font-display text-xl text-ink">Əlaqə saxlayın</h3>
                   <p className="text-sm text-ink-soft">
