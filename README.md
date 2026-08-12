@@ -1,37 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LuxeHome 🏡
 
-## Getting Started
+LuxeHome, müasir və premium dizayna sahib olan daşınmaz əmlak və ev bəzəyi (və ya lüks evlər) layihəsidir. Bu layihə [Next.js](https://nextjs.org/) (React framework) istifadə edilərək yaradılmışdır.
 
-First, run the development server:
+## 🚀 Başlanğıc
+
+Layihəni lokal mühitinizdə işə salmaq üçün aşağıdakı addımları izləyin.
+
+Əvvəlcə, inkişaf etdirmə (development) serverini işə salın:
 
 ```bash
 npm run dev
-# or
+# və ya
 yarn dev
-# or
+# və ya
 pnpm dev
-# or
+# və ya
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Nəticəni görmək üçün brauzerinizdə [http://localhost:3000](http://localhost:3000) ünvanına daxil olun.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Səhifəni redaktə etməyə `app/page.tsx` faylını dəyişərək başlaya bilərsiniz. Faylı yadda saxladığınız zaman səhifə avtomatik olaraq yenilənəcək.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📚 Daha Çox Öyrənin
 
-## Learn More
+Next.js haqqında daha çox öyrənmək üçün aşağıdakı resurslara nəzər sala bilərsiniz:
 
-To learn more about Next.js, take a look at the following resources:
+- [Next.js Sənədləri (İngiliscə)](https://nextjs.org/docs) - Next.js xüsusiyyətləri və API haqqında məlumat.
+- [Next.js Öyrən (İngiliscə)](https://nextjs.org/learn) - interaktiv Next.js dərslikləri.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ☁️ Vercel Üzərində Yayımlama (Deploy)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Next.js tətbiqini yayımlamağın ən asan yolu Next.js-in yaradıcıları tərəfindən təqdim olunan [Vercel Platformasından](https://vercel.com/new) istifadə etməkdir.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# LuxeHome
+Daha ətraflı məlumat üçün [Next.js yayımlama sənədlərini](https://nextjs.org/docs/app/building-your-application/deploying) yoxlayın.
