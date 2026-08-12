@@ -32,9 +32,20 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# database (SQLite)
+/prisma/dev.db
+/prisma/dev.db-journal
+/prisma/*.db
+/prisma/*.db-journal
+
+# istifadəçi tərəfindən yüklənən media
+/public/uploads/*
+!/public/uploads/.gitkeep
 
 # typescript
 *.tsbuildinfo

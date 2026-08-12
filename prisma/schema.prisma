@@ -1,0 +1,412 @@
+// LuxeHome — Prisma schema
+//
+// Provider: SQLite (development). PostgreSQL-ə keçid üçün yalnız `provider`
+// və `DATABASE_URL` dəyişdirilir — model strukturu hər iki bazada işləyir.
+// SQLite native enum dəstəkləmədiyi üçün status/rol sahələri String saxlanılır;
+// icazə verilən dəyərlər `src/lib/constants.ts` faylında toplanıb.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// İSTİFADƏÇİLƏR VƏ ROLLAR
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  properties Property[]  @relation("PropertyAuthor")
+  posts      BlogPost[]  @relation("PostAuthor")
+  media      Media[]     @relation("MediaUploader")
+  favorites  Favorite[]
+  leadNotes  Lead[]      @relation("LeadAssignee")
+
+  @@index([role])
+}
+
+// ---------------------------------------------------------------------------
+// TAKSONOMİYA
+// ---------------------------------------------------------------------------
+
+model PropertyType {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  icon        String?
+  imageUrl    String?
+  order       Int        @default(0)
+  isActive    Boolean    @default(true)
+  properties  Property[]
+}
+
+/// Şəhər və rayonlar üçün self-relation ağacı.
+/// kind = "CITY" | "DISTRICT"
+model Location {
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  kind     String  @default("CITY")
+  parentId String?
+  order    Int     @default(0)
+
+  parent   Location?  @relation("LocationTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Location[] @relation("LocationTree")
+
+  propertiesInCity     Property[] @relation("PropertyCity")
+  propertiesInDistrict Property[] @relation("PropertyDistrict")
+  projects             Project[]  @relation("ProjectCity")
+
+  @@index([parentId])
+  @@index([kind])
+}
+
+/// Əmlak xüsusiyyətləri (hovuz, qaraj, lift, ...).
+model Feature {
+  id      String @id @default(cuid())
+  name    String
+  slug    String @unique
+  icon    String?
+  group   String @default("GENERAL") // GENERAL | INDOOR | OUTDOOR | SECURITY
+  order   Int    @default(0)
+
+  properties PropertyFeature[]
+}
+
+model PropertyFeature {
+  propertyId String
+  featureId  String
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  feature  Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, featureId])
+  @@index([featureId])
+}
+
+// ---------------------------------------------------------------------------
+// ƏMLAK
+// ---------------------------------------------------------------------------
+
+model Property {
+  id          String @id @default(cuid())
+  title       String
+  slug        String @unique
+  description String
+
+  /// SALE = Satılır, RENT = Kirayə
+  listingType String @default("SALE")
+  /// DRAFT | PUBLISHED | RESERVED | SOLD | RENTED | ARCHIVED
+  status      String @default("DRAFT")
+
+  price    Float
+  currency String @default("AZN")
+  /// Kirayə üçün: MONTH | DAY — satış üçün null
+  pricePeriod String?
+
+  typeId     String
+  cityId     String
+  districtId String?
+  address    String?
+  latitude   Float?
+  longitude  Float?
+
+  rooms       Int?
+  bedrooms    Int?
+  bathrooms   Int?
+  area        Float?
+  landArea    Float?
+  floor       Int?
+  totalFloors Int?
+
+  /// COSMETIC | RENOVATED | DESIGNER | UNRENOVATED | NEW_BUILDING
+  renovation     String?
+  /// TITLE_DEED (çıxarış) | CONTRACT (müqavilə) | NONE
+  documentStatus String?
+
+  videoUrl String?
+
+  isFeatured Boolean @default(false)
+  /// Nümunə/demo qeydi — real məlumatla əvəzlənəndə false olur.
+  isDemo     Boolean @default(false)
+
+  viewCount   Int       @default(0)
+  publishedAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  metaTitle       String?
+  metaDescription String?
+
+  type     PropertyType @relation(fields: [typeId], references: [id])
+  city     Location     @relation("PropertyCity", fields: [cityId], references: [id])
+  district Location?    @relation("PropertyDistrict", fields: [districtId], references: [id], onDelete: SetNull)
+  author   User?        @relation("PropertyAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId String?
+
+  images    PropertyImage[]
+  features  PropertyFeature[]
+  leads     Lead[]
+  favorites Favorite[]
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([status, listingType])
+  @@index([typeId])
+  @@index([cityId])
+  @@index([districtId])
+  @@index([price])
+  @@index([isFeatured])
+  @@index([deletedAt])
+  @@index([publishedAt])
+}
+
+model PropertyImage {
+  id         String  @id @default(cuid())
+  propertyId String
+  url        String
+  thumbUrl   String?
+  alt        String  @default("")
+  width      Int?
+  height     Int?
+  order      Int     @default(0)
+  isCover    Boolean @default(false)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, order])
+}
+
+// ---------------------------------------------------------------------------
+// LAYİHƏLƏR
+// ---------------------------------------------------------------------------
+
+model Project {
+  id          String @id @default(cuid())
+  name        String
+  slug        String @unique
+  description String
+  summary     String?
+
+  /// RESIDENTIAL | COMMERCIAL | VILLA | MIXED
+  projectType String @default("RESIDENTIAL")
+  /// PLANNED | ONGOING | COMPLETED
+  status      String @default("ONGOING")
+
+  cityId  String?
+  address String?
+  latitude  Float?
+  longitude Float?
+
+  startDate    DateTime?
+  deliveryDate DateTime?
+  year         Int?
+
+  totalArea   Float?
+  floors      Int?
+  unitCount   Int?
+  /// Sərbəst xüsusiyyət siyahısı — JSON massiv (string[]).
+  highlights  String?
+  /// Tikinti mərhələləri — JSON massiv ({ step, title, done }[]).
+  timeline    String?
+
+  coverUrl String?
+  isDemo   Boolean @default(false)
+  isActive Boolean @default(true)
+  order    Int     @default(0)
+
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  city       Location?      @relation("ProjectCity", fields: [cityId], references: [id], onDelete: SetNull)
+  images     ProjectImage[]
+  properties Property[]
+
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model ProjectImage {
+  id        String  @id @default(cuid())
+  projectId String
+  url       String
+  thumbUrl  String?
+  alt       String  @default("")
+  /// EXTERIOR | INTERIOR | CONSTRUCTION | LANDSCAPE
+  category  String  @default("EXTERIOR")
+  order     Int     @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, order])
+}
+
+// ---------------------------------------------------------------------------
+// XİDMƏTLƏR
+// ---------------------------------------------------------------------------
+
+model Service {
+  id               String  @id @default(cuid())
+  title            String
+  slug             String  @unique
+  shortDescription String
+  description      String
+  icon             String  @default("Building2")
+  imageUrl         String?
+  /// Sərbəst maddələr — JSON massiv (string[]).
+  bullets          String?
+  order            Int     @default(0)
+  isActive         Boolean @default(true)
+
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// BLOQ
+// ---------------------------------------------------------------------------
+
+model BlogCategory {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  order       Int        @default(0)
+  posts       BlogPost[]
+}
+
+model BlogPost {
+  id         String  @id @default(cuid())
+  title      String
+  slug       String  @unique
+  excerpt    String
+  content    String
+  coverUrl   String?
+  coverAlt   String  @default("")
+  categoryId String?
+  authorId   String?
+
+  /// DRAFT | PUBLISHED | ARCHIVED
+  status      String    @default("DRAFT")
+  isDemo      Boolean   @default(false)
+  viewCount   Int       @default(0)
+  readMinutes Int       @default(3)
+  publishedAt DateTime?
+
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  category BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author   User?         @relation("PostAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+// ---------------------------------------------------------------------------
+// MÜRACİƏTLƏR (LEADS)
+// ---------------------------------------------------------------------------
+
+model Lead {
+  id      String  @id @default(cuid())
+  name    String
+  phone   String
+  email   String?
+  subject String?
+  message String
+
+  /// PROPERTY | CONTACT | SERVICE | PROJECT
+  source String @default("CONTACT")
+  /// NEW | CONTACTED | IN_PROGRESS | COMPLETED | CLOSED
+  status String @default("NEW")
+
+  propertyId String?
+  adminNote  String?
+  assigneeId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  assignee User?     @relation("LeadAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([propertyId])
+}
+
+// ---------------------------------------------------------------------------
+// FAVORİTLƏR
+// ---------------------------------------------------------------------------
+
+/// Qeydiyyatsız istifadəçilər üçün favoritlər localStorage-də saxlanılır.
+/// Bu model gələcək istifadəçi hesabları üçün backend sinxronizasiyasını təmin edir.
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// MEDİA VƏ PARAMETRLƏR
+// ---------------------------------------------------------------------------
+
+model Media {
+  id           String  @id @default(cuid())
+  url          String  @unique
+  thumbUrl     String?
+  originalName String
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  alt          String  @default("")
+  uploaderId   String?
+
+  createdAt DateTime @default(now())
+
+  uploader User? @relation("MediaUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
