@@ -1,26 +1,357 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   LuxeHome — Design tokens
+   Premium Luxury Real Estate + Modern Architecture + Corporate
+   Palitra: Charcoal / Dark Navy / Ivory / Champagne Gold / Soft Beige
+   ========================================================================== */
+
+@theme {
+  /* --- Rənglər: səth --- */
+  --color-ivory: #fbf9f6;
+  --color-beige: #f2ece3;
+  --color-beige-deep: #e8dfd2;
+  --color-paper: #ffffff;
+
+  /* --- Rənglər: tünd --- */
+  --color-charcoal: #16191d;
+  --color-charcoal-soft: #23272d;
+  --color-navy: #101a28;
+  --color-navy-soft: #1a2738;
+
+  /* --- Rənglər: mətn (WCAG AA yoxlanılıb) --- */
+  --color-ink: #14181c; /* ivory üzərində 15.9:1 */
+  --color-ink-soft: #454c54; /* ivory üzərində 8.4:1 */
+  --color-ink-muted: #6a7178; /* ivory üzərində 4.7:1 */
+  --color-ink-invert: #f7f4ef; /* navy üzərində 15.2:1 */
+  --color-ink-invert-soft: #b9c0c9; /* navy üzərində 8.7:1 */
+
+  /* --- Rənglər: champagne gold accent --- */
+  --color-gold: #b08d57; /* CTA fonu — üzərində ink 6.4:1 */
+  --color-gold-soft: #c9a870; /* tünd fonda mətn/ikon — 7.4:1 */
+  --color-gold-deep: #8a6d3f; /* açıq fonda link mətni — 4.9:1 */
+  --color-gold-line: #d9c7a6; /* incə ayırıcı və border */
+
+  /* --- Rənglər: kənar və sərhəd --- */
+  --color-line: #e4ddd2;
+  --color-line-strong: #d3c9ba;
+  --color-line-dark: #2b3440;
+
+  /* --- Rənglər: semantik --- */
+  --color-success: #2f6f4e;
+  --color-success-bg: #e8f2ec;
+  --color-warning: #96620c;
+  --color-warning-bg: #fbf1de;
+  --color-danger: #a92620;
+  --color-danger-bg: #fbeae9;
+  --color-info: #1f4e79;
+  --color-info-bg: #e8f0f7;
+
+  /* --- Şrift ailələri --- */
+  --font-display: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+
+  /* --- Radius: minimal, premium (həddindən artıq yuvarlaqlıq yoxdur) --- */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+
+  /* --- Kölgə: incə, dərinlik hissi yaradır, ağırlıq etmir --- */
+  --shadow-xs: 0 1px 2px rgb(20 24 28 / 0.05);
+  --shadow-sm: 0 1px 3px rgb(20 24 28 / 0.07), 0 1px 2px rgb(20 24 28 / 0.04);
+  --shadow-md: 0 4px 14px rgb(20 24 28 / 0.07), 0 1px 3px rgb(20 24 28 / 0.05);
+  --shadow-lg: 0 12px 32px rgb(20 24 28 / 0.1), 0 2px 6px rgb(20 24 28 / 0.05);
+
+  /* --- Animasiya: 150–300ms, ease-out --- */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* --- Breakpoint-lər --- */
+  --breakpoint-xs: 22.5rem; /* 360px */
+}
+
+/* --------------------------------------------------------------------------
+   Z-index şkalası — təbəqələr bir yerdə idarə olunur
+   -------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --z-base: 0;
+  --z-sticky: 20;
+  --z-header: 40;
+  --z-drawer: 60;
+  --z-modal: 80;
+  --z-toast: 100;
+
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* --------------------------------------------------------------------------
+   Baza
+   -------------------------------------------------------------------------- */
+* {
+  border-color: var(--color-line);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  /* Sticky header-in altında qalmasın deyə anchor offset */
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Mobil tap gecikməsini azaldır */
+  touch-action: manipulation;
+  /* Horizontal scroll-un qarşısını alır */
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Rəqəmlər cədvəl və qiymətlərdə sıçramasın */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Fokus — klaviatura naviqasiyası üçün həmişə görünür
+   -------------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-gold-deep);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.on-dark :focus-visible,
+.dark-surface :focus-visible {
+  outline-color: var(--color-gold-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Seçim rəngi
+   -------------------------------------------------------------------------- */
+::selection {
+  background-color: var(--color-gold);
+  color: var(--color-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Scrollbar — incə və brendlə uyğun
+   -------------------------------------------------------------------------- */
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reveal animasiyası — scroll zamanı yumşaq görünmə
+   IntersectionObserver `data-revealed` atributunu əlavə edir.
+   -------------------------------------------------------------------------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 400ms var(--ease-out-soft),
+    transform 400ms var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-reveal][data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   Skeleton shimmer
+   -------------------------------------------------------------------------- */
+@keyframes luxe-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background-color: var(--color-beige);
+  background-image: linear-gradient(
+    90deg,
+    var(--color-beige) 0%,
+    var(--color-beige-deep) 40%,
+    var(--color-beige) 80%
+  );
+  background-size: 400px 100%;
+  background-repeat: no-repeat;
+  animation: luxe-shimmer 1.4s linear infinite;
+}
+
+/* --------------------------------------------------------------------------
+   Sadə fade/slide — modal və drawer üçün
+   -------------------------------------------------------------------------- */
+@keyframes luxe-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes luxe-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes luxe-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes luxe-slide-right {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: luxe-fade-in 200ms var(--ease-out-soft);
+}
+.animate-scale-in {
+  animation: luxe-scale-in 220ms var(--ease-out-soft);
+}
+.animate-slide-up {
+  animation: luxe-slide-up 260ms var(--ease-out-soft);
+}
+.animate-slide-right {
+  animation: luxe-slide-right 240ms var(--ease-out-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Uzun mətn blokları (blog, layihə təsviri)
+   -------------------------------------------------------------------------- */
+.prose-luxe {
+  max-width: 68ch;
+  line-height: 1.75;
+  color: var(--color-ink-soft);
+}
+
+.prose-luxe > * + * {
+  margin-top: 1.25rem;
+}
+
+.prose-luxe h2 {
+  font-size: 1.6rem;
+  color: var(--color-ink);
+  margin-top: 2.5rem;
+}
+
+.prose-luxe h3 {
+  font-size: 1.25rem;
+  color: var(--color-ink);
+  margin-top: 2rem;
+}
+
+.prose-luxe strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.prose-luxe a {
+  color: var(--color-gold-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-luxe ul,
+.prose-luxe ol {
+  padding-left: 1.25rem;
+}
+
+.prose-luxe ul {
+  list-style: disc;
+}
+
+.prose-luxe ol {
+  list-style: decimal;
+}
+
+.prose-luxe li + li {
+  margin-top: 0.5rem;
+}
+
+.prose-luxe blockquote {
+  border-left: 2px solid var(--color-gold);
+  padding-left: 1.25rem;
+  font-style: italic;
+  color: var(--color-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Hərəkət azaldılması — sistem tələbinə hörmət
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Çap
+   -------------------------------------------------------------------------- */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }

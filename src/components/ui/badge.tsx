@@ -1,0 +1,50 @@
+import { cn } from "@/lib/utils";
+
+type Tone = "neutral" | "success" | "warning" | "danger" | "gold" | "dark" | "info";
+
+const TONES: Record<Tone, string> = {
+  neutral: "bg-beige text-ink-soft border-line-strong",
+  success: "bg-success-bg text-success border-success/25",
+  warning: "bg-warning-bg text-warning border-warning/25",
+  danger: "bg-danger-bg text-danger border-danger/25",
+  info: "bg-info-bg text-info border-info/25",
+  gold: "bg-gold text-ink border-transparent",
+  dark: "bg-charcoal text-ink-invert border-transparent",
+};
+
+export function Badge({
+  tone = "neutral",
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement> & { tone?: Tone }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-xs border px-2.5 py-1",
+        "text-xs font-medium tracking-wide whitespace-nowrap",
+        TONES[tone],
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+}
+
+/**
+ * Nümunə məlumatı işarələyən nişan.
+ * Demo seed data-nın real şirkət məlumatı kimi qəbul edilməsinin qarşısını alır.
+ */
+export function DemoBadge({ className }: { className?: string }) {
+  return (
+    <Badge
+      tone="info"
+      className={cn("uppercase", className)}
+      title="Bu məlumat nümunədir və real şirkət məlumatı deyil"
+    >
+      Nümunə
+    </Badge>
+  );
+}
