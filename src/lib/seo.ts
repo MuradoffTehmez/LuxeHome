@@ -83,6 +83,13 @@ export function organizationSchema() {
     },
     sameAs: [siteConfig.instagramUrl],
     areaServed: { "@type": "Country", name: "Azərbaycan" },
+    // Sayt, brend və marka hüquqlarının sahibi
+    owner: { "@type": "Person", name: siteConfig.owner.name },
+    brand: {
+      "@type": "Brand",
+      name: siteConfig.name,
+      slogan: siteConfig.slogan,
+    },
   };
 }
 

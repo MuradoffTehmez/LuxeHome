@@ -11,6 +11,16 @@ export const siteConfig = {
   legalName: "Luxe Home MMC",
   fullName: "Luxe Home MMC — Daşınmaz Əmlak",
   slogan: "HƏYATINIZIN ƏN DƏYƏRLİ ÜNVANI",
+
+  /**
+   * Saytın, brendin və markanın hüquqi sahibi.
+   * Müəllif hüququ bildirişi və struktur datada bu ad göstərilir.
+   */
+  owner: {
+    name: "Əmiyev Bahadur Qafar oğlu",
+    /** Hüquqi şəxs — brend və marka hüquqları da bu şəxsə məxsusdur. */
+    isLegalEntity: true,
+  },
   description:
     "LuxeHome — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi. Peşəkar daşınmaz əmlak xidmətləri.",
 

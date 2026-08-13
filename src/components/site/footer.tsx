@@ -124,9 +124,12 @@ export function Footer() {
 
         {/* Alt sətir */}
         <div className="mt-12 flex flex-col gap-4 border-t border-zinc-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-zinc-300">
-            © {year} {siteConfig.legalName}. Bütün hüquqlar qorunur.
-          </p>
+          <div className="flex flex-col gap-1 text-xs text-zinc-300">
+            <p>© {year} {siteConfig.legalName}. Bütün hüquqlar qorunur.</p>
+            <p>
+              Sayt, «{siteConfig.name}» brendi və markası {siteConfig.owner.name}-na məxsusdur.
+            </p>
+          </div>
 
           <ul className="flex flex-wrap gap-x-6 gap-y-1">
             {legalNavigation.map((item) => (
