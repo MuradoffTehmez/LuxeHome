@@ -90,9 +90,14 @@ export default async function HomePage() {
     value: type.slug,
     label: type.name,
   }));
+  // Rayon seçimi şəhərdən asılı olduğu üçün alt siyahı da ötürülür
   const cityOptions = filterOptions.cities.map((city) => ({
     value: city.slug,
     label: city.name,
+    districts: city.children.map((district) => ({
+      value: district.slug,
+      label: district.name,
+    })),
   }));
 
   const hasDemoContent =

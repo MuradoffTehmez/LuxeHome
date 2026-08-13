@@ -3,11 +3,11 @@ import { ArrowRight, Phone } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
-import { SearchPanel } from "./search-panel";
+import { SearchPanel, type CityOption, type TypeOption } from "./search-panel";
 
 type HeroProps = {
-  types: { value: string; label: string }[];
-  cities: { value: string; label: string }[];
+  types: TypeOption[];
+  cities: CityOption[];
 };
 
 /** Ana səhifənin hero bölməsi — LCP elementi burada yerləşir. */
