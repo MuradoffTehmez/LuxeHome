@@ -4,10 +4,12 @@ import { useId } from "react";
 import { AlertCircle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Qeyd: `focus:outline-none` qəsdən istifadə olunmur — klaviatura fokusu üçün
+// globals.css-dəki `:focus-visible` konturu görünən qalmalıdır (WCAG 2.4.7).
 const CONTROL_BASE =
   "w-full min-h-12 rounded-xs border bg-paper px-4 py-3 text-base text-ink " +
   "placeholder:text-ink-muted transition-colors duration-200 " +
-  "focus:border-gold focus:outline-none " +
+  "focus:border-gold " +
   "disabled:bg-beige disabled:text-ink-muted disabled:cursor-not-allowed";
 
 const CONTROL_OK = "border-line-strong hover:border-ink-muted";

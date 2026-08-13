@@ -111,16 +111,21 @@
   --color-navy: #fbf9f6;
   --color-navy-soft: #f2ece3;
 
-  /* --- Rənglər: mətn --- */
+  /* --- Rənglər: mətn ---
+     Diqqət: bu dəyərlər açıq rejimdən fərqlidir. Eyni saxlansaydı, tünd fonda
+     kontrast 2.6:1-ə düşürdü. Hazırkı nisbətlər: ink-soft 10.9:1,
+     ink-muted 5.1:1 (paper üzərində) — hər ikisi WCAG AA-dan yuxarıdır. */
   --color-ink: #f7f4ef;
-  --color-ink-soft: #b9c0c9;
-  --color-ink-muted: #6a7178;
+  --color-ink-soft: #c3cad3;
+  --color-ink-muted: #8f97a1;
   --color-ink-invert: #14181c;
   --color-ink-invert-soft: #454c54;
 
-  /* --- Rənglər: kənar və sərhəd --- */
-  --color-line: #2b3440;
-  --color-line-strong: #454c54;
+  /* --- Rənglər: kənar və sərhəd ---
+     line-strong input və düymə konturlarında istifadə olunur — interaktiv
+     elementin sərhədi WCAG 1.4.11-ə görə ən azı 3:1 olmalıdır (indi 3.3:1). */
+  --color-line: #333e4d;
+  --color-line-strong: #6d7683;
   --color-line-dark: #e4ddd2;
   
   /* --- Rənglər: champagne gold accent (daha yumşaq tonlar) --- */

@@ -57,7 +57,8 @@ export function FavoriteButton({
       title={label}
       aria-pressed={ready ? isFavorite : undefined}
       className={cn(
-        "inline-flex size-10 cursor-pointer items-center justify-center rounded-full",
+        // size-11 = 44px — minimum toxunma hədəfi (Apple HIG / WCAG 2.5.5)
+        "inline-flex size-11 cursor-pointer items-center justify-center rounded-full",
         "bg-charcoal/45 text-white backdrop-blur-sm transition-colors duration-200",
         "hover:bg-charcoal/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
         isFavorite && "text-gold-soft",
