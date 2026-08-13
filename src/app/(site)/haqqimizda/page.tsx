@@ -66,7 +66,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Başlıq */}
-      <Section tone="beige" className="py-10 sm:py-12">
+      <Section tone="beige" spacing="compact">
         <Container>
           <SectionHeader
             as="h1"

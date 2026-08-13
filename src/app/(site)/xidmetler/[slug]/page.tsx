@@ -40,8 +40,8 @@ export default async function ServiceDetailPage({ params }: Props) {
     if (service.bullets) {
       bullets = JSON.parse(service.bullets);
     }
-  } catch (e) {
-    //
+  } catch {
+    // Səhv formatlı JSON — maddələr siyahısı boş qalır
   }
 
   return (
@@ -65,7 +65,7 @@ export default async function ServiceDetailPage({ params }: Props) {
         )}
       />
 
-      <Section tone="beige" className="py-10 sm:py-12">
+      <Section tone="beige" spacing="compact">
         <Container>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <SectionHeader
@@ -81,7 +81,7 @@ export default async function ServiceDetailPage({ params }: Props) {
         </Container>
       </Section>
 
-      <Section tone="ivory" className="py-12 sm:py-16">
+      <Section tone="ivory" spacing="cozy">
         <Container>
           <div className="grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-14">
             {/* Sol tərəf: Məlumatlar */}

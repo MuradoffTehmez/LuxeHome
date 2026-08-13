@@ -198,7 +198,7 @@ export default async function ProjectDetailPage({ params }: Props) {
 
       {/* Layihəyə aid əmlaklar */}
       {project.properties && project.properties.length > 0 && (
-        <Section tone="paper" className="py-12 sm:py-16">
+        <Section tone="paper" spacing="cozy">
           <Container>
             <div className="mb-8 flex flex-col gap-2">
               <h2 className="font-display text-2xl text-ink sm:text-3xl">Layihədəki əmlaklar</h2>

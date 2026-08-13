@@ -8,7 +8,6 @@ import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getPostBySlug, getRelatedPosts } from "@/lib/queries";
-import { siteConfig } from "@/config/site";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -133,7 +132,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
-        <Section tone="paper" className="py-12 sm:py-16 border-t border-line">
+        <Section tone="paper" spacing="cozy" className="border-t border-line">
           <Container>
             <div className="mb-8 flex flex-col gap-2">
               <h2 className="font-display text-2xl text-ink sm:text-3xl">Oxşar məqalələr</h2>
