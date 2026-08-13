@@ -69,10 +69,12 @@ export function PropertyCard({ property, priority = false, className }: Property
           </div>
         )}
 
-        {/* Alt gradient — badge-lərin oxunaqlılığı üçün */}
+        {/* Alt gradient — qiymətin oxunaqlılığı üçün.
+            Açıq şəkillərdə (ağ villa, hovuz) zəif gradient qiyməti gözdən itirirdi,
+            ona görə tündlük artırılıb və zolaq hündürləndirilib. */}
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-charcoal/55 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-charcoal/85 via-charcoal/40 to-transparent"
         />
 
         {/* Sol üst nişanlar */}
@@ -91,8 +93,10 @@ export function PropertyCard({ property, priority = false, className }: Property
           {property.isDemo && <DemoBadge />}
         </div>
 
-        {/* Sağ üst — favorit */}
-        <div className="absolute top-3 right-3">
+        {/* Sağ üst — favorit.
+            z-10 vacibdir: başlıqdakı linkin `after:inset-0` örtüyü DOM-da sonra gəldiyi üçün
+            onsuz bu düymənin üstünə düşür və klik işləmir. */}
+        <div className="absolute top-3 right-3 z-10">
           <FavoriteButton propertyId={property.id} />
         </div>
 

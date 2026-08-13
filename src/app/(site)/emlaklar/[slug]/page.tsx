@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   BedDouble,
   FileCheck,
@@ -10,9 +9,8 @@ import {
   CheckCircle2,
   Phone,
   ArrowRight,
-  Info,
 } from "lucide-react";
-import { formatNumber, formatPrice, formatArea, cn } from "@/lib/utils";
+import { formatNumber, formatPrice, formatArea } from "@/lib/utils";
 import {
   LISTING_TYPES,
   PRICE_PERIOD_LABELS,
@@ -274,15 +272,24 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Əlaqə Forması */}
               <div className="rounded-md border border-line bg-paper p-5 sm:p-6 lg:sticky lg:top-28 lg:shadow-sm">
                 <div className="mb-6 flex flex-col gap-2">
-                  <h3 className="font-display text-xl text-ink">Əlaqə saxlayın</h3>
+                  <h3 className="font-display text-xl text-ink">
+                    {isClosed ? "Bu əmlak artıq mövcud deyil" : "Əlaqə saxlayın"}
+                  </h3>
                   <p className="text-sm text-ink-soft">
-                    Bu əmlakla maraqlanırsınız? Müraciət göndərin və ya zəng edin.
+                    {isClosed
+                      ? `Elan «${PROPERTY_STATUS_LABELS[status]}» statusundadır. Oxşar variantlar üçün bizimlə əlaqə saxlayın — portfelimizdə uyğun əmlak tapa bilərik.`
+                      : "Bu əmlakla maraqlanırsınız? Müraciət göndərin və ya zəng edin."}
                   </p>
                 </div>
 
                 <div className="mb-6">
-                  <ButtonAnchor href={siteConfig.phoneHref} variant="ghost" fullWidth className="h-12 border border-line hover:border-gold hover:text-gold-deep">
-                    <Phone className="mr-2 size-4" aria-hidden="true" />
+                  <ButtonAnchor
+                    href={siteConfig.phoneHref}
+                    variant="ghost"
+                    fullWidth
+                    className="border border-line hover:border-gold hover:text-gold-deep"
+                  >
+                    <Phone className="size-4" aria-hidden="true" />
                     {siteConfig.phone}
                   </ButtonAnchor>
                 </div>
@@ -303,7 +310,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
       {/* Bənzər Əmlaklar */}
       {similarProperties.length > 0 && (
-        <Section tone="paper" className="py-12 sm:py-16">
+        <Section tone="paper" spacing="cozy">
           <Container>
             <div className="mb-8 flex flex-col gap-2">
               <h2 className="font-display text-2xl text-ink sm:text-3xl">Oxşar əmlaklar</h2>
