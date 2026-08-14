@@ -1,4 +1,4 @@
-// LuxeHome — Prisma schema
+// Luxe Home Estate — Prisma schema
 //
 // Provider: SQLite (development). PostgreSQL-ə keçid üçün yalnız `provider`
 // və `DATABASE_URL` dəyişdirilir — model strukturu hər iki bazada işləyir.

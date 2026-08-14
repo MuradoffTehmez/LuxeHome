@@ -1,7 +1,7 @@
 /**
  * Loqo hazırlığı.
  *
- * Mənbə: LuxeHome_LOGO.png — tünd fonda qızılı gerb.
+ * Mənbə: LuxeHome_LOGO.png — tünd fonda qızılı gerb (Luxe Home Estate).
  * Bu skript ondan saytda istifadə üçün üç variant çıxarır:
  *
  *   public/logo-full.png   — tam loqo (tünd fonlar üçün, orijinal kompozisiya)

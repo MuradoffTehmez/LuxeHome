@@ -1,5 +1,5 @@
 /**
- * LuxeHome — mərkəzi sayt konfiqurasiyası.
+ * Luxe Home Estate — mərkəzi sayt konfiqurasiyası.
  *
  * Şirkətin bütün əlaqə və brend məlumatları burada saxlanılır ki, dəyişiklik
  * tək bir yerdən edilsin. Bu fayldakı dəyərlər şirkət tərəfindən təsdiqlənmiş
@@ -7,9 +7,9 @@
  */
 
 export const siteConfig = {
-  name: "LuxeHome",
-  legalName: "Luxe Home MMC",
-  fullName: "Luxe Home MMC — Daşınmaz Əmlak",
+  name: "Luxe Home Estate",
+  legalName: "Luxe Home Estate MMC",
+  fullName: "Luxe Home Estate MMC — Daşınmaz Əmlak",
   slogan: "HƏYATINIZIN ƏN DƏYƏRLİ ÜNVANI",
 
   /**
@@ -22,18 +22,18 @@ export const siteConfig = {
     isLegalEntity: true,
   },
   description:
-    "LuxeHome — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi. Peşəkar daşınmaz əmlak xidmətləri.",
+    "Luxe Home Estate — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi. Peşəkar daşınmaz əmlak xidmətləri.",
 
   phone: "+994 51 922 85 85",
   phoneHref: "tel:+994519228585",
   whatsapp: "994519228585",
   address: "Əliyar Əliyev 109A",
   addressFull: "Əliyar Əliyev 109A, Bakı, Azərbaycan",
-  email: "info@luxehome.az",
+  email: "info@luxehomeestate.az",
 
   instagram: "luxe_home_estate",
   instagramUrl: "https://instagram.com/luxe_home_estate",
-  website: "www.luxehome.az",
+  website: "www.luxehomeestate.az",
 
   /**
    * Ofisin xəritədəki mövqeyi.
@@ -63,7 +63,7 @@ export const siteConfig = {
  *
  * TODO: Rəhbərlikdən real rəqəmləri alın və bu bloku yeniləyin.
  * TODO: Real rəqəmlər əldə olunana qədər `enabled: false` saxlanıla bilər —
- *       bu halda "Niyə LuxeHome?" bölməsi rəqəmsiz variantla göstərilir.
+ *       bu halda "Niyə Luxe Home Estate?" bölməsi rəqəmsiz variantla göstərilir.
  */
 export const demoStats = {
   enabled: true,
