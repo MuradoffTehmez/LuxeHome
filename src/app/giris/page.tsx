@@ -7,7 +7,7 @@ import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
   title: "Giriş",
-  description: "LuxeHome idarə panelinə giriş.",
+  description: "Luxe Home Estate idarə panelinə giriş.",
   // İdarə paneli axtarış sistemlərində görünməməlidir
   robots: { index: false, follow: false },
 };
@@ -28,7 +28,7 @@ export default function LoginPage() {
 
           <div className="mb-8 flex flex-col gap-2">
             <span className="font-display text-xl tracking-[0.18em] text-ink">
-              LUXEHOME
+              LUXE HOME ESTATE
             </span>
             <h1 className="font-display text-3xl text-ink">İdarə panelinə giriş</h1>
             <p className="text-sm text-ink-soft">

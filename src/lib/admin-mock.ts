@@ -411,7 +411,7 @@ export const mockUsers: AdminUser[] = [
   {
     id: "u1",
     name: "Bahadur Əmiyev",
-    email: "admin@luxehome.az",
+    email: "admin@luxehomeestate.az",
     role: "SUPER_ADMIN",
     isActive: true,
     lastLoginAt: "2026-08-13T08:00:00Z",
@@ -419,7 +419,7 @@ export const mockUsers: AdminUser[] = [
   {
     id: "u2",
     name: "Satış meneceri",
-    email: "satis@luxehome.az",
+    email: "satis@luxehomeestate.az",
     role: "ADMIN",
     isActive: true,
     lastLoginAt: "2026-08-12T17:30:00Z",
@@ -427,7 +427,7 @@ export const mockUsers: AdminUser[] = [
   {
     id: "u3",
     name: "Kontent redaktoru",
-    email: "redaktor@luxehome.az",
+    email: "redaktor@luxehomeestate.az",
     role: "EDITOR",
     isActive: true,
     lastLoginAt: "2026-08-11T10:15:00Z",
@@ -435,7 +435,7 @@ export const mockUsers: AdminUser[] = [
   {
     id: "u4",
     name: "Keçmiş əməkdaş",
-    email: "arxiv@luxehome.az",
+    email: "arxiv@luxehomeestate.az",
     role: "EDITOR",
     isActive: false,
     lastLoginAt: "2026-04-02T12:00:00Z",

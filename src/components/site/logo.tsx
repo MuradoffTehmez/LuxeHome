@@ -13,7 +13,7 @@ type LogoProps = {
 };
 
 /**
- * LUXEHOME kimliyi: şirkət gerbi + wordmark.
+ * LUXE HOME ESTATE kimliyi: şirkət gerbi + wordmark.
  *
  * Gerb `public/logo-mark.png` faylından gəlir — orijinal loqodan kəsilmiş,
  * dairəvi maskalanmış variant (bax: scripts/prepare-logo.mjs).
@@ -54,7 +54,7 @@ export function Logo({
               : "text-ink group-hover:text-gold-deep",
           )}
         >
-          LUXEHOME
+          LUXE HOME ESTATE
         </span>
 
         {!compact && (

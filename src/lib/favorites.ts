@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "luxehome:favorites";
-const CHANGE_EVENT = "luxehome:favorites-changed";
+const STORAGE_KEY = "luxehomeestate:favorites";
+const CHANGE_EVENT = "luxehomeestate:favorites-changed";
 
 /**
  * Favoritlər qeydiyyatsız istifadəçilər üçün localStorage-də saxlanılır.

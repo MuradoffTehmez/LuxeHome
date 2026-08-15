@@ -42,7 +42,7 @@ export function LoginForm() {
           type="email"
           autoComplete="username"
           required
-          placeholder="ad@luxehome.az"
+          placeholder="ad@luxehomeestate.az"
           className={controlClass}
         />
       </Field>

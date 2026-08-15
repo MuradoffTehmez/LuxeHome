@@ -157,7 +157,7 @@ function Sidebar({
         <div className="flex min-h-16 items-center justify-between gap-2 border-b border-white/10 px-5">
           <Link href="/admin" className="flex flex-col leading-none">
             <span className="font-display text-lg tracking-[0.18em] text-white">
-              LUXEHOME
+              LUXE HOME ESTATE
             </span>
             <span className="mt-1 text-[10px] tracking-[0.22em] text-gold-soft">
               İDARƏ PANELİ

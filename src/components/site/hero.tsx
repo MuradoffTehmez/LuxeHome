@@ -48,7 +48,7 @@ export function Hero({ types, cities }: HeroProps) {
           </h1>
 
           <p className="animate-slide-up mt-6 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg" style={{ animationDelay: "200ms" }}>
-            LuxeHome ilə sizin üçün uyğun daşınmaz əmlakı kəşf edin. Mənzil,
+            Luxe Home Estate ilə sizin üçün uyğun daşınmaz əmlakı kəşf edin. Mənzil,
             villa, həyət evi, torpaq və kommersiya obyektləri üzrə geniş seçim.
           </p>
 
