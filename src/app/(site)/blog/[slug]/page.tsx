@@ -45,14 +45,14 @@ export default async function BlogPostPage({ params }: Props) {
     datePublished: post.publishedAt?.toISOString() || post.createdAt.toISOString(),
     author: {
       "@type": "Person",
-      name: post.author?.name || "LuxeHome",
+      name: post.author?.name || "Luxe Home Estate",
     },
     publisher: {
       "@type": "Organization",
-      name: "LuxeHome",
+      name: "Luxe Home Estate",
       logo: {
         "@type": "ImageObject",
-        url: `https://luxehome.az/logo.png`,
+        url: `https://luxehomeestate.az/logo.png`,
       },
     },
     description: post.excerpt,

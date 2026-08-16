@@ -130,7 +130,7 @@ export default async function HomePage() {
           <SectionHeader
             overline="Portfel"
             title="Seçilmiş Əmlaklar"
-            description="LuxeHome tərəfindən seçilmiş daşınmaz əmlaklar."
+            description="Luxe Home Estate tərəfindən seçilmiş daşınmaz əmlaklar."
             action={{ label: "Bütün əmlaklar", href: "/emlaklar" }}
           />
 
@@ -292,7 +292,7 @@ export default async function HomePage() {
             <div className="flex flex-col gap-6">
               <SectionHeader
                 overline="Haqqımızda"
-                title="LuxeHome haqqında"
+                title="Luxe Home Estate haqqında"
                 description={`${siteConfig.legalName} daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam və çəkiliş istiqamətlərində fəaliyyət göstərir.`}
               />
 
@@ -324,13 +324,13 @@ export default async function HomePage() {
       </Section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* NİYƏ LUXEHOME                                                      */}
+      {/* NİYƏ LUXE HOME ESTATE                                               */}
       {/* ------------------------------------------------------------------ */}
       <Section tone="beige">
         <Container>
           <SectionHeader
             overline="Üstünlüklər"
-            title="Niyə LuxeHome?"
+            title="Niyə Luxe Home Estate?"
             description="Müştərilərimizə təklif etdiyimiz yanaşmanın əsas prinsipləri."
             align="center"
           />

@@ -13,7 +13,7 @@ import { getServices } from "@/lib/queries";
 export const metadata: Metadata = buildMetadata({
   title: "Xidmətlər",
   description:
-    "LuxeHome-un daşınmaz əmlak sahəsindəki 7 əsas xidmət istiqaməti: alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam, çəkiliş və konsultasiya.",
+    "Luxe Home Estate-in daşınmaz əmlak sahəsindəki 7 əsas xidmət istiqaməti: alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam, çəkiliş və konsultasiya.",
   path: "/xidmetler",
 });
 

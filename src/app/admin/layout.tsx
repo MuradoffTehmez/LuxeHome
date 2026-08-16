@@ -5,7 +5,7 @@ import { mockStats } from "@/lib/admin-mock";
 export const metadata: Metadata = {
   title: {
     default: "İdarə paneli",
-    template: "%s | LuxeHome idarə paneli",
+    template: "%s | Luxe Home Estate idarə paneli",
   },
   // İdarə paneli heç vaxt indeksləşdirilməməlidir
   robots: { index: false, follow: false },

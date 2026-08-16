@@ -10,7 +10,7 @@ import { getProjects } from "@/lib/queries";
 export const metadata: Metadata = buildMetadata({
   title: "Layihələr",
   description:
-    "LuxeHome-un davam edən və tamamlanmış yaşayış, villa və kommersiya layihələri.",
+    "Luxe Home Estate-in davam edən və tamamlanmış yaşayış, villa və kommersiya layihələri.",
   path: "/layiheler",
 });
 

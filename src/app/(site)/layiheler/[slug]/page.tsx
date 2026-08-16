@@ -61,7 +61,7 @@ export default async function ProjectDetailPage({ params }: Props) {
     name: project.name,
     description: project.summary || project.description,
     image: project.images.map((img) => img.url),
-    url: `https://luxehome.az/layiheler/${project.slug}`,
+    url: `https://luxehomeestate.az/layiheler/${project.slug}`,
   };
 
   const imagesForGallery = project.images.map((img) => ({

@@ -71,7 +71,7 @@ export default function AboutPage() {
           <SectionHeader
             as="h1"
             overline="Haqqımızda"
-            title="LuxeHome haqqında"
+            title="Luxe Home Estate haqqında"
             description={`${siteConfig.legalName} daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam və çəkiliş istiqamətlərində fəaliyyət göstərir.`}
           />
         </Container>
@@ -133,12 +133,12 @@ export default function AboutPage() {
         </Container>
       </Section>
 
-      {/* Niyə LuxeHome */}
+      {/* Niyə Luxe Home Estate */}
       <Section tone="paper">
         <Container>
           <SectionHeader
             overline="Üstünlüklər"
-            title="Niyə LuxeHome?"
+            title="Niyə Luxe Home Estate?"
             description="Müştərilərimizə təklif etdiyimiz yanaşmanın əsas prinsipləri."
             align="center"
           />
