@@ -1,4 +1,4 @@
-# MEMORY.md — LuxeHome layihə yaddaşı
+# MEMORY.md — Luxe Home Estate layihə yaddaşı
 
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
@@ -9,7 +9,7 @@ Son yenilənmə: 13 avqust 2026.
 
 ## 0. Sahiblik
 
-Sayt, **«LuxeHome» brendi və markası** hüquqi şəxs **Əmiyev Bahadur Qafar oğlu**-na məxsusdur.
+Sayt, **«Luxe Home Estate» brendi və markası** hüquqi şəxs **Əmiyev Bahadur Qafar oğlu**-na məxsusdur.
 Kodda `siteConfig.owner` sahəsində saxlanılır; footer-dəki müəllif hüququ bildirişində və
 `organizationSchema()` JSON-LD blokunda göstərilir.
 
@@ -17,14 +17,14 @@ Kodda `siteConfig.owner` sahəsində saxlanılır; footer-dəki müəllif hüquq
 
 ## 1. Layihənin məqsədi və mərhələsi
 
-**Əsas hədəf: saytı müştəriyə (Luxe Home MMC) bəyəndirmək.** Bu səbəbdən cari mərhələdə
+**Əsas hədəf: saytı müştəriyə (Luxe Home Estate MMC) bəyəndirmək.** Bu səbəbdən cari mərhələdə
 diqqət **frontend**-dədir. Müştəri tam razılıq verdikdən sonra backend qatı yığılacaq.
 
 Bu, işin prioritetləşdirilməsində həlledici meyardır: vizual nəticə verən iş backend
 mükəmməlliyindən üstündür. Frontend-i sürətləndirmək üçün sadə/standart JavaScript həlləri
 qəbul edilir.
 
-Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home MMC, Əliyar Əliyev 109A.
+Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 
 ---
 

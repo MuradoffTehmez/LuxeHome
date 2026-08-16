@@ -1,5 +1,5 @@
 /**
- * LuxeHome — demo məlumat generatoru.
+ * Luxe Home Estate — demo məlumat generatoru.
  *
  * ⚠️ VACİB
  * Bu faylda yaradılan bütün əmlak, layihə və bloq yazıları NÜMUNƏ
@@ -73,8 +73,8 @@ async function main() {
   // -------------------------------------------------------------------------
   // 1. İSTİFADƏÇİLƏR
   // -------------------------------------------------------------------------
-  const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@luxehome.az";
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "LuxeHome2026!";
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@luxehomeestate.az";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "LuxeHomeEstate2026!";
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   const superAdmin = await prisma.user.upsert({
@@ -89,11 +89,11 @@ async function main() {
   });
 
   await prisma.user.upsert({
-    where: { email: "redaktor@luxehome.az" },
+    where: { email: "redaktor@luxehomeestate.az" },
     update: {},
     create: {
       name: "Məzmun Redaktoru",
-      email: "redaktor@luxehome.az",
+      email: "redaktor@luxehomeestate.az",
       passwordHash: await bcrypt.hash("Redaktor2026!", 12),
       role: "EDITOR",
     },
@@ -287,7 +287,7 @@ async function main() {
       icon: "Handshake",
       shortDescription: "Daşınmaz əmlakın alqı-satqısı üzrə peşəkar xidmət.",
       description:
-        "LuxeHome daşınmaz əmlakın alqı-satqısı prosesini əvvəldən sona qədər müşayiət edir. Əmlakın bazar dəyərinin qiymətləndirilməsindən başlayaraq, uyğun alıcı və ya satıcının tapılması, danışıqların aparılması, sənədlərin yoxlanılması və notarial rəsmiləşdirməyə qədər bütün mərhələlərdə yanınızdayıq.\n\nHər bir əmlak üzrə hüquqi təmizlik yoxlanılır, sənəd vəziyyəti dəqiqləşdirilir və tərəflər arasında şəffaf razılaşma təmin edilir.",
+        "Luxe Home Estate daşınmaz əmlakın alqı-satqısı prosesini əvvəldən sona qədər müşayiət edir. Əmlakın bazar dəyərinin qiymətləndirilməsindən başlayaraq, uyğun alıcı və ya satıcının tapılması, danışıqların aparılması, sənədlərin yoxlanılması və notarial rəsmiləşdirməyə qədər bütün mərhələlərdə yanınızdayıq.\n\nHər bir əmlak üzrə hüquqi təmizlik yoxlanılır, sənəd vəziyyəti dəqiqləşdirilir və tərəflər arasında şəffaf razılaşma təmin edilir.",
       bullets: JSON.stringify([
         "Əmlakın bazar dəyərinin qiymətləndirilməsi",
         "Hüquqi sənədlərin yoxlanılması",
@@ -371,7 +371,7 @@ async function main() {
         "Elan mətninin peşəkar hazırlanması",
         "Sosial media tanıtımı",
         "Hədəflənmiş rəqəmsal reklam",
-        "LuxeHome platformasında yerləşdirmə",
+        "Luxe Home Estate platformasında yerləşdirmə",
         "Nəticələr üzrə hesabat",
       ]),
       imageUrl: IMG(PHOTOS.cityPanorama, 1400),
@@ -401,7 +401,7 @@ async function main() {
       create: {
         ...service,
         order: index,
-        metaTitle: `${service.title} — LuxeHome`,
+        metaTitle: `${service.title} — Luxe Home Estate`,
         metaDescription: service.shortDescription,
       },
     });
@@ -418,7 +418,7 @@ async function main() {
       summary:
         "Şəhərin mərkəzi hissəsində müasir yaşayış kompleksi — nümunə layihə məlumatı.",
       description:
-        "Bu qeyd platformanın layihə bölməsinin necə işlədiyini göstərmək üçün yaradılmış NÜMUNƏ məlumatdır və real LuxeHome layihəsi deyil.\n\nReal layihə əlavə edildikdə admin panel vasitəsilə bu qeyd silinməli və yerinə şirkətin təsdiqlədiyi məlumatlar daxil edilməlidir.",
+        "Bu qeyd platformanın layihə bölməsinin necə işlədiyini göstərmək üçün yaradılmış NÜMUNƏ məlumatdır və real Luxe Home Estate layihəsi deyil.\n\nReal layihə əlavə edildikdə admin panel vasitəsilə bu qeyd silinməli və yerinə şirkətin təsdiqlədiyi məlumatlar daxil edilməlidir.",
       projectType: "RESIDENTIAL",
       status: "ONGOING",
       cityId: cities["baki"],
@@ -455,7 +455,7 @@ async function main() {
       slug: "numune-merdekan-villa-park",
       summary: "Qapalı ərazidə villa kompleksi — nümunə layihə məlumatı.",
       description:
-        "Bu qeyd NÜMUNƏ məlumatdır və real LuxeHome layihəsi deyil. Layihə bölməsinin strukturunu göstərmək üçün yaradılıb.\n\nReal layihə məlumatları rəhbərlik tərəfindən təsdiqləndikdən sonra admin panel vasitəsilə əlavə edilməlidir.",
+        "Bu qeyd NÜMUNƏ məlumatdır və real Luxe Home Estate layihəsi deyil. Layihə bölməsinin strukturunu göstərmək üçün yaradılıb.\n\nReal layihə məlumatları rəhbərlik tərəfindən təsdiqləndikdən sonra admin panel vasitəsilə əlavə edilməlidir.",
       projectType: "VILLA",
       status: "COMPLETED",
       cityId: cities["baki"],
@@ -535,7 +535,7 @@ async function main() {
         ...data,
         isDemo: true,
         order: index,
-        metaTitle: `${project.name} — LuxeHome`,
+        metaTitle: `${project.name} — Luxe Home Estate`,
         metaDescription: project.summary,
         images: {
           create: images.map((image, imageIndex) => ({
@@ -969,7 +969,7 @@ async function main() {
         publishedAt: daysAgo(daysOld),
         createdAt: daysAgo(daysOld),
         viewCount: Math.floor(Math.random() * 120) + 10,
-        metaTitle: `${property.title} — LuxeHome`,
+        metaTitle: `${property.title} — Luxe Home Estate`,
         metaDescription: property.description.split("\n")[0].slice(0, 155),
         images: {
           create: images.map((image, index) => ({
@@ -999,7 +999,7 @@ async function main() {
     { name: "Məsləhətlər", slug: "meslehetler" },
     { name: "İnteryer", slug: "interyer" },
     { name: "Tikinti", slug: "tikinti" },
-    { name: "LuxeHome xəbərləri", slug: "luxehome-xeberleri" },
+    { name: "Luxe Home Estate xəbərləri", slug: "luxehomeestate-xeberleri" },
   ];
 
   const categories: Record<string, string> = {};
@@ -1047,7 +1047,7 @@ Yaxınlıqda məktəb, bağça, ticarət mərkəzi və nəqliyyat çıxışını
 
 ## 6. Real bazar qiyməti
 
-Oxşar əmlakların qiymətlərini müqayisə edin. LuxeHome portfelində eyni ərazi üzrə variantları nəzərdən keçirə bilərsiniz.
+Oxşar əmlakların qiymətlərini müqayisə edin. Luxe Home Estate portfelində eyni ərazi üzrə variantları nəzərdən keçirə bilərsiniz.
 
 ## 7. Peşəkar dəstək
 
@@ -1175,12 +1175,12 @@ Mərhələlərin ardıcıllığı və müddəti əvvəlcədən razılaşdırılm
 
 Hər mərhələnin təhvili sənədləşdirilməlidir.
 
-LuxeHome təmir-tikinti xidməti haqqında ətraflı məlumat üçün xidmətlər bölməsinə baxın.`,
+Luxe Home Estate təmir-tikinti xidməti haqqında ətraflı məlumat üçün xidmətlər bölməsinə baxın.`,
     },
     {
-      title: "[Nümunə] LuxeHome onlayn platforması istifadəyə verildi",
-      slug: "numune-luxehome-onlayn-platformasi-istifadeye-verildi",
-      categorySlug: "luxehome-xeberleri",
+      title: "[Nümunə] Luxe Home Estate onlayn platforması istifadəyə verildi",
+      slug: "numune-luxehomeestate-onlayn-platformasi-istifadeye-verildi",
+      categorySlug: "luxehomeestate-xeberleri",
       excerpt:
         "Əmlak axtarışı, filtrləmə və müraciət sistemi ilə yeni onlayn platforma — nümunə xəbər.",
       coverUrl: IMG(PHOTOS.apartmentTower, 1400),
@@ -1218,7 +1218,7 @@ Real şirkət xəbərləri admin panel vasitəsilə dərc ediləcək.`,
         publishedAt: daysAgo(daysOld),
         createdAt: daysAgo(daysOld),
         viewCount: Math.floor(Math.random() * 200) + 20,
-        metaTitle: `${post.title} — LuxeHome Blog`,
+        metaTitle: `${post.title} — Luxe Home Estate Blog`,
         metaDescription: post.excerpt.slice(0, 155),
       },
     });
@@ -1230,11 +1230,11 @@ Real şirkət xəbərləri admin panel vasitəsilə dərc ediləcək.`,
   // 9. PARAMETRLƏR
   // -------------------------------------------------------------------------
   const settings = [
-    { key: "site.title", value: "LuxeHome — Həyatınızın ən dəyərli ünvanı" },
+    { key: "site.title", value: "Luxe Home Estate — Həyatınızın ən dəyərli ünvanı" },
     {
       key: "site.description",
       value:
-        "LuxeHome — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi.",
+        "Luxe Home Estate — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi.",
     },
     { key: "contact.phone", value: "+994 51 922 85 85" },
     { key: "contact.address", value: "Əliyar Əliyev 109A" },

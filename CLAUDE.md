@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Layihə haqqında
 
-LuxeHome — Luxe Home MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 15 App Router,
+Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 15 App Router,
 React 19, Tailwind CSS v4, Prisma v6. Saytın bütün istifadəçi mətnləri Azərbaycan dilindədir.
 
 **Kod dilində konvensiya:** identifikatorlar (dəyişən, funksiya, tip adları) ingiliscədir,
@@ -120,7 +120,7 @@ Bütün əlaqə, brend və naviqasiya məlumatları `src/config/site.ts`-dədir 
 `navigation`, `legalNavigation`, `demoStats`, `whatsappLink()`). Telefon, ünvan, Instagram
 kimi dəyərlər komponentlərdə hardcode edilmir.
 
-Sayt, «LuxeHome» brendi və markası hüquqi şəxs **Əmiyev Bahadur Qafar oğlu**-na məxsusdur
+Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur Qafar oğlu**-na məxsusdur
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
 

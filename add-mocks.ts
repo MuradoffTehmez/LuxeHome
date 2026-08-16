@@ -89,7 +89,7 @@ async function addMocks() {
         documentStatus: "TITLE_DEED",
         isFeatured: Math.random() > 0.8,
         isDemo: true,
-        metaTitle: `${title} — LuxeHome`,
+        metaTitle: `${title} — Luxe Home Estate`,
         metaDescription: "NÜMUNƏ ELAN. Bu qeyd platformanın necə işlədiyini göstərmək üçün yaradılıb və real satışda olan əmlak deyil.",
         images: {
           create: newImages,

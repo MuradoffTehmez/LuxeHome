@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="public/logo-full.png" alt="LuxeHome Logo" width="250"/>
-  <h1>🏡 LuxeHome</h1>
+  <img src="public/logo-full.png" alt="Luxe Home Estate Logo" width="250"/>
+  <h1>🏡 Luxe Home Estate</h1>
   <p>Müasir və premium dizayna sahib daşınmaz əmlak və lüks evlər platforması.</p>
 </div>
 
@@ -8,7 +8,7 @@
 
 ## 📖 Layihə Haqqında
 
-**LuxeHome** - elit və lüks daşınmaz əmlak obyektlərinin satışı, kirayəsi və layihə nümayişi üçün nəzərdə tutulmuş müasir veb platformasıdır. Layihə tam olaraq ən son texnologiyalar əsasında, sürət və təhlükəsizlik prioritet alınaraq hazırlanmışdır. Platforma həm istifadəçilər (alıcı/kirayəçi), həm də adminlər üçün xüsusi interfeyslərə sahibdir.
+**Luxe Home Estate** - elit və lüks daşınmaz əmlak obyektlərinin satışı, kirayəsi və layihə nümayişi üçün nəzərdə tutulmuş müasir veb platformasıdır. Layihə tam olaraq ən son texnologiyalar əsasında, sürət və təhlükəsizlik prioritet alınaraq hazırlanmışdır. Platforma həm istifadəçilər (alıcı/kirayəçi), həm də adminlər üçün xüsusi interfeyslərə sahibdir.
 
 ## ✨ Əsas Xüsusiyyətlər
 
@@ -90,7 +90,7 @@ Nəticəni görmək üçün brauzerinizdə [http://localhost:3000](http://localh
 ## 📂 Layihə Quruluşu (Project Structure)
 
 ```
-LuxeHome/
+LuxeHomeEstate/
 ├── prisma/             # Verilənlər bazası (schema.prisma), miqrasiyalar və seed faylları
 ├── public/             # Şəkillər, icon-lar və ictimai asetslər
 ├── scripts/            # Köməkçi sistem skriptləri
