@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { sendLeadNotificationEmail } from "@/lib/email";
 import { z } from "zod";
 
 const contactSchema = z.object({
@@ -41,7 +42,7 @@ export async function submitContactForm(
   }
 
   try {
-    await prisma.lead.create({
+    const lead = await prisma.lead.create({
       data: {
         name: result.data.name,
         phone: result.data.phone,
@@ -53,6 +54,20 @@ export async function submitContactForm(
       },
     });
 
+    // Resend vasitəsilə bildiriş göndər
+    try {
+      await sendLeadNotificationEmail({
+        name: lead.name,
+        phone: lead.phone,
+        email: lead.email,
+        subject: lead.subject,
+        message: lead.message,
+        source: lead.source,
+      });
+    } catch (emailErr) {
+      console.error("E-poçt bildirişi göndərilərkən xəta:", emailErr);
+    }
+
     return { success: true };
   } catch {
     return {
@@ -61,3 +76,4 @@ export async function submitContactForm(
     };
   }
 }
+
