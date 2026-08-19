@@ -340,11 +340,11 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                       font-weight:600;
                       border-radius:2px;
                     ">
-                      📞 Zəng et (${payload.phone})
+                      📞 Müştəriyə Zəng Et
                     </a>
                   </td>
                   <td align="center" style="padding:4px;">
-                    <a href="https://wa.me/${phoneClean}" class="action-btn" style="
+                    <a href="https://wa.me/994519228585?text=${encodeURIComponent(`Salam Luxe Home Estate. Saytdan yeni müraciət daxil oldu: ${payload.name} (${payload.phone}) — Mövzu: ${payload.subject || "Ümumi müraciət"}`)}" class="action-btn" style="
                       display:inline-block;
                       background-color:#25D366;
                       color:#ffffff;
@@ -356,7 +356,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                       font-weight:600;
                       border-radius:2px;
                     ">
-                      💬 WhatsApp-da yaz
+                      💬 WhatsApp (+994 51 922 85 85)
                     </a>
                   </td>
                 </tr>
@@ -791,18 +791,36 @@ export async function sendShowcaseEmail(payload: ShowcaseEmailPayload) {
               <div style="height:25px; line-height:25px;">&nbsp;</div>
               <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="border:1px solid #B89B5E; border-radius:2px;">
+                  <td style="padding:4px;">
+                    <a href="https://wa.me/994519228585?text=${encodeURIComponent('Salam, Luxe Home Estate. Seçilmiş premium əmlaklarla bağlı məlumat almaq istəyirəm.')}" style="
+                      display:inline-block;
+                      background-color:#25D366;
+                      color:#ffffff;
+                      padding:14px 28px;
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:11px;
+                      letter-spacing:1.5px;
+                      text-transform:uppercase;
+                      font-weight:600;
+                      border-radius:2px;
+                    ">
+                      💬 WhatsApp-da yaz (+994 51 922 85 85)
+                    </a>
+                  </td>
+                  <td style="padding:4px;">
                     <a href="https://luxehomeestate.az/elaqe" style="
                       display:inline-block;
-                      padding:14px 28px;
+                      border:1px solid #B89B5E;
+                      padding:13px 26px;
                       font-family:Arial, Helvetica, sans-serif;
                       font-size:11px;
                       letter-spacing:1.5px;
                       color:#B89B5E;
                       text-transform:uppercase;
                       font-weight:600;
+                      border-radius:2px;
                     ">
-                      Bizimlə əlaqə
+                      Əlaqə Səhifəsi
                     </a>
                   </td>
                 </tr>

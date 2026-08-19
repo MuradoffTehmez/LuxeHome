@@ -3,7 +3,7 @@ import { Clock, Globe, MapPin, Phone, Mail } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Reveal } from "@/components/ui/reveal";
-import { InstagramIcon } from "@/components/site/brand-icons";
+import { InstagramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig } from "@/config/site";
 import { ContactForm } from "./contact-form";
@@ -20,6 +20,12 @@ const CONTACT_ITEMS = [
     label: "Telefon",
     value: siteConfig.phone,
     href: siteConfig.phoneHref,
+  },
+  {
+    icon: WhatsAppIcon,
+    label: "WhatsApp",
+    value: "+994 51 922 85 85",
+    href: "https://wa.me/994519228585?text=Salam,%20Luxe%20Home%20Estate%20il%C9%99%20ba%C4%9Fl%C4%B1%20m%C9%99lumat%20almaq%20ist%C9%99yir%C9%99m.",
   },
   {
     icon: Mail,

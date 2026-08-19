@@ -34,6 +34,7 @@ import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { FavoriteButton } from "@/components/site/favorite-button";
 import { ShareButtons } from "@/components/site/share-buttons";
+import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/(site)/elaqe/contact-form";
 
 type Props = {
@@ -282,7 +283,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </p>
                 </div>
 
-                <div className="mb-6">
+                <div className="mb-6 flex flex-col gap-2">
                   <ButtonAnchor
                     href={siteConfig.phoneHref}
                     variant="ghost"
@@ -291,6 +292,18 @@ export default async function PropertyDetailPage({ params }: Props) {
                   >
                     <Phone className="size-4" aria-hidden="true" />
                     {siteConfig.phone}
+                  </ButtonAnchor>
+
+                  <ButtonAnchor
+                    href={`https://wa.me/994519228585?text=${encodeURIComponent(`Salam, "${property.title}" elanı ilə bağlı məlumat almaq istəyirəm.`)}`}
+                    variant="ghost"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    fullWidth
+                    className="border border-emerald-600/30 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 hover:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700/50"
+                  >
+                    <WhatsAppIcon className="size-4 text-emerald-600 dark:text-emerald-400" />
+                    WhatsApp ilə yaz
                   </ButtonAnchor>
                 </div>
 
