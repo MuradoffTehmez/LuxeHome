@@ -26,6 +26,23 @@ export type LeadEmailPayload = {
   propertyTitle?: string;
 };
 
+export type PropertyItem = {
+  title: string;
+  location: string;
+  price: string;
+  type: string;
+  imageUrl: string;
+  url: string;
+};
+
+export type ShowcaseEmailPayload = {
+  to: string | string[];
+  subject?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  properties?: PropertyItem[];
+};
+
 /**
  * Ümumi e-poçt göndərmə funksiyası
  */
@@ -77,103 +94,268 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
   }).format(new Date());
 
   const subject = `🔔 Yeni Müraciət: ${payload.name} — ${payload.subject || "Luxe Home Estate"}`;
+  const phoneClean = payload.phone.replace(/[^0-9]/g, "");
 
   const html = `
 <!DOCTYPE html>
-<html lang="az">
+<html lang="az" dir="ltr">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
   <title>${subject}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f3f1ed;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    table {
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+    img {
+      border: 0;
+      display: block;
+      max-width: 100%;
+    }
+    a {
+      text-decoration: none;
+    }
+    @media only screen and (max-width: 600px) {
+      .container {
+        width: 100% !important;
+      }
+      .mobile-padding {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+      }
+      .hero-title {
+        font-size: 26px !important;
+        line-height: 32px !important;
+      }
+      .action-btn {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 8px !important;
+      }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background-color:#F8F7F4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1A1A1A;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#F8F7F4;padding:32px 16px;">
+
+<body style="margin:0; padding:0; background-color:#f3f1ed;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f1ed;">
     <tr>
-      <td align="center">
-        <table role="presentation" width="100%" style="max-width:600px;background-color:#FFFFFF;border-radius:8px;border:1px solid #E6E2D8;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.04);">
-          
-          <!-- Başlıq -->
+      <td align="center" style="padding:30px 15px;">
+        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+
+          <!-- HEADER -->
           <tr>
-            <td style="background-color:#141414;padding:28px 32px;text-align:center;border-bottom:3px solid #C6A87D;">
-              <h1 style="margin:0;font-size:22px;letter-spacing:1px;font-weight:600;color:#FFFFFF;">
+            <td align="center" style="padding:32px 30px 24px 30px; background-color:#ffffff;">
+              <div style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:24px;
+                letter-spacing:2px;
+                font-weight:bold;
+                color:#171717;
+              ">
                 LUXE HOME ESTATE
-              </h1>
-              <p style="margin:4px 0 0 0;font-size:12px;color:#C6A87D;letter-spacing:2px;text-transform:uppercase;">
-                Yeni Müştəri Müraciəti
-              </p>
+              </div>
+              <div style="height:8px; line-height:8px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:10px;
+                letter-spacing:4px;
+                color:#B89B5E;
+                text-transform:uppercase;
+                font-weight:600;
+              ">
+                LUXURY REAL ESTATE
+              </div>
             </td>
           </tr>
 
-          <!-- Əsas Məzmun -->
+          <!-- GOLD ACCENT LINE -->
           <tr>
-            <td style="padding:32px;">
-              <p style="margin:0 0 20px 0;font-size:15px;line-height:1.5;color:#4A4A4A;">
-                Sayt üzərindən yeni bir müraciət daxil oldu:
-              </p>
+            <td style="height:2px; background-color:#B89B5E; font-size:0; line-height:0;">
+              &nbsp;
+            </td>
+          </tr>
 
-              <!-- Məlumat Cədvəli -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#FAF9F6;border:1px solid #EBE7DF;border-radius:6px;margin-bottom:24px;">
-                <tr>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:13px;font-weight:600;color:#706E6B;width:35%;">Ad, Soyad:</td>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:14px;font-weight:600;color:#141414;">${payload.name}</td>
-                </tr>
-                <tr>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:13px;font-weight:600;color:#706E6B;">Telefon:</td>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:14px;font-weight:600;color:#141414;">
-                    <a href="tel:${payload.phone}" style="color:#C6A87D;text-decoration:none;font-weight:bold;">${payload.phone}</a>
-                  </td>
-                </tr>
-                ${
-                  payload.email
-                    ? `
-                <tr>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:13px;font-weight:600;color:#706E6B;">E-poçt:</td>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:14px;color:#141414;">
-                    <a href="mailto:${payload.email}" style="color:#141414;text-decoration:underline;">${payload.email}</a>
-                  </td>
-                </tr>`
-                    : ""
-                }
-                ${
-                  payload.subject
-                    ? `
-                <tr>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:13px;font-weight:600;color:#706E6B;">Mövzu:</td>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:14px;color:#141414;">${payload.subject}</td>
-                </tr>`
-                    : ""
-                }
-                ${
-                  payload.propertyTitle
-                    ? `
-                <tr>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:13px;font-weight:600;color:#706E6B;">Əmlak / Layihə:</td>
-                  <td style="padding:12px 16px;border-bottom:1px solid #EBE7DF;font-size:14px;color:#141414;">${payload.propertyTitle}</td>
-                </tr>`
-                    : ""
-                }
-                <tr>
-                  <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#706E6B;">Tarix:</td>
-                  <td style="padding:12px 16px;font-size:13px;color:#706E6B;">${timeFormatted}</td>
-                </tr>
-              </table>
-
-              <!-- Mesaj Bloku -->
-              <div style="margin-bottom:24px;">
-                <p style="margin:0 0 8px 0;font-size:13px;font-weight:600;color:#706E6B;text-transform:uppercase;letter-spacing:0.5px;">Mesaj:</p>
-                <div style="background-color:#FAF9F6;border-left:3px solid #C6A87D;padding:14px 16px;font-size:14px;line-height:1.6;color:#1A1A1A;white-space:pre-wrap;">
-${payload.message}
-                </div>
+          <!-- HERO SECTION -->
+          <tr>
+            <td align="center" class="mobile-padding" style="padding:36px 40px 28px 40px; background-color:#ffffff;">
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:11px;
+                letter-spacing:3px;
+                color:#B89B5E;
+                text-transform:uppercase;
+                font-weight:bold;
+              ">
+                YENİ MÜŞTƏRİ MÜRACİƏTİ
               </div>
 
-              <!-- Əlaqə Düymələri -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+              <div style="height:12px; line-height:12px;">&nbsp;</div>
+
+              <div class="hero-title" style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:30px;
+                line-height:38px;
+                color:#171717;
+                font-weight:normal;
+              ">
+                ${payload.name}
+              </div>
+
+              <div style="height:10px; line-height:10px;">&nbsp;</div>
+
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:14px;
+                line-height:22px;
+                color:#777777;
+              ">
+                ${payload.subject || "Sayt üzərindən əlaqə müraciəti daxil oldu"}
+              </div>
+            </td>
+          </tr>
+
+          <!-- DETAILS CARD -->
+          <tr>
+            <td style="padding:0 35px 30px 35px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e7e3dc; background-color:#faf9f6; border-radius:2px;">
                 <tr>
-                  <td align="center" style="padding-top:8px;">
-                    <a href="tel:${payload.phone}" style="display:inline-block;background-color:#141414;color:#FFFFFF;padding:12px 24px;border-radius:4px;font-size:13px;font-weight:600;text-decoration:none;margin-right:8px;">
+                  <td style="padding:24px;">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1px; color:#B89B5E; text-transform:uppercase; font-weight:600; width:35%;">
+                          Müştəri:
+                        </td>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717; font-weight:bold;">
+                          ${payload.name}
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1px; color:#B89B5E; text-transform:uppercase; font-weight:600;">
+                          Telefon:
+                        </td>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717; font-weight:bold;">
+                          <a href="tel:${payload.phone}" style="color:#171717;">${payload.phone}</a>
+                        </td>
+                      </tr>
+
+                      ${
+                        payload.email
+                          ? `
+                      <tr>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1px; color:#B89B5E; text-transform:uppercase; font-weight:600;">
+                          E-poçt:
+                        </td>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717;">
+                          <a href="mailto:${payload.email}" style="color:#171717; text-decoration:underline;">${payload.email}</a>
+                        </td>
+                      </tr>`
+                          : ""
+                      }
+
+                      ${
+                        payload.propertyTitle
+                          ? `
+                      <tr>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1px; color:#B89B5E; text-transform:uppercase; font-weight:600;">
+                          Əmlak / Layihə:
+                        </td>
+                        <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717; font-weight:bold;">
+                          ${payload.propertyTitle}
+                        </td>
+                      </tr>`
+                          : ""
+                      }
+
+                      <tr>
+                        <td style="padding:8px 0; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1px; color:#B89B5E; text-transform:uppercase; font-weight:600;">
+                          Tarix:
+                        </td>
+                        <td style="padding:8px 0; font-family:Arial, Helvetica, sans-serif; font-size:13px; color:#777777;">
+                          ${timeFormatted}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <div style="height:18px; line-height:18px;">&nbsp;</div>
+
+                    <!-- MESSAGE BLOCK -->
+                    <div style="
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:11px;
+                      letter-spacing:1.5px;
+                      color:#B89B5E;
+                      text-transform:uppercase;
+                      font-weight:bold;
+                      margin-bottom:8px;
+                    ">
+                      MÜRACİƏT MƏTNİ:
+                    </div>
+
+                    <div style="
+                      background-color:#ffffff;
+                      border:1px solid #ede9e1;
+                      border-left:3px solid #B89B5E;
+                      padding:16px;
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:14px;
+                      line-height:22px;
+                      color:#2b2b2b;
+                      white-space:pre-wrap;
+                    ">${payload.message}</div>
+
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- QUICK ACTIONS -->
+          <tr>
+            <td align="center" style="padding:0 35px 35px 35px;">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:4px;">
+                    <a href="tel:${payload.phone}" class="action-btn" style="
+                      display:inline-block;
+                      background-color:#171717;
+                      color:#ffffff;
+                      padding:14px 28px;
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:11px;
+                      letter-spacing:1.5px;
+                      text-transform:uppercase;
+                      font-weight:600;
+                      border-radius:2px;
+                    ">
                       📞 Zəng et (${payload.phone})
                     </a>
-                    <a href="https://wa.me/${payload.phone.replace(/[^0-9]/g, "")}" style="display:inline-block;background-color:#25D366;color:#FFFFFF;padding:12px 24px;border-radius:4px;font-size:13px;font-weight:600;text-decoration:none;">
+                  </td>
+                  <td align="center" style="padding:4px;">
+                    <a href="https://wa.me/${phoneClean}" class="action-btn" style="
+                      display:inline-block;
+                      background-color:#25D366;
+                      color:#ffffff;
+                      padding:14px 28px;
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:11px;
+                      letter-spacing:1.5px;
+                      text-transform:uppercase;
+                      font-weight:600;
+                      border-radius:2px;
+                    ">
                       💬 WhatsApp-da yaz
                     </a>
                   </td>
@@ -182,12 +364,96 @@ ${payload.message}
             </td>
           </tr>
 
-          <!-- Altlıq -->
+          <!-- ABOUT BRAND SECTION -->
           <tr>
-            <td style="background-color:#FAF9F6;padding:20px 32px;border-top:1px solid #EBE7DF;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#8C8881;">
-                Bu bildiriş <a href="https://www.luxehomeestate.az" style="color:#C6A87D;text-decoration:none;">Luxe Home Estate</a> saytından avtomatik göndərilib.
-              </p>
+            <td align="center" style="padding:40px 35px; background-color:#171717;">
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:10px;
+                letter-spacing:3px;
+                color:#B89B5E;
+                text-transform:uppercase;
+              ">
+                LUXE HOME ESTATE
+              </div>
+              <div style="height:12px; line-height:12px;">&nbsp;</div>
+              <div style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:24px;
+                line-height:32px;
+                color:#ffffff;
+              ">
+                Həyatınızın ən dəyərli ünvanı.
+              </div>
+              <div style="height:12px; line-height:12px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:13px;
+                line-height:21px;
+                color:#bcbcbc;
+                max-width:440px;
+              ">
+                Bakıda premium daşınmaz əmlakların alqı-satqısı, icarəsi və peşəkar konsaltinq xidmətləri.
+              </div>
+              <div style="height:22px; line-height:22px;">&nbsp;</div>
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="border:1px solid #B89B5E; border-radius:2px;">
+                    <a href="https://luxehomeestate.az/admin" style="
+                      display:inline-block;
+                      padding:12px 24px;
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:11px;
+                      letter-spacing:1.5px;
+                      color:#B89B5E;
+                      text-transform:uppercase;
+                    ">
+                      İdarə Panelinə Keç
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" style="padding:28px 25px; background-color:#111111; border-top:1px solid #292929;">
+              <div style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:16px;
+                color:#ffffff;
+                letter-spacing:1px;
+              ">
+                LUXE HOME ESTATE MMC
+              </div>
+              <div style="height:10px; line-height:10px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:12px;
+                line-height:18px;
+                color:#8f8f8f;
+              ">
+                Əliyar Əliyev 109A, Bakı, Azərbaycan
+              </div>
+              <div style="height:6px; line-height:6px;">&nbsp;</div>
+              <div>
+                <a href="https://luxehomeestate.az" style="
+                  font-family:Arial, Helvetica, sans-serif;
+                  font-size:12px;
+                  color:#B89B5E;
+                ">
+                  www.luxehomeestate.az
+                </a>
+              </div>
+              <div style="height:16px; line-height:16px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:10px;
+                color:#666666;
+              ">
+                © 2026 Luxe Home Estate. Bütün hüquqlar qorunur.
+              </div>
             </td>
           </tr>
 
@@ -206,3 +472,397 @@ ${payload.message}
     replyTo: payload.email || undefined,
   });
 }
+
+/**
+ * Müştərilər üçün premium əmlak bülleteni / marketinq e-poçt şablonu
+ */
+export async function sendShowcaseEmail(payload: ShowcaseEmailPayload) {
+  const subject = payload.subject || "Luxe Home Estate — Seçilmiş Premium Əmlaklar";
+  const heroTitle = payload.heroTitle || "Yeni həyatınızı<br>burada kəşf edin";
+  const heroSubtitle =
+    payload.heroSubtitle ||
+    "Bakının seçilmiş premium daşınmaz əmlaklarını sizin üçün bir araya gətiririk.";
+
+  const properties = payload.properties || [
+    {
+      title: "Premium Residence",
+      location: "Bakı, Nəsimi rayonu",
+      price: "₼ 485,000",
+      type: "SATIŞ",
+      imageUrl: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
+      url: "https://luxehomeestate.az/emlaklar",
+    },
+    {
+      title: "Modern Dənizkənarı Villa",
+      location: "Bakı, Mərdəkan",
+      price: "₼ 1,250,000",
+      type: "SATIŞ",
+      imageUrl: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
+      url: "https://luxehomeestate.az/emlaklar",
+    },
+  ];
+
+  const html = `
+<!DOCTYPE html>
+<html lang="az" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+  <title>${subject}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f3f1ed;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    table {
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+    img {
+      border: 0;
+      display: block;
+      max-width: 100%;
+    }
+    a {
+      text-decoration: none;
+    }
+    @media only screen and (max-width: 600px) {
+      .container {
+        width: 100% !important;
+      }
+      .mobile-padding {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+      }
+      .hero-title {
+        font-size: 30px !important;
+        line-height: 36px !important;
+      }
+      .property-image {
+        width: 100% !important;
+      }
+    }
+  </style>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f3f1ed;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f1ed;">
+    <tr>
+      <td align="center" style="padding:30px 15px;">
+        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff;">
+
+          <!-- HEADER -->
+          <tr>
+            <td align="center" style="padding:30px 30px 25px 30px; background-color:#ffffff;">
+              <div style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:24px;
+                letter-spacing:2px;
+                font-weight:bold;
+                color:#171717;
+              ">
+                LUXE HOME ESTATE
+              </div>
+              <div style="height:10px; line-height:10px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:10px;
+                letter-spacing:4px;
+                color:#B89B5E;
+                text-transform:uppercase;
+                font-weight:600;
+              ">
+                LUXURY REAL ESTATE
+              </div>
+            </td>
+          </tr>
+
+          <!-- GOLD LINE -->
+          <tr>
+            <td style="height:2px; background-color:#B89B5E; font-size:0; line-height:0;">
+              &nbsp;
+            </td>
+          </tr>
+
+          <!-- HERO CONTENT -->
+          <tr>
+            <td align="center" class="mobile-padding" style="padding:42px 50px 40px 50px;">
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:11px;
+                letter-spacing:3px;
+                color:#B89B5E;
+                text-transform:uppercase;
+                font-weight:600;
+              ">
+                SİZİN ÜÇÜN SEÇİLMİŞ
+              </div>
+
+              <div style="height:14px; line-height:14px;">&nbsp;</div>
+
+              <div class="hero-title" style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:36px;
+                line-height:43px;
+                color:#171717;
+                font-weight:normal;
+              ">
+                ${heroTitle}
+              </div>
+
+              <div style="height:18px; line-height:18px;">&nbsp;</div>
+
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:15px;
+                line-height:25px;
+                color:#666666;
+              ">
+                ${heroSubtitle}
+              </div>
+
+              <div style="height:28px; line-height:28px;">&nbsp;</div>
+
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="background-color:#171717; border-radius:2px;">
+                    <a href="https://luxehomeestate.az/emlaklar" style="
+                      display:inline-block;
+                      padding:15px 30px;
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:12px;
+                      letter-spacing:1.5px;
+                      color:#ffffff;
+                      text-transform:uppercase;
+                      font-weight:600;
+                    ">
+                      Əmlaklara bax
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- SECTION TITLE -->
+          <tr>
+            <td align="center" class="mobile-padding" style="padding:15px 40px 30px 40px;">
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:10px;
+                letter-spacing:3px;
+                color:#B89B5E;
+                text-transform:uppercase;
+                font-weight:600;
+              ">
+                PREMIUM SEÇİMLƏR
+              </div>
+              <div style="height:10px; line-height:10px;">&nbsp;</div>
+              <div style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:28px;
+                line-height:35px;
+                color:#171717;
+              ">
+                Seçilmiş əmlaklar
+              </div>
+            </td>
+          </tr>
+
+          <!-- PROPERTY LIST -->
+          ${properties
+            .map(
+              (prop) => `
+          <tr>
+            <td style="padding:0 30px 35px 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e7e3dc; background-color:#ffffff;">
+                <tr>
+                  <td>
+                    <img
+                      class="property-image"
+                      src="${prop.imageUrl}"
+                      width="538"
+                      alt="${prop.title}"
+                      style="width:538px; max-width:100%; height:auto; display:block;"
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:25px;">
+                    <div style="
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:10px;
+                      letter-spacing:2px;
+                      color:#B89B5E;
+                      text-transform:uppercase;
+                      font-weight:600;
+                    ">
+                      ${prop.type}
+                    </div>
+                    <div style="height:8px; line-height:8px;">&nbsp;</div>
+                    <div style="
+                      font-family:Georgia, 'Times New Roman', serif;
+                      font-size:24px;
+                      color:#171717;
+                    ">
+                      ${prop.title}
+                    </div>
+                    <div style="height:8px; line-height:8px;">&nbsp;</div>
+                    <div style="
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:13px;
+                      color:#777777;
+                    ">
+                      ${prop.location}
+                    </div>
+                    <div style="height:18px; line-height:18px;">&nbsp;</div>
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="left">
+                          <div style="
+                            font-family:Arial, Helvetica, sans-serif;
+                            font-size:20px;
+                            color:#171717;
+                            font-weight:bold;
+                          ">
+                            ${prop.price}
+                          </div>
+                        </td>
+                        <td align="right">
+                          <a href="${prop.url}" style="
+                            font-family:Arial, Helvetica, sans-serif;
+                            font-size:11px;
+                            letter-spacing:1px;
+                            color:#B89B5E;
+                            text-transform:uppercase;
+                            font-weight:600;
+                          ">
+                            Ətraflı →
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          `
+            )
+            .join("")}
+
+          <!-- ABOUT / CTA SECTION -->
+          <tr>
+            <td align="center" style="padding:45px 40px; background-color:#171717;">
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:10px;
+                letter-spacing:3px;
+                color:#B89B5E;
+                text-transform:uppercase;
+              ">
+                LUXE HOME ESTATE
+              </div>
+              <div style="height:15px; line-height:15px;">&nbsp;</div>
+              <div style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:28px;
+                line-height:36px;
+                color:#ffffff;
+              ">
+                Doğru məkan.<br>
+                Doğru seçim.
+              </div>
+              <div style="height:15px; line-height:15px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:14px;
+                line-height:23px;
+                color:#bcbcbc;
+              ">
+                Premium daşınmaz əmlak axtarırsınız?
+                Biz sizin üçün doğru seçimi tapmağa kömək edirik.
+              </div>
+              <div style="height:25px; line-height:25px;">&nbsp;</div>
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="border:1px solid #B89B5E; border-radius:2px;">
+                    <a href="https://luxehomeestate.az/elaqe" style="
+                      display:inline-block;
+                      padding:14px 28px;
+                      font-family:Arial, Helvetica, sans-serif;
+                      font-size:11px;
+                      letter-spacing:1.5px;
+                      color:#B89B5E;
+                      text-transform:uppercase;
+                      font-weight:600;
+                    ">
+                      Bizimlə əlaqə
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" style="padding:30px 25px; background-color:#111111; border-top:1px solid #292929;">
+              <div style="
+                font-family:Georgia, 'Times New Roman', serif;
+                font-size:18px;
+                color:#ffffff;
+                letter-spacing:1px;
+              ">
+                LUXE HOME ESTATE
+              </div>
+              <div style="height:12px; line-height:12px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:12px;
+                line-height:20px;
+                color:#8f8f8f;
+              ">
+                Əliyar Əliyev 109A, Bakı, Azərbaycan
+              </div>
+              <div style="height:8px; line-height:8px;">&nbsp;</div>
+              <div>
+                <a href="https://luxehomeestate.az" style="
+                  font-family:Arial, Helvetica, sans-serif;
+                  font-size:12px;
+                  color:#B89B5E;
+                ">
+                  www.luxehomeestate.az
+                </a>
+              </div>
+              <div style="height:20px; line-height:20px;">&nbsp;</div>
+              <div style="
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:10px;
+                color:#666666;
+              ">
+                © 2026 Luxe Home Estate. Bütün hüquqlar qorunur.
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+
+  return sendEmail({
+    to: payload.to,
+    subject,
+    html,
+  });
+}
+
