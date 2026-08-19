@@ -1,8 +1,7 @@
 // Luxe Home Estate — Prisma schema
 //
-// Provider: SQLite (development). PostgreSQL-ə keçid üçün yalnız `provider`
-// və `DATABASE_URL` dəyişdirilir — model strukturu hər iki bazada işləyir.
-// SQLite native enum dəstəkləmədiyi üçün status/rol sahələri String saxlanılır;
+// Provider: PostgreSQL (Supabase). Model strukturu PostgreSQL-ə uyğundur.
+// Status/rol sahələri String saxlanılır;
 // icazə verilən dəyərlər `src/lib/constants.ts` faylında toplanıb.
 
 generator client {
@@ -10,9 +9,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
+
 
 // ---------------------------------------------------------------------------
 // İSTİFADƏÇİLƏR VƏ ROLLAR
