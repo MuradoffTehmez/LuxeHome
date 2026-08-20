@@ -23,6 +23,11 @@ import {
   type SortOption,
 } from "@/lib/constants";
 
+// Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
+// kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
+export const dynamic = "force-dynamic";
+
+
 export const metadata: Metadata = buildMetadata({
   title: "Əmlaklar",
   description:

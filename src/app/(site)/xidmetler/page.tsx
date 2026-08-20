@@ -10,6 +10,11 @@ import { ButtonLink } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 import { getServices } from "@/lib/queries";
 
+// Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
+// kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
+export const dynamic = "force-dynamic";
+
+
 export const metadata: Metadata = buildMetadata({
   title: "Xidmətlər",
   description:

@@ -9,6 +9,11 @@ import { PostCard } from "@/components/site/post-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getPostBySlug, getRelatedPosts } from "@/lib/queries";
 
+// Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
+// kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
+export const dynamic = "force-dynamic";
+
+
 type Props = {
   params: Promise<{ slug: string }>;
 };

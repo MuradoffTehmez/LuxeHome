@@ -7,6 +7,11 @@ import { ProjectCard } from "@/components/site/project-card";
 import { buildMetadata } from "@/lib/seo";
 import { getProjects } from "@/lib/queries";
 
+// Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
+// kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
+export const dynamic = "force-dynamic";
+
+
 export const metadata: Metadata = buildMetadata({
   title: "Layihələr",
   description:
