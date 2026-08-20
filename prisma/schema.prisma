@@ -1,17 +1,21 @@
 // Luxe Home Estate — Prisma schema
 //
-// Provider: PostgreSQL (Supabase). Model strukturu PostgreSQL-ə uyğundur.
+// Provider: SQLite (Cloudflare D1). Runtime-da @prisma/adapter-d1 driver adapter istifadə olunur.
 // Status/rol sahələri String saxlanılır;
 // icazə verilən dəyərlər `src/lib/constants.ts` faylında toplanıb.
 
 generator client {
+  // Standart yer (node_modules/.prisma/client) qəsdən saxlanılır: yalnız paket adı ilə
+  // idxal edildikdə `exports` şərtləri işləyir və Workers-də wasm engine seçilir.
+  // Xüsusi `output` verilsəydi, bundler `index.js` (Node binary engine) götürərdi.
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // D1 SQLite-ə əsaslanır. Bu URL yalnız lokal seed/miqrasiya generasiyası üçündür;
+  // production-da sorğular D1 binding (env.DB) üzərindən gedir.
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 
