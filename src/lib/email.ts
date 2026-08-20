@@ -94,7 +94,6 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
   }).format(new Date());
 
   const subject = `🔔 Yeni Müraciət: ${payload.name} — ${payload.subject || "Luxe Home Estate"}`;
-  const phoneClean = payload.phone.replace(/[^0-9]/g, "");
 
   const html = `
 <!DOCTYPE html>
