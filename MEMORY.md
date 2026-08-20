@@ -176,8 +176,7 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 **Vəziyyət: ictimai sayt canlıdır.**
 
-- Worker: `luxehomeestate` → `https://luxehomeestate.amiyevbahadur.workers.dev`
-- Hədəf domen: `luxehomeestate.az` (zone artıq Cloudflare-dədir)
+- Worker: `luxehomeestate` → `https://luxehomeestate.az` və `https://www.luxehomeestate.az`
 - D1: `luxehome-db` (`86d5f7e0-ffe6-48d8-bd84-d88163550b2a`) — `migrations/0001_init.sql`
   tətbiq olunub, `prisma/seed.sql` (212 sətir demo məzmun) yüklənib
 - R2: `luxehome-media`, `luxehome-next-cache`
@@ -195,7 +194,9 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 ### Yayımdan sonra qalan işlər
 
-- [ ] `luxehomeestate.az` custom domain-ini Worker-ə bağlamaq və `NEXT_PUBLIC_SITE_URL`-i yoxlamaq.
+- [x] `luxehomeestate.az` və `www.luxehomeestate.az` Worker-ə bağlandı (20 avqust 2026).
+      Canonical URL-lər, sitemap və robots.txt production ünvanını göstərir.
+      `workers.dev` alt domeni custom domain əlavə olunduqdan sonra söndü.
 - [ ] R2 üçün `media.luxehomeestate.az` public custom domain qurmaq.
 - [ ] Resend-də `luxehomeestate.az` domenini təsdiqləmək (hazırda `onboarding@resend.dev`
       göndərici ünvanı işlədilir — production üçün uyğun deyil).
