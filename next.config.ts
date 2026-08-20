@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
   // Layihə qovluğu iş sahəsinin kökü kimi qeyd olunur —
@@ -16,6 +17,11 @@ const nextConfig: NextConfig = {
         // TODO: Şirkətin öz foto arxivi hazır olduqda bu qayda silinə bilər.
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        // R2 media bucket-in public custom domain-i
+        protocol: "https",
+        hostname: "media.luxehomeestate.az",
       },
     ],
   },
@@ -49,3 +55,7 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// `next dev` zamanı Cloudflare binding-lərini (D1, R2) lokal miniflare üzərindən açır,
+// beləliklə development production ilə eyni kod yolunu işlədir.
+initOpenNextCloudflareForDev();
