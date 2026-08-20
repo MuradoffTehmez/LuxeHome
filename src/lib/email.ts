@@ -1,12 +1,31 @@
 import { Resend } from "resend";
 
-const resendApiKey = process.env.RESEND_API_KEY;
-const resendFromEmail =
-  process.env.RESEND_FROM_EMAIL || "Luxe Home Estate <onboarding@resend.dev>";
-const defaultNotificationEmail =
-  process.env.NOTIFICATION_EMAIL || "amiyevbahadur@gmail.com";
+/**
+ * Cloudflare Workers-də `process.env` yalnız sorğu kontekstində doldurulur —
+ * modul yüklənərkən oxunsa, dəyərlər boş qalır. Ona görə bütün konfiqurasiya
+ * ilk istifadə anında (lazy) oxunur.
+ */
+const DEFAULT_FROM_EMAIL = "Luxe Home Estate <onboarding@resend.dev>";
+const FALLBACK_NOTIFICATION_EMAIL = "info@luxehomeestate.az";
 
-export const resend = resendApiKey ? new Resend(resendApiKey) : null;
+function fromEmail(): string {
+  return process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
+}
+
+function notificationEmail(): string {
+  return process.env.NOTIFICATION_EMAIL || FALLBACK_NOTIFICATION_EMAIL;
+}
+
+let resendClient: Resend | null | undefined;
+
+/** Resend klienti — açar yoxdursa `null` qaytarır. */
+export function getResend(): Resend | null {
+  if (resendClient === undefined) {
+    const apiKey = process.env.RESEND_API_KEY;
+    resendClient = apiKey ? new Resend(apiKey) : null;
+  }
+  return resendClient;
+}
 
 export type SendEmailOptions = {
   to?: string | string[];
@@ -47,12 +66,14 @@ export type ShowcaseEmailPayload = {
  * Ümumi e-poçt göndərmə funksiyası
  */
 export async function sendEmail({
-  to = defaultNotificationEmail,
+  to,
   subject,
   html,
-  from = resendFromEmail,
+  from,
   replyTo,
 }: SendEmailOptions) {
+  const resend = getResend();
+
   if (!resend) {
     console.warn("⚠️ Resend API açarı (RESEND_API_KEY) tapılmadı. E-poçt göndərilmədi.");
     return { success: false, error: "RESEND_API_KEY təyin edilməyib" };
@@ -60,8 +81,8 @@ export async function sendEmail({
 
   try {
     const { data, error } = await resend.emails.send({
-      from,
-      to,
+      from: from ?? fromEmail(),
+      to: to ?? notificationEmail(),
       subject,
       html,
       replyTo: replyTo || undefined,
@@ -86,7 +107,7 @@ export async function sendEmail({
  * Saytdan gələn yeni müraciət üçün rəhbərliyə / adminə bildiriş e-poçtu
  */
 export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
-  const recipient = process.env.NOTIFICATION_EMAIL || defaultNotificationEmail;
+  const recipient = notificationEmail();
   const timeFormatted = new Intl.DateTimeFormat("az-AZ", {
     dateStyle: "full",
     timeStyle: "short",
