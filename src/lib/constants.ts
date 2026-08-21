@@ -340,3 +340,28 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
 
 /** 8 MB */
 export const MAX_UPLOAD_SIZE = 8 * 1024 * 1024;
+
+// ---------------------------------------------------------------------------
+// VALYUTA
+// ---------------------------------------------------------------------------
+
+export const CURRENCIES = {
+  AZN: "AZN",
+  USD: "USD",
+  EUR: "EUR",
+} as const;
+
+export type Currency = (typeof CURRENCIES)[keyof typeof CURRENCIES];
+
+export const CURRENCY_LABELS: Record<Currency, string> = {
+  AZN: "AZN (₼)",
+  USD: "USD ($)",
+  EUR: "EUR (€)",
+};
+
+// ---------------------------------------------------------------------------
+// PANELDƏ SƏHİFƏLƏMƏ
+// ---------------------------------------------------------------------------
+
+/** Admin cədvəllərində bir səhifədəki sətir sayı. */
+export const ADMIN_PAGE_SIZE = 20;

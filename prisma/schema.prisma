@@ -484,3 +484,24 @@ model Setting {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+/// Panel əməliyyatlarının izi: kim, nə vaxt, hansı qeydə nə etdi.
+/// Sətirlər heç vaxt yenilənmir və redaktorlar tərəfindən silinə bilmir.
+model AuditLog {
+  id       String @id @default(cuid())
+  userId   String?
+  userEmail String
+  /// CREATE | UPDATE | DELETE | RESTORE | PUBLISH | LOGIN_REVOKE | ROLE_CHANGE | UPLOAD
+  action   String
+  /// Property | Project | BlogPost | Service | Lead | Media | User | Setting
+  entity   String
+  entityId String?
+  /// Qısa insan oxunaqlı təsvir (məsələn elanın başlığı).
+  summary  String?
+  ip       String?
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
