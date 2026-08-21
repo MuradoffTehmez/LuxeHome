@@ -1,92 +1,196 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import Image from "next/image";
-import { GripVertical, ImagePlus, Star, Trash2, UploadCloud } from "lucide-react";
+import {
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  ImagePlus,
+  Loader2,
+  Star,
+  Trash2,
+  UploadCloud,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type PreviewImage = {
-  id: string;
-  url: string;
-  name: string;
-  isCover: boolean;
-};
-
-type ImageDropzoneProps = {
-  label: string;
-  hint?: string;
-  /** Redaktə zamanı verilən başlanğıc şəkillər. */
-  initial?: { id: string; url: string; name: string }[];
-  /** `single` — yalnız bir şəkil (üz qabığı), `multiple` — qalereya. */
-  mode?: "single" | "multiple";
-};
+import { MAX_UPLOAD_SIZE } from "@/lib/constants";
+import { useFieldError } from "./form-shell";
 
 /**
  * Şəkil yükləmə sahəsi.
  *
- * Hazırda yalnız interfeysdir: seçilən fayllar `URL.createObjectURL` ilə brauzerdə
- * göstərilir, heç bir yerə göndərilmir.
+ * Fayllar seçilən kimi `/api/admin/media`-ya gedir və R2-yə yazılır; forma yalnız
+ * hazır URL-ləri daşıyır. Bu qəsdəndir: Server Action gövdəsində 8 MB-lıq faylları
+ * daşımaq həm limitə dəyir, həm də irəliləyiş göstərməyə imkan vermir.
  *
- * TODO: Backend mərhələsində fayllar serverə yüklənəcək (əvvəlcə lokal disk
- *       `/public/uploads`, sonra Cloudflare R2 / S3 — bax MEMORY.md).
+ * Forma dəyəri gizli input-larda JSON kimi gedir — sıra, alt mətn və üz qabığı
+ * seçimi bir sahədə saxlanılır və server tərəfdə bir yerdə oxunur.
  */
+
+export type DropzoneImage = {
+  url: string;
+  alt: string;
+  isCover: boolean;
+};
+
+type Item = DropzoneImage & {
+  id: string;
+  status: "ready" | "uploading" | "error";
+  error?: string;
+};
+
+type ImageDropzoneProps = {
+  /** Forma sahəsinin adı — server `form.list(formData, name)` ilə oxuyur. */
+  name: string;
+  label: string;
+  hint?: string;
+  /** R2-də qovluq: emlaklar | layiheler | bloq | xidmetler | umumi */
+  folder: string;
+  initial?: DropzoneImage[];
+  /** `single` — yalnız bir şəkil (üz qabığı), `multiple` — qalereya. */
+  mode?: "single" | "multiple";
+};
+
+function withCover(items: Item[]): Item[] {
+  const ready = items.filter((item) => item.status !== "error");
+  if (ready.some((item) => item.isCover)) return items;
+  let assigned = false;
+  return items.map((item) => {
+    if (assigned || item.status === "error") return { ...item, isCover: false };
+    assigned = true;
+    return { ...item, isCover: true };
+  });
+}
+
 export function ImageDropzone({
+  name,
   label,
   hint,
+  folder,
   initial = [],
   mode = "multiple",
 }: ImageDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const fieldId = useId();
+  const fieldError = useFieldError(name);
   const [dragActive, setDragActive] = useState(false);
-  const [images, setImages] = useState<PreviewImage[]>(
-    initial.map((image, index) => ({ ...image, isCover: index === 0 })),
+  const [items, setItems] = useState<Item[]>(() =>
+    withCover(
+      initial.map((image, index) => ({
+        ...image,
+        id: `initial-${index}`,
+        status: "ready" as const,
+      })),
+    ),
   );
+
+  async function upload(file: File, id: string) {
+    if (file.size > MAX_UPLOAD_SIZE) {
+      setItems((current) =>
+        current.map((item) =>
+          item.id === id ? { ...item, status: "error", error: "Fayl 8 MB-dan böyükdür" } : item,
+        ),
+      );
+      return;
+    }
+
+    const body = new FormData();
+    body.append("file", file);
+    body.append("folder", folder);
+
+    try {
+      const response = await fetch("/api/admin/media", { method: "POST", body });
+      const payload = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error ?? "Yükləmə alınmadı");
+      }
+
+      setItems((current) =>
+        withCover(
+          current.map((item) =>
+            item.id === id ? { ...item, url: payload.url!, status: "ready" } : item,
+          ),
+        ),
+      );
+    } catch (error) {
+      setItems((current) =>
+        current.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                status: "error",
+                error: error instanceof Error ? error.message : "Yükləmə alınmadı",
+              }
+            : item,
+        ),
+      );
+    }
+  }
 
   function addFiles(files: FileList | null) {
     if (!files?.length) return;
-    const next = Array.from(files)
-      .filter((file) => file.type.startsWith("image/"))
-      .map((file, index) => ({
-        id: `${file.name}-${Date.now()}-${index}`,
-        url: URL.createObjectURL(file),
-        name: file.name,
-        isCover: false,
-      }));
 
-    setImages((current) => {
-      const merged = mode === "single" ? next.slice(0, 1) : [...current, ...next];
-      // Heç bir üz qabığı yoxdursa, birinci şəkil üz qabığı olur
-      return merged.some((image) => image.isCover)
-        ? merged
-        : merged.map((image, index) => ({ ...image, isCover: index === 0 }));
-    });
+    const selected = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    const limited = mode === "single" ? selected.slice(0, 1) : selected;
+
+    const pending: Item[] = limited.map((file, index) => ({
+      id: `${Date.now()}-${index}-${file.name}`,
+      // Yükləmə bitənə qədər brauzerdəki önbaxış göstərilir
+      url: URL.createObjectURL(file),
+      alt: "",
+      isCover: false,
+      status: "uploading" as const,
+    }));
+
+    setItems((current) => withCover(mode === "single" ? pending : [...current, ...pending]));
+    limited.forEach((file, index) => void upload(file, pending[index].id));
   }
 
   function remove(id: string) {
-    setImages((current) => {
-      const filtered = current.filter((image) => image.id !== id);
-      return filtered.some((image) => image.isCover)
-        ? filtered
-        : filtered.map((image, index) => ({ ...image, isCover: index === 0 }));
-    });
+    setItems((current) => withCover(current.filter((item) => item.id !== id)));
   }
 
   function setCover(id: string) {
-    setImages((current) =>
-      current.map((image) => ({ ...image, isCover: image.id === id })),
-    );
+    setItems((current) => current.map((item) => ({ ...item, isCover: item.id === id })));
   }
+
+  function move(id: string, direction: -1 | 1) {
+    setItems((current) => {
+      const index = current.findIndex((item) => item.id === id);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= current.length) return current;
+      const next = [...current];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+
+  function setAlt(id: string, alt: string) {
+    setItems((current) => current.map((item) => (item.id === id ? { ...item, alt } : item)));
+  }
+
+  const uploaded = items.filter((item) => item.status === "ready");
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Serverə gedən dəyər — sıra massivdəki sıra ilə eynidir */}
+      {uploaded.map((item) => (
+        <input
+          key={item.id}
+          type="hidden"
+          name={name}
+          value={JSON.stringify({ url: item.url, alt: item.alt, isCover: item.isCover })}
+        />
+      ))}
+
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-sm font-medium text-ink">{label}</span>
-        {images.length > 0 && (
-          <span className="tabular text-xs text-ink-muted">{images.length} şəkil</span>
+        {uploaded.length > 0 && (
+          <span className="tabular text-xs text-ink-muted">{uploaded.length} şəkil</span>
         )}
       </div>
 
-      {/* Sürüklə-burax sahəsi */}
       <div
         onDragOver={(event) => {
           event.preventDefault();
@@ -101,6 +205,7 @@ export function ImageDropzone({
         className={cn(
           "rounded-md border-2 border-dashed transition-colors duration-200",
           dragActive ? "border-gold bg-gold/8" : "border-line-strong bg-ivory",
+          fieldError && "border-danger",
         )}
       >
         <button
@@ -124,72 +229,145 @@ export function ImageDropzone({
           type="file"
           accept="image/jpeg,image/png,image/webp,image/avif"
           multiple={mode === "multiple"}
-          onChange={(event) => addFiles(event.target.files)}
+          onChange={(event) => {
+            addFiles(event.target.files);
+            event.target.value = "";
+          }}
           className="sr-only"
           aria-label={label}
         />
       </div>
 
-      {hint && <p className="text-xs text-ink-muted">{hint}</p>}
+      {hint && !fieldError && <p className="text-xs text-ink-muted">{hint}</p>}
+      {fieldError && (
+        <p role="alert" className="flex items-center gap-1.5 text-xs font-medium text-danger">
+          <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
+          {fieldError}
+        </p>
+      )}
 
-      {/* Seçilmiş şəkillər */}
-      {images.length > 0 && (
+      {items.length > 0 && (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {images.map((image) => (
+          {items.map((item, index) => (
             <li
-              key={image.id}
-              className="group relative overflow-hidden rounded-xs border border-line bg-beige"
+              key={item.id}
+              className={cn(
+                "relative overflow-hidden rounded-xs border bg-beige",
+                item.status === "error" ? "border-danger" : "border-line",
+              )}
             >
               <div className="relative aspect-4/3">
                 <Image
-                  src={image.url}
-                  alt={image.name}
+                  src={item.url}
+                  alt=""
                   fill
                   sizes="(max-width: 640px) 50vw, 25vw"
                   // Blob URL-lər Next optimizasiyasından keçmir
-                  unoptimized={image.url.startsWith("blob:")}
-                  className="object-cover"
+                  unoptimized={item.url.startsWith("blob:")}
+                  className={cn("object-cover", item.status !== "ready" && "opacity-50")}
                 />
+                {item.status === "uploading" && (
+                  <span className="absolute inset-0 grid place-items-center bg-charcoal/25">
+                    <Loader2 className="size-6 animate-spin text-paper" aria-hidden="true" />
+                  </span>
+                )}
               </div>
 
-              {image.isCover && (
+              {item.isCover && item.status === "ready" && (
                 <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-xs bg-gold px-2 py-1 text-[11px] font-semibold text-ink">
                   <Star className="size-3 fill-current" aria-hidden="true" />
                   Üz qabığı
                 </span>
               )}
 
-              <div className="flex items-center justify-between gap-1 bg-paper px-2 py-1.5">
-                <span
-                  className="grid size-8 place-items-center text-ink-muted"
-                  title="Sıranı dəyişmək üçün sürüşdürün"
-                >
-                  <GripVertical className="size-4" aria-hidden="true" />
-                </span>
+              {item.status === "error" && (
+                <p className="bg-danger-bg px-2 py-1.5 text-[11px] font-medium text-danger">
+                  {item.error}
+                </p>
+              )}
 
-                <div className="flex items-center gap-0.5">
-                  {!image.isCover && (
-                    <button
-                      type="button"
-                      onClick={() => setCover(image.id)}
-                      aria-label={`«${image.name}» şəklini üz qabığı et`}
-                      title="Üz qabığı et"
-                      className="grid size-9 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-beige hover:text-gold-deep"
-                    >
-                      <Star className="size-4" aria-hidden="true" />
-                    </button>
-                  )}
+              {item.status === "ready" && (
+                <div className="flex flex-col gap-1.5 bg-paper px-2 py-2">
+                  <label className="sr-only" htmlFor={`${fieldId}-alt-${item.id}`}>
+                    Şəklin alt mətni
+                  </label>
+                  <input
+                    id={`${fieldId}-alt-${item.id}`}
+                    type="text"
+                    value={item.alt}
+                    onChange={(event) => setAlt(item.id, event.target.value)}
+                    placeholder="Alt mətn (SEO)"
+                    maxLength={160}
+                    className="min-h-9 w-full rounded-xs border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
+                  />
+
+                  <div className="flex items-center justify-between gap-0.5">
+                    {mode === "multiple" ? (
+                      <span className="flex items-center gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => move(item.id, -1)}
+                          disabled={index === 0}
+                          aria-label="Sırada əvvələ apar"
+                          title="Əvvələ"
+                          className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                        >
+                          <ChevronLeft className="size-4" aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => move(item.id, 1)}
+                          disabled={index === items.length - 1}
+                          aria-label="Sırada sona apar"
+                          title="Sona"
+                          className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                        >
+                          <ChevronRight className="size-4" aria-hidden="true" />
+                        </button>
+                      </span>
+                    ) : (
+                      <span />
+                    )}
+
+                    <span className="flex items-center gap-0.5">
+                      {!item.isCover && mode === "multiple" && (
+                        <button
+                          type="button"
+                          onClick={() => setCover(item.id)}
+                          aria-label="Üz qabığı et"
+                          title="Üz qabığı et"
+                          className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-beige hover:text-gold-deep"
+                        >
+                          <Star className="size-4" aria-hidden="true" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => remove(item.id)}
+                        aria-label="Şəkli sil"
+                        title="Sil"
+                        className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
+                      >
+                        <Trash2 className="size-4" aria-hidden="true" />
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {item.status === "error" && (
+                <div className="flex justify-end bg-paper px-2 py-1.5">
                   <button
                     type="button"
-                    onClick={() => remove(image.id)}
-                    aria-label={`«${image.name}» şəklini sil`}
-                    title="Sil"
-                    className="grid size-9 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
+                    onClick={() => remove(item.id)}
+                    aria-label="Uğursuz şəkli siyahıdan çıxar"
+                    title="Çıxar"
+                    className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
                   </button>
                 </div>
-              </div>
+              )}
             </li>
           ))}
 
