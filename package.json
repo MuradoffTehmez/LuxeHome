@@ -30,12 +30,13 @@
   "dependencies": {
     "@prisma/adapter-d1": "^6.19.3",
     "@prisma/client": "^6.19.3",
-    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "jose": "^6.2.8",
     "lucide-react": "^1.31.0",
     "next": "15.5.23",
     "next-themes": "^0.4.6",
+    "otpauth": "^9.5.1",
+    "qrcode-svg": "^1.1.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "resend": "^6.20.0",
@@ -44,11 +45,12 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.0.0",
     "@eslint/eslintrc": "^3",
     "@opennextjs/cloudflare": "^1.20.2",
     "@tailwindcss/postcss": "^4",
-    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^26.2.0",
+    "@types/qrcode-svg": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
@@ -57,6 +59,7 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
     "typescript": "^5",
+    "vitest": "^4.1.11",
     "wrangler": "^4.124.0"
   },
   "allowScripts": {
