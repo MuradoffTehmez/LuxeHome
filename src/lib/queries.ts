@@ -676,3 +676,316 @@ export async function getPropertyFormOptions() {
 }
 
 export type PropertyFormOptions = Awaited<ReturnType<typeof getPropertyFormOptions>>;
+
+// ---------------------------------------------------------------------------
+// PANEL SORĞULARI — MÜRACİƏTLƏR
+// ---------------------------------------------------------------------------
+
+export type AdminLeadFilters = {
+  q?: string;
+  status?: string;
+  source?: string;
+  page?: number;
+};
+
+const adminLeadSelect = {
+  id: true,
+  name: true,
+  phone: true,
+  email: true,
+  subject: true,
+  source: true,
+  status: true,
+  createdAt: true,
+  property: { select: { id: true, title: true, slug: true } },
+  assignee: { select: { id: true, name: true } },
+} satisfies Prisma.LeadSelect;
+
+export type AdminLeadRow = Prisma.LeadGetPayload<{ select: typeof adminLeadSelect }>;
+
+export async function getAdminLeads(filters: AdminLeadFilters = {}) {
+  const page = Math.max(1, filters.page ?? 1);
+
+  const where: Prisma.LeadWhereInput = {
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.source ? { source: filters.source } : {}),
+    ...(filters.q
+      ? {
+          OR: [
+            { name: { contains: filters.q } },
+            { phone: { contains: filters.q } },
+            { email: { contains: filters.q } },
+            { message: { contains: filters.q } },
+          ],
+        }
+      : {}),
+  };
+
+  const [rows, total] = await Promise.all([
+    prisma.lead.findMany({
+      where,
+      select: adminLeadSelect,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * ADMIN_PAGE_SIZE,
+      take: ADMIN_PAGE_SIZE,
+    }),
+    prisma.lead.count({ where }),
+  ]);
+
+  return { rows, total, page, totalPages: Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE)) };
+}
+
+export async function getAdminLeadById(id: string) {
+  return prisma.lead.findUnique({
+    where: { id },
+    include: {
+      property: { select: { id: true, title: true, slug: true } },
+      assignee: { select: { id: true, name: true } },
+    },
+  });
+}
+
+/** Müraciətə təyin oluna bilən aktiv istifadəçilər. */
+export async function getAssignableUsers() {
+  return prisma.user.findMany({
+    where: { isActive: true },
+    select: { id: true, name: true, role: true },
+    orderBy: { name: "asc" },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// PANEL SORĞULARI — BLOQ
+// ---------------------------------------------------------------------------
+
+export type AdminPostFilters = {
+  q?: string;
+  status?: string;
+  categoryId?: string;
+  deleted?: boolean;
+  page?: number;
+};
+
+const adminPostSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  status: true,
+  coverUrl: true,
+  viewCount: true,
+  readMinutes: true,
+  publishedAt: true,
+  updatedAt: true,
+  deletedAt: true,
+  category: { select: { name: true } },
+  author: { select: { name: true } },
+} satisfies Prisma.BlogPostSelect;
+
+export type AdminPostRow = Prisma.BlogPostGetPayload<{ select: typeof adminPostSelect }>;
+
+export async function getAdminPosts(filters: AdminPostFilters = {}) {
+  const page = Math.max(1, filters.page ?? 1);
+
+  const where: Prisma.BlogPostWhereInput = {
+    deletedAt: filters.deleted ? { not: null } : null,
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
+    ...(filters.q
+      ? { OR: [{ title: { contains: filters.q } }, { slug: { contains: filters.q } }] }
+      : {}),
+  };
+
+  const [rows, total] = await Promise.all([
+    prisma.blogPost.findMany({
+      where,
+      select: adminPostSelect,
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * ADMIN_PAGE_SIZE,
+      take: ADMIN_PAGE_SIZE,
+    }),
+    prisma.blogPost.count({ where }),
+  ]);
+
+  return { rows, total, page, totalPages: Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE)) };
+}
+
+export async function getAdminPostById(id: string) {
+  return prisma.blogPost.findUnique({ where: { id } });
+}
+
+/** Panel üçün kateqoriyalar — ictimai `getBlogCategories()` yalnız dolu olanları qaytarır. */
+export async function getAdminBlogCategories() {
+  return prisma.blogCategory.findMany({
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      order: true,
+      _count: { select: { posts: true } },
+    },
+    orderBy: [{ order: "asc" }, { name: "asc" }],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// PANEL SORĞULARI — LAYİHƏLƏR VƏ XİDMƏTLƏR
+// ---------------------------------------------------------------------------
+
+export type AdminProjectFilters = {
+  q?: string;
+  status?: string;
+  projectType?: string;
+  deleted?: boolean;
+  page?: number;
+};
+
+const adminProjectSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  status: true,
+  projectType: true,
+  year: true,
+  unitCount: true,
+  isActive: true,
+  order: true,
+  coverUrl: true,
+  updatedAt: true,
+  deletedAt: true,
+  city: { select: { name: true } },
+  _count: { select: { properties: true, images: true } },
+} satisfies Prisma.ProjectSelect;
+
+export type AdminProjectRow = Prisma.ProjectGetPayload<{ select: typeof adminProjectSelect }>;
+
+export async function getAdminProjects(filters: AdminProjectFilters = {}) {
+  const page = Math.max(1, filters.page ?? 1);
+
+  const where: Prisma.ProjectWhereInput = {
+    deletedAt: filters.deleted ? { not: null } : null,
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.projectType ? { projectType: filters.projectType } : {}),
+    ...(filters.q
+      ? { OR: [{ name: { contains: filters.q } }, { slug: { contains: filters.q } }] }
+      : {}),
+  };
+
+  const [rows, total] = await Promise.all([
+    prisma.project.findMany({
+      where,
+      select: adminProjectSelect,
+      orderBy: [{ order: "asc" }, { updatedAt: "desc" }],
+      skip: (page - 1) * ADMIN_PAGE_SIZE,
+      take: ADMIN_PAGE_SIZE,
+    }),
+    prisma.project.count({ where }),
+  ]);
+
+  return { rows, total, page, totalPages: Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE)) };
+}
+
+export async function getAdminProjectById(id: string) {
+  return prisma.project.findUnique({
+    where: { id },
+    include: { images: { orderBy: { order: "asc" } } },
+  });
+}
+
+/** Layihə formasında yalnız şəhər siyahısı lazımdır. */
+export async function getCityOptions() {
+  return prisma.location.findMany({
+    where: { kind: "CITY" },
+    select: { id: true, name: true },
+    orderBy: { order: "asc" },
+  });
+}
+
+export async function getAdminServices() {
+  return prisma.service.findMany({
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      shortDescription: true,
+      icon: true,
+      order: true,
+      isActive: true,
+      updatedAt: true,
+    },
+    orderBy: [{ order: "asc" }, { title: "asc" }],
+  });
+}
+
+export async function getAdminServiceById(id: string) {
+  return prisma.service.findUnique({ where: { id } });
+}
+
+// ---------------------------------------------------------------------------
+// PANEL SORĞULARI — MEDİA, İSTİFADƏÇİLƏR, PARAMETRLƏR
+// ---------------------------------------------------------------------------
+
+export async function getAdminMedia(filters: { q?: string; page?: number } = {}) {
+  const page = Math.max(1, filters.page ?? 1);
+
+  const where: Prisma.MediaWhereInput = filters.q
+    ? { OR: [{ originalName: { contains: filters.q } }, { alt: { contains: filters.q } }] }
+    : {};
+
+  const [rows, total] = await Promise.all([
+    prisma.media.findMany({
+      where,
+      select: {
+        id: true,
+        url: true,
+        thumbUrl: true,
+        originalName: true,
+        mimeType: true,
+        size: true,
+        width: true,
+        height: true,
+        alt: true,
+        createdAt: true,
+        uploader: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * ADMIN_PAGE_SIZE,
+      take: ADMIN_PAGE_SIZE,
+    }),
+    prisma.media.count({ where }),
+  ]);
+
+  return { rows, total, page, totalPages: Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE)) };
+}
+
+export async function getAdminUsers() {
+  return prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      isActive: true,
+      lastLoginAt: true,
+      createdAt: true,
+      totpEnabledAt: true,
+      mustChangePassword: true,
+      lockedUntil: true,
+      _count: { select: { sessions: true } },
+    },
+    orderBy: [{ isActive: "desc" }, { name: "asc" }],
+  });
+}
+
+export async function getSettings() {
+  const rows = await prisma.setting.findMany({ orderBy: { key: "asc" } });
+  return Object.fromEntries(rows.map((row) => [row.key, row.value])) as Record<string, string>;
+}
+
+/** Son panel əməliyyatları — təhlükəsizlik icmalı üçün. */
+export async function getAuditLog(take = 50) {
+  return prisma.auditLog.findMany({
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+}
