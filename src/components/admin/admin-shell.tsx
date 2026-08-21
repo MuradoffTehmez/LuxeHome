@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ExternalLink, LogOut, Menu, Search, X } from "lucide-react";
@@ -173,12 +174,15 @@ function Sidebar({
       >
         {/* Loqo */}
         <div className="flex min-h-16 items-center justify-between gap-2 border-b border-white/10 px-5">
-          <Link href="/admin" className="flex flex-col leading-none">
-            <span className="font-display text-lg tracking-[0.18em] text-white">
-              LUXE HOME ESTATE
-            </span>
-            <span className="mt-1 text-[10px] tracking-[0.22em] text-gold-soft">
-              İDARƏ PANELİ
+          <Link href="/admin" className="flex items-center gap-2.5 leading-none">
+            <Image src="/logo-mark.png" alt="" width={512} height={512} className="size-9 shrink-0" />
+            <span className="flex flex-col">
+              <span className="font-display text-base tracking-[0.16em] text-white">
+                LUXE HOME ESTATE
+              </span>
+              <span className="mt-1 text-[10px] tracking-[0.22em] text-gold-soft">
+                İDARƏ PANELİ
+              </span>
             </span>
           </Link>
 

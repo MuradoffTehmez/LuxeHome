@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { readStageCookie, verifyStageToken } from "@/lib/auth/cookies";
 import { VerifyForm } from "./verify-form";
@@ -20,6 +21,7 @@ export default async function VerifyPage() {
     <main className="flex min-h-dvh flex-col justify-center bg-ivory px-5 py-10 sm:px-10">
       <div className="mx-auto w-full max-w-md">
         <div className="mb-8 flex flex-col gap-2">
+          <Image src="/logo-mark.png" alt="" width={512} height={512} className="mb-2 size-14" />
           <span className="font-display text-xl tracking-[0.18em] text-ink">LUXE HOME ESTATE</span>
           <h1 className="font-display text-3xl text-ink">Doğrulama kodu</h1>
           <p className="text-sm text-ink-soft">

@@ -36,6 +36,14 @@ export default async function LoginPage({
           </Link>
 
           <div className="mb-8 flex flex-col gap-2">
+            <Image
+              src="/logo-mark.png"
+              alt=""
+              width={512}
+              height={512}
+              priority
+              className="mb-2 size-14"
+            />
             <span className="font-display text-xl tracking-[0.18em] text-ink">
               LUXE HOME ESTATE
             </span>
