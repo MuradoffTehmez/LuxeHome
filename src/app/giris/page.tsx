@@ -12,7 +12,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage() {
+// Giriş marşrutu `?davam=` parametrini oxuyur — statik render mümkün deyil
+export const dynamic = "force-dynamic";
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ davam?: string }>;
+}) {
+  const { davam } = await searchParams;
+
   return (
     <main className="grid min-h-dvh lg:grid-cols-2">
       {/* --- Sol: forma --- */}
@@ -37,7 +46,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <LoginForm />
+          <LoginForm davam={davam} />
 
           <div className="mt-8 flex items-start gap-2.5 rounded-xs border border-line bg-beige px-4 py-3">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />

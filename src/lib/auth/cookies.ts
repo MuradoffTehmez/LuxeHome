@@ -1,5 +1,12 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import {
+  SESSION_COOKIE,
+  SESSION_SUBJECT,
+  STAGE_COOKIE,
+  STAGE_SUBJECT,
+  TOKEN_ISSUER,
+} from "./cookie-names";
 import type { AuthStage } from "./types";
 
 /**
@@ -12,12 +19,7 @@ import type { AuthStage } from "./types";
  * sessiya kimi qəbul edilə bilmir: ikinci addımı keçmədən panelə düşmək mümkün deyil.
  */
 
-export const SESSION_COOKIE = "lhe_session";
-export const STAGE_COOKIE = "lhe_2fa";
-
-const ISSUER = "luxehomeestate";
-const SESSION_SUBJECT = "session";
-const STAGE_SUBJECT = "stage";
+export { SESSION_COOKIE, STAGE_COOKIE };
 
 function secretKey(): Uint8Array {
   const secret = process.env.AUTH_SECRET;
@@ -26,12 +28,13 @@ function secretKey(): Uint8Array {
 }
 
 export type SessionClaims = { sid: string; uid: string; role: string };
-export type StageClaims = { uid: string; stage: AuthStage; secret?: string };
+/** `next` — girişdən sonra qayıdılacaq panel marşrutu (`?davam=` parametrindən gəlir). */
+export type StageClaims = { uid: string; stage: AuthStage; secret?: string; next?: string };
 
 export async function signSessionToken(claims: SessionClaims, expiresAt: Date): Promise<string> {
   return new SignJWT({ ...claims })
     .setProtectedHeader({ alg: "HS256" })
-    .setIssuer(ISSUER)
+    .setIssuer(TOKEN_ISSUER)
     .setSubject(SESSION_SUBJECT)
     .setIssuedAt()
     .setExpirationTime(Math.floor(expiresAt.getTime() / 1000))
@@ -41,7 +44,7 @@ export async function signSessionToken(claims: SessionClaims, expiresAt: Date): 
 export async function verifySessionToken(token: string): Promise<SessionClaims | null> {
   try {
     const { payload } = await jwtVerify(token, secretKey(), {
-      issuer: ISSUER,
+      issuer: TOKEN_ISSUER,
       subject: SESSION_SUBJECT,
     });
     const { sid, uid, role } = payload as Record<string, unknown>;
@@ -55,7 +58,7 @@ export async function verifySessionToken(token: string): Promise<SessionClaims |
 export async function signStageToken(claims: StageClaims, maxAgeSeconds: number): Promise<string> {
   return new SignJWT({ ...claims })
     .setProtectedHeader({ alg: "HS256" })
-    .setIssuer(ISSUER)
+    .setIssuer(TOKEN_ISSUER)
     .setSubject(STAGE_SUBJECT)
     .setIssuedAt()
     .setExpirationTime(Math.floor(Date.now() / 1000) + maxAgeSeconds)
@@ -65,13 +68,18 @@ export async function signStageToken(claims: StageClaims, maxAgeSeconds: number)
 export async function verifyStageToken(token: string): Promise<StageClaims | null> {
   try {
     const { payload } = await jwtVerify(token, secretKey(), {
-      issuer: ISSUER,
+      issuer: TOKEN_ISSUER,
       subject: STAGE_SUBJECT,
     });
-    const { uid, stage, secret } = payload as Record<string, unknown>;
+    const { uid, stage, secret, next } = payload as Record<string, unknown>;
     if (typeof uid !== "string") return null;
     if (stage !== "totp" && stage !== "enroll") return null;
-    return { uid, stage, secret: typeof secret === "string" ? secret : undefined };
+    return {
+      uid,
+      stage,
+      secret: typeof secret === "string" ? secret : undefined,
+      next: typeof next === "string" ? next : undefined,
+    };
   } catch {
     return null;
   }

@@ -13,8 +13,11 @@ import { signIn } from "./actions";
  * Parol yoxlaması `signIn` server action-ında aparılır; uğurlu halda action
  * ikinci mərhələyə (`/giris/dogrulama` və ya `/giris/2fa-qurulumu`) yönləndirir,
  * ona görə burada uğur vəziyyəti yoxdur — yalnız səhv mesajı qayıdır.
+ *
+ * `davam` — middleware-in qoyduğu marşrut: giriş bitəndə istifadəçi ilk istədiyi
+ * panel səhifəsinə qayıdır. Dəyər server tərəfdə yenidən yoxlanılır.
  */
-export function LoginForm() {
+export function LoginForm({ davam }: { davam?: string }) {
   const [showPassword, setShowPassword] = useState(false);
   const [state, formAction, pending] = useActionState<FormState, FormData>(signIn, {});
 
@@ -24,6 +27,8 @@ export function LoginForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
+      {davam && <input type="hidden" name="davam" value={davam} />}
+
       <Field label="E-poçt" htmlFor="login-email" required>
         <input
           id="login-email"

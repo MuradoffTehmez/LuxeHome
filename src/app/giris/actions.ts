@@ -53,6 +53,7 @@ import { sendEmail } from "@/lib/email";
  */
 
 const GENERIC_ERROR = "E-poçt və ya parol yanlışdır.";
+const DEFAULT_TARGET = "/admin";
 const STAGE_TOTP_SECONDS = 5 * 60;
 const STAGE_ENROLL_SECONDS = 10 * 60;
 
@@ -68,8 +69,23 @@ const credentialsSchema = z.object({
 const DUMMY_HASH =
   "pbkdf2$sha256$210000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
+/**
+ * Girişdən sonra qayıdılacaq ünvanı təmizləyir.
+ *
+ * Yalnız panel daxilindəki nisbi marşrutlar qəbul edilir — `//kenar.sayt` və ya
+ * tam URL verilsə, açıq yönləndirmə (open redirect) zəifliyi yaranardı.
+ */
+function safeTarget(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  return /^\/admin(?:[/?#]|$)/.test(value) ? value : undefined;
+}
+
 /** İkinci mərhələni keçmiş istifadəçi üçün sessiya açır və panelə yönləndirir. */
-async function startSession(userId: string, totpCounter: number | null): Promise<never> {
+async function startSession(
+  userId: string,
+  totpCounter: number | null,
+  target?: string,
+): Promise<never> {
   const requestHeaders = await headers();
   const ip = clientIp(requestHeaders);
 
@@ -93,7 +109,7 @@ async function startSession(userId: string, totpCounter: number | null): Promise
   await registerSuccess(userId, user.email, ip);
   await pruneExpiredSessions();
 
-  redirect("/admin");
+  redirect(target ?? DEFAULT_TARGET);
 }
 
 export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -104,6 +120,7 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   if (!parsed.success) return { error: GENERIC_ERROR };
 
   const { email, password } = parsed.data;
+  const next = safeTarget(formData.get("davam"));
   const ip = clientIp(await headers());
 
   if (!(await checkLoginLimit(ip))) {
@@ -157,14 +174,14 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   if (!user.totpEnabledAt) {
     const secret = generateTotpSecret();
     await setStageCookie(
-      await signStageToken({ uid: user.id, stage: "enroll", secret }, STAGE_ENROLL_SECONDS),
+      await signStageToken({ uid: user.id, stage: "enroll", secret, next }, STAGE_ENROLL_SECONDS),
       STAGE_ENROLL_SECONDS,
     );
     redirect("/giris/2fa-qurulumu");
   }
 
   await setStageCookie(
-    await signStageToken({ uid: user.id, stage: "totp" }, STAGE_TOTP_SECONDS),
+    await signStageToken({ uid: user.id, stage: "totp", next }, STAGE_TOTP_SECONDS),
     STAGE_TOTP_SECONDS,
   );
   redirect("/giris/dogrulama");
@@ -198,7 +215,7 @@ export async function verifyTwoFactor(_prev: FormState, formData: FormData): Pro
     }
     await prisma.backupCode.update({ where: { id: match.id }, data: { usedAt: new Date() } });
     // `startSession` yönləndirmə atır və heç vaxt qayıtmır
-    return startSession(user.id, null);
+    return startSession(user.id, null, claims.next);
   }
 
   const secret = await decryptTotpSecret(user.totpSecret);
@@ -213,7 +230,7 @@ export async function verifyTwoFactor(_prev: FormState, formData: FormData): Pro
     return { error: "Bu kod artıq istifadə olunub. Növbəti kodu gözləyin." };
   }
 
-  return startSession(user.id, step);
+  return startSession(user.id, step, claims.next);
 }
 
 /**
@@ -264,7 +281,7 @@ export async function finishEnrollment(): Promise<void> {
   const claims = token ? await verifyStageToken(token) : null;
   if (!claims || claims.stage !== "enroll") redirect("/giris");
 
-  await startSession(claims.uid, null);
+  await startSession(claims.uid, null, claims.next);
 }
 
 export async function signOut(): Promise<void> {
