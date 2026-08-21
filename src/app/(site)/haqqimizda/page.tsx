@@ -11,10 +11,9 @@ import {
 } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
-import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/ui/reveal";
 import { ButtonLink } from "@/components/ui/button";
-import { demoStats, siteConfig } from "@/config/site";
+import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -85,7 +84,7 @@ export default function AboutPage() {
               <div className="relative aspect-4/5 overflow-hidden rounded-md sm:aspect-4/3 lg:aspect-4/5">
                 <Image
                   src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
-                  alt="Müasir memarlıq nümunəsi"
+                  alt="Müasir premium memarlıq"
                   fill
                   loading="lazy"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -159,35 +158,6 @@ export default function AboutPage() {
             ))}
           </div>
 
-          {/* Statistika */}
-          {demoStats.enabled && (
-            <div className="mt-14">
-              {demoStats.isDemo && (
-                <p className="mb-4 flex flex-wrap items-center justify-center gap-2 text-center text-xs text-ink-muted">
-                  <Badge tone="info" className="uppercase">
-                    Nümunə
-                  </Badge>
-                  Aşağıdakı rəqəmlər nümunədir və şirkət tərəfindən
-                  təsdiqlənməyib.
-                </p>
-              )}
-
-              <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md bg-line lg:grid-cols-4">
-                {demoStats.items.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="flex flex-col items-center gap-1 bg-paper px-4 py-8 text-center"
-                  >
-                    <dt className="sr-only">{stat.label}</dt>
-                    <dd className="tabular font-display text-3xl text-ink sm:text-4xl">
-                      {stat.value}
-                    </dd>
-                    <p className="text-sm text-ink-muted">{stat.label}</p>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
         </Container>
       </Section>
     </>

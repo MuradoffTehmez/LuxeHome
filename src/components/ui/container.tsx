@@ -33,8 +33,8 @@ const SECTION_TONES = {
   ivory: "bg-ivory text-ink",
   paper: "bg-paper text-ink",
   beige: "bg-beige text-ink",
-  dark: "bg-zinc-900 text-white on-dark",
-  navy: "bg-[#101a28] text-white on-dark",
+  dark: "bg-charcoal text-ink-invert on-dark",
+  navy: "bg-navy text-ink-invert on-dark",
 } as const;
 
 /**

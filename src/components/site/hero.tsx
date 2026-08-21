@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { ArrowRight, Phone } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { SearchPanel, type CityOption, type TypeOption } from "./search-panel";
 
@@ -28,26 +28,31 @@ export function Hero({ types, cities }: HeroProps) {
         {/* İkiqat overlay — mətnin kontrastını hər şəkil üzərində təmin edir */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-zinc-900/62"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-b from-zinc-900/75 via-zinc-900/25 to-zinc-900/85"
+          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,17,15,0.86)_0%,rgba(18,17,15,0.58)_46%,rgba(18,17,15,0.12)_78%),linear-gradient(0deg,rgba(18,17,15,0.88)_0%,rgba(18,17,15,0.08)_48%)]"
         />
       </div>
 
-      <Container className="flex min-h-dvh flex-col justify-center pt-[calc(var(--header-h)+2rem)] pb-20 lg:pb-28 lg:pt-[calc(var(--header-h)+3rem)]">
-        <div className="max-w-3xl">
-          <p className="animate-fade-in flex items-center gap-3 text-xs font-medium tracking-[0.28em] text-gold-soft uppercase">
+      <Container
+        size="wide"
+        className="grid min-h-[min(54rem,100dvh)] items-end gap-10 pt-[calc(var(--header-h)+5rem)] pb-8 lg:grid-cols-12 lg:pb-10"
+      >
+        <div className="lg:col-span-7 lg:pb-10">
+          <p className="editorial-kicker animate-fade-in flex items-center gap-3 text-gold-soft">
             <span aria-hidden="true" className="h-px w-10 bg-gold-soft/60" />
             {siteConfig.legalName}
           </p>
 
-          <h1 className="animate-slide-up mt-6 font-display text-[2.5rem] leading-[1.08] text-white sm:text-6xl lg:text-7xl" style={{ animationDelay: "100ms" }}>
+          <h1
+            className="animate-slide-up mt-6 max-w-[10ch] font-display text-[clamp(3rem,7vw,7rem)] leading-[0.92] tracking-[-0.055em] text-white"
+            style={{ animationDelay: "100ms" }}
+          >
             {siteConfig.slogan}
           </h1>
 
-          <p className="animate-slide-up mt-6 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg" style={{ animationDelay: "200ms" }}>
+          <p
+            className="animate-slide-up mt-7 max-w-[58ch] text-base leading-relaxed text-white/78 sm:text-lg"
+            style={{ animationDelay: "200ms" }}
+          >
             Luxe Home Estate ilə sizin üçün uyğun daşınmaz əmlakı kəşf edin. Mənzil,
             villa, həyət evi, torpaq və kommersiya obyektləri üzrə geniş seçim.
           </p>
@@ -58,24 +63,32 @@ export function Hero({ types, cities }: HeroProps) {
               <ArrowRight className="size-4" aria-hidden="true" />
             </ButtonLink>
 
-            <ButtonLink href="/elaqe" variant="onDark" size="lg">
+            <ButtonLink
+              href="/elaqe"
+              variant="onDark"
+              size="lg"
+              className="border-white/30 text-white hover:text-gold-soft"
+            >
               Bizimlə əlaqə
             </ButtonLink>
 
-            <ButtonAnchor
+            <a
               href={siteConfig.phoneHref}
-              variant="onDark"
-              size="lg"
-              className="sm:hidden"
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/75 transition-colors hover:text-gold-soft sm:hidden"
             >
               <Phone className="size-4" aria-hidden="true" />
               Zəng et
-            </ButtonAnchor>
+            </a>
           </div>
         </div>
 
+        <div className="hidden lg:col-span-5 lg:block" aria-hidden="true" />
+
         {/* Axtarış paneli */}
-        <div className="animate-slide-up mt-12 lg:mt-16" style={{ animationDelay: "400ms" }}>
+        <div
+          className="animate-slide-up lg:col-span-12"
+          style={{ animationDelay: "400ms" }}
+        >
           <SearchPanel types={types} cities={cities} />
         </div>
       </Container>

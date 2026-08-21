@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
   Blocks,
   Building2,
-  Eye,
   FileEdit,
   Inbox,
   Newspaper,
@@ -15,21 +14,30 @@ import {
   AdminTable,
   AdminTableCell,
   AdminTableRow,
-  DemoNotice,
   StatCard,
   StatusBadge,
 } from "@/components/admin/admin-ui";
-import { formatNumber, formatPrice, formatRelative } from "@/lib/utils";
+import { formatPrice, formatRelative } from "@/lib/utils";
 import {
   LEAD_SOURCE_LABELS,
   LEAD_STATUS_LABELS,
   PROPERTY_STATUS_LABELS,
+  type LeadSource,
+  type LeadStatus,
+  type PropertyStatus,
 } from "@/lib/constants";
-import { mockLeads, mockProperties, mockStats } from "@/lib/admin-mock";
+import {
+  getDashboardStats,
+  getRecentAdminLeads,
+  getRecentAdminProperties,
+} from "@/lib/queries";
 
-export default function AdminDashboardPage() {
-  const recentLeads = mockLeads.slice(0, 5);
-  const recentProperties = mockProperties.slice(0, 5);
+export default async function AdminDashboardPage() {
+  const [stats, recentLeads, recentProperties] = await Promise.all([
+    getDashboardStats(),
+    getRecentAdminLeads(),
+    getRecentAdminProperties(),
+  ]);
 
   return (
     <>
@@ -50,39 +58,37 @@ export default function AdminDashboardPage() {
         }
       />
 
-      <DemoNotice className="mb-6" />
-
       {/* --- Sayğaclar --- */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Aktiv əmlaklar"
-          value={mockStats.activeProperties}
-          hint={`${mockStats.draftProperties} qaralama gözləyir`}
+          value={stats.activeProperties}
+          hint={`${stats.draftProperties} qaralama gözləyir`}
           icon={Building2}
           tone="gold"
           href="/admin/emlaklar"
         />
         <StatCard
           label="Yeni müraciətlər"
-          value={mockStats.newLeads}
-          hint={`Ümumi ${mockStats.totalLeads} müraciət`}
+          value={stats.newLeads}
+          hint={`Ümumi ${stats.totalLeads} müraciət`}
           icon={Inbox}
           tone="warning"
           href="/admin/muracietler"
         />
         <StatCard
           label="Aktiv layihələr"
-          value={mockStats.activeProjects}
+          value={stats.activeProjects}
           hint="Davam edən tikintilər"
           icon={Blocks}
           tone="neutral"
           href="/admin/layiheler"
         />
         <StatCard
-          label="30 günlük baxış"
-          value={formatNumber(mockStats.viewsLast30Days)}
-          hint="Bütün əmlak səhifələri üzrə"
-          icon={Eye}
+          label="Dərc edilmiş yazılar"
+          value={stats.publishedPosts}
+          hint="Bloqda görünən məqalələr"
+          icon={Newspaper}
           tone="success"
         />
       </div>
@@ -111,6 +117,13 @@ export default function AdminDashboardPage() {
               { label: "Vaxt", className: "text-right" },
             ]}
           >
+            {recentLeads.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-sm text-ink-muted">
+                  Hələ müraciət yoxdur.
+                </td>
+              </tr>
+            )}
             {recentLeads.map((lead) => (
               <AdminTableRow key={lead.id}>
                 <AdminTableCell>
@@ -123,10 +136,13 @@ export default function AdminDashboardPage() {
                   <p className="tabular mt-0.5 text-xs text-ink-muted">{lead.phone}</p>
                 </AdminTableCell>
                 <AdminTableCell className="text-sm text-ink-soft">
-                  {LEAD_SOURCE_LABELS[lead.source]}
+                  {LEAD_SOURCE_LABELS[lead.source as LeadSource]}
                 </AdminTableCell>
                 <AdminTableCell>
-                  <StatusBadge status={lead.status} label={LEAD_STATUS_LABELS[lead.status]} />
+                  <StatusBadge
+                    status={lead.status as LeadStatus}
+                    label={LEAD_STATUS_LABELS[lead.status as LeadStatus]}
+                  />
                 </AdminTableCell>
                 <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
                   {formatRelative(lead.createdAt)}
@@ -150,6 +166,11 @@ export default function AdminDashboardPage() {
           }
         >
           <ul className="divide-y divide-line">
+            {recentProperties.length === 0 && (
+              <li className="px-5 py-8 text-center text-sm text-ink-muted">
+                Hələ əmlak əlavə edilməyib.
+              </li>
+            )}
             {recentProperties.map((property) => (
               <li key={property.id} className="flex items-center gap-3 px-5 py-3.5">
                 <div className="min-w-0 flex-1">
@@ -165,8 +186,8 @@ export default function AdminDashboardPage() {
                   </p>
                 </div>
                 <StatusBadge
-                  status={property.status}
-                  label={PROPERTY_STATUS_LABELS[property.status]}
+                  status={property.status as PropertyStatus}
+                  label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]}
                 />
               </li>
             ))}

@@ -2,27 +2,33 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock, Newspaper } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import type { PostCardData } from "@/lib/queries";
 
 export function PostCard({
   post,
   priority = false,
   className,
+  variant = "standard",
 }: {
   post: PostCardData;
   priority?: boolean;
   className?: string;
+  variant?: "standard" | "featured";
 }) {
   return (
     <article
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-md border border-line bg-paper",
-        "transition-shadow duration-300 hover:shadow-md",
+        "group relative flex h-full flex-col overflow-hidden rounded-sm border border-line bg-paper transition-colors duration-300 hover:border-line-strong",
         className,
       )}
     >
-      <div className="relative aspect-16/10 overflow-hidden bg-beige">
+      <div
+        className={cn(
+          "relative overflow-hidden bg-beige",
+          variant === "featured" ? "aspect-16/10 lg:min-h-[30rem]" : "aspect-16/10",
+        )}
+      >
         {post.coverUrl ? (
           <Image
             src={post.coverUrl}
@@ -30,8 +36,12 @@ export function PostCard({
             fill
             priority={priority}
             loading={priority ? undefined : "lazy"}
-            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            sizes={
+              variant === "featured"
+                ? "(max-width: 1024px) 100vw, 58vw"
+                : "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            }
+            className="image-lift object-cover"
           />
         ) : (
           <div className="flex size-full items-center justify-center text-ink-muted">
@@ -41,12 +51,16 @@ export function PostCard({
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           {post.category && <Badge tone="dark">{post.category.name}</Badge>}
-          {post.isDemo && <DemoBadge />}
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="font-display text-lg leading-snug text-ink">
+      <div className={cn("flex flex-1 flex-col gap-3 p-5", variant === "featured" && "sm:p-7")}>
+        <h3
+          className={cn(
+            "font-display leading-snug text-ink",
+            variant === "featured" ? "text-2xl sm:text-3xl" : "text-lg",
+          )}
+        >
           <Link
             href={`/blog/${post.slug}`}
             className="after:absolute after:inset-0 after:content-[''] hover:text-gold-deep"

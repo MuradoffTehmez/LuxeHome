@@ -1,10 +1,9 @@
 /**
- * Lokal SQLite faylını (prisma/dev.db) D1-ə yüklənə bilən SQL faylına çevirir.
+ * Lokal SQLite faylındakı təhlükəsiz bootstrap məlumatlarını D1 SQL faylına çevirir.
  *
  * Axın:  prisma db push → tsx prisma/seed.ts → bu script → wrangler d1 execute --file
  *
- * Cədvəllər xarici açar asılılığına görə topoloji sıralanır, çünki D1 foreign key
- * məhdudiyyətlərini tətbiq edir və valideyn sətir uşaqdan əvvəl yazılmalıdır.
+ * İstifadəçi/auth, müraciət, media və ictimai kontent qəsdən ixrac edilmir.
  */
 import { DatabaseSync } from "node:sqlite";
 import { writeFileSync } from "node:fs";
@@ -15,6 +14,15 @@ const OUT_PATH = path.join(import.meta.dirname, "seed.sql");
 
 const db = new DatabaseSync(DB_PATH, { readOnly: true });
 
+const BOOTSTRAP_TABLES = new Set([
+  "BlogCategory",
+  "Feature",
+  "Location",
+  "PropertyType",
+  "Service",
+  "Setting",
+]);
+
 const tables = db
   .prepare(
     `SELECT name FROM sqlite_master
@@ -24,7 +32,8 @@ const tables = db
      ORDER BY name`,
   )
   .all()
-  .map((row) => String(row.name));
+  .map((row) => String(row.name))
+  .filter((table) => BOOTSTRAP_TABLES.has(table));
 
 /** Hər cədvəlin asılı olduğu valideyn cədvəllər. */
 const parentsOf = new Map<string, string[]>();
@@ -64,12 +73,6 @@ const lines: string[] = [
   "",
 ];
 
-// Təkrar icra zamanı köhnə məlumatı təmizlə (uşaqdan valideynə doğru).
-for (const table of [...ordered].reverse()) {
-  lines.push(`DELETE FROM "${table}";`);
-}
-lines.push("");
-
 let rowCount = 0;
 for (const table of ordered) {
   const rows = db.prepare(`SELECT * FROM "${table}"`).all();
@@ -80,7 +83,7 @@ for (const table of ordered) {
   for (const row of rows) {
     const values = columns.map((column) => literal(row[column])).join(", ");
     lines.push(
-      `INSERT INTO "${table}" (${columns.map((c) => `"${c}"`).join(", ")}) VALUES (${values});`,
+      `INSERT OR IGNORE INTO "${table}" (${columns.map((c) => `"${c}"`).join(", ")}) VALUES (${values});`,
     );
     rowCount++;
   }

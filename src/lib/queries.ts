@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
+  ADMIN_PAGE_SIZE,
   PAGE_SIZE,
   POST_STATUSES,
   PUBLIC_PROPERTY_STATUSES,
@@ -27,7 +28,6 @@ export const propertyCardSelect = {
   floor: true,
   totalFloors: true,
   isFeatured: true,
-  isDemo: true,
   publishedAt: true,
   createdAt: true,
   type: { select: { name: true, slug: true } },
@@ -53,7 +53,6 @@ export const projectCardSelect = {
   status: true,
   year: true,
   coverUrl: true,
-  isDemo: true,
   city: { select: { name: true } },
 } satisfies Prisma.ProjectSelect;
 
@@ -70,7 +69,6 @@ export const postCardSelect = {
   coverAlt: true,
   readMinutes: true,
   publishedAt: true,
-  isDemo: true,
   category: { select: { name: true, slug: true } },
 } satisfies Prisma.BlogPostSelect;
 
@@ -105,6 +103,7 @@ export type PropertyFilters = {
 function publicPropertyWhere(): Prisma.PropertyWhereInput {
   return {
     deletedAt: null,
+    isDemo: false,
     status: { in: PUBLIC_PROPERTY_STATUSES },
   };
 }
@@ -213,7 +212,7 @@ export async function getFeaturedProperties(take = 6) {
 
 export async function getPropertyBySlug(slug: string) {
   return prisma.property.findFirst({
-    where: { slug, deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+    where: { ...publicPropertyWhere(), slug },
     include: {
       type: true,
       city: true,
@@ -246,7 +245,7 @@ export async function getSimilarProperties(
 export async function getPropertiesByIds(ids: string[]) {
   if (ids.length === 0) return [];
   return prisma.property.findMany({
-    where: { id: { in: ids }, deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+    where: { ...publicPropertyWhere(), id: { in: ids } },
     select: propertyCardSelect,
   });
 }
@@ -301,7 +300,7 @@ export async function getPropertyTypesWithCounts() {
       _count: {
         select: {
           properties: {
-            where: { deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+            where: publicPropertyWhere(),
           },
         },
       },
@@ -318,6 +317,7 @@ export async function getProjects(filters: { status?: string; type?: string } = 
   return prisma.project.findMany({
     where: {
       deletedAt: null,
+      isDemo: false,
       isActive: true,
       ...(filters.status ? { status: filters.status } : {}),
       ...(filters.type ? { projectType: filters.type } : {}),
@@ -329,12 +329,12 @@ export async function getProjects(filters: { status?: string; type?: string } = 
 
 export async function getProjectBySlug(slug: string) {
   return prisma.project.findFirst({
-    where: { slug, deletedAt: null, isActive: true },
+    where: { slug, deletedAt: null, isDemo: false, isActive: true },
     include: {
       city: true,
       images: { orderBy: { order: "asc" } },
       properties: {
-        where: { deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+        where: publicPropertyWhere(),
         select: propertyCardSelect,
         take: 6,
       },
@@ -369,6 +369,7 @@ export async function getPosts(
 
   const where: Prisma.BlogPostWhereInput = {
     deletedAt: null,
+    isDemo: false,
     status: POST_STATUSES.PUBLISHED,
     ...(filters.categorySlug ? { category: { slug: filters.categorySlug } } : {}),
     ...(filters.search
@@ -403,7 +404,7 @@ export async function getPosts(
 
 export async function getPostBySlug(slug: string) {
   return prisma.blogPost.findFirst({
-    where: { slug, deletedAt: null, status: POST_STATUSES.PUBLISHED },
+    where: { slug, deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
     include: {
       category: true,
       author: { select: { name: true } },
@@ -415,6 +416,7 @@ export async function getRelatedPosts(postId: string, categoryId: string | null,
   return prisma.blogPost.findMany({
     where: {
       deletedAt: null,
+      isDemo: false,
       status: POST_STATUSES.PUBLISHED,
       id: { not: postId },
       ...(categoryId ? { categoryId } : {}),
@@ -431,7 +433,7 @@ export async function getBlogCategories() {
     include: {
       _count: {
         select: {
-          posts: { where: { deletedAt: null, status: POST_STATUSES.PUBLISHED } },
+          posts: { where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED } },
         },
       },
     },
@@ -445,11 +447,11 @@ export async function getBlogCategories() {
 export async function getSitemapEntries() {
   const [properties, projects, services, posts] = await Promise.all([
     prisma.property.findMany({
-      where: { deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+      where: publicPropertyWhere(),
       select: { slug: true, updatedAt: true },
     }),
     prisma.project.findMany({
-      where: { deletedAt: null, isActive: true },
+      where: { deletedAt: null, isDemo: false, isActive: true },
       select: { slug: true, updatedAt: true },
     }),
     prisma.service.findMany({
@@ -457,7 +459,7 @@ export async function getSitemapEntries() {
       select: { slug: true, updatedAt: true },
     }),
     prisma.blogPost.findMany({
-      where: { deletedAt: null, status: POST_STATUSES.PUBLISHED },
+      where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
       select: { slug: true, updatedAt: true },
     }),
   ]);
@@ -482,15 +484,23 @@ export async function getDashboardStats() {
     mediaCount,
   ] = await Promise.all([
     prisma.property.count({
-      where: { deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED },
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.PUBLISHED },
     }),
-    prisma.property.count({ where: { deletedAt: null, status: PROPERTY_STATUSES.SOLD } }),
-    prisma.property.count({ where: { deletedAt: null, status: PROPERTY_STATUSES.RENTED } }),
-    prisma.property.count({ where: { deletedAt: null, status: PROPERTY_STATUSES.DRAFT } }),
-    prisma.project.count({ where: { deletedAt: null, status: "ONGOING" } }),
+    prisma.property.count({
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.SOLD },
+    }),
+    prisma.property.count({
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.RENTED },
+    }),
+    prisma.property.count({
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.DRAFT },
+    }),
+    prisma.project.count({ where: { deletedAt: null, isDemo: false, status: "ONGOING" } }),
     prisma.lead.count({ where: { status: "NEW" } }),
     prisma.lead.count(),
-    prisma.blogPost.count({ where: { deletedAt: null, status: POST_STATUSES.PUBLISHED } }),
+    prisma.blogPost.count({
+      where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
+    }),
     prisma.media.count(),
   ]);
 
@@ -506,3 +516,163 @@ export async function getDashboardStats() {
     mediaCount,
   };
 }
+
+export async function getRecentAdminProperties(take = 5) {
+  return prisma.property.findMany({
+    where: { deletedAt: null, isDemo: false },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      price: true,
+      currency: true,
+      updatedAt: true,
+    },
+    orderBy: { updatedAt: "desc" },
+    take,
+  });
+}
+
+export async function getRecentAdminLeads(take = 5) {
+  return prisma.lead.findMany({
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      source: true,
+      status: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// PANEL SORĞULARI — ƏMLAK
+// ---------------------------------------------------------------------------
+
+export type AdminPropertyFilters = {
+  q?: string;
+  status?: string;
+  listingType?: string;
+  typeId?: string;
+  cityId?: string;
+  /** `true` — yalnız silinmiş elanlar (zibil qutusu görünüşü). */
+  deleted?: boolean;
+  page?: number;
+};
+
+const adminPropertySelect = {
+  id: true,
+  title: true,
+  slug: true,
+  listingType: true,
+  status: true,
+  price: true,
+  currency: true,
+  rooms: true,
+  area: true,
+  isFeatured: true,
+  viewCount: true,
+  updatedAt: true,
+  deletedAt: true,
+  type: { select: { name: true } },
+  city: { select: { name: true } },
+  district: { select: { name: true } },
+  images: { orderBy: [{ isCover: "desc" }, { order: "asc" }], take: 1, select: { url: true } },
+} satisfies Prisma.PropertySelect;
+
+export type AdminPropertyRow = Prisma.PropertyGetPayload<{ select: typeof adminPropertySelect }>;
+
+/**
+ * Panel siyahısı.
+ *
+ * `isDemo` şərti burada **yoxdur**: demo qeydlər ictimai saytda gizlədilir, amma
+ * redaktor onları paneldə görüb təmizləyə bilməlidir.
+ */
+export async function getAdminProperties(filters: AdminPropertyFilters = {}) {
+  const page = Math.max(1, filters.page ?? 1);
+
+  const where: Prisma.PropertyWhereInput = {
+    deletedAt: filters.deleted ? { not: null } : null,
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.listingType ? { listingType: filters.listingType } : {}),
+    ...(filters.typeId ? { typeId: filters.typeId } : {}),
+    ...(filters.cityId ? { cityId: filters.cityId } : {}),
+    // D1-də `mode: "insensitive"` yoxdur; SQLite LIKE yalnız ASCII hərflərində
+    // reqistrdən asılı deyil, ona görə azərbaycanca sorğu tam olmaya bilər
+    ...(filters.q
+      ? {
+          OR: [
+            { title: { contains: filters.q } },
+            { slug: { contains: filters.q } },
+            { address: { contains: filters.q } },
+          ],
+        }
+      : {}),
+  };
+
+  const [rows, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: adminPropertySelect,
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * ADMIN_PAGE_SIZE,
+      take: ADMIN_PAGE_SIZE,
+    }),
+    prisma.property.count({ where }),
+  ]);
+
+  return {
+    rows,
+    total,
+    page,
+    totalPages: Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE)),
+  };
+}
+
+/** Redaktə formasının doldurulması üçün tam qeyd. */
+export async function getAdminPropertyById(id: string) {
+  return prisma.property.findUnique({
+    where: { id },
+    include: {
+      images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
+      features: { select: { featureId: true } },
+    },
+  });
+}
+
+/** Formadakı bütün açılan siyahılar bir sorğu dəstində gətirilir. */
+export async function getPropertyFormOptions() {
+  const [types, cities, districts, features, projects] = await Promise.all([
+    prisma.propertyType.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.location.findMany({
+      where: { kind: "CITY" },
+      select: { id: true, name: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.location.findMany({
+      where: { kind: { in: ["DISTRICT", "SETTLEMENT", "METRO"] } },
+      select: { id: true, name: true, kind: true, parentId: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.feature.findMany({
+      select: { id: true, name: true, group: true },
+      orderBy: [{ group: "asc" }, { order: "asc" }],
+    }),
+    prisma.project.findMany({
+      where: { deletedAt: null },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
+
+  return { types, cities, districts, features, projects };
+}
+
+export type PropertyFormOptions = Awaited<ReturnType<typeof getPropertyFormOptions>>;

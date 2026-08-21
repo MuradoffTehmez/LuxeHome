@@ -64,7 +64,7 @@ export function ContactForm() {
           name="email"
           label="E-poçt"
           type="email"
-          placeholder="email@nümunə.az"
+          placeholder="ad@domen.az"
           error={state.fieldErrors?.email}
         />
         <Input

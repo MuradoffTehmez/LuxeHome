@@ -8,7 +8,7 @@ export type AdminNavItem = {
   href: string;
   /** lucide-react ikon adı — `admin-icon.tsx` içindəki icazə siyahısından seçilir. */
   icon: string;
-  /** Yan paneldə göstərilən sayğac açarı (mockStats sahəsi). */
+  /** Yan paneldə göstərilən sayğac açarı. */
   badgeKey?: "newLeads" | "draftProperties";
 };
 

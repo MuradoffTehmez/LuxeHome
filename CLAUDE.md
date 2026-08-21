@@ -34,7 +34,7 @@ Verilənlər bazası (D1) axını:
 
 ```bash
 npx prisma db push                # lokal prisma/dev.db faylını sxemlə sinxronlaşdırır
-npx tsx prisma/seed.ts            # demo məzmunu lokal fayla yazır
+npx tsx prisma/seed.ts            # sistem və taksonomiya məlumatlarını lokal fayla yazır
 npm run db:seed:build             # lokal fayldan prisma/seed.sql qurur
 npm run db:migrate:remote         # migrations/ qovluğunu remote D1-ə tətbiq edir
 npm run db:seed:remote            # prisma/seed.sql-i remote D1-ə yükləyir
@@ -103,8 +103,8 @@ icazə verilən dəyərlər **yalnız** `src/lib/constants.ts`-də toplanıb: `P
 
 Hər dəyər dəsti üçün `*_LABELS` (azərbaycanca göstərilən mətn) və bəziləri üçün `*_TONE`
 (badge rəngi) cütü var. **Status sətirini heç vaxt hardcode etmə** — sabitdən istifadə et.
-Sxem şərhləri ilə sabitlər arasında uyğunsuzluq buglara səbəb olur (məs. `add-mocks.ts`-də
-`pricePeriod: "MONTHLY"` yazılıb, düzgün dəyər `MONTH`-dur).
+Sxem şərhləri ilə sabitlər arasında uyğunsuzluq buglara səbəb olur; yazma zamanı yalnız
+`constants.ts` dəyərlərindən istifadə edilməlidir.
 
 ### Autentifikasiya
 
@@ -227,28 +227,26 @@ sessiya cookie-si production-da da imza yoxlamasından keçər.
 ### Şirkət məlumatları
 
 Bütün əlaqə, brend və naviqasiya məlumatları `src/config/site.ts`-dədir (`siteConfig`,
-`navigation`, `legalNavigation`, `demoStats`, `whatsappLink()`). Telefon, ünvan, Instagram
+`navigation`, `legalNavigation`, `whatsappLink()`). Telefon, ünvan, Instagram
 kimi dəyərlər komponentlərdə hardcode edilmir.
 
 Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur Qafar oğlu**-na məxsusdur
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
 
-`demoStats` — **şirkət tərəfindən təsdiqlənməmiş rəqəmlərdir**, `isDemo: true` ilə işarələnib.
+### Demo kontent qoruması
 
-### Demo kontent modeli
-
-`Property`, `Project`, `BlogPost` modellərində `isDemo` boolean sahəsi var. Nümunə kontent bu
-bayraqla işarələnir və UI-da `DemoBadge` göstərilir. Real məlumat gələndə bayraq `false` olur.
+`Property`, `Project`, `BlogPost` modellərində geriyə uyğunluq üçün `isDemo` boolean sahəsi var.
+İctimai sorğular yalnız `isDemo: false` qeydlərini qaytarır; seed ictimai məzmun yaratmır.
 
 ## Cari vəziyyət və bilinən boşluqlar
 
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
-- **Auth qatı hazırdır, CRUD hələ mock-dur.** Giriş axını işləyir: PBKDF2 parol, məcburi TOTP
+- **Auth qatı hazırdır, CRUD hələ tamamlanmayıb.** Giriş axını işləyir: PBKDF2 parol, məcburi TOTP
   2FA (`src/app/giris`), D1-də saxlanan ləğv edilə bilən sessiyalar, rol əsaslı `requirePermission()`
-  və iki laylı sürət limiti. `/admin/hesabim` real işləyir. Qalan admin səhifələri (`emlaklar`,
-  `layiheler`, `blog`, `muracietler` və s.) hələ `src/lib/admin-mock.ts` oxuyur — CRUD yazılmayıb.
+  və iki laylı sürət limiti. `/admin/hesabim`, dashboard və əmlak siyahısı D1-dən oxuyur;
+  əmlak CRUD və media yükləmə axını yazılmayıb.
 - **Panel production-da bağlıdır.** `ADMIN_ENABLED` yalnız staging-də `"true"`-dur; prod-da
   `src/middleware.ts` `/admin` və `/giris` marşrutlarını 404-ə çevirir. Panel staging-də tam
   yoxlanandan sonra prod `vars`-ında açılır.
@@ -268,7 +266,7 @@ bayraqla işarələnir və UI-da `DemoBadge` göstərilir. Real məlumat gələn
   natamamdır; həll yolu axtarış üçün əvvəlcədən kiçik hərfə salınmış ayrıca sütun saxlamaqdır.
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
-- `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (demo şəkillər) və
+- `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər) və
   `media.luxehomeestate.az` (R2 custom domain) mənbələrinə icazə verir. Yeni mənbə əlavə
   edilərsə bu siyahı yenilənməlidir.
 - `next/image` optimizasiyası Cloudflare `IMAGES` binding-i üzərindən gedir (`wrangler.jsonc`).

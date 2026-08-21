@@ -30,6 +30,43 @@ async function hasValidSignature(token: string | undefined): Promise<boolean> {
   }
 }
 
+/**
+ * Panel və giriş səhifələri üçün sərt başlıqlar.
+ *
+ * `frame-ancestors 'none'` clickjacking-i bağlayır: oğurlanmış sessiya ilə panelin
+ * kənar saytda görünməz iframe-də açılıb kliklərin oğurlanması mümkün olmamalıdır.
+ * `form-action 'self'` isə forma göndərilişini kənar ünvana yönləndirməyə imkan vermir.
+ *
+ * `script-src` qəsdən `'unsafe-inline'` saxlayır — Next.js hidrasiya məlumatını inline
+ * skript kimi yerləşdirir və nonce axını App Router-də hələ tam dəstəklənmir.
+ */
+const ADMIN_CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+].join("; ");
+
+function harden(response: NextResponse): NextResponse {
+  response.headers.set("Content-Security-Policy", ADMIN_CSP);
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  );
+  // Panel səhifələri heç vaxt paylaşılan keşdə saxlanılmamalıdır
+  response.headers.set("Cache-Control", "no-store, max-age=0");
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   if (process.env.ADMIN_ENABLED !== "true") {
     return NextResponse.rewrite(new URL("/__baglidir", request.url));
@@ -52,7 +89,7 @@ export async function middleware(request: NextRequest) {
   // səhifəsinə yönləndirilir, amma elə həmin səhifədə təkrar yönləndirilməməlidir.
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  return harden(NextResponse.next({ request: { headers: requestHeaders } }));
 }
 
 export const config = {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -244,30 +244,4 @@ export function StatusBadge({
   label: string;
 }) {
   return <Badge tone={STATUS_TONES[status] ?? "neutral"}>{label}</Badge>;
-}
-
-// ---------------------------------------------------------------------------
-// DEMO XƏBƏRDARLIĞI
-// ---------------------------------------------------------------------------
-
-/**
- * Admin panelin hazırda yalnız interfeys olduğunu açıq bildirir.
- * Backend qoşulduqda bu komponent silinir.
- */
-export function DemoNotice({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "flex items-start gap-3 rounded-md border border-info/25 bg-info-bg px-4 py-3",
-        className,
-      )}
-    >
-      <AlertTriangle className="mt-0.5 size-4.5 shrink-0 text-info" aria-hidden="true" />
-      <p className="text-sm leading-relaxed text-info">
-        <strong className="font-semibold">Dizayn mərhələsi.</strong> Bu panel hazırda yalnız
-        interfeysdir — göstərilən məlumatlar nümunədir və düymələr verilənlər bazasına yazmır.
-        Backend mərhələsində real məlumatlarla əvəzlənəcək.
-      </p>
-    </div>
-  );
 }

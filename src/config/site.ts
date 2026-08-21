@@ -55,28 +55,6 @@ export const siteConfig = {
   },
 } as const;
 
-/**
- * ⚠️ DİQQƏT — NÜMUNƏ STATİSTİKA
- *
- * Aşağıdakı rəqəmlər şirkət tərəfindən TƏSDİQLƏNMƏMİŞDİR və yalnız
- * dizayn/demo məqsədi daşıyır.
- *
- * TODO: Rəhbərlikdən real rəqəmləri alın və bu bloku yeniləyin.
- * TODO: Real rəqəmlər əldə olunana qədər `enabled: false` saxlanıla bilər —
- *       bu halda "Niyə Luxe Home Estate?" bölməsi rəqəmsiz variantla göstərilir.
- */
-export const demoStats = {
-  enabled: true,
-  /** true olduqda blokun üstündə "Nümunə məlumat" bildirişi göstərilir. */
-  isDemo: true,
-  items: [
-    { value: "500+", label: "Portfeldəki əmlak" },
-    { value: "12", label: "İllik təcrübə" },
-    { value: "1 200+", label: "Məmnun müştəri" },
-    { value: "7", label: "Xidmət istiqaməti" },
-  ],
-} as const;
-
 export const navigation = [
   { label: "Ana səhifə", href: "/" },
   { label: "Əmlaklar", href: "/emlaklar" },

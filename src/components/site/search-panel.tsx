@@ -93,6 +93,7 @@ function SelectField({
   placeholder,
   options,
   onChange,
+  className,
 }: {
   id: string;
   name: string;
@@ -101,9 +102,10 @@ function SelectField({
   placeholder: string;
   options: { value: string; label: string }[];
   onChange?: (value: string) => void;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className={cn("flex flex-col gap-1.5", className)}>
       <label htmlFor={id} className={LABEL_CLASS}>
         {label}
       </label>
@@ -200,64 +202,72 @@ export function SearchPanel({
   return (
     <div
       className={cn(
-        "rounded-md border border-line bg-paper/97 p-4 shadow-lg backdrop-blur-sm sm:p-5",
+        "rounded-sm border p-4 backdrop-blur-md sm:p-5",
+        variant === "hero"
+          ? "border-white/20 bg-paper/94 shadow-editorial"
+          : "border-line bg-paper shadow-sm",
         className,
       )}
     >
-      {/* --- Satılır / Kirayə + mobil filtr açarı --- */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div
-          role="radiogroup"
-          aria-label="Elan növü"
-          className="inline-flex rounded-xs border border-line-strong p-1"
-        >
-          {[
-            { value: LISTING_TYPES.SALE, label: "Satılır" },
-            { value: LISTING_TYPES.RENT, label: "Kirayə" },
-          ].map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              role="radio"
-              aria-checked={listingType === option.value}
-              onClick={() => setListingType(option.value)}
-              className={cn(
-                "min-h-10 cursor-pointer rounded-xs px-5 text-sm font-medium transition-colors duration-200",
-                listingType === option.value
-                  ? "bg-charcoal text-ink-invert"
-                  : "text-ink-soft hover:text-ink",
-              )}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-
-        {variant === "page" && (
-          <button
-            type="button"
-            onClick={() => setMobileOpen((open) => !open)}
-            aria-expanded={mobileOpen}
-            aria-controls={filtersId}
-            className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xs border border-line-strong px-4 text-sm font-medium text-ink transition-colors duration-200 hover:border-gold hover:text-gold-deep sm:hidden"
-          >
-            <SlidersHorizontal className="size-4" aria-hidden="true" />
-            Filtrlər
-            <ChevronDown
-              className={cn(
-                "size-4 transition-transform duration-200",
-                mobileOpen && "rotate-180",
-              )}
-              aria-hidden="true"
-            />
-          </button>
-        )}
-      </div>
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* --- Mətn axtarışı — panelin əsas girişi --- */}
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <div className="relative flex-1">
+        {/* --- Əsas discovery sırası --- */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
+          <div className="flex flex-col gap-1.5 lg:col-span-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className={LABEL_CLASS}>Elan növü</span>
+              {variant === "page" && (
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen((open) => !open)}
+                  aria-expanded={mobileOpen}
+                  aria-controls={filtersId}
+                  className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-sm font-medium text-ink transition-colors duration-200 hover:text-gold-deep sm:hidden"
+                >
+                  <SlidersHorizontal className="size-4" aria-hidden="true" />
+                  Filtrlər
+                  <ChevronDown
+                    className={cn(
+                      "size-4 transition-transform duration-200",
+                      mobileOpen && "rotate-180",
+                    )}
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+            </div>
+            <div
+              role="radiogroup"
+              aria-label="Elan növü"
+              className="grid min-h-12 grid-cols-2 rounded-xs border border-line-strong p-1"
+            >
+              {[
+                { value: LISTING_TYPES.SALE, label: "Satılır" },
+                { value: LISTING_TYPES.RENT, label: "Kirayə" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={listingType === option.value}
+                  onClick={() => setListingType(option.value)}
+                  className={cn(
+                    "min-h-10 cursor-pointer rounded-xs px-3 text-sm font-medium transition-colors duration-200",
+                    listingType === option.value
+                      ? "bg-charcoal text-ink-invert"
+                      : "text-ink-soft hover:text-ink",
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-6">
+            <label htmlFor="search-query" className={LABEL_CLASS}>
+              Axtarış
+            </label>
+            <div className="relative">
             <label htmlFor="search-query" className="sr-only">
               Açar söz ilə axtarış
             </label>
@@ -275,7 +285,13 @@ export function SearchPanel({
               className={cn(INPUT_CLASS, "pl-9")}
             />
           </div>
-          <Button type="submit" size="md" className="min-h-12 sm:w-auto sm:px-8">
+          </div>
+
+          <Button
+            type="submit"
+            size="md"
+            className="min-h-13 sm:col-span-2 lg:col-span-3"
+          >
             <Search className="size-4" aria-hidden="true" />
             Axtar
           </Button>
@@ -285,7 +301,7 @@ export function SearchPanel({
         <div
           id={filtersId}
           className={cn(
-            "grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5",
+            "grid gap-3 sm:grid-cols-2 lg:grid-cols-12",
             // Mobil ekranda `page` variantında yığılır; sm-dən yuxarı həmişə açıqdır
             variant === "page" && !mobileOpen && "hidden sm:grid",
           )}
@@ -297,6 +313,7 @@ export function SearchPanel({
             placeholder="Hamısı"
             defaultValue={initial.tip}
             options={types}
+            className="lg:col-span-2"
           />
 
           <SelectField
@@ -307,10 +324,11 @@ export function SearchPanel({
             defaultValue={initial.seher}
             options={cities}
             onChange={setCitySlug}
+            className="lg:col-span-2"
           />
 
           {/* Rayon yalnız şəhər seçildikdə mənalıdır */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 lg:col-span-2">
             <label htmlFor="search-district" className={LABEL_CLASS}>
               Rayon
             </label>
@@ -348,10 +366,11 @@ export function SearchPanel({
             placeholder="Fərq etməz"
             defaultValue={initial.otaq}
             options={ROOM_OPTIONS}
+            className="lg:col-span-2"
           />
 
           {/* Qiymət aralığı — iki sahə bir sütunda */}
-          <fieldset className="flex flex-col gap-1.5">
+          <fieldset className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-4">
             <legend className={LABEL_CLASS}>Qiymət (₼)</legend>
             <div className="flex items-center gap-2">
               <input

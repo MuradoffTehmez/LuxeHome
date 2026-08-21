@@ -18,6 +18,8 @@
     "db:seed:build": "tsx prisma/build-seed-sql.ts",
     "db:seed:local": "wrangler d1 execute luxehome-db --local --file=prisma/seed.sql",
     "db:seed:remote": "wrangler d1 execute luxehome-db --remote --file=prisma/seed.sql",
+    "db:clean-demo:local": "wrangler d1 execute luxehome-db --local --file=prisma/remove-demo-content.sql",
+    "db:clean-demo:remote": "wrangler d1 execute luxehome-db --remote --file=prisma/remove-demo-content.sql",
     "db:studio": "prisma studio",
     "deploy:staging": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env staging",
     "preview:staging": "opennextjs-cloudflare build && opennextjs-cloudflare preview -- --env staging",

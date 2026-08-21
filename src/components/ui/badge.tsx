@@ -32,19 +32,3 @@ export function Badge({
     </span>
   );
 }
-
-/**
- * Nümunə məlumatı işarələyən nişan.
- * Demo seed data-nın real şirkət məlumatı kimi qəbul edilməsinin qarşısını alır.
- */
-export function DemoBadge({ className }: { className?: string }) {
-  return (
-    <Badge
-      tone="info"
-      className={cn("uppercase", className)}
-      title="Bu məlumat nümunədir və real şirkət məlumatı deyil"
-    >
-      Nümunə
-    </Badge>
-  );
-}

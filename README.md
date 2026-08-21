@@ -21,7 +21,7 @@ Luxe Home Estate — Bakı və Azərbaycan daşınmaz əmlak bazarı üçün haz
 İctimai sayt [Next.js App Router](https://nextjs.org/docs/app) üzərində Server Component-lərlə işləyir. Məlumat qatı [Prisma ORM](https://www.prisma.io/) vasitəsilə Cloudflare D1 bazasına qoşulur; tətbiq [OpenNext](https://opennext.js.org/cloudflare) ilə Cloudflare Workers-ə yayımlanır.
 
 > [!IMPORTANT]
-> Repozitoriyadakı əmlak, layihə, bloq və statistika qeydlərinin bir hissəsi nümayiş məqsədli məlumatdır. Belə qeydlər `isDemo: true` ilə işarələnir və interfeysdə “Nümunə” nişanı daşıyır.
+> Seed prosesi ictimai məzmun yaratmır. Əmlaklar, layihələr və bloq yazıları yalnız admin panel vasitəsilə əlavə edilir; köhnə `isDemo` qeydləri ictimai sorğularda bloklanır.
 
 ## Cari imkanlar
 
@@ -96,8 +96,9 @@ luxehome/
 ├── migrations/              # Cloudflare D1 SQL miqrasiyaları
 ├── prisma/
 │   ├── schema.prisma        # Domen və auth sxemi
-│   ├── seed.ts              # Demo məlumat generatoru
+│   ├── seed.ts              # Sistem və taksonomiya başlanğıc məlumatları
 │   ├── seed.sql             # D1 üçün yaradılmış seed
+│   ├── remove-demo-content.sql # Köhnə demo kontentin təhlükəsiz təmizlənməsi
 │   └── build-seed-sql.ts    # Lokal SQLite → D1 SQL çeviricisi
 ├── public/                  # Loqo, OG şəkli və statik fayllar
 ├── scripts/                 # Loqo və e-poçt köməkçi skriptləri
@@ -234,7 +235,7 @@ Sxem dəyişdikdə tövsiyə olunan ardıcıllıq:
 # Lokal Prisma SQLite faylını sxemlə uyğunlaşdırın
 npx prisma db push
 
-# Demo məlumatı yaradın və D1 seed SQL-ə çevirin
+# Sistem və taksonomiya məlumatlarını yaradın, sonra D1 seed SQL-ə çevirin
 npx tsx prisma/seed.ts
 npm run db:seed:build
 
@@ -280,12 +281,12 @@ Auth testləri kriptoqrafiya, parol hash-i, hesab kilidi, icazə matrisi, sessiy
 
 ## Cari məhdudiyyətlər
 
-- Admin panelinin vizual interfeysi mövcuddur, lakin əmlak CRUD və media yükləmə axını hələ mock məlumatla işləyir.
+- Admin dashboard və əmlak siyahısı D1-dən oxuyur; əmlak CRUD və media yükləmə axını hələ tamamlanmayıb.
 - R2 `MEDIA` binding-i konfiqurasiya edilib, amma upload endpoint-i və media idarəetməsi tamamlanmayıb.
 - `CONTACT_LIMIT` binding-i mövcuddur; əlaqə formasında honeypot və Turnstile inteqrasiyası hələ tamamlanmayıb.
 - SQLite `LIKE` Azərbaycan hərfləri üçün tam registrsiz axtarış vermir; normallaşdırılmış axtarış sütunu tələb olunur.
 - İctimai interfeys hazırda yalnız Azərbaycan dilindədir; rus dili planlaşdırılır.
-- Demo şəkillər Unsplash mənbəyindəndir və real şirkət foto arxivi ilə əvəzlənməlidir.
+- Redaksiya dizaynındakı stok Unsplash şəkilləri şirkətin öz foto arxivi ilə əvəzlənməlidir.
 - Hüquqi səhifələrin yekun mətni hüquqşünas təsdiqi tələb edir.
 
 ## Deployment

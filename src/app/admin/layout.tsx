@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { ToastProvider } from "@/components/ui/toast";
 import { requireUser } from "@/lib/auth/guard";
 import { prisma } from "@/lib/prisma";
 
@@ -41,8 +42,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ]);
 
   return (
-    <AdminShell user={user} counters={{ newLeads, draftProperties }}>
-      {children}
-    </AdminShell>
+    <ToastProvider>
+      <AdminShell user={user} counters={{ newLeads, draftProperties }}>
+        {children}
+      </AdminShell>
+    </ToastProvider>
   );
 }
