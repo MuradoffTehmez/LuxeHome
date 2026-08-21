@@ -99,8 +99,20 @@ export function whatsappLink(message?: string): string {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
+/**
+ * Saytın kök ünvanı.
+ *
+ * `NEXT_PUBLIC_` prefiksli dəyişənlər Next.js tərəfindən build zamanı koda yapışdırılır —
+ * staging və prod üçün iki ayrı build tələb edərdi. Dəyər yalnız server tərəfdə lazım
+ * olduğuna görə runtime-da oxunur və bir build hər iki mühitə yayımlana bilir.
+ */
 export function siteUrl(path = ""): string {
-  const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
+  const base = (process.env.SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   if (!path) return base;
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/** Staging mühiti — prod-un dublikatı olduğu üçün indeksləşməyə bağlıdır. */
+export function isStaging(): boolean {
+  return process.env.IS_STAGING === "true";
 }

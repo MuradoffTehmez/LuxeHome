@@ -1,7 +1,12 @@
 import type { MetadataRoute } from "next";
-import { siteUrl } from "@/config/site";
+import { isStaging, siteUrl } from "@/config/site";
 
 export default function robots(): MetadataRoute.Robots {
+  // Staging prod-un birə-bir dublikatıdır — indekslənsə əsas domenin sıralamasına zərər verir
+  if (isStaging()) {
+    return { rules: { userAgent: "*", disallow: "/" } };
+  }
+
   return {
     rules: {
       userAgent: "*",
