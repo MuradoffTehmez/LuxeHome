@@ -21,8 +21,8 @@
     "db:studio": "prisma studio",
     "deploy:staging": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env staging",
     "preview:staging": "opennextjs-cloudflare build && opennextjs-cloudflare preview -- --env staging",
-    "db:migrate:staging": "wrangler d1 migrations apply luxehome-db-staging --remote",
-    "db:seed:staging": "wrangler d1 execute luxehome-db-staging --remote --file=prisma/seed.sql",
+    "db:migrate:staging": "wrangler d1 migrations apply luxehome-db-staging --remote --env staging",
+    "db:seed:staging": "wrangler d1 execute luxehome-db-staging --remote --env staging --file=prisma/seed.sql",
     "test": "vitest run",
     "test:watch": "vitest",
     "auth:create-admin": "tsx prisma/create-admin.ts"

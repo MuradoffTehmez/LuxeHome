@@ -34,13 +34,72 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  /// AES-GCM ilə şifrələnmiş TOTP sirri. Açıq mətn heç vaxt saxlanılmır.
+  totpSecret         String?
+  /// null = 2FA hələ qurulmayıb, ilk girişdə məcburi qurulum ekranı açılır
+  totpEnabledAt      DateTime?
+  mustChangePassword Boolean   @default(false)
+  failedAttempts     Int       @default(0)
+  lockedUntil        DateTime?
+
   properties Property[]  @relation("PropertyAuthor")
   posts      BlogPost[]  @relation("PostAuthor")
   media      Media[]     @relation("MediaUploader")
   favorites  Favorite[]
   leadNotes  Lead[]      @relation("LeadAssignee")
 
+  sessions    Session[]
+  backupCodes BackupCode[]
+
   @@index([role])
+}
+
+/// Aktiv giriş sessiyaları. Cookie yalnız bu sətrin id-sini daşıyır, beləliklə
+/// oğurlanmış cookie və ya işdən çıxan əməkdaşın girişi dərhal ləğv edilə bilir.
+model Session {
+  id          String    @id @default(cuid())
+  userId      String
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime
+  lastSeenAt  DateTime  @default(now())
+  ip          String?
+  userAgent   String?
+  revokedAt   DateTime?
+  /// Sessiyanı açan TOTP addımı — eyni kodun təkrar oynadılmasının qarşısını alır
+  totpCounter Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/// 2FA cihazı itirildikdə istifadə olunan birdəfəlik kodlar.
+/// Kodlar yüksək entropiyalı təsadüfi dəyərlərdir, ona görə SHA-256 kifayətdir —
+/// PBKDF2 burada yalnız boş yerə CPU yeyərdi.
+model BackupCode {
+  id       String    @id @default(cuid())
+  userId   String
+  codeHash String
+  usedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Təhlükəsizlik jurnalı — uğurlu və uğursuz giriş cəhdləri.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ip        String?
+  success   Boolean
+  /// OK | BAD_PASSWORD | BAD_TOTP | LOCKED | RATE_LIMITED | INACTIVE
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([createdAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -59,8 +118,9 @@ model PropertyType {
   properties  Property[]
 }
 
-/// Şəhər və rayonlar üçün self-relation ağacı.
-/// kind = "CITY" | "DISTRICT"
+/// Yerləşmə ağacı. Bakı bazarında yer dörd paralel açarla göstərilir və istifadəçi
+/// hər hansı biri ilə axtarır: rayon, metro, qəsəbə/mikrorayon, nişangah.
+/// kind = "CITY" | "DISTRICT" | "METRO" | "SETTLEMENT" | "LANDMARK"
 model Location {
   id       String  @id @default(cuid())
   name     String
@@ -134,6 +194,7 @@ model Property {
   bedrooms    Int?
   bathrooms   Int?
   area        Float?
+  /// Torpaq sahəsi, sot (1 sot = 100 m²). Torpaq və həyət evi elanlarında m²-nin yerini tutur.
   landArea    Float?
   floor       Int?
   totalFloors Int?
@@ -144,6 +205,14 @@ model Property {
   documentStatus String?
 
   videoUrl String?
+
+  /// NEW = yeni tikili, OLD = köhnə tikili. Yerli bazarda bu, əmlak növündən ayrı
+  /// ikinci ölçüdür: qiymət, sənəd vəziyyəti və ipoteka uyğunluğu birbaşa ondan asılıdır.
+  buildingType String? // NEW | OLD
+  /// İpoteka Fondunun şərtlərinə uyğundur
+  mortgageAvailable    Boolean @default(false)
+  /// Tikinti şirkətinin daxili taksiti mövcuddur
+  installmentAvailable Boolean @default(false)
 
   isFeatured Boolean @default(false)
   /// Nümunə/demo qeydi — real məlumatla əvəzlənəndə false olur.
