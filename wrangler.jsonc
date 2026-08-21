@@ -23,8 +23,16 @@
   "vars": {
     // İdarə paneli qapısı — "true" olana qədər /admin və /giris 404 qaytarır (src/middleware.ts)
     "ADMIN_ENABLED": "false",
-    "NEXT_PUBLIC_SITE_URL": "https://luxehomeestate.az"
+    // Runtime-da oxunur (src/config/site.ts) — build zamanı koda yapışdırılmır,
+    // beləliklə eyni build həm prod, həm staging-ə yayımlana bilir
+    "SITE_URL": "https://luxehomeestate.az"
   },
+
+  // Giriş və əlaqə formu üçün sürət limiti — Workers doğma binding-i
+  "ratelimits": [
+    { "name": "LOGIN_LIMIT", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } },
+    { "name": "CONTACT_LIMIT", "namespace_id": "1002", "simple": { "limit": 5, "period": 60 } }
+  ],
 
   // next/image optimizasiyası Cloudflare Images binding üzərindən işləyir
   "images": {
@@ -59,5 +67,65 @@
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "luxehome-next-cache"
     }
-  ]
+  ],
+
+  // Staging — prod resurslarından tam təcrid olunub. Wrangler-də vars, d1_databases,
+  // r2_buckets, services, ratelimits və assets irsi ötürülməyən açarlardır: hər biri
+  // burada təkrar yazılmasa, staging səssizcə prod resurslarına bağlanardı.
+  "env": {
+    "staging": {
+      "name": "luxehomeestate-staging",
+      "workers_dev": true,
+
+      // Custom domain qəsdən yoxdur — staging yalnız workers.dev ünvanında açılır
+
+      "observability": { "enabled": true },
+
+      "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS"
+      },
+
+      "images": { "binding": "IMAGES" },
+
+      "vars": {
+        // Panel yalnız staging-də açıqdır
+        "ADMIN_ENABLED": "true",
+        // robots.ts və seo.ts bunu görüb bütün səhifələri indeksdən çıxarır
+        "IS_STAGING": "true",
+        "SITE_URL": "https://luxehomeestate-staging.amiyevbahadur.workers.dev"
+      },
+
+      "ratelimits": [
+        { "name": "LOGIN_LIMIT", "namespace_id": "2001", "simple": { "limit": 10, "period": 60 } },
+        { "name": "CONTACT_LIMIT", "namespace_id": "2002", "simple": { "limit": 5, "period": 60 } }
+      ],
+
+      "services": [
+        {
+          "binding": "WORKER_SELF_REFERENCE",
+          "service": "luxehomeestate-staging"
+        }
+      ],
+
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "luxehome-db-staging",
+          "database_id": "295ea904-c268-4722-897f-39563c3ec87b"
+        }
+      ],
+
+      "r2_buckets": [
+        {
+          "binding": "MEDIA",
+          "bucket_name": "luxehome-media-staging"
+        },
+        {
+          "binding": "NEXT_INC_CACHE_R2_BUCKET",
+          "bucket_name": "luxehome-next-cache-staging"
+        }
+      ]
+    }
+  }
 }

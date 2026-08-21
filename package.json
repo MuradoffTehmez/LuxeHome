@@ -9,7 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env \"\"",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:generate": "prisma generate",
     "db:migrate:new": "prisma migrate diff --from-local-d1 --to-schema-datamodel prisma/schema.prisma --script",
@@ -18,7 +18,14 @@
     "db:seed:build": "tsx prisma/build-seed-sql.ts",
     "db:seed:local": "wrangler d1 execute luxehome-db --local --file=prisma/seed.sql",
     "db:seed:remote": "wrangler d1 execute luxehome-db --remote --file=prisma/seed.sql",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "deploy:staging": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env staging",
+    "preview:staging": "opennextjs-cloudflare build && opennextjs-cloudflare preview -- --env staging",
+    "db:migrate:staging": "wrangler d1 migrations apply luxehome-db-staging --remote",
+    "db:seed:staging": "wrangler d1 execute luxehome-db-staging --remote --file=prisma/seed.sql",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "auth:create-admin": "tsx prisma/create-admin.ts"
   },
   "dependencies": {
     "@prisma/adapter-d1": "^6.19.3",
