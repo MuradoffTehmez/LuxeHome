@@ -11,7 +11,7 @@ import {
   type PricePeriod,
   type PropertyStatus,
 } from "@/lib/constants";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import type { PropertyCardData } from "@/lib/queries";
 import { FavoriteButton } from "./favorite-button";
 
@@ -97,7 +97,6 @@ export function PropertyCard({
           {status === PROPERTY_STATUSES.RESERVED && (
             <Badge tone="warning">{PROPERTY_STATUS_LABELS[status]}</Badge>
           )}
-          {property.isDemo && <DemoBadge />}
         </div>
 
         {/* Sağ üst — favorit.

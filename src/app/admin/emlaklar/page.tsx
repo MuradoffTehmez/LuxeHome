@@ -9,7 +9,6 @@ import {
   AdminTable,
   AdminTableCell,
   AdminTableRow,
-  DemoNotice,
   StatusBadge,
 } from "@/components/admin/admin-ui";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
@@ -18,8 +17,10 @@ import {
   LISTING_TYPE_LABELS,
   PROPERTY_STATUS_LABELS,
   PROPERTY_STATUSES,
+  type ListingType,
+  type PropertyStatus,
 } from "@/lib/constants";
-import { mockProperties, mockStats } from "@/lib/admin-mock";
+import { getAdminProperties } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Əmlaklar" };
 
@@ -31,12 +32,20 @@ const STATUS_FILTERS = [
   })),
 ];
 
-export default function AdminPropertiesPage() {
+export default async function AdminPropertiesPage() {
+  const properties = await getAdminProperties();
+  const activeCount = properties.filter(
+    (property) => property.status === PROPERTY_STATUSES.PUBLISHED,
+  ).length;
+  const draftCount = properties.filter(
+    (property) => property.status === PROPERTY_STATUSES.DRAFT,
+  ).length;
+
   return (
     <>
       <AdminPageHeader
         title="Əmlaklar"
-        description={`${mockStats.activeProperties} aktiv, ${mockStats.draftProperties} qaralama elan.`}
+        description={`${activeCount} aktiv, ${draftCount} qaralama elan.`}
         breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Əmlaklar" }]}
         actions={
           <ButtonLink href="/admin/emlaklar/yeni" variant="primary" size="sm">
@@ -45,8 +54,6 @@ export default function AdminPropertiesPage() {
           </ButtonLink>
         }
       />
-
-      <DemoNotice className="mb-6" />
 
       <AdminCard bodyClassName="p-0">
         <AdminFilterBar
@@ -90,7 +97,14 @@ export default function AdminPropertiesPage() {
             { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
           ]}
         >
-          {mockProperties.map((property) => (
+          {properties.length === 0 && (
+            <tr>
+              <td colSpan={8} className="px-4 py-10 text-center text-sm text-ink-muted">
+                Hələ əmlak əlavə edilməyib.
+              </td>
+            </tr>
+          )}
+          {properties.map((property) => (
             <AdminTableRow key={property.id}>
               <AdminTableCell className="max-w-xs">
                 <div className="flex items-start gap-2">
@@ -108,7 +122,7 @@ export default function AdminPropertiesPage() {
                       {property.title}
                     </Link>
                     <p className="mt-0.5 text-xs text-ink-muted">
-                      {[property.districtName, property.cityName].filter(Boolean).join(", ")}
+                      {[property.district?.name, property.city.name].filter(Boolean).join(", ")}
                     </p>
                   </div>
                 </div>
@@ -117,9 +131,9 @@ export default function AdminPropertiesPage() {
               <AdminTableCell>
                 <div className="flex flex-col gap-1">
                   <Badge tone={property.listingType === "SALE" ? "dark" : "gold"}>
-                    {LISTING_TYPE_LABELS[property.listingType]}
+                    {LISTING_TYPE_LABELS[property.listingType as ListingType]}
                   </Badge>
-                  <span className="text-xs text-ink-muted">{property.typeName}</span>
+                  <span className="text-xs text-ink-muted">{property.type.name}</span>
                 </div>
               </AdminTableCell>
 
@@ -134,8 +148,8 @@ export default function AdminPropertiesPage() {
 
               <AdminTableCell>
                 <StatusBadge
-                  status={property.status}
-                  label={PROPERTY_STATUS_LABELS[property.status]}
+                  status={property.status as PropertyStatus}
+                  label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]}
                 />
               </AdminTableCell>
 
@@ -183,7 +197,9 @@ export default function AdminPropertiesPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
-            {mockProperties.length} elandan 1–{mockProperties.length} göstərilir
+            {properties.length === 0
+              ? "0 elan göstərilir"
+              : `${properties.length} elandan 1–${properties.length} göstərilir`}
           </span>
           <div className="flex items-center gap-1">
             <button

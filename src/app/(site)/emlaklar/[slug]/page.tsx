@@ -28,7 +28,7 @@ import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema } from "@/lib/s
 import { siteConfig } from "@/config/site";
 
 import { Container, Section } from "@/components/ui/container";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { ButtonLink, ButtonAnchor } from "@/components/ui/button";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
@@ -139,7 +139,6 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <Badge tone="neutral" className="bg-paper border-line">
                   {property.type.name}
                 </Badge>
-                {property.isDemo && <DemoBadge />}
               </div>
               
               <h1 className="font-display text-2xl leading-tight text-ink sm:text-3xl lg:text-4xl">

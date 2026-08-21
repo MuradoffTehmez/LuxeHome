@@ -8,7 +8,7 @@ import {
   type ProjectStatus,
   type ProjectType,
 } from "@/lib/constants";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import type { ProjectCardData } from "@/lib/queries";
 
 const STATUS_TONE: Record<ProjectStatus, "gold" | "success" | "neutral"> = {
@@ -60,7 +60,6 @@ export function ProjectCard({
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <Badge tone={STATUS_TONE[status]}>{PROJECT_STATUS_LABELS[status]}</Badge>
-          {project.isDemo && <DemoBadge />}
         </div>
       </div>
 

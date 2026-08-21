@@ -73,10 +73,6 @@ Müştəri təqdimatı üçün dördü də vacib sayılıb:
 
 | Yer | Problem |
 |---|---|
-| `add-mocks.ts:73` | `pricePeriod: "MONTHLY"` — düzgün dəyər `"MONTH"` (`constants.ts:145`). Kirayə qiymət periodu UI-da düzgün göstərilmir. |
-| `add-mocks.ts` | Elanlar `status: "PUBLISHED"` ilə yaradılır, amma `publishedAt` set olunmur. Default sıralama `publishedAt desc, createdAt desc`-dir — bu elanlar sıralamada aşağı düşür. |
-| `add-mocks.ts:48` | Slug generatoru `[^a-z0-9]+` istifadə edir; Azərbaycan hərfləri (ə, ş, ç, ğ, ı, ö, ü) silinir → `gənclik` yerinə `g-nclik`. `lib/utils.ts`-dəki slugify istifadə olunmalıdır. |
-| `package.json` | `db:clean-demo` scripti silinib — `prisma/clean-demo.ts` heç vaxt yazılmamışdı. Demo təmizləmə hələ də lazımdır. |
 | `queries.ts` | SQLite `LIKE` Azərbaycan hərflərində (ə, ş, ç, ğ, ı, ö, ü) reqistrə həssasdır — mətn axtarışı böyük hərflə yazılmış sorğuları tapmır. |
 
 ---
@@ -133,7 +129,7 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [ ] Telegram bot inteqrasiyası — yeni lead bildirişi.
 - [ ] **Contact form spam qoruması: honeypot + rate limit, sonra Cloudflare Turnstile.**
       Hazırda `elaqe/actions.ts` heç bir qorumaya malik deyil.
-- [ ] `prisma/clean-demo.ts` yaz — `isDemo: true` qeydləri təmizləyən script.
+- [x] `prisma/remove-demo-content.sql` və lokal/remote təmizləmə scriptləri əlavə edildi.
 - [ ] Azərbaycanca axtarış üçün normallaşdırılmış (kiçik hərfli) sütun əlavə etmək —
       `mode: "insensitive"` D1-də yoxdur.
 
@@ -153,8 +149,8 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 ### Kontent
 - [ ] `siteConfig.geo` — ofisin dəqiq koordinatları şirkətdən alınmalıdır (hazırkı dəyər təxminidir).
 - [ ] `siteConfig.workingHours` — real iş qrafiki təsdiqlənməlidir.
-- [ ] `demoStats` — rəqəmlər şirkət tərəfindən təsdiqlənməyib; real rəqəm gələnə qədər `isDemo: true` qalır.
-- [ ] Unsplash demo şəkilləri şirkətin öz foto arxivi ilə əvəzlənməlidir
+- [x] Təsdiqlənməmiş statistika və demo məzmun saytdan çıxarıldı.
+- [ ] Unsplash stok şəkilləri şirkətin öz foto arxivi ilə əvəzlənməlidir
       (`next.config.ts`-dəki `remotePatterns` qaydası sonra silinə bilər).
 
 ---
@@ -177,7 +173,7 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 - Worker: `luxehomeestate` → `https://luxehomeestate.az` və `https://www.luxehomeestate.az`
 - D1: `luxehome-db` (`86d5f7e0-ffe6-48d8-bd84-d88163550b2a`) — `migrations/0001_init.sql`
-  tətbiq olunub, `prisma/seed.sql` (212 sətir demo məzmun) yüklənib
+  tətbiq olunub; demo məzmun 21 avqust 2026 tarixində təmizlənib
 - R2: `luxehome-media`, `luxehome-next-cache`
 - Secret-lər: `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`
 

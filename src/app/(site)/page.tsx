@@ -13,14 +13,13 @@ import {
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ButtonLink } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Hero } from "@/components/site/hero";
 import { PropertyCard } from "@/components/site/property-card";
 import { ProjectCard } from "@/components/site/project-card";
 import { PostCard } from "@/components/site/post-card";
-import { demoStats, siteConfig } from "@/config/site";
+import { siteConfig } from "@/config/site";
 import {
   getBlogCategories,
   getFeaturedProperties,
@@ -126,27 +125,9 @@ export default async function HomePage() {
     })),
   }));
 
-  const hasDemoContent =
-    featured.some((p) => p.isDemo) || projects.some((p) => p.isDemo);
-
   return (
     <>
       <Hero types={typeOptions} cities={cityOptions} />
-
-      {/* Nümunə məzmun barədə açıq bildiriş */}
-      {hasDemoContent && (
-        <div className="border-b border-info/20 bg-info-bg">
-          <Container className="flex flex-wrap items-center justify-center gap-2 py-3 text-center text-sm text-info">
-            <Badge tone="info" className="uppercase">
-              Nümunə
-            </Badge>
-            <span>
-              Saytdakı əmlak, layihə və bloq qeydləri hazırda nümunə məlumatdır —
-              real elanlar admin panel vasitəsilə əlavə ediləcək.
-            </span>
-          </Container>
-        </div>
-      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* SEÇİLMİŞ ƏMLAKLAR                                                  */}
@@ -302,7 +283,7 @@ export default async function HomePage() {
               <div className="relative aspect-4/5 overflow-hidden rounded-md sm:aspect-4/3 lg:aspect-4/5">
                 <Image
                   src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
-                  alt="Müasir memarlıq nümunəsi"
+                  alt="Müasir premium memarlıq"
                   fill
                   loading="lazy"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -384,42 +365,6 @@ export default async function HomePage() {
             ))}
           </div>
 
-          {/*
-            NÜMUNƏ STATİSTİKA
-            Bu rəqəmlər şirkət tərəfindən təsdiqlənməyib.
-            TODO: Real rəqəmləri src/config/site.ts → demoStats bölməsində yeniləyin.
-          */}
-          {demoStats.enabled && (
-            <div className="mt-14">
-              {demoStats.isDemo && (
-                <p className="mb-4 flex flex-wrap items-center justify-center gap-2 text-center text-xs text-ink-muted">
-                  <Badge tone="info" className="uppercase">
-                    Nümunə
-                  </Badge>
-                  Aşağıdakı rəqəmlər nümunədir və şirkət tərəfindən təsdiqlənməyib.
-                </p>
-              )}
-
-              <dl className="grid grid-cols-2 border-y border-line-strong lg:grid-cols-4">
-                {demoStats.items.map((stat, index) => (
-                  <div
-                    key={stat.label}
-                    className={`flex flex-col items-center gap-1 px-4 py-8 text-center sm:py-10 ${
-                      index % 2 !== 0 ? "border-l border-line" : ""
-                    } ${index > 1 ? "border-t border-line lg:border-t-0" : ""} ${
-                      index > 0 ? "lg:border-l lg:border-line" : ""
-                    }`}
-                  >
-                    <dt className="sr-only">{stat.label}</dt>
-                    <dd className="tabular font-display text-3xl text-ink sm:text-4xl">
-                      {stat.value}
-                    </dd>
-                    <p className="text-sm text-ink-muted">{stat.label}</p>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
         </Container>
       </Section>
 

@@ -28,11 +28,6 @@ export default function TermsPage() {
         olmadan dəyişə bilər. Müqavilə bağlanmazdan əvvəl bütün məlumatlar şirkətlə
         birbaşa dəqiqləşdirilməlidir.
       </p>
-      <p>
-        «Nümunə» nişanı ilə işarələnmiş elanlar saytın nümayişi üçün hazırlanmış demo
-        məzmundur və real təklif deyil.
-      </p>
-
       <h2>İstifadəçinin öhdəlikləri</h2>
       <ul>
         <li>Müraciət formalarında doğru və özünüzə aid əlaqə məlumatı göstərmək.</li>

@@ -27,7 +27,6 @@ export const propertyCardSelect = {
   floor: true,
   totalFloors: true,
   isFeatured: true,
-  isDemo: true,
   publishedAt: true,
   createdAt: true,
   type: { select: { name: true, slug: true } },
@@ -53,7 +52,6 @@ export const projectCardSelect = {
   status: true,
   year: true,
   coverUrl: true,
-  isDemo: true,
   city: { select: { name: true } },
 } satisfies Prisma.ProjectSelect;
 
@@ -70,7 +68,6 @@ export const postCardSelect = {
   coverAlt: true,
   readMinutes: true,
   publishedAt: true,
-  isDemo: true,
   category: { select: { name: true, slug: true } },
 } satisfies Prisma.BlogPostSelect;
 
@@ -105,6 +102,7 @@ export type PropertyFilters = {
 function publicPropertyWhere(): Prisma.PropertyWhereInput {
   return {
     deletedAt: null,
+    isDemo: false,
     status: { in: PUBLIC_PROPERTY_STATUSES },
   };
 }
@@ -213,7 +211,7 @@ export async function getFeaturedProperties(take = 6) {
 
 export async function getPropertyBySlug(slug: string) {
   return prisma.property.findFirst({
-    where: { slug, deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+    where: { ...publicPropertyWhere(), slug },
     include: {
       type: true,
       city: true,
@@ -246,7 +244,7 @@ export async function getSimilarProperties(
 export async function getPropertiesByIds(ids: string[]) {
   if (ids.length === 0) return [];
   return prisma.property.findMany({
-    where: { id: { in: ids }, deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+    where: { ...publicPropertyWhere(), id: { in: ids } },
     select: propertyCardSelect,
   });
 }
@@ -301,7 +299,7 @@ export async function getPropertyTypesWithCounts() {
       _count: {
         select: {
           properties: {
-            where: { deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+            where: publicPropertyWhere(),
           },
         },
       },
@@ -318,6 +316,7 @@ export async function getProjects(filters: { status?: string; type?: string } = 
   return prisma.project.findMany({
     where: {
       deletedAt: null,
+      isDemo: false,
       isActive: true,
       ...(filters.status ? { status: filters.status } : {}),
       ...(filters.type ? { projectType: filters.type } : {}),
@@ -329,12 +328,12 @@ export async function getProjects(filters: { status?: string; type?: string } = 
 
 export async function getProjectBySlug(slug: string) {
   return prisma.project.findFirst({
-    where: { slug, deletedAt: null, isActive: true },
+    where: { slug, deletedAt: null, isDemo: false, isActive: true },
     include: {
       city: true,
       images: { orderBy: { order: "asc" } },
       properties: {
-        where: { deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+        where: publicPropertyWhere(),
         select: propertyCardSelect,
         take: 6,
       },
@@ -369,6 +368,7 @@ export async function getPosts(
 
   const where: Prisma.BlogPostWhereInput = {
     deletedAt: null,
+    isDemo: false,
     status: POST_STATUSES.PUBLISHED,
     ...(filters.categorySlug ? { category: { slug: filters.categorySlug } } : {}),
     ...(filters.search
@@ -403,7 +403,7 @@ export async function getPosts(
 
 export async function getPostBySlug(slug: string) {
   return prisma.blogPost.findFirst({
-    where: { slug, deletedAt: null, status: POST_STATUSES.PUBLISHED },
+    where: { slug, deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
     include: {
       category: true,
       author: { select: { name: true } },
@@ -415,6 +415,7 @@ export async function getRelatedPosts(postId: string, categoryId: string | null,
   return prisma.blogPost.findMany({
     where: {
       deletedAt: null,
+      isDemo: false,
       status: POST_STATUSES.PUBLISHED,
       id: { not: postId },
       ...(categoryId ? { categoryId } : {}),
@@ -431,7 +432,7 @@ export async function getBlogCategories() {
     include: {
       _count: {
         select: {
-          posts: { where: { deletedAt: null, status: POST_STATUSES.PUBLISHED } },
+          posts: { where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED } },
         },
       },
     },
@@ -445,11 +446,11 @@ export async function getBlogCategories() {
 export async function getSitemapEntries() {
   const [properties, projects, services, posts] = await Promise.all([
     prisma.property.findMany({
-      where: { deletedAt: null, status: { in: PUBLIC_PROPERTY_STATUSES } },
+      where: publicPropertyWhere(),
       select: { slug: true, updatedAt: true },
     }),
     prisma.project.findMany({
-      where: { deletedAt: null, isActive: true },
+      where: { deletedAt: null, isDemo: false, isActive: true },
       select: { slug: true, updatedAt: true },
     }),
     prisma.service.findMany({
@@ -457,7 +458,7 @@ export async function getSitemapEntries() {
       select: { slug: true, updatedAt: true },
     }),
     prisma.blogPost.findMany({
-      where: { deletedAt: null, status: POST_STATUSES.PUBLISHED },
+      where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
       select: { slug: true, updatedAt: true },
     }),
   ]);
@@ -482,15 +483,23 @@ export async function getDashboardStats() {
     mediaCount,
   ] = await Promise.all([
     prisma.property.count({
-      where: { deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED },
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.PUBLISHED },
     }),
-    prisma.property.count({ where: { deletedAt: null, status: PROPERTY_STATUSES.SOLD } }),
-    prisma.property.count({ where: { deletedAt: null, status: PROPERTY_STATUSES.RENTED } }),
-    prisma.property.count({ where: { deletedAt: null, status: PROPERTY_STATUSES.DRAFT } }),
-    prisma.project.count({ where: { deletedAt: null, status: "ONGOING" } }),
+    prisma.property.count({
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.SOLD },
+    }),
+    prisma.property.count({
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.RENTED },
+    }),
+    prisma.property.count({
+      where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.DRAFT },
+    }),
+    prisma.project.count({ where: { deletedAt: null, isDemo: false, status: "ONGOING" } }),
     prisma.lead.count({ where: { status: "NEW" } }),
     prisma.lead.count(),
-    prisma.blogPost.count({ where: { deletedAt: null, status: POST_STATUSES.PUBLISHED } }),
+    prisma.blogPost.count({
+      where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
+    }),
     prisma.media.count(),
   ]);
 
@@ -505,4 +514,59 @@ export async function getDashboardStats() {
     publishedPosts,
     mediaCount,
   };
+}
+
+export async function getAdminProperties() {
+  return prisma.property.findMany({
+    where: { deletedAt: null, isDemo: false },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      listingType: true,
+      status: true,
+      price: true,
+      currency: true,
+      rooms: true,
+      area: true,
+      isFeatured: true,
+      viewCount: true,
+      updatedAt: true,
+      type: { select: { name: true } },
+      city: { select: { name: true } },
+      district: { select: { name: true } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
+export async function getRecentAdminProperties(take = 5) {
+  return prisma.property.findMany({
+    where: { deletedAt: null, isDemo: false },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      price: true,
+      currency: true,
+      updatedAt: true,
+    },
+    orderBy: { updatedAt: "desc" },
+    take,
+  });
+}
+
+export async function getRecentAdminLeads(take = 5) {
+  return prisma.lead.findMany({
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      source: true,
+      status: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
 }

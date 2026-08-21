@@ -18,18 +18,17 @@ npm run build        # production build — lint + typecheck daxildir
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
 
-npm run db:migrate   # prisma migrate dev
-npm run db:push      # miqrasiya yaratmadan schema tətbiqi
-npm run db:seed      # taksonomiya + demo kontent (tsx prisma/seed.ts)
+npm run db:migrate:local # D1 miqrasiyalarını lokal tətbiq edir
+npx tsx prisma/seed.ts  # admin/taksonomiya/xidmət başlanğıc məlumatları
+npm run db:seed:build # lokal SQLite-dan D1 seed.sql yaradır
 npm run db:studio    # Prisma Studio
-npm run db:reset     # bazanı sıfırlayır və seed işlədir
 ```
 
 Test infrastrukturu yoxdur. **Yeganə keyfiyyət qapısı `npm run typecheck` + `npm run build`-dır** —
 dəyişiklikdən sonra hər ikisi işlədilməlidir.
 
-`npm run db:clean-demo` scripti `package.json`-da var, amma `prisma/clean-demo.ts` faylı
-mövcud deyil — çağırılarsa xəta verir.
+Köhnə demo kontent `npm run db:clean-demo:local` və ya açıq production əməliyyatı kimi
+`npm run db:clean-demo:remote` ilə təmizlənir.
 
 ## Arxitektura
 
@@ -117,27 +116,24 @@ hazırda çağırılmır.
 ### Şirkət məlumatları
 
 Bütün əlaqə, brend və naviqasiya məlumatları `src/config/site.ts`-dədir (`siteConfig`,
-`navigation`, `legalNavigation`, `demoStats`, `whatsappLink()`). Telefon, ünvan, Instagram
+`navigation`, `legalNavigation`, `whatsappLink()`). Telefon, ünvan, Instagram
 kimi dəyərlər komponentlərdə hardcode edilmir.
 
 Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur Qafar oğlu**-na məxsusdur
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
 
-`demoStats` — **şirkət tərəfindən təsdiqlənməmiş rəqəmlərdir**, `isDemo: true` ilə işarələnib.
+### Demo kontent qoruması
 
-### Demo kontent modeli
-
-`Property`, `Project`, `BlogPost` modellərində `isDemo` boolean sahəsi var. Nümunə kontent bu
-bayraqla işarələnir və UI-da `DemoBadge` göstərilir. Real məlumat gələndə bayraq `false` olur.
+`Property`, `Project`, `BlogPost` modellərində geriyə uyğunluq üçün `isDemo` boolean sahəsi var.
+İctimai sorğular yalnız `isDemo: false` qeydlərini qaytarır; seed ictimai məzmun yaratmır.
 
 ## Cari vəziyyət və bilinən boşluqlar
 
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
-- **Admin panel yoxdur.** `bcryptjs`, `jose` quraşdırılıb; `User` modeli, `ROLE_PERMISSIONS`
-  matrisi və `getDashboardStats()` hazırdır, lakin `src/app/admin`, `middleware.ts` və
-  auth kodu mövcud deyil. README-də admin interfeysinin olduğu yazılıb — bu doğru deyil.
+- **Admin panel qismən hazırdır.** Auth, dashboard və real əmlak siyahısı mövcuddur;
+  əmlak CRUD və media yükləmə axını hələ tamamlanmayıb.
 - **Sınıq daxili linklər:** `/favoritler` (navbar-da 2 yerdə), `legalNavigation`-dakı 3 hüquqi
   səhifə (footer). Hamısı 404 verir.
 - `not-found.tsx`, `error.tsx`, `loading.tsx`, `sitemap.ts`, `robots.ts` yoxdur.
@@ -153,7 +149,7 @@ bayraqla işarələnir və UI-da `DemoBadge` göstərilir. Real məlumat gələn
   case-insensitive işləyir, PostgreSQL-də isə `mode: "insensitive"` tələb edir.
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
-- `next.config.ts`-də `images.remotePatterns` yalnız `images.unsplash.com`-a icazə verir; demo
+- `next.config.ts`-də `images.remotePatterns` yalnız `images.unsplash.com`-a icazə verir; stok
   şəkillər oradandır. Yeni xarici şəkil mənbəyi əlavə edilərsə bu siyahı yenilənməlidir.
 - `outputFileTracingRoot: import.meta.dirname` qəsdən qoyulub — yuxarı qovluqdakı lockfile-ın
   səhvən workspace kökü kimi seçilməsinin qarşısını alır. Silinməməlidir.

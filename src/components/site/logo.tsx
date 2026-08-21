@@ -33,7 +33,7 @@ export function Logo({
     <Link
       href="/"
       aria-label={`${siteConfig.name} — ana səhifə`}
-      className={cn("group inline-flex shrink-0 items-center gap-3", className)}
+      className={cn("group inline-flex shrink-0 items-center gap-2 sm:gap-3", className)}
     >
       {!markless && (
         <Image
@@ -42,14 +42,14 @@ export function Logo({
           width={512}
           height={512}
           priority
-          className="size-10 shrink-0 sm:size-11"
+          className="size-8 shrink-0 sm:size-11"
         />
       )}
 
       <span className="flex flex-col whitespace-nowrap leading-none">
         <span
           className={cn(
-            "font-display text-lg font-semibold tracking-[0.18em] transition-colors duration-200 sm:text-xl",
+            "font-display text-[0.82rem] font-semibold tracking-[0.13em] transition-colors duration-200 sm:text-xl sm:tracking-[0.18em]",
             isDark
               ? "text-white group-hover:text-gold-soft"
               : "text-ink group-hover:text-gold-deep",

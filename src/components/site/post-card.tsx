@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock, Newspaper } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
-import { Badge, DemoBadge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import type { PostCardData } from "@/lib/queries";
 
 export function PostCard({
@@ -51,7 +51,6 @@ export function PostCard({
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           {post.category && <Badge tone="dark">{post.category.name}</Badge>}
-          {post.isDemo && <DemoBadge />}
         </div>
       </div>
 

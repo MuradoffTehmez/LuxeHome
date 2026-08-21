@@ -15,7 +15,7 @@ type PreviewImage = {
 type ImageDropzoneProps = {
   label: string;
   hint?: string;
-  /** Başlanğıc şəkillər — nümunə məlumatdan gəlir. */
+  /** Redaktə zamanı verilən başlanğıc şəkillər. */
   initial?: { id: string; url: string; name: string }[];
   /** `single` — yalnız bir şəkil (üz qabığı), `multiple` — qalereya. */
   mode?: "single" | "multiple";

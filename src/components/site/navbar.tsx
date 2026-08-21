@@ -90,7 +90,7 @@ export function Navbar() {
         <Logo tone={isOverlay ? "dark" : "light"} compact className="shrink-0" />
 
         {/* Desktop naviqasiya */}
-        <nav aria-label="Əsas naviqasiya" className="hidden lg:block">
+        <nav aria-label="Əsas naviqasiya" className="hidden xl:block">
           <ul className="flex items-center gap-1">
             {navigation.map((item) => {
               const active = isActive(item.href);
@@ -100,7 +100,7 @@ export function Navbar() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-3 text-sm font-medium transition-colors duration-300",
+                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2 text-xs font-medium transition-colors duration-300 2xl:px-3 2xl:text-sm",
                       isOverlay
                         ? active
                           ? "text-gold-soft"
@@ -147,7 +147,7 @@ export function Navbar() {
           <a
             href={siteConfig.phoneHref}
             className={cn(
-              "hidden min-h-11 shrink-0 items-center gap-2 text-sm font-medium transition-colors xl:inline-flex",
+              "hidden min-h-11 shrink-0 items-center gap-2 text-sm font-medium transition-colors 2xl:inline-flex",
               isOverlay
                 ? "text-ink-invert-soft hover:text-gold-soft"
                 : "text-ink-soft hover:text-gold-deep",
@@ -162,10 +162,10 @@ export function Navbar() {
             variant="primary"
             size="sm"
             aria-label="Əmlak axtar"
-            className="hidden lg:inline-flex lg:px-3 xl:px-4"
+            className="hidden lg:inline-flex lg:px-3 2xl:px-4"
           >
             <Search className="size-4" aria-hidden="true" />
-            <span className="hidden xl:inline">Əmlak axtar</span>
+            <span className="hidden 2xl:inline">Əmlak axtar</span>
           </ButtonLink>
 
           {/* Mobil menyu açarı */}
@@ -175,7 +175,7 @@ export function Navbar() {
             aria-controls="mobile-menu"
             onClick={() => setMenuOpen((v) => !v)}
             className={cn(
-              "lg:hidden",
+              "xl:hidden",
               isOverlay ? "text-ink-invert hover:bg-white/10" : "text-ink",
             )}
           >
@@ -192,7 +192,7 @@ export function Navbar() {
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="animate-fade-in fixed inset-x-0 top-[var(--header-h)] bottom-0 z-40 overflow-y-auto border-t border-line bg-ivory lg:hidden"
+          className="animate-fade-in fixed inset-x-0 top-[var(--header-h)] z-40 h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-line bg-ivory xl:hidden"
         >
           <nav aria-label="Mobil naviqasiya" className="px-5 pt-5 sm:px-8">
             <p className="editorial-kicker mb-3 text-ink-muted">Naviqasiya</p>

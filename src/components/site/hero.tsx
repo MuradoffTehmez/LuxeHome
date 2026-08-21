@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { ArrowRight, Phone } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { SearchPanel, type CityOption, type TypeOption } from "./search-panel";
 
@@ -72,15 +72,13 @@ export function Hero({ types, cities }: HeroProps) {
               Bizimlə əlaqə
             </ButtonLink>
 
-            <ButtonAnchor
+            <a
               href={siteConfig.phoneHref}
-              variant="ghost"
-              size="sm"
-              className="justify-start px-0 text-white/75 hover:text-gold-soft sm:hidden"
+              className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/75 transition-colors hover:text-gold-soft sm:hidden"
             >
               <Phone className="size-4" aria-hidden="true" />
               Zəng et
-            </ButtonAnchor>
+            </a>
           </div>
         </div>
 
