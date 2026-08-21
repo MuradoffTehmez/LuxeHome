@@ -66,6 +66,42 @@ export const LISTING_TYPE_LABELS: Record<ListingType, string> = {
   RENT: "Kirayə",
 };
 
+/**
+ * Tikilinin növü — yerli bazarda əmlak növündən ayrı ikinci ölçüdür.
+ * Qiymət, sənəd vəziyyəti və ipoteka uyğunluğu birbaşa bundan asılıdır.
+ */
+export const BUILDING_TYPES = {
+  NEW: "NEW",
+  OLD: "OLD",
+} as const;
+
+export type BuildingType = (typeof BUILDING_TYPES)[keyof typeof BUILDING_TYPES];
+
+export const BUILDING_TYPE_LABELS: Record<BuildingType, string> = {
+  NEW: "Yeni tikili",
+  OLD: "Köhnə tikili",
+};
+
+/** Yerləşmə ağacının səviyyələri — `Location.kind` sahəsinin icazə verilən dəyərləri. */
+export const LOCATION_KINDS = {
+  CITY: "CITY",
+  DISTRICT: "DISTRICT",
+  METRO: "METRO",
+  SETTLEMENT: "SETTLEMENT",
+  LANDMARK: "LANDMARK",
+} as const;
+
+export type LocationKind = (typeof LOCATION_KINDS)[keyof typeof LOCATION_KINDS];
+
+/** Yer göstərilərkən ada əlavə olunan qısaltma: «Nəsimi m.», «Mərdəkan q.». */
+export const LOCATION_KIND_SUFFIX: Record<LocationKind, string> = {
+  CITY: "",
+  DISTRICT: "r.",
+  METRO: "m.",
+  SETTLEMENT: "q.",
+  LANDMARK: "",
+};
+
 export const PROPERTY_STATUSES = {
   DRAFT: "DRAFT",
   PUBLISHED: "PUBLISHED",

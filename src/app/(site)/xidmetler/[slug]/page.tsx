@@ -11,6 +11,11 @@ import { buildMetadata, jsonLd, serviceSchema, breadcrumbSchema } from "@/lib/se
 import { getServiceBySlug } from "@/lib/queries";
 import { siteConfig } from "@/config/site";
 
+// Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
+// kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
+export const dynamic = "force-dynamic";
+
+
 type Props = {
   params: Promise<{ slug: string }>;
 };

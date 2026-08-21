@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { siteConfig, siteUrl } from "@/config/site";
+import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { LISTING_TYPES } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
@@ -33,7 +33,8 @@ export function buildMetadata({
     title,
     description,
     alternates: { canonical: url },
-    robots: noIndex ? { index: false, follow: false } : undefined,
+    // Staging heç bir səhifəsi ilə indeksə düşməməlidir
+    robots: noIndex || isStaging() ? { index: false, follow: false } : undefined,
     openGraph: {
       type,
       locale: "az_AZ",

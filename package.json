@@ -4,25 +4,39 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push",
+    "typecheck": "tsc --noEmit",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env \"\"",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "db:generate": "prisma generate",
+    "db:migrate:new": "prisma migrate diff --from-local-d1 --to-schema-datamodel prisma/schema.prisma --script",
+    "db:migrate:local": "wrangler d1 migrations apply luxehome-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply luxehome-db --remote",
+    "db:seed:build": "tsx prisma/build-seed-sql.ts",
+    "db:seed:local": "wrangler d1 execute luxehome-db --local --file=prisma/seed.sql",
+    "db:seed:remote": "wrangler d1 execute luxehome-db --remote --file=prisma/seed.sql",
     "db:studio": "prisma studio",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma migrate reset --force",
-    "db:clean-demo": "tsx prisma/clean-demo.ts",
-    "typecheck": "tsc --noEmit"
+    "deploy:staging": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env staging",
+    "preview:staging": "opennextjs-cloudflare build && opennextjs-cloudflare preview -- --env staging",
+    "db:migrate:staging": "wrangler d1 migrations apply luxehome-db-staging --remote --env staging",
+    "db:seed:staging": "wrangler d1 execute luxehome-db-staging --remote --env staging --file=prisma/seed.sql",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "auth:create-admin": "tsx prisma/create-admin.ts"
   },
   "dependencies": {
+    "@prisma/adapter-d1": "^6.19.3",
     "@prisma/client": "^6.19.3",
-    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "jose": "^6.2.8",
     "lucide-react": "^1.31.0",
     "next": "15.5.23",
     "next-themes": "^0.4.6",
+    "otpauth": "^9.5.1",
+    "qrcode-svg": "^1.1.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "resend": "^6.20.0",
@@ -31,10 +45,12 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.0.0",
     "@eslint/eslintrc": "^3",
+    "@opennextjs/cloudflare": "^1.20.2",
     "@tailwindcss/postcss": "^4",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^20",
+    "@types/node": "^26.2.0",
+    "@types/qrcode-svg": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
@@ -42,15 +58,19 @@
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.124.0"
   },
   "allowScripts": {
     "prisma@6.19.3": true,
     "@prisma/engines@6.19.3": true,
     "@prisma/client@6.19.3": true,
-    "unrs-resolver@1.12.2": true
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "unrs-resolver@1.12.2": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.25.4": true,
+    "esbuild@0.28.1": true,
+    "workerd@1.20260815.1": true,
+    "sharp@0.34.5": true
   }
 }

@@ -32,8 +32,11 @@ import {
   getServices,
 } from "@/lib/queries";
 
-/** Ana səhifə hər saat yenilənir — məzmun dəyişməyəndə keşdən verilir. */
-export const revalidate = 3600;
+// Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
+// kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
+export const dynamic = "force-dynamic";
+
+
 
 const WHY_ITEMS = [
   {

@@ -7,6 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 15 App Router,
 React 19, Tailwind CSS v4, Prisma v6. Saytın bütün istifadəçi mətnləri Azərbaycan dilindədir.
 
+**İnfrastruktur tam Cloudflare-dədir:** Workers (OpenNext adapteri), D1 (verilənlər bazası),
+R2 (media + ISR keşi), Images (şəkil optimizasiyası). Supabase və PostgreSQL layihədən çıxarılıb.
+
 **Kod dilində konvensiya:** identifikatorlar (dəyişən, funksiya, tip adları) ingiliscədir,
 şərhlər və istifadəçiyə görünən sətirlər Azərbaycan dilindədir. Yeni kod da bu qaydaya uyğun yazılır.
 
@@ -14,22 +17,31 @@ React 19, Tailwind CSS v4, Prisma v6. Saytın bütün istifadəçi mətnləri Az
 
 ```bash
 npm run dev          # development server (localhost:3000)
-npm run build        # production build — lint + typecheck daxildir
+npm run build        # prisma generate + next build
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
 
-npm run db:migrate   # prisma migrate dev
-npm run db:push      # miqrasiya yaratmadan schema tətbiqi
-npm run db:seed      # taksonomiya + demo kontent (tsx prisma/seed.ts)
-npm run db:studio    # Prisma Studio
-npm run db:reset     # bazanı sıfırlayır və seed işlədir
+npm run preview      # OpenNext bundle + lokal workerd (production ilə eyni runtime)
+npm run deploy       # OpenNext bundle + Cloudflare Workers-ə yayım
+npm run cf-typegen   # wrangler.jsonc-dən CloudflareEnv tiplərini yenidən yaradır
 ```
 
-Test infrastrukturu yoxdur. **Yeganə keyfiyyət qapısı `npm run typecheck` + `npm run build`-dır** —
-dəyişiklikdən sonra hər ikisi işlədilməlidir.
+Verilənlər bazası (D1) axını:
 
-`npm run db:clean-demo` scripti `package.json`-da var, amma `prisma/clean-demo.ts` faylı
-mövcud deyil — çağırılarsa xəta verir.
+```bash
+npx prisma db push                # lokal prisma/dev.db faylını sxemlə sinxronlaşdırır
+npx tsx prisma/seed.ts            # demo məzmunu lokal fayla yazır
+npm run db:seed:build             # lokal fayldan prisma/seed.sql qurur
+npm run db:migrate:remote         # migrations/ qovluğunu remote D1-ə tətbiq edir
+npm run db:seed:remote            # prisma/seed.sql-i remote D1-ə yükləyir
+```
+
+Yeni miqrasiya: `npm run db:migrate:new -- --output migrations/000N_ad.sql`
+(`prisma migrate diff --from-local-d1` işlədir, ona görə əvvəlcə `npm run db:migrate:local`).
+
+Test infrastrukturu yoxdur. **Yeganə keyfiyyət qapısı `npm run typecheck` + `npm run build`-dır** —
+dəyişiklikdən sonra hər ikisi işlədilməlidir. Yayımdan əvvəl `npm run preview` ilə workerd
+runtime-ında yoxlamaq tövsiyə olunur, çünki bəzi problemlər yalnız orada üzə çıxır.
 
 ## Arxitektura
 
@@ -46,7 +58,17 @@ Query parametrləri də azərbaycancadır və `emlaklar/page.tsx`-də əl ilə m
 ### Data axını
 
 Səhifələr Server Component-dir və birbaşa `src/lib/queries.ts`-dən oxuyur — ayrıca API qatı yoxdur.
-Yazma əməliyyatları Server Action ilə gedir (hazırda yeganə nümunə: `(site)/elaqe/actions.ts`).
+Yazma əməliyyatları Server Action ilə gedir (`(site)/elaqe/actions.ts`, `(site)/favoritler/actions.ts`).
+
+**D1 binding yalnız sorğu kontekstində əlçatandır.** Buna görə:
+
+- `src/lib/prisma.ts` klienti Proxy arxasında lazy qurur (`getCloudflareContext().env.DB`).
+  Modul səviyyəsində `new PrismaClient()` yazmaq olmaz — build zamanı çökür.
+- Prisma klienti `@prisma/client/wasm.js`-dən idxal olunur. Sadəcə `@prisma/client` yazılsa,
+  esbuild `node` şərtini seçir və Workers-də mövcud olmayan binary engine-i yükləməyə çalışır.
+- D1-dən oxuyan hər səhifədə `export const dynamic = "force-dynamic"` var — binding build
+  vaxtı olmadığı üçün statik prerender mümkün deyil.
+- **D1 transaction dəstəkləmir.** `$transaction` ayrı-ayrı sorğulara bölünür, atomarlıq yoxdur.
 
 `queries.ts` mərkəzi qaydaları saxlayır:
 
@@ -111,8 +133,27 @@ propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
   `propertySchema()`, `articleSchema()`, `serviceSchema()`, `breadcrumbSchema()`.
 - `siteUrl(path)` — `NEXT_PUBLIC_SITE_URL` üzərindən mütləq URL qurur.
 
-`getSitemapEntries()` (`queries.ts`) yazılıb, amma `app/sitemap.ts` mövcud olmadığı üçün
-hazırda çağırılmır.
+`app/sitemap.ts` `getSitemapEntries()`-i çağırır və `force-dynamic`-dir (D1-dən oxuyur).
+`app/robots.ts` `/admin`, `/giris` və `/favoritler` marşrutlarını indeksdən kənarlaşdırır.
+
+### Cloudflare infrastrukturu
+
+`wrangler.jsonc` bütün binding-ləri saxlayır. Dəyişiklikdən sonra `npm run cf-typegen`
+işlədilməli, `cloudflare-env.d.ts` yenilənməlidir.
+
+| Binding | Resurs | Təyinat |
+|---|---|---|
+| `DB` | D1 `luxehome-db` | Əsas verilənlər bazası (Prisma + `@prisma/adapter-d1`) |
+| `MEDIA` | R2 `luxehome-media` | Admin paneldən yüklənən şəkillər |
+| `NEXT_INC_CACHE_R2_BUCKET` | R2 `luxehome-next-cache` | OpenNext ISR keşi |
+| `IMAGES` | Cloudflare Images | `next/image` optimizasiyası |
+| `ASSETS` | Static assets | `.open-next/assets` |
+| `WORKER_SELF_REFERENCE` | Worker `luxehomeestate` | ISR revalidate çağırışları |
+
+`vars` bölməsi: `ADMIN_ENABLED` (idarə paneli qapısı), `NEXT_PUBLIC_SITE_URL`.
+
+Yayım: `npm run deploy`. Worker adı `luxehomeestate`, ünvan
+`https://luxehomeestate.amiyevbahadur.workers.dev` və `luxehomeestate.az`.
 
 ### Şirkət məlumatları
 
@@ -135,26 +176,35 @@ bayraqla işarələnir və UI-da `DemoBadge` göstərilir. Real məlumat gələn
 
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
-- **Admin panel yoxdur.** `bcryptjs`, `jose` quraşdırılıb; `User` modeli, `ROLE_PERMISSIONS`
-  matrisi və `getDashboardStats()` hazırdır, lakin `src/app/admin`, `middleware.ts` və
-  auth kodu mövcud deyil. README-də admin interfeysinin olduğu yazılıb — bu doğru deyil.
-- **Sınıq daxili linklər:** `/favoritler` (navbar-da 2 yerdə), `legalNavigation`-dakı 3 hüquqi
-  səhifə (footer). Hamısı 404 verir.
-- `not-found.tsx`, `error.tsx`, `loading.tsx`, `sitemap.ts`, `robots.ts` yoxdur.
-- Contact form-da rate limit / honeypot / captcha yoxdur.
-- `emlaklar/page.tsx` `queries.ts`-in dəstəklədiyi filtrlərin yalnız bir hissəsini ötürür
-  (mətn axtarışı, rayon, sahə, təmir, sənəd statusu, xüsusiyyətlər bağlanmayıb).
+- **Admin panel hazır deyil və bağlıdır.** `src/app/admin` və `src/app/giris` yalnız mock data ilə
+  işləyən UI-dır; auth yoxdur. `src/middleware.ts` `ADMIN_ENABLED !== "true"` olduqda hər iki
+  marşrutu 404-ə yönləndirir. Panel işə salınmazdan əvvəl jose JWT sessiyası, rol yoxlaması və
+  real CRUD yazılmalıdır.
+- Contact form-da rate limit / honeypot / Turnstile yoxdur.
+- `emlaklar/page.tsx` `queries.ts`-in dəstəklədiyi filtrlərin hamısını ötürmür
+  (xüsusiyyət filtri `featureSlugs` bağlanmayıb).
+- Media yükləmə axını yoxdur: R2 bucket (`MEDIA` binding) hazırdır, upload route və admin
+  inteqrasiyası yazılmayıb.
+- `loading.tsx` fayl(lar)ı yoxdur — səhifə keçidlərində skeleton göstərilmir.
 - Test və CI yoxdur.
 
 ## Diqqət tələb edən məqamlar
 
-- **Verilənlər bazası provayderi hələ seçilməyib** (SQLite dev-dədir, production qərarı verilməyib).
-  Yeni sorğu yazarkən SQLite-a xas davranışa bel bağlama. Xüsusilə `contains` filtrləri SQLite-da
-  case-insensitive işləyir, PostgreSQL-də isə `mode: "insensitive"` tələb edir.
+- **Verilənlər bazası Cloudflare D1-dir (SQLite).** `mode: "insensitive"` D1-də dəstəklənmir və
+  yazılmamalıdır. SQLite `LIKE` yalnız ASCII hərflərində reqistrdən asılı deyil — `ə`, `ş`, `ç`,
+  `ğ`, `ı`, `ö`, `ü` hərfləri **reqistrə həssasdır**. Azərbaycanca mətn axtarışı buna görə
+  natamamdır; həll yolu axtarış üçün əvvəlcədən kiçik hərfə salınmış ayrıca sütun saxlamaqdır.
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
-- `next.config.ts`-də `images.remotePatterns` yalnız `images.unsplash.com`-a icazə verir; demo
-  şəkillər oradandır. Yeni xarici şəkil mənbəyi əlavə edilərsə bu siyahı yenilənməlidir.
+- `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (demo şəkillər) və
+  `media.luxehomeestate.az` (R2 custom domain) mənbələrinə icazə verir. Yeni mənbə əlavə
+  edilərsə bu siyahı yenilənməlidir.
+- `next/image` optimizasiyası Cloudflare `IMAGES` binding-i üzərindən gedir (`wrangler.jsonc`).
+- Gizli dəyərlər `.env`-də deyil, Cloudflare secret-lərindədir:
+  `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`.
+  Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
+- `process.env` Workers-də yalnız sorğu kontekstində doludur. Modul səviyyəsində oxunan
+  konfiqurasiya boş qalır — `src/lib/email.ts`-dəki kimi lazy funksiya işlət.
 - `outputFileTracingRoot: import.meta.dirname` qəsdən qoyulub — yuxarı qovluqdakı lockfile-ın
   səhvən workspace kökü kimi seçilməsinin qarşısını alır. Silinməməlidir.
 

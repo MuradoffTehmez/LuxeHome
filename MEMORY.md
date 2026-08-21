@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 13 avqust 2026.
+Son yenilənmə: 20 avqust 2026.
 
 ---
 
@@ -33,8 +33,8 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 | Mövzu | Qərar |
 |---|---|
 | Admin panel | **Tam admin panel qurulacaq** — jose ilə JWT sessiya, middleware qoruma, rol əsaslı icazə, əmlak/layihə/blog/lead CRUD, media yükləmə. Frontend bitdikdən sonra. |
-| Verilənlər bazası + hosting | **Hələ qərar verilməyib.** Kod hər iki variantda (SQLite / PostgreSQL) işləyəcək şəkildə yazılır. |
-| Media yükləmə | **İndilik lokal disk** (`/public/uploads`). Xarici storage-a (R2/S3) keçid TODO-dur. |
+| Verilənlər bazası + hosting | **Qərar verilib (20 avqust 2026): tam Cloudflare.** Workers (OpenNext), D1, R2, Images. Supabase və PostgreSQL layihədən çıxarılıb. |
+| Media yükləmə | **Cloudflare R2** — `luxehome-media` bucket və `MEDIA` binding hazırdır. Upload route və admin inteqrasiyası hələ yazılmayıb. |
 | Dil | **AZ + RU.** Hazırda yalnız AZ. Çoxdilliliyin gec əlavə edilməsi baha başa gəlir — arxitektura qərarları buna hazırlıqlı verilməlidir. |
 | Lead bildirişi | **Telegram bot.** Yeni müraciət gələndə sistem bot vasitəsilə bildiriş göndərəcək. |
 | Spam qoruma | Honeypot + rate limit **və** Cloudflare Turnstile — hər ikisi olacaq, amma frontend-dən sonra. |
@@ -58,14 +58,14 @@ Müştəri təqdimatı üçün dördü də vacib sayılıb:
 
 ---
 
-## 4. Çatışmayan səhifələr (təsdiqlənib, hamısı qurulacaq)
+## 4. Çatışmayan səhifələr — **20 avqust 2026-da bağlandı**
 
-- `/favoritler` — navbar-da 2 yerdə link var (`navbar.tsx:134`, `navbar.tsx:218`), səhifə yoxdur → 404.
-  `useFavorites` hook (`lib/favorites.ts`) və `getPropertiesByIds()` hazırdır, yalnız səhifə çatmır.
-- Hüquqi səhifələr — `/mexfilik-siyaseti`, `/istifade-sertleri`, `/cookie-siyaseti`.
-  Footer-də link var, səhifə yox → 404. Google Ads və qanun tələbi.
-- `not-found.tsx`, `error.tsx`, `loading.tsx` — hazırda Next-in brendsiz ingiliscə default-ları görünür.
-- `sitemap.ts` + `robots.ts` — `getSitemapEntries()` yazılıb, çağırılmır.
+- ~~`/favoritler`~~ — qurulub. Server Action (`favoritler/actions.ts`) localStorage-dəki ID-ləri
+  alıb ictimai əmlakları qaytarır.
+- ~~Hüquqi səhifələr~~ — `/mexfilik-siyaseti`, `/istifade-sertleri`, `/cookie-siyaseti` qurulub
+  (`components/site/legal-article.tsx` ümumi çərçivə). **Mətnlər hüquqşünas təsdiqi gözləyir.**
+- ~~`not-found.tsx`, `error.tsx`~~ — brendli AZ versiyaları var. `loading.tsx` hələ yoxdur.
+- ~~`sitemap.ts` + `robots.ts`~~ — qurulub, `getSitemapEntries()` çağırılır.
 
 ---
 
@@ -76,7 +76,8 @@ Müştəri təqdimatı üçün dördü də vacib sayılıb:
 | `add-mocks.ts:73` | `pricePeriod: "MONTHLY"` — düzgün dəyər `"MONTH"` (`constants.ts:145`). Kirayə qiymət periodu UI-da düzgün göstərilmir. |
 | `add-mocks.ts` | Elanlar `status: "PUBLISHED"` ilə yaradılır, amma `publishedAt` set olunmur. Default sıralama `publishedAt desc, createdAt desc`-dir — bu elanlar sıralamada aşağı düşür. |
 | `add-mocks.ts:48` | Slug generatoru `[^a-z0-9]+` istifadə edir; Azərbaycan hərfləri (ə, ş, ç, ğ, ı, ö, ü) silinir → `gənclik` yerinə `g-nclik`. `lib/utils.ts`-dəki slugify istifadə olunmalıdır. |
-| `package.json:15` | `db:clean-demo` scripti `prisma/clean-demo.ts` faylını çağırır — fayl mövcud deyil. |
+| `package.json` | `db:clean-demo` scripti silinib — `prisma/clean-demo.ts` heç vaxt yazılmamışdı. Demo təmizləmə hələ də lazımdır. |
+| `queries.ts` | SQLite `LIKE` Azərbaycan hərflərində (ə, ş, ç, ğ, ı, ö, ü) reqistrə həssasdır — mətn axtarışı böyük hərflə yazılmış sorğuları tapmır. |
 
 ---
 
@@ -128,15 +129,14 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
       rol əsaslı icazə yoxlaması (`ROLE_PERMISSIONS` artıq hazırdır).
 - [ ] Admin CRUD: əmlak, layihə, xidmət, blog, lead, media, istifadəçi, parametrlər.
 - [ ] Dashboard səhifəsi — `getDashboardStats()` hazırdır, çağıran yoxdur.
-- [ ] **Media yükləmə: hazırda lokal disk (`/public/uploads`) planlaşdırılır. Xarici storage-a
-      (Cloudflare R2 / S3) keçid mütləq nəzərdən keçirilməlidir** — Vercel-də fayl sistemi
-      read-only olduğu üçün lokal həll orada işləməyəcək. Hosting qərarı verildikdə yenidən bax.
+- [ ] Media yükləmə: R2 (`MEDIA` binding) hazırdır. Upload route (`/api/upload`), `Media` modelinə
+      yazma və admin `ImageDropzone` inteqrasiyası qalır.
 - [ ] Telegram bot inteqrasiyası — yeni lead bildirişi.
 - [ ] **Contact form spam qoruması: honeypot + rate limit, sonra Cloudflare Turnstile.**
       Hazırda `elaqe/actions.ts` heç bir qorumaya malik deyil.
 - [ ] `prisma/clean-demo.ts` yaz — `isDemo: true` qeydləri təmizləyən script.
-- [ ] PostgreSQL-ə keçid hazırlığı: `contains` filtrlərinə `mode: "insensitive"` əlavə edilməsi
-      (`queries.ts` — `buildPropertyWhere` və `getPosts`).
+- [ ] Azərbaycanca axtarış üçün normallaşdırılmış (kiçik hərfli) sütun əlavə etmək —
+      `mode: "insensitive"` D1-də yoxdur.
 
 ### Çoxdillilik (AZ + RU)
 - [ ] Routing strategiyası seç (`[locale]` seqmenti və ya domen/subdomen).
@@ -168,3 +168,39 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - Mənbə kodu: ~6 700 sətir (`src/`).
 - Git: `main` branch, 27 commit.
 - `.env` düzgün şəkildə `.gitignore`-dadır; yalnız `.env.example` izlənir.
+
+
+---
+
+## 8. Cloudflare yayımı — 20 avqust 2026
+
+**Vəziyyət: ictimai sayt canlıdır.**
+
+- Worker: `luxehomeestate` → `https://luxehomeestate.az` və `https://www.luxehomeestate.az`
+- D1: `luxehome-db` (`86d5f7e0-ffe6-48d8-bd84-d88163550b2a`) — `migrations/0001_init.sql`
+  tətbiq olunub, `prisma/seed.sql` (212 sətir demo məzmun) yüklənib
+- R2: `luxehome-media`, `luxehome-next-cache`
+- Secret-lər: `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`
+
+### Yayım zamanı həll edilən problemlər
+
+| Problem | Həll |
+|---|---|
+| Prisma Workers-də `debian-openssl-1.1.x` binary engine axtarırdı | `@prisma/client/wasm.js`-dən idxal. `exports` xəritəsində `node` açarı `workerd`-dən əvvəl gəlir, esbuild isə `platform: "node"` işlədir. |
+| Module səviyyəsində `new PrismaClient()` binding tapmırdı | `src/lib/prisma.ts` Proxy arxasında lazy qurma. |
+| Səhifələr build zamanı D1-ə müraciət edib çökürdü | D1 oxuyan 9 səhifədə `dynamic = "force-dynamic"`. |
+| `process.env.RESEND_API_KEY` modul yüklənərkən boş idi | `src/lib/email.ts` konfiqurasiyası lazy funksiyalara köçürüldü. |
+| Remote D1-də köhnə boş sxem miqrasiyanı bloklayırdı | `prisma/reset-d1.sql` ilə cədvəllər silindi (0 sətir itirilməyib). |
+
+### Yayımdan sonra qalan işlər
+
+- [x] `luxehomeestate.az` və `www.luxehomeestate.az` Worker-ə bağlandı (20 avqust 2026).
+      Canonical URL-lər, sitemap və robots.txt production ünvanını göstərir.
+      `workers.dev` alt domeni custom domain əlavə olunduqdan sonra söndü.
+- [ ] R2 üçün `media.luxehomeestate.az` public custom domain qurmaq.
+- [ ] Resend-də `luxehomeestate.az` domenini təsdiqləmək (hazırda `onboarding@resend.dev`
+      göndərici ünvanı işlədilir — production üçün uyğun deyil).
+- [ ] Cloudflare Images transformations-u zone səviyyəsində aktivləşdirmək.
+- [ ] Admin panel auth-u yazıb `ADMIN_ENABLED="true"` etmək.
+- [ ] `npm run preview` (workerd) ilə lokal test axını qurmaq — `next dev` Node-da wasm
+      engine-i yükləyə bilmir.
