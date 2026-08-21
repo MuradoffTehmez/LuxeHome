@@ -8,16 +8,16 @@
 
 @theme {
   /* --- Rənglər: səth --- */
-  --color-ivory: #fbf9f6;
-  --color-beige: #f2ece3;
-  --color-beige-deep: #e8dfd2;
-  --color-paper: #ffffff;
+  --color-ivory: #f7f3ec;
+  --color-beige: #eee6da;
+  --color-beige-deep: #e2d6c6;
+  --color-paper: #fcfaf6;
 
   /* --- Rənglər: tünd --- */
-  --color-charcoal: #16191d;
-  --color-charcoal-soft: #23272d;
-  --color-navy: #101a28;
-  --color-navy-soft: #1a2738;
+  --color-charcoal: #1b1a18;
+  --color-charcoal-soft: #292724;
+  --color-navy: #17202b;
+  --color-navy-soft: #202c39;
 
   /* --- Rənglər: mətn (WCAG AA yoxlanılıb) --- */
   --color-ink: #14181c; /* ivory üzərində 15.9:1 */
@@ -27,9 +27,9 @@
   --color-ink-invert-soft: #b9c0c9; /* navy üzərində 8.7:1 */
 
   /* --- Rənglər: champagne gold accent --- */
-  --color-gold: #b08d57; /* CTA fonu — üzərində ink 6.4:1 */
-  --color-gold-soft: #c9a870; /* tünd fonda mətn/ikon — 7.4:1 */
-  --color-gold-deep: #8a6d3f; /* açıq fonda link mətni — 4.9:1 */
+  --color-gold: #aa8754; /* CTA fonu — üzərində ink 5.8:1 */
+  --color-gold-soft: #c4a575; /* tünd fonda mətn/ikon — 7:1-dən yuxarı */
+  --color-gold-deep: #806237; /* açıq fonda link mətni — WCAG AA */
   --color-gold-line: #d9c7a6; /* incə ayırıcı və border */
 
   /* --- Rənglər: kənar və sərhəd --- */
@@ -64,6 +64,7 @@
   --shadow-sm: 0 1px 3px rgb(20 24 28 / 0.07), 0 1px 2px rgb(20 24 28 / 0.04);
   --shadow-md: 0 4px 14px rgb(20 24 28 / 0.07), 0 1px 3px rgb(20 24 28 / 0.05);
   --shadow-lg: 0 12px 32px rgb(20 24 28 / 0.1), 0 2px 6px rgb(20 24 28 / 0.05);
+  --shadow-editorial: 0 24px 70px rgb(37 31 23 / 0.12);
 
   /* --- Animasiya --- */
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
@@ -84,7 +85,7 @@
   }
   @keyframes slow-zoom {
     from { transform: scale(1); }
-    to { transform: scale(1.12); }
+    to { transform: scale(1.06); }
   }
   @keyframes scale-in {
     from { opacity: 0; transform: scale(0.92); }
@@ -100,16 +101,16 @@
    -------------------------------------------------------------------------- */
 .dark {
   /* --- Rənglər: səth (qara və göy tonları) --- */
-  --color-ivory: #101a28;
-  --color-paper: #1a2738;
-  --color-beige: #23272d;
-  --color-beige-deep: #2b3440;
+  --color-ivory: #17202b;
+  --color-paper: #202c39;
+  --color-beige: #292724;
+  --color-beige-deep: #34312d;
 
   /* --- Rənglər: tünd (açıq tonlarla əvəzlənir) --- */
-  --color-charcoal: #fbf9f6;
-  --color-charcoal-soft: #f2ece3;
-  --color-navy: #fbf9f6;
-  --color-navy-soft: #f2ece3;
+  --color-charcoal: #f7f3ec;
+  --color-charcoal-soft: #eee6da;
+  --color-navy: #f7f3ec;
+  --color-navy-soft: #eee6da;
 
   /* --- Rənglər: mətn ---
      Diqqət: bu dəyərlər açıq rejimdən fərqlidir. Eyni saxlansaydı, tünd fonda
@@ -237,17 +238,42 @@ p {
    IntersectionObserver `data-revealed` atributunu əlavə edir.
    -------------------------------------------------------------------------- */
 [data-reveal] {
-  opacity: 0;
-  transform: translateY(24px);
   transition:
     opacity 500ms var(--ease-out-soft),
     transform 500ms var(--ease-out-soft);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
+[data-reveal][data-reveal-ready="true"][data-revealed="false"] {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
 [data-reveal][data-revealed="true"] {
   opacity: 1;
   transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   Editorial utility-lər — səssiz tipoqrafik vurğu və şəkil hərəkəti
+   -------------------------------------------------------------------------- */
+.editorial-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.image-lift {
+  transition:
+    transform 600ms var(--ease-out-soft),
+    filter 300ms ease;
+}
+
+@media (hover: hover) {
+  .group:hover .image-lift {
+    transform: scale(1.025);
+  }
 }
 
 /* --------------------------------------------------------------------------

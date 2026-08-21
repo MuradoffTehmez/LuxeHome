@@ -22,7 +22,12 @@ export function Reveal({
   as: Tag = "div",
 }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
+  const [ready, setReady] = useState(false);
   const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
 
   useEffect(() => {
     const element = ref.current;
@@ -48,6 +53,7 @@ export function Reveal({
     <Tag
       ref={ref as React.Ref<never>}
       data-reveal=""
+      data-reveal-ready={ready ? "true" : "false"}
       data-revealed={revealed ? "true" : "false"}
       style={{ "--reveal-delay": `${delay}ms` } as React.CSSProperties}
       className={cn(className)}
