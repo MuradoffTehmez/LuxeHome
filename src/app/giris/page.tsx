@@ -42,8 +42,8 @@ export default function LoginPage() {
           <div className="mt-8 flex items-start gap-2.5 rounded-xs border border-line bg-beige px-4 py-3">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <p className="text-xs leading-relaxed text-ink-soft">
-              Bu səhifə hazırda dizayn mərhələsindədir — forma heç bir yerə
-              göndərilmir. Doğrulama backend mərhələsində qoşulacaq.
+              Giriş iki mərhələlidir: parolunuzdan sonra doğrulama tətbiqindəki
+              kod soruşulacaq.
             </p>
           </div>
 
