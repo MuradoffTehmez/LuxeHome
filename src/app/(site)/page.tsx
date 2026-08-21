@@ -94,6 +94,12 @@ const CATEGORY_LAYOUT = [
   "lg:col-span-4",
 ];
 
+const BLOG_LAYOUT = [
+  "lg:col-span-7 lg:row-span-2",
+  "lg:col-span-5",
+  "lg:col-span-5",
+];
+
 export default async function HomePage() {
   const [featured, propertyTypes, services, projects, posts, filterOptions, categories] =
     await Promise.all([
@@ -422,7 +428,7 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {projects.length > 0 && (
         <Section tone="paper">
-          <Container>
+          <Container size="wide">
             <SectionHeader
               overline="Portfolio"
               title="Layihələrimiz"
@@ -446,7 +452,7 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {posts.items.length > 0 && (
         <Section tone="ivory">
-          <Container>
+          <Container size="wide">
             <SectionHeader
               overline="Blog"
               title="Faydalı məqalələr"
@@ -454,10 +460,18 @@ export default async function HomePage() {
               action={{ label: "Bütün yazılar", href: "/blog" }}
             />
 
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-12 lg:auto-rows-fr">
               {posts.items.map((post, index) => (
-                <Reveal key={post.id} delay={index * 60}>
-                  <PostCard post={post} />
+                <Reveal
+                  key={post.id}
+                  delay={index * 60}
+                  className={BLOG_LAYOUT[index] ?? "lg:col-span-4"}
+                >
+                  <PostCard
+                    post={post}
+                    priority={index === 0}
+                    variant={index === 0 ? "featured" : "standard"}
+                  />
                 </Reveal>
               ))}
             </div>
@@ -468,37 +482,41 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {/* CTA                                                                */}
       {/* ------------------------------------------------------------------ */}
-      <Section tone="dark" className="relative isolate overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <Image
-            src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=2000&q=80"
-            alt=""
-            fill
-            loading="lazy"
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div aria-hidden="true" className="absolute inset-0 bg-zinc-900/85" />
-        </div>
+      <Section tone="beige" spacing="none" className="overflow-hidden">
+        <Container size="wide" className="py-14 sm:py-18 lg:py-24">
+          <div className="grid lg:grid-cols-12">
+            <div className="relative aspect-4/3 overflow-hidden lg:col-span-7 lg:aspect-auto lg:min-h-[34rem]">
+              <Image
+                src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=2000&q=80"
+                alt=""
+                fill
+                loading="lazy"
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                className="object-cover"
+              />
+            </div>
 
-        <Container className="flex flex-col items-center gap-6 text-center">
-          <h2 className="max-w-2xl font-display text-3xl text-white sm:text-4xl lg:text-5xl">
-            Axtardığınız əmlakı tapmaqda kömək edək
-          </h2>
+            <div className="flex flex-col justify-center gap-6 bg-ivory p-7 sm:p-10 lg:col-span-5 lg:p-14">
+              <p className="editorial-kicker text-gold-deep">Fərdi seçim</p>
+              <h2 className="max-w-xl font-display text-[clamp(2.4rem,4vw,4.5rem)] leading-[0.98] tracking-[-0.04em] text-ink">
+                Axtardığınız əmlakı tapmaqda kömək edək
+              </h2>
 
-          <p className="max-w-xl text-base leading-relaxed text-white/80">
-            Tələbinizi bizə bildirin — uyğun variantları seçib sizinlə əlaqə
-            saxlayaq.
-          </p>
+              <p className="max-w-lg text-base leading-relaxed text-ink-soft">
+                Tələbinizi bizə bildirin — uyğun variantları seçib sizinlə əlaqə
+                saxlayaq.
+              </p>
 
-          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/elaqe" variant="primary" size="lg">
-              Müraciət göndər
-            </ButtonLink>
-            <ButtonLink href="/emlaklar" variant="onDark" size="lg">
-              Əmlaklara bax
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </ButtonLink>
+              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                <ButtonLink href="/elaqe" variant="primary" size="lg">
+                  Müraciət göndər
+                </ButtonLink>
+                <ButtonLink href="/emlaklar" variant="outline" size="lg">
+                  Əmlaklara bax
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </ButtonLink>
+              </div>
+            </div>
           </div>
         </Container>
       </Section>

@@ -32,12 +32,11 @@ export function ProjectCard({
   return (
     <article
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-md border border-line bg-paper",
-        "transition-shadow duration-300 hover:shadow-md",
+        "group relative flex h-full flex-col",
         className,
       )}
     >
-      <div className="relative aspect-16/10 overflow-hidden bg-beige">
+      <div className="relative aspect-16/11 overflow-hidden rounded-sm bg-beige">
         {project.coverUrl ? (
           <Image
             src={project.coverUrl}
@@ -46,7 +45,7 @@ export function ProjectCard({
             priority={priority}
             loading={priority ? undefined : "lazy"}
             sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            className="image-lift object-cover"
           />
         ) : (
           <div className="flex size-full items-center justify-center text-ink-muted">
@@ -65,7 +64,7 @@ export function ProjectCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-5">
+      <div className="flex flex-1 flex-col gap-3 pt-5">
         <div className="flex flex-col gap-1.5">
           <p className="text-xs font-medium tracking-wide text-gold-deep uppercase">
             {PROJECT_TYPE_LABELS[type]}

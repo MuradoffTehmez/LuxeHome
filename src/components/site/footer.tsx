@@ -21,11 +21,11 @@ export function Footer() {
   return (
     <footer className="on-dark border-t border-zinc-800 bg-zinc-900 text-zinc-50">
       <Container className="py-14 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           {/* Brend */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 lg:col-span-5">
             <Logo tone="dark" />
-            <p className="max-w-xs text-sm leading-relaxed text-zinc-300">
+            <p className="max-w-sm text-sm leading-relaxed text-zinc-300">
               {siteConfig.slogan.charAt(0) + siteConfig.slogan.slice(1).toLowerCase()}.
               Mənzil, villa, torpaq və kommersiya obyektləri üzrə peşəkar daşınmaz
               əmlak xidmətləri.
@@ -43,10 +43,10 @@ export function Footer() {
           </div>
 
           {/* Naviqasiya */}
-          <nav aria-labelledby="footer-nav-heading" className="flex flex-col gap-4">
+          <nav aria-labelledby="footer-nav-heading" className="flex flex-col gap-4 lg:col-span-3">
             <h2
               id="footer-nav-heading"
-              className="font-display text-sm tracking-[0.18em] text-gold-soft uppercase"
+              className="editorial-kicker text-gold-soft"
             >
               Naviqasiya
             </h2>
@@ -64,31 +64,9 @@ export function Footer() {
             </ul>
           </nav>
 
-          {/* Əmlak kateqoriyaları */}
-          <nav aria-labelledby="footer-props-heading" className="flex flex-col gap-4">
-            <h2
-              id="footer-props-heading"
-              className="font-display text-sm tracking-[0.18em] text-gold-soft uppercase"
-            >
-              Əmlaklar
-            </h2>
-            <ul className="flex flex-col gap-1">
-              {PROPERTY_LINKS.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="inline-flex min-h-9 items-center text-sm text-zinc-300 transition-colors hover:text-zinc-50"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
           {/* Əlaqə */}
-          <div className="flex flex-col gap-4">
-            <h2 className="font-display text-sm tracking-[0.18em] text-gold-soft uppercase">
+          <div className="flex flex-col gap-4 lg:col-span-4">
+            <h2 className="editorial-kicker text-gold-soft">
               Əlaqə
             </h2>
 
@@ -122,8 +100,30 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Əmlak kateqoriyaları — uzun sütun əvəzinə yığcam keçid zolağı */}
+        <nav
+          aria-labelledby="footer-props-heading"
+          className="mt-10 border-t border-zinc-800 pt-6"
+        >
+          <h2 id="footer-props-heading" className="editorial-kicker mb-3 text-gold-soft">
+            Əmlaklar
+          </h2>
+          <ul className="flex flex-wrap gap-x-7 gap-y-1">
+            {PROPERTY_LINKS.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="inline-flex min-h-9 items-center text-sm text-zinc-300 transition-colors hover:text-zinc-50"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         {/* Alt sətir */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-zinc-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-4 border-t border-zinc-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1 text-xs text-zinc-300">
             <p>© {year} {siteConfig.legalName}. Bütün hüquqlar qorunur.</p>
             <p>
