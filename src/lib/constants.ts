@@ -365,3 +365,23 @@ export const CURRENCY_LABELS: Record<Currency, string> = {
 
 /** Admin cədvəllərində bir səhifədəki sətir sayı. */
 export const ADMIN_PAGE_SIZE = 20;
+
+// ---------------------------------------------------------------------------
+// XÜSUSİYYƏT QRUPLARI
+// ---------------------------------------------------------------------------
+
+export const FEATURE_GROUPS = {
+  GENERAL: "GENERAL",
+  INDOOR: "INDOOR",
+  OUTDOOR: "OUTDOOR",
+  SECURITY: "SECURITY",
+} as const;
+
+export type FeatureGroup = (typeof FEATURE_GROUPS)[keyof typeof FEATURE_GROUPS];
+
+export const FEATURE_GROUP_LABELS: Record<FeatureGroup, string> = {
+  GENERAL: "Ümumi",
+  INDOOR: "Daxili",
+  OUTDOOR: "Xarici",
+  SECURITY: "Təhlükəsizlik",
+};
