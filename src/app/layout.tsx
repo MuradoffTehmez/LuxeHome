@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { organizationSchema } from "@/lib/seo";
+import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import "./globals.css";
 
 /**
@@ -84,6 +85,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="az" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_RUNTIME_SHIM }} />
+      </head>
       <body className="min-h-dvh antialiased">
         <script
           type="application/ld+json"
