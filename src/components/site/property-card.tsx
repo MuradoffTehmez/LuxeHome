@@ -20,11 +20,17 @@ type PropertyCardProps = {
   /** Siyahının ilk kartları üçün `priority` — LCP-ni yaxşılaşdırır. */
   priority?: boolean;
   className?: string;
+  variant?: "standard" | "featured";
 };
 
 const PLACEHOLDER_ALT = "Əmlak fotosu";
 
-export function PropertyCard({ property, priority = false, className }: PropertyCardProps) {
+export function PropertyCard({
+  property,
+  priority = false,
+  className,
+  variant = "standard",
+}: PropertyCardProps) {
   const image = property.images[0];
   const status = property.status as PropertyStatus;
   const isSale = property.listingType === LISTING_TYPES.SALE;
@@ -42,13 +48,18 @@ export function PropertyCard({ property, priority = false, className }: Property
   return (
     <article
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-md border border-line bg-paper",
-        "transition-all duration-300 ease-out-soft hover:-translate-y-2 hover:shadow-xl",
+        "group relative flex h-full flex-col overflow-hidden rounded-sm border border-line bg-paper",
+        "transition-colors duration-300 ease-out-soft hover:border-line-strong",
         className,
       )}
     >
       {/* --- Şəkil --- */}
-      <div className="relative aspect-4/3 overflow-hidden bg-beige">
+      <div
+        className={cn(
+          "relative overflow-hidden bg-beige",
+          variant === "featured" ? "aspect-16/10 lg:min-h-[34rem]" : "aspect-4/3",
+        )}
+      >
         {image ? (
           <Image
             src={image.url}
@@ -56,9 +67,13 @@ export function PropertyCard({ property, priority = false, className }: Property
             fill
             priority={priority}
             loading={priority ? undefined : "lazy"}
-            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            sizes={
+              variant === "featured"
+                ? "(max-width: 1024px) 100vw, 58vw"
+                : "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            }
             className={cn(
-              "object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.07]",
+              "image-lift object-cover",
               isClosed && "opacity-70 grayscale-[0.35]",
             )}
           />
@@ -68,14 +83,6 @@ export function PropertyCard({ property, priority = false, className }: Property
             <span className="sr-only">{PLACEHOLDER_ALT} mövcud deyil</span>
           </div>
         )}
-
-        {/* Alt gradient — qiymətin oxunaqlılığı üçün.
-            Açıq şəkillərdə (ağ villa, hovuz) zəif gradient qiyməti gözdən itirirdi,
-            ona görə tündlük artırılıb və zolaq hündürləndirilib. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-charcoal/85 via-charcoal/40 to-transparent"
-        />
 
         {/* Sol üst nişanlar */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
@@ -99,20 +106,26 @@ export function PropertyCard({ property, priority = false, className }: Property
         <div className="absolute top-3 right-3 z-10">
           <FavoriteButton propertyId={property.id} />
         </div>
-
-        {/* Sol alt — qiymət */}
-        <p className="absolute bottom-3 left-3 flex items-baseline gap-1 text-white">
-          <span className="tabular font-display text-xl font-semibold sm:text-2xl">
-            {formatPrice(property.price, property.currency)}
-          </span>
-          {period && <span className="text-sm opacity-90">/ {period}</span>}
-        </p>
       </div>
 
       {/* --- Məzmun --- */}
-      <div className="flex flex-1 flex-col gap-3 p-5">
+      <div className={cn("flex flex-1 flex-col gap-4 p-5", variant === "featured" && "sm:p-7")}>
+        <p className="tabular font-display text-2xl leading-none tracking-[-0.02em] text-ink">
+          {formatPrice(property.price, property.currency)}
+          {period && (
+            <span className="ml-1 font-sans text-xs font-normal text-ink-muted">
+              / {period}
+            </span>
+          )}
+        </p>
+
         <div className="flex flex-col gap-1.5">
-          <h3 className="font-display text-lg leading-snug text-ink">
+          <h3
+            className={cn(
+              "font-display leading-snug text-ink",
+              variant === "featured" ? "text-2xl sm:text-3xl" : "text-lg",
+            )}
+          >
             {/* Bütün kart klikləndikdə detala keçir; overlay link fokus sırasını pozmur */}
             <Link
               href={`/emlaklar/${property.slug}`}

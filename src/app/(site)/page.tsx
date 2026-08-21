@@ -77,6 +77,15 @@ const WHY_ITEMS = [
   },
 ];
 
+const PROPERTY_LAYOUT = [
+  "lg:col-span-7 lg:row-span-2",
+  "lg:col-span-5",
+  "lg:col-span-5",
+  "lg:col-span-4",
+  "lg:col-span-4",
+  "lg:col-span-4",
+];
+
 export default async function HomePage() {
   const [featured, propertyTypes, services, projects, posts, filterOptions, categories] =
     await Promise.all([
@@ -129,7 +138,7 @@ export default async function HomePage() {
       {/* SEÇİLMİŞ ƏMLAKLAR                                                  */}
       {/* ------------------------------------------------------------------ */}
       <Section tone="ivory">
-        <Container>
+        <Container size="wide">
           <SectionHeader
             overline="Portfel"
             title="Seçilmiş Əmlaklar"
@@ -139,10 +148,18 @@ export default async function HomePage() {
 
           <div className="mt-10">
             {featured.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-12 lg:auto-rows-fr">
                 {featured.map((property, index) => (
-                  <Reveal key={property.id} delay={index * 60}>
-                    <PropertyCard property={property} priority={index < 3} />
+                  <Reveal
+                    key={property.id}
+                    delay={index * 60}
+                    className={PROPERTY_LAYOUT[index] ?? "lg:col-span-4"}
+                  >
+                    <PropertyCard
+                      property={property}
+                      priority={index < 3}
+                      variant={index === 0 ? "featured" : "standard"}
+                    />
                   </Reveal>
                 ))}
               </div>
