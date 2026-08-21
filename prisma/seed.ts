@@ -14,9 +14,38 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import { webcrypto } from "node:crypto";
 
 const prisma = new PrismaClient();
+
+// ---------------------------------------------------------------------------
+// PAROL HASH-I
+// ---------------------------------------------------------------------------
+
+/**
+ * `src/lib/auth/password.ts` ilə eyni format və parametrlər.
+ * Skript Node altında işlədiyi üçün həmin modul birbaşa idxal edilmir
+ * (o, Workers-ə yönəlib), lakin nəticə birə-bir uyğun olmalıdır.
+ */
+const PBKDF2_ITERATIONS = 210_000;
+
+async function hashPassword(password: string): Promise<string> {
+  const salt = webcrypto.getRandomValues(new Uint8Array(16));
+  const key = await webcrypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+  const bits = await webcrypto.subtle.deriveBits(
+    { name: "PBKDF2", hash: "SHA-256", salt, iterations: PBKDF2_ITERATIONS },
+    key,
+    256,
+  );
+  const b64 = (bytes: Uint8Array) => Buffer.from(bytes).toString("base64url");
+  return `pbkdf2$sha256$${PBKDF2_ITERATIONS}$${b64(salt)}$${b64(new Uint8Array(bits))}`;
+}
 
 // ---------------------------------------------------------------------------
 // ŞƏKİL MƏNBƏYİ
@@ -75,7 +104,7 @@ async function main() {
   // -------------------------------------------------------------------------
   const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@luxehomeestate.az";
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || "LuxeHomeEstate2026!";
-  const passwordHash = await bcrypt.hash(adminPassword, 12);
+  const passwordHash = await hashPassword(adminPassword);
 
   const superAdmin = await prisma.user.upsert({
     where: { email: adminEmail },
@@ -94,7 +123,7 @@ async function main() {
     create: {
       name: "Məzmun Redaktoru",
       email: "redaktor@luxehomeestate.az",
-      passwordHash: await bcrypt.hash("Redaktor2026!", 12),
+      passwordHash: await hashPassword("Redaktor2026!"),
       role: "EDITOR",
     },
   });
