@@ -21,10 +21,10 @@
   ],
 
   "vars": {
-    // İdarə paneli qapısı — "true" olana qədər /admin və /giris 404 qaytarır (src/middleware.ts)
-    "ADMIN_ENABLED": "false",
-    // Runtime-da oxunur (src/config/site.ts) — build zamanı koda yapışdırılmır,
-    // beləliklə eyni build həm prod, həm staging-ə yayımlana bilir
+    // İdarə paneli qapısı — prod admin istifadəyə açıqdır
+    "ADMIN_ENABLED": "true",
+    // Dinamik səhifələrdə runtime-da oxunur; statik səhifələr üçün deploy skripti
+    // eyni dəyəri build prosesinə də ötürür
     "SITE_URL": "https://luxehomeestate.az"
   },
 
@@ -79,7 +79,11 @@
       "name": "luxehomeestate-staging",
       "workers_dev": true,
 
-      // Custom domain qəsdən yoxdur — staging yalnız workers.dev ünvanında açılır
+      // Custom domain qəsdən yoxdur — staging yalnız workers.dev ünvanında açılır.
+      // Boş massiv **mütləqdir**: `routes` irsi ötürülən açardır və burada
+      // yazılmasa, staging yayımı luxehomeestate.az domenini prod worker-dən
+      // alıb staging-ə bağlayır (wrangler bunu yalnız xəbərdarlıq kimi bildirir).
+      "routes": [],
 
       "observability": { "enabled": true },
 

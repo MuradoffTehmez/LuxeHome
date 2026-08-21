@@ -80,9 +80,9 @@ export function whatsappLink(message?: string): string {
 /**
  * Saytın kök ünvanı.
  *
- * `NEXT_PUBLIC_` prefiksli dəyişənlər Next.js tərəfindən build zamanı koda yapışdırılır —
- * staging və prod üçün iki ayrı build tələb edərdi. Dəyər yalnız server tərəfdə lazım
- * olduğuna görə runtime-da oxunur və bir build hər iki mühitə yayımlana bilir.
+ * Dəyər dinamik səhifələrdə Worker runtime-dan, statik yaradılan səhifələrdə isə build
+ * prosesindən oxunur. Deploy skriptləri hər iki mərhələyə eyni mühitə uyğun `SITE_URL`
+ * ötürməlidir; əks halda statik canonical URL-lər lokal ünvana bağlanar.
  */
 export function siteUrl(path = ""): string {
   const base = (process.env.SITE_URL || "http://localhost:3000").replace(/\/$/, "");

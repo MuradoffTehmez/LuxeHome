@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import { siteConfig, siteUrl } from "@/config/site";
+import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { organizationSchema } from "@/lib/seo";
 import "./globals.css";
 
@@ -60,11 +60,13 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — ${siteConfig.slogan}`,
     description: siteConfig.description,
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
+  robots: isStaging()
+    ? { index: false, follow: false }
+    : {
+        index: true,
+        follow: true,
+        googleBot: { index: true, follow: true, "max-image-preview": "large" },
+      },
 };
 
 export const viewport: Viewport = {
