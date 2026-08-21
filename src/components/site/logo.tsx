@@ -33,7 +33,7 @@ export function Logo({
     <Link
       href="/"
       aria-label={`${siteConfig.name} — ana səhifə`}
-      className={cn("group inline-flex items-center gap-3", className)}
+      className={cn("group inline-flex shrink-0 items-center gap-3", className)}
     >
       {!markless && (
         <Image
@@ -46,7 +46,7 @@ export function Logo({
         />
       )}
 
-      <span className="flex flex-col leading-none">
+      <span className="flex flex-col whitespace-nowrap leading-none">
         <span
           className={cn(
             "font-display text-lg font-semibold tracking-[0.18em] transition-colors duration-200 sm:text-xl",

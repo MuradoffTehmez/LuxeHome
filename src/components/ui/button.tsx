@@ -20,11 +20,11 @@ const VARIANTS: Record<Variant, string> = {
     "bg-charcoal text-ink-invert hover:bg-charcoal-soft border border-transparent",
   outline:
     "bg-transparent text-ink border border-line-strong hover:border-gold hover:text-gold-deep",
-  ghost: "bg-transparent text-ink-soft hover:bg-beige hover:text-ink border border-transparent",
+  ghost: "bg-transparent text-ink-soft hover:text-ink border border-transparent",
   dark: "bg-navy text-ink-invert hover:bg-navy-soft border border-transparent",
   // Tünd fon üzərində ikincili düymə
   onDark:
-    "bg-transparent text-white border border-white/25 hover:border-gold-soft hover:text-gold-soft",
+    "bg-transparent text-ink-invert border border-white/28 hover:border-gold-soft hover:text-gold-soft",
   danger: "bg-danger text-paper hover:opacity-90 border border-transparent",
 };
 
@@ -37,7 +37,7 @@ const SIZES: Record<Size, string> = {
 
 const BASE =
   "inline-flex items-center justify-center rounded-xs font-medium tracking-wide whitespace-nowrap " +
-  "transition-all duration-300 ease-out-soft hover:-translate-y-1 hover:shadow-md active:scale-95 " +
+  "transition-[color,background-color,border-color,transform] duration-300 ease-out-soft active:translate-y-px " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 " +
   "disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed";
 

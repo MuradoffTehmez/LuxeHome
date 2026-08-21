@@ -44,7 +44,7 @@ export function SectionHeader({
         {overline && (
           <span
             className={cn(
-              "flex items-center gap-3 text-xs font-medium tracking-[0.2em] uppercase",
+              "editorial-kicker flex items-center gap-3",
               isDark ? "text-gold-soft" : "text-gold-deep",
             )}
           >
@@ -58,8 +58,8 @@ export function SectionHeader({
 
         <Heading
           className={cn(
-            "font-display text-3xl sm:text-4xl lg:text-[2.75rem]",
-            isDark ? "text-white" : "text-ink",
+            "max-w-3xl font-display text-[clamp(2.25rem,4vw,4.5rem)] leading-[0.98] tracking-[-0.035em]",
+            isDark ? "text-ink-invert" : "text-ink",
           )}
         >
           {title}
@@ -69,7 +69,7 @@ export function SectionHeader({
           <p
             className={cn(
               "text-base leading-relaxed",
-              isDark ? "text-zinc-300" : "text-ink-soft",
+              isDark ? "text-ink-invert-soft" : "text-ink-soft",
             )}
           >
             {description}
@@ -80,9 +80,14 @@ export function SectionHeader({
       {action && (
         <ButtonLink
           href={action.href}
-          variant={isDark ? "onDark" : "outline"}
+          variant="ghost"
           size="sm"
-          className="shrink-0"
+          className={cn(
+            "group/action shrink-0 border-b px-0",
+            isDark
+              ? "border-white/30 text-ink-invert hover:border-gold-soft hover:bg-transparent hover:text-gold-soft"
+              : "border-line-strong text-ink hover:border-gold-deep hover:bg-transparent hover:text-gold-deep",
+          )}
         >
           {action.label}
         </ButtonLink>

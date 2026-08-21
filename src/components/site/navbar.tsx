@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Heart, Menu, Phone, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navigation, siteConfig } from "@/config/site";
-import { ButtonAnchor, ButtonLink, IconButton } from "@/components/ui/button";
+import { ButtonLink, IconButton } from "@/components/ui/button";
 import { Logo } from "./logo";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -71,7 +71,7 @@ export function Navbar() {
         "fixed top-0 z-40 w-full transition-[background-color,box-shadow] duration-300",
         isOverlay
           ? "border-b border-white/10 bg-transparent"
-          : "border-b border-line bg-ivory/95 shadow-sm backdrop-blur-md",
+          : "border-b border-line bg-ivory/92 backdrop-blur-xl",
       )}
     >
       {/* Klaviatura istifadəçiləri üçün keçid linki */}
@@ -83,11 +83,11 @@ export function Navbar() {
       </a>
 
       <div className={cn(
-        "mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 transition-[padding] duration-300 ease-out-soft sm:px-6 lg:px-10",
+        "mx-auto flex w-full max-w-[90rem] items-center justify-between gap-4 px-5 transition-[padding] duration-300 ease-out-soft sm:px-6 lg:gap-6 lg:px-10",
         scrolled ? "py-2 sm:py-3" : "py-4",
         isOverlay && "on-dark",
       )}>
-        <Logo tone={isOverlay ? "dark" : "light"} />
+        <Logo tone={isOverlay ? "dark" : "light"} compact className="shrink-0" />
 
         {/* Desktop naviqasiya */}
         <nav aria-label="Əsas naviqasiya" className="hidden lg:block">
@@ -144,19 +144,28 @@ export function Navbar() {
             <Heart className="size-5" aria-hidden="true" />
           </Link>
 
-          <ButtonAnchor
+          <a
             href={siteConfig.phoneHref}
-            variant={isOverlay ? "onDark" : "outline"}
-            size="sm"
-            className="hidden shrink-0 xl:inline-flex"
+            className={cn(
+              "hidden min-h-11 shrink-0 items-center gap-2 text-sm font-medium transition-colors xl:inline-flex",
+              isOverlay
+                ? "text-ink-invert-soft hover:text-gold-soft"
+                : "text-ink-soft hover:text-gold-deep",
+            )}
           >
             <Phone className="size-4" aria-hidden="true" />
             {siteConfig.phone}
-          </ButtonAnchor>
+          </a>
 
-          <ButtonLink href="/emlaklar" variant="primary" size="sm" className="hidden sm:inline-flex">
+          <ButtonLink
+            href="/emlaklar"
+            variant="primary"
+            size="sm"
+            aria-label="Əmlak axtar"
+            className="hidden lg:inline-flex lg:px-3 xl:px-4"
+          >
             <Search className="size-4" aria-hidden="true" />
-            Əmlak axtar
+            <span className="hidden xl:inline">Əmlak axtar</span>
           </ButtonLink>
 
           {/* Mobil menyu açarı */}
@@ -185,7 +194,8 @@ export function Navbar() {
           id="mobile-menu"
           className="animate-fade-in fixed inset-x-0 top-[var(--header-h)] bottom-0 z-40 overflow-y-auto border-t border-line bg-ivory lg:hidden"
         >
-          <nav aria-label="Mobil naviqasiya" className="px-5 py-4">
+          <nav aria-label="Mobil naviqasiya" className="px-5 pt-5 sm:px-8">
+            <p className="editorial-kicker mb-3 text-ink-muted">Naviqasiya</p>
             <ul className="flex flex-col">
               {navigation.map((item) => {
                 const active = isActive(item.href);
@@ -210,7 +220,9 @@ export function Navbar() {
             </ul>
           </nav>
 
-          <div className="flex flex-col gap-3 px-5 pt-2 pb-10">
+          <div className="mt-6 border-t border-line px-5 pt-6 pb-10 sm:px-8">
+            <p className="editorial-kicker mb-4 text-ink-muted">Sürətli keçidlər</p>
+            <div className="flex flex-col gap-3">
             <ButtonLink href="/emlaklar" variant="primary" size="lg" fullWidth>
               <Search className="size-4" aria-hidden="true" />
               Əmlak axtar
@@ -219,10 +231,14 @@ export function Navbar() {
               <Heart className="size-4" aria-hidden="true" />
               Favoritlərim
             </ButtonLink>
-            <ButtonAnchor href={siteConfig.phoneHref} variant="ghost" size="lg" fullWidth>
+            <a
+              href={siteConfig.phoneHref}
+              className="inline-flex min-h-14 items-center justify-center gap-2 text-sm font-medium text-ink-soft transition-colors hover:text-gold-deep"
+            >
               <Phone className="size-4" aria-hidden="true" />
               {siteConfig.phone}
-            </ButtonAnchor>
+            </a>
+            </div>
           </div>
         </div>
       )}
