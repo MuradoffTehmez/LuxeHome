@@ -102,9 +102,18 @@ async function main() {
   // -------------------------------------------------------------------------
   // 1. İSTİFADƏÇİLƏR
   // -------------------------------------------------------------------------
+  // Seed nəticəsi `prisma/seed.sql` faylına düşür və git-ə commit olunur, ona görə
+  // burada **heç vaxt** sabit parol yazılmır: fayla düşən hash real hesab açardı.
+  // Parol yalnız açıq şəkildə `SEED_ADMIN_PASSWORD` verildikdə qurulur (lokal iş üçün);
+  // əks halda hesablar giriş üçün yararsız hash ilə və deaktiv yaradılır.
+  // Production admini `npm run auth:create-admin` ilə ayrıca qurulur.
   const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@luxehomeestate.az";
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "LuxeHomeEstate2026!";
-  const passwordHash = await hashPassword(adminPassword);
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  const loginEnabled = Boolean(adminPassword);
+
+  // `verifyPassword` beş hissəli `pbkdf2$...` formatı gözləyir — bu dəyər heç bir parola uyğun gəlmir
+  const UNUSABLE_HASH = "disabled";
+  const passwordHash = adminPassword ? await hashPassword(adminPassword) : UNUSABLE_HASH;
 
   const superAdmin = await prisma.user.upsert({
     where: { email: adminEmail },
@@ -114,6 +123,7 @@ async function main() {
       email: adminEmail,
       passwordHash,
       role: "SUPER_ADMIN",
+      isActive: loginEnabled,
     },
   });
 
@@ -123,12 +133,17 @@ async function main() {
     create: {
       name: "Məzmun Redaktoru",
       email: "redaktor@luxehomeestate.az",
-      passwordHash: await hashPassword("Redaktor2026!"),
+      passwordHash: adminPassword ? await hashPassword("Redaktor2026!") : UNUSABLE_HASH,
       role: "EDITOR",
+      isActive: loginEnabled,
     },
   });
 
-  console.log(`  ✓ İstifadəçilər — giriş: ${adminEmail}`);
+  console.log(
+    loginEnabled
+      ? `  ✓ İstifadəçilər — giriş: ${adminEmail}`
+      : "  ✓ İstifadəçilər — giriş bağlıdır (SEED_ADMIN_PASSWORD verilməyib)",
+  );
 
   // -------------------------------------------------------------------------
   // 2. ƏMLAK NÖVLƏRİ

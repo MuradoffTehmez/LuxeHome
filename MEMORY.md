@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 20 avqust 2026.
+Son yenilənmə: 21 avqust 2026.
 
 ---
 
@@ -32,7 +32,7 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 
 | Mövzu | Qərar |
 |---|---|
-| Admin panel | **Tam admin panel qurulacaq** — jose ilə JWT sessiya, middleware qoruma, rol əsaslı icazə, əmlak/layihə/blog/lead CRUD, media yükləmə. Frontend bitdikdən sonra. |
+| Admin panel | **Tam admin panel qurulacaq.** Auth qatı 21 avqust 2026-da tamamlandı (bax bölmə 9); CRUD hələ qalır. |
 | Verilənlər bazası + hosting | **Qərar verilib (20 avqust 2026): tam Cloudflare.** Workers (OpenNext), D1, R2, Images. Supabase və PostgreSQL layihədən çıxarılıb. |
 | Media yükləmə | **Cloudflare R2** — `luxehome-media` bucket və `MEDIA` binding hazırdır. Upload route və admin inteqrasiyası hələ yazılmayıb. |
 | Dil | **AZ + RU.** Hazırda yalnız AZ. Çoxdilliliyin gec əlavə edilməsi baha başa gəlir — arxitektura qərarları buna hazırlıqlı verilməlidir. |
@@ -125,8 +125,7 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 ## 6. TODO backlog (frontend bitdikdən sonra)
 
 ### Backend / infrastruktur
-- [ ] Admin panel: auth (jose JWT + httpOnly cookie), `middleware.ts` route qoruma,
-      rol əsaslı icazə yoxlaması (`ROLE_PERMISSIONS` artıq hazırdır).
+- [x] Admin panel auth — **tamamlandı 21 avqust 2026**, bax bölmə 9.
 - [ ] Admin CRUD: əmlak, layihə, xidmət, blog, lead, media, istifadəçi, parametrlər.
 - [ ] Dashboard səhifəsi — `getDashboardStats()` hazırdır, çağıran yoxdur.
 - [ ] Media yükləmə: R2 (`MEDIA` binding) hazırdır. Upload route (`/api/upload`), `Media` modelinə
@@ -146,8 +145,8 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 ### Keyfiyyət
 - [ ] Xüsusiyyət filtri (`featureSlugs`) — çoxseçimli komponent, hovuz/qaraj/lift və s.
-- [ ] GitHub Actions CI: typecheck + build + lint.
-- [ ] Vitest — `queries.ts` filtr məntiqi üçün unit testlər.
+- [ ] GitHub Actions CI: test + typecheck + build + lint.
+- [ ] Vitest — `queries.ts` filtr məntiqi üçün unit testlər (auth qatı artıq örtülüb, 40 test).
 - [ ] Playwright — kritik axın (axtarış → detal → müraciət) üçün e2e.
 - [ ] Analitika (GA4 / Plausible) + Google Search Console.
 
@@ -201,6 +200,52 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [ ] Resend-də `luxehomeestate.az` domenini təsdiqləmək (hazırda `onboarding@resend.dev`
       göndərici ünvanı işlədilir — production üçün uyğun deyil).
 - [ ] Cloudflare Images transformations-u zone səviyyəsində aktivləşdirmək.
-- [ ] Admin panel auth-u yazıb `ADMIN_ENABLED="true"` etmək.
+- [ ] Panel staging-də yoxlanandan sonra prod `vars`-ında `ADMIN_ENABLED="true"` etmək.
 - [ ] `npm run preview` (workerd) ilə lokal test axını qurmaq — `next dev` Node-da wasm
       engine-i yükləyə bilmir.
+
+---
+
+## 9. Admin auth qatı — 21 avqust 2026
+
+**Vəziyyət: kod hazırdır və `feat/cloudflare-workers-d1-deployment` branch-ındadır.
+Staging yayımı və əl ilə yoxlama hələ icra olunmayıb.**
+
+Plan: `docs/superpowers/plans/2026-08-21-staging-ve-auth.md` (10 task).
+Dizayn: `docs/superpowers/specs/2026-08-20-staging-ve-auth-design.md`.
+
+### Nə quruldu
+
+| Task | Nəticə |
+|---|---|
+| 1-2 | `env.staging` bloku (ayrı worker, D1, R2); `SITE_URL` runtime-a keçdi; staging `noindex` |
+| 3 | Miqrasiya `0002_auth_and_market_fields.sql` — `Session`, `BackupCode`, `LoginAttempt` cədvəlləri + `User` auth sahələri |
+| 4 | Vitest (`@cloudflare/vitest-plugin`, workerd runtime); PBKDF2 parol hash-ı |
+| 5 | TOTP + AES-GCM ilə şifrələnmiş sirr + 10 birdəfəlik ehtiyat kod |
+| 6 | D1-də saxlanan, dərhal ləğv edilə bilən sessiyalar |
+| 7 | `hasPermission()` RBAC, hesab kilidi, IP sürət limiti, guard-lar |
+| 8 | Giriş ekranları: parol → 2FA qurulumu / doğrulama → sessiya |
+| 9 | `middleware.ts` imza yoxlaması, `admin/layout.tsx` guard-ı, `/admin/hesabim`, `forbidden.tsx` |
+| 10 | `prisma/create-admin.ts` — ilk SUPER_ADMIN üçün SQL generatoru |
+
+Keyfiyyət qapısı: 40 test, `typecheck` və `build` təmiz.
+
+### Qərarlar
+
+- **Sessiya D1-dədir, stateless JWT deyil.** Cookie yalnız imzalanmış sessiya ID-si daşıyır.
+  Səbəb: işdən çıxan əməkdaşın və ya oğurlanmış cookie-nin girişini dərhal bağlamaq lazımdır.
+- **2FA məcburidir.** 2FA qurmamış istifadəçi ilk girişdə qurulum ekranından keçir; panelə
+  bundan əvvəl düşə bilmir.
+- **Parol PBKDF2-dir, bcrypt deyil.** Saf JS bcrypt Workers-də bir girişə 150-400 ms CPU yeyir.
+- **`seed.ts` artıq giriş edilə bilən hesab yaratmır** — `seed.sql` git-ə commit olunur,
+  orada işlək hash saxlamaq repoya parol yerləşdirmək deməkdir.
+
+### Qalan addımlar (Task 10, əl ilə icra)
+
+1. Staging secret-ləri: `AUTH_SECRET` (prod-dan **fərqli**), `RESEND_API_KEY`,
+   `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL` — `npx wrangler secret put <AD> --env staging`.
+2. `npm run db:migrate:staging` və `npm run db:seed:staging`.
+3. `npm run auth:create-admin` → çıxan INSERT-i `npx wrangler d1 execute luxehome-db-staging
+   --remote --env staging --command "<INSERT>"` ilə tətbiq et.
+4. `npm run deploy:staging`, sonra prod-un toxunulmadığını yoxla.
+5. Spec bölmə 7-dəki 13 bəndlik əl ilə yoxlama siyahısı.
