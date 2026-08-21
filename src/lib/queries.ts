@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
+  ADMIN_PAGE_SIZE,
   PAGE_SIZE,
   POST_STATUSES,
   PUBLIC_PROPERTY_STATUSES,
@@ -516,30 +517,6 @@ export async function getDashboardStats() {
   };
 }
 
-export async function getAdminProperties() {
-  return prisma.property.findMany({
-    where: { deletedAt: null, isDemo: false },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      listingType: true,
-      status: true,
-      price: true,
-      currency: true,
-      rooms: true,
-      area: true,
-      isFeatured: true,
-      viewCount: true,
-      updatedAt: true,
-      type: { select: { name: true } },
-      city: { select: { name: true } },
-      district: { select: { name: true } },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
-}
-
 export async function getRecentAdminProperties(take = 5) {
   return prisma.property.findMany({
     where: { deletedAt: null, isDemo: false },
@@ -570,3 +547,132 @@ export async function getRecentAdminLeads(take = 5) {
     take,
   });
 }
+
+// ---------------------------------------------------------------------------
+// PANEL SORĞULARI — ƏMLAK
+// ---------------------------------------------------------------------------
+
+export type AdminPropertyFilters = {
+  q?: string;
+  status?: string;
+  listingType?: string;
+  typeId?: string;
+  cityId?: string;
+  /** `true` — yalnız silinmiş elanlar (zibil qutusu görünüşü). */
+  deleted?: boolean;
+  page?: number;
+};
+
+const adminPropertySelect = {
+  id: true,
+  title: true,
+  slug: true,
+  listingType: true,
+  status: true,
+  price: true,
+  currency: true,
+  rooms: true,
+  area: true,
+  isFeatured: true,
+  viewCount: true,
+  updatedAt: true,
+  deletedAt: true,
+  type: { select: { name: true } },
+  city: { select: { name: true } },
+  district: { select: { name: true } },
+  images: { orderBy: [{ isCover: "desc" }, { order: "asc" }], take: 1, select: { url: true } },
+} satisfies Prisma.PropertySelect;
+
+export type AdminPropertyRow = Prisma.PropertyGetPayload<{ select: typeof adminPropertySelect }>;
+
+/**
+ * Panel siyahısı.
+ *
+ * `isDemo` şərti burada **yoxdur**: demo qeydlər ictimai saytda gizlədilir, amma
+ * redaktor onları paneldə görüb təmizləyə bilməlidir.
+ */
+export async function getAdminProperties(filters: AdminPropertyFilters = {}) {
+  const page = Math.max(1, filters.page ?? 1);
+
+  const where: Prisma.PropertyWhereInput = {
+    deletedAt: filters.deleted ? { not: null } : null,
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.listingType ? { listingType: filters.listingType } : {}),
+    ...(filters.typeId ? { typeId: filters.typeId } : {}),
+    ...(filters.cityId ? { cityId: filters.cityId } : {}),
+    // D1-də `mode: "insensitive"` yoxdur; SQLite LIKE yalnız ASCII hərflərində
+    // reqistrdən asılı deyil, ona görə azərbaycanca sorğu tam olmaya bilər
+    ...(filters.q
+      ? {
+          OR: [
+            { title: { contains: filters.q } },
+            { slug: { contains: filters.q } },
+            { address: { contains: filters.q } },
+          ],
+        }
+      : {}),
+  };
+
+  const [rows, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: adminPropertySelect,
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * ADMIN_PAGE_SIZE,
+      take: ADMIN_PAGE_SIZE,
+    }),
+    prisma.property.count({ where }),
+  ]);
+
+  return {
+    rows,
+    total,
+    page,
+    totalPages: Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE)),
+  };
+}
+
+/** Redaktə formasının doldurulması üçün tam qeyd. */
+export async function getAdminPropertyById(id: string) {
+  return prisma.property.findUnique({
+    where: { id },
+    include: {
+      images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
+      features: { select: { featureId: true } },
+    },
+  });
+}
+
+/** Formadakı bütün açılan siyahılar bir sorğu dəstində gətirilir. */
+export async function getPropertyFormOptions() {
+  const [types, cities, districts, features, projects] = await Promise.all([
+    prisma.propertyType.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.location.findMany({
+      where: { kind: "CITY" },
+      select: { id: true, name: true },
+      orderBy: { order: "asc" },
+    }),
+    prisma.location.findMany({
+      where: { kind: { in: ["DISTRICT", "SETTLEMENT", "METRO"] } },
+      select: { id: true, name: true, kind: true, parentId: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.feature.findMany({
+      select: { id: true, name: true, group: true },
+      orderBy: [{ group: "asc" }, { order: "asc" }],
+    }),
+    prisma.project.findMany({
+      where: { deletedAt: null },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
+
+  return { types, cities, districts, features, projects };
+}
+
+export type PropertyFormOptions = Awaited<ReturnType<typeof getPropertyFormOptions>>;
