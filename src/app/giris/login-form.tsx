@@ -1,40 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useState } from "react";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
-import { Checkbox } from "@/components/ui/field";
+import type { FormState } from "@/lib/auth/types";
+import { signIn } from "./actions";
 
 /**
  * Giriş forması.
  *
- * Hazırda yalnız interfeysdir — məlumat heç bir yerə göndərilmir, düymə
- * birbaşa `/admin` səhifəsinə keçir.
+ * Parol yoxlaması `signIn` server action-ında aparılır; uğurlu halda action
+ * ikinci mərhələyə (`/giris/dogrulama` və ya `/giris/2fa-qurulumu`) yönləndirir,
+ * ona görə burada uğur vəziyyəti yoxdur — yalnız səhv mesajı qayıdır.
  *
- * TODO: Backend mərhələsində Server Action ilə əvəzlənəcək:
- *       bcryptjs ilə şifrə yoxlaması, jose ilə JWT sessiya, httpOnly cookie
- *       və `middleware.ts` üzərindən route qoruması.
+ * `davam` — middleware-in qoyduğu marşrut: giriş bitəndə istifadəçi ilk istədiyi
+ * panel səhifəsinə qayıdır. Dəyər server tərəfdə yenidən yoxlanılır.
  */
-export function LoginForm() {
-  const router = useRouter();
+export function LoginForm({ davam }: { davam?: string }) {
   const [showPassword, setShowPassword] = useState(false);
-  const [pending, setPending] = useState(false);
+  const [state, formAction, pending] = useActionState<FormState, FormData>(signIn, {});
 
   const controlClass =
     "w-full min-h-12 rounded-xs border border-line-strong bg-paper px-4 py-3 text-base text-ink " +
     "placeholder:text-ink-muted transition-colors duration-200 hover:border-ink-muted focus:border-gold";
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setPending(true);
-    // Backend qoşulana qədər sadəcə panelə keçid
-    router.push("/admin");
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form action={formAction} className="flex flex-col gap-5">
+      {davam && <input type="hidden" name="davam" value={davam} />}
+
       <Field label="E-poçt" htmlFor="login-email" required>
         <input
           id="login-email"
@@ -74,15 +68,14 @@ export function LoginForm() {
         </div>
       </Field>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Checkbox id="login-remember" name="remember" label="Məni xatırla" />
-        <button
-          type="button"
-          className="min-h-11 cursor-pointer text-sm text-ink-soft underline-offset-4 transition-colors duration-200 hover:text-gold-deep hover:underline"
+      {state.error && (
+        <p
+          role="alert"
+          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
         >
-          Şifrəni unutmusunuz?
-        </button>
-      </div>
+          {state.error}
+        </p>
+      )}
 
       <Button type="submit" size="lg" fullWidth loading={pending}>
         {!pending && <LogIn className="size-4.5" aria-hidden="true" />}

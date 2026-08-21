@@ -1,23 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ExternalLink, LogOut, Menu, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
+import { ROLE_LABELS } from "@/lib/constants";
+import type { AuthUser } from "@/lib/auth/types";
+import { signOut } from "@/app/giris/actions";
 import { adminNav } from "./admin-nav";
 import { AdminIcon } from "./admin-icon";
 
 type AdminShellProps = {
+  /** Sessiyadan gələn istifadəçi — layout-dakı `requireUser()` təmin edir. */
+  user: AuthUser;
   /** Yan paneldəki sayğaclar — server tərəfdən ötürülür. */
   counters?: { newLeads?: number; draftProperties?: number };
   children: React.ReactNode;
 };
 
+/** Ad və soyadın baş hərfləri — avatar şəkli olmadığı üçün. */
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 const SIDEBAR_WIDTH = "lg:pl-[264px]";
 
-export function AdminShell({ counters = {}, children }: AdminShellProps) {
+export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -51,6 +67,7 @@ export function AdminShell({ counters = {}, children }: AdminShellProps) {
       {/* --- Yan panel (desktop sabit, mobil çekmece) --- */}
       <Sidebar
         pathname={pathname}
+        user={user}
         counters={counters}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -104,11 +121,11 @@ export function AdminShell({ counters = {}, children }: AdminShellProps) {
                 aria-hidden="true"
                 className="grid size-9 shrink-0 place-items-center rounded-full bg-charcoal text-sm font-semibold text-ink-invert"
               >
-                BƏ
+                {initials(user.name)}
               </div>
               <div className="hidden leading-tight sm:block">
-                <p className="text-sm font-medium text-ink">Bahadur Əmiyev</p>
-                <p className="text-xs text-ink-muted">Super Admin</p>
+                <p className="text-sm font-medium text-ink">{user.name}</p>
+                <p className="text-xs text-ink-muted">{ROLE_LABELS[user.role]}</p>
               </div>
             </div>
           </div>
@@ -124,11 +141,13 @@ export function AdminShell({ counters = {}, children }: AdminShellProps) {
 
 function Sidebar({
   pathname,
+  user,
   counters,
   open,
   onClose,
 }: {
   pathname: string;
+  user: AuthUser;
   counters: { newLeads?: number; draftProperties?: number };
   open: boolean;
   onClose: () => void;
@@ -155,12 +174,15 @@ function Sidebar({
       >
         {/* Loqo */}
         <div className="flex min-h-16 items-center justify-between gap-2 border-b border-white/10 px-5">
-          <Link href="/admin" className="flex flex-col leading-none">
-            <span className="font-display text-lg tracking-[0.18em] text-white">
-              LUXE HOME ESTATE
-            </span>
-            <span className="mt-1 text-[10px] tracking-[0.22em] text-gold-soft">
-              İDARƏ PANELİ
+          <Link href="/admin" className="flex items-center gap-2.5 leading-none">
+            <Image src="/logo-mark.png" alt="" width={512} height={512} className="size-9 shrink-0" />
+            <span className="flex flex-col">
+              <span className="font-display text-base tracking-[0.16em] text-white">
+                LUXE HOME ESTATE
+              </span>
+              <span className="mt-1 text-[10px] tracking-[0.22em] text-gold-soft">
+                İDARƏ PANELİ
+              </span>
             </span>
           </Link>
 
@@ -218,13 +240,21 @@ function Sidebar({
         </nav>
 
         <div className="border-t border-white/10 p-3">
-          <Link
-            href="/giris"
-            className="flex min-h-11 items-center gap-3 rounded-xs px-3 text-sm text-white/75 transition-colors hover:bg-white/8 hover:text-white"
-          >
-            <LogOut className="size-4.5 shrink-0" aria-hidden="true" />
-            Çıxış
-          </Link>
+          <div className="px-3 pb-3">
+            <p className="truncate text-sm text-white/90">{user.name}</p>
+            <p className="truncate text-xs text-white/45">{user.email}</p>
+          </div>
+
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-xs px-3 text-sm text-white/75 transition-colors hover:bg-white/8 hover:text-white"
+            >
+              <LogOut className="size-4.5 shrink-0" aria-hidden="true" />
+              Çıxış
+            </button>
+          </form>
+
           <p className="px-3 pt-3 text-[11px] leading-relaxed text-white/35">
             {siteConfig.legalName}
             <br />

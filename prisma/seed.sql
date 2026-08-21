@@ -27,8 +27,8 @@ INSERT INTO "BlogCategory" ("id", "name", "slug", "description", "order") VALUES
 INSERT INTO "BlogCategory" ("id", "name", "slug", "description", "order") VALUES ('cmt1sru0k004yuadwgi4aue39', 'Luxe Home Estate xəbərləri', 'luxehomeestate-xeberleri', NULL, 5);
 
 -- User (2)
-INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "isActive", "lastLoginAt", "createdAt", "updatedAt") VALUES ('cmt1srsvv0000uadwxld8t2vl', 'Sistem Administratoru', 'admin@luxehomeestate.az', '$2b$12$80nx/tFlQBRouYNWfHozsO3UggrabV5b7tpl3/EGfRQQSI4xSyF4O', 'SUPER_ADMIN', 1, NULL, 1787247090426, 1787247090426);
-INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "isActive", "lastLoginAt", "createdAt", "updatedAt") VALUES ('cmt1srt5o0001uadwybhh82r5', 'Məzmun Redaktoru', 'redaktor@luxehomeestate.az', '$2b$12$6HT8ySQsxwlrGkB/dwy8Tez5DI/y3wn2Sg4rqhWvMCrCgyfofTM4y', 'EDITOR', 1, NULL, 1787247090780, 1787247090780);
+INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "isActive", "lastLoginAt", "createdAt", "updatedAt") VALUES ('cmt1srsvv0000uadwxld8t2vl', 'Sistem Administratoru', 'admin@luxehomeestate.az', 'disabled', 'SUPER_ADMIN', 0, NULL, 1787247090426, 1787247090426);
+INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "isActive", "lastLoginAt", "createdAt", "updatedAt") VALUES ('cmt1srt5o0001uadwybhh82r5', 'Məzmun Redaktoru', 'redaktor@luxehomeestate.az', 'disabled', 'EDITOR', 0, NULL, 1787247090780, 1787247090780);
 
 -- BlogPost (6)
 INSERT INTO "BlogPost" ("id", "title", "slug", "excerpt", "content", "coverUrl", "coverAlt", "categoryId", "authorId", "status", "isDemo", "viewCount", "readMinutes", "publishedAt", "metaTitle", "metaDescription", "createdAt", "updatedAt", "deletedAt") VALUES ('cmt1sru0w0050uadwueyaih1p', '[Nümunə] Mənzil alarkən diqqət edilməli 7 məqam', 'numune-menzil-alarken-diqqet-edilmeli-7-meqam', 'Mənzil almaq böyük qərardır. Sənədlərdən kommunikasiyaya qədər nəyi yoxlamaq lazımdır — bu nümunə yazıda ümumi baxış.', 'Bu yazı platformanın bloq bölməsinin necə işlədiyini göstərmək üçün hazırlanmış NÜMUNƏ məzmundur.

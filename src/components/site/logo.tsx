@@ -16,7 +16,8 @@ type LogoProps = {
  * LUXE HOME ESTATE kimliyi: şirkət gerbi + wordmark.
  *
  * Gerb `public/logo-mark.png` faylından gəlir — orijinal loqodan kəsilmiş,
- * dairəvi maskalanmış variant (bax: scripts/prepare-logo.mjs).
+ * fonu şəffaflaşdırılmış variant (bax: scripts/prepare-logo.mjs). Şəffaf olduğu
+ * üçün eyni fayl həm açıq, həm tünd fonda işləyir.
  * Wordmark mətn kimi verilir ki, hər ölçüdə kəskin qalsın və ekran
  * oxuyucular üçün oxunaqlı olsun.
  */
@@ -41,7 +42,7 @@ export function Logo({
           width={512}
           height={512}
           priority
-          className="size-10 shrink-0 rounded-full sm:size-11"
+          className="size-10 shrink-0 sm:size-11"
         />
       )}
 

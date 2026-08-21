@@ -20,10 +20,14 @@ npm run dev          # development server (localhost:3000)
 npm run build        # prisma generate + next build
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
+npm run test         # vitest (workerd runtime, auth qatının unit testləri)
 
 npm run preview      # OpenNext bundle + lokal workerd (production ilə eyni runtime)
-npm run deploy       # OpenNext bundle + Cloudflare Workers-ə yayım
+npm run deploy:staging  # staging worker-ə yayım (luxehomeestate-staging)
+npm run deploy       # OpenNext bundle + Cloudflare Workers-ə yayım (production)
 npm run cf-typegen   # wrangler.jsonc-dən CloudflareEnv tiplərini yenidən yaradır
+
+npm run auth:create-admin  # ilk SUPER_ADMIN üçün INSERT ifadəsi çap edir
 ```
 
 Verilənlər bazası (D1) axını:
@@ -34,14 +38,25 @@ npx tsx prisma/seed.ts            # demo məzmunu lokal fayla yazır
 npm run db:seed:build             # lokal fayldan prisma/seed.sql qurur
 npm run db:migrate:remote         # migrations/ qovluğunu remote D1-ə tətbiq edir
 npm run db:seed:remote            # prisma/seed.sql-i remote D1-ə yükləyir
+npm run db:migrate:staging        # eyni miqrasiyalar staging D1-ə
+npm run db:seed:staging           # seed staging D1-ə
 ```
+
+`prisma/seed.ts` **giriş edilə bilən hesab yaratmır**: `SEED_ADMIN_PASSWORD` verilmədikdə
+istifadəçilər `passwordHash = "disabled"` və `isActive = 0` ilə yaradılır. Səbəb — `seed.sql`
+git-ə commit olunur, orada işlək hash saxlamaq repoya parol yerləşdirmək deməkdir.
+Real hesab `npm run auth:create-admin` ilə qurulur.
 
 Yeni miqrasiya: `npm run db:migrate:new -- --output migrations/000N_ad.sql`
 (`prisma migrate diff --from-local-d1` işlədir, ona görə əvvəlcə `npm run db:migrate:local`).
 
-Test infrastrukturu yoxdur. **Yeganə keyfiyyət qapısı `npm run typecheck` + `npm run build`-dır** —
-dəyişiklikdən sonra hər ikisi işlədilməlidir. Yayımdan əvvəl `npm run preview` ilə workerd
-runtime-ında yoxlamaq tövsiyə olunur, çünki bəzi problemlər yalnız orada üzə çıxır.
+Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run build` — dəyişiklikdən sonra
+hər üçü işlədilməlidir. Testlər yalnız auth qatını (`src/lib/auth/__tests__`) əhatə edir və
+`@cloudflare/vitest-plugin` vasitəsilə workerd runtime-ında işləyir; UI və sorğu qatı hələ
+örtülməyib.
+
+Yayımdan əvvəl `npm run preview` ilə workerd runtime-ında yoxlamaq tövsiyə olunur, çünki bəzi
+problemlər yalnız orada üzə çıxır.
 
 ## Arxitektura
 
@@ -91,6 +106,39 @@ Hər dəyər dəsti üçün `*_LABELS` (azərbaycanca göstərilən mətn) və b
 Sxem şərhləri ilə sabitlər arasında uyğunsuzluq buglara səbəb olur (məs. `add-mocks.ts`-də
 `pricePeriod: "MONTHLY"` yazılıb, düzgün dəyər `MONTH`-dur).
 
+### Autentifikasiya
+
+Bütün auth kodu `src/lib/auth/` altındadır. Qatların bölgüsü qəsdəndir:
+
+| Fayl | Məsuliyyət |
+|---|---|
+| `password.ts` | Web Crypto PBKDF2-SHA256, 210 000 iterasiya. Format iterasiya sayını daşıyır, `needsRehash()` köhnə hash-ı uğurlu girişdə səssizcə yeniləyir. |
+| `crypto.ts` | HKDF açar törəmə, AES-GCM şifrələmə, base64url, `timingSafeEqual`. |
+| `totp.ts` | TOTP yoxlaması, QR SVG (server tərəfdə çəkilir), ehtiyat kodlar. Sirr bazada AES-GCM ilə şifrəli saxlanılır. |
+| `cookies.ts` | `jose` ilə imzalanan iki cookie: sessiya (`lhe_session`) və ikinci mərhələ (`lhe_2fa`). |
+| `cookie-names.ts` | Yalnız sabitlər — `middleware.ts` `next/headers`-i yükləmədən oxuya bilsin deyə ayrıdır. |
+| `session.ts` | D1-də saxlanan sessiyalar: yaratma, uzatma, ləğv, siyahı. |
+| `session-policy.ts` | Sürüşən (8 saat, hər aktivlikdə uzanır) və mütləq (7 gün) müddət hesabı. |
+| `permissions.ts` | `ROLE_PERMISSIONS` matrisi üzrə `hasPermission()`. |
+| `lockout.ts` / `rate-limit.ts` | 5 uğursuz cəhddən sonra 15 dəqiqəlik kilid + IP üzrə sürət limiti. |
+| `guard.ts` | `requireUser()`, `requirePermission()`, `getOptionalUser()`, `currentSessionId()`. |
+
+Qoruma **iki həlqəlidir və hər ikisi lazımdır**:
+
+1. `src/middleware.ts` — yalnız cookie imzasını yoxlayır. Ucuzdur (D1-ə müraciət yoxdur), amma
+   ləğv edilmiş sessiyanı və deaktiv istifadəçini görmür.
+2. `requireUser()` / `requirePermission()` — sessiyanı bazadan oxuyur. `admin/layout.tsx`
+   bütün panel səhifələrini örtür, **lakin server action-ları layout-dan keçmir**: birbaşa POST ilə
+   çağırıla bilir, ona görə hər action öz guard-ını ilk sətirdə çağırmalıdır.
+
+Cookie yalnız imzalanmış sessiya ID-si daşıyır — səlahiyyət hər sorğuda bazadan oxunur.
+Stateless JWT qəsdən seçilməyib: işdən çıxan əməkdaşın girişini dərhal bağlamaq mümkün olmalıdır.
+
+Giriş axını: parol → (2FA qurulmayıbsa) `/giris/2fa-qurulumu` → yoxsa `/giris/dogrulama` → sessiya.
+Aralıq mərhələ ayrıca `subject`-li cookie ilə işarələnir, ona görə ikinci addımı keçmədən panelə
+düşmək mümkün deyil. `?davam=` parametri bu cookie-nin içində daşınır və yalnız `/admin` ilə
+başlayan marşrutlar qəbul edilir (açıq yönləndirmə qorunması).
+
 ### Dizayn sistemi və dark mode
 
 `src/app/globals.css` Tailwind v4 `@theme` bloku ilə brend tokenlərini elan edir
@@ -131,7 +179,8 @@ propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
   Hər səhifə `export const metadata` və ya `generateMetadata` içindən bunu çağırır.
 - JSON-LD generatorları: `organizationSchema()` (root layout-da, `RealEstateAgent`),
   `propertySchema()`, `articleSchema()`, `serviceSchema()`, `breadcrumbSchema()`.
-- `siteUrl(path)` — `NEXT_PUBLIC_SITE_URL` üzərindən mütləq URL qurur.
+- `siteUrl(path)` — `SITE_URL` üzərindən mütləq URL qurur. Dəyər runtime-da oxunur, ona görə
+  eyni build həm production, həm staging worker-inə yayımlana bilir.
 
 `app/sitemap.ts` `getSitemapEntries()`-i çağırır və `force-dynamic`-dir (D1-dən oxuyur).
 `app/robots.ts` `/admin`, `/giris` və `/favoritler` marşrutlarını indeksdən kənarlaşdırır.
@@ -150,10 +199,30 @@ işlədilməli, `cloudflare-env.d.ts` yenilənməlidir.
 | `ASSETS` | Static assets | `.open-next/assets` |
 | `WORKER_SELF_REFERENCE` | Worker `luxehomeestate` | ISR revalidate çağırışları |
 
-`vars` bölməsi: `ADMIN_ENABLED` (idarə paneli qapısı), `NEXT_PUBLIC_SITE_URL`.
+`vars` bölməsi: `ADMIN_ENABLED` (idarə paneli qapısı), `SITE_URL`.
 
 Yayım: `npm run deploy`. Worker adı `luxehomeestate`, ünvan
 `https://luxehomeestate.amiyevbahadur.workers.dev` və `luxehomeestate.az`.
+
+#### Staging mühiti
+
+`wrangler.jsonc`-dəki `env.staging` bloku production-dan **tam ayrı** resurslar işlədir.
+Binding-lər `env.staging` içində təkrar yazılıb; təkrar yazılmasaydı staging səssizcə prod
+resurslarına bağlanardı.
+
+| Resurs | Production | Staging |
+|---|---|---|
+| Worker | `luxehomeestate` | `luxehomeestate-staging` |
+| D1 | `luxehome-db` | `luxehome-db-staging` |
+| R2 media | `luxehome-media` | `luxehome-media-staging` |
+| R2 ISR keş | `luxehome-next-cache` | `luxehome-next-cache-staging` |
+| `ADMIN_ENABLED` | `"false"` | `"true"` |
+| Ünvan | `luxehomeestate.az` | `luxehomeestate-staging.amiyevbahadur.workers.dev` |
+
+Staging custom domain almır və `robots.txt`-də tam `Disallow: /` verir — indeksləşməməlidir.
+Secret-lər mühit üzrə ayrıdır: `npx wrangler secret put <AD> --env staging`.
+**`AUTH_SECRET` staging və production-da fərqli olmalıdır** — eyni olarsa, staging-də verilmiş
+sessiya cookie-si production-da da imza yoxlamasından keçər.
 
 ### Şirkət məlumatları
 
@@ -176,17 +245,20 @@ bayraqla işarələnir və UI-da `DemoBadge` göstərilir. Real məlumat gələn
 
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
-- **Admin panel hazır deyil və bağlıdır.** `src/app/admin` və `src/app/giris` yalnız mock data ilə
-  işləyən UI-dır; auth yoxdur. `src/middleware.ts` `ADMIN_ENABLED !== "true"` olduqda hər iki
-  marşrutu 404-ə yönləndirir. Panel işə salınmazdan əvvəl jose JWT sessiyası, rol yoxlaması və
-  real CRUD yazılmalıdır.
+- **Auth qatı hazırdır, CRUD hələ mock-dur.** Giriş axını işləyir: PBKDF2 parol, məcburi TOTP
+  2FA (`src/app/giris`), D1-də saxlanan ləğv edilə bilən sessiyalar, rol əsaslı `requirePermission()`
+  və iki laylı sürət limiti. `/admin/hesabim` real işləyir. Qalan admin səhifələri (`emlaklar`,
+  `layiheler`, `blog`, `muracietler` və s.) hələ `src/lib/admin-mock.ts` oxuyur — CRUD yazılmayıb.
+- **Panel production-da bağlıdır.** `ADMIN_ENABLED` yalnız staging-də `"true"`-dur; prod-da
+  `src/middleware.ts` `/admin` və `/giris` marşrutlarını 404-ə çevirir. Panel staging-də tam
+  yoxlanandan sonra prod `vars`-ında açılır.
 - Contact form-da rate limit / honeypot / Turnstile yoxdur.
 - `emlaklar/page.tsx` `queries.ts`-in dəstəklədiyi filtrlərin hamısını ötürmür
   (xüsusiyyət filtri `featureSlugs` bağlanmayıb).
 - Media yükləmə axını yoxdur: R2 bucket (`MEDIA` binding) hazırdır, upload route və admin
   inteqrasiyası yazılmayıb.
 - `loading.tsx` fayl(lar)ı yoxdur — səhifə keçidlərində skeleton göstərilmir.
-- Test və CI yoxdur.
+- CI yoxdur. Testlər yalnız auth qatını əhatə edir.
 
 ## Diqqət tələb edən məqamlar
 

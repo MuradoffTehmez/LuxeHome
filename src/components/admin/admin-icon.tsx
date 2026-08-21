@@ -7,6 +7,7 @@ import {
   Newspaper,
   Settings,
   Sparkles,
+  UserCog,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -25,6 +26,7 @@ const ICONS: Record<string, LucideIcon> = {
   Images,
   Inbox,
   Users,
+  UserCog,
   Settings,
 };
 

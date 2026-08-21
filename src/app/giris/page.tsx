@@ -12,7 +12,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage() {
+// Giriş marşrutu `?davam=` parametrini oxuyur — statik render mümkün deyil
+export const dynamic = "force-dynamic";
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ davam?: string }>;
+}) {
+  const { davam } = await searchParams;
+
   return (
     <main className="grid min-h-dvh lg:grid-cols-2">
       {/* --- Sol: forma --- */}
@@ -27,6 +36,14 @@ export default function LoginPage() {
           </Link>
 
           <div className="mb-8 flex flex-col gap-2">
+            <Image
+              src="/logo-mark.png"
+              alt=""
+              width={512}
+              height={512}
+              priority
+              className="mb-2 size-14"
+            />
             <span className="font-display text-xl tracking-[0.18em] text-ink">
               LUXE HOME ESTATE
             </span>
@@ -37,13 +54,13 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <LoginForm />
+          <LoginForm davam={davam} />
 
           <div className="mt-8 flex items-start gap-2.5 rounded-xs border border-line bg-beige px-4 py-3">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />
             <p className="text-xs leading-relaxed text-ink-soft">
-              Bu səhifə hazırda dizayn mərhələsindədir — forma heç bir yerə
-              göndərilmir. Doğrulama backend mərhələsində qoşulacaq.
+              Giriş iki mərhələlidir: parolunuzdan sonra doğrulama tətbiqindəki
+              kod soruşulacaq.
             </p>
           </div>
 
