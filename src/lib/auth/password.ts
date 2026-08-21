@@ -12,8 +12,12 @@ import { fromBase64Url, timingSafeEqual, toBase64Url } from "./crypto";
 
 const ALGORITHM = "pbkdf2";
 const DIGEST = "sha256";
-/** OWASP-ın PBKDF2-HMAC-SHA256 üçün tövsiyəsi. */
-const ITERATIONS = 210_000;
+/**
+ * Cloudflare Workers Web Crypto production runtime-ının qəbul etdiyi maksimum
+ * PBKDF2 iterasiya sayı. Daha böyük dəyər `deriveBits()` zamanı `NotSupportedError`
+ * atır və düzgün parolun da rədd edilməsinə səbəb olur.
+ */
+const ITERATIONS = 100_000;
 const SALT_BYTES = 16;
 const KEY_BITS = 256;
 

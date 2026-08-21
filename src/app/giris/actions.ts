@@ -67,7 +67,7 @@ const credentialsSchema = z.object({
  * varlığını sızdırmasın. Dəyər real hash formatındadır, sadəcə heç bir parola uyğun gəlmir.
  */
 const DUMMY_HASH =
-  "pbkdf2$sha256$210000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+  "pbkdf2$sha256$100000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 /**
  * Girişdən sonra qayıdılacaq ünvanı təmizləyir.

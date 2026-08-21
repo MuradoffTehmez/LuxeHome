@@ -40,7 +40,8 @@ const stockPhotos = {
  * Skript Node altında işlədiyi üçün həmin modul birbaşa idxal edilmir
  * (o, Workers-ə yönəlib), lakin nəticə birə-bir uyğun olmalıdır.
  */
-const PBKDF2_ITERATIONS = 210_000;
+// Cloudflare Workers production Web Crypto bu həddən böyük PBKDF2 dəyərini rədd edir.
+const PBKDF2_ITERATIONS = 100_000;
 
 async function hashPassword(password: string): Promise<string> {
   const salt = webcrypto.getRandomValues(new Uint8Array(16));

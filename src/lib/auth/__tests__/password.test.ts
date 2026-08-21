@@ -18,6 +18,14 @@ describe("parol hash-ı", () => {
     expect(first).not.toBe(second);
   });
 
+  it("Cloudflare Workers-in PBKDF2 limitini aşmayan hash yaradır", async () => {
+    const stored = await hashPassword("Luxe-2026-Test!");
+    const iterations = Number.parseInt(stored.split("$")[2], 10);
+
+    // Production Workers Web Crypto 100 000-dən çox PBKDF2 iterasiyasını rədd edir.
+    expect(iterations).toBeLessThanOrEqual(100_000);
+  });
+
   it("formatı pozulmuş dəyəri rədd edir, çökmür", async () => {
     expect(await verifyPassword("nə olursa olsun", "zibil")).toBe(false);
     expect(await verifyPassword("nə olursa olsun", "")).toBe(false);

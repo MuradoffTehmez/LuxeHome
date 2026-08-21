@@ -15,7 +15,8 @@
 import { webcrypto } from "node:crypto";
 
 const crypto = webcrypto as unknown as Crypto;
-const ITERATIONS = 210_000;
+// Cloudflare Workers production Web Crypto bu həddən böyük PBKDF2 dəyərini rədd edir.
+const ITERATIONS = 100_000;
 
 function toBase64Url(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString("base64url");
