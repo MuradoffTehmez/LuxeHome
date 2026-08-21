@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   // yuxarı qovluqdakı lockfile-ın səhvən seçilməsinin qarşısını alır.
   outputFileTracingRoot: import.meta.dirname,
 
+  experimental: {
+    // `forbidden()` və `unauthorized()` naviqasiya kəsiciləri bu bayraq olmadan işləmir.
+    // İcazəsi olmayan istifadəçiyə 403 göstərmək üçün `src/lib/auth/guard.ts` onlardan asılıdır.
+    authInterrupts: true,
+  },
+
   images: {
     // Müasir formatlar — WebP/AVIF avtomatik seçilir
     formats: ["image/avif", "image/webp"],
