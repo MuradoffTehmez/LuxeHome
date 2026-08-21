@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { SETTING_KEYS, getSetting } from "@/lib/settings";
 
 /**
  * Cloudflare Workers-də `process.env` yalnız sorğu kontekstində doldurulur —
@@ -12,8 +13,15 @@ function fromEmail(): string {
   return process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
 }
 
-function notificationEmail(): string {
-  return process.env.NOTIFICATION_EMAIL || FALLBACK_NOTIFICATION_EMAIL;
+/**
+ * Bildiriş ünvanı.
+ *
+ * Sıra: paneldəki parametr → mühit dəyişəni → sabit ehtiyat ünvan. Paneldən
+ * dəyişmək mümkün olmalıdır ki, məsul əməkdaş dəyişəndə yayım gözlənilməsin.
+ */
+async function notificationEmail(): Promise<string> {
+  const configured = await getSetting(SETTING_KEYS.LEAD_NOTIFICATION_EMAIL);
+  return configured || process.env.NOTIFICATION_EMAIL || FALLBACK_NOTIFICATION_EMAIL;
 }
 
 let resendClient: Resend | null | undefined;
@@ -82,7 +90,7 @@ export async function sendEmail({
   try {
     const { data, error } = await resend.emails.send({
       from: from ?? fromEmail(),
-      to: to ?? notificationEmail(),
+      to: to ?? (await notificationEmail()),
       subject,
       html,
       replyTo: replyTo || undefined,
@@ -107,7 +115,12 @@ export async function sendEmail({
  * Saytdan gələn yeni müraciət üçün rəhbərliyə / adminə bildiriş e-poçtu
  */
 export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
-  const recipient = notificationEmail();
+  // Bildiriş paneldən söndürülə bilər — məsələn məzuniyyət dövründə
+  if ((await getSetting(SETTING_KEYS.LEAD_NOTIFY_ENABLED)) === "0") {
+    return { success: false, error: "Bildiriş paneldən söndürülüb" };
+  }
+
+  const recipient = await notificationEmail();
   const timeFormatted = new Intl.DateTimeFormat("az-AZ", {
     dateStyle: "full",
     timeStyle: "short",

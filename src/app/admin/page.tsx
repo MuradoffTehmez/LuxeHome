@@ -4,6 +4,7 @@ import {
   Building2,
   FileEdit,
   Inbox,
+  Megaphone,
   Newspaper,
   Plus,
 } from "lucide-react";
@@ -31,12 +32,14 @@ import {
   getRecentAdminLeads,
   getRecentAdminProperties,
 } from "@/lib/queries";
+import { SETTING_KEYS, getSetting } from "@/lib/settings";
 
 export default async function AdminDashboardPage() {
-  const [stats, recentLeads, recentProperties] = await Promise.all([
+  const [stats, recentLeads, recentProperties, announcement] = await Promise.all([
     getDashboardStats(),
     getRecentAdminLeads(),
     getRecentAdminProperties(),
+    getSetting(SETTING_KEYS.ADMIN_ANNOUNCEMENT),
   ]);
 
   return (
@@ -57,6 +60,14 @@ export default async function AdminDashboardPage() {
           </>
         }
       />
+
+      {/* Komanda qeydi — «Parametrlər» səhifəsindən yazılır */}
+      {announcement && (
+        <div className="mb-6 flex items-start gap-2.5 rounded-md border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ink">
+          <Megaphone className="mt-0.5 size-4 shrink-0 text-gold-deep" aria-hidden="true" />
+          <p className="whitespace-pre-wrap">{announcement}</p>
+        </div>
+      )}
 
       {/* --- Sayğaclar --- */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
