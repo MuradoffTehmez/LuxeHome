@@ -20,7 +20,6 @@ import { Hero } from "@/components/site/hero";
 import { PropertyCard } from "@/components/site/property-card";
 import { ProjectCard } from "@/components/site/project-card";
 import { PostCard } from "@/components/site/post-card";
-import { ServiceIcon } from "@/components/site/service-icon";
 import { demoStats, siteConfig } from "@/config/site";
 import {
   getBlogCategories,
@@ -79,6 +78,15 @@ const WHY_ITEMS = [
 
 const PROPERTY_LAYOUT = [
   "lg:col-span-7 lg:row-span-2",
+  "lg:col-span-5",
+  "lg:col-span-5",
+  "lg:col-span-4",
+  "lg:col-span-4",
+  "lg:col-span-4",
+];
+
+const CATEGORY_LAYOUT = [
+  "col-span-2 row-span-2 lg:col-span-7",
   "lg:col-span-5",
   "lg:col-span-5",
   "lg:col-span-4",
@@ -178,25 +186,23 @@ export default async function HomePage() {
       {/* KATEQORİYALAR                                                      */}
       {/* ------------------------------------------------------------------ */}
       <Section tone="paper">
-        <Container>
+        <Container size="wide">
           <SectionHeader
             overline="Kateqoriyalar"
             title="Sizə uyğun məkanı tapın"
             description="Axtardığınız əmlak növünü seçin və uyğun variantlara baxın."
           />
 
-          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="mt-10 grid auto-rows-[minmax(10rem,1fr)] grid-cols-2 gap-3 lg:auto-rows-[17rem] lg:grid-cols-12">
             {propertyTypes.map((type, index) => (
               <Reveal
                 key={type.id}
                 delay={index * 50}
-                className={index === 0 ? "col-span-2 lg:row-span-2" : undefined}
+                className={CATEGORY_LAYOUT[index] ?? "lg:col-span-4"}
               >
                 <Link
                   href={`/emlaklar?tip=${type.slug}`}
-                  className={`group relative flex overflow-hidden rounded-md ${
-                    index === 0 ? "aspect-4/3 lg:aspect-auto lg:h-full" : "aspect-4/3"
-                  }`}
+                  className="group relative flex size-full min-h-40 overflow-hidden rounded-sm"
                 >
                   {type.imageUrl ? (
                     <Image
@@ -205,7 +211,7 @@ export default async function HomePage() {
                       fill
                       loading="lazy"
                       sizes="(max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                      className="image-lift object-cover"
                     />
                   ) : (
                     <div className="size-full bg-beige" />
@@ -213,7 +219,7 @@ export default async function HomePage() {
 
                   <div
                     aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-t from-charcoal/85 via-charcoal/25 to-transparent transition-opacity duration-300 group-hover:from-charcoal/90"
+                    className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-charcoal/90 via-charcoal/38 to-transparent transition-opacity duration-300 group-hover:opacity-95"
                   />
 
                   <div className="relative mt-auto flex w-full items-end justify-between gap-3 p-5">
@@ -241,45 +247,41 @@ export default async function HomePage() {
       {/* XİDMƏTLƏR                                                          */}
       {/* ------------------------------------------------------------------ */}
       <Section tone="navy">
-        <Container>
-          <SectionHeader
-            overline="Nə edirik"
-            title="Xidmətlərimiz"
-            description="Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün 7 əsas istiqamətdə xidmət."
-            tone="dark"
-            action={{ label: "Bütün xidmətlər", href: "/xidmetler" }}
-          />
+        <Container size="wide">
+          <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+            <SectionHeader
+              overline="Nə edirik"
+              title="Xidmətlərimiz"
+              description="Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün 7 əsas istiqamətdə xidmət."
+              tone="dark"
+              action={{ label: "Bütün xidmətlər", href: "/xidmetler" }}
+              className="self-start lg:sticky lg:top-32"
+            />
 
-          <div className="mt-10 grid gap-px overflow-hidden rounded-md bg-line-dark sm:grid-cols-2 lg:grid-cols-4">
-            {services.map((service, index) => (
-              <Reveal key={service.id} delay={index * 40}>
-                <Link
-                  href={`/xidmetler/${service.slug}`}
-                  className="group flex h-full flex-col gap-4 bg-navy p-6 transition-colors duration-300 hover:bg-navy-soft"
-                >
-                  <span className="flex size-11 items-center justify-center rounded-xs border border-gold-soft/30 text-gold-soft transition-colors group-hover:border-gold-soft">
-                    <ServiceIcon name={service.icon} className="size-5" />
-                  </span>
-
-                  <div className="flex flex-col gap-2">
-                    <h3 className="font-display text-lg text-ink-invert">
+            <div className="border-t border-line-dark">
+              {services.map((service, index) => (
+                <Reveal key={service.id} delay={index * 40}>
+                  <Link
+                    href={`/xidmetler/${service.slug}`}
+                    className="group grid min-h-32 grid-cols-[2.5rem_1fr_auto] items-start gap-4 border-b border-line-dark py-6 transition-colors duration-300 hover:text-gold-soft sm:grid-cols-[3rem_0.7fr_1fr_auto] sm:items-center"
+                  >
+                    <span className="tabular editorial-kicker pt-1 text-gold-soft sm:pt-0">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="font-display text-xl text-ink-invert sm:text-2xl">
                       {service.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-ink-invert-soft">
+                    <p className="col-start-2 text-sm leading-relaxed text-ink-invert-soft sm:col-start-auto">
                       {service.shortDescription}
                     </p>
-                  </div>
-
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm text-gold-soft">
-                    Ətraflı
                     <ArrowRight
-                      className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                      className="mt-1 size-4 text-gold-soft transition-transform duration-300 group-hover:translate-x-1 sm:mt-0"
                       aria-hidden="true"
                     />
-                  </span>
-                </Link>
-              </Reveal>
-            ))}
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </Container>
       </Section>
@@ -288,9 +290,9 @@ export default async function HomePage() {
       {/* HAQQIMIZDA                                                         */}
       {/* ------------------------------------------------------------------ */}
       <Section tone="ivory">
-        <Container>
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            <Reveal className="relative">
+        <Container size="wide">
+          <div className="grid items-center gap-0 lg:grid-cols-12">
+            <Reveal className="relative lg:col-span-7 lg:col-start-1 lg:row-start-1">
               <div className="relative aspect-4/5 overflow-hidden rounded-md sm:aspect-4/3 lg:aspect-4/5">
                 <Image
                   src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
@@ -309,7 +311,7 @@ export default async function HomePage() {
               />
             </Reveal>
 
-            <div className="flex flex-col gap-6">
+            <div className="relative z-10 mt-[-2rem] mx-4 flex flex-col gap-6 bg-paper p-7 shadow-editorial sm:mx-10 sm:p-10 lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mx-0 lg:mt-0 lg:-ml-20 lg:p-12">
               <SectionHeader
                 overline="Haqqımızda"
                 title="Luxe Home Estate haqqında"
@@ -355,15 +357,20 @@ export default async function HomePage() {
             align="center"
           />
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-x-10 sm:grid-cols-2">
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.title} delay={index * 50}>
-                <div className="flex h-full flex-col gap-4 rounded-md border border-line bg-paper p-6">
-                  <span className="flex size-11 items-center justify-center rounded-xs bg-zinc-900 text-gold-soft">
+                <div className="grid h-full grid-cols-[auto_1fr] gap-x-5 gap-y-3 border-t border-line-strong py-6 sm:py-8">
+                  <span className="flex size-9 items-center justify-center text-gold-deep">
                     <item.icon className="size-5" aria-hidden="true" />
                   </span>
-                  <h3 className="font-display text-lg text-ink">{item.title}</h3>
-                  <p className="text-sm leading-relaxed text-ink-soft">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3 className="font-display text-xl text-ink">{item.title}</h3>
+                    <span className="tabular editorial-kicker text-ink-muted">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <p className="col-start-2 text-sm leading-relaxed text-ink-soft">
                     {item.description}
                   </p>
                 </div>
@@ -387,11 +394,15 @@ export default async function HomePage() {
                 </p>
               )}
 
-              <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md bg-line lg:grid-cols-4">
-                {demoStats.items.map((stat) => (
+              <dl className="grid grid-cols-2 border-y border-line-strong lg:grid-cols-4">
+                {demoStats.items.map((stat, index) => (
                   <div
                     key={stat.label}
-                    className="flex flex-col items-center gap-1 bg-paper px-4 py-8 text-center"
+                    className={`flex flex-col items-center gap-1 px-4 py-8 text-center sm:py-10 ${
+                      index % 2 !== 0 ? "border-l border-line" : ""
+                    } ${index > 1 ? "border-t border-line lg:border-t-0" : ""} ${
+                      index > 0 ? "lg:border-l lg:border-line" : ""
+                    }`}
                   >
                     <dt className="sr-only">{stat.label}</dt>
                     <dd className="tabular font-display text-3xl text-ink sm:text-4xl">
