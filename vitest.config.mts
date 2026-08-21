@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { cloudflareTest } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
@@ -18,6 +19,12 @@ export default defineConfig({
       },
     }),
   ],
+  // `@/*` alias-ı tsconfig-dədir, Vite onu avtomatik oxumur
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
   test: {
     include: ["src/**/*.test.ts"],
   },
