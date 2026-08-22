@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import type { PropertyCardData } from "@/lib/queries";
 import { FavoriteButton } from "./favorite-button";
+import { CompareButton } from "./compare-button";
 
 type PropertyCardProps = {
   property: PropertyCardData;
@@ -99,11 +100,12 @@ export function PropertyCard({
           )}
         </div>
 
-        {/* Sağ üst — favorit.
+        {/* Sağ üst — favorit və müqayisə.
             z-10 vacibdir: başlıqdakı linkin `after:inset-0` örtüyü DOM-da sonra gəldiyi üçün
-            onsuz bu düymənin üstünə düşür və klik işləmir. */}
-        <div className="absolute top-3 right-3 z-10">
+            onsuz bu düymələrin üstünə düşür və klik işləmir. */}
+        <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
           <FavoriteButton propertyId={property.id} />
+          <CompareButton propertyId={property.id} />
         </div>
       </div>
 
