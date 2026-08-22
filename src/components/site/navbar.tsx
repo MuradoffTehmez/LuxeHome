@@ -128,7 +128,7 @@ export function Navbar() {
         </nav>
 
         {/* Sağ tərəf — hərəkətlər */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 2xl:gap-2">
           <ThemeToggle />
           
           <Link
@@ -159,7 +159,13 @@ export function Navbar() {
           </a>
 
           {/* Hesab bölməsi — giriş/qeydiyyat və ya kabinet/panel keçidi */}
-          <div className="hidden md:flex">
+          <div
+            className={cn(
+              "hidden items-center md:flex md:ml-1 md:pl-3 2xl:ml-2",
+              "md:border-l",
+              isOverlay ? "border-white/20" : "border-line",
+            )}
+          >
             <AccountMenu isOverlay={isOverlay} />
           </div>
 
