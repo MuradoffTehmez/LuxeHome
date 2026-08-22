@@ -29,6 +29,7 @@ export type AuditEntity =
   | "Lead"
   | "Media"
   | "User"
+  | "Agency"
   | "Setting";
 
 export async function recordAudit(
