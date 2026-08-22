@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
+import { CompareBar } from "@/components/site/compare-bar";
 import { ToastProvider } from "@/components/ui/toast";
 
 /**
@@ -20,6 +21,7 @@ export default function SiteLayout({
           {children}
         </main>
         <Footer />
+        <CompareBar />
       </div>
     </ToastProvider>
   );
