@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Newspaper,
   Settings,
+  ShieldCheck,
   Sparkles,
   UserCog,
   Users,
@@ -28,6 +29,7 @@ const ICONS: Record<string, LucideIcon> = {
   Users,
   UserCog,
   Settings,
+  ShieldCheck,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {
