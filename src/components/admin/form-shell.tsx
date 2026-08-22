@@ -3,10 +3,11 @@
 import { createContext, useActionState, useContext, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
-import { AlertCircle, Loader2, Save } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
+import { SecretPanel } from "./secret-panel";
 
 /**
  * Admin formalarının ümumi çərçivəsi.
@@ -67,6 +68,19 @@ export function AdminForm({
             <span>{state.message}</span>
           </div>
         )}
+
+        {/* Uğur mesajı toast-dan əlavə burada da qalır — toast itir, nəticə qalmalıdır */}
+        {state.status === "success" && state.message && (
+          <div
+            role="status"
+            className="flex items-start gap-2.5 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
+          >
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            <span>{state.message}</span>
+          </div>
+        )}
+
+        {state.secret && <SecretPanel secret={state.secret} />}
 
         {children}
 

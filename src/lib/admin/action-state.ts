@@ -10,6 +10,14 @@ export type ActionState = {
   status: "idle" | "success" | "error";
   message?: string;
   fieldErrors?: Record<string, string>;
+  /**
+   * Bir dəfə göstərilən dəyər — müvəqqəti parol kimi.
+   *
+   * Toast 4 saniyəyə itir və uzun parolu oradan köçürmək mümkün deyil, ona görə
+   * belə nəticə ayrıca sahədə gəlir: UI onu qalıcı panelə çıxarır və köçürmə
+   * düyməsi verir.
+   */
+  secret?: string;
 };
 
 export const IDLE_STATE: ActionState = { status: "idle" };
@@ -38,6 +46,11 @@ export function invalid(error: ZodError): ActionState {
 
 export function success(message: string): ActionState {
   return { status: "success", message };
+}
+
+/** Nəticə ilə birlikdə bir dəfəlik dəyər qaytarır (müvəqqəti parol və s.). */
+export function successWithSecret(message: string, secret: string): ActionState {
+  return { status: "success", message, secret };
 }
 
 /**

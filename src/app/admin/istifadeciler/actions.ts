@@ -5,7 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { PERMISSIONS, ROLES } from "@/lib/constants";
 import { hashPassword } from "@/lib/auth/password";
 import { revokeAllSessions } from "@/lib/auth/session";
-import { type ActionState, failure, invalid, success, unexpected } from "@/lib/admin/action-state";
+import {
+  type ActionState,
+  failure,
+  invalid,
+  success,
+  successWithSecret,
+  unexpected,
+} from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { userCreateSchema, userUpdateSchema } from "@/lib/admin/schemas";
@@ -96,9 +103,7 @@ export async function createUser(_prev: ActionState, formData: FormData): Promis
     revalidatePath(LIST_PATH);
 
     // Parol yalnız bu bir dəfə göstərilir — bazada yalnız hash saxlanılır
-    return success(
-      `Hesab yaradıldı. Müvəqqəti parol: ${password} — istifadəçiyə təhlükəsiz kanalla ötürün, ilk girişdə dəyişməlidir.`,
-    );
+    return successWithSecret(`«${parsed.data.email}» hesabı yaradıldı.`, password);
   } catch (error) {
     return unexpected("istifadəçi yaradıla bilmədi", error);
   }
@@ -189,7 +194,7 @@ export async function resetUserPassword(id: string): Promise<ActionState> {
     await recordAudit(actor, "UPDATE", "User", id, `${user.email} — parol sıfırlandı`);
 
     revalidatePath(LIST_PATH);
-    return success(`Yeni müvəqqəti parol: ${password} — istifadəçiyə təhlükəsiz kanalla ötürün.`);
+    return successWithSecret(`«${user.email}» üçün parol sıfırlandı.`, password);
   } catch (error) {
     return unexpected("parol sıfırlanmadı", error);
   }
