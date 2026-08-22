@@ -27,7 +27,11 @@
     "db:seed:staging": "wrangler d1 execute DB --remote --env staging --file=prisma/seed.sql",
     "test": "vitest run",
     "test:watch": "vitest",
-    "auth:create-admin": "tsx prisma/create-admin.ts"
+    "auth:create-admin": "tsx prisma/create-admin.ts",
+    "db:taxonomy:build": "tsx prisma/build-taxonomy-sql.ts",
+    "db:taxonomy:local": "wrangler d1 execute luxehome-db --local --file=prisma/taxonomy.sql",
+    "db:taxonomy:remote": "wrangler d1 execute luxehome-db --remote --file=prisma/taxonomy.sql",
+    "db:taxonomy:staging": "wrangler d1 execute luxehome-db-staging --remote --env staging --file=prisma/taxonomy.sql"
   },
   "dependencies": {
     "@prisma/adapter-d1": "^6.19.3",

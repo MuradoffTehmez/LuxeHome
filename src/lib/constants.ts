@@ -166,9 +166,19 @@ export const RENOVATION_LABELS: Record<Renovation, string> = {
   UNRENOVATED: "Təmirsiz",
 };
 
+/**
+ * Əmlak sənədləri.
+ *
+ * Yerli bazarda sənəd növü qiymətə birbaşa təsir edir və alıcının ilk soruşduğu
+ * göstəricilərdəndir, ona görə siyahı bina.az/emlak.az dəsti ilə eyni saxlanılır.
+ */
 export const DOCUMENT_STATUSES = {
   TITLE_DEED: "TITLE_DEED",
   CONTRACT: "CONTRACT",
+  MUNICIPAL: "MUNICIPAL",
+  DECREE: "DECREE",
+  POWER_OF_ATTORNEY: "POWER_OF_ATTORNEY",
+  EXTRACT_COMMERCIAL: "EXTRACT_COMMERCIAL",
   NONE: "NONE",
 } as const;
 
@@ -176,9 +186,13 @@ export type DocumentStatus =
   (typeof DOCUMENT_STATUSES)[keyof typeof DOCUMENT_STATUSES];
 
 export const DOCUMENT_STATUS_LABELS: Record<DocumentStatus, string> = {
-  TITLE_DEED: "Çıxarış",
+  TITLE_DEED: "Kupça (Çıxarış)",
   CONTRACT: "Müqavilə",
-  NONE: "Sənədsiz",
+  MUNICIPAL: "Bələdiyyə sənədi",
+  DECREE: "Sərəncam",
+  POWER_OF_ATTORNEY: "Etibarnamə",
+  EXTRACT_COMMERCIAL: "Çıxarış (qeyri-yaşayış)",
+  NONE: "Kupçasız",
 };
 
 export const PRICE_PERIODS = {
@@ -378,6 +392,8 @@ export const ADMIN_PAGE_SIZE = 20;
 
 export const FEATURE_GROUPS = {
   GENERAL: "GENERAL",
+  UTILITY: "UTILITY",
+  PAYMENT: "PAYMENT",
   INDOOR: "INDOOR",
   OUTDOOR: "OUTDOOR",
   SECURITY: "SECURITY",
@@ -387,6 +403,8 @@ export type FeatureGroup = (typeof FEATURE_GROUPS)[keyof typeof FEATURE_GROUPS];
 
 export const FEATURE_GROUP_LABELS: Record<FeatureGroup, string> = {
   GENERAL: "Ümumi",
+  UTILITY: "Kommunal",
+  PAYMENT: "Ödəniş şərtləri",
   INDOOR: "Daxili",
   OUTDOOR: "Xarici",
   SECURITY: "Təhlükəsizlik",
@@ -439,3 +457,38 @@ export const LISTING_ACCOUNT_TYPES: AccountType[] = [
   ACCOUNT_TYPES.OWNER,
   ACCOUNT_TYPES.AGENCY,
 ];
+
+// ---------------------------------------------------------------------------
+// ÖDƏNİŞ VƏ SATIŞ ŞƏRTLƏRİ
+// ---------------------------------------------------------------------------
+
+/**
+ * Alıcının ödəniş imkanları.
+ *
+ * Ayrıca cədvəl yaradılmır: bu dəyərlər `Feature` taksonomiyasında `PAYMENT`
+ * qrupunda saxlanılır və mövcud `featureSlugs` filtri onları pulsuz dəstəkləyir.
+ * `Property.mortgageAvailable` və `installmentAvailable` sahələri geriyə uyğunluq
+ * üçün qalır və müvafiq slug ilə sinxron yazılır.
+ */
+export const PAYMENT_OPTIONS = {
+  CREDIT: "kredit",
+  INTEREST_FREE_CREDIT: "faizsiz-kredit",
+  MORTGAGE: "ipoteka",
+  READY_MORTGAGE: "hazir-ipoteka",
+  BARTER: "barter",
+  INSTALLMENT: "taksit",
+} as const;
+
+export type PaymentOption = (typeof PAYMENT_OPTIONS)[keyof typeof PAYMENT_OPTIONS];
+
+export const PAYMENT_OPTION_LABELS: Record<PaymentOption, string> = {
+  kredit: "Kredit",
+  "faizsiz-kredit": "Faizsiz kredit",
+  ipoteka: "İpoteka",
+  "hazir-ipoteka": "Hazır ipoteka",
+  barter: "Barter",
+  taksit: "Taksit",
+};
+
+/** `Feature.group` dəyəri — ödəniş şərtləri adi xüsusiyyətlərdən ayrı göstərilir. */
+export const PAYMENT_FEATURE_GROUP = "PAYMENT";
