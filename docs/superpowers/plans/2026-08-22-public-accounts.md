@@ -23,7 +23,7 @@ göndərmə axınını Cloudflare D1 üzərində tamamlamaq.
 
 ## Task 1 — Hesab foundation, qeydiyyat/giriş və kabinet
 
-- Mövcud `0004_public_accounts.sql`, Prisma sxemi, account constants və session projection-u tamamla.
+- Mövcud `0004_public_accounts.sql`, Prisma sxemi, account constants və session projection-u tamamla; artıq tətbiq edilən `0004`-ü dəyişmədən sessiya auth-kind əlavəsini ayrıca `0005`-də saxla.
 - `/qeydiyyat` səhifəsini yarat; `/daxil-ol` və qeydiyyatda təhlükəsiz `davam` yönləndirməsini saxla.
 - Staff hesabının ictimai girişdən keçməməsini və public hesabın `/admin`-ə girməməsini testlə.
 - `/kabinet` qorunan layout/səhifəsini yarat; hesab növü, agentlik təsdiqi və öz elanlarının xülasəsini göstər.
@@ -49,7 +49,7 @@ göndərmə axınını Cloudflare D1 üzərində tamamlamaq.
 
 ## Task 4 — Miqrasiya və yayım
 
-- `0004`-ü əvvəl staging D1-ə tətbiq et, staging deploy və smoke-test et.
-- Additiv miqrasiyanı production D1-ə tətbiq et, sonra production deploy et.
+- `0004` və `0005`-i əvvəl staging D1-ə tətbiq et, staging deploy və smoke-test et.
+- Additiv miqrasiyaları production D1-ə tətbiq et, sonra production deploy et.
 - Production-da staff login/2FA, public registration/login, `/admin` və `/kabinet` ayrımı, elan status siyasətini smoke-test et.
 - Git iş sahəsinin təmizliyini və commit tarixçəsini təsdiqlə.
