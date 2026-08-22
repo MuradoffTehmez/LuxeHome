@@ -1,19 +1,18 @@
 import Link from "next/link";
 import { MapPin, Phone, Globe, Clock } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { legalNavigation, navigation, siteConfig } from "@/config/site";
+import {
+  legalNavigation,
+  listingLinks,
+  navigation,
+  propertyTypeLinks,
+  siteConfig,
+  supportNavigation,
+} from "@/config/site";
 import { InstagramIcon } from "./brand-icons";
 import { Logo } from "./logo";
 
-const PROPERTY_LINKS = [
-  { label: "Mənzillər", href: "/emlaklar?tip=menziller" },
-  { label: "Villalar", href: "/emlaklar?tip=villalar" },
-  { label: "Həyət evləri", href: "/emlaklar?tip=heyet-evleri" },
-  { label: "Bağ evləri", href: "/emlaklar?tip=bag-evleri" },
-  { label: "Torpaq", href: "/emlaklar?tip=torpaq" },
-  { label: "Ofislər", href: "/emlaklar?tip=ofisler" },
-  { label: "Obyektlər", href: "/emlaklar?tip=obyektler" },
-];
+const PROPERTY_LINKS = propertyTypeLinks;
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -51,7 +50,7 @@ export function Footer() {
               Naviqasiya
             </h2>
             <ul className="flex flex-col gap-1">
-              {navigation.map((item) => (
+              {[...navigation, ...supportNavigation].map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -110,6 +109,28 @@ export function Footer() {
           </h2>
           <ul className="flex flex-wrap gap-x-7 gap-y-1">
             {PROPERTY_LINKS.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="inline-flex min-h-9 items-center text-sm text-zinc-300 transition-colors hover:text-zinc-50"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Elan növü üzrə keçidlər */}
+        <nav
+          aria-labelledby="footer-listing-heading"
+          className="mt-6 border-t border-zinc-800 pt-6"
+        >
+          <h2 id="footer-listing-heading" className="editorial-kicker mb-3 text-gold-soft">
+            Elan növü
+          </h2>
+          <ul className="flex flex-wrap gap-x-7 gap-y-1">
+            {listingLinks.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

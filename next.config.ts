@@ -10,6 +10,27 @@ const nextConfig: NextConfig = {
     // `forbidden()` və `unauthorized()` naviqasiya kəsiciləri bu bayraq olmadan işləmir.
     // İcazəsi olmayan istifadəçiyə 403 göstərmək üçün `src/lib/auth/guard.ts` onlardan asılıdır.
     authInterrupts: true,
+
+    serverActions: {
+      /**
+       * Server Action-ların mənbə yoxlaması.
+       *
+       * Next `Origin` başlığını proxy-dən gələn host ilə tutuşdurur. Cloudflare
+       * Workers-də sorğu bir neçə qatdan keçir və host başlığı həmişə üst-üstə
+       * düşmür — nəticədə etibarlı forma göndərişi 403 ilə rədd edilir və
+       * istifadəçi «Gözlənilməz xəta» səhifəsini görür.
+       *
+       * Siyahı **yalnız bizim domenlərdən** ibarətdir; kənar sayt əlavə edilməməlidir,
+       * əks halda CSRF müdafiəsi zəifləyər.
+       */
+      allowedOrigins: [
+        "luxehomeestate.az",
+        "www.luxehomeestate.az",
+        "luxehomeestate-staging.amiyevbahadur.workers.dev",
+        "localhost:3000",
+        "127.0.0.1:8787",
+      ],
+    },
   },
 
   images: {

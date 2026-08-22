@@ -98,6 +98,21 @@ export type PropertyFilters = {
   sort?: SortOption;
   page?: number;
   pageSize?: number;
+
+  /** NEW | OLD — yerli bazarda qiymətə ən çox təsir edən ikinci ölçü. */
+  buildingType?: string;
+  /** Kirayədə MONTH/DAY ayrımı: günlük kirayə ayrıca axtarış kateqoriyasıdır. */
+  pricePeriod?: string;
+  minFloor?: number;
+  maxFloor?: number;
+  /** «Birinci mərtəbə olmasın» — yerli elanlarda standart süzgəcdir. */
+  excludeFirstFloor?: boolean;
+  /** «Son mərtəbə olmasın» — binanın mərtəbə sayı ilə müqayisə olunur. */
+  excludeLastFloor?: boolean;
+  /** Yalnız şəkli olan elanlar. */
+  withImagesOnly?: boolean;
+  mortgageOnly?: boolean;
+  installmentOnly?: boolean;
 };
 
 /** İctimai səhifələr üçün baza şərt — silinmiş və qaralama əmlaklar görünmür. */
@@ -136,6 +151,42 @@ function buildPropertyWhere(filters: PropertyFilters): Prisma.PropertyWhereInput
   // "5" seçimi "5 və daha çox otaq" mənasını verir
   if (filters.rooms !== undefined) {
     where.rooms = filters.rooms >= 5 ? { gte: 5 } : filters.rooms;
+  }
+
+  if (filters.buildingType) where.buildingType = filters.buildingType;
+  if (filters.pricePeriod) where.pricePeriod = filters.pricePeriod;
+  if (filters.mortgageOnly) where.mortgageAvailable = true;
+  if (filters.installmentOnly) where.installmentAvailable = true;
+
+  if (filters.minFloor !== undefined || filters.maxFloor !== undefined) {
+    where.floor = {
+      ...(filters.minFloor !== undefined ? { gte: filters.minFloor } : {}),
+      ...(filters.maxFloor !== undefined ? { lte: filters.maxFloor } : {}),
+    };
+  }
+
+  // Birinci mərtəbə istisnası mərtəbə aralığı ilə birlikdə işləməlidir
+  if (filters.excludeFirstFloor) {
+    where.floor = { ...(where.floor as object), gt: 1 };
+  }
+
+  // «Son mərtəbə olmasın» iki sütunun müqayisəsidir; Prisma bunu birbaşa dəstəkləmir,
+  // ona görə xam SQL şərti ilə verilir
+  if (filters.excludeLastFloor) {
+    where.AND = [
+      ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
+      {
+        OR: [
+          { totalFloors: null },
+          { floor: null },
+          { floor: { lt: prisma.property.fields.totalFloors } },
+        ],
+      },
+    ];
+  }
+
+  if (filters.withImagesOnly) {
+    where.images = { some: {} };
   }
 
   if (filters.featureSlugs?.length) {

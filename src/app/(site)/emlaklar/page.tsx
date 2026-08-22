@@ -53,6 +53,8 @@ const FILTER_KEYS = [
   "sahe_max",
   "temir",
   "sened",
+  "tikili",
+  "dovr",
 ] as const;
 
 type FilterKey = (typeof FILTER_KEYS)[number];
@@ -63,6 +65,18 @@ function text(value: string | string[] | undefined): string | undefined {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed === "" ? undefined : trimmed;
+}
+
+/** Eyni adlı çoxlu parametr — xüsusiyyət filtri çoxseçimlidir. */
+function list(value: string | string[] | undefined): string[] {
+  if (Array.isArray(value)) return value.map((item) => item.trim()).filter(Boolean);
+  const single = text(value);
+  return single ? [single] : [];
+}
+
+/** `?sekilli=1` kimi bayraqlar. */
+function flag(value: string | string[] | undefined): boolean {
+  return text(value) === "1";
 }
 
 /** Yalnız müsbət ədədləri qəbul edir — «abc» və ya «-5» filtri sındırmasın. */
@@ -99,6 +113,14 @@ export default async function PropertiesPage({ searchParams }: Props) {
     maxArea: positiveNumber(params.sahe_max),
     renovation: raw.temir,
     documentStatus: raw.sened,
+    buildingType: raw.tikili,
+    pricePeriod: raw.dovr,
+    minFloor: positiveNumber(params.mertebe_min),
+    maxFloor: positiveNumber(params.mertebe_max),
+    excludeFirstFloor: flag(params.ilk_mertebe_yox),
+    excludeLastFloor: flag(params.son_mertebe_yox),
+    withImagesOnly: flag(params.sekilli),
+    featureSlugs: list(params.xususiyyet),
     sort,
     page: positiveNumber(params.sehife) ?? 1,
   };
@@ -119,6 +141,13 @@ export default async function PropertiesPage({ searchParams }: Props) {
       value: district.slug,
       label: district.name,
     })),
+  }));
+
+  // Ödəniş şərtləri xüsusiyyət cədvəlində saxlanılır, ona görə eyni siyahıdan gəlir
+  const featureOptions = filterOptions.features.map((feature) => ({
+    value: feature.slug,
+    label: feature.name,
+    group: feature.group,
   }));
 
   // --- URL qurucusu ----------------------------------------------------------
@@ -232,8 +261,18 @@ export default async function PropertiesPage({ searchParams }: Props) {
             <SearchPanel
               types={typeOptions}
               cities={cityOptions}
+            features={featureOptions}
               variant="page"
-              initial={{ ...raw, siralama: sort }}
+              initial={{
+              ...raw,
+              mertebe_min: text(params.mertebe_min),
+              mertebe_max: text(params.mertebe_max),
+              ilk_mertebe_yox: filters.excludeFirstFloor ? "1" : undefined,
+              son_mertebe_yox: filters.excludeLastFloor ? "1" : undefined,
+              sekilli: filters.withImagesOnly ? "1" : undefined,
+              xususiyyet: filters.featureSlugs,
+              siralama: sort,
+            }}
             />
           </div>
         </Container>

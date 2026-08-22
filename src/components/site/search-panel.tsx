@@ -7,11 +7,16 @@ import { ChevronDown, RotateCcw, Search, SlidersHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  DOCUMENT_STATUS_LABELS,
+  BUILDING_TYPES,
+  BUILDING_TYPE_LABELS,
   DOCUMENT_STATUSES,
+  DOCUMENT_STATUS_LABELS,
+  FEATURE_GROUP_LABELS,
   LISTING_TYPES,
-  RENOVATION_LABELS,
+  PRICE_PERIODS,
   RENOVATIONS,
+  RENOVATION_LABELS,
+  type FeatureGroup,
 } from "@/lib/constants";
 
 export type CityOption = {
@@ -39,12 +44,24 @@ export type SearchPanelInitial = {
   sahe_max?: string;
   temir?: string;
   sened?: string;
+  tikili?: string;
+  dovr?: string;
+  mertebe_min?: string;
+  mertebe_max?: string;
+  ilk_mertebe_yox?: string;
+  son_mertebe_yox?: string;
+  sekilli?: string;
+  xususiyyet?: string[];
   siralama?: string;
 };
+
+export type FeatureOption = { value: string; label: string; group: string };
 
 type SearchPanelProps = {
   types: TypeOption[];
   cities: CityOption[];
+  /** Qruplaşdırılmış xüsusiyyət və ödəniş şərtləri — çoxseçimli filtr üçün. */
+  features?: FeatureOption[];
   initial?: SearchPanelInitial;
   /**
    * `hero` — ana səhifə üçün kompakt görünüş.
@@ -53,6 +70,32 @@ type SearchPanelProps = {
   variant?: "hero" | "page";
   className?: string;
 };
+
+/** Filtr paneli üçün sadə checkbox — `ui/field.tsx` admin stilindədir. */
+function CheckboxField({
+  name,
+  label,
+  value,
+  defaultChecked,
+}: {
+  name: string;
+  label: string;
+  value?: string;
+  defaultChecked?: boolean;
+}) {
+  return (
+    <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm text-ink select-none">
+      <input
+        type="checkbox"
+        name={name}
+        value={value}
+        defaultChecked={defaultChecked}
+        className="size-4.5 shrink-0 cursor-pointer accent-[--color-gold]"
+      />
+      {label}
+    </label>
+  );
+}
 
 const ROOM_OPTIONS = [
   { value: "1", label: "1 otaq" },
@@ -65,6 +108,16 @@ const ROOM_OPTIONS = [
 const RENOVATION_OPTIONS = Object.values(RENOVATIONS).map((value) => ({
   value,
   label: RENOVATION_LABELS[value],
+}));
+
+const BUILDING_OPTIONS = Object.values(BUILDING_TYPES).map((value) => ({
+  value,
+  label: BUILDING_TYPE_LABELS[value],
+}));
+
+const PERIOD_OPTIONS = Object.values(PRICE_PERIODS).map((value) => ({
+  value,
+  label: value === "MONTH" ? "Aylıq" : "Günlük",
 }));
 
 const DOCUMENT_OPTIONS = Object.values(DOCUMENT_STATUSES).map((value) => ({
@@ -144,6 +197,7 @@ function SelectField({
 export function SearchPanel({
   types,
   cities,
+  features = [],
   initial = {},
   variant = "hero",
   className,
@@ -155,12 +209,38 @@ export function SearchPanel({
 
   // Ətraflı filtr açıq gəlir, əgər istifadəçi artıq həmin sahələrdən istifadə edibsə
   const hasAdvanced = Boolean(
-    initial.sahe_min || initial.sahe_max || initial.temir || initial.sened,
+    initial.sahe_min ||
+      initial.sahe_max ||
+      initial.temir ||
+      initial.sened ||
+      initial.tikili ||
+      initial.mertebe_min ||
+      initial.mertebe_max ||
+      initial.ilk_mertebe_yox ||
+      initial.son_mertebe_yox ||
+      initial.sekilli ||
+      (initial.xususiyyet?.length ?? 0) > 0,
   );
   const [advancedOpen, setAdvancedOpen] = useState(hasAdvanced);
 
   // Mobil ekranda əmlaklar səhifəsində filtrlər yer tutmasın deyə yığılmış başlayır
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const selectedFeatures = useMemo(
+    () => new Set(initial.xususiyyet ?? []),
+    [initial.xususiyyet],
+  );
+
+  // Xüsusiyyətlər qrup üzrə bölünür: siyahı uzun olduqda düz siyahı oxunmur
+  const featureGroups = useMemo(() => {
+    const groups = new Map<string, FeatureOption[]>();
+    for (const feature of features) {
+      const bucket = groups.get(feature.group) ?? [];
+      bucket.push(feature);
+      groups.set(feature.group, bucket);
+    }
+    return [...groups.entries()];
+  }, [features]);
 
   const districts = useMemo(() => {
     if (!citySlug) return [];
@@ -186,9 +266,24 @@ export function SearchPanel({
       "sahe_max",
       "temir",
       "sened",
+      "tikili",
+      "dovr",
+      "mertebe_min",
+      "mertebe_max",
     ]) {
       const value = String(form.get(field) ?? "").trim();
       if (value) params.set(field, value);
+    }
+
+    // Bayraqlar yalnız işarələnəndə URL-ə düşür ki, ünvan lazımsız uzanmasın
+    for (const flag of ["ilk_mertebe_yox", "son_mertebe_yox", "sekilli"]) {
+      if (form.get(flag)) params.set(flag, "1");
+    }
+
+    // Çoxseçimli xüsusiyyət filtri — hər seçim ayrı parametr kimi gedir
+    for (const value of form.getAll("xususiyyet")) {
+      const slug = String(value).trim();
+      if (slug) params.append("xususiyyet", slug);
     }
 
     // Sıralama seçimi filtrdən asılı deyil — mövcudsa saxlanılır
@@ -490,6 +585,101 @@ export function SearchPanel({
                 defaultValue={initial.sened}
                 options={DOCUMENT_OPTIONS}
               />
+
+              <SelectField
+                id="search-building"
+                name="tikili"
+                label="Tikili növü"
+                placeholder="Fərq etməz"
+                defaultValue={initial.tikili}
+                options={BUILDING_OPTIONS}
+              />
+
+              {listingType === LISTING_TYPES.RENT && (
+                <SelectField
+                  id="search-period"
+                  name="dovr"
+                  label="Kirayə müddəti"
+                  placeholder="Fərq etməz"
+                  defaultValue={initial.dovr}
+                  options={PERIOD_OPTIONS}
+                />
+              )}
+
+              <fieldset className="flex flex-col gap-1.5">
+                <legend className={LABEL_CLASS}>Mərtəbə</legend>
+                <div className="flex items-center gap-2">
+                  <input
+                    name="mertebe_min"
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    max={200}
+                    defaultValue={initial.mertebe_min ?? ""}
+                    placeholder="Min"
+                    aria-label="Minimum mərtəbə"
+                    className={INPUT_CLASS}
+                  />
+                  <span className="text-ink-muted" aria-hidden="true">
+                    —
+                  </span>
+                  <input
+                    name="mertebe_max"
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    max={200}
+                    defaultValue={initial.mertebe_max ?? ""}
+                    placeholder="Maks"
+                    aria-label="Maksimum mərtəbə"
+                    className={INPUT_CLASS}
+                  />
+                </div>
+              </fieldset>
+
+              <fieldset className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-3">
+                <legend className={LABEL_CLASS}>Əlavə şərtlər</legend>
+                <div className="flex flex-wrap gap-x-6 gap-y-1">
+                  <CheckboxField
+                    name="ilk_mertebe_yox"
+                    label="Birinci mərtəbə olmasın"
+                    defaultChecked={initial.ilk_mertebe_yox === "1"}
+                  />
+                  <CheckboxField
+                    name="son_mertebe_yox"
+                    label="Son mərtəbə olmasın"
+                    defaultChecked={initial.son_mertebe_yox === "1"}
+                  />
+                  <CheckboxField
+                    name="sekilli"
+                    label="Yalnız şəkilli elanlar"
+                    defaultChecked={initial.sekilli === "1"}
+                  />
+                </div>
+              </fieldset>
+
+              {featureGroups.length > 0 && (
+                <div className="flex flex-col gap-3 sm:col-span-2 lg:col-span-3">
+                  {featureGroups.map(([group, items]) => (
+                    <fieldset key={group} className="flex flex-col gap-1.5">
+                      <legend className={LABEL_CLASS}>
+                        {FEATURE_GROUP_LABELS[group as FeatureGroup] ?? group}
+                      </legend>
+                      <div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {items.map((feature) => (
+                          <CheckboxField
+                            key={feature.value}
+                            name="xususiyyet"
+                            value={feature.value}
+                            label={feature.label}
+                            defaultChecked={selectedFeatures.has(feature.value)}
+                          />
+                        ))}
+                      </div>
+                    </fieldset>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

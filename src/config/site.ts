@@ -58,10 +58,49 @@ export const siteConfig = {
 export const navigation = [
   { label: "Ana səhifə", href: "/" },
   { label: "Əmlaklar", href: "/emlaklar" },
+  { label: "Yaşayış kompleksləri", href: "/layiheler" },
+  { label: "Agentliklər", href: "/agentlikler" },
   { label: "Xidmətlər", href: "/xidmetler" },
-  { label: "Layihələr", href: "/layiheler" },
+  { label: "Bloq", href: "/blog" },
+  { label: "Əlaqə", href: "/elaqe" },
+] as const;
+
+/**
+ * Əmlak növləri üzrə sürətli keçidlər.
+ *
+ * Slug-lar `prisma/taxonomy-data.ts`-dəki dəyərlərlə eynidir — biri dəyişəndə
+ * digəri də yenilənməlidir, əks halda link boş nəticə səhifəsinə aparır.
+ */
+export const propertyTypeLinks = [
+  { label: "Mənzillər", href: "/emlaklar?tip=menziller" },
+  { label: "Yeni tikili", href: "/emlaklar?tip=yeni-tikili" },
+  { label: "Köhnə tikili", href: "/emlaklar?tip=kohne-tikili" },
+  { label: "Həyət evi / Villa", href: "/emlaklar?tip=heyet-evleri" },
+  { label: "Bağ evləri", href: "/emlaklar?tip=bag-evleri" },
+  { label: "Torpaq sahəsi", href: "/emlaklar?tip=torpaq" },
+  { label: "Obyekt", href: "/emlaklar?tip=obyektler" },
+  { label: "Ofis", href: "/emlaklar?tip=ofisler" },
+  { label: "Qaraj", href: "/emlaklar?tip=qarajlar" },
+  { label: "Mini otel / Xostel", href: "/emlaklar?tip=mini-otel" },
+  { label: "İstirahət mərkəzi", href: "/emlaklar?tip=istirahet-merkezleri" },
+  { label: "Konteyner ev", href: "/emlaklar?tip=konteyner-evler" },
+  { label: "A-frame ev", href: "/emlaklar?tip=a-frame-evler" },
+  { label: "Xarici əmlak", href: "/emlaklar?tip=xarici-emlak" },
+] as const;
+
+/** Elan növü üzrə keçidlər — günlük kirayə ayrıca kateqoriya kimi göstərilir. */
+export const listingLinks = [
+  { label: "Satılır", href: "/emlaklar?elan=SALE" },
+  { label: "Aylıq kirayə", href: "/emlaklar?elan=RENT&dovr=MONTH" },
+  { label: "Günlük kirayə", href: "/emlaklar?elan=RENT&dovr=DAY" },
+  { label: "İpotekaya uyğun", href: "/emlaklar?xususiyyet=ipoteka" },
+  { label: "Kreditlə", href: "/emlaklar?xususiyyet=kredit" },
+] as const;
+
+/** Footer-dəki köməkçi səhifələr. */
+export const supportNavigation = [
   { label: "Haqqımızda", href: "/haqqimizda" },
-  { label: "Blog", href: "/blog" },
+  { label: "Tez-tez verilən suallar", href: "/suallar" },
   { label: "Əlaqə", href: "/elaqe" },
 ] as const;
 
