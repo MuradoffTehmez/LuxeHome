@@ -302,6 +302,33 @@ export async function getPropertiesByIds(ids: string[]) {
   });
 }
 
+export const compareSelect = {
+  ...propertyCardSelect,
+  bedrooms: true,
+  bathrooms: true,
+  renovation: true,
+  documentStatus: true,
+  buildingType: true,
+  mortgageAvailable: true,
+  installmentAvailable: true,
+  features: {
+    select: { feature: { select: { name: true, group: true } } },
+  },
+} satisfies Prisma.PropertySelect;
+
+export type ComparePropertyData = Prisma.PropertyGetPayload<{
+  select: typeof compareSelect;
+}>;
+
+/** Müqayisə səhifəsi üçün geniş sahə dəsti — kart göstərmədən daha çox atribut lazımdır. */
+export async function getPropertiesForCompare(ids: string[]) {
+  if (ids.length === 0) return [];
+  return prisma.property.findMany({
+    where: { ...publicPropertyWhere(), id: { in: ids } },
+    select: compareSelect,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // FİLTER SEÇİMLƏRİ (dropdown-lar üçün)
 // ---------------------------------------------------------------------------
@@ -392,6 +419,79 @@ export async function getProjectBySlug(slug: string) {
       },
     },
   });
+}
+
+// ---------------------------------------------------------------------------
+// AGENTLİKLƏR
+// ---------------------------------------------------------------------------
+
+export async function getAgencies() {
+  const agencies = await prisma.agency.findMany({
+    where: { isVerified: true, user: { isActive: true } },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      logoUrl: true,
+      phone: true,
+      address: true,
+      user: {
+        select: {
+          _count: {
+            select: { properties: { where: publicPropertyWhere() } },
+          },
+        },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  return agencies.map((agency) => ({
+    id: agency.id,
+    name: agency.name,
+    slug: agency.slug,
+    logoUrl: agency.logoUrl,
+    phone: agency.phone,
+    address: agency.address,
+    propertyCount: agency.user._count.properties,
+  }));
+}
+
+/** Panel — bütün agentliklər (təsdiqlənməmişlər daxil). */
+export async function getAdminAgencies() {
+  return prisma.agency.findMany({
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      phone: true,
+      isVerified: true,
+      createdAt: true,
+      user: {
+        select: {
+          email: true,
+          isActive: true,
+          _count: { select: { properties: true } },
+        },
+      },
+    },
+    orderBy: [{ isVerified: "asc" }, { createdAt: "desc" }],
+  });
+}
+
+export async function getAgencyBySlug(slug: string) {
+  const agency = await prisma.agency.findFirst({
+    where: { slug, isVerified: true, user: { isActive: true } },
+  });
+  if (!agency) return null;
+
+  const properties = await prisma.property.findMany({
+    where: { ...publicPropertyWhere(), authorId: agency.userId },
+    select: propertyCardSelect,
+    orderBy: { publishedAt: "desc" },
+  });
+
+  return { agency, properties };
 }
 
 // ---------------------------------------------------------------------------
