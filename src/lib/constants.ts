@@ -344,6 +344,8 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
 
 /** 8 MB */
 export const MAX_UPLOAD_SIZE = 8 * 1024 * 1024;
+/** İctimai elanın qəbul etdiyi maksimum qalereya şəkli. */
+export const MAX_PROPERTY_IMAGES = 20;
 
 // ---------------------------------------------------------------------------
 // VALYUTA

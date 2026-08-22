@@ -1,4 +1,4 @@
-import { PROPERTY_STATUSES } from "@/lib/constants";
+import { LOCATION_KINDS, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES } from "@/lib/constants";
 import { readPropertyForm } from "@/lib/admin/property-input";
 import { propertyFieldsSchema } from "@/lib/admin/schemas";
 
@@ -58,25 +58,20 @@ export function submissionPolicy(accountType: string, agencyVerified: boolean, n
 /** Public action üçün admin sahələrini server tərəfdə dəyişməz təyin edir. */
 export function buildPublicPropertyData(
   input: PublicPropertyInput,
-  identity: {
-    userId: string;
-    accountType: string;
-    agencyVerified: boolean;
-    now?: Date;
-  },
+  identity: { userId: string },
 ) {
-  const policy = submissionPolicy(identity.accountType, identity.agencyVerified, identity.now);
   return {
     ...input,
     slug: "",
-    status: policy.status,
+    // Əlaqələr yazılarkən hər elan ictimai deyil; dərc yalnız sonrakı addımdadır.
+    status: PROPERTY_STATUSES.PENDING,
     projectId: null,
     isFeatured: false,
     metaTitle: null,
     metaDescription: null,
     authorId: identity.userId,
     isDemo: false,
-    publishedAt: policy.publishedAt,
+    publishedAt: null,
   };
 }
 
@@ -89,6 +84,7 @@ export function hasExclusiveMediaOwnership(submittedUrls: string[], ownedUrls: s
 type PropertyWriter<TData> = {
   createProperty(data: TData): Promise<{ id: string }>;
   createRelations(propertyId: string): Promise<void>;
+  finalizeProperty?(propertyId: string): Promise<void>;
   deleteProperty(propertyId: string): Promise<void>;
 };
 
@@ -99,13 +95,63 @@ type PropertyWriter<TData> = {
 export async function createPropertyWithRelations<TData>(
   writer: PropertyWriter<TData>,
   data: TData,
+  shouldFinalize = false,
 ): Promise<{ id: string }> {
   const property = await writer.createProperty(data);
   try {
     await writer.createRelations(property.id);
+    if (shouldFinalize) {
+      if (!writer.finalizeProperty) throw new Error("Elanın dərc addımı tapılmadı.");
+      await writer.finalizeProperty(property.id);
+    }
   } catch (error) {
     await writer.deleteProperty(property.id).catch(() => undefined);
     throw error;
   }
   return property;
+}
+
+export function hasAllowedPropertyImageCount(count: number): boolean {
+  return count <= MAX_PROPERTY_IMAGES;
+}
+
+const PUBLIC_DISTRICT_KINDS = [
+  LOCATION_KINDS.DISTRICT,
+  LOCATION_KINDS.SETTLEMENT,
+  LOCATION_KINDS.METRO,
+] as const;
+
+type PublicPropertyRelationStore = {
+  findType(id: string): Promise<{ isActive: boolean } | null>;
+  findLocation(id: string): Promise<{ kind: string; parentId: string | null } | null>;
+  countFeatures(ids: string[]): Promise<number>;
+};
+
+/** İctimai forma üçün saxtalaşdırılmış və passiv taksonomiya ID-lərini rədd edir. */
+export async function validatePublicPropertyRelations(
+  store: PublicPropertyRelationStore,
+  input: { typeId: string; cityId: string; districtId: string | null; featureIds: string[] },
+): Promise<Record<string, string> | null> {
+  const errors: Record<string, string> = {};
+  const [type, city, district, featureCount] = await Promise.all([
+    store.findType(input.typeId),
+    store.findLocation(input.cityId),
+    input.districtId ? store.findLocation(input.districtId) : null,
+    store.countFeatures(input.featureIds),
+  ]);
+
+  if (!type?.isActive) errors.typeId = "Əmlak növü seçilməyib";
+  if (!city || city.kind !== LOCATION_KINDS.CITY) errors.cityId = "Şəhər seçilməyib";
+  if (input.districtId && !district) errors.districtId = "Rayon tapılmadı";
+  if (district && !PUBLIC_DISTRICT_KINDS.includes(district.kind as never)) {
+    errors.districtId = "Seçilmiş rayon düzgün deyil";
+  }
+  if (district && district.parentId !== input.cityId) {
+    errors.districtId = "Seçilmiş rayon bu şəhərə aid deyil";
+  }
+  if (featureCount !== input.featureIds.length) {
+    errors.featureIds = "Seçilmiş xüsusiyyətlərdən biri tapılmadı";
+  }
+
+  return Object.keys(errors).length > 0 ? errors : null;
 }

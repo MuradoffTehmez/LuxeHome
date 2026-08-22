@@ -50,6 +50,8 @@ type ImageDropzoneProps = {
   initial?: DropzoneImage[];
   /** `single` — yalnız bir şəkil (üz qabığı), `multiple` — qalereya. */
   mode?: "single" | "multiple";
+  /** Çoxlu yükləmədə qəbul edilən maksimum şəkil sayı. */
+  maxFiles?: number;
   /** Media endpoint-i; panel formaları əvvəlki admin endpoint-dən istifadə edir. */
   uploadUrl?: string;
 };
@@ -72,6 +74,7 @@ export function ImageDropzone({
   folder,
   initial = [],
   mode = "multiple",
+  maxFiles,
   uploadUrl = DEFAULT_IMAGE_UPLOAD_URL,
 }: ImageDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -136,7 +139,9 @@ export function ImageDropzone({
     if (!files?.length) return;
 
     const selected = Array.from(files).filter((file) => file.type.startsWith("image/"));
-    const limited = mode === "single" ? selected.slice(0, 1) : selected;
+    const currentCount = items.filter((item) => item.status !== "error").length;
+    const available = maxFiles === undefined ? selected.length : Math.max(0, maxFiles - currentCount);
+    const limited = mode === "single" ? selected.slice(0, 1) : selected.slice(0, available);
 
     const pending: Item[] = limited.map((file, index) => ({
       id: `${Date.now()}-${index}-${file.name}`,

@@ -21,6 +21,7 @@ import {
   FEATURE_GROUP_LABELS,
   LISTING_TYPE_LABELS,
   LISTING_TYPES,
+  MAX_PROPERTY_IMAGES,
   PRICE_PERIOD_LABELS,
   PRICE_PERIODS,
   RENOVATION_LABELS,
@@ -211,7 +212,8 @@ export function PublicPropertyForm({
             label="Qalereya"
             folder="emlaklar"
             uploadUrl="/api/hesab/media"
-            hint="Şəkillər elan göndərilənədək hesabınıza bağlı saxlanılır."
+            maxFiles={MAX_PROPERTY_IMAGES}
+            hint={`Ən çox ${MAX_PROPERTY_IMAGES} şəkil yükləyin; şəkillər elan göndərilənədək hesabınıza bağlı saxlanılır.`}
           />
         </FullWidth>
       </FormSection>

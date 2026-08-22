@@ -5,6 +5,8 @@ import {
   hasExclusiveMediaOwnership,
   buildPublicPropertyData,
   createPropertyWithRelations,
+  hasAllowedPropertyImageCount,
+  validatePublicPropertyRelations,
   submissionPolicy,
 } from "../property-submission";
 
@@ -55,19 +57,15 @@ describe("ictimai elan göndərmə siyasəti", () => {
 
   it("göndərilən status və müəllif yerinə server dəyərlərini yazır", () => {
     const input = publicPropertySchema.parse(readPublicPropertyForm(minimalForm()));
-    const now = new Date("2026-08-22T12:00:00.000Z");
     const data = buildPublicPropertyData(input, {
       userId: "hesab-sahibi",
-      accountType: "AGENCY",
-      agencyVerified: true,
-      now,
     });
 
     expect(data).toMatchObject({
       authorId: "hesab-sahibi",
-      status: "PUBLISHED",
+      status: "PENDING",
       isFeatured: false,
-      publishedAt: now,
+      publishedAt: null,
     });
   });
 
@@ -98,5 +96,112 @@ describe("ictimai elan göndərmə siyasəti", () => {
     ).rejects.toThrow("FK xətası");
 
     expect(deleted).toEqual(["property-1"]);
+  });
+
+  it("təsdiqlənmiş agentliyi yalnız əlaqələrdən sonra dərc edir", async () => {
+    const events: string[] = [];
+    await createPropertyWithRelations(
+      {
+        createProperty: async (data: { status: string }) => {
+          events.push(`create:${data.status}`);
+          return { id: "property-1" };
+        },
+        createRelations: async () => {
+          events.push("relations");
+        },
+        finalizeProperty: async () => {
+          events.push("finalize");
+        },
+        deleteProperty: async () => {
+          events.push("delete");
+        },
+      },
+      { status: "PENDING" },
+      true,
+    );
+
+    expect(events).toEqual(["create:PENDING", "relations", "finalize"]);
+  });
+
+  it("dərc addımı uğursuz olarsa PENDING Property-ni silməyə çalışır", async () => {
+    const events: string[] = [];
+    await expect(
+      createPropertyWithRelations(
+        {
+          createProperty: async () => {
+            events.push("create");
+            return { id: "property-1" };
+          },
+          createRelations: async () => {
+            events.push("relations");
+          },
+          finalizeProperty: async () => {
+            events.push("finalize");
+            throw new Error("dərc xətası");
+          },
+          deleteProperty: async () => {
+            events.push("delete");
+          },
+        },
+        {},
+        true,
+      ),
+    ).rejects.toThrow("dərc xətası");
+
+    expect(events).toEqual(["create", "relations", "finalize", "delete"]);
+  });
+
+  it("silinmə kompensasiyası alınmasa da əsas xəta saxlanır", async () => {
+    await expect(
+      createPropertyWithRelations(
+        {
+          createProperty: async () => ({ id: "property-1" }),
+          createRelations: async () => {
+            throw new Error("əlaqə xətası");
+          },
+          finalizeProperty: async () => undefined,
+          deleteProperty: async () => {
+            throw new Error("silinmə xətası");
+          },
+        },
+        {},
+        false,
+      ),
+    ).rejects.toThrow("əlaqə xətası");
+  });
+
+  it("iyirmidən çox şəkilli elanı rədd edir", () => {
+    expect(hasAllowedPropertyImageCount(20)).toBe(true);
+    expect(hasAllowedPropertyImageCount(21)).toBe(false);
+  });
+
+  it("qeyri-aktiv əmlak növünü rədd edir", async () => {
+    const errors = await validatePublicPropertyRelations(
+      {
+        findType: async () => ({ isActive: false }),
+        findLocation: async () => ({ kind: "CITY", parentId: null }),
+        countFeatures: async () => 0,
+      },
+      { typeId: "type", cityId: "city", districtId: null, featureIds: [] },
+    );
+    expect(errors).toMatchObject({ typeId: "Əmlak növü seçilməyib" });
+  });
+
+  it("CITY olmayan şəhər və uyğun olmayan rayon növünü rədd edir", async () => {
+    const errors = await validatePublicPropertyRelations(
+      {
+        findType: async () => ({ isActive: true }),
+        findLocation: async (id) =>
+          id === "city"
+            ? { kind: "DISTRICT", parentId: null }
+            : { kind: "LANDMARK", parentId: "city" },
+        countFeatures: async () => 0,
+      },
+      { typeId: "type", cityId: "city", districtId: "district", featureIds: [] },
+    );
+    expect(errors).toMatchObject({
+      cityId: "Şəhər seçilməyib",
+      districtId: "Seçilmiş rayon düzgün deyil",
+    });
   });
 });

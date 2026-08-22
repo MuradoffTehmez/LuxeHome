@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { requirePermission } from "@/lib/auth/guard";
+import { requireLister, requirePermission } from "@/lib/auth/guard";
 import { clientIp } from "@/lib/auth/rate-limit";
 import type { AuthUser } from "@/lib/auth/types";
 import type { Permission } from "@/lib/constants";
@@ -47,12 +47,12 @@ export async function assertSameOrigin(): Promise<void> {
   }
 }
 
-async function assertWriteLimit(userId: string): Promise<void> {
+async function assertWriteLimit(userId: string, scope: string): Promise<void> {
   // Lokal `next dev` mühitində binding olmaya bilər — limit orada tətbiq edilmir
   const limiter = getCloudflareContext().env.ADMIN_LIMIT;
   if (!limiter) return;
 
-  const { success } = await limiter.limit({ key: `admin:${userId}` });
+  const { success } = await limiter.limit({ key: `${scope}:${userId}` });
   if (!success) {
     throw new AdminGuardError("Çox sayda əməliyyat oldu. Bir dəqiqə gözləyin.");
   }
@@ -61,7 +61,15 @@ async function assertWriteLimit(userId: string): Promise<void> {
 export async function requireAdminAction(permission: Permission): Promise<AuthUser> {
   await assertSameOrigin();
   const user = await requirePermission(permission);
-  await assertWriteLimit(user.id);
+  await assertWriteLimit(user.id, "admin");
+  return user;
+}
+
+/** İctimai kabinet yazıları üçün CSRF, hesab növü və ayrıca sürət limiti qapısı. */
+export async function requirePublicAction(scope: "media" | "property"): Promise<AuthUser> {
+  await assertSameOrigin();
+  const user = await requireLister();
+  await assertWriteLimit(user.id, `public:${scope}`);
   return user;
 }
 
