@@ -97,11 +97,10 @@ export const listingLinks = [
   { label: "Kreditlə", href: "/emlaklar?xususiyyet=kredit" },
 ] as const;
 
-/** Footer-dəki köməkçi səhifələr. */
+/** Footer-dəki köməkçi səhifələr — əsas naviqasiyada olmayanlar. */
 export const supportNavigation = [
   { label: "Haqqımızda", href: "/haqqimizda" },
   { label: "Tez-tez verilən suallar", href: "/suallar" },
-  { label: "Əlaqə", href: "/elaqe" },
 ] as const;
 
 export const legalNavigation = [
