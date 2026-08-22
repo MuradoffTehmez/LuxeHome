@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { AccountType, Role } from "@/lib/constants";
+import type { AccountType, AuthKind, Role } from "@/lib/constants";
 import { SLIDING_LIFETIME_MS, isSessionUsable, nextExpiry } from "./session-policy";
 import type { AuthUser } from "./types";
 
@@ -16,6 +16,7 @@ type CreateSessionInput = {
   totpCounter?: number | null;
   ip?: string | null;
   userAgent?: string | null;
+  authKind: AuthKind;
 };
 
 export async function createSession(input: CreateSessionInput) {
@@ -29,18 +30,22 @@ export async function createSession(input: CreateSessionInput) {
       totpCounter: input.totpCounter ?? null,
       ip: input.ip ?? null,
       userAgent: input.userAgent ?? null,
+      authKind: input.authKind,
     },
   });
 }
 
 /** Sessiyanı və sahibini birlikdə oxuyur; etibarsızdırsa `null`. */
-export async function resolveSession(sid: string): Promise<AuthUser | null> {
+export async function resolveSession(
+  sid: string,
+): Promise<(AuthUser & { sessionAuthKind: AuthKind }) | null> {
   const session = await prisma.session.findUnique({
     where: { id: sid },
     select: {
       createdAt: true,
       expiresAt: true,
       revokedAt: true,
+      authKind: true,
       user: {
         select: {
           id: true,
@@ -67,6 +72,7 @@ export async function resolveSession(sid: string): Promise<AuthUser | null> {
     accountType: session.user.accountType as AccountType,
     mustChangePassword: session.user.mustChangePassword,
     totpEnabled: session.user.totpEnabledAt !== null,
+    sessionAuthKind: session.authKind as AuthKind,
   };
 }
 

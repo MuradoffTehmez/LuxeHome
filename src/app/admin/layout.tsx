@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 /**
  * Admin panelin ümumi çərçivəsi və birinci qoruma həlqəsi.
  *
- * `requireUser()` sessiyanı bazadan yoxlayır — middleware-dəki imza yoxlaması
+ * `requireStaff()` sessiyanı bazadan yoxlayır — middleware-dəki imza yoxlaması
  * ləğv edilmiş sessiyanı görmür. Layout bütün panel səhifələrini əhatə edir,
  * amma server action-ları layout-dan keçmir: onlar öz guard-larını çağırır.
  */

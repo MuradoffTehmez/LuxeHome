@@ -410,6 +410,14 @@ export const ACCOUNT_TYPES = {
 
 export type AccountType = (typeof ACCOUNT_TYPES)[keyof typeof ACCOUNT_TYPES];
 
+/** Sessiyanın hansı giriş axınından yaradıldığını göstərir. */
+export const AUTH_KINDS = {
+  STAFF_2FA: "STAFF_2FA",
+  PUBLIC: "PUBLIC",
+} as const;
+
+export type AuthKind = (typeof AUTH_KINDS)[keyof typeof AUTH_KINDS];
+
 export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   STAFF: "Şirkət əməkdaşı",
   USER: "İstifadəçi",

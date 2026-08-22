@@ -5,7 +5,11 @@ import {
   SESSION_SUBJECT,
   TOKEN_ISSUER,
 } from "@/lib/auth/cookie-names";
-import { isCabinetPath } from "@/lib/auth/public-account-policy";
+import {
+  isUsableSignedSession,
+  signedSessionRedirect,
+  type SignedSession,
+} from "@/lib/auth/session-routing";
 
 /**
  * İdarə paneli və kabinet qapısı, ucuz sessiya yoxlaması.
@@ -18,8 +22,6 @@ import { isCabinetPath } from "@/lib/auth/public-account-policy";
  * panelin varlığı kənara bildirilmir.
  */
 
-type SignedSession = { accountType: "STAFF" | "USER" | "OWNER" | "AGENCY" };
-
 async function readSignedSession(token: string | undefined): Promise<SignedSession | null> {
   if (!token || !process.env.AUTH_SECRET) return null;
   try {
@@ -28,15 +30,21 @@ async function readSignedSession(token: string | undefined): Promise<SignedSessi
       subject: SESSION_SUBJECT,
     });
     const accountType = payload.accountType;
+    const authKind = payload.authKind;
     if (
       accountType !== "STAFF" &&
       accountType !== "USER" &&
       accountType !== "OWNER" &&
-      accountType !== "AGENCY"
+      accountType !== "AGENCY" ||
+      (authKind !== "STAFF_2FA" && authKind !== "PUBLIC")
     ) {
       return null;
     }
-    return { accountType };
+    const session: SignedSession = {
+      accountType: accountType as SignedSession["accountType"],
+      authKind: authKind as SignedSession["authKind"],
+    };
+    return isUsableSignedSession(session) ? session : null;
   } catch {
     return null;
   }
@@ -89,27 +97,8 @@ export async function middleware(request: NextRequest) {
   }
 
   const session = await readSignedSession(request.cookies.get(SESSION_COOKIE)?.value);
-  const signedIn = session !== null;
-
-  if (isAdminRoute && !signedIn) {
-    const target = new URL("/giris", request.url);
-    target.searchParams.set("davam", `${pathname}${search}`);
-    return NextResponse.redirect(target);
-  }
-
-  if (isAdminRoute && session?.accountType !== "STAFF") {
-    return NextResponse.redirect(new URL("/kabinet", request.url));
-  }
-
-  if (isCabinetPath(pathname) && !signedIn) {
-    const target = new URL("/daxil-ol", request.url);
-    target.searchParams.set("davam", `${pathname}${search}`);
-    return NextResponse.redirect(target);
-  }
-
-  if (isStaffLoginRoute && signedIn) {
-    return NextResponse.redirect(new URL(session.accountType === "STAFF" ? "/admin" : "/kabinet", request.url));
-  }
+  const redirectPath = signedSessionRedirect(pathname, search, session);
+  if (redirectPath) return NextResponse.redirect(new URL(redirectPath, request.url));
 
   // Layout cari marşrutu bilməlidir: müvəqqəti parolla gələn istifadəçi hesab
   // səhifəsinə yönləndirilir, amma elə həmin səhifədə təkrar yönləndirilməməlidir.

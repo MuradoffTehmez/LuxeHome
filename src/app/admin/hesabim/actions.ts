@@ -3,14 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { currentSessionId, requireUser } from "@/lib/auth/guard";
+import { currentSessionId, requireStaff } from "@/lib/auth/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { revokeAllSessions, revokeSession } from "@/lib/auth/session";
 
 /**
  * Hesab əməliyyatları.
  *
- * Hər action `requireUser()` ilə başlayır: server action-ları layout-dan keçmir,
+ * Hər action `requireStaff()` ilə başlayır: server action-ları layout-dan keçmir,
  * birbaşa POST ilə çağırıla bilir, ona görə qoruma burada təkrarlanmalıdır.
  */
 
@@ -33,7 +33,7 @@ export async function changePassword(
   _prev: AccountState,
   formData: FormData,
 ): Promise<AccountState> {
-  const user = await requireUser();
+  const user = await requireStaff();
 
   const parsed = passwordSchema.safeParse({
     current: formData.get("current"),
@@ -69,7 +69,7 @@ export async function changePassword(
 }
 
 export async function revokeOne(formData: FormData): Promise<void> {
-  const user = await requireUser();
+  const user = await requireStaff();
   const sid = String(formData.get("sid") ?? "");
 
   // Yalnız öz sessiyasını ləğv edə bilir
@@ -83,7 +83,7 @@ export async function revokeOne(formData: FormData): Promise<void> {
 }
 
 export async function revokeOtherSessions(): Promise<void> {
-  const user = await requireUser();
+  const user = await requireStaff();
   await revokeAllSessions(user.id, (await currentSessionId()) ?? undefined);
 
   revalidatePath("/admin/hesabim");

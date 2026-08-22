@@ -14,7 +14,7 @@ import { adminNav } from "./admin-nav";
 import { AdminIcon } from "./admin-icon";
 
 type AdminShellProps = {
-  /** Sessiyadan gələn istifadəçi — layout-dakı `requireUser()` təmin edir. */
+  /** Sessiyadan gələn əməkdaş — layout-dakı `requireStaff()` təmin edir. */
   user: AuthUser;
   /** Yan paneldəki sayğaclar — server tərəfdən ötürülür. */
   counters?: { newLeads?: number; draftProperties?: number };

@@ -98,6 +98,8 @@ model Session {
   revokedAt   DateTime?
   /// Sessiyanı açan TOTP addımı — eyni kodun təkrar oynadılmasının qarşısını alır
   totpCounter Int?
+  /// STAFF_2FA | PUBLIC — sessiyanın hansı doğrulama axınından gəldiyi
+  authKind    String @default("STAFF_2FA")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -206,7 +208,7 @@ model Property {
 
   /// SALE = Satılır, RENT = Kirayə
   listingType String @default("SALE")
-  /// DRAFT | PUBLISHED | RESERVED | SOLD | RENTED | ARCHIVED
+  /// DRAFT | PENDING | PUBLISHED | RESERVED | SOLD | RENTED | ARCHIVED
   status      String @default("DRAFT")
 
   price    Float
@@ -280,6 +282,7 @@ model Property {
   @@index([isFeatured])
   @@index([deletedAt])
   @@index([publishedAt])
+  @@index([authorId])
 }
 
 model PropertyImage {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { currentSessionId, requireUser } from "@/lib/auth/guard";
+import { currentSessionId, requireStaff } from "@/lib/auth/guard";
 import { listSessions } from "@/lib/auth/session";
 import { ROLE_LABELS } from "@/lib/constants";
 import { PasswordForm } from "./password-form";
@@ -36,7 +36,7 @@ export default async function AccountPage({
 }: {
   searchParams: Promise<{ parol?: string }>;
 }) {
-  const [user, { parol }] = await Promise.all([requireUser(), searchParams]);
+  const [user, { parol }] = await Promise.all([requireStaff(), searchParams]);
   const [sessions, activeSid, remainingCodes] = await Promise.all([
     listSessions(user.id),
     currentSessionId(),

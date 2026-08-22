@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
 import { ACCOUNT_TYPE_LABELS, ACCOUNT_TYPES, PUBLIC_ACCOUNT_TYPES } from "@/lib/constants";
 import { IDLE_STATE } from "@/lib/admin/action-state";
+import { accountAuthHref } from "@/lib/auth/public-account-policy";
 import { registerAccount } from "../hesab/actions";
 
 const ACCOUNT_HINTS: Record<string, string> = {
@@ -109,7 +110,10 @@ export function RegisterForm({ next }: { next?: string }) {
 
       <p className="text-center text-sm text-ink-soft">
         Hesabınız var?{" "}
-        <Link href="/daxil-ol" className="text-gold-deep underline-offset-4 hover:underline">
+        <Link
+          href={accountAuthHref("/daxil-ol", next)}
+          className="text-gold-deep underline-offset-4 hover:underline"
+        >
           Daxil olun
         </Link>
       </p>

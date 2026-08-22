@@ -41,7 +41,7 @@ import {
 } from "@/lib/auth/totp";
 import type { FormState } from "@/lib/auth/types";
 import { sendEmail } from "@/lib/email";
-import { ACCOUNT_TYPES, type AccountType } from "@/lib/constants";
+import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType } from "@/lib/constants";
 
 /**
  * Giriş axını.
@@ -94,17 +94,25 @@ async function startSession(
     where: { id: userId },
     select: { email: true, role: true, accountType: true },
   });
+  if (user.accountType !== ACCOUNT_TYPES.STAFF) redirect("/giris?yeniden=1");
 
   const session = await createSession({
     userId,
     totpCounter,
     ip,
     userAgent: requestHeaders.get("user-agent"),
+    authKind: AUTH_KINDS.STAFF_2FA,
   });
 
   await setSessionCookie(
     await signSessionToken(
-      { sid: session.id, uid: userId, role: user.role, accountType: user.accountType as AccountType },
+      {
+        sid: session.id,
+        uid: userId,
+        role: user.role,
+        accountType: user.accountType as AccountType,
+        authKind: AUTH_KINDS.STAFF_2FA,
+      },
       session.expiresAt,
     ),
     session.expiresAt,

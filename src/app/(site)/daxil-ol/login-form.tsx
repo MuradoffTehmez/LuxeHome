@@ -6,6 +6,7 @@ import { AlertCircle, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { IDLE_STATE } from "@/lib/admin/action-state";
+import { accountAuthHref } from "@/lib/auth/public-account-policy";
 import { signInAccount } from "../hesab/actions";
 
 /**
@@ -58,7 +59,10 @@ export function LoginForm({ next }: { next?: string }) {
 
       <p className="text-center text-sm text-ink-soft">
         Hesabınız yoxdur?{" "}
-        <Link href="/qeydiyyat" className="text-gold-deep underline-offset-4 hover:underline">
+        <Link
+          href={accountAuthHref("/qeydiyyat", next)}
+          className="text-gold-deep underline-offset-4 hover:underline"
+        >
           Qeydiyyatdan keçin
         </Link>
       </p>

@@ -1,8 +1,9 @@
 import { forbidden, redirect } from "next/navigation";
-import { LISTING_ACCOUNT_TYPES, type Permission } from "@/lib/constants";
+import { AUTH_KINDS, LISTING_ACCOUNT_TYPES, type AuthKind, type Permission } from "@/lib/constants";
 import { readSessionCookie, verifySessionToken } from "./cookies";
 import { hasPermission } from "./permissions";
 import { canAccessAdmin } from "./public-account-policy";
+import { matchesSessionProjection } from "./session-projection";
 import { resolveSession, touchSession } from "./session";
 import type { AuthUser } from "./types";
 
@@ -14,18 +15,19 @@ import type { AuthUser } from "./types";
  * action-lar layout-dan keçmir, birbaşa POST ilə çağırıla bilir.
  */
 
-export async function getOptionalUser(): Promise<AuthUser | null> {
+export async function getOptionalUser(expectedAuthKind?: AuthKind): Promise<AuthUser | null> {
   const token = await readSessionCookie();
   if (!token) return null;
 
   const claims = await verifySessionToken(token);
   if (!claims) return null;
 
-  const user = await resolveSession(claims.sid);
-  if (!user) return null;
+  const session = await resolveSession(claims.sid);
+  if (!session || !matchesSessionProjection(claims, session)) return null;
+  if (expectedAuthKind && session.sessionAuthKind !== expectedAuthKind) return null;
 
   await touchSession(claims.sid);
-  return user;
+  return session;
 }
 
 export async function requireUser(): Promise<AuthUser> {
@@ -35,10 +37,7 @@ export async function requireUser(): Promise<AuthUser> {
 }
 
 export async function requirePermission(permission: Permission): Promise<AuthUser> {
-  const user = await requireUser();
-  // Hesab növü də yoxlanılır: ictimai hesabın `role` sahəsi defolt qalsa belə
-  // panel əməliyyatına düşməməlidir
-  if (!canAccessAdmin(user.accountType)) forbidden();
+  const user = await requireStaff();
   if (!hasPermission(user.role, permission)) forbidden();
   return user;
 }
@@ -62,15 +61,16 @@ export async function currentSessionId(): Promise<string | null> {
  * mərhələli doğrulama yan keçilərdi. Sessiya `/giris` axınından gəlməlidir.
  */
 export async function requireStaff(): Promise<AuthUser> {
-  const user = await requireUser();
+  const user = await getOptionalUser(AUTH_KINDS.STAFF_2FA);
+  if (!user) redirect("/giris?yeniden=1");
   if (!canAccessAdmin(user.accountType)) forbidden();
   return user;
 }
 
 /** İctimai kabinet — yalnız aktiv qeyri-əməkdaş hesabları üçündür. */
 export async function requireAccount(): Promise<AuthUser> {
-  const user = await getOptionalUser();
-  if (!user) redirect("/daxil-ol");
+  const user = await getOptionalUser(AUTH_KINDS.PUBLIC);
+  if (!user) redirect("/daxil-ol?yeniden=1");
   if (canAccessAdmin(user.accountType)) redirect("/admin");
   return user;
 }

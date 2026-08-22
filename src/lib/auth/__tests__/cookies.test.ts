@@ -14,6 +14,7 @@ describe("sessiya cookie proyeksiyası", () => {
         uid: "user-1",
         role: "EDITOR",
         accountType: ACCOUNT_TYPES.USER,
+        authKind: "PUBLIC",
       },
       new Date(Date.now() + 60_000),
     );
@@ -23,6 +24,7 @@ describe("sessiya cookie proyeksiyası", () => {
       uid: "user-1",
       role: "EDITOR",
       accountType: ACCOUNT_TYPES.USER,
+      authKind: "PUBLIC",
     });
   });
 });

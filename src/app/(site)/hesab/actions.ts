@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
+  AUTH_KINDS,
   PUBLIC_ACCOUNT_TYPES,
   ROLES,
   type AccountType,
@@ -18,10 +19,14 @@ import {
   verifySessionToken,
 } from "@/lib/auth/cookies";
 import { hashPassword, needsRehash, verifyPassword } from "@/lib/auth/password";
-import { checkLoginLimit, clientIp, isAccountLocked, registerFailure, registerSuccess } from "@/lib/auth/rate-limit";
+import { checkLoginLimit, clientIp, registerFailure, registerSuccess } from "@/lib/auth/rate-limit";
 import { createSession, revokeSession } from "@/lib/auth/session";
 import { uniqueSlug } from "@/lib/admin/slug";
-import { canUsePublicSignIn, safePublicTarget } from "@/lib/auth/public-account-policy";
+import {
+  canUsePublicSignIn,
+  publicSignInOutcome,
+  safePublicTarget,
+} from "@/lib/auth/public-account-policy";
 import { createPublicAccount } from "@/lib/auth/public-account-registration";
 import { type ActionState, failure, invalid, unexpected } from "@/lib/admin/action-state";
 import * as form from "@/lib/admin/form";
@@ -41,6 +46,8 @@ import * as form from "@/lib/admin/form";
 
 const GENERIC_ERROR = "E-poçt və ya parol yanlışdır.";
 const CABINET = "/kabinet";
+const DUMMY_HASH =
+  "pbkdf2$sha256$100000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 /** Parol uzunluğu ictimai hesab üçün də ciddi saxlanılır — hesab elan yerləşdirə bilir. */
 const passwordRule = z
@@ -79,17 +86,25 @@ async function startPublicSession(userId: string, target?: string): Promise<neve
     where: { id: userId },
     select: { email: true, role: true, accountType: true },
   });
+  if (!canUsePublicSignIn(user.accountType as AccountType)) redirect("/daxil-ol?yeniden=1");
 
   const session = await createSession({
     userId,
     totpCounter: null,
     ip,
     userAgent: requestHeaders.get("user-agent"),
+    authKind: AUTH_KINDS.PUBLIC,
   });
 
   await setSessionCookie(
     await signSessionToken(
-      { sid: session.id, uid: userId, role: user.role, accountType: user.accountType as AccountType },
+      {
+        sid: session.id,
+        uid: userId,
+        role: user.role,
+        accountType: user.accountType as AccountType,
+        authKind: AUTH_KINDS.PUBLIC,
+      },
       session.expiresAt,
     ),
     session.expiresAt,
@@ -197,24 +212,23 @@ export async function signInAccount(
   if (!parsed.success) return failure(GENERIC_ERROR);
 
   const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-  if (!user || !user.isActive) {
-    await registerFailure(null, parsed.data.email, ip, "BAD_PASSWORD");
+  const passwordMatches = await verifyPassword(parsed.data.password, user?.passwordHash ?? DUMMY_HASH);
+  const outcome = publicSignInOutcome(user, passwordMatches, new Date());
+  if (outcome === "INVALID") {
+    await registerFailure(user?.id ?? null, parsed.data.email, ip, "BAD_PASSWORD");
     return failure(GENERIC_ERROR);
   }
 
-  // Əməkdaş hesabı buradan girə bilməz: 2FA addımı yan keçilərdi
-  if (!canUsePublicSignIn(user.accountType as AccountType)) {
+  // Əməkdaş hesabı yalnız parol düzgün olduqdan sonra öz 2FA girişinə yönləndirilir.
+  if (outcome === "STAFF") {
     return failure("Bu hesab şirkət panelinə aiddir. «İdarə paneli» girişindən istifadə edin.");
   }
 
-  if (isAccountLocked(user.lockedUntil)) {
+  if (outcome === "LOCKED") {
     return failure("Hesab müvəqqəti olaraq bağlanıb. 15 dəqiqə sonra yenidən cəhd edin.");
   }
 
-  if (!(await verifyPassword(parsed.data.password, user.passwordHash))) {
-    await registerFailure(user.id, user.email, ip, "BAD_PASSWORD");
-    return failure(GENERIC_ERROR);
-  }
+  if (!user) return failure(GENERIC_ERROR);
 
   if (needsRehash(user.passwordHash)) {
     await prisma.user.update({
