@@ -33,6 +33,8 @@ import { ButtonLink, ButtonAnchor } from "@/components/ui/button";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { FavoriteButton } from "@/components/site/favorite-button";
+import { CompareButton } from "@/components/site/compare-button";
+import { PropertyMap } from "@/components/site/property-map";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/(site)/elaqe/contact-form";
@@ -167,6 +169,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 />
                 <div className="h-6 w-px bg-line" aria-hidden="true" />
                 <FavoriteButton propertyId={property.id} />
+                <CompareButton propertyId={property.id} />
               </div>
             </div>
           </div>
@@ -253,6 +256,19 @@ export default async function PropertyDetailPage({ params }: Props) {
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {/* Xəritədə yerləşmə */}
+              {property.latitude != null && property.longitude != null && (
+                <div className="flex flex-col gap-4">
+                  <h2 className="font-display text-xl text-ink">Xəritədə</h2>
+                  <PropertyMap
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    title={property.title}
+                    className="h-80 w-full overflow-hidden rounded-md border border-line"
+                  />
                 </div>
               )}
 
