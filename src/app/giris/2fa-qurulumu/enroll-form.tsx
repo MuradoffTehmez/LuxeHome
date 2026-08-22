@@ -65,7 +65,7 @@ function BackupCodes({ codes }: { codes: string[] }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="rounded-xs border border-warning/30 bg-warning-bg px-4 py-3">
-        <p className="text-sm leading-relaxed text-ink">
+        <p className="text-sm leading-relaxed text-warning">
           <strong>Ehtiyat kodlarınızı indi saxlayın.</strong> Bu kodlar bir daha
           göstərilməyəcək. Telefonunuz əlinizdə olmayanda hər kod bir dəfə giriş üçün işləyir.
         </p>
