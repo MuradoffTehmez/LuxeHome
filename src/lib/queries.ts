@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
+  ACCOUNT_TYPES,
   ADMIN_PAGE_SIZE,
   PAGE_SIZE,
   POST_STATUSES,
@@ -960,6 +961,7 @@ export async function getAdminMedia(filters: { q?: string; page?: number } = {})
 
 export async function getAdminUsers() {
   return prisma.user.findMany({
+    where: { accountType: ACCOUNT_TYPES.STAFF },
     select: {
       id: true,
       name: true,

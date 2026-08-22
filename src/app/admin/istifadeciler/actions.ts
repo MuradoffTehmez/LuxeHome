@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { PERMISSIONS, ROLES } from "@/lib/constants";
+import { ACCOUNT_TYPES, PERMISSIONS, ROLES } from "@/lib/constants";
 import { hashPassword } from "@/lib/auth/password";
 import { revokeAllSessions } from "@/lib/auth/session";
 import {
@@ -45,16 +45,25 @@ function temporaryPassword(): string {
   return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
 }
 
-/** Sonuncu aktiv SUPER_ADMIN qorunur. */
-async function isLastSuperAdmin(userId: string): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { role: true, isActive: true },
+/** Panel əməliyyatlarının idarə edə biləcəyi əməkdaş hesabını qaytarır. */
+async function findStaffTarget(userId: string) {
+  return prisma.user.findFirst({
+    where: { id: userId, accountType: ACCOUNT_TYPES.STAFF },
+    select: { id: true, email: true, role: true, isActive: true },
   });
+}
+
+/** Sonuncu aktiv STAFF SUPER_ADMIN qorunur. */
+async function isLastSuperAdmin(userId: string): Promise<boolean> {
+  const user = await findStaffTarget(userId);
   if (user?.role !== ROLES.SUPER_ADMIN || !user.isActive) return false;
 
   const count = await prisma.user.count({
-    where: { role: ROLES.SUPER_ADMIN, isActive: true },
+    where: {
+      accountType: ACCOUNT_TYPES.STAFF,
+      role: ROLES.SUPER_ADMIN,
+      isActive: true,
+    },
   });
   return count <= 1;
 }
@@ -91,6 +100,7 @@ export async function createUser(_prev: ActionState, formData: FormData): Promis
         name: parsed.data.name,
         email: parsed.data.email,
         role: parsed.data.role,
+        accountType: ACCOUNT_TYPES.STAFF,
         passwordHash: await hashPassword(password),
         isActive: true,
         // 2FA qurulmayıb: ilk girişdə məcburi qurulum ekranı açılır
@@ -129,10 +139,7 @@ export async function updateUser(_prev: ActionState, formData: FormData): Promis
   if (!parsed.success) return invalid(parsed.error);
 
   try {
-    const target = await prisma.user.findUnique({
-      where: { id },
-      select: { role: true, isActive: true, email: true },
-    });
+    const target = await findStaffTarget(id);
     if (!target) return failure("İstifadəçi tapılmadı.");
 
     if (id === actor.id && (parsed.data.role !== target.role || !parsed.data.isActive)) {
@@ -146,7 +153,10 @@ export async function updateUser(_prev: ActionState, formData: FormData): Promis
       return failure("Sistemdə ən azı bir aktiv Super Admin qalmalıdır.");
     }
 
-    await prisma.user.update({ where: { id }, data: parsed.data });
+    await prisma.user.update({
+      where: { id, accountType: ACCOUNT_TYPES.STAFF },
+      data: parsed.data,
+    });
 
     // Deaktiv edilmiş istifadəçinin açıq sessiyaları dərhal bağlanır
     if (!parsed.data.isActive) await revokeAllSessions(id);
@@ -176,10 +186,13 @@ export async function resetUserPassword(id: string): Promise<ActionState> {
   }
 
   try {
+    const target = await findStaffTarget(id);
+    if (!target) return failure("İstifadəçi tapılmadı.");
+
     const password = temporaryPassword();
 
     const user = await prisma.user.update({
-      where: { id },
+      where: { id, accountType: ACCOUNT_TYPES.STAFF },
       data: {
         passwordHash: await hashPassword(password),
         mustChangePassword: true,
@@ -216,8 +229,11 @@ export async function resetUserTwoFactor(id: string): Promise<ActionState> {
   }
 
   try {
+    const target = await findStaffTarget(id);
+    if (!target) return failure("İstifadəçi tapılmadı.");
+
     const user = await prisma.user.update({
-      where: { id },
+      where: { id, accountType: ACCOUNT_TYPES.STAFF },
       data: { totpSecret: null, totpEnabledAt: null },
       select: { email: true },
     });
@@ -243,7 +259,7 @@ export async function revokeUserSessions(id: string): Promise<ActionState> {
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { id }, select: { email: true } });
+    const user = await findStaffTarget(id);
     if (!user) return failure("İstifadəçi tapılmadı.");
 
     await revokeAllSessions(id);
@@ -265,15 +281,21 @@ export async function deleteUser(id: string): Promise<ActionState> {
     throw error;
   }
 
-  if (id === actor.id) return failure("Öz hesabınızı silə bilməzsiniz.");
-
   try {
+    const target = await findStaffTarget(id);
+    if (!target) return failure("İstifadəçi tapılmadı.");
+
+    if (id === actor.id) return failure("Öz hesabınızı silə bilməzsiniz.");
+
     if (await isLastSuperAdmin(id)) {
       return failure("Sistemdə ən azı bir aktiv Super Admin qalmalıdır.");
     }
 
     // Elan və məqalələr silinmir: sxemdə müəllif əlaqəsi `onDelete: SetNull`-dur
-    const user = await prisma.user.delete({ where: { id }, select: { email: true } });
+    const user = await prisma.user.delete({
+      where: { id, accountType: ACCOUNT_TYPES.STAFF },
+      select: { email: true },
+    });
 
     await recordAudit(actor, "DELETE", "User", id, user.email);
     revalidatePath(LIST_PATH);
