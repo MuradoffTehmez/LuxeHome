@@ -1,0 +1,104 @@
+import { PROPERTY_STATUSES } from "@/lib/constants";
+import type { PropertyInput } from "./schemas";
+import * as form from "./form";
+
+/**
+ * Əmlak formasının saf (baza ilə əlaqəsiz) hissəsi.
+ *
+ * Action-dan ayrıdır ki, workerd testləri `FormData` → sxem yolunu birbaşa yoxlaya
+ * bilsin: forma sahəsinin adı ilə action-ın oxuduğu ad arasındakı uyğunsuzluq
+ * ən bahalı səhv növüdür — brauzerdə səssiz «heç nə olmur» kimi görünür.
+ */
+
+export function readPropertyForm(formData: FormData): PropertyInput {
+  return {
+    title: form.text(formData, "title"),
+    slug: form.text(formData, "slug"),
+    description: form.text(formData, "description"),
+
+    listingType: form.text(formData, "listingType"),
+    status: form.text(formData, "status"),
+
+    price: form.number(formData, "price") ?? 0,
+    currency: form.text(formData, "currency"),
+    pricePeriod: form.optionalText(formData, "pricePeriod"),
+
+    typeId: form.text(formData, "typeId"),
+    cityId: form.text(formData, "cityId"),
+    districtId: form.optionalText(formData, "districtId"),
+    projectId: form.optionalText(formData, "projectId"),
+    address: form.optionalText(formData, "address"),
+    latitude: form.number(formData, "latitude"),
+    longitude: form.number(formData, "longitude"),
+
+    rooms: form.integer(formData, "rooms"),
+    bedrooms: form.integer(formData, "bedrooms"),
+    bathrooms: form.integer(formData, "bathrooms"),
+    area: form.number(formData, "area"),
+    landArea: form.number(formData, "landArea"),
+    floor: form.integer(formData, "floor"),
+    totalFloors: form.integer(formData, "totalFloors"),
+
+    renovation: form.optionalText(formData, "renovation"),
+    documentStatus: form.optionalText(formData, "documentStatus"),
+    buildingType: form.optionalText(formData, "buildingType"),
+
+    videoUrl: form.optionalText(formData, "videoUrl"),
+    mortgageAvailable: form.boolean(formData, "mortgageAvailable"),
+    installmentAvailable: form.boolean(formData, "installmentAvailable"),
+    isFeatured: form.boolean(formData, "isFeatured"),
+
+    metaTitle: form.optionalText(formData, "metaTitle"),
+    metaDescription: form.optionalText(formData, "metaDescription"),
+
+    featureIds: form.list(formData, "featureIds"),
+  } as PropertyInput;
+}
+
+/** Elanın sahələrini Prisma-nın gözlədiyi formaya salır. */
+export function propertyData(input: PropertyInput) {
+  return {
+    title: input.title,
+    description: input.description,
+    listingType: input.listingType,
+    status: input.status,
+    price: input.price,
+    currency: input.currency,
+    // Satış elanında dövr sahəsi məna daşımır
+    pricePeriod: input.listingType === "RENT" ? input.pricePeriod : null,
+    typeId: input.typeId,
+    cityId: input.cityId,
+    districtId: input.districtId,
+    projectId: input.projectId,
+    address: input.address,
+    latitude: input.latitude,
+    longitude: input.longitude,
+    rooms: input.rooms,
+    bedrooms: input.bedrooms,
+    bathrooms: input.bathrooms,
+    area: input.area,
+    landArea: input.landArea,
+    floor: input.floor,
+    totalFloors: input.totalFloors,
+    renovation: input.renovation,
+    documentStatus: input.documentStatus,
+    buildingType: input.buildingType,
+    videoUrl: input.videoUrl,
+    mortgageAvailable: input.mortgageAvailable,
+    installmentAvailable: input.installmentAvailable,
+    isFeatured: input.isFeatured,
+    metaTitle: input.metaTitle,
+    metaDescription: input.metaDescription,
+  };
+}
+
+/**
+ * Dərc tarixi.
+ *
+ * Bir dəfə qoyulur: elan sonradan «satıldı» və ya «arxiv» olanda tarix silinmir,
+ * çünki sitemap və struktur data ilk dərc anını göstərməlidir.
+ */
+export function nextPublishedAt(status: string, current: Date | null): Date | null {
+  if (status !== PROPERTY_STATUSES.PUBLISHED) return current;
+  return current ?? new Date();
+}
