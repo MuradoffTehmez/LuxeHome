@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Building2, ClipboardList, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Container, Section } from "@/components/ui/container";
@@ -56,6 +57,14 @@ export default async function CabinetPage() {
                   ? "Göndərdiyiniz aktiv və gözləyən elanların ümumi sayı."
                   : "Elan yerləşdirmək üçün mülk sahibi və ya agentlik hesabı seçin."}
               </p>
+              {canList && (
+                <Link
+                  href="/kabinet/elanlar"
+                  className="mt-4 inline-flex text-sm font-medium text-gold-deep transition-colors hover:text-ink"
+                >
+                  Elanları idarə et →
+                </Link>
+              )}
             </article>
 
             {user.accountType === ACCOUNT_TYPES.AGENCY && (

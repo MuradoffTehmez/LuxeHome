@@ -59,8 +59,7 @@ const enumOf = <T extends Record<string, string>>(values: T) =>
 // ƏMLAK
 // ---------------------------------------------------------------------------
 
-export const propertySchema = z
-  .object({
+export const propertyFieldsSchema = z.object({
     title: requiredText("Başlıq", 5, 160),
     slug: z
       .string()
@@ -105,7 +104,9 @@ export const propertySchema = z
     metaDescription: optionalText(180),
 
     featureIds: z.array(cuid),
-  })
+  });
+
+export const propertySchema = propertyFieldsSchema
   .refine((data) => data.listingType !== "RENT" || data.pricePeriod !== null, {
     message: "Kirayə elanı üçün qiymət dövrü seçilməlidir",
     path: ["pricePeriod"],

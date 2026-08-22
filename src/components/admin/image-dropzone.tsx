@@ -15,11 +15,12 @@ import {
 import { cn } from "@/lib/utils";
 import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 import { useFieldError } from "./form-shell";
+import { DEFAULT_IMAGE_UPLOAD_URL } from "./image-dropzone-config";
 
 /**
  * Şəkil yükləmə sahəsi.
  *
- * Fayllar seçilən kimi `/api/admin/media`-ya gedir və R2-yə yazılır; forma yalnız
+ * Fayllar seçilən kimi seçilmiş media endpoint-inə gedir və R2-yə yazılır; forma yalnız
  * hazır URL-ləri daşıyır. Bu qəsdəndir: Server Action gövdəsində 8 MB-lıq faylları
  * daşımaq həm limitə dəyir, həm də irəliləyiş göstərməyə imkan vermir.
  *
@@ -49,6 +50,8 @@ type ImageDropzoneProps = {
   initial?: DropzoneImage[];
   /** `single` — yalnız bir şəkil (üz qabığı), `multiple` — qalereya. */
   mode?: "single" | "multiple";
+  /** Media endpoint-i; panel formaları əvvəlki admin endpoint-dən istifadə edir. */
+  uploadUrl?: string;
 };
 
 function withCover(items: Item[]): Item[] {
@@ -69,6 +72,7 @@ export function ImageDropzone({
   folder,
   initial = [],
   mode = "multiple",
+  uploadUrl = DEFAULT_IMAGE_UPLOAD_URL,
 }: ImageDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldId = useId();
@@ -99,7 +103,7 @@ export function ImageDropzone({
     body.append("folder", folder);
 
     try {
-      const response = await fetch("/api/admin/media", { method: "POST", body });
+      const response = await fetch(uploadUrl, { method: "POST", body });
       const payload = (await response.json()) as { url?: string; error?: string };
 
       if (!response.ok || !payload.url) {

@@ -23,7 +23,7 @@ import type { Permission } from "@/lib/constants";
 export class AdminGuardError extends Error {}
 
 /** Sorğunun bizim mənşədən gəldiyini yoxlayır. */
-async function assertSameOrigin(): Promise<void> {
+export async function assertSameOrigin(): Promise<void> {
   const requestHeaders = await headers();
 
   // Brauzer eyni-mənşəli sorğuda bu başlığı özü qoyur və JavaScript onu dəyişə bilmir

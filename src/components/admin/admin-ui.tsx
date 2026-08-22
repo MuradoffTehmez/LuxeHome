@@ -222,6 +222,7 @@ export function AdminTableCell({
 
 const STATUS_TONES = {
   DRAFT: "neutral",
+  PENDING: "warning",
   PUBLISHED: "success",
   RESERVED: "warning",
   SOLD: "danger",
