@@ -4,7 +4,8 @@ import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminBlogCategories } from "@/lib/queries";
 import { createPost } from "../actions";
-import { EMPTY_POST, PostForm } from "../post-form";
+import { EMPTY_POST } from "../form-values";
+import { PostForm } from "../post-form";
 
 export const metadata: Metadata = { title: "Yeni məqalə" };
 export const dynamic = "force-dynamic";

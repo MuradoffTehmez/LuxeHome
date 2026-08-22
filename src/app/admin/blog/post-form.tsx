@@ -8,34 +8,10 @@ import {
   FullWidth,
 } from "@/components/admin/form-fields";
 import { ContentEditor } from "@/components/admin/content-editor";
-import { ImageDropzone, type DropzoneImage } from "@/components/admin/image-dropzone";
+import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { POST_STATUS_LABELS, POST_STATUSES } from "@/lib/constants";
 import type { ActionState } from "@/lib/admin/action-state";
-
-export type PostFormValues = {
-  id?: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  categoryId: string;
-  status: string;
-  metaTitle: string;
-  metaDescription: string;
-  cover: DropzoneImage[];
-};
-
-export const EMPTY_POST: PostFormValues = {
-  title: "",
-  slug: "",
-  excerpt: "",
-  content: "",
-  categoryId: "",
-  status: POST_STATUSES.DRAFT,
-  metaTitle: "",
-  metaDescription: "",
-  cover: [],
-};
+import type { PostFormValues } from "./form-values";
 
 export function PostForm({
   action,

@@ -9,7 +9,8 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { getAdminServiceById } from "@/lib/queries";
 import { deleteService, saveService } from "../actions";
-import { ServiceForm, type ServiceFormValues } from "../service-form";
+import type { ServiceFormValues } from "../form-values";
+import { ServiceForm } from "../service-form";
 
 export const metadata: Metadata = { title: "Xidmətin redaktəsi" };
 export const dynamic = "force-dynamic";

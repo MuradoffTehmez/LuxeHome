@@ -9,7 +9,8 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { getAdminProjectById, getCityOptions } from "@/lib/queries";
 import { deleteProject, updateProject } from "../actions";
-import { ProjectForm, type ProjectFormValues } from "../project-form";
+import type { ProjectFormValues } from "../form-values";
+import { ProjectForm } from "../project-form";
 
 export const metadata: Metadata = { title: "Layihənin redaktəsi" };
 export const dynamic = "force-dynamic";

@@ -4,7 +4,8 @@ import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getCityOptions } from "@/lib/queries";
 import { createProject } from "../actions";
-import { EMPTY_PROJECT, ProjectForm } from "../project-form";
+import { EMPTY_PROJECT } from "../form-values";
+import { ProjectForm } from "../project-form";
 
 export const metadata: Metadata = { title: "Yeni layihə" };
 export const dynamic = "force-dynamic";

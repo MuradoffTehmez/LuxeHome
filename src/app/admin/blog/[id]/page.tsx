@@ -9,7 +9,8 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { formatDateTime } from "@/lib/utils";
 import { getAdminBlogCategories, getAdminPostById } from "@/lib/queries";
 import { deletePost, updatePost } from "../actions";
-import { PostForm, type PostFormValues } from "../post-form";
+import type { PostFormValues } from "../form-values";
+import { PostForm } from "../post-form";
 
 export const metadata: Metadata = { title: "Məqalənin redaktəsi" };
 export const dynamic = "force-dynamic";

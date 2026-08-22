@@ -9,7 +9,8 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { formatDateTime } from "@/lib/utils";
 import { getAdminPropertyById, getPropertyFormOptions } from "@/lib/queries";
 import { deleteProperty, updateProperty } from "../actions";
-import { PropertyForm, type PropertyFormValues } from "../property-form";
+import type { PropertyFormValues } from "../form-values";
+import { PropertyForm } from "../property-form";
 
 export const metadata: Metadata = { title: "Elanın redaktəsi" };
 export const dynamic = "force-dynamic";

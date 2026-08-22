@@ -4,7 +4,8 @@ import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getPropertyFormOptions } from "@/lib/queries";
 import { createProperty } from "../actions";
-import { EMPTY_PROPERTY, PropertyForm } from "../property-form";
+import { EMPTY_PROPERTY } from "../form-values";
+import { PropertyForm } from "../property-form";
 
 export const metadata: Metadata = { title: "Yeni elan" };
 export const dynamic = "force-dynamic";

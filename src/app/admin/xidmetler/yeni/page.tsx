@@ -3,7 +3,8 @@ import { AdminPageHeader } from "@/components/admin/admin-ui";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { saveService } from "../actions";
-import { EMPTY_SERVICE, ServiceForm } from "../service-form";
+import { EMPTY_SERVICE } from "../form-values";
+import { ServiceForm } from "../service-form";
 
 export const metadata: Metadata = { title: "Yeni xidmət" };
 export const dynamic = "force-dynamic";
