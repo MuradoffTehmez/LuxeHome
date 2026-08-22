@@ -10,10 +10,6 @@ ALTER TABLE "User" ADD COLUMN "emailVerifiedAt" DATETIME;
 
 CREATE INDEX "User_accountType_idx" ON "User"("accountType");
 
--- Köhnə sessiyalar panelin əvvəlki 2FA axınından gəlib. Yeni public sessiya
--- explicit olaraq PUBLIC yazılır və cookie claim-i ilə D1-də müqayisə edilir.
-ALTER TABLE "Session" ADD COLUMN "authKind" TEXT NOT NULL DEFAULT 'STAFF_2FA';
-
 -- Agentlik profili. Yalnız `accountType = 'AGENCY'` olan hesablarda olur.
 -- `isVerified` — admin təsdiqi: təsdiqlənmiş agentliyin elanı birbaşa dərc olunur,
 -- təsdiqlənməmişin elanı «Təsdiq gözləyir» statusunda qalır.
@@ -37,6 +33,3 @@ CREATE TABLE "Agency" (
 CREATE UNIQUE INDEX "Agency_userId_key" ON "Agency"("userId");
 CREATE UNIQUE INDEX "Agency_slug_key" ON "Agency"("slug");
 CREATE INDEX "Agency_isVerified_idx" ON "Agency"("isVerified");
-
--- Kabinet yalnız müəllifin elanlarının sayını/siyahısını oxuyur.
-CREATE INDEX "Property_authorId_idx" ON "Property"("authorId");

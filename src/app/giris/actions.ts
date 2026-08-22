@@ -40,6 +40,7 @@ import {
   verifyTotp,
 } from "@/lib/auth/totp";
 import type { FormState } from "@/lib/auth/types";
+import { verifyStaffPassword } from "@/lib/auth/staff-login-policy";
 import { sendEmail } from "@/lib/email";
 import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType } from "@/lib/constants";
 
@@ -141,9 +142,9 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
+  const passwordMatches = await verifyStaffPassword(user, password, verifyPassword, DUMMY_HASH);
 
   if (!user) {
-    await verifyPassword(password, DUMMY_HASH);
     await registerFailure(null, email, ip, "BAD_PASSWORD");
     return { error: GENERIC_ERROR };
   }
@@ -164,7 +165,7 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
     return { error: "Hesab müvəqqəti olaraq bağlanıb. 15 dəqiqə sonra yenidən cəhd edin." };
   }
 
-  if (!(await verifyPassword(password, user.passwordHash))) {
+  if (!passwordMatches) {
     const locked = await registerFailure(user.id, user.email, ip, "BAD_PASSWORD");
     if (locked) {
       await sendEmail({
