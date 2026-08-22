@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Building2, ClipboardList, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Container, Section } from "@/components/ui/container";
 import { getCabinetSummary } from "@/lib/accounts/cabinet-summary";
 import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_LABELS } from "@/lib/constants";
@@ -34,8 +33,7 @@ export default async function CabinetPage() {
   const canList = user.accountType !== ACCOUNT_TYPES.USER;
 
   return (
-    <Section spacing="cozy">
-      <Container size="narrow">
+      <>
         <div className="flex flex-col gap-8">
           <header className="flex flex-col gap-3">
             <Badge tone="gold" className="w-fit">
@@ -84,7 +82,6 @@ export default async function CabinetPage() {
             )}
           </div>
         </div>
-      </Container>
-    </Section>
+      </>
   );
 }

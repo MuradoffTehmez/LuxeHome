@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Container, Section } from "@/components/ui/container";
 import { requireLister } from "@/lib/auth/guard";
 import {
   PROPERTY_STATUS_LABELS,
@@ -42,8 +41,7 @@ export default async function CabinetPropertiesPage({
   ]);
 
   return (
-    <Section spacing="cozy">
-      <Container size="narrow">
+      <>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-gold-deep">Kabinet</p>
@@ -96,7 +94,6 @@ export default async function CabinetPropertiesPage({
             })}
           </ul>
         )}
-      </Container>
-    </Section>
+      </>
   );
 }

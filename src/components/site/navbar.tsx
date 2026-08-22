@@ -7,6 +7,7 @@ import { Heart, Menu, Phone, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navigation, siteConfig } from "@/config/site";
 import { ButtonLink, IconButton } from "@/components/ui/button";
+import { AccountMenu } from "./account-menu";
 import { Logo } from "./logo";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -83,7 +84,7 @@ export function Navbar() {
       </a>
 
       <div className={cn(
-        "mx-auto flex w-full max-w-[90rem] items-center justify-between gap-4 px-5 transition-[padding] duration-300 ease-out-soft sm:px-6 lg:gap-6 lg:px-10",
+        "mx-auto flex w-full max-w-360 items-center justify-between gap-4 px-5 transition-[padding] duration-300 ease-out-soft sm:px-6 lg:gap-6 lg:px-10",
         scrolled ? "py-2 sm:py-3" : "py-4",
         isOverlay && "on-dark",
       )}>
@@ -157,6 +158,11 @@ export function Navbar() {
             {siteConfig.phone}
           </a>
 
+          {/* Hesab bölməsi — giriş/qeydiyyat və ya kabinet/panel keçidi */}
+          <div className="hidden md:flex">
+            <AccountMenu isOverlay={isOverlay} />
+          </div>
+
           <ButtonLink
             href="/emlaklar"
             variant="primary"
@@ -192,7 +198,7 @@ export function Navbar() {
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="animate-fade-in fixed inset-x-0 top-[var(--header-h)] z-40 h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-line bg-ivory xl:hidden"
+          className="animate-fade-in fixed inset-x-0 top-(--header-h) z-40 h-[calc(100dvh-var(--header-h))] overflow-y-auto border-t border-line bg-ivory xl:hidden"
         >
           <nav aria-label="Mobil naviqasiya" className="px-5 pt-5 sm:px-8">
             <p className="editorial-kicker mb-3 text-ink-muted">Naviqasiya</p>
@@ -227,6 +233,7 @@ export function Navbar() {
               <Search className="size-4" aria-hidden="true" />
               Əmlak axtar
             </ButtonLink>
+            <AccountMenu variant="mobile" />
             <ButtonLink href="/favoritler" variant="outline" size="lg" fullWidth>
               <Heart className="size-4" aria-hidden="true" />
               Favoritlərim

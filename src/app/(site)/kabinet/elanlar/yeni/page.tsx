@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Container, Section } from "@/components/ui/container";
 import { getPropertyFormOptions } from "@/lib/queries";
 import { requireLister } from "@/lib/auth/guard";
 import { buildMetadata } from "@/lib/seo";
@@ -18,8 +17,7 @@ export default async function NewPropertyPage() {
   const options = await getPropertyFormOptions();
 
   return (
-    <Section spacing="cozy">
-      <Container size="narrow">
+      <>
         <header className="mb-8">
           <p className="text-sm font-medium text-gold-deep">Kabinet / Elanlar</p>
           <h1 className="mt-2 font-display text-3xl text-ink sm:text-4xl">Yeni elan göndər</h1>
@@ -29,7 +27,6 @@ export default async function NewPropertyPage() {
           </p>
         </header>
         <PublicPropertyForm action={createPublicProperty} options={options} />
-      </Container>
-    </Section>
+      </>
   );
 }
