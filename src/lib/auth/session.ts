@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Role } from "@/lib/constants";
+import type { AccountType, Role } from "@/lib/constants";
 import { SLIDING_LIFETIME_MS, isSessionUsable, nextExpiry } from "./session-policy";
 import type { AuthUser } from "./types";
 
@@ -47,6 +47,7 @@ export async function resolveSession(sid: string): Promise<AuthUser | null> {
           name: true,
           email: true,
           role: true,
+          accountType: true,
           isActive: true,
           mustChangePassword: true,
           totpEnabledAt: true,
@@ -63,6 +64,7 @@ export async function resolveSession(sid: string): Promise<AuthUser | null> {
     name: session.user.name,
     email: session.user.email,
     role: session.user.role as Role,
+    accountType: session.user.accountType as AccountType,
     mustChangePassword: session.user.mustChangePassword,
     totpEnabled: session.user.totpEnabledAt !== null,
   };

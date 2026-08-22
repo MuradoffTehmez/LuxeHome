@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ToastProvider } from "@/components/ui/toast";
-import { requireUser } from "@/lib/auth/guard";
+import { requireStaff } from "@/lib/auth/guard";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
@@ -26,7 +26,8 @@ export const dynamic = "force-dynamic";
  * amma server action-ları layout-dan keçmir: onlar öz guard-larını çağırır.
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const user = await requireUser();
+  // Panel yalnız şirkət əməkdaşlarına açıqdır — ictimai hesab da etibarlı sessiya daşıyır
+  const user = await requireStaff();
 
   // Müvəqqəti parolla gələn istifadəçi əvvəlcə onu dəyişməlidir.
   // Marşrut middleware-in qoyduğu başlıqdan oxunur — hesab səhifəsinin özündə

@@ -41,6 +41,7 @@ import {
 } from "@/lib/auth/totp";
 import type { FormState } from "@/lib/auth/types";
 import { sendEmail } from "@/lib/email";
+import { ACCOUNT_TYPES, type AccountType } from "@/lib/constants";
 
 /**
  * Giriş axını.
@@ -91,7 +92,7 @@ async function startSession(
 
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
-    select: { email: true, role: true },
+    select: { email: true, role: true, accountType: true },
   });
 
   const session = await createSession({
@@ -102,7 +103,10 @@ async function startSession(
   });
 
   await setSessionCookie(
-    await signSessionToken({ sid: session.id, uid: userId, role: user.role }, session.expiresAt),
+    await signSessionToken(
+      { sid: session.id, uid: userId, role: user.role, accountType: user.accountType as AccountType },
+      session.expiresAt,
+    ),
     session.expiresAt,
   );
   await clearStageCookie();
@@ -138,6 +142,12 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
 
   if (!user.isActive) {
     await registerFailure(null, user.email, ip, "INACTIVE");
+    return { error: GENERIC_ERROR };
+  }
+
+  // İctimai hesab panel girişindən 2FA mərhələsi başlada bilməz.
+  if (user.accountType !== ACCOUNT_TYPES.STAFF) {
+    await registerFailure(null, user.email, ip, "BAD_PASSWORD");
     return { error: GENERIC_ERROR };
   }
 

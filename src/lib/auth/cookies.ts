@@ -8,6 +8,7 @@ import {
   TOKEN_ISSUER,
 } from "./cookie-names";
 import type { AuthStage } from "./types";
+import type { AccountType } from "@/lib/constants";
 
 /**
  * Cookie qatı.
@@ -27,7 +28,7 @@ function secretKey(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export type SessionClaims = { sid: string; uid: string; role: string };
+export type SessionClaims = { sid: string; uid: string; role: string; accountType: AccountType };
 /** `next` — girişdən sonra qayıdılacaq panel marşrutu (`?davam=` parametrindən gəlir). */
 export type StageClaims = { uid: string; stage: AuthStage; secret?: string; next?: string };
 
@@ -47,9 +48,16 @@ export async function verifySessionToken(token: string): Promise<SessionClaims |
       issuer: TOKEN_ISSUER,
       subject: SESSION_SUBJECT,
     });
-    const { sid, uid, role } = payload as Record<string, unknown>;
-    if (typeof sid !== "string" || typeof uid !== "string" || typeof role !== "string") return null;
-    return { sid, uid, role };
+    const { sid, uid, role, accountType } = payload as Record<string, unknown>;
+    if (
+      typeof sid !== "string" ||
+      typeof uid !== "string" ||
+      typeof role !== "string" ||
+      (accountType !== "STAFF" && accountType !== "USER" && accountType !== "OWNER" && accountType !== "AGENCY")
+    ) {
+      return null;
+    }
+    return { sid, uid, role, accountType };
   } catch {
     return null;
   }

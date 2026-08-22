@@ -1,7 +1,8 @@
 import { forbidden, redirect } from "next/navigation";
-import type { Permission } from "@/lib/constants";
+import { LISTING_ACCOUNT_TYPES, type Permission } from "@/lib/constants";
 import { readSessionCookie, verifySessionToken } from "./cookies";
 import { hasPermission } from "./permissions";
+import { canAccessAdmin } from "./public-account-policy";
 import { resolveSession, touchSession } from "./session";
 import type { AuthUser } from "./types";
 
@@ -35,6 +36,9 @@ export async function requireUser(): Promise<AuthUser> {
 
 export async function requirePermission(permission: Permission): Promise<AuthUser> {
   const user = await requireUser();
+  // Hesab növü də yoxlanılır: ictimai hesabın `role` sahəsi defolt qalsa belə
+  // panel əməliyyatına düşməməlidir
+  if (!canAccessAdmin(user.accountType)) forbidden();
   if (!hasPermission(user.role, permission)) forbidden();
   return user;
 }
@@ -45,4 +49,35 @@ export async function currentSessionId(): Promise<string | null> {
   if (!token) return null;
   const claims = await verifySessionToken(token);
   return claims?.sid ?? null;
+}
+
+/**
+ * Panel yalnız şirkət əməkdaşları üçündür.
+ *
+ * `requireUser()` burada kifayət deyil: ictimai qeydiyyatdan keçən hesab da etibarlı
+ * sessiya daşıyır və middleware yalnız cookie imzasına baxır. Hesab növü yoxlanmasa,
+ * adi istifadəçi `/admin` ünvanını açıq yaza bilərdi.
+ *
+ * İkinci yoxlama 2FA-dır: əməkdaş hesabı ictimai giriş ekranından açılsaydı, iki
+ * mərhələli doğrulama yan keçilərdi. Sessiya `/giris` axınından gəlməlidir.
+ */
+export async function requireStaff(): Promise<AuthUser> {
+  const user = await requireUser();
+  if (!canAccessAdmin(user.accountType)) forbidden();
+  return user;
+}
+
+/** İctimai kabinet — yalnız aktiv qeyri-əməkdaş hesabları üçündür. */
+export async function requireAccount(): Promise<AuthUser> {
+  const user = await getOptionalUser();
+  if (!user) redirect("/daxil-ol");
+  if (canAccessAdmin(user.accountType)) redirect("/admin");
+  return user;
+}
+
+/** Elan yerləşdirə bilən hesab növü (mülk sahibi və ya agentlik). */
+export async function requireLister(): Promise<AuthUser> {
+  const user = await requireAccount();
+  if (!LISTING_ACCOUNT_TYPES.includes(user.accountType)) forbidden();
+  return user;
 }

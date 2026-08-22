@@ -1,4 +1,4 @@
-import type { Role } from "@/lib/constants";
+import type { AccountType, Role } from "@/lib/constants";
 
 /**
  * Guard-ların qaytardığı istifadəçi.
@@ -9,6 +9,8 @@ export type AuthUser = {
   name: string;
   email: string;
   role: Role;
+  /** Hesabın kim olduğu — panel yalnız `STAFF` üçün açıqdır. */
+  accountType: AccountType;
   mustChangePassword: boolean;
   totpEnabled: boolean;
 };

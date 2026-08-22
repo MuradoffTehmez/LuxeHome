@@ -104,6 +104,8 @@ export const LOCATION_KIND_SUFFIX: Record<LocationKind, string> = {
 
 export const PROPERTY_STATUSES = {
   DRAFT: "DRAFT",
+  /** Kənar istifadəçi göndərib, admin təsdiqi gözlənilir. */
+  PENDING: "PENDING",
   PUBLISHED: "PUBLISHED",
   RESERVED: "RESERVED",
   SOLD: "SOLD",
@@ -116,6 +118,7 @@ export type PropertyStatus =
 
 export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
   DRAFT: "Qaralama",
+  PENDING: "Təsdiq gözləyir",
   PUBLISHED: "Dərc olunub",
   RESERVED: "Beh alınıb",
   SOLD: "Satılıb",
@@ -129,6 +132,7 @@ export const PROPERTY_STATUS_TONE: Record<
   "neutral" | "success" | "warning" | "danger" | "gold"
 > = {
   DRAFT: "neutral",
+  PENDING: "warning",
   PUBLISHED: "success",
   RESERVED: "warning",
   SOLD: "danger",
@@ -385,3 +389,43 @@ export const FEATURE_GROUP_LABELS: Record<FeatureGroup, string> = {
   OUTDOOR: "Xarici",
   SECURITY: "Təhlükəsizlik",
 };
+
+// ---------------------------------------------------------------------------
+// HESAB NÖVLƏRİ (İCTİMAİ QEYDİYYAT)
+// ---------------------------------------------------------------------------
+
+/**
+ * Hesabın kim olduğu — `role` isə **yalnız** panel səlahiyyətini göstərir.
+ *
+ * İki ölçü qəsdən ayrıdır: şirkət əməkdaşı (`STAFF`) panelə girir, ictimai hesablar
+ * isə heç bir panel icazəsi almır. Beləliklə yeni hesab növü əlavə etmək RBAC
+ * matrisinə toxunmur.
+ */
+export const ACCOUNT_TYPES = {
+  STAFF: "STAFF",
+  USER: "USER",
+  OWNER: "OWNER",
+  AGENCY: "AGENCY",
+} as const;
+
+export type AccountType = (typeof ACCOUNT_TYPES)[keyof typeof ACCOUNT_TYPES];
+
+export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  STAFF: "Şirkət əməkdaşı",
+  USER: "İstifadəçi",
+  OWNER: "Mülk sahibi",
+  AGENCY: "Agentlik",
+};
+
+/** Qeydiyyat formasında seçilə bilən növlər — `STAFF` yalnız paneldən yaradılır. */
+export const PUBLIC_ACCOUNT_TYPES: AccountType[] = [
+  ACCOUNT_TYPES.USER,
+  ACCOUNT_TYPES.OWNER,
+  ACCOUNT_TYPES.AGENCY,
+];
+
+/** Öz elanını yerləşdirə bilən hesab növləri. */
+export const LISTING_ACCOUNT_TYPES: AccountType[] = [
+  ACCOUNT_TYPES.OWNER,
+  ACCOUNT_TYPES.AGENCY,
+];

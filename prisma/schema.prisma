@@ -29,6 +29,11 @@ model User {
   email        String    @unique
   passwordHash String
   role         String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR
+  /// Hesabın kim olduğu: STAFF | USER | OWNER | AGENCY.
+  /// `role` yalnız panel səlahiyyətini göstərir — iki ölçü qəsdən ayrıdır.
+  accountType  String    @default("STAFF")
+  phone        String?
+  emailVerifiedAt DateTime?
   isActive     Boolean   @default(true)
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
@@ -50,8 +55,34 @@ model User {
 
   sessions    Session[]
   backupCodes BackupCode[]
+  agency      Agency?
 
   @@index([role])
+  @@index([accountType])
+}
+
+/// Agentlik profili — yalnız `accountType = "AGENCY"` hesablarında olur.
+/// `isVerified` admin təsdiqidir: təsdiqlənmiş agentliyin elanı birbaşa dərc olunur,
+/// təsdiqlənməmişin elanı «Təsdiq gözləyir» statusunda qalır.
+model Agency {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  name        String
+  slug        String    @unique
+  description String?
+  logoUrl     String?
+  phone       String?
+  address     String?
+  website     String?
+  isVerified  Boolean   @default(false)
+  verifiedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([isVerified])
 }
 
 /// Aktiv giriş sessiyaları. Cookie yalnız bu sətrin id-sini daşıyır, beləliklə

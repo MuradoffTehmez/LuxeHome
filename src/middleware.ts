@@ -5,28 +5,40 @@ import {
   SESSION_SUBJECT,
   TOKEN_ISSUER,
 } from "@/lib/auth/cookie-names";
+import { isCabinetPath } from "@/lib/auth/public-account-policy";
 
 /**
- * İdarə paneli qapısı və ucuz sessiya yoxlaması.
+ * İdarə paneli və kabinet qapısı, ucuz sessiya yoxlaması.
  *
  * Burada yalnız cookie imzası doğrulanır — D1-ə müraciət edilmir, çünki middleware
  * hər sorğuda işləyir. Sessiyanın həqiqətən diri olduğunu (ləğv edilməyib, istifadəçi
  * aktivdir) `admin/layout.tsx` və hər server action-ın başındakı guard yoxlayır.
  *
- * Panel bağlıdırsa (`ADMIN_ENABLED !== "true"`) hər iki marşrut 404 qaytarır —
+ * Panel bağlıdırsa (`ADMIN_ENABLED !== "true"`) yalnız panel marşrutları 404 qaytarır —
  * panelin varlığı kənara bildirilmir.
  */
 
-async function hasValidSignature(token: string | undefined): Promise<boolean> {
-  if (!token || !process.env.AUTH_SECRET) return false;
+type SignedSession = { accountType: "STAFF" | "USER" | "OWNER" | "AGENCY" };
+
+async function readSignedSession(token: string | undefined): Promise<SignedSession | null> {
+  if (!token || !process.env.AUTH_SECRET) return null;
   try {
-    await jwtVerify(token, new TextEncoder().encode(process.env.AUTH_SECRET), {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.AUTH_SECRET), {
       issuer: TOKEN_ISSUER,
       subject: SESSION_SUBJECT,
     });
-    return true;
+    const accountType = payload.accountType;
+    if (
+      accountType !== "STAFF" &&
+      accountType !== "USER" &&
+      accountType !== "OWNER" &&
+      accountType !== "AGENCY"
+    ) {
+      return null;
+    }
+    return { accountType };
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -68,21 +80,35 @@ function harden(response: NextResponse): NextResponse {
 }
 
 export async function middleware(request: NextRequest) {
-  if (process.env.ADMIN_ENABLED !== "true") {
+  const { pathname, search } = request.nextUrl;
+  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isStaffLoginRoute = pathname === "/giris" || pathname.startsWith("/giris/");
+
+  if ((isAdminRoute || isStaffLoginRoute) && process.env.ADMIN_ENABLED !== "true") {
     return NextResponse.rewrite(new URL("/__baglidir", request.url));
   }
 
-  const signedIn = await hasValidSignature(request.cookies.get(SESSION_COOKIE)?.value);
-  const { pathname, search } = request.nextUrl;
+  const session = await readSignedSession(request.cookies.get(SESSION_COOKIE)?.value);
+  const signedIn = session !== null;
 
-  if (pathname.startsWith("/admin") && !signedIn) {
+  if (isAdminRoute && !signedIn) {
     const target = new URL("/giris", request.url);
     target.searchParams.set("davam", `${pathname}${search}`);
     return NextResponse.redirect(target);
   }
 
-  if (pathname === "/giris" && signedIn) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+  if (isAdminRoute && session?.accountType !== "STAFF") {
+    return NextResponse.redirect(new URL("/kabinet", request.url));
+  }
+
+  if (isCabinetPath(pathname) && !signedIn) {
+    const target = new URL("/daxil-ol", request.url);
+    target.searchParams.set("davam", `${pathname}${search}`);
+    return NextResponse.redirect(target);
+  }
+
+  if (isStaffLoginRoute && signedIn) {
+    return NextResponse.redirect(new URL(session.accountType === "STAFF" ? "/admin" : "/kabinet", request.url));
   }
 
   // Layout cari marşrutu bilməlidir: müvəqqəti parolla gələn istifadəçi hesab
@@ -93,5 +119,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/admin", "/giris/:path*", "/giris"],
+  matcher: ["/admin/:path*", "/admin", "/giris/:path*", "/giris", "/kabinet/:path*", "/kabinet"],
 };
