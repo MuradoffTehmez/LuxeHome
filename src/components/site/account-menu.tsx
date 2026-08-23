@@ -65,23 +65,23 @@ export function AccountMenu({
   if (state.status === "loading") return null;
 
   const linkClass = cn(
-    "inline-flex min-h-11 shrink-0 items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors duration-200",
-    variant === "mobile" && "w-full",
+    "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xs text-sm font-medium whitespace-nowrap transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+    variant === "mobile" ? "w-full justify-center" : "min-w-11 justify-center px-2 2xl:min-w-0 2xl:justify-start 2xl:px-0",
     isOverlay ? "text-ink-invert-soft hover:text-gold-soft" : "text-ink-soft hover:text-gold-deep",
   );
 
   if (state.status === "anonymous") {
     return (
       <div className={cn("flex items-center gap-3", variant === "mobile" && "flex-col items-stretch gap-2")}>
-        <Link href="/daxil-ol" className={linkClass}>
+        <Link href="/daxil-ol" aria-label="Daxil ol" className={linkClass}>
           <LogIn className="size-4" aria-hidden="true" />
-          Daxil ol
+          <span className={cn(variant === "desktop" && "sr-only 2xl:not-sr-only")}>Daxil ol</span>
         </Link>
         <Link
           href="/qeydiyyat"
           className={cn(
             "inline-flex min-h-11 shrink-0 items-center justify-center rounded-xs border px-3.5 text-sm font-medium whitespace-nowrap transition-colors duration-200",
-            variant === "mobile" && "w-full",
+            variant === "mobile" ? "w-full" : "hidden 2xl:inline-flex",
             isOverlay
               ? "border-white/40 text-ink-invert hover:border-gold-soft hover:text-gold-soft"
               : "border-ink-soft/40 text-ink hover:border-gold hover:text-gold-deep hover:bg-gold/5",
@@ -94,13 +94,19 @@ export function AccountMenu({
   }
 
   return (
-    <Link href={state.isStaff ? "/admin" : "/kabinet"} className={linkClass}>
+    <Link
+      href={state.isStaff ? "/admin" : "/kabinet"}
+      aria-label={state.isStaff ? "İdarə paneli" : `${state.name} kabineti`}
+      className={linkClass}
+    >
       {state.isStaff ? (
         <LayoutDashboard className="size-4" aria-hidden="true" />
       ) : (
         <UserRound className="size-4" aria-hidden="true" />
       )}
-      <span className="max-w-28 truncate">{state.isStaff ? "İdarə paneli" : state.name}</span>
+      <span className={cn("max-w-28 truncate", variant === "desktop" && "sr-only 2xl:not-sr-only")}>
+        {state.isStaff ? "İdarə paneli" : state.name}
+      </span>
     </Link>
   );
 }

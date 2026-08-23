@@ -185,8 +185,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   /* Mobil tap gecikməsini azaldır */
   touch-action: manipulation;
-  /* Header overflow root-cause düzəlişi tamamlanana qədər müvəqqəti qoruma. */
-  overflow-x: hidden;
 }
 
 h1,

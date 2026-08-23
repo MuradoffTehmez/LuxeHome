@@ -128,7 +128,7 @@ export function Overlay({
       <button
         type="button"
         tabIndex={-1}
-        aria-label="Bağla"
+        aria-hidden="true"
         onClick={onClose}
         className="animate-fade-in absolute inset-0 cursor-default bg-charcoal/60 backdrop-blur-[2px]"
       />

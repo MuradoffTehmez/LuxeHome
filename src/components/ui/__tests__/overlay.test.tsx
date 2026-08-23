@@ -35,4 +35,15 @@ describe("Overlay", () => {
 
     expect(html).toBe("");
   });
+
+  it("backdrop-u accessibility ağacına ikinci bağlama düyməsi kimi əlavə etmir", () => {
+    const html = renderToStaticMarkup(
+      <Overlay open onClose={() => undefined} title="Menyu">
+        <span>Məzmun</span>
+      </Overlay>,
+    );
+
+    expect(html.match(/aria-label="Bağla"/g)).toHaveLength(1);
+    expect(html).toContain('aria-hidden="true"');
+  });
 });
