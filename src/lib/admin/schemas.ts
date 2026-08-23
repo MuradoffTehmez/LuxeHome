@@ -103,6 +103,11 @@ export const propertyFieldsSchema = z.object({
 
     metaTitle: optionalText(70),
     metaDescription: optionalText(180),
+    noIndex: z.boolean(),
+    canonicalUrl: optionalText(300),
+    ogTitle: optionalText(70),
+    ogDescription: optionalText(200),
+    ogImage: optionalText(500),
 
     featureIds: z.array(cuid),
   });
@@ -162,6 +167,11 @@ export const projectSchema = z.object({
 
   metaTitle: optionalText(70),
   metaDescription: optionalText(180),
+  noIndex: z.boolean(),
+  canonicalUrl: optionalText(300),
+  ogTitle: optionalText(70),
+  ogDescription: optionalText(200),
+  ogImage: optionalText(500),
 });
 
 export type ProjectInput = z.infer<typeof projectSchema>;
@@ -184,6 +194,11 @@ export const postSchema = z.object({
   status: enumOf(POST_STATUSES),
   metaTitle: optionalText(70),
   metaDescription: optionalText(180),
+  noIndex: z.boolean(),
+  canonicalUrl: optionalText(300),
+  ogTitle: optionalText(70),
+  ogDescription: optionalText(200),
+  ogImage: optionalText(500),
 });
 
 export type PostInput = z.infer<typeof postSchema>;
@@ -218,6 +233,11 @@ export const serviceSchema = z.object({
   isActive: z.boolean(),
   metaTitle: optionalText(70),
   metaDescription: optionalText(180),
+  noIndex: z.boolean(),
+  canonicalUrl: optionalText(300),
+  ogTitle: optionalText(70),
+  ogDescription: optionalText(200),
+  ogImage: optionalText(500),
 });
 
 // ---------------------------------------------------------------------------

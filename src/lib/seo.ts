@@ -16,6 +16,12 @@ type PageMetaInput = {
   noIndex?: boolean;
   /** Səhifəyə xas açar sözlər — verilməzsə kök layout-dakı ümumi siyahı qüvvədə qalır. */
   keywords?: string[];
+  /** Duplikat kontent halında fərqli canonical ünvana işarə etmək üçün — adətən boş qalır. */
+  canonicalPath?: string | null;
+  /** Sosial paylaşımda görünən başlıq/təsvir/şəkil — boş qalsa əsas dəyərlər istifadə olunur. */
+  ogTitle?: string | null;
+  ogDescription?: string | null;
+  ogImage?: string | null;
 };
 
 /** Səhifə üçün tam metadata (canonical + Open Graph + Twitter) qurur. */
@@ -28,15 +34,25 @@ export function buildMetadata({
   publishedTime,
   noIndex = false,
   keywords,
+  canonicalPath,
+  ogTitle,
+  ogDescription,
+  ogImage,
 }: PageMetaInput): Metadata {
   const url = siteUrl(path);
-  const images = image ? [{ url: image, width: 1200, height: 630, alt: title }] : undefined;
+  const canonicalUrl = canonicalPath ? siteUrl(canonicalPath) : url;
+  const resolvedOgTitle = ogTitle || title;
+  const resolvedOgDescription = ogDescription || description;
+  const resolvedOgImage = ogImage || image;
+  const images = resolvedOgImage
+    ? [{ url: resolvedOgImage, width: 1200, height: 630, alt: resolvedOgTitle }]
+    : undefined;
 
   return {
     title,
     description,
     ...(keywords ? { keywords } : {}),
-    alternates: { canonical: url },
+    alternates: { canonical: canonicalUrl },
     // Staging heç bir səhifəsi ilə indeksə düşməməlidir
     robots: noIndex || isStaging() ? { index: false, follow: false } : undefined,
     openGraph: {
@@ -44,16 +60,16 @@ export function buildMetadata({
       locale: "az_AZ",
       url,
       siteName: siteConfig.name,
-      title,
-      description,
+      title: resolvedOgTitle,
+      description: resolvedOgDescription,
       images,
       ...(publishedTime ? { publishedTime } : {}),
     },
     twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title,
-      description,
-      images: image ? [image] : undefined,
+      card: resolvedOgImage ? "summary_large_image" : "summary",
+      title: resolvedOgTitle,
+      description: resolvedOgDescription,
+      images: resolvedOgImage ? [resolvedOgImage] : undefined,
     },
   };
 }

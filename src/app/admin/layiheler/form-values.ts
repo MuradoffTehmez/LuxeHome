@@ -27,6 +27,11 @@ export type ProjectFormValues = {
   order: string;
   metaTitle: string;
   metaDescription: string;
+  noIndex: boolean;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
   images: DropzoneImage[];
 };
 
@@ -53,5 +58,10 @@ export const EMPTY_PROJECT: ProjectFormValues = {
   order: "0",
   metaTitle: "",
   metaDescription: "",
+  noIndex: false,
+  canonicalUrl: "",
+  ogTitle: "",
+  ogDescription: "",
+  ogImage: "",
   images: [],
 };

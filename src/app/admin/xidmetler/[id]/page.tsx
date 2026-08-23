@@ -34,6 +34,11 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
     isActive: service.isActive,
     metaTitle: service.metaTitle ?? "",
     metaDescription: service.metaDescription ?? "",
+    noIndex: service.noIndex,
+    canonicalUrl: service.canonicalUrl ?? "",
+    ogTitle: service.ogTitle ?? "",
+    ogDescription: service.ogDescription ?? "",
+    ogImage: service.ogImage ?? "",
     image: service.imageUrl ? [{ url: service.imageUrl, alt: "", isCover: true }] : [],
   };
 

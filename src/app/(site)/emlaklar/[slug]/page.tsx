@@ -59,12 +59,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .join(", ");
 
   return buildMetadata({
-    title: `${property.title} | ${location}`,
-    description: property.description.slice(0, 160),
+    title: property.metaTitle || `${property.title} | ${location}`,
+    description: property.metaDescription || property.description.slice(0, 160),
     path: `/emlaklar/${property.slug}`,
     image,
     type: "article",
     publishedTime: property.publishedAt?.toISOString(),
+    noIndex: property.noIndex,
+    canonicalPath: property.canonicalUrl,
+    ogTitle: property.ogTitle,
+    ogDescription: property.ogDescription,
+    ogImage: property.ogImage,
   });
 }
 

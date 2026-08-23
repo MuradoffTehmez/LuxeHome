@@ -50,6 +50,11 @@ export function readPropertyForm(formData: FormData): PropertyInput {
 
     metaTitle: form.optionalText(formData, "metaTitle"),
     metaDescription: form.optionalText(formData, "metaDescription"),
+    noIndex: form.boolean(formData, "noIndex"),
+    canonicalUrl: form.optionalText(formData, "canonicalUrl"),
+    ogTitle: form.optionalText(formData, "ogTitle"),
+    ogDescription: form.optionalText(formData, "ogDescription"),
+    ogImage: form.optionalText(formData, "ogImage"),
 
     featureIds: form.list(formData, "featureIds"),
   } as PropertyInput;
@@ -89,6 +94,11 @@ export function propertyData(input: PropertyInput) {
     isFeatured: input.isFeatured,
     metaTitle: input.metaTitle,
     metaDescription: input.metaDescription,
+    noIndex: input.noIndex,
+    canonicalUrl: input.canonicalUrl,
+    ogTitle: input.ogTitle,
+    ogDescription: input.ogDescription,
+    ogImage: input.ogImage,
   };
 }
 

@@ -15,6 +15,11 @@ export type ServiceFormValues = {
   isActive: boolean;
   metaTitle: string;
   metaDescription: string;
+  noIndex: boolean;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
   image: DropzoneImage[];
 };
 
@@ -29,5 +34,10 @@ export const EMPTY_SERVICE: ServiceFormValues = {
   isActive: true,
   metaTitle: "",
   metaDescription: "",
+  noIndex: false,
+  canonicalUrl: "",
+  ogTitle: "",
+  ogDescription: "",
+  ogImage: "",
   image: [],
 };

@@ -52,6 +52,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: project.metaDescription || project.summary || project.description,
     path: `/layiheler/${project.slug}`,
     image: project.images[0]?.url,
+    noIndex: project.noIndex,
+    canonicalPath: project.canonicalUrl,
+    ogTitle: project.ogTitle,
+    ogDescription: project.ogDescription,
+    ogImage: project.ogImage,
   });
 }
 

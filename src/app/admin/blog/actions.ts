@@ -43,6 +43,11 @@ export async function createPost(_prev: ActionState, formData: FormData): Promis
     status: form.text(formData, "status"),
     metaTitle: form.optionalText(formData, "metaTitle"),
     metaDescription: form.optionalText(formData, "metaDescription"),
+    noIndex: form.boolean(formData, "noIndex"),
+    canonicalUrl: form.optionalText(formData, "canonicalUrl"),
+    ogTitle: form.optionalText(formData, "ogTitle"),
+    ogDescription: form.optionalText(formData, "ogDescription"),
+    ogImage: form.optionalText(formData, "ogImage"),
   });
   if (!parsed.success) return invalid(parsed.error);
 
@@ -72,6 +77,11 @@ export async function createPost(_prev: ActionState, formData: FormData): Promis
         publishedAt: parsed.data.status === POST_STATUSES.PUBLISHED ? new Date() : null,
         metaTitle: parsed.data.metaTitle,
         metaDescription: parsed.data.metaDescription,
+        noIndex: parsed.data.noIndex,
+        canonicalUrl: parsed.data.canonicalUrl,
+        ogTitle: parsed.data.ogTitle,
+        ogDescription: parsed.data.ogDescription,
+        ogImage: parsed.data.ogImage,
       },
       select: { id: true },
     });
@@ -108,6 +118,11 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
     status: form.text(formData, "status"),
     metaTitle: form.optionalText(formData, "metaTitle"),
     metaDescription: form.optionalText(formData, "metaDescription"),
+    noIndex: form.boolean(formData, "noIndex"),
+    canonicalUrl: form.optionalText(formData, "canonicalUrl"),
+    ogTitle: form.optionalText(formData, "ogTitle"),
+    ogDescription: form.optionalText(formData, "ogDescription"),
+    ogImage: form.optionalText(formData, "ogImage"),
   });
   if (!parsed.success) return invalid(parsed.error);
 
@@ -146,6 +161,11 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
             : existing.publishedAt,
         metaTitle: parsed.data.metaTitle,
         metaDescription: parsed.data.metaDescription,
+        noIndex: parsed.data.noIndex,
+        canonicalUrl: parsed.data.canonicalUrl,
+        ogTitle: parsed.data.ogTitle,
+        ogDescription: parsed.data.ogDescription,
+        ogImage: parsed.data.ogImage,
       },
     });
 

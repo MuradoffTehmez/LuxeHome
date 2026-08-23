@@ -35,6 +35,11 @@ function readForm(formData: FormData) {
     isActive: form.boolean(formData, "isActive"),
     metaTitle: form.optionalText(formData, "metaTitle"),
     metaDescription: form.optionalText(formData, "metaDescription"),
+    noIndex: form.boolean(formData, "noIndex"),
+    canonicalUrl: form.optionalText(formData, "canonicalUrl"),
+    ogTitle: form.optionalText(formData, "ogTitle"),
+    ogDescription: form.optionalText(formData, "ogDescription"),
+    ogImage: form.optionalText(formData, "ogImage"),
   };
 }
 
@@ -78,6 +83,11 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
       isActive: parsed.data.isActive,
       metaTitle: parsed.data.metaTitle,
       metaDescription: parsed.data.metaDescription,
+      noIndex: parsed.data.noIndex,
+      canonicalUrl: parsed.data.canonicalUrl,
+      ogTitle: parsed.data.ogTitle,
+      ogDescription: parsed.data.ogDescription,
+      ogImage: parsed.data.ogImage,
     };
 
     if (id) {

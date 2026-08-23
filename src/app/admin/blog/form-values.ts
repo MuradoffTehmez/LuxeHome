@@ -18,6 +18,11 @@ export type PostFormValues = {
   status: string;
   metaTitle: string;
   metaDescription: string;
+  noIndex: boolean;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
   cover: DropzoneImage[];
 };
 
@@ -30,5 +35,10 @@ export const EMPTY_POST: PostFormValues = {
   status: POST_STATUSES.DRAFT,
   metaTitle: "",
   metaDescription: "",
+  noIndex: false,
+  canonicalUrl: "",
+  ogTitle: "",
+  ogDescription: "",
+  ogImage: "",
   cover: [],
 };

@@ -47,6 +47,11 @@ export type PropertyFormValues = {
   isFeatured: boolean;
   metaTitle: string;
   metaDescription: string;
+  noIndex: boolean;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
   featureIds: string[];
   images: DropzoneImage[];
 };
@@ -83,6 +88,11 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   isFeatured: false,
   metaTitle: "",
   metaDescription: "",
+  noIndex: false,
+  canonicalUrl: "",
+  ogTitle: "",
+  ogDescription: "",
+  ogImage: "",
   featureIds: [],
   images: [],
 };

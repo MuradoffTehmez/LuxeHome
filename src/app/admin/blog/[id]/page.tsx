@@ -33,6 +33,11 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     status: post.status,
     metaTitle: post.metaTitle ?? "",
     metaDescription: post.metaDescription ?? "",
+    noIndex: post.noIndex,
+    canonicalUrl: post.canonicalUrl ?? "",
+    ogTitle: post.ogTitle ?? "",
+    ogDescription: post.ogDescription ?? "",
+    ogImage: post.ogImage ?? "",
     cover: post.coverUrl ? [{ url: post.coverUrl, alt: post.coverAlt, isCover: true }] : [],
   };
 

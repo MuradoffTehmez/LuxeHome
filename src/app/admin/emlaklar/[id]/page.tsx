@@ -66,6 +66,11 @@ export default async function EditPropertyPage({
     isFeatured: property.isFeatured,
     metaTitle: property.metaTitle ?? "",
     metaDescription: property.metaDescription ?? "",
+    noIndex: property.noIndex,
+    canonicalUrl: property.canonicalUrl ?? "",
+    ogTitle: property.ogTitle ?? "",
+    ogDescription: property.ogDescription ?? "",
+    ogImage: property.ogImage ?? "",
     featureIds: property.features.map((feature) => feature.featureId),
     images: property.images.map((image) => ({
       url: image.url,

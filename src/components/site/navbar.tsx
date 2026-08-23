@@ -79,12 +79,12 @@ export function Navbar() {
         />
 
         <nav aria-label="Əsas naviqasiya" className="hidden min-w-0 flex-1 justify-center lg:flex">
-          <ul className="flex min-w-0 items-center">
+          <ul className="flex items-center gap-0.5 xl:gap-1">
             {navigation.map((item) => {
               const active = isNavigationItemActive(pathname, item.href);
 
               return (
-                <li key={item.href} className="min-w-0">
+                <li key={item.href} className="shrink-0">
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}

@@ -54,6 +54,11 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
     order: String(project.order),
     metaTitle: project.metaTitle ?? "",
     metaDescription: project.metaDescription ?? "",
+    noIndex: project.noIndex,
+    canonicalUrl: project.canonicalUrl ?? "",
+    ogTitle: project.ogTitle ?? "",
+    ogDescription: project.ogDescription ?? "",
+    ogImage: project.ogImage ?? "",
     images: project.images.map((image) => ({
       url: image.url,
       alt: image.alt,

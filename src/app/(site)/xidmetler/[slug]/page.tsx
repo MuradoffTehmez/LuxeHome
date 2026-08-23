@@ -32,6 +32,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: service.metaDescription || service.shortDescription,
     path: `/xidmetler/${service.slug}`,
     image: service.imageUrl || undefined,
+    noIndex: service.noIndex,
+    canonicalPath: service.canonicalUrl,
+    ogTitle: service.ogTitle,
+    ogDescription: service.ogDescription,
+    ogImage: service.ogImage,
   });
 }
 

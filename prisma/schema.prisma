@@ -259,6 +259,13 @@ model Property {
 
   metaTitle       String?
   metaDescription String?
+  /// Google-a "bu URL-i indeksləşdirmə" deyir — duplikat və ya keçici səhifələr üçün.
+  noIndex         Boolean @default(false)
+  /// Boş buraxılsa canonical öz URL-inə işarə edir; yalnız duplikat kontent halında doldurulur.
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
 
   type     PropertyType @relation(fields: [typeId], references: [id])
   city     Location     @relation("PropertyCity", fields: [cityId], references: [id])
@@ -341,6 +348,13 @@ model Project {
 
   metaTitle       String?
   metaDescription String?
+  /// Google-a "bu URL-i indeksləşdirmə" deyir — duplikat və ya keçici səhifələr üçün.
+  noIndex         Boolean @default(false)
+  /// Boş buraxılsa canonical öz URL-inə işarə edir; yalnız duplikat kontent halında doldurulur.
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -388,6 +402,13 @@ model Service {
 
   metaTitle       String?
   metaDescription String?
+  /// Google-a "bu URL-i indeksləşdirmə" deyir — duplikat və ya keçici səhifələr üçün.
+  noIndex         Boolean @default(false)
+  /// Boş buraxılsa canonical öz URL-inə işarə edir; yalnız duplikat kontent halında doldurulur.
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -426,6 +447,13 @@ model BlogPost {
 
   metaTitle       String?
   metaDescription String?
+  /// Google-a "bu URL-i indeksləşdirmə" deyir — duplikat və ya keçici səhifələr üçün.
+  noIndex         Boolean @default(false)
+  /// Boş buraxılsa canonical öz URL-inə işarə edir; yalnız duplikat kontent halında doldurulur.
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

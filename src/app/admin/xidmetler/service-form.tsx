@@ -127,6 +127,38 @@ export function ServiceForm({
           defaultValue={initial.metaDescription}
           maxLength={180}
         />
+        <AdminInput
+          name="canonicalUrl"
+          label="Canonical URL"
+          defaultValue={initial.canonicalUrl}
+          placeholder="Boş buraxılsa öz ünvanına işarə edir"
+        />
+        <FullWidth>
+          <AdminCheckbox
+            name="noIndex"
+            label="Axtarış motorlarında gizlət (noindex)"
+            defaultChecked={initial.noIndex}
+          />
+        </FullWidth>
+      </FormSection>
+
+      <FormSection
+        title="Open Graph"
+        description="Sosial şəbəkədə paylaşılanda görünən başlıq/təsvir/şəkil. Boş buraxılsa meta sahələr istifadə olunur."
+      >
+        <AdminInput name="ogTitle" label="OG başlıq" defaultValue={initial.ogTitle} maxLength={70} />
+        <AdminInput
+          name="ogDescription"
+          label="OG təsvir"
+          defaultValue={initial.ogDescription}
+          maxLength={200}
+        />
+        <AdminInput
+          name="ogImage"
+          label="OG şəkil URL"
+          defaultValue={initial.ogImage}
+          placeholder="Boş buraxılsa xidmət şəkli istifadə olunur"
+        />
       </FormSection>
     </AdminForm>
   );

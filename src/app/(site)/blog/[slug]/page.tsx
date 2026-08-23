@@ -30,6 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/blog/${post.slug}`,
     image: post.coverUrl || undefined,
     type: "article",
+    noIndex: post.noIndex,
+    canonicalPath: post.canonicalUrl,
+    ogTitle: post.ogTitle,
+    ogDescription: post.ogDescription,
+    ogImage: post.ogImage,
   });
 }
 
