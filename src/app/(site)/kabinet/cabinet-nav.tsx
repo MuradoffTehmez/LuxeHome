@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { LayoutGrid, ListChecks, LogOut, Plus, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
 import { signOutAccount } from "../hesab/actions";
 
 /**
@@ -18,17 +19,16 @@ type CabinetNavProps = {
   name: string;
   accountLabel: string;
   canList: boolean;
+  variant?: "desktop" | "mobile";
+  onNavigate?: () => void;
 };
 
-const BASE_ITEMS = [
-  { href: "/kabinet", label: "Ümumi baxış", icon: LayoutGrid },
-  { href: "/kabinet/profil", label: "Profil", icon: UserRound },
-];
-
-const LISTING_ITEMS = [
-  { href: "/kabinet/elanlar", label: "Elanlarım", icon: ListChecks },
-  { href: "/kabinet/elanlar/yeni", label: "Yeni elan", icon: Plus },
-];
+const ICONS = {
+  overview: LayoutGrid,
+  listings: ListChecks,
+  "new-listing": Plus,
+  profile: UserRound,
+} as const;
 
 function SignOutButton() {
   const { pending } = useFormStatus();
@@ -45,27 +45,32 @@ function SignOutButton() {
   );
 }
 
-export function CabinetNav({ name, accountLabel, canList }: CabinetNavProps) {
+export function CabinetNav({
+  name,
+  accountLabel,
+  canList,
+  variant = "desktop",
+  onNavigate,
+}: CabinetNavProps) {
   const pathname = usePathname();
-
-  // «Yeni elan» ünvanı «Elanlarım» ilə eyni prefiksi bölüşür, ona görə tam
-  // uyğunluq yoxlanılır — əks halda hər iki bənd eyni anda aktiv görünərdi
-  const items = canList ? [BASE_ITEMS[0], ...LISTING_ITEMS, BASE_ITEMS[1]] : BASE_ITEMS;
+  const items = getCabinetItems(canList);
 
   return (
     <nav aria-label="Kabinet menyusu" className="flex flex-col gap-4">
-      <div className="rounded-md border border-line bg-paper p-4">
+      <div className={cn("rounded-md border border-line bg-paper p-4", variant === "mobile" && "bg-beige/45")}>
         <p className="text-xs tracking-wide text-ink-muted uppercase">{accountLabel}</p>
         <p className="mt-1 truncate font-medium text-ink">{name}</p>
       </div>
 
       <ul className="flex flex-col gap-0.5">
         {items.map((item) => {
-          const active = pathname === item.href;
+          const active = isCabinetItemActive(pathname, item.href);
+          const Icon = ICONS[item.id];
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={onNavigate}
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "inline-flex min-h-11 w-full items-center gap-2 rounded-xs px-3 text-sm transition-colors",
@@ -74,7 +79,7 @@ export function CabinetNav({ name, accountLabel, canList }: CabinetNavProps) {
                     : "text-ink-soft hover:bg-beige/60 hover:text-ink",
                 )}
               >
-                <item.icon className="size-4 shrink-0" aria-hidden="true" />
+                <Icon className="size-4 shrink-0" aria-hidden="true" />
                 {item.label}
               </Link>
             </li>
