@@ -81,7 +81,7 @@ export function AccountMenu({
           href="/qeydiyyat"
           className={cn(
             "inline-flex min-h-11 shrink-0 items-center justify-center rounded-xs border px-3.5 text-sm font-medium whitespace-nowrap transition-colors duration-200",
-            variant === "mobile" ? "w-full" : "hidden 2xl:inline-flex",
+            variant === "mobile" ? "w-full" : "hidden",
             isOverlay
               ? "border-white/40 text-ink-invert hover:border-gold-soft hover:text-gold-soft"
               : "border-ink-soft/40 text-ink hover:border-gold hover:text-gold-deep hover:bg-gold/5",
