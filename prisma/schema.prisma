@@ -567,3 +567,38 @@ model AuditLog {
   @@index([createdAt])
   @@index([entity, entityId])
 }
+
+// ---------------------------------------------------------------------------
+// YÖNLƏNDİRMƏLƏR VƏ 404 İZLƏMƏSİ
+// ---------------------------------------------------------------------------
+
+/// Köhnə/dəyişmiş URL-ləri yeni ünvana yönləndirir. `/[...slug]` catch-all
+/// route-u hər 404-də bu cədvəli yoxlayır — uyğunluq tapılmasa əsl 404 göstərilir.
+model Redirect {
+  id         String   @id @default(cuid())
+  /// Aparıcı `/` ilə, sorğu sətri olmadan — məsələn `/emlaklar/kohne-slug`.
+  fromPath   String   @unique
+  toPath     String
+  /// 301 = daimi (SEO dəyərini ötürür), 302 = müvəqqəti.
+  statusCode Int      @default(301)
+  isActive   Boolean  @default(true)
+  hitCount   Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+/// Uyğun yönləndirməsi olmayan 404-lərin qeydi — admin bunlardan hansı
+/// yönləndirmələrin əlavə edilməli olduğunu görür.
+model NotFoundHit {
+  id          String   @id @default(cuid())
+  path        String   @unique
+  count       Int      @default(1)
+  referrer    String?
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  @@index([count])
+}

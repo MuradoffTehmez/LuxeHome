@@ -280,6 +280,26 @@ export const featureCreateSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// YÖNLƏNDİRMƏLƏR
+// ---------------------------------------------------------------------------
+
+export const redirectCreateSchema = z.object({
+  fromPath: z
+    .string()
+    .trim()
+    .min(1, "Köhnə ünvan tələb olunur")
+    .regex(/^\/\S*$/, "Aparıcı / ilə başlamalı və boşluq olmamalıdır")
+    .max(300),
+  toPath: z
+    .string()
+    .trim()
+    .min(1, "Yeni ünvan tələb olunur")
+    .regex(/^(\/\S*|https?:\/\/\S+)$/, "Ya / ilə başlayan yol, ya da tam URL olmalıdır")
+    .max(500),
+  statusCode: z.union([z.literal(301), z.literal(302)]),
+});
+
+// ---------------------------------------------------------------------------
 // PARAMETRLƏR
 // ---------------------------------------------------------------------------
 

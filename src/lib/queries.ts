@@ -1252,3 +1252,54 @@ export async function getAuditLog(take = 50) {
     take,
   });
 }
+
+// ---------------------------------------------------------------------------
+// YÖNLƏNDİRMƏLƏR VƏ 404 İZLƏMƏSİ
+// ---------------------------------------------------------------------------
+
+/**
+ * Aktiv yönləndirməni tapır və baxış sayğacını artırır.
+ *
+ * `[...slug]` catch-all route hər 404-ə düşəndə bunu çağırır — sayğac artırmaq
+ * ayrıca sorğu deyil, eyni update-də gedir ki, əlavə gecikmə yaranmasın.
+ */
+export async function findActiveRedirect(path: string) {
+  const redirect = await prisma.redirect.findFirst({
+    where: { fromPath: path, isActive: true },
+    select: { id: true, toPath: true, statusCode: true },
+  });
+  if (!redirect) return null;
+
+  await prisma.redirect
+    .update({ where: { id: redirect.id }, data: { hitCount: { increment: 1 } } })
+    .catch(() => undefined);
+
+  return redirect;
+}
+
+/**
+ * Uyğun yönləndirməsi olmayan 404-ü qeydə alır.
+ *
+ * `upsert` ilə: eyni yol təkrar 404 versə sətir təkrarlanmır, sayğac artır.
+ * Nadir hallarda (məs. bot skaneri) sətir sayı çox arta bilər, ona görə panel
+ * yalnız ən çox rast gəlinənləri göstərir.
+ */
+export async function recordNotFoundHit(path: string, referrer?: string | null) {
+  await prisma.notFoundHit
+    .upsert({
+      where: { path },
+      create: { path, referrer: referrer ?? null },
+      update: { count: { increment: 1 }, lastSeenAt: new Date(), referrer: referrer ?? undefined },
+    })
+    .catch(() => undefined);
+}
+
+/** Panel — bütün yönləndirmələr. */
+export async function getAdminRedirects() {
+  return prisma.redirect.findMany({ orderBy: { createdAt: "desc" } });
+}
+
+/** Panel — ən çox rast gəlinən 404-lər (yönləndirmə ehtiyacını göstərir). */
+export async function getTopNotFoundHits(take = 30) {
+  return prisma.notFoundHit.findMany({ orderBy: { count: "desc" }, take });
+}

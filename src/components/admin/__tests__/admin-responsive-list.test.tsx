@@ -25,6 +25,7 @@ describe("admin responsive list primitive-ləri", () => {
 
   it("əməl menyusu trigger-ini 44 px və menu ARIA müqaviləsi ilə yaradır", () => {
     const html = renderToStaticMarkup(
+      // eslint-disable-next-line @next/next/no-html-link-for-pages -- renderToStaticMarkup ilə saf test, Link router konteksti tələb edir
       <AdminActionMenu label="Əməliyyatlar"><a href="/redakte">Redaktə et</a></AdminActionMenu>,
     );
 
