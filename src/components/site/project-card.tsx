@@ -44,7 +44,7 @@ export function ProjectCard({
             fill
             priority={priority}
             loading={priority ? undefined : "lazy"}
-            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            sizes="(max-width: 640px) 92vw, (max-width: 1280px) 50vw, 33vw"
             className="image-lift object-cover"
           />
         ) : (

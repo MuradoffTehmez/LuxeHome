@@ -39,7 +39,7 @@ export function PostCard({
             sizes={
               variant === "featured"
                 ? "(max-width: 1024px) 100vw, 58vw"
-                : "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                : "(max-width: 640px) 92vw, (max-width: 1280px) 50vw, 33vw"
             }
             className="image-lift object-cover"
           />

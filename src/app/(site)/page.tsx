@@ -16,6 +16,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Hero } from "@/components/site/hero";
+import { MobileCategoryRail } from "@/components/site/mobile-category-rail";
 import { PropertyCard } from "@/components/site/property-card";
 import { ProjectCard } from "@/components/site/project-card";
 import { PostCard } from "@/components/site/post-card";
@@ -124,6 +125,12 @@ export default async function HomePage() {
       label: district.name,
     })),
   }));
+  const categoryItems = propertyTypes.map((type) => ({
+    href: `/emlaklar?tip=${type.slug}`,
+    label: type.name,
+    count: type._count.properties,
+    imageUrl: type.imageUrl,
+  }));
 
   return (
     <>
@@ -180,21 +187,23 @@ export default async function HomePage() {
             description="Axtardığınız əmlak növünü seçin və uyğun variantlara baxın."
           />
 
-          <div className="mt-10 grid auto-rows-[minmax(10rem,1fr)] grid-cols-2 gap-3 lg:auto-rows-[17rem] lg:grid-cols-12">
-            {propertyTypes.map((type, index) => (
+          <MobileCategoryRail items={categoryItems} />
+
+          <div className="mt-10 hidden auto-rows-[17rem] grid-cols-12 gap-3 lg:grid">
+            {categoryItems.map((item, index) => (
               <Reveal
-                key={type.id}
+                key={item.href}
                 delay={index * 50}
                 className={CATEGORY_LAYOUT[index] ?? "lg:col-span-4"}
               >
                 <Link
-                  href={`/emlaklar?tip=${type.slug}`}
+                  href={item.href}
                   className="group relative flex size-full min-h-40 overflow-hidden rounded-sm"
                 >
-                  {type.imageUrl ? (
+                  {item.imageUrl ? (
                     <Image
-                      src={type.imageUrl}
-                      alt={type.name}
+                      src={item.imageUrl}
+                      alt={item.label}
                       fill
                       loading="lazy"
                       sizes="(max-width: 1024px) 50vw, 25vw"
@@ -212,10 +221,10 @@ export default async function HomePage() {
                   <div className="relative mt-auto flex w-full items-end justify-between gap-3 p-5">
                     <div>
                       <h3 className="font-display text-lg text-white sm:text-xl">
-                        {type.name}
+                        {item.label}
                       </h3>
                       <p className="tabular mt-1 text-sm text-white/75">
-                        {type._count.properties} elan
+                        {item.count} elan
                       </p>
                     </div>
                     <ArrowUpRight

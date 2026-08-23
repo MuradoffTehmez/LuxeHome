@@ -34,7 +34,7 @@ export function Hero({ types, cities }: HeroProps) {
 
       <Container
         size="wide"
-        className="grid min-h-[min(54rem,100dvh)] items-end gap-10 pt-[calc(var(--header-h)+5rem)] pb-8 lg:grid-cols-12 lg:pb-10"
+        className="grid min-h-[34rem] items-end gap-8 pt-[calc(var(--header-h)+4rem)] pb-6 sm:min-h-[40rem] lg:min-h-[min(54rem,100dvh)] lg:grid-cols-12 lg:gap-10 lg:pt-[calc(var(--header-h)+5rem)] lg:pb-10"
       >
         <div className="lg:col-span-7 lg:pb-10">
           <p className="editorial-kicker animate-fade-in flex items-center gap-3 text-gold-soft">
