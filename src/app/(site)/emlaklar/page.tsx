@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { X } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
+import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
+import { ResponsiveToolbar } from "@/components/ui/responsive-toolbar";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
@@ -192,50 +192,50 @@ export default async function PropertiesPage({ searchParams }: Props) {
         className="pt-8 pb-16 sm:pt-10 sm:pb-20 lg:pt-12 lg:pb-24"
       >
         <Container>
-          <div className="mb-5 flex min-h-14 items-center border-b border-line bg-paper px-2 lg:hidden">
-            <PropertyFilterSheet
-              types={typeOptions}
-              cities={cityOptions}
-              features={featureOptions}
-              initial={initialSearch}
-              resultCount={total}
-              activeCount={activeFilters.length}
+          <ResponsiveToolbar
+            mobile={
+              <div className="-mx-4 flex min-h-14 items-center justify-between gap-2 px-2 sm:-mx-6 sm:px-4">
+                <PropertyFilterSheet
+                  types={typeOptions}
+                  cities={cityOptions}
+                  features={featureOptions}
+                  initial={initialSearch}
+                  resultCount={total}
+                  activeCount={activeFilters.length}
+                />
+                <SortSelect
+                  value={sort}
+                  hrefs={sortHrefs}
+                  compact
+                  className="shrink-0"
+                />
+              </div>
+            }
+            desktop={
+              <div className="mb-8 flex items-start justify-between gap-6 border-b border-line pb-6">
+                {activeFilters.length > 0 ? (
+                  <ActiveFilterChips items={activeFilters} resetHref="/emlaklar" />
+                ) : (
+                  <p className="text-sm text-ink-muted">
+                    Filtr seçilməyib — bütün elanlar göstərilir.
+                  </p>
+                )}
+                <SortSelect value={sort} hrefs={sortHrefs} className="shrink-0" />
+              </div>
+            }
+          />
+
+          {activeFilters.length > 0 ? (
+            <ActiveFilterChips
+              items={activeFilters}
+              resetHref="/emlaklar"
+              className="mt-4 mb-6 lg:hidden"
             />
-          </div>
-
-          {/* Aktiv filtrlər + sıralama */}
-          <div className="mb-8 flex flex-col gap-4 border-b border-line pb-6 lg:flex-row lg:items-center lg:justify-between">
-            {activeFilters.length > 0 ? (
-              <ul className="flex flex-wrap items-center gap-2">
-                {activeFilters.map((filter) => (
-                  <li key={`${filter.key}-${filter.label}`}>
-                    <Link
-                      href={filter.href}
-                      className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line-strong bg-paper py-1 pr-2 pl-3 text-sm text-ink transition-colors duration-200 hover:border-gold hover:text-gold-deep"
-                    >
-                      {filter.label}
-                      <X className="size-3.5 shrink-0" aria-hidden="true" />
-                      <span className="sr-only">filtrini götür</span>
-                    </Link>
-                  </li>
-                ))}
-                <li>
-                  <Link
-                    href="/emlaklar"
-                    className="inline-flex min-h-9 items-center px-2 text-sm text-ink-muted underline-offset-4 transition-colors duration-200 hover:text-ink hover:underline"
-                  >
-                    Hamısını sıfırla
-                  </Link>
-                </li>
-              </ul>
-            ) : (
-              <p className="text-sm text-ink-muted">
-                Filtr seçilməyib — bütün elanlar göstərilir.
-              </p>
-            )}
-
-            <SortSelect value={sort} hrefs={sortHrefs} className="shrink-0" />
-          </div>
+          ) : (
+            <p className="mt-4 mb-6 text-sm text-ink-muted lg:hidden">
+              Filtr seçilməyib — bütün elanlar göstərilir.
+            </p>
+          )}
 
           {items.length > 0 ? (
             <>

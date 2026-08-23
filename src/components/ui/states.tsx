@@ -23,7 +23,7 @@ export function Skeleton({
 export function PropertyCardSkeleton() {
   return (
     <div className="overflow-hidden rounded-md border border-line bg-paper">
-      <Skeleton className="aspect-4/3 w-full rounded-none" />
+      <Skeleton className="aspect-4/3 w-full rounded-none sm:aspect-[16/11]" />
       <div className="flex flex-col gap-3 p-5">
         <Skeleton className="h-6 w-2/5" />
         <Skeleton className="h-5 w-4/5" />

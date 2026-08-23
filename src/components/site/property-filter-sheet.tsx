@@ -46,7 +46,7 @@ export function PropertyFilterSheet({
       >
         <SlidersHorizontal className="size-4" aria-hidden="true" />
         Filtrlər{activeCount > 0 ? ` (${activeCount})` : ""}
-        <span className="text-xs font-normal text-ink-muted">
+        <span className="hidden text-xs font-normal text-ink-muted min-[390px]:inline">
           {formatNumber(resultCount)} nəticə
         </span>
       </button>

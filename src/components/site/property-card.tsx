@@ -58,7 +58,9 @@ export function PropertyCard({
       <div
         className={cn(
           "relative overflow-hidden bg-beige",
-          variant === "featured" ? "aspect-16/10 lg:min-h-[34rem]" : "aspect-4/3",
+          variant === "featured"
+            ? "aspect-16/10 lg:min-h-[34rem]"
+            : "aspect-4/3 sm:aspect-[16/11]",
         )}
       >
         {image ? (
@@ -71,7 +73,7 @@ export function PropertyCard({
             sizes={
               variant === "featured"
                 ? "(max-width: 1024px) 100vw, 58vw"
-                : "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                : "(max-width: 639px) calc(100vw - 2rem), (max-width: 1279px) calc(50vw - 2rem), 33vw"
             }
             className={cn(
               "image-lift object-cover",
@@ -85,8 +87,11 @@ export function PropertyCard({
           </div>
         )}
 
-        {/* Sol üst nişanlar */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+      </div>
+
+      {/* --- Məzmun --- */}
+      <div className={cn("flex flex-1 flex-col gap-4 p-5", variant === "featured" && "sm:p-7")}>
+        <div className="flex flex-wrap gap-2">
           <Badge tone={isSale ? "dark" : "gold"}>
             {isSale ? "Satılır" : "Kirayə"}
           </Badge>
@@ -100,17 +105,6 @@ export function PropertyCard({
           )}
         </div>
 
-        {/* Sağ üst — favorit və müqayisə.
-            z-10 vacibdir: başlıqdakı linkin `after:inset-0` örtüyü DOM-da sonra gəldiyi üçün
-            onsuz bu düymələrin üstünə düşür və klik işləmir. */}
-        <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
-          <FavoriteButton propertyId={property.id} />
-          <CompareButton propertyId={property.id} />
-        </div>
-      </div>
-
-      {/* --- Məzmun --- */}
-      <div className={cn("flex flex-1 flex-col gap-4 p-5", variant === "featured" && "sm:p-7")}>
         <p className="tabular font-display text-2xl leading-none tracking-[-0.02em] text-ink">
           {formatPrice(property.price, property.currency)}
           {period && (
@@ -184,6 +178,13 @@ export function PropertyCard({
             </div>
           )}
         </dl>
+
+        {/* Mobil məlumat axınında əməl düymələri xüsusiyyətlərdən sonra gəlir.
+            z-10 onları kartın tam-səth linkindən yuxarı saxlayır. */}
+        <div className="relative z-10 flex items-center justify-end gap-2 border-t border-line pt-3">
+          <FavoriteButton propertyId={property.id} />
+          <CompareButton propertyId={property.id} />
+        </div>
       </div>
     </article>
   );

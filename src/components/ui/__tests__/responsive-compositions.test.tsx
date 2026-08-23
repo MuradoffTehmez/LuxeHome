@@ -60,6 +60,8 @@ describe("responsive composition komponentləri", () => {
     expect(html).toContain('aria-label="Villa filtrini sil"');
     expect(html).toContain('href="/emlaklar?seher=baki"');
     expect(html).toContain("Bütün filtrləri sıfırla");
+    expect(html).toContain("-mx-4");
+    expect(html).toContain("px-4");
   });
 
   it("mobil əməl zolağını safe-area ilə sabit saxlayıb desktopda gizlədir", () => {

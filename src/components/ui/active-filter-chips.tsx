@@ -24,9 +24,9 @@ export function ActiveFilterChips({
 
   return (
     <nav aria-label="Aktiv filtrlər" className={cn("min-w-0", className)}>
-      <ul className="flex snap-x items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <ul className="-mx-4 flex snap-x items-center gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden">
         {items.map((item) => (
-          <li key={item.key} className="shrink-0 snap-start">
+          <li key={`${item.key}-${item.label}`} className="shrink-0 snap-start">
             <Link
               href={item.href}
               aria-label={`${item.label} filtrini sil`}

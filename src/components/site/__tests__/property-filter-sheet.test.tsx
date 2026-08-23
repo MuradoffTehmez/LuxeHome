@@ -18,6 +18,7 @@ describe("PropertyFilterSheet", () => {
     expect(html).toContain('aria-haspopup="dialog"');
     expect(html).toContain("Filtrlər (3)");
     expect(html).toContain("124 nəticə");
+    expect(html).toMatch(/<span class="[^"]*hidden[^"]*min-\[390px\]:inline[^"]*">124 nəticə/);
     expect(html).toContain("lg:hidden");
   });
 });
