@@ -20,6 +20,10 @@ import {
   StatCard,
   StatusBadge,
 } from "@/components/admin/admin-ui";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 import { formatPrice, formatRelative } from "@/lib/utils";
 import {
   LEAD_SOURCE_LABELS,
@@ -94,7 +98,7 @@ export default async function AdminDashboardPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="inline-flex min-h-9 items-center gap-2 rounded-full border border-warning/40 bg-warning-bg px-3.5 text-sm font-medium text-warning transition-colors hover:border-warning"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-warning/40 bg-warning-bg px-3.5 text-sm font-medium text-warning transition-colors hover:border-warning"
             >
               <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
               {item.label}
@@ -151,58 +155,81 @@ export default async function AdminDashboardPage() {
         <AdminCard
           title="Son müraciətlər"
           description="Ən son gələn beş müraciət"
-          bodyClassName="p-0"
+          bodyClassName="p-4 lg:p-0"
           actions={
             <Link
               href="/admin/muracietler"
-              className="inline-flex min-h-9 items-center text-sm text-gold-deep underline-offset-4 transition-colors hover:underline"
+              className="inline-flex min-h-11 items-center text-sm text-gold-deep underline-offset-4 transition-colors hover:underline"
             >
               Hamısı
             </Link>
           }
         >
-          <AdminTable
-            caption="Son müraciətlər"
-            headers={[
-              { label: "Müştəri" },
-              { label: "Mənbə" },
-              { label: "Status" },
-              { label: "Vaxt", className: "text-right" },
-            ]}
-          >
-            {recentLeads.length === 0 && (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-sm text-ink-muted">
-                  Hələ müraciət yoxdur.
-                </td>
-              </tr>
-            )}
-            {recentLeads.map((lead) => (
-              <AdminTableRow key={lead.id}>
-                <AdminTableCell>
-                  <Link
-                    href="/admin/muracietler"
-                    className="font-medium text-ink transition-colors hover:text-gold-deep"
-                  >
+          <AdminResponsiveList
+            ariaLabel="Son müraciətlər"
+            items={recentLeads}
+            getKey={(lead) => lead.id}
+            empty={<p className="py-8 text-center text-sm text-ink-muted">Hələ müraciət yoxdur.</p>}
+            renderCard={(lead) => (
+              <AdminListCard
+                title={
+                  <Link href="/admin/muracietler" className="transition-colors hover:text-gold-deep">
                     {lead.name}
                   </Link>
-                  <p className="tabular mt-0.5 text-xs text-ink-muted">{lead.phone}</p>
-                </AdminTableCell>
-                <AdminTableCell className="text-sm text-ink-soft">
-                  {LEAD_SOURCE_LABELS[lead.source as LeadSource]}
-                </AdminTableCell>
-                <AdminTableCell>
+                }
+                meta={
+                  <span className="tabular">
+                    {lead.phone} · {formatRelative(lead.createdAt)}
+                  </span>
+                }
+                status={
                   <StatusBadge
                     status={lead.status as LeadStatus}
                     label={LEAD_STATUS_LABELS[lead.status as LeadStatus]}
                   />
-                </AdminTableCell>
-                <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
-                  {formatRelative(lead.createdAt)}
-                </AdminTableCell>
-              </AdminTableRow>
-            ))}
-          </AdminTable>
+                }
+              >
+                {LEAD_SOURCE_LABELS[lead.source as LeadSource]}
+              </AdminListCard>
+            )}
+            renderTable={(items) => (
+              <AdminTable
+                caption="Son müraciətlər"
+                headers={[
+                  { label: "Müştəri" },
+                  { label: "Mənbə" },
+                  { label: "Status" },
+                  { label: "Vaxt", className: "text-right" },
+                ]}
+              >
+                {items.map((lead) => (
+                  <AdminTableRow key={lead.id}>
+                    <AdminTableCell>
+                      <Link
+                        href="/admin/muracietler"
+                        className="font-medium text-ink transition-colors hover:text-gold-deep"
+                      >
+                        {lead.name}
+                      </Link>
+                      <p className="tabular mt-0.5 text-xs text-ink-muted">{lead.phone}</p>
+                    </AdminTableCell>
+                    <AdminTableCell className="text-sm text-ink-soft">
+                      {LEAD_SOURCE_LABELS[lead.source as LeadSource]}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <StatusBadge
+                        status={lead.status as LeadStatus}
+                        label={LEAD_STATUS_LABELS[lead.status as LeadStatus]}
+                      />
+                    </AdminTableCell>
+                    <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
+                      {formatRelative(lead.createdAt)}
+                    </AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTable>
+            )}
+          />
         </AdminCard>
 
         {/* --- Son əmlaklar --- */}
@@ -212,7 +239,7 @@ export default async function AdminDashboardPage() {
           actions={
             <Link
               href="/admin/emlaklar"
-              className="inline-flex min-h-9 items-center text-sm text-gold-deep underline-offset-4 transition-colors hover:underline"
+              className="inline-flex min-h-11 items-center text-sm text-gold-deep underline-offset-4 transition-colors hover:underline"
             >
               Hamısı
             </Link>
@@ -317,7 +344,7 @@ export default async function AdminDashboardPage() {
           <Link
             key={action.href}
             href={action.href}
-            className="flex items-center gap-3 rounded-md border border-line bg-paper p-4 transition-all duration-300 ease-out-soft hover:-translate-y-1 hover:border-gold hover:shadow-md"
+            className="flex min-h-11 items-center gap-3 rounded-md border border-line bg-paper p-4 transition-all duration-300 ease-out-soft hover:-translate-y-1 hover:border-gold hover:shadow-md"
           >
             <span className="grid size-10 shrink-0 place-items-center rounded-xs bg-beige text-ink-soft">
               <action.icon className="size-5" aria-hidden="true" />

@@ -22,7 +22,7 @@ export default async function AdminSettingsPage() {
         breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Parametrlər" }]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_1fr]">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[1.1fr_1fr]">
         <SettingsForm
           notificationEmail={settings[SETTING_KEYS.LEAD_NOTIFICATION_EMAIL] ?? ""}
           // Açar heç yazılmayıbsa, bildiriş aktiv sayılır
@@ -31,13 +31,13 @@ export default async function AdminSettingsPage() {
           fallbackEmail={siteConfig.email}
         />
 
-        <AdminCard title="Kodda saxlanılan məlumatlar">
-          <div className="flex flex-col gap-4 text-sm text-ink-soft">
+        <AdminCard title="Kodda saxlanılan məlumatlar" className="min-w-0">
+          <div className="flex min-w-0 flex-col gap-4 text-sm text-ink-soft">
             <p className="flex items-start gap-2.5">
               <Info className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />
               <span>
                 Şirkət adı, hüquqi ad, telefon, ünvan, iş qrafiki, sosial şəbəkə hesabları və
-                naviqasiya menyusu <code className="text-xs">src/config/site.ts</code> faylındadır.
+                naviqasiya menyusu <code className="break-all text-xs">src/config/site.ts</code> faylındadır.
                 Bu dəyərlər nadir hallarda dəyişir, ictimai səhifələrin statik render olunmasını
                 pozmamalıdır və dəyişikliyi kod nəzərdən keçirilməsindən keçməlidir.
               </span>
@@ -52,9 +52,9 @@ export default async function AdminSettingsPage() {
                 ["İş qrafiki", siteConfig.workingHours.weekdays],
                 ["Instagram", `@${siteConfig.instagram}`],
               ].map(([label, value]) => (
-                <div key={label} className="flex flex-wrap justify-between gap-2 border-b border-line pb-2">
+                <div key={label} className="flex min-w-0 flex-wrap justify-between gap-2 border-b border-line pb-2">
                   <dt className="text-xs tracking-wide text-ink-muted uppercase">{label}</dt>
-                  <dd className="text-right text-sm text-ink">{value}</dd>
+                  <dd className="min-w-0 text-right text-sm text-ink [overflow-wrap:anywhere]">{value}</dd>
                 </div>
               ))}
             </dl>
