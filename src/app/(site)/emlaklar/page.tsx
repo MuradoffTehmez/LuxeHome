@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { PropertyCard } from "@/components/site/property-card";
+import { PropertyFilterSheet } from "@/components/site/property-filter-sheet";
 import { SearchPanel } from "@/components/site/search-panel";
 import { SortSelect } from "@/components/site/sort-select";
 import { Pagination } from "@/components/ui/pagination";
@@ -137,6 +138,16 @@ export default async function PropertiesPage({ searchParams }: Props) {
   const listingLabel = raw.elan
     ? LISTING_TYPE_LABELS[raw.elan as ListingType]
     : null;
+  const initialSearch = {
+    ...raw,
+    mertebe_min: raw.mertebe_min,
+    mertebe_max: raw.mertebe_max,
+    ilk_mertebe_yox: filters.excludeFirstFloor ? "1" : undefined,
+    son_mertebe_yox: filters.excludeLastFloor ? "1" : undefined,
+    sekilli: filters.withImagesOnly ? "1" : undefined,
+    xususiyyet: filters.featureSlugs,
+    siralama: sort,
+  };
 
   return (
     <>
@@ -165,18 +176,9 @@ export default async function PropertiesPage({ searchParams }: Props) {
             <SearchPanel
               types={typeOptions}
               cities={cityOptions}
-            features={featureOptions}
+              features={featureOptions}
               variant="page"
-              initial={{
-              ...raw,
-              mertebe_min: raw.mertebe_min,
-              mertebe_max: raw.mertebe_max,
-              ilk_mertebe_yox: filters.excludeFirstFloor ? "1" : undefined,
-              son_mertebe_yox: filters.excludeLastFloor ? "1" : undefined,
-              sekilli: filters.withImagesOnly ? "1" : undefined,
-              xususiyyet: filters.featureSlugs,
-              siralama: sort,
-            }}
+              initial={initialSearch}
             />
           </div>
         </Container>
@@ -190,6 +192,17 @@ export default async function PropertiesPage({ searchParams }: Props) {
         className="pt-8 pb-16 sm:pt-10 sm:pb-20 lg:pt-12 lg:pb-24"
       >
         <Container>
+          <div className="mb-5 flex min-h-14 items-center border-b border-line bg-paper px-2 lg:hidden">
+            <PropertyFilterSheet
+              types={typeOptions}
+              cities={cityOptions}
+              features={featureOptions}
+              initial={initialSearch}
+              resultCount={total}
+              activeCount={activeFilters.length}
+            />
+          </div>
+
           {/* Aktiv filtrlər + sıralama */}
           <div className="mb-8 flex flex-col gap-4 border-b border-line pb-6 lg:flex-row lg:items-center lg:justify-between">
             {activeFilters.length > 0 ? (
