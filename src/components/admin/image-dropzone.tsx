@@ -256,7 +256,7 @@ export function ImageDropzone({
       )}
 
       {items.length > 0 && (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <ul className="grid gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item, index) => (
             <li
               key={item.id}
@@ -270,7 +270,7 @@ export function ImageDropzone({
                   src={item.url}
                   alt=""
                   fill
-                  sizes="(max-width: 639px) calc(50vw - 2rem), (max-width: 1023px) 33vw, 25vw"
+                  sizes="(max-width: 479px) 100vw, (max-width: 639px) 50vw, (max-width: 1023px) 33vw, 25vw"
                   // Blob URL-lər Next optimizasiyasından keçmir
                   unoptimized={item.url.startsWith("blob:")}
                   className={cn("object-cover", item.status !== "ready" && "opacity-50")}

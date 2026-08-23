@@ -47,17 +47,26 @@ export function AdminForm({
 }: AdminFormProps) {
   const [state, formAction] = useActionState(action, IDLE_STATE);
   const { toast } = useToast();
+  const formRef = useRef<HTMLFormElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (state.status === "idle" || !state.message) return;
     toast(state.message, state.status === "success" ? "success" : "error");
-    if (state.status === "error") errorRef.current?.scrollIntoView({ block: "center" });
+    if (state.status === "error") {
+      const firstInvalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+      if (firstInvalid) {
+        firstInvalid.focus({ preventScroll: true });
+        firstInvalid.scrollIntoView({ block: "center", behavior: "smooth" });
+      } else {
+        errorRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }
   }, [state, toast]);
 
   return (
     <FormStateContext.Provider value={state}>
-      <form action={formAction} className={cn("flex flex-col gap-6", className)} noValidate>
+      <form ref={formRef} action={formAction} className={cn("flex min-w-0 flex-col gap-6", className)} noValidate>
         {state.status === "error" && state.message && (
           <div
             ref={errorRef}
@@ -159,7 +168,7 @@ export function FormSection({
   return (
     <Tag className={cn("min-w-0 rounded-md border border-line bg-paper", className)}>
       {asFieldset ? <legend className="sr-only">{title}</legend> : null}
-      <header className="border-b border-line px-5 py-4">
+      <header className="border-b border-line px-4 py-4 sm:px-5">
         <h2 className="font-display text-lg text-ink">{title}</h2>
         {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
       </header>

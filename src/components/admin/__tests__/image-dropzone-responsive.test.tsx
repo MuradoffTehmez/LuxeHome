@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ImageDropzone } from "../image-dropzone";
 
 describe("ImageDropzone responsive idarələri", () => {
-  it("mobil preview-ləri iki sütunda və 44 px əməl hədəfləri ilə göstərir", () => {
+  it("preview-ləri 480 px-dən iki sütunda və 44 px əməl hədəfləri ilə göstərir", () => {
     const html = renderToStaticMarkup(
       <ImageDropzone
         name="images"
@@ -16,7 +16,8 @@ describe("ImageDropzone responsive idarələri", () => {
       />,
     );
 
-    expect(html).toContain("grid-cols-2");
+    expect(html).toContain("min-[480px]:grid-cols-2");
+    expect(html).toContain("(max-width: 479px) 100vw");
     expect(html).toContain("sm:grid-cols-3");
     expect(html).toContain("lg:grid-cols-4");
     expect(html.match(/size-11/g)?.length).toBeGreaterThanOrEqual(4);

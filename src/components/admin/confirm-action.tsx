@@ -85,7 +85,7 @@ export function ConfirmAction({
         aria-label={label}
         title={label}
         className={cn(
-          "grid size-9 cursor-pointer place-items-center rounded-xs transition-colors",
+          "grid size-11 cursor-pointer place-items-center rounded-xs transition-colors",
           tone === "danger"
             ? "text-ink-muted hover:bg-danger-bg hover:text-danger"
             : "text-ink-muted hover:bg-beige hover:text-ink",

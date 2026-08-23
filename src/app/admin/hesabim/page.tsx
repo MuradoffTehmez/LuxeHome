@@ -46,22 +46,22 @@ export default async function AccountPage({
   const otherSessions = sessions.filter((session) => session.id !== activeSid);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <header>
+    <div className="mx-auto flex min-w-0 w-full max-w-3xl flex-col gap-6 sm:gap-8">
+      <header className="min-w-0">
         <h1 className="font-display text-2xl text-ink">Hesabım</h1>
-        <p className="mt-1 text-sm text-ink-soft">
+        <p className="mt-1 text-sm text-ink-soft [overflow-wrap:anywhere]">
           {user.email} · {ROLE_LABELS[user.role]}
         </p>
       </header>
 
-      <section className="rounded-xs border border-line bg-paper p-6">
+      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
         <h2 className="font-display text-lg text-ink">Parolu dəyiş</h2>
         <div className="mt-4 max-w-md">
           <PasswordForm mustChange={parol === "deyis" || user.mustChangePassword} />
         </div>
       </section>
 
-      <section className="rounded-xs border border-line bg-paper p-6">
+      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
         <h2 className="font-display text-lg text-ink">İki mərhələli doğrulama</h2>
         <p className="mt-2 text-sm text-ink-soft">
           Aktivdir. İşlənməmiş ehtiyat kod sayı: <strong className="text-ink">{remainingCodes}</strong>
@@ -73,7 +73,7 @@ export default async function AccountPage({
         )}
       </section>
 
-      <section className="rounded-xs border border-line bg-paper p-6">
+      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-lg text-ink">Aktiv sessiyalar</h2>
           {otherSessions.length > 0 && (
@@ -94,7 +94,7 @@ export default async function AccountPage({
             return (
               <li
                 key={session.id}
-                className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3 last:border-0 last:pb-0"
+                className="flex min-w-0 flex-col items-start gap-2 border-b border-line pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm text-ink">
@@ -105,7 +105,7 @@ export default async function AccountPage({
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-ink-muted [overflow-wrap:anywhere]">
                     {session.ip ?? "IP yoxdur"} · son aktivlik{" "}
                     {session.lastSeenAt.toLocaleString("az-AZ")}
                   </p>
