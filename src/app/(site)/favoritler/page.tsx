@@ -14,6 +14,8 @@ export default function FavoritesPage() {
     <Section tone="ivory">
       <Container>
         <SectionHeader
+          as="h1"
+          overline="Şəxsi seçim"
           title="Favoritlər"
           description="Bəyəndiyiniz elanlar bu cihazda saxlanılır."
         />
