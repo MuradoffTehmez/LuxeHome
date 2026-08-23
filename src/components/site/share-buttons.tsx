@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Link2 } from "lucide-react";
+import { Check, Link2, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteUrl } from "@/config/site";
 import { FacebookIcon, TelegramIcon, WhatsAppIcon } from "./brand-icons";
 
-type ShareButtonsProps = {
+export type ShareButtonsProps = {
   /** Sayt kökünə nisbi yol, məsələn `/emlaklar/villa-slug`. */
   path: string;
   title: string;
+  /** Detal toolbar-ı üçün vahid native-share/copy düyməsi. */
+  compact?: boolean;
   className?: string;
 };
 
@@ -18,7 +20,7 @@ const ITEM =
   "text-sm text-ink-soft transition-colors duration-200 " +
   "hover:border-gold hover:text-gold-deep cursor-pointer";
 
-export function ShareButtons({ path, title, className }: ShareButtonsProps) {
+export function ShareButtons({ path, title, compact = false, className }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const url = siteUrl(path);
 
@@ -50,6 +52,40 @@ export function ShareButtons({ path, title, className }: ShareButtonsProps) {
     }
   }
 
+  async function shareLink() {
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title, text: title, url });
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+
+    await copyLink();
+  }
+
+  if (compact) {
+    return (
+      <div className={cn("flex items-center justify-center", className)}>
+        <button
+          type="button"
+          onClick={shareLink}
+          aria-label="Elanı paylaş"
+          aria-live="polite"
+          className={cn(ITEM, "w-full justify-center border-0")}
+        >
+          {copied ? (
+            <Check className="size-4 text-success" aria-hidden="true" />
+          ) : (
+            <Share2 className="size-4" aria-hidden="true" />
+          )}
+          <span className="hidden sm:inline">{copied ? "Kopyalandı" : "Paylaş"}</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       <span className="mr-1 text-sm font-medium text-ink">Paylaş:</span>
@@ -60,6 +96,7 @@ export function ShareButtons({ path, title, className }: ShareButtonsProps) {
           href={target.href}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label={`${target.label} ilə paylaş`}
           className={ITEM}
         >
           {target.icon}

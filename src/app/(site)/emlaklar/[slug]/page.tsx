@@ -25,17 +25,15 @@ import {
 } from "@/lib/constants";
 import { getPropertyBySlug, getSimilarProperties } from "@/lib/queries";
 import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema } from "@/lib/seo";
-import { siteConfig } from "@/config/site";
+import { siteConfig, whatsappLink } from "@/config/site";
 
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink, ButtonAnchor } from "@/components/ui/button";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
-import { FavoriteButton } from "@/components/site/favorite-button";
-import { CompareButton } from "@/components/site/compare-button";
+import { PropertyActionToolbar } from "@/components/site/property-action-toolbar";
 import { PropertyMap } from "@/components/site/property-map";
-import { ShareButtons } from "@/components/site/share-buttons";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/(site)/elaqe/contact-form";
 
@@ -88,6 +86,10 @@ export default async function PropertyDetailPage({ params }: Props) {
     .join(", ");
 
   const similarProperties = await getSimilarProperties(property, 4);
+  const propertyPath = `/emlaklar/${property.slug}`;
+  const whatsappHref = whatsappLink(
+    `Salam, "${property.title}" elanı ilə bağlı məlumat almaq istəyirəm.`,
+  );
 
   return (
     <>
@@ -124,7 +126,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         )}
       />
 
-      <div className="bg-ivory pt-6 pb-12 sm:pt-8 sm:pb-16">
+      <div className="bg-ivory pt-6 pb-[calc(7rem+var(--safe-bottom))] sm:pt-8 sm:pb-20 lg:pb-12">
         <Container>
           {/* Üst başlıq hissəsi */}
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -162,17 +164,16 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </span>
                 {period && <span className="text-sm text-ink-soft">/ {period}</span>}
               </p>
-              <div className="flex items-center gap-3">
-                <ShareButtons
-                  title={property.title}
-                  path={`/emlaklar/${property.slug}`}
-                />
-                <div className="h-6 w-px bg-line" aria-hidden="true" />
-                <FavoriteButton propertyId={property.id} />
-                <CompareButton propertyId={property.id} />
-              </div>
             </div>
           </div>
+
+          <PropertyActionToolbar
+            propertyId={property.id}
+            path={propertyPath}
+            title={property.title}
+            phone={siteConfig.phoneHref}
+            whatsappHref={whatsappHref}
+          />
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-14">
             {/* Sol tərəf: Qalereya və Əsas məlumatlar */}
@@ -315,14 +316,14 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </ButtonAnchor>
 
                   <ButtonAnchor
-                    href={`https://wa.me/994519228585?text=${encodeURIComponent(`Salam, "${property.title}" elanı ilə bağlı məlumat almaq istəyirəm.`)}`}
+                    href={whatsappHref}
                     variant="ghost"
                     target="_blank"
                     rel="noopener noreferrer"
                     fullWidth
-                    className="border border-emerald-600/30 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 hover:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700/50"
+                    className="border border-success/30 bg-success-bg text-success hover:border-success hover:bg-success-bg/70"
                   >
-                    <WhatsAppIcon className="size-4 text-emerald-600 dark:text-emerald-400" />
+                    <WhatsAppIcon className="size-4 text-success" />
                     WhatsApp ilə yaz
                   </ButtonAnchor>
                 </div>

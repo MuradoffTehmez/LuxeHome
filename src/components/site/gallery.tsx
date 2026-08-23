@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
+import { Overlay } from "@/components/ui/overlay";
 import { cn } from "@/lib/utils";
 
 export type GalleryImage = {
@@ -18,74 +19,45 @@ type GalleryProps = {
   className?: string;
 };
 
-/**
- * Əmlak/layihə qalereyası.
- *
- * - Böyük əsas şəkil + thumbnail sırası
- * - Klaviatura ilə ← → naviqasiya
- * - Tam ekran rejimi (Escape ilə bağlanır)
- * - Mobil üçün toxunma ilə sürüşdürmə (swipe)
- */
+/** Mobil scroll-snap rail, desktop grid və əlçatan fullscreen lightbox. */
 export function Gallery({ images, title, className }: GalleryProps) {
   const [index, setIndex] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
-  const touchStartX = useRef<number | null>(null);
-  const thumbsRef = useRef<HTMLDivElement>(null);
-
+  const railRef = useRef<HTMLDivElement>(null);
   const total = images.length;
 
   const go = useCallback(
-    (next: number) => {
+    (nextIndex: number) => {
       if (total === 0) return;
-      setIndex(((next % total) + total) % total);
+      setIndex(((nextIndex % total) + total) % total);
     },
     [total],
   );
-
   const next = useCallback(() => go(index + 1), [go, index]);
   const previous = useCallback(() => go(index - 1), [go, index]);
 
-  // Klaviatura naviqasiyası
   useEffect(() => {
+    if (!fullscreen) return;
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight") next();
       else if (event.key === "ArrowLeft") previous();
-      else if (event.key === "Escape" && fullscreen) setFullscreen(false);
     };
+
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [next, previous, fullscreen]);
+  }, [fullscreen, next, previous]);
 
-  // Tam ekranda arxa fon scroll-u bloklanır
-  useEffect(() => {
-    if (!fullscreen) return;
-    const original = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, [fullscreen]);
-
-  // Aktiv thumbnail görünüş sahəsinə sürüşür
-  useEffect(() => {
-    const container = thumbsRef.current;
-    const active = container?.querySelector<HTMLElement>('[data-active="true"]');
-    active?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-  }, [index]);
-
-  function onTouchStart(event: React.TouchEvent) {
-    touchStartX.current = event.touches[0].clientX;
+  function openAt(nextIndex: number) {
+    setIndex(nextIndex);
+    setFullscreen(true);
   }
 
-  function onTouchEnd(event: React.TouchEvent) {
-    if (touchStartX.current === null) return;
-    const delta = event.changedTouches[0].clientX - touchStartX.current;
-    // 50px-dən az hərəkət təsadüfi toxunuş sayılır
-    if (Math.abs(delta) > 50) {
-      if (delta < 0) next();
-      else previous();
-    }
-    touchStartX.current = null;
+  function handleRailScroll(event: React.UIEvent<HTMLDivElement>) {
+    const viewport = event.currentTarget.clientWidth;
+    if (viewport === 0) return;
+    const nextIndex = Math.round(event.currentTarget.scrollLeft / viewport);
+    if (nextIndex >= 0 && nextIndex < total) setIndex(nextIndex);
   }
 
   if (total === 0) {
@@ -104,152 +76,87 @@ export function Gallery({ images, title, className }: GalleryProps) {
   const current = images[index];
 
   return (
-    <div className={cn("flex flex-col gap-3", className)}>
-      {/* Əsas şəkil */}
+    <div className={cn("relative", className)}>
       <div
-        className="relative aspect-4/3 overflow-hidden rounded-md bg-beige sm:aspect-16/9"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        ref={railRef}
+        onScroll={handleRailScroll}
+        className="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible [&::-webkit-scrollbar]:hidden"
       >
-        <Image
-          key={current.url}
-          src={current.url}
-          alt={current.alt || `${title} — foto ${index + 1}`}
-          fill
-          priority={index === 0}
-          sizes="(max-width: 1024px) 100vw, 66vw"
-          className="animate-fade-in object-cover"
-        />
-
-        {total > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={previous}
-              aria-label="Əvvəlki foto"
-              className="absolute top-1/2 left-3 inline-flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-charcoal/45 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/70"
-            >
-              <ChevronLeft className="size-5" aria-hidden="true" />
-            </button>
-
-            <button
-              type="button"
-              onClick={next}
-              aria-label="Növbəti foto"
-              className="absolute top-1/2 right-3 inline-flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-charcoal/45 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/70"
-            >
-              <ChevronRight className="size-5" aria-hidden="true" />
-            </button>
-          </>
-        )}
-
-        <button
-          type="button"
-          onClick={() => setFullscreen(true)}
-          aria-label="Tam ekranda aç"
-          className="absolute right-3 bottom-3 inline-flex size-11 cursor-pointer items-center justify-center rounded-full bg-charcoal/45 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/70"
-        >
-          <Expand className="size-4" aria-hidden="true" />
-        </button>
-
-        <p className="tabular absolute bottom-3 left-3 rounded-xs bg-charcoal/55 px-2.5 py-1 text-xs text-white backdrop-blur-sm">
-          {index + 1} / {total}
-        </p>
-      </div>
-
-      {/* Thumbnail sırası */}
-      {total > 1 && (
-        <div
-          ref={thumbsRef}
-          className="flex gap-2 overflow-x-auto pb-1"
-          role="tablist"
-          aria-label="Foto seçimi"
-        >
-          {images.map((image, i) => (
+        {images.map((image, imageIndex) => {
+          const alt = image.alt || `${title} — şəkil ${imageIndex + 1}`;
+          return (
             <button
               key={image.url}
               type="button"
-              role="tab"
-              aria-selected={i === index}
-              aria-label={`Foto ${i + 1}`}
-              data-active={i === index}
-              onClick={() => setIndex(i)}
-              className={cn(
-                "relative h-16 w-24 shrink-0 cursor-pointer overflow-hidden rounded-xs border-2 transition-colors sm:h-20 sm:w-28",
-                i === index ? "border-gold" : "border-transparent opacity-70 hover:opacity-100",
-              )}
+              onClick={() => openAt(imageIndex)}
+              aria-label={`${alt} şəklini tam ekranda aç`}
+              className="group relative aspect-4/3 w-full shrink-0 snap-center cursor-zoom-in overflow-hidden bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset sm:rounded-sm"
             >
               <Image
                 src={image.url}
-                alt=""
+                alt={alt}
                 fill
-                loading="lazy"
-                sizes="112px"
-                className="object-cover"
+                priority={imageIndex === 0}
+                loading={imageIndex === 0 ? undefined : "lazy"}
+                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
+                className="image-lift object-cover"
               />
+              <span className="absolute right-3 bottom-3 inline-flex size-11 items-center justify-center rounded-full bg-charcoal/50 text-white opacity-100 backdrop-blur-sm transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+                <Expand className="size-4" aria-hidden="true" />
+              </span>
             </button>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
 
-      {/* Tam ekran */}
-      {fullscreen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${title} — foto qalereya`}
-          className="animate-fade-in fixed inset-0 z-[90] flex flex-col bg-charcoal/97"
-        >
-          <div className="flex items-center justify-between px-5 py-4">
-            <p className="tabular text-sm text-white/80">
-              {index + 1} / {total}
-            </p>
-            <button
-              type="button"
-              onClick={() => setFullscreen(false)}
-              aria-label="Tam ekranı bağla"
-              className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-white transition-colors hover:bg-white/10"
-            >
-              <X className="size-6" aria-hidden="true" />
-            </button>
-          </div>
+      <p
+        aria-live="polite"
+        className="tabular pointer-events-none absolute bottom-3 left-0 rounded-r-xs bg-charcoal/65 px-3 py-1.5 text-xs text-white backdrop-blur-sm sm:hidden"
+      >
+        {index + 1} / {total}
+      </p>
 
-          <div
-            className="relative flex-1"
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-          >
-            <Image
-              src={current.url}
-              alt={current.alt || `${title} — foto ${index + 1}`}
-              fill
-              sizes="100vw"
-              className="object-contain"
-            />
-          </div>
-
-          {total > 1 && (
-            <div className="flex items-center justify-center gap-4 px-5 py-5">
+      <Overlay
+        open={fullscreen}
+        onClose={() => setFullscreen(false)}
+        title={`${title} — şəkil ${index + 1} / ${total}`}
+        className="h-dvh max-h-dvh max-w-none rounded-none bg-paper"
+        footer={
+          total > 1 ? (
+            <div className="flex w-full items-center justify-center gap-4">
               <button
                 type="button"
                 onClick={previous}
-                aria-label="Əvvəlki foto"
-                className="inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-white/25 text-white transition-colors hover:border-gold-soft hover:text-gold-soft"
+                aria-label="Əvvəlki şəkil"
+                className="inline-flex size-12 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-gold-soft hover:text-gold-soft"
               >
                 <ChevronLeft className="size-5" aria-hidden="true" />
               </button>
+              <span aria-live="polite" className="tabular min-w-16 text-center text-sm text-ink-soft">
+                {index + 1} / {total}
+              </span>
               <button
                 type="button"
                 onClick={next}
-                aria-label="Növbəti foto"
-                className="inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-white/25 text-white transition-colors hover:border-gold-soft hover:text-gold-soft"
+                aria-label="Növbəti şəkil"
+                className="inline-flex size-12 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-gold-soft hover:text-gold-soft"
               >
                 <ChevronRight className="size-5" aria-hidden="true" />
               </button>
             </div>
-          )}
+          ) : null
+        }
+      >
+        <div className="relative -mx-5 -my-5 min-h-[60dvh] w-[calc(100%+2.5rem)] bg-charcoal sm:-mx-6 sm:min-h-[70dvh] sm:w-[calc(100%+3rem)]">
+          <Image
+            src={current.url}
+            alt={current.alt || `${title} — şəkil ${index + 1}`}
+            fill
+            sizes="100vw"
+            className="object-contain"
+          />
         </div>
-      )}
+      </Overlay>
     </div>
   );
 }
