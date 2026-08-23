@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
   ADMIN_PAGE_SIZE,
+  AGENCY_EMPLOYEE_STATUSES,
   PAGE_SIZE,
   POST_STATUSES,
   PUBLIC_PROPERTY_STATUSES,
@@ -540,6 +541,45 @@ export async function getAgencyBySlug(slug: string) {
   });
 
   return { agency, properties };
+}
+
+/** Kabinet — sahibin öz agentlik qeydi (komanda idarəetməsi üçün). */
+export async function getAgencyForOwner(userId: string) {
+  return prisma.agency.findUnique({
+    where: { userId },
+    select: { id: true, name: true, isVerified: true },
+  });
+}
+
+/** Kabinet — agentliyin əməkdaş siyahısı. */
+export async function getAgencyEmployees(agencyId: string) {
+  return prisma.agencyEmployee.findMany({
+    where: { agencyId },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+      invitedAt: true,
+      approvedAt: true,
+      user: { select: { id: true, name: true, email: true } },
+    },
+    orderBy: { invitedAt: "desc" },
+  });
+}
+
+/** Panel — təsdiq gözləyən agentlik əməkdaşları. */
+export async function getAdminAgencyEmployeeQueue() {
+  return prisma.agencyEmployee.findMany({
+    where: { status: AGENCY_EMPLOYEE_STATUSES.PENDING },
+    select: {
+      id: true,
+      role: true,
+      invitedAt: true,
+      user: { select: { name: true, email: true } },
+      agency: { select: { name: true, slug: true } },
+    },
+    orderBy: { invitedAt: "asc" },
+  });
 }
 
 // ---------------------------------------------------------------------------

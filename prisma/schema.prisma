@@ -39,6 +39,11 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  /// İstifadəçinin seçdiyi dil: az | en | ru. `src/lib/constants.ts`-dəki LOCALES-dən.
+  locale           String @default("az")
+  /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
+  themePreference  String @default("system")
+
   /// AES-GCM ilə şifrələnmiş TOTP sirri. Açıq mətn heç vaxt saxlanılmır.
   totpSecret         String?
   /// null = 2FA hələ qurulmayıb, ilk girişdə məcburi qurulum ekranı açılır
@@ -56,6 +61,7 @@ model User {
   sessions    Session[]
   backupCodes BackupCode[]
   agency      Agency?
+  agencyEmployments AgencyEmployee[]
 
   @@index([role])
   @@index([accountType])
@@ -80,9 +86,33 @@ model Agency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employees AgencyEmployee[]
 
   @@index([isVerified])
+}
+
+/// Agentlik işçisi. Sahibin (Agency.userId) özü bura yazılmır — yalnız dəvət
+/// olunan əməkdaşlar. Maksimum say (3) tətbiq səviyyəsində yoxlanılır, çünki
+/// D1 tranzaksiya dəstəkləmədiyi üçün DB-səviyyəli CHECK etibarlı deyil.
+model AgencyEmployee {
+  id       String @id @default(cuid())
+  agencyId String
+  userId   String
+
+  /// MANAGER | AGENT — sahibdən (owner) aşağı rol. Sahiblik `Agency.userId`-dədir.
+  role   String @default("AGENT")
+  /// PENDING | APPROVED | REJECTED — admin təsdiqi tələb olunur.
+  status String @default("PENDING")
+
+  invitedAt  DateTime  @default(now())
+  approvedAt DateTime?
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, userId])
+  @@index([agencyId, status])
 }
 
 /// Aktiv giriş sessiyaları. Cookie yalnız bu sətrin id-sini daşıyır, beləliklə
@@ -566,6 +596,26 @@ model AuditLog {
 
   @@index([createdAt])
   @@index([entity, entityId])
+}
+
+/// Yüngül domen hadisə jurnalı (outbox pattern). D1 tranzaksiya dəstəkləmədiyi
+/// üçün tam event-sourcing/CQRS burada mənasız risk daşıyır — bunun əvəzinə
+/// hər əhəmiyyətli yazı əməliyyatından sonra ayrıca INSERT ilə hadisə qeyd olunur.
+/// `AuditLog`-dan fərqi: bu, "kim etdi" deyil, "sistemdə nə baş verdi" səviyyəsidir
+/// və gələcəkdə bildiriş/analitika abunəçiləri üçün mənbədir.
+model DomainEvent {
+  id   String @id @default(cuid())
+  /// property.published | agency.employee_requested | lead.created və s.
+  type       String
+  entityType String
+  entityId   String
+  /// JSON sətir kimi saxlanılır — D1-də native JSON tipi yoxdur.
+  payload    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@index([entityType, entityId])
 }
 
 // ---------------------------------------------------------------------------

@@ -492,3 +492,58 @@ export const PAYMENT_OPTION_LABELS: Record<PaymentOption, string> = {
 
 /** `Feature.group` dəyəri — ödəniş şərtləri adi xüsusiyyətlərdən ayrı göstərilir. */
 export const PAYMENT_FEATURE_GROUP = "PAYMENT";
+
+// ---------------------------------------------------------------------------
+// DİL (i18n)
+// ---------------------------------------------------------------------------
+
+export const LOCALES = {
+  AZ: "az",
+  EN: "en",
+  RU: "ru",
+} as const;
+
+export type Locale = (typeof LOCALES)[keyof typeof LOCALES];
+
+export const LOCALE_LABELS: Record<Locale, string> = {
+  az: "Azərbaycan",
+  en: "English",
+  ru: "Русский",
+};
+
+export const DEFAULT_LOCALE: Locale = LOCALES.AZ;
+
+// ---------------------------------------------------------------------------
+// AGENTLİK KOMANDASI
+// ---------------------------------------------------------------------------
+
+/** Sahibdən (Agency.userId) aşağı əməkdaş rolu. */
+export const AGENCY_EMPLOYEE_ROLES = {
+  MANAGER: "MANAGER",
+  AGENT: "AGENT",
+} as const;
+
+export type AgencyEmployeeRole = (typeof AGENCY_EMPLOYEE_ROLES)[keyof typeof AGENCY_EMPLOYEE_ROLES];
+
+export const AGENCY_EMPLOYEE_ROLE_LABELS: Record<AgencyEmployeeRole, string> = {
+  MANAGER: "Menecer",
+  AGENT: "Agent",
+};
+
+export const AGENCY_EMPLOYEE_STATUSES = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+} as const;
+
+export type AgencyEmployeeStatus =
+  (typeof AGENCY_EMPLOYEE_STATUSES)[keyof typeof AGENCY_EMPLOYEE_STATUSES];
+
+export const AGENCY_EMPLOYEE_STATUS_LABELS: Record<AgencyEmployeeStatus, string> = {
+  PENDING: "Təsdiq gözləyir",
+  APPROVED: "Təsdiqləndi",
+  REJECTED: "Rədd edildi",
+};
+
+/** Sahibdən əlavə maksimum əməkdaş sayı — PRD Phase 1 tələbi. */
+export const MAX_AGENCY_EMPLOYEES = 3;

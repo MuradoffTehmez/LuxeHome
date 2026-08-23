@@ -9,10 +9,11 @@ type CabinetShellProps = {
   name: string;
   accountLabel: string;
   canList: boolean;
+  canManageTeam?: boolean;
   children: React.ReactNode;
 };
 
-export function CabinetShell({ name, accountLabel, canList, children }: CabinetShellProps) {
+export function CabinetShell({ name, accountLabel, canList, canManageTeam = false, children }: CabinetShellProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,7 +37,7 @@ export function CabinetShell({ name, accountLabel, canList, children }: CabinetS
 
       <div className="grid min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
-          <CabinetNav name={name} accountLabel={accountLabel} canList={canList} />
+          <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} />
         </aside>
         <div className="min-w-0">{children}</div>
       </div>
@@ -51,6 +52,7 @@ export function CabinetShell({ name, accountLabel, canList, children }: CabinetS
           name={name}
           accountLabel={accountLabel}
           canList={canList}
+          canManageTeam={canManageTeam}
           variant="mobile"
           onNavigate={() => setOpen(false)}
         />

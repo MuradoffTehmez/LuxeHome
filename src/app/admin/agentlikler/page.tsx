@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ShieldCheck, ShieldX } from "lucide-react";
+import { Check, ShieldCheck, ShieldX, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   AdminCard,
@@ -14,17 +14,20 @@ import {
 } from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatDateTime } from "@/lib/utils";
-import { PERMISSIONS } from "@/lib/constants";
+import { AGENCY_EMPLOYEE_ROLE_LABELS, PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { getAdminAgencies } from "@/lib/queries";
-import { toggleAgencyVerification } from "./actions";
+import { getAdminAgencies, getAdminAgencyEmployeeQueue } from "@/lib/queries";
+import { approveAgencyEmployee, rejectAgencyEmployee, toggleAgencyVerification } from "./actions";
 
 export const metadata: Metadata = { title: "Agentliklər" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminAgenciesPage() {
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
-  const agencies = await getAdminAgencies();
+  const [agencies, employeeQueue] = await Promise.all([
+    getAdminAgencies(),
+    getAdminAgencyEmployeeQueue(),
+  ]);
 
   return (
     <>
@@ -33,6 +36,59 @@ export default async function AdminAgenciesPage() {
         description="Yalnız təsdiqlənmiş agentliklər ictimai /agentlikler səhifəsində və elanları avtomatik dərc olunmuş görünür."
         breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Agentliklər" }]}
       />
+
+      {employeeQueue.length > 0 && (
+        <AdminCard
+          title="Komanda dəvətləri"
+          description="Agentlik sahiblərinin dəvət etdiyi əməkdaşlar — təsdiqlənənə qədər panelə giriş almırlar."
+          bodyClassName="p-0"
+          className="mb-6"
+        >
+          <ul className="divide-y divide-line">
+            {employeeQueue.map((employee) => (
+              <li
+                key={employee.id}
+                className="flex flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-ink">{employee.user.name}</p>
+                  <p className="mt-0.5 truncate text-xs text-ink-muted">
+                    {employee.user.email} · {employee.agency.name} ·{" "}
+                    {AGENCY_EMPLOYEE_ROLE_LABELS[employee.role as keyof typeof AGENCY_EMPLOYEE_ROLE_LABELS] ??
+                      employee.role}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <ConfirmAction
+                    action={approveAgencyEmployee}
+                    id={employee.id}
+                    label={`${employee.user.name} təsdiqlə`}
+                    title="Əməkdaşı təsdiqləmək"
+                    description={`${employee.user.name} (${employee.user.email}) "${employee.agency.name}" agentliyinə əməkdaş kimi əlavə olunacaq.`}
+                    confirmLabel="Təsdiqlə"
+                    tone="neutral"
+                    className="size-11"
+                  >
+                    <Check className="size-4" aria-hidden="true" />
+                  </ConfirmAction>
+                  <ConfirmAction
+                    action={rejectAgencyEmployee}
+                    id={employee.id}
+                    label={`${employee.user.name} dəvətini rədd et`}
+                    title="Dəvəti rədd etmək"
+                    description={`${employee.user.name} üçün komanda dəvəti rədd olunacaq.`}
+                    confirmLabel="Rədd et"
+                    tone="danger"
+                    className="size-11"
+                  >
+                    <X className="size-4" aria-hidden="true" />
+                  </ConfirmAction>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </AdminCard>
+      )}
 
       <AdminCard bodyClassName="p-4 lg:p-0">
         <AdminResponsiveList

@@ -1,5 +1,5 @@
 export type CabinetNavItem = {
-  id: "overview" | "listings" | "new-listing" | "profile";
+  id: "overview" | "listings" | "new-listing" | "team" | "profile";
   href: string;
   label: string;
 };
@@ -14,8 +14,13 @@ const LISTING_ITEMS: readonly CabinetNavItem[] = [
   { id: "new-listing", href: "/kabinet/elanlar/yeni", label: "Yeni elan" },
 ];
 
-export function getCabinetItems(canList: boolean): readonly CabinetNavItem[] {
-  return canList ? [BASE_ITEMS[0], ...LISTING_ITEMS, BASE_ITEMS[1]] : BASE_ITEMS;
+const TEAM_ITEM: CabinetNavItem = { id: "team", href: "/kabinet/komanda", label: "Komanda" };
+
+export function getCabinetItems(canList: boolean, canManageTeam = false): readonly CabinetNavItem[] {
+  const items = canList ? [BASE_ITEMS[0], ...LISTING_ITEMS] : [BASE_ITEMS[0]];
+  if (canManageTeam) items.push(TEAM_ITEM);
+  items.push(BASE_ITEMS[1]);
+  return items;
 }
 
 export function isCabinetItemActive(pathname: string, href: string): boolean {

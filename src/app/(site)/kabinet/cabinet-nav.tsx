@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useFormStatus } from "react-dom";
-import { LayoutGrid, ListChecks, LogOut, Plus, UserRound } from "lucide-react";
+import { LayoutGrid, ListChecks, LogOut, Plus, UserRound, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
 import { signOutAccount } from "../hesab/actions";
@@ -19,6 +19,7 @@ type CabinetNavProps = {
   name: string;
   accountLabel: string;
   canList: boolean;
+  canManageTeam?: boolean;
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
 };
@@ -27,6 +28,7 @@ const ICONS = {
   overview: LayoutGrid,
   listings: ListChecks,
   "new-listing": Plus,
+  team: Users,
   profile: UserRound,
 } as const;
 
@@ -49,11 +51,12 @@ export function CabinetNav({
   name,
   accountLabel,
   canList,
+  canManageTeam = false,
   variant = "desktop",
   onNavigate,
 }: CabinetNavProps) {
   const pathname = usePathname();
-  const items = getCabinetItems(canList);
+  const items = getCabinetItems(canList, canManageTeam);
 
   return (
     <nav aria-label="Kabinet menyusu" className="flex flex-col gap-4">
