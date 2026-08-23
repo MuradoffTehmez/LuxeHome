@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Container, Section } from "@/components/ui/container";
+import { CheckCircle2 } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { buildMetadata } from "@/lib/seo";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES } from "@/lib/constants";
@@ -29,21 +30,30 @@ export default async function LoginPage({
   const next = typeof params.davam === "string" ? params.davam : undefined;
 
   return (
-    <Section spacing="cozy">
-      <Container>
-        <div className="mx-auto flex w-full max-w-md flex-col gap-6">
-          <header className="flex flex-col gap-2 text-center">
-            <h1 className="font-display text-3xl text-ink">Hesaba giriş</h1>
-            <p className="text-sm text-ink-soft">
-              Favoritlərinizi saxlamaq və elanlarınızı idarə etmək üçün daxil olun.
-            </p>
-          </header>
-
-          <div className="rounded-md border border-line bg-paper p-6">
-            <LoginForm next={next} />
-          </div>
+    <AuthShell
+      eyebrow="Şəxsi kabinet"
+      title="Hesaba giriş"
+      description="Favoritlərinizi saxlamaq və elanlarınızı idarə etmək üçün daxil olun."
+      aside={
+        <div className="mx-auto max-w-lg">
+          <p className="text-xs font-semibold tracking-[0.16em] text-gold-deep uppercase">
+            Bir hesab, bütün seçimləriniz
+          </p>
+          <h2 className="mt-3 font-display text-4xl leading-tight text-ink">
+            Əmlak axtarışınızı qaldığınız yerdən davam etdirin.
+          </h2>
+          <ul className="mt-7 flex flex-col gap-4 text-sm text-ink-soft">
+            {["Favorit elanları saxlayın", "Müraciətlərinizi izləyin", "Öz elanlarınızı idarə edin"].map((item) => (
+              <li key={item} className="flex items-center gap-3">
+                <CheckCircle2 className="size-5 shrink-0 text-gold-deep" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
-      </Container>
-    </Section>
+      }
+    >
+      <LoginForm next={next} />
+    </AuthShell>
   );
 }

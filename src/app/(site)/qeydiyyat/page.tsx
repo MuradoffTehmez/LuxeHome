@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Container, Section } from "@/components/ui/container";
+import { CheckCircle2 } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
@@ -27,21 +28,30 @@ export default async function RegisterPage({
   const next = typeof params.davam === "string" ? params.davam : undefined;
 
   return (
-    <Section spacing="cozy">
-      <Container>
-        <div className="mx-auto flex w-full max-w-md flex-col gap-6">
-          <header className="flex flex-col gap-2 text-center">
-            <h1 className="font-display text-3xl text-ink">Hesab yaradın</h1>
-            <p className="text-sm text-ink-soft">
-              Favoritlərinizi, müraciətlərinizi və elanlarınızı bir yerdən idarə edin.
-            </p>
-          </header>
-
-          <div className="rounded-md border border-line bg-paper p-6">
-            <RegisterForm next={next} />
-          </div>
+    <AuthShell
+      eyebrow="Yeni hesab"
+      title="Hesab yaradın"
+      description="Favoritlərinizi, müraciətlərinizi və elanlarınızı bir yerdən idarə edin."
+      aside={
+        <div className="mx-auto max-w-lg">
+          <p className="text-xs font-semibold tracking-[0.16em] text-gold-deep uppercase">
+            Sizə uyğun kabinet
+          </p>
+          <h2 className="mt-3 font-display text-4xl leading-tight text-ink">
+            Alıcı, mülk sahibi və ya agentlik kimi başlayın.
+          </h2>
+          <ul className="mt-7 flex flex-col gap-4 text-sm text-ink-soft">
+            {["Hesab növünü özünüz seçin", "Məlumatlarınızı təhlükəsiz saxlayın", "Elan prosesini bir yerdən izləyin"].map((item) => (
+              <li key={item} className="flex items-center gap-3">
+                <CheckCircle2 className="size-5 shrink-0 text-gold-deep" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
-      </Container>
-    </Section>
+      }
+    >
+      <RegisterForm next={next} />
+    </AuthShell>
   );
 }

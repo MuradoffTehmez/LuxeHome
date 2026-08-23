@@ -25,7 +25,7 @@ export function LoginForm({ next }: { next?: string }) {
       {state.status === "error" && state.message && (
         <p
           role="alert"
-          className="flex items-start gap-2.5 rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
+          className="flex min-w-0 items-start gap-2.5 rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger [overflow-wrap:anywhere]"
         >
           <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           {state.message}
@@ -36,6 +36,7 @@ export function LoginForm({ next }: { next?: string }) {
         name="email"
         label="E-poçt"
         type="email"
+        inputMode="email"
         required
         autoComplete="email"
         placeholder="ad@nümunə.az"
@@ -57,11 +58,11 @@ export function LoginForm({ next }: { next?: string }) {
         Daxil ol
       </Button>
 
-      <p className="text-center text-sm text-ink-soft">
-        Hesabınız yoxdur?{" "}
+      <p className="flex flex-wrap items-center justify-center gap-x-1 text-center text-sm text-ink-soft">
+        <span>Hesabınız yoxdur?</span>
         <Link
           href={accountAuthHref("/qeydiyyat", next)}
-          className="text-gold-deep underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center rounded-xs text-gold-deep underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
         >
           Qeydiyyatdan keçin
         </Link>
