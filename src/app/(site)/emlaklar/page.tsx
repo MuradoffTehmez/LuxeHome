@@ -13,14 +13,14 @@ import { buildMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { getProperties, getFilterOptions } from "@/lib/queries";
 import { formatNumber } from "@/lib/utils";
 import {
-  DOCUMENT_STATUS_LABELS,
+  buildActivePropertyFilters,
+  buildPropertySearchHref,
+  parsePropertySearchParams,
+} from "@/lib/property-search";
+import {
   LISTING_TYPE_LABELS,
-  RENOVATION_LABELS,
   SORT_OPTIONS,
-  type DocumentStatus,
   type ListingType,
-  type Renovation,
-  type SortOption,
 } from "@/lib/constants";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -51,51 +51,12 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-/** URL-dəki bütün filtr parametrləri — SearchPanel ilə eyni adlar. */
-const FILTER_KEYS = [
-  "elan",
-  "axtaris",
-  "tip",
-  "seher",
-  "rayon",
-  "otaq",
-  "min",
-  "max",
-  "sahe_min",
-  "sahe_max",
-  "temir",
-  "sened",
-  "tikili",
-  "dovr",
-] as const;
-
-type FilterKey = (typeof FILTER_KEYS)[number];
-
 const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
 
-function text(value: string | string[] | undefined): string | undefined {
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  return trimmed === "" ? undefined : trimmed;
-}
-
-/** Eyni adlı çoxlu parametr — xüsusiyyət filtri çoxseçimlidir. */
-function list(value: string | string[] | undefined): string[] {
-  if (Array.isArray(value)) return value.map((item) => item.trim()).filter(Boolean);
-  const single = text(value);
-  return single ? [single] : [];
-}
-
-/** `?sekilli=1` kimi bayraqlar. */
-function flag(value: string | string[] | undefined): boolean {
-  return text(value) === "1";
-}
-
 /** Yalnız müsbət ədədləri qəbul edir — «abc» və ya «-5» filtri sındırmasın. */
-function positiveNumber(value: string | string[] | undefined): number | undefined {
-  const raw = text(value);
-  if (raw === undefined) return undefined;
-  const parsed = Number(raw);
+function positiveNumber(value: string | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
 }
 
@@ -103,14 +64,9 @@ export default async function PropertiesPage({ searchParams }: Props) {
   const params = await searchParams;
 
   // --- URL → filtr obyekti ---------------------------------------------------
-  const raw = Object.fromEntries(
-    FILTER_KEYS.map((key) => [key, text(params[key])]),
-  ) as Partial<Record<FilterKey, string>>;
-
-  const sortParam = text(params.siralama);
-  const sort: SortOption = SORT_VALUES.includes(sortParam as SortOption)
-    ? (sortParam as SortOption)
-    : "newest";
+  const searchState = parsePropertySearchParams(params);
+  const raw = searchState.values;
+  const sort = searchState.sort;
 
   const filters = {
     listingType: raw.elan,
@@ -118,23 +74,23 @@ export default async function PropertiesPage({ searchParams }: Props) {
     typeSlug: raw.tip,
     citySlug: raw.seher,
     districtSlug: raw.rayon,
-    rooms: positiveNumber(params.otaq),
-    minPrice: positiveNumber(params.min),
-    maxPrice: positiveNumber(params.max),
-    minArea: positiveNumber(params.sahe_min),
-    maxArea: positiveNumber(params.sahe_max),
+    rooms: positiveNumber(raw.otaq),
+    minPrice: positiveNumber(raw.min),
+    maxPrice: positiveNumber(raw.max),
+    minArea: positiveNumber(raw.sahe_min),
+    maxArea: positiveNumber(raw.sahe_max),
     renovation: raw.temir,
     documentStatus: raw.sened,
     buildingType: raw.tikili,
     pricePeriod: raw.dovr,
-    minFloor: positiveNumber(params.mertebe_min),
-    maxFloor: positiveNumber(params.mertebe_max),
-    excludeFirstFloor: flag(params.ilk_mertebe_yox),
-    excludeLastFloor: flag(params.son_mertebe_yox),
-    withImagesOnly: flag(params.sekilli),
-    featureSlugs: list(params.xususiyyet),
+    minFloor: positiveNumber(raw.mertebe_min),
+    maxFloor: positiveNumber(raw.mertebe_max),
+    excludeFirstFloor: searchState.excludeFirstFloor,
+    excludeLastFloor: searchState.excludeLastFloor,
+    withImagesOnly: searchState.withImagesOnly,
+    featureSlugs: searchState.featureSlugs,
     sort,
-    page: positiveNumber(params.sehife) ?? 1,
+    page: searchState.page,
   };
 
   const [{ items, total, page, totalPages }, filterOptions] = await Promise.all([
@@ -162,32 +118,8 @@ export default async function PropertiesPage({ searchParams }: Props) {
     group: feature.group,
   }));
 
-  // --- URL qurucusu ----------------------------------------------------------
-  /**
-   * Cari filtrləri saxlayaraq yalnız verilən açarları dəyişir.
-   * `null` dəyəri həmin parametri silir.
-   */
-  function buildHref(overrides: Record<string, string | number | null> = {}) {
-    const sp = new URLSearchParams();
-
-    for (const key of FILTER_KEYS) {
-      const value = raw[key];
-      if (value) sp.set(key, value);
-    }
-    if (sort !== "newest") sp.set("siralama", sort);
-    if (page > 1) sp.set("sehife", String(page));
-
-    for (const [key, value] of Object.entries(overrides)) {
-      if (value === null || value === "") sp.delete(key);
-      else sp.set(key, String(value));
-    }
-
-    // Filtr dəyişəndə birinci səhifəyə qayıdılır
-    if (Object.keys(overrides).some((key) => key !== "sehife")) sp.delete("sehife");
-
-    const qs = sp.toString();
-    return `/emlaklar${qs ? `?${qs}` : ""}`;
-  }
+  const buildHref = (overrides: Record<string, string | number | null> = {}) =>
+    buildPropertySearchHref(searchState, overrides);
 
   const sortHrefs = Object.fromEntries(
     SORT_VALUES.map((value) => [
@@ -196,59 +128,11 @@ export default async function PropertiesPage({ searchParams }: Props) {
     ]),
   );
 
-  // --- Aktiv filtr nişanları -------------------------------------------------
-  const labelOf = {
-    tip: (value: string) => typeOptions.find((t) => t.value === value)?.label,
-    seher: (value: string) => cityOptions.find((c) => c.value === value)?.label,
-    rayon: (value: string) =>
-      cityOptions.flatMap((c) => c.districts).find((d) => d.value === value)?.label,
-  };
-
-  const activeFilters: { key: FilterKey; label: string }[] = [];
-
-  if (raw.elan) {
-    const label = LISTING_TYPE_LABELS[raw.elan as ListingType];
-    if (label) activeFilters.push({ key: "elan", label });
-  }
-  if (raw.axtaris) activeFilters.push({ key: "axtaris", label: `«${raw.axtaris}»` });
-  if (raw.tip) {
-    const label = labelOf.tip(raw.tip);
-    if (label) activeFilters.push({ key: "tip", label });
-  }
-  if (raw.seher) {
-    const label = labelOf.seher(raw.seher);
-    if (label) activeFilters.push({ key: "seher", label });
-  }
-  if (raw.rayon) {
-    const label = labelOf.rayon(raw.rayon);
-    if (label) activeFilters.push({ key: "rayon", label });
-  }
-  if (filters.rooms !== undefined) {
-    activeFilters.push({
-      key: "otaq",
-      label: filters.rooms >= 5 ? "5+ otaq" : `${filters.rooms} otaq`,
-    });
-  }
-  if (filters.minPrice !== undefined) {
-    activeFilters.push({ key: "min", label: `${formatNumber(filters.minPrice)} ₼-dən` });
-  }
-  if (filters.maxPrice !== undefined) {
-    activeFilters.push({ key: "max", label: `${formatNumber(filters.maxPrice)} ₼-dək` });
-  }
-  if (filters.minArea !== undefined) {
-    activeFilters.push({ key: "sahe_min", label: `${formatNumber(filters.minArea)} m²-dən` });
-  }
-  if (filters.maxArea !== undefined) {
-    activeFilters.push({ key: "sahe_max", label: `${formatNumber(filters.maxArea)} m²-dək` });
-  }
-  if (raw.temir) {
-    const label = RENOVATION_LABELS[raw.temir as Renovation];
-    if (label) activeFilters.push({ key: "temir", label });
-  }
-  if (raw.sened) {
-    const label = DOCUMENT_STATUS_LABELS[raw.sened as DocumentStatus];
-    if (label) activeFilters.push({ key: "sened", label });
-  }
+  const activeFilters = buildActivePropertyFilters(searchState, {
+    types: typeOptions,
+    cities: cityOptions,
+    features: featureOptions,
+  });
 
   const listingLabel = raw.elan
     ? LISTING_TYPE_LABELS[raw.elan as ListingType]
@@ -285,8 +169,8 @@ export default async function PropertiesPage({ searchParams }: Props) {
               variant="page"
               initial={{
               ...raw,
-              mertebe_min: text(params.mertebe_min),
-              mertebe_max: text(params.mertebe_max),
+              mertebe_min: raw.mertebe_min,
+              mertebe_max: raw.mertebe_max,
               ilk_mertebe_yox: filters.excludeFirstFloor ? "1" : undefined,
               son_mertebe_yox: filters.excludeLastFloor ? "1" : undefined,
               sekilli: filters.withImagesOnly ? "1" : undefined,
@@ -313,7 +197,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
                 {activeFilters.map((filter) => (
                   <li key={`${filter.key}-${filter.label}`}>
                     <Link
-                      href={buildHref({ [filter.key]: null })}
+                      href={filter.href}
                       className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line-strong bg-paper py-1 pr-2 pl-3 text-sm text-ink transition-colors duration-200 hover:border-gold hover:text-gold-deep"
                     >
                       {filter.label}
