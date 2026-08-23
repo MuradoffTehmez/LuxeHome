@@ -3,6 +3,7 @@ import {
   BUILDING_TYPES,
   CURRENCIES,
   DOCUMENT_STATUSES,
+  FEATURE_GROUPS,
   LEAD_STATUSES,
   LISTING_TYPES,
   POST_STATUSES,
@@ -243,6 +244,19 @@ export const userUpdateSchema = z.object({
   name: requiredText("Ad", 2, 120),
   role: enumOf(ROLES),
   isActive: z.boolean(),
+});
+
+// ---------------------------------------------------------------------------
+// TAKSONOMİYA
+// ---------------------------------------------------------------------------
+
+export const propertyTypeCreateSchema = z.object({
+  name: requiredText("Ad", 2, 80),
+});
+
+export const featureCreateSchema = z.object({
+  name: requiredText("Ad", 2, 80),
+  group: enumOf(FEATURE_GROUPS),
 });
 
 // ---------------------------------------------------------------------------

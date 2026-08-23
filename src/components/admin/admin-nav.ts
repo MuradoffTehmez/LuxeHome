@@ -26,11 +26,13 @@ export const adminNav: AdminNavGroup[] = [
     title: "Kontent",
     items: [
       { label: "Əmlaklar", href: "/admin/emlaklar", icon: "Building2", badgeKey: "draftProperties" },
+      { label: "Taksonomiya", href: "/admin/taksonomiya", icon: "Tags" },
       { label: "Layihələr", href: "/admin/layiheler", icon: "Blocks" },
       { label: "Bloq", href: "/admin/blog", icon: "Newspaper" },
       { label: "Xidmətlər", href: "/admin/xidmetler", icon: "Sparkles" },
       { label: "Media", href: "/admin/media", icon: "Images" },
       { label: "Agentliklər", href: "/admin/agentlikler", icon: "ShieldCheck" },
+      { label: "SEO auditı", href: "/admin/seo", icon: "SearchCheck" },
     ],
   },
   {
@@ -43,6 +45,7 @@ export const adminNav: AdminNavGroup[] = [
     title: "Sistem",
     items: [
       { label: "İstifadəçilər", href: "/admin/istifadeciler", icon: "Users" },
+      { label: "Hesablar", href: "/admin/hesablar", icon: "Contact" },
       { label: "Hesabım", href: "/admin/hesabim", icon: "UserCog" },
       { label: "Parametrlər", href: "/admin/parametrler", icon: "Settings" },
     ],

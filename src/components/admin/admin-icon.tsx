@@ -1,13 +1,16 @@
 import {
   Blocks,
   Building2,
+  Contact,
   Images,
   Inbox,
   LayoutDashboard,
   Newspaper,
+  SearchCheck,
   Settings,
   ShieldCheck,
   Sparkles,
+  Tags,
   UserCog,
   Users,
   type LucideIcon,
@@ -21,6 +24,7 @@ import {
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
   Building2,
+  Contact,
   Blocks,
   Newspaper,
   Sparkles,
@@ -29,7 +33,9 @@ const ICONS: Record<string, LucideIcon> = {
   Users,
   UserCog,
   Settings,
+  SearchCheck,
   ShieldCheck,
+  Tags,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import {
+  AlertTriangle,
   Blocks,
   Building2,
+  Eye,
   FileEdit,
   Inbox,
   Megaphone,
@@ -28,19 +30,43 @@ import {
   type PropertyStatus,
 } from "@/lib/constants";
 import {
+  getAdminAlerts,
   getDashboardStats,
+  getLeadStatusBreakdown,
   getRecentAdminLeads,
   getRecentAdminProperties,
+  getTopViewedProperties,
 } from "@/lib/queries";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
 
 export default async function AdminDashboardPage() {
-  const [stats, recentLeads, recentProperties, announcement] = await Promise.all([
-    getDashboardStats(),
-    getRecentAdminLeads(),
-    getRecentAdminProperties(),
-    getSetting(SETTING_KEYS.ADMIN_ANNOUNCEMENT),
-  ]);
+  const [stats, recentLeads, recentProperties, announcement, alerts, topViewed, leadBreakdown] =
+    await Promise.all([
+      getDashboardStats(),
+      getRecentAdminLeads(),
+      getRecentAdminProperties(),
+      getSetting(SETTING_KEYS.ADMIN_ANNOUNCEMENT),
+      getAdminAlerts(),
+      getTopViewedProperties(),
+      getLeadStatusBreakdown(),
+    ]);
+
+  const alertItems = [
+    alerts.pendingProperties > 0 && {
+      label: `${alerts.pendingProperties} elan təsdiq gözləyir`,
+      href: "/admin/emlaklar?status=PENDING",
+    },
+    alerts.unverifiedAgencies > 0 && {
+      label: `${alerts.unverifiedAgencies} agentlik təsdiq gözləyir`,
+      href: "/admin/agentlikler",
+    },
+    alerts.lockedUsers > 0 && {
+      label: `${alerts.lockedUsers} əməkdaş hesabı kilidli`,
+      href: "/admin/istifadeciler",
+    },
+  ].filter((item): item is { label: string; href: string } => Boolean(item));
+
+  const maxLeadCount = Math.max(1, ...leadBreakdown.map((row) => row.count));
 
   return (
     <>
@@ -60,6 +86,22 @@ export default async function AdminDashboardPage() {
           </>
         }
       />
+
+      {/* Bildirişlər — diqqət tələb edən qeydlər */}
+      {alertItems.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2.5">
+          {alertItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="inline-flex min-h-9 items-center gap-2 rounded-full border border-warning/40 bg-warning-bg px-3.5 text-sm font-medium text-warning transition-colors hover:border-warning"
+            >
+              <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Komanda qeydi — «Parametrlər» səhifəsindən yazılır */}
       {announcement && (
@@ -203,6 +245,64 @@ export default async function AdminDashboardPage() {
               </li>
             ))}
           </ul>
+        </AdminCard>
+      </div>
+
+      {/* --- Analitika --- */}
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_1fr]">
+        <AdminCard title="Ən çox baxılan elanlar" description="Baxış sayına görə" bodyClassName="p-0">
+          <ul className="divide-y divide-line">
+            {topViewed.length === 0 && (
+              <li className="px-5 py-8 text-center text-sm text-ink-muted">
+                Hələ baxış qeydə alınmayıb.
+              </li>
+            )}
+            {topViewed.map((property, index) => (
+              <li key={property.id} className="flex items-center gap-3 px-5 py-3.5">
+                <span className="tabular grid size-6 shrink-0 place-items-center rounded-full bg-beige text-xs font-medium text-ink-muted">
+                  {index + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/admin/emlaklar/${property.id}`}
+                    className="line-clamp-1 text-sm font-medium text-ink transition-colors hover:text-gold-deep"
+                  >
+                    {property.title}
+                  </Link>
+                  {property.city?.name && (
+                    <p className="mt-0.5 text-xs text-ink-muted">{property.city.name}</p>
+                  )}
+                </div>
+                <span className="tabular inline-flex shrink-0 items-center gap-1.5 text-sm text-ink-soft">
+                  <Eye className="size-4" aria-hidden="true" />
+                  {property.viewCount}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </AdminCard>
+
+        <AdminCard title="Müraciətlər üzrə bölgü" description="Status üzrə say" bodyClassName="p-5">
+          {leadBreakdown.length === 0 ? (
+            <p className="py-8 text-center text-sm text-ink-muted">Hələ müraciət yoxdur.</p>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {leadBreakdown.map((row) => (
+                <li key={row.status} className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-ink">{LEAD_STATUS_LABELS[row.status as LeadStatus]}</span>
+                    <span className="tabular font-medium text-ink">{row.count}</span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-beige">
+                    <div
+                      className="h-full rounded-full bg-gold"
+                      style={{ width: `${(row.count / maxLeadCount) * 100}%` }}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </AdminCard>
       </div>
 

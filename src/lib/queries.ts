@@ -457,6 +457,54 @@ export async function getAgencies() {
   }));
 }
 
+/** Panel — əmlak növü və xüsusiyyət taksonomiyası, idarəetmə üçün tam siyahı. */
+export async function getAdminTaxonomy() {
+  const [types, features] = await Promise.all([
+    prisma.propertyType.findMany({
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        isActive: true,
+        order: true,
+        _count: { select: { properties: true } },
+      },
+    }),
+    prisma.feature.findMany({
+      orderBy: [{ group: "asc" }, { order: "asc" }, { name: "asc" }],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        group: true,
+        order: true,
+        _count: { select: { properties: true } },
+      },
+    }),
+  ]);
+  return { types, features };
+}
+
+/** Panel — ictimai qeydiyyatdan keçən hesablar (STAFF xaric). */
+export async function getAdminPublicAccounts() {
+  return prisma.user.findMany({
+    where: { accountType: { in: [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY] } },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      accountType: true,
+      isActive: true,
+      createdAt: true,
+      lastLoginAt: true,
+      _count: { select: { properties: true, favorites: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 /** Panel — bütün agentliklər (təsdiqlənməmişlər daxil). */
 export async function getAdminAgencies() {
   return prisma.agency.findMany({
@@ -667,6 +715,68 @@ export async function getDashboardStats() {
     publishedPosts,
     mediaCount,
   };
+}
+
+/** İdarə paneli — diqqət tələb edən qeydlərin sayı (bildiriş paneli). */
+export async function getAdminAlerts() {
+  const [pendingProperties, unverifiedAgencies, lockedUsers] = await Promise.all([
+    prisma.property.count({ where: { deletedAt: null, status: PROPERTY_STATUSES.PENDING } }),
+    prisma.agency.count({ where: { isVerified: false } }),
+    prisma.user.count({ where: { accountType: "STAFF", lockedUntil: { gt: new Date() } } }),
+  ]);
+  return { pendingProperties, unverifiedAgencies, lockedUsers };
+}
+
+/** İdarə paneli — ən çox baxılan elanlar (sadə analitika). */
+export async function getTopViewedProperties(take = 5) {
+  return prisma.property.findMany({
+    where: { deletedAt: null, isDemo: false, viewCount: { gt: 0 } },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      viewCount: true,
+      status: true,
+      city: { select: { name: true } },
+    },
+    orderBy: { viewCount: "desc" },
+    take,
+  });
+}
+
+/** İdarə paneli — müraciətlərin status üzrə bölgüsü. */
+export async function getLeadStatusBreakdown() {
+  const rows = await prisma.lead.groupBy({ by: ["status"], _count: { _all: true } });
+  return rows.map((row) => ({ status: row.status, count: row._count._all }));
+}
+
+/** SEO auditı — meta başlıq/təsvir çatışmayan dərc olunmuş məzmun. */
+export async function getSeoAuditItems() {
+  const [properties, posts] = await Promise.all([
+    prisma.property.findMany({
+      where: {
+        deletedAt: null,
+        isDemo: false,
+        status: { in: PUBLIC_PROPERTY_STATUSES },
+        OR: [{ metaTitle: null }, { metaDescription: null }],
+      },
+      select: { id: true, title: true, slug: true, metaTitle: true, metaDescription: true },
+      orderBy: { publishedAt: "desc" },
+      take: 50,
+    }),
+    prisma.blogPost.findMany({
+      where: {
+        deletedAt: null,
+        isDemo: false,
+        status: POST_STATUSES.PUBLISHED,
+        OR: [{ metaTitle: null }, { metaDescription: null }],
+      },
+      select: { id: true, title: true, slug: true, metaTitle: true, metaDescription: true },
+      orderBy: { publishedAt: "desc" },
+      take: 50,
+    }),
+  ]);
+  return { properties, posts };
 }
 
 export async function getRecentAdminProperties(take = 5) {
