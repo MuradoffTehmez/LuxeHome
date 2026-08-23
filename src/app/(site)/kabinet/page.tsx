@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Building2, ClipboardList, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { getCabinetSummary } from "@/lib/accounts/cabinet-summary";
 import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_LABELS } from "@/lib/constants";
@@ -33,17 +34,19 @@ export default async function CabinetPage() {
   const canList = user.accountType !== ACCOUNT_TYPES.USER;
 
   return (
-      <>
-        <div className="flex flex-col gap-8">
-          <header className="flex flex-col gap-3">
+    <div className="flex min-w-0 flex-col gap-8">
+          <PageHeader
+            contained
+            compact
+            eyebrow="Kabinet"
+            title={`Salam, ${user.name}`}
+            description={user.email}
+            actions={
             <Badge tone="gold" className="w-fit">
               {ACCOUNT_TYPE_LABELS[user.accountType]}
             </Badge>
-            <div>
-              <h1 className="font-display text-3xl text-ink sm:text-4xl">Salam, {user.name}</h1>
-              <p className="mt-2 text-ink-soft">{user.email}</p>
-            </div>
-          </header>
+            }
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <article className="rounded-md border border-line bg-paper p-5">
@@ -56,12 +59,14 @@ export default async function CabinetPage() {
                   : "Elan yerləşdirmək üçün mülk sahibi və ya agentlik hesabı seçin."}
               </p>
               {canList && (
-                <Link
+                <ButtonLink
                   href="/kabinet/elanlar"
-                  className="mt-4 inline-flex text-sm font-medium text-gold-deep transition-colors hover:text-ink"
+                  variant="ghost"
+                  size="sm"
+                  className="mt-4 self-start px-0 text-gold-deep hover:text-ink"
                 >
                   Elanları idarə et →
-                </Link>
+                </ButtonLink>
               )}
             </article>
 
@@ -81,7 +86,6 @@ export default async function CabinetPage() {
               </article>
             )}
           </div>
-        </div>
-      </>
+    </div>
   );
 }

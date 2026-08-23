@@ -30,6 +30,16 @@ describe("responsive composition komponentləri", () => {
     expect(html).toContain('aria-current="page"');
   });
 
+  it("nested kabinet və panel sütunlarında əlavə container yaratmır", () => {
+    const html = renderToStaticMarkup(
+      <PageHeader contained compact title="Elanlarım" actions={<button>Yeni elan</button>} />,
+    );
+
+    expect(html).toContain("bg-transparent");
+    expect(html).toContain("py-0");
+    expect(html).not.toContain("max-w-7xl");
+  });
+
   it("toolbar-ın mobil və desktop təqdimatlarını yalnız CSS breakpoint-i ilə ayırır", () => {
     const html = renderToStaticMarkup(
       <ResponsiveToolbar

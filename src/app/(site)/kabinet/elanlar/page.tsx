@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Image from "next/image";
 import { Plus } from "lucide-react";
+import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/states";
 import { requireLister } from "@/lib/auth/guard";
 import {
   PROPERTY_STATUS_LABELS,
@@ -10,6 +14,7 @@ import {
 } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
+import { formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = buildMetadata({
   title: "Elanlarım",
@@ -40,21 +45,91 @@ export default async function CabinetPropertiesPage({
     searchParams,
   ]);
 
-  return (
-      <>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-gold-deep">Kabinet</p>
-            <h1 className="mt-2 font-display text-3xl text-ink sm:text-4xl">Elanlarım</h1>
+  type CabinetProperty = (typeof properties)[number];
+
+  function propertyStatus(property: CabinetProperty) {
+    return property.status as PropertyStatus;
+  }
+
+  function PropertyThumbnail({ property }: { property: CabinetProperty }) {
+    return (
+      <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-xs bg-beige text-center text-[0.65rem] leading-tight text-ink-muted">
+        {property.images[0]?.url ? (
+          <Image
+            src={property.images[0].url}
+            alt=""
+            fill
+            sizes="64px"
+            className="object-cover"
+          />
+        ) : (
+          "Şəkil yoxdur"
+        )}
+      </div>
+    );
+  }
+
+  function renderPropertyCard(property: CabinetProperty) {
+    const status = propertyStatus(property);
+    return (
+      <article className="min-w-0 rounded-md border border-line bg-paper p-4 shadow-sm">
+        <div className="flex min-w-0 items-start gap-3">
+          <PropertyThumbnail property={property} />
+          <div className="min-w-0 flex-1">
+            <h2 className="font-medium text-ink [overflow-wrap:anywhere]">{property.title}</h2>
+            <p className="mt-2 text-sm font-medium text-ink-soft tabular-nums">
+              {formatPrice(property.price, property.currency)}
+            </p>
           </div>
-          <Link
-            href="/kabinet/elanlar/yeni"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xs bg-gold px-4 text-sm font-medium text-ink transition-colors hover:bg-gold-soft"
-          >
-            <Plus className="size-4" aria-hidden="true" />
-            Yeni elan
-          </Link>
         </div>
+        <div className="mt-4 border-t border-line pt-3">
+          <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
+            {PROPERTY_STATUS_LABELS[status] ?? status}
+          </Badge>
+        </div>
+      </article>
+    );
+  }
+
+  function renderPropertyList(items: readonly CabinetProperty[]) {
+    return (
+      <ul className="divide-y divide-line overflow-hidden rounded-md border border-line bg-paper">
+        {items.map((property) => {
+          const status = propertyStatus(property);
+          return (
+            <li key={property.id} className="flex min-w-0 items-center gap-4 p-5">
+              <PropertyThumbnail property={property} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-ink">{property.title}</p>
+                <p className="mt-1 text-sm text-ink-soft tabular-nums">
+                  {formatPrice(property.price, property.currency)}
+                </p>
+              </div>
+              <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
+                {PROPERTY_STATUS_LABELS[status] ?? status}
+              </Badge>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
+  return (
+    <div className="min-w-0">
+        <PageHeader
+          contained
+          compact
+          eyebrow="Kabinet"
+          title="Elanlarım"
+          description={`${properties.length} elan`}
+          actions={
+            <ButtonLink href="/kabinet/elanlar/yeni" size="sm">
+              <Plus className="size-4" aria-hidden="true" />
+              Yeni elan
+            </ButtonLink>
+          }
+        />
 
         {params.yeni === "1" && (
           <p role="status" className="mt-6 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success">
@@ -62,38 +137,21 @@ export default async function CabinetPropertiesPage({
           </p>
         )}
 
-        {properties.length === 0 ? (
-          <div className="mt-8 rounded-md border border-line bg-paper p-6 text-ink-soft">
-            Hələ elan göndərməmisiniz. İlk elanınızı yaratmaq üçün «Yeni elan» düyməsindən istifadə edin.
-          </div>
-        ) : (
-          <ul className="mt-8 divide-y divide-line rounded-md border border-line bg-paper">
-            {properties.map((property) => {
-              const status = property.status as PropertyStatus;
-              return (
-                <li key={property.id} className="flex flex-wrap items-center gap-4 p-4 sm:flex-nowrap sm:p-5">
-                  <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xs bg-beige text-xs text-ink-muted">
-                    {property.images[0]?.url ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- kabinet siyahısında sabit, daxili URL
-                      <img src={property.images[0].url} alt="" className="size-full object-cover" />
-                    ) : (
-                      "Şəkil yoxdur"
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-ink">{property.title}</p>
-                    <p className="mt-1 text-sm text-ink-soft">
-                      {new Intl.NumberFormat("az-AZ").format(property.price)} {property.currency}
-                    </p>
-                  </div>
-                  <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
-                    {PROPERTY_STATUS_LABELS[status] ?? status}
-                  </Badge>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </>
+        <div className="mt-8">
+          <AdaptiveDataList
+            items={properties}
+            getKey={(property) => property.id}
+            renderCard={renderPropertyCard}
+            renderTable={renderPropertyList}
+            empty={
+              <EmptyState
+                title="Hələ elan göndərməmisiniz"
+                description="İlk elanınızı yaratdıqdan sonra statusunu bu səhifədən izləyə bilərsiniz."
+                action={{ label: "Yeni elan yarat", href: "/kabinet/elanlar/yeni" }}
+              />
+            }
+          />
+        </div>
+    </div>
   );
 }
