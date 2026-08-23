@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   Blocks,
   Building2,
   Contact,
@@ -38,6 +39,7 @@ const ICONS: Record<string, LucideIcon> = {
   SearchCheck,
   ShieldCheck,
   Tags,
+  BarChart3,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

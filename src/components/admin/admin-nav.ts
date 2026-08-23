@@ -34,6 +34,7 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Agentliklər", href: "/admin/agentlikler", icon: "ShieldCheck" },
       { label: "SEO auditı", href: "/admin/seo", icon: "SearchCheck" },
       { label: "Yönləndirmələr", href: "/admin/redirects", icon: "Route" },
+      { label: "Trafik analitikası", href: "/admin/analitika", icon: "BarChart3" },
     ],
   },
   {
