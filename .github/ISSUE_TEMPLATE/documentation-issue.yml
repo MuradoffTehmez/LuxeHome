@@ -1,0 +1,59 @@
+name: 📚 Documentation Issue
+description: README, Wiki və ya kod şərhlərindəki səhv/boşluğu bildirin
+title: "[Docs]: "
+labels: ["documentation"]
+assignees: []
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Fayl/səhifə
+      placeholder: "README.md, CONTRIBUTING.md, Wiki: Arxitektura"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: Yanlış və ya çatışmayan məlumat
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Təklif olunan dəyişiklik
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Hədəf auditoriya
+      options:
+        - Yeni töhfəçi
+        - Təcrübəli inkişaf etdirici
+        - Admin panel istifadəçisi
+        - Son istifadəçi
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Xarici istinadlar
+      description: Əlaqəli sənəd, kod sətri və ya link.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Təsdiqlər
+      options:
+        - label: Bu problem üçün mövcud issue axtardım və dublikat tapmadım
+          required: true
+        - label: Bu hesabatda həssas məlumat yoxdur
+          required: true
+        - label: Bu, [Davranış Kodeksi](../../CODE_OF_CONDUCT.md)-nə uyğundur
+          required: true

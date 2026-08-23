@@ -1,0 +1,72 @@
+name: 🎨 UI/UX Improvement
+description: Dizayn və istifadəçi təcrübəsi ilə bağlı təklif bildirin
+title: "[UI/UX]: "
+labels: ["enhancement"]
+assignees: []
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Route/komponent
+      placeholder: "/emlaklar, Navbar, admin Dashboard"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Hazırkı UX problemi
+      description: İstifadəçi təcrübəsində nə narahatlıq yaradır?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Təklif olunan yaxşılaşdırma
+    validations:
+      required: true
+
+  - type: dropdown
+    id: viewport
+    attributes:
+      label: Təsirlənən viewport
+      multiple: true
+      options:
+        - Mobil (< 640px)
+        - Planşet (640–1024px)
+        - Desktop (> 1024px)
+        - Hamısı
+    validations:
+      required: true
+
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility təsiri
+      description: Kontrast, klaviatura naviqasiyası, ekran oxuyucu və s. ilə əlaqəsi varmı?
+    validations:
+      required: true
+
+  - type: textarea
+    id: visuals
+    attributes:
+      label: Screenshot / vizual istinad
+      description: |
+        ⚠️ Diqqət: real müştəri məlumatı olan ekran görüntüsü əlavə etməyin.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Təsdiqlər
+      options:
+        - label: Bu təklif üçün mövcud issue axtardım və dublikat tapmadım
+          required: true
+        - label: Bu hesabatda həssas məlumat yoxdur
+          required: true
+        - label: Bu, [Davranış Kodeksi](../../CODE_OF_CONDUCT.md)-nə uyğundur
+          required: true
+        - label: Bu, təhlükəsizlik zəifliyi deyil (əks halda [SECURITY.md](../../SECURITY.md)-yə baxın)
+          required: true

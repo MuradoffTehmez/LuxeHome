@@ -1,0 +1,128 @@
+# Töhfə vermə bələdçisi
+
+Luxe Home Estate-ə töhfə vermək istədiyiniz üçün təşəkkür edirik. Bu sənəd issue açmaqdan
+pull request-in `main`-ə merge olunmasına qədər olan bütün axını izah edir.
+
+Töhfə verməzdən əvvəl [Davranış Kodeksi](CODE_OF_CONDUCT.md) və
+[Təhlükəsizlik Siyasəti](SECURITY.md) ilə tanış olun.
+
+## Əvvəlcə
+
+1. **Dublikat axtarın.** Yeni issue açmazdan əvvəl [mövcud issue-ları](https://github.com/MuradoffTehmez/LuxeHome/issues)
+   axtarın — eyni problem artıq qeydə alınmış ola bilər.
+2. **Uyğun Issue Form seçin.** Yeni issue açarkən [boş issue](https://github.com/MuradoffTehmez/LuxeHome/issues/new/choose)
+   deyil, aşağıdakılardan biri seçilməlidir:
+   - **Bug Report** — nasazlıq və gözlənilməyən davranış
+   - **Feature Request** — yeni funksiya təklifi
+   - **UI/UX Improvement** — dizayn və istifadəçi təcrübəsi
+   - **Performance Issue** — yavaşlıq, gecikmə, resurs istehlakı
+   - **Mobile/Responsive Issue** — mobil/planşet görünüş problemləri
+   - **Documentation Issue** — README, Wiki və ya kod şərhlərindəki səhv/boşluq
+3. **Təhlükəsizlik zəifliyini açıq issue kimi paylaşmayın.** [SECURITY.md](SECURITY.md)-dəki
+   məxfi kanaldan istifadə edin.
+
+## Töhfə axını
+
+```mermaid
+flowchart LR
+    A[Issue aç] --> B[Təsdiq gözlə]
+    B --> C[Branch yarat]
+    C --> D[Dəyişiklik et]
+    D --> E[Keyfiyyət qapısı]
+    E --> F[PR aç — Closes #issue]
+    F --> G[Review]
+    G -->|Dəyişiklik lazımdır| D
+    G -->|Təsdiqləndi| H[main-ə merge]
+```
+
+1. Issue açın və rəhbərlərdən təsdiq/istiqamət gözləyin — xüsusilə böyük dəyişikliklər üçün.
+2. Issue-dan ayrıca branch yaradın (aşağıdakı adlandırma qaydasına uyğun).
+3. Kiçik, məqsədli dəyişikliklər edin. Bir PR bir məqsəd daşımalıdır.
+4. [Conventional Commits](https://www.conventionalcommits.org/) formatından istifadə edin.
+5. Göndərmədən əvvəl lokal keyfiyyət qapısını işlədin.
+6. `Closes #<issue>` olan pull request açın.
+7. Review rəylərini ayrıca commit və ya məqsədli düzəlişlə cavablandırın — köhnə tarixçəni
+   `--force` ilə silməyin.
+8. Yalnız təsdiq və keyfiyyət qapısından keçdikdən sonra `main`-ə merge olunur.
+
+## Branch adlandırma
+
+Kiçik ingilis hərfləri, rəqəm və tire (`-`) istifadə edin. Bir branch bir issue və bir əsas
+məqsəd daşıyır.
+
+| Prefiks | Təyinat |
+|---|---|
+| `feature/<qisa-tesvir>` | Yeni funksiya |
+| `fix/<qisa-tesvir>` | Nasazlıq düzəlişi |
+| `docs/<qisa-tesvir>` | Yalnız sənəd dəyişikliyi |
+| `refactor/<qisa-tesvir>` | Davranışı dəyişməyən kod yenidənqurması |
+| `test/<qisa-tesvir>` | Test əlavəsi/düzəlişi |
+| `chore/<qisa-tesvir>` | Asılılıq, konfiqurasiya, alət dəyişikliyi |
+
+Nümunə: `fix/property-filter-crash`
+
+## Commit mesajları
+
+Format: `type(scope): qısa əmr cümləsi`
+
+Tiplər: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `style`, `build`, `ci`
+
+Breaking change `!` işarəsi və commit body-də `BREAKING CHANGE:` sətri ilə göstərilir:
+
+```
+feat(auth)!: sessiya cookie formatını dəyişdir
+
+BREAKING CHANGE: köhnə sessiya cookie-ləri etibarsızdır, bütün istifadəçilər yenidən daxil olmalıdır.
+```
+
+## Keyfiyyət qapısı
+
+Pull request açmazdan əvvəl bunların hamısı lokal olaraq keçməlidir:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+D1 sxem dəyişikliyi varsa, əlavə olaraq:
+
+```bash
+npm run db:migrate:local   # lokal D1-ə tətbiq et və yoxla
+```
+
+Miqrasiyalar həmişə geri qaytarıla bilən (reversible) olmalı və əvvəlcə lokal, sonra
+staging mühitində sınanmalıdır — birbaşa production-a tətbiq edilmir.
+
+## Kod qaydaları
+
+- **Dil konvensiyası:** identifikatorlar (dəyişən, funksiya, tip adı) ingiliscə, şərhlər və
+  istifadəçiyə görünən mətnlər azərbaycanca.
+- **Domen sabitləri:** status/rol/kateqoriya dəyərləri heç vaxt hardcode edilmir —
+  `src/lib/constants.ts`-dən istifadə olunur.
+- **Prisma:** yalnız `src/lib/prisma.ts`-dəki singleton üzərindən (`prisma/` altındakı
+  standalone scriptlər istisnadır).
+- **İctimai sorğular:** yeni ictimai əmlak sorğusu mütləq `publicPropertyWhere()`
+  predikatından başlamalıdır — əks halda qaralama/silinmiş qeydlər sızır.
+- **Dark mode:** `dark:` prefiksi yazılmır — mövcud semantik tokenlərdən (`bg-ivory`,
+  `text-ink` və s.) istifadə olunur, onlar `.dark` klassı altında öz-özünə yenidən təyin olunur.
+- **Sirlər:** heç bir parol, API açarı, token və ya production məlumatı commit edilmir.
+
+Ətraflı arxitektura və qaydalar üçün [README](README.md) və
+[texniki Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
+
+## Pull request
+
+PR açarkən şablonun bütün bölmələrini doldurun. Aid olmayan bölmə varsa, boş buraxmaq
+əvəzinə **"Tətbiq edilmir"** yazın ki, reviewer bunun nəzərdən qaçırılmadığını bilsin.
+
+Reviewer PR təsvirindən aşağıdakıları aydın görə bilməlidir:
+
+- dəyişikliyin növü və məqsədi;
+- test sübutu (komandalar və/və ya manual ssenari);
+- UI dəyişikliyi varsa, əvvəl/sonra görüntü;
+- breaking change, migration və ya deployment addımı varmı;
+- rollback lazım olarsa necə ediləcək.
+
+Töhfəniz üçün əvvəlcədən təşəkkür edirik.

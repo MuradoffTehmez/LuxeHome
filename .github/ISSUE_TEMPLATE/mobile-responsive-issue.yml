@@ -1,0 +1,92 @@
+name: 📱 Mobile/Responsive Issue
+description: Mobil və ya planşet görünüşündə problem bildirin
+title: "[Mobile]: "
+labels: ["bug"]
+assignees: []
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Route
+      placeholder: "/kabinet/elanlar/yeni"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Cihaz və ya viewport eni
+      placeholder: "iPhone 13 (390px), Samsung Galaxy S22, və ya 375px simulyasiya"
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Brauzer
+      placeholder: "Safari 17, Chrome Mobile 128"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: orientation
+    attributes:
+      label: Orientasiya
+      options:
+        - Portret
+        - Landşaft
+        - Hər ikisi
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Cari davranış
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Gözlənilən davranış
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Təkrarlama addımları
+    validations:
+      required: true
+
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshot / video
+      description: |
+        ⚠️ Diqqət: real müştəri məlumatı olan görüntü paylaşmayın.
+    validations:
+      required: false
+
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility təsiri
+      description: Toxunma hədəfi ölçüsü, kontrast, klaviatura/skrin-oxuyucu ilə əlaqəsi varmı?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Təsdiqlər
+      options:
+        - label: Bu problem üçün mövcud issue axtardım və dublikat tapmadım
+          required: true
+        - label: Bu hesabatda həssas məlumat yoxdur
+          required: true
+        - label: Bu, [Davranış Kodeksi](../../CODE_OF_CONDUCT.md)-nə uyğundur
+          required: true
+        - label: Bu, təhlükəsizlik zəifliyi deyil (əks halda [SECURITY.md](../../SECURITY.md)-yə baxın)
+          required: true

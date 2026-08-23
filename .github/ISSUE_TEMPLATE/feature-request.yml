@@ -1,0 +1,83 @@
+name: ✨ Feature Request
+description: Yeni funksiya və ya təkmilləşdirmə təklif edin
+title: "[Feature]: "
+labels: ["enhancement"]
+assignees: []
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Həll edilən problem
+      description: Hansı ehtiyac və ya çətinlik bu təklifi doğurur?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Təklif olunan nəticə
+      description: Funksiya necə işləməlidir?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-type
+    attributes:
+      label: İstifadəçi tipi
+      description: Bu funksiyadan kim faydalanacaq?
+      options:
+        - Ziyarətçi / axtaran
+        - Qeydiyyatlı istifadəçi (mülk sahibi/agentlik)
+        - Admin panel istifadəçisi (əməkdaş)
+        - Digər
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Bu funksiya nə vaxt "hazır" sayılır? Siyahı şəklində yazın.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Bu təklifə nə daxildir, nə daxil deyil?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativlər
+      description: Nəzərdən keçirdiyiniz başqa həll yolları varmı?
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Əlavə kontekst
+      description: Referans link, rəqib nümunəsi, mockup və s.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Təsdiqlər
+      options:
+        - label: Bu təklif üçün mövcud issue axtardım və dublikat tapmadım
+          required: true
+        - label: Bu hesabatda həssas məlumat yoxdur
+          required: true
+        - label: Bu, [Davranış Kodeksi](../../CODE_OF_CONDUCT.md)-nə uyğundur
+          required: true
+        - label: Bu, təhlükəsizlik zəifliyi deyil (əks halda [SECURITY.md](../../SECURITY.md)-yə baxın)
+          required: true

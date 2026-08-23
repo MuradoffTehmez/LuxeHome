@@ -1,0 +1,94 @@
+name: 🐛 Bug Report
+description: Saytda və ya admin paneldə nasazlıq və gözlənilməyən davranış bildirin
+title: "[Bug]: "
+labels: ["bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Nasazlığı bildirdiyiniz üçün təşəkkür edirik. Aşağıdakı sahələri mümkün qədər dəqiq doldurun.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Qısa təsvir
+      description: Nasazlığı bir-iki cümlə ilə təsvir edin.
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Təsirlənən səhifə/komponent
+      description: Məsələn `/emlaklar`, `SearchPanel`, admin `İstifadəçilər` səhifəsi.
+      placeholder: "/emlaklar/[slug]"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Cari davranış
+      description: Hazırda nə baş verir?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Gözlənilən davranış
+      description: Nə baş verməli idi?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Təkrarlama addımları
+      placeholder: |
+        1. ... səhifəsinə keçin
+        2. ... düyməsinə klikləyin
+        3. Xəta görünür
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Brauzer və əməliyyat sistemi
+      placeholder: "Chrome 128, Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: regression
+    attributes:
+      label: Mümkün regressiya məlumatı
+      description: Əvvəllər işləyirdisə, hansı dəyişiklikdən sonra pozulduğunu bilirsinizmi?
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log / screenshot
+      description: |
+        ⚠️ Diqqət: parol, sessiya cookie-si, token və ya real müştəri məlumatı əlavə etməyin.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Təsdiqlər
+      options:
+        - label: Bu problem üçün mövcud issue axtardım və dublikat tapmadım
+          required: true
+        - label: Bu hesabatda həssas məlumat (parol, token, real müştəri datası) yoxdur
+          required: true
+        - label: Bu, [Davranış Kodeksi](../../CODE_OF_CONDUCT.md)-nə uyğundur
+          required: true
+        - label: Bu, təhlükəsizlik zəifliyi deyil (əks halda [SECURITY.md](../../SECURITY.md)-yə baxın)
+          required: true

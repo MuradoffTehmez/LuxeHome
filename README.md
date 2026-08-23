@@ -8,6 +8,10 @@
     ·
     <a href="https://github.com/MuradoffTehmez/LuxeHome/wiki">Texniki Wiki</a>
     ·
+    <a href="CONTRIBUTING.md">Töhfə vermə bələdçisi</a>
+    ·
+    <a href="CODE_OF_CONDUCT.md">Davranış Kodeksi</a>
+    ·
     <a href="SECURITY.md">Təhlükəsizlik siyasəti</a>
     ·
     <a href="LICENSE">MIT lisenziyası</a>
@@ -291,6 +295,21 @@ D1 üçün destruktiv dəyişikliklər geri dönüş planı olmadan production-a
 - Admin route-ları CSP, `no-store`, clickjacking və referrer başlıqları ilə sərtləşdirilib.
 
 Zəifliyi açıq issue kimi paylaşmayın. Bildiriş qaydası üçün [SECURITY.md](SECURITY.md)-yə baxın.
+
+## Töhfə vermək
+
+Töhfələr açığız — nasazlıq bildirişi, funksiya təklifi və ya sənəd düzəlişi olsun.
+
+1. Uyğun [Issue Form](https://github.com/MuradoffTehmez/LuxeHome/issues/new/choose) seçib
+   problemi strukturlaşdırılmış şəkildə bildirin.
+2. Təhlükəsizlik zəifliyini açıq issue kimi paylaşmayın — [SECURITY.md](SECURITY.md)-dəki məxfi
+   kanaldan istifadə edin.
+3. Issue təsdiqindən sonra branch yaradıb dəyişikliyi edin və `Closes #issue` olan pull request
+   açın.
+4. Tam axın, branch adlandırma, commit qaydaları və keyfiyyət qapısı üçün
+   [CONTRIBUTING.md](CONTRIBUTING.md)-ə baxın.
+
+İştirak edərkən [Davranış Kodeksi](CODE_OF_CONDUCT.md)-nə əməl olunur.
 
 ## Keyfiyyət qapısı
 

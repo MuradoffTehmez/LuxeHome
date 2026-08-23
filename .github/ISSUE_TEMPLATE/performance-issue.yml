@@ -1,0 +1,76 @@
+name: ⚡ Performance Issue
+description: Yavaşlıq, gecikmə və ya resurs istehlakı problemi bildirin
+title: "[Performance]: "
+labels: ["bug"]
+assignees: []
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Təsirlənən route/əməliyyat
+      placeholder: "/emlaklar filtr sorğusu, admin Media yüklənməsi"
+    validations:
+      required: true
+
+  - type: textarea
+    id: symptom
+    attributes:
+      label: Ölçülən simptom
+      description: Nə qədər yavaş? Hansı fəaliyyət təsirlənir?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Təkrarlama addımları
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Mühit
+      placeholder: "Production / Staging, brauzer, şəbəkə (4G, Wi-Fi)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: measurement
+    attributes:
+      label: Müşahidə olunan ölçü
+      description: Vaxt (ms/san), TTFB, LCP və ya digər ölçülən dəyər.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Lighthouse / profiler / network trace
+      description: |
+        ⚠️ Diqqət: həssas sorğu başlıqları (cookie, auth token) daxil olan trace paylaşmayın.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: regression
+    attributes:
+      label: Regression məlumatı
+      description: Əvvəllər sürətli idisə, nə vaxtdan yavaşladığını bilirsinizmi?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Təsdiqlər
+      options:
+        - label: Bu problem üçün mövcud issue axtardım və dublikat tapmadım
+          required: true
+        - label: Bu hesabatda həssas məlumat yoxdur
+          required: true
+        - label: Bu, [Davranış Kodeksi](../../CODE_OF_CONDUCT.md)-nə uyğundur
+          required: true
+        - label: Bu, təhlükəsizlik zəifliyi deyil (əks halda [SECURITY.md](../../SECURITY.md)-yə baxın)
+          required: true
