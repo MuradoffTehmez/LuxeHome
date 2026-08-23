@@ -41,7 +41,6 @@ export function Logo({
           alt=""
           width={512}
           height={512}
-          priority
           className="size-8 shrink-0 sm:size-11"
         />
       )}

@@ -100,7 +100,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     alt={service.title}
                     fill
                     priority
-                    sizes="(max-width: 1024px) 100vw, 66vw"
+                    sizes="(max-width: 1023px) calc(100vw - 2.5rem), (max-width: 1279px) calc(100vw - 29rem), 764px"
                     className="object-cover"
                   />
                 </div>

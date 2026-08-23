@@ -107,7 +107,7 @@ export default async function BlogPage({ searchParams }: Props) {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {postsResult.items.map((post, index) => (
                   <Reveal key={post.id} delay={index * 50}>
-                    <PostCard post={post} />
+                    <PostCard post={post} priority={index === 0} />
                   </Reveal>
                 ))}
               </div>

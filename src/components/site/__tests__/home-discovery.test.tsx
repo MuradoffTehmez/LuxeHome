@@ -62,7 +62,7 @@ describe("ana səhifə discovery təcrübəsi", () => {
     const projectHtml = renderToStaticMarkup(<ProjectCard project={project} />);
     const postHtml = renderToStaticMarkup(<PostCard post={post} />);
     const expectedSizes =
-      "(max-width: 639px) calc(100vw - 2rem), (max-width: 1279px) calc(50vw - 2rem), 33vw";
+      "(max-width: 639px) calc(100vw - 2.5rem), (max-width: 1279px) calc(50vw - 2.25rem), 448px";
 
     expect(projectHtml).toContain(`sizes="${expectedSizes}"`);
     expect(postHtml).toContain(`sizes="${expectedSizes}"`);

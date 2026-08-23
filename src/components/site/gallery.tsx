@@ -98,7 +98,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
                 fill
                 priority={imageIndex === 0}
                 loading={imageIndex === 0 ? undefined : "lazy"}
-                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
+                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 390px"
                 className="image-lift object-cover"
               />
               <span className="absolute right-3 bottom-3 inline-flex size-11 items-center justify-center rounded-full bg-charcoal/50 text-white opacity-100 backdrop-blur-sm transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">

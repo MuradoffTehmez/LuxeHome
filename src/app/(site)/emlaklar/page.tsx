@@ -242,7 +242,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {items.map((property, index) => (
                   <Reveal key={property.id} delay={index * 40}>
-                    <PropertyCard property={property} priority={index < 3} />
+                    <PropertyCard property={property} priority={index === 0} />
                   </Reveal>
                 ))}
               </div>

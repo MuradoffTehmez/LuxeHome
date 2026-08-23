@@ -159,7 +159,6 @@ export default async function HomePage() {
                   >
                     <PropertyCard
                       property={property}
-                      priority={index < 3}
                       variant={index === 0 ? "featured" : "standard"}
                     />
                   </Reveal>
@@ -423,7 +422,6 @@ export default async function HomePage() {
                 >
                   <PostCard
                     post={post}
-                    priority={index === 0}
                     variant={index === 0 ? "featured" : "standard"}
                   />
                 </Reveal>
