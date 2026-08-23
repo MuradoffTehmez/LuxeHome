@@ -85,7 +85,7 @@ export function AdminForm({
         {children}
 
         {/* Uzun formada saxla düyməsi həmişə əlçatan qalır */}
-        <div className="sticky bottom-0 z-20 -mx-4 flex flex-wrap items-center justify-end gap-2 border-t border-line bg-paper/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+        <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 flex flex-wrap items-center justify-end gap-2 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:-mx-6 sm:px-6 sm:pb-3">
           {extraActions}
           {cancelHref && (
             <Link
@@ -146,19 +146,24 @@ export function FormSection({
   description,
   children,
   className,
+  asFieldset = false,
 }: {
   title: string;
   description?: string;
   children: React.ReactNode;
   className?: string;
+  asFieldset?: boolean;
 }) {
+  const Tag = asFieldset ? "fieldset" : "section";
+
   return (
-    <section className={cn("rounded-md border border-line bg-paper", className)}>
+    <Tag className={cn("min-w-0 rounded-md border border-line bg-paper", className)}>
+      {asFieldset ? <legend className="sr-only">{title}</legend> : null}
       <header className="border-b border-line px-5 py-4">
         <h2 className="font-display text-lg text-ink">{title}</h2>
         {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
       </header>
-      <div className="grid gap-4 p-5 sm:grid-cols-2">{children}</div>
-    </section>
+      <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">{children}</div>
+    </Tag>
   );
 }

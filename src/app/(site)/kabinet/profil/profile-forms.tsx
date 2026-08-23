@@ -19,8 +19,8 @@ function StateMessage({ state }: { state: ActionState }) {
       role={error ? "alert" : "status"}
       className={
         error
-          ? "flex items-start gap-2.5 rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
-          : "flex items-start gap-2.5 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
+          ? "flex min-w-0 items-start gap-2.5 rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger [overflow-wrap:anywhere]"
+          : "flex min-w-0 items-start gap-2.5 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success [overflow-wrap:anywhere]"
       }
     >
       <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
@@ -92,9 +92,11 @@ export function ProfileForm({
         </>
       )}
 
-      <Button type="submit" loading={pending} className="w-fit">
-        Yadda saxla
-      </Button>
+      <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
+        <Button type="submit" loading={pending} className="w-full sm:w-auto">
+          Yadda saxla
+        </Button>
+      </div>
     </form>
   );
 }
@@ -132,9 +134,11 @@ export function PasswordForm() {
         error={state.fieldErrors?.repeat}
       />
 
-      <Button type="submit" variant="outline" loading={pending} className="w-fit">
-        Parolu dəyiş
-      </Button>
+      <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
+        <Button type="submit" variant="outline" loading={pending} className="w-full sm:w-auto">
+          Parolu dəyiş
+        </Button>
+      </div>
     </form>
   );
 }

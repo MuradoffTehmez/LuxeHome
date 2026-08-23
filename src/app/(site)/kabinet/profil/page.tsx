@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@/components/ui/page-header";
 import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
@@ -33,14 +34,15 @@ export default async function CabinetProfilePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-1">
-        <h1 className="font-display text-3xl text-ink">Profil</h1>
-        <p className="text-sm text-ink-soft">
-          E-poçt dəyişdirilmir — dəyişiklik üçün bizimlə əlaqə saxlayın ({profile.email}).
-        </p>
-      </header>
+      <PageHeader
+        contained
+        compact
+        eyebrow="Kabinet"
+        title="Profil"
+        description={`E-poçt dəyişdirilmir — dəyişiklik üçün bizimlə əlaqə saxlayın (${profile.email}).`}
+      />
 
-      <section className="rounded-md border border-line bg-paper p-6">
+      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
         <h2 className="mb-5 font-display text-lg text-ink">Hesab məlumatları</h2>
         <ProfileForm
           name={profile.name}
@@ -59,7 +61,7 @@ export default async function CabinetProfilePage() {
         />
       </section>
 
-      <section className="rounded-md border border-line bg-paper p-6">
+      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
         <h2 className="mb-5 font-display text-lg text-ink">Parol</h2>
         <PasswordForm />
       </section>

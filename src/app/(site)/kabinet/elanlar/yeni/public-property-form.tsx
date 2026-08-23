@@ -57,7 +57,8 @@ export function PublicPropertyForm({
   return (
     <AdminForm action={action} submitLabel="Elanı göndər" cancelHref="/kabinet/elanlar">
       <FormSection
-        title="Elan məlumatları"
+        asFieldset
+        title="Əsas məlumat"
         description="Elan yoxlanıldıqdan sonra saytda görünəcək."
       >
         <FullWidth>
@@ -81,7 +82,7 @@ export function PublicPropertyForm({
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Elan növü və qiymət">
+      <FormSection asFieldset title="Qiymət və elan növü">
         <AdminSelect
           name="listingType"
           label="Elan növü"
@@ -109,7 +110,7 @@ export function PublicPropertyForm({
         )}
       </FormSection>
 
-      <FormSection title="Yerləşmə">
+      <FormSection asFieldset title="Ünvan">
         <AdminSelect
           name="typeId"
           label="Əmlak növü"
@@ -141,7 +142,7 @@ export function PublicPropertyForm({
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Ölçülər">
+      <FormSection asFieldset title="Ölçü və planlama">
         <AdminInput name="rooms" label="Otaq sayı" type="number" min={0} />
         <AdminInput name="bedrooms" label="Yataq otağı" type="number" min={0} />
         <AdminInput name="bathrooms" label="Sanitar qovşaq" type="number" min={0} />
@@ -151,7 +152,7 @@ export function PublicPropertyForm({
         <AdminInput name="totalFloors" label="Binanın mərtəbəsi" type="number" min={0} />
       </FormSection>
 
-      <FormSection title="Vəziyyət və şərtlər">
+      <FormSection asFieldset title="Vəziyyət və şərtlər">
         <AdminSelect
           name="renovation"
           label="Təmir vəziyyəti"
@@ -180,7 +181,7 @@ export function PublicPropertyForm({
       </FormSection>
 
       {options.features.length > 0 && (
-        <FormSection title="Xüsusiyyətlər" description="Uyğun alıcılara daha asan çatın.">
+        <FormSection asFieldset title="Xüsusiyyətlər" description="Uyğun alıcılara daha asan çatın.">
           <FullWidth>
             <div className="flex flex-col gap-4">
               {Object.entries(featureGroups).map(([group, features]) => (
@@ -205,7 +206,7 @@ export function PublicPropertyForm({
         </FormSection>
       )}
 
-      <FormSection title="Şəkillər" description="Birinci şəkil elanınızın üz qabığı olacaq.">
+      <FormSection asFieldset title="Şəkillər" description="Birinci şəkil elanınızın üz qabığı olacaq.">
         <FullWidth>
           <ImageDropzone
             name="images"

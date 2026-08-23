@@ -220,7 +220,7 @@ export function ImageDropzone({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex w-full cursor-pointer flex-col items-center gap-2 px-6 py-8 text-center"
+          className="flex min-h-32 w-full cursor-pointer flex-col items-center justify-center gap-2 px-4 py-6 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset sm:px-6 sm:py-8"
         >
           <span className="grid size-12 place-items-center rounded-full bg-beige text-ink-soft">
             <UploadCloud className="size-6" aria-hidden="true" />
@@ -270,7 +270,7 @@ export function ImageDropzone({
                   src={item.url}
                   alt=""
                   fill
-                  sizes="(max-width: 640px) 50vw, 25vw"
+                  sizes="(max-width: 639px) calc(50vw - 2rem), (max-width: 1023px) 33vw, 25vw"
                   // Blob URL-lər Next optimizasiyasından keçmir
                   unoptimized={item.url.startsWith("blob:")}
                   className={cn("object-cover", item.status !== "ready" && "opacity-50")}
@@ -307,7 +307,7 @@ export function ImageDropzone({
                     onChange={(event) => setAlt(item.id, event.target.value)}
                     placeholder="Alt mətn (SEO)"
                     maxLength={160}
-                    className="min-h-9 w-full rounded-xs border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
+                    className="min-h-11 w-full rounded-xs border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
                   />
 
                   <div className="flex items-center justify-between gap-0.5">
@@ -319,7 +319,7 @@ export function ImageDropzone({
                           disabled={index === 0}
                           aria-label="Sırada əvvələ apar"
                           title="Əvvələ"
-                          className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                          className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                         >
                           <ChevronLeft className="size-4" aria-hidden="true" />
                         </button>
@@ -329,7 +329,7 @@ export function ImageDropzone({
                           disabled={index === items.length - 1}
                           aria-label="Sırada sona apar"
                           title="Sona"
-                          className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                          className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                         >
                           <ChevronRight className="size-4" aria-hidden="true" />
                         </button>
@@ -345,7 +345,7 @@ export function ImageDropzone({
                           onClick={() => setCover(item.id)}
                           aria-label="Üz qabığı et"
                           title="Üz qabığı et"
-                          className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-beige hover:text-gold-deep"
+                          className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-beige hover:text-gold-deep"
                         >
                           <Star className="size-4" aria-hidden="true" />
                         </button>
@@ -355,7 +355,7 @@ export function ImageDropzone({
                         onClick={() => remove(item.id)}
                         aria-label="Şəkli sil"
                         title="Sil"
-                        className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
+                        className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
                       >
                         <Trash2 className="size-4" aria-hidden="true" />
                       </button>
@@ -371,7 +371,7 @@ export function ImageDropzone({
                     onClick={() => remove(item.id)}
                     aria-label="Uğursuz şəkli siyahıdan çıxar"
                     title="Çıxar"
-                    className="grid size-8 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
+                    className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
                   </button>
@@ -385,7 +385,7 @@ export function ImageDropzone({
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="flex aspect-4/3 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xs border-2 border-dashed border-line-strong text-ink-muted transition-colors hover:border-gold hover:text-gold-deep"
+                className="flex min-h-11 aspect-4/3 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xs border-2 border-dashed border-line-strong text-ink-muted transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
               >
                 <ImagePlus className="size-6" aria-hidden="true" />
                 <span className="text-xs font-medium">Daha əlavə et</span>

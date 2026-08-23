@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@/components/ui/page-header";
 import { getPropertyFormOptions } from "@/lib/queries";
 import { requireLister } from "@/lib/auth/guard";
 import { buildMetadata } from "@/lib/seo";
@@ -17,16 +18,17 @@ export default async function NewPropertyPage() {
   const options = await getPropertyFormOptions();
 
   return (
-      <>
-        <header className="mb-8">
-          <p className="text-sm font-medium text-gold-deep">Kabinet / Elanlar</p>
-          <h1 className="mt-2 font-display text-3xl text-ink sm:text-4xl">Yeni elan göndər</h1>
-          <p className="mt-3 max-w-2xl text-ink-soft">
-            Məlumatları diqqətlə doldurun. Elanınız hesab növünüzə uyğun olaraq yoxlanacaq və ya
-            dərhal dərc ediləcək.
-          </p>
-        </header>
+      <div className="min-w-0">
+        <PageHeader
+          contained
+          compact
+          eyebrow="Kabinet / Elanlar"
+          title="Yeni elan göndər"
+          description="Məlumatları diqqətlə doldurun. Elanınız hesab növünüzə uyğun olaraq yoxlanacaq və ya dərhal dərc ediləcək."
+        />
+        <div className="mt-8">
         <PublicPropertyForm action={createPublicProperty} options={options} />
-      </>
+        </div>
+      </div>
   );
 }
