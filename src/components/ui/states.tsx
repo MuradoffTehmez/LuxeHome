@@ -1,6 +1,7 @@
 import { AlertTriangle, Inbox, SearchX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button, ButtonLink } from "./button";
+import { Container, Section } from "./container";
 
 // ---------------------------------------------------------------------------
 // SKELETON
@@ -61,18 +62,66 @@ export function ArticleCardSkeleton() {
   );
 }
 
+export function CollectionPageSkeleton({
+  cards = 6,
+  variant = "property",
+}: {
+  cards?: number;
+  variant?: "property" | "article";
+}) {
+  return (
+    <div role="status" aria-label="Məzmun yüklənir" aria-busy="true">
+      <header className="border-b border-line bg-[var(--surface-page)] py-7 sm:py-9">
+        <Container>
+          <Skeleton className="mb-4 h-4 w-28" />
+          <Skeleton className="h-10 w-full max-w-xl sm:h-12" />
+          <Skeleton className="mt-4 h-5 w-full max-w-2xl" />
+        </Container>
+      </header>
+      <Section tone="ivory" spacing="cozy">
+        <Container>
+          {variant === "article" ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: cards }, (_, index) => (
+                <ArticleCardSkeleton key={index} />
+              ))}
+            </div>
+          ) : (
+            <PropertyGridSkeleton count={cards} />
+          )}
+        </Container>
+      </Section>
+      <span className="sr-only">Məzmun yüklənir…</span>
+    </div>
+  );
+}
+
 export function DetailSkeleton() {
   return (
-    <div className="flex flex-col gap-8">
-      <Skeleton className="aspect-16/9 w-full rounded-md" />
-      <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-        <div className="flex flex-col gap-4">
-          <Skeleton className="h-9 w-3/4" />
-          <Skeleton className="h-5 w-1/2" />
-          <Skeleton className="h-32 w-full" />
-        </div>
-        <Skeleton className="h-72 w-full rounded-md" />
-      </div>
+    <div role="status" aria-label="Detal səhifəsi yüklənir" aria-busy="true">
+      <header className="border-b border-line bg-[var(--surface-page)] py-7 sm:py-9">
+        <Container>
+          <Skeleton className="mb-4 h-4 w-36" />
+          <Skeleton className="h-10 w-full max-w-2xl sm:h-12" />
+          <Skeleton className="mt-4 h-5 w-full max-w-xl" />
+        </Container>
+      </header>
+      <Section tone="ivory" spacing="cozy">
+        <Container>
+          <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
+            <div className="flex min-w-0 flex-col gap-6">
+              <Skeleton className="aspect-16/9 w-full rounded-md" />
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-5 w-1/2" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+            <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
+              <Skeleton className="h-80 w-full rounded-md" />
+            </div>
+          </div>
+        </Container>
+      </Section>
+      <span className="sr-only">Detal məlumatları yüklənir…</span>
     </div>
   );
 }
