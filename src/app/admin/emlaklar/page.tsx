@@ -13,6 +13,10 @@ import {
   StatusBadge,
 } from "@/components/admin/admin-ui";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatArea, formatNumber, formatPrice, formatRelative } from "@/lib/utils";
 import {
@@ -79,6 +83,54 @@ export default async function AdminPropertiesPage({
     return search ? `${LIST_PATH}?${search}` : LIST_PATH;
   }
 
+  function renderActions(property: (typeof rows)[number]) {
+    return deleted ? (
+      <ConfirmAction
+        action={restoreProperty}
+        id={property.id}
+        label={`«${property.title}» elanını bərpa et`}
+        title="Elanı bərpa etmək"
+        description="Elan yenidən aktiv siyahıya qayıdacaq. Statusu dəyişmir."
+        confirmLabel="Bərpa et"
+        tone="neutral"
+        className="size-11"
+      >
+        <RotateCcw className="size-4" aria-hidden="true" />
+      </ConfirmAction>
+    ) : (
+      <>
+        <Link
+          href={`/emlaklar/${property.slug}`}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`«${property.title}» elanını saytda aç`}
+          title="Saytda bax"
+          className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+        >
+          <Eye className="size-4" aria-hidden="true" />
+        </Link>
+        <Link
+          href={`${LIST_PATH}/${property.id}`}
+          aria-label={`«${property.title}» elanını redaktə et`}
+          title="Redaktə et"
+          className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+        >
+          <Pencil className="size-4" aria-hidden="true" />
+        </Link>
+        <ConfirmAction
+          action={deleteProperty}
+          id={property.id}
+          label={`«${property.title}» elanını sil`}
+          title="Elanı silmək"
+          description="Elan saytdan çıxarılacaq, amma zibil qutusunda qalacaq və bərpa edilə bilər."
+          className="size-11"
+        >
+          <Trash2 className="size-4" aria-hidden="true" />
+        </ConfirmAction>
+      </>
+    );
+  }
+
   return (
     <>
       <AdminPageHeader
@@ -115,6 +167,7 @@ export default async function AdminPropertiesPage({
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder="Başlıq, ünvan və ya slug üzrə axtar…"
+          resultLabel={`${total} elan tapıldı`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
@@ -162,138 +215,136 @@ export default async function AdminPropertiesPage({
           ]}
         />
 
-        <AdminTable
-          caption="Əmlak elanları"
-          headers={[
-            { label: "Elan" },
-            { label: "Növ" },
-            { label: "Qiymət", className: "text-right" },
-            { label: "Ölçü", className: "text-right" },
-            { label: "Status" },
-            { label: "Baxış", className: "text-right" },
-            { label: "Yenilənib", className: "text-right" },
-            { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
-          ]}
-        >
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={8} className="px-4 py-10 text-center text-sm text-ink-muted">
+        <div className="p-4 lg:p-0">
+          <AdminResponsiveList
+            ariaLabel="Əmlak elanları"
+            items={rows}
+            getKey={(property) => property.id}
+            empty={
+              <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.listingType
                   ? "Bu filtrlərə uyğun elan tapılmadı."
                   : "Hələ əmlak əlavə edilməyib."}
-              </td>
-            </tr>
-          )}
-          {rows.map((property) => (
-            <AdminTableRow key={property.id}>
-              <AdminTableCell className="max-w-xs">
-                <div className="flex items-start gap-2">
-                  {property.isFeatured && (
-                    <Star
-                      className="mt-1 size-3.5 shrink-0 fill-current text-gold"
-                      aria-label="Tövsiyə olunan"
-                    />
-                  )}
-                  <div className="min-w-0">
-                    <Link
-                      href={`${LIST_PATH}/${property.id}`}
-                      className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep"
-                    >
+              </p>
+            }
+            renderCard={(property) => (
+              <AdminListCard
+                title={
+                  <span className="flex items-start gap-2">
+                    {property.isFeatured ? (
+                      <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label="Tövsiyə olunan" />
+                    ) : null}
+                    <Link href={`${LIST_PATH}/${property.id}`} className="transition-colors hover:text-gold-deep">
                       {property.title}
                     </Link>
-                    <p className="mt-0.5 text-xs text-ink-muted">
-                      {[property.district?.name, property.city.name].filter(Boolean).join(", ")}
-                    </p>
-                  </div>
-                </div>
-              </AdminTableCell>
-
-              <AdminTableCell>
-                <div className="flex flex-col gap-1">
-                  <Badge tone={property.listingType === "SALE" ? "dark" : "gold"}>
-                    {LISTING_TYPE_LABELS[property.listingType as ListingType]}
-                  </Badge>
-                  <span className="text-xs text-ink-muted">{property.type.name}</span>
-                </div>
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="tabular font-medium whitespace-nowrap">
-                {formatPrice(property.price, property.currency)}
-              </AdminTableCell>
-
-              <AdminTableCell
-                align="right"
-                className="tabular text-sm whitespace-nowrap text-ink-soft"
+                  </span>
+                }
+                meta={
+                  <>
+                    {[property.district?.name, property.city.name].filter(Boolean).join(", ")}
+                    <span className="mt-1 block">{formatRelative(property.updatedAt)}</span>
+                  </>
+                }
+                status={
+                  <StatusBadge
+                    status={property.status as PropertyStatus}
+                    label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]}
+                  />
+                }
+                actions={renderActions(property)}
               >
-                {property.area ? formatArea(property.area) : "—"}
-                {property.rooms ? ` · ${property.rooms} otaq` : ""}
-              </AdminTableCell>
-
-              <AdminTableCell>
-                <StatusBadge
-                  status={property.status as PropertyStatus}
-                  label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]}
-                />
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="tabular text-sm text-ink-soft">
-                {formatNumber(property.viewCount)}
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
-                {formatRelative(property.updatedAt)}
-              </AdminTableCell>
-
-              <AdminTableCell align="right">
-                <div className="flex items-center justify-end gap-0.5">
-                  {deleted ? (
-                    <ConfirmAction
-                      action={restoreProperty}
-                      id={property.id}
-                      label={`«${property.title}» elanını bərpa et`}
-                      title="Elanı bərpa etmək"
-                      description="Elan yenidən aktiv siyahıya qayıdacaq. Statusu dəyişmir."
-                      confirmLabel="Bərpa et"
-                      tone="neutral"
-                    >
-                      <RotateCcw className="size-4" aria-hidden="true" />
-                    </ConfirmAction>
-                  ) : (
-                    <>
-                      <Link
-                        href={`/emlaklar/${property.slug}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={`«${property.title}» elanını saytda aç`}
-                        title="Saytda bax"
-                        className="grid size-9 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
-                      >
-                        <Eye className="size-4" aria-hidden="true" />
-                      </Link>
-                      <Link
-                        href={`${LIST_PATH}/${property.id}`}
-                        aria-label={`«${property.title}» elanını redaktə et`}
-                        title="Redaktə et"
-                        className="grid size-9 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
-                      >
-                        <Pencil className="size-4" aria-hidden="true" />
-                      </Link>
-                      <ConfirmAction
-                        action={deleteProperty}
-                        id={property.id}
-                        label={`«${property.title}» elanını sil`}
-                        title="Elanı silmək"
-                        description="Elan saytdan çıxarılacaq, amma zibil qutusunda qalacaq və bərpa edilə bilər."
-                      >
-                        <Trash2 className="size-4" aria-hidden="true" />
-                      </ConfirmAction>
-                    </>
-                  )}
-                </div>
-              </AdminTableCell>
-            </AdminTableRow>
-          ))}
-        </AdminTable>
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div>
+                    <dt className="text-xs text-ink-muted">Elan</dt>
+                    <dd className="mt-1 flex flex-wrap items-center gap-2">
+                      <Badge tone={property.listingType === "SALE" ? "dark" : "gold"}>
+                        {LISTING_TYPE_LABELS[property.listingType as ListingType]}
+                      </Badge>
+                      <span>{property.type.name}</span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Qiymət</dt>
+                    <dd className="tabular mt-1 font-medium text-ink">{formatPrice(property.price, property.currency)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Ölçü</dt>
+                    <dd className="tabular mt-1 text-ink">
+                      {property.area ? formatArea(property.area) : "—"}
+                      {property.rooms ? ` · ${property.rooms} otaq` : ""}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Baxış</dt>
+                    <dd className="tabular mt-1 text-ink">{formatNumber(property.viewCount)}</dd>
+                  </div>
+                </dl>
+              </AdminListCard>
+            )}
+            renderTable={(items) => (
+              <AdminTable
+                caption="Əmlak elanları"
+                headers={[
+                  { label: "Elan" },
+                  { label: "Növ" },
+                  { label: "Qiymət", className: "text-right" },
+                  { label: "Ölçü", className: "text-right" },
+                  { label: "Status" },
+                  { label: "Baxış", className: "text-right" },
+                  { label: "Yenilənib", className: "text-right" },
+                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                ]}
+              >
+                {items.map((property) => (
+                  <AdminTableRow key={property.id}>
+                    <AdminTableCell className="max-w-xs">
+                      <div className="flex items-start gap-2">
+                        {property.isFeatured ? (
+                          <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label="Tövsiyə olunan" />
+                        ) : null}
+                        <div className="min-w-0">
+                          <Link href={`${LIST_PATH}/${property.id}`} className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep">
+                            {property.title}
+                          </Link>
+                          <p className="mt-0.5 text-xs text-ink-muted">
+                            {[property.district?.name, property.city.name].filter(Boolean).join(", ")}
+                          </p>
+                        </div>
+                      </div>
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <div className="flex flex-col gap-1">
+                        <Badge tone={property.listingType === "SALE" ? "dark" : "gold"}>
+                          {LISTING_TYPE_LABELS[property.listingType as ListingType]}
+                        </Badge>
+                        <span className="text-xs text-ink-muted">{property.type.name}</span>
+                      </div>
+                    </AdminTableCell>
+                    <AdminTableCell align="right" className="tabular font-medium whitespace-nowrap">
+                      {formatPrice(property.price, property.currency)}
+                    </AdminTableCell>
+                    <AdminTableCell align="right" className="tabular text-sm whitespace-nowrap text-ink-soft">
+                      {property.area ? formatArea(property.area) : "—"}
+                      {property.rooms ? ` · ${property.rooms} otaq` : ""}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <StatusBadge status={property.status as PropertyStatus} label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]} />
+                    </AdminTableCell>
+                    <AdminTableCell align="right" className="tabular text-sm text-ink-soft">
+                      {formatNumber(property.viewCount)}
+                    </AdminTableCell>
+                    <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
+                      {formatRelative(property.updatedAt)}
+                    </AdminTableCell>
+                    <AdminTableCell align="right">
+                      <div className="flex items-center justify-end gap-0.5">{renderActions(property)}</div>
+                    </AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTable>
+            )}
+          />
+        </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">

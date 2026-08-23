@@ -13,6 +13,10 @@ import {
   StatusBadge,
 } from "@/components/admin/admin-ui";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatRelative } from "@/lib/utils";
 import {
@@ -71,6 +75,54 @@ export default async function AdminProjectsPage({
     return search ? `${LIST_PATH}?${search}` : LIST_PATH;
   }
 
+  function renderActions(project: (typeof rows)[number]) {
+    return deleted ? (
+      <ConfirmAction
+        action={restoreProject}
+        id={project.id}
+        label={`«${project.name}» layihəsini bərpa et`}
+        title="Layihəni bərpa etmək"
+        description="Layihə yenidən aktiv siyahıya qayıdacaq."
+        confirmLabel="Bərpa et"
+        tone="neutral"
+        className="size-11"
+      >
+        <RotateCcw className="size-4" aria-hidden="true" />
+      </ConfirmAction>
+    ) : (
+      <>
+        <Link
+          href={`/layiheler/${project.slug}`}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`«${project.name}» layihəsini saytda aç`}
+          title="Saytda bax"
+          className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+        >
+          <Eye className="size-4" aria-hidden="true" />
+        </Link>
+        <Link
+          href={`${LIST_PATH}/${project.id}`}
+          aria-label={`«${project.name}» layihəsini redaktə et`}
+          title="Redaktə et"
+          className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+        >
+          <Pencil className="size-4" aria-hidden="true" />
+        </Link>
+        <ConfirmAction
+          action={deleteProject}
+          id={project.id}
+          label={`«${project.name}» layihəsini sil`}
+          title="Layihəni silmək"
+          description="Layihə saytdan çıxarılacaq, amma zibil qutusunda qalacaq. Ona bağlı elanlar silinmir."
+          className="size-11"
+        >
+          <Trash2 className="size-4" aria-hidden="true" />
+        </ConfirmAction>
+      </>
+    );
+  }
+
   return (
     <>
       <AdminPageHeader
@@ -107,6 +159,7 @@ export default async function AdminProjectsPage({
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder="Ad və ya slug üzrə axtar…"
+          resultLabel={`${total} layihə tapıldı`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
@@ -136,121 +189,101 @@ export default async function AdminProjectsPage({
           ]}
         />
 
-        <AdminTable
-          caption="Layihələr"
-          headers={[
-            { label: "Layihə" },
-            { label: "Növ" },
-            { label: "Status" },
-            { label: "Elan", className: "text-right" },
-            { label: "Şəkil", className: "text-right" },
-            { label: "Yenilənib", className: "text-right" },
-            { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
-          ]}
-        >
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={7} className="px-4 py-10 text-center text-sm text-ink-muted">
+        <div className="p-4 lg:p-0">
+          <AdminResponsiveList
+            ariaLabel="Layihələr"
+            items={rows}
+            getKey={(project) => project.id}
+            empty={
+              <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.projectType
                   ? "Bu filtrlərə uyğun layihə tapılmadı."
                   : "Hələ layihə əlavə edilməyib."}
-              </td>
-            </tr>
-          )}
-          {rows.map((project) => (
-            <AdminTableRow key={project.id}>
-              <AdminTableCell className="max-w-xs">
-                <Link
-                  href={`${LIST_PATH}/${project.id}`}
-                  className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep"
-                >
-                  {project.name}
-                </Link>
-                <p className="mt-0.5 text-xs text-ink-muted">
-                  {[project.city?.name, project.year ? `${project.year}` : null]
-                    .filter(Boolean)
-                    .join(" · ") || `/${project.slug}`}
-                </p>
-              </AdminTableCell>
-
-              <AdminTableCell>
-                <Badge tone="neutral">
-                  {PROJECT_TYPE_LABELS[project.projectType as ProjectType]}
-                </Badge>
-                {!project.isActive && (
-                  <p className="mt-1 text-xs text-ink-muted">Saytda gizlidir</p>
-                )}
-              </AdminTableCell>
-
-              <AdminTableCell>
-                <StatusBadge
-                  status={project.status as ProjectStatus}
-                  label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]}
-                />
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="tabular text-sm text-ink-soft">
-                {project._count.properties}
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="tabular text-sm text-ink-soft">
-                {project._count.images}
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
-                {formatRelative(project.updatedAt)}
-              </AdminTableCell>
-
-              <AdminTableCell align="right">
-                <div className="flex items-center justify-end gap-0.5">
-                  {deleted ? (
-                    <ConfirmAction
-                      action={restoreProject}
-                      id={project.id}
-                      label={`«${project.name}» layihəsini bərpa et`}
-                      title="Layihəni bərpa etmək"
-                      description="Layihə yenidən aktiv siyahıya qayıdacaq."
-                      confirmLabel="Bərpa et"
-                      tone="neutral"
-                    >
-                      <RotateCcw className="size-4" aria-hidden="true" />
-                    </ConfirmAction>
-                  ) : (
-                    <>
-                      <Link
-                        href={`/layiheler/${project.slug}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={`«${project.name}» layihəsini saytda aç`}
-                        title="Saytda bax"
-                        className="grid size-9 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
-                      >
-                        <Eye className="size-4" aria-hidden="true" />
-                      </Link>
-                      <Link
-                        href={`${LIST_PATH}/${project.id}`}
-                        aria-label={`«${project.name}» layihəsini redaktə et`}
-                        title="Redaktə et"
-                        className="grid size-9 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
-                      >
-                        <Pencil className="size-4" aria-hidden="true" />
-                      </Link>
-                      <ConfirmAction
-                        action={deleteProject}
-                        id={project.id}
-                        label={`«${project.name}» layihəsini sil`}
-                        title="Layihəni silmək"
-                        description="Layihə saytdan çıxarılacaq, amma zibil qutusunda qalacaq. Ona bağlı elanlar silinmir."
-                      >
-                        <Trash2 className="size-4" aria-hidden="true" />
-                      </ConfirmAction>
-                    </>
-                  )}
+              </p>
+            }
+            renderCard={(project) => (
+              <AdminListCard
+                title={
+                  <Link href={`${LIST_PATH}/${project.id}`} className="transition-colors hover:text-gold-deep">
+                    {project.name}
+                  </Link>
+                }
+                meta={
+                  <>
+                    {[project.city?.name, project.year ? `${project.year}` : null]
+                      .filter(Boolean)
+                      .join(" · ") || `/${project.slug}`}
+                    <span className="mt-1 block">{formatRelative(project.updatedAt)}</span>
+                  </>
+                }
+                status={
+                  <StatusBadge
+                    status={project.status as ProjectStatus}
+                    label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]}
+                  />
+                }
+                actions={renderActions(project)}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge tone="neutral">{PROJECT_TYPE_LABELS[project.projectType as ProjectType]}</Badge>
+                  {!project.isActive ? <Badge tone="neutral">Saytda gizlidir</Badge> : null}
                 </div>
-              </AdminTableCell>
-            </AdminTableRow>
-          ))}
-        </AdminTable>
+                <dl className="mt-4 grid grid-cols-2 gap-3">
+                  <div>
+                    <dt className="text-xs text-ink-muted">Elan</dt>
+                    <dd className="tabular mt-1 text-ink">{project._count.properties}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Şəkil</dt>
+                    <dd className="tabular mt-1 text-ink">{project._count.images}</dd>
+                  </div>
+                </dl>
+              </AdminListCard>
+            )}
+            renderTable={(items) => (
+              <AdminTable
+                caption="Layihələr"
+                headers={[
+                  { label: "Layihə" },
+                  { label: "Növ" },
+                  { label: "Status" },
+                  { label: "Elan", className: "text-right" },
+                  { label: "Şəkil", className: "text-right" },
+                  { label: "Yenilənib", className: "text-right" },
+                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                ]}
+              >
+                {items.map((project) => (
+                  <AdminTableRow key={project.id}>
+                    <AdminTableCell className="max-w-xs">
+                      <Link href={`${LIST_PATH}/${project.id}`} className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep">
+                        {project.name}
+                      </Link>
+                      <p className="mt-0.5 text-xs text-ink-muted">
+                        {[project.city?.name, project.year ? `${project.year}` : null]
+                          .filter(Boolean)
+                          .join(" · ") || `/${project.slug}`}
+                      </p>
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <Badge tone="neutral">{PROJECT_TYPE_LABELS[project.projectType as ProjectType]}</Badge>
+                      {!project.isActive ? <p className="mt-1 text-xs text-ink-muted">Saytda gizlidir</p> : null}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <StatusBadge status={project.status as ProjectStatus} label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]} />
+                    </AdminTableCell>
+                    <AdminTableCell align="right" className="tabular text-sm text-ink-soft">{project._count.properties}</AdminTableCell>
+                    <AdminTableCell align="right" className="tabular text-sm text-ink-soft">{project._count.images}</AdminTableCell>
+                    <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{formatRelative(project.updatedAt)}</AdminTableCell>
+                    <AdminTableCell align="right">
+                      <div className="flex items-center justify-end gap-0.5">{renderActions(project)}</div>
+                    </AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTable>
+            )}
+          />
+        </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">

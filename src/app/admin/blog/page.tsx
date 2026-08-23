@@ -12,6 +12,10 @@ import {
   StatusBadge,
 } from "@/components/admin/admin-ui";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatNumber, formatRelative } from "@/lib/utils";
 import {
@@ -66,6 +70,54 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
     return search ? `${LIST_PATH}?${search}` : LIST_PATH;
   }
 
+  function renderActions(post: (typeof rows)[number]) {
+    return deleted ? (
+      <ConfirmAction
+        action={restorePost}
+        id={post.id}
+        label={`«${post.title}» məqaləsini bərpa et`}
+        title="Məqaləni bərpa etmək"
+        description="Məqalə yenidən aktiv siyahıya qayıdacaq."
+        confirmLabel="Bərpa et"
+        tone="neutral"
+        className="size-11"
+      >
+        <RotateCcw className="size-4" aria-hidden="true" />
+      </ConfirmAction>
+    ) : (
+      <>
+        <Link
+          href={`/blog/${post.slug}`}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`«${post.title}» məqaləsini saytda aç`}
+          title="Saytda bax"
+          className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+        >
+          <Eye className="size-4" aria-hidden="true" />
+        </Link>
+        <Link
+          href={`${LIST_PATH}/${post.id}`}
+          aria-label={`«${post.title}» məqaləsini redaktə et`}
+          title="Redaktə et"
+          className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+        >
+          <Pencil className="size-4" aria-hidden="true" />
+        </Link>
+        <ConfirmAction
+          action={deletePost}
+          id={post.id}
+          label={`«${post.title}» məqaləsini sil`}
+          title="Məqaləni silmək"
+          description="Məqalə saytdan çıxarılacaq, amma zibil qutusunda qalacaq."
+          className="size-11"
+        >
+          <Trash2 className="size-4" aria-hidden="true" />
+        </ConfirmAction>
+      </>
+    );
+  }
+
   return (
     <>
       <AdminPageHeader
@@ -106,6 +158,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder="Başlıq və ya slug üzrə axtar…"
+          resultLabel={`${total} məqalə tapıldı`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
@@ -132,114 +185,89 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
           ]}
         />
 
-        <AdminTable
-          caption="Bloq məqalələri"
-          headers={[
-            { label: "Məqalə" },
-            { label: "Kateqoriya" },
-            { label: "Müəllif" },
-            { label: "Status" },
-            { label: "Baxış", className: "text-right" },
-            { label: "Yenilənib", className: "text-right" },
-            { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
-          ]}
-        >
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={7} className="px-4 py-10 text-center text-sm text-ink-muted">
+        <div className="p-4 lg:p-0">
+          <AdminResponsiveList
+            ariaLabel="Bloq məqalələri"
+            items={rows}
+            getKey={(post) => post.id}
+            empty={
+              <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.categoryId
                   ? "Bu filtrlərə uyğun məqalə tapılmadı."
                   : "Hələ məqalə yazılmayıb."}
-              </td>
-            </tr>
-          )}
-          {rows.map((post) => (
-            <AdminTableRow key={post.id}>
-              <AdminTableCell className="max-w-sm">
-                <Link
-                  href={`${LIST_PATH}/${post.id}`}
-                  className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep"
-                >
-                  {post.title}
-                </Link>
-                <p className="mt-0.5 text-xs text-ink-muted">
-                  {post.readMinutes} dəq oxu · /{post.slug}
-                </p>
-              </AdminTableCell>
-
-              <AdminTableCell className="text-sm text-ink-soft">
-                {post.category?.name ?? <span className="text-ink-muted">Kateqoriyasız</span>}
-              </AdminTableCell>
-
-              <AdminTableCell className="text-sm text-ink-soft">
-                {post.author?.name ?? "—"}
-              </AdminTableCell>
-
-              <AdminTableCell>
-                <StatusBadge
-                  status={post.status as PostStatus}
-                  label={POST_STATUS_LABELS[post.status as PostStatus]}
-                />
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="tabular text-sm text-ink-soft">
-                {formatNumber(post.viewCount)}
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
-                {formatRelative(post.updatedAt)}
-              </AdminTableCell>
-
-              <AdminTableCell align="right">
-                <div className="flex items-center justify-end gap-0.5">
-                  {deleted ? (
-                    <ConfirmAction
-                      action={restorePost}
-                      id={post.id}
-                      label={`«${post.title}» məqaləsini bərpa et`}
-                      title="Məqaləni bərpa etmək"
-                      description="Məqalə yenidən aktiv siyahıya qayıdacaq."
-                      confirmLabel="Bərpa et"
-                      tone="neutral"
-                    >
-                      <RotateCcw className="size-4" aria-hidden="true" />
-                    </ConfirmAction>
-                  ) : (
-                    <>
-                      <Link
-                        href={`/blog/${post.slug}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={`«${post.title}» məqaləsini saytda aç`}
-                        title="Saytda bax"
-                        className="grid size-9 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
-                      >
-                        <Eye className="size-4" aria-hidden="true" />
-                      </Link>
-                      <Link
-                        href={`${LIST_PATH}/${post.id}`}
-                        aria-label={`«${post.title}» məqaləsini redaktə et`}
-                        title="Redaktə et"
-                        className="grid size-9 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
-                      >
-                        <Pencil className="size-4" aria-hidden="true" />
-                      </Link>
-                      <ConfirmAction
-                        action={deletePost}
-                        id={post.id}
-                        label={`«${post.title}» məqaləsini sil`}
-                        title="Məqaləni silmək"
-                        description="Məqalə saytdan çıxarılacaq, amma zibil qutusunda qalacaq."
-                      >
-                        <Trash2 className="size-4" aria-hidden="true" />
-                      </ConfirmAction>
-                    </>
-                  )}
-                </div>
-              </AdminTableCell>
-            </AdminTableRow>
-          ))}
-        </AdminTable>
+              </p>
+            }
+            renderCard={(post) => (
+              <AdminListCard
+                title={
+                  <Link href={`${LIST_PATH}/${post.id}`} className="transition-colors hover:text-gold-deep">
+                    {post.title}
+                  </Link>
+                }
+                meta={
+                  <>
+                    {post.readMinutes} dəq oxu · /{post.slug}
+                    <span className="mt-1 block">{formatRelative(post.updatedAt)}</span>
+                  </>
+                }
+                status={
+                  <StatusBadge status={post.status as PostStatus} label={POST_STATUS_LABELS[post.status as PostStatus]} />
+                }
+                actions={renderActions(post)}
+              >
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div>
+                    <dt className="text-xs text-ink-muted">Kateqoriya</dt>
+                    <dd className="mt-1 text-ink">{post.category?.name ?? "Kateqoriyasız"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Müəllif</dt>
+                    <dd className="mt-1 text-ink">{post.author?.name ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Baxış</dt>
+                    <dd className="tabular mt-1 text-ink">{formatNumber(post.viewCount)}</dd>
+                  </div>
+                </dl>
+              </AdminListCard>
+            )}
+            renderTable={(items) => (
+              <AdminTable
+                caption="Bloq məqalələri"
+                headers={[
+                  { label: "Məqalə" },
+                  { label: "Kateqoriya" },
+                  { label: "Müəllif" },
+                  { label: "Status" },
+                  { label: "Baxış", className: "text-right" },
+                  { label: "Yenilənib", className: "text-right" },
+                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                ]}
+              >
+                {items.map((post) => (
+                  <AdminTableRow key={post.id}>
+                    <AdminTableCell className="max-w-sm">
+                      <Link href={`${LIST_PATH}/${post.id}`} className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep">{post.title}</Link>
+                      <p className="mt-0.5 text-xs text-ink-muted">{post.readMinutes} dəq oxu · /{post.slug}</p>
+                    </AdminTableCell>
+                    <AdminTableCell className="text-sm text-ink-soft">
+                      {post.category?.name ?? <span className="text-ink-muted">Kateqoriyasız</span>}
+                    </AdminTableCell>
+                    <AdminTableCell className="text-sm text-ink-soft">{post.author?.name ?? "—"}</AdminTableCell>
+                    <AdminTableCell>
+                      <StatusBadge status={post.status as PostStatus} label={POST_STATUS_LABELS[post.status as PostStatus]} />
+                    </AdminTableCell>
+                    <AdminTableCell align="right" className="tabular text-sm text-ink-soft">{formatNumber(post.viewCount)}</AdminTableCell>
+                    <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{formatRelative(post.updatedAt)}</AdminTableCell>
+                    <AdminTableCell align="right">
+                      <div className="flex items-center justify-end gap-0.5">{renderActions(post)}</div>
+                    </AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTable>
+            )}
+          />
+        </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
