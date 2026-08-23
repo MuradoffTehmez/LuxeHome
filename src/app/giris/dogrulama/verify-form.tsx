@@ -24,6 +24,9 @@ export function VerifyForm() {
           name="code"
           inputMode="text"
           autoComplete="one-time-code"
+          autoCapitalize="characters"
+          spellCheck={false}
+          maxLength={9}
           autoFocus
           required
           placeholder="123456"
@@ -34,7 +37,7 @@ export function VerifyForm() {
       {state.error && (
         <p
           role="alert"
-          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
+          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger [overflow-wrap:anywhere]"
         >
           {state.error}
         </p>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { siteConfig } from "@/config/site";
 import { LoginForm } from "./login-form";
 
@@ -23,36 +24,39 @@ export default async function LoginPage({
   const { davam } = await searchParams;
 
   return (
-    <main className="grid min-h-dvh lg:grid-cols-2">
-      {/* --- Sol: forma --- */}
-      <div className="flex flex-col justify-center bg-ivory px-5 py-10 sm:px-10 lg:px-16">
-        <div className="mx-auto w-full max-w-md">
+    <AuthShell
+      standalone
+      eyebrow="Əməkdaş girişi"
+      title="İdarə panelinə giriş"
+      description="Hesab məlumatlarınızı daxil edin. Giriş yalnız səlahiyyətli əməkdaşlar üçündür."
+      aside={
+        <div className="on-dark relative min-h-[34rem] overflow-hidden rounded-md">
+          <Image
+            src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80"
+            alt=""
+            fill
+            sizes="50vw"
+            className="object-cover"
+          />
+          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/60 to-charcoal/35" />
+          <div className="relative flex min-h-[34rem] flex-col justify-end p-10 xl:p-14">
+            <p className="max-w-md font-display text-3xl leading-tight text-white xl:text-4xl">
+              {siteConfig.slogan}
+            </p>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-white/75">
+              {siteConfig.description}
+            </p>
+          </div>
+        </div>
+      }
+    >
           <Link
             href="/"
-            className="mb-10 inline-flex min-h-11 items-center gap-2 text-sm text-ink-soft transition-colors duration-200 hover:text-gold-deep"
+            className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-xs text-sm text-ink-soft transition-colors duration-200 hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
             Sayta qayıt
           </Link>
-
-          <div className="mb-8 flex flex-col gap-2">
-            <Image
-              src="/logo-mark.png"
-              alt=""
-              width={512}
-              height={512}
-              priority
-              className="mb-2 size-14"
-            />
-            <span className="font-display text-xl tracking-[0.18em] text-ink">
-              LUXE HOME ESTATE
-            </span>
-            <h1 className="font-display text-3xl text-ink">İdarə panelinə giriş</h1>
-            <p className="text-sm text-ink-soft">
-              Hesab məlumatlarınızı daxil edin. Giriş yalnız səlahiyyətli
-              əməkdaşlar üçündür.
-            </p>
-          </div>
 
           <LoginForm davam={davam} />
 
@@ -64,36 +68,10 @@ export default async function LoginPage({
             </p>
           </div>
 
-          <p className="mt-8 text-xs text-ink-muted">
+          <p className="mt-7 text-xs text-ink-muted [overflow-wrap:anywhere]">
             © {new Date().getFullYear()} {siteConfig.legalName}. Sahibi:{" "}
             {siteConfig.owner.name}.
           </p>
-        </div>
-      </div>
-
-      {/* --- Sağ: brend paneli (yalnız geniş ekranda) --- */}
-      <div className="on-dark relative hidden lg:block">
-        <Image
-          src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80"
-          alt=""
-          fill
-          sizes="50vw"
-          className="object-cover"
-          priority
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-zinc-900/92 via-zinc-900/60 to-zinc-900/40"
-        />
-        <div className="relative flex h-full flex-col justify-end p-12 xl:p-16">
-          <p className="max-w-md font-display text-3xl leading-tight text-white xl:text-4xl">
-            {siteConfig.slogan}
-          </p>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-white/70">
-            {siteConfig.description}
-          </p>
-        </div>
-      </div>
-    </main>
+    </AuthShell>
   );
 }

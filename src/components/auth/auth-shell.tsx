@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/container";
+import { cn } from "@/lib/utils";
 
 export type AuthShellProps = {
   eyebrow?: string;
@@ -6,6 +7,7 @@ export type AuthShellProps = {
   description?: string;
   children: React.ReactNode;
   aside?: React.ReactNode;
+  standalone?: boolean;
 };
 
 /** İctimai və əməkdaş giriş axınları üçün form-first responsive çərçivə. */
@@ -15,10 +17,11 @@ export function AuthShell({
   description,
   children,
   aside,
+  standalone = false,
 }: AuthShellProps) {
   return (
-    <main className="min-h-[calc(100dvh-var(--header-h))] bg-beige">
-      <Container className="grid min-h-[calc(100dvh-var(--header-h))] items-center gap-10 py-8 lg:grid-cols-2 lg:py-16">
+    <main className={cn(standalone ? "min-h-dvh" : "min-h-[calc(100dvh-var(--header-h))]", "bg-beige")}>
+      <Container className={cn("grid items-center gap-10 py-8 lg:py-16", aside && "lg:grid-cols-2", standalone ? "min-h-dvh" : "min-h-[calc(100dvh-var(--header-h))]")}>
         <section className="mx-auto w-full max-w-lg rounded-md border border-line bg-paper p-5 shadow-sm sm:p-8">
           <header className="mb-7">
             {eyebrow ? (

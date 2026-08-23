@@ -34,6 +34,7 @@ export function LoginForm({ davam }: { davam?: string }) {
           id="login-email"
           name="email"
           type="email"
+          inputMode="email"
           autoComplete="username"
           required
           placeholder="ad@luxehomeestate.az"
@@ -71,7 +72,7 @@ export function LoginForm({ davam }: { davam?: string }) {
       {state.error && (
         <p
           role="alert"
-          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
+          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger [overflow-wrap:anywhere]"
         >
           {state.error}
         </p>

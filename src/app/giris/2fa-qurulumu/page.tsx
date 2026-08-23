@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { redirect } from "next/navigation";
+import { KeyRound } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { prisma } from "@/lib/prisma";
 import { readEnrollmentSecret } from "@/lib/auth/enrollment";
 import { buildOtpauthUri, renderQrSvg } from "@/lib/auth/totp";
@@ -27,28 +28,33 @@ export default async function EnrollPage() {
   const qrSvg = renderQrSvg(buildOtpauthUri(enrollment.secret, user.email));
 
   return (
-    <main className="flex min-h-dvh flex-col justify-center bg-ivory px-5 py-10 sm:px-10">
-      <div className="mx-auto w-full max-w-lg">
-        <div className="mb-8 flex flex-col gap-2">
-          <Image src="/logo-mark.png" alt="" width={512} height={512} className="mb-2 size-14" />
-          <span className="font-display text-xl tracking-[0.18em] text-ink">LUXE HOME ESTATE</span>
-          <h1 className="font-display text-3xl text-ink">İki mərhələli doğrulama</h1>
-          <p className="text-sm text-ink-soft">
-            Panelə giriş üçün doğrulama tətbiqi tələb olunur. QR kodu Google Authenticator,
-            Microsoft Authenticator və ya oxşar tətbiqlə skan edin, sonra tətbiqdəki kodu yazın.
+    <AuthShell
+      standalone
+      eyebrow="Təhlükəsizlik qurulumu"
+      title="İki mərhələli doğrulama"
+      description="QR kodu doğrulama tətbiqi ilə skan edin, sonra tətbiqdə görünən kodu yazın."
+      aside={
+        <div className="mx-auto max-w-md">
+          <KeyRound className="size-10 text-gold-deep" aria-hidden="true" />
+          <h2 className="mt-5 font-display text-3xl text-ink">Sirr cihazınızda qalır</h2>
+          <p className="mt-3 text-sm leading-6 text-ink-soft">
+            QR kod serverdə yaradılır; doğrulama sirri heç bir xarici xidmətə göndərilmir.
           </p>
         </div>
+      }
+    >
 
-        <div className="mb-6 flex justify-center rounded-xs border border-line bg-paper p-6">
+        <div className="mb-6 flex max-w-full justify-center overflow-x-auto rounded-xs border border-line bg-paper p-4 sm:p-6">
           <div
             aria-label="QR kod"
+            className="max-w-full [&_svg]:h-auto [&_svg]:max-w-full"
             // Server tərəfdə çəkilir — sirr kənar servisə göndərilmir
             dangerouslySetInnerHTML={{ __html: qrSvg }}
           />
         </div>
 
-        <details className="mb-6 rounded-xs border border-line bg-beige px-4 py-3">
-          <summary className="min-h-11 cursor-pointer text-sm text-ink-soft">
+        <details className="mb-6 max-w-full overflow-x-auto rounded-xs border border-line bg-beige px-4 py-2">
+          <summary className="flex min-h-11 cursor-pointer items-center text-sm text-ink-soft">
             QR skan edilmirsə, açarı əl ilə yazın
           </summary>
           <code className="mt-2 block font-mono text-sm break-all text-ink">
@@ -57,7 +63,6 @@ export default async function EnrollPage() {
         </details>
 
         <EnrollForm />
-      </div>
-    </main>
+    </AuthShell>
   );
 }

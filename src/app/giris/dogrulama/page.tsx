@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { redirect } from "next/navigation";
+import { ShieldCheck } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { readStageCookie, verifyStageToken } from "@/lib/auth/cookies";
 import { VerifyForm } from "./verify-form";
 
@@ -18,20 +19,22 @@ export default async function VerifyPage() {
   if (!claims || claims.stage !== "totp") redirect("/giris");
 
   return (
-    <main className="flex min-h-dvh flex-col justify-center bg-ivory px-5 py-10 sm:px-10">
-      <div className="mx-auto w-full max-w-md">
-        <div className="mb-8 flex flex-col gap-2">
-          <Image src="/logo-mark.png" alt="" width={512} height={512} className="mb-2 size-14" />
-          <span className="font-display text-xl tracking-[0.18em] text-ink">LUXE HOME ESTATE</span>
-          <h1 className="font-display text-3xl text-ink">Doğrulama kodu</h1>
-          <p className="text-sm text-ink-soft">
-            Doğrulama tətbiqindəki 6 rəqəmli kodu yazın. Cihazınız əlinizdə deyilsə,
-            ehtiyat kodlarınızdan birini istifadə edin.
+    <AuthShell
+      standalone
+      eyebrow="İkinci mərhələ"
+      title="Doğrulama kodu"
+      description="Doğrulama tətbiqindəki 6 rəqəmli kodu yazın. Cihazınız əlinizdə deyilsə, ehtiyat kodlarınızdan birini istifadə edin."
+      aside={
+        <div className="mx-auto max-w-md rounded-md border border-line bg-paper/70 p-8">
+          <ShieldCheck className="size-10 text-gold-deep" aria-hidden="true" />
+          <h2 className="mt-5 font-display text-3xl text-ink">Hesabınız qorunur</h2>
+          <p className="mt-3 text-sm leading-6 text-ink-soft">
+            Doğrulama kodu yalnız qısa müddət etibarlıdır və hər girişdə yenilənir.
           </p>
         </div>
-
-        <VerifyForm />
-      </div>
-    </main>
+      }
+    >
+      <VerifyForm />
+    </AuthShell>
   );
 }

@@ -29,6 +29,8 @@ export function EnrollForm() {
           name="code"
           inputMode="numeric"
           autoComplete="one-time-code"
+          pattern="[0-9]{6}"
+          maxLength={6}
           autoFocus
           required
           placeholder="123456"
@@ -39,7 +41,7 @@ export function EnrollForm() {
       {state.error && (
         <p
           role="alert"
-          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
+          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger [overflow-wrap:anywhere]"
         >
           {state.error}
         </p>
@@ -71,9 +73,9 @@ function BackupCodes({ codes }: { codes: string[] }) {
         </p>
       </div>
 
-      <ul className="grid grid-cols-2 gap-2 rounded-xs border border-line bg-paper p-4">
+      <ul className="grid min-w-0 grid-cols-2 gap-2 rounded-xs border border-line bg-paper p-3 sm:p-4">
         {codes.map((code) => (
-          <li key={code} className="text-center font-mono text-sm tracking-wider text-ink">
+          <li key={code} className="min-w-0 text-center font-mono text-sm tracking-wide text-ink [overflow-wrap:anywhere]">
             {code}
           </li>
         ))}
