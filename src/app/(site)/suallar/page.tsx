@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
-import { SectionHeader } from "@/components/ui/section-header";
+import { PageHeader } from "@/components/ui/page-header";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 
@@ -121,31 +121,35 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema()) }}
       />
 
+      <PageHeader
+        compact
+        eyebrow="Kömək mərkəzi"
+        title="Tez-tez verilən suallar"
+        description="Daşınmaz əmlak əməliyyatlarında ən çox soruşulan sualların qısa cavabları."
+        breadcrumbs={[
+          { label: "Ana səhifə", href: "/" },
+          { label: "Suallar" },
+        ]}
+      />
+
       <Section spacing="cozy">
         <Container size="narrow">
-          <SectionHeader
-            overline="Kömək mərkəzi"
-            title="Tez-tez verilən suallar"
-            as="h1"
-            description="Daşınmaz əmlak əməliyyatlarında ən çox soruşulan sualların qısa cavabları."
-          />
-
-          <div className="mt-10 flex flex-col gap-10">
+          <div className="flex flex-col gap-10">
             {FAQ_GROUPS.map((group) => (
               <section key={group.title} className="flex flex-col gap-3">
                 <h2 className="font-display text-xl text-ink">{group.title}</h2>
 
                 <div className="flex flex-col divide-y divide-line rounded-md border border-line bg-paper">
                   {group.items.map((item) => (
-                    <details key={item.question} className="group px-5 py-4">
-                      <summary className="flex cursor-pointer items-start justify-between gap-4 text-left text-sm font-medium text-ink marker:content-['']">
-                        {item.question}
+                    <details key={item.question} className="group px-4 sm:px-5">
+                      <summary className="flex min-h-14 cursor-pointer items-center justify-between gap-4 py-2 text-left text-sm font-medium text-ink marker:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset">
+                        <span className="min-w-0 [overflow-wrap:anywhere]">{item.question}</span>
                         <ChevronDown
                           className="mt-0.5 size-4 shrink-0 text-ink-muted transition-transform duration-200 group-open:rotate-180"
                           aria-hidden="true"
                         />
                       </summary>
-                      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{item.answer}</p>
+                      <p className="pb-4 text-sm leading-relaxed text-ink-soft [overflow-wrap:anywhere]">{item.answer}</p>
                     </details>
                   ))}
                 </div>

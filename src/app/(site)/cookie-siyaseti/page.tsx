@@ -15,6 +15,7 @@ export default function CookiePage() {
       title="Cookie siyasəti"
       description="Saytda hansı cookie-lərin işlədiyi və onları necə idarə edə biləcəyiniz."
       updatedAt="20 avqust 2026"
+      path="/cookie-siyaseti"
     >
       <p>
         Cookie — saytın brauzerinizdə saxladığı kiçik mətn faylıdır. {siteConfig.name}{" "}

@@ -15,6 +15,7 @@ export default function PrivacyPage() {
       title="Məxfilik siyasəti"
       description="Şəxsi məlumatlarınızı necə topladığımız, istifadə etdiyimiz və qoruduğumuz barədə."
       updatedAt="20 avqust 2026"
+      path="/mexfilik-siyaseti"
     >
       <p>
         Bu siyasət {siteConfig.legalName} ({siteConfig.owner.name}) tərəfindən idarə olunan{" "}

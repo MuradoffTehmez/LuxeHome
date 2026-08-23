@@ -15,6 +15,7 @@ export default function TermsPage() {
       title="İstifadə şərtləri"
       description="Saytdan istifadə edərkən qüvvədə olan qaydalar."
       updatedAt="20 avqust 2026"
+      path="/istifade-sertleri"
     >
       <p>
         {siteConfig.name} saytı {siteConfig.legalName} ({siteConfig.owner.name}) tərəfindən

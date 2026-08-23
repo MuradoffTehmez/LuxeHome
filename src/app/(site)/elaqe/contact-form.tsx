@@ -16,7 +16,7 @@ export function ContactForm() {
 
   if (state.success) {
     return (
-      <div className="flex flex-col items-center gap-4 py-10 text-center">
+      <div role="status" aria-live="polite" className="flex flex-col items-center gap-4 py-10 text-center">
         <span className="flex size-14 items-center justify-center rounded-full bg-success-bg text-success">
           <CheckCircle2 className="size-7" aria-hidden="true" />
         </span>
@@ -84,7 +84,7 @@ export function ContactForm() {
         error={state.fieldErrors?.message}
       />
 
-      <Button type="submit" variant="primary" size="lg" loading={isPending}>
+      <Button type="submit" variant="primary" size="lg" loading={isPending} className="w-full sm:w-auto sm:self-start">
         Göndər
       </Button>
     </form>

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
+import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { ButtonLink } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
@@ -64,22 +65,21 @@ const WHY_ITEMS = [
 export default function AboutPage() {
   return (
     <>
-      {/* Başlıq */}
-      <Section tone="beige" spacing="compact">
-        <Container>
-          <SectionHeader
-            as="h1"
-            overline="Haqqımızda"
-            title="Luxe Home Estate haqqında"
-            description={`${siteConfig.legalName} daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam və çəkiliş istiqamətlərində fəaliyyət göstərir.`}
-          />
-        </Container>
-      </Section>
+      <PageHeader
+        compact
+        eyebrow="Haqqımızda"
+        title="Luxe Home Estate haqqında"
+        description={`${siteConfig.legalName} daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam və çəkiliş istiqamətlərində fəaliyyət göstərir.`}
+        breadcrumbs={[
+          { label: "Ana səhifə", href: "/" },
+          { label: "Haqqımızda" },
+        ]}
+      />
 
       {/* Şirkət haqqında — şəkil + mətn */}
       <Section tone="ivory">
         <Container>
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="grid min-w-0 items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <Reveal className="relative">
               <div className="relative aspect-4/5 overflow-hidden rounded-md sm:aspect-4/3 lg:aspect-4/5">
                 <Image
@@ -97,7 +97,7 @@ export default function AboutPage() {
               />
             </Reveal>
 
-            <div className="flex flex-col gap-6">
+            <div className="flex min-w-0 flex-col gap-6">
               <h2 className="font-display text-3xl text-ink sm:text-4xl">
                 Missiyamız
               </h2>
@@ -145,8 +145,8 @@ export default function AboutPage() {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.title} delay={index * 50}>
-                <div className="flex h-full flex-col gap-4 rounded-md border border-line bg-ivory p-6">
-                  <span className="flex size-11 items-center justify-center rounded-xs bg-zinc-900 text-gold-soft">
+                <div className="flex h-full min-w-0 flex-col gap-4 rounded-md border border-line bg-ivory p-5 sm:p-6">
+                  <span className="flex size-11 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
                     <item.icon className="size-5" aria-hidden="true" />
                   </span>
                   <h3 className="font-display text-lg text-ink">{item.title}</h3>
