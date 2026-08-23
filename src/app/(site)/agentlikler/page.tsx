@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Container, Section } from "@/components/ui/container";
-import { SectionHeader } from "@/components/ui/section-header";
+import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { AgencyCard } from "@/components/site/agency-card";
@@ -23,21 +23,16 @@ export default async function AgenciesPage() {
 
   return (
     <>
-      <Section tone="beige" spacing="compact">
-        <Container>
-          <SectionHeader
-            as="h1"
-            overline="Tərəfdaşlar"
-            title="Agentliklər"
-            description="Platformada təsdiqlənmiş daşınmaz əmlak agentlikləri."
-          />
-        </Container>
-      </Section>
+      <PageHeader
+        eyebrow="Tərəfdaşlar"
+        title="Agentliklər"
+        description="Platformada təsdiqlənmiş daşınmaz əmlak agentlikləri."
+      />
 
       <Section tone="ivory">
         <Container>
           {agencies.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {agencies.map((agency, index) => (
                 <Reveal key={agency.id} delay={index * 60}>
                   <AgencyCard agency={agency} />

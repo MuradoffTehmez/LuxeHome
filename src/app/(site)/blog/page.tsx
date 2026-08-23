@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container, Section } from "@/components/ui/container";
-import { SectionHeader } from "@/components/ui/section-header";
+import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { PostCard } from "@/components/site/post-card";
@@ -31,7 +31,8 @@ export default async function BlogPage({ searchParams }: Props) {
 
   const categorySlug =
     typeof params.kateqoriya === "string" ? params.kateqoriya : undefined;
-  const page = params.sehife ? Number(params.sehife) : 1;
+  const rawPage = typeof params.sehife === "string" ? Number(params.sehife) : 1;
+  const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
 
   const [postsResult, categories] = await Promise.all([
     getPosts({ categorySlug, page }),
@@ -52,23 +53,23 @@ export default async function BlogPage({ searchParams }: Props) {
 
   return (
     <>
-      {/* Başlıq */}
-      <Section tone="beige" spacing="compact">
-        <Container>
-          <SectionHeader
-            as="h1"
-            overline="Blog"
-            title={activeCategory ? activeCategory.name : "Faydalı məqalələr"}
-            description={`${postsResult.total} məqalə${categories.length > 0 ? ` · ${categories.length} kateqoriya` : ""}`}
-          />
+      <PageHeader
+        eyebrow="Blog"
+        title={activeCategory ? activeCategory.name : "Faydalı məqalələr"}
+        description={`${postsResult.total} məqalə${categories.length > 0 ? ` · ${categories.length} kateqoriya` : ""}`}
+      />
 
-          {/* Kateqoriya tabları */}
-          {categories.length > 0 && (
-            <div className="mt-8 flex flex-wrap gap-2">
+      {categories.length > 0 && (
+        <div className="border-b border-line bg-paper">
+          <Container>
+            <nav
+              aria-label="Bloq kateqoriyaları"
+              className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 py-4 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:px-0 [&::-webkit-scrollbar]:hidden"
+            >
               <Link
                 href="/blog"
                 className={cn(
-                  "inline-flex min-h-10 items-center rounded-xs border px-4 text-sm font-medium transition-colors",
+                  "inline-flex min-h-11 shrink-0 snap-start items-center rounded-xs border px-4 text-sm font-medium transition-colors",
                   !categorySlug
                     ? "border-charcoal bg-charcoal text-ink-invert"
                     : "border-line-strong text-ink-soft hover:border-gold hover:text-gold-deep",
@@ -81,7 +82,7 @@ export default async function BlogPage({ searchParams }: Props) {
                   key={cat.id}
                   href={`/blog?kateqoriya=${cat.slug}`}
                   className={cn(
-                    "inline-flex min-h-10 items-center rounded-xs border px-4 text-sm font-medium transition-colors",
+                    "inline-flex min-h-11 shrink-0 snap-start items-center rounded-xs border px-4 text-sm font-medium transition-colors",
                     categorySlug === cat.slug
                       ? "border-charcoal bg-charcoal text-ink-invert"
                       : "border-line-strong text-ink-soft hover:border-gold hover:text-gold-deep",
@@ -93,17 +94,17 @@ export default async function BlogPage({ searchParams }: Props) {
                   </span>
                 </Link>
               ))}
-            </div>
-          )}
-        </Container>
-      </Section>
+            </nav>
+          </Container>
+        </div>
+      )}
 
       {/* Məqalələr */}
       <Section tone="ivory">
         <Container>
           {postsResult.items.length > 0 ? (
             <>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {postsResult.items.map((post, index) => (
                   <Reveal key={post.id} delay={index * 50}>
                     <PostCard post={post} />

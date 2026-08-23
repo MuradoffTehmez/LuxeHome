@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
-import { SectionHeader } from "@/components/ui/section-header";
+import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { ServiceIcon } from "@/components/site/service-icon";
@@ -28,29 +28,21 @@ export default async function ServicesPage() {
 
   return (
     <>
-      {/* Başlıq bölməsi */}
-      <Section tone="navy">
-        <Container>
-          <SectionHeader
-            as="h1"
-            overline="Nə edirik"
-            title="Xidmətlərimiz"
-            description="Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün peşəkar xidmətlər."
-            tone="dark"
-            align="center"
-          />
-        </Container>
-      </Section>
+      <PageHeader
+        eyebrow="Nə edirik"
+        title="Xidmətlərimiz"
+        description="Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün peşəkar xidmətlər."
+      />
 
       {/* Xidmət kartları */}
       <Section tone="ivory">
         <Container>
           {services.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {services.map((service, index) => (
                 <Reveal key={service.id} delay={index * 50}>
-                  <div className="group flex h-full flex-col gap-5 rounded-md border border-line bg-paper p-7 transition-shadow duration-300 hover:shadow-md">
-                    <span className="flex size-12 items-center justify-center rounded-xs bg-zinc-900 text-gold-soft">
+                  <div className="group flex h-full flex-col gap-5 rounded-md border border-line bg-paper p-5 transition-shadow duration-300 hover:shadow-md sm:p-7">
+                    <span className="flex size-12 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
                       <ServiceIcon name={service.icon} className="size-5" />
                     </span>
 
@@ -66,7 +58,7 @@ export default async function ServicesPage() {
                     <div className="mt-auto pt-4 border-t border-line">
                       <Link
                         href={`/xidmetler/${service.slug}`}
-                        className="inline-flex items-center gap-1.5 text-sm font-medium text-gold-deep transition-colors hover:text-gold"
+                        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-gold-deep transition-colors hover:text-gold"
                       >
                         Ətraflı oxu
                         <ArrowRight

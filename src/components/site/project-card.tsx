@@ -44,7 +44,7 @@ export function ProjectCard({
             fill
             priority={priority}
             loading={priority ? undefined : "lazy"}
-            sizes="(max-width: 640px) 92vw, (max-width: 1280px) 50vw, 33vw"
+            sizes="(max-width: 639px) calc(100vw - 2rem), (max-width: 1279px) calc(50vw - 2rem), 33vw"
             className="image-lift object-cover"
           />
         ) : (
@@ -72,7 +72,7 @@ export function ProjectCard({
           <h3 className="font-display text-xl leading-snug text-ink">
             <Link
               href={`/layiheler/${project.slug}`}
-              className="after:absolute after:inset-0 after:content-[''] hover:text-gold-deep"
+              className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center hover:text-gold-deep"
             >
               {project.name}
             </Link>

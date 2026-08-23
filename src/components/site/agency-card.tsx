@@ -23,7 +23,7 @@ export function AgencyCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col gap-4 rounded-sm border border-line bg-ivory p-6 transition-colors duration-200 hover:border-gold",
+        "group relative flex h-full flex-col gap-4 rounded-sm border border-line bg-paper p-5 transition-colors duration-200 hover:border-gold sm:p-6",
         className,
       )}
     >
@@ -46,7 +46,7 @@ export function AgencyCard({
           <h3 className="font-display text-lg leading-snug text-ink">
             <Link
               href={`/agentlikler/${agency.slug}`}
-              className="after:absolute after:inset-0 after:content-[''] hover:text-gold-deep"
+              className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center hover:text-gold-deep"
             >
               {agency.name}
             </Link>
