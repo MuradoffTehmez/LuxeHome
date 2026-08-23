@@ -1,4 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CollectionPageSkeleton,
@@ -30,5 +32,20 @@ describe("route vəziyyətləri", () => {
 
     expect(html).toContain("Yenidən cəhd et");
     expect(html).toContain('href="/elaqe"');
+  });
+
+  it.each([
+    "src/app/(site)/kabinet/loading.tsx",
+    "src/app/admin/loading.tsx",
+    "src/app/giris/loading.tsx",
+  ])("%s segment səviyyəli accessible loading vəziyyətini saxlayır", (file) => {
+    const source = readFileSync(join(process.cwd(), file), "utf8");
+    expect(source).toContain('role="status"');
+    expect(source).toContain('aria-busy="true"');
+  });
+
+  it("ictimai segment ümumi kolleksiya skeleton-undan istifadə edir", () => {
+    const source = readFileSync(join(process.cwd(), "src/app/(site)/loading.tsx"), "utf8");
+    expect(source).toContain("CollectionPageSkeleton");
   });
 });

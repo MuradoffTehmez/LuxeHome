@@ -32,8 +32,8 @@ export default async function AdminTaxonomyPage() {
         breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Taksonomiya" }]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <div className="flex flex-col gap-6">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-6">
           <AdminCard title="Əmlak növləri" description={`${types.length} növ`} bodyClassName="p-0">
             <ul>
               {types.map((type) => (
@@ -50,7 +50,7 @@ export default async function AdminTaxonomyPage() {
           <CreatePropertyTypeForm />
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <AdminCard title="Xüsusiyyətlər" description={`${features.length} xüsusiyyət`} bodyClassName="p-0">
             <div className="flex flex-col">
               {Array.from(featuresByGroup.entries()).map(([group, items]) => (

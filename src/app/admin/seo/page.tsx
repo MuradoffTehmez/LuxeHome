@@ -35,14 +35,14 @@ export default async function AdminSeoPage() {
             <AdminCard title="Əmlaklar" description={`${properties.length} elanda meta məlumat çatışmır`} bodyClassName="p-0">
               <ul className="divide-y divide-line">
                 {properties.map((property) => (
-                  <li key={property.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                  <li key={property.id} className="flex min-w-0 flex-col items-start gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-5">
                     <Link
                       href={`/admin/emlaklar/${property.id}`}
-                      className="line-clamp-1 text-sm font-medium text-ink transition-colors hover:text-gold-deep"
+                      className="inline-flex min-h-11 min-w-0 items-center text-sm font-medium text-ink transition-colors hover:text-gold-deep [overflow-wrap:anywhere]"
                     >
                       {property.title}
                     </Link>
-                    <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-warning">
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-warning sm:shrink-0">
                       <AlertTriangle className="size-3.5" aria-hidden="true" />
                       {!property.metaTitle && !property.metaDescription
                         ? "Başlıq və təsvir yoxdur"
@@ -60,14 +60,14 @@ export default async function AdminSeoPage() {
             <AdminCard title="Bloq yazıları" description={`${posts.length} yazıda meta məlumat çatışmır`} bodyClassName="p-0">
               <ul className="divide-y divide-line">
                 {posts.map((post) => (
-                  <li key={post.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                  <li key={post.id} className="flex min-w-0 flex-col items-start gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-5">
                     <Link
                       href={`/admin/blog/${post.id}`}
-                      className="line-clamp-1 text-sm font-medium text-ink transition-colors hover:text-gold-deep"
+                      className="inline-flex min-h-11 min-w-0 items-center text-sm font-medium text-ink transition-colors hover:text-gold-deep [overflow-wrap:anywhere]"
                     >
                       {post.title}
                     </Link>
-                    <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-warning">
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-warning sm:shrink-0">
                       <AlertTriangle className="size-3.5" aria-hidden="true" />
                       {!post.metaTitle && !post.metaDescription
                         ? "Başlıq və təsvir yoxdur"

@@ -255,7 +255,7 @@ export function PropertyFilterFields({
                 onChange={() => setListingType(option.value)}
                 className="peer sr-only"
               />
-              <span className="flex min-h-10 items-center justify-center rounded-xs px-3 text-sm font-medium text-ink-soft transition-colors peer-checked:bg-charcoal peer-checked:text-ink-invert peer-focus-visible:ring-2 peer-focus-visible:ring-gold">
+              <span className="flex min-h-11 items-center justify-center rounded-xs px-3 text-sm font-medium text-ink-soft transition-colors peer-checked:bg-charcoal peer-checked:text-ink-invert peer-focus-visible:ring-2 peer-focus-visible:ring-gold">
                 {option.label}
               </span>
             </label>

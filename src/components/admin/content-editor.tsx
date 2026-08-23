@@ -122,7 +122,7 @@ export function ContentEditor({
                   onClick={() => apply(tool)}
                   title={tool.label}
                   aria-label={tool.label}
-                  className="grid size-9 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
+                  className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
                 >
                   <tool.icon className="size-4" aria-hidden="true" />
                 </button>
@@ -136,7 +136,7 @@ export function ContentEditor({
               onClick={() => document.execCommand("undo")}
               title="Geri al"
               aria-label="Geri al"
-              className="grid size-9 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
+              className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
             >
               <Undo2 className="size-4" aria-hidden="true" />
             </button>
@@ -145,7 +145,7 @@ export function ContentEditor({
               onClick={() => document.execCommand("redo")}
               title="Təkrarla"
               aria-label="Təkrarla"
-              className="grid size-9 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
+              className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
             >
               <Redo2 className="size-4" aria-hidden="true" />
             </button>

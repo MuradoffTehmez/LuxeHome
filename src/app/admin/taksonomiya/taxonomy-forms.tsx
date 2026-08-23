@@ -61,13 +61,13 @@ export function PropertyTypeRow({
   const { toast } = useToast();
 
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5 last:border-0">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-ink">{name}</span>
+    <li className="flex min-w-0 flex-col items-stretch gap-2 border-b border-line px-4 py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <span className="text-sm text-ink [overflow-wrap:anywhere]">{name}</span>
         <span className="tabular text-xs text-ink-muted">({propertyCount})</span>
         {!isActive && <Badge tone="neutral">Deaktiv</Badge>}
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center justify-end gap-1 sm:shrink-0">
         <form
           action={async () => {
             const result = await togglePropertyTypeActive(id);
@@ -76,7 +76,7 @@ export function PropertyTypeRow({
         >
           <button
             type="submit"
-            className="rounded-xs px-2 py-1 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
+            className="inline-flex min-h-11 items-center rounded-xs px-3 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
           >
             {isActive ? "Deaktiv et" : "Aktivləşdir"}
           </button>
@@ -106,9 +106,9 @@ export function FeatureRow({
   propertyCount: number;
 }) {
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5 last:border-0">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-ink">{name}</span>
+    <li className="flex min-w-0 items-center justify-between gap-3 border-b border-line px-4 py-3 last:border-0">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <span className="text-sm text-ink [overflow-wrap:anywhere]">{name}</span>
         <span className="tabular text-xs text-ink-muted">({propertyCount})</span>
       </div>
       <ConfirmAction
