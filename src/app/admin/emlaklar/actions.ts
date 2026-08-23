@@ -300,3 +300,54 @@ export async function togglePropertyFeatured(id: string): Promise<ActionState> {
     return unexpected("tövsiyə nişanı dəyişmədi", error);
   }
 }
+
+const BULK_INTENTS = ["publish", "archive", "delete", "restore"] as const;
+type BulkIntent = (typeof BULK_INTENTS)[number];
+
+/**
+ * Siyahıda seçilmiş bir neçə elana eyni əməliyyatı tətbiq edir.
+ *
+ * D1 `$transaction` dəstəkləmədiyi üçün hər id ayrıca yazılır — biri uğursuz olsa
+ * digərləri geri qaytarılmır, ona görə nəticə mesajı neçəsinin işlədiyini bildirir.
+ */
+export async function bulkUpdateProperties(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  let user;
+  try {
+    user = await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const ids = form.list(formData, "ids");
+  if (ids.length === 0) return failure("Heç bir elan seçilməyib.");
+
+  const intent = form.text(formData, "intent") as BulkIntent;
+  if (!BULK_INTENTS.includes(intent)) return failure("Naməlum əməliyyat.");
+
+  const data =
+    intent === "publish"
+      ? { status: PROPERTY_STATUSES.PUBLISHED, publishedAt: new Date() }
+      : intent === "archive"
+        ? { status: PROPERTY_STATUSES.ARCHIVED }
+        : intent === "delete"
+          ? { deletedAt: new Date() }
+          : { deletedAt: null };
+
+  let done = 0;
+  for (const id of ids) {
+    try {
+      await prisma.property.update({ where: { id }, data });
+      done += 1;
+    } catch {
+      // Tək id uğursuz olsa qalanları dayandırmır — nəticədə sayılır
+    }
+  }
+
+  await recordAudit(user, "UPDATE", "Property", null, `Kütləvi ${intent}: ${done}/${ids.length} elan`);
+  revalidatePath(LIST_PATH);
+
+  if (done === 0) return failure("Heç bir elan yenilənmədi.");
+  if (done < ids.length) return failure(`${done}/${ids.length} elan yeniləndi, qalanları uğursuz oldu.`);
+  return success(`${done} elan yeniləndi.`);
+}

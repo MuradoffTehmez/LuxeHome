@@ -29,6 +29,7 @@ import {
 } from "@/lib/constants";
 import { getAdminProperties, getPropertyFormOptions } from "@/lib/queries";
 import { deleteProperty, restoreProperty } from "./actions";
+import { BulkActionsForm, RowCheckbox } from "./bulk-actions";
 
 export const metadata: Metadata = { title: "Əmlaklar" };
 export const dynamic = "force-dynamic";
@@ -215,6 +216,7 @@ export default async function AdminPropertiesPage({
           ]}
         />
 
+        <BulkActionsForm mode={deleted ? "deleted" : "active"}>
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
             ariaLabel="Əmlak elanları"
@@ -231,6 +233,7 @@ export default async function AdminPropertiesPage({
               <AdminListCard
                 title={
                   <span className="flex items-start gap-2">
+                    <RowCheckbox id={property.id} />
                     {property.isFeatured ? (
                       <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label="Tövsiyə olunan" />
                     ) : null}
@@ -285,6 +288,7 @@ export default async function AdminPropertiesPage({
               <AdminTable
                 caption="Əmlak elanları"
                 headers={[
+                  { label: "Seç", srOnly: true },
                   { label: "Elan" },
                   { label: "Növ" },
                   { label: "Qiymət", className: "text-right" },
@@ -297,6 +301,9 @@ export default async function AdminPropertiesPage({
               >
                 {items.map((property) => (
                   <AdminTableRow key={property.id}>
+                    <AdminTableCell className="w-9">
+                      <RowCheckbox id={property.id} />
+                    </AdminTableCell>
                     <AdminTableCell className="max-w-xs">
                       <div className="flex items-start gap-2">
                         {property.isFeatured ? (
@@ -345,6 +352,7 @@ export default async function AdminPropertiesPage({
             )}
           />
         </div>
+        </BulkActionsForm>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
