@@ -350,6 +350,15 @@ p {
   }
 }
 
+@keyframes luxe-slide-left {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 .animate-fade-in {
   animation: luxe-fade-in 200ms var(--ease-out-soft);
 }
@@ -361,6 +370,9 @@ p {
 }
 .animate-slide-right {
   animation: luxe-slide-right 240ms var(--ease-out-soft);
+}
+.animate-slide-left {
+  animation: luxe-slide-left 240ms var(--ease-out-soft);
 }
 
 /* --------------------------------------------------------------------------

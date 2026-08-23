@@ -3,22 +3,19 @@ import { cloudflareTest } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
 /**
- * Testlər workerd runtime-ında işləyir — Web Crypto davranışı production ilə eynidir.
- * Node-un `crypto` modulu ilə yoxlamaq yanıltıcı olardı: Workers-də bəzi alqoritmlər
- * fərqli davranır və ya ümumiyyətlə mövcud deyil.
+ * Domen testləri workerd runtime-ında işləyir — Web Crypto davranışı production ilə eynidir.
+ * React SSR komponent testləri isə Next.js-in Node modulları ilə uyğunluq üçün ayrıca Node
+ * layihəsində işləyir. Hər iki layihə eyni `npm test` əmrinə daxildir.
  *
- * Wrangler konfiqurasiyası qəsdən qoşulmayıb: bu testlər saf funksiyaları yoxlayır,
+ * Wrangler konfiqurasiyası qəsdən qoşulmayıb: domen testləri saf funksiyaları yoxlayır,
  * D1/R2 binding-lərinə ehtiyac duymur və onları qaldırmaq testləri yalnız yavaşladardı.
  */
 export default defineConfig({
-  plugins: [
-    cloudflareTest({
-      miniflare: {
-        compatibilityDate: "2026-08-20",
-        compatibilityFlags: ["nodejs_compat"],
-      },
-    }),
-  ],
+  oxc: {
+    jsx: {
+      runtime: "automatic",
+    },
+  },
   // `@/*` alias-ı tsconfig-dədir, Vite onu avtomatik oxumur
   resolve: {
     alias: {
@@ -26,6 +23,31 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["src/**/*.test.ts"],
+    projects: [
+      {
+        extends: true,
+        plugins: [
+          cloudflareTest({
+            miniflare: {
+              compatibilityDate: "2026-08-20",
+              compatibilityFlags: ["nodejs_compat"],
+            },
+          }),
+        ],
+        test: {
+          name: "workerd",
+          include: ["src/**/*.test.{ts,tsx}"],
+          exclude: ["src/components/**/*.test.{ts,tsx}"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "ui-node",
+          environment: "node",
+          include: ["src/components/**/*.test.{ts,tsx}"],
+        },
+      },
+    ],
   },
 });
