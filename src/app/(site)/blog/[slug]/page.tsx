@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Clock, Eye, Calendar } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/page-header";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
@@ -76,17 +76,18 @@ export default async function BlogPostPage({ params }: Props) {
         )}
       />
 
-      <Section tone="ivory" className="pt-8 pb-12 sm:pt-12 sm:pb-16">
-        <Container>
-          <div className="mx-auto max-w-3xl">
-            {/* Meta */}
-            <div className="mb-6 flex flex-wrap items-center gap-3">
-              {post.category && (
-                <Badge tone="neutral">
-                  {post.category.name}
-                </Badge>
-              )}
-              <div className="flex items-center gap-4 text-sm text-ink-muted">
+      <PageHeader
+        compact
+        eyebrow={post.category?.name || "Luxe jurnal"}
+        title={post.title}
+        description={post.excerpt}
+        breadcrumbs={[
+          { label: "Ana səhifə", href: "/" },
+          { label: "Blog", href: "/blog" },
+          { label: post.title },
+        ]}
+        actions={
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-muted">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="size-4" aria-hidden="true" />
                   {new Intl.DateTimeFormat("az-AZ", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(post.publishedAt || post.createdAt))}
@@ -100,13 +101,12 @@ export default async function BlogPostPage({ params }: Props) {
                   {post.viewCount} baxış
                 </span>
               </div>
-            </div>
+        }
+      />
 
-            {/* Title */}
-            <h1 className="mb-8 font-display text-3xl leading-tight text-ink sm:text-4xl lg:text-5xl">
-              {post.title}
-            </h1>
-
+      <Section tone="ivory" spacing="compact">
+        <Container size="narrow">
+          <div className="min-w-0">
             {/* Cover */}
             {post.coverUrl && (
               <div className="relative mb-10 aspect-16/9 w-full overflow-hidden rounded-md bg-beige shadow-sm">
@@ -122,13 +122,13 @@ export default async function BlogPostPage({ params }: Props) {
             )}
 
             {/* Content */}
-            <article className="prose-luxe max-w-none text-base sm:text-lg">
+            <article className="prose-luxe min-w-0 max-w-[68ch] text-base [overflow-wrap:anywhere] sm:text-lg">
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </article>
 
             {/* Share */}
             <div className="mt-12 flex flex-col gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-display text-lg text-ink">Məqaləni paylaş:</span>
+              <span className="font-display text-lg text-ink">Məqaləni paylaş</span>
               <ShareButtons title={post.title} path={`/blog/${post.slug}`} />
             </div>
           </div>

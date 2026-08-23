@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
-import { SectionHeader } from "@/components/ui/section-header";
+import { PageHeader } from "@/components/ui/page-header";
+import { PublicDetailLayout } from "@/components/ui/public-detail-layout";
 import { ServiceIcon } from "@/components/site/service-icon";
 import { ButtonAnchor } from "@/components/ui/button";
 import { ContactForm } from "@/app/(site)/elaqe/contact-form";
@@ -70,27 +71,28 @@ export default async function ServiceDetailPage({ params }: Props) {
         )}
       />
 
-      <Section tone="beige" spacing="compact">
-        <Container>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <SectionHeader
-              as="h1"
-              overline="Xidmətlərimiz"
-              title={service.title}
-              description={service.shortDescription}
-            />
-            <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-zinc-900 text-gold-soft shadow-sm lg:size-20">
-              <ServiceIcon name={service.icon} className="size-8 lg:size-10" />
-            </div>
+      <PageHeader
+        compact
+        eyebrow="Xidmətlərimiz"
+        title={service.title}
+        description={service.shortDescription}
+        breadcrumbs={[
+          { label: "Ana səhifə", href: "/" },
+          { label: "Xidmətlər", href: "/xidmetler" },
+          { label: service.title },
+        ]}
+        actions={
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-charcoal text-gold-soft shadow-sm lg:size-20">
+            <ServiceIcon name={service.icon} className="size-8 lg:size-10" />
           </div>
-        </Container>
-      </Section>
+        }
+      />
 
       <Section tone="ivory" spacing="cozy">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-14">
-            {/* Sol tərəf: Məlumatlar */}
-            <div className="flex flex-col gap-8">
+          <PublicDetailLayout
+            main={
+            <div className="flex min-w-0 flex-col gap-8">
               {service.imageUrl && (
                 <div className="relative aspect-16/9 w-full overflow-hidden rounded-md bg-beige">
                   <Image
@@ -104,7 +106,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 </div>
               )}
 
-              <div className="prose prose-ink max-w-none text-base leading-relaxed text-ink-soft">
+              <div className="prose-luxe min-w-0 max-w-[68ch] text-base [overflow-wrap:anywhere]">
                 {service.description.split('\n').map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
@@ -124,10 +126,9 @@ export default async function ServiceDetailPage({ params }: Props) {
                 </div>
               )}
             </div>
-
-            {/* Sağ tərəf: Əlaqə forması */}
-            <div className="flex flex-col gap-8">
-              <div className="rounded-md border border-line bg-paper p-5 sm:p-6 lg:sticky lg:top-28 lg:shadow-sm">
+            }
+            aside={
+              <div className="rounded-md border border-line bg-paper p-5 shadow-sm sm:p-6">
                 <div className="mb-6 flex flex-col gap-2">
                   <h3 className="font-display text-xl text-ink">Müraciət edin</h3>
                   <p className="text-sm text-ink-soft">
@@ -151,8 +152,8 @@ export default async function ServiceDetailPage({ params }: Props) {
 
                 <ContactForm />
               </div>
-            </div>
-          </div>
+            }
+          />
         </Container>
       </Section>
     </>

@@ -4,6 +4,8 @@ import { Calendar, MapPin, CheckCircle2, Phone, Building2 } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { ButtonAnchor } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
+import { PublicDetailLayout } from "@/components/ui/public-detail-layout";
 import { ContactForm } from "@/app/(site)/elaqe/contact-form";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
@@ -87,11 +89,17 @@ export default async function ProjectDetailPage({ params }: Props) {
         )}
       />
 
-      <div className="bg-ivory pt-6 pb-12 sm:pt-8 sm:pb-16">
-        <Container>
-          {/* Üst başlıq hissəsi */}
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex flex-col gap-2">
+      <PageHeader
+        compact
+        eyebrow="Yaşayış layihəsi"
+        title={project.name}
+        description={project.summary || undefined}
+        breadcrumbs={[
+          { label: "Ana səhifə", href: "/" },
+          { label: "Layihələr", href: "/layiheler" },
+          { label: project.name },
+        ]}
+        actions={
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={PROJECT_STATUS_TONE[project.status]}>
                   {PROJECT_STATUS_LABELS[project.status]}
@@ -100,24 +108,22 @@ export default async function ProjectDetailPage({ params }: Props) {
                   {PROJECT_TYPE_LABELS[project.projectType]}
                 </Badge>
               </div>
-              <h1 className="font-display text-2xl leading-tight text-ink sm:text-3xl lg:text-4xl">
-                {project.name}
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-ink-soft">
-                {project.city && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="size-4 text-ink-muted" aria-hidden="true" />
-                    {project.city.name}
-                    {project.address && `, ${project.address}`}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
+        }
+      />
 
-          <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-14">
-            {/* Sol tərəf: Qalereya və Əsas məlumatlar */}
-            <div className="flex flex-col gap-10">
+      <Section tone="ivory" spacing="cozy">
+        <Container>
+          <PublicDetailLayout
+            main={
+            <div className="flex min-w-0 flex-col gap-10">
+              {project.city && (
+                <p className="flex min-h-11 items-center gap-2 text-sm text-ink-soft">
+                  <MapPin className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                  <span className="[overflow-wrap:anywhere]">
+                    {project.city.name}{project.address && `, ${project.address}`}
+                  </span>
+                </p>
+              )}
               {/* Qalereya */}
               {imagesForGallery.length > 0 && (
                 <Gallery images={imagesForGallery} title={project.name} />
@@ -162,17 +168,16 @@ export default async function ProjectDetailPage({ params }: Props) {
               {/* Təsvir */}
               <div className="flex flex-col gap-4">
                 <h2 className="font-display text-xl text-ink">Layihə haqqında</h2>
-                <div className="prose prose-ink max-w-none text-base leading-relaxed text-ink-soft">
+                <div className="prose-luxe min-w-0 max-w-[68ch] text-base [overflow-wrap:anywhere]">
                   {project.description.split('\n').map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
                   ))}
                 </div>
               </div>
             </div>
-
-            {/* Sağ tərəf: Əlaqə forması */}
-            <div className="flex flex-col gap-8">
-              <div className="rounded-md border border-line bg-paper p-5 sm:p-6 lg:sticky lg:top-28 lg:shadow-sm">
+            }
+            aside={
+              <div className="rounded-md border border-line bg-paper p-5 shadow-sm sm:p-6">
                 <div className="mb-6 flex flex-col gap-2">
                   <h3 className="font-display text-xl text-ink">Layihə barədə müraciət</h3>
                   <p className="text-sm text-ink-soft">
@@ -196,10 +201,10 @@ export default async function ProjectDetailPage({ params }: Props) {
 
                 <ContactForm />
               </div>
-            </div>
-          </div>
+            }
+          />
         </Container>
-      </div>
+      </Section>
 
       {/* Layihəyə aid əmlaklar */}
       {project.properties && project.properties.length > 0 && (

@@ -380,6 +380,20 @@ p {
   max-width: 68ch;
   line-height: 1.75;
   color: var(--color-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.prose-luxe img,
+.prose-luxe video,
+.prose-luxe iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose-luxe pre,
+.prose-luxe table {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .prose-luxe > * + * {

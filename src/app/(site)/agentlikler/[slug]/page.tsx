@@ -5,6 +5,7 @@ import { Building2, Globe, MapPin, Phone } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
+import { PageHeader } from "@/components/ui/page-header";
 import { PropertyCard } from "@/components/site/property-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getAgencyBySlug } from "@/lib/queries";
@@ -51,9 +52,17 @@ export default async function AgencyDetailPage({ params }: Props) {
         )}
       />
 
-      <div className="bg-ivory pt-6 pb-12 sm:pt-8 sm:pb-16">
-        <Container>
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+      <PageHeader
+        compact
+        eyebrow="Təsdiqlənmiş agentlik"
+        title={agency.name}
+        description={agency.description || undefined}
+        breadcrumbs={[
+          { label: "Ana səhifə", href: "/" },
+          { label: "Agentliklər", href: "/agentlikler" },
+          { label: agency.name },
+        ]}
+        actions={
             <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-beige sm:size-24">
               {agency.logoUrl ? (
                 <Image
@@ -67,32 +76,27 @@ export default async function AgencyDetailPage({ params }: Props) {
                 <Building2 className="size-9 text-ink-muted" aria-hidden="true" />
               )}
             </div>
+        }
+      />
 
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="gold">Təsdiqlənmiş agentlik</Badge>
-                <Badge tone="neutral">{properties.length} elan</Badge>
-              </div>
-              <h1 className="font-display text-2xl leading-tight text-ink sm:text-3xl">
-                {agency.name}
-              </h1>
-              {agency.description && (
-                <p className="max-w-2xl text-sm leading-relaxed text-ink-soft">
-                  {agency.description}
-                </p>
-              )}
-
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-soft">
+      <Section tone="ivory" spacing="compact" className="border-b border-line">
+        <Container>
+          <div className="rounded-md border border-line bg-paper p-4 shadow-sm sm:p-5">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <Badge tone="gold">Təsdiqlənmiş agentlik</Badge>
+              <Badge tone="neutral">{properties.length} elan</Badge>
+            </div>
+              <div className="flex min-w-0 flex-col gap-1 text-sm text-ink-soft sm:flex-row sm:flex-wrap sm:gap-x-6">
                 {agency.phone && (
-                  <a href={`tel:${agency.phone}`} className="flex items-center gap-1.5 hover:text-gold-deep">
-                    <Phone className="size-4 text-ink-muted" aria-hidden="true" />
-                    {agency.phone}
+                  <a href={`tel:${agency.phone}`} className="flex min-h-11 min-w-0 items-center gap-2 rounded-xs hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                    <Phone className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                    <span className="[overflow-wrap:anywhere]">{agency.phone}</span>
                   </a>
                 )}
                 {agency.address && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="size-4 text-ink-muted" aria-hidden="true" />
-                    {agency.address}
+                  <span className="flex min-h-11 min-w-0 items-center gap-2">
+                    <MapPin className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                    <span className="[overflow-wrap:anywhere]">{agency.address}</span>
                   </span>
                 )}
                 {agency.website && (
@@ -100,17 +104,16 @@ export default async function AgencyDetailPage({ params }: Props) {
                     href={agency.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 hover:text-gold-deep"
+                    className="flex min-h-11 min-w-0 items-center gap-2 rounded-xs hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                   >
-                    <Globe className="size-4 text-ink-muted" aria-hidden="true" />
-                    {agency.website}
+                    <Globe className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                    <span className="break-all">{agency.website}</span>
                   </a>
                 )}
               </div>
-            </div>
           </div>
         </Container>
-      </div>
+      </Section>
 
       <Section tone="paper" spacing="cozy">
         <Container>
@@ -122,7 +125,7 @@ export default async function AgencyDetailPage({ params }: Props) {
           </div>
 
           {properties.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {properties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
