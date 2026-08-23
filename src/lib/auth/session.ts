@@ -56,6 +56,8 @@ export async function resolveSession(
           isActive: true,
           mustChangePassword: true,
           totpEnabledAt: true,
+          locale: true,
+          themePreference: true,
         },
       },
     },
@@ -72,6 +74,8 @@ export async function resolveSession(
     accountType: session.user.accountType as AccountType,
     mustChangePassword: session.user.mustChangePassword,
     totpEnabled: session.user.totpEnabledAt !== null,
+    locale: session.user.locale,
+    themePreference: session.user.themePreference,
     sessionAuthKind: session.authKind as AuthKind,
   };
 }

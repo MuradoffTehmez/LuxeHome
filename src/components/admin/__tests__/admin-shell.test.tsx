@@ -18,6 +18,8 @@ describe("AdminShell", () => {
           accountType: "STAFF",
           mustChangePassword: false,
           totpEnabled: true,
+          locale: "az",
+          themePreference: "system",
         }}
       >
         <p>Panel məzmunu</p>

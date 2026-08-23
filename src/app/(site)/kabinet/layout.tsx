@@ -1,4 +1,5 @@
 import { Container, Section } from "@/components/ui/container";
+import { ThemeSync } from "@/components/theme-sync";
 import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_LABELS } from "@/lib/constants";
 import { CabinetShell } from "./cabinet-shell";
@@ -16,6 +17,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
 
   return (
     <Section spacing="cozy">
+      <ThemeSync preference={user.themePreference} />
       <Container>
         <CabinetShell
           name={user.name}

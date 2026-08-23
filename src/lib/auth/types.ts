@@ -13,6 +13,8 @@ export type AuthUser = {
   accountType: AccountType;
   mustChangePassword: boolean;
   totpEnabled: boolean;
+  locale: string;
+  themePreference: string;
 };
 
 /**
