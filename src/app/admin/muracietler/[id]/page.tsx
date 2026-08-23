@@ -45,17 +45,17 @@ export default async function AdminLeadPage({ params }: { params: Promise<{ id: 
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
-        <div className="flex flex-col gap-6">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[1fr_1.1fr]">
+        <div className="flex min-w-0 flex-col gap-6">
           <AdminCard title="Əlaqə">
             <dl className="flex flex-col gap-3 text-sm">
-              <div className="flex items-center gap-2.5">
+              <div className="flex min-w-0 items-center gap-2.5">
                 <Phone className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
                 <dt className="sr-only">Telefon</dt>
                 <dd className="tabular">
                   <a
                     href={`tel:${lead.phone}`}
-                    className="text-ink transition-colors hover:text-gold-deep"
+                    className="tabular inline-flex min-h-11 items-center text-ink transition-colors hover:text-gold-deep"
                   >
                     {formatPhone(lead.phone)}
                   </a>
@@ -63,13 +63,13 @@ export default async function AdminLeadPage({ params }: { params: Promise<{ id: 
               </div>
 
               {lead.email && (
-                <div className="flex items-center gap-2.5">
+                <div className="flex min-w-0 items-center gap-2.5">
                   <Mail className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
                   <dt className="sr-only">E-poçt</dt>
-                  <dd>
+                  <dd className="min-w-0">
                     <a
                       href={`mailto:${lead.email}`}
-                      className="text-ink transition-colors hover:text-gold-deep"
+                      className="inline-flex min-h-11 max-w-full items-center text-ink transition-colors hover:text-gold-deep [overflow-wrap:anywhere]"
                     >
                       {lead.email}
                     </a>
@@ -77,7 +77,7 @@ export default async function AdminLeadPage({ params }: { params: Promise<{ id: 
                 </div>
               )}
 
-              <div className="flex items-center gap-2.5">
+              <div className="flex min-w-0 items-center gap-2.5">
                 <MessageSquare className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
                 <dt className="sr-only">WhatsApp</dt>
                 <dd>
@@ -85,7 +85,7 @@ export default async function AdminLeadPage({ params }: { params: Promise<{ id: 
                     href={whatsappLink(`Salam, ${lead.name}. Luxe Home Estate ilə əlaqə saxladığınız üçün təşəkkür edirik.`)}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-ink transition-colors hover:text-gold-deep"
+                    className="inline-flex min-h-11 items-center text-ink transition-colors hover:text-gold-deep"
                   >
                     WhatsApp-da yaz
                   </a>
@@ -93,13 +93,13 @@ export default async function AdminLeadPage({ params }: { params: Promise<{ id: 
               </div>
 
               {lead.property && (
-                <div className="flex items-center gap-2.5">
+                <div className="flex min-w-0 items-center gap-2.5">
                   <Building2 className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
                   <dt className="sr-only">Əlaqəli elan</dt>
-                  <dd>
+                  <dd className="min-w-0">
                     <Link
                       href={`/admin/emlaklar/${lead.property.id}`}
-                      className="text-ink transition-colors hover:text-gold-deep"
+                      className="inline-flex min-h-11 max-w-full items-center text-ink transition-colors hover:text-gold-deep [overflow-wrap:anywhere]"
                     >
                       {lead.property.title}
                     </Link>
@@ -111,7 +111,7 @@ export default async function AdminLeadPage({ params }: { params: Promise<{ id: 
 
           <AdminCard title="Mesaj" description={lead.subject ?? undefined}>
             {/* Müştərinin mətni — redaktə edilmir, olduğu kimi göstərilir */}
-            <p className="text-sm leading-relaxed whitespace-pre-wrap text-ink-soft">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-ink-soft [overflow-wrap:anywhere]">
               {lead.message}
             </p>
           </AdminCard>

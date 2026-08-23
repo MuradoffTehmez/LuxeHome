@@ -11,6 +11,10 @@ import {
   StatusBadge,
 } from "@/components/admin/admin-ui";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatPhone, formatRelative } from "@/lib/utils";
 import {
@@ -61,6 +65,31 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
     return search ? `${LIST_PATH}?${search}` : LIST_PATH;
   }
 
+  function renderActions(lead: (typeof rows)[number]) {
+    return (
+      <>
+        <Link
+          href={`${LIST_PATH}/${lead.id}`}
+          aria-label={`«${lead.name}» müraciətini aç`}
+          title="Ətraflı"
+          className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+        >
+          <Eye className="size-4" aria-hidden="true" />
+        </Link>
+        <ConfirmAction
+          action={deleteLead}
+          id={lead.id}
+          label={`«${lead.name}» müraciətini sil`}
+          title="Müraciəti silmək"
+          description="Müraciət tamamilə silinəcək və bərpa edilə bilməyəcək."
+          className="size-11"
+        >
+          <Trash2 className="size-4" aria-hidden="true" />
+        </ConfirmAction>
+      </>
+    );
+  }
+
   return (
     <>
       <AdminPageHeader
@@ -74,6 +103,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder="Ad, telefon, e-poçt və ya mətn üzrə axtar…"
+          resultLabel={`${total} müraciət tapıldı`}
           selects={[
             {
               name: "status",
@@ -102,94 +132,86 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
           ]}
         />
 
-        <AdminTable
-          caption="Müraciətlər"
-          headers={[
-            { label: "Müştəri" },
-            { label: "Mövzu" },
-            { label: "Mənbə" },
-            { label: "Məsul" },
-            { label: "Status" },
-            { label: "Vaxt", className: "text-right" },
-            { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
-          ]}
-        >
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={7} className="px-4 py-10 text-center text-sm text-ink-muted">
+        <div className="p-4 lg:p-0">
+          <AdminResponsiveList
+            ariaLabel="Müraciətlər"
+            items={rows}
+            getKey={(lead) => lead.id}
+            empty={
+              <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.source
                   ? "Bu filtrlərə uyğun müraciət tapılmadı."
                   : "Hələ müraciət yoxdur."}
-              </td>
-            </tr>
-          )}
-          {rows.map((lead) => (
-            <AdminTableRow key={lead.id}>
-              <AdminTableCell>
-                <Link
-                  href={`${LIST_PATH}/${lead.id}`}
-                  className="font-medium text-ink transition-colors hover:text-gold-deep"
-                >
-                  {lead.name}
-                </Link>
-                <a
-                  href={`tel:${lead.phone}`}
-                  className="tabular mt-0.5 flex items-center gap-1 text-xs text-ink-muted transition-colors hover:text-gold-deep"
-                >
-                  <Phone className="size-3" aria-hidden="true" />
-                  {formatPhone(lead.phone)}
-                </a>
-              </AdminTableCell>
-
-              <AdminTableCell className="max-w-xs">
-                <span className="line-clamp-1 text-sm text-ink-soft">
-                  {lead.subject ?? lead.property?.title ?? "—"}
-                </span>
-              </AdminTableCell>
-
-              <AdminTableCell className="text-sm text-ink-soft">
-                {LEAD_SOURCE_LABELS[lead.source as LeadSource]}
-              </AdminTableCell>
-
-              <AdminTableCell className="text-sm text-ink-soft">
-                {lead.assignee?.name ?? <span className="text-ink-muted">Təyin edilməyib</span>}
-              </AdminTableCell>
-
-              <AdminTableCell>
-                <StatusBadge
-                  status={lead.status as LeadStatus}
-                  label={LEAD_STATUS_LABELS[lead.status as LeadStatus]}
-                />
-              </AdminTableCell>
-
-              <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
-                {formatRelative(lead.createdAt)}
-              </AdminTableCell>
-
-              <AdminTableCell align="right">
-                <div className="flex items-center justify-end gap-0.5">
-                  <Link
-                    href={`${LIST_PATH}/${lead.id}`}
-                    aria-label={`«${lead.name}» müraciətini aç`}
-                    title="Ətraflı"
-                    className="grid size-9 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
-                  >
-                    <Eye className="size-4" aria-hidden="true" />
+              </p>
+            }
+            renderCard={(lead) => (
+              <AdminListCard
+                title={
+                  <Link href={`${LIST_PATH}/${lead.id}`} className="transition-colors hover:text-gold-deep">
+                    {lead.name}
                   </Link>
-                  <ConfirmAction
-                    action={deleteLead}
-                    id={lead.id}
-                    label={`«${lead.name}» müraciətini sil`}
-                    title="Müraciəti silmək"
-                    description="Müraciət tamamilə silinəcək və bərpa edilə bilməyəcək."
-                  >
-                    <Trash2 className="size-4" aria-hidden="true" />
-                  </ConfirmAction>
-                </div>
-              </AdminTableCell>
-            </AdminTableRow>
-          ))}
-        </AdminTable>
+                }
+                meta={
+                  <a href={`tel:${lead.phone}`} className="tabular inline-flex min-h-11 items-center gap-1 transition-colors hover:text-gold-deep">
+                    <Phone className="size-3" aria-hidden="true" />
+                    {formatPhone(lead.phone)}
+                  </a>
+                }
+                status={
+                  <StatusBadge status={lead.status as LeadStatus} label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} />
+                }
+                actions={renderActions(lead)}
+              >
+                <p className="[overflow-wrap:anywhere]">{lead.subject ?? lead.property?.title ?? "Mövzu yoxdur"}</p>
+                <dl className="mt-4 grid grid-cols-2 gap-3">
+                  <div>
+                    <dt className="text-xs text-ink-muted">Mənbə</dt>
+                    <dd className="mt-1 text-ink">{LEAD_SOURCE_LABELS[lead.source as LeadSource]}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Məsul</dt>
+                    <dd className="mt-1 text-ink">{lead.assignee?.name ?? "Təyin edilməyib"}</dd>
+                  </div>
+                  <div className="col-span-2">
+                    <dt className="text-xs text-ink-muted">Vaxt</dt>
+                    <dd className="mt-1 text-ink">{formatRelative(lead.createdAt)}</dd>
+                  </div>
+                </dl>
+              </AdminListCard>
+            )}
+            renderTable={(items) => (
+              <AdminTable
+                caption="Müraciətlər"
+                headers={[
+                  { label: "Müştəri" },
+                  { label: "Mövzu" },
+                  { label: "Mənbə" },
+                  { label: "Məsul" },
+                  { label: "Status" },
+                  { label: "Vaxt", className: "text-right" },
+                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                ]}
+              >
+                {items.map((lead) => (
+                  <AdminTableRow key={lead.id}>
+                    <AdminTableCell>
+                      <Link href={`${LIST_PATH}/${lead.id}`} className="font-medium text-ink transition-colors hover:text-gold-deep">{lead.name}</Link>
+                      <a href={`tel:${lead.phone}`} className="tabular mt-0.5 flex items-center gap-1 text-xs text-ink-muted transition-colors hover:text-gold-deep">
+                        <Phone className="size-3" aria-hidden="true" />{formatPhone(lead.phone)}
+                      </a>
+                    </AdminTableCell>
+                    <AdminTableCell className="max-w-xs"><span className="line-clamp-1 text-sm text-ink-soft">{lead.subject ?? lead.property?.title ?? "—"}</span></AdminTableCell>
+                    <AdminTableCell className="text-sm text-ink-soft">{LEAD_SOURCE_LABELS[lead.source as LeadSource]}</AdminTableCell>
+                    <AdminTableCell className="text-sm text-ink-soft">{lead.assignee?.name ?? <span className="text-ink-muted">Təyin edilməyib</span>}</AdminTableCell>
+                    <AdminTableCell><StatusBadge status={lead.status as LeadStatus} label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} /></AdminTableCell>
+                    <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{formatRelative(lead.createdAt)}</AdminTableCell>
+                    <AdminTableCell align="right"><div className="flex items-center justify-end gap-0.5">{renderActions(lead)}</div></AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTable>
+            )}
+          />
+        </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">

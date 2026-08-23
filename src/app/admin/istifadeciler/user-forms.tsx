@@ -8,6 +8,7 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { useToast } from "@/components/ui/toast";
 import { ROLE_LABELS, ROLES } from "@/lib/constants";
 import { IDLE_STATE } from "@/lib/admin/action-state";
+import { cn } from "@/lib/utils";
 import {
   createUser,
   deleteUser,
@@ -48,6 +49,7 @@ export function UserRow({
   isActive,
   isSelf,
   sessionCount,
+  mobile = false,
 }: {
   id: string;
   name: string;
@@ -55,6 +57,7 @@ export function UserRow({
   isActive: boolean;
   isSelf: boolean;
   sessionCount: number;
+  mobile?: boolean;
 }) {
   const [state, formAction] = useActionState(updateUser, IDLE_STATE);
   const { toast } = useToast();
@@ -65,8 +68,11 @@ export function UserRow({
   }, [state, toast]);
 
   return (
-    <div className="flex flex-col gap-3">
-      <form action={formAction} className="flex flex-wrap items-end gap-2">
+    <div className="flex min-w-0 flex-col gap-3">
+      <form
+        action={formAction}
+        className={cn("gap-2", mobile ? "grid w-full sm:grid-cols-2" : "flex flex-wrap items-end")}
+      >
         <input type="hidden" name="id" value={id} />
 
         <label className="sr-only" htmlFor={`name-${id}`}>
@@ -78,7 +84,10 @@ export function UserRow({
           type="text"
           defaultValue={name}
           maxLength={120}
-          className="min-h-9 w-40 rounded-xs border border-line bg-paper px-2 text-xs text-ink transition-colors focus:border-gold"
+          className={cn(
+            "min-h-11 rounded-xs border border-line bg-paper px-3 text-ink transition-colors focus:border-gold",
+            mobile ? "w-full text-base sm:text-sm" : "w-40 text-xs",
+          )}
         />
 
         <label className="sr-only" htmlFor={`role-${id}`}>
@@ -89,7 +98,10 @@ export function UserRow({
           name="role"
           defaultValue={role}
           disabled={isSelf}
-          className="min-h-9 cursor-pointer rounded-xs border border-line bg-paper px-2 text-xs text-ink transition-colors focus:border-gold disabled:cursor-not-allowed disabled:bg-beige"
+          className={cn(
+            "min-h-11 cursor-pointer rounded-xs border border-line bg-paper px-3 text-ink transition-colors focus:border-gold disabled:cursor-not-allowed disabled:bg-beige",
+            mobile ? "w-full text-base sm:text-sm" : "text-xs",
+          )}
         >
           {ROLE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -103,10 +115,10 @@ export function UserRow({
           label="Aktiv"
           defaultChecked={isActive}
           disabled={isSelf}
-          className="min-h-9 text-xs"
+          className="min-h-11 text-xs"
         />
 
-        <SubmitButton label="Saxla" className="min-h-9 px-3 text-xs" />
+        <SubmitButton label="Saxla" className="min-h-11 px-3 text-xs" />
       </form>
 
       <div className="flex flex-wrap items-center gap-0.5">
@@ -118,6 +130,7 @@ export function UserRow({
           description="Yeni müvəqqəti parol yaradılacaq və istifadəçinin bütün sessiyaları bağlanacaq. Parol bir dəfə göstəriləcək."
           confirmLabel="Sıfırla"
           tone="neutral"
+          className="size-11"
         >
           <KeyRound className="size-4" aria-hidden="true" />
         </ConfirmAction>
@@ -130,6 +143,7 @@ export function UserRow({
           description="Doğrulama sirri və ehtiyat kodlar silinəcək. İstifadəçi növbəti girişdə 2FA-nı yenidən quracaq."
           confirmLabel="Sıfırla"
           tone="neutral"
+          className="size-11"
         >
           <ShieldOff className="size-4" aria-hidden="true" />
         </ConfirmAction>
@@ -143,6 +157,7 @@ export function UserRow({
             description={`${sessionCount} açıq sessiya dərhal bağlanacaq və istifadəçi yenidən daxil olmalı olacaq.`}
             confirmLabel="Bağla"
             tone="neutral"
+            className="size-11"
           >
             <LogOut className="size-4" aria-hidden="true" />
           </ConfirmAction>
@@ -155,6 +170,7 @@ export function UserRow({
             label={`«${name}» hesabını sil`}
             title="Hesabı silmək"
             description="Hesab tamamilə silinəcək. Yazdığı elan və məqalələr qalır, sadəcə müəllifsiz olur."
+            className="size-11"
           >
             <Trash2 className="size-4" aria-hidden="true" />
           </ConfirmAction>

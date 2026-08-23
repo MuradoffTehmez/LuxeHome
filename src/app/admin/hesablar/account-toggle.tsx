@@ -8,10 +8,12 @@ export function AccountToggle({
   id,
   name,
   isActive,
+  className,
 }: {
   id: string;
   name: string;
   isActive: boolean;
+  className?: string;
 }) {
   return (
     <ConfirmAction
@@ -26,6 +28,7 @@ export function AccountToggle({
       }
       confirmLabel={isActive ? "Deaktiv et" : "Aktivləşdir"}
       tone={isActive ? "danger" : "neutral"}
+      className={className}
     >
       {isActive ? (
         <PowerOff className="size-4" aria-hidden="true" />

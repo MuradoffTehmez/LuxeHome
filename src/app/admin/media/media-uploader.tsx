@@ -80,7 +80,7 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={pending > 0}
-        className="flex w-full cursor-pointer flex-col items-center gap-2 px-6 py-8 text-center disabled:cursor-wait"
+        className="flex min-h-44 w-full cursor-pointer flex-col items-center justify-center gap-2 px-4 py-6 text-center disabled:cursor-wait sm:px-6 sm:py-8"
       >
         <span className="grid size-12 place-items-center rounded-full bg-beige text-ink-soft">
           {pending > 0 ? (

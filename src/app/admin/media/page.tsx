@@ -52,6 +52,7 @@ export default async function AdminMediaPage({
           action={LIST_PATH}
           searchValue={q}
           searchPlaceholder="Fayl adı və ya alt mətn üzrə axtar…"
+          resultLabel={`${total} fayl tapıldı`}
         />
 
         {rows.length === 0 ? (
@@ -59,7 +60,7 @@ export default async function AdminMediaPage({
             {q ? "Bu axtarışa uyğun fayl tapılmadı." : "Hələ fayl yüklənməyib."}
           </p>
         ) : (
-          <ul className="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid gap-4 p-4 min-[480px]:grid-cols-2 lg:grid-cols-3 lg:p-5 xl:grid-cols-4">
             {rows.map((media) => (
               <MediaCard
                 key={media.id}

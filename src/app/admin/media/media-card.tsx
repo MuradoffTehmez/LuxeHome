@@ -62,7 +62,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
           src={item.thumbUrl ?? item.url}
           alt={item.alt}
           fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          sizes="(max-width: 479px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
           className="object-cover"
         />
       </div>
@@ -93,11 +93,11 @@ export function MediaCard({ item }: { item: MediaItem }) {
             defaultValue={item.alt}
             placeholder="Alt mətn (SEO)"
             maxLength={160}
-            className="min-h-9 w-full rounded-xs border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
+            className="min-h-11 w-full rounded-xs border border-line px-3 text-base text-ink placeholder:text-ink-muted focus:border-gold sm:text-sm"
           />
 
           <div className="flex items-center justify-between gap-1">
-            <SubmitButton label="Saxla" className="min-h-9 px-3 text-xs" />
+            <SubmitButton label="Saxla" className="min-h-11 px-3 text-xs" />
 
             <div className="flex items-center gap-0.5">
               <button
@@ -105,7 +105,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
                 onClick={copyUrl}
                 aria-label="Ünvanı kopyala"
                 title={copied ? "Kopyalandı" : "Ünvanı kopyala"}
-                className="grid size-9 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
+                className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
               >
                 {copied ? (
                   <Check className="size-4 text-success" aria-hidden="true" />
@@ -120,6 +120,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
                 label={`«${item.originalName}» faylını sil`}
                 title="Faylı silmək"
                 description="Fayl anbardan tamamilə silinəcək. Elan və məqalələrdə istifadə olunursa, orada şəkil yerinə boşluq qalacaq."
+                className="size-11"
               >
                 <Trash2 className="size-4" aria-hidden="true" />
               </ConfirmAction>
