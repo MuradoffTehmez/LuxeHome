@@ -63,22 +63,25 @@ export function Navbar() {
       <Container
         size="wide"
         className={cn(
-          "flex min-h-[var(--header-h)] min-w-0 items-center gap-2 lg:gap-3 2xl:gap-5",
+          "flex min-h-[var(--header-h)] min-w-0 items-center gap-2 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4 2xl:gap-6",
           isOverlay && "on-dark",
         )}
       >
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="shrink-0 lg:hidden 2xl:inline-flex"
+          className="shrink-0 lg:hidden xl:inline-flex"
         />
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="hidden shrink-0 lg:inline-flex 2xl:hidden [&>span]:hidden"
+          className="hidden shrink-0 lg:inline-flex xl:hidden [&>span]:hidden"
         />
 
-        <nav aria-label="Əsas naviqasiya" className="hidden min-w-0 flex-1 justify-center lg:flex">
+        <nav
+          aria-label="Əsas naviqasiya"
+          className="hidden min-w-0 overflow-hidden lg:flex lg:justify-center"
+        >
           <ul className="flex items-center gap-0.5 xl:gap-1">
             {navigation.map((item) => {
               const active = isNavigationItemActive(pathname, item.href);
@@ -89,7 +92,7 @@ export function Navbar() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2 text-xs font-medium transition-colors duration-300 2xl:px-3 2xl:text-sm",
+                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2 text-xs font-medium transition-colors duration-300 xl:px-2.5 xl:text-sm",
                       isOverlay
                         ? active
                           ? "text-gold-soft"
@@ -99,10 +102,7 @@ export function Navbar() {
                           : "text-ink-soft hover:text-ink",
                     )}
                   >
-                    <span className="2xl:hidden">
-                      {COMPACT_NAVIGATION_LABELS[item.href] ?? item.label}
-                    </span>
-                    <span className="hidden 2xl:inline">{item.label}</span>
+                    {COMPACT_NAVIGATION_LABELS[item.href] ?? item.label}
                     <span
                       aria-hidden="true"
                       className={cn(
@@ -118,7 +118,7 @@ export function Navbar() {
           </ul>
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1 2xl:gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-1 lg:ml-0 xl:gap-1.5">
           <ThemeToggle />
 
           <Link
@@ -133,22 +133,9 @@ export function Navbar() {
             <Heart className="size-5" aria-hidden="true" />
           </Link>
 
-          <a
-            href={siteConfig.phoneHref}
-            className={cn(
-              "hidden min-h-11 shrink-0 items-center gap-2 text-sm font-medium transition-colors 2xl:inline-flex",
-              isOverlay
-                ? "text-ink-invert-soft hover:text-gold-soft"
-                : "text-ink-soft hover:text-gold-deep",
-            )}
-          >
-            <Phone className="size-4" aria-hidden="true" />
-            {siteConfig.phone}
-          </a>
-
           <div
             className={cn(
-              "hidden items-center border-l pl-1 lg:flex 2xl:ml-1 2xl:pl-3",
+              "hidden items-center border-l pl-1 lg:flex xl:ml-0.5 xl:pl-2",
               isOverlay ? "border-white/20" : "border-line",
             )}
           >
@@ -159,11 +146,10 @@ export function Navbar() {
             href="/kabinet/elanlar/yeni"
             variant="primary"
             size="sm"
-            className="hidden px-2.5 lg:inline-flex 2xl:px-4"
+            className="hidden px-3 lg:inline-flex xl:px-4"
           >
             <Plus className="size-4" aria-hidden="true" />
-            <span className="2xl:hidden">Elan ver</span>
-            <span className="hidden 2xl:inline">Əmlak əlavə et</span>
+            Elan ver
           </ButtonLink>
 
           <IconButton
