@@ -17,6 +17,13 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Luxe Home Estate-in davam edən və tamamlanmış yaşayış, villa və kommersiya layihələri.",
   path: "/layiheler",
+  keywords: [
+    "yaşayış kompleksi",
+    "yeni tikili layihə",
+    "villa layihəsi",
+    "Bakıda tikinti layihələri",
+    "kommersiya layihəsi",
+  ],
 });
 
 export default async function ProjectsPage() {

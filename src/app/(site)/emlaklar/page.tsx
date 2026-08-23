@@ -9,7 +9,7 @@ import { PropertyCard } from "@/components/site/property-card";
 import { SearchPanel } from "@/components/site/search-panel";
 import { SortSelect } from "@/components/site/sort-select";
 import { Pagination } from "@/components/ui/pagination";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { getProperties, getFilterOptions } from "@/lib/queries";
 import { formatNumber } from "@/lib/utils";
 import {
@@ -33,6 +33,18 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Bakıda mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyektlərinin satışı və icarəsi. Axtarış filtri ilə sizə uyğun əmlakı tapın.",
   path: "/emlaklar",
+  keywords: [
+    "əmlak elanları",
+    "Bakıda əmlak satışı",
+    "mənzil satışı",
+    "mənzil kirayə",
+    "villa satışı",
+    "günlük kirayə",
+    "aylıq kirayə",
+    "torpaq satışı",
+    "ofis icarəsi",
+    "yeni tikili mənzil",
+  ],
 });
 
 type Props = {
@@ -244,6 +256,14 @@ export default async function PropertiesPage({ searchParams }: Props) {
 
   return (
     <>
+      {items.length > 0 && (
+        <script
+          {...jsonLd(
+            itemListSchema(items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` }))),
+          )}
+        />
+      )}
+
       {/* Axtarış paneli */}
       <Section tone="beige" spacing="compact">
         <Container>

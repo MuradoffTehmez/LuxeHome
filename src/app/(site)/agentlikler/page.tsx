@@ -15,6 +15,7 @@ export const metadata: Metadata = buildMetadata({
   title: "Agentliklər",
   description: "Luxe Home Estate platformasında təsdiqlənmiş daşınmaz əmlak agentlikləri.",
   path: "/agentlikler",
+  keywords: ["əmlak agentliyi", "daşınmaz əmlak agentlikləri", "Bakıda əmlak agentliyi"],
 });
 
 export default async function AgenciesPage() {

@@ -1,12 +1,16 @@
 import {
   Building2,
+  Calculator,
   Camera,
   Hammer,
   Handshake,
   KeyRound,
   Landmark,
   Megaphone,
+  MessageCircle,
+  Triangle,
   Wallet,
+  Wind,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +30,10 @@ const ICONS: Record<string, LucideIcon> = {
   Megaphone,
   Camera,
   Building2,
+  Calculator,
+  MessageCircle,
+  Triangle,
+  Wind,
 };
 
 export const SERVICE_ICON_NAMES = Object.keys(ICONS);

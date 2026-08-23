@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
-import { organizationSchema } from "@/lib/seo";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import "./globals.css";
 
@@ -32,13 +32,25 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   applicationName: siteConfig.name,
   keywords: [
+    "əmlak",
+    "əmlak elanları",
     "daşınmaz əmlak",
+    "Bakıda əmlak",
+    "əmlak agentliyi",
+    "əmlak satışı",
     "Bakı mənzil",
+    "mənzil satışı",
+    "mənzil kirayə",
     "villa satışı",
     "əmlak kirayə",
+    "günlük kirayə",
+    "aylıq kirayə",
     "həyət evi",
+    "bağ evi",
     "torpaq sahəsi",
     "ofis icarəsi",
+    "yeni tikili",
+    "köhnə tikili",
     "Luxe Home Estate",
     "Luxe Home Estate MMC",
   ],
@@ -93,6 +105,12 @@ export default function RootLayout({
           // Struktur data statik obyektdən yaradılır — istifadəçi girişi daxil deyil.
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema()),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema()),
           }}
         />
         <ThemeProvider>

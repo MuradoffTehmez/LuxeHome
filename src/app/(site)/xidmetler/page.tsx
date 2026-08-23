@@ -20,6 +20,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Luxe Home Estate-in daşınmaz əmlak sahəsindəki 7 əsas xidmət istiqaməti: alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam, çəkiliş və konsultasiya.",
   path: "/xidmetler",
+  keywords: ["daşınmaz əmlak xidmətləri", "əmlak konsultasiyası", "ipoteka məsləhəti", "əmlak reklamı"],
 });
 
 export default async function ServicesPage() {

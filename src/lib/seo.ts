@@ -14,6 +14,8 @@ type PageMetaInput = {
   type?: "website" | "article";
   publishedTime?: string;
   noIndex?: boolean;
+  /** Səhifəyə xas açar sözlər — verilməzsə kök layout-dakı ümumi siyahı qüvvədə qalır. */
+  keywords?: string[];
 };
 
 /** Səhifə üçün tam metadata (canonical + Open Graph + Twitter) qurur. */
@@ -25,6 +27,7 @@ export function buildMetadata({
   type = "website",
   publishedTime,
   noIndex = false,
+  keywords,
 }: PageMetaInput): Metadata {
   const url = siteUrl(path);
   const images = image ? [{ url: image, width: 1200, height: 630, alt: title }] : undefined;
@@ -32,6 +35,7 @@ export function buildMetadata({
   return {
     title,
     description,
+    ...(keywords ? { keywords } : {}),
     alternates: { canonical: url },
     // Staging heç bir səhifəsi ilə indeksə düşməməlidir
     robots: noIndex || isStaging() ? { index: false, follow: false } : undefined,
@@ -58,7 +62,13 @@ export function buildMetadata({
 // STRUKTUR DATA (JSON-LD)
 // ---------------------------------------------------------------------------
 
-/** Şirkət — RealEstateAgent (LocalBusiness alt tipi). */
+/**
+ * Şirkət — RealEstateAgent (LocalBusiness alt tipi).
+ *
+ * `openingHoursSpecification`, `image` və `priceRange` Local SEO üçün Google
+ * Business Profile ilə uyğunluğu artırır — axtarış nəticələrində "açıqdır/
+ * bağlıdır" göstəricisi və qiymət diapazonu bu sahələrdən oxunur.
+ */
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
@@ -71,6 +81,9 @@ export function organizationSchema() {
     email: siteConfig.email,
     slogan: siteConfig.slogan,
     description: siteConfig.description,
+    image: siteUrl("/logo-full.png"),
+    logo: siteUrl("/logo-mark.png"),
+    priceRange: "$$",
     address: {
       "@type": "PostalAddress",
       streetAddress: siteConfig.address,
@@ -82,6 +95,12 @@ export function organizationSchema() {
       latitude: siteConfig.geo.latitude,
       longitude: siteConfig.geo.longitude,
     },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: siteConfig.workingHours.structured.days,
+      opens: siteConfig.workingHours.structured.opens,
+      closes: siteConfig.workingHours.structured.closes,
+    },
     sameAs: [siteConfig.instagramUrl],
     areaServed: { "@type": "Country", name: "Azərbaycan" },
     // Sayt, brend və marka hüquqlarının sahibi
@@ -90,6 +109,32 @@ export function organizationSchema() {
       "@type": "Brand",
       name: siteConfig.name,
       slogan: siteConfig.slogan,
+    },
+  };
+}
+
+/**
+ * WebSite + SearchAction.
+ *
+ * Google-a saytın daxili axtarışını "sitelinks search box" kimi göstərməyə
+ * icazə verir — brendli axtarışlarda birbaşa axtarış qutusu görünə bilər.
+ */
+export function websiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteUrl()}/#website`,
+    url: siteUrl(),
+    name: siteConfig.name,
+    publisher: { "@id": `${siteUrl()}/#organization` },
+    inLanguage: "az-AZ",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteUrl("/emlaklar")}?axtaris={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
     },
   };
 }
@@ -231,6 +276,20 @@ export function serviceSchema(service: {
     url: siteUrl(`/xidmetler/${service.slug}`),
     provider: { "@id": `${siteUrl()}/#organization` },
     areaServed: { "@type": "Country", name: "Azərbaycan" },
+  };
+}
+
+/** Siyahı səhifələri üçün ItemList — axtarış nəticələrində zəngin siyahı görünüşünə kömək edir. */
+export function itemListSchema(items: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      url: siteUrl(item.path),
+    })),
   };
 }
 
