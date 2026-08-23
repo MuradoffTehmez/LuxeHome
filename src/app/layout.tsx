@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Geist, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { organizationSchema } from "@/lib/seo";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
@@ -17,10 +17,9 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const geist = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -84,7 +83,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="az" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="az" suppressHydrationWarning className={`${playfair.variable} ${geist.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_RUNTIME_SHIM }} />
       </head>

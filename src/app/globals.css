@@ -49,7 +49,7 @@
 
   /* --- Şrift ailələri --- */
   --font-display: var(--font-playfair), "Playfair Display", Georgia, serif;
-  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI",
+  --font-sans: var(--font-geist-sans), "Geist", system-ui, -apple-system, "Segoe UI",
     sans-serif;
 
   /* --- Radius: minimal, premium (həddindən artıq yuvarlaqlıq yoxdur) --- */
@@ -139,6 +139,14 @@
    Z-index şkalası — təbəqələr bir yerdə idarə olunur
    -------------------------------------------------------------------------- */
 :root {
+  /* Semantik səth və mətn alias-ları — component-ləri palitra adlarından ayırır. */
+  --surface-page: var(--color-ivory);
+  --surface-panel: var(--color-paper);
+  --surface-subtle: var(--color-beige);
+  --text-primary: var(--color-ink);
+  --text-secondary: var(--color-ink-soft);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
   --z-base: 0;
   --z-sticky: 20;
   --z-header: 40;
@@ -168,8 +176,8 @@ html {
 }
 
 body {
-  background-color: var(--color-ivory);
-  color: var(--color-ink);
+  background-color: var(--surface-page);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 1rem;
   line-height: 1.6;
@@ -177,7 +185,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   /* Mobil tap gecikməsini azaldır */
   touch-action: manipulation;
-  /* Horizontal scroll-un qarşısını alır */
+  /* Header overflow root-cause düzəlişi tamamlanana qədər müvəqqəti qoruma. */
   overflow-x: hidden;
 }
 
