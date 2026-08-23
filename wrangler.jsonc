@@ -25,7 +25,11 @@
     "ADMIN_ENABLED": "true",
     // Dinamik səhifələrdə runtime-da oxunur; statik səhifələr üçün deploy skripti
     // eyni dəyəri build prosesinə də ötürür
-    "SITE_URL": "https://luxehomeestate.az"
+    "SITE_URL": "https://luxehomeestate.az",
+    // Admin "Search Analytics" paneli GraphQL Analytics API sorğusunda istifadə edir —
+    // sirr deyil, sadəcə hansı zona/hesabın sorğulanacağını göstərir
+    "CF_ZONE_ID": "d401a9f612bc47ed88e1c14e658141d1",
+    "CF_ACCOUNT_ID": "8e6ae175474aa8e5033b3b9087775250"
   },
 
   // Giriş və əlaqə formu üçün sürət limiti — Workers doğma binding-i
