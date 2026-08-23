@@ -170,6 +170,7 @@ export function Footer() {
             <p>
               Sayt, «{siteConfig.name}» brendi və markası {siteConfig.owner.name}-na məxsusdur.
             </p>
+            <p className="tabular">VÖEN: {siteConfig.legal.voen}</p>
           </div>
 
           <ul className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">

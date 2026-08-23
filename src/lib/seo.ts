@@ -100,6 +100,7 @@ export function organizationSchema() {
     image: siteUrl("/logo-full.png"),
     logo: siteUrl("/logo-mark.png"),
     priceRange: "$$",
+    taxID: siteConfig.legal.voen,
     address: {
       "@type": "PostalAddress",
       streetAddress: siteConfig.address,

@@ -28,8 +28,14 @@ export const siteConfig = {
   phoneHref: "tel:+994519228585",
   whatsapp: "994519228585",
   address: "Əliyar Əliyev 109A",
-  addressFull: "Əliyar Əliyev 109A, Bakı, Azərbaycan",
+  addressFull: "Əliyar Əliyev 109A, Nərimanov rayonu, Bakı AZ1033, Azərbaycan",
   email: "info@luxehomeestate.az",
+
+  /** Rəsmi qeydiyyat sənədləri (VÖEN, reyestr) əsasında — hüquqi ünvanla sinxron saxlanılmalıdır. */
+  legal: {
+    voen: "1507750271",
+    registrationDate: "17.08.2026",
+  },
 
   instagram: "luxe_home_estate",
   instagramUrl: "https://instagram.com/luxe_home_estate",
