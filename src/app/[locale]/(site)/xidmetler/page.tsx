@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { ServiceIcon } from "@/components/site/service-icon";
-import { ButtonLink } from "@/components/ui/button";
+import { buttonClassName } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 import { getServices } from "@/lib/queries";
 import { localizeKnownContent } from "@/i18n/dynamic-content";
@@ -96,9 +96,9 @@ export default async function ServicesPage({ params }: PageProps) {
           <p className="max-w-md text-base text-ink-soft">
             {t("ctaDescription")}
           </p>
-          <ButtonLink href="/elaqe" variant="primary" size="lg">
+          <Link href="/elaqe" className={buttonClassName("primary", "lg")}>
             {t("cta")}
-          </ButtonLink>
+          </Link>
         </Container>
       </Section>
     </>

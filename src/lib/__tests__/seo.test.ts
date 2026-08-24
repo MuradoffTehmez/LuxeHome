@@ -112,7 +112,7 @@ describe("buildMetadata", () => {
     expect(metadata.robots).toMatchObject({ index: false, follow: false });
   });
 
-  it("RU səhifəsini AZ canonical-a bağlayıb indeksləmir", () => {
+  it("RU səhifəsinə self-canonical və bütün dil alternativlərini verir", () => {
     const metadata = buildMetadata({
       title: "Əmlaklar",
       description: "Əmlak siyahısı.",
@@ -121,9 +121,15 @@ describe("buildMetadata", () => {
     });
 
     expect(metadata.alternates).toEqual({
-      canonical: siteUrl("/emlaklar"),
+      canonical: siteUrl("/ru/emlaklar"),
+      languages: {
+        az: siteUrl("/az/emlaklar"),
+        en: siteUrl("/en/emlaklar"),
+        ru: siteUrl("/ru/emlaklar"),
+        "x-default": siteUrl("/az/emlaklar"),
+      },
     });
-    expect(metadata.robots).toMatchObject({ index: false, follow: true });
+    expect(metadata.robots).toBeUndefined();
     expect(metadata.openGraph).toMatchObject({ locale: "ru_RU" });
   });
 });
@@ -191,10 +197,11 @@ describe("structured data kontraktı", () => {
       bedrooms: 2,
       bathrooms: 2,
       status: "PUBLISHED",
-    });
+    }, "ru");
 
     expect(schema["@type"]).toBe("RealEstateListing");
     expect(schema["@id"]).toContain("#listing");
+    expect(schema.url).toBe(siteUrl("/ru/emlaklar/nerimanov-3-otaqli"));
     expect(schema.about).toMatchObject({
       "@type": "Residence",
       address: {
@@ -218,7 +225,7 @@ describe("structured data kontraktı", () => {
     });
     expect(article).toMatchObject({
       "@type": "BlogPosting",
-      "@id": `${siteUrl("/blog/menzil-secimi")}#article`,
+      "@id": `${siteUrl("/az/blog/menzil-secimi")}#article`,
       publisher: { "@id": `${siteUrl()}/#organization` },
     });
     expect(JSON.stringify(article)).toContain("/logo-full.png");
@@ -230,7 +237,7 @@ describe("structured data kontraktı", () => {
     });
     expect(faqSchema([{ question: "Sual?", answer: "Cavab." }], "/suallar")).toMatchObject({
       "@type": "FAQPage",
-      "@id": `${siteUrl("/suallar")}#faq`,
+      "@id": `${siteUrl("/az/suallar")}#faq`,
     });
   });
 });

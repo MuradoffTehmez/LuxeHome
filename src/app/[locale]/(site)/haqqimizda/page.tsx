@@ -14,7 +14,8 @@ import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
-import { ButtonLink } from "@/components/ui/button";
+import { buttonClassName } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 import { BusinessTrustPanel } from "@/components/site/business-trust-panel";
@@ -66,13 +67,13 @@ export default async function AboutPage({ params }: PageProps) {
                 <p>{t("about.paragraph3")}</p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <ButtonLink href="/xidmetler" variant="outline">
+                <Link href="/xidmetler" className={buttonClassName("outline")}>
                   {t("about.services")}
-                </ButtonLink>
-                <ButtonLink href="/elaqe" variant="ghost">
+                </Link>
+                <Link href="/elaqe" className={buttonClassName("ghost")}>
                   {t("about.contact")}
                   <ArrowRight className="size-4" aria-hidden="true" />
-                </ButtonLink>
+                </Link>
               </div>
             </div>
           </div>

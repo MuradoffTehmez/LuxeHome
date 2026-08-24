@@ -59,9 +59,9 @@ export default async function MetroLandingPage({ params, searchParams }: Props) 
 
   return (
     <>
-      <script {...jsonLd(breadcrumbSchema([{ name: labels.home, path: "/" }, { name: labels.properties, path: "/emlaklar" }, { name: landing.h1, path: landing.path }]))} />
-      <script {...jsonLd(faqSchema(landing.faq, landing.path))} />
-      <script {...jsonLd(itemListSchema(result.items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` }))))} />
+      <script {...jsonLd(breadcrumbSchema([{ name: labels.home, path: "/" }, { name: labels.properties, path: "/emlaklar" }, { name: landing.h1, path: landing.path }], localeValue))} />
+      <script {...jsonLd(faqSchema(landing.faq, landing.path, localeValue))} />
+      <script {...jsonLd(itemListSchema(result.items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` })), localeValue))} />
       <SeoLandingPage landing={landing} locale={localeValue} {...result} />
     </>
   );

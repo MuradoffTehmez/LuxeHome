@@ -75,14 +75,15 @@ export default async function FixedSeoLandingPage({ params, searchParams }: Prop
             { name: labels.home, path: "/" },
             { name: labels.properties, path: "/emlaklar" },
             { name: landing.h1, path: landing.path },
-          ]),
+          ], resolvedLocale),
         )}
       />
-      <script {...jsonLd(faqSchema(landing.faq, landing.path))} />
+      <script {...jsonLd(faqSchema(landing.faq, landing.path, resolvedLocale))} />
       <script
         {...jsonLd(
           itemListSchema(
             result.items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` })),
+            resolvedLocale,
           ),
         )}
       />

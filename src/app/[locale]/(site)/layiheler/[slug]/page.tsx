@@ -12,8 +12,9 @@ import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getCachedProjectBySlug } from "@/lib/public-cache";
-import { siteConfig } from "@/config/site";
+import { siteConfig, siteUrl } from "@/config/site";
 import type { Locale } from "@/lib/constants";
+import { localizePath } from "@/i18n/path-locale";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -81,7 +82,7 @@ export default async function ProjectDetailPage({ params }: Props) {
     name: project.name,
     description: project.summary || project.description,
     image: project.images.map((img) => img.url),
-    url: `https://luxehomeestate.az/layiheler/${project.slug}`,
+    url: siteUrl(localizePath(`/layiheler/${project.slug}`, locale as Locale)),
   };
 
   const imagesForGallery = project.images.map((img) => ({
@@ -98,7 +99,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             { name: navigation("home"), path: "/" },
             { name: navigation("projects"), path: "/layiheler" },
             { name: project.name, path: `/layiheler/${project.slug}` },
-          ]),
+          ], locale as Locale),
         )}
       />
 

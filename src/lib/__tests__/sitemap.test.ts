@@ -23,13 +23,14 @@ describe("sitemap assembler", () => {
     });
     const urls = sitemap.map((entry) => entry.url);
 
-    expect(urls).toContain("https://luxehomeestate.az/emlaklar/aktiv-villa");
-    expect(urls).toContain("https://luxehomeestate.az/agentlikler/etibar-emlak");
-    expect(urls).toContain("https://luxehomeestate.az/satilan-emlaklar");
-    expect(urls).not.toContain("https://luxehomeestate.az/emlaklar/satilib");
-    expect(urls).not.toContain("https://luxehomeestate.az/emlaklar/noindex");
-    expect(urls).not.toContain("https://luxehomeestate.az/emlaklar/duplicate");
-    expect(urls).not.toContain("https://luxehomeestate.az/layiheler/dublikat-layihe");
+    expect(urls).toContain("https://luxehomeestate.az/az/emlaklar/aktiv-villa");
+    expect(urls).toContain("https://luxehomeestate.az/en/emlaklar/aktiv-villa");
+    expect(urls).toContain("https://luxehomeestate.az/ru/agentlikler/etibar-emlak");
+    expect(urls).toContain("https://luxehomeestate.az/az/satilan-emlaklar");
+    expect(urls).not.toContain("https://luxehomeestate.az/az/emlaklar/satilib");
+    expect(urls).not.toContain("https://luxehomeestate.az/az/emlaklar/noindex");
+    expect(urls).not.toContain("https://luxehomeestate.az/az/emlaklar/duplicate");
+    expect(urls).not.toContain("https://luxehomeestate.az/az/layiheler/dublikat-layihe");
   });
 
   it("agentlik, FAQ və hüquqi hub-ları absolute HTTPS URL kimi elan edir", () => {
@@ -52,7 +53,9 @@ describe("sitemap assembler", () => {
       "/istifade-sertleri",
       "/cookie-siyaseti",
     ]) {
-      expect(urls).toContain(`https://luxehomeestate.az${path}`);
+      expect(urls).toContain(`https://luxehomeestate.az/az${path}`);
+      expect(urls).toContain(`https://luxehomeestate.az/en${path}`);
+      expect(urls).toContain(`https://luxehomeestate.az/ru${path}`);
     }
     expect(urls.every((url) => url.startsWith("https://luxehomeestate.az/"))).toBe(true);
   });

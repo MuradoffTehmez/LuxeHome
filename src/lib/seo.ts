@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import {
   DEFAULT_LOCALE,
+  LOCALES,
   type Locale,
 } from "@/lib/constants";
+import { localizePath } from "@/i18n/path-locale";
 
 // ---------------------------------------------------------------------------
 // METADATA KÖMƏKÇİLƏRİ
@@ -58,13 +60,20 @@ export function buildMetadata({
   ogDescription,
   ogImage,
 }: PageMetaInput): Metadata {
-  const localePrefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
-  const localizedPath = path === "/" ? `${localePrefix}/` : `${localePrefix}${path}`;
+  const localizedPath = localizePath(path, locale);
   const url = siteUrl(localizedPath);
-  // RU/EN DB məzmunu hələ lokallaşdırılmadığı üçün canonical həmişə AZ route-udur.
   // `null` qeyri-ekvivalent faceted səhifədə canonical-ın qəsdən buraxılmasıdır.
+  const canonicalSource = canonicalPath === undefined ? path : canonicalPath;
   const canonicalUrl =
-    canonicalPath === null ? null : siteUrl(canonicalPath === undefined ? path : canonicalPath);
+    canonicalSource === null ? null : siteUrl(localizePath(canonicalSource, locale));
+  const languageAlternates = canonicalSource === null
+    ? undefined
+    : {
+        ...Object.fromEntries(
+          Object.values(LOCALES).map((code) => [code, siteUrl(localizePath(canonicalSource, code))]),
+        ),
+        "x-default": siteUrl(localizePath(canonicalSource, DEFAULT_LOCALE)),
+      };
   const resolvedOgTitle = ogTitle || title;
   const resolvedOgDescription = ogDescription || description;
   const resolvedOgImage = ogImage || image;
@@ -82,7 +91,7 @@ export function buildMetadata({
   const effectivePolicy: IndexPolicy =
     isStaging() || indexPolicy === "private"
       ? "private"
-      : noIndex || locale !== DEFAULT_LOCALE || indexPolicy === "noindex-follow"
+      : noIndex || indexPolicy === "noindex-follow"
         ? "noindex-follow"
         : "index";
   const robots: Metadata["robots"] =
@@ -105,7 +114,9 @@ export function buildMetadata({
     title,
     description,
     ...(keywords ? { keywords } : {}),
-    ...(canonicalUrl ? { alternates: { canonical: canonicalUrl } } : {}),
+    ...(canonicalUrl
+      ? { alternates: { canonical: canonicalUrl, ...(languageAlternates ? { languages: languageAlternates } : {}) } }
+      : {}),
     robots,
     openGraph: {
       type,
@@ -183,7 +194,7 @@ export function websiteSchema() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteUrl("/emlaklar")}?axtaris={search_term_string}`,
+        urlTemplate: `${siteUrl(localizePath("/emlaklar", DEFAULT_LOCALE))}?axtaris={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -192,7 +203,7 @@ export function websiteSchema() {
 
 type BreadcrumbItem = { name: string; path: string };
 
-export function breadcrumbSchema(items: BreadcrumbItem[]) {
+export function breadcrumbSchema(items: BreadcrumbItem[], locale: Locale = DEFAULT_LOCALE) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -200,7 +211,7 @@ export function breadcrumbSchema(items: BreadcrumbItem[]) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: siteUrl(item.path),
+      item: siteUrl(localizePath(item.path, locale)),
     })),
   };
 }
@@ -226,7 +237,7 @@ type PropertySchemaInput = {
 };
 
 /** Əmlak elanı: listing + təsvir edilən obyekt + kommersiya təklifi. */
-export function propertySchema(property: PropertySchemaInput) {
+export function propertySchema(property: PropertySchemaInput, locale: Locale = DEFAULT_LOCALE) {
   const availability =
     property.status === "SOLD" || property.status === "RENTED"
       ? "https://schema.org/SoldOut"
@@ -234,7 +245,7 @@ export function propertySchema(property: PropertySchemaInput) {
         ? "https://schema.org/LimitedAvailability"
         : "https://schema.org/InStock";
 
-  const url = siteUrl(`/emlaklar/${property.slug}`);
+  const url = siteUrl(localizePath(`/emlaklar/${property.slug}`, locale));
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
@@ -291,8 +302,8 @@ type ArticleSchemaInput = {
   authorName?: string | null;
 };
 
-export function articleSchema(post: ArticleSchemaInput) {
-  const url = siteUrl(`/blog/${post.slug}`);
+export function articleSchema(post: ArticleSchemaInput, locale: Locale = DEFAULT_LOCALE) {
+  const url = siteUrl(localizePath(`/blog/${post.slug}`, locale));
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -316,7 +327,7 @@ export function articleSchema(post: ArticleSchemaInput) {
       logo: { "@type": "ImageObject", url: siteUrl("/logo-full.png") },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    inLanguage: "az-AZ",
+    inLanguage: { az: "az-AZ", en: "en-US", ru: "ru-RU" }[locale],
   };
 }
 
@@ -324,8 +335,8 @@ export function serviceSchema(service: {
   title: string;
   description: string;
   slug: string;
-}) {
-  const url = siteUrl(`/xidmetler/${service.slug}`);
+}, locale: Locale = DEFAULT_LOCALE) {
+  const url = siteUrl(localizePath(`/xidmetler/${service.slug}`, locale));
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -339,7 +350,10 @@ export function serviceSchema(service: {
 }
 
 /** Siyahı səhifələri üçün ItemList — axtarış nəticələrində zəngin siyahı görünüşünə kömək edir. */
-export function itemListSchema(items: { name: string; path: string }[]) {
+export function itemListSchema(
+  items: { name: string; path: string }[],
+  locale: Locale = DEFAULT_LOCALE,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -347,7 +361,7 @@ export function itemListSchema(items: { name: string; path: string }[]) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      url: siteUrl(item.path),
+      url: siteUrl(localizePath(item.path, locale)),
     })),
   };
 }
@@ -375,12 +389,14 @@ function cleanJsonLd(value: unknown): JsonValue | undefined {
 export function faqSchema(
   items: Array<{ question: string; answer: string }> | readonly { question: string; answer: string }[],
   path: string,
+  locale: Locale = DEFAULT_LOCALE,
 ) {
+  const url = siteUrl(localizePath(path, locale));
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "@id": `${siteUrl(path)}#faq`,
-    url: siteUrl(path),
+    "@id": `${url}#faq`,
+    url,
     mainEntity: items.map((item) => ({
       "@type": "Question",
       name: item.question,
@@ -397,8 +413,8 @@ export function agencySchema(agency: {
   address?: string | null;
   website?: string | null;
   logoUrl?: string | null;
-}) {
-  const url = siteUrl(`/agentlikler/${agency.slug}`);
+}, locale: Locale = DEFAULT_LOCALE) {
+  const url = siteUrl(localizePath(`/agentlikler/${agency.slug}`, locale));
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",

@@ -52,14 +52,14 @@ export default async function AgencyDetailPage({ params }: Props) {
 
   return (
     <>
-      <script {...jsonLd(agencySchema(agency))} />
+      <script {...jsonLd(agencySchema(agency, locale as Locale))} />
       <script
         {...jsonLd(
           breadcrumbSchema([
             { name: navigation("home"), path: "/" },
             { name: navigation("agencies"), path: "/agentlikler" },
             { name: agency.name, path: `/agentlikler/${agency.slug}` },
-          ]),
+          ], locale as Locale),
         )}
       />
 

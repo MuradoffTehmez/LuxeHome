@@ -27,7 +27,7 @@ import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
 
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
-import { ButtonLink, ButtonAnchor } from "@/components/ui/button";
+import { ButtonAnchor, buttonClassName } from "@/components/ui/button";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyActionToolbar } from "@/components/site/property-action-toolbar";
@@ -175,7 +175,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             bedrooms: property.bedrooms,
             bathrooms: property.bathrooms,
             status: property.status,
-          }),
+          }, locale as Locale),
         )}
       />
       <script
@@ -184,13 +184,14 @@ export default async function PropertyDetailPage({ params }: Props) {
             { name: navigation("home"), path: "/" },
             { name: navigation("properties"), path: "/emlaklar" },
             { name: property.title, path: `/emlaklar/${property.slug}` },
-          ]),
+          ], locale as Locale),
         )}
       />
 
       <div className="bg-ivory pt-6 pb-[calc(7rem+var(--safe-bottom))] sm:pt-8 sm:pb-20 lg:pb-12">
         <Container>
           <Breadcrumbs
+            locale={locale as Locale}
             items={[
               { label: navigation("home"), href: "/" },
               { label: navigation("properties"), href: "/emlaklar" },
@@ -369,9 +370,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                       <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">{content("project")}</span>
                       <h3 className="font-display text-lg text-ink">{property.project.name}</h3>
                     </div>
-                    <ButtonLink href={`/layiheler/${property.project.slug}`} variant="outline" size="sm">
+                    <Link href={`/layiheler/${property.project.slug}`} className={buttonClassName("outline", "sm")}>
                       {content("viewProject")} <ArrowRight className="ml-2 size-4" />
-                    </ButtonLink>
+                    </Link>
                   </div>
                 </div>
               )}

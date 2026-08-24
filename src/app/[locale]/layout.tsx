@@ -10,29 +10,15 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-
-  return locale === routing.defaultLocale
-    ? {}
-    : {
-        robots: {
-          index: false,
-          follow: true,
-          googleBot: { index: false, follow: true, "max-image-preview": "large" },
-        },
-      };
+  return {};
 }
 
 /**
- * Lokallaşdırılmış ictimai ağacın kökü. `localePrefix: "as-needed"` səbəbindən
- * default dil (AZ) heç bir prefikslə buraya çatmır — yalnız `/en/...`, `/ru/...`
- * bu layout-dan keçir. Naməlum `[locale]` dəyəri 404 verir.
+ * Lokallaşdırılmış istifadəçi ağacının kökü. Bütün dillər, o cümlədən AZ,
+ * məcburi locale prefiksi ilə buradan keçir. Naməlum `[locale]` dəyəri 404 verir.
  */
 export default async function LocaleLayout({
   children,

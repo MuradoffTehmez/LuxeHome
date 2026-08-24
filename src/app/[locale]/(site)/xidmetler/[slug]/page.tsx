@@ -75,7 +75,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             title: service.title,
             description: service.shortDescription,
             slug: service.slug,
-          }),
+          }, locale as Locale),
         )}
       />
       <script
@@ -84,7 +84,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             { name: navigation("home"), path: "/" },
             { name: navigation("services"), path: "/xidmetler" },
             { name: service.title, path: `/xidmetler/${service.slug}` },
-          ]),
+          ], locale as Locale),
         )}
       />
 

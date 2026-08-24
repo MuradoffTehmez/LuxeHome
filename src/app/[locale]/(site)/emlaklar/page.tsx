@@ -196,7 +196,10 @@ export default async function PropertiesPage({ params: routeParams, searchParams
       {items.length > 0 && (
         <script
           {...jsonLd(
-            itemListSchema(items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` }))),
+            itemListSchema(
+              items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` })),
+              locale as Locale,
+            ),
           )}
         />
       )}

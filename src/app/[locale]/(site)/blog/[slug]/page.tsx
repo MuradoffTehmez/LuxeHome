@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: Props) {
             publishedAt: post.publishedAt || post.createdAt,
             updatedAt: post.updatedAt,
             authorName: post.author?.name,
-          }),
+          }, locale as Locale),
         )}
       />
       <script
@@ -80,7 +80,7 @@ export default async function BlogPostPage({ params }: Props) {
             { name: navigation("home"), path: "/" },
             { name: navigation("blog"), path: "/blog" },
             { name: post.title, path: `/blog/${post.slug}` },
-          ]),
+          ], locale as Locale),
         )}
       />
 

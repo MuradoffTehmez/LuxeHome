@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
-import { ButtonLink } from "@/components/ui/button";
+import { buttonClassName } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Hero } from "@/components/site/hero";
@@ -300,13 +300,13 @@ export default async function HomePage({ params }: HomePageProps) {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <ButtonLink href="/haqqimizda" variant="outline">
+                <Link href="/haqqimizda" className={buttonClassName("outline")}>
                   {t("about.more")}
-                </ButtonLink>
-                <ButtonLink href="/elaqe" variant="ghost">
+                </Link>
+                <Link href="/elaqe" className={buttonClassName("ghost")}>
                   {t("about.contact")}
                   <ArrowRight className="size-4" aria-hidden="true" />
-                </ButtonLink>
+                </Link>
               </div>
             </div>
           </div>
@@ -432,13 +432,13 @@ export default async function HomePage({ params }: HomePageProps) {
               </p>
 
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/elaqe" variant="primary" size="lg">
+                <Link href="/elaqe" className={buttonClassName("primary", "lg")}>
                   {t("cta.send")}
-                </ButtonLink>
-                <ButtonLink href="/emlaklar" variant="outline" size="lg">
+                </Link>
+                <Link href="/emlaklar" className={buttonClassName("outline", "lg")}>
                   {t("cta.view")}
                   <ArrowRight className="size-4" aria-hidden="true" />
-                </ButtonLink>
+                </Link>
               </div>
             </div>
           </div>

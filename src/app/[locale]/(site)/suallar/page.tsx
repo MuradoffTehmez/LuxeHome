@@ -33,7 +33,7 @@ export default async function FaqPage({ params }: PageProps) {
 
   return (
     <>
-      <script {...jsonLd(faqSchema(items, "/suallar"))} />
+      <script {...jsonLd(faqSchema(items, "/suallar", activeLocale))} />
 
       <PageHeader
         compact
