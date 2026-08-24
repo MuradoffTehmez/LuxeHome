@@ -19,7 +19,7 @@
   "search": {
     "listingType": "Listing type", "sale": "For sale", "rent": "For rent", "search": "Search",
     "queryPlaceholder": "Address, district or keyword", "propertyType": "Property type",
-    "city": "City", "district": "District", "selectCityFirst": "Select a city first",
+    "city": "City", "district": "District", "metro": "Metro station", "selectCityFirst": "Select a city first",
     "all": "All", "rooms": "Rooms", "any": "Any", "roomOption": "{count, plural, one {# room} other {# rooms}}",
     "fivePlusRooms": "5+ rooms", "price": "Price (₼)", "area": "Area (m²)",
     "renovation": "Condition", "document": "Documents", "building": "Building type",

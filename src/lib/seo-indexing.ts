@@ -51,6 +51,7 @@ const PROPERTY_FILTER_KEYS = new Set([
   "tip",
   "seher",
   "rayon",
+  "metro",
   "otaq",
   "min",
   "max",

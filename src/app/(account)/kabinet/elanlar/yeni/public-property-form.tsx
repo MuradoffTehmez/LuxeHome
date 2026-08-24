@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import {
   AdminCheckbox,
@@ -12,21 +13,14 @@ import {
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import type { ActionState } from "@/lib/admin/action-state";
 import {
-  BUILDING_TYPE_LABELS,
   BUILDING_TYPES,
   CURRENCIES,
   CURRENCY_LABELS,
-  DOCUMENT_STATUS_LABELS,
   DOCUMENT_STATUSES,
-  FEATURE_GROUP_LABELS,
-  LISTING_TYPE_LABELS,
   LISTING_TYPES,
   MAX_PROPERTY_IMAGES,
-  PRICE_PERIOD_LABELS,
   PRICE_PERIODS,
-  RENOVATION_LABELS,
   RENOVATIONS,
-  type FeatureGroup,
 } from "@/lib/constants";
 import type { PropertyFormOptions } from "@/lib/queries";
 
@@ -43,6 +37,9 @@ export function PublicPropertyForm({
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
   options: PropertyFormOptions;
 }) {
+  const t = useTranslations("account.newProperty");
+  const searchT = useTranslations("listings.search");
+  const propertyT = useTranslations("property");
   const [listingType, setListingType] = useState<string>(LISTING_TYPES.SALE);
   const [cityId, setCityId] = useState(options.cities[0]?.id ?? "");
   const districts = options.districts.filter((district) => district.parentId === cityId);
@@ -55,72 +52,72 @@ export function PublicPropertyForm({
   );
 
   return (
-    <AdminForm action={action} submitLabel="Elanı göndər" cancelHref="/kabinet/elanlar">
+    <AdminForm action={action} submitLabel={t("submit")} cancelHref="/kabinet/elanlar">
       <FormSection
         asFieldset
-        title="Əsas məlumat"
-        description="Elan yoxlanıldıqdan sonra saytda görünəcək."
+        title={t("main")}
+        description={t("mainDescription")}
       >
         <FullWidth>
           <AdminInput
             name="title"
-            label="Başlıq"
+            label={t("titleField")}
             required
             maxLength={160}
-            hint="Məsələn: «Xətai rayonunda 3 otaqlı yeni tikili mənzil»"
+            hint={t("titleHint")}
           />
         </FullWidth>
         <FullWidth>
           <AdminTextarea
             name="description"
-            label="Təsvir"
+            label={t("descriptionField")}
             required
             rows={8}
             maxLength={8000}
-            hint="Əmlakın vəziyyəti, şəraiti və üstünlüklərini yazın."
+            hint={t("descriptionHint")}
           />
         </FullWidth>
       </FormSection>
 
-      <FormSection asFieldset title="Qiymət və elan növü">
+      <FormSection asFieldset title={t("priceSection")}>
         <AdminSelect
           name="listingType"
-          label="Elan növü"
+          label={t("listingType")}
           required
           value={listingType}
           onChange={(event) => setListingType(event.target.value)}
-          options={optionsOf(LISTING_TYPES, LISTING_TYPE_LABELS)}
+          options={[{ value: LISTING_TYPES.SALE, label: searchT("sale") }, { value: LISTING_TYPES.RENT, label: searchT("rent") }]}
         />
         <AdminSelect
           name="currency"
-          label="Valyuta"
+          label={t("currency")}
           required
           defaultValue={CURRENCIES.AZN}
           options={optionsOf(CURRENCIES, CURRENCY_LABELS)}
         />
-        <AdminInput name="price" label="Qiymət" required type="number" min={0} step="0.01" />
+        <AdminInput name="price" label={t("price")} required type="number" min={0} step="0.01" />
         {listingType === LISTING_TYPES.RENT && (
           <AdminSelect
             name="pricePeriod"
-            label="Qiymət dövrü"
+            label={t("pricePeriod")}
             required
             defaultValue={PRICE_PERIODS.MONTH}
-            options={optionsOf(PRICE_PERIODS, PRICE_PERIOD_LABELS)}
+            options={[{ value: PRICE_PERIODS.MONTH, label: searchT("monthly") }, { value: PRICE_PERIODS.DAY, label: searchT("daily") }]}
           />
         )}
       </FormSection>
 
-      <FormSection asFieldset title="Ünvan">
+      <FormSection asFieldset title={t("addressSection")}>
         <AdminSelect
           name="typeId"
-          label="Əmlak növü"
+          label={t("propertyType")}
           required
-          placeholder="Seçin"
+          placeholder={t("select")}
           options={options.types.map((type) => ({ value: type.id, label: type.name }))}
         />
         <AdminSelect
           name="cityId"
-          label="Şəhər"
+          label={t("city")}
           required
           value={cityId}
           onChange={(event) => setCityId(event.target.value)}
@@ -128,66 +125,66 @@ export function PublicPropertyForm({
         />
         <AdminSelect
           name="districtId"
-          label="Rayon / qəsəbə"
-          placeholder="Seçilməyib"
+          label={t("district")}
+          placeholder={t("notSelected")}
           options={districts.map((district) => ({ value: district.id, label: district.name }))}
         />
         <FullWidth>
           <AdminInput
             name="address"
-            label="Ünvan"
+            label={t("address")}
             maxLength={240}
-            hint="Küçə və bina yazın; mənzil nömrəsini daxil etməyin."
+            hint={t("addressHint")}
           />
         </FullWidth>
       </FormSection>
 
-      <FormSection asFieldset title="Ölçü və planlama">
-        <AdminInput name="rooms" label="Otaq sayı" type="number" min={0} />
-        <AdminInput name="bedrooms" label="Yataq otağı" type="number" min={0} />
-        <AdminInput name="bathrooms" label="Sanitar qovşaq" type="number" min={0} />
-        <AdminInput name="area" label="Sahə (m²)" type="number" min={0} step="0.01" />
-        <AdminInput name="landArea" label="Torpaq sahəsi (sot)" type="number" min={0} step="0.01" />
-        <AdminInput name="floor" label="Mərtəbə" type="number" min={0} />
-        <AdminInput name="totalFloors" label="Binanın mərtəbəsi" type="number" min={0} />
+      <FormSection asFieldset title={t("planning")}>
+        <AdminInput name="rooms" label={t("rooms")} type="number" min={0} />
+        <AdminInput name="bedrooms" label={t("bedrooms")} type="number" min={0} />
+        <AdminInput name="bathrooms" label={t("bathrooms")} type="number" min={0} />
+        <AdminInput name="area" label={t("area")} type="number" min={0} step="0.01" />
+        <AdminInput name="landArea" label={t("landArea")} type="number" min={0} step="0.01" />
+        <AdminInput name="floor" label={t("floor")} type="number" min={0} />
+        <AdminInput name="totalFloors" label={t("totalFloors")} type="number" min={0} />
       </FormSection>
 
-      <FormSection asFieldset title="Vəziyyət və şərtlər">
+      <FormSection asFieldset title={t("condition")}>
         <AdminSelect
           name="renovation"
-          label="Təmir vəziyyəti"
-          placeholder="Seçilməyib"
-          options={optionsOf(RENOVATIONS, RENOVATION_LABELS)}
+          label={t("renovation")}
+          placeholder={t("notSelected")}
+          options={Object.values(RENOVATIONS).map((value) => ({ value, label: propertyT(`renovation.${value === "COSMETIC" ? "cosmetic" : value === "RENOVATED" ? "renovated" : value === "DESIGNER" ? "designer" : value === "UNRENOVATED" ? "unrenovated" : "newBuilding"}`) }))}
         />
         <AdminSelect
           name="documentStatus"
-          label="Sənəd"
-          placeholder="Seçilməyib"
-          options={optionsOf(DOCUMENT_STATUSES, DOCUMENT_STATUS_LABELS)}
+          label={t("document")}
+          placeholder={t("notSelected")}
+          options={Object.values(DOCUMENT_STATUSES).map((value) => ({ value, label: propertyT(`document.${value === "TITLE_DEED" ? "titleDeed" : value === "CONTRACT" ? "contract" : value === "MUNICIPAL" ? "municipal" : value === "DECREE" ? "decree" : value === "POWER_OF_ATTORNEY" ? "powerOfAttorney" : value === "EXTRACT_COMMERCIAL" ? "commercialExtract" : "none"}`) }))}
         />
         <AdminSelect
           name="buildingType"
-          label="Tikili növü"
-          placeholder="Seçilməyib"
-          options={optionsOf(BUILDING_TYPES, BUILDING_TYPE_LABELS)}
+          label={t("building")}
+          placeholder={t("notSelected")}
+          options={Object.values(BUILDING_TYPES).map((value) => ({ value, label: propertyT(`building.${value === "NEW" ? "new" : "old"}`) }))}
         />
-        <AdminInput name="videoUrl" label="Video ünvanı" type="url" hint="Yalnız https://" />
+        <AdminInput name="videoUrl" label={t("video")} type="url" hint={t("videoHint")} />
         <FullWidth>
           <div className="flex flex-wrap gap-x-6 gap-y-1">
-            <AdminCheckbox name="mortgageAvailable" label="İpoteka mümkündür" />
-            <AdminCheckbox name="installmentAvailable" label="Taksit mümkündür" />
+            <AdminCheckbox name="mortgageAvailable" label={t("mortgage")} />
+            <AdminCheckbox name="installmentAvailable" label={t("installment")} />
           </div>
         </FullWidth>
       </FormSection>
 
       {options.features.length > 0 && (
-        <FormSection asFieldset title="Xüsusiyyətlər" description="Uyğun alıcılara daha asan çatın.">
+        <FormSection asFieldset title={t("features")} description={t("featuresDescription")}>
           <FullWidth>
             <div className="flex flex-col gap-4">
               {Object.entries(featureGroups).map(([group, features]) => (
                 <fieldset key={group} className="flex flex-col gap-1">
                   <legend className="mb-1 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                    {FEATURE_GROUP_LABELS[group as FeatureGroup] ?? group}
+                    {propertyT(`featureGroup.${group === "UTILITY" ? "utility" : group === "INDOOR" ? "indoor" : group === "OUTDOOR" ? "outdoor" : group === "SECURITY" ? "security" : group === "PAYMENT" ? "payment" : "general"}`)}
                   </legend>
                   <div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
                     {features.map((feature) => (
@@ -206,15 +203,15 @@ export function PublicPropertyForm({
         </FormSection>
       )}
 
-      <FormSection asFieldset title="Şəkillər" description="Birinci şəkil elanınızın üz qabığı olacaq.">
+      <FormSection asFieldset title={t("images")} description={t("imagesDescription")}>
         <FullWidth>
           <ImageDropzone
             name="images"
-            label="Qalereya"
+            label={t("gallery")}
             folder="emlaklar"
             uploadUrl="/api/hesab/media"
             maxFiles={MAX_PROPERTY_IMAGES}
-            hint={`Ən çox ${MAX_PROPERTY_IMAGES} şəkil yükləyin; şəkillər elan göndərilənədək hesabınıza bağlı saxlanılır.`}
+            hint={t("imageHint", { count: MAX_PROPERTY_IMAGES })}
           />
         </FullWidth>
       </FormSection>

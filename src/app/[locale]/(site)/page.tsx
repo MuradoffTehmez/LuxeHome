@@ -29,7 +29,7 @@ import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { buildMetadata } from "@/lib/seo";
 import { getCachedHomePageData } from "@/lib/public-cache";
-import { localizeKnownContent } from "@/i18n/dynamic-content";
+import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -98,10 +98,10 @@ export default async function HomePage({ params }: HomePageProps) {
   // Rayon seçimi şəhərdən asılı olduğu üçün alt siyahı da ötürülür
   const cityOptions = filterOptions.cities.map((city) => ({
     value: city.slug,
-    label: city.name,
+    label: localizeLocation(city, resolvedLocale).name,
     districts: city.children.map((district) => ({
       value: district.slug,
-      label: district.name,
+      label: localizeLocation(district, resolvedLocale).name,
     })),
   }));
   const categoryItems = localizedPropertyTypes.map((type) => ({

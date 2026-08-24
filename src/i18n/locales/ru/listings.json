@@ -19,7 +19,7 @@
   "search": {
     "listingType": "Тип объявления", "sale": "Продажа", "rent": "Аренда", "search": "Поиск",
     "queryPlaceholder": "Адрес, район или ключевое слово", "propertyType": "Тип недвижимости",
-    "city": "Город", "district": "Район", "selectCityFirst": "Сначала выберите город",
+    "city": "Город", "district": "Район", "metro": "Станция метро", "selectCityFirst": "Сначала выберите город",
     "all": "Все", "rooms": "Количество комнат", "any": "Неважно", "roomOption": "{count, plural, one {# комната} few {# комнаты} many {# комнат} other {# комнаты}}",
     "fivePlusRooms": "5+ комнат", "price": "Цена (₼)", "area": "Площадь (м²)",
     "renovation": "Состояние ремонта", "document": "Документы", "building": "Тип здания",

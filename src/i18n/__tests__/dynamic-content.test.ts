@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { localizeKnownContent } from "@/i18n/dynamic-content";
+import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 
 describe("production dynamic content localization", () => {
   it("property title, description and SEO fields no longer leak AZ content", () => {
@@ -41,5 +41,17 @@ describe("production dynamic content localization", () => {
     expect(service.title).toBe("Buying and selling");
     expect(service.metaTitle).toBe("Buying and selling");
     expect(service.metaDescription).toBe(service.shortDescription);
+  });
+
+  it("localizes city, district and metro names without AZ alphabet leakage", () => {
+    expect(localizeLocation({ name: "Bakı", slug: "baki" }, "en").name).toBe("Baku");
+    expect(localizeLocation({ name: "Nərimanov", slug: "baki-nerimanov" }, "ru").name).toBe("Нариманов");
+    expect(localizeLocation({ name: "28 May", slug: "metro-28-may" }, "ru").name).toBe("28 Мая");
+    expect(localizeLocation({ name: "Ağcabədi", slug: "agcabedi" }, "en").name).toBe("Aghjabadi");
+  });
+
+  it("covers production property types and feature values", () => {
+    expect(localizeKnownContent("propertyType", { slug: "mini-otel", name: "Mini otel" }, "ru").name).toBe("Мини-отели / хостелы");
+    expect(localizeKnownContent("feature", { slug: "hazir-ipoteka", name: "Hazır ipoteka" }, "en").name).toBe("Existing mortgage");
   });
 });

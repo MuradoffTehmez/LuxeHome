@@ -24,7 +24,7 @@ import {
   parsePropertySearchParams,
 } from "@/lib/property-search";
 import { SORT_OPTIONS, type Locale } from "@/lib/constants";
-import { localizeKnownContent } from "@/i18n/dynamic-content";
+import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -65,6 +65,7 @@ function positiveNumber(value: string | undefined): number | undefined {
 export default async function PropertiesPage({ params: routeParams, searchParams }: Props) {
   const [{ locale }, params] = await Promise.all([routeParams, searchParams]);
   const t = await getTranslations({ locale, namespace: "listings" });
+  const propertyT = await getTranslations({ locale, namespace: "property" });
   const indexDecision = classifyPropertySearchParams(params);
   if (!indexDecision.validPage) notFound();
 
@@ -79,6 +80,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     typeSlug: raw.tip,
     citySlug: raw.seher,
     districtSlug: raw.rayon,
+    metroSlug: raw.metro,
     rooms: positiveNumber(raw.otaq),
     minPrice: positiveNumber(raw.min),
     maxPrice: positiveNumber(raw.max),
@@ -110,11 +112,15 @@ export default async function PropertiesPage({ params: routeParams, searchParams
   }));
   const cityOptions = filterOptions.cities.map((city) => ({
     value: city.slug,
-    label: city.name,
+    label: localizeLocation(city, locale as Locale).name,
     districts: city.children.map((district) => ({
       value: district.slug,
-      label: district.name,
+      label: localizeLocation(district, locale as Locale).name,
     })),
+  }));
+  const metroOptions = filterOptions.metros.map((metro) => ({
+    value: metro.slug,
+    label: localizeLocation(metro, locale as Locale).name,
   }));
 
   // Ödəniş şərtləri xüsusiyyət cədvəlində saxlanılır, ona görə eyni siyahıdan gəlir
@@ -137,7 +143,36 @@ export default async function PropertiesPage({ params: routeParams, searchParams
   const activeFilters = buildActivePropertyFilters(searchState, {
     types: typeOptions,
     cities: cityOptions,
+    metros: metroOptions,
     features: featureOptions,
+    translateLabel: (key, fallback) => {
+      if (key === "elan") return raw.elan === "SALE" ? t("search.sale") : t("search.rent");
+      if (key === "otaq" && raw.otaq) return Number(raw.otaq) >= 5 ? t("search.fivePlusRooms") : t("search.roomOption", { count: Number(raw.otaq) });
+      if (key === "min" && raw.min) return `${t("search.min")}: ${raw.min} ₼`;
+      if (key === "max" && raw.max) return `${t("search.max")}: ${raw.max} ₼`;
+      if (key === "sahe_min" && raw.sahe_min) return `${t("search.min")}: ${raw.sahe_min} m²`;
+      if (key === "sahe_max" && raw.sahe_max) return `${t("search.max")}: ${raw.sahe_max} m²`;
+      if (key === "mertebe_min" && raw.mertebe_min) return `${t("search.min")}: ${raw.mertebe_min} ${t("search.floor").toLocaleLowerCase(locale)}`;
+      if (key === "mertebe_max" && raw.mertebe_max) return `${t("search.max")}: ${raw.mertebe_max} ${t("search.floor").toLocaleLowerCase(locale)}`;
+      if (key === "temir" && raw.temir) {
+        const labels: Record<string, string> = { COSMETIC: propertyT("renovation.cosmetic"), RENOVATED: propertyT("renovation.renovated"), DESIGNER: propertyT("renovation.designer"), UNRENOVATED: propertyT("renovation.unrenovated"), NEW_BUILDING: propertyT("renovation.newBuilding") };
+        return labels[raw.temir] ?? fallback;
+      }
+      if (key === "sened" && raw.sened) {
+        const labels: Record<string, string> = { TITLE_DEED: propertyT("document.titleDeed"), CONTRACT: propertyT("document.contract"), MUNICIPAL: propertyT("document.municipal"), DECREE: propertyT("document.decree"), POWER_OF_ATTORNEY: propertyT("document.powerOfAttorney"), COMMERCIAL_EXTRACT: propertyT("document.commercialExtract"), NONE: propertyT("document.none") };
+        return labels[raw.sened] ?? fallback;
+      }
+      if (key === "tikili" && raw.tikili) return raw.tikili === "NEW" ? propertyT("building.new") : propertyT("building.old");
+      if (key === "dovr" && raw.dovr) return raw.dovr === "MONTH" ? t("search.monthly") : t("search.daily");
+      if (key === "ilk_mertebe_yox") return t("search.notFirstFloor");
+      if (key === "son_mertebe_yox") return t("search.notLastFloor");
+      if (key === "sekilli") return t("search.withPhotos");
+      if (key === "siralama") {
+        const labels: Record<string, string> = { newest: t("search.sortNewest"), price_asc: t("search.sortPriceAsc"), price_desc: t("search.sortPriceDesc"), area_desc: t("search.sortAreaDesc") };
+        return labels[sort] ?? fallback;
+      }
+      return fallback;
+    },
   });
 
   const listingLabel = raw.elan === "SALE"
@@ -179,6 +214,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
             <SearchPanel
               types={typeOptions}
               cities={cityOptions}
+              metros={metroOptions}
               features={featureOptions}
               variant="page"
               initial={initialSearch}
@@ -201,6 +237,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                 <PropertyFilterSheet
                   types={typeOptions}
                   cities={cityOptions}
+                  metros={metroOptions}
                   features={featureOptions}
                   initial={initialSearch}
                   resultCount={total}

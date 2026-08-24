@@ -33,5 +33,5 @@
   "renovation": {"cosmetic": "Kosmetik təmir", "renovated": "Təmirli", "designer": "Dizayner təmiri", "unrenovated": "Təmirsiz", "newBuilding": "Yeni tikili"},
   "document": {"titleDeed": "Kupça (Çıxarış)", "contract": "Müqavilə", "municipal": "Bələdiyyə sənədi", "decree": "Sərəncam", "powerOfAttorney": "Etibarnamə", "commercialExtract": "Çıxarış (qeyri-yaşayış)", "none": "Kupçasız"},
   "building": {"new": "Yeni tikili", "old": "Köhnə tikili"}
-  ,"featureGroup": {"general": "Ümumi", "indoor": "Daxili", "outdoor": "Xarici", "security": "Təhlükəsizlik"}
+  ,"featureGroup": {"general": "Ümumi", "utility": "Kommunal imkanlar", "indoor": "Daxili", "outdoor": "Xarici", "security": "Təhlükəsizlik", "payment": "Ödəniş imkanları"}
 }

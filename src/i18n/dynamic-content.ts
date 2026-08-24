@@ -3,37 +3,151 @@ import type { Locale } from "@/lib/constants";
 type TranslationFields = Record<string, string | null>;
 type TranslationCatalog = Record<string, { en: TranslationFields; ru: TranslationFields }>;
 
+const LOCATION_NAMES: Record<string, { en: string; ru: string }> = {
+  "Bakı": { en: "Baku", ru: "Баку" },
+  "Gəncə": { en: "Ganja", ru: "Гянджа" },
+  "Sumqayıt": { en: "Sumgayit", ru: "Сумгаит" },
+  "Xırdalan": { en: "Khirdalan", ru: "Хырдалан" },
+  "Mingəçevir": { en: "Mingachevir", ru: "Мингячевир" },
+  "Şirvan": { en: "Shirvan", ru: "Ширван" },
+  "Naftalan": { en: "Naftalan", ru: "Нафталан" },
+  "Naxçıvan": { en: "Nakhchivan", ru: "Нахчыван" },
+  "Xankəndi": { en: "Khankendi", ru: "Ханкенди" },
+  "Abşeron": { en: "Absheron", ru: "Апшерон" },
+  "Qəbələ": { en: "Gabala", ru: "Габала" },
+  "Şəki": { en: "Shaki", ru: "Шеки" },
+  "Lənkəran": { en: "Lankaran", ru: "Ленкорань" },
+  "Binəqədi": { en: "Binagadi", ru: "Бинагади" },
+  "Nərimanov": { en: "Narimanov", ru: "Нариманов" },
+  "Nəsimi": { en: "Nasimi", ru: "Насими" },
+  "Qaradağ": { en: "Garadagh", ru: "Гарадаг" },
+  "Sabunçu": { en: "Sabunchu", ru: "Сабунчи" },
+  "Səbail": { en: "Sabail", ru: "Сабаиль" },
+  "Suraxanı": { en: "Surakhani", ru: "Сураханы" },
+  "Xəzər": { en: "Khazar", ru: "Хазар" },
+  "Xətai": { en: "Khatai", ru: "Хатаи" },
+  "Yasamal": { en: "Yasamal", ru: "Ясамал" },
+  "Pirallahı": { en: "Pirallahi", ru: "Пираллахи" },
+  "20 Yanvar": { en: "20 January", ru: "20 Января" },
+  "28 May": { en: "28 May", ru: "28 Мая" },
+  "8 Noyabr": { en: "8 November", ru: "8 Ноября" },
+  "Avtovağzal": { en: "Avtovagzal", ru: "Автовокзал" },
+  "Azadlıq prospekti": { en: "Azadlig Prospekti", ru: "Проспект Азадлыг" },
+  "Bakmil": { en: "Bakmil", ru: "Бакмил" },
+  "Cəfər Cabbarlı": { en: "Jafar Jabbarly", ru: "Джафар Джаббарлы" },
+  "Dərnəgül": { en: "Darnagul", ru: "Дарнагюль" },
+  "Elmlər Akademiyası": { en: "Elmlar Akademiyasi", ru: "Элмляр Академиясы" },
+  "Əhmədli": { en: "Ahmadli", ru: "Ахмедлы" },
+  "Gənclik": { en: "Ganjlik", ru: "Гянджлик" },
+  "Həzi Aslanov": { en: "Hazi Aslanov", ru: "Ази Асланов" },
+  "İçərişəhər": { en: "Icherisheher", ru: "Ичери Шехер" },
+  "İnşaatçılar": { en: "Inshaatchilar", ru: "Иншаатчылар" },
+  "Koroğlu": { en: "Koroglu", ru: "Кёроглу" },
+  "Qara Qarayev": { en: "Gara Garayev", ru: "Кара Караев" },
+  "Memar Əcəmi": { en: "Memar Ajami", ru: "Мемар Аджеми" },
+  "Nariman Nərimanov": { en: "Nariman Narimanov", ru: "Нариман Нариманов" },
+  "Neftçilər": { en: "Neftchilar", ru: "Нефтчиляр" },
+  "Sahil": { en: "Sahil", ru: "Сахиль" },
+  "Ulduz": { en: "Ulduz", ru: "Улдуз" },
+  "Xalqlar Dostluğu": { en: "Khalglar Dostlugu", ru: "Халглар Достлугу" },
+  "Xocəsən": { en: "Khojasan", ru: "Ходжасан" },
+  "Şah İsmayıl Xətai": { en: "Shah Ismail Khatai", ru: "Шах Исмаил Хатаи" },
+};
+
+const ENGLISH_TRANSLITERATION: Record<string, string> = {
+  ə: "a", ı: "i", ö: "o", ü: "u", ş: "sh", ç: "ch", ğ: "gh", x: "kh", q: "g", c: "j", j: "zh",
+  Ə: "A", İ: "I", Ö: "O", Ü: "U", Ş: "Sh", Ç: "Ch", Ğ: "Gh", X: "Kh", Q: "G", C: "J", J: "Zh",
+};
+
+const RUSSIAN_TRANSLITERATION: Record<string, string> = {
+  a: "а", b: "б", c: "дж", ç: "ч", d: "д", e: "е", ə: "э", f: "ф", g: "г", ğ: "г",
+  h: "х", x: "х", ı: "ы", i: "и", j: "ж", k: "к", q: "г", l: "л", m: "м", n: "н",
+  o: "о", ö: "ё", p: "п", r: "р", s: "с", ş: "ш", t: "т", u: "у", ü: "ю", v: "в",
+  y: "й", z: "з",
+};
+
+function transliterateLocation(name: string, locale: Exclude<Locale, "az">): string {
+  const map = locale === "en" ? ENGLISH_TRANSLITERATION : RUSSIAN_TRANSLITERATION;
+  return [...name].map((character) => {
+    const direct = map[character];
+    if (direct) return direct;
+    if (locale === "ru") {
+      const lower = character.toLocaleLowerCase("az-AZ");
+      const translated = map[lower];
+      if (translated) return character === lower ? translated : translated.toLocaleUpperCase("ru-RU");
+    }
+    return character;
+  }).join("");
+}
+
+/** Şəhər, rayon, qəsəbə və metro adlarını seçilmiş dilin yazılışına çevirir. */
+export function localizeLocation<T extends { name: string }>(value: T, locale: Locale): T {
+  if (locale === "az") return value;
+  const name = LOCATION_NAMES[value.name]?.[locale] ?? transliterateLocation(value.name, locale);
+  return { ...value, name };
+}
+
 const PROPERTY_TYPES: TranslationCatalog = {
   menziller: { en: { name: "Apartments" }, ru: { name: "Квартиры" } },
+  "yeni-tikili": { en: { name: "New-build apartments" }, ru: { name: "Новостройки" } },
+  "kohne-tikili": { en: { name: "Resale apartments" }, ru: { name: "Вторичное жильё" } },
   villalar: { en: { name: "Villas" }, ru: { name: "Виллы" } },
   "heyet-evleri": { en: { name: "Detached houses" }, ru: { name: "Частные дома" } },
   "bag-evleri": { en: { name: "Country houses" }, ru: { name: "Дачные дома" } },
   torpaq: { en: { name: "Land" }, ru: { name: "Земельные участки" } },
   ofisler: { en: { name: "Offices" }, ru: { name: "Офисы" } },
   obyektler: { en: { name: "Commercial property" }, ru: { name: "Коммерческие объекты" } },
+  qarajlar: { en: { name: "Garages" }, ru: { name: "Гаражи" } },
+  "mini-otel": { en: { name: "Mini-hotels / hostels" }, ru: { name: "Мини-отели / хостелы" } },
+  "istirahet-merkezleri": { en: { name: "Holiday resorts" }, ru: { name: "Базы отдыха" } },
+  "konteyner-evler": { en: { name: "Container homes" }, ru: { name: "Контейнерные дома" } },
+  "a-frame-evler": { en: { name: "A-frame homes" }, ru: { name: "A-frame дома" } },
+  "xarici-emlak": { en: { name: "International property" }, ru: { name: "Зарубежная недвижимость" } },
 };
 
 const FEATURES: TranslationCatalog = {
+  qaz: { en: { name: "Gas" }, ru: { name: "Газ" } },
+  su: { en: { name: "Water" }, ru: { name: "Вода" } },
+  isiq: { en: { name: "Electricity" }, ru: { name: "Электричество" } },
+  telefon: { en: { name: "Telephone" }, ru: { name: "Телефон" } },
+  "kabel-tv": { en: { name: "Cable TV" }, ru: { name: "Кабельное ТВ" } },
+  kanalizasiya: { en: { name: "Sewerage" }, ru: { name: "Канализация" } },
   hovuz: { en: { name: "Swimming pool" }, ru: { name: "Бассейн" } },
   qaraj: { en: { name: "Garage" }, ru: { name: "Гараж" } },
   heyet: { en: { name: "Private yard" }, ru: { name: "Двор" } },
   bagca: { en: { name: "Garden / landscaping" }, ru: { name: "Сад / ландшафт" } },
   mangal: { en: { name: "Barbecue area" }, ru: { name: "Зона барбекю" } },
   lift: { en: { name: "Lift" }, ru: { name: "Лифт" } },
+  "pvc-pencere": { en: { name: "PVC windows" }, ru: { name: "ПВХ-окна" } },
   kombi: { en: { name: "Individual heating" }, ru: { name: "Индивидуальное отопление" } },
+  "merkezi-isitme": { en: { name: "Central heating" }, ru: { name: "Центральное отопление" } },
   kondisioner: { en: { name: "Air conditioning" }, ru: { name: "Кондиционер" } },
+  "metbex-mebeli": { en: { name: "Fitted kitchen" }, ru: { name: "Кухонная мебель" } },
+  esyali: { en: { name: "Furnished" }, ru: { name: "С мебелью" } },
+  duzelme: { en: { name: "Converted layout" }, ru: { name: "Перепланировка" } },
   mebel: { en: { name: "Furnished" }, ru: { name: "Мебель" } },
   kamin: { en: { name: "Fireplace" }, ru: { name: "Камин" } },
   balkon: { en: { name: "Balcony" }, ru: { name: "Балкон" } },
+  avtodayanacaq: { en: { name: "Car park" }, ru: { name: "Автостоянка" } },
+  "bag-sahesi": { en: { name: "Garden plot" }, ru: { name: "Садовый участок" } },
+  hamam: { en: { name: "Bath / sauna" }, ru: { name: "Баня / сауна" } },
   sauna: { en: { name: "Sauna" }, ru: { name: "Сауна" } },
   "merkezi-istilik": { en: { name: "Central heating" }, ru: { name: "Центральное отопление" } },
   kamera: { en: { name: "Security cameras" }, ru: { name: "Камеры видеонаблюдения" } },
   muhafize: { en: { name: "24/7 security" }, ru: { name: "Охрана 24/7" } },
   domofon: { en: { name: "Intercom" }, ru: { name: "Домофон" } },
+  siqnalizasiya: { en: { name: "Alarm system" }, ru: { name: "Сигнализация" } },
+  "bagli-erazi": { en: { name: "Gated grounds" }, ru: { name: "Закрытая территория" } },
   "qapali-erazi": { en: { name: "Gated grounds" }, ru: { name: "Закрытая территория" } },
   internet: { en: { name: "Internet" }, ru: { name: "Интернет" } },
   parkinq: { en: { name: "Parking" }, ru: { name: "Парковка" } },
   "deniz-menzeresi": { en: { name: "Sea view" }, ru: { name: "Вид на море" } },
+  ipoteka: { en: { name: "Mortgage available" }, ru: { name: "Ипотека" } },
+  "hazir-ipoteka": { en: { name: "Existing mortgage" }, ru: { name: "Готовая ипотека" } },
+  kredit: { en: { name: "Credit" }, ru: { name: "Кредит" } },
+  "faizsiz-kredit": { en: { name: "Interest-free credit" }, ru: { name: "Беспроцентный кредит" } },
+  taksit: { en: { name: "Instalments" }, ru: { name: "Рассрочка" } },
+  barter: { en: { name: "Barter" }, ru: { name: "Бартер" } },
 };
 
 const SERVICES: TranslationCatalog = {

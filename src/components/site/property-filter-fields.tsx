@@ -19,6 +19,7 @@ export type CityOption = {
 };
 
 export type TypeOption = { value: string; label: string };
+export type MetroOption = { value: string; label: string };
 export type FeatureOption = { value: string; label: string; group: string };
 
 export type SearchPanelInitial = {
@@ -27,6 +28,7 @@ export type SearchPanelInitial = {
   tip?: string;
   seher?: string;
   rayon?: string;
+  metro?: string;
   otaq?: string;
   min?: string;
   max?: string;
@@ -48,6 +50,7 @@ export type SearchPanelInitial = {
 export type PropertyFilterFieldsProps = {
   types: TypeOption[];
   cities: CityOption[];
+  metros?: MetroOption[];
   features: FeatureOption[];
   initial: SearchPanelInitial;
   mode: "compact" | "full";
@@ -56,7 +59,7 @@ export type PropertyFilterFieldsProps = {
 const RENOVATION_KEYS = { COSMETIC: "cosmetic", RENOVATED: "renovated", DESIGNER: "designer", UNRENOVATED: "unrenovated", NEW_BUILDING: "newBuilding" } as const;
 const DOCUMENT_KEYS = { TITLE_DEED: "titleDeed", CONTRACT: "contract", MUNICIPAL: "municipal", DECREE: "decree", POWER_OF_ATTORNEY: "powerOfAttorney", EXTRACT_COMMERCIAL: "commercialExtract", NONE: "none" } as const;
 const BUILDING_KEYS = { NEW: "new", OLD: "old" } as const;
-const FEATURE_GROUP_KEYS = { GENERAL: "general", INDOOR: "indoor", OUTDOOR: "outdoor", SECURITY: "security" } as const;
+const FEATURE_GROUP_KEYS = { GENERAL: "general", UTILITY: "utility", INDOOR: "indoor", OUTDOOR: "outdoor", SECURITY: "security", PAYMENT: "payment" } as const;
 
 const CONTROL =
   "min-h-12 w-full rounded-xs border border-line-strong bg-paper px-3 text-base text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold sm:text-sm";
@@ -186,6 +189,7 @@ function CheckboxField({
 export function PropertyFilterFields({
   types,
   cities,
+  metros = [],
   features,
   initial,
   mode,
@@ -291,6 +295,14 @@ export function PropertyFilterFields({
             placeholder={citySlug ? t("all") : t("selectCityFirst")}
             defaultValue={initial.rayon}
             options={districts}
+          />
+          <SelectField
+            id={`${id}-metro`}
+            name="metro"
+            label={t("metro")}
+            placeholder={t("all")}
+            defaultValue={initial.metro}
+            options={metros}
           />
           <SelectField
             id={`${id}-rooms`}

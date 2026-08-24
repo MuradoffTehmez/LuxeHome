@@ -10,15 +10,17 @@ import {
   PropertyFilterFields,
   type CityOption,
   type FeatureOption,
+  type MetroOption,
   type SearchPanelInitial,
   type TypeOption,
 } from "./property-filter-fields";
 
-export type { CityOption, FeatureOption, SearchPanelInitial, TypeOption } from "./property-filter-fields";
+export type { CityOption, FeatureOption, MetroOption, SearchPanelInitial, TypeOption } from "./property-filter-fields";
 
 type SearchPanelProps = {
   types: TypeOption[];
   cities: CityOption[];
+  metros?: MetroOption[];
   features?: FeatureOption[];
   initial?: SearchPanelInitial;
   variant?: "hero" | "page";
@@ -29,6 +31,7 @@ type SearchPanelProps = {
 export function SearchPanel({
   types,
   cities,
+  metros = [],
   features = [],
   initial = {},
   variant = "hero",
@@ -55,6 +58,7 @@ export function SearchPanel({
         <PropertyFilterFields
           types={types}
           cities={cities}
+          metros={metros}
           features={features}
           initial={initial}
           mode={isPage ? "full" : "compact"}

@@ -33,5 +33,5 @@
   "renovation": {"cosmetic": "Cosmetic renovation", "renovated": "Renovated", "designer": "Designer renovation", "unrenovated": "Unrenovated", "newBuilding": "New build"},
   "document": {"titleDeed": "Title deed", "contract": "Contract", "municipal": "Municipal document", "decree": "Decree", "powerOfAttorney": "Power of attorney", "commercialExtract": "Commercial title deed", "none": "No title deed"},
   "building": {"new": "New build", "old": "Older building"}
-  ,"featureGroup": {"general": "General", "indoor": "Indoor", "outdoor": "Outdoor", "security": "Security"}
+  ,"featureGroup": {"general": "General", "utility": "Utilities", "indoor": "Indoor", "outdoor": "Outdoor", "security": "Security", "payment": "Payment options"}
 }

@@ -24,6 +24,7 @@ export const PROPERTY_SEARCH_KEYS = [
   "tip",
   "seher",
   "rayon",
+  "metro",
   "otaq",
   "min",
   "max",
@@ -57,6 +58,8 @@ export type PropertyFilterLabelOptions = {
     districts?: readonly { value: string; label: string }[];
   }[];
   features?: readonly { value: string; label: string }[];
+  metros?: readonly { value: string; label: string }[];
+  translateLabel?: (key: string, fallback: string) => string;
 };
 
 export type ActiveFilterChip = { key: string; label: string; href: string };
@@ -148,7 +151,7 @@ export function buildActivePropertyFilters(
   const add = (key: string, label: string, overrideKey = key) => {
     chips.push({
       key,
-      label,
+      label: options.translateLabel?.(key, label) ?? label,
       href: buildPropertySearchHref(state, { [overrideKey]: null }),
     });
   };
@@ -165,6 +168,7 @@ export function buildActivePropertyFilters(
     const districts = options.cities?.flatMap((city) => city.districts ?? []);
     add("rayon", optionLabel(districts, values.rayon));
   }
+  if (values.metro) add("metro", optionLabel(options.metros, values.metro));
   if (values.otaq) add("otaq", Number(values.otaq) >= 5 ? "5+ otaq" : `${values.otaq} otaq`);
   if (values.min) add("min", numericLabel(values.min, " ₼-dən"));
   if (values.max) add("max", numericLabel(values.max, " ₼-dək"));
@@ -184,7 +188,7 @@ export function buildActivePropertyFilters(
   for (const slug of state.featureSlugs) {
     chips.push({
       key: `xususiyyet:${slug}`,
-      label: optionLabel(options.features, slug),
+      label: options.translateLabel?.(`xususiyyet:${slug}`, optionLabel(options.features, slug)) ?? optionLabel(options.features, slug),
       href: buildPropertySearchHref(state, {
         xususiyyet: state.featureSlugs.filter((value) => value !== slug),
       }),

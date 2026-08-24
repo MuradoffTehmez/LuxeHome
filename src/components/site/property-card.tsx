@@ -12,7 +12,7 @@ import {
   type PropertyStatus,
   type Locale,
 } from "@/lib/constants";
-import { localizeKnownContent } from "@/i18n/dynamic-content";
+import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { Badge } from "@/components/ui/badge";
 import type { PropertyCardData } from "@/lib/queries";
 import { FavoriteButton } from "./favorite-button";
@@ -44,6 +44,8 @@ export function PropertyCard({
   const property = {
     ...localizedProperty,
     type: localizeKnownContent("propertyType", localizedProperty.type, locale),
+    city: localizeLocation(localizedProperty.city, locale),
+    district: localizedProperty.district ? localizeLocation(localizedProperty.district, locale) : null,
   };
   const image = property.images[0];
   const status = property.status as PropertyStatus;
@@ -210,7 +212,12 @@ export function PropertyCard({
 export function PropertyRow({ property: sourceProperty }: { property: PropertyCardData }) {
   const format = useFormatter();
   const locale = useLocale() as Locale;
-  const property = localizeKnownContent("property", sourceProperty, locale);
+  const localizedProperty = localizeKnownContent("property", sourceProperty, locale);
+  const property = {
+    ...localizedProperty,
+    city: localizeLocation(localizedProperty.city, locale),
+    district: localizedProperty.district ? localizeLocation(localizedProperty.district, locale) : null,
+  };
   const image = property.images[0];
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)

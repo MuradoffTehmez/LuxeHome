@@ -1,5 +1,6 @@
 import type { PropertyFilters } from "@/lib/queries";
 import type { Locale } from "@/lib/constants";
+import { localizeLocation } from "@/i18n/dynamic-content";
 
 export const MIN_INDEXABLE_LISTINGS = 3;
 
@@ -305,7 +306,7 @@ export function buildTaxonomyLandingDescriptor(
   if (locale !== "az") {
     const isDistrict = kind === "DISTRICT";
     const prefix = isDistrict ? "rayon" : "metro";
-    const place = location.name;
+    const place = localizeLocation(location, locale).name;
     const heading = locale === "en"
       ? `${isDistrict ? `Property in ${place} district` : `Property near ${place} metro`}`
       : `${isDistrict ? `Недвижимость в районе ${place}` : `Недвижимость у метро ${place}`}`;

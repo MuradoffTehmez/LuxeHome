@@ -36,7 +36,7 @@ import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
-import { localizeKnownContent } from "@/i18n/dynamic-content";
+import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -63,7 +63,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sourceProperty = await getCachedPropertyBySlug(slug);
 
   if (!sourceProperty) return { title: content("notFound") };
-  const property = localizeKnownContent("property", sourceProperty, locale as Locale);
+  const localizedProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
+  const property = {
+    ...localizedProperty,
+    city: localizeLocation(localizedProperty.city, locale as Locale),
+    district: localizedProperty.district ? localizeLocation(localizedProperty.district, locale as Locale) : null,
+  };
 
   const image = property.images[0]?.url || null;
   const isClosed = property.status === "SOLD" || property.status === "RENTED";
@@ -103,6 +108,9 @@ export default async function PropertyDetailPage({ params }: Props) {
   const property = {
     ...localizedProperty,
     type: localizeKnownContent("propertyType", localizedProperty.type, locale as Locale),
+    city: localizeLocation(localizedProperty.city, locale as Locale),
+    district: localizedProperty.district ? localizeLocation(localizedProperty.district, locale as Locale) : null,
+    metro: localizedProperty.metro ? localizeLocation(localizedProperty.metro, locale as Locale) : null,
     features: localizedProperty.features.map((item) => ({
       ...item,
       feature: localizeKnownContent("feature", item.feature, locale as Locale),
@@ -136,11 +144,11 @@ export default async function PropertyDetailPage({ params }: Props) {
     },
     property.district && {
       href: `/rayon/${property.district.slug}`,
-      label: `${property.district.name} rayonu`,
+      label: locale === "az" ? `${property.district.name} rayonu` : property.district.name,
     },
     property.metro && {
       href: `/metro/${property.metro.slug}`,
-      label: `${property.metro.name} metrosu`,
+      label: locale === "az" ? `${property.metro.name} metrosu` : property.metro.name,
     },
   ].filter((item): item is { href: string; label: string } => Boolean(item && item.href));
 

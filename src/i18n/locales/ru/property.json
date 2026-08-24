@@ -33,5 +33,5 @@
   "renovation": {"cosmetic": "Косметический ремонт", "renovated": "С ремонтом", "designer": "Дизайнерский ремонт", "unrenovated": "Без ремонта", "newBuilding": "Новостройка"},
   "document": {"titleDeed": "Купчая (выписка)", "contract": "Договор", "municipal": "Муниципальный документ", "decree": "Распоряжение", "powerOfAttorney": "Доверенность", "commercialExtract": "Выписка на нежилое помещение", "none": "Без купчей"},
   "building": {"new": "Новостройка", "old": "Старый фонд"}
-  ,"featureGroup": {"general": "Общее", "indoor": "В помещении", "outdoor": "Снаружи", "security": "Безопасность"}
+  ,"featureGroup": {"general": "Общее", "utility": "Коммуникации", "indoor": "В помещении", "outdoor": "Снаружи", "security": "Безопасность", "payment": "Условия оплаты"}
 }

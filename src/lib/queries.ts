@@ -342,7 +342,7 @@ export async function getPropertiesForCompare(ids: string[]) {
 // ---------------------------------------------------------------------------
 
 export async function getFilterOptions() {
-  const [types, cities, features] = await Promise.all([
+  const [types, cities, metros, features] = await Promise.all([
     prisma.propertyType.findMany({
       where: { isActive: true },
       orderBy: { order: "asc" },
@@ -360,13 +360,18 @@ export async function getFilterOptions() {
         },
       },
     }),
+    prisma.location.findMany({
+      where: { kind: "METRO" },
+      orderBy: { order: "asc" },
+      select: { name: true, slug: true },
+    }),
     prisma.feature.findMany({
       orderBy: { order: "asc" },
       select: { name: true, slug: true, group: true },
     }),
   ]);
 
-  return { types, cities, features };
+  return { types, cities, metros, features };
 }
 
 /** Kateqoriya kartlarında göstərilən əmlak sayları. */
@@ -1301,26 +1306,26 @@ export async function getPropertyFormOptions() {
   const [types, cities, districts, metros, features, projects] = await Promise.all([
     prisma.propertyType.findMany({
       where: { isActive: true },
-      select: { id: true, name: true },
+      select: { id: true, name: true, slug: true },
       orderBy: { order: "asc" },
     }),
     prisma.location.findMany({
       where: { kind: "CITY" },
-      select: { id: true, name: true },
+      select: { id: true, name: true, slug: true },
       orderBy: { order: "asc" },
     }),
     prisma.location.findMany({
       where: { kind: { in: ["DISTRICT", "SETTLEMENT"] } },
-      select: { id: true, name: true, kind: true, parentId: true },
+      select: { id: true, name: true, slug: true, kind: true, parentId: true },
       orderBy: { name: "asc" },
     }),
     prisma.location.findMany({
       where: { kind: "METRO" },
-      select: { id: true, name: true, parentId: true },
+      select: { id: true, name: true, slug: true, parentId: true },
       orderBy: { name: "asc" },
     }),
     prisma.feature.findMany({
-      select: { id: true, name: true, group: true },
+      select: { id: true, name: true, slug: true, group: true },
       orderBy: [{ group: "asc" }, { order: "asc" }],
     }),
     prisma.project.findMany({

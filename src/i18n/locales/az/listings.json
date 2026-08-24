@@ -19,7 +19,7 @@
   "search": {
     "listingType": "Elan növü", "sale": "Satılır", "rent": "Kirayə", "search": "Axtarış",
     "queryPlaceholder": "Ünvan, rayon və ya açar söz", "propertyType": "Əmlak növü",
-    "city": "Şəhər", "district": "Rayon", "selectCityFirst": "Əvvəlcə şəhər seçin",
+    "city": "Şəhər", "district": "Rayon", "metro": "Metro", "selectCityFirst": "Əvvəlcə şəhər seçin",
     "all": "Hamısı", "rooms": "Otaq sayı", "any": "Fərq etməz", "roomOption": "{count} otaq",
     "fivePlusRooms": "5+ otaq", "price": "Qiymət (₼)", "area": "Sahə (m²)",
     "renovation": "Təmir vəziyyəti", "document": "Sənəd", "building": "Tikili növü",
