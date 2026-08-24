@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronDown, Clock, Globe, MapPin, Phone } from "lucide-react";
+import { ChevronDown, Globe, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import {
   legalNavigation,
@@ -108,13 +108,6 @@ function ContactDetails() {
       <span className="flex items-start gap-3 py-2">
         <Globe className="mt-0.5 size-4 shrink-0 text-gold-soft" aria-hidden="true" />
         {siteConfig.website}
-      </span>
-      <span className="flex items-start gap-3 py-2">
-        <Clock className="mt-0.5 size-4 shrink-0 text-gold-soft" aria-hidden="true" />
-        <span className="flex flex-col">
-          <span>{siteConfig.workingHours.weekdays}</span>
-          <span>{siteConfig.workingHours.weekend}</span>
-        </span>
       </span>
     </address>
   );

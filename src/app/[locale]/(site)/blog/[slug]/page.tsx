@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Clock, Eye, Calendar } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
+import { ArticleTrustMeta } from "@/components/site/article-trust-meta";
 import { articleSchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getRelatedPosts } from "@/lib/queries";
 import { getCachedPostBySlug } from "@/lib/public-cache";
@@ -47,6 +47,8 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const relatedPosts = await getRelatedPosts(post.id, post.categoryId, 3);
+  const publishedAt = new Date(post.publishedAt || post.createdAt);
+  const updatedAt = new Date(post.updatedAt);
 
   return (
     <>
@@ -84,20 +86,13 @@ export default async function BlogPostPage({ params }: Props) {
           { label: post.title },
         ]}
         actions={
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-muted">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="size-4" aria-hidden="true" />
-                  {new Intl.DateTimeFormat("az-AZ", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(post.publishedAt || post.createdAt))}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="size-4" aria-hidden="true" />
-                  {post.readMinutes} dəq oxuma
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Eye className="size-4" aria-hidden="true" />
-                  {post.viewCount} baxış
-                </span>
-              </div>
+          <ArticleTrustMeta
+            authorName={post.author?.name}
+            publishedAt={publishedAt}
+            updatedAt={updatedAt}
+            readMinutes={post.readMinutes}
+            viewCount={post.viewCount}
+          />
         }
       />
 

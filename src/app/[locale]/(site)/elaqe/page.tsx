@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Clock, Globe, MapPin, Phone, Mail } from "lucide-react";
+import { Globe, MapPin, Phone, Mail } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
@@ -37,12 +37,6 @@ const CONTACT_ITEMS = [
     icon: MapPin,
     label: "Ünvan",
     value: siteConfig.addressFull,
-    href: `https://maps.google.com/?q=${siteConfig.geo.latitude},${siteConfig.geo.longitude}`,
-  },
-  {
-    icon: Clock,
-    label: "İş saatları",
-    value: `${siteConfig.workingHours.weekdays}\n${siteConfig.workingHours.weekend}`,
     href: undefined,
   },
   {

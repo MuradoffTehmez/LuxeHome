@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import {
   BadgeCheck,
   Building2,
@@ -16,6 +15,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { ButtonLink } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
+import { BusinessTrustPanel } from "@/components/site/business-trust-panel";
 
 export const metadata: Metadata = buildMetadata({
   title: "Haqqımızda",
@@ -58,7 +58,7 @@ const WHY_ITEMS = [
     icon: Handshake,
     title: "Kompleks xidmət",
     description:
-      "Alqı-satqıdan təmir, reklam və çəkilişə qədər 7 istiqamətdə dəstək göstəririk.",
+      "Alqı-satqıdan təmir, reklam və çəkilişə qədər müxtəlif istiqamətlərdə dəstək göstəririk.",
   },
 ];
 
@@ -80,22 +80,7 @@ export default function AboutPage() {
       <Section tone="ivory">
         <Container>
           <div className="grid min-w-0 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            <Reveal className="relative">
-              <div className="relative aspect-4/5 overflow-hidden rounded-md sm:aspect-4/3 lg:aspect-4/5">
-                <Image
-                  src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
-                  alt="Müasir premium memarlıq"
-                  fill
-                  loading="lazy"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
-              <div
-                aria-hidden="true"
-                className="absolute -right-3 -bottom-3 hidden size-32 border-r border-b border-gold lg:block"
-              />
-            </Reveal>
+            <Reveal><BusinessTrustPanel /></Reveal>
 
             <div className="flex min-w-0 flex-col gap-6">
               <h2 className="font-display text-3xl text-ink sm:text-4xl">

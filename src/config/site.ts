@@ -41,38 +41,6 @@ export const siteConfig = {
   instagramUrl: "https://instagram.com/luxe_home_estate",
   website: "www.luxehomeestate.az",
 
-  /**
-   * Ofisin xəritədəki mövqeyi.
-   * TODO: Şirkət dəqiq koordinatları təqdim etdikdə yenilənməlidir —
-   * hazırkı dəyərlər Əliyar Əliyev küçəsi üzrə təxmini mövqedir.
-   */
-  geo: {
-    latitude: 40.3971,
-    longitude: 49.8624,
-  },
-
-  /**
-   * İş saatları.
-   * TODO: Şirkətdən real iş qrafiki alınmalı və dəqiqləşdirilməlidir.
-   * `structured` sahəsi `organizationSchema()`-da `openingHoursSpecification`
-   * üçün istifadə olunur — mətn təsviri ilə sinxron saxlanılmalıdır.
-   */
-  workingHours: {
-    weekdays: "B.e — Şənbə: 09:00 — 19:00",
-    weekend: "Bazar: Bağlıdır",
-    structured: {
-      days: [
-        "https://schema.org/Monday",
-        "https://schema.org/Tuesday",
-        "https://schema.org/Wednesday",
-        "https://schema.org/Thursday",
-        "https://schema.org/Friday",
-        "https://schema.org/Saturday",
-      ],
-      opens: "09:00",
-      closes: "19:00",
-    },
-  },
 } as const;
 
 export const PRODUCTION_SITE_URL = "https://luxehomeestate.az";

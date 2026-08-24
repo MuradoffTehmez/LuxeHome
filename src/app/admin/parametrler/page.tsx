@@ -49,7 +49,7 @@ export default async function AdminSettingsPage() {
                 ["Telefon", siteConfig.phone],
                 ["E-poçt", siteConfig.email],
                 ["Ünvan", siteConfig.addressFull],
-                ["İş qrafiki", siteConfig.workingHours.weekdays],
+                ["İş qrafiki", "Biznes təsdiqi gözlənilir"],
                 ["Instagram", `@${siteConfig.instagram}`],
               ].map(([label, value]) => (
                 <div key={label} className="flex min-w-0 flex-wrap justify-between gap-2 border-b border-line pb-2">
