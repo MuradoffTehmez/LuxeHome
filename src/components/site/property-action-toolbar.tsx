@@ -7,6 +7,7 @@ import { CompareButton } from "./compare-button";
 import { FavoriteButton } from "./favorite-button";
 import { ShareButtons } from "./share-buttons";
 import { WhatsAppIcon } from "./brand-icons";
+import { trackEvent } from "@/lib/client-analytics";
 
 export type PropertyActionToolbarProps = {
   propertyId: string;
@@ -43,7 +44,7 @@ export function PropertyActionToolbar({
       </nav>
 
       <StickyActionBar className="grid grid-cols-2 gap-2">
-        <ButtonAnchor href={phone} variant="outline" size="sm" fullWidth>
+        <ButtonAnchor href={phone} variant="outline" size="sm" fullWidth onClick={() => trackEvent("phone_click", { property_id: propertyId, placement: "sticky_toolbar" })}>
           <Phone className="size-4" aria-hidden="true" />
           Zəng et
         </ButtonAnchor>
@@ -54,6 +55,7 @@ export function PropertyActionToolbar({
           target="_blank"
           rel="noopener noreferrer"
           fullWidth
+          onClick={() => trackEvent("whatsapp_click", { property_id: propertyId, placement: "sticky_toolbar" })}
         >
           <WhatsAppIcon className="size-4" />
           WhatsApp

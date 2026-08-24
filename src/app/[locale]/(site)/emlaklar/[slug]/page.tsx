@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   BedDouble,
   FileCheck,
@@ -10,7 +11,7 @@ import {
   Phone,
   ArrowRight,
 } from "lucide-react";
-import { formatNumber, formatPrice, formatArea } from "@/lib/utils";
+import { formatNumber, formatPrice, formatArea, toIsoDateTime } from "@/lib/utils";
 import {
   LISTING_TYPES,
   PRICE_PERIOD_LABELS,
@@ -23,9 +24,11 @@ import {
   type Renovation,
   type DocumentStatus,
 } from "@/lib/constants";
-import { getPropertyBySlug, getSimilarProperties } from "@/lib/queries";
-import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema } from "@/lib/seo";
+import { getSimilarProperties } from "@/lib/queries";
+import { getCachedPropertyBySlug } from "@/lib/public-cache";
+import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
+import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
 
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +37,8 @@ import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyActionToolbar } from "@/components/site/property-action-toolbar";
 import { PropertyMap } from "@/components/site/property-map";
+import { Breadcrumbs } from "@/components/site/breadcrumbs";
+import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 
@@ -48,11 +53,12 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getCachedPropertyBySlug(slug);
 
   if (!property) return { title: "Əmlak tapılmadı" };
 
   const image = property.images[0]?.url || null;
+  const isClosed = property.status === "SOLD" || property.status === "RENTED";
 
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
@@ -60,13 +66,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return buildMetadata({
     title: property.metaTitle || `${property.title} | ${location}`,
-    description: property.metaDescription || property.description.slice(0, 160),
+    description: property.metaDescription || truncateAtWord(property.description, 160),
     path: `/emlaklar/${property.slug}`,
     image,
-    type: "article",
-    publishedTime: property.publishedAt?.toISOString(),
-    noIndex: property.noIndex,
-    canonicalPath: property.canonicalUrl,
+    type: "website",
+    publishedTime: toIsoDateTime(property.publishedAt),
+    indexPolicy: property.noIndex || isClosed ? "noindex-follow" : "index",
+    canonicalPath: property.canonicalUrl || undefined,
     ogTitle: property.ogTitle,
     ogDescription: property.ogDescription,
     ogImage: property.ogImage,
@@ -75,7 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getCachedPropertyBySlug(slug);
 
   if (!property) notFound();
 
@@ -95,9 +101,28 @@ export default async function PropertyDetailPage({ params }: Props) {
   const whatsappHref = whatsappLink(
     `Salam, "${property.title}" elanı ilə bağlı məlumat almaq istəyirəm.`,
   );
+  const relatedLandingLinks = [
+    {
+      href: propertyFiltersToLandingPath({ listingType: property.listingType }) ?? "/emlaklar",
+      label: isSale ? "Satılan əmlaklar" : "Kirayə əmlaklar",
+    },
+    {
+      href: propertyFiltersToLandingPath({ typeSlug: property.type.slug }),
+      label: property.type.name,
+    },
+    property.district && {
+      href: `/rayon/${property.district.slug}`,
+      label: `${property.district.name} rayonu`,
+    },
+    property.metro && {
+      href: `/metro/${property.metro.slug}`,
+      label: `${property.metro.name} metrosu`,
+    },
+  ].filter((item): item is { href: string; label: string } => Boolean(item && item.href));
 
   return (
     <>
+      <AnalyticsEventBeacon event="property_view" payload={{ property_id: property.id }} />
       <script
         {...jsonLd(
           propertySchema({
@@ -133,6 +158,14 @@ export default async function PropertyDetailPage({ params }: Props) {
 
       <div className="bg-ivory pt-6 pb-[calc(7rem+var(--safe-bottom))] sm:pt-8 sm:pb-20 lg:pb-12">
         <Container>
+          <Breadcrumbs
+            items={[
+              { label: "Ana səhifə", href: "/" },
+              { label: "Əmlaklar", href: "/emlaklar" },
+              { label: property.title },
+            ]}
+            className="mb-6"
+          />
           {/* Üst başlıq hissəsi */}
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex flex-col gap-2">
@@ -249,6 +282,24 @@ export default async function PropertyDetailPage({ params }: Props) {
                   ))}
                 </div>
               </div>
+
+              {relatedLandingLinks.length > 0 && (
+                <nav aria-label="Əlaqəli əmlak axtarışları" className="border-y border-line py-5">
+                  <h2 className="font-display text-xl text-ink">Əlaqəli axtarışlar</h2>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {relatedLandingLinks.map((item) => (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          className="inline-flex min-h-11 items-center rounded-xs border border-line px-3 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
 
               {/* Əlavə Xüsusiyyətlər (əgər varsa) */}
               {property.features.length > 0 && (

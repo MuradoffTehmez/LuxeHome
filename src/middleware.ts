@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
+import { isStaging } from "@/config/site";
+import { getCanonicalHostRedirect } from "@/lib/seo-host";
 import {
   SESSION_COOKIE,
   SESSION_SUBJECT,
@@ -113,9 +115,21 @@ function isAccountFlowRoute(pathname: string): boolean {
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  const forwardedProtocol = request.headers.get("x-forwarded-proto");
+  const canonicalRedirect = getCanonicalHostRedirect({
+    hostname: request.nextUrl.hostname,
+    protocol: forwardedProtocol ? `${forwardedProtocol}:` : request.nextUrl.protocol,
+    pathname,
+    search,
+    isProduction: process.env.NODE_ENV === "production",
+    isStaging: isStaging(),
+  });
+  if (canonicalRedirect) return NextResponse.redirect(canonicalRedirect, 308);
 
   if (!isAccountFlowRoute(pathname)) {
-    return intlMiddleware(request);
+    const response = intlMiddleware(request);
+    if (isStaging()) response.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return response;
   }
 
   const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");

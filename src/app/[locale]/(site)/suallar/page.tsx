@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, faqSchema, jsonLd } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 
 /**
@@ -98,28 +98,11 @@ export const metadata: Metadata = buildMetadata({
   path: "/suallar",
 });
 
-/** Struktur data — Google nəticələrində sual-cavab blokunu göstərir. */
-function faqSchema() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ_GROUPS.flatMap((group) =>
-      group.items.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: { "@type": "Answer", text: item.answer },
-      })),
-    ),
-  };
-}
-
 export default function FaqPage() {
+  const items = FAQ_GROUPS.flatMap((group) => group.items);
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema()) }}
-      />
+      <script {...jsonLd(faqSchema(items, "/suallar"))} />
 
       <PageHeader
         compact

@@ -39,14 +39,14 @@ export function Hero({ types, cities }: HeroProps) {
         <div className="lg:col-span-7 lg:pb-10">
           <p className="editorial-kicker animate-fade-in flex items-center gap-3 text-gold-soft">
             <span aria-hidden="true" className="h-px w-10 bg-gold-soft/60" />
-            {siteConfig.legalName}
+            {siteConfig.slogan}
           </p>
 
           <h1
-            className="animate-slide-up mt-6 max-w-[10ch] font-display text-[clamp(3rem,7vw,7rem)] leading-[0.92] tracking-[-0.055em] text-white"
+            className="animate-slide-up mt-6 max-w-[13ch] font-display text-[clamp(2.8rem,6.5vw,6.6rem)] leading-[0.94] tracking-[-0.05em] text-white"
             style={{ animationDelay: "100ms" }}
           >
-            {siteConfig.slogan}
+            Bakıda daşınmaz əmlak satışı və icarəsi
           </h1>
 
           <p

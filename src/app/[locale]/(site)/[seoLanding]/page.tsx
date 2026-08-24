@@ -1,0 +1,88 @@
+import type { Metadata } from "next";
+import { cache } from "react";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { SeoLandingPage } from "@/components/site/seo-landing-page";
+import { routing } from "@/i18n/routing";
+import { type Locale } from "@/lib/constants";
+import { getSeoLandingProperties } from "@/lib/queries";
+import {
+  breadcrumbSchema,
+  faqSchema,
+  itemListSchema,
+  jsonLd,
+  buildMetadata,
+} from "@/lib/seo";
+import { findSeoLanding, seoLandingIndexPolicy } from "@/lib/seo-landings";
+
+export const dynamic = "force-dynamic";
+
+type Props = {
+  params: Promise<{ locale: string; seoLanding: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+const getLandingResult = cache(getSeoLandingProperties);
+
+function readPage(value: string | string[] | undefined): number | null {
+  if (value === undefined) return 1;
+  if (typeof value !== "string" || !/^[1-9]\d*$/.test(value)) return null;
+  const page = Number(value);
+  return Number.isSafeInteger(page) ? page : null;
+}
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const [{ locale, seoLanding }, query] = await Promise.all([params, searchParams]);
+  const landing = findSeoLanding(seoLanding);
+  if (!landing) return {};
+  const page = readPage(query.sehife);
+  if (!page) return {};
+  const result = await getLandingResult(landing, page);
+  const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
+  const canonicalPath = page && page > 1 ? `${landing.path}?sehife=${page}` : landing.path;
+
+  return buildMetadata({
+    title: page && page > 1 ? `${landing.title} — ${page}-ci səhifə` : landing.title,
+    description: landing.description,
+    path: canonicalPath,
+    canonicalPath,
+    indexPolicy:
+      page > result.totalPages ? "noindex-follow" : seoLandingIndexPolicy(result.total),
+    locale: resolvedLocale,
+  });
+}
+
+export default async function FixedSeoLandingPage({ params, searchParams }: Props) {
+  const [{ locale, seoLanding }, query] = await Promise.all([params, searchParams]);
+  const landing = findSeoLanding(seoLanding);
+  const page = readPage(query.sehife);
+  const hasExtraParams = Object.keys(query).some((key) => key !== "sehife");
+  if (!landing || !page || hasExtraParams) notFound();
+
+  const result = await getLandingResult(landing, page);
+  if (page > result.totalPages) notFound();
+  const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
+
+  return (
+    <>
+      <script
+        {...jsonLd(
+          breadcrumbSchema([
+            { name: "Ana səhifə", path: "/" },
+            { name: "Əmlaklar", path: "/emlaklar" },
+            { name: landing.h1, path: landing.path },
+          ]),
+        )}
+      />
+      <script {...jsonLd(faqSchema(landing.faq, landing.path))} />
+      <script
+        {...jsonLd(
+          itemListSchema(
+            result.items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` })),
+          ),
+        )}
+      />
+      <SeoLandingPage landing={landing} locale={resolvedLocale} {...result} />
+    </>
+  );
+}

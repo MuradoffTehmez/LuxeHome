@@ -10,6 +10,7 @@ import {
 } from "@/components/admin/form-fields";
 import { ContentEditor } from "@/components/admin/content-editor";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { SeoFields } from "@/components/admin/seo-fields";
 import { POST_STATUS_LABELS, POST_STATUSES } from "@/lib/constants";
 import type { ActionState } from "@/lib/admin/action-state";
 import type { PostFormValues } from "./form-values";
@@ -105,18 +106,7 @@ export function PostForm({
       </FormSection>
 
       <FormSection title="SEO" description="Boş buraxılsa, başlıq və qısa təsvirdən qurulur.">
-        <AdminInput
-          name="metaTitle"
-          label="Meta başlıq"
-          defaultValue={initial.metaTitle}
-          maxLength={70}
-        />
-        <AdminInput
-          name="metaDescription"
-          label="Meta təsvir"
-          defaultValue={initial.metaDescription}
-          maxLength={180}
-        />
+        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Bloq yazısı"} fallbackDescription={initial.excerpt || "Məqalənin qısa təsviri"} pathname={`/blog/${initial.slug || "yeni-yazi"}`} />
         <AdminInput
           name="canonicalUrl"
           label="Canonical URL"

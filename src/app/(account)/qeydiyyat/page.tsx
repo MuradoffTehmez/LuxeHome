@@ -11,7 +11,7 @@ export const metadata: Metadata = buildMetadata({
   title: "Qeydiyyat",
   description: "Luxe Home Estate hesabı yaradın və elanlarınızı idarə edin.",
   path: "/qeydiyyat",
-  noIndex: true,
+  indexPolicy: "noindex-follow",
 });
 
 export const dynamic = "force-dynamic";

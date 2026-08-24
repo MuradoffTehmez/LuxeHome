@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useCompareItem } from "@/lib/compare";
 import { useToast } from "@/components/ui/toast";
 import { MAX_COMPARE } from "@/lib/compare";
+import { trackEvent } from "@/lib/client-analytics";
 
 type CompareButtonProps = {
   propertyId: string;
@@ -28,6 +29,7 @@ export function CompareButton({
       toast(`Ən çox ${MAX_COMPARE} əmlakı müqayisə edə bilərsiniz.`, "error");
       return;
     }
+    trackEvent(isComparing ? "compare_remove" : "compare_add", { property_id: propertyId });
     toggle();
   }
 

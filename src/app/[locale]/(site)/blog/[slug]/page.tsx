@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Clock, Eye, Calendar } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
-import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
-import { getPostBySlug, getRelatedPosts } from "@/lib/queries";
+import { ArticleTrustMeta } from "@/components/site/article-trust-meta";
+import { articleSchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
+import { getRelatedPosts } from "@/lib/queries";
+import { getCachedPostBySlug } from "@/lib/public-cache";
 import { isUnoptimizedImage } from "@/lib/utils";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -21,7 +22,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getCachedPostBySlug(slug);
 
   if (!post) return { title: "Məqalə tapılmadı" };
 
@@ -41,37 +42,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getCachedPostBySlug(slug);
 
   if (!post) notFound();
 
   const relatedPosts = await getRelatedPosts(post.id, post.categoryId, 3);
-
-  // JSON-LD for Blog Post
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    image: post.coverUrl ? [post.coverUrl] : [],
-    datePublished: post.publishedAt?.toISOString() || post.createdAt.toISOString(),
-    author: {
-      "@type": "Person",
-      name: post.author?.name || "Luxe Home Estate",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Luxe Home Estate",
-      logo: {
-        "@type": "ImageObject",
-        url: `https://luxehomeestate.az/logo.png`,
-      },
-    },
-    description: post.excerpt,
-  };
+  const publishedAt = new Date(post.publishedAt || post.createdAt);
+  const updatedAt = new Date(post.updatedAt);
 
   return (
     <>
-      <script {...jsonLd(articleSchema)} />
+      <script
+        {...jsonLd(
+          articleSchema({
+            title: post.title,
+            description: post.excerpt,
+            slug: post.slug,
+            image: post.coverUrl,
+            publishedAt: post.publishedAt || post.createdAt,
+            updatedAt: post.updatedAt,
+            authorName: post.author?.name,
+          }),
+        )}
+      />
       <script
         {...jsonLd(
           breadcrumbSchema([
@@ -93,20 +86,13 @@ export default async function BlogPostPage({ params }: Props) {
           { label: post.title },
         ]}
         actions={
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ink-muted">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="size-4" aria-hidden="true" />
-                  {new Intl.DateTimeFormat("az-AZ", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(post.publishedAt || post.createdAt))}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="size-4" aria-hidden="true" />
-                  {post.readMinutes} dəq oxuma
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Eye className="size-4" aria-hidden="true" />
-                  {post.viewCount} baxış
-                </span>
-              </div>
+          <ArticleTrustMeta
+            authorName={post.author?.name}
+            publishedAt={publishedAt}
+            updatedAt={updatedAt}
+            readMinutes={post.readMinutes}
+            viewCount={post.viewCount}
+          />
         }
       />
 

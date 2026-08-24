@@ -27,6 +27,7 @@ export type PropertyFormValues = {
   typeId: string;
   cityId: string;
   districtId: string;
+  metroId: string;
   projectId: string;
   address: string;
   latitude: string;
@@ -68,6 +69,7 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   typeId: "",
   cityId: "",
   districtId: "",
+  metroId: "",
   projectId: "",
   address: "",
   latitude: "",

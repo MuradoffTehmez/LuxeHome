@@ -3,6 +3,7 @@
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFavorite } from "@/lib/favorites";
+import { trackEvent } from "@/lib/client-analytics";
 
 type FavoriteButtonProps = {
   propertyId: string;
@@ -19,12 +20,16 @@ export function FavoriteButton({
   const { isFavorite, ready, toggle } = useFavorite(propertyId);
 
   const label = isFavorite ? "Favoritlərdən çıxar" : "Favoritlərə əlavə et";
+  const handleToggle = () => {
+    trackEvent(isFavorite ? "favorite_remove" : "favorite_add", { property_id: propertyId });
+    toggle();
+  };
 
   if (variant === "inline") {
     return (
       <button
         type="button"
-        onClick={toggle}
+        onClick={handleToggle}
         aria-pressed={ready ? isFavorite : undefined}
         className={cn(
           "inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-xs border px-4 text-sm font-medium",
@@ -51,7 +56,7 @@ export function FavoriteButton({
         // Kart tam link olduğu üçün naviqasiyanın qarşısı alınır
         event.preventDefault();
         event.stopPropagation();
-        toggle();
+        handleToggle();
       }}
       aria-label={label}
       title={label}

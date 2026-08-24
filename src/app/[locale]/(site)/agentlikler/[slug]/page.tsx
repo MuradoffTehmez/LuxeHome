@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { PageHeader } from "@/components/ui/page-header";
 import { PropertyCard } from "@/components/site/property-card";
-import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
+import { agencySchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getAgencyBySlug } from "@/lib/queries";
 import { isUnoptimizedImage } from "@/lib/utils";
+import { TrackedAnchor } from "@/components/analytics/analytics-event";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -43,6 +44,7 @@ export default async function AgencyDetailPage({ params }: Props) {
 
   return (
     <>
+      <script {...jsonLd(agencySchema(agency))} />
       <script
         {...jsonLd(
           breadcrumbSchema([
@@ -90,10 +92,10 @@ export default async function AgencyDetailPage({ params }: Props) {
             </div>
               <div className="flex min-w-0 flex-col gap-1 text-sm text-ink-soft sm:flex-row sm:flex-wrap sm:gap-x-6">
                 {agency.phone && (
-                  <a href={`tel:${agency.phone}`} className="flex min-h-11 min-w-0 items-center gap-2 rounded-xs hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                  <TrackedAnchor event="agency_contact" payload={{ agency_id: agency.id, method: "phone" }} href={`tel:${agency.phone}`} className="flex min-h-11 min-w-0 items-center gap-2 rounded-xs hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                     <Phone className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
                     <span className="[overflow-wrap:anywhere]">{agency.phone}</span>
-                  </a>
+                  </TrackedAnchor>
                 )}
                 {agency.address && (
                   <span className="flex min-h-11 min-w-0 items-center gap-2">

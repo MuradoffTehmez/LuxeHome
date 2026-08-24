@@ -19,6 +19,7 @@ import {
 } from "@/lib/accounts/property-submission";
 import { ACCOUNT_TYPES, PROPERTY_STATUSES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 const LIST_PATH = "/kabinet/elanlar";
 
@@ -144,5 +145,6 @@ export async function createPublicProperty(
   revalidatePath("/kabinet");
   revalidatePath(LIST_PATH);
   revalidatePath("/emlaklar");
+  revalidatePublicContent("property");
   redirect(`${LIST_PATH}?yeni=1`);
 }

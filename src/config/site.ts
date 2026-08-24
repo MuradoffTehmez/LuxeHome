@@ -41,39 +41,9 @@ export const siteConfig = {
   instagramUrl: "https://instagram.com/luxe_home_estate",
   website: "www.luxehomeestate.az",
 
-  /**
-   * Ofisin xəritədəki mövqeyi.
-   * TODO: Şirkət dəqiq koordinatları təqdim etdikdə yenilənməlidir —
-   * hazırkı dəyərlər Əliyar Əliyev küçəsi üzrə təxmini mövqedir.
-   */
-  geo: {
-    latitude: 40.3971,
-    longitude: 49.8624,
-  },
-
-  /**
-   * İş saatları.
-   * TODO: Şirkətdən real iş qrafiki alınmalı və dəqiqləşdirilməlidir.
-   * `structured` sahəsi `organizationSchema()`-da `openingHoursSpecification`
-   * üçün istifadə olunur — mətn təsviri ilə sinxron saxlanılmalıdır.
-   */
-  workingHours: {
-    weekdays: "B.e — Şənbə: 09:00 — 19:00",
-    weekend: "Bazar: Bağlıdır",
-    structured: {
-      days: [
-        "https://schema.org/Monday",
-        "https://schema.org/Tuesday",
-        "https://schema.org/Wednesday",
-        "https://schema.org/Thursday",
-        "https://schema.org/Friday",
-        "https://schema.org/Saturday",
-      ],
-      opens: "09:00",
-      closes: "19:00",
-    },
-  },
 } as const;
+
+export const PRODUCTION_SITE_URL = "https://luxehomeestate.az";
 
 export const navigation = [
   { label: "Ana səhifə", href: "/" },
@@ -92,29 +62,19 @@ export const navigation = [
  * digəri də yenilənməlidir, əks halda link boş nəticə səhifəsinə aparır.
  */
 export const propertyTypeLinks = [
-  { label: "Mənzillər", href: "/emlaklar?tip=menziller" },
-  { label: "Yeni tikili", href: "/emlaklar?tip=yeni-tikili" },
-  { label: "Köhnə tikili", href: "/emlaklar?tip=kohne-tikili" },
-  { label: "Həyət evi / Villa", href: "/emlaklar?tip=heyet-evleri" },
-  { label: "Bağ evləri", href: "/emlaklar?tip=bag-evleri" },
-  { label: "Torpaq sahəsi", href: "/emlaklar?tip=torpaq" },
-  { label: "Obyekt", href: "/emlaklar?tip=obyektler" },
-  { label: "Ofis", href: "/emlaklar?tip=ofisler" },
-  { label: "Qaraj", href: "/emlaklar?tip=qarajlar" },
-  { label: "Mini otel / Xostel", href: "/emlaklar?tip=mini-otel" },
-  { label: "İstirahət mərkəzi", href: "/emlaklar?tip=istirahet-merkezleri" },
-  { label: "Konteyner ev", href: "/emlaklar?tip=konteyner-evler" },
-  { label: "A-frame ev", href: "/emlaklar?tip=a-frame-evler" },
-  { label: "Xarici əmlak", href: "/emlaklar?tip=xarici-emlak" },
+  { label: "Satılan mənzillər", href: "/bakida-satilan-menziller" },
+  { label: "Kirayə mənzillər", href: "/bakida-kiraye-menziller" },
+  { label: "Villalar", href: "/villalar" },
+  { label: "Həyət evləri", href: "/heyet-evleri" },
+  { label: "Torpaq sahələri", href: "/torpaq-saheleri" },
+  { label: "Kommersiya obyektləri", href: "/kommersiya-obyektleri" },
+  { label: "Ofislər", href: "/ofisler" },
 ] as const;
 
 /** Elan növü üzrə keçidlər — günlük kirayə ayrıca kateqoriya kimi göstərilir. */
 export const listingLinks = [
-  { label: "Satılır", href: "/emlaklar?elan=SALE" },
-  { label: "Aylıq kirayə", href: "/emlaklar?elan=RENT&dovr=MONTH" },
-  { label: "Günlük kirayə", href: "/emlaklar?elan=RENT&dovr=DAY" },
-  { label: "İpotekaya uyğun", href: "/emlaklar?xususiyyet=ipoteka" },
-  { label: "Kreditlə", href: "/emlaklar?xususiyyet=kredit" },
+  { label: "Satılır", href: "/satilan-emlaklar" },
+  { label: "Kirayə", href: "/kiraye-emlaklar" },
 ] as const;
 
 /** Footer-dəki köməkçi səhifələr — əsas naviqasiyada olmayanlar. */
@@ -142,8 +102,39 @@ export function whatsappLink(message?: string): string {
  * prosesindən oxunur. Deploy skriptləri hər iki mərhələyə eyni mühitə uyğun `SITE_URL`
  * ötürməlidir; əks halda statik canonical URL-lər lokal ünvana bağlanar.
  */
+type SiteBaseUrlInput = {
+  nodeEnv?: string;
+  staging: boolean;
+  configuredUrl?: string;
+};
+
+export function resolveSiteBaseUrl(input: SiteBaseUrlInput): string {
+  let base = "http://localhost:3000";
+
+  if (input.nodeEnv === "production" && !input.staging) {
+    // Production canonical host deploy dəyişənindən asılı deyil. Yanlış və ya unudulmuş
+    // env dəyəri indeksdə alternativ host yaratmamalıdır.
+    base = PRODUCTION_SITE_URL;
+  } else if (input.configuredUrl) {
+    try {
+      const parsed = new URL(input.configuredUrl);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        base = parsed.origin;
+      }
+    } catch {
+      // Lokal development üçün təhlükəsiz fallback aşağıda saxlanılır.
+    }
+  }
+
+  return base.replace(/\/$/, "");
+}
+
 export function siteUrl(path = ""): string {
-  const base = (process.env.SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = resolveSiteBaseUrl({
+    nodeEnv: process.env.NODE_ENV,
+    staging: isStaging(),
+    configuredUrl: process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL,
+  });
   if (!path) return base;
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }

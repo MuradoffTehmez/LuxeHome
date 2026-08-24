@@ -34,8 +34,10 @@ export default function CookiePage() {
         </li>
       </ul>
       <p>
-        Hazırda saytda reklam və ya davranış izləmə cookie-ləri istifadə olunmur.
-        Analitika alətləri əlavə edilərsə, bu səhifə yenilənəcək.
+        Production mühitində Google Analytics və ya Google Tag Manager identifikatoru
+        konfiqurasiya edildikdə analitika yalnız açıq razılığınızdan sonra aktivləşir.
+        Razılıq verilməyənədək analitika skripti yüklənmir və event göndərilmir. Göndərilən
+        eventlər telefon, e-poçt, ad, ünvan və müraciət mətni daşımır.
       </p>
 
       <h2>İdarə etmək</h2>
@@ -43,6 +45,8 @@ export default function CookiePage() {
         Cookie-ləri brauzerinizin parametrlərindən silə və ya bloklaya bilərsiniz. Zəruri
         cookie-lər bloklanarsa saytın bəzi hissələri düzgün işləməyə bilər. Brauzer yaddaşındakı
         favoritləri «Favoritlər» səhifəsindəki «Siyahını təmizlə» düyməsi ilə silmək mümkündür.
+        Analitika seçimi <code>analytics_consent</code> cookie-sində bir il saxlanılır; cookie-ni
+        silməklə seçim ekranını yenidən aça bilərsiniz.
       </p>
 
       <h2>Əlaqə</h2>

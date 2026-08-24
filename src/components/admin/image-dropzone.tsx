@@ -309,6 +309,12 @@ export function ImageDropzone({
                     maxLength={160}
                     className="min-h-11 w-full rounded-xs border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
                   />
+                  {!item.alt.trim() && (
+                    <p className="flex items-start gap-1 text-[11px] leading-4 text-warning">
+                      <AlertCircle className="mt-0.5 size-3 shrink-0" aria-hidden="true" />
+                      <span><strong>Alt mətn boşdur.</strong> Şəkli qısa və konkret təsvir edin; yalnız dekorativdirsə boş saxlayın.</span>
+                    </p>
+                  )}
 
                   <div className="flex items-center justify-between gap-0.5">
                     {mode === "multiple" ? (

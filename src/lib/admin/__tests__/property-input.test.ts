@@ -22,6 +22,7 @@ function minimalSaleForm(): FormData {
   formData.set("cityId", "city_baki");
   // Seçilməmiş açılan siyahılar boş sətir göndərir
   formData.set("districtId", "");
+  formData.set("metroId", "");
   formData.set("projectId", "");
   formData.set("address", "");
   formData.set("latitude", "");
@@ -91,6 +92,14 @@ describe("əmlak formasının oxunması", () => {
       "feature_lift",
       "feature_qaraj",
     ]);
+  });
+
+  it("optional metro əlaqəsini formadan Prisma datasına ötürür", () => {
+    const formData = minimalSaleForm();
+    formData.set("metroId", "metro_nerimanov");
+    const data = propertyData(propertySchema.parse(readPropertyForm(formData)));
+
+    expect(data.metroId).toBe("metro_nerimanov");
   });
 
   it("boş video ünvanını xəta saymır", () => {

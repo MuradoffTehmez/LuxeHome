@@ -11,7 +11,7 @@ export const metadata: Metadata = buildMetadata({
   title: "Hesaba giriş",
   description: "Luxe Home Estate hesabınıza daxil olun — favoritlər, müraciətlər və elanlarınız.",
   path: "/daxil-ol",
-  noIndex: true,
+  indexPolicy: "noindex-follow",
 });
 
 // Sessiya D1-dən oxunur — statik render mümkün deyil

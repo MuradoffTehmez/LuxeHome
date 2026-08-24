@@ -12,6 +12,7 @@ import { parseSingleImage } from "@/lib/admin/images";
 import { serviceSchema } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 /**
  * Xidmət CRUD-u.
@@ -95,6 +96,7 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
       await recordAudit(user, "UPDATE", "Service", id, parsed.data.title);
       revalidatePath(LIST_PATH);
       revalidatePath(`/xidmetler/${slug}`);
+      revalidatePublicContent("service", slug);
       return success("Xidmət yeniləndi.");
     }
 
@@ -106,6 +108,7 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
   }
 
   revalidatePath(LIST_PATH);
+  revalidatePublicContent("service");
   redirect(`${LIST_PATH}/${serviceId}`);
 }
 
@@ -133,6 +136,7 @@ export async function deleteService(id: string): Promise<ActionState> {
     await recordAudit(user, "DELETE", "Service", id, service.title);
     revalidatePath(LIST_PATH);
     revalidatePath(`/xidmetler/${service.slug}`);
+    revalidatePublicContent("service", service.slug);
     return success("Xidmət silindi.");
   } catch (error) {
     return unexpected("xidmət silinmədi", error);

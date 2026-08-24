@@ -8,6 +8,7 @@ export const metadata: Metadata = buildMetadata({
   title: "Müqayisə",
   description: "Seçdiyiniz əmlakları qiymət, sahə və xüsusiyyətlərinə görə yan-yana müqayisə edin.",
   path: "/muqayise",
+  indexPolicy: "noindex-follow",
 });
 
 export default function ComparePage() {

@@ -23,4 +23,18 @@ describe("ImageDropzone responsive idarələri", () => {
     expect(html.match(/size-11/g)?.length).toBeGreaterThanOrEqual(4);
     expect(html).toContain("min-h-11");
   });
+
+  it("boş alt mətn üçün görünən warning və dekorativ şəkil izahı göstərir", () => {
+    const html = renderToStaticMarkup(
+      <ImageDropzone
+        name="cover"
+        label="Üz qabığı"
+        folder="bloq"
+        mode="single"
+        initial={[{ url: "https://media.luxehomeestate.az/cover.jpg", alt: "", isCover: true }]}
+      />,
+    );
+    expect(html).toContain("Alt mətn boşdur");
+    expect(html).toContain("yalnız dekorativdirsə boş saxlayın");
+  });
 });
