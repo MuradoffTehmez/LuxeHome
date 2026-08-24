@@ -1,0 +1,23 @@
+{
+  "home": "Главная",
+  "properties": "Недвижимость",
+  "projects": "Жилые комплексы",
+  "agencies": "Агентства",
+  "services": "Услуги",
+  "blog": "Блог",
+  "contact": "Контакты",
+  "favorites": "Избранное",
+  "listProperty": "Разместить объявление",
+  "openMenu": "Открыть меню",
+  "menuOpen": "Меню открыто",
+  "quickLinks": "Быстрые ссылки",
+  "searchProperties": "Поиск недвижимости",
+  "myFavorites": "Мои избранные",
+  "footer": {
+    "quickLinks": "Быстрые ссылки",
+    "propertyTypes": "Типы недвижимости",
+    "contactUs": "Связаться с нами",
+    "legal": "Правовая информация",
+    "rightsReserved": "Все права защищены."
+  }
+}

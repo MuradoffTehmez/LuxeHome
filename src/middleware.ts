@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
 import {
   SESSION_COOKIE,
   SESSION_SUBJECT,
@@ -10,6 +12,8 @@ import {
   signedSessionRedirect,
   type SignedSession,
 } from "@/lib/auth/session-routing";
+
+const intlMiddleware = createIntlMiddleware(routing);
 
 /**
  * İdarə paneli və kabinet qapısı, ucuz sessiya yoxlaması.
@@ -87,8 +91,33 @@ function harden(response: NextResponse): NextResponse {
   return response;
 }
 
+/**
+ * Sessiya/hesab yollarının siyahısı — bunlar qəsdən dil prefiksindən kənardadır
+ * (`session-routing.ts` yönləndirmə hədəfləri də sərt bu yollara bağlıdır), ona görə
+ * next-intl middleware-i bu yollarda işə düşmür.
+ */
+function isAccountFlowRoute(pathname: string): boolean {
+  return (
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/giris" ||
+    pathname.startsWith("/giris/") ||
+    pathname === "/kabinet" ||
+    pathname.startsWith("/kabinet/") ||
+    pathname === "/daxil-ol" ||
+    pathname.startsWith("/daxil-ol/") ||
+    pathname === "/qeydiyyat" ||
+    pathname.startsWith("/qeydiyyat/")
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  if (!isAccountFlowRoute(pathname)) {
+    return intlMiddleware(request);
+  }
+
   const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
   const isStaffLoginRoute = pathname === "/giris" || pathname.startsWith("/giris/");
 
@@ -108,5 +137,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/admin", "/giris/:path*", "/giris", "/kabinet/:path*", "/kabinet"],
+  // `api`, `_next`, `media` (R2 şəkil route-u) və uzantılı fayllar middleware-dən keçmir
+  matcher: ["/((?!api|_next|media|llms\\.txt|.*\\..*).*)"],
 };

@@ -1,0 +1,23 @@
+{
+  "home": "Home",
+  "properties": "Properties",
+  "projects": "Residential Complexes",
+  "agencies": "Agencies",
+  "services": "Services",
+  "blog": "Blog",
+  "contact": "Contact",
+  "favorites": "Favorites",
+  "listProperty": "List a property",
+  "openMenu": "Open menu",
+  "menuOpen": "Menu is open",
+  "quickLinks": "Quick links",
+  "searchProperties": "Search properties",
+  "myFavorites": "My favorites",
+  "footer": {
+    "quickLinks": "Quick links",
+    "propertyTypes": "Property types",
+    "contactUs": "Contact us",
+    "legal": "Legal",
+    "rightsReserved": "All rights reserved."
+  }
+}

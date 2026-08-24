@@ -1,0 +1,7 @@
+{
+  "nameMin": "Ad ən azı 2 simvol olmalıdır",
+  "phoneMin": "Telefon nömrəsi düzgün deyil",
+  "emailInvalid": "E-poçt ünvanı düzgün deyil",
+  "messageMin": "Mesaj ən azı 10 simvol olmalıdır",
+  "submitError": "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin."
+}

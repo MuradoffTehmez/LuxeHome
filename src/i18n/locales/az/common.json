@@ -1,0 +1,21 @@
+{
+  "loading": "Yüklənir…",
+  "error": "Xəta baş verdi",
+  "retry": "Yenidən cəhd et",
+  "save": "Yadda saxla",
+  "cancel": "Ləğv et",
+  "close": "Bağla",
+  "search": "Axtar",
+  "theme": {
+    "light": "Açıq",
+    "dark": "Tünd",
+    "system": "Sistem",
+    "toggle": "Mövzu: {theme}. Dəyişmək üçün klikləyin."
+  },
+  "locale": {
+    "az": "Azərbaycan",
+    "en": "English",
+    "ru": "Русский",
+    "switch": "Dili dəyiş"
+  }
+}

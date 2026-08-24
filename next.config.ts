@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   // Layihə qovluğu iş sahəsinin kökü kimi qeyd olunur —
@@ -81,7 +84,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);
 
 // `next dev` zamanı Cloudflare binding-lərini (D1, R2) lokal miniflare üzərindən açır,
 // beləliklə development production ilə eyni kod yolunu işlədir.

@@ -1,0 +1,12 @@
+{
+  "listingType": {
+    "sale": "For sale",
+    "rent": "For rent"
+  },
+  "pricePeriod": {
+    "month": "/mo",
+    "day": "/day"
+  },
+  "area": "{value, number, integer} m²",
+  "rooms": "{count, plural, one {# room} other {# rooms}}"
+}

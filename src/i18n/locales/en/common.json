@@ -1,0 +1,21 @@
+{
+  "loading": "Loading…",
+  "error": "Something went wrong",
+  "retry": "Retry",
+  "save": "Save",
+  "cancel": "Cancel",
+  "close": "Close",
+  "search": "Search",
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "toggle": "Theme: {theme}. Click to change."
+  },
+  "locale": {
+    "az": "Azərbaycan",
+    "en": "English",
+    "ru": "Русский",
+    "switch": "Change language"
+  }
+}

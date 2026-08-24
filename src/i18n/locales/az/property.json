@@ -1,0 +1,12 @@
+{
+  "listingType": {
+    "sale": "Satılır",
+    "rent": "Kirayə"
+  },
+  "pricePeriod": {
+    "month": "/ay",
+    "day": "/gün"
+  },
+  "area": "{value, number, integer} m²",
+  "rooms": "{count, plural, other {# otaq}}"
+}

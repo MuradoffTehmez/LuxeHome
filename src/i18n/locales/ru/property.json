@@ -1,0 +1,12 @@
+{
+  "listingType": {
+    "sale": "Продаётся",
+    "rent": "Аренда"
+  },
+  "pricePeriod": {
+    "month": "/мес",
+    "day": "/день"
+  },
+  "area": "{value, number, integer} м²",
+  "rooms": "{count, plural, one {# комната} few {# комнаты} many {# комнат} other {# комнаты}}"
+}

@@ -1,0 +1,23 @@
+{
+  "home": "Ana səhifə",
+  "properties": "Əmlaklar",
+  "projects": "Yaşayış kompleksləri",
+  "agencies": "Agentliklər",
+  "services": "Xidmətlər",
+  "blog": "Bloq",
+  "contact": "Əlaqə",
+  "favorites": "Favoritlər",
+  "listProperty": "Elan ver",
+  "openMenu": "Menyunu aç",
+  "menuOpen": "Menyu açıqdır",
+  "quickLinks": "Sürətli keçidlər",
+  "searchProperties": "Əmlak axtar",
+  "myFavorites": "Favoritlərim",
+  "footer": {
+    "quickLinks": "Sürətli keçidlər",
+    "propertyTypes": "Əmlak növləri",
+    "contactUs": "Bizimlə əlaqə",
+    "legal": "Hüquqi",
+    "rightsReserved": "Bütün hüquqlar qorunur."
+  }
+}
