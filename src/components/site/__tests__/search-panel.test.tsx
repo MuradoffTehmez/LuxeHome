@@ -15,7 +15,7 @@ describe("SearchPanel", () => {
     );
 
     expect(html).toMatch(/class="[^"]*hidden[^"]*lg:block[^"]*"/);
-    expect(html).toContain('action="/emlaklar"');
+    expect(html).toContain('action="/az/emlaklar"');
     expect(html).toContain('method="get"');
     expect(html).toContain('name="sahe_min"');
   });

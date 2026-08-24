@@ -35,9 +35,9 @@ describe("route vəziyyətləri", () => {
   });
 
   it.each([
-    "src/app/(account)/kabinet/loading.tsx",
+    "src/app/[locale]/(account)/kabinet/loading.tsx",
     "src/app/admin/loading.tsx",
-    "src/app/giris/loading.tsx",
+    "src/app/[locale]/giris/loading.tsx",
   ])("%s segment səviyyəli accessible loading vəziyyətini saxlayır", (file) => {
     const source = readFileSync(join(process.cwd(), file), "utf8");
     expect(source).toContain('role="status"');

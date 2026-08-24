@@ -1,10 +1,12 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Overlay } from "@/components/ui/overlay";
+import { localizePath } from "@/i18n/path-locale";
+import type { Locale } from "@/lib/constants";
 import {
   PropertyFilterFields,
   type CityOption,
@@ -34,6 +36,7 @@ export function PropertyFilterSheet({
   resultCount,
   activeCount,
 }: PropertyFilterSheetProps) {
+  const locale = useLocale() as Locale;
   const t = useTranslations("listings.search");
   const [open, setOpen] = useState(false);
   const generatedId = useId();
@@ -68,7 +71,7 @@ export function PropertyFilterSheet({
           </Button>
         }
       >
-        <form id={formId} action="/emlaklar" method="get">
+        <form id={formId} action={localizePath("/emlaklar", locale)} method="get">
           <PropertyFilterFields
             types={types}
             cities={cities}

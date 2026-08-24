@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { localeFromPathname } from "@/i18n/path-locale";
+import {
+  localeFromPathname,
+  localizePath,
+  pathnameWithoutLocale,
+} from "@/i18n/path-locale";
 
 describe("public route content language", () => {
   it.each([
@@ -9,5 +13,25 @@ describe("public route content language", () => {
     ["/ru/emlaklar/test", "ru"],
   ])("%s route-u üçün %s qaytarır", (pathname, locale) => {
     expect(localeFromPathname(pathname)).toBe(locale);
+  });
+});
+
+describe("locale-prefiksli marşrutlar", () => {
+  it.each([
+    ["/kabinet", "az", "/az/kabinet"],
+    ["/kabinet/elanlar", "en", "/en/kabinet/elanlar"],
+    ["/daxil-ol?davam=%2Fru%2Fkabinet", "ru", "/ru/daxil-ol?davam=%2Fru%2Fkabinet"],
+    ["/", "az", "/az"],
+  ] as const)("%s yolunu %s dili ilə %s edir", (path, locale, expected) => {
+    expect(localizePath(path, locale)).toBe(expected);
+  });
+
+  it.each([
+    ["/az/kabinet", "/kabinet"],
+    ["/en/kabinet/elanlar", "/kabinet/elanlar"],
+    ["/ru", "/"],
+    ["/admin", "/admin"],
+  ] as const)("%s yolundan locale seqmentini çıxarır", (path, expected) => {
+    expect(pathnameWithoutLocale(path)).toBe(expected);
   });
 });

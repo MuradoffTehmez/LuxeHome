@@ -7,7 +7,7 @@ import { Heart, Menu, Phone, Plus, Search } from "lucide-react";
 import { navigation, siteConfig } from "@/config/site";
 import { isNavigationItemActive } from "@/lib/ui/navigation";
 import { cn } from "@/lib/utils";
-import { ButtonLink, IconButton, buttonClassName } from "@/components/ui/button";
+import { IconButton, buttonClassName } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Overlay } from "@/components/ui/overlay";
 import { AccountMenu } from "./account-menu";
@@ -30,16 +30,13 @@ const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" |
 /**
  * Fixed, responsive ictimai sayt başlığı.
  *
- * `showLocaleSwitcher` qəsdən defolt `false`-dur: `(account)` qrupu (kabinet,
- * daxil-ol, qeydiyyat) dil prefiksindən kənardadır — orada dil dəyişmə cəhdi
- * mövcud olmayan `/en/kabinet` kimi marşruta apararaq 404 yaradardı.
+ * Dil seçici cari locale-prefiksli marşrutda qalaraq bütün ictimai və hesab
+ * səhifələrində eyni naviqasiya davranışını saxlayır.
  */
 export function Navbar({
   showLocaleSwitcher = false,
-  localizedRoutes = true,
 }: {
   showLocaleSwitcher?: boolean;
-  localizedRoutes?: boolean;
 }) {
   const t = useTranslations("navigation");
   const pathname = usePathname();
@@ -137,7 +134,7 @@ export function Navbar({
         <div className="ml-auto flex shrink-0 items-center gap-1 xl:ml-0 xl:gap-1.5">
           <ThemeToggle />
           {showLocaleSwitcher && (
-            <LocaleSwitcher isOverlay={isOverlay} localizedRoutes={localizedRoutes} />
+            <LocaleSwitcher isOverlay={isOverlay} />
           )}
 
           <Link
@@ -161,15 +158,13 @@ export function Navbar({
             <AccountMenu isOverlay={isOverlay} />
           </div>
 
-          <ButtonLink
+          <Link
             href="/kabinet/elanlar/yeni"
-            variant="primary"
-            size="sm"
-            className="hidden px-3 xl:inline-flex xl:px-4"
+            className={buttonClassName("primary", "sm", false, "hidden px-3 xl:inline-flex xl:px-4")}
           >
             <Plus className="size-4" aria-hidden="true" />
             {t("listProperty")}
-          </ButtonLink>
+          </Link>
 
           <IconButton
             label={menuOpen ? t("menuOpen") : t("openMenu")}

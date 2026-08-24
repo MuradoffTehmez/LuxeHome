@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/admin" }));
-vi.mock("@/app/giris/actions", () => ({ signOut: vi.fn() }));
+vi.mock("@/app/[locale]/giris/actions", () => ({ signOut: vi.fn() }));
 
 import { AdminShell } from "../admin-shell";
 

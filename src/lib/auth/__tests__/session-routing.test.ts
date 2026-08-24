@@ -4,8 +4,8 @@ import { signedSessionRedirect } from "../session-routing";
 
 describe("imzalı sessiya marşrutları", () => {
   it("köhnə və ya etibarsız cookie ilə kabinetdən reauth ünvanına yönləndirir", () => {
-    expect(signedSessionRedirect("/kabinet", "?filtr=1", null)).toBe(
-      "/daxil-ol?davam=%2Fkabinet%3Ffiltr%3D1&yeniden=1",
+    expect(signedSessionRedirect("/ru/kabinet", "?filtr=1", null)).toBe(
+      "/ru/daxil-ol?davam=%2Fru%2Fkabinet%3Ffiltr%3D1&yeniden=1",
     );
   });
 
@@ -14,13 +14,13 @@ describe("imzalı sessiya marşrutları", () => {
       signedSessionRedirect("/admin/emlaklar", "", {
         accountType: ACCOUNT_TYPES.USER,
         authKind: AUTH_KINDS.PUBLIC,
-      }),
-    ).toBe("/kabinet");
+      }, "en"),
+    ).toBe("/en/kabinet");
   });
 
   it("staff sessiyası kabinet əvəzinə panelə yönləndirilir", () => {
     expect(
-      signedSessionRedirect("/kabinet", "", {
+      signedSessionRedirect("/az/kabinet", "", {
         accountType: ACCOUNT_TYPES.STAFF,
         authKind: AUTH_KINDS.STAFF_2FA,
       }),
@@ -29,10 +29,19 @@ describe("imzalı sessiya marşrutları", () => {
 
   it("yenidən giriş flag-i olduqda köhnə staff cookie-si login səhifəsindən panelə qaytarmır", () => {
     expect(
-      signedSessionRedirect("/giris", "?yeniden=1", {
+      signedSessionRedirect("/ru/giris", "?yeniden=1", {
         accountType: ACCOUNT_TYPES.STAFF,
         authKind: AUTH_KINDS.STAFF_2FA,
       }),
     ).toBeNull();
+  });
+
+  it("ictimai sessiyanı locale-prefiksli işçi girişindən eyni dildə kabinetə qaytarır", () => {
+    expect(
+      signedSessionRedirect("/en/giris", "", {
+        accountType: ACCOUNT_TYPES.OWNER,
+        authKind: AUTH_KINDS.PUBLIC,
+      }),
+    ).toBe("/en/kabinet");
   });
 });

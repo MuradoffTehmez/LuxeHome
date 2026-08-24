@@ -1,5 +1,13 @@
 import { forbidden, redirect } from "next/navigation";
-import { AUTH_KINDS, LISTING_ACCOUNT_TYPES, type AuthKind, type Permission } from "@/lib/constants";
+import {
+  AUTH_KINDS,
+  DEFAULT_LOCALE,
+  LISTING_ACCOUNT_TYPES,
+  type AuthKind,
+  type Locale,
+  type Permission,
+} from "@/lib/constants";
+import { localizePath } from "@/i18n/path-locale";
 import { readSessionCookie, verifySessionToken } from "./cookies";
 import { hasPermission } from "./permissions";
 import { canAccessAdmin } from "./public-account-policy";
@@ -68,16 +76,16 @@ export async function requireStaff(): Promise<AuthUser> {
 }
 
 /** İctimai kabinet — yalnız aktiv qeyri-əməkdaş hesabları üçündür. */
-export async function requireAccount(): Promise<AuthUser> {
+export async function requireAccount(locale: Locale = DEFAULT_LOCALE): Promise<AuthUser> {
   const user = await getOptionalUser(AUTH_KINDS.PUBLIC);
-  if (!user) redirect("/daxil-ol?yeniden=1");
+  if (!user) redirect(localizePath("/daxil-ol?yeniden=1", locale));
   if (canAccessAdmin(user.accountType)) redirect("/admin");
   return user;
 }
 
 /** Elan yerləşdirə bilən hesab növü (mülk sahibi və ya agentlik). */
-export async function requireLister(): Promise<AuthUser> {
-  const user = await requireAccount();
+export async function requireLister(locale: Locale = DEFAULT_LOCALE): Promise<AuthUser> {
+  const user = await requireAccount(locale);
   if (!LISTING_ACCOUNT_TYPES.includes(user.accountType)) forbidden();
   return user;
 }

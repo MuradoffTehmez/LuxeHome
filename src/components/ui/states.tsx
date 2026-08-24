@@ -1,7 +1,8 @@
 import { AlertTriangle, Inbox, SearchX } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Button, ButtonLink } from "./button";
+import { Link } from "@/i18n/navigation";
+import { Button, ButtonLink, buttonClassName } from "./button";
 import { Container, Section } from "./container";
 
 // ---------------------------------------------------------------------------
@@ -154,7 +155,7 @@ type EmptyStateProps = {
   title: string;
   description?: string;
   icon?: React.ReactNode;
-  action?: { label: string; href: string };
+  action?: { label: string; href: string; localized?: boolean };
   onAction?: { label: string; onClick: () => void };
   className?: string;
 };
@@ -186,11 +187,15 @@ export function EmptyState({
         )}
       </div>
 
-      {action && (
+      {action && (action.localized !== false ? (
+        <Link href={action.href} className={buttonClassName("outline", "sm")}>
+          {action.label}
+        </Link>
+      ) : (
         <ButtonLink href={action.href} variant="outline" size="sm">
           {action.label}
         </ButtonLink>
-      )}
+      ))}
       {onAction && (
         <Button type="button" variant="outline" size="sm" onClick={onAction.onClick}>
           {onAction.label}
@@ -264,9 +269,9 @@ export function ErrorState({
             {t("retry")}
           </Button>
         )}
-        <ButtonLink href="/elaqe" variant="ghost" size="sm">
+        <Link href="/elaqe" className={buttonClassName("ghost", "sm")}>
           {t("contact")}
-        </ButtonLink>
+        </Link>
       </div>
     </div>
   );

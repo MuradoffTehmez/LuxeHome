@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import { ButtonLink } from "./button";
+import { Link } from "@/i18n/navigation";
+import { buttonClassName } from "./button";
 
 type SectionHeaderProps = {
   /** Başlıq üstündə göstərilən kiçik etiket (eyebrow). */
@@ -78,19 +79,17 @@ export function SectionHeader({
       </div>
 
       {action && (
-        <ButtonLink
+        <Link
           href={action.href}
-          variant="ghost"
-          size="sm"
-          className={cn(
+          className={buttonClassName("ghost", "sm", false, cn(
             "group/action shrink-0 border-b px-0",
             isDark
               ? "border-white/30 text-ink-invert hover:border-gold-soft hover:bg-transparent hover:text-gold-soft"
               : "border-line-strong text-ink hover:border-gold-deep hover:bg-transparent hover:text-gold-deep",
-          )}
+          ))}
         >
           {action.label}
-        </ButtonLink>
+        </Link>
       )}
     </div>
   );

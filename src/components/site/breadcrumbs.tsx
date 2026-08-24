@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -14,10 +15,10 @@ export function Breadcrumbs({
   locale?: Locale;
   className?: string;
 }) {
-  const localePrefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
+  const t = useTranslations("common.ui");
 
   return (
-    <nav aria-label="Naviqasiya yolu" className={cn(className)}>
+    <nav aria-label={t("breadcrumbs")} className={cn(className)}>
       <ol className="flex flex-wrap items-center gap-1.5 text-sm text-ink-muted">
         {items.map((item, index) => {
           const isCurrent = index === items.length - 1 || !item.href;
@@ -30,7 +31,8 @@ export function Breadcrumbs({
                 </span>
               ) : (
                 <Link
-                  href={`${localePrefix}${item.href}`}
+                  href={item.href as string}
+                  locale={locale}
                   className="inline-flex min-h-11 items-center transition-colors hover:text-gold-deep"
                 >
                   {item.label}

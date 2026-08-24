@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { ROLE_LABELS } from "@/lib/constants";
 import type { AuthUser } from "@/lib/auth/types";
-import { signOut } from "@/app/giris/actions";
+import { signOut } from "@/app/[locale]/giris/actions";
 import { adminNav } from "./admin-nav";
 import { AdminIcon } from "./admin-icon";
 

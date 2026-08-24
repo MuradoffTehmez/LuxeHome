@@ -13,10 +13,8 @@ import { Modal } from "@/components/ui/modal";
 /** Navbar-dakı `ThemeToggle`-ə bənzər dil seçici — dil dəyişdikdə cari səhifədə qalır. */
 export function LocaleSwitcher({
   isOverlay = false,
-  localizedRoutes = true,
 }: {
   isOverlay?: boolean;
-  localizedRoutes?: boolean;
 }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("common.locale");
@@ -28,11 +26,7 @@ export function LocaleSwitcher({
     setOpen(false);
     if (next === locale) return;
     await saveLocalePreference(next);
-    if (localizedRoutes) {
-      router.replace(pathname, { locale: next });
-    } else {
-      window.location.reload();
-    }
+    router.replace(pathname, { locale: next });
   }
 
   return (

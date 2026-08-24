@@ -4,6 +4,7 @@ import { requireLister, requirePermission } from "@/lib/auth/guard";
 import { clientIp } from "@/lib/auth/rate-limit";
 import type { AuthUser } from "@/lib/auth/types";
 import type { Permission } from "@/lib/constants";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
 
 /**
  * Paneldəki hər yazma əməliyyatının giriş qapısı.
@@ -66,9 +67,12 @@ export async function requireAdminAction(permission: Permission): Promise<AuthUs
 }
 
 /** İctimai kabinet yazıları üçün CSRF, hesab növü və ayrıca sürət limiti qapısı. */
-export async function requirePublicAction(scope: "media" | "property"): Promise<AuthUser> {
+export async function requirePublicAction(
+  scope: "media" | "property",
+  locale: Locale = DEFAULT_LOCALE,
+): Promise<AuthUser> {
   await assertSameOrigin();
-  const user = await requireLister();
+  const user = await requireLister(locale);
   await assertWriteLimit(user.id, `public:${scope}`);
   return user;
 }

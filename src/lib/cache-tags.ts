@@ -22,13 +22,17 @@ const CONFIG: Record<PublicContentKind, { tag: string; listPath: string; detailB
 
 export function contentInvalidation(kind: PublicContentKind, slug?: string) {
   const config = CONFIG[kind];
+  const localized = (path: string) =>
+    Object.values(LOCALES).map((locale) => localizePath(path, locale as Locale));
   return {
     tags: [PUBLIC_CACHE_TAGS.home, config.tag, PUBLIC_CACHE_TAGS.sitemap],
     paths: [
-      "/",
-      config.listPath,
+      ...localized("/"),
+      ...localized(config.listPath),
       "/sitemap.xml",
-      ...(slug && config.detailBase ? [`${config.detailBase}/${slug}`] : []),
+      ...(slug && config.detailBase ? localized(`${config.detailBase}/${slug}`) : []),
     ],
   };
 }
+import { LOCALES, type Locale } from "@/lib/constants";
+import { localizePath } from "@/i18n/path-locale";

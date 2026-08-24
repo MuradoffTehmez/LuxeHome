@@ -1,4 +1,6 @@
 import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType, type AuthKind } from "@/lib/constants";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
+import { localeFromPathname, localizePath, pathnameWithoutLocale } from "@/i18n/path-locale";
 import { isCabinetPath } from "./public-account-policy";
 
 export type SignedSession = { accountType: AccountType; authKind: AuthKind };
@@ -10,8 +12,13 @@ export function isUsableSignedSession(session: SignedSession): boolean {
   );
 }
 
-function reauthPath(path: "/giris" | "/daxil-ol", pathname: string, search: string): string {
-  return `${path}?davam=${encodeURIComponent(`${pathname}${search}`)}&yeniden=1`;
+function reauthPath(
+  path: "/giris" | "/daxil-ol",
+  pathname: string,
+  search: string,
+  locale: Locale,
+): string {
+  return `${localizePath(path, locale)}?davam=${encodeURIComponent(`${pathname}${search}`)}&yeniden=1`;
 }
 
 /** Middleware-in yalnız cookie claim-i ilə verdiyi ucuz istiqamət qərarı. */
@@ -19,23 +26,30 @@ export function signedSessionRedirect(
   pathname: string,
   search: string,
   session: SignedSession | null,
+  preferredLocale: Locale = DEFAULT_LOCALE,
 ): string | null {
-  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
-  const isStaffLoginRoute = pathname === "/giris" || pathname.startsWith("/giris/");
+  const routeLocale = pathnameWithoutLocale(pathname) === pathname
+    ? preferredLocale
+    : localeFromPathname(pathname);
+  const routePath = pathnameWithoutLocale(pathname);
+  const isAdminRoute = routePath === "/admin" || routePath.startsWith("/admin/");
+  const isStaffLoginRoute = routePath === "/giris" || routePath.startsWith("/giris/");
 
   if (isAdminRoute) {
     if (!session) {
-      return reauthPath("/giris", pathname, search);
+      return reauthPath("/giris", pathname, search, routeLocale);
     }
-    if (session.accountType !== ACCOUNT_TYPES.STAFF) return "/kabinet";
-    if (session.authKind !== AUTH_KINDS.STAFF_2FA) return reauthPath("/giris", pathname, search);
+    if (session.accountType !== ACCOUNT_TYPES.STAFF) return localizePath("/kabinet", routeLocale);
+    if (session.authKind !== AUTH_KINDS.STAFF_2FA) {
+      return reauthPath("/giris", pathname, search, routeLocale);
+    }
   }
 
-  if (isCabinetPath(pathname)) {
+  if (isCabinetPath(routePath)) {
     if (!session || session.authKind !== AUTH_KINDS.PUBLIC) {
       return session?.accountType === ACCOUNT_TYPES.STAFF
         ? "/admin"
-        : reauthPath("/daxil-ol", pathname, search);
+        : reauthPath("/daxil-ol", pathname, search, routeLocale);
     }
   }
 
@@ -44,7 +58,9 @@ export function signedSessionRedirect(
   if (isStaffLoginRoute && new URLSearchParams(search).get("yeniden") === "1") return null;
 
   if (isStaffLoginRoute && session) {
-    return session.accountType === ACCOUNT_TYPES.STAFF ? "/admin" : "/kabinet";
+    return session.accountType === ACCOUNT_TYPES.STAFF
+      ? "/admin"
+      : localizePath("/kabinet", routeLocale);
   }
 
   return null;

@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { ArrowRight, Phone } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
-import { ButtonLink } from "@/components/ui/button";
+import { buttonClassName } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { SearchPanel, type CityOption, type TypeOption } from "./search-panel";
 
@@ -59,19 +60,17 @@ export async function Hero({ types, cities }: HeroProps) {
           </p>
 
           <div className="animate-slide-up mt-9 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "300ms" }}>
-            <ButtonLink href="/emlaklar" variant="primary" size="lg">
+            <Link href="/emlaklar" className={buttonClassName("primary", "lg")}>
               {t("viewProperties")}
               <ArrowRight className="size-4" aria-hidden="true" />
-            </ButtonLink>
+            </Link>
 
-            <ButtonLink
+            <Link
               href="/elaqe"
-              variant="onDark"
-              size="lg"
-              className="border-white/30 text-white hover:text-gold-soft"
+              className={buttonClassName("onDark", "lg", false, "border-white/30 text-white hover:text-gold-soft")}
             >
               {t("contactUs")}
-            </ButtonLink>
+            </Link>
 
             <a
               href={siteConfig.phoneHref}

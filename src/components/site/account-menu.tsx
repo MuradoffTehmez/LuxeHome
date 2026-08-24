@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { LayoutDashboard, LogIn, UserRound } from "lucide-react";
+import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 /**
@@ -95,12 +95,8 @@ export function AccountMenu({
     );
   }
 
-  return (
-    <Link
-      href={state.isStaff ? "/admin" : "/kabinet"}
-      aria-label={state.isStaff ? t("adminPanel") : state.name}
-      className={linkClass}
-    >
+  const contents = (
+    <>
       {state.isStaff ? (
         <LayoutDashboard className="size-4" aria-hidden="true" />
       ) : (
@@ -109,6 +105,16 @@ export function AccountMenu({
       <span className={cn("max-w-28 truncate", variant === "desktop" && "sr-only 2xl:not-sr-only")}>
         {state.isStaff ? t("adminPanel") : state.name}
       </span>
+    </>
+  );
+
+  return state.isStaff ? (
+    <NextLink href="/admin" aria-label={t("adminPanel")} className={linkClass}>
+      {contents}
+    </NextLink>
+  ) : (
+    <Link href="/kabinet" aria-label={state.name} className={linkClass}>
+      {contents}
     </Link>
   );
 }

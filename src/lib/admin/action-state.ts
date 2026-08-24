@@ -59,7 +59,11 @@ export function successWithSecret(message: string, secret: string): ActionState 
  * Xətanın özü konsola yazılır — Workers loglarında görünür. İstifadəçiyə
  * daxili detal qaytarılmır.
  */
-export function unexpected(context: string, error: unknown): ActionState {
+export function unexpected(
+  context: string,
+  error: unknown,
+  publicMessage = "Əməliyyat tamamlanmadı. Bir az sonra yenidən cəhd edin.",
+): ActionState {
   console.error(`[admin] ${context}:`, error);
-  return failure("Əməliyyat tamamlanmadı. Bir az sonra yenidən cəhd edin.");
+  return failure(publicMessage);
 }

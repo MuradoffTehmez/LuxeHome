@@ -1,11 +1,13 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/lib/client-analytics";
+import { localizePath } from "@/i18n/path-locale";
+import type { Locale } from "@/lib/constants";
 import {
   PropertyFilterFields,
   type CityOption,
@@ -37,6 +39,7 @@ export function SearchPanel({
   variant = "hero",
   className,
 }: SearchPanelProps) {
+  const locale = useLocale() as Locale;
   const t = useTranslations("listings.search");
   const isPage = variant === "page";
 
@@ -50,7 +53,7 @@ export function SearchPanel({
         className,
       )}
     >
-      <form action="/emlaklar" method="get" className="flex flex-col gap-5" onSubmit={(event) => {
+      <form action={localizePath("/emlaklar", locale)} method="get" className="flex flex-col gap-5" onSubmit={(event) => {
         const data = new FormData(event.currentTarget);
         const filterCount = Array.from(data.entries()).filter(([, value]) => String(value).trim()).length;
         trackEvent("filter_submit", { filter_count: filterCount, placement: variant });

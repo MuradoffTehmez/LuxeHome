@@ -4,7 +4,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { isStaging } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
-import { localeFromPathname } from "@/i18n/path-locale";
+import { localeFromPathname, pathnameWithoutLocale } from "@/i18n/path-locale";
 import { LOCALE_COOKIE } from "@/i18n/config";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import {
@@ -97,22 +97,23 @@ function harden(response: NextResponse): NextResponse {
 }
 
 /**
- * Sessiya/hesab yollarının siyahısı — bunlar qəsdən dil prefiksindən kənardadır
- * (`session-routing.ts` yönləndirmə hədəfləri də sərt bu yollara bağlıdır), ona görə
- * next-intl middleware-i bu yollarda işə düşmür.
+ * İstifadəçiyə görünən giriş və kabinet yolları `[locale]` ağacındadır. Yalnız
+ * `/admin` locale-dən kənarda qalır; bu funksiya sessiya qapısının hansı URL-lərə
+ * tətbiq olunacağını locale seqmentindən asılı olmadan müəyyən edir.
  */
 function isAccountFlowRoute(pathname: string): boolean {
+  const routePath = pathnameWithoutLocale(pathname);
   return (
     pathname === "/admin" ||
     pathname.startsWith("/admin/") ||
-    pathname === "/giris" ||
-    pathname.startsWith("/giris/") ||
-    pathname === "/kabinet" ||
-    pathname.startsWith("/kabinet/") ||
-    pathname === "/daxil-ol" ||
-    pathname.startsWith("/daxil-ol/") ||
-    pathname === "/qeydiyyat" ||
-    pathname.startsWith("/qeydiyyat/")
+    routePath === "/giris" ||
+    routePath.startsWith("/giris/") ||
+    routePath === "/kabinet" ||
+    routePath.startsWith("/kabinet/") ||
+    routePath === "/daxil-ol" ||
+    routePath.startsWith("/daxil-ol/") ||
+    routePath === "/qeydiyyat" ||
+    routePath.startsWith("/qeydiyyat/")
   );
 }
 
@@ -136,29 +137,34 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  const routePath = pathnameWithoutLocale(pathname);
   const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
-  const isStaffLoginRoute = pathname === "/giris" || pathname.startsWith("/giris/");
+  const isStaffLoginRoute = routePath === "/giris" || routePath.startsWith("/giris/");
 
   if ((isAdminRoute || isStaffLoginRoute) && process.env.ADMIN_ENABLED !== "true") {
     return NextResponse.rewrite(new URL("/__baglidir", request.url));
   }
 
+  const preferred = request.cookies.get(LOCALE_COOKIE)?.value;
+  const preferredLocale = Object.values(LOCALES).includes(preferred as Locale)
+    ? (preferred as Locale)
+    : DEFAULT_LOCALE;
   const session = await readSignedSession(request.cookies.get(SESSION_COOKIE)?.value);
-  const redirectPath = signedSessionRedirect(pathname, search, session);
+  const redirectPath = signedSessionRedirect(pathname, search, session, preferredLocale);
   if (redirectPath) return NextResponse.redirect(new URL(redirectPath, request.url));
 
   // Layout cari marşrutu bilməlidir: müvəqqəti parolla gələn istifadəçi hesab
   // səhifəsinə yönləndirilir, amma elə həmin səhifədə təkrar yönləndirilməməlidir.
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
-  if (!isAdminRoute) {
-    const preferred = request.cookies.get(LOCALE_COOKIE)?.value;
-    const locale = Object.values(LOCALES).includes(preferred as Locale)
-      ? (preferred as Locale)
-      : DEFAULT_LOCALE;
-    requestHeaders.set("X-NEXT-INTL-LOCALE", locale);
+  if (isAdminRoute) {
+    return harden(NextResponse.next({ request: { headers: requestHeaders } }));
   }
-  return harden(NextResponse.next({ request: { headers: requestHeaders } }));
+
+  const response = intlMiddleware(request);
+  response.headers.set("Content-Language", localeFromPathname(pathname));
+  if (isStaging()) response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return harden(response);
 }
 
 export const config = {
