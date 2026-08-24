@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { AlertCircle, CheckCircle2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
@@ -28,10 +29,11 @@ function StateMessage({ state }: { state: ActionState }) {
 }
 
 export function InviteEmployeeForm({ disabled }: { disabled: boolean }) {
+  const t = useTranslations("account.team");
   const [state, formAction, pending] = useActionState(inviteAgencyEmployee, IDLE_STATE);
 
   if (disabled) {
-    return <p className="text-sm text-ink-muted">Maksimum əməkdaş sayına çatmısınız.</p>;
+    return <p className="text-sm text-ink-muted">{t("limit")}</p>;
   }
 
   return (
@@ -41,28 +43,29 @@ export function InviteEmployeeForm({ disabled }: { disabled: boolean }) {
         <Input
           name="email"
           type="email"
-          label="Əməkdaşın e-poçtu"
+          label={t("email")}
           required
           placeholder="istifadeci@nümunə.az"
           error={state.fieldErrors?.email}
         />
       </div>
       <Button type="submit" variant="primary" loading={pending} className="sm:mb-0.5">
-        Dəvət et
+        {t("invite")}
       </Button>
     </form>
   );
 }
 
 export function RemoveEmployeeButton({ id, name }: { id: string; name: string }) {
+  const t = useTranslations("account.team");
   return (
     <ConfirmAction
       action={removeAgencyEmployee}
       id={id}
-      label={`${name} komandadan çıxar`}
-      title="Əməkdaşı çıxarmaq"
-      description={`${name} komandadan çıxarılacaq. Yenidən qoşulmaq üçün yeni dəvət lazımdır.`}
-      confirmLabel="Çıxar"
+      label={t("removeLabel", { name })}
+      title={t("removeTitle")}
+      description={t("removeDescription", { name })}
+      confirmLabel={t("remove")}
       tone="danger"
     >
       <UserX className="size-4" aria-hidden="true" />

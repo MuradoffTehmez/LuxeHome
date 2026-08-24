@@ -1,6 +1,7 @@
 import type common from "./src/i18n/locales/az/common.json";
 import type navigation from "./src/i18n/locales/az/navigation.json";
 import type auth from "./src/i18n/locales/az/auth.json";
+import type account from "./src/i18n/locales/az/account.json";
 import type property from "./src/i18n/locales/az/property.json";
 import type validation from "./src/i18n/locales/az/validation.json";
 import type home from "./src/i18n/locales/az/home.json";
@@ -19,6 +20,7 @@ type Messages = {
   common: typeof common;
   navigation: typeof navigation;
   auth: typeof auth;
+  account: typeof account;
   property: typeof property;
   validation: typeof validation;
   home: typeof home;

@@ -13,6 +13,7 @@ export const MESSAGE_NAMESPACES = [
   "common",
   "navigation",
   "auth",
+  "account",
   "property",
   "validation",
   "home",

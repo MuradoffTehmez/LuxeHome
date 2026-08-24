@@ -9,6 +9,7 @@ const requiredNamespaces = [
   "common",
   "navigation",
   "auth",
+  "account",
   "property",
   "validation",
   "home",

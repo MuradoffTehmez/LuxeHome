@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -14,11 +15,12 @@ import { verifyTwoFactor } from "../actions";
  * server action-ı özü ayırd edir, ona görə `inputMode` rəqəmlə məhdudlaşdırılmır.
  */
 export function VerifyForm() {
+  const t = useTranslations("auth.verification");
   const [state, formAction, pending] = useActionState<FormState, FormData>(verifyTwoFactor, {});
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      <Field label="Kod" htmlFor="totp-code" required>
+      <Field label={t("field")} htmlFor="totp-code" required>
         <input
           id="totp-code"
           name="code"
@@ -45,7 +47,7 @@ export function VerifyForm() {
 
       <Button type="submit" size="lg" fullWidth loading={pending}>
         {!pending && <ShieldCheck className="size-4.5" aria-hidden="true" />}
-        Təsdiqlə
+        {t("submit")}
       </Button>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -18,6 +19,7 @@ import { signIn } from "./actions";
  * panel səhifəsinə qayıdır. Dəyər server tərəfdə yenidən yoxlanılır.
  */
 export function LoginForm({ davam }: { davam?: string }) {
+  const t = useTranslations("auth");
   const [showPassword, setShowPassword] = useState(false);
   const [state, formAction, pending] = useActionState<FormState, FormData>(signIn, {});
 
@@ -29,7 +31,7 @@ export function LoginForm({ davam }: { davam?: string }) {
     <form action={formAction} className="flex flex-col gap-5">
       {davam && <input type="hidden" name="davam" value={davam} />}
 
-      <Field label="E-poçt" htmlFor="login-email" required>
+      <Field label={t("fields.email")} htmlFor="login-email" required>
         <input
           id="login-email"
           name="email"
@@ -42,7 +44,7 @@ export function LoginForm({ davam }: { davam?: string }) {
         />
       </Field>
 
-      <Field label="Şifrə" htmlFor="login-password" required>
+      <Field label={t("fields.staffPassword")} htmlFor="login-password" required>
         <div className="relative">
           <input
             id="login-password"
@@ -56,7 +58,7 @@ export function LoginForm({ davam }: { davam?: string }) {
           <button
             type="button"
             onClick={() => setShowPassword((shown) => !shown)}
-            aria-label={showPassword ? "Şifrəni gizlət" : "Şifrəni göstər"}
+            aria-label={showPassword ? t("fields.hidePassword") : t("fields.showPassword")}
             aria-pressed={showPassword}
             className="absolute top-1/2 right-1 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors duration-200 hover:text-ink"
           >
@@ -80,7 +82,7 @@ export function LoginForm({ davam }: { davam?: string }) {
 
       <Button type="submit" size="lg" fullWidth loading={pending}>
         {!pending && <LogIn className="size-4.5" aria-hidden="true" />}
-        Daxil ol
+        {t("staffLogin.submit")}
       </Button>
     </form>
   );

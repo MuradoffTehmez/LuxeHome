@@ -1,0 +1,31 @@
+{
+  "listings": {
+    "metaTitle": "Elanlarım", "metaDescription": "Luxe Home Estate kabinetinizdəki elanlar.",
+    "eyebrow": "Kabinet", "title": "Elanlarım", "count": "{count} elan", "new": "Yeni elan",
+    "submitted": "Elanınız göndərildi. Statusu aşağıdakı siyahıdan izləyə bilərsiniz.",
+    "noImage": "Şəkil yoxdur", "emptyTitle": "Hələ elan göndərməmisiniz",
+    "emptyDescription": "İlk elanınızı yaratdıqdan sonra statusunu bu səhifədən izləyə bilərsiniz.",
+    "emptyAction": "Yeni elan yarat",
+    "status": {"draft":"Qaralama","pending":"Təsdiq gözləyir","published":"Dərc olunub","reserved":"Bron edilib","sold":"Satılıb","rented":"Kirayə verilib","archived":"Arxivdə"}
+  },
+  "newProperty": {
+    "metaTitle":"Elan göndər","metaDescription":"Luxe Home Estate üçün yeni əmlak elanı göndərin.",
+    "eyebrow":"Kabinet / Elanlar","title":"Yeni elan göndər","description":"Məlumatları diqqətlə doldurun. Elanınız hesab növünüzə uyğun olaraq yoxlanacaq və ya dərhal dərc ediləcək.",
+    "submit":"Elanı göndər","main":"Əsas məlumat","mainDescription":"Elan yoxlanıldıqdan sonra saytda görünəcək.",
+    "titleField":"Başlıq","titleHint":"Məsələn: «Xətai rayonunda 3 otaqlı yeni tikili mənzil»","descriptionField":"Təsvir","descriptionHint":"Əmlakın vəziyyəti, şəraiti və üstünlüklərini yazın.",
+    "priceSection":"Qiymət və elan növü","listingType":"Elan növü","currency":"Valyuta","price":"Qiymət","pricePeriod":"Qiymət dövrü",
+    "addressSection":"Ünvan","propertyType":"Əmlak növü","city":"Şəhər","district":"Rayon / qəsəbə","select":"Seçin","notSelected":"Seçilməyib","address":"Ünvan","addressHint":"Küçə və bina yazın; mənzil nömrəsini daxil etməyin.",
+    "planning":"Ölçü və planlama","rooms":"Otaq sayı","bedrooms":"Yataq otağı","bathrooms":"Sanitar qovşaq","area":"Sahə (m²)","landArea":"Torpaq sahəsi (sot)","floor":"Mərtəbə","totalFloors":"Binanın mərtəbəsi",
+    "condition":"Vəziyyət və şərtlər","renovation":"Təmir vəziyyəti","document":"Sənəd","building":"Tikili növü","video":"Video ünvanı","videoHint":"Yalnız https://","mortgage":"İpoteka mümkündür","installment":"Taksit mümkündür",
+    "features":"Xüsusiyyətlər","featuresDescription":"Uyğun alıcılara daha asan çatın.","images":"Şəkillər","imagesDescription":"Birinci şəkil elanınızın üz qabığı olacaq.","gallery":"Qalereya","imageHint":"Ən çox {count} şəkil yükləyin; şəkillər elan göndərilənədək hesabınıza bağlı saxlanılır."
+  },
+  "team": {
+    "metaTitle":"Komanda","metaDescription":"Agentlik komandasını idarə edin.","eyebrow":"Kabinet","title":"Komanda","description":"Sahibdən əlavə maksimum {count} əməkdaş dəvət edə bilərsiniz. Dəvət LuxeHome heyəti təsdiqlədikdən sonra aktiv olur.",
+    "completeProfile":"Əvvəlcə agentlik profilini tamamlayın","completeProfileDescription":"Komanda idarə etmək üçün profildə agentlik adını daxil edin.","newInvite":"Yeni dəvət","employees":"Əməkdaşlar","empty":"Hələ əməkdaş dəvət olunmayıb.","limit":"Maksimum əməkdaş sayına çatmısınız.","email":"Əməkdaşın e-poçtu","invite":"Dəvət et","removeLabel":"{name} komandadan çıxar","removeTitle":"Əməkdaşı çıxarmaq","removeDescription":"{name} komandadan çıxarılacaq. Yenidən qoşulmaq üçün yeni dəvət lazımdır.","remove":"Çıxar",
+    "status":{"pending":"Təsdiq gözləyir","approved":"Təsdiqlənib","rejected":"Rədd edilib"}
+  },
+  "actions": {"genericCredentials":"E-poçt və ya parol yanlışdır.","rateLimited":"Çox sayda cəhd oldu. Bir dəqiqə sonra yenidən yoxlayın.","emailUsed":"Bu e-poçt artıq qeydiyyatdadır.","emailFieldUsed":"Bu e-poçt artıq istifadə olunur","staffAccount":"Bu hesab şirkət panelinə aiddir. «İdarə paneli» girişindən istifadə edin.","locked":"Hesab müvəqqəti olaraq bağlanıb. 15 dəqiqə sonra yenidən cəhd edin.","verificationExpired":"Doğrulama müddəti bitdi. Yenidən daxil olun.","invalidCode":"Kod yanlışdır.","usedCode":"Bu kod artıq istifadə olunub. Növbəti kodu gözləyin.","setupExpired":"Qurulum müddəti bitdi. Yenidən daxil olun.","currentCode":"Kod yanlışdır. Tətbiqdəki cari kodu yazın."},
+  "profile": {
+    "metaTitle":"Profil","metaDescription":"Hesab məlumatlarınızı yeniləyin.","eyebrow":"Kabinet","title":"Profil","description":"E-poçt dəyişdirilmir — dəyişiklik üçün bizimlə əlaqə saxlayın ({email}).","accountInfo":"Hesab məlumatları","passwordSection":"Parol","name":"Ad Soyad","phone":"Telefon","agencyName":"Agentliyin adı","agencyDescription":"Agentlik haqqında","address":"Ünvan","website":"Veb sayt","save":"Yadda saxla","currentPassword":"Cari parol","newPassword":"Yeni parol","repeatPassword":"Yeni parol (təkrar)","passwordHint":"Ən azı 10 simvol.","changePassword":"Parolu dəyiş"
+  }
+}

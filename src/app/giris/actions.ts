@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
@@ -54,7 +55,6 @@ import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType } from "@/lib/constants";
  * sonra sayğac, ən sonda jurnal.
  */
 
-const GENERIC_ERROR = "E-poçt və ya parol yanlışdır.";
 const DEFAULT_TARGET = "/admin";
 const STAGE_TOTP_SECONDS = 5 * 60;
 const STAGE_ENROLL_SECONDS = 10 * 60;
@@ -126,11 +126,12 @@ async function startSession(
 }
 
 export async function signIn(_prev: FormState, formData: FormData): Promise<FormState> {
+  const t = await getTranslations("account");
   const parsed = credentialsSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
-  if (!parsed.success) return { error: GENERIC_ERROR };
+  if (!parsed.success) return { error: t("actions.genericCredentials") };
 
   const { email, password } = parsed.data;
   const next = safeTarget(formData.get("davam"));
@@ -138,7 +139,7 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
 
   if (!(await checkLoginLimit(ip))) {
     await logRateLimited(email, ip);
-    return { error: "Çox sayda cəhd oldu. Bir dəqiqə sonra yenidən yoxlayın." };
+    return { error: t("actions.rateLimited") };
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
@@ -146,23 +147,23 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
 
   if (!user) {
     await registerFailure(null, email, ip, "BAD_PASSWORD");
-    return { error: GENERIC_ERROR };
+    return { error: t("actions.genericCredentials") };
   }
 
   if (!user.isActive) {
     await registerFailure(null, user.email, ip, "INACTIVE");
-    return { error: GENERIC_ERROR };
+    return { error: t("actions.genericCredentials") };
   }
 
   // İctimai hesab panel girişindən 2FA mərhələsi başlada bilməz.
   if (user.accountType !== ACCOUNT_TYPES.STAFF) {
     await registerFailure(null, user.email, ip, "BAD_PASSWORD");
-    return { error: GENERIC_ERROR };
+    return { error: t("actions.genericCredentials") };
   }
 
   if (isAccountLocked(user.lockedUntil)) {
     await registerFailure(null, user.email, ip, "LOCKED");
-    return { error: "Hesab müvəqqəti olaraq bağlanıb. 15 dəqiqə sonra yenidən cəhd edin." };
+    return { error: t("actions.locked") };
   }
 
   if (!passwordMatches) {
@@ -177,7 +178,7 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
           `<p>Cəhdin gəldiyi IP: <strong>${ip}</strong></p>`,
       });
     }
-    return { error: GENERIC_ERROR };
+    return { error: t("actions.genericCredentials") };
   }
 
   // Hash köhnə parametrlərlə yaradılıbsa, cari parolla səssizcə yenilənir
@@ -207,15 +208,16 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
 }
 
 export async function verifyTwoFactor(_prev: FormState, formData: FormData): Promise<FormState> {
+  const t = await getTranslations("account");
   const token = await readStageCookie();
   const claims = token ? await verifyStageToken(token) : null;
   if (!claims || claims.stage !== "totp") {
-    return { error: "Doğrulama müddəti bitdi. Yenidən daxil olun." };
+    return { error: t("actions.verificationExpired") };
   }
 
   const user = await prisma.user.findUnique({ where: { id: claims.uid } });
   if (!user?.totpSecret || !user.isActive) {
-    return { error: "Doğrulama müddəti bitdi. Yenidən daxil olun." };
+    return { error: t("actions.verificationExpired") };
   }
 
   const input = String(formData.get("code") ?? "");
@@ -230,7 +232,7 @@ export async function verifyTwoFactor(_prev: FormState, formData: FormData): Pro
     });
     if (!match) {
       await registerFailure(user.id, user.email, ip, "BAD_TOTP");
-      return { error: "Kod yanlışdır." };
+      return { error: t("actions.invalidCode") };
     }
     await prisma.backupCode.update({ where: { id: match.id }, data: { usedAt: new Date() } });
     // `startSession` yönləndirmə atır və heç vaxt qayıtmır
@@ -241,12 +243,12 @@ export async function verifyTwoFactor(_prev: FormState, formData: FormData): Pro
   const step = verifyTotp(secret, input);
   if (step === null) {
     await registerFailure(user.id, user.email, ip, "BAD_TOTP");
-    return { error: "Kod yanlışdır." };
+    return { error: t("actions.invalidCode") };
   }
 
   if (await isTotpStepUsed(user.id, step)) {
     await registerFailure(user.id, user.email, ip, "BAD_TOTP");
-    return { error: "Bu kod artıq istifadə olunub. Növbəti kodu gözləyin." };
+    return { error: t("actions.usedCode") };
   }
 
   return startSession(user.id, step, claims.next);
@@ -260,14 +262,15 @@ export async function completeEnrollment(
   _prev: EnrollmentState,
   formData: FormData,
 ): Promise<EnrollmentState> {
+  const t = await getTranslations("account");
   const token = await readStageCookie();
   const claims = token ? await verifyStageToken(token) : null;
   if (!claims || claims.stage !== "enroll" || !claims.secret) {
-    return { error: "Qurulum müddəti bitdi. Yenidən daxil olun." };
+    return { error: t("actions.setupExpired") };
   }
 
   if (verifyTotp(claims.secret, String(formData.get("code") ?? "")) === null) {
-    return { error: "Kod yanlışdır. Tətbiqdəki cari kodu yazın." };
+    return { error: t("actions.currentCode") };
   }
 
   const codes = generateBackupCodes();

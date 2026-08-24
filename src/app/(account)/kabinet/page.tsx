@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { Building2, ClipboardList, ShieldCheck } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { getCabinetSummary } from "@/lib/accounts/cabinet-summary";
 import { requireAccount } from "@/lib/auth/guard";
-import { ACCOUNT_TYPES, ACCOUNT_TYPE_LABELS } from "@/lib/constants";
+import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Kabinet",
-  description: "Luxe Home Estate hesab kabinetiniz.",
-  path: "/kabinet",
-  noIndex: true,
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "auth.cabinet" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet", noIndex: true, locale: locale as Locale });
+}
 
 export default async function CabinetPage() {
   const user = await requireAccount();
@@ -32,18 +32,21 @@ export default async function CabinetPage() {
   );
 
   const canList = user.accountType !== ACCOUNT_TYPES.USER;
+  const t = await getTranslations("auth.cabinet");
+  const accountT = await getTranslations("auth.accountTypes");
+  const accountTypeKey = user.accountType === ACCOUNT_TYPES.USER ? "user" : user.accountType === ACCOUNT_TYPES.OWNER ? "owner" : user.accountType === ACCOUNT_TYPES.AGENCY ? "agency" : "staff";
 
   return (
     <div className="flex min-w-0 flex-col gap-8">
           <PageHeader
             contained
             compact
-            eyebrow="Kabinet"
-            title={`Salam, ${user.name}`}
+            eyebrow={t("eyebrow")}
+            title={t("greeting", { name: user.name })}
             description={user.email}
             actions={
             <Badge tone="gold" className="w-fit">
-              {ACCOUNT_TYPE_LABELS[user.accountType]}
+              {accountT(accountTypeKey)}
             </Badge>
             }
           />
@@ -51,12 +54,12 @@ export default async function CabinetPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <article className="rounded-md border border-line bg-paper p-5">
               <ClipboardList className="size-5 text-gold-deep" aria-hidden="true" />
-              <p className="mt-5 text-sm text-ink-soft">Elanlarınız</p>
+              <p className="mt-5 text-sm text-ink-soft">{t("yourListings")}</p>
               <p className="mt-1 font-display text-3xl text-ink">{summary.propertyCount}</p>
               <p className="mt-2 text-sm text-ink-soft">
                 {canList
-                  ? "Göndərdiyiniz aktiv və gözləyən elanların ümumi sayı."
-                  : "Elan yerləşdirmək üçün mülk sahibi və ya agentlik hesabı seçin."}
+                  ? t("listingCountDescription")
+                  : t("listingPermissionHint")}
               </p>
               {canList && (
                 <ButtonLink
@@ -65,7 +68,7 @@ export default async function CabinetPage() {
                   size="sm"
                   className="mt-4 self-start px-0 text-gold-deep hover:text-ink"
                 >
-                  Elanları idarə et →
+                  {t("manageListings")} →
                 </ButtonLink>
               )}
             </article>
@@ -73,14 +76,14 @@ export default async function CabinetPage() {
             {user.accountType === ACCOUNT_TYPES.AGENCY && (
               <article className="rounded-md border border-line bg-paper p-5">
                 <Building2 className="size-5 text-gold-deep" aria-hidden="true" />
-                <p className="mt-5 text-sm text-ink-soft">Agentlik profili</p>
+                <p className="mt-5 text-sm text-ink-soft">{t("agencyProfile")}</p>
                 <p className="mt-1 font-display text-xl text-ink">
-                  {summary.agency?.name ?? "Profil yaradılmayıb"}
+                  {summary.agency?.name ?? t("profileMissing")}
                 </p>
                 <div className="mt-3">
                   <Badge tone={summary.agency?.isVerified ? "success" : "warning"}>
                     <ShieldCheck className="size-3.5" aria-hidden="true" />
-                    {summary.agency?.isVerified ? "Təsdiqlənib" : "Təsdiq gözləyir"}
+                    {summary.agency?.isVerified ? t("verified") : t("verificationPending")}
                   </Badge>
                 </div>
               </article>

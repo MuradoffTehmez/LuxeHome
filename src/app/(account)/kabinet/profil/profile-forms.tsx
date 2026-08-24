@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/field";
@@ -40,16 +41,17 @@ export function ProfileForm({
   isAgency: boolean;
   agency: { name: string; description: string; address: string; website: string } | null;
 }) {
+  const t = useTranslations("account.profile");
   const [state, formAction, pending] = useActionState(updateProfile, IDLE_STATE);
 
   return (
     <form action={formAction} className="flex flex-col gap-5" noValidate>
       <StateMessage state={state} />
 
-      <Input name="name" label="Ad Soyad" required defaultValue={name} maxLength={120} error={state.fieldErrors?.name} />
+      <Input name="name" label={t("name")} required defaultValue={name} maxLength={120} error={state.fieldErrors?.name} />
       <Input
         name="phone"
-        label="Telefon"
+        label={t("phone")}
         type="tel"
         defaultValue={phone}
         placeholder="+994 XX XXX XX XX"
@@ -60,7 +62,7 @@ export function ProfileForm({
         <>
           <Input
             name="agencyName"
-            label="Agentliyin adı"
+            label={t("agencyName")}
             required
             defaultValue={agency?.name ?? ""}
             maxLength={160}
@@ -68,7 +70,7 @@ export function ProfileForm({
           />
           <Textarea
             name="agencyDescription"
-            label="Agentlik haqqında"
+            label={t("agencyDescription")}
             rows={4}
             maxLength={2000}
             defaultValue={agency?.description ?? ""}
@@ -76,14 +78,14 @@ export function ProfileForm({
           />
           <Input
             name="agencyAddress"
-            label="Ünvan"
+            label={t("address")}
             defaultValue={agency?.address ?? ""}
             maxLength={240}
             error={state.fieldErrors?.agencyAddress}
           />
           <Input
             name="agencyWebsite"
-            label="Veb sayt"
+            label={t("website")}
             type="url"
             placeholder="https://"
             defaultValue={agency?.website ?? ""}
@@ -94,7 +96,7 @@ export function ProfileForm({
 
       <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
         <Button type="submit" loading={pending} className="w-full sm:w-auto">
-          Yadda saxla
+          {t("save")}
         </Button>
       </div>
     </form>
@@ -102,6 +104,7 @@ export function ProfileForm({
 }
 
 export function PasswordForm() {
+  const t = useTranslations("account.profile");
   const [state, formAction, pending] = useActionState(changePassword, IDLE_STATE);
 
   return (
@@ -110,7 +113,7 @@ export function PasswordForm() {
 
       <Input
         name="current"
-        label="Cari parol"
+        label={t("currentPassword")}
         type="password"
         required
         autoComplete="current-password"
@@ -118,16 +121,16 @@ export function PasswordForm() {
       />
       <Input
         name="next"
-        label="Yeni parol"
+        label={t("newPassword")}
         type="password"
         required
         autoComplete="new-password"
-        hint="Ən azı 10 simvol."
+        hint={t("passwordHint")}
         error={state.fieldErrors?.next}
       />
       <Input
         name="repeat"
-        label="Yeni parol (təkrar)"
+        label={t("repeatPassword")}
         type="password"
         required
         autoComplete="new-password"
@@ -136,7 +139,7 @@ export function PasswordForm() {
 
       <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
         <Button type="submit" variant="outline" loading={pending} className="w-full sm:w-auto">
-          Parolu dəyiş
+          {t("changePassword")}
         </Button>
       </div>
     </form>

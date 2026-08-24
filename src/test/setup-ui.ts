@@ -4,6 +4,7 @@ import { vi } from "vitest";
 import common from "@/i18n/locales/az/common.json";
 import navigation from "@/i18n/locales/az/navigation.json";
 import auth from "@/i18n/locales/az/auth.json";
+import account from "@/i18n/locales/az/account.json";
 import property from "@/i18n/locales/az/property.json";
 import validation from "@/i18n/locales/az/validation.json";
 import home from "@/i18n/locales/az/home.json";
@@ -13,7 +14,7 @@ import contact from "@/i18n/locales/az/contact.json";
 import legal from "@/i18n/locales/az/legal.json";
 import seoLandings from "@/i18n/locales/az/seoLandings.json";
 
-const messages = { common, navigation, auth, property, validation, home, listings, content, contact, legal, seoLandings };
+const messages = { common, navigation, auth, account, property, validation, home, listings, content, contact, legal, seoLandings };
 
 vi.mock("next-intl", async (importOriginal) => {
   const actual = await importOriginal<typeof import("next-intl")>();

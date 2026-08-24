@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check, Copy, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -14,6 +15,7 @@ import { completeEnrollment, finishEnrollment, type EnrollmentState } from "../a
  *    sonra `finishEnrollment` sessiyanı açıb panelə yönləndirir.
  */
 export function EnrollForm() {
+  const t = useTranslations("auth.enrollment");
   const [state, formAction, pending] = useActionState<EnrollmentState, FormData>(
     completeEnrollment,
     {},
@@ -23,7 +25,7 @@ export function EnrollForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      <Field label="Tətbiqdəki kod" htmlFor="enroll-code" required>
+      <Field label={t("field")} htmlFor="enroll-code" required>
         <input
           id="enroll-code"
           name="code"
@@ -49,13 +51,14 @@ export function EnrollForm() {
 
       <Button type="submit" size="lg" fullWidth loading={pending}>
         {!pending && <ShieldCheck className="size-4.5" aria-hidden="true" />}
-        Doğrulamanı aktivləşdir
+        {t("enable")}
       </Button>
     </form>
   );
 }
 
 function BackupCodes({ codes }: { codes: string[] }) {
+  const t = useTranslations("auth.enrollment");
   const [copied, setCopied] = useState(false);
 
   async function copyCodes() {
@@ -68,8 +71,7 @@ function BackupCodes({ codes }: { codes: string[] }) {
     <div className="flex flex-col gap-5">
       <div className="rounded-xs border border-warning/30 bg-warning-bg px-4 py-3">
         <p className="text-sm leading-relaxed text-warning">
-          <strong>Ehtiyat kodlarınızı indi saxlayın.</strong> Bu kodlar bir daha
-          göstərilməyəcək. Telefonunuz əlinizdə olmayanda hər kod bir dəfə giriş üçün işləyir.
+          <strong>{t("backupTitle")}</strong> {t("backupDescription")}
         </p>
       </div>
 
@@ -87,12 +89,12 @@ function BackupCodes({ codes }: { codes: string[] }) {
         ) : (
           <Copy className="size-4.5" aria-hidden="true" />
         )}
-        {copied ? "Kopyalandı" : "Kodları kopyala"}
+        {copied ? t("copied") : t("copy")}
       </Button>
 
       <form action={finishEnrollment}>
         <Button type="submit" size="lg" fullWidth>
-          Kodları saxladım, panelə keç
+          {t("finish")}
         </Button>
       </form>
     </div>

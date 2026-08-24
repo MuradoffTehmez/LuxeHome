@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Container, Section } from "@/components/ui/container";
 import { ThemeSync } from "@/components/theme-sync";
+import { getTranslations } from "next-intl/server";
 import { requireAccount } from "@/lib/auth/guard";
-import { ACCOUNT_TYPES, ACCOUNT_TYPE_LABELS } from "@/lib/constants";
+import { ACCOUNT_TYPES } from "@/lib/constants";
 import { CabinetShell } from "./cabinet-shell";
 
 export const metadata: Metadata = {
@@ -19,6 +20,8 @@ export const dynamic = "force-dynamic";
  */
 export default async function CabinetLayout({ children }: { children: React.ReactNode }) {
   const user = await requireAccount();
+  const t = await getTranslations("auth.accountTypes");
+  const accountTypeKey = user.accountType === ACCOUNT_TYPES.USER ? "user" : user.accountType === ACCOUNT_TYPES.OWNER ? "owner" : user.accountType === ACCOUNT_TYPES.AGENCY ? "agency" : "staff";
 
   return (
     <Section spacing="cozy">
@@ -26,7 +29,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
       <Container>
         <CabinetShell
           name={user.name}
-          accountLabel={ACCOUNT_TYPE_LABELS[user.accountType]}
+          accountLabel={t(accountTypeKey)}
           canList={user.accountType !== ACCOUNT_TYPES.USER}
           canManageTeam={user.accountType === ACCOUNT_TYPES.AGENCY}
         >

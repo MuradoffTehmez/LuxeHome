@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
@@ -44,7 +45,6 @@ import * as form from "@/lib/admin/form";
  * Sessiya mexanizmi eynidir: D1-də saxlanılan, dərhal ləğv edilə bilən sessiya.
  */
 
-const GENERIC_ERROR = "E-poçt və ya parol yanlışdır.";
 const CABINET = "/kabinet";
 const DUMMY_HASH =
   "pbkdf2$sha256$100000$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -118,9 +118,10 @@ export async function registerAccount(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const t = await getTranslations("account");
   const ip = clientIp(await headers());
   if (!(await checkLoginLimit(ip))) {
-    return failure("Çox sayda cəhd oldu. Bir dəqiqə sonra yenidən yoxlayın.");
+    return failure(t("actions.rateLimited"));
   }
 
   const parsed = registerSchema.safeParse({
@@ -141,8 +142,8 @@ export async function registerAccount(
       select: { id: true },
     });
     if (existing) {
-      return failure("Bu e-poçt artıq qeydiyyatdadır.", {
-        email: "Bu e-poçt artıq istifadə olunur",
+      return failure(t("actions.emailUsed"), {
+        email: t("actions.emailFieldUsed"),
       });
     }
 
@@ -195,9 +196,10 @@ export async function signInAccount(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const t = await getTranslations("account");
   const ip = clientIp(await headers());
   if (!(await checkLoginLimit(ip))) {
-    return failure("Çox sayda cəhd oldu. Bir dəqiqə sonra yenidən yoxlayın.");
+    return failure(t("actions.rateLimited"));
   }
 
   const parsed = z
@@ -209,26 +211,26 @@ export async function signInAccount(
       email: form.text(formData, "email"),
       password: form.text(formData, "password"),
     });
-  if (!parsed.success) return failure(GENERIC_ERROR);
+  if (!parsed.success) return failure(t("actions.genericCredentials"));
 
   const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
   const passwordMatches = await verifyPassword(parsed.data.password, user?.passwordHash ?? DUMMY_HASH);
   const outcome = publicSignInOutcome(user, passwordMatches, new Date());
   if (outcome === "INVALID") {
     await registerFailure(user?.id ?? null, parsed.data.email, ip, "BAD_PASSWORD");
-    return failure(GENERIC_ERROR);
+    return failure(t("actions.genericCredentials"));
   }
 
   // Əməkdaş hesabı yalnız parol düzgün olduqdan sonra öz 2FA girişinə yönləndirilir.
   if (outcome === "STAFF") {
-    return failure("Bu hesab şirkət panelinə aiddir. «İdarə paneli» girişindən istifadə edin.");
+    return failure(t("actions.staffAccount"));
   }
 
   if (outcome === "LOCKED") {
-    return failure("Hesab müvəqqəti olaraq bağlanıb. 15 dəqiqə sonra yenidən cəhd edin.");
+    return failure(t("actions.locked"));
   }
 
-  if (!user) return failure(GENERIC_ERROR);
+  if (!user) return failure(t("actions.genericCredentials"));
 
   if (needsRehash(user.passwordHash)) {
     await prisma.user.update({

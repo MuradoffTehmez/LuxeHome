@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { CheckCircle2 } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { buildMetadata } from "@/lib/seo";
 import { getOptionalUser } from "@/lib/auth/guard";
-import { ACCOUNT_TYPES } from "@/lib/constants";
+import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { LoginForm } from "./login-form";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Hesaba giriş",
-  description: "Luxe Home Estate hesabınıza daxil olun — favoritlər, müraciətlər və elanlarınız.",
-  path: "/daxil-ol",
-  indexPolicy: "noindex-follow",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "auth.publicLogin" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/daxil-ol", indexPolicy: "noindex-follow", locale: locale as Locale });
+}
 
 // Sessiya D1-dən oxunur — statik render mümkün deyil
 export const dynamic = "force-dynamic";
@@ -28,22 +28,24 @@ export default async function LoginPage({
 
   const params = await searchParams;
   const next = typeof params.davam === "string" ? params.davam : undefined;
+  const t = await getTranslations("auth.publicLogin");
+  const benefits = [t("benefits.favorites"), t("benefits.requests"), t("benefits.listings")];
 
   return (
     <AuthShell
-      eyebrow="Şəxsi kabinet"
-      title="Hesaba giriş"
-      description="Favoritlərinizi saxlamaq və elanlarınızı idarə etmək üçün daxil olun."
+      eyebrow={t("eyebrow")}
+      title={t("title")}
+      description={t("description")}
       aside={
         <div className="mx-auto max-w-lg">
           <p className="text-xs font-semibold tracking-[0.16em] text-gold-deep uppercase">
-            Bir hesab, bütün seçimləriniz
+            {t("asideEyebrow")}
           </p>
           <h2 className="mt-3 font-display text-4xl leading-tight text-ink">
-            Əmlak axtarışınızı qaldığınız yerdən davam etdirin.
+            {t("asideTitle")}
           </h2>
           <ul className="mt-7 flex flex-col gap-4 text-sm text-ink-soft">
-            {["Favorit elanları saxlayın", "Müraciətlərinizi izləyin", "Öz elanlarınızı idarə edin"].map((item) => (
+            {benefits.map((item) => (
               <li key={item} className="flex items-center gap-3">
                 <CheckCircle2 className="size-5 shrink-0 text-gold-deep" aria-hidden="true" />
                 {item}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Menu } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
 import { CabinetNav } from "./cabinet-nav";
@@ -15,6 +16,7 @@ type CabinetShellProps = {
 
 export function CabinetShell({ name, accountLabel, canList, canManageTeam = false, children }: CabinetShellProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("auth.cabinet");
 
   return (
     <>
@@ -25,7 +27,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
         </div>
         <button
           type="button"
-          aria-label="Kabinet menyusunu aç"
+          aria-label={t("openMenu")}
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen(true)}
@@ -45,7 +47,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
       <Overlay
         open={open}
         onClose={() => setOpen(false)}
-        title="Kabinet menyusu"
+        title={t("menu")}
         placement="left"
       >
         <CabinetNav

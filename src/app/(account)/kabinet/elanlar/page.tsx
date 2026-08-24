@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Plus } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -8,8 +9,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireLister } from "@/lib/auth/guard";
 import {
-  PROPERTY_STATUS_LABELS,
   PROPERTY_STATUS_TONE,
+  type Locale,
   type PropertyStatus,
 } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
@@ -17,12 +18,16 @@ import { buildMetadata } from "@/lib/seo";
 import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Elanlarım",
-  description: "Luxe Home Estate kabinetinizdəki elanlar.",
-  path: "/kabinet/elanlar",
-  noIndex: true,
-});
+const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
+  DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
+  SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "account.listings" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/elanlar", noIndex: true, locale: locale as Locale });
+}
 
 export default async function CabinetPropertiesPage({
   searchParams,
@@ -30,6 +35,7 @@ export default async function CabinetPropertiesPage({
   searchParams: Promise<{ yeni?: string }>;
 }) {
   const user = await requireLister();
+  const t = await getTranslations("account.listings");
   const [properties, params] = await Promise.all([
     prisma.property.findMany({
       where: { authorId: user.id, deletedAt: null },
@@ -65,7 +71,7 @@ export default async function CabinetPropertiesPage({
             className="object-cover"
           />
         ) : (
-          "Şəkil yoxdur"
+          t("noImage")
         )}
       </div>
     );
@@ -86,7 +92,7 @@ export default async function CabinetPropertiesPage({
         </div>
         <div className="mt-4 border-t border-line pt-3">
           <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
-            {PROPERTY_STATUS_LABELS[status] ?? status}
+            {t(`status.${STATUS_KEYS[status]}`)}
           </Badge>
         </div>
       </article>
@@ -108,7 +114,7 @@ export default async function CabinetPropertiesPage({
                 </p>
               </div>
               <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
-                {PROPERTY_STATUS_LABELS[status] ?? status}
+                {t(`status.${STATUS_KEYS[status]}`)}
               </Badge>
             </li>
           );
@@ -123,20 +129,20 @@ export default async function CabinetPropertiesPage({
         <PageHeader
           contained
           compact
-          eyebrow="Kabinet"
-          title="Elanlarım"
-          description={`${properties.length} elan`}
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          description={t("count", { count: properties.length })}
           actions={
             <ButtonLink href="/kabinet/elanlar/yeni" size="sm">
               <Plus className="size-4" aria-hidden="true" />
-              Yeni elan
+              {t("new")}
             </ButtonLink>
           }
         />
 
         {params.yeni === "1" && (
           <p role="status" className="mt-6 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success">
-            Elanınız göndərildi. Statusu aşağıdakı siyahıdan izləyə bilərsiniz.
+            {t("submitted")}
           </p>
         )}
 
@@ -148,9 +154,9 @@ export default async function CabinetPropertiesPage({
             renderTable={renderPropertyList}
             empty={
               <EmptyState
-                title="Hələ elan göndərməmisiniz"
-                description="İlk elanınızı yaratdıqdan sonra statusunu bu səhifədən izləyə bilərsiniz."
-                action={{ label: "Yeni elan yarat", href: "/kabinet/elanlar/yeni" }}
+                title={t("emptyTitle")}
+                description={t("emptyDescription")}
+                action={{ label: t("emptyAction"), href: "/kabinet/elanlar/yeni" }}
               />
             }
           />

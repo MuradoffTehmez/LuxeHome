@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AlertCircle, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
@@ -16,6 +17,7 @@ import { signInAccount } from "../hesab/actions";
  * əməkdaşı hesabı qəbul edilmir (server tərəfdə yoxlanılır).
  */
 export function LoginForm({ next }: { next?: string }) {
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(signInAccount, IDLE_STATE);
 
   return (
@@ -34,7 +36,7 @@ export function LoginForm({ next }: { next?: string }) {
 
       <Input
         name="email"
-        label="E-poçt"
+        label={t("fields.email")}
         type="email"
         inputMode="email"
         required
@@ -45,7 +47,7 @@ export function LoginForm({ next }: { next?: string }) {
 
       <Input
         name="password"
-        label="Parol"
+        label={t("fields.password")}
         type="password"
         required
         autoComplete="current-password"
@@ -55,16 +57,16 @@ export function LoginForm({ next }: { next?: string }) {
 
       <Button type="submit" loading={pending} fullWidth>
         <LogIn className="size-4" aria-hidden="true" />
-        Daxil ol
+        {t("publicLogin.submit")}
       </Button>
 
       <p className="flex flex-wrap items-center justify-center gap-x-1 text-center text-sm text-ink-soft">
-        <span>Hesabınız yoxdur?</span>
+        <span>{t("publicLogin.noAccount")}</span>
         <Link
           href={accountAuthHref("/qeydiyyat", next)}
           className="inline-flex min-h-11 items-center rounded-xs text-gold-deep underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
         >
-          Qeydiyyatdan keçin
+          {t("publicLogin.registerLink")}
         </Link>
       </p>
     </form>
