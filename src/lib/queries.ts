@@ -567,6 +567,38 @@ export async function getAgencyEmployees(agencyId: string) {
   });
 }
 
+/** Panel — moderasiya növbəsi: kənar istifadəçilərin göndərdiyi təsdiq gözləyən elanlar. */
+export async function getModerationQueue() {
+  return prisma.property.findMany({
+    where: { status: PROPERTY_STATUSES.PENDING, deletedAt: null },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      listingType: true,
+      price: true,
+      currency: true,
+      createdAt: true,
+      type: { select: { name: true } },
+      city: { select: { name: true } },
+      images: {
+        orderBy: [{ isCover: "desc" }, { order: "asc" }],
+        take: 1,
+        select: { url: true, alt: true },
+      },
+      author: {
+        select: {
+          name: true,
+          email: true,
+          accountType: true,
+          agency: { select: { name: true, isVerified: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
 /** Panel — təsdiq gözləyən agentlik əməkdaşları. */
 export async function getAdminAgencyEmployeeQueue() {
   return prisma.agencyEmployee.findMany({

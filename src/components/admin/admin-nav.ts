@@ -9,7 +9,7 @@ export type AdminNavItem = {
   /** lucide-react ikon adı — `admin-icon.tsx` içindəki icazə siyahısından seçilir. */
   icon: string;
   /** Yan paneldə göstərilən sayğac açarı. */
-  badgeKey?: "newLeads" | "draftProperties";
+  badgeKey?: "newLeads" | "draftProperties" | "pendingModeration";
 };
 
 export type AdminNavGroup = {
@@ -26,6 +26,7 @@ export const adminNav: AdminNavGroup[] = [
     title: "Kontent",
     items: [
       { label: "Əmlaklar", href: "/admin/emlaklar", icon: "Building2", badgeKey: "draftProperties" },
+      { label: "Moderasiya", href: "/admin/moderation", icon: "ClipboardCheck", badgeKey: "pendingModeration" },
       { label: "Taksonomiya", href: "/admin/taksonomiya", icon: "Tags" },
       { label: "Layihələr", href: "/admin/layiheler", icon: "Blocks" },
       { label: "Bloq", href: "/admin/blog", icon: "Newspaper" },

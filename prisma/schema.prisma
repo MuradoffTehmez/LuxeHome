@@ -240,6 +240,8 @@ model Property {
   listingType String @default("SALE")
   /// DRAFT | PENDING | PUBLISHED | RESERVED | SOLD | RENTED | ARCHIVED
   status      String @default("DRAFT")
+  /// Moderator PENDING elanı rədd edəndə yazdığı səbəb — sahibə "Elanlarım"da göstərilir.
+  moderationNote String?
 
   price    Float
   currency String @default("AZN")

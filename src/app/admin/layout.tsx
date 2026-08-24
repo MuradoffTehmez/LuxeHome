@@ -38,15 +38,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/admin/hesabim?parol=deyis");
   }
 
-  const [newLeads, draftProperties] = await Promise.all([
+  const [newLeads, draftProperties, pendingModeration] = await Promise.all([
     prisma.lead.count({ where: { status: "NEW" } }),
     prisma.property.count({ where: { status: "DRAFT", deletedAt: null } }),
+    prisma.property.count({ where: { status: "PENDING", deletedAt: null } }),
   ]);
 
   return (
     <ToastProvider>
       <ThemeSync preference={user.themePreference} />
-      <AdminShell user={user} counters={{ newLeads, draftProperties }}>
+      <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration }}>
         {children}
       </AdminShell>
     </ToastProvider>

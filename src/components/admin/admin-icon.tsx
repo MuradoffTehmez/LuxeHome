@@ -2,6 +2,7 @@ import {
   BarChart3,
   Blocks,
   Building2,
+  ClipboardCheck,
   Contact,
   Images,
   Inbox,
@@ -40,6 +41,7 @@ const ICONS: Record<string, LucideIcon> = {
   ShieldCheck,
   Tags,
   BarChart3,
+  ClipboardCheck,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

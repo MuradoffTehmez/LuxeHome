@@ -16,14 +16,14 @@ import { AdminIcon } from "./admin-icon";
 
 type AdminShellProps = {
   user: AuthUser;
-  counters?: { newLeads?: number; draftProperties?: number };
+  counters?: { newLeads?: number; draftProperties?: number; pendingModeration?: number };
   children: React.ReactNode;
 };
 
 type SidebarContentProps = {
   pathname: string;
   user: AuthUser;
-  counters: { newLeads?: number; draftProperties?: number };
+  counters: { newLeads?: number; draftProperties?: number; pendingModeration?: number };
   tone: "light" | "dark";
   onNavigate?: () => void;
 };
