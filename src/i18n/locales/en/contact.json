@@ -3,10 +3,17 @@
   "description": "Send us your questions and our team will get back to you as soon as possible.",
   "name": "Name",
   "phone": "Phone",
+  "address": "Address",
   "email": "Email",
   "subject": "Subject",
   "message": "Message",
   "send": "Send",
   "sending": "Sending…",
-  "success": "Your enquiry has been received. We will contact you shortly."
+  "success": "Your enquiry has been received. We will contact you shortly.",
+  "metaDescription": "Contact {legalName}. Address: {address}. Phone: {phone}.",
+  "eyebrow": "Contact", "home": "Home", "sendEnquiry": "Send an enquiry", "contactDetails": "Contact details",
+  "whatsappMessage": "Hello, I would like information about Luxe Home Estate.",
+  "website": "Website", "fullName": "Full name", "namePlaceholder": "Enter your name",
+  "subjectPlaceholder": "Subject of your enquiry", "messagePlaceholder": "Write your enquiry...",
+  "successTitle": "Your enquiry has been sent!", "successDescription": "Our team will contact you as soon as possible."
 }

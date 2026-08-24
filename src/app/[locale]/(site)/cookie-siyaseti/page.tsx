@@ -1,58 +1,43 @@
-import { LegalArticle } from "@/components/site/legal-article";
+import type { Metadata } from "next";
+import { LocalizedLegalPage } from "@/components/site/localized-legal-page";
 import { siteConfig } from "@/config/site";
+import { getLegalDocuments } from "@/i18n/public-content";
+import type { Locale } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
 
-export const metadata = buildMetadata({
-  title: "Cookie siyasəti",
-  description:
-    "Luxe Home Estate saytında istifadə olunan cookie və brauzer yaddaşı texnologiyaları.",
-  path: "/cookie-siyaseti",
-});
+type PageProps = { params: Promise<{ locale: string }> };
 
-export default function CookiePage() {
+function documents(locale: Locale) {
+  return getLegalDocuments(locale, {
+    name: siteConfig.name,
+    legalName: siteConfig.legalName,
+    ownerName: siteConfig.owner.name,
+    email: siteConfig.email,
+    phone: siteConfig.phone,
+    address: siteConfig.addressFull,
+  });
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const document = documents(locale as Locale).cookies;
+  return buildMetadata({
+    title: document.title,
+    description: document.metaDescription,
+    path: "/cookie-siyaseti",
+    locale: locale as Locale,
+  });
+}
+
+export default async function CookiePage({ params }: PageProps) {
+  const { locale } = await params;
   return (
-    <LegalArticle
-      title="Cookie siyasəti"
-      description="Saytda hansı cookie-lərin işlədiyi və onları necə idarə edə biləcəyiniz."
-      updatedAt="20 avqust 2026"
+    <LocalizedLegalPage
+      document={documents(locale as Locale).cookies}
       path="/cookie-siyaseti"
-    >
-      <p>
-        Cookie — saytın brauzerinizdə saxladığı kiçik mətn faylıdır. {siteConfig.name}{" "}
-        yalnız saytın işləməsi üçün zəruri olan minimal dəsti istifadə edir.
-      </p>
-
-      <h2>İstifadə olunan növlər</h2>
-      <ul>
-        <li>
-          <strong>Zəruri:</strong> təhlükəsizlik, sorğu balanslaşdırılması və sui-istifadənin
-          qarşısının alınması üçün Cloudflare tərəfindən qoyulan texniki cookie-lər.
-        </li>
-        <li>
-          <strong>Seçim yaddaşı (localStorage):</strong> tema (işıqlı/tünd) və favorit elanların
-          siyahısı. Bu məlumat yalnız sizin cihazınızda qalır, serverə göndərilmir.
-        </li>
-      </ul>
-      <p>
-        Production mühitində Google Analytics və ya Google Tag Manager identifikatoru
-        konfiqurasiya edildikdə analitika yalnız açıq razılığınızdan sonra aktivləşir.
-        Razılıq verilməyənədək analitika skripti yüklənmir və event göndərilmir. Göndərilən
-        eventlər telefon, e-poçt, ad, ünvan və müraciət mətni daşımır.
-      </p>
-
-      <h2>İdarə etmək</h2>
-      <p>
-        Cookie-ləri brauzerinizin parametrlərindən silə və ya bloklaya bilərsiniz. Zəruri
-        cookie-lər bloklanarsa saytın bəzi hissələri düzgün işləməyə bilər. Brauzer yaddaşındakı
-        favoritləri «Favoritlər» səhifəsindəki «Siyahını təmizlə» düyməsi ilə silmək mümkündür.
-        Analitika seçimi <code>analytics_consent</code> cookie-sində bir il saxlanılır; cookie-ni
-        silməklə seçim ekranını yenidən aça bilərsiniz.
-      </p>
-
-      <h2>Əlaqə</h2>
-      <p>
-        Suallarınız üçün: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
-      </p>
-    </LegalArticle>
+      email={siteConfig.email}
+      phone={siteConfig.phone}
+      phoneHref={siteConfig.phoneHref}
+    />
   );
 }

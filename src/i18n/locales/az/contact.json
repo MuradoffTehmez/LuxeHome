@@ -3,10 +3,17 @@
   "description": "Suallarınız üçün müraciət edin — komandamız ən qısa zamanda geri dönüş edəcək.",
   "name": "Ad",
   "phone": "Telefon",
+  "address": "Ünvan",
   "email": "E-poçt",
   "subject": "Mövzu",
   "message": "Mesaj",
   "send": "Göndər",
   "sending": "Göndərilir…",
-  "success": "Müraciətiniz qəbul edildi. Tezliklə sizinlə əlaqə saxlayacağıq."
+  "success": "Müraciətiniz qəbul edildi. Tezliklə sizinlə əlaqə saxlayacağıq.",
+  "metaDescription": "{legalName} ilə əlaqə saxlayın. Ünvan: {address}. Telefon: {phone}.",
+  "eyebrow": "Əlaqə", "home": "Ana səhifə", "sendEnquiry": "Müraciət göndər", "contactDetails": "Əlaqə məlumatları",
+  "whatsappMessage": "Salam, Luxe Home Estate ilə bağlı məlumat almaq istəyirəm.",
+  "website": "Vebsayt", "fullName": "Ad, soyad", "namePlaceholder": "Adınızı daxil edin",
+  "subjectPlaceholder": "Müraciətin mövzusu", "messagePlaceholder": "Müraciətinizi yazın...",
+  "successTitle": "Müraciətiniz göndərildi!", "successDescription": "Komandamız ən qısa zamanda sizinlə əlaqə saxlayacaq."
 }

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/lib/constants";
 import { Globe, MapPin, Phone, Mail } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -8,62 +10,35 @@ import { buildMetadata } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 import { ContactForm } from "./contact-form";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Əlaqə",
-  description: `${siteConfig.legalName} ilə əlaqə saxlayın. Ünvan: ${siteConfig.addressFull}. Telefon: ${siteConfig.phone}.`,
-  path: "/elaqe",
-});
+type PageProps = { params: Promise<{ locale: string }> };
 
-const CONTACT_ITEMS = [
-  {
-    icon: Phone,
-    label: "Telefon",
-    value: siteConfig.phone,
-    href: siteConfig.phoneHref,
-  },
-  {
-    icon: WhatsAppIcon,
-    label: "WhatsApp",
-    value: siteConfig.phone,
-    href: whatsappLink("Salam, Luxe Home Estate ilə bağlı məlumat almaq istəyirəm."),
-  },
-  {
-    icon: Mail,
-    label: "E-poçt",
-    value: siteConfig.email,
-    href: `mailto:${siteConfig.email}`,
-  },
-  {
-    icon: MapPin,
-    label: "Ünvan",
-    value: siteConfig.addressFull,
-    href: undefined,
-  },
-  {
-    icon: InstagramIcon,
-    label: "Instagram",
-    value: `@${siteConfig.instagram}`,
-    href: siteConfig.instagramUrl,
-  },
-  {
-    icon: Globe,
-    label: "Vebsayt",
-    value: siteConfig.website,
-    href: `https://${siteConfig.website}`,
-  },
-];
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "contact" });
+  return buildMetadata({ title: t("eyebrow"), description: t("metaDescription", { legalName: siteConfig.legalName, address: siteConfig.addressFull, phone: siteConfig.phone }), path: "/elaqe", locale: locale as Locale });
+}
 
-export default function ContactPage() {
+export default async function ContactPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "contact" });
+  const contactItems = [
+    { icon: Phone, label: t("phone"), value: siteConfig.phone, href: siteConfig.phoneHref },
+    { icon: WhatsAppIcon, label: "WhatsApp", value: siteConfig.phone, href: whatsappLink(t("whatsappMessage")) },
+    { icon: Mail, label: t("email"), value: siteConfig.email, href: `mailto:${siteConfig.email}` },
+    { icon: MapPin, label: t("address"), value: siteConfig.addressFull, href: undefined },
+    { icon: InstagramIcon, label: "Instagram", value: `@${siteConfig.instagram}`, href: siteConfig.instagramUrl },
+    { icon: Globe, label: t("website"), value: siteConfig.website, href: `https://${siteConfig.website}` },
+  ];
   return (
     <>
       <PageHeader
         compact
-        eyebrow="Əlaqə"
-        title="Bizimlə əlaqə saxlayın"
-        description="Suallarınız üçün müraciət edin — komandamız ən qısa zamanda geri dönüş edəcək."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
         breadcrumbs={[
-          { label: "Ana səhifə", href: "/" },
-          { label: "Əlaqə" },
+          { label: t("home"), href: "/" },
+          { label: t("eyebrow") },
         ]}
       />
 
@@ -74,18 +49,18 @@ export default function ContactPage() {
             {/* Mobil ekranda əsas əməl olan forma birinci göstərilir. */}
             <div className="min-w-0 rounded-md border border-line bg-paper p-5 shadow-sm sm:p-8">
               <h2 className="mb-6 font-display text-2xl text-ink">
-                Müraciət göndər
+                {t("sendEnquiry")}
               </h2>
               <ContactForm />
             </div>
 
             <div className="flex min-w-0 flex-col gap-8 lg:pt-2">
               <h2 className="font-display text-2xl text-ink">
-                Əlaqə məlumatları
+                {t("contactDetails")}
               </h2>
 
               <div className="flex flex-col gap-5">
-                {CONTACT_ITEMS.map((item, index) => (
+                {contactItems.map((item, index) => (
                   <Reveal key={item.label} delay={index * 40}>
                     <div className="flex min-w-0 items-start gap-4">
                       <span className="flex size-10 shrink-0 items-center justify-center rounded-xs bg-beige text-ink-muted">

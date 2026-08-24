@@ -7,8 +7,10 @@ import { ArticleTrustMeta } from "@/components/site/article-trust-meta";
 import { siteConfig } from "@/config/site";
 
 describe("ictimai məlumat səhifələri", () => {
-  it("əlaqə səhifəsində mobil axında formanı əlaqə siyahısından əvvəl göstərir", () => {
-    const html = renderToStaticMarkup(<ContactPage />);
+  it("əlaqə səhifəsində mobil axında formanı əlaqə siyahısından əvvəl göstərir", async () => {
+    const html = renderToStaticMarkup(
+      await ContactPage({ params: Promise.resolve({ locale: "az" }) }),
+    );
 
     expect(html.indexOf("Müraciət göndər")).toBeLessThan(html.indexOf("Əlaqə məlumatları"));
     expect(html).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]");
@@ -20,8 +22,10 @@ describe("ictimai məlumat səhifələri", () => {
     expect(html).not.toContain("Xəritədə aç");
   });
 
-  it("haqqımızda səhifəsində hüquqi ad və owner görünür, uydurma statistika və stok team fotosu yoxdur", () => {
-    const html = renderToStaticMarkup(<AboutPage />);
+  it("haqqımızda səhifəsində hüquqi ad və owner görünür, uydurma statistika və stok team fotosu yoxdur", async () => {
+    const html = renderToStaticMarkup(
+      await AboutPage({ params: Promise.resolve({ locale: "az" }) }),
+    );
     expect(html).toContain(siteConfig.legalName);
     expect(html).toContain(siteConfig.owner.name);
     expect(html).toContain(siteConfig.legal.voen);
@@ -47,8 +51,10 @@ describe("ictimai məlumat səhifələri", () => {
     expect(html).toContain('dateTime="2026-08-24T09:00:00.000Z"');
   });
 
-  it("FAQ cavablarını JavaScript-siz disclosure və böyük toxunma hədəfi ilə təqdim edir", () => {
-    const html = renderToStaticMarkup(<FaqPage />);
+  it("FAQ cavablarını JavaScript-siz disclosure və böyük toxunma hədəfi ilə təqdim edir", async () => {
+    const html = renderToStaticMarkup(
+      await FaqPage({ params: Promise.resolve({ locale: "az" }) }),
+    );
 
     expect(html).toContain("<details");
     expect(html).toContain("<summary");

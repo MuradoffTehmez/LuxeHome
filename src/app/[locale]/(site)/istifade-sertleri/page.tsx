@@ -1,59 +1,43 @@
-import { LegalArticle } from "@/components/site/legal-article";
+import type { Metadata } from "next";
+import { LocalizedLegalPage } from "@/components/site/localized-legal-page";
 import { siteConfig } from "@/config/site";
+import { getLegalDocuments } from "@/i18n/public-content";
+import type { Locale } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
 
-export const metadata = buildMetadata({
-  title: "İstifadə şərtləri",
-  description:
-    "Luxe Home Estate saytından istifadə qaydaları, məsuliyyət hüdudları və müəllif hüquqları.",
-  path: "/istifade-sertleri",
-});
+type PageProps = { params: Promise<{ locale: string }> };
 
-export default function TermsPage() {
+function documents(locale: Locale) {
+  return getLegalDocuments(locale, {
+    name: siteConfig.name,
+    legalName: siteConfig.legalName,
+    ownerName: siteConfig.owner.name,
+    email: siteConfig.email,
+    phone: siteConfig.phone,
+    address: siteConfig.addressFull,
+  });
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const document = documents(locale as Locale).terms;
+  return buildMetadata({
+    title: document.title,
+    description: document.metaDescription,
+    path: "/istifade-sertleri",
+    locale: locale as Locale,
+  });
+}
+
+export default async function TermsPage({ params }: PageProps) {
+  const { locale } = await params;
   return (
-    <LegalArticle
-      title="İstifadə şərtləri"
-      description="Saytdan istifadə edərkən qüvvədə olan qaydalar."
-      updatedAt="20 avqust 2026"
+    <LocalizedLegalPage
+      document={documents(locale as Locale).terms}
       path="/istifade-sertleri"
-    >
-      <p>
-        {siteConfig.name} saytı {siteConfig.legalName} ({siteConfig.owner.name}) tərəfindən
-        idarə olunur. Saytı ziyarət etməklə aşağıdakı şərtləri qəbul edirsiniz.
-      </p>
-
-      <h2>Elanların statusu</h2>
-      <p>
-        Saytda yerləşdirilən əmlak elanları, qiymətlər və texniki göstəricilər məlumat
-        xarakteri daşıyır və ictimai oferta sayılmır. Qiymət və mövcudluq xəbərdarlıq
-        olmadan dəyişə bilər. Müqavilə bağlanmazdan əvvəl bütün məlumatlar şirkətlə
-        birbaşa dəqiqləşdirilməlidir.
-      </p>
-      <h2>İstifadəçinin öhdəlikləri</h2>
-      <ul>
-        <li>Müraciət formalarında doğru və özünüzə aid əlaqə məlumatı göstərmək.</li>
-        <li>Saytın işini pozan avtomatlaşdırılmış vasitələrdən istifadə etməmək.</li>
-        <li>Məzmunu icazəsiz kopyalayıb kommersiya məqsədilə yaymamaq.</li>
-      </ul>
-
-      <h2>Müəllif hüquqları</h2>
-      <p>
-        Saytın dizaynı, mətnləri, fotoşəkilləri, loqotipi və «Luxe Home Estate» brendi{" "}
-        {siteConfig.owner.name}-na məxsusdur. Yazılı icazə olmadan istifadə qadağandır.
-      </p>
-
-      <h2>Məsuliyyət hüdudu</h2>
-      <p>
-        Şirkət saytdakı məlumatların dolğunluğuna görə maksimum səy göstərsə də, texniki
-        səhvlərdən və ya üçüncü tərəf mənbələrindən qaynaqlanan qeyri-dəqiqliyə görə
-        məsuliyyət daşımır. Xarici saytlara olan linklərin məzmunu şirkətin nəzarətində deyil.
-      </p>
-
-      <h2>Əlaqə</h2>
-      <p>
-        Suallar üçün: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>,{" "}
-        <a href={siteConfig.phoneHref}>{siteConfig.phone}</a>, {siteConfig.addressFull}.
-      </p>
-    </LegalArticle>
+      email={siteConfig.email}
+      phone={siteConfig.phone}
+      phoneHref={siteConfig.phoneHref}
+    />
   );
 }

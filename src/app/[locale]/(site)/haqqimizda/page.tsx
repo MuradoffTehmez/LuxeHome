@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/lib/constants";
 import {
   BadgeCheck,
   Building2,
@@ -17,62 +19,34 @@ import { siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 import { BusinessTrustPanel } from "@/components/site/business-trust-panel";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Haqqımızda",
-  description: `${siteConfig.legalName} — Bakıda daşınmaz əmlak sahəsində peşəkar xidmətlər. Fərdi yanaşma, şəffaf proses və kompleks xidmət.`,
-  path: "/haqqimizda",
-});
+type PageProps = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "home.about" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription", { legalName: siteConfig.legalName }), path: "/haqqimizda", locale: locale as Locale });
+}
 
 const WHY_ITEMS = [
-  {
-    icon: Users,
-    title: "Fərdi yanaşma",
-    description:
-      "Hər müştərinin tələbi fərqlidir. Axtarışı sizin büdcə, ərazi və yaşayış tərzinizə uyğunlaşdırırıq.",
-  },
-  {
-    icon: Building2,
-    title: "Geniş əmlak seçimi",
-    description:
-      "Mənzil, villa, həyət evi, bağ evi, torpaq, ofis və kommersiya obyektləri — hamısı bir platformada.",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Peşəkar xidmət",
-    description:
-      "Baxışdan rəsmiləşdirməyə qədər bütün mərhələlərdə komandamız sizi müşayiət edir.",
-  },
-  {
-    icon: Eye,
-    title: "Şəffaf proses",
-    description:
-      "Əmlakın vəziyyəti, sənədləri və şərtləri barədə məlumat açıq şəkildə təqdim olunur.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Sənəd təhlükəsizliyi",
-    description:
-      "Hər əməliyyatda hüquqi sənədlərin yoxlanılmasına xüsusi diqqət yetirilir.",
-  },
-  {
-    icon: Handshake,
-    title: "Kompleks xidmət",
-    description:
-      "Alqı-satqıdan təmir, reklam və çəkilişə qədər müxtəlif istiqamətlərdə dəstək göstəririk.",
-  },
-];
+  { icon: Users, key: "personal" }, { icon: Building2, key: "selection" },
+  { icon: BadgeCheck, key: "service" }, { icon: Eye, key: "transparent" },
+  { icon: ShieldCheck, key: "documents" }, { icon: Handshake, key: "complete" },
+] as const;
 
-export default function AboutPage() {
+export default async function AboutPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "home" });
+  const nav = await getTranslations({ locale, namespace: "navigation" });
   return (
     <>
       <PageHeader
         compact
-        eyebrow="Haqqımızda"
-        title="Luxe Home Estate haqqında"
-        description={`${siteConfig.legalName} daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam və çəkiliş istiqamətlərində fəaliyyət göstərir.`}
+        eyebrow={t("about.overline")}
+        title={t("about.title")}
+        description={t("about.description", { legalName: siteConfig.legalName })}
         breadcrumbs={[
-          { label: "Ana səhifə", href: "/" },
-          { label: "Haqqımızda" },
+          { label: nav("home"), href: "/" },
+          { label: nav("about") },
         ]}
       />
 
@@ -84,31 +58,19 @@ export default function AboutPage() {
 
             <div className="flex min-w-0 flex-col gap-6">
               <h2 className="font-display text-3xl text-ink sm:text-4xl">
-                Missiyamız
+                {t("about.mission")}
               </h2>
               <div className="flex flex-col gap-4 text-base leading-relaxed text-ink-soft">
-                <p>
-                  Yanaşmamız sadədir: müştərinin real tələbini anlamaq və ona
-                  uyğun əmlakı tapmaq. Hər müraciətə fərdi baxırıq — büdcə,
-                  ərazi, yaşayış tərzi və gələcək planlar nəzərə alınır.
-                </p>
-                <p>
-                  Əməliyyatın hər mərhələsində şəffaflığa önəm veririk. Əmlakın
-                  vəziyyəti, sənədləri və şərtləri barədə məlumat olduğu kimi
-                  təqdim olunur.
-                </p>
-                <p>
-                  Komandamız yalnız satış deyil, uzunmüddətli əlaqə qurmağa
-                  fokuslanır. Hər müştərinin memnuniyyəti bizim üçün ən böyük
-                  nailiyyətdir.
-                </p>
+                <p>{t("about.paragraph1")}</p>
+                <p>{t("about.paragraph2")}</p>
+                <p>{t("about.paragraph3")}</p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <ButtonLink href="/xidmetler" variant="outline">
-                  Xidmətlərimiz
+                  {t("about.services")}
                 </ButtonLink>
                 <ButtonLink href="/elaqe" variant="ghost">
-                  Bizimlə əlaqə
+                  {t("about.contact")}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </ButtonLink>
               </div>
@@ -121,22 +83,22 @@ export default function AboutPage() {
       <Section tone="paper">
         <Container>
           <SectionHeader
-            overline="Üstünlüklər"
-            title="Niyə Luxe Home Estate?"
-            description="Müştərilərimizə təklif etdiyimiz yanaşmanın əsas prinsipləri."
+            overline={t("why.overline")}
+            title={t("why.title")}
+            description={t("why.description")}
             align="center"
           />
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {WHY_ITEMS.map((item, index) => (
-              <Reveal key={item.title} delay={index * 50}>
+              <Reveal key={item.key} delay={index * 50}>
                 <div className="flex h-full min-w-0 flex-col gap-4 rounded-md border border-line bg-ivory p-5 sm:p-6">
                   <span className="flex size-11 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
                     <item.icon className="size-5" aria-hidden="true" />
                   </span>
-                  <h3 className="font-display text-lg text-ink">{item.title}</h3>
+                  <h3 className="font-display text-lg text-ink">{t(`why.items.${item.key}.title`)}</h3>
                   <p className="text-sm leading-relaxed text-ink-soft">
-                    {item.description}
+                    {t(`why.items.${item.key}.description`)}
                   </p>
                 </div>
               </Reveal>

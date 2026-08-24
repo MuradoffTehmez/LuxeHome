@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle2 } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { trackEvent } from "@/lib/client-analytics";
 const initialState: ContactFormState = { success: false };
 
 export function ContactForm() {
+  const t = useTranslations("contact");
   const [state, formAction, isPending] = useActionState(
     submitContactForm,
     initialState,
@@ -25,10 +27,10 @@ export function ContactForm() {
           <CheckCircle2 className="size-7" aria-hidden="true" />
         </span>
         <h3 className="font-display text-xl text-ink">
-          Müraciətiniz göndərildi!
+          {t("successTitle")}
         </h3>
         <p className="max-w-sm text-sm text-ink-soft">
-          Komandamız ən qısa zamanda sizinlə əlaqə saxlayacaq.
+          {t("successDescription")}
         </p>
       </div>
     );
@@ -48,14 +50,14 @@ export function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <Input
           name="name"
-          label="Ad, soyad"
-          placeholder="Adınızı daxil edin"
+          label={t("fullName")}
+          placeholder={t("namePlaceholder")}
           required
           error={state.fieldErrors?.name}
         />
         <Input
           name="phone"
-          label="Telefon"
+          label={t("phone")}
           type="tel"
           placeholder="+994 50 XXX XX XX"
           required
@@ -66,30 +68,30 @@ export function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <Input
           name="email"
-          label="E-poçt"
+          label={t("email")}
           type="email"
           placeholder="ad@domen.az"
           error={state.fieldErrors?.email}
         />
         <Input
           name="subject"
-          label="Mövzu"
-          placeholder="Müraciətin mövzusu"
+          label={t("subject")}
+          placeholder={t("subjectPlaceholder")}
           error={state.fieldErrors?.subject}
         />
       </div>
 
       <Textarea
         name="message"
-        label="Mesaj"
-        placeholder="Müraciətinizi yazın..."
+        label={t("message")}
+        placeholder={t("messagePlaceholder")}
         required
         rows={5}
         error={state.fieldErrors?.message}
       />
 
       <Button type="submit" variant="primary" size="lg" loading={isPending} className="w-full sm:w-auto sm:self-start">
-        Göndər
+        {t("send")}
       </Button>
     </form>
   );
