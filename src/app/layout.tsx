@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Geist, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -22,6 +23,9 @@ const geist = Geist({
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
+
+/** Google Analytics ölçmə ID-si — yalnız production-da yüklənir. */
+const GA_MEASUREMENT_ID = "G-54KSFRM17B";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -98,6 +102,22 @@ export default function RootLayout({
     <html lang="az" suppressHydrationWarning className={`${playfair.variable} ${geist.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_RUNTIME_SHIM }} />
+        {!isStaging() && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="gtag-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </head>
       <body className="min-h-dvh antialiased">
         <script
