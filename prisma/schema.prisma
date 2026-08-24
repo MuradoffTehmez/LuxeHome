@@ -197,6 +197,7 @@ model Location {
 
   propertiesInCity     Property[] @relation("PropertyCity")
   propertiesInDistrict Property[] @relation("PropertyDistrict")
+  propertiesNearMetro  Property[] @relation("PropertyMetro")
   projects             Project[]  @relation("ProjectCity")
 
   @@index([parentId])
@@ -251,6 +252,7 @@ model Property {
   typeId     String
   cityId     String
   districtId String?
+  metroId    String?
   address    String?
   latitude   Float?
   longitude  Float?
@@ -302,6 +304,7 @@ model Property {
   type     PropertyType @relation(fields: [typeId], references: [id])
   city     Location     @relation("PropertyCity", fields: [cityId], references: [id])
   district Location?    @relation("PropertyDistrict", fields: [districtId], references: [id], onDelete: SetNull)
+  metro    Location?    @relation("PropertyMetro", fields: [metroId], references: [id], onDelete: SetNull)
   author   User?        @relation("PropertyAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   authorId String?
 
@@ -317,6 +320,7 @@ model Property {
   @@index([typeId])
   @@index([cityId])
   @@index([districtId])
+  @@index([metroId])
   @@index([price])
   @@index([isFeatured])
   @@index([deletedAt])

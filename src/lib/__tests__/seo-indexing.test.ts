@@ -26,7 +26,7 @@ describe("əmlak faceted index siyasəti", () => {
 
   it("filter, sort, search, naməlum və təkrarlanan parametrləri noindex edir", () => {
     for (const params of [
-      { tip: "villalar" },
+      { tip: "yeni-tikili" },
       { axtaris: "Nərimanov" },
       { siralama: "price_asc" },
       { utm_fake: "sonsuz" },
@@ -37,6 +37,20 @@ describe("əmlak faceted index siyasəti", () => {
         indexPolicy: "noindex-follow",
       });
     }
+  });
+
+  it("tam ekvivalent kommersiya filtrlərini təmiz landing canonical-a bağlayır", () => {
+    expect(classifyPropertySearchParams({ elan: "SALE" })).toMatchObject({
+      canonicalPath: "/satilan-emlaklar",
+      indexPolicy: "noindex-follow",
+    });
+    expect(
+      classifyPropertySearchParams({ elan: "SALE", tip: "menziller", sehife: "2" }),
+    ).toMatchObject({
+      canonicalPath: "/bakida-satilan-menziller?sehife=2",
+      indexPolicy: "noindex-follow",
+    });
+    expect(classifyPropertySearchParams({ elan: "SALE", otaq: "3" }).canonicalPath).toBeNull();
   });
 
   it("yanlış səhifə dəyərini 404 üçün etibarsız işarələyir", () => {

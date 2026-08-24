@@ -79,6 +79,7 @@ export const propertyFieldsSchema = z.object({
     typeId: cuid,
     cityId: cuid,
     districtId: cuid.nullable(),
+    metroId: cuid.nullable(),
     projectId: cuid.nullable(),
     address: optionalText(240),
     latitude: z.number().min(-90).max(90).nullable(),

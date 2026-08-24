@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { submitContactForm, type ContactFormState } from "./actions";
+import { trackEvent } from "@/lib/client-analytics";
 
 const initialState: ContactFormState = { success: false };
 
@@ -13,6 +14,9 @@ export function ContactForm() {
     submitContactForm,
     initialState,
   );
+  useEffect(() => {
+    if (state.success) trackEvent("contact_submit", { status: "success" });
+  }, [state.success]);
 
   if (state.success) {
     return (

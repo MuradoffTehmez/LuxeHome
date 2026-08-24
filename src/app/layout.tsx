@@ -5,6 +5,7 @@ import { Geist, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { jsonLd, organizationSchema, websiteSchema } from "@/lib/seo";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import "./globals.css";
 
 /**
@@ -114,6 +115,7 @@ export default async function RootLayout({
         <script {...jsonLd(websiteSchema())} />
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+          <AnalyticsProvider />
         </ThemeProvider>
       </body>
     </html>

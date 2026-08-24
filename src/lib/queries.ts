@@ -10,6 +10,8 @@ import {
   PROPERTY_STATUSES,
   type SortOption,
 } from "@/lib/constants";
+import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
+import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
 
 // ---------------------------------------------------------------------------
 // SEÇİM (SELECT) TƏRİFLƏRİ — kart və detal görünüşləri üçün
@@ -87,6 +89,8 @@ export type PropertyFilters = {
   typeSlug?: string;
   citySlug?: string;
   districtSlug?: string;
+  metroSlug?: string;
+  statuses?: string[];
   minPrice?: number;
   maxPrice?: number;
   rooms?: number;
@@ -128,10 +132,12 @@ function publicPropertyWhere(): Prisma.PropertyWhereInput {
 function buildPropertyWhere(filters: PropertyFilters): Prisma.PropertyWhereInput {
   const where: Prisma.PropertyWhereInput = publicPropertyWhere();
 
+  if (filters.statuses?.length) where.status = { in: filters.statuses };
   if (filters.listingType) where.listingType = filters.listingType;
   if (filters.typeSlug) where.type = { slug: filters.typeSlug };
   if (filters.citySlug) where.city = { slug: filters.citySlug };
   if (filters.districtSlug) where.district = { slug: filters.districtSlug };
+  if (filters.metroSlug) where.metro = { slug: filters.metroSlug };
   if (filters.renovation) where.renovation = filters.renovation;
   if (filters.documentStatus) where.documentStatus = filters.documentStatus;
 
@@ -270,6 +276,7 @@ export async function getPropertyBySlug(slug: string) {
       type: true,
       city: true,
       district: true,
+      metro: true,
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { include: { feature: true } },
       project: { select: { name: true, slug: true } },
@@ -776,7 +783,7 @@ export async function getBlogCategories() {
 // ---------------------------------------------------------------------------
 
 export async function getSitemapEntries() {
-  const [properties, projects, services, posts, agencies] = await Promise.all([
+  const [properties, projects, services, posts, agencies, seoLandings, districts, metros] = await Promise.all([
     prisma.property.findMany({
       where: {
         ...publicPropertyWhere(),
@@ -808,9 +815,124 @@ export async function getSitemapEntries() {
       where: { isVerified: true, user: { isActive: true } },
       select: { slug: true, updatedAt: true },
     }),
+    getIndexableSeoLandingEntries(),
+    getIndexableTaxonomyLandings("DISTRICT"),
+    getIndexableTaxonomyLandings("METRO"),
   ]);
 
-  return { properties, projects, services, posts, agencies, landings: [] };
+  return {
+    properties,
+    projects,
+    services,
+    posts,
+    agencies,
+    landings: [
+      ...seoLandings,
+      ...districts.map((item) => ({ path: `/rayon/${item.slug}`, updatedAt: item.updatedAt })),
+      ...metros.map((item) => ({ path: `/metro/${item.slug}`, updatedAt: item.updatedAt })),
+    ],
+  };
+}
+
+const INDEXABLE_LISTING_STATUSES = [
+  PROPERTY_STATUSES.PUBLISHED,
+  PROPERTY_STATUSES.RESERVED,
+];
+
+/** Sabit kommersiya landing-i üçün yalnız aktiv, canonical public elanlar. */
+export async function getSeoLandingProperties(landing: SeoLanding, page = 1) {
+  return getProperties({
+    ...landing.filters,
+    statuses: INDEXABLE_LISTING_STATUSES,
+    page,
+    pageSize: 12,
+  });
+}
+
+export async function getTaxonomyLandingProperties(
+  kind: "DISTRICT" | "METRO",
+  slug: string,
+  page = 1,
+) {
+  const location = await prisma.location.findFirst({
+    where: { slug, kind },
+    select: { id: true, name: true, slug: true, kind: true, parent: { select: { name: true } } },
+  });
+  if (!location) return null;
+
+  const result = await getProperties({
+    ...(kind === "DISTRICT" ? { districtSlug: slug } : { metroSlug: slug }),
+    statuses: INDEXABLE_LISTING_STATUSES,
+    page,
+    pageSize: 12,
+  });
+  return { location, ...result };
+}
+
+async function getIndexableSeoLandingEntries() {
+  const rows = await Promise.all(
+    SEO_LANDINGS.map(async (landing) => {
+      const where = buildPropertyWhere({
+        ...landing.filters,
+        statuses: INDEXABLE_LISTING_STATUSES,
+      });
+      const aggregate = await prisma.property.aggregate({
+        where,
+        _count: { _all: true },
+        _max: { updatedAt: true },
+      });
+      return aggregate._count._all >= MIN_INDEXABLE_LISTINGS
+        ? { path: landing.path, updatedAt: aggregate._max.updatedAt ?? undefined }
+        : null;
+    }),
+  );
+  return rows.filter((row): row is NonNullable<typeof row> => row !== null);
+}
+
+export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
+  const baseWhere = buildPropertyWhere({ statuses: INDEXABLE_LISTING_STATUSES });
+  const grouped: Array<{
+    locationId: string | null;
+    count: number;
+    updatedAt?: Date;
+  }> =
+    kind === "DISTRICT"
+      ? (
+          await prisma.property.groupBy({
+            by: ["districtId"],
+            where: { ...baseWhere, districtId: { not: null } },
+            _count: { _all: true },
+            _max: { updatedAt: true },
+          })
+        ).map((row) => ({
+          locationId: row.districtId,
+          count: row._count._all,
+          updatedAt: row._max.updatedAt ?? undefined,
+        }))
+      : (
+          await prisma.property.groupBy({
+            by: ["metroId"],
+            where: { ...baseWhere, metroId: { not: null } },
+            _count: { _all: true },
+            _max: { updatedAt: true },
+          })
+        ).map((row) => ({
+          locationId: row.metroId,
+          count: row._count._all,
+          updatedAt: row._max.updatedAt ?? undefined,
+        }));
+  const eligible = grouped.filter((row) => row.count >= MIN_INDEXABLE_LISTINGS);
+  const ids = eligible.map((row) => row.locationId).filter((id): id is string => Boolean(id));
+  if (ids.length === 0) return [];
+
+  const locations = await prisma.location.findMany({
+    where: { id: { in: ids }, kind },
+    select: { id: true, name: true, slug: true },
+  });
+  const counts = new Map(
+    eligible.map((row) => [row.locationId, { count: row.count, updatedAt: row.updatedAt }]),
+  );
+  return locations.map((location) => ({ ...location, ...counts.get(location.id)! }));
 }
 
 // ---------------------------------------------------------------------------
@@ -896,33 +1018,156 @@ export async function getLeadStatusBreakdown() {
   return rows.map((row) => ({ status: row.status, count: row._count._all }));
 }
 
-/** SEO auditı — meta başlıq/təsvir çatışmayan dərc olunmuş məzmun. */
+/** SEO auditı — public məzmunun bounded keyfiyyət proyeksiyası. */
 export async function getSeoAuditItems() {
-  const [properties, posts] = await Promise.all([
+  const [properties, posts, projects, services] = await Promise.all([
     prisma.property.findMany({
-      where: {
-        deletedAt: null,
-        isDemo: false,
-        status: { in: PUBLIC_PROPERTY_STATUSES },
-        OR: [{ metaTitle: null }, { metaDescription: null }],
+      where: publicPropertyWhere(),
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        description: true,
+        metaTitle: true,
+        metaDescription: true,
+        noIndex: true,
+        publishedAt: true,
+        districtId: true,
+        metroId: true,
+        images: { select: { url: true, alt: true }, orderBy: [{ isCover: "desc" }, { order: "asc" }], take: 1 },
       },
-      select: { id: true, title: true, slug: true, metaTitle: true, metaDescription: true },
       orderBy: { publishedAt: "desc" },
-      take: 50,
+      take: 200,
     }),
     prisma.blogPost.findMany({
       where: {
         deletedAt: null,
         isDemo: false,
         status: POST_STATUSES.PUBLISHED,
-        OR: [{ metaTitle: null }, { metaDescription: null }],
       },
-      select: { id: true, title: true, slug: true, metaTitle: true, metaDescription: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        content: true,
+        metaTitle: true,
+        metaDescription: true,
+        noIndex: true,
+        coverUrl: true,
+        coverAlt: true,
+        authorId: true,
+        publishedAt: true,
+      },
       orderBy: { publishedAt: "desc" },
-      take: 50,
+      take: 200,
+    }),
+    prisma.project.findMany({
+      where: { deletedAt: null, isDemo: false, isActive: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        metaTitle: true,
+        metaDescription: true,
+        noIndex: true,
+        coverUrl: true,
+        cityId: true,
+        images: { select: { alt: true }, orderBy: { order: "asc" }, take: 1 },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 200,
+    }),
+    prisma.service.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        description: true,
+        metaTitle: true,
+        metaDescription: true,
+        noIndex: true,
+        imageUrl: true,
+      },
+      orderBy: { order: "asc" },
+      take: 200,
     }),
   ]);
-  return { properties, posts };
+
+  const contents: SeoAuditContent[] = [
+    ...properties.map((item) => ({
+      kind: "property" as const,
+      id: item.id,
+      title: item.title,
+      slug: item.slug,
+      description: item.description,
+      metaTitle: item.metaTitle,
+      metaDescription: item.metaDescription,
+      noIndex: item.noIndex,
+      imageUrl: item.images[0]?.url,
+      imageAlt: item.images[0]?.alt,
+      hasLocation: Boolean(item.districtId || item.metroId),
+      hasAuthor: true,
+      hasPublishedAt: Boolean(item.publishedAt),
+      internalLinkCount: 1,
+      adminPath: `/admin/emlaklar/${item.id}`,
+      publicPath: `/emlaklar/${item.slug}`,
+    })),
+    ...posts.map((item) => ({
+      kind: "post" as const,
+      id: item.id,
+      title: item.title,
+      slug: item.slug,
+      description: item.content,
+      metaTitle: item.metaTitle,
+      metaDescription: item.metaDescription,
+      noIndex: item.noIndex,
+      imageUrl: item.coverUrl,
+      imageAlt: item.coverAlt,
+      hasAuthor: Boolean(item.authorId),
+      hasPublishedAt: Boolean(item.publishedAt),
+      internalLinkCount: 1,
+      adminPath: `/admin/blog/${item.id}`,
+      publicPath: `/blog/${item.slug}`,
+    })),
+    ...projects.map((item) => ({
+      kind: "project" as const,
+      id: item.id,
+      title: item.name,
+      slug: item.slug,
+      description: item.description,
+      metaTitle: item.metaTitle,
+      metaDescription: item.metaDescription,
+      noIndex: item.noIndex,
+      imageUrl: item.coverUrl,
+      imageAlt: item.images[0]?.alt,
+      hasLocation: Boolean(item.cityId),
+      hasAuthor: true,
+      hasPublishedAt: true,
+      internalLinkCount: 1,
+      adminPath: `/admin/layiheler/${item.id}`,
+      publicPath: `/layiheler/${item.slug}`,
+    })),
+    ...services.map((item) => ({
+      kind: "service" as const,
+      id: item.id,
+      title: item.title,
+      slug: item.slug,
+      description: item.description,
+      metaTitle: item.metaTitle,
+      metaDescription: item.metaDescription,
+      noIndex: item.noIndex,
+      imageUrl: item.imageUrl,
+      imageAlt: item.imageUrl ? item.title : null,
+      hasAuthor: true,
+      hasPublishedAt: true,
+      internalLinkCount: 1,
+      adminPath: `/admin/xidmetler/${item.id}`,
+      publicPath: `/xidmetler/${item.slug}`,
+    })),
+  ];
+  return evaluateSeoAudit(contents);
 }
 
 export async function getRecentAdminProperties(take = 5) {
@@ -1053,7 +1298,7 @@ export async function getAdminPropertyById(id: string) {
 
 /** Formadakı bütün açılan siyahılar bir sorğu dəstində gətirilir. */
 export async function getPropertyFormOptions() {
-  const [types, cities, districts, features, projects] = await Promise.all([
+  const [types, cities, districts, metros, features, projects] = await Promise.all([
     prisma.propertyType.findMany({
       where: { isActive: true },
       select: { id: true, name: true },
@@ -1065,8 +1310,13 @@ export async function getPropertyFormOptions() {
       orderBy: { order: "asc" },
     }),
     prisma.location.findMany({
-      where: { kind: { in: ["DISTRICT", "SETTLEMENT", "METRO"] } },
+      where: { kind: { in: ["DISTRICT", "SETTLEMENT"] } },
       select: { id: true, name: true, kind: true, parentId: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.location.findMany({
+      where: { kind: "METRO" },
+      select: { id: true, name: true, parentId: true },
       orderBy: { name: "asc" },
     }),
     prisma.feature.findMany({
@@ -1080,7 +1330,7 @@ export async function getPropertyFormOptions() {
     }),
   ]);
 
-  return { types, cities, districts, features, projects };
+  return { types, cities, districts, metros, features, projects };
 }
 
 export type PropertyFormOptions = Awaited<ReturnType<typeof getPropertyFormOptions>>;

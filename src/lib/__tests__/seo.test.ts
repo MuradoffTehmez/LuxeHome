@@ -1,5 +1,16 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { buildMetadata, jsonLd, serializeJsonLd } from "@/lib/seo";
+import {
+  agencySchema,
+  articleSchema,
+  buildMetadata,
+  faqSchema,
+  jsonLd,
+  organizationSchema,
+  propertySchema,
+  serializeJsonLd,
+  serviceSchema,
+  truncateAtWord,
+} from "@/lib/seo";
 import { resolveSiteBaseUrl, siteUrl } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
 
@@ -116,6 +127,13 @@ describe("buildMetadata", () => {
   });
 });
 
+describe("metadata fallback mətni", () => {
+  it("təsviri sözün ortasında deyil, sərhəddə kəsir", () => {
+    expect(truncateAtWord("Bir iki üç dörd", 12)).toBe("Bir iki üç…");
+    expect(truncateAtWord("Qısa mətn", 50)).toBe("Qısa mətn");
+  });
+});
+
 describe("JSON-LD serializer", () => {
   it("boş dəyərləri çıxarır və script injection simvollarını escape edir", () => {
     const serialized = serializeJsonLd({
@@ -132,5 +150,77 @@ describe("JSON-LD serializer", () => {
     expect(serialized).toContain("\\u0026");
     expect(serialized).toContain("\\u2028");
     expect(jsonLd({ name: "Luxe" }).dangerouslySetInnerHTML.__html).toBe('{"name":"Luxe"}');
+  });
+});
+
+describe("structured data kontraktı", () => {
+  it("organization schema-da yalnız təsdiqlənmiş NAP saxlayır", () => {
+    const schema = organizationSchema();
+    expect(schema["@id"]).toBe(`${siteUrl()}/#organization`);
+    expect(schema.address.streetAddress).toBe("Əliyar Əliyev 109A");
+    expect(schema).not.toHaveProperty("geo");
+    expect(schema).not.toHaveProperty("openingHoursSpecification");
+  });
+
+  it("əmlakı RealEstateListing, yaşayış vahidi, Offer və location ilə təsvir edir", () => {
+    const schema = propertySchema({
+      title: "Nərimanovda 3 otaqlı mənzil",
+      description: "İşıqlı və geniş mənzil.",
+      slug: "nerimanov-3-otaqli",
+      price: 250000,
+      currency: "AZN",
+      listingType: "SALE",
+      images: ["https://example.com/home.jpg"],
+      city: "Bakı",
+      district: "Nərimanov",
+      address: "Ağa Nemətulla küçəsi",
+      latitude: 40.4,
+      longitude: 49.87,
+      area: 120,
+      rooms: 3,
+      bedrooms: 2,
+      bathrooms: 2,
+      status: "PUBLISHED",
+    });
+
+    expect(schema["@type"]).toBe("RealEstateListing");
+    expect(schema["@id"]).toContain("#listing");
+    expect(schema.about).toMatchObject({
+      "@type": "Residence",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Ağa Nemətulla küçəsi",
+        addressLocality: "Bakı",
+        addressRegion: "Nərimanov",
+        addressCountry: "AZ",
+      },
+      geo: { "@type": "GeoCoordinates", latitude: 40.4, longitude: 49.87 },
+    });
+    expect(schema.offers).toMatchObject({ "@type": "Offer", price: 250000 });
+  });
+
+  it("məqalə, xidmət, agentlik və FAQ üçün stable id və görünən data yaradır", () => {
+    const article = articleSchema({
+      title: "Mənzil seçimi",
+      description: "Praktik bələdçi",
+      slug: "menzil-secimi",
+      publishedAt: "2026-08-24T00:00:00Z",
+    });
+    expect(article).toMatchObject({
+      "@type": "BlogPosting",
+      "@id": `${siteUrl("/blog/menzil-secimi")}#article`,
+      publisher: { "@id": `${siteUrl()}/#organization` },
+    });
+    expect(JSON.stringify(article)).toContain("/logo-full.png");
+
+    expect(serviceSchema({ title: "Əmlak satışı", description: "Satış xidməti", slug: "emlak-satisi" })["@id"]).toContain("#service");
+    expect(agencySchema({ name: "Test Agentlik", slug: "test-agentlik", phone: "+994501112233" })).toMatchObject({
+      "@type": "RealEstateAgent",
+      telephone: "+994501112233",
+    });
+    expect(faqSchema([{ question: "Sual?", answer: "Cavab." }], "/suallar")).toMatchObject({
+      "@type": "FAQPage",
+      "@id": `${siteUrl("/suallar")}#faq`,
+    });
   });
 });

@@ -10,6 +10,7 @@ import {
   FullWidth,
 } from "@/components/admin/form-fields";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { SeoFields } from "@/components/admin/seo-fields";
 import {
   BUILDING_TYPE_LABELS,
   BUILDING_TYPES,
@@ -63,6 +64,7 @@ export function PropertyForm({
 
   // Rayon siyahısı seçilmiş şəhərdən asılıdır — kaskad ictimai axtarışdakı ilə eynidir
   const districts = options.districts.filter((district) => district.parentId === cityId);
+  const metros = options.metros.filter((metro) => metro.parentId === cityId);
 
   const featureGroups = options.features.reduce<Record<string, typeof options.features>>(
     (groups, feature) => {
@@ -185,6 +187,14 @@ export function PropertyForm({
           defaultValue={initial.districtId}
           placeholder="Seçilməyib"
           options={districts.map((district) => ({ value: district.id, label: district.name }))}
+        />
+
+        <AdminSelect
+          name="metroId"
+          label="Metro"
+          defaultValue={initial.metroId}
+          placeholder="Seçilməyib"
+          options={metros.map((metro) => ({ value: metro.id, label: metro.name }))}
         />
 
         <AdminSelect
@@ -355,18 +365,7 @@ export function PropertyForm({
       </FormSection>
 
       <FormSection title="SEO" description="Boş buraxılsa, başlıq və təsvirdən qurulur.">
-        <AdminInput
-          name="metaTitle"
-          label="Meta başlıq"
-          defaultValue={initial.metaTitle}
-          maxLength={70}
-        />
-        <AdminInput
-          name="metaDescription"
-          label="Meta təsvir"
-          defaultValue={initial.metaDescription}
-          maxLength={180}
-        />
+        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Əmlak elanı"} fallbackDescription={initial.description || "Əmlak haqqında məlumat"} pathname={`/emlaklar/${initial.slug || "yeni-elan"}`} />
         <AdminInput
           name="canonicalUrl"
           label="Canonical URL"

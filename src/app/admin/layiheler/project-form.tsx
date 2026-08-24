@@ -9,6 +9,7 @@ import {
   FullWidth,
 } from "@/components/admin/form-fields";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { SeoFields } from "@/components/admin/seo-fields";
 import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUSES,
@@ -207,18 +208,7 @@ export function ProjectForm({
       </FormSection>
 
       <FormSection title="SEO">
-        <AdminInput
-          name="metaTitle"
-          label="Meta başlıq"
-          defaultValue={initial.metaTitle}
-          maxLength={70}
-        />
-        <AdminInput
-          name="metaDescription"
-          label="Meta təsvir"
-          defaultValue={initial.metaDescription}
-          maxLength={180}
-        />
+        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.name || "Yaşayış layihəsi"} fallbackDescription={initial.summary || initial.description || "Layihə haqqında məlumat"} pathname={`/layiheler/${initial.slug || "yeni-layihe"}`} />
         <AdminInput
           name="canonicalUrl"
           label="Canonical URL"

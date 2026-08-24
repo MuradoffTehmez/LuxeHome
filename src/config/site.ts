@@ -94,29 +94,19 @@ export const navigation = [
  * digəri də yenilənməlidir, əks halda link boş nəticə səhifəsinə aparır.
  */
 export const propertyTypeLinks = [
-  { label: "Mənzillər", href: "/emlaklar?tip=menziller" },
-  { label: "Yeni tikili", href: "/emlaklar?tip=yeni-tikili" },
-  { label: "Köhnə tikili", href: "/emlaklar?tip=kohne-tikili" },
-  { label: "Həyət evi / Villa", href: "/emlaklar?tip=heyet-evleri" },
-  { label: "Bağ evləri", href: "/emlaklar?tip=bag-evleri" },
-  { label: "Torpaq sahəsi", href: "/emlaklar?tip=torpaq" },
-  { label: "Obyekt", href: "/emlaklar?tip=obyektler" },
-  { label: "Ofis", href: "/emlaklar?tip=ofisler" },
-  { label: "Qaraj", href: "/emlaklar?tip=qarajlar" },
-  { label: "Mini otel / Xostel", href: "/emlaklar?tip=mini-otel" },
-  { label: "İstirahət mərkəzi", href: "/emlaklar?tip=istirahet-merkezleri" },
-  { label: "Konteyner ev", href: "/emlaklar?tip=konteyner-evler" },
-  { label: "A-frame ev", href: "/emlaklar?tip=a-frame-evler" },
-  { label: "Xarici əmlak", href: "/emlaklar?tip=xarici-emlak" },
+  { label: "Satılan mənzillər", href: "/bakida-satilan-menziller" },
+  { label: "Kirayə mənzillər", href: "/bakida-kiraye-menziller" },
+  { label: "Villalar", href: "/villalar" },
+  { label: "Həyət evləri", href: "/heyet-evleri" },
+  { label: "Torpaq sahələri", href: "/torpaq-saheleri" },
+  { label: "Kommersiya obyektləri", href: "/kommersiya-obyektleri" },
+  { label: "Ofislər", href: "/ofisler" },
 ] as const;
 
 /** Elan növü üzrə keçidlər — günlük kirayə ayrıca kateqoriya kimi göstərilir. */
 export const listingLinks = [
-  { label: "Satılır", href: "/emlaklar?elan=SALE" },
-  { label: "Aylıq kirayə", href: "/emlaklar?elan=RENT&dovr=MONTH" },
-  { label: "Günlük kirayə", href: "/emlaklar?elan=RENT&dovr=DAY" },
-  { label: "İpotekaya uyğun", href: "/emlaklar?xususiyyet=ipoteka" },
-  { label: "Kreditlə", href: "/emlaklar?xususiyyet=kredit" },
+  { label: "Satılır", href: "/satilan-emlaklar" },
+  { label: "Kirayə", href: "/kiraye-emlaklar" },
 ] as const;
 
 /** Footer-dəki köməkçi səhifələr — əsas naviqasiyada olmayanlar. */

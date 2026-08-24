@@ -1,4 +1,5 @@
 import type { IndexPolicy } from "@/lib/seo";
+import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
 
 export type SearchParamInput = Record<string, string | string[] | undefined>;
 
@@ -69,7 +70,29 @@ const PROPERTY_FILTER_KEYS = new Set([
 ]);
 
 export function classifyPropertySearchParams(params: SearchParamInput): SearchIndexDecision {
-  return classifySearchParams(params, "/emlaklar", PROPERTY_FILTER_KEYS);
+  const decision = classifySearchParams(params, "/emlaklar", PROPERTY_FILTER_KEYS);
+  if (!decision.validPage || decision.indexPolicy === "index") return decision;
+
+  const filterKeys = Object.keys(params).filter((key) => key !== "sehife");
+  if (
+    filterKeys.length === 0 ||
+    filterKeys.some((key) => key !== "elan" && key !== "tip") ||
+    filterKeys.some((key) => typeof params[key] !== "string")
+  ) {
+    return decision;
+  }
+
+  const landingPath = propertyFiltersToLandingPath({
+    ...(typeof params.elan === "string" ? { listingType: params.elan } : {}),
+    ...(typeof params.tip === "string" ? { typeSlug: params.tip } : {}),
+  });
+  return landingPath
+    ? {
+        ...decision,
+        canonicalPath:
+          decision.page > 1 ? `${landingPath}?sehife=${decision.page}` : landingPath,
+      }
+    : decision;
 }
 
 export function classifyBlogSearchParams(params: SearchParamInput): SearchIndexDecision {

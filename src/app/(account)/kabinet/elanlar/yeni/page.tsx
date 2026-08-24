@@ -5,6 +5,7 @@ import { requireLister } from "@/lib/auth/guard";
 import { buildMetadata } from "@/lib/seo";
 import { createPublicProperty } from "./actions";
 import { PublicPropertyForm } from "./public-property-form";
+import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 
 export const metadata: Metadata = buildMetadata({
   title: "Elan göndər",
@@ -19,6 +20,7 @@ export default async function NewPropertyPage() {
 
   return (
       <div className="min-w-0">
+        <AnalyticsEventBeacon event="submission_start" payload={{ content_type: "property" }} />
         <PageHeader
           contained
           compact

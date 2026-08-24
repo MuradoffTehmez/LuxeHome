@@ -9,6 +9,7 @@ import {
   FullWidth,
 } from "@/components/admin/form-fields";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { SeoFields } from "@/components/admin/seo-fields";
 import { SERVICE_ICON_NAMES } from "@/components/site/service-icon";
 import type { ActionState } from "@/lib/admin/action-state";
 import type { ServiceFormValues } from "./form-values";
@@ -115,18 +116,7 @@ export function ServiceForm({
       </FormSection>
 
       <FormSection title="SEO">
-        <AdminInput
-          name="metaTitle"
-          label="Meta başlıq"
-          defaultValue={initial.metaTitle}
-          maxLength={70}
-        />
-        <AdminInput
-          name="metaDescription"
-          label="Meta təsvir"
-          defaultValue={initial.metaDescription}
-          maxLength={180}
-        />
+        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Daşınmaz əmlak xidməti"} fallbackDescription={initial.shortDescription || initial.description || "Xidmət haqqında məlumat"} pathname={`/xidmetler/${initial.slug || "yeni-xidmet"}`} />
         <AdminInput
           name="canonicalUrl"
           label="Canonical URL"

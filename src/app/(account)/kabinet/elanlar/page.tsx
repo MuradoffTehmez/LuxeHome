@@ -15,6 +15,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
 import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
+import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 
 export const metadata: Metadata = buildMetadata({
   title: "Elanlarım",
@@ -118,6 +119,7 @@ export default async function CabinetPropertiesPage({
 
   return (
     <div className="min-w-0">
+        {params.yeni === "1" && <AnalyticsEventBeacon event="submission_complete" payload={{ content_type: "property", status: "success" }} />}
         <PageHeader
           contained
           compact

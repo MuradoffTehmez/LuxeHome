@@ -16,6 +16,8 @@ const database = vi.hoisted(() => ({
   propertyFindMany: vi.fn(),
   propertyFindFirst: vi.fn(),
   propertyCount: vi.fn(),
+  propertyAggregate: vi.fn(),
+  propertyGroupBy: vi.fn(),
   projectFindMany: vi.fn(),
   projectFindFirst: vi.fn(),
   blogPostFindMany: vi.fn(),
@@ -25,6 +27,7 @@ const database = vi.hoisted(() => ({
   blogCategoryFindMany: vi.fn(),
   serviceFindMany: vi.fn(),
   agencyFindMany: vi.fn(),
+  locationFindMany: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -33,6 +36,8 @@ vi.mock("@/lib/prisma", () => ({
       findMany: database.propertyFindMany,
       findFirst: database.propertyFindFirst,
       count: database.propertyCount,
+      aggregate: database.propertyAggregate,
+      groupBy: database.propertyGroupBy,
     },
     project: {
       findMany: database.projectFindMany,
@@ -47,6 +52,7 @@ vi.mock("@/lib/prisma", () => ({
     blogCategory: { findMany: database.blogCategoryFindMany },
     service: { findMany: database.serviceFindMany },
     agency: { findMany: database.agencyFindMany },
+    location: { findMany: database.locationFindMany },
   },
 }));
 
@@ -153,6 +159,9 @@ describe("ictimai məzmun sərhədi", () => {
     database.propertyCount.mockImplementation(async (args: QueryArgs) =>
       args.where?.isDemo === false ? 1 : 2,
     );
+    database.propertyAggregate.mockResolvedValue({ _count: { _all: 1 }, _max: { updatedAt: null } });
+    database.propertyGroupBy.mockResolvedValue([]);
+    database.locationFindMany.mockResolvedValue([]);
     database.projectFindMany.mockImplementation(async (args: QueryArgs) =>
       onlyPublic(args, realProject, demoProject),
     );

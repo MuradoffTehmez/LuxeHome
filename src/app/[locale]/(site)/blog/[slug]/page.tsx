@@ -6,7 +6,7 @@ import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
-import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
+import { articleSchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getPostBySlug, getRelatedPosts } from "@/lib/queries";
 import { isUnoptimizedImage } from "@/lib/utils";
 
@@ -47,31 +47,21 @@ export default async function BlogPostPage({ params }: Props) {
 
   const relatedPosts = await getRelatedPosts(post.id, post.categoryId, 3);
 
-  // JSON-LD for Blog Post
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    image: post.coverUrl ? [post.coverUrl] : [],
-    datePublished: post.publishedAt?.toISOString() || post.createdAt.toISOString(),
-    author: {
-      "@type": "Person",
-      name: post.author?.name || "Luxe Home Estate",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Luxe Home Estate",
-      logo: {
-        "@type": "ImageObject",
-        url: `https://luxehomeestate.az/logo.png`,
-      },
-    },
-    description: post.excerpt,
-  };
-
   return (
     <>
-      <script {...jsonLd(articleSchema)} />
+      <script
+        {...jsonLd(
+          articleSchema({
+            title: post.title,
+            description: post.excerpt,
+            slug: post.slug,
+            image: post.coverUrl,
+            publishedAt: post.publishedAt || post.createdAt,
+            updatedAt: post.updatedAt,
+            authorName: post.author?.name,
+          }),
+        )}
+      />
       <script
         {...jsonLd(
           breadcrumbSchema([

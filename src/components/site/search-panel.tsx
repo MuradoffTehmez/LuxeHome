@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/client-analytics";
 import {
   PropertyFilterFields,
   type CityOption,
@@ -42,7 +45,11 @@ export function SearchPanel({
         className,
       )}
     >
-      <form action="/emlaklar" method="get" className="flex flex-col gap-5">
+      <form action="/emlaklar" method="get" className="flex flex-col gap-5" onSubmit={(event) => {
+        const data = new FormData(event.currentTarget);
+        const filterCount = Array.from(data.entries()).filter(([, value]) => String(value).trim()).length;
+        trackEvent("filter_submit", { filter_count: filterCount, placement: variant });
+      }}>
         <PropertyFilterFields
           types={types}
           cities={cities}
