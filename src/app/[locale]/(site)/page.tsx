@@ -84,7 +84,7 @@ const WHY_ITEMS = [
     icon: Handshake,
     title: "Kompleks xidmət",
     description:
-      "Alqı-satqıdan təmir, reklam və çəkilişə qədər 7 istiqamətdə dəstək göstəririk.",
+      "Alqı-satqıdan təmir, reklam və çəkilişə qədər müxtəlif istiqamətlərdə dəstək göstəririk.",
   },
 ];
 
