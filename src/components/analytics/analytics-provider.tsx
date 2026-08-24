@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ANALYTICS_CONSENT_COOKIE,
   analyticsRuntimeEnabled,
@@ -21,6 +22,7 @@ function writeConsent(value: Exclude<Consent, null>) {
 }
 
 export function AnalyticsProvider() {
+  const t = useTranslations("common.analytics");
   const [consent, setConsent] = useState<Consent>(null);
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
@@ -50,14 +52,29 @@ export function AnalyticsProvider() {
     document.head.appendChild(script);
   }, [consent, gaId, gtmId, measurementId]);
 
-  if (!configured || consent !== null) return null;
+  if (!configured) return null;
+
+  if (consent === "granted" && gtmId) {
+    return (
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(gtmId)}`}
+        height="0"
+        width="0"
+        className="hidden"
+        title="Google Tag Manager"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  if (consent !== null) return null;
   return (
-    <aside role="dialog" aria-label="Analitika seçimi" className="fixed inset-x-4 bottom-[calc(1rem+var(--safe-bottom))] z-[110] mx-auto max-w-2xl rounded-md border border-line-strong bg-paper p-4 shadow-lg sm:p-5">
-      <p className="font-medium text-ink">Analitika seçimi</p>
-      <p className="mt-1 text-sm leading-6 text-ink-soft">Saytın necə istifadə edildiyini şəxsi məlumat toplamadan ölçmək üçün analitika cookie-sinə icazə verə bilərsiniz. İmtina etdikdə analitika skripti yüklənmir.</p>
+    <aside role="dialog" aria-label={t("ariaLabel")} className="fixed inset-x-4 bottom-[calc(1rem+var(--safe-bottom))] z-[110] mx-auto max-w-2xl rounded-md border border-line-strong bg-paper p-4 shadow-lg sm:p-5">
+      <p className="font-medium text-ink">{t("title")}</p>
+      <p className="mt-1 text-sm leading-6 text-ink-soft">{t("description")}</p>
       <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" onClick={() => { writeConsent("granted"); setConsent("granted"); }} className="inline-flex min-h-11 items-center rounded-xs bg-gold px-4 text-sm font-medium text-ink hover:bg-gold-soft">İcazə verirəm</button>
-        <button type="button" onClick={() => { writeConsent("denied"); setConsent("denied"); }} className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-4 text-sm font-medium text-ink hover:border-gold">İmtina edirəm</button>
+        <button type="button" onClick={() => { writeConsent("granted"); setConsent("granted"); }} className="inline-flex min-h-11 items-center rounded-xs bg-gold px-4 text-sm font-medium text-ink hover:bg-gold-soft">{t("accept")}</button>
+        <button type="button" onClick={() => { writeConsent("denied"); setConsent("denied"); }} className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-4 text-sm font-medium text-ink hover:border-gold">{t("decline")}</button>
       </div>
     </aside>
   );

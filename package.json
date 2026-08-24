@@ -9,7 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "cross-env SITE_URL=https://luxehomeestate.az IS_STAGING=false opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env=\"\"",
+    "deploy": "cross-env SITE_URL=https://luxehomeestate.az IS_STAGING=false NEXT_PUBLIC_GTM_ID=GTM-MMV4VC9L opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env=\"\"",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:generate": "prisma generate",
     "db:migrate:new": "prisma migrate diff --from-local-d1 --to-schema-datamodel prisma/schema.prisma --script",

@@ -17,5 +17,12 @@
     "en": "English",
     "ru": "Русский",
     "switch": "Change language"
+  },
+  "analytics": {
+    "ariaLabel": "Analytics preferences",
+    "title": "Analytics preferences",
+    "description": "You can allow analytics cookies so we can understand how the website is used without collecting personal information. If you decline, the analytics script will not load.",
+    "accept": "Allow analytics",
+    "decline": "Decline"
   }
 }

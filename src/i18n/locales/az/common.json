@@ -17,5 +17,12 @@
     "en": "English",
     "ru": "Русский",
     "switch": "Dili dəyiş"
+  },
+  "analytics": {
+    "ariaLabel": "Analitika seçimi",
+    "title": "Analitika seçimi",
+    "description": "Saytın necə istifadə edildiyini şəxsi məlumat toplamadan ölçmək üçün analitika cookie-sinə icazə verə bilərsiniz. İmtina etdikdə analitika skripti yüklənmir.",
+    "accept": "İcazə verirəm",
+    "decline": "İmtina edirəm"
   }
 }
