@@ -8,6 +8,7 @@ import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getPostBySlug, getRelatedPosts } from "@/lib/queries";
+import { isUnoptimizedImage } from "@/lib/utils";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -119,6 +120,7 @@ export default async function BlogPostPage({ params }: Props) {
                   src={post.coverUrl}
                   alt={post.coverAlt || post.title}
                   fill
+                  unoptimized={isUnoptimizedImage(post.coverUrl)}
                   priority
                   className="object-cover"
                   sizes="(max-width: 767px) calc(100vw - 2.5rem), 720px"

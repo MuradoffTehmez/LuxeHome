@@ -62,6 +62,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
           src={item.thumbUrl ?? item.url}
           alt={item.alt}
           fill
+          unoptimized
           sizes="(max-width: 479px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
           className="object-cover"
         />

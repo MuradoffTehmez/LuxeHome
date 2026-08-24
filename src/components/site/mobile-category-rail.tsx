@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Building2 } from "lucide-react";
+import { isUnoptimizedImage } from "@/lib/utils";
 
 export type MobileCategoryRailItem = {
   href: string;
@@ -33,6 +34,7 @@ export function MobileCategoryRail({ items }: MobileCategoryRailProps) {
                 src={item.imageUrl}
                 alt=""
                 fill
+                unoptimized={isUnoptimizedImage(item.imageUrl)}
                 loading="lazy"
                 sizes="78vw"
                 className="image-lift object-cover"

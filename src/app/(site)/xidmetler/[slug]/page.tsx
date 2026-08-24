@@ -11,6 +11,7 @@ import { ContactForm } from "@/app/(site)/elaqe/contact-form";
 import { buildMetadata, jsonLd, serviceSchema, breadcrumbSchema } from "@/lib/seo";
 import { getServiceBySlug } from "@/lib/queries";
 import { siteConfig } from "@/config/site";
+import { isUnoptimizedImage } from "@/lib/utils";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -104,6 +105,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     src={service.imageUrl}
                     alt={service.title}
                     fill
+                    unoptimized={isUnoptimizedImage(service.imageUrl)}
                     priority
                     sizes="(max-width: 1023px) calc(100vw - 2.5rem), (max-width: 1279px) calc(100vw - 29rem), 764px"
                     className="object-cover"

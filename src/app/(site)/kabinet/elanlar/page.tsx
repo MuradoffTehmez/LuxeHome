@@ -14,7 +14,7 @@ import {
 } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 
 export const metadata: Metadata = buildMetadata({
   title: "Elanlarım",
@@ -59,6 +59,7 @@ export default async function CabinetPropertiesPage({
             src={property.images[0].url}
             alt=""
             fill
+            unoptimized={isUnoptimizedImage(property.images[0].url)}
             sizes="64px"
             className="object-cover"
           />

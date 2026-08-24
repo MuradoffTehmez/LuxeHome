@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BedDouble, Building2, Layers, Maximize, MapPin } from "lucide-react";
-import { cn, formatArea, formatNumber, formatPrice } from "@/lib/utils";
+import { cn, formatArea, formatNumber, formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import {
   LISTING_TYPES,
   PRICE_PERIOD_LABELS,
@@ -68,6 +68,7 @@ export function PropertyCard({
             src={image.url}
             alt={image.alt || `${property.title} — ${location}`}
             fill
+            unoptimized={isUnoptimizedImage(image.url)}
             priority={priority}
             loading={priority ? undefined : "lazy"}
             sizes={
@@ -205,6 +206,7 @@ export function PropertyRow({ property }: { property: PropertyCardData }) {
             src={image.url}
             alt={image.alt || property.title}
             fill
+            unoptimized={isUnoptimizedImage(image.url)}
             loading="lazy"
             sizes="96px"
             className="object-cover transition-transform duration-500 group-hover:scale-105"

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Building2, CalendarDays, MapPin } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
   PROJECT_STATUS_LABELS,
   PROJECT_TYPE_LABELS,
@@ -42,6 +42,7 @@ export function ProjectCard({
             src={project.coverUrl}
             alt={`${project.name} layihəsi`}
             fill
+            unoptimized={isUnoptimizedImage(project.coverUrl)}
             priority={priority}
             loading={priority ? undefined : "lazy"}
             sizes="(max-width: 639px) calc(100vw - 2.5rem), (max-width: 1279px) calc(50vw - 2.25rem), 448px"

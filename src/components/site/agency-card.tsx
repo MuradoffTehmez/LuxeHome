@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Building2, MapPin, Phone } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 
 export type AgencyCardData = {
   id: string;
@@ -34,6 +34,7 @@ export function AgencyCard({
               src={agency.logoUrl}
               alt={agency.name}
               fill
+              unoptimized={isUnoptimizedImage(agency.logoUrl)}
               sizes="64px"
               className="object-cover"
             />

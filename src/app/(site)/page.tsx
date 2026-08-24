@@ -18,6 +18,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { Hero } from "@/components/site/hero";
 import { MobileCategoryRail } from "@/components/site/mobile-category-rail";
 import { PropertyCard } from "@/components/site/property-card";
+import { isUnoptimizedImage } from "@/lib/utils";
 import { ProjectCard } from "@/components/site/project-card";
 import { PostCard } from "@/components/site/post-card";
 import { siteConfig } from "@/config/site";
@@ -204,6 +205,7 @@ export default async function HomePage() {
                       src={item.imageUrl}
                       alt={item.label}
                       fill
+                      unoptimized={isUnoptimizedImage(item.imageUrl)}
                       loading="lazy"
                       sizes="(max-width: 1024px) 50vw, 25vw"
                       className="image-lift object-cover"

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Building2, GitCompareArrows, X } from "lucide-react";
 import { EmptyState } from "@/components/ui/states";
 import { ConfirmClearButton } from "@/components/site/confirm-clear-button";
-import { cn, formatArea, formatNumber, formatPrice } from "@/lib/utils";
+import { cn, formatArea, formatNumber, formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import {
   BUILDING_TYPE_LABELS,
   DOCUMENT_STATUS_LABELS,
@@ -168,6 +168,7 @@ export function ComparePresentation({
                   src={selected.images[0].url}
                   alt={selected.images[0].alt || selected.title}
                   fill
+                  unoptimized={isUnoptimizedImage(selected.images[0].url)}
                   sizes="96px"
                   className="object-cover"
                 />
@@ -222,6 +223,7 @@ export function ComparePresentation({
                           src={property.images[0].url}
                           alt={property.images[0].alt || property.title}
                           fill
+                          unoptimized={isUnoptimizedImage(property.images[0].url)}
                           sizes="240px"
                           className="object-cover"
                         />

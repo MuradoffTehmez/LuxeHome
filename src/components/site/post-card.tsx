@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, Newspaper } from "lucide-react";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, isUnoptimizedImage } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { PostCardData } from "@/lib/queries";
 
@@ -34,6 +34,7 @@ export function PostCard({
             src={post.coverUrl}
             alt={post.coverAlt || post.title}
             fill
+            unoptimized={isUnoptimizedImage(post.coverUrl)}
             priority={priority}
             loading={priority ? undefined : "lazy"}
             sizes={

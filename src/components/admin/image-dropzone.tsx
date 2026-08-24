@@ -12,7 +12,7 @@ import {
   Trash2,
   UploadCloud,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 import { useFieldError } from "./form-shell";
 import { DEFAULT_IMAGE_UPLOAD_URL } from "./image-dropzone-config";
@@ -271,8 +271,8 @@ export function ImageDropzone({
                   alt=""
                   fill
                   sizes="(max-width: 479px) 100vw, (max-width: 639px) 50vw, (max-width: 1023px) 33vw, 25vw"
-                  // Blob URL-lər Next optimizasiyasından keçmir
-                  unoptimized={item.url.startsWith("blob:")}
+                  // Blob URL-lər və R2-dən verilən /media/ şəkilləri Next optimizasiyasından keçmir
+                  unoptimized={isUnoptimizedImage(item.url)}
                   className={cn("object-cover", item.status !== "ready" && "opacity-50")}
                 />
                 {item.status === "uploading" && (

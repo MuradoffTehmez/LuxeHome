@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PropertyCard } from "@/components/site/property-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getAgencyBySlug } from "@/lib/queries";
+import { isUnoptimizedImage } from "@/lib/utils";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -69,6 +70,7 @@ export default async function AgencyDetailPage({ params }: Props) {
                   src={agency.logoUrl}
                   alt={agency.name}
                   fill
+                  unoptimized={isUnoptimizedImage(agency.logoUrl)}
                   sizes="96px"
                   className="object-cover"
                 />

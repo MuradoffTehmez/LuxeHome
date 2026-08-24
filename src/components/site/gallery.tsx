@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
-import { cn } from "@/lib/utils";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 
 export type GalleryImage = {
   url: string;
@@ -96,6 +96,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
                 src={image.url}
                 alt={alt}
                 fill
+                unoptimized={isUnoptimizedImage(image.url)}
                 priority={imageIndex === 0}
                 loading={imageIndex === 0 ? undefined : "lazy"}
                 sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 390px"
@@ -152,6 +153,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
             src={current.url}
             alt={current.alt || `${title} — şəkil ${index + 1}`}
             fill
+            unoptimized={isUnoptimizedImage(current.url)}
             sizes="100vw"
             className="object-contain"
           />
