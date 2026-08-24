@@ -1,5 +1,6 @@
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
+import { useTranslations } from "next-intl";
 
 /**
  * Hüquqi mətn səhifələri üçün ümumi çərçivə (məxfilik, şərtlər, cookie).
@@ -53,6 +54,3 @@ export function LegalArticle({
     </>
   );
 }
-"use client";
-
-import { useTranslations } from "next-intl";

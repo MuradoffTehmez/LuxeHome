@@ -13,8 +13,8 @@ const discoveryLinks = [
 ] as const;
 
 /** Ana səhifədə axtarış niyyətini izah edən, crawl edilə bilən lokal giriş. */
-export async function HomeSeoIntro({ locale: _locale = DEFAULT_LOCALE }: { locale?: Locale }) {
-  const t = await getTranslations("home.intro");
+export async function HomeSeoIntro({ locale = DEFAULT_LOCALE }: { locale?: Locale }) {
+  const t = await getTranslations({ locale, namespace: "home.intro" });
   return (
     <Section tone="paper" spacing="cozy" aria-labelledby="home-seo-intro-title">
       <Container size="wide">

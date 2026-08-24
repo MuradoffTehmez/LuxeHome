@@ -1,4 +1,5 @@
 import { AlertTriangle, Inbox, SearchX } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button, ButtonLink } from "./button";
 import { Container, Section } from "./container";
@@ -69,8 +70,10 @@ export function CollectionPageSkeleton({
   cards?: number;
   variant?: "property" | "article";
 }) {
+  const t = useTranslations("common.ui");
+
   return (
-    <div role="status" aria-label="Məzmun yüklənir" aria-busy="true">
+    <div role="status" aria-label={t("contentLoading")} aria-busy="true">
       <header className="border-b border-line bg-[var(--surface-page)] py-7 sm:py-9">
         <Container>
           <Skeleton className="mb-4 h-4 w-28" />
@@ -91,14 +94,16 @@ export function CollectionPageSkeleton({
           )}
         </Container>
       </Section>
-      <span className="sr-only">Məzmun yüklənir…</span>
+      <span className="sr-only">{t("contentLoading")}</span>
     </div>
   );
 }
 
 export function DetailSkeleton() {
+  const t = useTranslations("common.ui");
+
   return (
-    <div role="status" aria-label="Detal səhifəsi yüklənir" aria-busy="true">
+    <div role="status" aria-label={t("detailLoading")} aria-busy="true">
       <header className="border-b border-line bg-[var(--surface-page)] py-7 sm:py-9">
         <Container>
           <Skeleton className="mb-4 h-4 w-36" />
@@ -121,7 +126,7 @@ export function DetailSkeleton() {
           </div>
         </Container>
       </Section>
-      <span className="sr-only">Detal məlumatları yüklənir…</span>
+      <span className="sr-only">{t("detailLoading")}</span>
     </div>
   );
 }
@@ -197,13 +202,15 @@ export function EmptyState({
 
 /** Filtrlərə uyğun əmlak tapılmadıqda göstərilir. */
 export function NoResultsState({ onReset }: { onReset?: () => void }) {
+  const t = useTranslations("common.ui");
+
   return (
     <EmptyState
       icon={<SearchX className="size-6" aria-hidden="true" />}
-      title="Bu kriteriyalara uyğun əmlak tapılmadı"
-      description="Axtarış şərtlərini dəyişərək və ya filtrləri sıfırlayaraq yenidən cəhd edin."
-      onAction={onReset ? { label: "Filtrləri sıfırla", onClick: onReset } : undefined}
-      action={onReset ? undefined : { label: "Bütün əmlaklara bax", href: "/emlaklar" }}
+      title={t("noResultsTitle")}
+      description={t("noResultsDescription")}
+      onAction={onReset ? { label: t("resetFilters"), onClick: onReset } : undefined}
+      action={onReset ? undefined : { label: t("allProperties"), href: "/emlaklar" }}
     />
   );
 }
@@ -224,11 +231,15 @@ type ErrorStateProps = {
  * yalnız anlaşılan mesaj və bərpa yolu.
  */
 export function ErrorState({
-  title = "Xidmət müvəqqəti olaraq əlçatan deyil",
-  description = "Bir qədər sonra yenidən cəhd edin. Problem davam edərsə, bizimlə əlaqə saxlayın.",
+  title,
+  description,
   onRetry,
   className,
 }: ErrorStateProps) {
+  const t = useTranslations("common.ui");
+  const resolvedTitle = title ?? t("errorTitle");
+  const resolvedDescription = description ?? t("errorDescription");
+
   return (
     <div
       role="alert"
@@ -243,18 +254,18 @@ export function ErrorState({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <h3 className="font-display text-xl text-ink">{title}</h3>
-        <p className="mx-auto max-w-sm text-sm text-ink-soft">{description}</p>
+        <h3 className="font-display text-xl text-ink">{resolvedTitle}</h3>
+        <p className="mx-auto max-w-sm text-sm text-ink-soft">{resolvedDescription}</p>
       </div>
 
       <div className="flex flex-wrap justify-center gap-3">
         {onRetry && (
           <Button type="button" variant="outline" size="sm" onClick={onRetry}>
-            Yenidən cəhd et
+            {t("retry")}
           </Button>
         )}
         <ButtonLink href="/elaqe" variant="ghost" size="sm">
-          Bizimlə əlaqə
+          {t("contact")}
         </ButtonLink>
       </div>
     </div>

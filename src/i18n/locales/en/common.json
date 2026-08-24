@@ -49,6 +49,15 @@
     "nextPage": "Next page",
     "page": "Page {page}",
     "close": "Close",
-    "notificationClose": "Dismiss notification"
+    "notificationClose": "Dismiss notification",
+    "contentLoading": "Content is loading…",
+    "detailLoading": "Property details are loading…",
+    "noResultsTitle": "No properties match these criteria",
+    "noResultsDescription": "Change your search criteria or reset the filters and try again.",
+    "allProperties": "View all properties",
+    "errorTitle": "The service is temporarily unavailable",
+    "errorDescription": "Please try again shortly. If the problem continues, contact us.",
+    "retry": "Try again",
+    "contact": "Contact us"
   }
 }

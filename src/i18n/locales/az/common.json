@@ -49,6 +49,15 @@
     "nextPage": "Növbəti səhifə",
     "page": "Səhifə {page}",
     "close": "Bağla",
-    "notificationClose": "Bildirişi bağla"
+    "notificationClose": "Bildirişi bağla",
+    "contentLoading": "Məzmun yüklənir…",
+    "detailLoading": "Detal məlumatları yüklənir…",
+    "noResultsTitle": "Bu kriteriyalara uyğun əmlak tapılmadı",
+    "noResultsDescription": "Axtarış şərtlərini dəyişərək və ya filtrləri sıfırlayaraq yenidən cəhd edin.",
+    "allProperties": "Bütün əmlaklara bax",
+    "errorTitle": "Xidmət müvəqqəti olaraq əlçatan deyil",
+    "errorDescription": "Bir qədər sonra yenidən cəhd edin. Problem davam edərsə, bizimlə əlaqə saxlayın.",
+    "retry": "Yenidən cəhd et",
+    "contact": "Bizimlə əlaqə"
   }
 }
