@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { getFocusWrapIndex } from "@/lib/ui/overlay-focus";
 import { cn } from "@/lib/utils";
@@ -114,7 +115,7 @@ export function Overlay({
 
   if (!open) return null;
 
-  return (
+  const dialog = (
     <div
       className={cn(
         "fixed inset-0 z-[var(--z-modal)] flex overflow-hidden",
@@ -170,4 +171,10 @@ export function Overlay({
       </div>
     </div>
   );
+
+  // `document.body`-yə portallanır: çağıran ağacda `backdrop-blur`/`transform` olan
+  // əcdad (məs. Navbar-ın bulanıq header-i) `position: fixed`-ə yeni containing block
+  // yaradır və overlay-i öz kiçik qutusuna həbs edir — panel görünmür. SSR-də
+  // `document` yoxdur, ona görə orada portalsız render olunur (test mühiti daxil).
+  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }
