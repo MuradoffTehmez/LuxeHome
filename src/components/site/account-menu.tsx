@@ -48,7 +48,7 @@ export function AccountMenu({
         if (!active) return;
         setState(
           data.signedIn
-            ? { status: "signed-in", name: data.name ?? "Hesab", isStaff: data.isStaff === true }
+            ? { status: "signed-in", name: data.name ?? t("myAccount"), isStaff: data.isStaff === true }
             : { status: "anonymous" },
         );
       } catch {
@@ -62,7 +62,7 @@ export function AccountMenu({
       active = false;
     };
     // Marşrut dəyişəndə yenidən oxunur: giriş/çıxışdan sonra menyu dərhal uyğunlaşır
-  }, [pathname]);
+  }, [pathname, t]);
 
   if (state.status === "loading") return null;
 

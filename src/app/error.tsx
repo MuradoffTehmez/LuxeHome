@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/container";
 import { Button, ButtonLink } from "@/components/ui/button";
 
@@ -15,6 +16,9 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const locale = useLocale();
+  const t = useTranslations("common.globalError");
+  const prefix = locale === "az" ? "" : `/${locale}`;
   useEffect(() => {
     console.error("Səhifə xətası:", error);
   }, [error]);
@@ -24,18 +28,18 @@ export default function GlobalError({
       <Container>
         <div className="mx-auto max-w-xl py-20 text-center">
           <h1 className="font-serif text-3xl text-ink sm:text-4xl">
-            Gözlənilməz xəta baş verdi
+            {t("title")}
           </h1>
           <p className="mt-4 text-ink-soft">
-            Zəhmət olmasa səhifəni yeniləyin. Problem davam edərsə bizimlə əlaqə saxlayın.
+            {t("description")}
           </p>
           {error.digest ? (
-            <p className="mt-3 text-xs text-ink-muted">Xəta kodu: {error.digest}</p>
+            <p className="mt-3 text-xs text-ink-muted">{t("code", { code: error.digest })}</p>
           ) : null}
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button onClick={reset}>Yenidən cəhd et</Button>
-            <ButtonLink href="/elaqe" variant="outline">
-              Əlaqə
+            <Button onClick={reset}>{t("retry")}</Button>
+            <ButtonLink href={`${prefix}/elaqe`} variant="outline">
+              {t("contact")}
             </ButtonLink>
           </div>
         </div>

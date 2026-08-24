@@ -16,5 +16,8 @@
   "call": "Call",
   "portfolio": "Current portfolio",
   "matchingListings": "Matching property listings",
-  "activeListings": "{count, plural, one {# active listing} other {# active listings}}"
+  "activeListings": "{count, plural, one {# active listing} other {# active listings}}",
+  "articleShare": "Share this article",
+  "relatedArticlesDescription": "More articles for readers interested in this topic.",
+  "propertyDetail": {"notFound": "Property not found", "sale": "For sale", "rent": "For rent", "saleListings": "Properties for sale", "rentListings": "Properties for rent", "whatsappMessage": "Hello, I would like more information about the listing \"{title}\".", "rooms": "Rooms", "area": "Area", "floor": "Floor", "renovation": "Condition", "document": "Documents", "landArea": "Land area", "relatedSearchesAria": "Related property searches", "relatedSearches": "Related searches", "onMap": "On the map", "project": "Development", "viewProject": "View development", "closedTitle": "This property is no longer available", "contactTitle": "Contact us", "closedDescription": "Browse similar active listings or contact us for a new selection.", "contactDescription": "Interested in this property? Send an enquiry or call us.", "orEnquiry": "or send an enquiry", "similarDescription": "Explore other properties similar to this listing."}
 }

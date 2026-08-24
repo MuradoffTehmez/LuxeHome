@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { getFocusWrapIndex } from "@/lib/ui/overlay-focus";
 import { cn } from "@/lib/utils";
 import { IconButton } from "./button";
@@ -52,6 +53,7 @@ export function Overlay({
   footer,
   className,
 }: OverlayProps) {
+  const t = useTranslations("common.ui");
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const generatedId = useId();
@@ -154,7 +156,7 @@ export function Overlay({
               </p>
             ) : null}
           </div>
-          <IconButton label="Bağla" onClick={onClose} className="-mt-2 -mr-2 shrink-0">
+          <IconButton label={t("close")} onClick={onClose} className="-mt-2 -mr-2 shrink-0">
             <X className="size-5" aria-hidden="true" />
           </IconButton>
         </header>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { BedDouble, Building2, Layers, Maximize, MapPin } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
@@ -10,7 +10,9 @@ import {
   PROPERTY_STATUSES,
   PROPERTY_STATUS_TONE,
   type PropertyStatus,
+  type Locale,
 } from "@/lib/constants";
+import { localizeKnownContent } from "@/i18n/dynamic-content";
 import { Badge } from "@/components/ui/badge";
 import type { PropertyCardData } from "@/lib/queries";
 import { FavoriteButton } from "./favorite-button";
@@ -30,13 +32,19 @@ const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "r
 };
 
 export function PropertyCard({
-  property,
+  property: sourceProperty,
   priority = false,
   className,
   variant = "standard",
 }: PropertyCardProps) {
   const t = useTranslations("property");
   const format = useFormatter();
+  const locale = useLocale() as Locale;
+  const localizedProperty = localizeKnownContent("property", sourceProperty, locale);
+  const property = {
+    ...localizedProperty,
+    type: localizeKnownContent("propertyType", localizedProperty.type, locale),
+  };
   const image = property.images[0];
   const status = property.status as PropertyStatus;
   const isSale = property.listingType === LISTING_TYPES.SALE;
@@ -199,8 +207,10 @@ export function PropertyCard({
 }
 
 /** Yan panel və oxşar əmlaklar üçün kompakt sətir. */
-export function PropertyRow({ property }: { property: PropertyCardData }) {
+export function PropertyRow({ property: sourceProperty }: { property: PropertyCardData }) {
   const format = useFormatter();
+  const locale = useLocale() as Locale;
+  const property = localizeKnownContent("property", sourceProperty, locale);
   const image = property.images[0];
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)

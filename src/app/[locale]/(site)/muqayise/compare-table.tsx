@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { Building2, GitCompareArrows, X } from "lucide-react";
@@ -10,6 +10,8 @@ import { ConfirmClearButton } from "@/components/site/confirm-clear-button";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { useCompareList } from "@/lib/compare";
 import { fetchCompareProperties } from "./actions";
+import { localizeKnownContent } from "@/i18n/dynamic-content";
+import type { Locale } from "@/lib/constants";
 
 export type CompareProperty = Awaited<ReturnType<typeof fetchCompareProperties>>[number];
 
@@ -111,11 +113,23 @@ type ComparePresentationProps = {
 
 /** Yüklənmiş müqayisə datasının breakpoint-ə uyğun iki təqdimatı. */
 export function ComparePresentation({
-  properties,
+  properties: sourceProperties,
   sourceCount,
   onRemove,
   onClear,
 }: ComparePresentationProps) {
+  const locale = useLocale() as Locale;
+  const properties = sourceProperties.map((sourceProperty) => {
+    const property = localizeKnownContent("property", sourceProperty, locale);
+    return {
+      ...property,
+      type: localizeKnownContent("propertyType", property.type, locale),
+      features: property.features.map((item) => ({
+        ...item,
+        feature: localizeKnownContent("feature", item.feature, locale),
+      })),
+    };
+  });
   const t = useTranslations("property.compareTable");
   const compareT = useTranslations("property.compare");
   const rows = useCompareRows();

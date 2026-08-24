@@ -16,5 +16,8 @@
   "call": "Zəng et",
   "portfolio": "Cari portfel",
   "matchingListings": "Uyğun əmlak elanları",
-  "activeListings": "{count} aktiv elan"
+  "activeListings": "{count} aktiv elan",
+  "articleShare": "Məqaləni paylaş",
+  "relatedArticlesDescription": "Bu mövzu ilə maraqlananlar üçün digər yazılarımız.",
+  "propertyDetail": {"notFound": "Əmlak tapılmadı", "sale": "Satılır", "rent": "Kirayə", "saleListings": "Satılan əmlaklar", "rentListings": "Kirayə əmlaklar", "whatsappMessage": "Salam, \"{title}\" elanı ilə bağlı məlumat almaq istəyirəm.", "rooms": "Otaqlar", "area": "Sahə", "floor": "Mərtəbə", "renovation": "Təmir", "document": "Sənəd", "landArea": "Torpaq sahəsi", "relatedSearchesAria": "Əlaqəli əmlak axtarışları", "relatedSearches": "Əlaqəli axtarışlar", "onMap": "Xəritədə", "project": "Layihə", "viewProject": "Layihəyə bax", "closedTitle": "Bu əmlak artıq mövcud deyil", "contactTitle": "Əlaqə saxlayın", "closedDescription": "Oxşar aktiv elanlara baxa və ya yeni seçim üçün bizimlə əlaqə saxlaya bilərsiniz.", "contactDescription": "Bu əmlakla maraqlanırsınız? Müraciət göndərin və ya zəng edin.", "orEnquiry": "və ya müraciət yazın", "similarDescription": "Bu əmlaka oxşar digər təkliflərə göz atın."}
 }

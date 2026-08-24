@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
 import { ResponsiveToolbar } from "@/components/ui/responsive-toolbar";
@@ -17,17 +18,13 @@ import { classifyPropertySearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
 import { getFilterOptions } from "@/lib/queries";
 import { getCachedProperties } from "@/lib/public-cache";
-import { formatNumber } from "@/lib/utils";
 import {
   buildActivePropertyFilters,
   buildPropertySearchHref,
   parsePropertySearchParams,
 } from "@/lib/property-search";
-import {
-  LISTING_TYPE_LABELS,
-  SORT_OPTIONS,
-  type ListingType,
-} from "@/lib/constants";
+import { SORT_OPTIONS, type Locale } from "@/lib/constants";
+import { localizeKnownContent } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -42,13 +39,13 @@ type Props = {
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const [{ locale }, query] = await Promise.all([params, searchParams]);
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
+  const t = await getTranslations({ locale: resolvedLocale, namespace: "listings.propertiesPage" });
   const decision = classifyPropertySearchParams(query);
-  const pageSuffix = decision.page > 1 ? ` — ${decision.page}-ci səhifə` : "";
+  const pageSuffix = decision.page > 1 ? t("pageSuffix", { page: decision.page }) : "";
 
   return buildMetadata({
-    title: `Bakıda əmlak elanları${pageSuffix}`,
-    description:
-      "Bakıda mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyektlərinin satışı və icarəsi. Axtarış filtri ilə sizə uyğun əmlakı tapın.",
+    title: `${t("metaTitle")}${pageSuffix}`,
+    description: t("metaDescription"),
     path: decision.canonicalPath ?? "/emlaklar",
     canonicalPath: decision.canonicalPath,
     indexPolicy: decision.indexPolicy,
@@ -65,8 +62,9 @@ function positiveNumber(value: string | undefined): number | undefined {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
 }
 
-export default async function PropertiesPage({ searchParams }: Props) {
-  const params = await searchParams;
+export default async function PropertiesPage({ params: routeParams, searchParams }: Props) {
+  const [{ locale }, params] = await Promise.all([routeParams, searchParams]);
+  const t = await getTranslations({ locale, namespace: "listings" });
   const indexDecision = classifyPropertySearchParams(params);
   if (!indexDecision.validPage) notFound();
 
@@ -108,7 +106,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
 
   const typeOptions = filterOptions.types.map((type) => ({
     value: type.slug,
-    label: type.name,
+    label: localizeKnownContent("propertyType", type, locale as Locale).name,
   }));
   const cityOptions = filterOptions.cities.map((city) => ({
     value: city.slug,
@@ -122,7 +120,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
   // Ödəniş şərtləri xüsusiyyət cədvəlində saxlanılır, ona görə eyni siyahıdan gəlir
   const featureOptions = filterOptions.features.map((feature) => ({
     value: feature.slug,
-    label: feature.name,
+    label: localizeKnownContent("feature", feature, locale as Locale).name,
     group: feature.group,
   }));
 
@@ -142,9 +140,11 @@ export default async function PropertiesPage({ searchParams }: Props) {
     features: featureOptions,
   });
 
-  const listingLabel = raw.elan
-    ? LISTING_TYPE_LABELS[raw.elan as ListingType]
-    : null;
+  const listingLabel = raw.elan === "SALE"
+    ? t("search.sale")
+    : raw.elan === "RENT"
+      ? t("search.rent")
+      : null;
   const initialSearch = {
     ...raw,
     mertebe_min: raw.mertebe_min,
@@ -171,13 +171,9 @@ export default async function PropertiesPage({ searchParams }: Props) {
         <Container>
           <SectionHeader
             as="h1"
-            overline="Əmlaklar"
-            title={listingLabel ? `${listingLabel} elanları` : "Bütün əmlaklar"}
-            description={
-              total > 0
-                ? `${formatNumber(total)} nəticə tapıldı`
-                : "Nəticə tapılmadı"
-            }
+            overline={t("propertiesPage.overline")}
+            title={listingLabel ? t("propertiesPage.typedTitle", { type: listingLabel }) : t("propertiesPage.allTitle")}
+            description={t("results", { count: total })}
           />
           <div className="mt-8">
             <SearchPanel
@@ -224,7 +220,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
                   <ActiveFilterChips items={activeFilters} resetHref="/emlaklar" />
                 ) : (
                   <p className="text-sm text-ink-muted">
-                    Filtr seçilməyib — bütün elanlar göstərilir.
+                    {t("propertiesPage.noFilters")}
                   </p>
                 )}
                 <SortSelect value={sort} hrefs={sortHrefs} className="shrink-0" />
@@ -240,7 +236,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
             />
           ) : (
             <p className="mt-4 mb-6 text-sm text-ink-muted lg:hidden">
-              Filtr seçilməyib — bütün elanlar göstərilir.
+              {t("propertiesPage.noFilters")}
             </p>
           )}
 
@@ -263,9 +259,9 @@ export default async function PropertiesPage({ searchParams }: Props) {
             </>
           ) : (
             <EmptyState
-              title="Bu kriteriyalara uyğun əmlak tapılmadı"
-              description="Axtarış şərtlərini genişləndirin və ya filtrləri sıfırlayaraq yenidən cəhd edin."
-              action={{ label: "Bütün əmlaklara bax", href: "/emlaklar" }}
+              title={t("propertiesPage.emptyTitle")}
+              description={t("propertiesPage.emptyDescription")}
+              action={{ label: t("propertiesPage.viewAll"), href: "/emlaklar" }}
             />
           )}
         </Container>

@@ -29,6 +29,7 @@ import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { buildMetadata } from "@/lib/seo";
 import { getCachedHomePageData } from "@/lib/public-cache";
+import { localizeKnownContent } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -87,10 +88,12 @@ export default async function HomePage({ params }: HomePageProps) {
   const propertyT = await getTranslations({ locale: resolvedLocale, namespace: "property" });
   const { featured, propertyTypes, services, projects, posts, filterOptions, categories } =
     await getCachedHomePageData();
+  const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
+  const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 
   const typeOptions = filterOptions.types.map((type) => ({
     value: type.slug,
-    label: type.name,
+    label: localizeKnownContent("propertyType", type, resolvedLocale).name,
   }));
   // Rayon seçimi şəhərdən asılı olduğu üçün alt siyahı da ötürülür
   const cityOptions = filterOptions.cities.map((city) => ({
@@ -101,7 +104,7 @@ export default async function HomePage({ params }: HomePageProps) {
       label: district.name,
     })),
   }));
-  const categoryItems = propertyTypes.map((type) => ({
+  const categoryItems = localizedPropertyTypes.map((type) => ({
     href: `/emlaklar?tip=${type.slug}`,
     label: type.name,
     count: type._count.properties,
@@ -232,7 +235,7 @@ export default async function HomePage({ params }: HomePageProps) {
             />
 
             <div className="border-t border-line-dark">
-              {services.map((service, index) => (
+              {localizedServices.map((service, index) => (
                 <Reveal key={service.id} delay={index * 40}>
                   <Link
                     href={`/xidmetler/${service.slug}`}

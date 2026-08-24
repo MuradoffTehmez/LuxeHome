@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 type ToastTone = "success" | "error" | "info";
@@ -42,6 +43,7 @@ const TONES: Record<ToastTone, { className: string; icon: React.ReactNode }> = {
 const AUTO_DISMISS_MS = 4000;
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("common.ui");
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const dismiss = useCallback((id: number) => {
@@ -83,7 +85,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => dismiss(item.id)}
-              aria-label="Bildirişi bağla"
+              aria-label={t("notificationClose")}
               className="-my-1 -mr-1 shrink-0 cursor-pointer rounded-xs p-1 opacity-70 transition-opacity hover:opacity-100"
             >
               <X className="size-4" aria-hidden="true" />

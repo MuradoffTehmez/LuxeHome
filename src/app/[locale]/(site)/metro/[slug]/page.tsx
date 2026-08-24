@@ -7,7 +7,7 @@ import { routing } from "@/i18n/routing";
 import { type Locale } from "@/lib/constants";
 import { getTaxonomyLandingProperties } from "@/lib/queries";
 import { breadcrumbSchema, buildMetadata, faqSchema, itemListSchema, jsonLd } from "@/lib/seo";
-import { buildTaxonomyLandingDescriptor, seoLandingIndexPolicy } from "@/lib/seo-landings";
+import { buildTaxonomyLandingDescriptor, getSeoLandingRouteLabels, seoLandingIndexPolicy } from "@/lib/seo-landings";
 
 export const dynamic = "force-dynamic";
 
@@ -32,16 +32,18 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const page = pageNumber(query.sehife);
   const result = page ? await getMetroLandingResult(slug, page) : null;
   if (!page || !result) return {};
-  const landing = buildTaxonomyLandingDescriptor("METRO", result.location);
+  const localeValue = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
+  const landing = buildTaxonomyLandingDescriptor("METRO", result.location, localeValue);
+  const labels = getSeoLandingRouteLabels(localeValue);
   const canonicalPath = page > 1 ? `${landing.path}?sehife=${page}` : landing.path;
   return buildMetadata({
-    title: page > 1 ? `${landing.title} — ${page}-ci səhifə` : landing.title,
+    title: page > 1 ? `${landing.title}${labels.pageSuffix(page)}` : landing.title,
     description: landing.description,
     path: canonicalPath,
     canonicalPath,
     indexPolicy:
       page > result.totalPages ? "noindex-follow" : seoLandingIndexPolicy(result.total),
-    locale: (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale,
+    locale: localeValue,
   });
 }
 
@@ -51,12 +53,13 @@ export default async function MetroLandingPage({ params, searchParams }: Props) 
   if (!page || Object.keys(query).some((key) => key !== "sehife")) notFound();
   const result = await getMetroLandingResult(slug, page);
   if (!result || page > result.totalPages) notFound();
-  const landing = buildTaxonomyLandingDescriptor("METRO", result.location);
   const localeValue = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
+  const landing = buildTaxonomyLandingDescriptor("METRO", result.location, localeValue);
+  const labels = getSeoLandingRouteLabels(localeValue);
 
   return (
     <>
-      <script {...jsonLd(breadcrumbSchema([{ name: "Ana səhifə", path: "/" }, { name: "Əmlaklar", path: "/emlaklar" }, { name: landing.h1, path: landing.path }]))} />
+      <script {...jsonLd(breadcrumbSchema([{ name: labels.home, path: "/" }, { name: labels.properties, path: "/emlaklar" }, { name: landing.h1, path: landing.path }]))} />
       <script {...jsonLd(faqSchema(landing.faq, landing.path))} />
       <script {...jsonLd(itemListSchema(result.items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` }))))} />
       <SeoLandingPage landing={landing} locale={localeValue} {...result} />

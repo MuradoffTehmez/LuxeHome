@@ -13,7 +13,7 @@ import {
   jsonLd,
   buildMetadata,
 } from "@/lib/seo";
-import { findSeoLanding, seoLandingIndexPolicy } from "@/lib/seo-landings";
+import { findSeoLanding, getSeoLandingRouteLabels, localizeSeoLanding, seoLandingIndexPolicy } from "@/lib/seo-landings";
 
 export const dynamic = "force-dynamic";
 
@@ -33,16 +33,18 @@ function readPage(value: string | string[] | undefined): number | null {
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const [{ locale, seoLanding }, query] = await Promise.all([params, searchParams]);
-  const landing = findSeoLanding(seoLanding);
-  if (!landing) return {};
+  const sourceLanding = findSeoLanding(seoLanding);
+  if (!sourceLanding) return {};
   const page = readPage(query.sehife);
   if (!page) return {};
-  const result = await getLandingResult(landing, page);
+  const result = await getLandingResult(sourceLanding, page);
   const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
+  const landing = localizeSeoLanding(sourceLanding, resolvedLocale);
+  const labels = getSeoLandingRouteLabels(resolvedLocale);
   const canonicalPath = page && page > 1 ? `${landing.path}?sehife=${page}` : landing.path;
 
   return buildMetadata({
-    title: page && page > 1 ? `${landing.title} — ${page}-ci səhifə` : landing.title,
+    title: page && page > 1 ? `${landing.title}${labels.pageSuffix(page)}` : landing.title,
     description: landing.description,
     path: canonicalPath,
     canonicalPath,
@@ -54,22 +56,24 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function FixedSeoLandingPage({ params, searchParams }: Props) {
   const [{ locale, seoLanding }, query] = await Promise.all([params, searchParams]);
-  const landing = findSeoLanding(seoLanding);
+  const sourceLanding = findSeoLanding(seoLanding);
   const page = readPage(query.sehife);
   const hasExtraParams = Object.keys(query).some((key) => key !== "sehife");
-  if (!landing || !page || hasExtraParams) notFound();
+  if (!sourceLanding || !page || hasExtraParams) notFound();
 
-  const result = await getLandingResult(landing, page);
+  const result = await getLandingResult(sourceLanding, page);
   if (page > result.totalPages) notFound();
   const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
+  const landing = localizeSeoLanding(sourceLanding, resolvedLocale);
+  const labels = getSeoLandingRouteLabels(resolvedLocale);
 
   return (
     <>
       <script
         {...jsonLd(
           breadcrumbSchema([
-            { name: "Ana səhifə", path: "/" },
-            { name: "Əmlaklar", path: "/emlaklar" },
+            { name: labels.home, path: "/" },
+            { name: labels.properties, path: "/emlaklar" },
             { name: landing.h1, path: landing.path },
           ]),
         )}

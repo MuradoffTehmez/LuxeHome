@@ -24,5 +24,31 @@
     "description": "You can allow analytics cookies so we can understand how the website is used without collecting personal information. If you decline, the analytics script will not load.",
     "accept": "Allow analytics",
     "decline": "Decline"
+  },
+  "notFound": {
+    "title": "The page you requested was not found",
+    "description": "The page may have been removed, renamed or the address may be incorrect.",
+    "home": "Home",
+    "properties": "View properties"
+  },
+  "globalError": {
+    "title": "Something went wrong",
+    "description": "Please refresh the page. If the problem continues, contact our team.",
+    "code": "Error code: {code}",
+    "retry": "Try again",
+    "contact": "Contact"
+  },
+  "ui": {
+    "activeFilters": "Active filters",
+    "removeFilter": "Remove {label} filter",
+    "breadcrumbs": "Breadcrumb",
+    "resetFilters": "Reset all filters",
+    "pageActions": "Page actions",
+    "pagination": "Pagination",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "page": "Page {page}",
+    "close": "Close",
+    "notificationClose": "Dismiss notification"
   }
 }

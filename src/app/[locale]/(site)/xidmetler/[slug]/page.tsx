@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -12,6 +13,8 @@ import { buildMetadata, jsonLd, serviceSchema, breadcrumbSchema } from "@/lib/se
 import { getCachedServiceBySlug } from "@/lib/public-cache";
 import { siteConfig } from "@/config/site";
 import { isUnoptimizedImage } from "@/lib/utils";
+import type { Locale } from "@/lib/constants";
+import { localizeKnownContent } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -19,14 +22,16 @@ export const dynamic = "force-dynamic";
 
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const service = await getCachedServiceBySlug(slug);
+  const { locale, slug } = await params;
+  const t = await getTranslations({ locale, namespace: "listings" });
+  const sourceService = await getCachedServiceBySlug(slug);
 
-  if (!service) return { title: "Xidmət tapılmadı" };
+  if (!sourceService) return { title: t("detail.notFound") };
+  const service = localizeKnownContent("service", sourceService, locale as Locale);
 
   return buildMetadata({
     title: service.metaTitle || service.title,
@@ -38,14 +43,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogTitle: service.ogTitle,
     ogDescription: service.ogDescription,
     ogImage: service.ogImage,
+    locale: locale as Locale,
   });
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
-  const { slug } = await params;
-  const service = await getCachedServiceBySlug(slug);
+  const { locale, slug } = await params;
+  const [t, navigation] = await Promise.all([
+    getTranslations({ locale, namespace: "listings" }),
+    getTranslations({ locale, namespace: "navigation" }),
+  ]);
+  const sourceService = await getCachedServiceBySlug(slug);
 
-  if (!service) notFound();
+  if (!sourceService) notFound();
+  const service = localizeKnownContent("service", sourceService, locale as Locale);
 
   let bullets: string[] = [];
   try {
@@ -70,8 +81,8 @@ export default async function ServiceDetailPage({ params }: Props) {
       <script
         {...jsonLd(
           breadcrumbSchema([
-            { name: "Ana səhifə", path: "/" },
-            { name: "Xidmətlər", path: "/xidmetler" },
+            { name: navigation("home"), path: "/" },
+            { name: navigation("services"), path: "/xidmetler" },
             { name: service.title, path: `/xidmetler/${service.slug}` },
           ]),
         )}
@@ -79,12 +90,12 @@ export default async function ServiceDetailPage({ params }: Props) {
 
       <PageHeader
         compact
-        eyebrow="Xidmətlərimiz"
+        eyebrow={t("detail.serviceEyebrow")}
         title={service.title}
         description={service.shortDescription}
         breadcrumbs={[
-          { label: "Ana səhifə", href: "/" },
-          { label: "Xidmətlər", href: "/xidmetler" },
+          { label: navigation("home"), href: "/" },
+          { label: navigation("services"), href: "/xidmetler" },
           { label: service.title },
         ]}
         actions={
@@ -121,7 +132,7 @@ export default async function ServiceDetailPage({ params }: Props) {
 
               {bullets.length > 0 && (
                 <div className="mt-4 flex flex-col gap-4">
-                  <h2 className="font-display text-xl text-ink">Xidmətə nələr daxildir?</h2>
+                  <h2 className="font-display text-xl text-ink">{t("detail.serviceIncludes")}</h2>
                   <ul className="flex flex-col gap-3">
                     {bullets.map((bullet, index) => (
                       <li key={index} className="flex items-start gap-3 text-sm text-ink-soft sm:text-base">
@@ -137,9 +148,9 @@ export default async function ServiceDetailPage({ params }: Props) {
             aside={
               <div className="rounded-md border border-line bg-paper p-5 shadow-sm sm:p-6">
                 <div className="mb-6 flex flex-col gap-2">
-                  <h3 className="font-display text-xl text-ink">Müraciət edin</h3>
+                  <h3 className="font-display text-xl text-ink">{t("detail.enquire")}</h3>
                   <p className="text-sm text-ink-soft">
-                    Bu xidmət barədə suallarınız var və ya sifariş etmək istəyirsiniz?
+                    {t("detail.serviceEnquiryDescription")}
                   </p>
                 </div>
 
@@ -154,7 +165,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                   <div className="absolute inset-0 flex items-center" aria-hidden="true">
                     <div className="w-full border-t border-line" />
                   </div>
-                  <span className="relative bg-paper px-3 text-xs font-medium uppercase text-ink-muted">və ya mesaj yazın</span>
+                  <span className="relative bg-paper px-3 text-xs font-medium uppercase text-ink-muted">{t("detail.orMessage")}</span>
                 </div>
 
                 <ContactForm />

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ const ITEM =
   "transition-colors duration-200";
 
 export function Pagination({ page, totalPages, buildHref, className }: PaginationProps) {
+  const t = useTranslations("common.ui");
   if (totalPages <= 1) return null;
 
   const items = pageRange(page, totalPages);
@@ -40,14 +42,14 @@ export function Pagination({ page, totalPages, buildHref, className }: Paginatio
 
   return (
     <nav
-      aria-label="Səhifələmə"
+      aria-label={t("pagination")}
       className={cn("flex flex-wrap items-center justify-center gap-2", className)}
     >
       {hasPrevious ? (
         <Link
           href={buildHref(page - 1)}
           rel="prev"
-          aria-label="Əvvəlki səhifə"
+          aria-label={t("previousPage")}
           className={cn(ITEM, "border-line-strong text-ink hover:border-gold hover:text-gold-deep")}
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
@@ -82,7 +84,7 @@ export function Pagination({ page, totalPages, buildHref, className }: Paginatio
           <Link
             key={item}
             href={buildHref(item)}
-            aria-label={`Səhifə ${item}`}
+            aria-label={t("page", { page: item })}
             className={cn(
               ITEM,
               "tabular border-line-strong text-ink hover:border-gold hover:text-gold-deep",
@@ -97,7 +99,7 @@ export function Pagination({ page, totalPages, buildHref, className }: Paginatio
         <Link
           href={buildHref(page + 1)}
           rel="next"
-          aria-label="Növbəti səhifə"
+          aria-label={t("nextPage")}
           className={cn(ITEM, "border-line-strong text-ink hover:border-gold hover:text-gold-deep")}
         >
           <ChevronRight className="size-4" aria-hidden="true" />

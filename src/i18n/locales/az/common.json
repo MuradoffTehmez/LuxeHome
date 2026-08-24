@@ -24,5 +24,31 @@
     "description": "Saytın necə istifadə edildiyini şəxsi məlumat toplamadan ölçmək üçün analitika cookie-sinə icazə verə bilərsiniz. İmtina etdikdə analitika skripti yüklənmir.",
     "accept": "İcazə verirəm",
     "decline": "İmtina edirəm"
+  },
+  "notFound": {
+    "title": "Axtardığınız səhifə tapılmadı",
+    "description": "Səhifə silinmiş, adı dəyişmiş və ya ünvan səhv yazılmış ola bilər.",
+    "home": "Ana səhifə",
+    "properties": "Əmlaklara bax"
+  },
+  "globalError": {
+    "title": "Gözlənilməz xəta baş verdi",
+    "description": "Zəhmət olmasa səhifəni yeniləyin. Problem davam edərsə bizimlə əlaqə saxlayın.",
+    "code": "Xəta kodu: {code}",
+    "retry": "Yenidən cəhd et",
+    "contact": "Əlaqə"
+  },
+  "ui": {
+    "activeFilters": "Aktiv filtrlər",
+    "removeFilter": "{label} filtrini sil",
+    "breadcrumbs": "Naviqasiya yolu",
+    "resetFilters": "Bütün filtrləri sıfırla",
+    "pageActions": "Səhifə əməliyyatları",
+    "pagination": "Səhifələmə",
+    "previousPage": "Əvvəlki səhifə",
+    "nextPage": "Növbəti səhifə",
+    "page": "Səhifə {page}",
+    "close": "Bağla",
+    "notificationClose": "Bildirişi bağla"
   }
 }

@@ -11,6 +11,7 @@ import { ServiceIcon } from "@/components/site/service-icon";
 import { ButtonLink } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 import { getServices } from "@/lib/queries";
+import { localizeKnownContent } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -28,7 +29,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ServicesPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "listings.servicesPage" });
-  const services = await getServices();
+  const services = (await getServices()).map((service) =>
+    localizeKnownContent("service", service, locale as Locale),
+  );
 
   return (
     <>

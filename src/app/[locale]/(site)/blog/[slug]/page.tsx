@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { ShareButtons } from "@/components/site/share-buttons";
@@ -10,6 +11,7 @@ import { articleSchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/se
 import { getRelatedPosts } from "@/lib/queries";
 import { getCachedPostBySlug } from "@/lib/public-cache";
 import { isUnoptimizedImage } from "@/lib/utils";
+import type { Locale } from "@/lib/constants";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -17,14 +19,15 @@ export const dynamic = "force-dynamic";
 
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.blogPage" });
   const post = await getCachedPostBySlug(slug);
 
-  if (!post) return { title: "Məqalə tapılmadı" };
+  if (!post) return { title: t("notFound") };
 
   return buildMetadata({
     title: post.metaTitle || post.title,
@@ -37,11 +40,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogTitle: post.ogTitle,
     ogDescription: post.ogDescription,
     ogImage: post.ogImage,
+    locale: locale as Locale,
   });
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const [content, listings, navigation] = await Promise.all([
+    getTranslations({ locale, namespace: "content" }),
+    getTranslations({ locale, namespace: "listings" }),
+    getTranslations({ locale, namespace: "navigation" }),
+  ]);
   const post = await getCachedPostBySlug(slug);
 
   if (!post) notFound();
@@ -68,8 +77,8 @@ export default async function BlogPostPage({ params }: Props) {
       <script
         {...jsonLd(
           breadcrumbSchema([
-            { name: "Ana səhifə", path: "/" },
-            { name: "Blog", path: "/blog" },
+            { name: navigation("home"), path: "/" },
+            { name: navigation("blog"), path: "/blog" },
             { name: post.title, path: `/blog/${post.slug}` },
           ]),
         )}
@@ -77,12 +86,12 @@ export default async function BlogPostPage({ params }: Props) {
 
       <PageHeader
         compact
-        eyebrow={post.category?.name || "Luxe jurnal"}
+        eyebrow={post.category?.name || listings("blogPage.journal")}
         title={post.title}
         description={post.excerpt}
         breadcrumbs={[
-          { label: "Ana səhifə", href: "/" },
-          { label: "Blog", href: "/blog" },
+          { label: navigation("home"), href: "/" },
+          { label: navigation("blog"), href: "/blog" },
           { label: post.title },
         ]}
         actions={
@@ -121,7 +130,7 @@ export default async function BlogPostPage({ params }: Props) {
 
             {/* Share */}
             <div className="mt-12 flex flex-col gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-display text-lg text-ink">Məqaləni paylaş</span>
+              <span className="font-display text-lg text-ink">{content("articleShare")}</span>
               <ShareButtons title={post.title} path={`/blog/${post.slug}`} />
             </div>
           </div>
@@ -133,8 +142,8 @@ export default async function BlogPostPage({ params }: Props) {
         <Section tone="paper" spacing="cozy" className="border-t border-line">
           <Container>
             <div className="mb-8 flex flex-col gap-2">
-              <h2 className="font-display text-2xl text-ink sm:text-3xl">Oxşar məqalələr</h2>
-              <p className="text-sm text-ink-soft">Bu mövzu ilə maraqlananlar üçün digər yazılarımız.</p>
+              <h2 className="font-display text-2xl text-ink sm:text-3xl">{content("similarArticles")}</h2>
+              <p className="text-sm text-ink-soft">{content("relatedArticlesDescription")}</p>
             </div>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

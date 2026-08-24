@@ -1,4 +1,5 @@
 import type { PropertyFilters } from "@/lib/queries";
+import type { Locale } from "@/lib/constants";
 
 export const MIN_INDEXABLE_LISTINGS = 3;
 
@@ -210,6 +211,65 @@ export function findSeoLanding(slug: string): SeoLanding | null {
   return SEO_LANDINGS.find((landing) => landing.slug === slug) ?? null;
 }
 
+type LocalizedLandingHeading = Pick<SeoLanding, "title" | "description" | "h1" | "overline">;
+
+const EN_LANDING_HEADINGS: Record<string, LocalizedLandingHeading> = {
+  "satilan-emlaklar": { title: "Property for sale in Baku", description: "Compare apartments, villas, houses, land, offices and commercial property for sale in Baku by price, area and location.", h1: "Property for sale in Baku", overline: "Property sales" },
+  "kiraye-emlaklar": { title: "Property for rent in Baku", description: "Explore apartments, villas, houses, offices and commercial property for rent in Baku by price, area and rental period.", h1: "Property for rent in Baku", overline: "Property rentals" },
+  "bakida-satilan-menziller": { title: "Apartments for sale in Baku", description: "Compare apartments for sale in Baku by rooms, area, price, district, building type, condition and documents.", h1: "Apartments for sale in Baku", overline: "Apartment sales" },
+  "bakida-kiraye-menziller": { title: "Apartments for rent in Baku", description: "Compare apartments for rent in Baku by district, rooms, area, floor, furnishing and monthly price.", h1: "Apartments for rent in Baku", overline: "Apartment rentals" },
+  villalar: { title: "Villas in Baku", description: "Explore villas for sale and rent in Baku by land area, house area, rooms, condition, documents and location.", h1: "Villas for sale and rent in Baku", overline: "Villa selection" },
+  "heyet-evleri": { title: "Detached houses in Baku", description: "Compare detached houses for sale and rent in Baku by house and land area, rooms, condition, documents and location.", h1: "Detached houses for sale and rent in Baku", overline: "Private homes" },
+  "torpaq-saheleri": { title: "Land for sale in Baku", description: "Explore land for sale in Baku by plot size, price, permitted use, documents, utilities and location.", h1: "Land plots for sale in Baku", overline: "Land sales" },
+  "kommersiya-obyektleri": { title: "Commercial property in Baku", description: "Compare commercial property for sale and rent in Baku by area, access, location, documents, condition and price.", h1: "Commercial property in Baku", overline: "Business premises" },
+  ofisler: { title: "Offices in Baku", description: "Explore offices for sale and rent in Baku by area, layout, business centre, condition, parking and location.", h1: "Offices for sale and rent in Baku", overline: "Workspaces" },
+};
+
+const RU_LANDING_HEADINGS: Record<string, LocalizedLandingHeading> = {
+  "satilan-emlaklar": { title: "Недвижимость на продажу в Баку", description: "Сравнивайте квартиры, виллы, дома, участки, офисы и коммерческие объекты на продажу в Баку по цене, площади и расположению.", h1: "Недвижимость на продажу в Баку", overline: "Продажа недвижимости" },
+  "kiraye-emlaklar": { title: "Недвижимость в аренду в Баку", description: "Подбирайте квартиры, виллы, дома, офисы и коммерческие объекты в аренду в Баку по цене, площади и сроку аренды.", h1: "Недвижимость в аренду в Баку", overline: "Аренда недвижимости" },
+  "bakida-satilan-menziller": { title: "Квартиры на продажу в Баку", description: "Сравнивайте квартиры на продажу в Баку по количеству комнат, площади, цене, району, типу дома, ремонту и документам.", h1: "Квартиры на продажу в Баку", overline: "Продажа квартир" },
+  "bakida-kiraye-menziller": { title: "Квартиры в аренду в Баку", description: "Сравнивайте квартиры в аренду в Баку по району, комнатам, площади, этажу, мебели и месячной цене.", h1: "Квартиры в аренду в Баку", overline: "Аренда квартир" },
+  villalar: { title: "Виллы в Баку", description: "Подбирайте виллы на продажу и в аренду в Баку по площади дома и участка, комнатам, ремонту, документам и расположению.", h1: "Виллы на продажу и в аренду в Баку", overline: "Выбор виллы" },
+  "heyet-evleri": { title: "Частные дома в Баку", description: "Сравнивайте частные дома на продажу и в аренду в Баку по площади дома и участка, комнатам, ремонту и документам.", h1: "Частные дома на продажу и в аренду в Баку", overline: "Частные дома" },
+  "torpaq-saheleri": { title: "Земельные участки в Баку", description: "Подбирайте участки на продажу в Баку по площади, цене, назначению, документам, коммуникациям и расположению.", h1: "Земельные участки на продажу в Баку", overline: "Продажа земли" },
+  "kommersiya-obyektleri": { title: "Коммерческая недвижимость в Баку", description: "Сравнивайте коммерческие объекты на продажу и в аренду в Баку по площади, входу, расположению, документам и цене.", h1: "Коммерческая недвижимость в Баку", overline: "Помещения для бизнеса" },
+  ofisler: { title: "Офисы в Баку", description: "Подбирайте офисы на продажу и в аренду в Баку по площади, планировке, бизнес-центру, ремонту, парковке и расположению.", h1: "Офисы на продажу и в аренду в Баку", overline: "Рабочие пространства" },
+};
+
+export function localizeSeoLanding(landing: SeoLanding, locale: Locale): SeoLanding {
+  if (locale === "az") return landing;
+  const heading = (locale === "en" ? EN_LANDING_HEADINGS : RU_LANDING_HEADINGS)[landing.slug];
+  if (!heading) return landing;
+
+  const content = locale === "en"
+    ? [
+        `${heading.h1} are collected here from the current Luxe Home Estate portfolio. Use the listing cards and filters to compare price, area, rooms, location, condition and document details where those fields have been provided. The result count reflects active public listings in our database, not the size or statistics of the wider market.`,
+        "A listing is a starting point for comparison. Before buying or renting, confirm the exact address, physical condition, utilities, ownership documents, payment terms and any additional costs with the responsible person. An in-person viewing and independent legal or technical checks may be appropriate before signing an agreement.",
+      ]
+    : [
+        `${heading.h1} собраны на этой странице из актуального портфеля Luxe Home Estate. Карточки и фильтры помогают сравнить цену, площадь, комнаты, расположение, ремонт и документы, если эти данные указаны в объявлении. Количество результатов отражает активные публичные объявления в нашей базе, а не статистику всего рынка.`,
+        "Объявление служит отправной точкой для сравнения. До покупки или аренды уточните точный адрес, фактическое состояние, коммуникации, документы о собственности, условия оплаты и дополнительные расходы у ответственного лица. Перед подписанием договора может потребоваться личный осмотр и независимая юридическая или техническая проверка.",
+      ];
+  const faq = locale === "en"
+    ? [
+        { question: "How can I narrow the results?", answer: "Use property type, sale or rent status, price, area, rooms, condition and document filters to refine the available listings." },
+        { question: "What does the result count represent?", answer: "It shows current active public listings in the Luxe Home Estate database for this selection and is not a general market statistic." },
+      ]
+    : [
+        { question: "Как сузить результаты поиска?", answer: "Используйте фильтры типа недвижимости, продажи или аренды, цены, площади, комнат, ремонта и документов." },
+        { question: "Что означает количество результатов?", answer: "Это число активных публичных объявлений в базе Luxe Home Estate для выбранной категории, а не общая статистика рынка." },
+      ];
+
+  return { ...landing, ...heading, content, faq };
+}
+
+export function getSeoLandingRouteLabels(locale: Locale) {
+  if (locale === "en") return { home: "Home", properties: "Properties", pageSuffix: (page: number) => ` — page ${page}` };
+  if (locale === "ru") return { home: "Главная", properties: "Недвижимость", pageSuffix: (page: number) => ` — страница ${page}` };
+  return { home: "Ana səhifə", properties: "Əmlaklar", pageSuffix: (page: number) => ` — ${page}-ci səhifə` };
+}
+
 function activeFilterEntries(filters: PropertyFilters): Array<[string, unknown]> {
   return Object.entries(filters).filter(([, value]) => value !== undefined);
 }
@@ -240,7 +300,46 @@ type TaxonomyLocation = {
 export function buildTaxonomyLandingDescriptor(
   kind: "DISTRICT" | "METRO",
   location: TaxonomyLocation,
+  locale: Locale = "az",
 ): SeoLanding {
+  if (locale !== "az") {
+    const isDistrict = kind === "DISTRICT";
+    const prefix = isDistrict ? "rayon" : "metro";
+    const place = location.name;
+    const heading = locale === "en"
+      ? `${isDistrict ? `Property in ${place} district` : `Property near ${place} metro`}`
+      : `${isDistrict ? `Недвижимость в районе ${place}` : `Недвижимость у метро ${place}`}`;
+    return {
+      slug: location.slug,
+      path: `/${prefix}/${location.slug}`,
+      title: heading,
+      description: locale === "en"
+        ? `Compare active properties for sale and rent ${isDistrict ? `in ${place} district` : `near ${place} metro`} by price, area, rooms and property type.`
+        : `Сравнивайте активные предложения о продаже и аренде ${isDistrict ? `в районе ${place}` : `у метро ${place}`} по цене, площади, комнатам и типу недвижимости.`,
+      h1: heading,
+      overline: locale === "en" ? (isDistrict ? "Search by district" : "Search near metro") : (isDistrict ? "Поиск по району" : "Поиск у метро"),
+      filters: isDistrict ? { districtSlug: location.slug } : { metroSlug: location.slug },
+      content: locale === "en"
+        ? [
+            `This page groups current public Luxe Home Estate listings ${isDistrict ? `in ${place} district` : `near ${place} metro`}. Available property types depend on the active portfolio, and listing cards show only information entered for each property.`,
+            "Compare the exact location, daily transport needs, building or plot condition, documents and payment terms before making a decision. Confirm any missing details with the responsible person and arrange an in-person viewing.",
+          ]
+        : [
+            `На этой странице собраны актуальные публичные объявления Luxe Home Estate ${isDistrict ? `в районе ${place}` : `у метро ${place}`}. Доступные типы недвижимости зависят от текущего портфеля, а карточки показывают только сведения, указанные для конкретного объекта.`,
+            "До принятия решения сравните точное расположение, ежедневные маршруты, состояние здания или участка, документы и условия оплаты. Уточните недостающие сведения у ответственного лица и договоритесь о личном просмотре.",
+          ],
+      faq: locale === "en"
+        ? [
+            { question: `How can I refine listings for ${place}?`, answer: "Use filters for property type, sale or rent, price, area, rooms, condition and documents." },
+            { question: "What does the result count represent?", answer: "It shows active public listings linked to this location in the Luxe Home Estate database, not general market statistics." },
+          ]
+        : [
+            { question: `Как уточнить поиск по локации ${place}?`, answer: "Используйте фильтры типа недвижимости, продажи или аренды, цены, площади, комнат, ремонта и документов." },
+            { question: "Что означает количество результатов?", answer: "Это активные публичные объявления, связанные с этой локацией в базе Luxe Home Estate, а не общая статистика рынка." },
+          ],
+      relatedPaths: ["/satilan-emlaklar", "/kiraye-emlaklar", "/bakida-satilan-menziller"],
+    };
+  }
   const isDistrict = kind === "DISTRICT";
   const prefix = isDistrict ? "rayon" : "metro";
   const placeLabel = isDistrict ? `${location.name} rayonunda` : `${location.name} metrosu yaxınlığında`;

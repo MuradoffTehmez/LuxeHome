@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import {
   BedDouble,
   FileCheck,
@@ -11,18 +12,12 @@ import {
   Phone,
   ArrowRight,
 } from "lucide-react";
-import { formatNumber, formatPrice, formatArea, toIsoDateTime } from "@/lib/utils";
+import { formatPrice, toIsoDateTime } from "@/lib/utils";
 import {
   LISTING_TYPES,
-  PRICE_PERIOD_LABELS,
-  PROPERTY_STATUS_LABELS,
   PROPERTY_STATUS_TONE,
-  RENOVATION_LABELS,
-  DOCUMENT_STATUS_LABELS,
-  type PricePeriod,
   type PropertyStatus,
-  type Renovation,
-  type DocumentStatus,
+  type Locale,
 } from "@/lib/constants";
 import { getSimilarProperties } from "@/lib/queries";
 import { getCachedPropertyBySlug } from "@/lib/public-cache";
@@ -41,6 +36,7 @@ import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
+import { localizeKnownContent } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -48,14 +44,26 @@ export const dynamic = "force-dynamic";
 
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
+};
+
+const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
+  DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved", SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
+};
+const RENOVATION_KEYS: Record<string, "cosmetic" | "renovated" | "designer" | "unrenovated" | "newBuilding"> = {
+  COSMETIC: "cosmetic", RENOVATED: "renovated", DESIGNER: "designer", UNRENOVATED: "unrenovated", NEW_BUILDING: "newBuilding",
+};
+const DOCUMENT_KEYS: Record<string, "titleDeed" | "contract" | "municipal" | "decree" | "powerOfAttorney" | "commercialExtract" | "none"> = {
+  TITLE_DEED: "titleDeed", CONTRACT: "contract", MUNICIPAL: "municipal", DECREE: "decree", POWER_OF_ATTORNEY: "powerOfAttorney", COMMERCIAL_EXTRACT: "commercialExtract", NONE: "none",
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const property = await getCachedPropertyBySlug(slug);
+  const { locale, slug } = await params;
+  const content = await getTranslations({ locale, namespace: "content.propertyDetail" });
+  const sourceProperty = await getCachedPropertyBySlug(slug);
 
-  if (!property) return { title: "Əmlak tapılmadı" };
+  if (!sourceProperty) return { title: content("notFound") };
+  const property = localizeKnownContent("property", sourceProperty, locale as Locale);
 
   const image = property.images[0]?.url || null;
   const isClosed = property.status === "SOLD" || property.status === "RENTED";
@@ -76,20 +84,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogTitle: property.ogTitle,
     ogDescription: property.ogDescription,
     ogImage: property.ogImage,
+    locale: locale as Locale,
   });
 }
 
 export default async function PropertyDetailPage({ params }: Props) {
-  const { slug } = await params;
-  const property = await getCachedPropertyBySlug(slug);
+  const { locale, slug } = await params;
+  const [content, propertyText, navigation, commonContent] = await Promise.all([
+    getTranslations({ locale, namespace: "content.propertyDetail" }),
+    getTranslations({ locale, namespace: "property" }),
+    getTranslations({ locale, namespace: "navigation" }),
+    getTranslations({ locale, namespace: "content" }),
+  ]);
+  const sourceProperty = await getCachedPropertyBySlug(slug);
 
-  if (!property) notFound();
+  if (!sourceProperty) notFound();
+  const localizedProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
+  const property = {
+    ...localizedProperty,
+    type: localizeKnownContent("propertyType", localizedProperty.type, locale as Locale),
+    features: localizedProperty.features.map((item) => ({
+      ...item,
+      feature: localizeKnownContent("feature", item.feature, locale as Locale),
+    })),
+  };
 
   const isSale = property.listingType === LISTING_TYPES.SALE;
   const status = property.status as PropertyStatus;
   const isClosed = status === "SOLD" || status === "RENTED";
   const period = property.pricePeriod
-    ? PRICE_PERIOD_LABELS[property.pricePeriod as PricePeriod]
+    ? property.pricePeriod === "MONTH" ? propertyText("pricePeriod.month") : propertyText("pricePeriod.day")
     : null;
 
   const location = [property.district?.name, property.city.name]
@@ -99,12 +123,12 @@ export default async function PropertyDetailPage({ params }: Props) {
   const similarProperties = await getSimilarProperties(property, 4);
   const propertyPath = `/emlaklar/${property.slug}`;
   const whatsappHref = whatsappLink(
-    `Salam, "${property.title}" elanı ilə bağlı məlumat almaq istəyirəm.`,
+    content("whatsappMessage", { title: property.title }),
   );
   const relatedLandingLinks = [
     {
       href: propertyFiltersToLandingPath({ listingType: property.listingType }) ?? "/emlaklar",
-      label: isSale ? "Satılan əmlaklar" : "Kirayə əmlaklar",
+      label: isSale ? content("saleListings") : content("rentListings"),
     },
     {
       href: propertyFiltersToLandingPath({ typeSlug: property.type.slug }),
@@ -149,8 +173,8 @@ export default async function PropertyDetailPage({ params }: Props) {
       <script
         {...jsonLd(
           breadcrumbSchema([
-            { name: "Ana səhifə", path: "/" },
-            { name: "Əmlaklar", path: "/emlaklar" },
+            { name: navigation("home"), path: "/" },
+            { name: navigation("properties"), path: "/emlaklar" },
             { name: property.title, path: `/emlaklar/${property.slug}` },
           ]),
         )}
@@ -160,8 +184,8 @@ export default async function PropertyDetailPage({ params }: Props) {
         <Container>
           <Breadcrumbs
             items={[
-              { label: "Ana səhifə", href: "/" },
-              { label: "Əmlaklar", href: "/emlaklar" },
+              { label: navigation("home"), href: "/" },
+              { label: navigation("properties"), href: "/emlaklar" },
               { label: property.title },
             ]}
             className="mb-6"
@@ -171,11 +195,11 @@ export default async function PropertyDetailPage({ params }: Props) {
             <div className="flex flex-col gap-2">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={isSale ? "dark" : "gold"}>
-                  {isSale ? "Satılır" : "Kirayə"}
+                  {isSale ? content("sale") : content("rent")}
                 </Badge>
                 {status !== "PUBLISHED" && (
                   <Badge tone={PROPERTY_STATUS_TONE[status]}>
-                    {PROPERTY_STATUS_LABELS[status]}
+                    {propertyText(`status.${STATUS_KEYS[status]}`)}
                   </Badge>
                 )}
                 <Badge tone="neutral" className="bg-paper border-line">
@@ -224,21 +248,21 @@ export default async function PropertyDetailPage({ params }: Props) {
                 {property.rooms != null && (
                   <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
                     <BedDouble className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">Otaqlar</span>
+                    <span className="text-xs font-medium text-ink-muted uppercase">{content("rooms")}</span>
                     <span className="tabular font-medium text-ink">{property.rooms}</span>
                   </div>
                 )}
                 {property.area != null && (
                   <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
                     <Maximize className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">Sahə</span>
-                    <span className="tabular font-medium text-ink">{formatArea(property.area)}</span>
+                    <span className="text-xs font-medium text-ink-muted uppercase">{content("area")}</span>
+                    <span className="tabular font-medium text-ink">{propertyText("area", { value: property.area })}</span>
                   </div>
                 )}
                 {property.floor != null && property.totalFloors != null && (
                   <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
                     <Layers className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">Mərtəbə</span>
+                    <span className="text-xs font-medium text-ink-muted uppercase">{content("floor")}</span>
                     <span className="tabular font-medium text-ink">
                       {property.floor} / {property.totalFloors}
                     </span>
@@ -247,27 +271,27 @@ export default async function PropertyDetailPage({ params }: Props) {
                 {property.renovation != null && (
                   <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
                     <CheckCircle2 className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">Təmir</span>
+                    <span className="text-xs font-medium text-ink-muted uppercase">{content("renovation")}</span>
                     <span className="font-medium text-ink">
-                      {RENOVATION_LABELS[property.renovation as Renovation]}
+                      {propertyText(`renovation.${RENOVATION_KEYS[property.renovation]}`)}
                     </span>
                   </div>
                 )}
                 {property.documentStatus != null && (
                   <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
                     <FileCheck className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">Sənəd</span>
+                    <span className="text-xs font-medium text-ink-muted uppercase">{content("document")}</span>
                     <span className="font-medium text-ink">
-                      {DOCUMENT_STATUS_LABELS[property.documentStatus as DocumentStatus]}
+                      {propertyText(`document.${DOCUMENT_KEYS[property.documentStatus]}`)}
                     </span>
                   </div>
                 )}
                 {property.landArea != null && property.area == null && (
                   <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
                     <Maximize className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">Torpaq sahəsi</span>
+                    <span className="text-xs font-medium text-ink-muted uppercase">{content("landArea")}</span>
                     <span className="tabular font-medium text-ink">
-                      {formatNumber(property.landArea)} sot
+                      {propertyText("landUnit", { value: property.landArea })}
                     </span>
                   </div>
                 )}
@@ -275,7 +299,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* Təsvir */}
               <div className="flex flex-col gap-4">
-                <h2 className="font-display text-xl text-ink">Təsvir</h2>
+                <h2 className="font-display text-xl text-ink">{commonContent("description")}</h2>
                 <div className="prose prose-ink max-w-none text-base leading-relaxed text-ink-soft">
                   {property.description.split('\n').map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
@@ -284,8 +308,8 @@ export default async function PropertyDetailPage({ params }: Props) {
               </div>
 
               {relatedLandingLinks.length > 0 && (
-                <nav aria-label="Əlaqəli əmlak axtarışları" className="border-y border-line py-5">
-                  <h2 className="font-display text-xl text-ink">Əlaqəli axtarışlar</h2>
+                <nav aria-label={content("relatedSearchesAria")} className="border-y border-line py-5">
+                  <h2 className="font-display text-xl text-ink">{content("relatedSearches")}</h2>
                   <ul className="mt-3 flex flex-wrap gap-2">
                     {relatedLandingLinks.map((item) => (
                       <li key={item.href}>
@@ -304,7 +328,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Əlavə Xüsusiyyətlər (əgər varsa) */}
               {property.features.length > 0 && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="font-display text-xl text-ink">Xüsusiyyətlər</h2>
+                  <h2 className="font-display text-xl text-ink">{commonContent("features")}</h2>
                   <ul className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
                     {property.features.map(({ feature }) => (
                       <li key={feature.id} className="flex items-center gap-2 text-sm text-ink-soft">
@@ -319,7 +343,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Xəritədə yerləşmə */}
               {property.latitude != null && property.longitude != null && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="font-display text-xl text-ink">Xəritədə</h2>
+                  <h2 className="font-display text-xl text-ink">{content("onMap")}</h2>
                   <PropertyMap
                     latitude={property.latitude}
                     longitude={property.longitude}
@@ -334,11 +358,11 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <div className="rounded-md border border-line bg-paper p-5 sm:p-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-col gap-1">
-                      <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">Layihə</span>
+                      <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">{content("project")}</span>
                       <h3 className="font-display text-lg text-ink">{property.project.name}</h3>
                     </div>
                     <ButtonLink href={`/layiheler/${property.project.slug}`} variant="outline" size="sm">
-                      Layihəyə bax <ArrowRight className="ml-2 size-4" />
+                      {content("viewProject")} <ArrowRight className="ml-2 size-4" />
                     </ButtonLink>
                   </div>
                 </div>
@@ -351,12 +375,12 @@ export default async function PropertyDetailPage({ params }: Props) {
               <div className="rounded-md border border-line bg-paper p-5 sm:p-6 lg:sticky lg:top-28 lg:shadow-sm">
                 <div className="mb-6 flex flex-col gap-2">
                   <h3 className="font-display text-xl text-ink">
-                    {isClosed ? "Bu əmlak artıq mövcud deyil" : "Əlaqə saxlayın"}
+                    {isClosed ? content("closedTitle") : content("contactTitle")}
                   </h3>
                   <p className="text-sm text-ink-soft">
                     {isClosed
-                      ? `Elan «${PROPERTY_STATUS_LABELS[status]}» statusundadır. Oxşar variantlar üçün bizimlə əlaqə saxlayın — portfelimizdə uyğun əmlak tapa bilərik.`
-                      : "Bu əmlakla maraqlanırsınız? Müraciət göndərin və ya zəng edin."}
+                      ? content("closedDescription")
+                      : content("contactDescription")}
                   </p>
                 </div>
 
@@ -380,7 +404,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     className="border border-success/30 bg-success-bg text-success hover:border-success hover:bg-success-bg/70"
                   >
                     <WhatsAppIcon className="size-4 text-success" />
-                    WhatsApp ilə yaz
+                    WhatsApp
                   </ButtonAnchor>
                 </div>
 
@@ -388,7 +412,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <div className="absolute inset-0 flex items-center" aria-hidden="true">
                     <div className="w-full border-t border-line" />
                   </div>
-                  <span className="relative bg-paper px-3 text-xs font-medium uppercase text-ink-muted">və ya müraciət yazın</span>
+                  <span className="relative bg-paper px-3 text-xs font-medium uppercase text-ink-muted">{content("orEnquiry")}</span>
                 </div>
 
                 <ContactForm />
@@ -403,8 +427,8 @@ export default async function PropertyDetailPage({ params }: Props) {
         <Section tone="paper" spacing="cozy">
           <Container>
             <div className="mb-8 flex flex-col gap-2">
-              <h2 className="font-display text-2xl text-ink sm:text-3xl">Oxşar əmlaklar</h2>
-              <p className="text-sm text-ink-soft">Bu əmlaka oxşar digər təkliflərə göz atın.</p>
+              <h2 className="font-display text-2xl text-ink sm:text-3xl">{commonContent("similarProperties")}</h2>
+              <p className="text-sm text-ink-soft">{content("similarDescription")}</p>
             </div>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

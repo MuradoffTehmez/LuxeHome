@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Container } from "./container";
@@ -23,10 +24,11 @@ export function PageHeader({
   compact = false,
   contained = false,
 }: PageHeaderProps) {
+  const t = useTranslations("common.ui");
   const content = (
     <>
       {breadcrumbs?.length ? (
-        <nav aria-label="Naviqasiya yolu" className="mb-5">
+        <nav aria-label={t("breadcrumbs")} className="mb-5">
           <ol className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-2 text-sm text-ink-muted">
             {breadcrumbs.map((item, index) => {
               const isCurrent = index === breadcrumbs.length - 1;
@@ -79,7 +81,7 @@ export function PageHeader({
 
         {actions ? (
           <div
-            aria-label="Səhifə əməliyyatları"
+            aria-label={t("pageActions")}
             className="flex shrink-0 flex-wrap items-center gap-3"
           >
             {actions}

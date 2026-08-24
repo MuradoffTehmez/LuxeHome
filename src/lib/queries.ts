@@ -320,7 +320,7 @@ export const compareSelect = {
   mortgageAvailable: true,
   installmentAvailable: true,
   features: {
-    select: { feature: { select: { name: true, group: true } } },
+    select: { feature: { select: { name: true, slug: true, group: true } } },
   },
 } satisfies Prisma.PropertySelect;
 

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,16 +21,17 @@ export function ActiveFilterChips({
   resetHref,
   className,
 }: ActiveFilterChipsProps) {
+  const t = useTranslations("common.ui");
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Aktiv filtrlər" className={cn("min-w-0", className)}>
+    <nav aria-label={t("activeFilters")} className={cn("min-w-0", className)}>
       <ul className="-mx-4 flex snap-x items-center gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden">
         {items.map((item) => (
           <li key={`${item.key}-${item.label}`} className="shrink-0 snap-start">
             <Link
               href={item.href}
-              aria-label={`${item.label} filtrini sil`}
+              aria-label={t("removeFilter", { label: item.label })}
               className="inline-flex min-h-11 items-center gap-2 rounded-xs border border-line-strong bg-paper px-3 text-sm font-medium text-ink-soft transition-colors hover:border-gold hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             >
               <span>{item.label}</span>
@@ -44,7 +46,7 @@ export function ActiveFilterChips({
               href={resetHref}
               className="inline-flex min-h-11 items-center rounded-xs px-2 text-sm font-medium text-gold-deep underline-offset-4 transition-colors hover:text-ink hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
-              Bütün filtrləri sıfırla
+              {t("resetFilters")}
             </Link>
           </li>
         ) : null}

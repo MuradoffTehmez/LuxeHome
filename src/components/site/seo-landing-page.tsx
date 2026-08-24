@@ -10,7 +10,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/states";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
 import type { PropertyCardData } from "@/lib/queries";
-import { findSeoLanding, type SeoLanding } from "@/lib/seo-landings";
+import { findSeoLanding, localizeSeoLanding, type SeoLanding } from "@/lib/seo-landings";
 
 type SeoLandingPageProps = {
   landing: SeoLanding;
@@ -32,7 +32,6 @@ export function SeoLandingPage({
   const nav = useTranslations("navigation");
   const t = useTranslations("seoLandings");
   const content = useTranslations("content");
-  const localePrefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
 
   return (
     <>
@@ -67,13 +66,14 @@ export function SeoLandingPage({
               <ul className="mt-4 flex flex-col gap-1">
                 {landing.relatedPaths.map((path) => {
                   const related = findSeoLanding(path.slice(1));
+                  const localizedRelated = related ? localizeSeoLanding(related, locale) : null;
                   return (
                     <li key={path}>
                       <Link
-                        href={`${localePrefix}${path}`}
+                        href={path}
                         className="flex min-h-11 items-center justify-between gap-3 text-sm text-ink-soft transition-colors hover:text-gold-deep"
                       >
-                        {related?.h1 ?? path.replaceAll("-", " ").slice(1)}
+                        {localizedRelated?.h1 ?? path.replaceAll("-", " ").slice(1)}
                         <ArrowRight className="size-3.5 shrink-0" aria-hidden="true" />
                       </Link>
                     </li>
@@ -104,7 +104,7 @@ export function SeoLandingPage({
                 page={page}
                 totalPages={totalPages}
                 buildHref={(targetPage) =>
-                  `${localePrefix}${landing.path}${targetPage > 1 ? `?sehife=${targetPage}` : ""}`
+                  `${landing.path}${targetPage > 1 ? `?sehife=${targetPage}` : ""}`
                 }
                 className="mt-12"
               />
@@ -113,7 +113,7 @@ export function SeoLandingPage({
             <EmptyState
               title={t("emptyTitle")}
               description={t("emptyDescription")}
-              action={{ label: t("allProperties"), href: `${localePrefix}/emlaklar` }}
+              action={{ label: t("allProperties"), href: "/emlaklar" }}
             />
           )}
         </Container>

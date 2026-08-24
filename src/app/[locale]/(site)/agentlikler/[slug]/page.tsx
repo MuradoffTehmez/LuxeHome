@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { Building2, Globe, MapPin, Phone } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
@@ -11,31 +12,38 @@ import { agencySchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo
 import { getAgencyBySlug } from "@/lib/queries";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { TrackedAnchor } from "@/components/analytics/analytics-event";
+import type { Locale } from "@/lib/constants";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.detail" });
   const data = await getAgencyBySlug(slug);
 
-  if (!data) return { title: "Agentlik tapılmadı" };
+  if (!data) return { title: t("notFound") };
 
   return buildMetadata({
     title: data.agency.name,
-    description: data.agency.description || `${data.agency.name} — Luxe Home Estate platformasında təsdiqlənmiş agentlik.`,
+    description: data.agency.description || t("agencyFallback", { name: data.agency.name }),
     path: `/agentlikler/${data.agency.slug}`,
     image: data.agency.logoUrl ?? undefined,
+    locale: locale as Locale,
   });
 }
 
 export default async function AgencyDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const [t, navigation] = await Promise.all([
+    getTranslations({ locale, namespace: "listings.detail" }),
+    getTranslations({ locale, namespace: "navigation" }),
+  ]);
   const data = await getAgencyBySlug(slug);
 
   if (!data) notFound();
@@ -48,8 +56,8 @@ export default async function AgencyDetailPage({ params }: Props) {
       <script
         {...jsonLd(
           breadcrumbSchema([
-            { name: "Ana səhifə", path: "/" },
-            { name: "Agentliklər", path: "/agentlikler" },
+            { name: navigation("home"), path: "/" },
+            { name: navigation("agencies"), path: "/agentlikler" },
             { name: agency.name, path: `/agentlikler/${agency.slug}` },
           ]),
         )}
@@ -57,12 +65,12 @@ export default async function AgencyDetailPage({ params }: Props) {
 
       <PageHeader
         compact
-        eyebrow="Təsdiqlənmiş agentlik"
+        eyebrow={t("verifiedAgency")}
         title={agency.name}
         description={agency.description || undefined}
         breadcrumbs={[
-          { label: "Ana səhifə", href: "/" },
-          { label: "Agentliklər", href: "/agentlikler" },
+          { label: navigation("home"), href: "/" },
+          { label: navigation("agencies"), href: "/agentlikler" },
           { label: agency.name },
         ]}
         actions={
@@ -87,8 +95,8 @@ export default async function AgencyDetailPage({ params }: Props) {
         <Container>
           <div className="rounded-md border border-line bg-paper p-4 shadow-sm sm:p-5">
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <Badge tone="gold">Təsdiqlənmiş agentlik</Badge>
-              <Badge tone="neutral">{properties.length} elan</Badge>
+              <Badge tone="gold">{t("verifiedAgency")}</Badge>
+              <Badge tone="neutral">{t("activeListingCount", { count: properties.length })}</Badge>
             </div>
               <div className="flex min-w-0 flex-col gap-1 text-sm text-ink-soft sm:flex-row sm:flex-wrap sm:gap-x-6">
                 {agency.phone && (
@@ -122,9 +130,9 @@ export default async function AgencyDetailPage({ params }: Props) {
       <Section tone="paper" spacing="cozy">
         <Container>
           <div className="mb-8 flex flex-col gap-2">
-            <h2 className="font-display text-2xl text-ink sm:text-3xl">Agentliyin elanları</h2>
+            <h2 className="font-display text-2xl text-ink sm:text-3xl">{t("agencyListings")}</h2>
             <p className="text-sm text-ink-soft">
-              {agency.name} tərəfindən yerləşdirilmiş aktiv satış və kirayə təklifləri.
+              {t("agencyListingsDescription", { name: agency.name })}
             </p>
           </div>
 
@@ -136,8 +144,8 @@ export default async function AgencyDetailPage({ params }: Props) {
             </div>
           ) : (
             <EmptyState
-              title="Hazırda aktiv elan yoxdur"
-              description="Bu agentlik yeni elan yerləşdirdikcə burada göstəriləcək."
+              title={t("agencyEmptyTitle")}
+              description={t("agencyEmptyDescription")}
             />
           )}
         </Container>
