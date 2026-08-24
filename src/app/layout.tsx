@@ -114,8 +114,10 @@ export default async function RootLayout({
         <script {...jsonLd(organizationSchema())} />
         <script {...jsonLd(websiteSchema())} />
         <ThemeProvider>
-          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
-          <AnalyticsProvider />
+          <NextIntlClientProvider messages={messages}>
+            {children}
+            <AnalyticsProvider />
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>
