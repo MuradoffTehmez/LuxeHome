@@ -46,4 +46,21 @@ describe("SEO landing template", () => {
     expect(html).toContain(`href="${landing.relatedPaths[0]}"`);
     expect(html).toContain('href="/emlaklar/nerimanov-3-otaqli"');
   });
+
+  it("elan olmadıqda boş grid əvəzinə bərpa yolu göstərir", () => {
+    const html = renderToStaticMarkup(
+      <ToastProvider>
+        <SeoLandingPage
+          landing={SEO_LANDINGS[0]}
+          items={[]}
+          total={0}
+          page={1}
+          totalPages={1}
+        />
+      </ToastProvider>,
+    );
+
+    expect(html).toContain("Bu kateqoriyada hazırda aktiv elan yoxdur");
+    expect(html).toContain('href="/emlaklar"');
+  });
 });

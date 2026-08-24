@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { PropertyCard } from "@/components/site/property-card";
 import { Container, Section } from "@/components/ui/container";
 import { Pagination } from "@/components/ui/pagination";
+import { EmptyState } from "@/components/ui/states";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
 import type { PropertyCardData } from "@/lib/queries";
 import { findSeoLanding, type SeoLanding } from "@/lib/seo-landings";
@@ -87,19 +88,29 @@ export function SeoLandingPage({
               Uyğun əmlak elanları
             </h2>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((property, index) => (
-              <PropertyCard key={property.id} property={property} priority={index === 0} />
-            ))}
-          </div>
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            buildHref={(targetPage) =>
-              `${localePrefix}${landing.path}${targetPage > 1 ? `?sehife=${targetPage}` : ""}`
-            }
-            className="mt-12"
-          />
+          {items.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {items.map((property, index) => (
+                  <PropertyCard key={property.id} property={property} priority={index === 0} />
+                ))}
+              </div>
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                buildHref={(targetPage) =>
+                  `${localePrefix}${landing.path}${targetPage > 1 ? `?sehife=${targetPage}` : ""}`
+                }
+                className="mt-12"
+              />
+            </>
+          ) : (
+            <EmptyState
+              title="Bu kateqoriyada hazırda aktiv elan yoxdur"
+              description="Yeni elanlar dərc edildikcə burada görünəcək. Cari portfelə baxaraq başqa uyğun variantları araşdıra bilərsiniz."
+              action={{ label: "Bütün əmlaklara bax", href: `${localePrefix}/emlaklar` }}
+            />
+          )}
         </Container>
       </Section>
 

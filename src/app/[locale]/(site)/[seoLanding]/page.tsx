@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { SeoLandingPage } from "@/components/site/seo-landing-page";
@@ -12,7 +13,7 @@ import {
   jsonLd,
   buildMetadata,
 } from "@/lib/seo";
-import { findSeoLanding, MIN_INDEXABLE_LISTINGS } from "@/lib/seo-landings";
+import { findSeoLanding, seoLandingIndexPolicy } from "@/lib/seo-landings";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,8 @@ type Props = {
   params: Promise<{ locale: string; seoLanding: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+const getLandingResult = cache(getSeoLandingProperties);
 
 function readPage(value: string | string[] | undefined): number | null {
   if (value === undefined) return 1;
@@ -33,6 +36,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const landing = findSeoLanding(seoLanding);
   if (!landing) return {};
   const page = readPage(query.sehife);
+  if (!page) return {};
+  const result = await getLandingResult(landing, page);
   const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
   const canonicalPath = page && page > 1 ? `${landing.path}?sehife=${page}` : landing.path;
 
@@ -41,6 +46,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     description: landing.description,
     path: canonicalPath,
     canonicalPath,
+    indexPolicy:
+      page > result.totalPages ? "noindex-follow" : seoLandingIndexPolicy(result.total),
     locale: resolvedLocale,
   });
 }
@@ -52,8 +59,8 @@ export default async function FixedSeoLandingPage({ params, searchParams }: Prop
   const hasExtraParams = Object.keys(query).some((key) => key !== "sehife");
   if (!landing || !page || hasExtraParams) notFound();
 
-  const result = await getSeoLandingProperties(landing, page);
-  if (result.total < MIN_INDEXABLE_LISTINGS || page > result.totalPages) notFound();
+  const result = await getLandingResult(landing, page);
+  if (page > result.totalPages) notFound();
   const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
 
   return (

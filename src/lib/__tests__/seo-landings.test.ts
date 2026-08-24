@@ -5,6 +5,7 @@ import {
   buildTaxonomyLandingDescriptor,
   findSeoLanding,
   propertyFiltersToLandingPath,
+  seoLandingIndexPolicy,
 } from "@/lib/seo-landings";
 
 const requiredPaths = [
@@ -50,6 +51,12 @@ describe("SEO landing registry", () => {
 
   it("nazik landing üçün minimum üç real elan tələb edir", () => {
     expect(MIN_INDEXABLE_LISTINGS).toBe(3);
+  });
+
+  it("az inventarlı landing-i 404 etmədən noindex saxlayır", () => {
+    expect(seoLandingIndexPolicy(0)).toBe("noindex-follow");
+    expect(seoLandingIndexPolicy(2)).toBe("noindex-follow");
+    expect(seoLandingIndexPolicy(3)).toBe("index");
   });
 });
 

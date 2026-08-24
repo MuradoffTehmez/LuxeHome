@@ -2,6 +2,14 @@ import type { PropertyFilters } from "@/lib/queries";
 
 export const MIN_INDEXABLE_LISTINGS = 3;
 
+/**
+ * Az inventarlı landing istifadəçi üçün işlək qalır, lakin kifayət qədər real
+ * elan toplanana qədər axtarış indeksinə buraxılmır.
+ */
+export function seoLandingIndexPolicy(total: number): "index" | "noindex-follow" {
+  return total >= MIN_INDEXABLE_LISTINGS ? "index" : "noindex-follow";
+}
+
 export type SeoLanding = {
   slug: string;
   path: `/${string}`;
