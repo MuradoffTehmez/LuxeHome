@@ -1,0 +1,11 @@
+{
+  "properties": "Əmlaklar",
+  "projects": "Layihələr",
+  "services": "Xidmətlər",
+  "blog": "Bloq",
+  "agencies": "Agentliklər",
+  "all": "Hamısı",
+  "results": "{count, plural, =0 {Nəticə tapılmadı} one {# nəticə tapıldı} other {# nəticə tapıldı}}",
+  "emptyTitle": "Hazırda məlumat əlavə edilməyib",
+  "emptyDescription": "Yeni məlumatlar əlavə edildikcə bu səhifədə göstəriləcək."
+}

@@ -1,0 +1,12 @@
+{
+  "title": "Bizimlə əlaqə saxlayın",
+  "description": "Suallarınız üçün müraciət edin — komandamız ən qısa zamanda geri dönüş edəcək.",
+  "name": "Ad",
+  "phone": "Telefon",
+  "email": "E-poçt",
+  "subject": "Mövzu",
+  "message": "Mesaj",
+  "send": "Göndər",
+  "sending": "Göndərilir…",
+  "success": "Müraciətiniz qəbul edildi. Tezliklə sizinlə əlaqə saxlayacağıq."
+}
