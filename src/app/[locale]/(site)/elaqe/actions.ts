@@ -1,16 +1,33 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { sendLeadNotificationEmail } from "@/lib/email";
 import { z } from "zod";
 
-const contactSchema = z.object({
-  name: z.string().min(2, "Ad ən azı 2 simvol olmalıdır"),
-  phone: z.string().min(7, "Telefon nömrəsi düzgün deyil"),
-  email: z.string().email("E-poçt ünvanı düzgün deyil").optional().or(z.literal("")),
-  subject: z.string().optional().or(z.literal("")),
-  message: z.string().min(10, "Mesaj ən azı 10 simvol olmalıdır"),
-});
+async function contactSchema() {
+  let nameMin = "Ad ən azı 2 simvol olmalıdır";
+  let phoneMin = "Telefon nömrəsi düzgün deyil";
+  let emailInvalid = "E-poçt ünvanı düzgün deyil";
+  let messageMin = "Mesaj ən azı 10 simvol olmalıdır";
+  try {
+    const t = await getTranslations("validation");
+    nameMin = t("nameMin");
+    phoneMin = t("phoneMin");
+    emailInvalid = t("emailInvalid");
+    messageMin = t("messageMin");
+  } catch {
+    // Request kontekstindən kənarda (məs. unit testlər) standart azərbaycanca mesajlar istifadə olunur
+  }
+
+  return z.object({
+    name: z.string().min(2, nameMin),
+    phone: z.string().min(7, phoneMin),
+    email: z.string().email(emailInvalid).optional().or(z.literal("")),
+    subject: z.string().optional().or(z.literal("")),
+    message: z.string().min(10, messageMin),
+  });
+}
 
 export type ContactFormState = {
   success: boolean;
@@ -30,7 +47,8 @@ export async function submitContactForm(
     message: formData.get("message") as string,
   };
 
-  const result = contactSchema.safeParse(raw);
+  const schema = await contactSchema();
+  const result = schema.safeParse(raw);
 
   if (!result.success) {
     const fieldErrors: Record<string, string> = {};

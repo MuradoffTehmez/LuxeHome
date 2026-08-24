@@ -35,7 +35,7 @@ import { PropertyCard } from "@/components/site/property-card";
 import { PropertyActionToolbar } from "@/components/site/property-action-toolbar";
 import { PropertyMap } from "@/components/site/property-map";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
-import { ContactForm } from "@/app/(site)/elaqe/contact-form";
+import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.

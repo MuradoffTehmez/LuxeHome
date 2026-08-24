@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonAnchor } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { PublicDetailLayout } from "@/components/ui/public-detail-layout";
-import { ContactForm } from "@/app/(site)/elaqe/contact-form";
+import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";

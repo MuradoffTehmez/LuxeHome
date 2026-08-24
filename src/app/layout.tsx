@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { Geist, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -95,11 +97,14 @@ export const viewport: Viewport = {
 
 import { ThemeProvider } from "@/components/theme-provider";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="az" suppressHydrationWarning className={`${playfair.variable} ${geist.variable}`}>
+    <html lang={locale} suppressHydrationWarning className={`${playfair.variable} ${geist.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_RUNTIME_SHIM }} />
         {!isStaging() && (
@@ -134,7 +139,7 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider>
-          {children}
+          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

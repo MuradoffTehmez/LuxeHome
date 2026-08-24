@@ -4,13 +4,14 @@ import { CompareBar } from "@/components/site/compare-bar";
 import { ToastProvider } from "@/components/ui/toast";
 
 /**
- * İctimai saytın çərçivəsi.
- * Admin panel ayrı route qrupundadır və bu layout-u istifadə etmir.
+ * Hesab sistemi çərçivəsi (kabinet, daxil-ol, qeydiyyat).
  *
- * Header `fixed` olduğu üçün `<main>`-ə `pt-[--header-h]` əlavə olunur.
- * Ana səhifənin hero-su bu padding-i mənfi margin ilə neytrallaşdırır.
+ * `[locale]/(site)/layout.tsx`-in eynisidir, amma qəsdən ayrıdır: hesab səhifələri
+ * dil prefiksindən kənarda qalır (həmişə `/kabinet`, heç vaxt `/en/kabinet`), çünki
+ * middleware-dəki sessiya yönləndirmə məntiqi (`session-routing.ts`) bu yollara sərt
+ * bağlıdır — lokallaşdırma bu sahəyə toxunmamalıdır.
  */
-export default function SiteLayout({
+export default function AccountLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (

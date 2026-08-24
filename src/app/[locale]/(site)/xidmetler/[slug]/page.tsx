@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PublicDetailLayout } from "@/components/ui/public-detail-layout";
 import { ServiceIcon } from "@/components/site/service-icon";
 import { ButtonAnchor } from "@/components/ui/button";
-import { ContactForm } from "@/app/(site)/elaqe/contact-form";
+import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { buildMetadata, jsonLd, serviceSchema, breadcrumbSchema } from "@/lib/seo";
 import { getServiceBySlug } from "@/lib/queries";
 import { siteConfig } from "@/config/site";
