@@ -13,6 +13,7 @@ import { parseSingleImage } from "@/lib/admin/images";
 import { blogCategorySchema, postSchema } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 /**
  * Bloq idarəsi.
@@ -93,6 +94,7 @@ export async function createPost(_prev: ActionState, formData: FormData): Promis
   }
 
   revalidatePath(LIST_PATH);
+  revalidatePublicContent("post");
   redirect(`${LIST_PATH}/${postId}`);
 }
 
@@ -172,6 +174,7 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
     await recordAudit(user, "UPDATE", "BlogPost", id, parsed.data.title);
     revalidatePath(LIST_PATH);
     revalidatePath(`/blog/${slug}`);
+    revalidatePublicContent("post", slug);
     return success("Məqalə yeniləndi.");
   } catch (error) {
     return unexpected("məqalə yenilənmədi", error);
@@ -197,6 +200,7 @@ export async function deletePost(id: string): Promise<ActionState> {
     await recordAudit(user, "DELETE", "BlogPost", id, post.title);
     revalidatePath(LIST_PATH);
     revalidatePath(`/blog/${post.slug}`);
+    revalidatePublicContent("post", post.slug);
     return success("Məqalə silindi.");
   } catch (error) {
     return unexpected("məqalə silinmədi", error);
@@ -221,6 +225,7 @@ export async function restorePost(id: string): Promise<ActionState> {
 
     await recordAudit(user, "RESTORE", "BlogPost", id, post.title);
     revalidatePath(LIST_PATH);
+    revalidatePublicContent("post");
     return success("Məqalə bərpa edildi.");
   } catch (error) {
     return unexpected("məqalə bərpa edilmədi", error);

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { PRODUCTION_SITE_URL } from "@/config/site";
 import { PROPERTY_STATUSES } from "@/lib/constants";
-import { getSitemapEntries } from "@/lib/queries";
+import { getCachedSitemapEntries } from "@/lib/public-cache";
 
 // Sitemap D1-dən oxuyur — build zamanı deyil, sorğu anında qurulur.
 export const dynamic = "force-dynamic";
@@ -95,5 +95,5 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  return buildSitemap(await getSitemapEntries());
+  return buildSitemap(await getCachedSitemapEntries());
 }

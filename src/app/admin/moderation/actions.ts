@@ -13,6 +13,7 @@ import * as form from "@/lib/admin/form";
 import { recordAudit } from "@/lib/admin/audit";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 const LIST_PATH = "/admin/moderation";
 
@@ -43,6 +44,7 @@ export async function approveModerationProperty(id: string): Promise<ActionState
     revalidatePath(LIST_PATH);
     revalidatePath("/emlaklar");
     revalidatePath(`/emlaklar/${property.slug}`);
+    revalidatePublicContent("property", property.slug);
     return success("Elan təsdiqləndi və dərc olundu.");
   } catch (error) {
     return unexpected("elan təsdiqlənmədi", error);

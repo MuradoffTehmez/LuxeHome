@@ -7,7 +7,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
 import { articleSchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
-import { getPostBySlug, getRelatedPosts } from "@/lib/queries";
+import { getRelatedPosts } from "@/lib/queries";
+import { getCachedPostBySlug } from "@/lib/public-cache";
 import { isUnoptimizedImage } from "@/lib/utils";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -21,7 +22,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getCachedPostBySlug(slug);
 
   if (!post) return { title: "Məqalə tapılmadı" };
 
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getCachedPostBySlug(slug);
 
   if (!post) notFound();
 

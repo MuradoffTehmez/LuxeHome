@@ -10,7 +10,7 @@ import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
-import { getProjectBySlug } from "@/lib/queries";
+import { getCachedProjectBySlug } from "@/lib/public-cache";
 import { siteConfig } from "@/config/site";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -43,7 +43,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const project = await getCachedProjectBySlug(slug);
 
   if (!project) return { title: "Layihə tapılmadı" };
 
@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const project = await getCachedProjectBySlug(slug);
 
   if (!project) notFound();
 

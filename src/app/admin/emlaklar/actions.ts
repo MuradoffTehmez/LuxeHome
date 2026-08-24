@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin/property-input";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 /**
  * Əmlak CRUD-u.
@@ -126,6 +127,7 @@ export async function createProperty(
   }
 
   revalidatePath(LIST_PATH);
+  revalidatePublicContent("property");
   redirect(`${LIST_PATH}/${propertyId}?yeni=1`);
 }
 
@@ -177,6 +179,7 @@ export async function updateProperty(
 
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${slug}`);
+    revalidatePublicContent("property", slug);
     return success("Elan yeniləndi.");
   } catch (error) {
     return unexpected("əmlak yenilənmədi", error);
@@ -204,6 +207,7 @@ export async function deleteProperty(id: string): Promise<ActionState> {
     await recordAudit(user, "DELETE", "Property", id, property.title);
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${property.slug}`);
+    revalidatePublicContent("property", property.slug);
     return success("Elan silindi.");
   } catch (error) {
     return unexpected("əmlak silinmədi", error);
@@ -228,6 +232,7 @@ export async function restoreProperty(id: string): Promise<ActionState> {
 
     await recordAudit(user, "RESTORE", "Property", id, property.title);
     revalidatePath(LIST_PATH);
+    revalidatePublicContent("property");
     return success("Elan bərpa edildi.");
   } catch (error) {
     return unexpected("əmlak bərpa edilmədi", error);
@@ -266,6 +271,7 @@ export async function setPropertyStatus(id: string, status: string): Promise<Act
     await recordAudit(user, "PUBLISH", "Property", id, `${existing.title} → ${status}`);
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${existing.slug}`);
+    revalidatePublicContent("property", existing.slug);
     return success("Status yeniləndi.");
   } catch (error) {
     return unexpected("status dəyişmədi", error);
@@ -295,6 +301,7 @@ export async function togglePropertyFeatured(id: string): Promise<ActionState> {
 
     await recordAudit(user, "UPDATE", "Property", id, `${existing.title} — tövsiyə nişanı`);
     revalidatePath(LIST_PATH);
+    revalidatePublicContent("property");
     return success(existing.isFeatured ? "Tövsiyədən çıxarıldı." : "Tövsiyəyə əlavə edildi.");
   } catch (error) {
     return unexpected("tövsiyə nişanı dəyişmədi", error);
@@ -346,6 +353,7 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
 
   await recordAudit(user, "UPDATE", "Property", null, `Kütləvi ${intent}: ${done}/${ids.length} elan`);
   revalidatePath(LIST_PATH);
+  revalidatePublicContent("property");
 
   if (done === 0) return failure("Heç bir elan yenilənmədi.");
   if (done < ids.length) return failure(`${done}/${ids.length} elan yeniləndi, qalanları uğursuz oldu.`);

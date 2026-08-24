@@ -15,7 +15,8 @@ import { Pagination } from "@/components/ui/pagination";
 import { buildMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { classifyPropertySearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
-import { getProperties, getFilterOptions } from "@/lib/queries";
+import { getFilterOptions } from "@/lib/queries";
+import { getCachedProperties } from "@/lib/public-cache";
 import { formatNumber } from "@/lib/utils";
 import {
   buildActivePropertyFilters,
@@ -100,7 +101,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
   };
 
   const [{ items, total, page, totalPages }, filterOptions] = await Promise.all([
-    getProperties(filters),
+    getCachedProperties(filters),
     getFilterOptions(),
   ]);
   if (page > totalPages) notFound();

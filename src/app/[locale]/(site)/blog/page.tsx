@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils";
 import { buildMetadata } from "@/lib/seo";
 import { classifyBlogSearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
-import { getPosts, getBlogCategories } from "@/lib/queries";
+import { getBlogCategories } from "@/lib/queries";
+import { getCachedPosts } from "@/lib/public-cache";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -52,7 +53,7 @@ export default async function BlogPage({ searchParams }: Props) {
   const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
 
   const [postsResult, categories] = await Promise.all([
-    getPosts({ categorySlug, page }),
+    getCachedPosts({ categorySlug, page }),
     getBlogCategories(),
   ]);
   if (page > postsResult.totalPages) notFound();

@@ -11,6 +11,7 @@ import { parseImages } from "@/lib/admin/images";
 import { projectSchema, type ProjectInput } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 /**
  * Layihə CRUD-u.
@@ -156,6 +157,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
   }
 
   revalidatePath(LIST_PATH);
+  revalidatePublicContent("project");
   redirect(`${LIST_PATH}/${projectId}`);
 }
 
@@ -200,6 +202,7 @@ export async function updateProject(_prev: ActionState, formData: FormData): Pro
 
     revalidatePath(LIST_PATH);
     revalidatePath(`/layiheler/${slug}`);
+    revalidatePublicContent("project", slug);
     return success("Layihə yeniləndi.");
   } catch (error) {
     return unexpected("layihə yenilənmədi", error);
@@ -225,6 +228,7 @@ export async function deleteProject(id: string): Promise<ActionState> {
     await recordAudit(user, "DELETE", "Project", id, project.name);
     revalidatePath(LIST_PATH);
     revalidatePath(`/layiheler/${project.slug}`);
+    revalidatePublicContent("project", project.slug);
     return success("Layihə silindi.");
   } catch (error) {
     return unexpected("layihə silinmədi", error);
@@ -249,6 +253,7 @@ export async function restoreProject(id: string): Promise<ActionState> {
 
     await recordAudit(user, "RESTORE", "Project", id, project.name);
     revalidatePath(LIST_PATH);
+    revalidatePublicContent("project");
     return success("Layihə bərpa edildi.");
   } catch (error) {
     return unexpected("layihə bərpa edilmədi", error);

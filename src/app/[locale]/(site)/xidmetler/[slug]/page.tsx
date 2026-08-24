@@ -9,7 +9,7 @@ import { ServiceIcon } from "@/components/site/service-icon";
 import { ButtonAnchor } from "@/components/ui/button";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { buildMetadata, jsonLd, serviceSchema, breadcrumbSchema } from "@/lib/seo";
-import { getServiceBySlug } from "@/lib/queries";
+import { getCachedServiceBySlug } from "@/lib/public-cache";
 import { siteConfig } from "@/config/site";
 import { isUnoptimizedImage } from "@/lib/utils";
 
@@ -24,7 +24,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const service = await getServiceBySlug(slug);
+  const service = await getCachedServiceBySlug(slug);
 
   if (!service) return { title: "Xidmət tapılmadı" };
 
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
-  const service = await getServiceBySlug(slug);
+  const service = await getCachedServiceBySlug(slug);
 
   if (!service) notFound();
 

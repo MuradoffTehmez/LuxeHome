@@ -27,15 +27,7 @@ import { PostCard } from "@/components/site/post-card";
 import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { buildMetadata } from "@/lib/seo";
-import {
-  getBlogCategories,
-  getFeaturedProperties,
-  getFilterOptions,
-  getPosts,
-  getProjects,
-  getPropertyTypesWithCounts,
-  getServices,
-} from "@/lib/queries";
+import { getCachedHomePageData } from "@/lib/public-cache";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -123,16 +115,8 @@ const BLOG_LAYOUT = [
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
-  const [featured, propertyTypes, services, projects, posts, filterOptions, categories] =
-    await Promise.all([
-      getFeaturedProperties(6),
-      getPropertyTypesWithCounts(),
-      getServices(),
-      getProjects(),
-      getPosts({ pageSize: 3 }),
-      getFilterOptions(),
-      getBlogCategories(),
-    ]);
+  const { featured, propertyTypes, services, projects, posts, filterOptions, categories } =
+    await getCachedHomePageData();
 
   const typeOptions = filterOptions.types.map((type) => ({
     value: type.slug,

@@ -34,6 +34,7 @@
     "db:taxonomy:staging": "wrangler d1 execute luxehome-db-staging --remote --env staging --file=prisma/taxonomy.sql"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
     "@prisma/adapter-d1": "^6.19.3",
     "@prisma/client": "^6.19.3",
     "clsx": "^2.1.1",

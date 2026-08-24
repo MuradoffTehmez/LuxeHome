@@ -15,6 +15,7 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { uniqueSlug } from "@/lib/admin/slug";
 import { featureCreateSchema, propertyTypeCreateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 const LIST_PATH = "/admin/taksonomiya";
 
@@ -43,6 +44,7 @@ export async function createPropertyType(_prev: ActionState, formData: FormData)
 
     await recordAudit(actor, "CREATE", "Property", type.id, `Əmlak növü: ${parsed.data.name}`);
     revalidatePath(LIST_PATH);
+    revalidatePublicContent("taxonomy");
     return success(`«${parsed.data.name}» əmlak növü əlavə edildi.`);
   } catch (error) {
     return unexpected("əmlak növü yaradıla bilmədi", error);

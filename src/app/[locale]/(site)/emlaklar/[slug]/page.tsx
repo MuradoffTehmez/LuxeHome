@@ -24,7 +24,8 @@ import {
   type Renovation,
   type DocumentStatus,
 } from "@/lib/constants";
-import { getPropertyBySlug, getSimilarProperties } from "@/lib/queries";
+import { getSimilarProperties } from "@/lib/queries";
+import { getCachedPropertyBySlug } from "@/lib/public-cache";
 import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
@@ -52,7 +53,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getCachedPropertyBySlug(slug);
 
   if (!property) return { title: "Əmlak tapılmadı" };
 
@@ -80,7 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = await getCachedPropertyBySlug(slug);
 
   if (!property) notFound();
 
