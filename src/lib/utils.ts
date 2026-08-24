@@ -73,6 +73,13 @@ export function formatDateTime(date: Date | string): string {
   return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+/** Cache sərhədində mətnə çevrilmiş DateTime dəyərini metadata üçün normallaşdırır. */
+export function toIsoDateTime(value: Date | string | null | undefined): string | undefined {
+  if (!value) return undefined;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+}
+
 /** "2 saat əvvəl", "dünən", "3 gün əvvəl" */
 export function formatRelative(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;

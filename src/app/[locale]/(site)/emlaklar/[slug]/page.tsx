@@ -11,7 +11,7 @@ import {
   Phone,
   ArrowRight,
 } from "lucide-react";
-import { formatNumber, formatPrice, formatArea } from "@/lib/utils";
+import { formatNumber, formatPrice, formatArea, toIsoDateTime } from "@/lib/utils";
 import {
   LISTING_TYPES,
   PRICE_PERIOD_LABELS,
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/emlaklar/${property.slug}`,
     image,
     type: "website",
-    publishedTime: property.publishedAt?.toISOString(),
+    publishedTime: toIsoDateTime(property.publishedAt),
     indexPolicy: property.noIndex || isClosed ? "noindex-follow" : "index",
     canonicalPath: property.canonicalUrl || undefined,
     ogTitle: property.ogTitle,

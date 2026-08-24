@@ -13,6 +13,7 @@ import {
 } from "@/lib/seo";
 import { resolveSiteBaseUrl, siteUrl } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
+import { toIsoDateTime } from "@/lib/utils";
 
 const originalEnv = {
   NODE_ENV: process.env.NODE_ENV,
@@ -131,6 +132,15 @@ describe("metadata fallback mətni", () => {
   it("təsviri sözün ortasında deyil, sərhəddə kəsir", () => {
     expect(truncateAtWord("Bir iki üç dörd", 12)).toBe("Bir iki üç…");
     expect(truncateAtWord("Qısa mətn", 50)).toBe("Qısa mətn");
+  });
+
+  it("cache-dən mətn kimi gələn tarixi ISO metadata vaxtına çevirir", () => {
+    expect(toIsoDateTime("2026-08-24T05:56:25.491+00:00")).toBe(
+      "2026-08-24T05:56:25.491Z",
+    );
+    expect(toIsoDateTime(new Date("2026-08-24T05:56:25.491Z"))).toBe(
+      "2026-08-24T05:56:25.491Z",
+    );
   });
 });
 
