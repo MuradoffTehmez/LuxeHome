@@ -5,6 +5,8 @@ import { routing } from "@/i18n/routing";
 import { isStaging } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
 import { localeFromPathname } from "@/i18n/path-locale";
+import { LOCALE_COOKIE } from "@/i18n/config";
+import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import {
   SESSION_COOKIE,
   SESSION_SUBJECT,
@@ -149,6 +151,13 @@ export async function middleware(request: NextRequest) {
   // səhifəsinə yönləndirilir, amma elə həmin səhifədə təkrar yönləndirilməməlidir.
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
+  if (!isAdminRoute) {
+    const preferred = request.cookies.get(LOCALE_COOKIE)?.value;
+    const locale = Object.values(LOCALES).includes(preferred as Locale)
+      ? (preferred as Locale)
+      : DEFAULT_LOCALE;
+    requestHeaders.set("X-NEXT-INTL-LOCALE", locale);
+  }
   return harden(NextResponse.next({ request: { headers: requestHeaders } }));
 }
 

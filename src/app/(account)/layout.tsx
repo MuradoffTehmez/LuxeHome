@@ -17,7 +17,7 @@ export default function AccountLayout({
   return (
     <ToastProvider>
       <div className="flex min-h-dvh flex-col">
-        <Navbar />
+        <Navbar showLocaleSwitcher localizedRoutes={false} />
         <main id="main" className="flex-1 pt-[var(--header-h)]">
           {children}
         </main>

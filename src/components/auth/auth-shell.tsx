@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/container";
+import { LocaleSwitcher } from "@/components/site/locale-switcher";
 import { cn } from "@/lib/utils";
 
 export type AuthShellProps = {
@@ -23,6 +24,11 @@ export function AuthShell({
     <main className={cn(standalone ? "min-h-dvh" : "min-h-[calc(100dvh-var(--header-h))]", "bg-beige")}>
       <Container className={cn("grid items-center gap-10 py-8 lg:py-16", aside && "lg:grid-cols-2", standalone ? "min-h-dvh" : "min-h-[calc(100dvh-var(--header-h))]")}>
         <section className="mx-auto w-full max-w-lg rounded-md border border-line bg-paper p-5 shadow-sm sm:p-8">
+          {standalone ? (
+            <div className="mb-5 flex justify-end">
+              <LocaleSwitcher localizedRoutes={false} />
+            </div>
+          ) : null}
           <header className="mb-7">
             {eyebrow ? (
               <p className="text-xs font-semibold tracking-[0.16em] text-gold-deep uppercase">

@@ -34,7 +34,13 @@ const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" |
  * daxil-ol, qeydiyyat) dil prefiksindən kənardadır — orada dil dəyişmə cəhdi
  * mövcud olmayan `/en/kabinet` kimi marşruta apararaq 404 yaradardı.
  */
-export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: boolean }) {
+export function Navbar({
+  showLocaleSwitcher = false,
+  localizedRoutes = true,
+}: {
+  showLocaleSwitcher?: boolean;
+  localizedRoutes?: boolean;
+}) {
   const t = useTranslations("navigation");
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -73,24 +79,24 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
       <Container
         size="wide"
         className={cn(
-          "flex min-h-[var(--header-h)] min-w-0 items-center gap-2 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-4 2xl:gap-6",
+          "flex min-h-[var(--header-h)] min-w-0 items-center gap-2 xl:grid xl:grid-cols-[auto_minmax(0,1fr)_auto] xl:gap-4 2xl:gap-6",
           isOverlay && "on-dark",
         )}
       >
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="shrink-0 max-[359px]:[&>span]:hidden lg:hidden xl:inline-flex"
+          className="shrink-0 max-[359px]:[&>span]:hidden xl:hidden"
         />
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="hidden shrink-0 lg:inline-flex xl:hidden [&>span]:hidden"
+          className="hidden shrink-0 xl:inline-flex [&>span]:hidden"
         />
 
         <nav
           aria-label={t("mainNavigation")}
-          className="hidden min-w-0 overflow-hidden lg:flex lg:justify-center"
+          className="hidden min-w-0 overflow-hidden xl:flex xl:justify-center"
         >
           <ul className="flex items-center gap-0.5 xl:gap-1">
             {navigation.map((item) => {
@@ -128,9 +134,11 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
           </ul>
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1 lg:ml-0 xl:gap-1.5">
+        <div className="ml-auto flex shrink-0 items-center gap-1 xl:ml-0 xl:gap-1.5">
           <ThemeToggle />
-          {showLocaleSwitcher && <LocaleSwitcher isOverlay={isOverlay} />}
+          {showLocaleSwitcher && (
+            <LocaleSwitcher isOverlay={isOverlay} localizedRoutes={localizedRoutes} />
+          )}
 
           <Link
             href="/favoritler"
@@ -146,7 +154,7 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
 
           <div
             className={cn(
-              "hidden items-center border-l pl-1 lg:flex xl:ml-0.5 xl:pl-2",
+              "hidden items-center border-l pl-1 xl:ml-0.5 xl:flex xl:pl-2",
               isOverlay ? "border-white/20" : "border-line",
             )}
           >
@@ -157,7 +165,7 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
             href="/kabinet/elanlar/yeni"
             variant="primary"
             size="sm"
-            className="hidden px-3 lg:inline-flex xl:px-4"
+            className="hidden px-3 xl:inline-flex xl:px-4"
           >
             <Plus className="size-4" aria-hidden="true" />
             {t("listProperty")}
@@ -168,7 +176,7 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
             className={cn(
-              "lg:hidden",
+              "xl:hidden",
               isOverlay ? "text-ink-invert hover:bg-white/10" : "text-ink",
             )}
           >

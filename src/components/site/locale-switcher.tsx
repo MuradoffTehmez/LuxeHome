@@ -11,18 +11,28 @@ import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
 
 /** Navbar-dakı `ThemeToggle`-ə bənzər dil seçici — dil dəyişdikdə cari səhifədə qalır. */
-export function LocaleSwitcher({ isOverlay = false }: { isOverlay?: boolean }) {
+export function LocaleSwitcher({
+  isOverlay = false,
+  localizedRoutes = true,
+}: {
+  isOverlay?: boolean;
+  localizedRoutes?: boolean;
+}) {
   const locale = useLocale() as Locale;
   const t = useTranslations("common.locale");
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  function select(next: Locale) {
+  async function select(next: Locale) {
     setOpen(false);
     if (next === locale) return;
-    router.replace(pathname, { locale: next });
-    void saveLocalePreference(next);
+    await saveLocalePreference(next);
+    if (localizedRoutes) {
+      router.replace(pathname, { locale: next });
+    } else {
+      window.location.reload();
+    }
   }
 
   return (
@@ -45,7 +55,7 @@ export function LocaleSwitcher({ isOverlay = false }: { isOverlay?: boolean }) {
             <li key={code}>
               <button
                 type="button"
-                onClick={() => select(code)}
+                onClick={() => void select(code)}
                 className={cn(
                   "flex min-h-12 w-full items-center justify-between rounded-xs px-3 text-sm transition-colors",
                   code === locale ? "bg-beige font-medium text-ink" : "text-ink-soft hover:bg-beige/60 hover:text-ink",
