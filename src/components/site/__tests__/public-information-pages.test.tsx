@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import ContactPage from "@/app/(site)/elaqe/page";
-import FaqPage from "@/app/(site)/suallar/page";
+import ContactPage from "@/app/[locale]/(site)/elaqe/page";
+import FaqPage from "@/app/[locale]/(site)/suallar/page";
 
 describe("ictimai məlumat səhifələri", () => {
   it("əlaqə səhifəsində mobil axında formanı əlaqə siyahısından əvvəl göstərir", () => {

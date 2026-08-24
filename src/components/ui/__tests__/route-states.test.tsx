@@ -35,7 +35,7 @@ describe("route vəziyyətləri", () => {
   });
 
   it.each([
-    "src/app/(site)/kabinet/loading.tsx",
+    "src/app/(account)/kabinet/loading.tsx",
     "src/app/admin/loading.tsx",
     "src/app/giris/loading.tsx",
   ])("%s segment səviyyəli accessible loading vəziyyətini saxlayır", (file) => {
@@ -45,7 +45,7 @@ describe("route vəziyyətləri", () => {
   });
 
   it("ictimai segment ümumi kolleksiya skeleton-undan istifadə edir", () => {
-    const source = readFileSync(join(process.cwd(), "src/app/(site)/loading.tsx"), "utf8");
+    const source = readFileSync(join(process.cwd(), "src/app/[locale]/(site)/loading.tsx"), "utf8");
     expect(source).toContain("CollectionPageSkeleton");
   });
 });

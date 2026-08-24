@@ -5,11 +5,11 @@ import type { PropertyCardData } from "@/lib/queries";
 import {
   ComparePresentation,
   type CompareProperty,
-} from "@/app/(site)/muqayise/compare-table";
+} from "@/app/[locale]/(site)/muqayise/compare-table";
 import {
   FavoritesPresentation,
   type FavoriteProperty,
-} from "@/app/(site)/favoritler/favorites-list";
+} from "@/app/[locale]/(site)/favoritler/favorites-list";
 import { getCompareBarPositionClass } from "../compare-bar";
 
 const cardProperty = {
