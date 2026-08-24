@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import type { Locale } from "@/lib/constants";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -15,23 +17,25 @@ import { getServices } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 
-export const metadata: Metadata = buildMetadata({
-  title: "Xidmətlər",
-  description:
-    "Luxe Home Estate-in daşınmaz əmlak sahəsindəki 7 əsas xidmət istiqaməti: alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam, çəkiliş və konsultasiya.",
-  path: "/xidmetler",
-  keywords: ["daşınmaz əmlak xidmətləri", "əmlak konsultasiyası", "ipoteka məsləhəti", "əmlak reklamı"],
-});
+type PageProps = { params: Promise<{ locale: string }> };
 
-export default async function ServicesPage() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.servicesPage" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/xidmetler", locale: locale as Locale });
+}
+
+export default async function ServicesPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.servicesPage" });
   const services = await getServices();
 
   return (
     <>
       <PageHeader
-        eyebrow="Nə edirik"
-        title="Xidmətlərimiz"
-        description="Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün peşəkar xidmətlər."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
 
       {/* Xidmət kartları */}
@@ -60,7 +64,7 @@ export default async function ServicesPage() {
                         href={`/xidmetler/${service.slug}`}
                         className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-gold-deep transition-colors hover:text-gold"
                       >
-                        Ətraflı oxu
+                        {t("more")}
                         <ArrowRight
                           className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
                           aria-hidden="true"
@@ -73,8 +77,8 @@ export default async function ServicesPage() {
             </div>
           ) : (
             <EmptyState
-              title="Hazırda xidmət məlumatı əlavə edilməyib"
-              description="Xidmətlər admin panel vasitəsilə əlavə ediləcək."
+              title={t("emptyTitle")}
+              description={t("emptyDescription")}
             />
           )}
         </Container>
@@ -84,13 +88,13 @@ export default async function ServicesPage() {
       <Section tone="beige">
         <Container className="flex flex-col items-center gap-6 text-center">
           <h2 className="max-w-xl font-display text-3xl text-ink sm:text-4xl">
-            Xidmətlərimiz haqqında sualınız var?
+            {t("ctaTitle")}
           </h2>
           <p className="max-w-md text-base text-ink-soft">
-            Tələbinizi bizə bildirin — komandamız sizinlə əlaqə saxlayacaq.
+            {t("ctaDescription")}
           </p>
           <ButtonLink href="/elaqe" variant="primary" size="lg">
-            Bizimlə əlaqə
+            {t("cta")}
           </ButtonLink>
         </Container>
       </Section>

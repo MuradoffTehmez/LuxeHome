@@ -8,5 +8,30 @@
     "day": "/day"
   },
   "area": "{value, number, integer} m²",
-  "rooms": "{count, plural, one {# room} other {# rooms}}"
+  "rooms": "{count, plural, one {# room} other {# rooms}}",
+  "photo": "Property photo",
+  "photoUnavailable": "Property photo unavailable",
+  "address": "Address",
+  "phone": "Phone",
+  "location": "Location",
+  "year": "Year",
+  "landArea": "Land area",
+  "landUnit": "{value, number, integer} sot",
+  "floor": "Floor",
+  "listingCount": "{count, plural, one {# listing} other {# listings}}",
+  "readMinutes": "{count, plural, one {# min read} other {# min read}}",
+  "projectImageAlt": "{name} development",
+  "favorite": {"add": "Add to favorites", "remove": "Remove from favorites", "active": "In favorites"},
+  "compare": {"add": "Add to compare", "remove": "Remove from compare", "active": "In comparison", "action": "Compare", "limit": "You can compare up to {count} properties.", "list": "Comparison list", "selected": "{count, plural, one {# property selected for comparison} other {# properties selected for comparison}}", "clear": "Clear", "clearTitle": "Clear the comparison list?", "clearDescription": "All selected properties will be removed from the comparison list."},
+  "clear": {"label": "Clear list", "cancel": "Cancel", "deleteAll": "Delete all", "notice": "This action only affects the list stored on this device."},
+  "saved": {"count": "{count, plural, one {# property saved} other {# properties saved}}", "favoritesClearTitle": "Clear the favorites list?", "favoritesClearDescription": "All saved properties will be removed from this device.", "missingNotice": "Some listings are no longer available or have been archived and are not shown.", "unavailableTitle": "Saved listings are no longer available", "unavailableDescription": "The listings were removed or archived. Clear the list and choose new properties.", "chooseNew": "Choose a new property", "unavailableClear": "All unavailable selections will be removed from the list.", "emptyTitle": "Your favorites list is empty", "emptyDescription": "Save listings with the heart icon and they will appear here.", "view": "View properties"},
+  "compareTable": {"price": "Price", "propertyType": "Property type", "location": "Location", "rooms": "Rooms", "bedrooms": "Bedrooms", "bathrooms": "Bathrooms", "area": "Area", "landArea": "Land area", "floor": "Floor", "building": "Building type", "renovation": "Condition", "document": "Documents", "mortgage": "Mortgage", "installment": "Instalments", "features": "Features", "eligible": "Eligible", "available": "Available", "count": "{count, plural, one {Comparing # property} other {Comparing # properties}}", "tabs": "Properties being compared", "remove": "Remove from comparison", "property": "Property", "removeShort": "Remove", "missingNotice": "Some listings are no longer available or have been archived and are not shown.", "unavailableTitle": "Selected listings are no longer available", "unavailableDescription": "The listings were removed or archived. Clear the list and choose new properties.", "chooseNew": "Choose a new property", "unavailableClear": "All unavailable selections will be removed.", "emptyTitle": "Your comparison list is empty", "emptyDescription": "Use the compare button on property cards to add listings here.", "view": "View properties"},
+  "share": {"listing": "Share listing", "label": "Share", "copied": "Copied", "copyLink": "Copy link", "via": "Share via {network}"},
+  "status": {"draft": "Draft", "pending": "Pending approval", "published": "Published", "reserved": "Reserved", "sold": "Sold", "rented": "Rented", "archived": "Archived"},
+  "projectStatus": {"planned": "Planned", "ongoing": "In progress", "completed": "Completed"},
+  "projectType": {"residential": "Residential", "commercial": "Commercial", "villa": "Villa", "mixed": "Mixed use"},
+  "renovation": {"cosmetic": "Cosmetic renovation", "renovated": "Renovated", "designer": "Designer renovation", "unrenovated": "Unrenovated", "newBuilding": "New build"},
+  "document": {"titleDeed": "Title deed", "contract": "Contract", "municipal": "Municipal document", "decree": "Decree", "powerOfAttorney": "Power of attorney", "commercialExtract": "Commercial title deed", "none": "No title deed"},
+  "building": {"new": "New build", "old": "Older building"}
+  ,"featureGroup": {"general": "General", "indoor": "Indoor", "outdoor": "Outdoor", "security": "Security"}
 }

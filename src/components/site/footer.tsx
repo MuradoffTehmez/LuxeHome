@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ChevronDown, Globe, MapPin, Phone } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
 import {
   legalNavigation,
@@ -55,11 +56,19 @@ function FooterLinkList({
   );
 }
 
-function PropertyLinks() {
+function PropertyLinks({
+  propertyItems,
+  listingItems,
+  listingTypeLabel,
+}: {
+  propertyItems: readonly { label: string; href: string }[];
+  listingItems: readonly { label: string; href: string }[];
+  listingTypeLabel: string;
+}) {
   return (
     <div className="space-y-5">
       <ul className="grid grid-cols-2 gap-x-4 gap-y-1 lg:grid-cols-1 xl:grid-cols-2">
-        {propertyTypeLinks.map((item) => (
+        {propertyItems.map((item) => (
           <li key={item.href}>
             <Link
               href={item.href}
@@ -72,10 +81,10 @@ function PropertyLinks() {
       </ul>
       <div className="border-t border-line-dark pt-4">
         <p className="mb-2 text-xs font-semibold tracking-[0.12em] text-gold-soft uppercase">
-          Elan növü
+          {listingTypeLabel}
         </p>
         <ul className="flex flex-wrap gap-2">
-          {listingLinks.map((item) => (
+          {listingItems.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}
@@ -113,9 +122,37 @@ function ContactDetails() {
   );
 }
 
-export function Footer() {
+const NAV_KEY_BY_HREF = {
+  "/": "home", "/emlaklar": "properties", "/layiheler": "projects",
+  "/agentlikler": "agencies", "/xidmetler": "services", "/blog": "blog",
+  "/elaqe": "contact", "/haqqimizda": "about", "/suallar": "faq",
+} as const;
+
+const PROPERTY_KEY_BY_HREF = {
+  "/bakida-satilan-menziller": "saleApartments", "/bakida-kiraye-menziller": "rentApartments",
+  "/villalar": "villas", "/heyet-evleri": "houses", "/torpaq-saheleri": "land",
+  "/kommersiya-obyektleri": "commercial", "/ofisler": "offices",
+} as const;
+
+const LEGAL_KEY_BY_HREF = {
+  "/mexfilik-siyaseti": "privacy", "/istifade-sertleri": "terms", "/cookie-siyaseti": "cookies",
+} as const;
+
+export async function Footer() {
+  const t = await getTranslations("navigation");
   const year = new Date().getFullYear();
-  const navigationItems = [...navigation, ...supportNavigation];
+  const navigationItems = [...navigation, ...supportNavigation].map((item) => ({
+    href: item.href,
+    label: t(NAV_KEY_BY_HREF[item.href]),
+  }));
+  const propertyItems = propertyTypeLinks.map((item) => ({
+    href: item.href,
+    label: t(`propertyLinks.${PROPERTY_KEY_BY_HREF[item.href]}`),
+  }));
+  const listingItems = listingLinks.map((item) => ({
+    href: item.href,
+    label: t(`propertyLinks.${item.href === "/satilan-emlaklar" ? "sale" : "rent"}`),
+  }));
 
   return (
     <footer className="on-dark relative border-t border-line-dark bg-navy text-ink-invert">
@@ -129,9 +166,7 @@ export function Footer() {
           <div className="flex flex-col gap-5 pb-2 lg:pb-0">
             <Logo tone="dark" />
             <p className="max-w-sm text-sm leading-7 text-ink-invert-soft">
-              {siteConfig.slogan.charAt(0) + siteConfig.slogan.slice(1).toLowerCase()}.
-              Mənzil, villa, torpaq və kommersiya obyektləri üzrə peşəkar daşınmaz
-              əmlak xidmətləri.
+              {t("footer.description")}
             </p>
             <a
               href={siteConfig.instagramUrl}
@@ -144,26 +179,28 @@ export function Footer() {
             </a>
           </div>
 
-          <FooterSection title="Naviqasiya">
+          <FooterSection title={t("navigation")}>
             <FooterLinkList items={navigationItems} />
           </FooterSection>
 
-          <FooterSection title="Əmlaklar">
-            <PropertyLinks />
+          <FooterSection title={t("properties")}>
+            <PropertyLinks
+              propertyItems={propertyItems}
+              listingItems={listingItems}
+              listingTypeLabel={t("listingType")}
+            />
           </FooterSection>
 
-          <FooterSection title="Əlaqə">
+          <FooterSection title={t("contact")}>
             <ContactDetails />
           </FooterSection>
         </div>
 
         <div className="mt-10 flex flex-col gap-5 border-t border-line-dark pt-6 lg:mt-14 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex max-w-2xl flex-col gap-1 text-xs leading-5 text-ink-invert-muted">
-            <p>© {year} {siteConfig.legalName}. Bütün hüquqlar qorunur.</p>
-            <p>
-              Sayt, «{siteConfig.name}» brendi və markası {siteConfig.owner.name}-na məxsusdur.
-            </p>
-            <p className="tabular">VÖEN: {siteConfig.legal.voen}</p>
+            <p>© {year} {siteConfig.legalName}. {t("footer.rightsReserved")}</p>
+            <p>{t("footer.ownership", { brand: siteConfig.name, owner: siteConfig.owner.name })}</p>
+            <p className="tabular">{t("footer.vat", { value: siteConfig.legal.voen })}</p>
           </div>
 
           <ul className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
@@ -173,7 +210,7 @@ export function Footer() {
                   href={item.href}
                   className="inline-flex min-h-11 items-center rounded-xs text-xs text-ink-invert-muted transition-colors hover:text-ink-invert focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
-                  {item.label}
+                  {t(LEGAL_KEY_BY_HREF[item.href])}
                 </Link>
               </li>
             ))}

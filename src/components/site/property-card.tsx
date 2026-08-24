@@ -1,14 +1,14 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useFormatter, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { BedDouble, Building2, Layers, Maximize, MapPin } from "lucide-react";
-import { cn, formatArea, formatNumber, formatPrice, isUnoptimizedImage } from "@/lib/utils";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
   LISTING_TYPES,
-  PRICE_PERIOD_LABELS,
   PROPERTY_STATUSES,
-  PROPERTY_STATUS_LABELS,
   PROPERTY_STATUS_TONE,
-  type PricePeriod,
   type PropertyStatus,
 } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,10 @@ type PropertyCardProps = {
   variant?: "standard" | "featured";
 };
 
-const PLACEHOLDER_ALT = "Əmlak fotosu";
+const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
+  DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
+  SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
+};
 
 export function PropertyCard({
   property,
@@ -32,6 +35,8 @@ export function PropertyCard({
   className,
   variant = "standard",
 }: PropertyCardProps) {
+  const t = useTranslations("property");
+  const format = useFormatter();
   const image = property.images[0];
   const status = property.status as PropertyStatus;
   const isSale = property.listingType === LISTING_TYPES.SALE;
@@ -42,9 +47,11 @@ export function PropertyCard({
     .filter(Boolean)
     .join(", ");
 
-  const period = property.pricePeriod
-    ? PRICE_PERIOD_LABELS[property.pricePeriod as PricePeriod]
-    : null;
+  const period = property.pricePeriod === "MONTH"
+    ? t("pricePeriod.month")
+    : property.pricePeriod === "DAY" ? t("pricePeriod.day") : null;
+  const number = (value: number) => format.number(value, { maximumFractionDigits: 0 });
+  const currency = property.currency === "AZN" ? "₼" : property.currency === "USD" ? "$" : property.currency === "EUR" ? "€" : property.currency;
 
   return (
     <article
@@ -84,7 +91,7 @@ export function PropertyCard({
         ) : (
           <div className="flex size-full items-center justify-center text-ink-muted">
             <Building2 className="size-10" aria-hidden="true" />
-            <span className="sr-only">{PLACEHOLDER_ALT} mövcud deyil</span>
+            <span className="sr-only">{t("photoUnavailable")}</span>
           </div>
         )}
 
@@ -94,20 +101,20 @@ export function PropertyCard({
       <div className={cn("flex flex-1 flex-col gap-4 p-5", variant === "featured" && "sm:p-7")}>
         <div className="flex flex-wrap gap-2">
           <Badge tone={isSale ? "dark" : "gold"}>
-            {isSale ? "Satılır" : "Kirayə"}
+            {isSale ? t("listingType.sale") : t("listingType.rent")}
           </Badge>
           {isClosed && (
             <Badge tone={PROPERTY_STATUS_TONE[status]}>
-              {PROPERTY_STATUS_LABELS[status]}
+              {t(`status.${STATUS_KEYS[status]}`)}
             </Badge>
           )}
           {status === PROPERTY_STATUSES.RESERVED && (
-            <Badge tone="warning">{PROPERTY_STATUS_LABELS[status]}</Badge>
+            <Badge tone="warning">{t(`status.${STATUS_KEYS[status]}`)}</Badge>
           )}
         </div>
 
         <p className="tabular font-display text-2xl leading-none tracking-[-0.02em] text-ink">
-          {formatPrice(property.price, property.currency)}
+          {number(property.price)} {currency}
           {period && (
             <span className="ml-1 font-sans text-xs font-normal text-ink-muted">
               / {period}
@@ -148,31 +155,31 @@ export function PropertyCard({
           {property.rooms != null && (
             <div className="flex items-center gap-1.5">
               <BedDouble className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
-              <dt className="sr-only">Otaq sayı</dt>
-              <dd className="tabular">{property.rooms} otaq</dd>
+              <dt className="sr-only">{t("rooms", { count: property.rooms })}</dt>
+              <dd className="tabular">{t("rooms", { count: property.rooms })}</dd>
             </div>
           )}
 
           {property.area != null && (
             <div className="flex items-center gap-1.5">
               <Maximize className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
-              <dt className="sr-only">Sahə</dt>
-              <dd className="tabular">{formatArea(property.area)}</dd>
+              <dt className="sr-only">{t("area", { value: property.area })}</dt>
+              <dd className="tabular">{t("area", { value: property.area })}</dd>
             </div>
           )}
 
           {property.landArea != null && property.area == null && (
             <div className="flex items-center gap-1.5">
               <Maximize className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
-              <dt className="sr-only">Torpaq sahəsi</dt>
-              <dd className="tabular">{formatNumber(property.landArea)} sot</dd>
+              <dt className="sr-only">{t("landArea")}</dt>
+              <dd className="tabular">{t("landUnit", { value: property.landArea })}</dd>
             </div>
           )}
 
           {property.floor != null && property.totalFloors != null && (
             <div className="flex items-center gap-1.5">
               <Layers className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
-              <dt className="sr-only">Mərtəbə</dt>
+              <dt className="sr-only">{t("floor")}</dt>
               <dd className="tabular">
                 {property.floor}/{property.totalFloors}
               </dd>
@@ -193,6 +200,7 @@ export function PropertyCard({
 
 /** Yan panel və oxşar əmlaklar üçün kompakt sətir. */
 export function PropertyRow({ property }: { property: PropertyCardData }) {
+  const format = useFormatter();
   const image = property.images[0];
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
@@ -229,7 +237,7 @@ export function PropertyRow({ property }: { property: PropertyCardData }) {
         </h3>
         {location && <p className="truncate text-xs text-ink-muted">{location}</p>}
         <p className="tabular text-sm font-semibold text-ink">
-          {formatPrice(property.price, property.currency)}
+          {format.number(property.price, { maximumFractionDigits: 0 })} {property.currency === "AZN" ? "₼" : property.currency}
         </p>
       </div>
     </article>

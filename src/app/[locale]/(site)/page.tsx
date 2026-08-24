@@ -1,7 +1,8 @@
 import Image from "next/image";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { hasLocale } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -38,11 +39,11 @@ type HomePageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const { locale } = await params;
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
+  const t = await getTranslations({ locale: resolvedLocale, namespace: "home" });
 
   return buildMetadata({
-    title: "Bakıda daşınmaz əmlak — mənzil, villa və obyektlər",
-    description:
-      "Bakıda mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyektlərinin satışı və icarəsi. Real əmlak elanlarını rahat filtrləyin və Luxe Home Estate ilə əlaqə saxlayın.",
+    title: t("metaTitle"),
+    description: t("metaDescription"),
     path: "/",
     locale: resolvedLocale,
   });
@@ -50,43 +51,10 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 
 
 const WHY_ITEMS = [
-  {
-    icon: Users,
-    title: "Fərdi yanaşma",
-    description:
-      "Hər müştərinin tələbi fərqlidir. Axtarışı sizin büdcə, ərazi və yaşayış tərzinizə uyğunlaşdırırıq.",
-  },
-  {
-    icon: Building2,
-    title: "Geniş əmlak seçimi",
-    description:
-      "Mənzil, villa, həyət evi, bağ evi, torpaq, ofis və kommersiya obyektləri — hamısı bir platformada.",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Peşəkar xidmət",
-    description:
-      "Baxışdan rəsmiləşdirməyə qədər bütün mərhələlərdə komandamız sizi müşayiət edir.",
-  },
-  {
-    icon: Eye,
-    title: "Şəffaf proses",
-    description:
-      "Əmlakın vəziyyəti, sənədləri və şərtləri barədə məlumat açıq şəkildə təqdim olunur.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Sənəd təhlükəsizliyi",
-    description:
-      "Hər əməliyyatda hüquqi sənədlərin yoxlanılmasına xüsusi diqqət yetirilir.",
-  },
-  {
-    icon: Handshake,
-    title: "Kompleks xidmət",
-    description:
-      "Alqı-satqıdan təmir, reklam və çəkilişə qədər müxtəlif istiqamətlərdə dəstək göstəririk.",
-  },
-];
+  { icon: Users, key: "personal" }, { icon: Building2, key: "selection" },
+  { icon: BadgeCheck, key: "service" }, { icon: Eye, key: "transparent" },
+  { icon: ShieldCheck, key: "documents" }, { icon: Handshake, key: "complete" },
+] as const;
 
 const PROPERTY_LAYOUT = [
   "lg:col-span-7 lg:row-span-2",
@@ -115,6 +83,8 @@ const BLOG_LAYOUT = [
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
+  const t = await getTranslations({ locale: resolvedLocale, namespace: "home" });
+  const propertyT = await getTranslations({ locale: resolvedLocale, namespace: "property" });
   const { featured, propertyTypes, services, projects, posts, filterOptions, categories } =
     await getCachedHomePageData();
 
@@ -149,10 +119,10 @@ export default async function HomePage({ params }: HomePageProps) {
       <Section tone="ivory">
         <Container size="wide">
           <SectionHeader
-            overline="Portfel"
-            title="Seçilmiş Əmlaklar"
-            description="Luxe Home Estate tərəfindən seçilmiş daşınmaz əmlaklar."
-            action={{ label: "Bütün əmlaklar", href: "/emlaklar" }}
+            overline={t("featured.overline")}
+            title={t("featured.title")}
+            description={t("featured.description")}
+            action={{ label: t("featured.all"), href: "/emlaklar" }}
           />
 
           <div className="mt-10">
@@ -173,9 +143,9 @@ export default async function HomePage({ params }: HomePageProps) {
               </div>
             ) : (
               <EmptyState
-                title="Hazırda seçilmiş əmlak yoxdur"
-                description="Yeni əmlaklar əlavə edildikcə bu bölmədə göstəriləcək."
-                action={{ label: "Bütün əmlaklara bax", href: "/emlaklar" }}
+                title={t("featured.emptyTitle")}
+                description={t("featured.emptyDescription")}
+                action={{ label: t("featured.emptyAction"), href: "/emlaklar" }}
               />
             )}
           </div>
@@ -188,9 +158,9 @@ export default async function HomePage({ params }: HomePageProps) {
       <Section tone="paper">
         <Container size="wide">
           <SectionHeader
-            overline="Kateqoriyalar"
-            title="Sizə uyğun məkanı tapın"
-            description="Axtardığınız əmlak növünü seçin və uyğun variantlara baxın."
+            overline={t("categories.overline")}
+            title={t("categories.title")}
+            description={t("categories.description")}
           />
 
           <MobileCategoryRail items={categoryItems} />
@@ -231,7 +201,7 @@ export default async function HomePage({ params }: HomePageProps) {
                         {item.label}
                       </h3>
                       <p className="tabular mt-1 text-sm text-white/75">
-                        {item.count} elan
+                        {propertyT("listingCount", { count: item.count })}
                       </p>
                     </div>
                     <ArrowUpRight
@@ -253,11 +223,11 @@ export default async function HomePage({ params }: HomePageProps) {
         <Container size="wide">
           <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
             <SectionHeader
-              overline="Nə edirik"
-              title="Xidmətlərimiz"
-              description="Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün 7 əsas istiqamətdə xidmət."
+              overline={t("services.overline")}
+              title={t("services.title")}
+              description={t("services.description")}
               tone="dark"
-              action={{ label: "Bütün xidmətlər", href: "/xidmetler" }}
+              action={{ label: t("services.all"), href: "/xidmetler" }}
               className="self-start lg:sticky lg:top-32"
             />
 
@@ -299,7 +269,7 @@ export default async function HomePage({ params }: HomePageProps) {
               <div className="relative aspect-4/5 overflow-hidden rounded-md sm:aspect-4/3 lg:aspect-4/5">
                 <Image
                   src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
-                  alt="Müasir premium memarlıq"
+                  alt={t("about.imageAlt")}
                   fill
                   loading="lazy"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -316,30 +286,22 @@ export default async function HomePage({ params }: HomePageProps) {
 
             <div className="relative z-10 mt-[-2rem] mx-4 flex flex-col gap-6 bg-paper p-7 shadow-editorial sm:mx-10 sm:p-10 lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mx-0 lg:mt-0 lg:-ml-20 lg:p-12">
               <SectionHeader
-                overline="Haqqımızda"
-                title="Luxe Home Estate haqqında"
-                description={`${siteConfig.legalName} daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam və çəkiliş istiqamətlərində fəaliyyət göstərir.`}
+                overline={t("about.overline")}
+                title={t("about.title")}
+                description={t("about.description", { legalName: siteConfig.legalName })}
               />
 
               <div className="flex flex-col gap-4 text-base leading-relaxed text-ink-soft">
-                <p>
-                  Yanaşmamız sadədir: müştərinin real tələbini anlamaq və ona
-                  uyğun əmlakı tapmaq. Hər müraciətə fərdi baxırıq — büdcə,
-                  ərazi, yaşayış tərzi və gələcək planlar nəzərə alınır.
-                </p>
-                <p>
-                  Əməliyyatın hər mərhələsində şəffaflığa önəm veririk. Əmlakın
-                  vəziyyəti, sənədləri və şərtləri barədə məlumat olduğu kimi
-                  təqdim olunur.
-                </p>
+                <p>{t("about.paragraph1")}</p>
+                <p>{t("about.paragraph2")}</p>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <ButtonLink href="/haqqimizda" variant="outline">
-                  Ətraflı oxu
+                  {t("about.more")}
                 </ButtonLink>
                 <ButtonLink href="/elaqe" variant="ghost">
-                  Bizimlə əlaqə
+                  {t("about.contact")}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </ButtonLink>
               </div>
@@ -354,27 +316,27 @@ export default async function HomePage({ params }: HomePageProps) {
       <Section tone="beige">
         <Container>
           <SectionHeader
-            overline="Üstünlüklər"
-            title="Niyə Luxe Home Estate?"
-            description="Müştərilərimizə təklif etdiyimiz yanaşmanın əsas prinsipləri."
+            overline={t("why.overline")}
+            title={t("why.title")}
+            description={t("why.description")}
             align="center"
           />
 
           <div className="mt-12 grid gap-x-10 sm:grid-cols-2">
             {WHY_ITEMS.map((item, index) => (
-              <Reveal key={item.title} delay={index * 50}>
+              <Reveal key={item.key} delay={index * 50}>
                 <div className="grid h-full grid-cols-[auto_1fr] gap-x-5 gap-y-3 border-t border-line-strong py-6 sm:py-8">
                   <span className="flex size-9 items-center justify-center text-gold-deep">
                     <item.icon className="size-5" aria-hidden="true" />
                   </span>
                   <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="font-display text-xl text-ink">{item.title}</h3>
+                    <h3 className="font-display text-xl text-ink">{t(`why.items.${item.key}.title`)}</h3>
                     <span className="tabular editorial-kicker text-ink-muted">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                   </div>
                   <p className="col-start-2 text-sm leading-relaxed text-ink-soft">
-                    {item.description}
+                    {t(`why.items.${item.key}.description`)}
                   </p>
                 </div>
               </Reveal>
@@ -391,10 +353,10 @@ export default async function HomePage({ params }: HomePageProps) {
         <Section tone="paper">
           <Container size="wide">
             <SectionHeader
-              overline="Portfolio"
-              title="Layihələrimiz"
-              description="Davam edən və tamamlanmış layihələr."
-              action={{ label: "Bütün layihələr", href: "/layiheler" }}
+              overline={t("projects.overline")}
+              title={t("projects.title")}
+              description={t("projects.description")}
+              action={{ label: t("projects.all"), href: "/layiheler" }}
             />
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -415,10 +377,10 @@ export default async function HomePage({ params }: HomePageProps) {
         <Section tone="ivory">
           <Container size="wide">
             <SectionHeader
-              overline="Blog"
-              title="Faydalı məqalələr"
-              description={`${categories.length} kateqoriya üzrə daşınmaz əmlak, bazar və interyer mövzularında yazılar.`}
-              action={{ label: "Bütün yazılar", href: "/blog" }}
+              overline={t("blog.overline")}
+              title={t("blog.title")}
+              description={t("blog.description", { count: categories.length })}
+              action={{ label: t("blog.all"), href: "/blog" }}
             />
 
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-12 lg:auto-rows-fr">
@@ -457,22 +419,21 @@ export default async function HomePage({ params }: HomePageProps) {
             </div>
 
             <div className="flex flex-col justify-center gap-6 bg-ivory p-7 sm:p-10 lg:col-span-5 lg:p-14">
-              <p className="editorial-kicker text-gold-deep">Fərdi seçim</p>
+              <p className="editorial-kicker text-gold-deep">{t("cta.overline")}</p>
               <h2 className="max-w-xl font-display text-[clamp(2.4rem,4vw,4.5rem)] leading-[0.98] tracking-[-0.04em] text-ink">
-                Axtardığınız əmlakı tapmaqda kömək edək
+                {t("cta.title")}
               </h2>
 
               <p className="max-w-lg text-base leading-relaxed text-ink-soft">
-                Tələbinizi bizə bildirin — uyğun variantları seçib sizinlə əlaqə
-                saxlayaq.
+                {t("cta.description")}
               </p>
 
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/elaqe" variant="primary" size="lg">
-                  Müraciət göndər
+                  {t("cta.send")}
                 </ButtonLink>
                 <ButtonLink href="/emlaklar" variant="outline" size="lg">
-                  Əmlaklara bax
+                  {t("cta.view")}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </ButtonLink>
               </div>

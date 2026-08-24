@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Heart } from "lucide-react";
 import { PropertyCard } from "@/components/site/property-card";
 import { ConfirmClearButton } from "@/components/site/confirm-clear-button";
@@ -22,13 +23,14 @@ export function FavoritesPresentation({
   savedCount,
   onClear,
 }: FavoritesPresentationProps) {
+  const t = useTranslations("property.saved");
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-start gap-3 border-b border-line pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-ink-muted">{savedCount} əmlak yadda saxlanılıb</p>
+        <p className="text-sm text-ink-muted">{t("count", { count: savedCount })}</p>
         <ConfirmClearButton
-          title="Favorit siyahısı təmizlənsin?"
-          description="Yadda saxladığınız bütün əmlaklar bu cihazdakı siyahıdan silinəcək."
+          title={t("favoritesClearTitle")}
+          description={t("favoritesClearDescription")}
           onConfirm={onClear}
         />
       </div>
@@ -41,7 +43,7 @@ export function FavoritesPresentation({
 
       {properties.length < savedCount ? (
         <p role="status" className="text-sm text-ink-muted">
-          Bəzi elanlar artıq mövcud deyil və ya arxivə salınıb, ona görə göstərilmir.
+          {t("missingNotice")}
         </p>
       ) : null}
     </div>
@@ -49,6 +51,7 @@ export function FavoritesPresentation({
 }
 
 export function FavoritesList() {
+  const t = useTranslations("property.saved");
   const { ids, ready, clear, count } = useFavorites();
   const [properties, setProperties] = useState<FavoriteProperty[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -84,14 +87,14 @@ export function FavoritesList() {
         <div className="flex flex-col items-center gap-4">
           <EmptyState
             icon={<Heart className="size-6" aria-hidden="true" />}
-            title="Yadda saxlanan elanlar artıq əlçatan deyil"
-            description="Elanlar silinib və ya arxivə salınıb. Siyahını təmizləyib yeni əmlaklar seçə bilərsiniz."
-            action={{ href: "/emlaklar", label: "Yeni əmlak seç" }}
+            title={t("unavailableTitle")}
+            description={t("unavailableDescription")}
+            action={{ href: "/emlaklar", label: t("chooseNew") }}
             className="w-full"
           />
           <ConfirmClearButton
-            title="Favorit siyahısı təmizlənsin?"
-            description="Əlçatan olmayan bütün seçimlər siyahıdan silinəcək."
+            title={t("favoritesClearTitle")}
+            description={t("unavailableClear")}
             onConfirm={clear}
           />
         </div>
@@ -101,9 +104,9 @@ export function FavoritesList() {
     return (
       <EmptyState
         icon={<Heart className="size-6" aria-hidden="true" />}
-        title="Favorit siyahınız boşdur"
-        description="Bəyəndiyiniz elanları ürək işarəsi ilə yadda saxlayın — burada toplanacaq."
-        action={{ href: "/emlaklar", label: "Əmlaklara bax" }}
+        title={t("emptyTitle")}
+        description={t("emptyDescription")}
+        action={{ href: "/emlaklar", label: t("view") }}
       />
     );
   }

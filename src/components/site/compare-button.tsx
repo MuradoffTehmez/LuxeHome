@@ -1,6 +1,7 @@
 "use client";
 
 import { GitCompareArrows } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useCompareItem } from "@/lib/compare";
 import { useToast } from "@/components/ui/toast";
@@ -19,14 +20,15 @@ export function CompareButton({
   variant = "overlay",
   className,
 }: CompareButtonProps) {
+  const t = useTranslations("property.compare");
   const { isComparing, ready, atLimit, toggle } = useCompareItem(propertyId);
   const { toast } = useToast();
 
-  const label = isComparing ? "Müqayisədən çıxar" : "Müqayisəyə əlavə et";
+  const label = isComparing ? t("remove") : t("add");
 
   function handleToggle() {
     if (atLimit) {
-      toast(`Ən çox ${MAX_COMPARE} əmlakı müqayisə edə bilərsiniz.`, "error");
+      toast(t("limit", { count: MAX_COMPARE }), "error");
       return;
     }
     trackEvent(isComparing ? "compare_remove" : "compare_add", { property_id: propertyId });
@@ -49,7 +51,7 @@ export function CompareButton({
         )}
       >
         <GitCompareArrows className="size-4" aria-hidden="true" />
-        {isComparing ? "Müqayisədədir" : "Müqayisə et"}
+        {isComparing ? t("active") : t("action")}
       </button>
     );
   }

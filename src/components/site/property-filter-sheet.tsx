@@ -1,10 +1,10 @@
 "use client";
 
 import { useId, useState } from "react";
+import { useTranslations } from "next-intl";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Overlay } from "@/components/ui/overlay";
-import { formatNumber } from "@/lib/utils";
 import {
   PropertyFilterFields,
   type CityOption,
@@ -31,6 +31,7 @@ export function PropertyFilterSheet({
   resultCount,
   activeCount,
 }: PropertyFilterSheetProps) {
+  const t = useTranslations("listings.search");
   const [open, setOpen] = useState(false);
   const generatedId = useId();
   const formId = `${generatedId}-property-filter-form`;
@@ -45,22 +46,22 @@ export function PropertyFilterSheet({
         className="inline-flex min-h-11 items-center gap-2 rounded-xs px-2 text-sm font-semibold text-ink transition-colors hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:hidden"
       >
         <SlidersHorizontal className="size-4" aria-hidden="true" />
-        Filtrlər{activeCount > 0 ? ` (${activeCount})` : ""}
+        {t("filters")}{activeCount > 0 ? ` (${activeCount})` : ""}
         <span className="hidden text-xs font-normal text-ink-muted min-[390px]:inline">
-          {formatNumber(resultCount)} nəticə
+          {t("resultShort", { count: resultCount })}
         </span>
       </button>
 
       <Overlay
         open={open}
         onClose={() => setOpen(false)}
-        title="Filtrlər"
-        description="Axtarış şərtlərini seçin"
+        title={t("filters")}
+        description={t("chooseCriteria")}
         placement="bottom"
         className="h-dvh max-h-dvh rounded-none pb-0 lg:hidden"
         footer={
           <Button type="submit" form={formId} fullWidth>
-            {formatNumber(resultCount)} nəticəni göstər
+            {t("showResults", { count: resultCount })}
           </Button>
         }
       >

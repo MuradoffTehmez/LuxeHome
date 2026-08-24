@@ -1,6 +1,7 @@
 "use client";
 
 import { Phone } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ButtonAnchor } from "@/components/ui/button";
 import { StickyActionBar } from "@/components/ui/sticky-action-bar";
 import { CompareButton } from "./compare-button";
@@ -25,13 +26,14 @@ export function PropertyActionToolbar({
   phone,
   whatsappHref,
 }: PropertyActionToolbarProps) {
+  const t = useTranslations("content");
   const iconButtonClass =
     "bg-transparent text-ink hover:bg-beige focus-visible:outline-gold";
 
   return (
     <>
       <nav
-        aria-label="Əmlak əməliyyatları"
+        aria-label={t("propertyActions")}
         className="grid grid-cols-3 divide-x divide-line border-y border-line bg-paper sm:ml-auto sm:max-w-sm"
       >
         <div className="flex min-h-14 items-center justify-center">
@@ -46,7 +48,7 @@ export function PropertyActionToolbar({
       <StickyActionBar className="grid grid-cols-2 gap-2">
         <ButtonAnchor href={phone} variant="outline" size="sm" fullWidth onClick={() => trackEvent("phone_click", { property_id: propertyId, placement: "sticky_toolbar" })}>
           <Phone className="size-4" aria-hidden="true" />
-          Zəng et
+          {t("call")}
         </ButtonAnchor>
         <ButtonAnchor
           href={whatsappHref}

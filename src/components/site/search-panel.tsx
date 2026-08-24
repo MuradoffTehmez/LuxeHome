@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,7 @@ export function SearchPanel({
   variant = "hero",
   className,
 }: SearchPanelProps) {
+  const t = useTranslations("listings.search");
   const isPage = variant === "page";
 
   return (
@@ -65,12 +67,12 @@ export function SearchPanel({
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xs px-3 text-sm text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
               <RotateCcw className="size-4" aria-hidden="true" />
-              Filtrləri sıfırla
+              {t("reset")}
             </Link>
           ) : null}
           <Button type="submit" size="md" className="sm:min-w-40">
             <Search className="size-4" aria-hidden="true" />
-            Axtar
+            {t("submit")}
           </Button>
         </div>
       </form>

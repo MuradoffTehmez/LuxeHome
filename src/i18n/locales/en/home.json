@@ -4,13 +4,26 @@
   "hero": {
     "eyebrow": "Luxe Home Estate",
     "title": "Real estate for sale and rent in Baku",
-    "description": "Local market expertise, a transparent process and a personal approach to finding the right property.",
-    "imageAlt": "Premium villa with contemporary architecture"
+    "description": "Discover the right property with Luxe Home Estate. A broad selection of apartments, villas, houses, land and commercial property.",
+    "imageAlt": "Premium villa with contemporary architecture",
+    "viewProperties": "View properties",
+    "contactUs": "Contact us",
+    "call": "Call"
   },
   "intro": {
     "eyebrow": "Baku property market",
-    "title": "Trusted guidance from search to completion",
-    "description": "Luxe Home Estate simplifies buying and renting property in Baku and the surrounding area. Compare listings that match your budget, location and lifestyle, explore developments and receive professional advice.",
-    "navLabel": "Main property options"
-  }
+    "title": "Choose your home or investment with confidence",
+    "paragraph1": "Luxe Home Estate brings together apartments, villas, houses, land, offices and commercial property for buyers, tenants and owners searching in Baku. Listings can be explored by sale or rent, property type, city and district, price, area and other important criteria. Available price, location, area, room, document and renovation details make it easier to compare options before deciding.",
+    "paragraph2": "Start with ready-made searches, review suitable residential developments and contact our team directly about any property that interests you. We do not display artificial offers when there are no real active listings; new properties appear on the relevant category and location pages as they are published. Our goal is to make finding a suitable option simple, transparent and convenient.",
+    "navLabel": "Main property options",
+    "links": {"sale": "Properties for sale", "rent": "Properties for rent", "apartments": "Apartments for sale in Baku", "villas": "Villas", "projects": "Residential developments"}
+  },
+  "featured": {"overline": "Portfolio", "title": "Featured properties", "description": "Properties selected by Luxe Home Estate.", "all": "All properties", "emptyTitle": "There are no featured properties right now", "emptyDescription": "New properties will appear in this section as they are added.", "emptyAction": "View all properties"},
+  "categories": {"overline": "Categories", "title": "Find the right place for you", "description": "Choose the property type you need and browse suitable options."},
+  "services": {"overline": "What we do", "title": "Our services", "description": "Seven core services for all your real estate needs.", "all": "All services"},
+  "about": {"overline": "About us", "title": "About Luxe Home Estate", "description": "{legalName} provides real estate sales, rentals, mortgages, renovation and construction, advertising and photography services.", "paragraph1": "Our approach is simple: understand the client's real needs and find the right property. We treat every enquiry individually, taking budget, area, lifestyle and future plans into account.", "paragraph2": "We value transparency at every stage of the transaction. Information about the property's condition, documents and terms is presented as it is.", "imageAlt": "Contemporary premium architecture", "more": "Read more", "contact": "Contact us"},
+  "why": {"overline": "Advantages", "title": "Why Luxe Home Estate?", "description": "The core principles behind the service we offer.", "items": {"personal": {"title": "Personal approach", "description": "Every client's needs are different. We tailor the search to your budget, preferred area and lifestyle."}, "selection": {"title": "Broad property selection", "description": "Apartments, villas, houses, holiday homes, land, offices and commercial property in one platform."}, "service": {"title": "Professional service", "description": "Our team supports you at every stage, from viewing to completion."}, "transparent": {"title": "Transparent process", "description": "The property's condition, documents and terms are presented openly."}, "documents": {"title": "Document security", "description": "We pay particular attention to checking legal documents in every transaction."}, "complete": {"title": "Complete service", "description": "Support across sales, renovation, advertising and photography."}}},
+  "projects": {"overline": "Portfolio", "title": "Our developments", "description": "Ongoing and completed developments.", "all": "All developments"},
+  "blog": {"overline": "Blog", "title": "Useful articles", "description": "Articles about property, the market and interiors across {count} categories.", "all": "All articles"},
+  "cta": {"overline": "Personal selection", "title": "Let us help you find the property you need", "description": "Tell us what you need and we will select suitable options and contact you.", "send": "Send an enquiry", "view": "View properties"}
 }

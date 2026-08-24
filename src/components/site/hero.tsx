@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { ArrowRight, Phone } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button";
@@ -11,14 +12,15 @@ type HeroProps = {
 };
 
 /** Ana səhifənin hero bölməsi — LCP elementi burada yerləşir. */
-export function Hero({ types, cities }: HeroProps) {
+export async function Hero({ types, cities }: HeroProps) {
+  const t = await getTranslations("home.hero");
   return (
     <section className="on-dark relative isolate -mt-[var(--header-h)]">
       {/* Fon şəkli — hero başlığın altında fixed header-in arxasına uzanır */}
       <div className="absolute inset-0 -z-10">
         <Image
           src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2400&q=80"
-          alt="Müasir memarlıqla tikilmiş premium villa"
+          alt={t("imageAlt")}
           fill
           priority
           fetchPriority="high"
@@ -46,20 +48,19 @@ export function Hero({ types, cities }: HeroProps) {
             className="animate-slide-up mt-6 max-w-[13ch] font-display text-[clamp(2.8rem,6.5vw,6.6rem)] leading-[0.94] tracking-[-0.05em] text-white"
             style={{ animationDelay: "100ms" }}
           >
-            Bakıda daşınmaz əmlak satışı və icarəsi
+            {t("title")}
           </h1>
 
           <p
             className="animate-slide-up mt-7 max-w-[58ch] text-base leading-relaxed text-white/78 sm:text-lg"
             style={{ animationDelay: "200ms" }}
           >
-            Luxe Home Estate ilə sizin üçün uyğun daşınmaz əmlakı kəşf edin. Mənzil,
-            villa, həyət evi, torpaq və kommersiya obyektləri üzrə geniş seçim.
+            {t("description")}
           </p>
 
           <div className="animate-slide-up mt-9 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "300ms" }}>
             <ButtonLink href="/emlaklar" variant="primary" size="lg">
-              Əmlaklara bax
+              {t("viewProperties")}
               <ArrowRight className="size-4" aria-hidden="true" />
             </ButtonLink>
 
@@ -69,7 +70,7 @@ export function Hero({ types, cities }: HeroProps) {
               size="lg"
               className="border-white/30 text-white hover:text-gold-soft"
             >
-              Bizimlə əlaqə
+              {t("contactUs")}
             </ButtonLink>
 
             <a
@@ -77,7 +78,7 @@ export function Hero({ types, cities }: HeroProps) {
               className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/75 transition-colors hover:text-gold-soft sm:hidden"
             >
               <Phone className="size-4" aria-hidden="true" />
-              Zəng et
+              {t("call")}
             </a>
           </div>
         </div>

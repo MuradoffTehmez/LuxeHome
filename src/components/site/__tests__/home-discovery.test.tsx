@@ -8,8 +8,8 @@ import { PostCard } from "../post-card";
 import { ProjectCard } from "../project-card";
 
 describe("ana səhifə discovery təcrübəsi", () => {
-  it("hero-nu mobil ekranda content-based, desktopda viewport-a uyğun saxlayır", () => {
-    const html = renderToStaticMarkup(<Hero types={[]} cities={[]} />);
+  it("hero-nu mobil ekranda content-based, desktopda viewport-a uyğun saxlayır", async () => {
+    const html = renderToStaticMarkup(await Hero({ types: [], cities: [] }));
 
     expect(html).toContain("min-h-[34rem]");
     expect(html).toContain("sm:min-h-[40rem]");
@@ -18,16 +18,16 @@ describe("ana səhifə discovery təcrübəsi", () => {
     expect(html).toContain("pb-6");
   });
 
-  it("hero yalnız bir, kommersiya niyyətli H1 göstərir", () => {
-    const html = renderToStaticMarkup(<Hero types={[]} cities={[]} />);
+  it("hero yalnız bir, kommersiya niyyətli H1 göstərir", async () => {
+    const html = renderToStaticMarkup(await Hero({ types: [], cities: [] }));
 
     expect(html.match(/<h1/g)).toHaveLength(1);
     expect(html).toContain("Bakıda daşınmaz əmlak satışı və icarəsi");
     expect(html).not.toMatch(/<h1[^>]*>\s*HƏYATINIZIN ƏN DƏYƏRLİ ÜNVANI/);
   });
 
-  it("lokal giriş mətnindən təmiz kommersiya route-larına link verir", () => {
-    const html = renderToStaticMarkup(<HomeSeoIntro />);
+  it("lokal giriş mətnindən təmiz kommersiya route-larına link verir", async () => {
+    const html = renderToStaticMarkup(await HomeSeoIntro({}));
     const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
     const wordCount = text.split(" ").length;
 

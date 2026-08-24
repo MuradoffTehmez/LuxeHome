@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { GitCompareArrows } from "lucide-react";
 import { ConfirmClearButton } from "@/components/site/confirm-clear-button";
 import { useCompareList } from "@/lib/compare";
@@ -19,6 +19,7 @@ export function getCompareBarPositionClass(pathname: string): string {
  * ayrıca link əlavə edilməyib.
  */
 export function CompareBar() {
+  const t = useTranslations("property.compare");
   const { ids, ready, count, clear } = useCompareList();
   const pathname = usePathname();
 
@@ -26,7 +27,7 @@ export function CompareBar() {
 
   return (
     <aside
-      aria-label="Müqayisə siyahısı"
+      aria-label={t("list")}
       className={cn(
         "fixed inset-x-0 z-[var(--z-sticky)] border-t border-line-strong bg-ivory/95 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-sm",
         getCompareBarPositionClass(pathname),
@@ -35,21 +36,21 @@ export function CompareBar() {
       <div className="mx-auto flex min-h-14 w-full max-w-360 flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6 lg:px-10">
         <span className="inline-flex items-center gap-2 text-sm font-medium text-ink">
           <GitCompareArrows className="size-4 text-gold-deep" aria-hidden="true" />
-          {count} əmlak müqayisəyə seçildi
+          {t("selected", { count })}
         </span>
 
         <div className="flex items-center gap-2">
           <ConfirmClearButton
-            label="Təmizlə"
-            title="Müqayisə siyahısı təmizlənsin?"
-            description="Seçdiyiniz bütün əmlaklar müqayisə siyahısından çıxarılacaq."
+            label={t("clear")}
+            title={t("clearTitle")}
+            description={t("clearDescription")}
             onConfirm={clear}
           />
           <Link
             href="/muqayise"
             className="inline-flex min-h-11 items-center rounded-xs bg-ink px-4 text-xs font-medium text-ink-invert transition-colors hover:bg-charcoal"
           >
-            Müqayisə et ({ids.length})
+            {t("action")} ({ids.length})
           </Link>
         </div>
       </div>

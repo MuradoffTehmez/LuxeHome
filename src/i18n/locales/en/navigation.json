@@ -13,11 +13,38 @@
   "quickLinks": "Quick links",
   "searchProperties": "Search properties",
   "myFavorites": "My favorites",
+  "logoHome": "{brand} — home page",
+  "realEstate": "Real Estate",
+  "skipToContent": "Skip to main content",
+  "mainNavigation": "Main navigation",
+  "mobileNavigation": "Mobile navigation",
+  "menu": "Menu",
+  "navigation": "Navigation",
+  "listingType": "Listing type",
+  "about": "About us",
+  "faq": "Frequently asked questions",
+  "privacy": "Privacy policy",
+  "terms": "Terms of use",
+  "cookies": "Cookie policy",
+  "propertyLinks": {
+    "saleApartments": "Apartments for sale",
+    "rentApartments": "Apartments for rent",
+    "villas": "Villas",
+    "houses": "Houses",
+    "land": "Land plots",
+    "commercial": "Commercial property",
+    "offices": "Offices",
+    "sale": "For sale",
+    "rent": "For rent"
+  },
   "footer": {
     "quickLinks": "Quick links",
     "propertyTypes": "Property types",
     "contactUs": "Contact us",
     "legal": "Legal",
-    "rightsReserved": "All rights reserved."
+    "rightsReserved": "All rights reserved.",
+    "description": "Professional real estate services for apartments, villas, land and commercial property.",
+    "ownership": "The website and the «{brand}» brand and trademark belong to {owner}.",
+    "vat": "Tax ID: {value}"
   }
 }

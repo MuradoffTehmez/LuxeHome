@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useFormatter, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Clock, Newspaper } from "lucide-react";
-import { cn, formatDate, isUnoptimizedImage } from "@/lib/utils";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { PostCardData } from "@/lib/queries";
 
@@ -16,6 +19,8 @@ export function PostCard({
   className?: string;
   variant?: "standard" | "featured";
 }) {
+  const t = useTranslations("property");
+  const format = useFormatter();
   return (
     <article
       className={cn(
@@ -77,12 +82,12 @@ export function PostCard({
         <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-4 text-xs text-ink-muted">
           {post.publishedAt && (
             <time dateTime={new Date(post.publishedAt).toISOString()}>
-              {formatDate(post.publishedAt)}
+              {format.dateTime(new Date(post.publishedAt), { day: "numeric", month: "long", year: "numeric" })}
             </time>
           )}
           <span className="flex items-center gap-1.5">
             <Clock className="size-3.5" aria-hidden="true" />
-            {post.readMinutes} dəq oxunuş
+            {t("readMinutes", { count: post.readMinutes })}
           </span>
         </div>
       </div>

@@ -3,6 +3,12 @@ import type navigation from "./src/i18n/locales/az/navigation.json";
 import type auth from "./src/i18n/locales/az/auth.json";
 import type property from "./src/i18n/locales/az/property.json";
 import type validation from "./src/i18n/locales/az/validation.json";
+import type home from "./src/i18n/locales/az/home.json";
+import type listings from "./src/i18n/locales/az/listings.json";
+import type content from "./src/i18n/locales/az/content.json";
+import type contact from "./src/i18n/locales/az/contact.json";
+import type legal from "./src/i18n/locales/az/legal.json";
+import type seoLandings from "./src/i18n/locales/az/seoLandings.json";
 
 /**
  * `useTranslations()`/`getTranslations()` üçün açar avtotamamlama.
@@ -15,6 +21,12 @@ type Messages = {
   auth: typeof auth;
   property: typeof property;
   validation: typeof validation;
+  home: typeof home;
+  listings: typeof listings;
+  content: typeof content;
+  contact: typeof contact;
+  legal: typeof legal;
+  seoLandings: typeof seoLandings;
 };
 
 declare module "next-intl" {

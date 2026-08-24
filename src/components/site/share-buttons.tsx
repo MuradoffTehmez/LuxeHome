@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check, Link2, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteUrl } from "@/config/site";
@@ -21,6 +22,7 @@ const ITEM =
   "hover:border-gold hover:text-gold-deep cursor-pointer";
 
 export function ShareButtons({ path, title, compact = false, className }: ShareButtonsProps) {
+  const t = useTranslations("property.share");
   const [copied, setCopied] = useState(false);
   const url = siteUrl(path);
 
@@ -71,7 +73,7 @@ export function ShareButtons({ path, title, compact = false, className }: ShareB
         <button
           type="button"
           onClick={shareLink}
-          aria-label="Elanı paylaş"
+          aria-label={t("listing")}
           aria-live="polite"
           className={cn(ITEM, "w-full justify-center border-0")}
         >
@@ -80,7 +82,7 @@ export function ShareButtons({ path, title, compact = false, className }: ShareB
           ) : (
             <Share2 className="size-4" aria-hidden="true" />
           )}
-          <span className="hidden sm:inline">{copied ? "Kopyalandı" : "Paylaş"}</span>
+          <span className="hidden sm:inline">{copied ? t("copied") : t("label")}</span>
         </button>
       </div>
     );
@@ -88,7 +90,7 @@ export function ShareButtons({ path, title, compact = false, className }: ShareB
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
-      <span className="mr-1 text-sm font-medium text-ink">Paylaş:</span>
+      <span className="mr-1 text-sm font-medium text-ink">{t("label")}:</span>
 
       {targets.map((target) => (
         <a
@@ -96,7 +98,7 @@ export function ShareButtons({ path, title, compact = false, className }: ShareB
           href={target.href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`${target.label} ilə paylaş`}
+          aria-label={t("via", { network: target.label })}
           className={ITEM}
         >
           {target.icon}
@@ -111,7 +113,7 @@ export function ShareButtons({ path, title, compact = false, className }: ShareB
           <Link2 className="size-4" aria-hidden="true" />
         )}
         <span className="hidden sm:inline">
-          {copied ? "Kopyalandı" : "Linki kopyala"}
+          {copied ? t("copied") : t("copyLink")}
         </span>
       </button>
     </div>

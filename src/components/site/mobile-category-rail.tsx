@@ -1,5 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { ArrowUpRight, Building2 } from "lucide-react";
 import { isUnoptimizedImage } from "@/lib/utils";
 
@@ -16,11 +17,13 @@ export type MobileCategoryRailProps = {
 
 /** 320–1023 px-də kateqoriyaları bir-birinə sıxışdırmadan göstərən swipe rail. */
 export function MobileCategoryRail({ items }: MobileCategoryRailProps) {
+  const t = useTranslations("listings.search");
+  const propertyT = useTranslations("property");
   if (items.length === 0) return null;
 
   return (
     <ul
-      aria-label="Əmlak kateqoriyaları"
+      aria-label={t("categories")}
       className="-mx-4 mt-10 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:hidden [&::-webkit-scrollbar]:hidden"
     >
       {items.map((item) => (
@@ -53,7 +56,7 @@ export function MobileCategoryRail({ items }: MobileCategoryRailProps) {
               <span>
                 <span className="block font-display text-2xl text-white">{item.label}</span>
                 <span className="tabular mt-1 block text-sm text-white/75">
-                  {item.count} elan
+                  {propertyT("listingCount", { count: item.count })}
                 </span>
               </span>
               <ArrowUpRight className="size-5 shrink-0 text-gold-soft" aria-hidden="true" />

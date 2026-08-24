@@ -7,5 +7,27 @@
   "all": "All",
   "results": "{count, plural, =0 {No results found} one {# result found} other {# results found}}",
   "emptyTitle": "No information has been added yet",
-  "emptyDescription": "New information will appear on this page as it is added."
+  "emptyDescription": "New information will appear on this page as it is added.",
+  "projectsPage": {"metaTitle": "Developments", "metaDescription": "Ongoing and completed residential, villa and commercial developments from Luxe Home Estate.", "eyebrow": "Portfolio", "title": "Our developments", "description": "Ongoing and completed construction developments.", "emptyTitle": "No developments have been added yet", "emptyDescription": "New developments will appear here as they are added."},
+  "servicesPage": {"metaTitle": "Services", "metaDescription": "Luxe Home Estate services for sales, rentals, mortgages, renovation, construction, advertising, photography and consulting.", "eyebrow": "What we do", "title": "Our services", "description": "Professional services for all your real estate needs.", "more": "Read more", "emptyTitle": "No service information has been added yet", "emptyDescription": "New services will appear here as they are added.", "ctaTitle": "Have a question about our services?", "ctaDescription": "Tell us what you need and our team will contact you.", "cta": "Contact us"},
+  "agenciesPage": {"metaTitle": "Agencies", "metaDescription": "Verified real estate agencies on the Luxe Home Estate platform.", "eyebrow": "Partners", "title": "Agencies", "description": "Verified real estate agencies on the platform.", "emptyTitle": "There are no verified agencies yet", "emptyDescription": "New agencies will appear here after verification."},
+  "favoritesPage": {"metaTitle": "Favorites", "metaDescription": "Property listings you have saved.", "eyebrow": "Personal selection", "title": "Favorites", "description": "Properties you like are saved on this device."},
+  "comparePage": {"metaTitle": "Compare", "metaDescription": "Compare selected properties side by side by price, area and features.", "eyebrow": "Properties", "title": "Compare", "description": "Compare your selected listings side by side."},
+  "search": {
+    "listingType": "Listing type", "sale": "For sale", "rent": "For rent", "search": "Search",
+    "queryPlaceholder": "Address, district or keyword", "propertyType": "Property type",
+    "city": "City", "district": "District", "selectCityFirst": "Select a city first",
+    "all": "All", "rooms": "Rooms", "any": "Any", "roomOption": "{count, plural, one {# room} other {# rooms}}",
+    "fivePlusRooms": "5+ rooms", "price": "Price (₼)", "area": "Area (m²)",
+    "renovation": "Condition", "document": "Documents", "building": "Building type",
+    "rentPeriod": "Rental period", "monthly": "Monthly", "daily": "Daily", "floor": "Floor",
+    "extra": "Additional criteria", "notFirstFloor": "Not on the first floor",
+    "notLastFloor": "Not on the top floor", "withPhotos": "Listings with photos only",
+    "min": "Min", "max": "Max", "minimum": "Minimum {unit}", "maximum": "Maximum {unit}",
+    "reset": "Reset filters", "submit": "Search", "filters": "Filters",
+    "chooseCriteria": "Choose your search criteria", "resultShort": "{count, plural, one {# result} other {# results}}",
+    "showResults": "Show {count, plural, one {# result} other {# results}}", "categories": "Property categories",
+    "sort": "Sort", "sortNewest": "Newest", "sortPriceAsc": "Lowest price",
+    "sortPriceDesc": "Highest price", "sortAreaDesc": "Largest area"
+  }
 }

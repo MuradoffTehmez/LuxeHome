@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/lib/constants";
+import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
@@ -12,29 +14,25 @@ import { getProjects } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 
-export const metadata: Metadata = buildMetadata({
-  title: "Layihələr",
-  description:
-    "Luxe Home Estate-in davam edən və tamamlanmış yaşayış, villa və kommersiya layihələri.",
-  path: "/layiheler",
-  keywords: [
-    "yaşayış kompleksi",
-    "yeni tikili layihə",
-    "villa layihəsi",
-    "Bakıda tikinti layihələri",
-    "kommersiya layihəsi",
-  ],
-});
+type PageProps = { params: Promise<{ locale: string }> };
 
-export default async function ProjectsPage() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.projectsPage" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/layiheler", locale: locale as Locale });
+}
+
+export default async function ProjectsPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.projectsPage" });
   const projects = await getProjects();
 
   return (
     <>
       <PageHeader
-        eyebrow="Portfolio"
-        title="Layihələrimiz"
-        description="Davam edən və tamamlanmış tikinti layihələri."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
 
       {/* Layihə kartları */}
@@ -50,8 +48,8 @@ export default async function ProjectsPage() {
             </div>
           ) : (
             <EmptyState
-              title="Hazırda layihə əlavə edilməyib"
-              description="Yeni layihələr əlavə edildikcə bu səhifədə göstəriləcək."
+              title={t("emptyTitle")}
+              description={t("emptyDescription")}
             />
           )}
         </Container>

@@ -13,11 +13,38 @@
   "quickLinks": "Sürətli keçidlər",
   "searchProperties": "Əmlak axtar",
   "myFavorites": "Favoritlərim",
+  "logoHome": "{brand} — ana səhifə",
+  "realEstate": "Daşınmaz Əmlak",
+  "skipToContent": "Əsas məzmuna keç",
+  "mainNavigation": "Əsas naviqasiya",
+  "mobileNavigation": "Mobil naviqasiya",
+  "menu": "Menyu",
+  "navigation": "Naviqasiya",
+  "listingType": "Elan növü",
+  "about": "Haqqımızda",
+  "faq": "Tez-tez verilən suallar",
+  "privacy": "Məxfilik siyasəti",
+  "terms": "İstifadə şərtləri",
+  "cookies": "Cookie siyasəti",
+  "propertyLinks": {
+    "saleApartments": "Satılan mənzillər",
+    "rentApartments": "Kirayə mənzillər",
+    "villas": "Villalar",
+    "houses": "Həyət evləri",
+    "land": "Torpaq sahələri",
+    "commercial": "Kommersiya obyektləri",
+    "offices": "Ofislər",
+    "sale": "Satılır",
+    "rent": "Kirayə"
+  },
   "footer": {
     "quickLinks": "Sürətli keçidlər",
     "propertyTypes": "Əmlak növləri",
     "contactUs": "Bizimlə əlaqə",
     "legal": "Hüquqi",
-    "rightsReserved": "Bütün hüquqlar qorunur."
+    "rightsReserved": "Bütün hüquqlar qorunur.",
+    "description": "Mənzil, villa, torpaq və kommersiya obyektləri üzrə peşəkar daşınmaz əmlak xidmətləri.",
+    "ownership": "Sayt, «{brand}» brendi və markası {owner}-na məxsusdur.",
+    "vat": "VÖEN: {value}"
   }
 }

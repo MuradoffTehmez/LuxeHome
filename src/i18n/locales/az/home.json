@@ -4,13 +4,26 @@
   "hero": {
     "eyebrow": "Luxe Home Estate",
     "title": "Bakıda daşınmaz əmlak satışı və icarəsi",
-    "description": "Düzgün əmlakı tapmaq üçün yerli bazar təcrübəsi, şəffaf proses və fərdi yanaşma.",
-    "imageAlt": "Müasir memarlıqla tikilmiş premium villa"
+    "description": "Luxe Home Estate ilə sizin üçün uyğun daşınmaz əmlakı kəşf edin. Mənzil, villa, həyət evi, torpaq və kommersiya obyektləri üzrə geniş seçim.",
+    "imageAlt": "Müasir memarlıqla tikilmiş premium villa",
+    "viewProperties": "Əmlaklara bax",
+    "contactUs": "Bizimlə əlaqə",
+    "call": "Zəng et"
   },
   "intro": {
     "eyebrow": "Bakı əmlak bazarı",
-    "title": "Axtarışdan rəsmiləşdirməyə qədər etibarlı müşayiət",
-    "description": "Luxe Home Estate Bakı və ətrafında daşınmaz əmlakın satışı və icarəsi üzrə seçim prosesini sadələşdirir. Büdcə, yerləşmə və yaşayış tərzinə uyğun elanları müqayisə edə, layihələri araşdıra və peşəkar məsləhət ala bilərsiniz.",
-    "navLabel": "Əsas əmlak seçimləri"
-  }
+    "title": "Evinizi və investisiya üçün uyğun məkanı inamla seçin",
+    "paragraph1": "Luxe Home Estate Bakıda daşınmaz əmlak axtaran alıcı, kirayəçi və mülkiyyətçilər üçün mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyektlərini bir araya gətirir. Elanları satış və kirayə məqsədinə, əmlak növünə, şəhər və rayona, qiymətə, sahəyə və digər vacib meyarlara görə araşdırmaq mümkündür. Hər elanda mövcud olan qiymət, yerləşmə, sahə, otaq sayı, sənəd və təmir məlumatları qərar verməzdən əvvəl variantları daha aydın müqayisə etməyə kömək edir.",
+    "paragraph2": "Axtarışa hazır seçimlərdən başlayın, uyğun yaşayış komplekslərini nəzərdən keçirin və maraqlandığınız əmlak üzrə komandamızla birbaşa əlaqə saxlayın. Portfeldə real aktiv elan olmadıqda süni təklif göstərilmir; yeni əmlaklar dərc olunduqca müvafiq kateqoriya və yerləşmə səhifələrində görünür. Məqsədimiz tələbinizə uyğun variantı tapmağı sadə, şəffaf və rahat prosesə çevirməkdir.",
+    "navLabel": "Əsas əmlak seçimləri",
+    "links": {"sale": "Satılan əmlaklar", "rent": "Kirayə əmlaklar", "apartments": "Bakıda satılan mənzillər", "villas": "Villalar", "projects": "Yaşayış layihələri"}
+  },
+  "featured": {"overline": "Portfel", "title": "Seçilmiş əmlaklar", "description": "Luxe Home Estate tərəfindən seçilmiş daşınmaz əmlaklar.", "all": "Bütün əmlaklar", "emptyTitle": "Hazırda seçilmiş əmlak yoxdur", "emptyDescription": "Yeni əmlaklar əlavə edildikcə bu bölmədə göstəriləcək.", "emptyAction": "Bütün əmlaklara bax"},
+  "categories": {"overline": "Kateqoriyalar", "title": "Sizə uyğun məkanı tapın", "description": "Axtardığınız əmlak növünü seçin və uyğun variantlara baxın."},
+  "services": {"overline": "Nə edirik", "title": "Xidmətlərimiz", "description": "Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün 7 əsas istiqamətdə xidmət.", "all": "Bütün xidmətlər"},
+  "about": {"overline": "Haqqımızda", "title": "Luxe Home Estate haqqında", "description": "{legalName} daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam və çəkiliş istiqamətlərində fəaliyyət göstərir.", "paragraph1": "Yanaşmamız sadədir: müştərinin real tələbini anlamaq və ona uyğun əmlakı tapmaq. Hər müraciətə fərdi baxırıq — büdcə, ərazi, yaşayış tərzi və gələcək planlar nəzərə alınır.", "paragraph2": "Əməliyyatın hər mərhələsində şəffaflığa önəm veririk. Əmlakın vəziyyəti, sənədləri və şərtləri barədə məlumat olduğu kimi təqdim olunur.", "imageAlt": "Müasir premium memarlıq", "more": "Ətraflı oxu", "contact": "Bizimlə əlaqə"},
+  "why": {"overline": "Üstünlüklər", "title": "Niyə Luxe Home Estate?", "description": "Müştərilərimizə təklif etdiyimiz yanaşmanın əsas prinsipləri.", "items": {"personal": {"title": "Fərdi yanaşma", "description": "Hər müştərinin tələbi fərqlidir. Axtarışı sizin büdcə, ərazi və yaşayış tərzinizə uyğunlaşdırırıq."}, "selection": {"title": "Geniş əmlak seçimi", "description": "Mənzil, villa, həyət evi, bağ evi, torpaq, ofis və kommersiya obyektləri — hamısı bir platformada."}, "service": {"title": "Peşəkar xidmət", "description": "Baxışdan rəsmiləşdirməyə qədər bütün mərhələlərdə komandamız sizi müşayiət edir."}, "transparent": {"title": "Şəffaf proses", "description": "Əmlakın vəziyyəti, sənədləri və şərtləri barədə məlumat açıq şəkildə təqdim olunur."}, "documents": {"title": "Sənəd təhlükəsizliyi", "description": "Hər əməliyyatda hüquqi sənədlərin yoxlanılmasına xüsusi diqqət yetirilir."}, "complete": {"title": "Kompleks xidmət", "description": "Alqı-satqıdan təmir, reklam və çəkilişə qədər müxtəlif istiqamətlərdə dəstək göstəririk."}}},
+  "projects": {"overline": "Portfel", "title": "Layihələrimiz", "description": "Davam edən və tamamlanmış layihələr.", "all": "Bütün layihələr"},
+  "blog": {"overline": "Bloq", "title": "Faydalı məqalələr", "description": "{count} kateqoriya üzrə daşınmaz əmlak, bazar və interyer mövzularında yazılar.", "all": "Bütün yazılar"},
+  "cta": {"overline": "Fərdi seçim", "title": "Axtardığınız əmlakı tapmaqda kömək edək", "description": "Tələbinizi bizə bildirin — uyğun variantları seçib sizinlə əlaqə saxlayaq.", "send": "Müraciət göndər", "view": "Əmlaklara bax"}
 }

@@ -1,9 +1,9 @@
 "use client";
 
 import { useId } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
-import { SORT_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 type SortSelectProps = {
@@ -24,6 +24,7 @@ type SortSelectProps = {
  * bərpa oluna bilər.
  */
 export function SortSelect({ value, hrefs, compact = false, className }: SortSelectProps) {
+  const t = useTranslations("listings.search");
   const router = useRouter();
   const id = useId();
 
@@ -37,7 +38,7 @@ export function SortSelect({ value, hrefs, compact = false, className }: SortSel
         htmlFor={id}
         className={cn("text-sm whitespace-nowrap text-ink-soft", compact && "sr-only")}
       >
-        Sıralama
+        {t("sort")}
       </label>
       <div className={cn("relative", compact && "min-w-0 max-w-36")}>
         <select
@@ -52,7 +53,12 @@ export function SortSelect({ value, hrefs, compact = false, className }: SortSel
             compact && "max-w-36",
           )}
         >
-          {SORT_OPTIONS.map((option) => (
+          {[
+            { value: "newest", label: t("sortNewest") },
+            { value: "price_asc", label: t("sortPriceAsc") },
+            { value: "price_desc", label: t("sortPriceDesc") },
+            { value: "area_desc", label: t("sortAreaDesc") },
+          ].map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

@@ -18,15 +18,17 @@ export function LegalArticle({
   path: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("legal");
+  const nav = useTranslations("navigation");
   return (
     <>
       <PageHeader
         compact
-        eyebrow="Hüquqi məlumat"
+        eyebrow={t("eyebrow")}
         title={title}
         description={description}
         breadcrumbs={[
-          { label: "Ana səhifə", href: "/" },
+          { label: nav("home"), href: "/" },
           { label: title, href: path },
         ]}
       />
@@ -34,7 +36,7 @@ export function LegalArticle({
       <Section tone="ivory" spacing="cozy">
         <Container size="narrow">
           <p className="text-sm text-ink-muted">
-            Son yenilənmə: <time dateTime="2026-08-20">{updatedAt}</time>
+            {t("updated", { date: updatedAt })}
           </p>
           <div
             className={[
@@ -51,3 +53,6 @@ export function LegalArticle({
     </>
   );
 }
+"use client";
+
+import { useTranslations } from "next-intl";

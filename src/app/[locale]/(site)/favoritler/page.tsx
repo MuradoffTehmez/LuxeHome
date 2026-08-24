@@ -1,24 +1,29 @@
 import { Container, Section } from "@/components/ui/container";
+import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/lib/constants";
 import { SectionHeader } from "@/components/ui/section-header";
 import { buildMetadata } from "@/lib/seo";
 import { FavoritesList } from "./favorites-list";
 
-export const metadata = buildMetadata({
-  title: "Favoritlər",
-  description: "Yadda saxladığınız əmlak elanları.",
-  path: "/favoritler",
-  indexPolicy: "noindex-follow",
-});
+type PageProps = { params: Promise<{ locale: string }> };
 
-export default function FavoritesPage() {
+export async function generateMetadata({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.favoritesPage" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/favoritler", locale: locale as Locale, indexPolicy: "noindex-follow" });
+}
+
+export default async function FavoritesPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.favoritesPage" });
   return (
     <Section tone="ivory">
       <Container>
         <SectionHeader
           as="h1"
-          overline="Şəxsi seçim"
-          title="Favoritlər"
-          description="Bəyəndiyiniz elanlar bu cihazda saxlanılır."
+          overline={t("eyebrow")}
+          title={t("title")}
+          description={t("description")}
         />
         <div className="mt-10">
           <FavoritesList />

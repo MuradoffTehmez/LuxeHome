@@ -7,5 +7,14 @@
   "description": "Описание",
   "features": "Характеристики",
   "similarProperties": "Похожие объекты",
-  "similarArticles": "Похожие статьи"
+  "similarArticles": "Похожие статьи",
+  "gallery": {"empty": "Фотографии не добавлены", "imageAlt": "{title} — фото {index}", "open": "Открыть {alt} на весь экран", "title": "{title} — фото {index} из {total}", "previous": "Предыдущее фото", "next": "Следующее фото"},
+  "mapLabel": "{title} на карте",
+  "trust": {"aria": "Юридические и контактные данные компании", "officeAlt": "Офис {brand}", "verified": "Проверенная информация", "taxId": "ИНН", "owner": "Владелец бренда и товарного знака", "address": "Адрес", "phone": "Телефон", "email": "Электронная почта"},
+  "articleMeta": {"published": "Опубликовано:", "updated": "Обновлено:", "read": "{count, plural, one {# мин чтения} few {# мин чтения} many {# мин чтения} other {# мин чтения}}", "views": "{count, plural, one {# просмотр} few {# просмотра} many {# просмотров} other {# просмотра}}"},
+  "propertyActions": "Действия с объектом",
+  "call": "Позвонить",
+  "portfolio": "Текущий портфель",
+  "matchingListings": "Подходящие объявления",
+  "activeListings": "{count, plural, one {# активное объявление} few {# активных объявления} many {# активных объявлений} other {# активного объявления}}"
 }

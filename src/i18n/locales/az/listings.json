@@ -7,5 +7,27 @@
   "all": "Hamısı",
   "results": "{count, plural, =0 {Nəticə tapılmadı} one {# nəticə tapıldı} other {# nəticə tapıldı}}",
   "emptyTitle": "Hazırda məlumat əlavə edilməyib",
-  "emptyDescription": "Yeni məlumatlar əlavə edildikcə bu səhifədə göstəriləcək."
+  "emptyDescription": "Yeni məlumatlar əlavə edildikcə bu səhifədə göstəriləcək.",
+  "projectsPage": {"metaTitle": "Layihələr", "metaDescription": "Luxe Home Estate-in davam edən və tamamlanmış yaşayış, villa və kommersiya layihələri.", "eyebrow": "Portfel", "title": "Layihələrimiz", "description": "Davam edən və tamamlanmış tikinti layihələri.", "emptyTitle": "Hazırda layihə əlavə edilməyib", "emptyDescription": "Yeni layihələr əlavə edildikcə bu səhifədə göstəriləcək."},
+  "servicesPage": {"metaTitle": "Xidmətlər", "metaDescription": "Luxe Home Estate-in daşınmaz əmlak sahəsində alqı-satqı, icarə, ipoteka, təmir-tikinti, reklam, çəkiliş və konsultasiya xidmətləri.", "eyebrow": "Nə edirik", "title": "Xidmətlərimiz", "description": "Daşınmaz əmlakla bağlı bütün ehtiyaclarınız üçün peşəkar xidmətlər.", "more": "Ətraflı oxu", "emptyTitle": "Hazırda xidmət məlumatı əlavə edilməyib", "emptyDescription": "Yeni xidmətlər əlavə edildikcə burada göstəriləcək.", "ctaTitle": "Xidmətlərimiz haqqında sualınız var?", "ctaDescription": "Tələbinizi bizə bildirin — komandamız sizinlə əlaqə saxlayacaq.", "cta": "Bizimlə əlaqə"},
+  "agenciesPage": {"metaTitle": "Agentliklər", "metaDescription": "Luxe Home Estate platformasında təsdiqlənmiş daşınmaz əmlak agentlikləri.", "eyebrow": "Tərəfdaşlar", "title": "Agentliklər", "description": "Platformada təsdiqlənmiş daşınmaz əmlak agentlikləri.", "emptyTitle": "Hazırda təsdiqlənmiş agentlik yoxdur", "emptyDescription": "Yeni agentliklər təsdiqləndikcə bu səhifədə göstəriləcək."},
+  "favoritesPage": {"metaTitle": "Favoritlər", "metaDescription": "Yadda saxladığınız əmlak elanları.", "eyebrow": "Şəxsi seçim", "title": "Favoritlər", "description": "Bəyəndiyiniz elanlar bu cihazda saxlanılır."},
+  "comparePage": {"metaTitle": "Müqayisə", "metaDescription": "Seçdiyiniz əmlakları qiymət, sahə və xüsusiyyətlərinə görə yan-yana müqayisə edin.", "eyebrow": "Əmlaklar", "title": "Müqayisə", "description": "Seçdiyiniz elanları yan-yana müqayisə edin."},
+  "search": {
+    "listingType": "Elan növü", "sale": "Satılır", "rent": "Kirayə", "search": "Axtarış",
+    "queryPlaceholder": "Ünvan, rayon və ya açar söz", "propertyType": "Əmlak növü",
+    "city": "Şəhər", "district": "Rayon", "selectCityFirst": "Əvvəlcə şəhər seçin",
+    "all": "Hamısı", "rooms": "Otaq sayı", "any": "Fərq etməz", "roomOption": "{count} otaq",
+    "fivePlusRooms": "5+ otaq", "price": "Qiymət (₼)", "area": "Sahə (m²)",
+    "renovation": "Təmir vəziyyəti", "document": "Sənəd", "building": "Tikili növü",
+    "rentPeriod": "Kirayə müddəti", "monthly": "Aylıq", "daily": "Günlük", "floor": "Mərtəbə",
+    "extra": "Əlavə şərtlər", "notFirstFloor": "Birinci mərtəbə olmasın",
+    "notLastFloor": "Son mərtəbə olmasın", "withPhotos": "Yalnız şəkilli elanlar",
+    "min": "Min", "max": "Maks", "minimum": "Minimum {unit}", "maximum": "Maksimum {unit}",
+    "reset": "Filtrləri sıfırla", "submit": "Axtar", "filters": "Filtrlər",
+    "chooseCriteria": "Axtarış şərtlərini seçin", "resultShort": "{count} nəticə",
+    "showResults": "{count} nəticəni göstər", "categories": "Əmlak kateqoriyaları",
+    "sort": "Sıralama", "sortNewest": "Ən yeni", "sortPriceAsc": "Əvvəl ucuz",
+    "sortPriceDesc": "Əvvəl bahalı", "sortAreaDesc": "Sahəsi böyük"
+  }
 }

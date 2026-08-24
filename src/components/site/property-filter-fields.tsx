@@ -1,19 +1,15 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   BUILDING_TYPES,
-  BUILDING_TYPE_LABELS,
   DOCUMENT_STATUSES,
-  DOCUMENT_STATUS_LABELS,
-  FEATURE_GROUP_LABELS,
   LISTING_TYPES,
   PRICE_PERIODS,
   RENOVATIONS,
-  RENOVATION_LABELS,
-  type FeatureGroup,
 } from "@/lib/constants";
 
 export type CityOption = {
@@ -57,30 +53,10 @@ export type PropertyFilterFieldsProps = {
   mode: "compact" | "full";
 };
 
-const ROOM_OPTIONS = [
-  { value: "1", label: "1 otaq" },
-  { value: "2", label: "2 otaq" },
-  { value: "3", label: "3 otaq" },
-  { value: "4", label: "4 otaq" },
-  { value: "5", label: "5+ otaq" },
-];
-
-const RENOVATION_OPTIONS = Object.values(RENOVATIONS).map((value) => ({
-  value,
-  label: RENOVATION_LABELS[value],
-}));
-const BUILDING_OPTIONS = Object.values(BUILDING_TYPES).map((value) => ({
-  value,
-  label: BUILDING_TYPE_LABELS[value],
-}));
-const DOCUMENT_OPTIONS = Object.values(DOCUMENT_STATUSES).map((value) => ({
-  value,
-  label: DOCUMENT_STATUS_LABELS[value],
-}));
-const PERIOD_OPTIONS = Object.values(PRICE_PERIODS).map((value) => ({
-  value,
-  label: value === PRICE_PERIODS.MONTH ? "Aylıq" : "Günlük",
-}));
+const RENOVATION_KEYS = { COSMETIC: "cosmetic", RENOVATED: "renovated", DESIGNER: "designer", UNRENOVATED: "unrenovated", NEW_BUILDING: "newBuilding" } as const;
+const DOCUMENT_KEYS = { TITLE_DEED: "titleDeed", CONTRACT: "contract", MUNICIPAL: "municipal", DECREE: "decree", POWER_OF_ATTORNEY: "powerOfAttorney", EXTRACT_COMMERCIAL: "commercialExtract", NONE: "none" } as const;
+const BUILDING_KEYS = { NEW: "new", OLD: "old" } as const;
+const FEATURE_GROUP_KEYS = { GENERAL: "general", INDOOR: "indoor", OUTDOOR: "outdoor", SECURITY: "security" } as const;
 
 const CONTROL =
   "min-h-12 w-full rounded-xs border border-line-strong bg-paper px-3 text-base text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold sm:text-sm";
@@ -136,16 +112,18 @@ function RangeField({
   maxName,
   minValue,
   maxValue,
-  unit,
   step,
+  minLabel,
+  maxLabel,
 }: {
   legend: string;
   minName: string;
   maxName: string;
   minValue?: string;
   maxValue?: string;
-  unit: string;
   step: number;
+  minLabel: string;
+  maxLabel: string;
 }) {
   return (
     <fieldset className="flex flex-col gap-1.5">
@@ -158,8 +136,8 @@ function RangeField({
           min={0}
           step={step}
           defaultValue={minValue ?? ""}
-          placeholder="Min"
-          aria-label={`Minimum ${unit}`}
+          placeholder={minLabel}
+          aria-label={minLabel}
           className={INPUT_CLASS}
         />
         <span className="text-ink-muted" aria-hidden="true">—</span>
@@ -170,8 +148,8 @@ function RangeField({
           min={0}
           step={step}
           defaultValue={maxValue ?? ""}
-          placeholder="Maks"
-          aria-label={`Maksimum ${unit}`}
+          placeholder={maxLabel}
+          aria-label={maxLabel}
           className={INPUT_CLASS}
         />
       </div>
@@ -212,7 +190,14 @@ export function PropertyFilterFields({
   initial,
   mode,
 }: PropertyFilterFieldsProps) {
+  const t = useTranslations("listings.search");
+  const propertyT = useTranslations("property");
   const id = useId();
+  const roomOptions = [1, 2, 3, 4].map((count) => ({ value: String(count), label: t("roomOption", { count }) })).concat({ value: "5", label: t("fivePlusRooms") });
+  const renovationOptions = Object.values(RENOVATIONS).map((value) => ({ value, label: propertyT(`renovation.${RENOVATION_KEYS[value]}`) }));
+  const buildingOptions = Object.values(BUILDING_TYPES).map((value) => ({ value, label: propertyT(`building.${BUILDING_KEYS[value]}`) }));
+  const documentOptions = Object.values(DOCUMENT_STATUSES).map((value) => ({ value, label: propertyT(`document.${DOCUMENT_KEYS[value]}`) }));
+  const periodOptions = Object.values(PRICE_PERIODS).map((value) => ({ value, label: value === PRICE_PERIODS.MONTH ? t("monthly") : t("daily") }));
   const [listingType, setListingType] = useState(initial.elan ?? LISTING_TYPES.SALE);
   const [citySlug, setCitySlug] = useState(initial.seher ?? "");
   const districts = useMemo(
@@ -240,11 +225,11 @@ export function PropertyFilterFields({
       ) : null}
 
       <fieldset className={cn("flex flex-col gap-1.5", mode === "compact" && "lg:col-span-3")}>
-        <legend className={LABEL_CLASS}>Elan növü</legend>
+        <legend className={LABEL_CLASS}>{t("listingType")}</legend>
         <div className="grid min-h-12 grid-cols-2 rounded-xs border border-line-strong bg-paper p-1">
           {[
-            { value: LISTING_TYPES.SALE, label: "Satılır" },
-            { value: LISTING_TYPES.RENT, label: "Kirayə" },
+            { value: LISTING_TYPES.SALE, label: t("sale") },
+            { value: LISTING_TYPES.RENT, label: t("rent") },
           ].map((option) => (
             <label key={option.value} className="relative cursor-pointer">
               <input
@@ -264,7 +249,7 @@ export function PropertyFilterFields({
       </fieldset>
 
       <div className={cn("flex flex-col gap-1.5", mode === "compact" && "sm:col-span-2 lg:col-span-4")}>
-        <label htmlFor={`${id}-query`} className={LABEL_CLASS}>Axtarış</label>
+        <label htmlFor={`${id}-query`} className={LABEL_CLASS}>{t("search")}</label>
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" aria-hidden="true" />
           <input
@@ -273,7 +258,7 @@ export function PropertyFilterFields({
             type="search"
             enterKeyHint="search"
             defaultValue={initial.axtaris ?? ""}
-            placeholder="Ünvan, rayon və ya açar söz"
+            placeholder={t("queryPlaceholder")}
             className={cn(INPUT_CLASS, "pl-9")}
           />
         </div>
@@ -282,16 +267,16 @@ export function PropertyFilterFields({
       <SelectField
         id={`${id}-type`}
         name="tip"
-        label="Əmlak növü"
-        placeholder="Hamısı"
+        label={t("propertyType")}
+        placeholder={t("all")}
         defaultValue={initial.tip}
         options={types}
       />
       <SelectField
         id={`${id}-city`}
         name="seher"
-        label="Şəhər"
-        placeholder="Hamısı"
+        label={t("city")}
+        placeholder={t("all")}
         defaultValue={initial.seher}
         options={cities}
         onChange={setCitySlug}
@@ -302,94 +287,97 @@ export function PropertyFilterFields({
           <SelectField
             id={`${id}-district`}
             name="rayon"
-            label="Rayon"
-            placeholder={citySlug ? "Hamısı" : "Əvvəlcə şəhər seçin"}
+            label={t("district")}
+            placeholder={citySlug ? t("all") : t("selectCityFirst")}
             defaultValue={initial.rayon}
             options={districts}
           />
           <SelectField
             id={`${id}-rooms`}
             name="otaq"
-            label="Otaq sayı"
-            placeholder="Fərq etməz"
+            label={t("rooms")}
+            placeholder={t("any")}
             defaultValue={initial.otaq}
-            options={ROOM_OPTIONS}
+            options={roomOptions}
           />
           <RangeField
-            legend="Qiymət (₼)"
+            legend={t("price")}
             minName="min"
             maxName="max"
             minValue={initial.min}
             maxValue={initial.max}
-            unit="qiymət (₼)"
             step={1000}
+            minLabel={t("minimum", { unit: t("price") })}
+            maxLabel={t("maximum", { unit: t("price") })}
           />
           <RangeField
-            legend="Sahə (m²)"
+            legend={t("area")}
             minName="sahe_min"
             maxName="sahe_max"
             minValue={initial.sahe_min}
             maxValue={initial.sahe_max}
-            unit="sahə (m²)"
             step={5}
+            minLabel={t("minimum", { unit: t("area") })}
+            maxLabel={t("maximum", { unit: t("area") })}
           />
           <SelectField
             id={`${id}-renovation`}
             name="temir"
-            label="Təmir vəziyyəti"
-            placeholder="Fərq etməz"
+            label={t("renovation")}
+            placeholder={t("any")}
             defaultValue={initial.temir}
-            options={RENOVATION_OPTIONS}
+            options={renovationOptions}
           />
           <SelectField
             id={`${id}-document`}
             name="sened"
-            label="Sənəd"
-            placeholder="Fərq etməz"
+            label={t("document")}
+            placeholder={t("any")}
             defaultValue={initial.sened}
-            options={DOCUMENT_OPTIONS}
+            options={documentOptions}
           />
           <SelectField
             id={`${id}-building`}
             name="tikili"
-            label="Tikili növü"
-            placeholder="Fərq etməz"
+            label={t("building")}
+            placeholder={t("any")}
             defaultValue={initial.tikili}
-            options={BUILDING_OPTIONS}
+            options={buildingOptions}
           />
           {listingType === LISTING_TYPES.RENT ? (
             <SelectField
               id={`${id}-period`}
               name="dovr"
-              label="Kirayə müddəti"
-              placeholder="Fərq etməz"
+              label={t("rentPeriod")}
+              placeholder={t("any")}
               defaultValue={initial.dovr}
-              options={PERIOD_OPTIONS}
+              options={periodOptions}
             />
           ) : null}
           <RangeField
-            legend="Mərtəbə"
+            legend={t("floor")}
             minName="mertebe_min"
             maxName="mertebe_max"
             minValue={initial.mertebe_min}
             maxValue={initial.mertebe_max}
-            unit="mərtəbə"
             step={1}
+            minLabel={t("minimum", { unit: t("floor") })}
+            maxLabel={t("maximum", { unit: t("floor") })}
           />
 
           <fieldset className="sm:col-span-2 lg:col-span-3">
-            <legend className={LABEL_CLASS}>Əlavə şərtlər</legend>
+            <legend className={LABEL_CLASS}>{t("extra")}</legend>
             <div className="mt-1 grid sm:grid-cols-2 lg:grid-cols-3">
-              <CheckboxField name="ilk_mertebe_yox" label="Birinci mərtəbə olmasın" defaultChecked={initial.ilk_mertebe_yox === "1"} />
-              <CheckboxField name="son_mertebe_yox" label="Son mərtəbə olmasın" defaultChecked={initial.son_mertebe_yox === "1"} />
-              <CheckboxField name="sekilli" label="Yalnız şəkilli elanlar" defaultChecked={initial.sekilli === "1"} />
+              <CheckboxField name="ilk_mertebe_yox" label={t("notFirstFloor")} defaultChecked={initial.ilk_mertebe_yox === "1"} />
+              <CheckboxField name="son_mertebe_yox" label={t("notLastFloor")} defaultChecked={initial.son_mertebe_yox === "1"} />
+              <CheckboxField name="sekilli" label={t("withPhotos")} defaultChecked={initial.sekilli === "1"} />
             </div>
           </fieldset>
 
           {featureGroups.map(([group, items]) => (
             <fieldset key={group} className="sm:col-span-2 lg:col-span-3">
               <legend className={LABEL_CLASS}>
-                {FEATURE_GROUP_LABELS[group as FeatureGroup] ?? group}
+                {FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS] ? propertyT(`featureGroup.${FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS]}`) : group}
               </legend>
               <div className="mt-1 grid sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((feature) => (

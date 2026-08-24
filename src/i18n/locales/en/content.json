@@ -7,5 +7,14 @@
   "description": "Description",
   "features": "Features",
   "similarProperties": "Similar properties",
-  "similarArticles": "Related articles"
+  "similarArticles": "Related articles",
+  "gallery": {"empty": "No photos have been added", "imageAlt": "{title} — image {index}", "open": "Open {alt} in full screen", "title": "{title} — image {index} of {total}", "previous": "Previous image", "next": "Next image"},
+  "mapLabel": "{title} on the map",
+  "trust": {"aria": "Company legal and contact details", "officeAlt": "{brand} office", "verified": "Verified information", "taxId": "Tax ID", "owner": "Brand and trademark owner", "address": "Address", "phone": "Phone", "email": "Email"},
+  "articleMeta": {"published": "Published:", "updated": "Updated:", "read": "{count, plural, one {# min read} other {# min read}}", "views": "{count, plural, one {# view} other {# views}}"},
+  "propertyActions": "Property actions",
+  "call": "Call",
+  "portfolio": "Current portfolio",
+  "matchingListings": "Matching property listings",
+  "activeListings": "{count, plural, one {# active listing} other {# active listings}}"
 }

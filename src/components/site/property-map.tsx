@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import "leaflet/dist/leaflet.css";
 
 type PropertyMapProps = {
@@ -17,6 +18,7 @@ type PropertyMapProps = {
  * dinamik idxal olunur. OpenStreetMap tile-ları açar tələb etmir.
  */
 export function PropertyMap({ latitude, longitude, title, className }: PropertyMapProps) {
+  const t = useTranslations("content");
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
 
@@ -63,7 +65,7 @@ export function PropertyMap({ latitude, longitude, title, className }: PropertyM
     <div
       ref={containerRef}
       role="img"
-      aria-label={`${title} xəritədə`}
+      aria-label={t("mapLabel", { title })}
       className={className}
     />
   );

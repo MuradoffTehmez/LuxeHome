@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
@@ -21,6 +22,7 @@ type GalleryProps = {
 
 /** Mobil scroll-snap rail, desktop grid və əlçatan fullscreen lightbox. */
 export function Gallery({ images, title, className }: GalleryProps) {
+  const t = useTranslations("content.gallery");
   const [index, setIndex] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
@@ -68,7 +70,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
           className,
         )}
       >
-        Foto əlavə edilməyib
+        {t("empty")}
       </div>
     );
   }
@@ -83,13 +85,13 @@ export function Gallery({ images, title, className }: GalleryProps) {
         className="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible [&::-webkit-scrollbar]:hidden"
       >
         {images.map((image, imageIndex) => {
-          const alt = image.alt || `${title} — şəkil ${imageIndex + 1}`;
+          const alt = image.alt || t("imageAlt", { title, index: imageIndex + 1 });
           return (
             <button
               key={image.url}
               type="button"
               onClick={() => openAt(imageIndex)}
-              aria-label={`${alt} şəklini tam ekranda aç`}
+              aria-label={t("open", { alt })}
               className="group relative aspect-4/3 w-full shrink-0 snap-center cursor-zoom-in overflow-hidden bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset sm:rounded-sm"
             >
               <Image
@@ -120,7 +122,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
       <Overlay
         open={fullscreen}
         onClose={() => setFullscreen(false)}
-        title={`${title} — şəkil ${index + 1} / ${total}`}
+        title={t("title", { title, index: index + 1, total })}
         className="h-dvh max-h-dvh max-w-none rounded-none bg-paper"
         footer={
           total > 1 ? (
@@ -128,7 +130,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
               <button
                 type="button"
                 onClick={previous}
-                aria-label="Əvvəlki şəkil"
+                aria-label={t("previous")}
                 className="inline-flex size-12 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-gold-soft hover:text-gold-soft"
               >
                 <ChevronLeft className="size-5" aria-hidden="true" />
@@ -139,7 +141,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
               <button
                 type="button"
                 onClick={next}
-                aria-label="Növbəti şəkil"
+                aria-label={t("next")}
                 className="inline-flex size-12 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-gold-soft hover:text-gold-soft"
               >
                 <ChevronRight className="size-5" aria-hidden="true" />
@@ -151,7 +153,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
         <div className="relative -mx-5 -my-5 min-h-[60dvh] w-[calc(100%+2.5rem)] bg-charcoal sm:-mx-6 sm:min-h-[70dvh] sm:w-[calc(100%+3rem)]">
           <Image
             src={current.url}
-            alt={current.alt || `${title} — şəkil ${index + 1}`}
+            alt={current.alt || t("imageAlt", { title, index: index + 1 })}
             fill
             unoptimized={isUnoptimizedImage(current.url)}
             sizes="100vw"

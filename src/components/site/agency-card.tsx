@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Building2, MapPin, Phone } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 
@@ -20,6 +23,7 @@ export function AgencyCard({
   agency: AgencyCardData;
   className?: string;
 }) {
+  const t = useTranslations("property");
   return (
     <article
       className={cn(
@@ -53,7 +57,7 @@ export function AgencyCard({
             </Link>
           </h3>
           <p className="text-xs font-medium tracking-wide text-gold-deep uppercase">
-            {agency.propertyCount} elan
+            {t("listingCount", { count: agency.propertyCount })}
           </p>
         </div>
       </div>
@@ -62,14 +66,14 @@ export function AgencyCard({
         {agency.address && (
           <div className="flex items-start gap-1.5">
             <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            <dt className="sr-only">Ünvan</dt>
+            <dt className="sr-only">{t("address")}</dt>
             <dd className="line-clamp-1">{agency.address}</dd>
           </div>
         )}
         {agency.phone && (
           <div className="flex items-center gap-1.5">
             <Phone className="size-4 shrink-0" aria-hidden="true" />
-            <dt className="sr-only">Telefon</dt>
+            <dt className="sr-only">{t("phone")}</dt>
             <dd className="tabular">{agency.phone}</dd>
           </div>
         )}

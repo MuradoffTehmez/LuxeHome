@@ -46,6 +46,7 @@ export default defineConfig({
           name: "ui-node",
           environment: "node",
           include: ["src/components/**/*.test.{ts,tsx}"],
+          setupFiles: ["./src/test/setup-ui.ts"],
         },
       },
     ],

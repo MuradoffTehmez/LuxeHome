@@ -8,5 +8,30 @@
     "day": "/gün"
   },
   "area": "{value, number, integer} m²",
-  "rooms": "{count, plural, other {# otaq}}"
+  "rooms": "{count, plural, other {# otaq}}",
+  "photo": "Əmlak fotosu",
+  "photoUnavailable": "Əmlak fotosu mövcud deyil",
+  "address": "Ünvan",
+  "phone": "Telefon",
+  "location": "Yerləşmə",
+  "year": "İl",
+  "landArea": "Torpaq sahəsi",
+  "landUnit": "{value, number, integer} sot",
+  "floor": "Mərtəbə",
+  "listingCount": "{count, plural, other {# elan}}",
+  "readMinutes": "{count, plural, other {# dəq oxunuş}}",
+  "projectImageAlt": "{name} layihəsi",
+  "favorite": {"add": "Favoritlərə əlavə et", "remove": "Favoritlərdən çıxar", "active": "Favoritlərdədir"},
+  "compare": {"add": "Müqayisəyə əlavə et", "remove": "Müqayisədən çıxar", "active": "Müqayisədədir", "action": "Müqayisə et", "limit": "Ən çox {count} əmlakı müqayisə edə bilərsiniz.", "list": "Müqayisə siyahısı", "selected": "{count} əmlak müqayisəyə seçildi", "clear": "Təmizlə", "clearTitle": "Müqayisə siyahısı təmizlənsin?", "clearDescription": "Seçdiyiniz bütün əmlaklar müqayisə siyahısından çıxarılacaq."},
+  "clear": {"label": "Siyahını təmizlə", "cancel": "Ləğv et", "deleteAll": "Hamısını sil", "notice": "Bu əməliyyat yalnız bu cihazda saxlanan siyahıya təsir edir."},
+  "saved": {"count": "{count} əmlak yadda saxlanılıb", "favoritesClearTitle": "Favorit siyahısı təmizlənsin?", "favoritesClearDescription": "Yadda saxladığınız bütün əmlaklar bu cihazdakı siyahıdan silinəcək.", "missingNotice": "Bəzi elanlar artıq mövcud deyil və ya arxivə salınıb, ona görə göstərilmir.", "unavailableTitle": "Yadda saxlanan elanlar artıq əlçatan deyil", "unavailableDescription": "Elanlar silinib və ya arxivə salınıb. Siyahını təmizləyib yeni əmlaklar seçə bilərsiniz.", "chooseNew": "Yeni əmlak seç", "unavailableClear": "Əlçatan olmayan bütün seçimlər siyahıdan silinəcək.", "emptyTitle": "Favorit siyahınız boşdur", "emptyDescription": "Bəyəndiyiniz elanları ürək işarəsi ilə yadda saxlayın — burada toplanacaq.", "view": "Əmlaklara bax"},
+  "compareTable": {"price": "Qiymət", "propertyType": "Əmlak növü", "location": "Yerləşmə", "rooms": "Otaq sayı", "bedrooms": "Yataq otağı", "bathrooms": "Hamam", "area": "Sahə", "landArea": "Torpaq sahəsi", "floor": "Mərtəbə", "building": "Tikili növü", "renovation": "Təmir", "document": "Sənəd", "mortgage": "İpoteka", "installment": "Taksit", "features": "Xüsusiyyətlər", "eligible": "Uyğundur", "available": "Mövcuddur", "count": "{count} əmlak müqayisə edilir", "tabs": "Müqayisə edilən əmlaklar", "remove": "Müqayisədən çıxar", "property": "Əmlak", "removeShort": "Çıxar", "missingNotice": "Bəzi elanlar artıq mövcud deyil və ya arxivə salınıb, ona görə göstərilmir.", "unavailableTitle": "Seçilmiş elanlar artıq əlçatan deyil", "unavailableDescription": "Elanlar silinib və ya arxivə salınıb. Siyahını təmizləyib yeni əmlaklar seçə bilərsiniz.", "chooseNew": "Yeni əmlak seç", "unavailableClear": "Əlçatan olmayan bütün seçimlər siyahıdan çıxarılacaq.", "emptyTitle": "Müqayisə siyahınız boşdur", "emptyDescription": "Əmlak kartlarındakı müqayisə düyməsi ilə elanları buraya əlavə edin.", "view": "Əmlaklara bax"},
+  "share": {"listing": "Elanı paylaş", "label": "Paylaş", "copied": "Kopyalandı", "copyLink": "Linki kopyala", "via": "{network} ilə paylaş"},
+  "status": {"draft": "Qaralama", "pending": "Təsdiq gözləyir", "published": "Dərc olunub", "reserved": "Rezerv edilib", "sold": "Satılıb", "rented": "Kirayə verilib", "archived": "Arxivdə"},
+  "projectStatus": {"planned": "Planlaşdırılır", "ongoing": "Davam edir", "completed": "Tamamlanıb"},
+  "projectType": {"residential": "Yaşayış", "commercial": "Kommersiya", "villa": "Villa", "mixed": "Qarışıq"},
+  "renovation": {"cosmetic": "Kosmetik təmir", "renovated": "Təmirli", "designer": "Dizayner təmiri", "unrenovated": "Təmirsiz", "newBuilding": "Yeni tikili"},
+  "document": {"titleDeed": "Kupça (Çıxarış)", "contract": "Müqavilə", "municipal": "Bələdiyyə sənədi", "decree": "Sərəncam", "powerOfAttorney": "Etibarnamə", "commercialExtract": "Çıxarış (qeyri-yaşayış)", "none": "Kupçasız"},
+  "building": {"new": "Yeni tikili", "old": "Köhnə tikili"}
+  ,"featureGroup": {"general": "Ümumi", "indoor": "Daxili", "outdoor": "Xarici", "security": "Təhlükəsizlik"}
 }

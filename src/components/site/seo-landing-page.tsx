@@ -1,4 +1,7 @@
-import Link from "next/link";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { PropertyCard } from "@/components/site/property-card";
@@ -8,7 +11,6 @@ import { EmptyState } from "@/components/ui/states";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
 import type { PropertyCardData } from "@/lib/queries";
 import { findSeoLanding, type SeoLanding } from "@/lib/seo-landings";
-import { formatNumber } from "@/lib/utils";
 
 type SeoLandingPageProps = {
   landing: SeoLanding;
@@ -27,6 +29,9 @@ export function SeoLandingPage({
   totalPages,
   locale = DEFAULT_LOCALE,
 }: SeoLandingPageProps) {
+  const nav = useTranslations("navigation");
+  const t = useTranslations("seoLandings");
+  const content = useTranslations("content");
   const localePrefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
 
   return (
@@ -36,8 +41,8 @@ export function SeoLandingPage({
           <Breadcrumbs
             locale={locale}
             items={[
-              { label: "Ana səhifə", href: "/" },
-              { label: "Əmlaklar", href: "/emlaklar" },
+              { label: nav("home"), href: "/" },
+              { label: nav("properties"), href: "/emlaklar" },
               { label: landing.h1 },
             ]}
           />
@@ -45,7 +50,7 @@ export function SeoLandingPage({
           <h1 className="mt-3 max-w-4xl font-display text-4xl leading-tight text-ink sm:text-5xl lg:text-6xl">
             {landing.h1}
           </h1>
-          <p className="mt-5 text-base text-ink-soft">{formatNumber(total)} aktiv elan</p>
+          <p className="mt-5 text-base text-ink-soft">{content("activeListings", { count: total })}</p>
         </Container>
       </div>
 
@@ -58,7 +63,7 @@ export function SeoLandingPage({
               ))}
             </div>
             <aside className="border-l border-line pl-6">
-              <h2 className="font-display text-xl text-ink">Əlaqəli seçimlər</h2>
+              <h2 className="font-display text-xl text-ink">{t("related")}</h2>
               <ul className="mt-4 flex flex-col gap-1">
                 {landing.relatedPaths.map((path) => {
                   const related = findSeoLanding(path.slice(1));
@@ -83,9 +88,9 @@ export function SeoLandingPage({
       <Section tone="paper" spacing="cozy" aria-labelledby="landing-results-title">
         <Container>
           <div className="mb-8 flex flex-col gap-2">
-            <p className="editorial-kicker text-gold-deep">Cari portfel</p>
+            <p className="editorial-kicker text-gold-deep">{content("portfolio")}</p>
             <h2 id="landing-results-title" className="font-display text-3xl text-ink">
-              Uyğun əmlak elanları
+              {content("matchingListings")}
             </h2>
           </div>
           {items.length > 0 ? (
@@ -106,9 +111,9 @@ export function SeoLandingPage({
             </>
           ) : (
             <EmptyState
-              title="Bu kateqoriyada hazırda aktiv elan yoxdur"
-              description="Yeni elanlar dərc edildikcə burada görünəcək. Cari portfelə baxaraq başqa uyğun variantları araşdıra bilərsiniz."
-              action={{ label: "Bütün əmlaklara bax", href: `${localePrefix}/emlaklar` }}
+              title={t("emptyTitle")}
+              description={t("emptyDescription")}
+              action={{ label: t("allProperties"), href: `${localePrefix}/emlaklar` }}
             />
           )}
         </Container>
@@ -117,7 +122,7 @@ export function SeoLandingPage({
       <Section tone="ivory" spacing="cozy" aria-labelledby="landing-faq-title">
         <Container size="narrow">
           <h2 id="landing-faq-title" className="font-display text-3xl text-ink">
-            Tez-tez verilən suallar
+            {nav("faq")}
           </h2>
           <div className="mt-7 divide-y divide-line border-y border-line">
             {landing.faq.map((item) => (

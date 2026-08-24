@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useFavorite } from "@/lib/favorites";
 import { trackEvent } from "@/lib/client-analytics";
@@ -17,9 +18,10 @@ export function FavoriteButton({
   variant = "overlay",
   className,
 }: FavoriteButtonProps) {
+  const t = useTranslations("property.favorite");
   const { isFavorite, ready, toggle } = useFavorite(propertyId);
 
-  const label = isFavorite ? "Favoritlərdən çıxar" : "Favoritlərə əlavə et";
+  const label = isFavorite ? t("remove") : t("add");
   const handleToggle = () => {
     trackEvent(isFavorite ? "favorite_remove" : "favorite_add", { property_id: propertyId });
     toggle();
@@ -44,7 +46,7 @@ export function FavoriteButton({
           className={cn("size-4", isFavorite && "fill-current")}
           aria-hidden="true"
         />
-        {isFavorite ? "Favoritlərdədir" : "Favoritlərə əlavə et"}
+        {isFavorite ? t("active") : t("add")}
       </button>
     );
   }

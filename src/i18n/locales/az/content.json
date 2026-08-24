@@ -7,5 +7,14 @@
   "description": "Təsvir",
   "features": "Xüsusiyyətlər",
   "similarProperties": "Oxşar əmlaklar",
-  "similarArticles": "Oxşar məqalələr"
+  "similarArticles": "Oxşar məqalələr",
+  "gallery": {"empty": "Foto əlavə edilməyib", "imageAlt": "{title} — şəkil {index}", "open": "{alt} şəklini tam ekranda aç", "title": "{title} — şəkil {index} / {total}", "previous": "Əvvəlki şəkil", "next": "Növbəti şəkil"},
+  "mapLabel": "{title} xəritədə",
+  "trust": {"aria": "Şirkətin hüquqi və əlaqə məlumatları", "officeAlt": "{brand} ofisi", "verified": "Təsdiqlənmiş məlumat", "taxId": "VÖEN", "owner": "Brend və markanın sahibi", "address": "Ünvan", "phone": "Telefon", "email": "E-poçt"},
+  "articleMeta": {"published": "Dərc edilib:", "updated": "Yenilənib:", "read": "{count} dəq oxuma", "views": "{count} baxış"},
+  "propertyActions": "Əmlak əməliyyatları",
+  "call": "Zəng et",
+  "portfolio": "Cari portfel",
+  "matchingListings": "Uyğun əmlak elanları",
+  "activeListings": "{count} aktiv elan"
 }

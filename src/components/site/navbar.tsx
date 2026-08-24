@@ -67,7 +67,7 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-[var(--z-toast)] focus:rounded-xs focus:bg-charcoal focus:px-4 focus:py-2 focus:text-sm focus:text-ink-invert"
       >
-        Əsas məzmuna keç
+        {t("skipToContent")}
       </a>
 
       <Container
@@ -89,7 +89,7 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
         />
 
         <nav
-          aria-label="Əsas naviqasiya"
+          aria-label={t("mainNavigation")}
           className="hidden min-w-0 overflow-hidden lg:flex lg:justify-center"
         >
           <ul className="flex items-center gap-0.5 xl:gap-1">
@@ -180,11 +180,11 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
       <Overlay
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        title="Menyu"
+        title={t("menu")}
         placement="right"
         className="w-[min(26rem,92vw)]"
       >
-        <nav aria-label="Mobil naviqasiya">
+        <nav aria-label={t("mobileNavigation")}>
           <ul className="flex flex-col">
             {navigation.map((item) => {
               const active = isNavigationItemActive(pathname, item.href);

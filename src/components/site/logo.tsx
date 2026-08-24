@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 
@@ -27,12 +30,13 @@ export function Logo({
   compact = false,
   markless = false,
 }: LogoProps) {
+  const t = useTranslations("navigation");
   const isDark = tone === "dark";
 
   return (
     <Link
       href="/"
-      aria-label={`${siteConfig.name} — ana səhifə`}
+      aria-label={t("logoHome", { brand: siteConfig.name })}
       className={cn("group inline-flex shrink-0 items-center gap-2 sm:gap-3", className)}
     >
       {!markless && (
@@ -69,7 +73,7 @@ export function Logo({
                 isDark ? "text-ink-invert-soft" : "text-ink-muted",
               )}
             >
-              Daşınmaz Əmlak
+              {t("realEstate")}
             </span>
           </span>
         )}

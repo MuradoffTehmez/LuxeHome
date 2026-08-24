@@ -1,10 +1,11 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Building2, CalendarDays, MapPin } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
-  PROJECT_STATUS_LABELS,
-  PROJECT_TYPE_LABELS,
   type ProjectStatus,
   type ProjectType,
 } from "@/lib/constants";
@@ -16,6 +17,8 @@ const STATUS_TONE: Record<ProjectStatus, "gold" | "success" | "neutral"> = {
   ONGOING: "gold",
   COMPLETED: "success",
 };
+const STATUS_KEY: Record<ProjectStatus, "planned" | "ongoing" | "completed"> = { PLANNED: "planned", ONGOING: "ongoing", COMPLETED: "completed" };
+const TYPE_KEY: Record<ProjectType, "residential" | "commercial" | "villa" | "mixed"> = { RESIDENTIAL: "residential", COMMERCIAL: "commercial", VILLA: "villa", MIXED: "mixed" };
 
 export function ProjectCard({
   project,
@@ -26,6 +29,7 @@ export function ProjectCard({
   priority?: boolean;
   className?: string;
 }) {
+  const t = useTranslations("property");
   const status = project.status as ProjectStatus;
   const type = project.projectType as ProjectType;
 
@@ -40,7 +44,7 @@ export function ProjectCard({
         {project.coverUrl ? (
           <Image
             src={project.coverUrl}
-            alt={`${project.name} layihəsi`}
+            alt={t("projectImageAlt", { name: project.name })}
             fill
             unoptimized={isUnoptimizedImage(project.coverUrl)}
             priority={priority}
@@ -60,14 +64,14 @@ export function ProjectCard({
         />
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          <Badge tone={STATUS_TONE[status]}>{PROJECT_STATUS_LABELS[status]}</Badge>
+          <Badge tone={STATUS_TONE[status]}>{t(`projectStatus.${STATUS_KEY[status]}`)}</Badge>
         </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 pt-5">
         <div className="flex flex-col gap-1.5">
           <p className="text-xs font-medium tracking-wide text-gold-deep uppercase">
-            {PROJECT_TYPE_LABELS[type]}
+            {t(`projectType.${TYPE_KEY[type]}`)}
           </p>
 
           <h3 className="font-display text-xl leading-snug text-ink">
@@ -90,14 +94,14 @@ export function ProjectCard({
           {project.city?.name && (
             <div className="flex items-center gap-1.5">
               <MapPin className="size-4 shrink-0" aria-hidden="true" />
-              <dt className="sr-only">Yerləşmə</dt>
+              <dt className="sr-only">{t("location")}</dt>
               <dd>{project.city.name}</dd>
             </div>
           )}
           {project.year && (
             <div className="flex items-center gap-1.5">
               <CalendarDays className="size-4 shrink-0" aria-hidden="true" />
-              <dt className="sr-only">İl</dt>
+              <dt className="sr-only">{t("year")}</dt>
               <dd className="tabular">{project.year}</dd>
             </div>
           )}

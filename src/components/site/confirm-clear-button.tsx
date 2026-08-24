@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Overlay } from "@/components/ui/overlay";
 
@@ -13,17 +14,18 @@ export type ConfirmClearButtonProps = {
 
 /** Lokal favorit/müqayisə siyahısını tək səhv kliklə silməyə qoymur. */
 export function ConfirmClearButton({
-  label = "Siyahını təmizlə",
+  label,
   title,
   description,
   onConfirm,
 }: ConfirmClearButtonProps) {
+  const t = useTranslations("property.clear");
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(true)}>
-        {label}
+        {label ?? t("label")}
       </Button>
       <Overlay
         open={open}
@@ -33,7 +35,7 @@ export function ConfirmClearButton({
         footer={
           <>
             <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
-              Ləğv et
+              {t("cancel")}
             </Button>
             <Button
               type="button"
@@ -44,13 +46,13 @@ export function ConfirmClearButton({
                 setOpen(false);
               }}
             >
-              Hamısını sil
+              {t("deleteAll")}
             </Button>
           </>
         }
       >
         <p className="text-sm leading-relaxed text-ink-soft">
-          Bu əməliyyat yalnız bu cihazda saxlanan siyahıya təsir edir.
+          {t("notice")}
         </p>
       </Overlay>
     </>

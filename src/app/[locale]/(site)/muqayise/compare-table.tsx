@@ -1,22 +1,13 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useFormatter, useTranslations } from "next-intl";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Building2, GitCompareArrows, X } from "lucide-react";
 import { EmptyState } from "@/components/ui/states";
 import { ConfirmClearButton } from "@/components/site/confirm-clear-button";
-import { cn, formatArea, formatNumber, formatPrice, isUnoptimizedImage } from "@/lib/utils";
-import {
-  BUILDING_TYPE_LABELS,
-  DOCUMENT_STATUS_LABELS,
-  PRICE_PERIOD_LABELS,
-  RENOVATION_LABELS,
-  type BuildingType,
-  type DocumentStatus,
-  type PricePeriod,
-  type Renovation,
-} from "@/lib/constants";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { useCompareList } from "@/lib/compare";
 import { fetchCompareProperties } from "./actions";
 
@@ -27,68 +18,76 @@ type Row = {
   render: (property: CompareProperty) => React.ReactNode;
 };
 
-const ROWS: Row[] = [
+const RENOVATION_KEYS = { COSMETIC: "cosmetic", RENOVATED: "renovated", DESIGNER: "designer", UNRENOVATED: "unrenovated", NEW_BUILDING: "newBuilding" } as const;
+const DOCUMENT_KEYS = { TITLE_DEED: "titleDeed", CONTRACT: "contract", MUNICIPAL: "municipal", DECREE: "decree", POWER_OF_ATTORNEY: "powerOfAttorney", EXTRACT_COMMERCIAL: "commercialExtract", NONE: "none" } as const;
+const BUILDING_KEYS = { NEW: "new", OLD: "old" } as const;
+
+function useCompareRows(): Row[] {
+  const t = useTranslations("property.compareTable");
+  const propertyT = useTranslations("property");
+  const format = useFormatter();
+  const number = (value: number) => format.number(value, { maximumFractionDigits: 0 });
+  const price = (property: CompareProperty) => {
+    const currency = property.currency === "AZN" ? "₼" : property.currency;
+    const period = property.pricePeriod === "MONTH" ? propertyT("pricePeriod.month") : property.pricePeriod === "DAY" ? propertyT("pricePeriod.day") : "";
+    return `${number(property.price)} ${currency}${period ? ` ${period}` : ""}`;
+  };
+
+  return [
   {
-    label: "Qiymət",
-    render: (property) =>
-      `${formatPrice(property.price, property.currency)}${property.pricePeriod ? ` / ${PRICE_PERIOD_LABELS[property.pricePeriod as PricePeriod]}` : ""}`,
+    label: t("price"), render: price,
   },
-  { label: "Əmlak növü", render: (property) => property.type.name },
+  { label: t("propertyType"), render: (property) => property.type.name },
   {
-    label: "Yerləşmə",
+    label: t("location"),
     render: (property) =>
       [property.district?.name, property.city.name].filter(Boolean).join(", "),
   },
-  { label: "Otaq sayı", render: (property) => property.rooms ?? "—" },
-  { label: "Yataq otağı", render: (property) => property.bedrooms ?? "—" },
-  { label: "Hamam", render: (property) => property.bathrooms ?? "—" },
+  { label: t("rooms"), render: (property) => property.rooms ?? "—" },
+  { label: t("bedrooms"), render: (property) => property.bedrooms ?? "—" },
+  { label: t("bathrooms"), render: (property) => property.bathrooms ?? "—" },
   {
-    label: "Sahə",
-    render: (property) => (property.area ? formatArea(property.area) : "—"),
+    label: t("area"), render: (property) => (property.area ? propertyT("area", { value: property.area }) : "—"),
   },
   {
-    label: "Torpaq sahəsi",
-    render: (property) =>
-      property.landArea ? `${formatNumber(property.landArea)} sot` : "—",
+    label: t("landArea"), render: (property) => property.landArea ? propertyT("landUnit", { value: property.landArea }) : "—",
   },
   {
-    label: "Mərtəbə",
+    label: t("floor"),
     render: (property) =>
       property.floor
         ? `${property.floor}${property.totalFloors ? ` / ${property.totalFloors}` : ""}`
         : "—",
   },
   {
-    label: "Tikili növü",
+    label: t("building"),
     render: (property) =>
       property.buildingType
-        ? BUILDING_TYPE_LABELS[property.buildingType as BuildingType]
+        ? propertyT(`building.${BUILDING_KEYS[property.buildingType as keyof typeof BUILDING_KEYS]}`)
         : "—",
   },
   {
-    label: "Təmir",
+    label: t("renovation"),
     render: (property) =>
       property.renovation
-        ? RENOVATION_LABELS[property.renovation as Renovation]
+        ? propertyT(`renovation.${RENOVATION_KEYS[property.renovation as keyof typeof RENOVATION_KEYS]}`)
         : "—",
   },
   {
-    label: "Sənəd",
+    label: t("document"),
     render: (property) =>
       property.documentStatus
-        ? DOCUMENT_STATUS_LABELS[property.documentStatus as DocumentStatus]
+        ? propertyT(`document.${DOCUMENT_KEYS[property.documentStatus as keyof typeof DOCUMENT_KEYS]}`)
         : "—",
   },
   {
-    label: "İpoteka",
-    render: (property) => (property.mortgageAvailable ? "Uyğundur" : "—"),
+    label: t("mortgage"), render: (property) => (property.mortgageAvailable ? t("eligible") : "—"),
   },
   {
-    label: "Taksit",
-    render: (property) => (property.installmentAvailable ? "Mövcuddur" : "—"),
+    label: t("installment"), render: (property) => (property.installmentAvailable ? t("available") : "—"),
   },
   {
-    label: "Xüsusiyyətlər",
+    label: t("features"),
     render: (property) =>
       property.features.length > 0 ? (
         <ul className="flex flex-col gap-1 text-left">
@@ -100,7 +99,8 @@ const ROWS: Row[] = [
         "—"
       ),
   },
-];
+  ];
+}
 
 type ComparePresentationProps = {
   properties: CompareProperty[];
@@ -116,6 +116,9 @@ export function ComparePresentation({
   onRemove,
   onClear,
 }: ComparePresentationProps) {
+  const t = useTranslations("property.compareTable");
+  const compareT = useTranslations("property.compare");
+  const rows = useCompareRows();
   const [selectedId, setSelectedId] = useState(properties[0]?.id ?? "");
   const selected =
     properties.find((property) => property.id === selectedId) ?? properties[0];
@@ -126,11 +129,11 @@ export function ComparePresentation({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink-muted">
-          {properties.length} əmlak müqayisə edilir
+          {t("count", { count: properties.length })}
         </p>
         <ConfirmClearButton
-          title="Müqayisə siyahısı təmizlənsin?"
-          description="Seçdiyiniz bütün əmlaklar müqayisə siyahısından çıxarılacaq."
+          title={compareT("clearTitle")}
+          description={compareT("clearDescription")}
           onConfirm={onClear}
         />
       </div>
@@ -138,7 +141,7 @@ export function ComparePresentation({
       <div className="lg:hidden">
         <div
           role="tablist"
-          aria-label="Müqayisə edilən əmlaklar"
+          aria-label={t("tabs")}
           className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] sm:-mx-6 sm:px-6 [&::-webkit-scrollbar]:hidden"
         >
           {properties.map((property) => (
@@ -191,13 +194,13 @@ export function ComparePresentation({
                 className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm text-ink-muted hover:text-danger"
               >
                 <X className="size-4" aria-hidden="true" />
-                Müqayisədən çıxar
+                {t("remove")}
               </button>
             </div>
           </div>
 
           <dl className="divide-y divide-line">
-            {ROWS.map((row) => (
+            {rows.map((row) => (
               <div key={row.label} className="grid gap-1 px-4 py-3">
                 <dt className="text-xs font-medium text-ink-muted">{row.label}</dt>
                 <dd className="text-sm text-ink">{row.render(selected)}</dd>
@@ -212,7 +215,7 @@ export function ComparePresentation({
           <thead>
             <tr className="border-b border-line bg-beige">
               <th className="w-40 shrink-0 px-4 py-3 text-left text-xs font-medium tracking-wide text-ink-muted uppercase">
-                Əmlak
+                {t("property")}
               </th>
               {properties.map((property) => (
                 <th key={property.id} className="min-w-52 px-4 py-3 text-left align-top">
@@ -241,7 +244,7 @@ export function ComparePresentation({
                       className="inline-flex min-h-11 w-fit items-center gap-1 text-xs text-ink-muted hover:text-danger"
                     >
                       <X className="size-3.5" aria-hidden="true" />
-                      Çıxar
+                      {t("removeShort")}
                     </button>
                   </div>
                 </th>
@@ -249,7 +252,7 @@ export function ComparePresentation({
             </tr>
           </thead>
           <tbody>
-            {ROWS.map((row, rowIndex) => (
+            {rows.map((row, rowIndex) => (
               <tr
                 key={row.label}
                 className={cn(
@@ -273,7 +276,7 @@ export function ComparePresentation({
 
       {properties.length < sourceCount ? (
         <p role="status" className="text-sm text-ink-muted">
-          Bəzi elanlar artıq mövcud deyil və ya arxivə salınıb, ona görə göstərilmir.
+          {t("missingNotice")}
         </p>
       ) : null}
     </div>
@@ -281,6 +284,8 @@ export function ComparePresentation({
 }
 
 export function CompareTable() {
+  const t = useTranslations("property.compareTable");
+  const compareT = useTranslations("property.compare");
   const { ids, ready, remove, clear } = useCompareList();
   const [properties, setProperties] = useState<CompareProperty[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -321,14 +326,14 @@ export function CompareTable() {
         <div className="flex flex-col items-center gap-4">
           <EmptyState
             icon={<GitCompareArrows className="size-6" aria-hidden="true" />}
-            title="Seçilmiş elanlar artıq əlçatan deyil"
-            description="Elanlar silinib və ya arxivə salınıb. Siyahını təmizləyib yeni əmlaklar seçə bilərsiniz."
-            action={{ href: "/emlaklar", label: "Yeni əmlak seç" }}
+            title={t("unavailableTitle")}
+            description={t("unavailableDescription")}
+            action={{ href: "/emlaklar", label: t("chooseNew") }}
             className="w-full"
           />
           <ConfirmClearButton
-            title="Müqayisə siyahısı təmizlənsin?"
-            description="Əlçatan olmayan bütün seçimlər siyahıdan çıxarılacaq."
+            title={compareT("clearTitle")}
+            description={t("unavailableClear")}
             onConfirm={clear}
           />
         </div>
@@ -338,9 +343,9 @@ export function CompareTable() {
     return (
       <EmptyState
         icon={<GitCompareArrows className="size-6" aria-hidden="true" />}
-        title="Müqayisə siyahınız boşdur"
-        description="Əmlak kartlarındakı müqayisə düyməsi ilə elanları buraya əlavə edin."
-        action={{ href: "/emlaklar", label: "Əmlaklara bax" }}
+        title={t("emptyTitle")}
+        description={t("emptyDescription")}
+        action={{ href: "/emlaklar", label: t("view") }}
       />
     );
   }

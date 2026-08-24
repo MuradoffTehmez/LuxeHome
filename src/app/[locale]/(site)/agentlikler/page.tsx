@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/lib/constants";
+import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
@@ -11,22 +13,25 @@ import { getAgencies } from "@/lib/queries";
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = buildMetadata({
-  title: "Agentliklər",
-  description: "Luxe Home Estate platformasında təsdiqlənmiş daşınmaz əmlak agentlikləri.",
-  path: "/agentlikler",
-  keywords: ["əmlak agentliyi", "daşınmaz əmlak agentlikləri", "Bakıda əmlak agentliyi"],
-});
+type PageProps = { params: Promise<{ locale: string }> };
 
-export default async function AgenciesPage() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.agenciesPage" });
+  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/agentlikler", locale: locale as Locale });
+}
+
+export default async function AgenciesPage({ params }: PageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "listings.agenciesPage" });
   const agencies = await getAgencies();
 
   return (
     <>
       <PageHeader
-        eyebrow="Tərəfdaşlar"
-        title="Agentliklər"
-        description="Platformada təsdiqlənmiş daşınmaz əmlak agentlikləri."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
 
       <Section tone="ivory">
@@ -41,8 +46,8 @@ export default async function AgenciesPage() {
             </div>
           ) : (
             <EmptyState
-              title="Hazırda təsdiqlənmiş agentlik yoxdur"
-              description="Yeni agentliklər təsdiqləndikcə bu səhifədə göstəriləcək."
+              title={t("emptyTitle")}
+              description={t("emptyDescription")}
             />
           )}
         </Container>
