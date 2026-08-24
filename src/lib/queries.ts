@@ -567,6 +567,65 @@ export async function getAgencyEmployees(agencyId: string) {
   });
 }
 
+/** Panel — Security səhifəsi: son giriş cəhdləri. */
+export async function getAdminLoginAttempts(limit = 50) {
+  return prisma.loginAttempt.findMany({
+    select: { id: true, email: true, ip: true, success: true, reason: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+}
+
+/** Panel — Security səhifəsi: bütün əməkdaşların aktiv sessiyaları. */
+export async function getAdminActiveSessions(limit = 100) {
+  return prisma.session.findMany({
+    where: { revokedAt: null, expiresAt: { gt: new Date() } },
+    select: {
+      id: true,
+      ip: true,
+      userAgent: true,
+      lastSeenAt: true,
+      createdAt: true,
+      authKind: true,
+      user: { select: { id: true, name: true, email: true, accountType: true } },
+    },
+    orderBy: { lastSeenAt: "desc" },
+    take: limit,
+  });
+}
+
+/** Panel — Security səhifəsi: uğursuz cəhdlərə görə kilidlənmiş hesablar. */
+export async function getAdminLockedUsers() {
+  return prisma.user.findMany({
+    where: { lockedUntil: { gt: new Date() } },
+    select: { id: true, name: true, email: true, lockedUntil: true, failedAttempts: true },
+    orderBy: { lockedUntil: "desc" },
+  });
+}
+
+/** Panel — Audit Log səhifəsi, səhifələnmiş. */
+export async function getAdminAuditLog(page = 1, pageSize = ADMIN_PAGE_SIZE) {
+  const [entries, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      select: {
+        id: true,
+        userEmail: true,
+        action: true,
+        entity: true,
+        entityId: true,
+        summary: true,
+        ip: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.auditLog.count(),
+  ]);
+  return { entries, total, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
+}
+
 /** Panel — moderasiya növbəsi: kənar istifadəçilərin göndərdiyi təsdiq gözləyən elanlar. */
 export async function getModerationQueue() {
   return prisma.property.findMany({

@@ -4,6 +4,7 @@ import {
   Building2,
   ClipboardCheck,
   Contact,
+  History,
   Images,
   Inbox,
   LayoutDashboard,
@@ -11,6 +12,7 @@ import {
   Route,
   SearchCheck,
   Settings,
+  ShieldAlert,
   ShieldCheck,
   Sparkles,
   Tags,
@@ -38,10 +40,12 @@ const ICONS: Record<string, LucideIcon> = {
   Settings,
   Route,
   SearchCheck,
+  ShieldAlert,
   ShieldCheck,
   Tags,
   BarChart3,
   ClipboardCheck,
+  History,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

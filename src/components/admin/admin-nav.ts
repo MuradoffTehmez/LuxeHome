@@ -49,6 +49,8 @@ export const adminNav: AdminNavGroup[] = [
     items: [
       { label: "İstifadəçilər", href: "/admin/istifadeciler", icon: "Users" },
       { label: "Hesablar", href: "/admin/hesablar", icon: "Contact" },
+      { label: "Təhlükəsizlik", href: "/admin/security", icon: "ShieldAlert" },
+      { label: "Audit jurnalı", href: "/admin/audit", icon: "History" },
       { label: "Hesabım", href: "/admin/hesabim", icon: "UserCog" },
       { label: "Parametrlər", href: "/admin/parametrler", icon: "Settings" },
     ],
