@@ -1,16 +1,17 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { saveThemePreference } from "@/lib/theme-actions";
 
 const CYCLE = ["light", "dark", "system"] as const;
 const ICONS = { light: Sun, dark: Moon, system: Monitor } as const;
-const LABELS = { light: "Açıq", dark: "Tünd", system: "Sistem" } as const;
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("common.theme");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export function ThemeToggle() {
         setTheme(next);
         void saveThemePreference(next);
       }}
-      aria-label={`Mövzu: ${LABELS[current]}. Dəyişmək üçün klikləyin.`}
+      aria-label={t("toggle", { theme: t(current) })}
     >
       <Icon className="size-5" aria-hidden="true" />
     </button>

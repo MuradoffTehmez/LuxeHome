@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { LayoutDashboard, LogIn, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,7 @@ export function AccountMenu({
 }) {
   const [state, setState] = useState<MenuState>({ status: "loading" });
   const pathname = usePathname();
+  const t = useTranslations("auth");
 
   useEffect(() => {
     let active = true;
@@ -73,9 +75,9 @@ export function AccountMenu({
   if (state.status === "anonymous") {
     return (
       <div className={cn("flex items-center gap-3", variant === "mobile" && "flex-col items-stretch gap-2")}>
-        <Link href="/daxil-ol" aria-label="Daxil ol" className={linkClass}>
+        <Link href="/daxil-ol" aria-label={t("login")} className={linkClass}>
           <LogIn className="size-4" aria-hidden="true" />
-          <span className={cn(variant === "desktop" && "sr-only 2xl:not-sr-only")}>Daxil ol</span>
+          <span className={cn(variant === "desktop" && "sr-only 2xl:not-sr-only")}>{t("login")}</span>
         </Link>
         <Link
           href="/qeydiyyat"
@@ -87,7 +89,7 @@ export function AccountMenu({
               : "border-ink-soft/40 text-ink hover:border-gold hover:text-gold-deep hover:bg-gold/5",
           )}
         >
-          Qeydiyyat
+          {t("register")}
         </Link>
       </div>
     );
@@ -96,7 +98,7 @@ export function AccountMenu({
   return (
     <Link
       href={state.isStaff ? "/admin" : "/kabinet"}
-      aria-label={state.isStaff ? "İdarə paneli" : `${state.name} kabineti`}
+      aria-label={state.isStaff ? t("adminPanel") : state.name}
       className={linkClass}
     >
       {state.isStaff ? (
@@ -105,7 +107,7 @@ export function AccountMenu({
         <UserRound className="size-4" aria-hidden="true" />
       )}
       <span className={cn("max-w-28 truncate", variant === "desktop" && "sr-only 2xl:not-sr-only")}>
-        {state.isStaff ? "İdarə paneli" : state.name}
+        {state.isStaff ? t("adminPanel") : state.name}
       </span>
     </Link>
   );

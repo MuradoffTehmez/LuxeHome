@@ -1,31 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Heart, Menu, Phone, Plus, Search } from "lucide-react";
 import { navigation, siteConfig } from "@/config/site";
 import { isNavigationItemActive } from "@/lib/ui/navigation";
 import { cn } from "@/lib/utils";
-import { ButtonLink, IconButton } from "@/components/ui/button";
+import { ButtonLink, IconButton, buttonClassName } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Overlay } from "@/components/ui/overlay";
 import { AccountMenu } from "./account-menu";
 import { Logo } from "./logo";
+import { LocaleSwitcher } from "./locale-switcher";
 import { ThemeToggle } from "./theme-toggle";
 
-const COMPACT_NAVIGATION_LABELS: Record<string, string> = {
-  "/": "Ana",
-  "/emlaklar": "Əmlaklar",
-  "/layiheler": "Komplekslər",
-  "/agentlikler": "Agentliklər",
-  "/xidmetler": "Xidmətlər",
-  "/blog": "Bloq",
-  "/elaqe": "Əlaqə",
+/** `siteConfig.navigation`-dakı href → tərcümə açarı. Kompakt (xl-dən aşağı) etiket
+ * də eyni açardan gəlir — ayrıca sabit lüğət artıq lazım deyil. */
+const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" | "services" | "blog" | "contact"> = {
+  "/": "home",
+  "/emlaklar": "properties",
+  "/layiheler": "projects",
+  "/agentlikler": "agencies",
+  "/xidmetler": "services",
+  "/blog": "blog",
+  "/elaqe": "contact",
 };
 
-/** Fixed, responsive ictimai sayt başlığı. */
-export function Navbar() {
+/**
+ * Fixed, responsive ictimai sayt başlığı.
+ *
+ * `showLocaleSwitcher` qəsdən defolt `false`-dur: `(account)` qrupu (kabinet,
+ * daxil-ol, qeydiyyat) dil prefiksindən kənardadır — orada dil dəyişmə cəhdi
+ * mövcud olmayan `/en/kabinet` kimi marşruta apararaq 404 yaradardı.
+ */
+export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: boolean }) {
+  const t = useTranslations("navigation");
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -102,7 +112,7 @@ export function Navbar() {
                           : "text-ink-soft hover:text-ink",
                     )}
                   >
-                    {COMPACT_NAVIGATION_LABELS[item.href] ?? item.label}
+                    {NAV_KEYS[item.href] ? t(NAV_KEYS[item.href]) : item.label}
                     <span
                       aria-hidden="true"
                       className={cn(
@@ -120,11 +130,12 @@ export function Navbar() {
 
         <div className="ml-auto flex shrink-0 items-center gap-1 lg:ml-0 xl:gap-1.5">
           <ThemeToggle />
+          {showLocaleSwitcher && <LocaleSwitcher isOverlay={isOverlay} />}
 
           <Link
             href="/favoritler"
-            aria-label="Favorit əmlaklarım"
-            title="Favoritlər"
+            aria-label={t("myFavorites")}
+            title={t("favorites")}
             className={cn(
               "hidden size-11 items-center justify-center rounded-xs transition-colors duration-200 xl:inline-flex",
               isOverlay ? "text-white hover:text-gold-soft" : "text-ink-soft hover:text-gold-deep",
@@ -149,11 +160,11 @@ export function Navbar() {
             className="hidden px-3 lg:inline-flex xl:px-4"
           >
             <Plus className="size-4" aria-hidden="true" />
-            Elan ver
+            {t("listProperty")}
           </ButtonLink>
 
           <IconButton
-            label={menuOpen ? "Menyu açıqdır" : "Menyunu aç"}
+            label={menuOpen ? t("menuOpen") : t("openMenu")}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
             className={cn(
@@ -189,7 +200,7 @@ export function Navbar() {
                       active ? "text-gold-deep" : "text-ink",
                     )}
                   >
-                    {item.label}
+                    {NAV_KEYS[item.href] ? t(NAV_KEYS[item.href]) : item.label}
                     {active ? <span aria-hidden="true" className="h-px w-6 bg-gold" /> : null}
                   </Link>
                 </li>
@@ -199,29 +210,25 @@ export function Navbar() {
         </nav>
 
         <div className="mt-7 border-t border-line pt-6">
-          <p className="editorial-kicker mb-4 text-ink-muted">Sürətli keçidlər</p>
+          <p className="editorial-kicker mb-4 text-ink-muted">{t("quickLinks")}</p>
           <div className="flex flex-col gap-3">
-            <ButtonLink
+            <Link
               href="/emlaklar"
               onClick={() => setMenuOpen(false)}
-              variant="primary"
-              size="lg"
-              fullWidth
+              className={buttonClassName("primary", "lg", true)}
             >
               <Search className="size-4" aria-hidden="true" />
-              Əmlak axtar
-            </ButtonLink>
+              {t("searchProperties")}
+            </Link>
             <AccountMenu variant="mobile" />
-            <ButtonLink
+            <Link
               href="/favoritler"
               onClick={() => setMenuOpen(false)}
-              variant="outline"
-              size="lg"
-              fullWidth
+              className={buttonClassName("outline", "lg", true)}
             >
               <Heart className="size-4" aria-hidden="true" />
-              Favoritlərim
-            </ButtonLink>
+              {t("myFavorites")}
+            </Link>
             <a
               href={siteConfig.phoneHref}
               className="inline-flex min-h-14 items-center justify-center gap-2 text-sm font-medium text-ink-soft transition-colors hover:text-gold-deep"

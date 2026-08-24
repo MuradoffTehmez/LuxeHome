@@ -77,6 +77,19 @@ export function Button({
   );
 }
 
+/**
+ * `ButtonLink`-in vizual siniflərini `next/link` olmayan link komponentlərində
+ * (məs. lokallaşdırılmış `@/i18n/navigation`-dakı `Link`) istifadə etmək üçün.
+ */
+export function buttonClassName(
+  variant: Variant = "primary",
+  size: Size = "md",
+  fullWidth = false,
+  className?: string,
+): string {
+  return cn(BASE, VARIANTS[variant], SIZES[size], fullWidth && "w-full", className);
+}
+
 type ButtonLinkProps = CommonProps &
   Omit<React.ComponentProps<typeof Link>, "children" | "className">;
 
