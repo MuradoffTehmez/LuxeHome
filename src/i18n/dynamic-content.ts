@@ -178,5 +178,18 @@ export function localizeKnownContent<T extends { slug: string }>(
 ): T {
   if (locale === "az") return value;
   const translated = CATALOGS[kind][value.slug]?.[locale];
-  return translated ? { ...value, ...translated } : value;
+  if (!translated) return value;
+
+  if (kind === "property" || kind === "service") {
+    const metaTitle = translated.title;
+    const metaDescription = translated.shortDescription ?? translated.description;
+    return {
+      ...value,
+      ...translated,
+      ...(metaTitle ? { metaTitle, ogTitle: metaTitle } : {}),
+      ...(metaDescription ? { metaDescription, ogDescription: metaDescription } : {}),
+    };
+  }
+
+  return { ...value, ...translated };
 }

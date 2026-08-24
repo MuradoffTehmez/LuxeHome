@@ -80,7 +80,7 @@ export function Navbar({ showLocaleSwitcher = false }: { showLocaleSwitcher?: bo
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="shrink-0 lg:hidden xl:inline-flex"
+          className="shrink-0 max-[359px]:[&>span]:hidden lg:hidden xl:inline-flex"
         />
         <Logo
           tone={isOverlay ? "dark" : "light"}

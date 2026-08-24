@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { LocaleDocumentSync } from "@/components/site/locale-document-sync";
+import type { Locale } from "@/lib/constants";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -44,5 +46,10 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  return children;
+  return (
+    <>
+      <LocaleDocumentSync locale={locale as Locale} />
+      {children}
+    </>
+  );
 }

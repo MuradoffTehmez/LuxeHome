@@ -4,6 +4,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { isStaging } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
+import { localeFromPathname } from "@/i18n/path-locale";
 import {
   SESSION_COOKIE,
   SESSION_SUBJECT,
@@ -128,6 +129,7 @@ export async function middleware(request: NextRequest) {
 
   if (!isAccountFlowRoute(pathname)) {
     const response = intlMiddleware(request);
+    response.headers.set("Content-Language", localeFromPathname(pathname));
     if (isStaging()) response.headers.set("X-Robots-Tag", "noindex, nofollow");
     return response;
   }
