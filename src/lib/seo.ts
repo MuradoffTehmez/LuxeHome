@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
-import { LISTING_TYPES } from "@/lib/constants";
+import {
+  DEFAULT_LOCALE,
+  LISTING_TYPES,
+  type Locale,
+} from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // METADATA KÖMƏKÇİLƏRİ
 // ---------------------------------------------------------------------------
+
+export type IndexPolicy = "index" | "noindex-follow" | "private";
 
 type PageMetaInput = {
   title: string;
@@ -13,7 +19,10 @@ type PageMetaInput = {
   image?: string | null;
   type?: "website" | "article";
   publishedTime?: string;
+  /** @deprecated Yeni kodda `indexPolicy` istifadə olunmalıdır. */
   noIndex?: boolean;
+  indexPolicy?: IndexPolicy;
+  locale?: Locale;
   /** Səhifəyə xas açar sözlər — verilməzsə kök layout-dakı ümumi siyahı qüvvədə qalır. */
   keywords?: string[];
   /** Duplikat kontent halında fərqli canonical ünvana işarə etmək üçün — adətən boş qalır. */
@@ -33,31 +42,66 @@ export function buildMetadata({
   type = "website",
   publishedTime,
   noIndex = false,
+  indexPolicy = "index",
+  locale = DEFAULT_LOCALE,
   keywords,
   canonicalPath,
   ogTitle,
   ogDescription,
   ogImage,
 }: PageMetaInput): Metadata {
-  const url = siteUrl(path);
-  const canonicalUrl = canonicalPath ? siteUrl(canonicalPath) : url;
+  const localePrefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
+  const localizedPath = path === "/" ? `${localePrefix}/` : `${localePrefix}${path}`;
+  const url = siteUrl(localizedPath);
+  // RU/EN DB məzmunu hələ lokallaşdırılmadığı üçün canonical həmişə AZ route-udur.
+  // `null` qeyri-ekvivalent faceted səhifədə canonical-ın qəsdən buraxılmasıdır.
+  const canonicalUrl =
+    canonicalPath === null ? null : siteUrl(canonicalPath === undefined ? path : canonicalPath);
   const resolvedOgTitle = ogTitle || title;
   const resolvedOgDescription = ogDescription || description;
   const resolvedOgImage = ogImage || image;
   const images = resolvedOgImage
-    ? [{ url: resolvedOgImage, width: 1200, height: 630, alt: resolvedOgTitle }]
-    : undefined;
+    ? [
+        {
+          url: resolvedOgImage.startsWith("http") ? resolvedOgImage : siteUrl(resolvedOgImage),
+          width: 1200,
+          height: 630,
+          alt: resolvedOgTitle,
+        },
+      ]
+    : [{ url: siteUrl("/og-default.png"), width: 1200, height: 630, alt: resolvedOgTitle }];
+
+  const effectivePolicy: IndexPolicy =
+    isStaging() || indexPolicy === "private"
+      ? "private"
+      : noIndex || locale !== DEFAULT_LOCALE || indexPolicy === "noindex-follow"
+        ? "noindex-follow"
+        : "index";
+  const robots: Metadata["robots"] =
+    effectivePolicy === "index"
+      ? undefined
+      : effectivePolicy === "noindex-follow"
+        ? {
+            index: false,
+            follow: true,
+            googleBot: { index: false, follow: true, "max-image-preview": "large" },
+          }
+        : { index: false, follow: false, googleBot: { index: false, follow: false } };
+  const ogLocales: Record<Locale, string> = {
+    az: "az_AZ",
+    ru: "ru_RU",
+    en: "en_US",
+  };
 
   return {
     title,
     description,
     ...(keywords ? { keywords } : {}),
-    alternates: { canonical: canonicalUrl },
-    // Staging heç bir səhifəsi ilə indeksə düşməməlidir
-    robots: noIndex || isStaging() ? { index: false, follow: false } : undefined,
+    ...(canonicalUrl ? { alternates: { canonical: canonicalUrl } } : {}),
+    robots,
     openGraph: {
       type,
-      locale: "az_AZ",
+      locale: ogLocales[locale],
       url,
       siteName: siteConfig.name,
       title: resolvedOgTitle,
@@ -66,10 +110,10 @@ export function buildMetadata({
       ...(publishedTime ? { publishedTime } : {}),
     },
     twitter: {
-      card: resolvedOgImage ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: resolvedOgTitle,
       description: resolvedOgDescription,
-      images: resolvedOgImage ? [resolvedOgImage] : undefined,
+      images: [images[0].url],
     },
   };
 }
@@ -310,10 +354,48 @@ export function itemListSchema(items: { name: string; path: string }[]) {
   };
 }
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+function cleanJsonLd(value: unknown): JsonValue | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  if (Array.isArray(value)) {
+    const items = value.map(cleanJsonLd).filter((item): item is JsonValue => item !== undefined);
+    return items.length > 0 ? items : undefined;
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value)
+      .map(([key, item]) => [key, cleanJsonLd(item)] as const)
+      .filter((entry): entry is readonly [string, JsonValue] => entry[1] !== undefined);
+    return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+  }
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return value;
+  }
+  return undefined;
+}
+
+/**
+ * JSON-LD-ni HTML `<script>` kontekstinə təhlükəsiz serialize edir.
+ * Təmizləmə schema-da boş massiv/string və `undefined` yaranmasının qarşısını alır.
+ */
+export function serializeJsonLd(schema: object): string {
+  return JSON.stringify(cleanJsonLd(schema) ?? {}).replace(
+    /[<>&\u2028\u2029]/g,
+    (character) =>
+      ({
+        "<": "\\u003c",
+        ">": "\\u003e",
+        "&": "\\u0026",
+        "\u2028": "\\u2028",
+        "\u2029": "\\u2029",
+      })[character] ?? character,
+  );
+}
+
 /** JSON-LD blokunu səhifəyə əlavə etmək üçün hazır props qaytarır. */
 export function jsonLd(schema: object) {
   return {
     type: "application/ld+json" as const,
-    dangerouslySetInnerHTML: { __html: JSON.stringify(schema) },
+    dangerouslySetInnerHTML: { __html: serializeJsonLd(schema) },
   };
 }

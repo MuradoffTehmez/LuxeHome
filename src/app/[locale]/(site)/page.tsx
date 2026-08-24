@@ -1,5 +1,7 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { hasLocale } from "next-intl";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -16,12 +18,15 @@ import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Hero } from "@/components/site/hero";
+import { HomeSeoIntro } from "@/components/site/home-seo-intro";
 import { MobileCategoryRail } from "@/components/site/mobile-category-rail";
 import { PropertyCard } from "@/components/site/property-card";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { ProjectCard } from "@/components/site/project-card";
 import { PostCard } from "@/components/site/post-card";
 import { siteConfig } from "@/config/site";
+import { routing } from "@/i18n/routing";
+import { buildMetadata } from "@/lib/seo";
 import {
   getBlogCategories,
   getFeaturedProperties,
@@ -36,6 +41,20 @@ import {
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
 export const dynamic = "force-dynamic";
 
+type HomePageProps = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
+
+  return buildMetadata({
+    title: "Bakıda daşınmaz əmlak — mənzil, villa və obyektlər",
+    description:
+      "Bakıda mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyektlərinin satışı və icarəsi. Real əmlak elanlarını rahat filtrləyin və Luxe Home Estate ilə əlaqə saxlayın.",
+    path: "/",
+    locale: resolvedLocale,
+  });
+}
 
 
 const WHY_ITEMS = [
@@ -101,7 +120,9 @@ const BLOG_LAYOUT = [
   "lg:col-span-5",
 ];
 
-export default async function HomePage() {
+export default async function HomePage({ params }: HomePageProps) {
+  const { locale } = await params;
+  const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const [featured, propertyTypes, services, projects, posts, filterOptions, categories] =
     await Promise.all([
       getFeaturedProperties(6),
@@ -136,6 +157,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero types={typeOptions} cities={cityOptions} />
+      <HomeSeoIntro locale={resolvedLocale} />
 
       {/* ------------------------------------------------------------------ */}
       {/* SEÇİLMİŞ ƏMLAKLAR                                                  */}

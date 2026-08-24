@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
 import { Container, Section } from "@/components/ui/container";
 import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
 import { ResponsiveToolbar } from "@/components/ui/responsive-toolbar";
@@ -11,6 +13,8 @@ import { SearchPanel } from "@/components/site/search-panel";
 import { SortSelect } from "@/components/site/sort-select";
 import { Pagination } from "@/components/ui/pagination";
 import { buildMetadata, itemListSchema, jsonLd } from "@/lib/seo";
+import { classifyPropertySearchParams } from "@/lib/seo-indexing";
+import { routing } from "@/i18n/routing";
 import { getProperties, getFilterOptions } from "@/lib/queries";
 import { formatNumber } from "@/lib/utils";
 import {
@@ -29,28 +33,27 @@ import {
 export const dynamic = "force-dynamic";
 
 
-export const metadata: Metadata = buildMetadata({
-  title: "Əmlaklar",
-  description:
-    "Bakıda mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyektlərinin satışı və icarəsi. Axtarış filtri ilə sizə uyğun əmlakı tapın.",
-  path: "/emlaklar",
-  keywords: [
-    "əmlak elanları",
-    "Bakıda əmlak satışı",
-    "mənzil satışı",
-    "mənzil kirayə",
-    "villa satışı",
-    "günlük kirayə",
-    "aylıq kirayə",
-    "torpaq satışı",
-    "ofis icarəsi",
-    "yeni tikili mənzil",
-  ],
-});
-
 type Props = {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const [{ locale }, query] = await Promise.all([params, searchParams]);
+  const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
+  const decision = classifyPropertySearchParams(query);
+  const pageSuffix = decision.page > 1 ? ` — ${decision.page}-ci səhifə` : "";
+
+  return buildMetadata({
+    title: `Bakıda əmlak elanları${pageSuffix}`,
+    description:
+      "Bakıda mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyektlərinin satışı və icarəsi. Axtarış filtri ilə sizə uyğun əmlakı tapın.",
+    path: decision.canonicalPath ?? "/emlaklar",
+    canonicalPath: decision.canonicalPath,
+    indexPolicy: decision.indexPolicy,
+    locale: resolvedLocale,
+  });
+}
 
 const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
 
@@ -63,6 +66,8 @@ function positiveNumber(value: string | undefined): number | undefined {
 
 export default async function PropertiesPage({ searchParams }: Props) {
   const params = await searchParams;
+  const indexDecision = classifyPropertySearchParams(params);
+  if (!indexDecision.validPage) notFound();
 
   // --- URL → filtr obyekti ---------------------------------------------------
   const searchState = parsePropertySearchParams(params);
@@ -98,6 +103,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
     getProperties(filters),
     getFilterOptions(),
   ]);
+  if (page > totalPages) notFound();
 
   const typeOptions = filterOptions.types.map((type) => ({
     value: type.slug,

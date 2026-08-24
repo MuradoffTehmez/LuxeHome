@@ -24,6 +24,7 @@ const database = vi.hoisted(() => ({
   propertyTypeFindMany: vi.fn(),
   blogCategoryFindMany: vi.fn(),
   serviceFindMany: vi.fn(),
+  agencyFindMany: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -45,6 +46,7 @@ vi.mock("@/lib/prisma", () => ({
     propertyType: { findMany: database.propertyTypeFindMany },
     blogCategory: { findMany: database.blogCategoryFindMany },
     service: { findMany: database.serviceFindMany },
+    agency: { findMany: database.agencyFindMany },
   },
 }));
 
@@ -198,6 +200,7 @@ describe("ictimai məzmun sərhədi", () => {
       },
     ]);
     database.serviceFindMany.mockResolvedValue([]);
+    database.agencyFindMany.mockResolvedValue([]);
   });
 
   it("siyahı və sitemap nəticələrində demo qeydləri göstərmir", async () => {

@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Geist, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
-import { organizationSchema, websiteSchema } from "@/lib/seo";
+import { jsonLd, organizationSchema, websiteSchema } from "@/lib/seo";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import "./globals.css";
 
@@ -25,9 +24,6 @@ const geist = Geist({
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
-
-/** Google Analytics ölçmə ID-si — yalnız production-da yüklənir. */
-const GA_MEASUREMENT_ID = "G-54KSFRM17B";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -64,7 +60,12 @@ export const metadata: Metadata = {
   creator: siteConfig.legalName,
   publisher: siteConfig.legalName,
   formatDetection: { telephone: true, address: true, email: true },
-  alternates: { canonical: "/" },
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
+  other: {
+    seobility: "915a7ee78cdfc3bf8b2b272351e8ac86",
+  },
   openGraph: {
     type: "website",
     locale: "az_AZ",
@@ -107,37 +108,10 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning className={`${playfair.variable} ${geist.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_RUNTIME_SHIM }} />
-        {!isStaging() && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="gtag-init" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}');
-              `}
-            </Script>
-          </>
-        )}
       </head>
       <body className="min-h-dvh antialiased">
-        <script
-          type="application/ld+json"
-          // Struktur data statik obyektdən yaradılır — istifadəçi girişi daxil deyil.
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema()),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteSchema()),
-          }}
-        />
+        <script {...jsonLd(organizationSchema())} />
+        <script {...jsonLd(websiteSchema())} />
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
         </ThemeProvider>

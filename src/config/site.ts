@@ -75,6 +75,8 @@ export const siteConfig = {
   },
 } as const;
 
+export const PRODUCTION_SITE_URL = "https://luxehomeestate.az";
+
 export const navigation = [
   { label: "Ana səhifə", href: "/" },
   { label: "Əmlaklar", href: "/emlaklar" },
@@ -142,8 +144,39 @@ export function whatsappLink(message?: string): string {
  * prosesindən oxunur. Deploy skriptləri hər iki mərhələyə eyni mühitə uyğun `SITE_URL`
  * ötürməlidir; əks halda statik canonical URL-lər lokal ünvana bağlanar.
  */
+type SiteBaseUrlInput = {
+  nodeEnv?: string;
+  staging: boolean;
+  configuredUrl?: string;
+};
+
+export function resolveSiteBaseUrl(input: SiteBaseUrlInput): string {
+  let base = "http://localhost:3000";
+
+  if (input.nodeEnv === "production" && !input.staging) {
+    // Production canonical host deploy dəyişənindən asılı deyil. Yanlış və ya unudulmuş
+    // env dəyəri indeksdə alternativ host yaratmamalıdır.
+    base = PRODUCTION_SITE_URL;
+  } else if (input.configuredUrl) {
+    try {
+      const parsed = new URL(input.configuredUrl);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        base = parsed.origin;
+      }
+    } catch {
+      // Lokal development üçün təhlükəsiz fallback aşağıda saxlanılır.
+    }
+  }
+
+  return base.replace(/\/$/, "");
+}
+
 export function siteUrl(path = ""): string {
-  const base = (process.env.SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = resolveSiteBaseUrl({
+    nodeEnv: process.env.NODE_ENV,
+    staging: isStaging(),
+    configuredUrl: process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL,
+  });
   if (!path) return base;
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }

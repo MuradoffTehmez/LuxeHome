@@ -7,6 +7,7 @@ export const metadata = buildMetadata({
   title: "Favoritlər",
   description: "Yadda saxladığınız əmlak elanları.",
   path: "/favoritler",
+  indexPolicy: "noindex-follow",
 });
 
 export default function FavoritesPage() {

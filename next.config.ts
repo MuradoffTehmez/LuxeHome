@@ -58,6 +58,15 @@ const nextConfig: NextConfig = {
 
   // Cavab başlıqları — təhlükəsizlik
   async headers() {
+    const productionOnlyHeaders =
+      process.env.NODE_ENV === "production" && process.env.IS_STAGING !== "true"
+        ? [
+            {
+              key: "Strict-Transport-Security",
+              value: "max-age=31536000; includeSubDomains; preload",
+            },
+          ]
+        : [];
     return [
       {
         source: "/:path*",
@@ -69,6 +78,7 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(), payment=()",
           },
+          ...productionOnlyHeaders,
         ],
       },
       {

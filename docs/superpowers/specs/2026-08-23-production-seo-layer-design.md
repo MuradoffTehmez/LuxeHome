@@ -3,6 +3,8 @@
 Tarix: 23 avqust 2026
 Status: implementasiya öncəsi review
 
+Yenilənmə: 24 avqust 2026 — `next-intl` locale route-ları nəzərə alındı.
+
 ## 1. Məqsəd və uğur meyarı
 
 Bu işin məqsədi Luxe Home Estate saytının SEO qatını ölçülə bilən production səviyyəsinə
@@ -44,6 +46,14 @@ sahələri mövcuddur. Aşağıdakı boşluqlar production qəbulunu bloklayır:
 - canlı domen anonim browser/crawler sorğularında Cloudflare Managed Challenge qaytarır;
   verified Googlebot davranışı Search Console və Cloudflare ilə ayrıca yoxlanmalıdır.
 
+24 avqust 2026 tarixli Seobility PDF yoxlaması canlı `https://www.luxehomeestate.az/` üçün
+sonrakı ayrıca ölçmə təqdim edir: HTTP 200, ümumi SEO score 54%, meta 95%, page quality 38%,
+page structure 79%, link structure 25%, server 0%. Hesabat H1-in olmamasını, 213 sözlük nazik
+ana səhifəni, query-parametrli daxili linkləri, üç boş logo alt-ını, `www`-dan apex-ə redirect
+olmamasını və `private, no-cache, no-store` cavabında 0.71 saniyə response time-ı göstərir.
+HSTS artıq edge-də `max-age=15552000` ilə mövcuddur. Bu PDF bir alətin lab auditidir; Lighthouse,
+CrUX və Search Console sübutunu əvəz etmir, amma final müqayisə üçün 54% baseline kimi saxlanılır.
+
 ## 3. Seçilən yanaşma
 
 Seçilən həll ayrıca ağır SEO CMS modeli yaratmadan data-backed SEO qatı qurur:
@@ -59,6 +69,24 @@ Bu yanaşma route copy-sinin kor-koranə hardcode edilməsinin qarşısını al�
 əlavə `SeoLanding` CRUD subsystem-i yaratmır.
 
 ## 4. İndekslənmə siyasəti
+
+### 4.0 Dil variantları
+
+Cari `next-intl` konfiqurasiyası `az`, `ru` və `en` route-larını yaradır, lakin yalnız kiçik UI
+mesaj dəsti tərcümə olunub; public DB məzmunu və səhifə copy-si Azərbaycan dilində qalır. Buna
+görə production indeks siyasəti belədir:
+
+- Azərbaycan dili default, canonical və indexable variantdır (`localePrefix: "as-needed"`,
+  yəni `/emlaklar`);
+- `/ru/**` və `/en/**` route-ları real lokal məzmun sahələri yaradılana qədər
+  `noindex, follow` olur, sitemap-a və `hreflang` siyahısına daxil edilmir;
+- həmin route-ların canonical-ı semantik cəhətdən eyni AZ route-a işarə edir;
+- DB title/description/body və landing copy-si locale üzrə ayrıca saxlanılmadan RU/EN indeksə
+  açılmır;
+- gələcəkdə yalnız tam tərcümə olunmuş route-lar qarşılıqlı `hreflang` və `x-default` ilə açılır.
+
+Bu siyasət UI dil seçimini saxlayır, amma üç dildə eyni Azərbaycan məzmununun duplikat kimi
+indekslənməsinə yol vermir.
 
 ### 4.1 Indexable səhifələr
 
@@ -125,7 +153,7 @@ FAQ və əlaqəli route-larla təsvir edir:
 - `/kommersiya-obyektleri`;
 - `/ofisler`.
 
-Root səviyyəli registry route-ları `src/app/(site)/[seoLanding]/page.tsx` vasitəsilə resolve olunur;
+Root səviyyəli registry route-ları `src/app/[locale]/(site)/[seoLanding]/page.tsx` vasitəsilə resolve olunur;
 mövcud statik route-lar Next.js prioritetinə görə əvvəl seçilir. Registry-də olmayan slug 404-dür.
 
 ### 6.2 Taksonomiya route-ları
@@ -164,6 +192,8 @@ Landing yalnız aşağıdakı şərtlərdə indexable olur:
 - GSC verification metadata-sı yalnız env dəyişəni varsa;
 - staging-də məcburi `noindex, nofollow`;
 - Open Graph və Twitter üçün eyni canonical image/description mənbəyi.
+- locale-aware OG dili və AZ canonical mapping; natamam RU/EN route-ları üçün məcburi
+  `noindex, follow`.
 
 Ana səhifə ayrıca title, description və canonical alır. Hero H1-i “Bakıda daşınmaz əmlak
 satışı və icarəsi” olur; sloqan vizual ikinci səviyyədə qalır. Hero-dan sonra 100–180 sözlük

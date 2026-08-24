@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
@@ -8,6 +10,8 @@ import { PostCard } from "@/components/site/post-card";
 import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import { buildMetadata } from "@/lib/seo";
+import { classifyBlogSearchParams } from "@/lib/seo-indexing";
+import { routing } from "@/i18n/routing";
 import { getPosts, getBlogCategories } from "@/lib/queries";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -15,19 +19,32 @@ import { getPosts, getBlogCategories } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 
-export const metadata: Metadata = buildMetadata({
-  title: "Blog",
-  description:
-    "Daşınmaz əmlak bazarı, interyer dizaynı, tikinti yenilikləri və investisiya haqqında faydalı məqalələr.",
-  path: "/blog",
-});
-
 type Props = {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const [{ locale }, query] = await Promise.all([params, searchParams]);
+  const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
+  const decision = classifyBlogSearchParams(query);
+  const pageSuffix = decision.page > 1 ? ` — ${decision.page}-ci səhifə` : "";
+
+  return buildMetadata({
+    title: `Daşınmaz əmlak bloqu${pageSuffix}`,
+    description:
+      "Daşınmaz əmlak bazarı, interyer dizaynı, tikinti yenilikləri və investisiya haqqında faydalı məqalələr.",
+    path: decision.canonicalPath ?? "/blog",
+    canonicalPath: decision.canonicalPath,
+    indexPolicy: decision.indexPolicy,
+    locale: resolvedLocale,
+  });
+}
+
 export default async function BlogPage({ searchParams }: Props) {
   const params = await searchParams;
+  const indexDecision = classifyBlogSearchParams(params);
+  if (!indexDecision.validPage) notFound();
 
   const categorySlug =
     typeof params.kateqoriya === "string" ? params.kateqoriya : undefined;
@@ -38,6 +55,7 @@ export default async function BlogPage({ searchParams }: Props) {
     getPosts({ categorySlug, page }),
     getBlogCategories(),
   ]);
+  if (page > postsResult.totalPages) notFound();
 
   const activeCategory = categorySlug
     ? categories.find((c) => c.slug === categorySlug)

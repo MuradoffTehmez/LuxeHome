@@ -776,26 +776,41 @@ export async function getBlogCategories() {
 // ---------------------------------------------------------------------------
 
 export async function getSitemapEntries() {
-  const [properties, projects, services, posts] = await Promise.all([
+  const [properties, projects, services, posts, agencies] = await Promise.all([
     prisma.property.findMany({
-      where: publicPropertyWhere(),
-      select: { slug: true, updatedAt: true },
+      where: {
+        ...publicPropertyWhere(),
+        status: { in: [PROPERTY_STATUSES.PUBLISHED, PROPERTY_STATUSES.RESERVED] },
+        noIndex: false,
+        canonicalUrl: null,
+      },
+      select: { slug: true, updatedAt: true, status: true, noIndex: true, canonicalUrl: true },
     }),
     prisma.project.findMany({
-      where: { deletedAt: null, isDemo: false, isActive: true },
-      select: { slug: true, updatedAt: true },
+      where: { deletedAt: null, isDemo: false, isActive: true, noIndex: false, canonicalUrl: null },
+      select: { slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
     }),
     prisma.service.findMany({
-      where: { isActive: true },
-      select: { slug: true, updatedAt: true },
+      where: { isActive: true, noIndex: false, canonicalUrl: null },
+      select: { slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
     }),
     prisma.blogPost.findMany({
-      where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
+      where: {
+        deletedAt: null,
+        isDemo: false,
+        status: POST_STATUSES.PUBLISHED,
+        noIndex: false,
+        canonicalUrl: null,
+      },
+      select: { slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
+    }),
+    prisma.agency.findMany({
+      where: { isVerified: true, user: { isActive: true } },
       select: { slug: true, updatedAt: true },
     }),
   ]);
 
-  return { properties, projects, services, posts };
+  return { properties, projects, services, posts, agencies, landings: [] };
 }
 
 // ---------------------------------------------------------------------------

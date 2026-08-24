@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { Container, Section } from "@/components/ui/container";
 import { ThemeSync } from "@/components/theme-sync";
 import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, ACCOUNT_TYPE_LABELS } from "@/lib/constants";
 import { CabinetShell } from "./cabinet-shell";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
+};
 
 export const dynamic = "force-dynamic";
 

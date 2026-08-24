@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { PostCardData, ProjectCardData } from "@/lib/queries";
 import { Hero } from "../hero";
+import { HomeSeoIntro } from "../home-seo-intro";
 import { MobileCategoryRail } from "../mobile-category-rail";
 import { PostCard } from "../post-card";
 import { ProjectCard } from "../project-card";
@@ -15,6 +16,32 @@ describe("ana səhifə discovery təcrübəsi", () => {
     expect(html).toContain("lg:min-h-[min(54rem,100dvh)]");
     expect(html).toContain("gap-8");
     expect(html).toContain("pb-6");
+  });
+
+  it("hero yalnız bir, kommersiya niyyətli H1 göstərir", () => {
+    const html = renderToStaticMarkup(<Hero types={[]} cities={[]} />);
+
+    expect(html.match(/<h1/g)).toHaveLength(1);
+    expect(html).toContain("Bakıda daşınmaz əmlak satışı və icarəsi");
+    expect(html).not.toMatch(/<h1[^>]*>\s*HƏYATINIZIN ƏN DƏYƏRLİ ÜNVANI/);
+  });
+
+  it("lokal giriş mətnindən təmiz kommersiya route-larına link verir", () => {
+    const html = renderToStaticMarkup(<HomeSeoIntro />);
+    const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const wordCount = text.split(" ").length;
+
+    expect(wordCount).toBeGreaterThanOrEqual(100);
+    expect(wordCount).toBeLessThanOrEqual(180);
+    for (const href of [
+      "/satilan-emlaklar",
+      "/kiraye-emlaklar",
+      "/bakida-satilan-menziller",
+      "/villalar",
+      "/layiheler",
+    ]) {
+      expect(html).toContain(`href="${href}"`);
+    }
   });
 
   it("kateqoriyaları mobil scroll-snap rail kimi əlçatan render edir", () => {
