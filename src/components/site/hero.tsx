@@ -36,16 +36,16 @@ export async function Hero({ types, cities }: HeroProps) {
 
       <Container
         size="wide"
-        className="grid min-h-[34rem] items-end gap-8 pt-[calc(var(--header-h)+4rem)] pb-6 sm:min-h-[40rem] lg:min-h-[min(54rem,100dvh)] lg:grid-cols-12 lg:gap-10 lg:pt-[calc(var(--header-h)+5rem)] lg:pb-10"
+        className="grid min-h-[34rem] min-w-0 items-end gap-8 pt-[calc(var(--header-h)+4rem)] pb-6 sm:min-h-[40rem] lg:min-h-[min(54rem,100dvh)] lg:grid-cols-12 lg:gap-10 lg:pt-[calc(var(--header-h)+5rem)] lg:pb-10"
       >
-        <div className="lg:col-span-7 lg:pb-10">
+        <div className="min-w-0 lg:col-span-7 lg:pb-10">
           <p className="editorial-kicker animate-fade-in flex items-center gap-3 text-gold-soft">
             <span aria-hidden="true" className="h-px w-10 bg-gold-soft/60" />
-            {siteConfig.slogan}
+            {t("eyebrow")}
           </p>
 
           <h1
-            className="animate-slide-up mt-6 max-w-[13ch] font-display text-[clamp(2.8rem,6.5vw,6.6rem)] leading-[0.94] tracking-[-0.05em] text-white"
+            className="animate-slide-up mt-6 max-w-[13ch] font-display text-[clamp(2.5rem,12vw,6.6rem)] leading-[0.94] tracking-[-0.05em] text-white [overflow-wrap:anywhere] sm:text-[clamp(2.8rem,6.5vw,6.6rem)]"
             style={{ animationDelay: "100ms" }}
           >
             {t("title")}
@@ -87,7 +87,7 @@ export async function Hero({ types, cities }: HeroProps) {
 
         {/* Axtarış paneli */}
         <div
-          className="animate-slide-up lg:col-span-12"
+          className="animate-slide-up min-w-0 lg:col-span-12"
           style={{ animationDelay: "400ms" }}
         >
           <SearchPanel types={types} cities={cities} />

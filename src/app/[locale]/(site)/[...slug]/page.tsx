@@ -1,13 +1,24 @@
 import { notFound, permanentRedirect, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { findActiveRedirect, recordNotFoundHit } from "@/lib/queries";
 
 // Yönləndirmə cədvəli D1-də saxlanılır, ona görə hər sorğu anında oxunmalıdır.
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<{ locale: string; slug: string[] }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "common.notFound" });
+  return {
+    title: t("title"),
+    robots: { index: false, follow: true },
+  };
+}
 
 /**
  * Bilinməyən bütün ictimai marşrutların son dayanacağı.
