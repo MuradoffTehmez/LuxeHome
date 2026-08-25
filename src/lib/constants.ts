@@ -330,6 +330,44 @@ export const LEAD_SOURCE_LABELS: Record<LeadSource, string> = {
 };
 
 // ---------------------------------------------------------------------------
+// SAXLANMIŞ AXTARIŞLAR VƏ BİLDİRİŞLƏR
+// ---------------------------------------------------------------------------
+
+export const SAVED_SEARCH_FREQUENCIES = {
+  IMMEDIATE: "IMMEDIATE",
+  DAILY: "DAILY",
+  WEEKLY: "WEEKLY",
+  OFF: "OFF",
+} as const;
+
+export type SavedSearchFrequency =
+  (typeof SAVED_SEARCH_FREQUENCIES)[keyof typeof SAVED_SEARCH_FREQUENCIES];
+
+export const SAVED_SEARCH_FREQUENCY_LABELS: Record<SavedSearchFrequency, string> = {
+  IMMEDIATE: "Dərhal",
+  DAILY: "Gündəlik",
+  WEEKLY: "Həftəlik",
+  OFF: "Söndürülüb",
+};
+
+/**
+ * Bildiriş növləri. Hazırda yalnız saxlanmış axtarış uyğunluğu istehsal edir —
+ * gələcək alt-layihələr PRICE_DROP (qiymət düşməsi) və MEETING_REMINDER (görüş
+ * xatırlatması) əlavə edəcək, `Notification` modeli onlar üçün sxem dəyişikliyi
+ * olmadan hazırdır.
+ */
+export const NOTIFICATION_TYPES = {
+  SAVED_SEARCH_MATCH: "SAVED_SEARCH_MATCH",
+} as const;
+
+export type NotificationType =
+  (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];
+
+export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
+  SAVED_SEARCH_MATCH: "Saxlanmış axtarışa uyğun elan",
+};
+
+// ---------------------------------------------------------------------------
 // SIRALAMA VƏ SƏHİFƏLƏMƏ
 // ---------------------------------------------------------------------------
 

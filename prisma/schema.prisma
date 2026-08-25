@@ -63,6 +63,9 @@ model User {
   agency      Agency?
   agencyEmployments AgencyEmployee[]
 
+  savedSearches SavedSearch[]
+  notifications Notification[]
+
   @@index([role])
   @@index([accountType])
 }
@@ -312,6 +315,7 @@ model Property {
   features  PropertyFeature[]
   leads     Lead[]
   favorites Favorite[]
+  savedSearchMatches SavedSearchMatch[]
 
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
@@ -552,6 +556,65 @@ model Favorite {
 
   @@unique([userId, propertyId])
   @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// SAXLANMIŞ AXTARIŞLAR VƏ BİLDİRİŞLƏR
+// ---------------------------------------------------------------------------
+
+/// İstifadəçinin saxladığı filtr kombinasiyası. `filters` PropertyFilters JSON-udur
+/// (queries.ts ilə eyni forma — axtarış səhifəsindəki filtrlərlə birbaşa uyğunlaşır).
+model SavedSearch {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  filters     String    // JSON — PropertyFilters (sort/page/pageSize xaric)
+  /// IMMEDIATE | DAILY | WEEKLY | OFF
+  frequency   String    @default("DAILY")
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  lastCheckedAt   DateTime?
+  lastNotifiedAt  DateTime?
+
+  user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matches SavedSearchMatch[]
+
+  @@index([userId])
+  @@index([enabled])
+}
+
+/// Təkrar bildirişin qarşısını alır — eyni əmlak eyni saxlanmış axtarışa bir dəfə əlavə olunur.
+model SavedSearchMatch {
+  id            String   @id @default(cuid())
+  savedSearchId String
+  propertyId    String
+  notifiedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  savedSearch SavedSearch @relation(fields: [savedSearchId], references: [id], onDelete: Cascade)
+  property    Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([savedSearchId, propertyId])
+  @@index([propertyId])
+}
+
+/// Ümumi bildiriş qeydi — Saved Search matching ilə başlayır, gələcək bildiriş
+/// növləri (Price Drop, Meeting Reminder) eyni cədvəldən istifadə edəcək.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  /// SAVED_SEARCH_MATCH | PRICE_DROP | MEETING_REMINDER (gələcək)
+  type      String
+  title     String
+  content   String
+  actionUrl String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([createdAt])
 }
 
 // ---------------------------------------------------------------------------
