@@ -29,6 +29,7 @@ import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { buildMetadata } from "@/lib/seo";
 import { getCachedHomePageData } from "@/lib/public-cache";
+import { getCategoryImageUrl } from "@/lib/category-images";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -108,7 +109,7 @@ export default async function HomePage({ params }: HomePageProps) {
     href: `/emlaklar?tip=${type.slug}`,
     label: type.name,
     count: type._count.properties,
-    imageUrl: type.imageUrl,
+    imageUrl: getCategoryImageUrl(type.slug, type.imageUrl),
   }));
 
   return (
