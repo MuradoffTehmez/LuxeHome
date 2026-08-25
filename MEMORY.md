@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 21 avqust 2026.
+Son yenilənmə: 25 avqust 2026.
 
 ---
 
@@ -17,12 +17,11 @@ Kodda `siteConfig.owner` sahəsində saxlanılır; footer-dəki müəllif hüquq
 
 ## 1. Layihənin məqsədi və mərhələsi
 
-**Əsas hədəf: saytı müştəriyə (Luxe Home Estate MMC) bəyəndirmək.** Bu səbəbdən cari mərhələdə
-diqqət **frontend**-dədir. Müştəri tam razılıq verdikdən sonra backend qatı yığılacaq.
-
-Bu, işin prioritetləşdirilməsində həlledici meyardır: vizual nəticə verən iş backend
-mükəmməlliyindən üstündür. Frontend-i sürətləndirmək üçün sadə/standart JavaScript həlləri
-qəbul edilir.
+**Əsas hədəf: saytı müştəriyə (Luxe Home Estate MMC) bəyəndirmək.** Frontend-first mərhələ və
+admin auth qatı artıq tamamlanıb (canlı: `luxehomeestate.az`). **25 avqust 2026-da qərar
+genişləndi: hədəf artıq təkcə frontend deyil, hər iki PRD sənədinin (bölmə 10-a bax) 100%
+koda köçürülməsidir.** Bu, işin uzunmüddətli hədəfidir — qısamüddətli prioritetləşdirmə hələ
+də ardıcıl, kiçik, təsdiqlənən addımlarla gedir (bax bölmə 10).
 
 Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 
@@ -245,3 +244,34 @@ Keyfiyyət qapısı: 40 test, `typecheck` və `build` təmiz.
    --remote --env staging --command "<INSERT>"` ilə tətbiq et.
 4. `npm run deploy:staging`, sonra prod-un toxunulmadığını yoxla.
 5. Spec bölmə 7-dəki 13 bəndlik əl ilə yoxlama siyahısı.
+
+---
+
+## 10. Tam PRD tamamlama yol xəritəsi — 25 avqust 2026
+
+**Qərar: hər iki PRD sənədi (`docs/LuxeHomeEstate — Full Platform & Advanced Admin Panel
+PRD.md`, `docs/LuxeHomeEstate — Geniş Miqyaslı Public Platform PRD.md`) uzunmüddətdə 100%
+koda köçürülməlidir.** 25 avqust 2026 tarixli audit: Phase 1 MVP üzrə hər iki sənəd ~75% və
+~74% tamamlanıb; sənədlərin tam əhatəsinə görə (Finance/CRM, AI, reservation və s. daxil) isə
+~30-35%.
+
+İş rejimi **ardıcıldır** — hər maddə tamamlanıb təsdiqlənəndən sonra növbətiyə keçilir,
+paralel deyil. Təsdiqlənmiş sıra:
+
+1. **Saved Search + Recently Viewed + Notification Center** — cari iş.
+2. AI axtarış + Reservation (görüş sistemi) — təqvim inteqrasiyalı (Google Calendar). AI
+   provider hələ qəti deyil, namizəd: **Cloudflare Workers AI**.
+3. Telegram bot qurulumu (lead bildirişi) — bot token/chat ID hələ yoxdur, əvvəlcə yaradılmalıdır.
+4. Agent (əmlakçı) ictimai profili — **ayrıca entity** kimi, agentlik əməkdaşı modelindən asılı
+   olmayaraq: foto+əlaqə+bio, aktiv elanlar siyahısı, reytinq/rəy sistemi, statistika (satış
+   sayı və s.).
+5. CMS statik səhifə redaktoru — Haqqımızda, Xidmətlər, Ana səhifə blok/bannerlər.
+6. Watermark (şəkil qorunması) — aşağı prioritet, media/upload işi ilə bundle olunacaq.
+7. Finance/CRM/Ödəniş sistemi — **yalnız struktur/UI**, real ödəniş provider inteqrasiyası yox
+   (bu mərhələdə).
+8. Backup / system health / cron monitoring — ən sonda, funksional modullar bitdikdən sonra.
+
+Bu sıra `AskUserQuestion` vasitəsilə istifadəçi ilə birbaşa təsdiqlənib (bax
+`.claude` yaddaş faylı `luxehome-prd-full-scope-goal.md`). Hər maddə brainstorming
+skill-inin architectural yolu ilə gedir: kontekst araşdırması → suallar → yanaşmalar →
+dizayn → spec (`docs/superpowers/specs/`) → təsdiq → `writing-plans`.

@@ -241,6 +241,10 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
 
 ## Cari vəziyyət və bilinən boşluqlar
 
+**25 avqust 2026-dan etibarən hədəf genişlənib: hər iki PRD sənədinin (`docs/`) tam (100%)
+koda köçürülməsi uzunmüddətli məqsəddir, təkcə Phase 1 MVP deyil.** Ardıcıl iş rejimi və
+təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
+
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
 - **Auth qatı hazırdır, CRUD hələ tamamlanmayıb.** Giriş axını işləyir: PBKDF2 parol, məcburi TOTP
