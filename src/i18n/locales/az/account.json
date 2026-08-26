@@ -40,9 +40,10 @@
     "eyebrow":"Kabinet","title":"Saxlanmış axtarışlarım","count":"{count} axtarış",
     "noFilters":"Filtrsiz — bütün elanlar","newMatches":"{count} yeni","pausedBadge":"Dayandırılıb","viewResults":"Nəticələrə bax",
     "emptyTitle":"Hələ saxlanmış axtarışınız yoxdur","emptyDescription":"Axtarış nəticələrindən «Axtarışı saxla» düyməsi ilə filtrlərinizi yadda saxlaya bilərsiniz.","emptyAction":"Əmlaklara bax",
-    "saved":"Axtarış saxlanıldı.","notFound":"Saxlanmış axtarış tapılmadı.","paused":"Axtarış dayandırıldı.","resumed":"Axtarış yenidən aktivləşdirildi.","deleted":"Saxlanmış axtarış silindi.",
+    "saved":"Axtarış saxlanıldı.","notFound":"Saxlanmış axtarış tapılmadı.","paused":"Axtarış dayandırıldı.","resumed":"Axtarış yenidən aktivləşdirildi.","deleted":"Saxlanmış axtarış silindi.","updated":"Saxlanmış axtarış yeniləndi.",
     "pauseLabel":"{name} axtarışını dayandır","resumeLabel":"{name} axtarışını aktivləşdir","pause":"Dayandır","resume":"Aktivləşdir",
     "deleteLabel":"{name} axtarışını sil","deleteTitle":"Saxlanmış axtarışı sil","deleteDescription":"«{name}» saxlanmış axtarışı silinəcək. Bu geri qaytarıla bilməz.","delete":"Sil",
+    "editLabel":"{name} axtarışını redaktə et","edit":"Redaktə et","editTitle":"Saxlanmış axtarışı redaktə et","nameLabel":"Axtarışın adı","frequencyLabel":"Bildiriş tezliyi","save":"Yadda saxla",
     "frequency":{"immediate":"Dərhal","daily":"Gündəlik","weekly":"Həftəlik","off":"Söndürülüb"}
   },
   "notifications": {

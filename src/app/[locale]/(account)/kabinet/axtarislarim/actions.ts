@@ -72,6 +72,40 @@ async function ownedSavedSearch(userId: string, id: string) {
   return prisma.savedSearch.findFirst({ where: { id, userId }, select: { id: true, enabled: true } });
 }
 
+const updateSavedSearchSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(2).max(120),
+  frequency: z.enum(FREQUENCY_VALUES),
+});
+
+/** Ad və bildiriş tezliyini dəyişir — filtr kombinasiyası redaktə olunmur, yenisi saxlanılmalıdır. */
+export async function updateSavedSearch(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations("account");
+  const user = await requireAccount(locale);
+
+  const parsed = updateSavedSearchSchema.safeParse({
+    id: form.text(formData, "id"),
+    name: form.text(formData, "name"),
+    frequency: form.text(formData, "frequency"),
+  });
+  if (!parsed.success) return failure(t("actions.invalidForm"), toFieldErrors(parsed.error));
+
+  try {
+    const existing = await ownedSavedSearch(user.id, parsed.data.id);
+    if (!existing) return failure(t("savedSearches.notFound"));
+
+    await prisma.savedSearch.update({
+      where: { id: parsed.data.id },
+      data: { name: parsed.data.name, frequency: parsed.data.frequency },
+    });
+    revalidatePath(localizePath(LIST_PATH, locale));
+    return success(t("savedSearches.updated"));
+  } catch (error) {
+    return unexpected("saxlanmış axtarış yenilənmədi", error, t("actions.unexpected"));
+  }
+}
+
 export async function toggleSavedSearchEnabled(id: string): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");

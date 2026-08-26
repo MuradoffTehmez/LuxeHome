@@ -132,7 +132,7 @@ export default async function SavedSearchesPage() {
             <ButtonLink href={localizePath(filtersToSearchParams(filters), locale)} variant="ghost" size="sm">
               {t("viewResults")}
             </ButtonLink>
-            <SavedSearchActions id={item.id} name={item.name} enabled={item.enabled} />
+            <SavedSearchActions id={item.id} name={item.name} frequency={item.frequency} enabled={item.enabled} />
           </div>
         </div>
       </article>

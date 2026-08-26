@@ -25,9 +25,10 @@
     "eyebrow":"Account","title":"My saved searches","count":"{count, plural, one {# saved search} other {# saved searches}}",
     "noFilters":"No filters — all listings","newMatches":"{count} new","pausedBadge":"Paused","viewResults":"View results",
     "emptyTitle":"You have no saved searches yet","emptyDescription":"Use \"Save search\" on the search results to keep your filters for later.","emptyAction":"Browse listings",
-    "saved":"Search saved.","notFound":"Saved search not found.","paused":"Search paused.","resumed":"Search resumed.","deleted":"Saved search deleted.",
+    "saved":"Search saved.","notFound":"Saved search not found.","paused":"Search paused.","resumed":"Search resumed.","deleted":"Saved search deleted.","updated":"Saved search updated.",
     "pauseLabel":"Pause {name}","resumeLabel":"Resume {name}","pause":"Pause","resume":"Resume",
     "deleteLabel":"Delete {name}","deleteTitle":"Delete saved search","deleteDescription":"\"{name}\" will be deleted. This cannot be undone.","delete":"Delete",
+    "editLabel":"Edit {name}","edit":"Edit","editTitle":"Edit saved search","nameLabel":"Search name","frequencyLabel":"Notification frequency","save":"Save",
     "frequency":{"immediate":"Immediately","daily":"Daily","weekly":"Weekly","off":"Off"}
   },
   "notifications": {
