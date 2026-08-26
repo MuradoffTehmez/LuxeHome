@@ -34,6 +34,7 @@ import { PropertyActionToolbar } from "@/components/site/property-action-toolbar
 import { PropertyMap } from "@/components/site/property-map";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
+import { RecentlyViewedTracker } from "@/components/site/recently-viewed-tracker";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
@@ -155,6 +156,7 @@ export default async function PropertyDetailPage({ params }: Props) {
   return (
     <>
       <AnalyticsEventBeacon event="property_view" payload={{ property_id: property.id }} />
+      <RecentlyViewedTracker propertyId={property.id} />
       <script
         {...jsonLd(
           propertySchema({

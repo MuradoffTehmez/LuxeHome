@@ -35,5 +35,11 @@
     "eyebrow":"Account","title":"Notifications","count":"{count, plural, one {# notification} other {# notifications}}",
     "emptyTitle":"You have no notifications yet","emptyDescription":"When a new listing matches one of your saved searches, it will appear here.","emptyAction":"Browse listings",
     "markAllRead":"Mark all as read","markedRead":"Notification marked as read.","allMarkedRead":"All notifications marked as read.","deleted":"Notification deleted.","notFound":"Notification not found.","delete":"Delete"
+  },
+  "recentlyViewed": {
+    "metaTitle":"Recently viewed","metaDescription":"Properties you have recently viewed on this device.",
+    "eyebrow":"Account","title":"Recently viewed","description":"This list is only saved on this browser.",
+    "count":"{count, plural, one {# property} other {# properties}}","emptyTitle":"You have not viewed any properties yet","emptyDescription":"Listings you view will appear here.","viewProperties":"Browse listings",
+    "clearTitle":"Clear list","clearDescription":"All recently viewed properties will be removed from this device."
   }
 }

@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { LayoutGrid, ListChecks, LogOut, Plus, UserRound, Users } from "lucide-react";
+import { Bell, History, LayoutGrid, ListChecks, LogOut, Plus, Search, UserRound, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
@@ -29,7 +29,21 @@ const ICONS = {
   listings: ListChecks,
   "new-listing": Plus,
   team: Users,
+  "saved-searches": Search,
+  notifications: Bell,
+  "recently-viewed": History,
   profile: UserRound,
+} as const;
+
+const LABEL_KEYS = {
+  overview: "overview",
+  listings: "listings",
+  "new-listing": "newListing",
+  team: "team",
+  "saved-searches": "savedSearches",
+  notifications: "notifications",
+  "recently-viewed": "recentlyViewed",
+  profile: "profile",
 } as const;
 
 function SignOutButton() {
@@ -85,7 +99,7 @@ export function CabinetNav({
                 )}
               >
                 <Icon className="size-4 shrink-0" aria-hidden="true" />
-                {t(item.id === "new-listing" ? "newListing" : item.id === "overview" ? "overview" : item.id)}
+                {t(LABEL_KEYS[item.id])}
               </Link>
             </li>
           );

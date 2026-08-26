@@ -10,7 +10,13 @@ describe("kabinet naviqasiyası", () => {
   it("elan icazəsi olmayan hesab üçün elan bəndlərini gizlədir", () => {
     const items = getCabinetItems(false);
 
-    expect(items.map((item) => item.href)).toEqual(["/kabinet", "/kabinet/profil"]);
+    expect(items.map((item) => item.href)).toEqual([
+      "/kabinet",
+      "/kabinet/axtarislarim",
+      "/kabinet/bildirisler",
+      "/kabinet/son-baxilanlar",
+      "/kabinet/profil",
+    ]);
     expect(items.some((item) => item.href.includes("elanlar"))).toBe(false);
   });
 });

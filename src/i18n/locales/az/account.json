@@ -50,5 +50,11 @@
     "eyebrow":"Kabinet","title":"Bildirişlər","count":"{count} bildiriş",
     "emptyTitle":"Hələ bildirişiniz yoxdur","emptyDescription":"Saxlanmış axtarışlarınıza uyğun yeni elan dərc olunanda burada görünəcək.","emptyAction":"Əmlaklara bax",
     "markAllRead":"Hamısını oxu","markedRead":"Bildiriş oxunmuş işarələndi.","allMarkedRead":"Bütün bildirişlər oxunmuş işarələndi.","deleted":"Bildiriş silindi.","notFound":"Bildiriş tapılmadı.","delete":"Sil"
+  },
+  "recentlyViewed": {
+    "metaTitle":"Son baxılanlar","metaDescription":"Bu cihazda son baxdığınız əmlaklar.",
+    "eyebrow":"Kabinet","title":"Son baxılanlar","description":"Bu siyahı yalnız bu brauzerdə saxlanılır.",
+    "count":"{count} əmlak","emptyTitle":"Hələ heç bir əmlaka baxmamısınız","emptyDescription":"Baxdığınız elanlar burada görünəcək.","viewProperties":"Əmlaklara bax",
+    "clearTitle":"Siyahını təmizlə","clearDescription":"Son baxılan bütün əmlaklar bu cihazdan silinəcək."
   }
 }
