@@ -20,6 +20,7 @@ import {
 } from "@/lib/accounts/property-submission";
 import { ACCOUNT_TYPES, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { localizePath } from "@/i18n/path-locale";
 
@@ -121,7 +122,7 @@ export async function createPublicProperty(
       slug,
     };
 
-    await createPropertyWithRelations(
+    const created = await createPropertyWithRelations(
       {
         createProperty: (propertyInput) =>
           prisma.property.create({
@@ -151,6 +152,10 @@ export async function createPublicProperty(
       data,
       finalPolicy.status === PROPERTY_STATUSES.PUBLISHED,
     );
+
+    if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED) {
+      await notifyMatchingSavedSearches(created.id);
+    }
   } catch (error) {
     // Şəkil yükləmələri qəsdən silinmir: istifadəçi formadakı xətanı düzəldib yenidən göndərə bilər.
     return unexpected("elan göndərilə bilmədi", error, t("actions.unexpected"));

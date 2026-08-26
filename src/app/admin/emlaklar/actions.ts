@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin/property-input";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
+import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 /**
@@ -122,6 +123,10 @@ export async function createProperty(
 
     await replaceRelations(propertyId, parsed.data.featureIds, images);
     await recordAudit(user, "CREATE", "Property", propertyId, parsed.data.title);
+
+    if (parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
+      await notifyMatchingSavedSearches(propertyId);
+    }
   } catch (error) {
     return unexpected("əmlak yaradıla bilmədi", error);
   }
@@ -176,6 +181,10 @@ export async function updateProperty(
 
     await replaceRelations(id, parsed.data.featureIds, parseImages(formData, "images"));
     await recordAudit(user, "UPDATE", "Property", id, parsed.data.title);
+
+    if (existing.publishedAt === null && parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
+      await notifyMatchingSavedSearches(id);
+    }
 
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${slug}`);
@@ -269,6 +278,11 @@ export async function setPropertyStatus(id: string, status: string): Promise<Act
     });
 
     await recordAudit(user, "PUBLISH", "Property", id, `${existing.title} → ${status}`);
+
+    if (existing.publishedAt === null && status === PROPERTY_STATUSES.PUBLISHED) {
+      await notifyMatchingSavedSearches(id);
+    }
+
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${existing.slug}`);
     revalidatePublicContent("property", existing.slug);
@@ -341,11 +355,29 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
           ? { deletedAt: new Date() }
           : { deletedAt: null };
 
+  // Yalnız ilk dəfə dərc olunanlar (əvvəllər `publishedAt` boş olan) saxlanmış axtarış
+  // bildirişinə səbəb olur — artıq dərc edilmiş elanın statusu təkrar "publish" ilə
+  // toxunulsa belə, bildiriş təkrarlanmır.
+  const previouslyUnpublished =
+    intent === "publish"
+      ? new Set(
+          (
+            await prisma.property.findMany({
+              where: { id: { in: ids }, publishedAt: null },
+              select: { id: true },
+            })
+          ).map((property) => property.id),
+        )
+      : null;
+
   let done = 0;
   for (const id of ids) {
     try {
       await prisma.property.update({ where: { id }, data });
       done += 1;
+      if (previouslyUnpublished?.has(id)) {
+        await notifyMatchingSavedSearches(id);
+      }
     } catch {
       // Tək id uğursuz olsa qalanları dayandırmır — nəticədə sayılır
     }

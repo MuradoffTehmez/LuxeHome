@@ -1,5 +1,8 @@
 import { Resend } from "resend";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
+import { siteUrl } from "@/config/site";
+import { localizePath } from "@/i18n/path-locale";
+import { DEFAULT_LOCALE } from "@/lib/constants";
 
 /**
  * Cloudflare Workers-də `process.env` yalnız sorğu kontekstində doldurulur —
@@ -923,20 +926,99 @@ export type SavedSearchMatchEmailProperty = {
 };
 
 /**
- * Saxlanmış axtarışa uyğun yeni elan barədə istifadəçiyə dərhal e-poçt bildirişi.
- *
- * Müvəqqəti stub: hazırkı alt-tapşırıq (uyğunluq mühərriki) bu funksiyanı
- * çağırır, lakin real HTML şablonu ayrıca alt-tapşırıqda yazılacaq. O vaxta
- * qədər heç nə göndərmir ki, `notifyMatchingSavedSearches` importu tipcheck-i
- * poza bilməsin.
+ * Saxlanmış axtarışa uyğun yeni elan barədə istifadəçiyə "dərhal" tezliyində
+ * göndərilən e-poçt bildirişi. `DAILY`/`WEEKLY` tezliklər üçün çağırılmır —
+ * onların toplu göndərməsi cron infrastrukturu qurulanda əlavə olunacaq
+ * (bax spec bölmə 3, "Əhatə dairəsindən kənar").
  */
 export async function sendSavedSearchMatchEmail(
   userEmail: string,
   property: SavedSearchMatchEmailProperty,
   searchName: string,
-): Promise<void> {
-  void userEmail;
-  void property;
-  void searchName;
+) {
+  const propertyUrl = siteUrl(localizePath(`/emlaklar/${property.slug}`, DEFAULT_LOCALE));
+  const subject = `🏠 "${searchName}" axtarışınıza uyğun yeni elan`;
+
+  const html = `
+<!DOCTYPE html>
+<html lang="az" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>${subject}</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f3f1ed; font-family: Arial, Helvetica, sans-serif; }
+    table { border-spacing: 0; border-collapse: collapse; }
+    a { text-decoration: none; }
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; }
+      .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f1ed;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f1ed;">
+    <tr>
+      <td align="center" style="padding:30px 15px;">
+        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff;">
+
+          <tr>
+            <td align="center" style="padding:32px 30px 24px 30px;">
+              <div style="font-family:Georgia, 'Times New Roman', serif; font-size:24px; letter-spacing:2px; font-weight:bold; color:#171717;">
+                LUXE HOME ESTATE
+              </div>
+            </td>
+          </tr>
+
+          <tr><td style="height:2px; background-color:#B89B5E; font-size:0; line-height:0;">&nbsp;</td></tr>
+
+          <tr>
+            <td align="center" class="mobile-padding" style="padding:36px 40px 28px 40px;">
+              <div style="font-family:Arial, Helvetica, sans-serif; font-size:11px; letter-spacing:3px; color:#B89B5E; text-transform:uppercase; font-weight:bold;">
+                SAXLANMIŞ AXTARIŞ — «${searchName}»
+              </div>
+              <div style="height:12px; line-height:12px;">&nbsp;</div>
+              <div style="font-family:Georgia, 'Times New Roman', serif; font-size:26px; line-height:34px; color:#171717;">
+                ${property.title}
+              </div>
+              <div style="height:10px; line-height:10px;">&nbsp;</div>
+              <div style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:22px; color:#777777;">
+                Axtarışınıza uyğun yeni elan dərc olundu.
+              </div>
+              <div style="height:26px; line-height:26px;">&nbsp;</div>
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="background-color:#171717; border-radius:2px;">
+                    <a href="${propertyUrl}" style="display:inline-block; padding:14px 28px; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1.5px; color:#ffffff; text-transform:uppercase; font-weight:600;">
+                      Elana bax
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:28px 25px; background-color:#111111; border-top:1px solid #292929;">
+              <div style="font-family:Georgia, 'Times New Roman', serif; font-size:16px; color:#ffffff; letter-spacing:1px;">
+                LUXE HOME ESTATE MMC
+              </div>
+              <div style="height:10px; line-height:10px;">&nbsp;</div>
+              <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#8f8f8f;">
+                Bu bildirişi «${searchName}» saxlanmış axtarışınız üçün «Dərhal» tezliyi seçdiyinizə görə alırsınız.
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+
+  return sendEmail({ to: userEmail, subject, html });
 }
 

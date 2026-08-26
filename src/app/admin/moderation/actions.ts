@@ -13,6 +13,7 @@ import * as form from "@/lib/admin/form";
 import { recordAudit } from "@/lib/admin/audit";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 const LIST_PATH = "/admin/moderation";
@@ -40,6 +41,7 @@ export async function approveModerationProperty(id: string): Promise<ActionState
 
     await recordAudit(actor, "PUBLISH", "Property", id, `${property.title} — moderasiyadan təsdiqləndi`);
     await recordDomainEvent("property.published", "Property", id, { title: property.title });
+    await notifyMatchingSavedSearches(id);
 
     revalidatePath(LIST_PATH);
     revalidatePath("/emlaklar");
