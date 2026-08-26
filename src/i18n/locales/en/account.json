@@ -29,5 +29,11 @@
     "pauseLabel":"Pause {name}","resumeLabel":"Resume {name}","pause":"Pause","resume":"Resume",
     "deleteLabel":"Delete {name}","deleteTitle":"Delete saved search","deleteDescription":"\"{name}\" will be deleted. This cannot be undone.","delete":"Delete",
     "frequency":{"immediate":"Immediately","daily":"Daily","weekly":"Weekly","off":"Off"}
+  },
+  "notifications": {
+    "metaTitle":"Notifications","metaDescription":"New listings matching your saved searches and other notifications.",
+    "eyebrow":"Account","title":"Notifications","count":"{count, plural, one {# notification} other {# notifications}}",
+    "emptyTitle":"You have no notifications yet","emptyDescription":"When a new listing matches one of your saved searches, it will appear here.","emptyAction":"Browse listings",
+    "markAllRead":"Mark all as read","markedRead":"Notification marked as read.","allMarkedRead":"All notifications marked as read.","deleted":"Notification deleted.","notFound":"Notification not found.","delete":"Delete"
   }
 }

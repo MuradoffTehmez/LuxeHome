@@ -1880,3 +1880,12 @@ export async function notifyMatchingSavedSearches(propertyId: string): Promise<v
     console.error("[saved-search] uyğunluq yoxlanmadı:", error);
   }
 }
+
+// ---------------------------------------------------------------------------
+// BİLDİRİŞ MƏRKƏZİ
+// ---------------------------------------------------------------------------
+
+/** Naviqasiyada göstərilən oxunmamış bildiriş sayı. */
+export async function getUnreadNotificationCount(userId: string): Promise<number> {
+  return prisma.notification.count({ where: { userId, readAt: null } });
+}

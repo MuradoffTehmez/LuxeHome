@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
-import { LayoutDashboard, LogIn, UserRound } from "lucide-react";
+import { Bell, LayoutDashboard, LogIn, UserRound } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 type MenuState =
   | { status: "loading" }
   | { status: "anonymous" }
-  | { status: "signed-in"; name: string; isStaff: boolean };
+  | { status: "signed-in"; name: string; isStaff: boolean; unreadNotifications: number };
 
 export function AccountMenu({
   isOverlay = false,
@@ -44,11 +44,17 @@ export function AccountMenu({
           signedIn: boolean;
           name?: string;
           isStaff?: boolean;
+          unreadNotifications?: number;
         };
         if (!active) return;
         setState(
           data.signedIn
-            ? { status: "signed-in", name: data.name ?? t("myAccount"), isStaff: data.isStaff === true }
+            ? {
+                status: "signed-in",
+                name: data.name ?? t("myAccount"),
+                isStaff: data.isStaff === true,
+                unreadNotifications: data.unreadNotifications ?? 0,
+              }
             : { status: "anonymous" },
         );
       } catch {
@@ -108,13 +114,33 @@ export function AccountMenu({
     </>
   );
 
-  return state.isStaff ? (
-    <NextLink href="/admin" aria-label={t("adminPanel")} className={linkClass}>
-      {contents}
-    </NextLink>
-  ) : (
-    <Link href="/kabinet" aria-label={state.name} className={linkClass}>
-      {contents}
-    </Link>
+  if (state.isStaff) {
+    return (
+      <NextLink href="/admin" aria-label={t("adminPanel")} className={linkClass}>
+        {contents}
+      </NextLink>
+    );
+  }
+
+  return (
+    <div className={cn("flex items-center gap-1", variant === "mobile" && "flex-col items-stretch gap-2")}>
+      <Link
+        href="/kabinet/bildirisler"
+        aria-label={
+          state.unreadNotifications > 0
+            ? t("notificationsUnread", { count: state.unreadNotifications })
+            : t("notifications")
+        }
+        className={cn(linkClass, "relative", variant === "desktop" && "min-w-11 2xl:min-w-11 2xl:justify-center 2xl:px-0")}
+      >
+        <Bell className="size-4" aria-hidden="true" />
+        {state.unreadNotifications > 0 && (
+          <span aria-hidden="true" className="absolute top-1.5 right-1.5 size-2 rounded-full bg-gold" />
+        )}
+      </Link>
+      <Link href="/kabinet" aria-label={state.name} className={linkClass}>
+        {contents}
+      </Link>
+    </div>
   );
 }
