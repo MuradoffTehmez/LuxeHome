@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyFilterSheet } from "@/components/site/property-filter-sheet";
+import { SaveSearchButton } from "@/components/site/save-search-button";
 import { SearchPanel } from "@/components/site/search-panel";
 import { SortSelect } from "@/components/site/sort-select";
 import { Pagination } from "@/components/ui/pagination";
@@ -18,6 +19,8 @@ import { classifyPropertySearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
 import { getFilterOptions } from "@/lib/queries";
 import { getCachedProperties } from "@/lib/public-cache";
+import { getOptionalUser } from "@/lib/auth/guard";
+import { canAccessAdmin } from "@/lib/auth/public-account-policy";
 import {
   buildActivePropertyFilters,
   buildPropertySearchHref,
@@ -100,11 +103,17 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     page: searchState.page,
   };
 
-  const [{ items, total, page, totalPages }, filterOptions] = await Promise.all([
+  const [{ items, total, page, totalPages }, filterOptions, user] = await Promise.all([
     getCachedProperties(filters),
     getFilterOptions(),
+    getOptionalUser(),
   ]);
   if (page > totalPages) notFound();
+
+  const canSaveSearch = user !== null && !canAccessAdmin(user.accountType);
+  const { sort: _savedSort, page: _savedPage, ...saveableFilters } = filters;
+  void _savedSort;
+  void _savedPage;
 
   const typeOptions = filterOptions.types.map((type) => ({
     value: type.slug,
@@ -263,7 +272,10 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                     {t("propertiesPage.noFilters")}
                   </p>
                 )}
-                <SortSelect value={sort} hrefs={sortHrefs} className="shrink-0" />
+                <div className="flex shrink-0 items-center gap-3">
+                  {canSaveSearch && <SaveSearchButton filters={saveableFilters} />}
+                  <SortSelect value={sort} hrefs={sortHrefs} />
+                </div>
               </div>
             }
           />

@@ -19,5 +19,15 @@
   },
   "profile": {
     "metaTitle":"Profile","metaDescription":"Update your account information.","eyebrow":"Account","title":"Profile","description":"Email cannot be changed here — contact us to request a change ({email}).","accountInfo":"Account information","passwordSection":"Password","name":"Full name","phone":"Phone","agencyName":"Agency name","agencyDescription":"About the agency","address":"Address","website":"Website","save":"Save changes","currentPassword":"Current password","newPassword":"New password","repeatPassword":"Repeat new password","passwordHint":"At least 10 characters.","changePassword":"Change password"
+  },
+  "savedSearches": {
+    "metaTitle":"My saved searches","metaDescription":"Your saved property searches and match notifications.",
+    "eyebrow":"Account","title":"My saved searches","count":"{count, plural, one {# saved search} other {# saved searches}}",
+    "noFilters":"No filters — all listings","newMatches":"{count} new","pausedBadge":"Paused","viewResults":"View results",
+    "emptyTitle":"You have no saved searches yet","emptyDescription":"Use \"Save search\" on the search results to keep your filters for later.","emptyAction":"Browse listings",
+    "saved":"Search saved.","notFound":"Saved search not found.","paused":"Search paused.","resumed":"Search resumed.","deleted":"Saved search deleted.",
+    "pauseLabel":"Pause {name}","resumeLabel":"Resume {name}","pause":"Pause","resume":"Resume",
+    "deleteLabel":"Delete {name}","deleteTitle":"Delete saved search","deleteDescription":"\"{name}\" will be deleted. This cannot be undone.","delete":"Delete",
+    "frequency":{"immediate":"Immediately","daily":"Daily","weekly":"Weekly","off":"Off"}
   }
 }

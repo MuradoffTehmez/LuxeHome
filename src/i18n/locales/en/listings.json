@@ -31,6 +31,10 @@
     "chooseCriteria": "Choose your search criteria", "resultShort": "{count, plural, one {# result} other {# results}}",
     "showResults": "Show {count, plural, one {# result} other {# results}}", "categories": "Property categories",
     "sort": "Sort", "sortNewest": "Newest", "sortPriceAsc": "Lowest price",
-    "sortPriceDesc": "Highest price", "sortAreaDesc": "Largest area"
+    "sortPriceDesc": "Highest price", "sortAreaDesc": "Largest area",
+    "saveSearch": "Save search", "saveSearchName": "Search name",
+    "saveSearchFrequency": "Notification frequency", "saveSearchSubmit": "Save",
+    "saveSearchFrequencyImmediate": "Immediately", "saveSearchFrequencyDaily": "Daily",
+    "saveSearchFrequencyWeekly": "Weekly", "saveSearchFrequencyOff": "Off"
   }
 }

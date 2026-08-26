@@ -31,6 +31,10 @@
     "chooseCriteria": "Выберите параметры поиска", "resultShort": "{count, plural, one {# результат} few {# результата} many {# результатов} other {# результата}}",
     "showResults": "Показать {count, plural, one {# результат} few {# результата} many {# результатов} other {# результата}}", "categories": "Категории недвижимости",
     "sort": "Сортировка", "sortNewest": "Сначала новые", "sortPriceAsc": "Сначала дешевле",
-    "sortPriceDesc": "Сначала дороже", "sortAreaDesc": "Сначала большая площадь"
+    "sortPriceDesc": "Сначала дороже", "sortAreaDesc": "Сначала большая площадь",
+    "saveSearch": "Сохранить поиск", "saveSearchName": "Название поиска",
+    "saveSearchFrequency": "Частота уведомлений", "saveSearchSubmit": "Сохранить",
+    "saveSearchFrequencyImmediate": "Сразу", "saveSearchFrequencyDaily": "Ежедневно",
+    "saveSearchFrequencyWeekly": "Еженедельно", "saveSearchFrequencyOff": "Отключено"
   }
 }

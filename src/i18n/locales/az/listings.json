@@ -31,6 +31,10 @@
     "chooseCriteria": "Axtarış şərtlərini seçin", "resultShort": "{count} nəticə",
     "showResults": "{count} nəticəni göstər", "categories": "Əmlak kateqoriyaları",
     "sort": "Sıralama", "sortNewest": "Ən yeni", "sortPriceAsc": "Əvvəl ucuz",
-    "sortPriceDesc": "Əvvəl bahalı", "sortAreaDesc": "Sahəsi böyük"
+    "sortPriceDesc": "Əvvəl bahalı", "sortAreaDesc": "Sahəsi böyük",
+    "saveSearch": "Axtarışı saxla", "saveSearchName": "Axtarışın adı",
+    "saveSearchFrequency": "Bildiriş tezliyi", "saveSearchSubmit": "Saxla",
+    "saveSearchFrequencyImmediate": "Dərhal", "saveSearchFrequencyDaily": "Gündəlik",
+    "saveSearchFrequencyWeekly": "Həftəlik", "saveSearchFrequencyOff": "Söndürülüb"
   }
 }

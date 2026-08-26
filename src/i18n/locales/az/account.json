@@ -34,5 +34,15 @@
   },
   "profile": {
     "metaTitle":"Profil","metaDescription":"Hesab məlumatlarınızı yeniləyin.","eyebrow":"Kabinet","title":"Profil","description":"E-poçt dəyişdirilmir — dəyişiklik üçün bizimlə əlaqə saxlayın ({email}).","accountInfo":"Hesab məlumatları","passwordSection":"Parol","name":"Ad Soyad","phone":"Telefon","agencyName":"Agentliyin adı","agencyDescription":"Agentlik haqqında","address":"Ünvan","website":"Veb sayt","save":"Yadda saxla","currentPassword":"Cari parol","newPassword":"Yeni parol","repeatPassword":"Yeni parol (təkrar)","passwordHint":"Ən azı 10 simvol.","changePassword":"Parolu dəyiş"
+  },
+  "savedSearches": {
+    "metaTitle":"Saxlanmış axtarışlarım","metaDescription":"Saxladığınız əmlak axtarışları və uyğunluq bildirişləri.",
+    "eyebrow":"Kabinet","title":"Saxlanmış axtarışlarım","count":"{count} axtarış",
+    "noFilters":"Filtrsiz — bütün elanlar","newMatches":"{count} yeni","pausedBadge":"Dayandırılıb","viewResults":"Nəticələrə bax",
+    "emptyTitle":"Hələ saxlanmış axtarışınız yoxdur","emptyDescription":"Axtarış nəticələrindən «Axtarışı saxla» düyməsi ilə filtrlərinizi yadda saxlaya bilərsiniz.","emptyAction":"Əmlaklara bax",
+    "saved":"Axtarış saxlanıldı.","notFound":"Saxlanmış axtarış tapılmadı.","paused":"Axtarış dayandırıldı.","resumed":"Axtarış yenidən aktivləşdirildi.","deleted":"Saxlanmış axtarış silindi.",
+    "pauseLabel":"{name} axtarışını dayandır","resumeLabel":"{name} axtarışını aktivləşdir","pause":"Dayandır","resume":"Aktivləşdir",
+    "deleteLabel":"{name} axtarışını sil","deleteTitle":"Saxlanmış axtarışı sil","deleteDescription":"«{name}» saxlanmış axtarışı silinəcək. Bu geri qaytarıla bilməz.","delete":"Sil",
+    "frequency":{"immediate":"Dərhal","daily":"Gündəlik","weekly":"Həftəlik","off":"Söndürülüb"}
   }
 }
