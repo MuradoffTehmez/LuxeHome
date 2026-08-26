@@ -4,10 +4,12 @@ import {
   ACCOUNT_TYPES,
   ADMIN_PAGE_SIZE,
   AGENCY_EMPLOYEE_STATUSES,
+  NOTIFICATION_TYPES,
   PAGE_SIZE,
   POST_STATUSES,
   PUBLIC_PROPERTY_STATUSES,
   PROPERTY_STATUSES,
+  SAVED_SEARCH_FREQUENCIES,
   type SortOption,
 } from "@/lib/constants";
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
@@ -1703,4 +1705,176 @@ export async function getAdminRedirects() {
 /** Panel — ən çox rast gəlinən 404-lər (yönləndirmə ehtiyacını göstərir). */
 export async function getTopNotFoundHits(take = 30) {
   return prisma.notFoundHit.findMany({ orderBy: { count: "desc" }, take });
+}
+
+// ---------------------------------------------------------------------------
+// SAXLANMIŞ AXTARIŞ UYĞUNLUQ MÜHƏRRİKİ
+// ---------------------------------------------------------------------------
+
+type SavedSearchNotificationInput = {
+  userId: string;
+  type: string;
+  title: string;
+  content: string;
+  actionUrl: string;
+};
+
+type SavedSearchMatchProperty = {
+  title: string;
+  slug: string;
+};
+
+type ActiveSavedSearch = {
+  id: string;
+  userId: string;
+  name: string;
+  filters: string;
+  frequency: string;
+  user: { email: string };
+};
+
+export type SavedSearchMatchStore = {
+  findActiveSavedSearches(): Promise<ActiveSavedSearch[]>;
+  matchesFilters(filters: PropertyFilters, propertyId: string): Promise<boolean>;
+  recordMatch(savedSearchId: string, propertyId: string): Promise<boolean>;
+  getProperty(propertyId: string): Promise<SavedSearchMatchProperty | null>;
+  createNotification(input: SavedSearchNotificationInput): Promise<void>;
+  sendImmediateEmail(
+    userEmail: string,
+    property: SavedSearchMatchProperty,
+    searchName: string,
+  ): Promise<void>;
+};
+
+export async function runSavedSearchMatching(
+  propertyId: string,
+  store: SavedSearchMatchStore,
+): Promise<void> {
+  const property = await store.getProperty(propertyId);
+  if (!property) return;
+
+  const searches = await store.findActiveSavedSearches();
+
+  for (const search of searches) {
+    let filters: PropertyFilters;
+    try {
+      filters = JSON.parse(search.filters) as PropertyFilters;
+    } catch {
+      continue;
+    }
+
+    const isMatch = await store.matchesFilters(filters, propertyId);
+    if (!isMatch) continue;
+
+    const isNewMatch = await store.recordMatch(search.id, propertyId);
+    if (!isNewMatch) continue;
+
+    await store.createNotification({
+      userId: search.userId,
+      type: NOTIFICATION_TYPES.SAVED_SEARCH_MATCH,
+      title: `"${search.name}" axtarışına uyğun yeni elan`,
+      content: property.title,
+      actionUrl: `/emlaklar/${property.slug}`,
+    });
+
+    if (search.frequency === SAVED_SEARCH_FREQUENCIES.IMMEDIATE) {
+      try {
+        await store.sendImmediateEmail(search.user.email, property, search.name);
+      } catch (error) {
+        console.error("[saved-search] dərhal e-poçt göndərilmədi:", error);
+      }
+    }
+  }
+}
+
+/**
+ * Prisma-nın `PrismaClientKnownRequestError` sinifini import etmək (`@prisma/client/wasm.js`
+ * `exports` xəritəsi ilə) workerd test mühitində modul həlli xətası yaradır — bax
+ * `src/lib/prisma.ts`-dəki wasm qeydi. `code` sahəsinə görə "duck typing" yoxlaması
+ * Prisma-nın rəsmi sənədlərində də tövsiyə olunan təhlükəsiz alternativdir.
+ */
+function isPrismaKnownRequestErrorCode(error: unknown, code: string): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code: unknown }).code === code
+  );
+}
+
+const savedSearchMatchStore: SavedSearchMatchStore = {
+  async findActiveSavedSearches() {
+    return prisma.savedSearch.findMany({
+      where: { enabled: true },
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        filters: true,
+        frequency: true,
+        user: { select: { email: true } },
+      },
+    });
+  },
+
+  async matchesFilters(filters, propertyId) {
+    const match = await prisma.property.findFirst({
+      where: { ...buildPropertyWhere(filters), id: propertyId },
+      select: { id: true },
+    });
+    return match !== null;
+  },
+
+  async recordMatch(savedSearchId, propertyId) {
+    try {
+      await prisma.savedSearchMatch.create({ data: { savedSearchId, propertyId } });
+      return true;
+    } catch (error) {
+      // Unikal indeks toqquşması (P2002) — bu əmlak bu axtarışa artıq bildirilib.
+      //
+      // Prisma-nın `PrismaClientKnownRequestError` sinifini `@prisma/client/wasm.js`-dən
+      // idxal etmək workerd test mühitində (Vitest + Miniflare) modul/tip həlli xətası
+      // yaradır — bax `src/lib/prisma.ts`-dəki wasm qeydinə: bu paketin `exports`
+      // xəritəsi şərti çox qatlıdır. `code` sahəsinə görə "duck typing" yoxlaması
+      // Prisma-nın rəsmi sənədlərində də istifadə olunan təhlükəsiz alternativdir.
+      if (isPrismaKnownRequestErrorCode(error, "P2002")) {
+        return false;
+      }
+      throw error;
+    }
+  },
+
+  async getProperty(propertyId) {
+    return prisma.property.findUnique({
+      where: { id: propertyId },
+      select: { title: true, slug: true },
+    });
+  },
+
+  async createNotification(input) {
+    await prisma.notification.create({
+      data: {
+        userId: input.userId,
+        type: input.type,
+        title: input.title,
+        content: input.content,
+        actionUrl: input.actionUrl,
+      },
+    });
+  },
+
+  async sendImmediateEmail(userEmail, property, searchName) {
+    // Dinamik import qəsdən: `resend` paketi statik idxal olunsaydı, bu modulu
+    // yükləyən hər domen testi (unit test) onu da yükləməyə məcbur olardı.
+    const { sendSavedSearchMatchEmail } = await import("@/lib/email");
+    await sendSavedSearchMatchEmail(userEmail, property, searchName);
+  },
+};
+
+export async function notifyMatchingSavedSearches(propertyId: string): Promise<void> {
+  try {
+    await runSavedSearchMatching(propertyId, savedSearchMatchStore);
+  } catch (error) {
+    console.error("[saved-search] uyğunluq yoxlanmadı:", error);
+  }
 }

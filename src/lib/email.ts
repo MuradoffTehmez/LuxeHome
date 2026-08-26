@@ -917,3 +917,26 @@ export async function sendShowcaseEmail(payload: ShowcaseEmailPayload) {
   });
 }
 
+export type SavedSearchMatchEmailProperty = {
+  title: string;
+  slug: string;
+};
+
+/**
+ * Saxlanmış axtarışa uyğun yeni elan barədə istifadəçiyə dərhal e-poçt bildirişi.
+ *
+ * Müvəqqəti stub: hazırkı alt-tapşırıq (uyğunluq mühərriki) bu funksiyanı
+ * çağırır, lakin real HTML şablonu ayrıca alt-tapşırıqda yazılacaq. O vaxta
+ * qədər heç nə göndərmir ki, `notifyMatchingSavedSearches` importu tipcheck-i
+ * poza bilməsin.
+ */
+export async function sendSavedSearchMatchEmail(
+  userEmail: string,
+  property: SavedSearchMatchEmailProperty,
+  searchName: string,
+): Promise<void> {
+  void userEmail;
+  void property;
+  void searchName;
+}
+
