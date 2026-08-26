@@ -63,7 +63,7 @@ describe("saxlanmış axtarış uyğunluq mühərriki", () => {
         type: "SAVED_SEARCH_MATCH",
         title: '"Yasamal 3 otaqlı" axtarışına uyğun yeni elan',
         content: PROPERTY.title,
-        actionUrl: `/emlaklar/${PROPERTY.slug}`,
+        actionUrl: `/az/emlaklar/${PROPERTY.slug}`,
       },
     ]);
     expect(calls.sendImmediateEmail).toEqual([

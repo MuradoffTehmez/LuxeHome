@@ -4,6 +4,7 @@ import {
   ACCOUNT_TYPES,
   ADMIN_PAGE_SIZE,
   AGENCY_EMPLOYEE_STATUSES,
+  DEFAULT_LOCALE,
   NOTIFICATION_TYPES,
   PAGE_SIZE,
   POST_STATUSES,
@@ -12,6 +13,7 @@ import {
   SAVED_SEARCH_FREQUENCIES,
   type SortOption,
 } from "@/lib/constants";
+import { localizePath } from "@/i18n/path-locale";
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
 import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
 
@@ -1774,7 +1776,7 @@ export async function runSavedSearchMatching(
       type: NOTIFICATION_TYPES.SAVED_SEARCH_MATCH,
       title: `"${search.name}" axtarışına uyğun yeni elan`,
       content: property.title,
-      actionUrl: `/emlaklar/${property.slug}`,
+      actionUrl: localizePath(`/emlaklar/${property.slug}`, DEFAULT_LOCALE),
     });
 
     if (search.frequency === SAVED_SEARCH_FREQUENCIES.IMMEDIATE) {
