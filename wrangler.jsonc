@@ -103,7 +103,13 @@
         "ADMIN_ENABLED": "true",
         // robots.ts və seo.ts bunu görüb bütün səhifələri indeksdən çıxarır
         "IS_STAGING": "true",
-        "SITE_URL": "https://luxehomeestate-staging.amiyevbahadur.workers.dev"
+        "SITE_URL": "https://luxehomeestate-staging.amiyevbahadur.workers.dev",
+        // `vars` mühitlərə irsi ötürülmür — bu iki açar yuxarıda olsa da burada
+        // təkrarlanmalıdır, əks halda staging-də «Trafik analitikası» paneli
+        // GraphQL sorğusunu qura bilmir. Zona və hesab prod ilə eynidir:
+        // staging öz custom domenini almır, ona görə ölçülən zona da eyni qalır.
+        "CF_ZONE_ID": "d401a9f612bc47ed88e1c14e658141d1",
+        "CF_ACCOUNT_ID": "8e6ae175474aa8e5033b3b9087775250"
       },
 
       "ratelimits": [

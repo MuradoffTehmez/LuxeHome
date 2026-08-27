@@ -21,7 +21,9 @@ const eslintConfig = [
       // Avtomatik yaradılan fayllar
       "cloudflare-env.d.ts",
       ".open-next/**",
+      // Kök və alt qovluqdakı worker-lərin (workers/*) wrangler build artefaktları
       ".wrangler/**",
+      "**/.wrangler/**",
     ],
   },
 ];
