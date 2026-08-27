@@ -13,9 +13,6 @@ import { ContactForm } from "./contact-form";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
-// Əlaqə məlumatları paneldən dəyişdiyi üçün səhifə hər sorğuda aktual Setting dəyərlərini oxuyur.
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "contact" });

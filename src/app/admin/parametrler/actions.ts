@@ -62,7 +62,7 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
     revalidatePath("/admin/parametrler");
     revalidatePath("/admin");
     revalidatePath("/", "layout");
-    revalidatePath("/elaqe");
+    for (const locale of ["az", "en", "ru"]) revalidatePath(`/${locale}/elaqe`);
     return success("Parametrlər yadda saxlanıldı.");
   } catch (error) {
     return unexpected("parametrlər saxlanılmadı", error);
