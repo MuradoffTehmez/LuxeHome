@@ -12,9 +12,10 @@ import listings from "@/i18n/locales/az/listings.json";
 import content from "@/i18n/locales/az/content.json";
 import contact from "@/i18n/locales/az/contact.json";
 import legal from "@/i18n/locales/az/legal.json";
+import partners from "@/i18n/locales/az/partners.json";
 import seoLandings from "@/i18n/locales/az/seoLandings.json";
 
-const messages = { common, navigation, auth, account, property, validation, home, listings, content, contact, legal, seoLandings };
+const messages = { common, navigation, auth, account, property, validation, home, listings, content, contact, legal, partners, seoLandings };
 
 vi.mock("next-intl", async (importOriginal) => {
   const actual = await importOriginal<typeof import("next-intl")>();
