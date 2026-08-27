@@ -8,7 +8,6 @@ import {
   AdminTable,
   AdminTableCell,
   AdminTableRow,
-  StatusBadge,
 } from "@/components/admin/admin-ui";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
 import {
@@ -29,6 +28,7 @@ import {
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminLeads } from "@/lib/queries";
 import { deleteLead } from "./actions";
+import { LeadQuickStatus } from "./lead-quick-status";
 
 export const metadata: Metadata = { title: "Müraciətlər" };
 export const dynamic = "force-dynamic";
@@ -157,9 +157,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                     {formatPhone(lead.phone)}
                   </a>
                 }
-                status={
-                  <StatusBadge status={lead.status as LeadStatus} label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} />
-                }
+                status={<LeadQuickStatus id={lead.id} status={lead.status as LeadStatus} name={lead.name} />}
                 actions={renderActions(lead)}
               >
                 <p className="[overflow-wrap:anywhere]">{lead.subject ?? lead.property?.title ?? "Mövzu yoxdur"}</p>
@@ -203,7 +201,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                     <AdminTableCell className="max-w-xs"><span className="line-clamp-1 text-sm text-ink-soft">{lead.subject ?? lead.property?.title ?? "—"}</span></AdminTableCell>
                     <AdminTableCell className="text-sm text-ink-soft">{LEAD_SOURCE_LABELS[lead.source as LeadSource]}</AdminTableCell>
                     <AdminTableCell className="text-sm text-ink-soft">{lead.assignee?.name ?? <span className="text-ink-muted">Təyin edilməyib</span>}</AdminTableCell>
-                    <AdminTableCell><StatusBadge status={lead.status as LeadStatus} label={LEAD_STATUS_LABELS[lead.status as LeadStatus]} /></AdminTableCell>
+                    <AdminTableCell><LeadQuickStatus id={lead.id} status={lead.status as LeadStatus} name={lead.name} /></AdminTableCell>
                     <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{formatRelative(lead.createdAt)}</AdminTableCell>
                     <AdminTableCell align="right"><div className="flex items-center justify-end gap-0.5">{renderActions(lead)}</div></AdminTableCell>
                   </AdminTableRow>
