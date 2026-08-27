@@ -340,7 +340,7 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
     throw error;
   }
 
-  const ids = form.list(formData, "ids");
+  const ids = form.uniqueList(formData, "ids");
   if (ids.length === 0) return failure("Heç bir elan seçilməyib.");
 
   const intent = form.text(formData, "intent") as BulkIntent;

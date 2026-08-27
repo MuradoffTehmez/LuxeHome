@@ -42,6 +42,14 @@ export function list(formData: FormData, name: string): string[] {
     .filter((value) => value !== "");
 }
 
+/**
+ * Responsive görünüşlərdə eyni checkbox həm kart, həm cədvəl DOM-unda ola bilər.
+ * Kütləvi əməliyyatda eyni qeydin iki dəfə işlənməməsi üçün təkrarsız siyahı.
+ */
+export function uniqueList(formData: FormData, name: string): string[] {
+  return [...new Set(list(formData, name))];
+}
+
 /** Sətir-başına-bir-maddə formatındakı textarea → massiv. */
 export function lines(formData: FormData, name: string): string[] {
   return text(formData, name)
