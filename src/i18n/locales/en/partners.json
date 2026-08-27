@@ -9,7 +9,7 @@
   "externalSiteAria": "Open the {name} website in a new tab",
   "details": "Details",
   "list": {
-    "metaTitle": "Our Official Partners | Luxe Home Estate",
+    "metaTitle": "Our Official Partners",
     "metaDescription": "The official partners of Luxe Home Estate: brokers, agencies, developers and strategic partners. Broader opportunities through trusted collaboration.",
     "eyebrow": "Collaboration",
     "title": "Our partners",
@@ -26,7 +26,7 @@
     "ctaAction": "Get in touch"
   },
   "detail": {
-    "metaTitle": "{name} — Official Partner | Luxe Home Estate",
+    "metaTitle": "{name} — Official Partner",
     "metaDescriptionFallback": "{name} — an official partner of Luxe Home Estate. Areas of collaboration, related listings and projects.",
     "aboutPartnership": "About the partnership",
     "directions": "Areas of collaboration",

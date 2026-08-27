@@ -9,7 +9,7 @@
   "externalSiteAria": "Открыть сайт {name} в новой вкладке",
   "details": "Подробнее",
   "list": {
-    "metaTitle": "Наши официальные партнёры | Luxe Home Estate",
+    "metaTitle": "Наши официальные партнёры",
     "metaDescription": "Официальные партнёры Luxe Home Estate: брокеры, агентства, застройщики и стратегические партнёры. Больше возможностей благодаря надёжному сотрудничеству.",
     "eyebrow": "Сотрудничество",
     "title": "Наши партнёры",
@@ -26,7 +26,7 @@
     "ctaAction": "Связаться с нами"
   },
   "detail": {
-    "metaTitle": "{name} — Официальный партнёр | Luxe Home Estate",
+    "metaTitle": "{name} — Официальный партнёр",
     "metaDescriptionFallback": "{name} — официальный партнёр Luxe Home Estate. Направления сотрудничества, связанные объявления и проекты.",
     "aboutPartnership": "О сотрудничестве",
     "directions": "Направления сотрудничества",
