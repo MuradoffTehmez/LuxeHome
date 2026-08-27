@@ -1,0 +1,45 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "luxehomeestate-cron",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-20",
+
+  // Bu worker `fetch` handler daşımır — yalnız cron ilə işə düşür.
+  // workers.dev alt domeni mənasız ictimai ünvan yaradardı.
+  "workers_dev": false,
+
+  "observability": {
+    "enabled": true
+  },
+
+  // 05:00 UTC = 09:00 Bakı vaxtı.
+  //
+  // Gündəlik bir işləmə həm `DAILY`, həm `WEEKLY` tezliyini örtür: hansı
+  // axtarışın vaxtının çatdığını `isDigestDue()` özü hesablayır, ona görə
+  // həftəlik üçün ayrıca cron lazım deyil.
+  "triggers": {
+    "crons": ["0 5 * * *"]
+  },
+
+  "vars": {
+    "DIGEST_URL": "https://luxehomeestate.az/api/cron/saved-search-digest"
+  },
+
+  // Staging ayrıca worker-dir və **ayrıca `CRON_SECRET` daşımalıdır** —
+  // eyni sirr işlədilsəydi, staging-dən gələn çağırış production digest-ini
+  // işə sala bilərdi.
+  "env": {
+    "staging": {
+      "workers_dev": false,
+      "observability": { "enabled": true },
+
+      "triggers": {
+        "crons": ["0 5 * * *"]
+      },
+
+      "vars": {
+        "DIGEST_URL": "https://luxehomeestate-staging.amiyevbahadur.workers.dev/api/cron/saved-search-digest"
+      }
+    }
+  }
+}

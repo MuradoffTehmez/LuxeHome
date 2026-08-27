@@ -58,6 +58,8 @@ next-env.d.ts
 # Cloudflare
 /.open-next/
 /.wrangler/
+# Alt qovluqdakı worker-lərin (workers/*) öz build artefaktları
+**/.wrangler/
 .dev.vars
 !.env.production
 

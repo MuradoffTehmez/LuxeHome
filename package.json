@@ -22,6 +22,8 @@
     "db:clean-demo:remote": "wrangler d1 execute DB --remote --file=prisma/remove-demo-content.sql",
     "db:studio": "prisma studio",
     "deploy:staging": "cross-env SITE_URL=https://luxehomeestate-staging.amiyevbahadur.workers.dev IS_STAGING=true opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env staging",
+    "deploy:cron": "wrangler deploy --config workers/saved-search-cron/wrangler.jsonc --env=\"\"",
+    "deploy:cron:staging": "wrangler deploy --config workers/saved-search-cron/wrangler.jsonc --env staging",
     "preview:staging": "cross-env SITE_URL=https://luxehomeestate-staging.amiyevbahadur.workers.dev IS_STAGING=true opennextjs-cloudflare build && opennextjs-cloudflare preview -- --env staging",
     "db:migrate:staging": "wrangler d1 migrations apply DB --remote --env staging",
     "db:seed:staging": "wrangler d1 execute DB --remote --env staging --file=prisma/seed.sql",
