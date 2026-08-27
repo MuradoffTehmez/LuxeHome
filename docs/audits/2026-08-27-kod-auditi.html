@@ -534,7 +534,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
   </p>
 
   <div class="callout">
-    <strong>Bu sessiyada:</strong> B1–B8 düzəldildi (B4 — kod hazırdır, cron trigger əl ilə qoşulmalıdır), donma/yubanmanın dörd səbəbi tapılıb aradan qaldırıldı, səhifə keçid animasiyası əlavə olundu. 312 test, typecheck, lint və build təmizdir.<br><br><strong>Ən vacib üç iş idi:</strong> əlaqə formasına spam qoruması (B2), <code>viewCount</code>
+    <strong>Bu sessiyada:</strong> B1–B8 və B14 tam düzəldildi, donma/yubanmanın dörd səbəbi aradan qaldırıldı, səhifə keçid animasiyası və naviqasiya göstəricisi əlavə olundu, digest cron-u hər iki mühitdə qoşuldu. Production və staging yayımlandı; hər iki D1 miqrasiyaları ilə bərabərləşdirildi. 312 test, typecheck, lint və build təmizdir.<br><br><strong>Ən vacib üç iş idi:</strong> əlaqə formasına spam qoruması (B2), <code>viewCount</code>
     artımının bərpası (B3) və filtr birləşməsindəki üzərinə yazma xətası (B1). Üçü də
     kiçik dəyişiklikdir, üçü də bu gün canlı saytda istifadəçiyə təsir edir.
   </div>
@@ -764,7 +764,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
         <span class="bug-id">B4</span>
         <span class="bug-title">«Gündəlik» və «Həftəlik» bildiriş tezliyi heç vaxt göndərilmir</span>
         <span class="chip high">Yüksək</span>
-        <span class="chip fixed">Qismən — kod hazırdır</span>
+        <span class="chip fixed">Düzəldildi</span>
       </div>
       <div class="bug-loc">src/lib/queries.ts:1781 — runSavedSearchMatching() · wrangler.jsonc</div>
       <dl>
@@ -787,7 +787,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
           isə e-poçt anında işarələnməlidir. Alternativ: seçimləri müvəqqəti olaraq
           <code>IMMEDIATE</code> / <code>OFF</code> ilə məhdudlaşdır.
         </dd></div>
-              <div class="fix"><dt>Düzəliş</dt><dd>Digest mühərriki (<code>saved-search-digest.ts</code>) + sirlə qorunan marşrut (<code>/api/cron/saved-search-digest</code>) yazıldı; <code>lastNotifiedAt</code> / <code>notifiedAt</code> indi doldurulur. <strong>Qalan addım sizdədir:</strong> <code>CRON_SECRET</code> secret-i və Cloudflare cron trigger-i. OpenNext-in yaratdığı worker yalnız <code>fetch</code> ixrac edir, ona görə <code>scheduled()</code> handler əvəzinə marşrut seçildi — detallar route faylının şərhindədir.</dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd>Digest mühərriki (<code>saved-search-digest.ts</code>) + sirlə qorunan marşrut (<code>/api/cron/saved-search-digest</code>) yazıldı; <code>lastNotifiedAt</code> / <code>notifiedAt</code> indi doldurulur. Cədvəl <code>workers/saved-search-cron/</code> altındakı ayrıca worker ilə qurulub (<code>0 5 * * *</code> — 09:00 Bakı vaxtı): OpenNext-in yaratdığı worker yalnız <code>fetch</code> ixrac edir, ona görə <code>scheduled()</code> handler-i əsas worker-ə əlavə etmək əvəzinə cron ayrıca yayımlanır — sayt öz axınında qalır. Sirr hər iki mühitdə qoyuldu (staging ayrıca dəyər işlədir). Zəncir uçdan-uca yoxlanıldı: <code>{&quot;checked&quot;:0,&quot;sent&quot;:0,&quot;failed&quot;:0}</code>.</dd></div>
       </dl>
     </article>
 
@@ -925,6 +925,42 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
         <div><dt>Nəticə</dt><dd>
           Admin PRD bölmə 4 açıq şəkildə panel üçün də çoxdillilik tələb edir.
           Bu, indi kiçik boşluqdur — hər yeni admin səhifəsi ilə köçürmə qiyməti artır.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug high done">
+      <div class="bug-top">
+        <span class="bug-id">B14</span>
+        <span class="bug-title">Saxlanmış axtarış cədvəlləri production bazasında ümumiyyətlə yox idi</span>
+        <span class="chip high">Yüksək</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">migrations/0012_saved_search_notifications.sql — remote D1-ə tətbiq edilməyib</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Miqrasiya repoda 26 avqustda yaradılıb və kod yayımlanıb, lakin
+          <code>npm run db:migrate:remote</code> heç vaxt işlədilməyib.
+          <code>SavedSearch</code>, <code>SavedSearchMatch</code> və <code>Notification</code>
+          cədvəlləri canlı bazada yox idi.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Saxlanmış axtarış və bildiriş modulu <strong>production-da 26 avqustdan bəri
+          sınıq işləyirdi</strong>: kabinetdəki iki səhifə, «Axtarışı saxla» düyməsi və dərc
+          anındakı uyğunluq yoxlaması. Sonuncu <code>try/catch</code> içində olduğu üçün
+          səssizcə udulurdu — ona görə heç bir xəta görünmürdü və problem üzə çıxmamışdı.
+          Bu, kod auditində deyil, <strong>digest marşrutunun canlı yoxlanmasında</strong>
+          tapıldı: sirr qoyulandan sonra marşrut 500 qaytardı.
+        </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          Miqrasiya production-a tətbiq olundu (additiv — yalnız <code>CREATE TABLE</code> və
+          indeks, mövcud sətirlərə toxunmur). Staging üç miqrasiya geridə idi
+          (<code>0010</code>, <code>0011</code>, <code>0012</code>) — o da bərabərləşdirildi.
+          Hər iki mühitdə indi <code>No migrations to apply!</code>.
+          <br><br>
+          <strong>Dərs:</strong> repoda miqrasiya olması onun tətbiq edildiyi demək deyil.
+          CI qurulanda (tövsiyə 4) <code>wrangler d1 migrations list</code> yoxlaması da
+          ora əlavə olunmalıdır — əks halda eyni səhv təkrarlanacaq.
         </dd></div>
       </dl>
     </article>
