@@ -64,6 +64,11 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
   let serviceId = id;
 
   try {
+    const existing = id
+      ? await prisma.service.findUnique({ where: { id }, select: { slug: true } })
+      : null;
+    if (id && !existing) return failure("Redaktə edilən xidmət tapılmadı. Siyahını yeniləyin.");
+
     const slug = await uniqueSlug(
       parsed.data.slug || parsed.data.title,
       (candidate) => prisma.service.findUnique({ where: { slug: candidate }, select: { id: true } }),
@@ -96,6 +101,10 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
       await recordAudit(user, "UPDATE", "Service", id, parsed.data.title);
       revalidatePath(LIST_PATH);
       revalidatePath(`/xidmetler/${slug}`);
+      if (existing && existing.slug !== slug) {
+        revalidatePath(`/xidmetler/${existing.slug}`);
+        revalidatePublicContent("service", existing.slug);
+      }
       revalidatePublicContent("service", slug);
       return success("Xidmət yeniləndi.");
     }
