@@ -57,8 +57,15 @@ export async function getOperationalSiteConfig() {
 }
 
 export async function getAllSettings(): Promise<Record<string, string>> {
-  const rows = await prisma.setting.findMany({ select: { key: true, value: true } });
-  return Object.fromEntries(rows.map((row) => [row.key, row.value]));
+  try {
+    const rows = await prisma.setting.findMany({ select: { key: true, value: true } });
+    return Object.fromEntries(rows.map((row) => [row.key, row.value]));
+  } catch (error) {
+    // Build/test və müvəqqəti DB nasazlığında ictimai səhifələr kodda təsdiqlənmiş
+    // ehtiyat məlumatlarla işləməyə davam edir.
+    console.error("[settings] parametrlər oxunmadı:", error);
+    return {};
+  }
 }
 
 /**
