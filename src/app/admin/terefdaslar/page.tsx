@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { AlertTriangle, Eye, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { AlertTriangle, Eye, EyeOff, Pencil, Plus, RotateCcw, ScanEye, Trash2 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
@@ -30,7 +30,7 @@ import {
 } from "@/lib/queries";
 import { daysUntilPartnershipEnd } from "@/lib/partners";
 import { formatRelative, isUnoptimizedImage } from "@/lib/utils";
-import { deletePartner, restorePartner } from "./actions";
+import { deletePartner, restorePartner, togglePartnerVisibility } from "./actions";
 
 export const metadata: Metadata = { title: "Tərəfdaşlar" };
 export const dynamic = "force-dynamic";
@@ -59,6 +59,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
   const canCreate = hasPermission(user.role, PERMISSIONS.PARTNER_CREATE);
   const canUpdate = hasPermission(user.role, PERMISSIONS.PARTNER_UPDATE);
   const canDelete = hasPermission(user.role, PERMISSIONS.PARTNER_DELETE);
+  const canPublish = hasPermission(user.role, PERMISSIONS.PARTNER_PUBLISH);
   const params = await searchParams;
   const deleted = one(params, "silinmis") === "1";
   const period = one(params, "yaradilma");
@@ -114,6 +115,19 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
     </ConfirmAction>
   ) : null) : (
     <>
+      {canPublish ? (
+        <ConfirmAction
+          action={togglePartnerVisibility}
+          id={partner.id}
+          label={partner.showPublicly ? `«${partner.name}» tərəfdaşını saytdan gizlət` : `«${partner.name}» tərəfdaşını saytda göstər`}
+          title={partner.showPublicly ? "Tərəfdaşı saytdan gizlətmək" : "Tərəfdaşı saytda göstərmək"}
+          description={partner.showPublicly ? "Məlumat silinməyəcək; ictimai profil və ana səhifə görünüşü bağlanacaq." : "Aktiv tərəfdaşın ictimai profili dərhal açılacaq."}
+          confirmLabel={partner.showPublicly ? "Gizlət" : "Saytda göstər"}
+          tone={partner.showPublicly ? "danger" : "neutral"}
+        >
+          {partner.showPublicly ? <EyeOff className="size-4" aria-hidden="true" /> : <ScanEye className="size-4" aria-hidden="true" />}
+        </ConfirmAction>
+      ) : null}
       {partner.showPublicly ? (
         <Link
           href={`/terefdaslar/${partner.slug}`}

@@ -7,10 +7,11 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
-import { getAdminProjectById, getCityOptions } from "@/lib/queries";
+import { getAdminProjectById, getAdminProjectPartnerLinks, getCityOptions, getPartnerOptions } from "@/lib/queries";
 import { deleteProject, updateProject } from "../actions";
 import type { ProjectFormValues } from "../form-values";
 import { ProjectForm } from "../project-form";
+import { ProjectPartnersManager } from "../project-partners-manager";
 
 export const metadata: Metadata = { title: "Layihənin redaktəsi" };
 export const dynamic = "force-dynamic";
@@ -24,7 +25,12 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
   await requireAdminRead(PERMISSIONS.PROJECT_MANAGE);
 
   const { id } = await params;
-  const [project, cities] = await Promise.all([getAdminProjectById(id), getCityOptions()]);
+  const [project, cities, partnerLinks, partnerOptions] = await Promise.all([
+    getAdminProjectById(id),
+    getCityOptions(),
+    getAdminProjectPartnerLinks(id),
+    getPartnerOptions(),
+  ]);
 
   if (!project) notFound();
 
@@ -114,6 +120,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
           )
         }
       />
+      <ProjectPartnersManager projectId={project.id} links={partnerLinks} options={partnerOptions} />
     </>
   );
 }

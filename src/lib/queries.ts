@@ -2608,6 +2608,7 @@ export async function getAdminProjectPartnerLinks(projectId: string) {
       id: true,
       partnerId: true,
       role: true,
+      sourceUrl: true,
       isPublic: true,
       isPrimary: true,
       partner: { select: { name: true, slug: true } },
@@ -2636,6 +2637,7 @@ export async function getAdminPartnerRelations(partnerId: string) {
       select: {
         id: true,
         role: true,
+        sourceUrl: true,
         isPublic: true,
         isPrimary: true,
         project: { select: { id: true, name: true, slug: true } },

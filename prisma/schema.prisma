@@ -888,6 +888,8 @@ model ProjectPartner {
   partnerId String
 
   role      String  @default("DEVELOPER")
+  /// Tərəfdaşın öz saytındakı layihə ünvanı.
+  sourceUrl String?
   isPublic  Boolean @default(true)
   isPrimary Boolean @default(false)
 

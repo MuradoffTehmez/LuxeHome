@@ -403,6 +403,44 @@ export async function restorePartner(id: string): Promise<ActionState> {
   }
 }
 
+/** Siyahıdan tərəfdaş profilini silmədən saytda göstərir və ya gizlədir. */
+export async function togglePartnerVisibility(id: string): Promise<ActionState> {
+  let user: AuthUser;
+  try {
+    user = await requireAdminAction(PERMISSIONS.PARTNER_PUBLISH);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  try {
+    const partner = await prisma.partner.findFirst({
+      where: { id, deletedAt: null },
+      select: { id: true, name: true, slug: true, status: true, showPublicly: true },
+    });
+    if (!partner) return failure("Tərəfdaş tapılmadı.");
+    if (!partner.showPublicly && partner.status !== PARTNER_STATUSES.ACTIVE) {
+      return failure("Saytda göstərmək üçün tərəfdaşın statusu əvvəlcə «Aktiv» olmalıdır.");
+    }
+
+    const showPublicly = !partner.showPublicly;
+    await prisma.partner.update({
+      where: { id },
+      data: {
+        showPublicly,
+        showOnHomepage: showPublicly ? undefined : false,
+        updatedById: user.id,
+      },
+    });
+    await recordAudit(user, showPublicly ? "PUBLISH" : "UNPUBLISH", "Partner", id, partner.name);
+    revalidatePath(LIST_PATH);
+    revalidatePublicContent("partner", partner.slug);
+    return success(showPublicly ? "Tərəfdaş silinmədən saytda göstərildi." : "Tərəfdaş saytdan gizlədildi; məlumatları saxlanıldı.");
+  } catch (error) {
+    return unexpected("tərəfdaş görünüşü dəyişmədi", error);
+  }
+}
+
 /** Cron-un sonradan eyni service məntiqini çağırması üçün toplu expiration əməliyyatı. */
 export async function expireOverduePartners(): Promise<ActionState> {
   let user: AuthUser;
@@ -512,10 +550,12 @@ export async function addPartnerRelation(
           projectId: entityId,
           partnerId: parsed.data.partnerId,
           role: parsed.data.role,
+          sourceUrl: parsed.data.sourceUrl,
           isPublic: parsed.data.isPublic,
           isPrimary: parsed.data.isPrimary,
         },
       });
+      revalidatePath(`/admin/layiheler/${entityId}`);
       revalidatePublicContent("project", project.slug);
     } else {
       const agency = await prisma.agency.findUnique({
@@ -554,6 +594,7 @@ export async function removePartnerRelation(
   formData: FormData,
 ): Promise<ActionState> {
   let user: AuthUser;
+  let relatedProjectId: string | null = null;
   try {
     user = await requireAdminAction(PERMISSIONS.PARTNER_RELATION_MANAGE);
   } catch (error) {
@@ -570,6 +611,11 @@ export async function removePartnerRelation(
     if (entity === "property") {
       await prisma.propertyPartner.deleteMany({ where: { id: relationId, partnerId } });
     } else if (entity === "project") {
+      const relation = await prisma.projectPartner.findFirst({
+        where: { id: relationId, partnerId },
+        select: { projectId: true },
+      });
+      relatedProjectId = relation?.projectId ?? null;
       await prisma.projectPartner.deleteMany({ where: { id: relationId, partnerId } });
     } else {
       await prisma.agencyPartner.deleteMany({ where: { id: relationId, partnerId } });
@@ -583,6 +629,7 @@ export async function removePartnerRelation(
       oldValue: { entity, relationId },
     });
     revalidatePath(`${LIST_PATH}/${partnerId}`);
+    if (relatedProjectId) revalidatePath(`/admin/layiheler/${relatedProjectId}`);
     if (partner) revalidatePublicContent("partner", partner.slug);
     return success("Əlaqə silindi.");
   } catch (error) {

@@ -70,9 +70,9 @@ export function PartnerRelationsManager({
             ))}
           </select>
         </label>
-        {entityType === "property" ? (
+        {entityType === "property" || entityType === "project" ? (
           <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
-            Mənbə URL
+            {entityType === "project" ? "Layihənin tərəfdaş səhifəsi" : "Mənbə URL"}
             <input name="sourceUrl" type="url" className={fieldClass} placeholder="https://…" />
           </label>
         ) : <div />}
