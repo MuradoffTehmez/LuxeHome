@@ -1,8 +1,8 @@
 /**
  * Cloudflare GraphQL Analytics API-dən zona trafik statistikası.
  *
- * `CLOUDFLARE_ANALYTICS_TOKEN` (secret, `Account Analytics:Read` səlahiyyəti ilə)
- * və `CF_ZONE_ID` (vars, sirr deyil) lazımdır. Hər ikisi Workers-də yalnız
+ * `CLOUDFLARE_ANALYTICS_TOKEN` (secret, sorğulanan resurs üçün Analytics:Read
+ * səlahiyyəti ilə) və `CF_ZONE_ID` (vars, sirr deyil) lazımdır. Hər ikisi Workers-də yalnız
  * sorğu kontekstində dolur, ona görə oxuma ilk istifadə anında baş verir.
  */
 
@@ -34,6 +34,31 @@ type GraphQlResponse = {
     };
   };
 };
+
+const PERMISSION_REASON =
+  "Cloudflare tokeninin bu zona üçün «Analytics: Read» icazəsi yoxdur. " +
+  "CLOUDFLARE_ANALYTICS_TOKEN secret-ini uyğun icazəli tokenlə yeniləyin.";
+
+/**
+ * Provider-in daxili actor/token identifikatorunu panelə çıxarmadan operatora
+ * bərpa addımı verir. Bu mətn dar mobil ekranda da daşmamalıdır.
+ */
+export function analyticsFailureReason(status?: number, messages: string[] = []): string {
+  const detail = messages.join(" ").toLocaleLowerCase("en");
+
+  if (
+    status === 401 ||
+    status === 403 ||
+    /permission|unauthori[sz]ed|not authori[sz]ed|does not have access/.test(detail)
+  ) {
+    return PERMISSION_REASON;
+  }
+  if (status === 429 || /rate limit|too many|excessive resources/.test(detail)) {
+    return "Cloudflare analitika sorğusu müvəqqəti limitə çatıb. Bir qədər sonra yenidən yoxlayın.";
+  }
+  if (status) return `Cloudflare Analytics API sorğusu tamamlanmadı (HTTP ${status}).`;
+  return "Cloudflare analitika sorğusu tamamlanmadı. Bir qədər sonra yenidən yoxlayın.";
+}
 
 /** Son N gün üçün gündəlik sorğu/pageview/unikal ziyarətçi statistikası. */
 export async function getSearchAnalytics(daysBack = 14): Promise<SearchAnalyticsResult> {
@@ -80,12 +105,20 @@ export async function getSearchAnalytics(daysBack = 14): Promise<SearchAnalytics
   }
 
   if (!response.ok) {
-    return { available: false, reason: `Cloudflare API xətası (HTTP ${response.status}).` };
+    return { available: false, reason: analyticsFailureReason(response.status) };
   }
 
-  const json = (await response.json()) as GraphQlResponse;
+  let json: GraphQlResponse;
+  try {
+    json = (await response.json()) as GraphQlResponse;
+  } catch {
+    return { available: false, reason: analyticsFailureReason() };
+  }
   if (json.errors?.length) {
-    return { available: false, reason: json.errors[0]?.message ?? "Naməlum GraphQL xətası." };
+    return {
+      available: false,
+      reason: analyticsFailureReason(undefined, json.errors.map((error) => error.message)),
+    };
   }
 
   const groups = json.data?.viewer?.zones?.[0]?.httpRequests1dGroups ?? [];
