@@ -4,7 +4,6 @@ import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import {
   AdminCheckbox,
   AdminInput,
-  AdminSelect,
   AdminTextarea,
   FullWidth,
 } from "@/components/admin/form-fields";
@@ -15,7 +14,6 @@ export function SettingsForm({
   notifyEnabled,
   announcement,
   fallbackEmail,
-  defaultTheme,
   contactPhone,
   contactEmail,
   contactAddress,
@@ -26,7 +24,6 @@ export function SettingsForm({
   notifyEnabled: boolean;
   announcement: string;
   fallbackEmail: string;
-  defaultTheme: string;
   contactPhone: string;
   contactEmail: string;
   contactAddress: string;
@@ -35,17 +32,6 @@ export function SettingsForm({
 }) {
   return (
     <AdminForm action={saveSettings} submitLabel="Parametrləri saxla">
-      <FormSection
-        title="Saytın görünüşü"
-        description="İlk dəfə daxil olan ziyarətçi üçün defolt tema. Hesab sahibi sonradan öz profilindən dəyişə bilər."
-      >
-        <AdminSelect name="defaultTheme" label="Defolt tema" defaultValue={defaultTheme} options={[
-          { value: "light", label: "Açıq" },
-          { value: "dark", label: "Tünd" },
-          { value: "system", label: "Cihaz ayarı" },
-        ]} />
-      </FormSection>
-
       <FormSection
         title="Əməliyyat əlaqə məlumatları"
         description="Əlaqə səhifəsi və footer bu dəyərləri dərhal istifadə edir. Boş sahə kodda təsdiqlənmiş ehtiyat dəyərə qayıdır."

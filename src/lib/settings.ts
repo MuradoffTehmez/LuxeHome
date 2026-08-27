@@ -17,7 +17,6 @@ export const SETTING_KEYS = {
   LEAD_NOTIFY_ENABLED: "lead.notify_enabled",
   /** Panel idarə səhifəsində komandaya göstərilən qeyd. */
   ADMIN_ANNOUNCEMENT: "admin.announcement",
-  DEFAULT_THEME: "site.default_theme",
   CONTACT_PHONE: "site.contact_phone",
   CONTACT_EMAIL: "site.contact_email",
   CONTACT_ADDRESS: "site.contact_address",

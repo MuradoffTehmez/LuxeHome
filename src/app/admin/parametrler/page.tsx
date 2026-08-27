@@ -29,7 +29,6 @@ export default async function AdminSettingsPage() {
           notifyEnabled={settings[SETTING_KEYS.LEAD_NOTIFY_ENABLED] !== "0"}
           announcement={settings[SETTING_KEYS.ADMIN_ANNOUNCEMENT] ?? ""}
           fallbackEmail={siteConfig.email}
-          defaultTheme={settings[SETTING_KEYS.DEFAULT_THEME] ?? "light"}
           contactPhone={settings[SETTING_KEYS.CONTACT_PHONE] ?? siteConfig.phone}
           contactEmail={settings[SETTING_KEYS.CONTACT_EMAIL] ?? siteConfig.email}
           contactAddress={settings[SETTING_KEYS.CONTACT_ADDRESS] ?? siteConfig.addressFull}

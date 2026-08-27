@@ -6,7 +6,6 @@ import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { jsonLd, organizationSchema, websiteSchema } from "@/lib/seo";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
-import { getSetting, SETTING_KEYS } from "@/lib/settings";
 import "./globals.css";
 
 /**
@@ -99,12 +98,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [locale, messages, configuredTheme] = await Promise.all([
-    getLocale(),
-    getMessages(),
-    getSetting(SETTING_KEYS.DEFAULT_THEME),
-  ]);
-  const defaultTheme = configuredTheme === "dark" || configuredTheme === "system" ? configuredTheme : "light";
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   return (
     <html lang={locale} suppressHydrationWarning className={`${playfair.variable} ${geist.variable}`}>
@@ -114,7 +109,7 @@ export default async function RootLayout({
       <body className="min-h-dvh antialiased">
         <script {...jsonLd(organizationSchema())} />
         <script {...jsonLd(websiteSchema())} />
-        <ThemeProvider defaultTheme={defaultTheme}>
+        <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
             {children}
             <AnalyticsProvider />

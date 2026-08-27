@@ -8,7 +8,8 @@ import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 
 /** Audit jurnalını yalnız Super Admin sıfırlaya bilər; sıfırlama faktının özü saxlanılır. */
-export async function clearAuditLog(_id: string): Promise<ActionState> {
+export async function clearAuditLog(id: string): Promise<ActionState> {
+  void id;
   let actor;
   try {
     actor = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
