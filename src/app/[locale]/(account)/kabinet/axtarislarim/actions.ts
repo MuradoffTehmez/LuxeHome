@@ -6,7 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAccount } from "@/lib/auth/guard";
 import { SAVED_SEARCH_FREQUENCIES, type Locale } from "@/lib/constants";
-import type { PropertyFilters } from "@/lib/queries";
+import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
 import { type ActionState, failure, success, toFieldErrors, unexpected } from "@/lib/admin/action-state";
 import * as form from "@/lib/admin/form";
 import { localizePath } from "@/i18n/path-locale";
@@ -39,17 +39,11 @@ export async function createSavedSearch(_prev: ActionState, formData: FormData):
   });
   if (!parsed.success) return failure(t("actions.invalidForm"), toFieldErrors(parsed.error));
 
-  let filters: PropertyFilters;
-  try {
-    filters = JSON.parse(parsed.data.filters) as PropertyFilters;
-  } catch {
-    return failure(t("actions.invalidForm"));
-  }
-  // Yaddaşda saxlanılan filtr yalnız axtarış kombinasiyasını təsvir edir —
-  // nəticə səhifəsinin sıralama/səhifələmə vəziyyəti buraya sızmır.
-  delete filters.sort;
-  delete filters.page;
-  delete filters.pageSize;
+  // Sxem həm formanı, həm də saxta POST-u yoxlayır: filtr JSON-u sonradan birbaşa
+  // Prisma `where` qurucusuna verilir, ona görə sahə tipləri burada təsdiqlənməlidir.
+  // Sxem `sort`/`page`/`pageSize` açarlarını onsuz da tanımır və atır.
+  const filters = parseSavedSearchFilters(parsed.data.filters);
+  if (!filters) return failure(t("actions.invalidForm"));
 
   try {
     await prisma.savedSearch.create({

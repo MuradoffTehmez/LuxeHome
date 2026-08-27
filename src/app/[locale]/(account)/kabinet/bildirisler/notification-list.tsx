@@ -3,11 +3,12 @@
 import { useTransition } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Bookmark, CheckCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { NOTIFICATION_TYPES, type NotificationType } from "@/lib/constants";
+import type { Locale, NotificationType } from "@/lib/constants";
+import { localizePath, pathnameWithoutLocale } from "@/i18n/path-locale";
 import { markAllNotificationsRead, markNotificationRead, deleteNotification } from "./actions";
 
 export type NotificationListItem = {
@@ -26,6 +27,7 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
 
 function NotificationRow({ item }: { item: NotificationListItem }) {
   const t = useTranslations("account.notifications");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const Icon = ICONS[item.type as NotificationType] ?? Bookmark;
@@ -74,7 +76,13 @@ function NotificationRow({ item }: { item: NotificationListItem }) {
       )}
     >
       {item.actionUrl ? (
-        <NextLink href={item.actionUrl} onClick={handleOpen} className="flex min-w-0 flex-1 items-start gap-3">
+        // Bildiriş bazada dilsiz yolla saxlanılır; link oxucunun cari dilinə burada
+        // uyğunlaşdırılır. Köhnə qeydlərdə prefiks ola bilər — əvvəlcə təmizlənir.
+        <NextLink
+          href={localizePath(pathnameWithoutLocale(item.actionUrl), locale)}
+          onClick={handleOpen}
+          className="flex min-w-0 flex-1 items-start gap-3"
+        >
           {body}
         </NextLink>
       ) : (

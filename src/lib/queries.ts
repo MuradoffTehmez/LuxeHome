@@ -1,19 +1,25 @@
 import { Prisma } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
   ADMIN_PAGE_SIZE,
   AGENCY_EMPLOYEE_STATUSES,
   DEFAULT_LOCALE,
+  LOCALES,
   NOTIFICATION_TYPES,
   PAGE_SIZE,
   POST_STATUSES,
   PUBLIC_PROPERTY_STATUSES,
   PROPERTY_STATUSES,
   SAVED_SEARCH_FREQUENCIES,
+  type Locale,
   type SortOption,
 } from "@/lib/constants";
-import { localizePath } from "@/i18n/path-locale";
+import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
+import type { DigestStore } from "@/lib/saved-search-digest";
+
+const LOCALE_VALUES = Object.values(LOCALES);
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
 import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
 
@@ -133,7 +139,25 @@ function publicPropertyWhere(): Prisma.PropertyWhereInput {
   };
 }
 
-function buildPropertyWhere(filters: PropertyFilters): Prisma.PropertyWhereInput {
+/**
+ * `where.AND`-ə şərt əlavə edir, mövcud şərtləri qoruyaraq.
+ *
+ * Birbaşa `where.AND = [...]` yazmaq təhlükəlidir: iki müstəqil filtr (məsələn
+ * «son mərtəbə olmasın» və xüsusiyyət seçimi) eyni sahəyə yazır və sonuncu
+ * birincini səssizcə silir. Filtr UI-da aktiv görünməyə davam edir, nəticə isə
+ * yanlış olur — ona görə hər əlavə bu funksiyadan keçir.
+ */
+function andWhere(
+  where: Prisma.PropertyWhereInput,
+  ...conditions: Prisma.PropertyWhereInput[]
+): void {
+  if (conditions.length === 0) return;
+  const existing = Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : [];
+  where.AND = [...existing, ...conditions];
+}
+
+/** Yalnız oxuma — filtr birləşmə məntiqi unit testlərlə örtülsün deyə ixrac olunur. */
+export function buildPropertyWhere(filters: PropertyFilters): Prisma.PropertyWhereInput {
   const where: Prisma.PropertyWhereInput = publicPropertyWhere();
 
   if (filters.statuses?.length) where.status = { in: filters.statuses };
@@ -184,38 +208,44 @@ function buildPropertyWhere(filters: PropertyFilters): Prisma.PropertyWhereInput
   // «Son mərtəbə olmasın» iki sütunun müqayisəsidir; Prisma bunu birbaşa dəstəkləmir,
   // ona görə xam SQL şərti ilə verilir
   if (filters.excludeLastFloor) {
-    where.AND = [
-      ...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []),
-      {
-        OR: [
-          { totalFloors: null },
-          { floor: null },
-          { floor: { lt: prisma.property.fields.totalFloors } },
-        ],
-      },
-    ];
+    andWhere(where, {
+      OR: [
+        { totalFloors: null },
+        { floor: null },
+        { floor: { lt: prisma.property.fields.totalFloors } },
+      ],
+    });
   }
 
   if (filters.withImagesOnly) {
     where.images = { some: {} };
   }
 
+  // Hər xüsusiyyət ayrıca AND şərtidir — «hovuz VƏ qaraj» seçimi ikisi də olan
+  // elanları qaytarmalıdır, birini daşıyanı yox.
   if (filters.featureSlugs?.length) {
-    where.AND = filters.featureSlugs.map((slug) => ({
-      features: { some: { feature: { slug } } },
-    }));
+    andWhere(
+      where,
+      ...filters.featureSlugs.map((slug) => ({
+        features: { some: { feature: { slug } } },
+      })),
+    );
   }
 
+  // Mətn axtarışı da AND-in içinə salınır: `where.OR` birbaşa yazılsaydı,
+  // gələcəkdə əlavə olunan hər OR-lu filtr onu üzərinə yazardı.
   if (filters.search) {
     const term = filters.search.trim();
     if (term) {
-      where.OR = [
-        { title: { contains: term } },
-        { description: { contains: term } },
-        { address: { contains: term } },
-        { city: { name: { contains: term } } },
-        { district: { name: { contains: term } } },
-      ];
+      andWhere(where, {
+        OR: [
+          { title: { contains: term } },
+          { description: { contains: term } },
+          { address: { contains: term } },
+          { city: { name: { contains: term } } },
+          { district: { name: { contains: term } } },
+        ],
+      });
     }
   }
 
@@ -1689,14 +1719,39 @@ export async function findActiveRedirect(path: string) {
  * Nadir hallarda (məs. bot skaneri) sətir sayı çox arta bilər, ona görə panel
  * yalnız ən çox rast gəlinənləri göstərir.
  */
+/** Cədvəldə saxlanılan fərqli yolların tavanı — skaner selini məhdudlaşdırır. */
+const NOT_FOUND_HIT_LIMIT = 5_000;
+/** Uzun yol yalnız jurnal üçündür; tam saxlamağın faydası yoxdur. */
+const NOT_FOUND_PATH_MAX = 512;
+
+/**
+ * 404 sayğacı.
+ *
+ * Marşrut autentifikasiyasız və `force-dynamic`-dir: təsadüfi URL-lərlə gəzən
+ * bir skaner cədvəldə limitsiz sətir yarada bilirdi. İndi iki hədd var —
+ * yolun uzunluğu və fərqli yolların sayı.
+ *
+ * Əvvəlcə `update` sınanır: təkrar 404 (adi hal) bir sorğuya düşür. Yalnız
+ * yeni yol üçün sayğac oxunur və sətir yaradılır.
+ */
 export async function recordNotFoundHit(path: string, referrer?: string | null) {
-  await prisma.notFoundHit
-    .upsert({
-      where: { path },
-      create: { path, referrer: referrer ?? null },
-      update: { count: { increment: 1 }, lastSeenAt: new Date(), referrer: referrer ?? undefined },
-    })
-    .catch(() => undefined);
+  const safePath = path.slice(0, NOT_FOUND_PATH_MAX);
+
+  try {
+    const updated = await prisma.notFoundHit.updateMany({
+      where: { path: safePath },
+      data: { count: { increment: 1 }, lastSeenAt: new Date(), referrer: referrer ?? undefined },
+    });
+    if (updated.count > 0) return;
+
+    if ((await prisma.notFoundHit.count()) >= NOT_FOUND_HIT_LIMIT) return;
+
+    await prisma.notFoundHit.create({
+      data: { path: safePath, referrer: referrer?.slice(0, NOT_FOUND_PATH_MAX) ?? null },
+    });
+  } catch {
+    // Sayğac jurnaldır — 404 səhifəsi ona görə sınmamalıdır
+  }
 }
 
 /** Panel — bütün yönləndirmələr. */
@@ -1732,7 +1787,7 @@ type ActiveSavedSearch = {
   name: string;
   filters: string;
   frequency: string;
-  user: { email: string };
+  user: { email: string; locale: string };
 };
 
 export type SavedSearchMatchStore = {
@@ -1741,8 +1796,14 @@ export type SavedSearchMatchStore = {
   recordMatch(savedSearchId: string, propertyId: string): Promise<boolean>;
   getProperty(propertyId: string): Promise<SavedSearchMatchProperty | null>;
   createNotification(input: SavedSearchNotificationInput): Promise<void>;
+  /** İstifadəçinin dilində bildiriş başlığı — mətn yazılma anında hazırlanır. */
+  notificationCopy(
+    locale: string,
+    searchName: string,
+  ): Promise<{ title: string }>;
   sendImmediateEmail(
     userEmail: string,
+    locale: string,
     property: SavedSearchMatchProperty,
     searchName: string,
   ): Promise<void>;
@@ -1758,33 +1819,65 @@ export async function runSavedSearchMatching(
   const searches = await store.findActiveSavedSearches();
 
   for (const search of searches) {
-    let filters: PropertyFilters;
+    // Hər saxlanmış axtarış öz təcridində işlənir.
+    //
+    // Əvvəl try/catch bütün döngəni əhatə edirdi: siyahıda əvvəldə duran bir
+    // pozulmuş filtr istisna atanda döngə dayanırdı və **sonrakı bütün
+    // istifadəçilər** həmin elan üçün bildiriş almırdı. İndi nasaz qeyd yalnız
+    // özünü keçir.
     try {
-      filters = JSON.parse(search.filters) as PropertyFilters;
-    } catch {
-      continue;
+      await matchOneSavedSearch(propertyId, property, search, store);
+    } catch (error) {
+      console.error(`[saved-search] «${search.id}» yoxlanmadı:`, error);
     }
+  }
+}
 
-    const isMatch = await store.matchesFilters(filters, propertyId);
-    if (!isMatch) continue;
+async function matchOneSavedSearch(
+  propertyId: string,
+  property: SavedSearchMatchProperty,
+  search: ActiveSavedSearch,
+  store: SavedSearchMatchStore,
+): Promise<void> {
+  // Pozulmuş və ya sxemə uyğun gəlməyən filtr sorğuya buraxılmır
+  const filters = parseSavedSearchFilters(search.filters);
+  if (!filters) return;
 
-    const isNewMatch = await store.recordMatch(search.id, propertyId);
-    if (!isNewMatch) continue;
+  // Söndürülmüş tezlik uyğunluğu qeyd etmir və bildiriş yaratmır
+  if (search.frequency === SAVED_SEARCH_FREQUENCIES.OFF) return;
 
-    await store.createNotification({
-      userId: search.userId,
-      type: NOTIFICATION_TYPES.SAVED_SEARCH_MATCH,
-      title: `"${search.name}" axtarışına uyğun yeni elan`,
-      content: property.title,
-      actionUrl: localizePath(`/emlaklar/${property.slug}`, DEFAULT_LOCALE),
-    });
+  const isMatch = await store.matchesFilters(filters, propertyId);
+  if (!isMatch) return;
 
-    if (search.frequency === SAVED_SEARCH_FREQUENCIES.IMMEDIATE) {
-      try {
-        await store.sendImmediateEmail(search.user.email, property, search.name);
-      } catch (error) {
-        console.error("[saved-search] dərhal e-poçt göndərilmədi:", error);
-      }
+  const isNewMatch = await store.recordMatch(search.id, propertyId);
+  if (!isNewMatch) return;
+
+  const copy = await store.notificationCopy(search.user.locale, search.name);
+
+  await store.createNotification({
+    userId: search.userId,
+    type: NOTIFICATION_TYPES.SAVED_SEARCH_MATCH,
+    title: copy.title,
+    content: property.title,
+    // Dil prefiksi qəsdən yoxdur: link klik anında oxucunun cari dilinə
+    // uyğunlaşdırılır (bax `bildirisler/notification-list.tsx`). Yazılma anında
+    // sabitlənsəydi, rus dilində gəzən istifadəçi AZ versiyaya düşərdi.
+    actionUrl: `/emlaklar/${property.slug}`,
+  });
+
+  // DAILY/WEEKLY üçün e-poçt burada getmir — uyğunluq `SavedSearchMatch`-də
+  // `notifiedAt: null` kimi qalır və digest işi (`/api/cron/saved-search-digest`)
+  // onu yığıb tək məktubda göndərir.
+  if (search.frequency === SAVED_SEARCH_FREQUENCIES.IMMEDIATE) {
+    try {
+      await store.sendImmediateEmail(
+        search.user.email,
+        search.user.locale,
+        property,
+        search.name,
+      );
+    } catch (error) {
+      console.error("[saved-search] dərhal e-poçt göndərilmədi:", error);
     }
   }
 }
@@ -1814,7 +1907,7 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
         name: true,
         filters: true,
         frequency: true,
-        user: { select: { email: true } },
+        user: { select: { email: true, locale: true } },
       },
     });
   },
@@ -1865,11 +1958,30 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
     });
   },
 
-  async sendImmediateEmail(userEmail, property, searchName) {
+  async notificationCopy(locale, searchName) {
+    // `getTranslations`-a dil açıq şəkildə verilir: bu kod istifadəçinin öz
+    // sorğusunda deyil, elanı dərc edən **admin sorğusunda** işləyir, ona görə
+    // request locale-i yanlış dili (adminin dilini) qaytarardı.
+    const safeLocale = (LOCALE_VALUES as readonly string[]).includes(locale)
+      ? (locale as Locale)
+      : DEFAULT_LOCALE;
+    try {
+      const t = await getTranslations({
+        locale: safeLocale,
+        namespace: "account.notifications",
+      });
+      return { title: t("savedSearchMatch", { name: searchName }) };
+    } catch (error) {
+      console.error("[saved-search] bildiriş mətni tərcümə olunmadı:", error);
+      return { title: `"${searchName}" axtarışına uyğun yeni elan` };
+    }
+  },
+
+  async sendImmediateEmail(userEmail, locale, property, searchName) {
     // Dinamik import qəsdən: `resend` paketi statik idxal olunsaydı, bu modulu
     // yükləyən hər domen testi (unit test) onu da yükləməyə məcbur olardı.
     const { sendSavedSearchMatchEmail } = await import("@/lib/email");
-    await sendSavedSearchMatchEmail(userEmail, property, searchName);
+    await sendSavedSearchMatchEmail(userEmail, locale, property, searchName);
   },
 };
 
@@ -1889,3 +2001,112 @@ export async function notifyMatchingSavedSearches(propertyId: string): Promise<v
 export async function getUnreadNotificationCount(userId: string): Promise<number> {
   return prisma.notification.count({ where: { userId, readAt: null } });
 }
+
+// ---------------------------------------------------------------------------
+// SAXLANMIŞ AXTARIŞ DIGEST-İ (GÜNDƏLİK / HƏFTƏLİK)
+// ---------------------------------------------------------------------------
+
+/**
+ * Digest mühərrikinin D1 implementasiyası.
+ *
+ * Mühərrikin özü `src/lib/saved-search-digest.ts`-dədir və store-u kənardan
+ * alır — beləliklə vaxt/tezlik məntiqi Prisma olmadan test edilə bilir.
+ */
+export const savedSearchDigestStore: DigestStore = {
+  async findDigestSavedSearches() {
+    return prisma.savedSearch.findMany({
+      where: {
+        enabled: true,
+        frequency: {
+          in: [SAVED_SEARCH_FREQUENCIES.DAILY, SAVED_SEARCH_FREQUENCIES.WEEKLY],
+        },
+      },
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        frequency: true,
+        lastNotifiedAt: true,
+        user: { select: { email: true, locale: true } },
+      },
+    });
+  },
+
+  async findPendingMatches(savedSearchId, limit) {
+    const matches = await prisma.savedSearchMatch.findMany({
+      where: {
+        savedSearchId,
+        notifiedAt: null,
+        // Elan bu arada silinib və ya qaralamaya qaytarılıbsa məktuba düşməməlidir
+        property: publicPropertyWhere(),
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      select: {
+        property: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            price: true,
+            currency: true,
+            images: {
+              orderBy: { order: "asc" },
+              take: 1,
+              select: { url: true },
+            },
+          },
+        },
+      },
+    });
+
+    return matches.map(({ property }) => ({
+      id: property.id,
+      title: property.title,
+      slug: property.slug,
+      price: property.price,
+      currency: property.currency,
+      imageUrl: property.images[0]?.url ?? null,
+    }));
+  },
+
+  async countPendingMatches(savedSearchId) {
+    return prisma.savedSearchMatch.count({
+      where: { savedSearchId, notifiedAt: null, property: publicPropertyWhere() },
+    });
+  },
+
+  async sendDigestEmail({ email, locale, searchName, frequency, properties, totalCount }) {
+    // Dinamik import: `resend` paketi bu modulu yükləyən unit testlərə düşməsin
+    const { sendSavedSearchDigestEmail } = await import("@/lib/email");
+    await sendSavedSearchDigestEmail({
+      userEmail: email,
+      locale,
+      searchName,
+      frequency,
+      properties,
+      totalCount,
+    });
+  },
+
+  async markNotified(savedSearchId, propertyIds, at) {
+    // D1 transaction dəstəkləmir: əvvəlcə uyğunluqlar möhürlənir, sonra axtarış.
+    // Sıra qəsdəndir — aradakı nasazlıqda təkrar məktub getmir, sadəcə növbəti
+    // işləmə `lastNotifiedAt`-ı yeniləyir.
+    await prisma.savedSearchMatch.updateMany({
+      where: { savedSearchId, propertyId: { in: propertyIds }, notifiedAt: null },
+      data: { notifiedAt: at },
+    });
+    await prisma.savedSearch.update({
+      where: { id: savedSearchId },
+      data: { lastNotifiedAt: at, lastCheckedAt: at },
+    });
+  },
+
+  async markChecked(savedSearchId, at) {
+    await prisma.savedSearch.update({
+      where: { id: savedSearchId },
+      data: { lastCheckedAt: at },
+    });
+  },
+};

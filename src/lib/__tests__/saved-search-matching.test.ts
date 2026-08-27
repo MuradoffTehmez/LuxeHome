@@ -12,7 +12,7 @@ function search(overrides: Partial<ActiveSearch> = {}): ActiveSearch {
     name: "Yasamal 3 otaqlı",
     filters: JSON.stringify({ districtSlug: "yasamal", rooms: 3 }),
     frequency: "DAILY",
-    user: { email: "user1@example.com" },
+    user: { email: "user1@example.com", locale: "az" },
     ...overrides,
   };
 }
@@ -24,6 +24,7 @@ function createFakeStore(overrides: Partial<SavedSearchMatchStore> = {}) {
     recordMatch: [] as unknown[],
     createNotification: [] as unknown[],
     sendImmediateEmail: [] as unknown[],
+    notificationCopy: [] as unknown[],
   };
 
   const store: SavedSearchMatchStore = {
@@ -40,8 +41,14 @@ function createFakeStore(overrides: Partial<SavedSearchMatchStore> = {}) {
     createNotification: async (input) => {
       calls.createNotification.push(input);
     },
-    sendImmediateEmail: async (userEmail, property, searchName) => {
-      calls.sendImmediateEmail.push({ userEmail, property, searchName });
+    notificationCopy: async (locale, searchName) => {
+      calls.notificationCopy.push({ locale, searchName });
+      // Real store `next-intl`-dən oxuyur; testdə dil açıq şəkildə görünsün deyə
+      // sadə şablon işlədilir
+      return { title: `[${locale}] ${searchName}` };
+    },
+    sendImmediateEmail: async (userEmail, locale, property, searchName) => {
+      calls.sendImmediateEmail.push({ userEmail, locale, property, searchName });
     },
     ...overrides,
   };
@@ -61,13 +68,19 @@ describe("saxlanmış axtarış uyğunluq mühərriki", () => {
       {
         userId: "user-1",
         type: "SAVED_SEARCH_MATCH",
-        title: '"Yasamal 3 otaqlı" axtarışına uyğun yeni elan',
+        title: "[az] Yasamal 3 otaqlı",
         content: PROPERTY.title,
-        actionUrl: `/az/emlaklar/${PROPERTY.slug}`,
+        // Dil prefiksi qəsdən yoxdur — link klik anında lokallaşdırılır
+        actionUrl: `/emlaklar/${PROPERTY.slug}`,
       },
     ]);
     expect(calls.sendImmediateEmail).toEqual([
-      { userEmail: "user1@example.com", property: PROPERTY, searchName: "Yasamal 3 otaqlı" },
+      {
+        userEmail: "user1@example.com",
+        locale: "az",
+        property: PROPERTY,
+        searchName: "Yasamal 3 otaqlı",
+      },
     ]);
   });
 
@@ -123,6 +136,69 @@ describe("saxlanmış axtarış uyğunluq mühərriki", () => {
     expect(calls.matchesFilters).toEqual([
       { filters: JSON.parse(goodSearch.filters), propertyId: "property-1" },
     ]);
+    expect(calls.createNotification).toHaveLength(1);
+    expect((calls.createNotification[0] as { userId: string }).userId).toBe("user-good");
+  });
+
+  it("rus dilli istifadəçiyə bildiriş onun dilində yazılır", async () => {
+    const { store, calls } = createFakeStore({
+      findActiveSavedSearches: async () => [
+        search({ user: { email: "user1@example.com", locale: "ru" } }),
+      ],
+    });
+
+    await runSavedSearchMatching("property-1", store);
+
+    expect(calls.notificationCopy).toEqual([{ locale: "ru", searchName: "Yasamal 3 otaqlı" }]);
+    expect((calls.createNotification[0] as { title: string }).title).toBe("[ru] Yasamal 3 otaqlı");
+  });
+
+  it("OFF tezliyi üçün nə uyğunluq qeyd edir, nə bildiriş yaradır", async () => {
+    const { store, calls } = createFakeStore({
+      findActiveSavedSearches: async () => [search({ frequency: "OFF" })],
+    });
+
+    await runSavedSearchMatching("property-1", store);
+
+    expect(calls.matchesFilters).toHaveLength(0);
+    expect(calls.recordMatch).toHaveLength(0);
+    expect(calls.createNotification).toHaveLength(0);
+  });
+
+  it("sxemə uyğun gəlməyən filtr (obyekt dəyər) digərlərini dayandırmır", async () => {
+    // Saxta POST ilə göndərilə bilən forma: `citySlug` sətir yerinə obyektdir
+    const poisoned = search({
+      id: "search-poisoned",
+      userId: "user-poisoned",
+      filters: JSON.stringify({ citySlug: { contains: "bak" } }),
+    });
+    const healthy = search({ id: "search-good", userId: "user-good" });
+    const { store, calls } = createFakeStore({
+      findActiveSavedSearches: async () => [poisoned, healthy],
+    });
+
+    await runSavedSearchMatching("property-1", store);
+
+    expect(calls.matchesFilters).toHaveLength(1);
+    expect((calls.createNotification[0] as { userId: string }).userId).toBe("user-good");
+  });
+
+  it("bir axtarışda istisna baş verərsə sonrakılar yenə işlənir", async () => {
+    const failing = search({ id: "search-fails", userId: "user-fails" });
+    const healthy = search({ id: "search-good", userId: "user-good" });
+    const { store, calls } = createFakeStore({
+      findActiveSavedSearches: async () => [failing, healthy],
+      matchesFilters: async (_filters, propertyId) => {
+        calls.matchesFilters.push({ propertyId });
+        // İlk çağırış çökür — əvvəl bu, bütün döngəni dayandırırdı
+        if (calls.matchesFilters.length === 1) throw new Error("D1 unavailable");
+        return true;
+      },
+    });
+
+    await runSavedSearchMatching("property-1", store);
+
+    expect(calls.matchesFilters).toHaveLength(2);
     expect(calls.createNotification).toHaveLength(1);
     expect((calls.createNotification[0] as { userId: string }).userId).toBe("user-good");
   });
