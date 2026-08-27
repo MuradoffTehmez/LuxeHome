@@ -32,6 +32,7 @@ model User {
   /// `role` yalnız panel səlahiyyətini göstərir — iki ölçü qəsdən ayrıdır.
   accountType     String    @default("STAFF")
   phone           String?
+  avatarUrl       String?
   emailVerifiedAt DateTime?
   /// İdarə panelində hesabın biznes baxımından yoxlanılıb təsdiqləndiyi vaxt.
   /// E-poçt doğrulamasından və bloklama (`isActive`) statusundan qəsdən ayrıdır.
@@ -44,7 +45,7 @@ model User {
   /// İstifadəçinin seçdiyi dil: az | en | ru. `src/lib/constants.ts`-dəki LOCALES-dən.
   locale          String @default("az")
   /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
-  themePreference String @default("system")
+  themePreference String @default("light")
 
   /// AES-GCM ilə şifrələnmiş TOTP sirri. Açıq mətn heç vaxt saxlanılmır.
   totpSecret         String?

@@ -4,6 +4,8 @@ import { currentSessionId, requireStaff } from "@/lib/auth/guard";
 import { listSessions } from "@/lib/auth/session";
 import { ROLE_LABELS } from "@/lib/constants";
 import { PasswordForm } from "./password-form";
+import { ProfileForm } from "./profile-form";
+import { BackupCodesForm } from "./backup-codes-form";
 import { revokeOne, revokeOtherSessions } from "./actions";
 
 export const metadata: Metadata = { title: "Hesabım" };
@@ -37,10 +39,14 @@ export default async function AccountPage({
   searchParams: Promise<{ parol?: string }>;
 }) {
   const [user, { parol }] = await Promise.all([requireStaff(), searchParams]);
-  const [sessions, activeSid, remainingCodes] = await Promise.all([
+  const [sessions, activeSid, remainingCodes, profile] = await Promise.all([
     listSessions(user.id),
     currentSessionId(),
     prisma.backupCode.count({ where: { userId: user.id, usedAt: null } }),
+    prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+      select: { name: true, phone: true, locale: true, themePreference: true, avatarUrl: true },
+    }),
   ]);
 
   const otherSessions = sessions.filter((session) => session.id !== activeSid);
@@ -53,6 +59,16 @@ export default async function AccountPage({
           {user.email} · {ROLE_LABELS[user.role]}
         </p>
       </header>
+
+      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
+        <ProfileForm initial={{
+          name: profile.name,
+          phone: profile.phone ?? "",
+          locale: profile.locale,
+          themePreference: profile.themePreference,
+          avatarUrl: profile.avatarUrl,
+        }} />
+      </section>
 
       <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
         <h2 className="font-display text-lg text-ink">Parolu dəyiş</h2>
@@ -68,9 +84,10 @@ export default async function AccountPage({
         </p>
         {remainingCodes < 3 && (
           <p className="mt-3 rounded-xs border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
-            Ehtiyat kodlarınız azalıb. Yenilərini yaratmaq üçün administratora müraciət edin.
+            Ehtiyat kodlarınız azalıb. Cari parolunuzla yeni dəst yarada bilərsiniz.
           </p>
         )}
+        <BackupCodesForm />
       </section>
 
       <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">

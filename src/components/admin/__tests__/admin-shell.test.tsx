@@ -14,6 +14,7 @@ describe("AdminShell", () => {
           id: "staff-1",
           name: "Admin User",
           email: "admin@example.az",
+          avatarUrl: null,
           role: "SUPER_ADMIN",
           accountType: "STAFF",
           mustChangePassword: false,

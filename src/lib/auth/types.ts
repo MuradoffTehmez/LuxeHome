@@ -8,6 +8,7 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  avatarUrl: string | null;
   role: Role;
   /** Hesabın kim olduğu — panel yalnız `STAFF` üçün açıqdır. */
   accountType: AccountType;

@@ -13,10 +13,12 @@ import { cn } from "@/lib/utils";
  */
 export function SecretPanel({
   secret,
+  title = "Müvəqqəti parol — bir dəfə göstərilir",
   note,
   className,
 }: {
   secret: string;
+  title?: string;
   note?: string;
   className?: string;
 }) {
@@ -42,11 +44,11 @@ export function SecretPanel({
     >
       <p className="flex items-center gap-2 text-sm font-medium text-ink">
         <KeyRound className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
-        Müvəqqəti parol — bir dəfə göstərilir
+        {title}
       </p>
 
       <div className="flex flex-wrap items-center gap-2">
-        <code className="tabular flex-1 rounded-xs border border-line bg-paper px-3 py-2 font-mono text-base tracking-wider text-ink select-all">
+        <code className="tabular flex-1 whitespace-pre-wrap rounded-xs border border-line bg-paper px-3 py-2 font-mono text-base tracking-wider text-ink select-all">
           {secret}
         </code>
         <button

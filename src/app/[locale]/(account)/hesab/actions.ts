@@ -153,6 +153,7 @@ export async function registerAccount(
               // İctimai hesab panel səlahiyyəti almır; `role` yalnız sxem tələbidir.
               role: ROLES.EDITOR,
               isActive: true,
+              themePreference: "light",
               mustChangePassword: false,
             },
             select: { id: true },

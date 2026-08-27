@@ -87,9 +87,13 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
             </Link>
             <div className="hidden h-8 w-px bg-line sm:block" aria-hidden="true" />
             <div className="flex min-w-0 items-center gap-3 pl-1">
-              <div aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-charcoal text-sm font-semibold text-ink-invert">
-                {initials(user.name)}
-              </div>
+              {user.avatarUrl ? (
+                <Image src={user.avatarUrl} alt="" width={72} height={72} className="size-9 shrink-0 rounded-full object-cover" />
+              ) : (
+                <div aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-charcoal text-sm font-semibold text-ink-invert">
+                  {initials(user.name)}
+                </div>
+              )}
               <div className="hidden min-w-0 leading-tight sm:block">
                 <p className="max-w-48 truncate text-sm font-medium text-ink">{user.name}</p>
                 <p className="text-xs text-ink-muted">{ROLE_LABELS[user.role]}</p>

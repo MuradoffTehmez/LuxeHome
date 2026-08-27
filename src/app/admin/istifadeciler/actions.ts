@@ -101,6 +101,7 @@ export async function createUser(_prev: ActionState, formData: FormData): Promis
         email: parsed.data.email,
         role: parsed.data.role,
         accountType: ACCOUNT_TYPES.STAFF,
+        themePreference: "light",
         passwordHash: await hashPassword(password),
         isActive: true,
         // 2FA qurulmayıb: ilk girişdə məcburi qurulum ekranı açılır

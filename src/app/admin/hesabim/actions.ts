@@ -6,6 +6,12 @@ import { prisma } from "@/lib/prisma";
 import { currentSessionId, requireStaff } from "@/lib/auth/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { revokeAllSessions, revokeSession } from "@/lib/auth/session";
+import { generateBackupCodes, hashBackupCode } from "@/lib/auth/totp";
+import { parseSingleImage } from "@/lib/admin/images";
+import { recordAudit } from "@/lib/admin/audit";
+import { assertSameOrigin } from "@/lib/admin/guard";
+import { type ActionState, failure, invalid, success, successWithSecret, unexpected } from "@/lib/admin/action-state";
+import * as form from "@/lib/admin/form";
 
 /**
  * Hesab əməliyyatları.
@@ -15,6 +21,70 @@ import { revokeAllSessions, revokeSession } from "@/lib/auth/session";
  */
 
 export type AccountState = { error?: string; success?: string };
+
+const profileSchema = z.object({
+  name: z.string().trim().min(2, "Ad ən azı 2 simvol olmalıdır.").max(120),
+  phone: z.string().trim().max(30).nullable(),
+  locale: z.enum(["az", "en", "ru"]),
+  themePreference: z.enum(["light", "dark", "system"]),
+});
+
+export async function saveProfile(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  await assertSameOrigin();
+  const user = await requireStaff();
+  const parsed = profileSchema.safeParse({
+    name: form.text(formData, "name"),
+    phone: form.optionalText(formData, "phone"),
+    locale: form.text(formData, "locale"),
+    themePreference: form.text(formData, "themePreference"),
+  });
+  if (!parsed.success) return invalid(parsed.error);
+
+  try {
+    const image = parseSingleImage(formData, "avatar");
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { ...parsed.data, avatarUrl: image?.url ?? null },
+    });
+    await recordAudit(user, "UPDATE", "User", user.id, "Şəxsi profil yeniləndi");
+    revalidatePath("/admin", "layout");
+    revalidatePath("/admin/hesabim");
+    return success("Profil məlumatları yeniləndi.");
+  } catch (error) {
+    return unexpected("profil yenilənmədi", error);
+  }
+}
+
+export async function regenerateBackupCodes(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await assertSameOrigin();
+  const user = await requireStaff();
+  const currentPassword = form.text(formData, "currentPassword");
+  if (!currentPassword) return failure("Cari parolu yazın.", { currentPassword: "Cari parol tələb olunur" });
+
+  const record = await prisma.user.findUniqueOrThrow({
+    where: { id: user.id },
+    select: { passwordHash: true },
+  });
+  if (!(await verifyPassword(currentPassword, record.passwordHash))) {
+    return failure("Cari parol yanlışdır.", { currentPassword: "Cari parol yanlışdır" });
+  }
+
+  try {
+    const codes = generateBackupCodes();
+    await prisma.backupCode.deleteMany({ where: { userId: user.id } });
+    for (const code of codes) {
+      await prisma.backupCode.create({ data: { userId: user.id, codeHash: await hashBackupCode(code) } });
+    }
+    await recordAudit(user, "UPDATE", "User", user.id, "2FA ehtiyat kodları yeniləndi");
+    revalidatePath("/admin/hesabim");
+    return successWithSecret("Yeni ehtiyat kodları yaradıldı. Onları indi təhlükəsiz yerdə saxlayın.", codes.join("\n"));
+  } catch (error) {
+    return unexpected("ehtiyat kodları yenilənmədi", error);
+  }
+}
 
 const passwordSchema = z
   .object({
