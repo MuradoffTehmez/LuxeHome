@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -21,6 +22,7 @@ import {
 } from "@/lib/constants";
 import { getSimilarProperties } from "@/lib/queries";
 import { getCachedPropertyBySlug } from "@/lib/public-cache";
+import { recordView } from "@/lib/view-counter";
 import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
@@ -104,6 +106,10 @@ export default async function PropertyDetailPage({ params }: Props) {
   const sourceProperty = await getCachedPropertyBySlug(slug);
 
   if (!sourceProperty) notFound();
+
+  // Sayğac cavabı gözlətmir — `waitUntil` ilə render bitdikdən sonra yazılır
+  recordView("property", sourceProperty.id, (await headers()).get("user-agent"));
+
   const localizedProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
   const property = {
     ...localizedProperty,

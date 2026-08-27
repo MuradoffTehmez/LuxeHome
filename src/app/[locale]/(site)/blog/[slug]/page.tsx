@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
@@ -10,6 +11,7 @@ import { ArticleTrustMeta } from "@/components/site/article-trust-meta";
 import { articleSchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getRelatedPosts } from "@/lib/queries";
 import { getCachedPostBySlug } from "@/lib/public-cache";
+import { recordView } from "@/lib/view-counter";
 import { isUnoptimizedImage } from "@/lib/utils";
 import type { Locale } from "@/lib/constants";
 
@@ -53,6 +55,9 @@ export default async function BlogPostPage({ params }: Props) {
   const post = await getCachedPostBySlug(slug);
 
   if (!post) notFound();
+
+  // Sayğac cavabı gözlətmir — `waitUntil` ilə render bitdikdən sonra yazılır
+  recordView("post", post.id, (await headers()).get("user-agent"));
 
   const relatedPosts = await getRelatedPosts(post.id, post.categoryId, 3);
   const publishedAt = new Date(post.publishedAt || post.createdAt);
