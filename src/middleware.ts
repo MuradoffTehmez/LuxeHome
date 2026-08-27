@@ -4,7 +4,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { isStaging } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
-import { localeFromPathname, pathnameWithoutLocale } from "@/i18n/path-locale";
+import { canonicalAdminPath, localeFromPathname, pathnameWithoutLocale } from "@/i18n/path-locale";
 import { LOCALE_COOKIE } from "@/i18n/config";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import {
@@ -129,6 +129,9 @@ export async function middleware(request: NextRequest) {
     isStaging: isStaging(),
   });
   if (canonicalRedirect) return NextResponse.redirect(canonicalRedirect, 308);
+
+  const canonicalAdmin = canonicalAdminPath(pathname, search);
+  if (canonicalAdmin) return NextResponse.redirect(new URL(canonicalAdmin, request.url), 308);
 
   if (!isAccountFlowRoute(pathname)) {
     const response = intlMiddleware(request);

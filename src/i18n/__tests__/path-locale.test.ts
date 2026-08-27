@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canonicalAdminPath,
   localeFromPathname,
   localizePath,
   pathnameWithoutLocale,
@@ -33,5 +34,16 @@ describe("locale-prefiksli marşrutlar", () => {
     ["/admin", "/admin"],
   ] as const)("%s yolundan locale seqmentini çıxarır", (path, expected) => {
     expect(pathnameWithoutLocale(path)).toBe(expected);
+  });
+});
+
+describe("canonicalAdminPath", () => {
+  it("locale prefiksli admin yolunu query ilə birlikdə kanonikləşdirir", () => {
+    expect(canonicalAdminPath("/az/admin/audit", "?sehife=2")).toBe("/admin/audit?sehife=2");
+  });
+
+  it("kanonik və ictimai yolları dəyişmir", () => {
+    expect(canonicalAdminPath("/admin/audit", "?sehife=2")).toBeNull();
+    expect(canonicalAdminPath("/az/elaqe")).toBeNull();
   });
 });

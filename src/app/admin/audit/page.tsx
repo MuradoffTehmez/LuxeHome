@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Trash2 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/states";
 import {
@@ -9,14 +10,12 @@ import {
   AdminTableRow,
 } from "@/components/admin/admin-ui";
 import { formatDateTime } from "@/lib/utils";
-import { PERMISSIONS } from "@/lib/constants";
+import { PERMISSIONS, ROLES } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminAuditLog } from "@/lib/queries";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
-import {
-  AdminListCard,
-  AdminResponsiveList,
-} from "@/components/admin/admin-responsive-list";
+import { ConfirmAction } from "@/components/admin/confirm-action";
+import { clearAuditLog } from "./actions";
 
 export const metadata: Metadata = { title: "Audit jurnalı" };
 export const dynamic = "force-dynamic";
@@ -33,7 +32,7 @@ function auditValue(value: string | null): unknown {
 }
 
 export default async function AdminAuditPage({ searchParams }: { searchParams: SearchParams }) {
-  await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
+  const user = await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
 
   const params = await searchParams;
   const rawPage = params.sehife;
@@ -41,14 +40,26 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
   const entity = typeof params.entity === "string" ? params.entity : "";
   const query = typeof params.q === "string" ? params.q : "";
 
-  const { entries, pageCount } = await getAdminAuditLog(page, undefined, { entity, query });
+  const { entries, pageCount, total } = await getAdminAuditLog(page, 12, { entity, query });
 
   return (
     <>
       <AdminPageHeader
         title="Audit jurnalı"
-        description="Panel əməliyyatlarının dəyişdirilə bilməyən qeydi — kim, nə vaxt, nə etdi."
+        description={`Panel əməliyyatlarının peşəkar izləmə cədvəli · ${total} qeyd.`}
         breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Audit jurnalı" }]}
+        actions={user.role === ROLES.SUPER_ADMIN && total > 0 ? (
+          <ConfirmAction
+            action={clearAuditLog}
+            id="all"
+            label="Audit jurnalını sıfırla"
+            title="Audit jurnalını sıfırlamaq"
+            description={`${total} qeyd silinəcək. Bu əməliyyat geri qaytarılmır; sıfırlama faktının özü yeni audit qeydi kimi saxlanılacaq.`}
+            confirmLabel="Jurnalı sıfırla"
+          >
+            <Trash2 className="size-4" aria-hidden="true" />
+          </ConfirmAction>
+        ) : undefined}
       />
 
       <AdminCard bodyClassName="p-0">
@@ -69,33 +80,9 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
             ],
           }]}
         />
-        <div className="p-4 lg:p-0">
-          <AdminResponsiveList
-            ariaLabel="Audit jurnalı"
-            items={entries}
-            getKey={(entry) => entry.id}
-            empty={<EmptyState title="Audit qeydi yoxdur" />}
-            renderCard={(entry) => (
-              <AdminListCard
-                title={`${entry.entity} · ${entry.action}`}
-                meta={`${formatDateTime(entry.createdAt)} · ${entry.userEmail}`}
-              >
-                <p className="[overflow-wrap:anywhere]">{entry.summary ?? "—"}</p>
-                {entry.entityId ? (
-                  <p className="mt-2 text-xs text-ink-muted [overflow-wrap:anywhere]">ID: {entry.entityId}</p>
-                ) : null}
-                {entry.oldValue || entry.newValue ? (
-                  <details className="mt-3">
-                    <summary className="min-h-11 cursor-pointer py-3 text-ink-soft">Dəyişiklik</summary>
-                    <pre className="max-w-full overflow-x-auto whitespace-pre-wrap rounded-xs bg-beige p-2 text-[11px] text-ink-soft">
-                      {JSON.stringify({ əvvəl: auditValue(entry.oldValue), sonra: auditValue(entry.newValue) }, null, 2)}
-                    </pre>
-                  </details>
-                ) : null}
-              </AdminListCard>
-            )}
-            renderTable={(items) => (
-              <AdminTable
+        <div className="p-0">
+          {entries.length === 0 ? <EmptyState title="Audit qeydi yoxdur" /> : (
+            <AdminTable
                 caption="Audit jurnalı"
                 headers={[
                   { label: "Tarix" },
@@ -105,7 +92,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
                   { label: "Təfərrüat" },
                 ]}
               >
-                {items.map((entry) => (
+                {entries.map((entry) => (
                   <AdminTableRow key={entry.id}>
                     <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
                       {formatDateTime(entry.createdAt)}
@@ -134,8 +121,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
                   </AdminTableRow>
                 ))}
               </AdminTable>
-            )}
-          />
+          )}
         </div>
       </AdminCard>
 

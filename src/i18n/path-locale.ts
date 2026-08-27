@@ -15,6 +15,13 @@ export function pathnameWithoutLocale(pathname: string): string {
   return match[2] || "/";
 }
 
+/** Locale prefiksi səhvən əlavə edilmiş admin URL-ni kanonik locale-siz yola çevirir. */
+export function canonicalAdminPath(pathname: string, search = ""): string | null {
+  const normalized = pathnameWithoutLocale(pathname);
+  const isAdmin = normalized === "/admin" || normalized.startsWith("/admin/");
+  return isAdmin && normalized !== pathname ? `${normalized}${search}` : null;
+}
+
 /** İstənilən tətbiqdaxili yolu bütün dillər üçün məcburi locale prefiksi ilə qurur. */
 export function localizePath(path: string, locale: Locale): string {
   const suffixIndex = path.search(/[?#]/);

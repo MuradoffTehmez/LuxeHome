@@ -23,7 +23,8 @@ export type AuditAction =
   | "EXPIRE"
   | "UPLOAD"
   | "ROLE_CHANGE"
-  | "SESSION_REVOKE";
+  | "SESSION_REVOKE"
+  | "RESET";
 
 export type AuditEntity =
   | "Property"
@@ -37,7 +38,8 @@ export type AuditEntity =
   | "Agency"
   | "Partner"
   | "Redirect"
-  | "Setting";
+  | "Setting"
+  | "AuditLog";
 
 export async function recordAudit(
   user: Pick<AuthUser, "id" | "email">,
