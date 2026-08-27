@@ -18,7 +18,7 @@ export default async function AdminSettingsPage() {
     <>
       <AdminPageHeader
         title="Parametrlər"
-        description="İşləmə vaxtı dəyişən dəyərlər. Brend və əlaqə məlumatları kodda saxlanılır."
+        description="Saytın defolt görünüşü, əlaqə məlumatları, müraciət bildirişləri və komanda qeydi."
         breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Parametrlər" }]}
       />
 
@@ -29,28 +29,29 @@ export default async function AdminSettingsPage() {
           notifyEnabled={settings[SETTING_KEYS.LEAD_NOTIFY_ENABLED] !== "0"}
           announcement={settings[SETTING_KEYS.ADMIN_ANNOUNCEMENT] ?? ""}
           fallbackEmail={siteConfig.email}
+          defaultTheme={settings[SETTING_KEYS.DEFAULT_THEME] ?? "light"}
+          contactPhone={settings[SETTING_KEYS.CONTACT_PHONE] ?? siteConfig.phone}
+          contactEmail={settings[SETTING_KEYS.CONTACT_EMAIL] ?? siteConfig.email}
+          contactAddress={settings[SETTING_KEYS.CONTACT_ADDRESS] ?? siteConfig.addressFull}
+          contactInstagram={settings[SETTING_KEYS.CONTACT_INSTAGRAM] ?? siteConfig.instagram}
+          contactWhatsapp={settings[SETTING_KEYS.CONTACT_WHATSAPP] ?? siteConfig.whatsapp}
         />
 
-        <AdminCard title="Kodda saxlanılan məlumatlar" className="min-w-0">
+        <AdminCard title="Qorunan hüquqi məlumatlar" className="min-w-0">
           <div className="flex min-w-0 flex-col gap-4 text-sm text-ink-soft">
             <p className="flex items-start gap-2.5">
               <Info className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />
               <span>
-                Şirkət adı, hüquqi ad, telefon, ünvan, iş qrafiki, sosial şəbəkə hesabları və
-                naviqasiya menyusu <code className="break-all text-xs">src/config/site.ts</code> faylındadır.
-                Bu dəyərlər nadir hallarda dəyişir, ictimai səhifələrin statik render olunmasını
-                pozmamalıdır və dəyişikliyi kod nəzərdən keçirilməsindən keçməlidir.
+                Hüquqi ad, VÖEN, brend sahibi və naviqasiya strukturu kodda qorunur. Telefon,
+                e-poçt, ünvan və sosial əlaqələri isə soldakı formadan dəyişə bilərsiniz.
               </span>
             </p>
 
             <dl className="grid gap-2">
               {[
                 ["Şirkət", siteConfig.legalName],
-                ["Telefon", siteConfig.phone],
-                ["E-poçt", siteConfig.email],
-                ["Ünvan", siteConfig.addressFull],
-                ["İş qrafiki", "Biznes təsdiqi gözlənilir"],
-                ["Instagram", `@${siteConfig.instagram}`],
+                ["Hüquqi sahib", siteConfig.owner.name],
+                ["VÖEN", siteConfig.legal.voen],
               ].map(([label, value]) => (
                 <div key={label} className="flex min-w-0 flex-wrap justify-between gap-2 border-b border-line pb-2">
                   <dt className="text-xs tracking-wide text-ink-muted uppercase">{label}</dt>

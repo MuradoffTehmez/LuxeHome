@@ -18,6 +18,12 @@ const settingsSchema = z.object({
     .or(z.literal("")),
   notifyEnabled: z.boolean(),
   announcement: z.string().trim().max(500, "Qeyd 500 simvoldan uzun ola bilməz"),
+  defaultTheme: z.enum(["light", "dark", "system"]),
+  contactPhone: z.string().trim().max(30),
+  contactEmail: z.string().trim().toLowerCase().pipe(z.email("Korporativ e-poçt düzgün deyil")).or(z.literal("")),
+  contactAddress: z.string().trim().max(300),
+  contactInstagram: z.string().trim().max(100),
+  contactWhatsapp: z.string().trim().max(30),
 });
 
 export async function saveSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -33,6 +39,12 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
     notificationEmail: form.text(formData, "notificationEmail"),
     notifyEnabled: form.boolean(formData, "notifyEnabled"),
     announcement: form.text(formData, "announcement"),
+    defaultTheme: form.text(formData, "defaultTheme"),
+    contactPhone: form.text(formData, "contactPhone"),
+    contactEmail: form.text(formData, "contactEmail"),
+    contactAddress: form.text(formData, "contactAddress"),
+    contactInstagram: form.text(formData, "contactInstagram"),
+    contactWhatsapp: form.text(formData, "contactWhatsapp"),
   });
   if (!parsed.success) return invalid(parsed.error);
 
@@ -41,11 +53,19 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
       [SETTING_KEYS.LEAD_NOTIFICATION_EMAIL]: parsed.data.notificationEmail,
       [SETTING_KEYS.LEAD_NOTIFY_ENABLED]: parsed.data.notifyEnabled ? "1" : "0",
       [SETTING_KEYS.ADMIN_ANNOUNCEMENT]: parsed.data.announcement,
+      [SETTING_KEYS.DEFAULT_THEME]: parsed.data.defaultTheme,
+      [SETTING_KEYS.CONTACT_PHONE]: parsed.data.contactPhone,
+      [SETTING_KEYS.CONTACT_EMAIL]: parsed.data.contactEmail,
+      [SETTING_KEYS.CONTACT_ADDRESS]: parsed.data.contactAddress,
+      [SETTING_KEYS.CONTACT_INSTAGRAM]: parsed.data.contactInstagram.replace(/^@/, ""),
+      [SETTING_KEYS.CONTACT_WHATSAPP]: parsed.data.contactWhatsapp,
     });
 
     await recordAudit(user, "UPDATE", "Setting", null, "Panel parametrləri");
     revalidatePath("/admin/parametrler");
     revalidatePath("/admin");
+    revalidatePath("/", "layout");
+    revalidatePath("/elaqe");
     return success("Parametrlər yadda saxlanıldı.");
   } catch (error) {
     return unexpected("parametrlər saxlanılmadı", error);

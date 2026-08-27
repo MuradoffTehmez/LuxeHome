@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/lib/constants";
-import { Globe, MapPin, Phone, Mail } from "lucide-react";
+import { MapPin, Phone, Mail } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { InstagramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
 import { buildMetadata } from "@/lib/seo";
-import { siteConfig, whatsappLink } from "@/config/site";
+import { siteConfig } from "@/config/site";
+import { getOperationalSiteConfig } from "@/lib/settings";
 import { ContactForm } from "./contact-form";
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -15,19 +16,20 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "contact" });
-  return buildMetadata({ title: t("eyebrow"), description: t("metaDescription", { legalName: siteConfig.legalName, address: siteConfig.addressFull, phone: siteConfig.phone }), path: "/elaqe", locale: locale as Locale });
+  const operational = await getOperationalSiteConfig();
+  return buildMetadata({ title: t("eyebrow"), description: t("metaDescription", { legalName: siteConfig.legalName, address: operational.addressFull, phone: operational.phone }), path: "/elaqe", locale: locale as Locale });
 }
 
 export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "contact" });
+  const operational = await getOperationalSiteConfig();
   const contactItems = [
-    { icon: Phone, label: t("phone"), value: siteConfig.phone, href: siteConfig.phoneHref },
-    { icon: WhatsAppIcon, label: "WhatsApp", value: siteConfig.phone, href: whatsappLink(t("whatsappMessage")) },
-    { icon: Mail, label: t("email"), value: siteConfig.email, href: `mailto:${siteConfig.email}` },
-    { icon: MapPin, label: t("address"), value: siteConfig.addressFull, href: undefined },
-    { icon: InstagramIcon, label: "Instagram", value: `@${siteConfig.instagram}`, href: siteConfig.instagramUrl },
-    { icon: Globe, label: t("website"), value: siteConfig.website, href: `https://${siteConfig.website}` },
+    { icon: Phone, label: t("phone"), value: operational.phone, href: operational.phoneHref },
+    { icon: WhatsAppIcon, label: "WhatsApp", value: operational.phone, href: `https://wa.me/${operational.whatsapp}?text=${encodeURIComponent(t("whatsappMessage"))}` },
+    { icon: Mail, label: t("email"), value: operational.email, href: `mailto:${operational.email}` },
+    { icon: MapPin, label: t("address"), value: operational.addressFull, href: undefined },
+    { icon: InstagramIcon, label: "Instagram", value: `@${operational.instagram}`, href: operational.instagramUrl },
   ];
   return (
     <>

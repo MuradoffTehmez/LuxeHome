@@ -12,6 +12,7 @@ import {
 } from "@/config/site";
 import { InstagramIcon } from "./brand-icons";
 import { Logo } from "./logo";
+import { getOperationalSiteConfig } from "@/lib/settings";
 
 function FooterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -100,19 +101,19 @@ function PropertyLinks({
   );
 }
 
-function ContactDetails() {
+function ContactDetails({ operational }: { operational: Awaited<ReturnType<typeof getOperationalSiteConfig>> }) {
   return (
     <address className="flex flex-col gap-3 text-sm not-italic text-ink-invert-soft">
       <a
-        href={siteConfig.phoneHref}
+        href={operational.phoneHref}
         className="flex min-h-11 items-center gap-3 rounded-xs transition-colors hover:text-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
       >
         <Phone className="size-4 shrink-0 text-gold-soft" aria-hidden="true" />
-        <span className="tabular">{siteConfig.phone}</span>
+        <span className="tabular">{operational.phone}</span>
       </a>
       <span className="flex items-start gap-3 py-2">
         <MapPin className="mt-0.5 size-4 shrink-0 text-gold-soft" aria-hidden="true" />
-        {siteConfig.addressFull}
+        {operational.addressFull}
       </span>
       <span className="flex items-start gap-3 py-2">
         <Globe className="mt-0.5 size-4 shrink-0 text-gold-soft" aria-hidden="true" />
@@ -141,6 +142,7 @@ const LEGAL_KEY_BY_HREF = {
 
 export async function Footer() {
   const t = await getTranslations("navigation");
+  const operational = await getOperationalSiteConfig();
   const year = new Date().getFullYear();
   const navigationItems = [...navigation, ...supportNavigation].map((item) => ({
     href: item.href,
@@ -170,13 +172,13 @@ export async function Footer() {
               {t("footer.description")}
             </p>
             <a
-              href={siteConfig.instagramUrl}
+              href={operational.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-xs border border-line-dark px-3 text-sm text-ink-invert-soft transition-colors hover:border-gold-soft hover:text-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
               <InstagramIcon className="size-4" />
-              @{siteConfig.instagram}
+              @{operational.instagram}
             </a>
           </div>
 
@@ -193,7 +195,7 @@ export async function Footer() {
           </FooterSection>
 
           <FooterSection title={t("contact")}>
-            <ContactDetails />
+            <ContactDetails operational={operational} />
           </FooterSection>
         </div>
 
