@@ -7,6 +7,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { buttonClassName } from "@/components/ui/button";
 import { PartnerGrid } from "./partner-grid";
 import { PartnerLogo } from "./partner-logo";
+import { PartnerProfileLink } from "./partner-tracking";
 import { siteConfig } from "@/config/site";
 import { isOfficialPartnerVisible, localizePartnerContent } from "@/lib/partners";
 import type { PartnerCardData } from "@/lib/queries";
@@ -34,12 +35,16 @@ export async function FeaturedPartnership({
   if (partners.length === 0) return null;
 
   const t = await getTranslations({ locale, namespace: "partners" });
+  const singleShowcase =
+    partners.length === 1
+      ? await SinglePartnerShowcase({ partner: partners[0], locale })
+      : null;
 
   return (
     <Section tone="paper">
       <Container size="wide">
         {partners.length === 1 ? (
-          <SinglePartnerShowcase partner={partners[0]} locale={locale} />
+          singleShowcase
         ) : (
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-3 text-center">
@@ -123,10 +128,16 @@ async function SinglePartnerShowcase({
             {shortDescription || t("home.description")}
           </p>
 
-          <Link href={`/terefdaslar/${partner.slug}`} className={buttonClassName("outline")}>
+          <PartnerProfileLink
+            href={`/terefdaslar/${partner.slug}`}
+            partnerId={partner.id}
+            partnerType={partner.partnershipType}
+            placement="home"
+            className={buttonClassName("outline")}
+          >
             {t("home.action")}
             <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
+          </PartnerProfileLink>
         </div>
       </div>
     </Reveal>
@@ -181,12 +192,15 @@ function PartnerLogoWall({ partners }: { partners: PartnerCardData[] }) {
     <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-3 lg:grid-cols-4">
       {partners.map((partner) => (
         <li key={partner.id} className="bg-paper">
-          <Link
+          <PartnerProfileLink
             href={`/terefdaslar/${partner.slug}`}
+            partnerId={partner.id}
+            partnerType={partner.partnershipType}
+            placement="home"
             className="flex min-h-28 items-center justify-center p-6 transition-colors hover:bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset"
           >
             <PartnerLogo partner={partner} size="md" />
-          </Link>
+          </PartnerProfileLink>
         </li>
       ))}
     </ul>

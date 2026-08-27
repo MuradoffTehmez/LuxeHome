@@ -11,6 +11,7 @@ import { buttonClassName } from "@/components/ui/button";
 import { PartnerBadges } from "@/components/site/partner-badge";
 import { PartnerLogo } from "@/components/site/partner-logo";
 import { PartnerExternalLink } from "@/components/site/partner-external-link";
+import { PartnerListingTracker } from "@/components/site/partner-tracking";
 import { PropertyCard } from "@/components/site/property-card";
 import { ProjectCard } from "@/components/site/project-card";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
@@ -285,7 +286,14 @@ export default async function PartnerDetailPage({ params }: Props) {
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {properties.map((link) => (
-                <PropertyCard key={link.property.id} property={link.property} />
+                <PartnerListingTracker
+                  key={link.property.id}
+                  partnerId={partner.id}
+                  partnerType={type}
+                  propertyId={link.property.id}
+                >
+                  <PropertyCard property={link.property} />
+                </PartnerListingTracker>
               ))}
             </div>
           </Container>

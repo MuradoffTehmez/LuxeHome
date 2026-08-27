@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { ArrowUpRight, MapPin } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { PartnerProfileLink } from "./partner-tracking";
 import { PartnerBadges } from "./partner-badge";
 import { PartnerLogo } from "./partner-logo";
 import { PartnerExternalLink } from "./partner-external-link";
@@ -35,12 +35,15 @@ export async function PartnerCard({
 
       <div className="flex min-w-0 flex-col gap-2">
         <h3 className="font-display text-xl text-ink">
-          <Link
+          <PartnerProfileLink
             href={`/terefdaslar/${partner.slug}`}
+            partnerId={partner.id}
+            partnerType={type}
+            placement="partner_list"
             className="rounded-xs transition-colors after:absolute after:inset-0 after:content-[''] hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
             {partner.name}
-          </Link>
+          </PartnerProfileLink>
         </h3>
 
         <PartnerBadges partner={partner} locale={locale} />

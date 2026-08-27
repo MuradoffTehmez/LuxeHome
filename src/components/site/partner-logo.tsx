@@ -59,8 +59,6 @@ export function PartnerLogo({
   }
 
   const common = {
-    // Alt mətn şirkətin adıdır — ekran oxuyucu loqonu ad kimi oxuyur.
-    alt: partner.name,
     width: config.width,
     height: config.height,
     sizes: config.sizes,
@@ -72,7 +70,12 @@ export function PartnerLogo({
     const src = (light ?? dark) as string;
     return (
       <span className={cn("flex shrink-0 items-center", config.box, className)}>
-        <Image src={src} unoptimized={isUnoptimizedImage(src)} {...common} />
+        <Image
+          src={src}
+          alt={partner.name}
+          unoptimized={isUnoptimizedImage(src)}
+          {...common}
+        />
       </span>
     );
   }
