@@ -40,7 +40,7 @@ export function PartnerLogo({
   priority = false,
   className,
 }: PartnerLogoProps) {
-  const { light, dark, hasThemeVariants } = partnerLogoVariants(partner);
+  const { light, dark, hasThemeVariants, hasDarkOnly } = partnerLogoVariants(partner);
   const config = SIZES[size];
 
   if (!light && !dark) {
@@ -69,7 +69,14 @@ export function PartnerLogo({
   if (!hasThemeVariants) {
     const src = (light ?? dark) as string;
     return (
-      <span className={cn("flex shrink-0 items-center", config.box, className)}>
+      <span
+        className={cn(
+          "flex shrink-0 items-center",
+          hasDarkOnly && "rounded-sm bg-navy px-3 py-2",
+          config.box,
+          className,
+        )}
+      >
         <Image
           src={src}
           alt={partner.name}

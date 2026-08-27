@@ -247,7 +247,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
                     <AdminTableCell>
                       <div className="flex min-w-44 items-center gap-3">
                         <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-xs border border-line bg-ivory text-xs font-semibold text-ink">
-                          {partner.logoUrl ? <Image src={partner.logoUrl} alt="" fill sizes="44px" unoptimized={isUnoptimizedImage(partner.logoUrl)} className="object-contain p-1" /> : partner.name.slice(0, 2).toUpperCase()}
+                          {partner.logoUrl ?? partner.logoLight ?? partner.logoDark ? <Image src={(partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string} alt="" fill sizes="44px" unoptimized={isUnoptimizedImage((partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string)} className={!partner.logoUrl && !partner.logoLight ? "object-contain bg-navy p-1" : "object-contain p-1"} /> : partner.name.slice(0, 2).toUpperCase()}
                         </span>
                         <div><p className="font-medium text-ink">{partner.name}</p><p className="text-xs text-ink-muted">/{partner.slug}</p></div>
                       </div>

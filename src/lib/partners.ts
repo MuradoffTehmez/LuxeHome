@@ -287,11 +287,17 @@ export function partnerLogoVariants(partner: PartnerLogoSource): {
   light: string | null;
   dark: string | null;
   hasThemeVariants: boolean;
+  hasDarkOnly: boolean;
 } {
   const base = partner.logoUrl?.trim() || null;
   const light = partner.logoLight?.trim() || base;
   const dark = partner.logoDark?.trim() || base;
-  return { light, dark, hasThemeVariants: light !== dark && light != null && dark != null };
+  return {
+    light,
+    dark,
+    hasThemeVariants: light !== dark && light != null && dark != null,
+    hasDarkOnly: base == null && light == null && dark != null,
+  };
 }
 
 // ---------------------------------------------------------------------------

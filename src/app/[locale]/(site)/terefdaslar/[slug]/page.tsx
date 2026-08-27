@@ -54,15 +54,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     shortDescription ||
     (description ? truncateAtWord(description.replace(/<[^>]*>/g, " "), 160) : "") ||
     t("detail.metaDescriptionFallback", { name: partner.name });
+  // Admin paneldəki SEO sahələri AZ əsas səhifəyə aiddir. Digər dillərdə
+  // Azərbaycan dilində metadata göstərməkdənsə lokallaşdırılmış məzmun işlədilir.
+  const useCustomSeo = locale === "az";
 
   return buildMetadata({
-    title: partner.seoTitle || t("detail.metaTitle", { name: partner.name }),
-    description: partner.seoDescription || fallbackDescription,
+    title: (useCustomSeo && partner.seoTitle) || t("detail.metaTitle", { name: partner.name }),
+    description: (useCustomSeo && partner.seoDescription) || fallbackDescription,
     path: `/terefdaslar/${partner.slug}`,
     image: partner.coverImage ?? partner.logoUrl ?? undefined,
     ogImage: partner.ogImage,
     locale: locale as Locale,
-    keywords: partner.seoKeywords
+    keywords: useCustomSeo && partner.seoKeywords
       ? partner.seoKeywords.split(",").map((word) => word.trim()).filter(Boolean)
       : undefined,
   });
@@ -107,7 +110,7 @@ export default async function PartnerDetailPage({ params }: Props) {
               slug: partner.slug,
               legalName: partner.legalName,
               description: shortDescription,
-              logoUrl: partner.logoUrl,
+              logoUrl: partner.logoUrl ?? partner.logoLight ?? partner.logoDark,
               websiteUrl: partner.websiteUrl,
               email: partner.email,
               phone: partner.phone,

@@ -101,8 +101,67 @@ INSERT OR IGNORE INTO "Service" ("id", "title", "slug", "shortDescription", "des
 
 Hər çəkiliş əmlakın güclü tərəflərini önə çıxaracaq şəkildə planlaşdırılır.', 'Camera', 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=80', '["Peşəkar interyer və eksteryer fotoçəkilişi","Video təqdimat rolikləri","Dron ilə hava çəkilişi","Şəkillərin peşəkar emalı","Sosial media üçün format hazırlığı"]', 6, 1, 'Çəkiliş — Luxe Home Estate', 'Professional foto və video çəkiliş xidmətləri.', 1787247091551, 1787247091551);
 
--- Partner (1)
-INSERT OR IGNORE INTO "Partner" ("id", "name", "slug", "websiteUrl", "partnershipType", "status", "verified", "officialPartner", "featured", "showPublicly", "showOnHomepage", "sortOrder", "createdAt", "updatedAt") VALUES ('cm0treva00000000000000000', 'TREVA', 'treva', 'https://treva.realestate/az', 'OTHER', 'ACTIVE', 1, 1, 1, 1, 1, 0, 1787850000000, 1787850000000);
+-- Partner (1). TREVA məlumatları yalnız rəsmi açıq mənbələrə əsaslanır;
+-- hüquqi ad, müqavilə və əməkdaşlıq tarixləri təsdiqlənmədiyi üçün boş saxlanılır.
+INSERT INTO "Partner" ("id", "name", "slug", "shortDescription", "shortDescriptionEn", "shortDescriptionRu", "description", "descriptionEn", "descriptionRu", "websiteUrl", "email", "phone", "logoDark", "coverImage", "country", "city", "address", "partnershipType", "status", "verified", "officialPartner", "featured", "showPublicly", "showOnHomepage", "sortOrder", "seoTitle", "seoDescription", "seoKeywords", "ogImage", "createdAt", "updatedAt") VALUES (
+  'cm0treva00000000000000000',
+  'TREVA',
+  'treva',
+  'TREVA developerləri, brokerləri və alıcıları vahid satış infrastrukturu üzərində birləşdirən Bakı əsaslı daşınmaz əmlak platformasıdır.',
+  'TREVA is a Baku-based real estate sales platform connecting developers, brokers and buyers through a unified sales infrastructure.',
+  'TREVA — бакинская платформа продаж недвижимости, объединяющая девелоперов, брокеров и покупателей в единой инфраструктуре.',
+  '<p>TREVA daşınmaz əmlak layihələrinin satışı və marketinqi üzrə fəaliyyət göstərən Bakı əsaslı platformadır. Şirkət developerləri, brokerləri və alıcıları vahid satış infrastrukturu üzərində birləşdirir.</p><h3>Developerlər üçün</h3><p>TREVA bazar araşdırması, rəqib təhlili, mövqeləndirmə və qiymət strategiyasından başlayaraq marketinq, potensial müştəri cəlbi, CRM, broker şəbəkəsi və satışın bağlanmasına qədər layihənin bazara çıxış prosesini dəstəkləyir.</p><h3>Broker və agentliklər üçün</h3><p>Platforma eksklüziv layihələrə çıxış, hazır marketinq materialları, satış dəstəyi və peşəkar şəbəkəni genişləndirmək imkanı təqdim edir.</p><h3>Alıcı və investorlar üçün</h3><p>Komanda uyğun layihə və əmlak seçimi, bazar üzrə məlumatlandırma və alış prosesinin mərhələləri üzrə dəstək göstərir.</p>',
+  '<p>TREVA is a Baku-based platform specialising in the sales and marketing of real estate projects. It connects developers, brokers and buyers through a unified sales infrastructure.</p><h3>For developers</h3><p>TREVA supports a project from market research, competitor analysis, positioning and pricing strategy through marketing, lead generation, CRM, broker outreach and closing support.</p><h3>For brokers and agencies</h3><p>The platform provides access to exclusive projects, ready-to-use marketing materials, sales support and opportunities to expand a professional network.</p><h3>For buyers and investors</h3><p>The team assists with selecting suitable projects and properties, understanding the market and navigating the stages of the purchase process.</p>',
+  '<p>TREVA — бакинская платформа, специализирующаяся на продажах и маркетинге проектов недвижимости. Она объединяет девелоперов, брокеров и покупателей в единой инфраструктуре продаж.</p><h3>Для девелоперов</h3><p>TREVA сопровождает вывод проекта на рынок: от исследования рынка, анализа конкурентов, позиционирования и ценовой стратегии до маркетинга, привлечения клиентов, CRM, работы с брокерской сетью и поддержки закрытия сделок.</p><h3>Для брокеров и агентств</h3><p>Платформа предоставляет доступ к эксклюзивным проектам, готовым маркетинговым материалам, поддержке продаж и возможностям расширения профессиональной сети.</p><h3>Для покупателей и инвесторов</h3><p>Команда помогает подобрать подходящий проект или объект, разобраться в рыночной информации и пройти основные этапы процесса покупки.</p>',
+  'https://treva.realestate/az',
+  'info@treva.realestate',
+  '+994 50 277 26 62',
+  'https://treva.realestate/cdn-assets/c06d6deb09-685d6b08f6dce7040049422e_treva-logo.svg',
+  'https://treva.realestate/images/treva-hero-bg.jpg',
+  'Azərbaycan',
+  'Bakı',
+  'Ziya Yusifzadə küçəsi 10, Sabah Residence',
+  'REAL_ESTATE_AGENCY',
+  'ACTIVE',
+  1, 1, 1, 1, 1, 0,
+  'TREVA Real Estate — rəsmi tərəfdaş',
+  'TREVA Real Estate — Bakıda developer, broker və alıcıları birləşdirən daşınmaz əmlak satış platforması. Xidmətlər və əlaqə məlumatları.',
+  'TREVA Real Estate, TREVA, daşınmaz əmlak, Bakı daşınmaz əmlak, əmlak satış platforması, developer, broker, investisiya',
+  'https://treva.realestate/images/treva-hero-bg.jpg',
+  1787850000000,
+  1787850000000
+)
+ON CONFLICT("slug") DO UPDATE SET
+  "name" = excluded."name",
+  "shortDescription" = excluded."shortDescription",
+  "shortDescriptionEn" = excluded."shortDescriptionEn",
+  "shortDescriptionRu" = excluded."shortDescriptionRu",
+  "description" = excluded."description",
+  "descriptionEn" = excluded."descriptionEn",
+  "descriptionRu" = excluded."descriptionRu",
+  "websiteUrl" = excluded."websiteUrl",
+  "email" = excluded."email",
+  "phone" = excluded."phone",
+  "logoUrl" = NULL,
+  "logoLight" = NULL,
+  "logoDark" = excluded."logoDark",
+  "coverImage" = excluded."coverImage",
+  "country" = excluded."country",
+  "city" = excluded."city",
+  "address" = excluded."address",
+  "partnershipType" = excluded."partnershipType",
+  "status" = excluded."status",
+  "verified" = excluded."verified",
+  "officialPartner" = excluded."officialPartner",
+  "featured" = excluded."featured",
+  "showPublicly" = excluded."showPublicly",
+  "showOnHomepage" = excluded."showOnHomepage",
+  "sortOrder" = excluded."sortOrder",
+  "seoTitle" = excluded."seoTitle",
+  "seoDescription" = excluded."seoDescription",
+  "seoKeywords" = excluded."seoKeywords",
+  "ogImage" = excluded."ogImage",
+  "updatedAt" = excluded."updatedAt";
 
 -- Setting (6)
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('site.title', 'Luxe Home Estate — Həyatınızın ən dəyərli ünvanı', 1787247092242);

@@ -411,19 +411,50 @@ async function main() {
   // -------------------------------------------------------------------------
   // Yalnız master promptda təsdiqlənmiş məlumatlar yazılır. Hüquqi ad,
   // müqavilə və əməkdaşlıq tarixləri real sənəd olmadan təxmin edilmir.
+  const trevaData = {
+    name: "TREVA",
+    websiteUrl: "https://treva.realestate/az",
+    email: "info@treva.realestate",
+    phone: "+994 50 277 26 62",
+    country: "Azərbaycan",
+    city: "Bakı",
+    address: "Ziya Yusifzadə küçəsi 10, Sabah Residence",
+    partnershipType: "REAL_ESTATE_AGENCY",
+    status: "ACTIVE",
+    shortDescription:
+      "TREVA developerləri, brokerləri və alıcıları vahid satış infrastrukturu üzərində birləşdirən Bakı əsaslı daşınmaz əmlak platformasıdır.",
+    shortDescriptionEn:
+      "TREVA is a Baku-based real estate sales platform connecting developers, brokers and buyers through a unified sales infrastructure.",
+    shortDescriptionRu:
+      "TREVA — бакинская платформа продаж недвижимости, объединяющая девелоперов, брокеров и покупателей в единой инфраструктуре.",
+    description: `<p>TREVA daşınmaz əmlak layihələrinin satışı və marketinqi üzrə fəaliyyət göstərən Bakı əsaslı platformadır. Şirkət developerləri, brokerləri və alıcıları vahid satış infrastrukturu üzərində birləşdirir.</p><h3>Developerlər üçün</h3><p>TREVA bazar araşdırması, rəqib təhlili, mövqeləndirmə və qiymət strategiyasından başlayaraq marketinq, potensial müştəri cəlbi, CRM, broker şəbəkəsi və satışın bağlanmasına qədər layihənin bazara çıxış prosesini dəstəkləyir.</p><h3>Broker və agentliklər üçün</h3><p>Platforma eksklüziv layihələrə çıxış, hazır marketinq materialları, satış dəstəyi və peşəkar şəbəkəni genişləndirmək imkanı təqdim edir.</p><h3>Alıcı və investorlar üçün</h3><p>Komanda uyğun layihə və əmlak seçimi, bazar üzrə məlumatlandırma və alış prosesinin mərhələləri üzrə dəstək göstərir.</p>`,
+    descriptionEn: `<p>TREVA is a Baku-based platform specialising in the sales and marketing of real estate projects. It connects developers, brokers and buyers through a unified sales infrastructure.</p><h3>For developers</h3><p>TREVA supports a project from market research, competitor analysis, positioning and pricing strategy through marketing, lead generation, CRM, broker outreach and closing support.</p><h3>For brokers and agencies</h3><p>The platform provides access to exclusive projects, ready-to-use marketing materials, sales support and opportunities to expand a professional network.</p><h3>For buyers and investors</h3><p>The team assists with selecting suitable projects and properties, understanding the market and navigating the stages of the purchase process.</p>`,
+    descriptionRu: `<p>TREVA — бакинская платформа, специализирующаяся на продажах и маркетинге проектов недвижимости. Она объединяет девелоперов, брокеров и покупателей в единой инфраструктуре продаж.</p><h3>Для девелоперов</h3><p>TREVA сопровождает вывод проекта на рынок: от исследования рынка, анализа конкурентов, позиционирования и ценовой стратегии до маркетинга, привлечения клиентов, CRM, работы с брокерской сетью и поддержки закрытия сделок.</p><h3>Для брокеров и агентств</h3><p>Платформа предоставляет доступ к эксклюзивным проектам, готовым маркетинговым материалам, поддержке продаж и возможностям расширения профессиональной сети.</p><h3>Для покупателей и инвесторов</h3><p>Команда помогает подобрать подходящий проект или объект, разобраться в рыночной информации и пройти основные этапы процесса покупки.</p>`,
+    logoUrl: null,
+    logoLight: null,
+    logoDark:
+      "https://treva.realestate/cdn-assets/c06d6deb09-685d6b08f6dce7040049422e_treva-logo.svg",
+    coverImage: "https://treva.realestate/images/treva-hero-bg.jpg",
+    verified: true,
+    officialPartner: true,
+    featured: true,
+    showPublicly: true,
+    showOnHomepage: true,
+    sortOrder: 0,
+    seoTitle: "TREVA Real Estate — rəsmi tərəfdaş",
+    seoDescription:
+      "TREVA Real Estate — Bakıda developer, broker və alıcıları birləşdirən daşınmaz əmlak satış platforması. Xidmətlər və əlaqə məlumatları.",
+    seoKeywords:
+      "TREVA Real Estate, TREVA, daşınmaz əmlak, Bakı daşınmaz əmlak, əmlak satış platforması, developer, broker, investisiya",
+    ogImage: "https://treva.realestate/images/treva-hero-bg.jpg",
+  } as const;
+
   await prisma.partner.upsert({
     where: { slug: "treva" },
-    update: {},
+    update: trevaData,
     create: {
-      name: "TREVA",
       slug: "treva",
-      websiteUrl: "https://treva.realestate/az",
-      status: "ACTIVE",
-      verified: true,
-      officialPartner: true,
-      featured: true,
-      showPublicly: true,
-      showOnHomepage: true,
+      ...trevaData,
     },
   });
   console.log("  ✓ Rəsmi tərəfdaşlar (TREVA)");

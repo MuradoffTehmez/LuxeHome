@@ -8,6 +8,7 @@ import {
   isPartnerPubliclyVisible,
   isPartnershipExpired,
   partnerDomain,
+  partnerLogoVariants,
   shouldMarkExpired,
 } from "@/lib/partners";
 
@@ -52,6 +53,15 @@ describe("tərəfdaşlıq domen qaydaları", () => {
     expect(partnerDomain("https://www.TREVA.realestate/az")).toBe("treva.realestate");
     expect(partnerDomain("https://treva.realestate")).toBe("treva.realestate");
     expect(partnerDomain("javascript:alert(1)")).toBeNull();
+  });
+
+  it("yalnız tünd fonda işləyən rəsmi loqonu ayrıca qeyd edir", () => {
+    expect(partnerLogoVariants({ logoUrl: null, logoLight: null, logoDark: "https://example.com/logo.svg" })).toEqual({
+      light: null,
+      dark: "https://example.com/logo.svg",
+      hasThemeVariants: false,
+      hasDarkOnly: true,
+    });
   });
 });
 

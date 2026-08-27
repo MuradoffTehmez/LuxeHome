@@ -16,7 +16,11 @@ export function cn(...inputs: ClassValue[]) {
  * optimizasiyası həm mümkün deyil, həm lazımsızdır — server tərəf artıq işini görüb.
  */
 export function isUnoptimizedImage(url: string): boolean {
-  return url.startsWith("/media/") || url.startsWith("blob:");
+  return (
+    url.startsWith("/media/") ||
+    url.startsWith("blob:") ||
+    /\.svg(?:[?#]|$)/i.test(url)
+  );
 }
 
 // ---------------------------------------------------------------------------

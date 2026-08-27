@@ -230,17 +230,17 @@ export function PartnerForm({
       </FormSection>
 
       <FormSection title="SEO">
-        <AdminInput name="seoTitle" label="SEO başlıq" maxLength={70} defaultValue={initial.seoTitle} />
+        <AdminInput name="seoTitle" label="SEO başlıq (AZ)" maxLength={70} defaultValue={initial.seoTitle} />
         <AdminInput
           name="seoDescription"
-          label="SEO təsvir"
+          label="SEO təsvir (AZ)"
           maxLength={180}
           defaultValue={initial.seoDescription}
         />
         <FullWidth>
           <AdminInput
             name="seoKeywords"
-            label="Açar sözlər"
+            label="Açar sözlər (AZ)"
             maxLength={300}
             defaultValue={initial.seoKeywords}
             hint="Vergüllə ayırın."

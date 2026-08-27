@@ -53,6 +53,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "media.luxehomeestate.az",
       },
+      {
+        // TREVA-nın rəsmi loqo və cover materialları.
+        protocol: "https",
+        hostname: "treva.realestate",
+      },
     ],
   },
 
