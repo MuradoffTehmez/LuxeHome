@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { startNavigationProgress } from "@/components/site/navigation-progress";
 
 type SortSelectProps = {
   /** Cari sıralama dəyəri. */
@@ -46,7 +47,10 @@ export function SortSelect({ value, hrefs, compact = false, className }: SortSel
           value={value}
           onChange={(event) => {
             const href = hrefs[event.target.value];
-            if (href) router.push(href);
+            if (!href) return;
+            // Keçid `select`-dən gedir — klik dinləyicisi onu tutmur
+            startNavigationProgress();
+            router.push(href);
           }}
           className={cn(
             "min-h-11 w-full cursor-pointer appearance-none rounded-xs border border-line-strong bg-paper pr-9 pl-3 text-sm text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold",

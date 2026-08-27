@@ -374,6 +374,31 @@ p {
 }
 
 /* --------------------------------------------------------------------------
+   Səhifə keçidi
+
+   `(site)/template.tsx` hər naviqasiyada yenidən mount olunur, ona görə bu
+   animasiya hər keçiddə işə düşür. Qəsdən qısadır: uzun animasiya məzmunun
+   gec gəldiyi hissi yaradır, halbuki məqsəd kəskin sıçrayışı yumşaltmaqdır.
+
+   `translate3d` GPU qatına keçirir — mətn ağır səhifədə (əmlak detalı) 8 px-lik
+   sürüşmə də sub-pixel yenidən rəsm tələb edə bilir.
+   -------------------------------------------------------------------------- */
+@keyframes luxe-page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.page-transition {
+  animation: luxe-page-enter 160ms var(--ease-out-soft) both;
+}
+
+/* --------------------------------------------------------------------------
    Uzun mətn blokları (blog, layihə təsviri)
    -------------------------------------------------------------------------- */
 .prose-luxe {

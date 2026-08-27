@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { CompareBar } from "@/components/site/compare-bar";
+import { NavigationProgress } from "@/components/site/navigation-progress";
 import { ToastProvider } from "@/components/ui/toast";
 
 /**
@@ -15,6 +16,7 @@ export default function SiteLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ToastProvider>
+      <NavigationProgress />
       <div className="flex min-h-dvh flex-col">
         <Navbar showLocaleSwitcher />
         <main id="main" className="flex-1 pt-[var(--header-h)]">

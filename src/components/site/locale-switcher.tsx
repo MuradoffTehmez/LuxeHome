@@ -8,6 +8,7 @@ import { routing } from "@/i18n/routing";
 import { LOCALE_LABELS, type Locale } from "@/lib/constants";
 import { saveLocalePreference } from "@/lib/locale-actions";
 import { cn } from "@/lib/utils";
+import { startNavigationProgress } from "@/components/site/navigation-progress";
 import { Modal } from "@/components/ui/modal";
 
 /** Navbar-dakı `ThemeToggle`-ə bənzər dil seçici — dil dəyişdikdə cari səhifədə qalır. */
@@ -25,6 +26,8 @@ export function LocaleSwitcher({
   async function select(next: Locale) {
     setOpen(false);
     if (next === locale) return;
+    // Keçid düymədən gedir, ona görə irəliləyiş zolağı əl ilə işə salınır
+    startNavigationProgress();
     await saveLocalePreference(next);
     router.replace(pathname, { locale: next });
   }
