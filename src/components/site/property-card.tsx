@@ -31,6 +31,26 @@ const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "r
   SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
 };
 
+/**
+ * Kartda göstəriləcək şəkil ünvanı.
+ *
+ * `/media/` ünvanları `next/image` optimizasiyasından yan keçir (zona
+ * səviyyəsində Cloudflare Images transformations hələ açılmayıb), ona görə
+ * `url` verilsə brauzer 2400 px-lik master faylı yükləyir — 12 kartlıq siyahıda
+ * bu bir neçə meqabayt deməkdir. Yükləmə zamanı hazırlanan 640 px-lik nüsxə
+ * kart ölçüsü üçün kifayətdir.
+ *
+ * `featured` variantı desktopda genişdir; orada master şəkil saxlanılır, çünki
+ * o, adətən səhifənin LCP elementidir və 640 px orada yumşaq görünür.
+ */
+function cardImageSrc(
+  image: { url: string; thumbUrl?: string | null },
+  preferFullSize: boolean,
+): string {
+  if (preferFullSize) return image.url;
+  return image.thumbUrl || image.url;
+}
+
 export function PropertyCard({
   property: sourceProperty,
   priority = false,
@@ -82,7 +102,7 @@ export function PropertyCard({
       >
         {image ? (
           <Image
-            src={image.url}
+            src={cardImageSrc(image, variant === "featured")}
             alt={image.alt || `${property.title} — ${location}`}
             fill
             unoptimized={isUnoptimizedImage(image.url)}
@@ -228,7 +248,7 @@ export function PropertyRow({ property: sourceProperty }: { property: PropertyCa
       <div className="relative size-24 shrink-0 overflow-hidden rounded-xs bg-beige">
         {image ? (
           <Image
-            src={image.url}
+            src={cardImageSrc(image, false)}
             alt={image.alt || property.title}
             fill
             unoptimized={isUnoptimizedImage(image.url)}

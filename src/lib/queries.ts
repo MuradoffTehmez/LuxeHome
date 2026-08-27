@@ -50,7 +50,10 @@ export const propertyCardSelect = {
   images: {
     orderBy: [{ isCover: "desc" }, { order: "asc" }],
     take: 1,
-    select: { url: true, alt: true, width: true, height: true },
+    // `thumbUrl` kart üçün vacibdir: `/media/` ünvanları `next/image`
+    // optimizasiyasından yan keçir (zona səviyyəsində Images transformations hələ
+    // açılmayıb), ona görə `url` verilsə kartda 2400 px-lik master şəkil yüklənir.
+    select: { url: true, thumbUrl: true, alt: true, width: true, height: true },
   },
 } satisfies Prisma.PropertySelect;
 

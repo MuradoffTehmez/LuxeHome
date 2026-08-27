@@ -25,6 +25,19 @@ export const getCachedProperties = unstable_cache(
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 
+/**
+ * Filtr açılışlarının məzmunu (əmlak növü, şəhər/rayon, metro, xüsusiyyət).
+ *
+ * `/emlaklar` səhifəsi bunu hər sorğuda keşsiz oxuyurdu — dörd ayrı D1 sorğusu,
+ * halbuki taksonomiya ayda bir dəfə dəyişir. Nəticələr `taxonomy` teqi ilə
+ * bağlıdır, ona görə paneldən taksonomiya dəyişəndə keş dərhal təmizlənir.
+ */
+export const getCachedFilterOptions = unstable_cache(
+  getFilterOptions,
+  ["public-filter-options-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.taxonomy], revalidate: FIVE_MINUTES },
+);
+
 export const getCachedPosts = unstable_cache(
   async (filters: { categorySlug?: string; page?: number; pageSize?: number; search?: string }) =>
     getPosts(filters),

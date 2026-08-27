@@ -66,3 +66,56 @@ describe("PropertyCard", () => {
     expect(skeletonHtml).toContain("sm:aspect-[16/11]");
   });
 });
+
+describe("PropertyCard — şəkil çatdırılması", () => {
+  const withImage = {
+    ...property,
+    images: [
+      {
+        url: "/media/emlaklar/2026/08/master.webp",
+        thumbUrl: "/media/emlaklar/2026/08/master-thumb.webp",
+        alt: "Mənzilin qonaq otağı",
+        width: 2400,
+        height: 1600,
+      },
+    ],
+  } as PropertyCardData;
+
+  it("adi kartda master şəkli deyil, kiçik nüsxəni yükləyir", () => {
+    // `/media/` ünvanları `next/image` optimizasiyasından yan keçir: master
+    // verilsə, 12 kartlıq siyahı bir neçə meqabayt yükləyir
+    const html = renderToStaticMarkup(
+      <ToastProvider>
+        <PropertyCard property={withImage} />
+      </ToastProvider>,
+    );
+
+    expect(html).toContain("master-thumb.webp");
+  });
+
+  it("featured kartda master şəkli saxlayır — o, adətən LCP elementidir", () => {
+    const html = renderToStaticMarkup(
+      <ToastProvider>
+        <PropertyCard property={withImage} variant="featured" />
+      </ToastProvider>,
+    );
+
+    expect(html).toContain("master.webp");
+    expect(html).not.toContain("master-thumb.webp");
+  });
+
+  it("kiçik nüsxə yoxdursa master şəklə düşür", () => {
+    const withoutThumb = {
+      ...withImage,
+      images: [{ ...withImage.images[0], thumbUrl: null }],
+    } as PropertyCardData;
+
+    const html = renderToStaticMarkup(
+      <ToastProvider>
+        <PropertyCard property={withoutThumb} />
+      </ToastProvider>,
+    );
+
+    expect(html).toContain("master.webp");
+  });
+});
