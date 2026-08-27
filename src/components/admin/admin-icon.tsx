@@ -9,6 +9,7 @@ import {
   Images,
   Inbox,
   LayoutDashboard,
+  Mail,
   Newspaper,
   Route,
   SearchCheck,
@@ -48,6 +49,7 @@ const ICONS: Record<string, LucideIcon> = {
   ClipboardCheck,
   History,
   Handshake,
+  Mail,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

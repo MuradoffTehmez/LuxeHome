@@ -688,6 +688,25 @@ model AuditLog {
   @@index([entity, entityId])
 }
 
+/// Korporativ e-poçtun məzmununu deyil, çatdırılma və qəbul metadatasını saxlayır.
+model EmailActivity {
+  id              String   @id @default(cuid())
+  providerId      String   @unique
+  direction       String   // OUTBOUND | INBOUND
+  eventType       String
+  fromAddress     String?
+  toAddresses     String   @default("[]")
+  subject         String?
+  messageId       String?
+  attachmentCount Int      @default(0)
+  lastEventAt     DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([direction, lastEventAt])
+  @@index([eventType, lastEventAt])
+}
+
 /// Yüngül domen hadisə jurnalı (outbox pattern). D1 tranzaksiya dəstəkləmədiyi
 /// üçün tam event-sourcing/CQRS burada mənasız risk daşıyır — bunun əvəzinə
 /// hər əhəmiyyətli yazı əməliyyatından sonra ayrıca INSERT ilə hadisə qeyd olunur.

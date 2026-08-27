@@ -3,6 +3,7 @@ import { SETTING_KEYS, getSetting } from "@/lib/settings";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
+import { recordEmailActivity } from "@/lib/email-activity";
 
 /**
  * E-poçt mətnləri.
@@ -168,16 +169,27 @@ export async function sendEmail({
   replyTo,
 }: SendEmailOptions) {
   const resend = getResend();
+  const resolvedTo = to ?? (await notificationEmail());
+  const resolvedFrom = from ?? fromEmail();
+  const toAddresses = Array.isArray(resolvedTo) ? resolvedTo : [resolvedTo];
 
   if (!resend) {
     console.warn("⚠️ Resend API açarı (RESEND_API_KEY) tapılmadı. E-poçt göndərilmədi.");
+    await recordEmailActivity({
+      providerId: `local-${crypto.randomUUID()}`,
+      direction: "OUTBOUND",
+      eventType: "email.failed",
+      fromAddress: resolvedFrom,
+      toAddresses,
+      subject,
+    });
     return { success: false, error: "RESEND_API_KEY təyin edilməyib" };
   }
 
   try {
     const { data, error } = await resend.emails.send({
-      from: from ?? fromEmail(),
-      to: to ?? (await notificationEmail()),
+      from: resolvedFrom,
+      to: resolvedTo,
       subject,
       html,
       replyTo: replyTo || undefined,
@@ -185,12 +197,36 @@ export async function sendEmail({
 
     if (error) {
       console.error("❌ Resend e-poçt göndərmə xətası:", error);
+      await recordEmailActivity({
+        providerId: `local-${crypto.randomUUID()}`,
+        direction: "OUTBOUND",
+        eventType: "email.failed",
+        fromAddress: resolvedFrom,
+        toAddresses,
+        subject,
+      });
       return { success: false, error: error.message };
     }
 
+    await recordEmailActivity({
+      providerId: data?.id ?? `local-${crypto.randomUUID()}`,
+      direction: "OUTBOUND",
+      eventType: "email.sent",
+      fromAddress: resolvedFrom,
+      toAddresses,
+      subject,
+    });
     return { success: true, data };
   } catch (err) {
     console.error("❌ Resend gözlənilməz xəta:", err);
+    await recordEmailActivity({
+      providerId: `local-${crypto.randomUUID()}`,
+      direction: "OUTBOUND",
+      eventType: "email.failed",
+      fromAddress: resolvedFrom,
+      toAddresses,
+      subject,
+    });
     return {
       success: false,
       error: err instanceof Error ? err.message : "Naməlum xəta",

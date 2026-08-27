@@ -2158,6 +2158,35 @@ function startOfToday(now: Date): Date {
   );
 }
 
+/** Panel — korporativ e-poçt göndəriş və qəbul metadatası. */
+export async function getAdminEmailActivities(
+  page = 1,
+  filters: { direction?: string; eventType?: string; query?: string } = {},
+) {
+  const pageSize = 20;
+  const where: Prisma.EmailActivityWhereInput = {
+    ...(filters.direction ? { direction: filters.direction } : {}),
+    ...(filters.eventType ? { eventType: filters.eventType } : {}),
+    ...(filters.query ? {
+      OR: [
+        { subject: { contains: filters.query } },
+        { fromAddress: { contains: filters.query } },
+        { toAddresses: { contains: filters.query } },
+      ],
+    } : {}),
+  };
+  const [rows, total] = await Promise.all([
+    prisma.emailActivity.findMany({
+      where,
+      orderBy: { lastEventAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.emailActivity.count({ where }),
+  ]);
+  return { rows, total, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
+}
+
 /**
  * Hər ictimai tərəfdaş sorğusunun bazası.
  *

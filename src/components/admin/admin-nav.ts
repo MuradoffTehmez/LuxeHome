@@ -43,6 +43,7 @@ export const adminNav: AdminNavGroup[] = [
     title: "Satış",
     items: [
       { label: "Müraciətlər", href: "/admin/muracietler", icon: "Inbox", badgeKey: "newLeads" },
+      { label: "Korporativ e-poçt", href: "/admin/e-poct", icon: "Mail" },
     ],
   },
   {
