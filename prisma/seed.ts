@@ -407,8 +407,30 @@ async function main() {
   console.log(`  ✓ Xidmətlər (${serviceData.length})`);
 
   // -------------------------------------------------------------------------
+  // 6. RƏSMİ TƏRƏFDAŞLAR
   // -------------------------------------------------------------------------
-  // 6. BLOQ KATEQORİYALARI
+  // Yalnız master promptda təsdiqlənmiş məlumatlar yazılır. Hüquqi ad,
+  // müqavilə və əməkdaşlıq tarixləri real sənəd olmadan təxmin edilmir.
+  await prisma.partner.upsert({
+    where: { slug: "treva" },
+    update: {},
+    create: {
+      name: "TREVA",
+      slug: "treva",
+      websiteUrl: "https://treva.realestate/az",
+      status: "ACTIVE",
+      verified: true,
+      officialPartner: true,
+      featured: true,
+      showPublicly: true,
+      showOnHomepage: true,
+    },
+  });
+  console.log("  ✓ Rəsmi tərəfdaşlar (TREVA)");
+
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // 7. BLOQ KATEQORİYALARI
   // -------------------------------------------------------------------------
   const categoryData = [
     { name: "Daşınmaz əmlak", slug: "dasinmaz-emlak" },

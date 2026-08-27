@@ -45,7 +45,7 @@ type ImageDropzoneProps = {
   name: string;
   label: string;
   hint?: string;
-  /** R2-də qovluq: emlaklar | layiheler | bloq | xidmetler | umumi */
+  /** R2-də təhlükəsiz server allowlist-ində olan qovluq. */
   folder: string;
   initial?: DropzoneImage[];
   /** `single` — yalnız bir şəkil (üz qabığı), `multiple` — qalereya. */
@@ -54,6 +54,8 @@ type ImageDropzoneProps = {
   maxFiles?: number;
   /** Media endpoint-i; panel formaları əvvəlki admin endpoint-dən istifadə edir. */
   uploadUrl?: string;
+  /** Client tərəfdə erkən yoxlama; server qovluğa görə limiti yenidən tətbiq edir. */
+  maxFileSize?: number;
 };
 
 function withCover(items: Item[]): Item[] {
@@ -76,6 +78,7 @@ export function ImageDropzone({
   mode = "multiple",
   maxFiles,
   uploadUrl = DEFAULT_IMAGE_UPLOAD_URL,
+  maxFileSize = MAX_UPLOAD_SIZE,
 }: ImageDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldId = useId();
@@ -92,10 +95,16 @@ export function ImageDropzone({
   );
 
   async function upload(file: File, id: string) {
-    if (file.size > MAX_UPLOAD_SIZE) {
+    if (file.size > maxFileSize) {
       setItems((current) =>
         current.map((item) =>
-          item.id === id ? { ...item, status: "error", error: "Fayl 8 MB-dan böyükdür" } : item,
+          item.id === id
+            ? {
+                ...item,
+                status: "error",
+                error: `Fayl ${Math.round(maxFileSize / 1024 / 1024)} MB-dan böyükdür`,
+              }
+            : item,
         ),
       );
       return;

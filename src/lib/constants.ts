@@ -32,7 +32,13 @@ export const PERMISSIONS = {
   MEDIA_MANAGE: "media:manage",
   USER_MANAGE: "user:manage",
   SETTINGS_MANAGE: "settings:manage",
-  PARTNER_MANAGE: "partner:manage",
+  PARTNER_VIEW: "partner:view",
+  PARTNER_CREATE: "partner:create",
+  PARTNER_UPDATE: "partner:update",
+  PARTNER_DELETE: "partner:delete",
+  PARTNER_VERIFY: "partner:verify",
+  PARTNER_PUBLISH: "partner:publish",
+  PARTNER_RELATION_MANAGE: "partner:relationships",
   /**
    * Müqavilə metadatası (nömrə, tarixlər, sənəd, daxili qeydlər) ayrıca icazədir:
    * bu məlumat kommersiya sirridir və adi paneldə avtomatik görünməməlidir.
@@ -52,9 +58,15 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.BLOG_MANAGE,
     PERMISSIONS.LEAD_MANAGE,
     PERMISSIONS.MEDIA_MANAGE,
-    PERMISSIONS.PARTNER_MANAGE,
+    PERMISSIONS.PARTNER_VIEW,
+    PERMISSIONS.PARTNER_CREATE,
+    PERMISSIONS.PARTNER_UPDATE,
+    PERMISSIONS.PARTNER_DELETE,
+    PERMISSIONS.PARTNER_VERIFY,
+    PERMISSIONS.PARTNER_PUBLISH,
+    PERMISSIONS.PARTNER_RELATION_MANAGE,
   ],
-  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.MEDIA_MANAGE],
+  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.PARTNER_VIEW],
 };
 
 // ---------------------------------------------------------------------------

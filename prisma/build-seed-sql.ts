@@ -18,6 +18,7 @@ const BOOTSTRAP_TABLES = new Set([
   "BlogCategory",
   "Feature",
   "Location",
+  "Partner",
   "PropertyType",
   "Service",
   "Setting",

@@ -1,0 +1,93 @@
+import type { DropzoneImage } from "@/components/admin/image-dropzone";
+import { PARTNER_STATUSES, PARTNERSHIP_TYPES } from "@/lib/constants";
+
+export type PartnerFormValues = {
+  id?: string;
+  name: string;
+  legalName: string;
+  slug: string;
+  partnershipType: string;
+  status: string;
+  shortDescription: string;
+  shortDescriptionEn: string;
+  shortDescriptionRu: string;
+  description: string;
+  descriptionEn: string;
+  descriptionRu: string;
+  disclaimer: string;
+  disclaimerEn: string;
+  disclaimerRu: string;
+  websiteUrl: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  country: string;
+  city: string;
+  address: string;
+  verified: boolean;
+  officialPartner: boolean;
+  featured: boolean;
+  showPublicly: boolean;
+  showOnHomepage: boolean;
+  officialSince: string;
+  partnershipEndDate: string;
+  sortOrder: string;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
+  ogImage: string;
+  logo: DropzoneImage[];
+  logoLight: DropzoneImage[];
+  logoDark: DropzoneImage[];
+  coverImage: DropzoneImage[];
+  contractNumber: string;
+  contractStartDate: string;
+  contractEndDate: string;
+  contractDocument: string;
+  internalNotes: string;
+};
+
+export const EMPTY_PARTNER: PartnerFormValues = {
+  name: "",
+  legalName: "",
+  slug: "",
+  partnershipType: PARTNERSHIP_TYPES.OTHER,
+  status: PARTNER_STATUSES.DRAFT,
+  shortDescription: "",
+  shortDescriptionEn: "",
+  shortDescriptionRu: "",
+  description: "",
+  descriptionEn: "",
+  descriptionRu: "",
+  disclaimer: "",
+  disclaimerEn: "",
+  disclaimerRu: "",
+  websiteUrl: "",
+  email: "",
+  phone: "",
+  whatsapp: "",
+  country: "",
+  city: "",
+  address: "",
+  verified: false,
+  officialPartner: false,
+  featured: false,
+  showPublicly: false,
+  showOnHomepage: false,
+  officialSince: "",
+  partnershipEndDate: "",
+  sortOrder: "0",
+  seoTitle: "",
+  seoDescription: "",
+  seoKeywords: "",
+  ogImage: "",
+  logo: [],
+  logoLight: [],
+  logoDark: [],
+  coverImage: [],
+  contractNumber: "",
+  contractStartDate: "",
+  contractEndDate: "",
+  contractDocument: "",
+  internalNotes: "",
+};

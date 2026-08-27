@@ -35,6 +35,7 @@ export type PartnerVisibilityInput = {
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const BAKU_UTC_OFFSET_MS = 4 * 60 * 60 * 1000;
 
 function toTime(value: Date | string | null | undefined): number | null {
   if (value == null) return null;
@@ -54,7 +55,19 @@ export function isPartnershipExpired(
 ): boolean {
   const end = toTime(partner.partnershipEndDate);
   if (end === null) return false;
-  return now.getTime() > end + DAY_MS;
+  const endDate = new Date(end);
+  const endDay = Date.UTC(
+    endDate.getUTCFullYear(),
+    endDate.getUTCMonth(),
+    endDate.getUTCDate(),
+  );
+  const bakuNow = new Date(now.getTime() + BAKU_UTC_OFFSET_MS);
+  const todayInBaku = Date.UTC(
+    bakuNow.getUTCFullYear(),
+    bakuNow.getUTCMonth(),
+    bakuNow.getUTCDate(),
+  );
+  return todayInBaku > endDay;
 }
 
 /**
@@ -117,7 +130,19 @@ export function daysUntilPartnershipEnd(
 ): number | null {
   const end = toTime(partner.partnershipEndDate);
   if (end === null) return null;
-  return Math.ceil((end - now.getTime()) / DAY_MS);
+  const endDate = new Date(end);
+  const endDay = Date.UTC(
+    endDate.getUTCFullYear(),
+    endDate.getUTCMonth(),
+    endDate.getUTCDate(),
+  );
+  const bakuNow = new Date(now.getTime() + BAKU_UTC_OFFSET_MS);
+  const todayInBaku = Date.UTC(
+    bakuNow.getUTCFullYear(),
+    bakuNow.getUTCMonth(),
+    bakuNow.getUTCDate(),
+  );
+  return Math.round((endDay - todayInBaku) / DAY_MS);
 }
 
 /** Paneldə «bitməsinə az qalıb» xəbərdarlığının açıldığı hədd. */
@@ -282,7 +307,10 @@ export function partnerLogoVariants(partner: PartnerLogoSource): {
 export function partnerDomain(websiteUrl: string | null | undefined): string | null {
   if (!websiteUrl?.trim()) return null;
   try {
-    const host = new URL(websiteUrl.trim()).hostname.toLowerCase();
+    const url = new URL(websiteUrl.trim());
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    const host = url.hostname.toLowerCase();
+    if (!host) return null;
     return host.startsWith("www.") ? host.slice(4) : host;
   } catch {
     return null;

@@ -16,6 +16,11 @@ export type AuditAction =
   | "DELETE"
   | "RESTORE"
   | "PUBLISH"
+  | "UNPUBLISH"
+  | "VERIFY"
+  | "STATUS_CHANGE"
+  | "RELATION_CHANGE"
+  | "EXPIRE"
   | "UPLOAD"
   | "ROLE_CHANGE"
   | "SESSION_REVOKE";
@@ -30,6 +35,7 @@ export type AuditEntity =
   | "Media"
   | "User"
   | "Agency"
+  | "Partner"
   | "Redirect"
   | "Setting";
 
@@ -39,6 +45,7 @@ export async function recordAudit(
   entity: AuditEntity,
   entityId: string | null,
   summary?: string | null,
+  changes?: { oldValue?: unknown; newValue?: unknown },
 ): Promise<void> {
   try {
     await prisma.auditLog.create({
@@ -49,6 +56,8 @@ export async function recordAudit(
         entity,
         entityId,
         summary: summary ?? null,
+        oldValue: changes?.oldValue === undefined ? null : JSON.stringify(changes.oldValue),
+        newValue: changes?.newValue === undefined ? null : JSON.stringify(changes.newValue),
         ip: await requestIp(),
       },
     });

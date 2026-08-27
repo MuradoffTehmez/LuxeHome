@@ -672,6 +672,9 @@ model AuditLog {
   entityId  String?
   /// Qısa insan oxunaqlı təsvir (məsələn elanın başlığı).
   summary   String?
+  /// Həssas dəyərlər yazılmadan əvvəl çağıran tərəfindən maskalanmış JSON snapshot.
+  oldValue String?
+  newValue String?
   ip        String?
 
   createdAt DateTime @default(now())

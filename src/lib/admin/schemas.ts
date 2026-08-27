@@ -414,13 +414,27 @@ export const partnerSchema = partnerBaseSchema.superRefine((value, ctx) => {
 export type PartnerInput = z.infer<typeof partnerSchema>;
 
 /** Müqavilə metadatası — ayrıca sxem, çünki ayrıca icazə ilə qorunur. */
-export const partnerContractSchema = z.object({
-  contractNumber: optionalText(80),
-  contractStartDate: optionalDate,
-  contractEndDate: optionalDate,
-  contractDocument: optionalText(500),
-  internalNotes: z.string().trim().max(4000).nullable(),
-});
+export const partnerContractSchema = z
+  .object({
+    contractNumber: optionalText(80),
+    contractStartDate: optionalDate,
+    contractEndDate: optionalDate,
+    contractDocument: optionalText(500),
+    internalNotes: z.string().trim().max(4000).nullable(),
+  })
+  .superRefine((value, ctx) => {
+    if (
+      value.contractStartDate &&
+      value.contractEndDate &&
+      value.contractEndDate.getTime() < value.contractStartDate.getTime()
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["contractEndDate"],
+        message: "Müqavilənin bitmə tarixi başlama tarixindən əvvəl ola bilməz",
+      });
+    }
+  });
 
 export type PartnerContractInput = z.infer<typeof partnerContractSchema>;
 

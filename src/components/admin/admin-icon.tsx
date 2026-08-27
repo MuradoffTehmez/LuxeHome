@@ -5,6 +5,7 @@ import {
   ClipboardCheck,
   Contact,
   History,
+  Handshake,
   Images,
   Inbox,
   LayoutDashboard,
@@ -46,6 +47,7 @@ const ICONS: Record<string, LucideIcon> = {
   BarChart3,
   ClipboardCheck,
   History,
+  Handshake,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

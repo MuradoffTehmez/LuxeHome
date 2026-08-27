@@ -1,5 +1,9 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { ALLOWED_IMAGE_MIME_TYPES, MAX_UPLOAD_SIZE } from "@/lib/constants";
+import {
+  ALLOWED_IMAGE_MIME_TYPES,
+  MAX_PARTNER_LOGO_SIZE,
+  MAX_UPLOAD_SIZE,
+} from "@/lib/constants";
 
 /**
  * R2-yə şəkil yükləmə qatı.
@@ -16,7 +20,15 @@ import { ALLOWED_IMAGE_MIME_TYPES, MAX_UPLOAD_SIZE } from "@/lib/constants";
  * onsuz da `next/image` tərəfindən Accept başlığına görə verilir.
  */
 
-export const MEDIA_FOLDERS = ["emlaklar", "layiheler", "bloq", "xidmetler", "umumi"] as const;
+export const MEDIA_FOLDERS = [
+  "emlaklar",
+  "layiheler",
+  "bloq",
+  "xidmetler",
+  "terefdaslar",
+  "terefdaslar-logo",
+  "umumi",
+] as const;
 export type MediaFolder = (typeof MEDIA_FOLDERS)[number];
 
 type AllowedMime = (typeof ALLOWED_IMAGE_MIME_TYPES)[number];
@@ -132,11 +144,12 @@ export type UploadResult =
   | { ok: false; error: string };
 
 export async function putImage(file: File, folder: MediaFolder): Promise<UploadResult> {
+  const maxSize = folder === "terefdaslar-logo" ? MAX_PARTNER_LOGO_SIZE : MAX_UPLOAD_SIZE;
   if (file.size === 0) return { ok: false, error: "Fayl boşdur." };
-  if (file.size > MAX_UPLOAD_SIZE) {
+  if (file.size > maxSize) {
     return {
       ok: false,
-      error: `Fayl ${Math.round(MAX_UPLOAD_SIZE / 1024 / 1024)} MB-dan böyükdür.`,
+      error: `Fayl ${Math.round(maxSize / 1024 / 1024)} MB-dan böyükdür.`,
     };
   }
 

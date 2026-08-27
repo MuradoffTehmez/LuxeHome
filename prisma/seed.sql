@@ -101,6 +101,9 @@ INSERT OR IGNORE INTO "Service" ("id", "title", "slug", "shortDescription", "des
 
 Hər çəkiliş əmlakın güclü tərəflərini önə çıxaracaq şəkildə planlaşdırılır.', 'Camera', 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=80', '["Peşəkar interyer və eksteryer fotoçəkilişi","Video təqdimat rolikləri","Dron ilə hava çəkilişi","Şəkillərin peşəkar emalı","Sosial media üçün format hazırlığı"]', 6, 1, 'Çəkiliş — Luxe Home Estate', 'Professional foto və video çəkiliş xidmətləri.', 1787247091551, 1787247091551);
 
+-- Partner (1)
+INSERT OR IGNORE INTO "Partner" ("id", "name", "slug", "websiteUrl", "partnershipType", "status", "verified", "officialPartner", "featured", "showPublicly", "showOnHomepage", "sortOrder", "createdAt", "updatedAt") VALUES ('cm0treva00000000000000000', 'TREVA', 'treva', 'https://treva.realestate/az', 'OTHER', 'ACTIVE', 1, 1, 1, 1, 1, 0, 1787850000000, 1787850000000);
+
 -- Setting (6)
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('site.title', 'Luxe Home Estate — Həyatınızın ən dəyərli ünvanı', 1787247092242);
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('site.description', 'Luxe Home Estate — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi.', 1787247092390);

@@ -655,9 +655,26 @@ export async function getAdminLockedUsers() {
 }
 
 /** Panel — Audit Log səhifəsi, səhifələnmiş. */
-export async function getAdminAuditLog(page = 1, pageSize = ADMIN_PAGE_SIZE) {
+export async function getAdminAuditLog(
+  page = 1,
+  pageSize = ADMIN_PAGE_SIZE,
+  filters: { entity?: string; query?: string } = {},
+) {
+  const where: Prisma.AuditLogWhereInput = {
+    ...(filters.entity ? { entity: filters.entity } : {}),
+    ...(filters.query
+      ? {
+          OR: [
+            { entityId: { contains: filters.query } },
+            { summary: { contains: filters.query } },
+            { userEmail: { contains: filters.query } },
+          ],
+        }
+      : {}),
+  };
   const [entries, total] = await Promise.all([
     prisma.auditLog.findMany({
+      where,
       select: {
         id: true,
         userEmail: true,
@@ -665,6 +682,8 @@ export async function getAdminAuditLog(page = 1, pageSize = ADMIN_PAGE_SIZE) {
         entity: true,
         entityId: true,
         summary: true,
+        oldValue: true,
+        newValue: true,
         ip: true,
         createdAt: true,
       },
@@ -672,7 +691,7 @@ export async function getAdminAuditLog(page = 1, pageSize = ADMIN_PAGE_SIZE) {
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
-    prisma.auditLog.count(),
+    prisma.auditLog.count({ where }),
   ]);
   return { entries, total, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
 }
@@ -2124,7 +2143,12 @@ export const savedSearchDigestStore: DigestStore = {
 
 /** Müqavilə tarixləri gün dəqiqliyindədir — son gün bütöv sayılır. */
 function startOfToday(now: Date): Date {
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  // Müqavilə tarixləri Bakı təqvim günüdür. `Date` bazada UTC midnight kimi
+  // saxlanır, ona görə əvvəlcə cari anı UTC+4-ə çəkib həmin calendar date-i qururuq.
+  const bakuNow = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+  return new Date(
+    Date.UTC(bakuNow.getUTCFullYear(), bakuNow.getUTCMonth(), bakuNow.getUTCDate()),
+  );
 }
 
 /**
@@ -2367,6 +2391,9 @@ export type AdminPartnerFilters = {
   featured?: string;
   homepage?: string;
   country?: string;
+  createdFrom?: Date;
+  createdTo?: Date;
+  deleted?: boolean;
   page?: number;
 };
 
@@ -2415,7 +2442,7 @@ export async function getAdminPartners(filters: AdminPartnerFilters = {}) {
   const where: Prisma.PartnerWhereInput = {
     // `ARCHIVED` adi statusdur və siyahıda görünür; `deletedAt` isə həqiqi
     // yumşaq silmədir — silinmiş qeyd yalnız bərpa əməliyyatı ilə qayıdır.
-    deletedAt: null,
+    deletedAt: filters.deleted ? { not: null } : null,
     ...(filters.status ? { status: filters.status } : {}),
     ...(filters.type ? { partnershipType: filters.type } : {}),
     ...(filters.country ? { country: filters.country } : {}),
@@ -2423,6 +2450,14 @@ export async function getAdminPartners(filters: AdminPartnerFilters = {}) {
     ...(official !== undefined ? { officialPartner: official } : {}),
     ...(featured !== undefined ? { featured } : {}),
     ...(homepage !== undefined ? { showOnHomepage: homepage } : {}),
+    ...(filters.createdFrom || filters.createdTo
+      ? {
+          createdAt: {
+            ...(filters.createdFrom ? { gte: filters.createdFrom } : {}),
+            ...(filters.createdTo ? { lte: filters.createdTo } : {}),
+          },
+        }
+      : {}),
     // D1 `mode: "insensitive"` dəstəkləmir — SQLite LIKE yalnız ASCII-də reqistrsizdir.
     ...(search
       ? {
@@ -2572,6 +2607,77 @@ export async function getAdminProjectPartnerLinks(projectId: string) {
     },
     orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
   });
+}
+
+/** Tərəfdaş redaktə səhifəsində göstərilən bütün relation-lar. */
+export async function getAdminPartnerRelations(partnerId: string) {
+  const [properties, projects, agencies] = await Promise.all([
+    prisma.propertyPartner.findMany({
+      where: { partnerId },
+      select: {
+        id: true,
+        role: true,
+        sourceUrl: true,
+        isPublic: true,
+        isPrimary: true,
+        property: { select: { id: true, title: true, slug: true } },
+      },
+      orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+    }),
+    prisma.projectPartner.findMany({
+      where: { partnerId },
+      select: {
+        id: true,
+        role: true,
+        isPublic: true,
+        isPrimary: true,
+        project: { select: { id: true, name: true, slug: true } },
+      },
+      orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+    }),
+    prisma.agencyPartner.findMany({
+      where: { partnerId },
+      select: {
+        id: true,
+        role: true,
+        isPublic: true,
+        agency: { select: { id: true, name: true, slug: true } },
+      },
+      orderBy: { createdAt: "asc" },
+    }),
+  ]);
+
+  return { properties, projects, agencies };
+}
+
+/**
+ * Relation əlavə etmə forması üçün yüngül seçim siyahıları.
+ * Son yenilənən qeydlərlə məhdudlaşdırılır; minlərlə elan olduqda ayrıca axtarış
+ * endpoint-inə keçirilə bilər, amma səhifə bütün bazanı client bundle-a daşımır.
+ */
+export async function getPartnerRelationOptions() {
+  const [properties, projects, agencies] = await Promise.all([
+    prisma.property.findMany({
+      where: { deletedAt: null },
+      select: { id: true, title: true },
+      orderBy: { updatedAt: "desc" },
+      take: 100,
+    }),
+    prisma.project.findMany({
+      where: { deletedAt: null },
+      select: { id: true, name: true },
+      orderBy: { updatedAt: "desc" },
+      take: 100,
+    }),
+    prisma.agency.findMany({
+      where: { user: { isActive: true } },
+      select: { id: true, name: true },
+      orderBy: { updatedAt: "desc" },
+      take: 100,
+    }),
+  ]);
+
+  return { properties, projects, agencies };
 }
 
 /**
