@@ -276,3 +276,24 @@ Bu sıra `AskUserQuestion` vasitəsilə istifadəçi ilə birbaşa təsdiqlənib
 `.claude` yaddaş faylı `luxehome-prd-full-scope-goal.md`). Hər maddə brainstorming
 skill-inin architectural yolu ilə gedir: kontekst araşdırması → suallar → yanaşmalar →
 dizayn → spec (`docs/superpowers/specs/`) → təsdiq → `writing-plans`.
+
+---
+
+## 11. Rəsmi tərəfdaşlıq sistemi — 27 avqust 2026
+
+Master prompt üzrə tərəfdaşlıq modulu tam platformaya inteqrasiya edildi:
+
+- `Partner`, `PropertyPartner`, `ProjectPartner`, `AgencyPartner` və lead atribusiyası;
+- status, tarix və Bakı vaxt qurşağına görə rəsmi nişan/ictimai görünürlük qaydaları;
+- AZ/EN/RU tərəfdaş siyahısı, profil, ana səhifə vitrini, SEO/JSON-LD və analitika;
+- granular RBAC-li admin CRUD, müqavilə sahələri, relation manager, soft-delete və audit snapshot-ları;
+- təhlükəsiz logo yükləmə (2 MB, MIME/magic-byte yoxlaması) və TREVA başlanğıc qeydi;
+- `0013_partners.sql` və tətbiq edilmiş sxemə toxunmadan əlavə olunan
+  `0014_partner_audit_snapshots.sql` miqrasiyaları.
+
+Keyfiyyət qapısı: 324 test, typecheck, ESLint, Next production build və OpenNext Workerd build
+təmizdir. İctimai siyahı/profil 320–1920 px enlərində horizontal overflow olmadan yoxlanıb.
+
+Kontent addımları: TREVA-nın real logo faylı, hüquqi/müqavilə rekvizitləri və geniş AZ/EN/RU
+mətnləri etibarlı mənbə təqdim ediləndən sonra admin paneldən əlavə edilməlidir. Uydurma məlumat
+seed edilməyib.
