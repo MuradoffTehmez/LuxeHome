@@ -2,6 +2,10 @@ import { headers } from "next/headers";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { requireLister, requirePermission } from "@/lib/auth/guard";
 import { clientIp } from "@/lib/auth/rate-limit";
+import {
+  SameOriginError,
+  assertSameOrigin as assertRequestSameOrigin,
+} from "@/lib/request-origin";
 import type { AuthUser } from "@/lib/auth/types";
 import type { Permission } from "@/lib/constants";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
@@ -23,28 +27,17 @@ import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
 
 export class AdminGuardError extends Error {}
 
-/** Sorğunun bizim mənşədən gəldiyini yoxlayır. */
+/**
+ * Mənbə yoxlaması. Məntiq `@/lib/request-origin`-dədir — ictimai formalar onu
+ * auth qatını yükləmədən çağıra bilsin deyə. Burada yalnız xəta tipi panelin
+ * gözlədiyi `AdminGuardError`-a çevrilir.
+ */
 export async function assertSameOrigin(): Promise<void> {
-  const requestHeaders = await headers();
-
-  // Brauzer eyni-mənşəli sorğuda bu başlığı özü qoyur və JavaScript onu dəyişə bilmir
-  const fetchSite = requestHeaders.get("sec-fetch-site");
-  if (fetchSite && fetchSite !== "same-origin" && fetchSite !== "none") {
-    throw new AdminGuardError("Sorğu kənar saytdan gəlib.");
-  }
-
-  const origin = requestHeaders.get("origin");
-  if (!origin) return; // Sec-Fetch-Site yoxlaması artıq keçib
-
-  const host = requestHeaders.get("host");
-  if (!host) throw new AdminGuardError("Host başlığı yoxdur.");
-
   try {
-    if (new URL(origin).host !== host) {
-      throw new AdminGuardError("Origin host ilə uyğun gəlmir.");
-    }
-  } catch {
-    throw new AdminGuardError("Origin başlığı oxunmadı.");
+    await assertRequestSameOrigin();
+  } catch (error) {
+    if (error instanceof SameOriginError) throw new AdminGuardError(error.message);
+    throw error;
   }
 }
 

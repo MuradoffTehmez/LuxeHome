@@ -7,6 +7,7 @@ import { Input, Textarea } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { submitContactForm, type ContactFormState } from "./actions";
 import { trackEvent } from "@/lib/client-analytics";
+import { HONEYPOT_FIELD } from "@/lib/spam";
 
 const initialState: ContactFormState = { success: false };
 
@@ -38,6 +39,24 @@ export function ContactForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
+      {/*
+        Honeypot — ziyarətçi görmür, bot doldurur. Ekrandan kənara çıxarılır,
+        `display: none` işlədilmir: botların bir hissəsi məhz həmin xassəyə görə
+        sahəni atır. `aria-hidden` + `tabindex="-1"` klaviatura və ekran
+        oxuyucusunu ondan uzaq saxlayır.
+      */}
+      <div aria-hidden="true" className="pointer-events-none absolute -left-[9999px] size-px overflow-hidden">
+        <label htmlFor={HONEYPOT_FIELD}>{t("website")}</label>
+        <input
+          id={HONEYPOT_FIELD}
+          name={HONEYPOT_FIELD}
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+        />
+      </div>
+
       {state.error && (
         <div
           role="alert"

@@ -35,6 +35,20 @@ export async function checkLoginLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/**
+ * İctimai forma (əlaqə, müraciət) üçün IP limiti — `true` = davam etmək olar.
+ *
+ * Panel yazılarından ayrı binding-dir: əməkdaşın normal iş tempi ilə anonim
+ * ziyarətçinin forma göndərişi eyni büdcəni bölüşməməlidir.
+ */
+export async function checkContactLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.CONTACT_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `contact:${ip}` });
+  return success;
+}
+
 export function isAccountLocked(lockedUntil: Date | null): boolean {
   return isLockActive(lockedUntil, new Date());
 }

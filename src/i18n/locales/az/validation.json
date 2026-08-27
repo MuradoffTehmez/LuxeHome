@@ -3,5 +3,7 @@
   "phoneMin": "Telefon nömrəsi düzgün deyil",
   "emailInvalid": "E-poçt ünvanı düzgün deyil",
   "messageMin": "Mesaj ən azı 10 simvol olmalıdır",
-  "submitError": "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin."
+  "submitError": "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
+  "rateLimited": "Çox sayda müraciət göndərildi. Bir dəqiqə gözləyin.",
+  "origin": "Müraciət qəbul edilmədi. Səhifəni yeniləyib yenidən cəhd edin."
 }

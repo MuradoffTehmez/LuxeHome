@@ -1,8 +1,12 @@
 "use server";
 
+import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { sendLeadNotificationEmail } from "@/lib/email";
+import { SameOriginError, assertSameOrigin } from "@/lib/request-origin";
+import { checkContactLimit, clientIp } from "@/lib/auth/rate-limit";
+import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
 import { z } from "zod";
 
 async function contactSchema() {
@@ -35,10 +39,53 @@ export type ContactFormState = {
   fieldErrors?: Record<string, string>;
 };
 
+/** Spam qapısının rədd mesajları — tərcümə yoxdursa azərbaycancaya düşür. */
+async function rejectionMessage(kind: "origin" | "rateLimited"): Promise<string> {
+  const fallback =
+    kind === "origin"
+      ? "Müraciət qəbul edilmədi. Səhifəni yeniləyib yenidən cəhd edin."
+      : "Çox sayda müraciət göndərildi. Bir dəqiqə gözləyin.";
+  try {
+    return (await getTranslations("validation"))(kind);
+  } catch {
+    return fallback;
+  }
+}
+
 export async function submitContactForm(
   _prev: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  // --- Spam qapısı ----------------------------------------------------------
+  //
+  // Üç laylıdır və sıra vacibdir: ən ucuz yoxlama əvvəldədir.
+  //
+  // 1. Honeypot — heç bir şəbəkə və ya DB müraciəti tələb etmir.
+  // 2. Mənbə (CSRF) — yalnız başlıq oxumasıdır.
+  // 3. Sürət limiti — Workers binding-i, D1-ə toxunmur.
+  //
+  // Bunlar olmadan bir skript `Lead` cədvəlini limitsiz doldura və hər sətir
+  // üçün Resend e-poçtu tetikleyə bilirdi.
+
+  if (isHoneypotFilled(formData.get(HONEYPOT_FIELD))) {
+    // Bota uğur cavabı qaytarılır — sahənin tələ olduğunu bilməsin
+    return { success: true };
+  }
+
+  try {
+    await assertSameOrigin();
+  } catch (error) {
+    if (error instanceof SameOriginError) {
+      return { success: false, error: await rejectionMessage("origin") };
+    }
+    throw error;
+  }
+
+  const ip = clientIp(await headers());
+  if (!(await checkContactLimit(ip))) {
+    return { success: false, error: await rejectionMessage("rateLimited") };
+  }
+
   const raw = {
     name: formData.get("name") as string,
     phone: formData.get("phone") as string,

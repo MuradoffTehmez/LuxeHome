@@ -3,5 +3,7 @@
   "phoneMin": "Phone number is invalid",
   "emailInvalid": "Email address is invalid",
   "messageMin": "Message must be at least 10 characters",
-  "submitError": "Something went wrong while sending your request. Please try again shortly."
+  "submitError": "Something went wrong while sending your request. Please try again shortly.",
+  "rateLimited": "Too many requests were sent. Please wait a minute.",
+  "origin": "The request was rejected. Refresh the page and try again."
 }
