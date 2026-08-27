@@ -105,8 +105,8 @@ Hər çəkiliş əmlakın güclü tərəflərini önə çıxaracaq şəkildə pl
 -- hüquqi ad, müqavilə və əməkdaşlıq tarixləri təsdiqlənmədiyi üçün boş saxlanılır.
 INSERT INTO "Partner" ("id", "name", "slug", "shortDescription", "shortDescriptionEn", "shortDescriptionRu", "description", "descriptionEn", "descriptionRu", "websiteUrl", "email", "phone", "logoDark", "coverImage", "country", "city", "address", "partnershipType", "status", "verified", "officialPartner", "featured", "showPublicly", "showOnHomepage", "sortOrder", "seoTitle", "seoDescription", "seoKeywords", "ogImage", "createdAt", "updatedAt") VALUES (
   'cm0treva00000000000000000',
-  'TREVA',
-  'treva',
+  'TREVA Real Estate',
+  'treva-real-estate',
   'TREVA developerləri, brokerləri və alıcıları vahid satış infrastrukturu üzərində birləşdirən Bakı əsaslı daşınmaz əmlak platformasıdır.',
   'TREVA is a Baku-based real estate sales platform connecting developers, brokers and buyers through a unified sales infrastructure.',
   'TREVA — бакинская платформа продаж недвижимости, объединяющая девелоперов, брокеров и покупателей в единой инфраструктуре.',
@@ -131,8 +131,9 @@ INSERT INTO "Partner" ("id", "name", "slug", "shortDescription", "shortDescripti
   1787850000000,
   1787850000000
 )
-ON CONFLICT("slug") DO UPDATE SET
+ON CONFLICT("id") DO UPDATE SET
   "name" = excluded."name",
+  "slug" = excluded."slug",
   "shortDescription" = excluded."shortDescription",
   "shortDescriptionEn" = excluded."shortDescriptionEn",
   "shortDescriptionRu" = excluded."shortDescriptionRu",

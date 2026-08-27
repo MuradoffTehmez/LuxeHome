@@ -412,7 +412,7 @@ async function main() {
   // Yalnız master promptda təsdiqlənmiş məlumatlar yazılır. Hüquqi ad,
   // müqavilə və əməkdaşlıq tarixləri real sənəd olmadan təxmin edilmir.
   const trevaData = {
-    name: "TREVA",
+    name: "TREVA Real Estate",
     websiteUrl: "https://treva.realestate/az",
     email: "info@treva.realestate",
     phone: "+994 50 277 26 62",
@@ -450,10 +450,11 @@ async function main() {
   } as const;
 
   await prisma.partner.upsert({
-    where: { slug: "treva" },
+    where: { id: "cm0treva00000000000000000" },
     update: trevaData,
     create: {
-      slug: "treva",
+      id: "cm0treva00000000000000000",
+      slug: "treva-real-estate",
       ...trevaData,
     },
   });
