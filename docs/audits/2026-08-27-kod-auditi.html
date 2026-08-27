@@ -1,0 +1,1347 @@
+<title>Luxe Home Estate Auditi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+
+<style>
+/* ---------------------------------------------------------------------------
+   Palitra layihənin öz brend tokenlərindən götürülüb (src/app/globals.css):
+   ivory / navy / gold / ink + semantik success-warning-danger.
+   --------------------------------------------------------------------------- */
+:root {
+  --ivory: #f7f3ec;
+  --beige: #eee6da;
+  --beige-deep: #e2d6c6;
+  --surface: #fffdf9;
+  --navy: #17202b;
+  --navy-soft: #202c39;
+
+  --ink: #14181c;
+  --ink-soft: #454c54;
+  --ink-muted: #6a7178;
+
+  --gold: #aa8754;
+  --gold-deep: #806237;
+  --gold-line: #d9c7a6;
+
+  --line: #e4ddd2;
+  --line-strong: #d3c9ba;
+
+  --ok: #2f6f4e;
+  --ok-bg: #e8f2ec;
+  --warn: #96620c;
+  --warn-bg: #fbf1de;
+  --bad: #a92620;
+  --bad-bg: #fbeae9;
+
+  --display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --shadow: 0 1px 2px rgba(20, 24, 28, .04), 0 8px 24px -16px rgba(20, 24, 28, .18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ivory: #17202b;
+    --beige: #232b36;
+    --beige-deep: #2b3440;
+    --surface: #1b242f;
+    --navy: #f7f3ec;
+    --navy-soft: #eee6da;
+
+    --ink: #f7f4ef;
+    --ink-soft: #c3cad3;
+    --ink-muted: #8f97a1;
+
+    --gold: #c9a870;
+    --gold-deep: #d9be8d;
+    --gold-line: #4a4234;
+
+    --line: #333e4d;
+    --line-strong: #4d5867;
+
+    --ok: #74c69d;
+    --ok-bg: #1c2f28;
+    --warn: #e0ac54;
+    --warn-bg: #33291a;
+    --bad: #ef8b84;
+    --bad-bg: #35211f;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px -16px rgba(0, 0, 0, .6);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ivory: #17202b;
+  --beige: #232b36;
+  --beige-deep: #2b3440;
+  --surface: #1b242f;
+  --navy: #f7f3ec;
+  --navy-soft: #eee6da;
+
+  --ink: #f7f4ef;
+  --ink-soft: #c3cad3;
+  --ink-muted: #8f97a1;
+
+  --gold: #c9a870;
+  --gold-deep: #d9be8d;
+  --gold-line: #4a4234;
+
+  --line: #333e4d;
+  --line-strong: #4d5867;
+
+  --ok: #74c69d;
+  --ok-bg: #1c2f28;
+  --warn: #e0ac54;
+  --warn-bg: #33291a;
+  --bad: #ef8b84;
+  --bad-bg: #35211f;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px -16px rgba(0, 0, 0, .6);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 24px 96px;
+}
+
+/* --- Başlıq ------------------------------------------------------------- */
+
+.masthead {
+  border-bottom: 1px solid var(--line);
+  padding: 56px 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.eyebrow span:not(:last-child)::after {
+  content: "·";
+  margin-left: 10px;
+  color: var(--line-strong);
+}
+
+h1 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(34px, 5.4vw, 54px);
+  line-height: 1.08;
+  letter-spacing: -.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.standfirst {
+  font-size: 17.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 62ch;
+  margin: 0;
+}
+
+/* --- Keyfiyyət qapısı ---------------------------------------------------- */
+
+.gates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.gate {
+  background: var(--surface);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gate-k {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.gate-v {
+  font-family: var(--display);
+  font-size: 25px;
+  line-height: 1.2;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.gate-v.pass { color: var(--ok); }
+.gate-n { font-size: 12.5px; color: var(--ink-muted); }
+
+/* --- Bölmə ---------------------------------------------------------------- */
+
+section { padding-top: 64px; scroll-margin-top: 24px; }
+
+h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(24px, 3.2vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  margin: 0 0 6px;
+  text-wrap: balance;
+}
+.sec-note {
+  color: var(--ink-muted);
+  font-size: 14.5px;
+  margin: 0 0 26px;
+  max-width: 68ch;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+h3 {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: .01em;
+  margin: 34px 0 12px;
+  color: var(--ink);
+}
+
+p { max-width: 68ch; }
+
+code, .path {
+  font-family: var(--mono);
+  font-size: .875em;
+  background: var(--beige);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 1px 5px;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+/* --- Tamamlanma ölçüləri ------------------------------------------------- */
+
+.meters {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.meter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 7px;
+}
+.meter-name { font-weight: 500; font-size: 15px; }
+.meter-pct {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-deep);
+}
+.track {
+  height: 7px;
+  background: var(--beige-deep);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.fill { height: 100%; border-radius: 99px; background: var(--gold); }
+.fill.low { background: var(--bad); }
+.fill.mid { background: var(--warn); }
+.meter-sub { font-size: 13.5px; color: var(--ink-muted); margin: 7px 0 0; }
+
+/* --- Modul lövhəsi -------------------------------------------------------- */
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+.mod {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: 2px;
+  background: var(--surface);
+  padding: 11px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mod.done { border-left-color: var(--ok); }
+.mod.part { border-left-color: var(--warn); }
+.mod.none { border-left-color: var(--bad); }
+.mod-n { font-weight: 500; font-size: 14.5px; }
+.mod-d { font-size: 12.5px; color: var(--ink-muted); line-height: 1.45; }
+
+/* --- Bug qeydiyyatı ------------------------------------------------------- */
+
+.bugs { display: flex; flex-direction: column; gap: 14px; }
+
+.bug {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line-strong);
+  border-radius: 3px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bug.high { border-left-color: var(--bad); }
+.bug.med  { border-left-color: var(--warn); }
+.bug.low  { border-left-color: var(--ink-muted); }
+
+.bug-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+.bug-id {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+.bug-title {
+  font-weight: 600;
+  font-size: 16.5px;
+  line-height: 1.35;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.chip.high { background: var(--bad-bg); color: var(--bad); border-color: color-mix(in srgb, var(--bad) 28%, transparent); }
+.chip.med  { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 28%, transparent); }
+.chip.low  { background: var(--beige); color: var(--ink-muted); border-color: var(--line-strong); }
+.chip.fixed { background: var(--ok-bg); color: var(--ok); border-color: color-mix(in srgb, var(--ok) 32%, transparent); }
+.chip.open  { background: var(--beige); color: var(--ink-soft); border-color: var(--line-strong); }
+
+.bug.done { border-left-color: var(--ok); }
+.bug.done .bug-title { text-decoration: none; }
+
+.fix {
+  border-top: 1px dashed var(--line-strong);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+.fix dt { color: var(--ok); }
+
+.bug-loc {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--gold-deep);
+  overflow-wrap: anywhere;
+}
+.bug dl { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.bug dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 1px;
+}
+.bug dd { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); max-width: 78ch; }
+.bug dd strong { color: var(--ink); font-weight: 600; }
+
+/* --- Cədvəl --------------------------------------------------------------- */
+
+.scroller { overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 560px; background: var(--surface); }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  background: var(--beige);
+  font-weight: 500;
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* --- Sıralı tövsiyələr ---------------------------------------------------- */
+
+.steps { display: flex; flex-direction: column; gap: 0; counter-reset: step; }
+.step {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 18px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.step:last-child { border-bottom: 0; }
+.step-n {
+  font-family: var(--display);
+  font-size: 27px;
+  font-weight: 600;
+  color: var(--gold);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.step-b { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.step-t { font-weight: 600; font-size: 16px; }
+.step-d { font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+.step-m { font-family: var(--mono); font-size: 12px; color: var(--ink-muted); }
+
+/* --- Sitat bloku ---------------------------------------------------------- */
+
+.callout {
+  border: 1px solid var(--gold-line);
+  background: color-mix(in srgb, var(--gold) 9%, var(--surface));
+  border-radius: 3px;
+  padding: 18px 20px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 78ch;
+}
+.callout strong { color: var(--ink); }
+
+ul.tight { padding-left: 20px; margin: 10px 0; max-width: 74ch; }
+ul.tight li { margin-bottom: 7px; font-size: 14.5px; color: var(--ink-soft); }
+ul.tight li strong { color: var(--ink); font-weight: 600; }
+
+footer {
+  margin-top: 72px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .06em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+
+a { color: var(--gold-deep); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .wrap { padding: 0 18px 72px; }
+  .masthead { padding-top: 40px; }
+  .step { grid-template-columns: 34px 1fr; gap: 12px; }
+  .step-n { font-size: 22px; }
+}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow">
+    <span>Layihə auditi</span>
+    <span>27 avqust 2026</span>
+    <span>audit + düzəlişlər</span>
+    <span>branch main · 74052c8</span>
+  </div>
+  <h1>Luxe Home Estate — kod bazasının vəziyyəti</h1>
+  <p class="standfirst">
+    38 220 sətir mənbə kodu, 274 commit, 76 marşrut, 28 verilənlər bazası modeli və iki PRD
+    sənədi. Aşağıda faktiki tamamlanma dərəcəsi, təsdiqlənmiş 13 defekt və sənədləşmə
+    sürüşməsi verilib. Bütün tapıntılar kod üzərində yoxlanılıb — PRD-dəki niyyət deyil,
+    repoda olan davranış əsas götürülüb.
+  </p>
+
+  <div class="gates">
+    <div class="gate">
+      <span class="gate-k">typecheck</span>
+      <span class="gate-v pass">0</span>
+      <span class="gate-n">xəta yoxdur</span>
+    </div>
+    <div class="gate">
+      <span class="gate-k">eslint</span>
+      <span class="gate-v pass">0</span>
+      <span class="gate-n">xəta / xəbərdarlıq</span>
+    </div>
+    <div class="gate">
+      <span class="gate-k">vitest</span>
+      <span class="gate-v pass">312</span>
+      <span class="gate-n">75 fayl, hamısı keçir</span>
+    </div>
+    <div class="gate">
+      <span class="gate-k">next build</span>
+      <span class="gate-v pass">OK</span>
+      <span class="gate-n">76 marşrut</span>
+    </div>
+    <div class="gate">
+      <span class="gate-k">CI</span>
+      <span class="gate-v" style="color:var(--bad)">yox</span>
+      <span class="gate-n">workflow faylı yoxdur</span>
+    </div>
+  </div>
+</header>
+
+<section id="xulase">
+  <h2>Bir abzasda</h2>
+  <p class="sec-note">Layihənin ümumi sağlamlığı və əsas riski.</p>
+
+  <p>
+    Kod bazası texniki cəhətdən sağlamdır: dörd keyfiyyət qapısının hamısı təmiz keçir,
+    auth qatı ciddi qurulub (D1-də ləğv edilə bilən sessiya, məcburi TOTP, CSRF + sürət
+    limiti hər yazma əməliyyatında), i18n intizamı yüksəkdir və media yükləmə axını
+    magic-byte yoxlaması ilə düzgün müdafiə olunub. Arxitektura sənədləşməsi (CLAUDE.md)
+    qeyri-adi dərəcədə keyfiyyətlidir — «niyə belədir» izahları real qərarları saxlayır.
+  </p>
+  <p>
+    Əsas risk funksionallıq boşluğunda deyil, <strong>yarımçıq bağlanmış zəncirlərdədir</strong>:
+    UI istifadəçiyə vəd verir, arxa tərəfdə isə həmin vəd yerinə yetirilmir. Saxlanmış axtarışın
+    «Gündəlik / Həftəlik» seçimi heç vaxt göndərilmir, baxış sayğacı heç vaxt artmır,
+    əlaqə forması tamamilə qorunmamışdır. Bunların heç biri testdən keçmir, çünki
+    testlər həmin zəncirlərin uclarını yoxlamır.
+  </p>
+
+  <div class="callout">
+    <strong>Bu sessiyada:</strong> B1–B8 düzəldildi (B4 — kod hazırdır, cron trigger əl ilə qoşulmalıdır), donma/yubanmanın dörd səbəbi tapılıb aradan qaldırıldı, səhifə keçid animasiyası əlavə olundu. 312 test, typecheck, lint və build təmizdir.<br><br><strong>Ən vacib üç iş idi:</strong> əlaqə formasına spam qoruması (B2), <code>viewCount</code>
+    artımının bərpası (B3) və filtr birləşməsindəki üzərinə yazma xətası (B1). Üçü də
+    kiçik dəyişiklikdir, üçü də bu gün canlı saytda istifadəçiyə təsir edir.
+  </div>
+</section>
+
+<section id="tamamlanma">
+  <h2>Tamamlanma dərəcəsi</h2>
+  <p class="sec-note">
+    Hər iki PRD sənədinin bölmələri kod üzərində bir-bir yoxlanıldı. Faizlər modul
+    mövcudluğuna görədir — yarımçıq modul yarım sayılır.
+  </p>
+
+  <div class="meters">
+    <div>
+      <div class="meter-head">
+        <span class="meter-name">Public PRD — Phase 1 MVP (bölmə 178)</span>
+        <span class="meter-pct">~80%</span>
+      </div>
+      <div class="track"><div class="fill" style="width:80%"></div></div>
+      <p class="meter-sub">
+        Home, axtarış, filtrlər, əmlak detalı, agentliklər, rayon/metro səhifələri, üç dil,
+        tema, qeydiyyat, favorit, son baxılanlar, saxlanmış axtarış, bildiriş və bütün SEO
+        bəndləri hazırdır. Çatışmayan: <strong>agent profili</strong>, <strong>qiymət tarixçəsi</strong>,
+        <strong>QR kod</strong>, <strong>görüş sorğusu</strong>.
+      </p>
+    </div>
+
+    <div>
+      <div class="meter-head">
+        <span class="meter-name">Public PRD — Phase 2 (bölmə 179)</span>
+        <span class="meter-pct">~8%</span>
+      </div>
+      <div class="track"><div class="fill low" style="width:8%"></div></div>
+      <p class="meter-sub">
+        13 bənddən yalnız <strong>Müqayisə</strong> hazırdır. Web Push, Price Drop, Rezervasiya,
+        agent rəyləri, testimonial, nearby places, premium elan, tövsiyə mühərriki və
+        wizard yazılmayıb.
+      </p>
+    </div>
+
+    <div>
+      <div class="meter-head">
+        <span class="meter-name">Public PRD — Phase 3 / AI (bölmə 180-181)</span>
+        <span class="meter-pct">0%</span>
+      </div>
+      <div class="track"><div class="fill low" style="width:2%"></div></div>
+      <p class="meter-sub">
+        AI Assistant, semantik axtarış, Match Score, chatbot, map draw search — repoda
+        heç bir AI provider inteqrasiyası yoxdur.
+      </p>
+    </div>
+
+    <div>
+      <div class="meter-head">
+        <span class="meter-name">Admin Panel PRD — bütün sənəd</span>
+        <span class="meter-pct">~55%</span>
+      </div>
+      <div class="track"><div class="fill mid" style="width:55%"></div></div>
+      <p class="meter-sub">
+        21 admin bölməsi işləkdir və CRUD tamdır. Çatışmayan: Finance / paket / ödəniş,
+        Marketing, CMS statik səhifə redaktoru, e-poçt şablonları, blocked IP,
+        schema manager, watermark, admin i18n və 7 admin rolundan yalnız 3-ü.
+      </p>
+    </div>
+
+    <div>
+      <div class="meter-head">
+        <span class="meter-name">Hər iki sənədin tam əhatəsi</span>
+        <span class="meter-pct">~40%</span>
+      </div>
+      <div class="track"><div class="fill mid" style="width:40%"></div></div>
+      <p class="meter-sub">
+        MEMORY.md-dəki 25 avqust auditi bu rəqəmi ~30-35% göstərirdi. İki günlük
+        saved search / bildiriş / kabinet işi onu ~40%-ə qaldırıb.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="hazir">
+  <h2>Hazır olan modullar</h2>
+  <p class="sec-note">
+    Sol kənar zolağı vəziyyəti göstərir: yaşıl — tam, sarı — qismən, qırmızı — yoxdur.
+  </p>
+
+  <h3>İctimai sayt</h3>
+  <div class="modules">
+    <div class="mod done"><span class="mod-n">Çoxdillilik</span><span class="mod-d">az / en / ru, hər marşrut locale prefiksli, 12 tərcümə kataloqu, parity testi</span></div>
+    <div class="mod done"><span class="mod-n">Axtarış və filtrlər</span><span class="mod-d">14 parametr, xüsusiyyət filtri daxil, chip-lər, bottom-sheet</span></div>
+    <div class="mod done"><span class="mod-n">Əmlak detalı</span><span class="mod-d">qalereya, xəritə, oxşar elanlar, WhatsApp + zəng CTA</span></div>
+    <div class="mod done"><span class="mod-n">SEO qatı</span><span class="mod-d">canonical, hreflang, JSON-LD, sitemap, robots, llms.txt, redirect + 404 izləmə</span></div>
+    <div class="mod done"><span class="mod-n">SEO landing səhifələri</span><span class="mod-d">rayon, metro, taksonomiya kombinasiyaları, keşlənmiş discovery</span></div>
+    <div class="mod done"><span class="mod-n">Favorit / Müqayisə</span><span class="mod-d">localStorage + server action, hesabsız işləyir</span></div>
+    <div class="mod done"><span class="mod-n">Analitika</span><span class="mod-d">GTM, razılıq qapısı (consent), event sanitizasiyası</span></div>
+    <div class="mod done"><span class="mod-n">Tema</span><span class="mod-d">Light / Dark / System, profil üzrə saxlanılır</span></div>
+    <div class="mod part"><span class="mod-n">Bildiriş mərkəzi</span><span class="mod-d">yalnız sayt daxilində; e-poçt yalnız IMMEDIATE, push yoxdur</span></div>
+    <div class="mod part"><span class="mod-n">Saxlanmış axtarış</span><span class="mod-d">CRUD işləyir, dərhal uyğunluq işləyir, digest yoxdur</span></div>
+    <div class="mod none"><span class="mod-n">Agent profili</span><span class="mod-d">entity yoxdur — əlaqə həmişə şirkət nömrəsinə gedir</span></div>
+    <div class="mod none"><span class="mod-n">Qiymət tarixçəsi</span><span class="mod-d">model, UI və Price Drop bildirişi yoxdur</span></div>
+  </div>
+
+  <h3>Kabinet (ictimai hesab)</h3>
+  <div class="modules">
+    <div class="mod done"><span class="mod-n">Qeydiyyat / giriş</span><span class="mod-d">USER / OWNER / AGENCY, IP sürət limiti, əməkdaş hesabı ayrılıb</span></div>
+    <div class="mod done"><span class="mod-n">Elan göndərmə</span><span class="mod-d">şəkil yükləmə + moderasiya növbəsinə düşür</span></div>
+    <div class="mod done"><span class="mod-n">Komanda</span><span class="mod-d">agentlik + 3 əməkdaş, admin təsdiqi</span></div>
+    <div class="mod done"><span class="mod-n">Profil / Son baxılanlar</span><span class="mod-d">sıra baxılma tarixinə görə qorunur</span></div>
+    <div class="mod none"><span class="mod-n">Hesabı ixrac / sil</span><span class="mod-d">PRD bölmə 155 — yazılmayıb</span></div>
+  </div>
+
+  <h3>Admin panel</h3>
+  <div class="modules">
+    <div class="mod done"><span class="mod-n">Əmlak CRUD + toplu</span><span class="mod-d">form, media, SEO sahələri, bulk action</span></div>
+    <div class="mod done"><span class="mod-n">Moderasiya növbəsi</span><span class="mod-d">təsdiq / rədd + qeyd</span></div>
+    <div class="mod done"><span class="mod-n">Media kitabxanası</span><span class="mod-d">R2 + Images, WebP, thumbnail, magic-byte yoxlaması</span></div>
+    <div class="mod done"><span class="mod-n">Layihə / Bloq / Xidmət</span><span class="mod-d">tam CRUD, kateqoriyalar, kontent redaktoru</span></div>
+    <div class="mod done"><span class="mod-n">Müraciətlər</span><span class="mod-d">status, təyinat, qeyd</span></div>
+    <div class="mod done"><span class="mod-n">Təhlükəsizlik + Audit</span><span class="mod-d">sessiyalar, giriş cəhdləri, kilidlər, audit jurnalı</span></div>
+    <div class="mod done"><span class="mod-n">Yönləndirmələr</span><span class="mod-d">301/302 + 404 hit sayğacı</span></div>
+    <div class="mod part"><span class="mod-n">SEO audit</span><span class="mod-d">14 yoxlama işləyir; PRD-də 24 tələb olunur</span></div>
+    <div class="mod part"><span class="mod-n">Parametrlər</span><span class="mod-d">yalnız 3 açar; PRD ~25 sahə tələb edir</span></div>
+    <div class="mod part"><span class="mod-n">Rollar</span><span class="mod-d">3 rol / 12 icazə; PRD 7 admin rolu istəyir</span></div>
+    <div class="mod none"><span class="mod-n">Finance / paketlər</span><span class="mod-d">model, UI, ödəniş — heç biri yoxdur</span></div>
+    <div class="mod none"><span class="mod-n">CMS statik səhifələr</span><span class="mod-d">Haqqımızda / banner redaktoru yoxdur</span></div>
+    <div class="mod none"><span class="mod-n">E-poçt şablonları</span><span class="mod-d">şablonlar kodda sabitdir, delivery log yoxdur</span></div>
+    <div class="mod none"><span class="mod-n">Admin çoxdilliliyi</span><span class="mod-d">21 bölmədən 0-ı tərcümə qatını işlətmir</span></div>
+  </div>
+</section>
+
+<section id="buglar">
+  <h2>Təsdiqlənmiş defektlər</h2>
+  <p class="sec-note">
+    13 tapıntı. Hər biri kod üzərində yoxlanılıb; sətir nömrələri <code>74052c8</code>
+    commit-inə aiddir. Ciddilik istifadəçiyə real təsirə görə verilib.
+  </p>
+
+  <div class="bugs">
+
+    <article class="bug high done">
+      <div class="bug-top">
+        <span class="bug-id">B1</span>
+        <span class="bug-title">Xüsusiyyət filtri «son mərtəbə olmasın» şərtini səssizcə silir</span>
+        <span class="chip high">Yüksək</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/lib/queries.ts:203 — buildPropertyWhere()</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          <code>excludeLastFloor</code> şərti <code>where.AND</code> massivini qurur (sətir 185).
+          Bir neçə sətir sonra <code>featureSlugs</code> bloku eyni sahəyə
+          <strong>üzərinə yazır</strong>: <code>where.AND = filters.featureSlugs.map(...)</code>.
+          Əvvəlki şərt itir.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          İstifadəçi «son mərtəbə olmasın» + «hovuz» seçirsə, mərtəbə şərti tətbiq
+          olunmur və nəticələrə son mərtəbə mənzillər düşür. Filtr UI-da aktiv kimi
+          görünməyə davam edir — istifadəçi yanlış nəticəyə inanır.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          <code>where.AND</code>-ə mövcud massivi qoruyaraq əlavə et (eynilə
+          <code>excludeLastFloor</code> blokundakı spread nümunəsi kimi).
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd><code>andWhere()</code> köməkçisi əlavə olundu — hər filtr <code>where.AND</code>-ə əlavə edir, üzərinə yazmır. Mətn axtarışı da <code>where.OR</code>-dan AND-in içinə köçürüldü ki, gələcək OR-lu filtr onu da silməsin. <code>property-where.test.ts</code> — 8 regresiya testi.</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug high done">
+      <div class="bug-top">
+        <span class="bug-id">B2</span>
+        <span class="bug-title">Əlaqə formasında heç bir spam qoruması yoxdur</span>
+        <span class="chip high">Yüksək</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/app/[locale]/(site)/elaqe/actions.ts — submitContactForm()</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Action nə honeypot, nə sürət limiti, nə Turnstile, nə də <code>assertSameOrigin()</code>
+          çağırır. Panel yazmaları <code>requireAdminAction()</code> ilə üç qat qorunur —
+          ictimai forma isə tamamilə açıqdır.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Bir skript <code>Lead</code> cədvəlini limitsiz doldura və <strong>hər sətir üçün
+          Resend e-poçtu tetikleyə</strong> bilər. Bu, həm D1 yazma xərcini, həm Resend
+          kvotasını, həm də şirkətin poçt qutusunu hədəf alır. Müraciət növbəsi
+          real leadlərin görünməz olduğu həddə çirklənə bilər.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          Gizli honeypot sahəsi + IP üzrə <code>ADMIN_LIMIT</code> tipli rate limit +
+          <code>assertSameOrigin()</code>. Turnstile sonrakı addım kimi qala bilər.
+          MEMORY.md bunu artıq TODO kimi qeyd edir, amma iş görülməyib.
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd>Üç laylı qapı: honeypot (<code>src/lib/spam.ts</code>) → mənbə yoxlaması (<code>src/lib/request-origin.ts</code>) → <code>CONTACT_LIMIT</code> sürət limiti. Binding <code>wrangler.jsonc</code>-də artıq var idi, sadəcə çağırılmırdı. Honeypot tutulanda bota <strong>uğur</strong> cavabı gedir ki, tələni tanımasın.</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug high done">
+      <div class="bug-top">
+        <span class="bug-id">B3</span>
+        <span class="bug-title">Baxış sayğacı heç vaxt artmır — bütün statistika sıfırdır</span>
+        <span class="chip high">Yüksək</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">prisma/schema.prisma:291, :484 — Property.viewCount, BlogPost.viewCount</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Repoda <code>viewCount</code> üçün heç bir <code>increment</code> yoxdur.
+          Sahə yalnız oxunur: admin əmlak siyahısında, əmlak detal panelində,
+          dashboard-da və bloq yazısının «N baxış» sətrində.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Dashboard-dakı <strong>«Ən çox baxılan əmlaklar»</strong> bloku
+          <code>viewCount: { gt: 0 }</code> filtrinə görə <strong>həmişə boşdur</strong>.
+          Bloq yazıları ictimai səhifədə hər ziyarətçiyə <strong>«0 baxış»</strong> göstərir —
+          bu, yeni saytda etibarı birbaşa zədələyir. Public PRD bölmə 111 (analytics
+          event-ləri) və bölmə 51 (Property Analytics) bu sahə üzərində qurulub.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          Detal səhifəsində artım (bot filtri ilə) və ya GA4-dən dövri sinxronizasiya.
+          Qısa müddətdə: sayğac düzələnə qədər bloqda «N baxış» sətrini gizlət.
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd><code>src/lib/view-counter.ts</code>: artım <code>ctx.waitUntil()</code> ilə cavabdan sonraya salınır (səhifəyə gecikmə əlavə etmir) və user-agent filtri robot trafikini kəsir. Əmlak və bloq detal səhifələrinə qoşuldu.</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug high done">
+      <div class="bug-top">
+        <span class="bug-id">B4</span>
+        <span class="bug-title">«Gündəlik» və «Həftəlik» bildiriş tezliyi heç vaxt göndərilmir</span>
+        <span class="chip high">Yüksək</span>
+        <span class="chip fixed">Qismən — kod hazırdır</span>
+      </div>
+      <div class="bug-loc">src/lib/queries.ts:1781 — runSavedSearchMatching() · wrangler.jsonc</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Uyğunluq mühərriki yalnız <code>IMMEDIATE</code> üçün e-poçt göndərir.
+          <code>DAILY</code> / <code>WEEKLY</code> üçün digest işi yoxdur —
+          <code>wrangler.jsonc</code>-də <strong>heç bir cron trigger yoxdur</strong> və
+          sxemdəki <code>lastCheckedAt</code> / <code>lastNotifiedAt</code> sütunlarına
+          heç yerdən yazılmır.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Kabinetdə istifadəçiyə dörd tezlik seçimi təklif olunur; ikisi işləmir.
+          Standart dəyər isə məhz <code>DAILY</code>-dir (<code>schema.prisma:572</code>) —
+          yəni <strong>heç nə seçməyən istifadəçi susqun rejimə düşür</strong> və yalnız
+          sayta girdikdə bildirişi görür.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          Cloudflare Cron Trigger + <code>scheduled</code> handler; digest göndərişində
+          <code>lastNotifiedAt</code> yazılmalı, <code>SavedSearchMatch.notifiedAt</code>
+          isə e-poçt anında işarələnməlidir. Alternativ: seçimləri müvəqqəti olaraq
+          <code>IMMEDIATE</code> / <code>OFF</code> ilə məhdudlaşdır.
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd>Digest mühərriki (<code>saved-search-digest.ts</code>) + sirlə qorunan marşrut (<code>/api/cron/saved-search-digest</code>) yazıldı; <code>lastNotifiedAt</code> / <code>notifiedAt</code> indi doldurulur. <strong>Qalan addım sizdədir:</strong> <code>CRON_SECRET</code> secret-i və Cloudflare cron trigger-i. OpenNext-in yaratdığı worker yalnız <code>fetch</code> ixrac edir, ona görə <code>scheduled()</code> handler əvəzinə marşrut seçildi — detallar route faylının şərhindədir.</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug med done">
+      <div class="bug-top">
+        <span class="bug-id">B5</span>
+        <span class="bug-title">Bir pozulmuş saxlanmış axtarış bütün digərlərinin bildirişini dayandırır</span>
+        <span class="chip med">Orta</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/lib/queries.ts:1758-1789 — döngə + matchesFilters()</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Döngə <strong>bütün</strong> aktiv saxlanmış axtarışları yükləyir və hər biri üçün
+          ayrıca D1 sorğusu atır. <code>matchesFilters()</code> istisna atarsa, döngə
+          dayanır — <code>notifyMatchingSavedSearches()</code>-dəki try/catch bütün
+          funksiyanı əhatə edir, tək iterasiyanı yox.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          İki risk bir yerdə. <strong>Etibarlılıq:</strong> siyahıda əvvəldə duran bir
+          pozulmuş filtr bütün sonrakı istifadəçilərin bildirişini kəsir.
+          <strong>Miqyas:</strong> N saxlanmış axtarış → elan dərc edilərkən N+2 D1 sorğusu.
+          Bir neçə min axtarışda dərc əməliyyatı Workers subrequest həddinə dəyəcək.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          <code>try/catch</code>-i döngənin içinə sal; uzunmüddətdə uyğunluğu dərc
+          axınından ayırıb növbəyə (queue / cron) köçür.
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd><code>try/catch</code> döngənin içinə salındı: hər saxlanmış axtarış öz təcridində işlənir. Bir nasaz qeyd artıq qalan istifadəçilərin bildirişini kəsmir.</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug med done">
+      <div class="bug-top">
+        <span class="bug-id">B6</span>
+        <span class="bug-title">Saxlanmış axtarışın filtr JSON-u forma yoxlamasından keçmir</span>
+        <span class="chip med">Orta</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/app/[locale]/(account)/kabinet/axtarislarim/actions.ts:26, :42</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Sxem yalnız <code>filters: z.string().max(4000)</code> yoxlayır. Sonra
+          <code>JSON.parse</code> nəticəsi <code>as PropertyFilters</code> ilə
+          tiplənir və birbaşa Prisma <code>where</code> qurucusuna verilir. Sahə
+          tipləri heç yerdə yoxlanılmır.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Saxta POST ilə <code>{"citySlug": {"contains": "a"}}</code> kimi obyekt
+          göndərmək mümkündür. SQL injection deyil (Prisma qoruyur), lakin sorğu
+          semantikası dəyişir və ya sorğu çökür — bu isə birbaşa B5-dəki döngə
+          dayanmasına yol açır.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          <code>PropertyFilters</code> üçün ayrıca Zod sxemi qurub parse nəticəsini
+          onunla təsdiqlə; naməlum açarları at.
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd><code>savedSearchFiltersSchema</code> (Zod, strip rejimi) əlavə olundu; JSON həm forma, həm saxta POST yolunda yoxlanılır. Sxemə uyğun gəlməyən filtr sorğuya buraxılmır.</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug med done">
+      <div class="bug-top">
+        <span class="bug-id">B7</span>
+        <span class="bug-title">Bildiriş və e-poçt mətnləri həmişə azərbaycancadır</span>
+        <span class="chip med">Orta</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/lib/queries.ts:1776-1780 · src/lib/email.ts:5</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Bildirişin başlığı yazılma anında sabit AZ sətir kimi qurulur
+          (<code>"…axtarışına uyğun yeni elan"</code>) və <code>actionUrl</code>
+          <code>localizePath(..., DEFAULT_LOCALE)</code> ilə həmişə <code>/az/…</code> olur.
+          E-poçt qatı da eyni sabiti işlədir.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Saytı rusca və ya ingiliscə işlədən istifadəçi azərbaycanca bildiriş alır və
+          linkə klikləyəndə <strong>dilini itirib AZ versiyaya düşür</strong>. Bu, üç dilli
+          marşrutlaşdırmaya sərf olunmuş bütün işi son addımda pozur.
+          <code>User.locale</code> sahəsi sxemdə var, sadəcə işlədilmir.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          Bildirişdə hazır mətn yox, <strong>açar + parametr</strong> saxla
+          (məs. <code>type</code> + <code>{searchName, propertyTitle}</code>) və
+          göstərilmə anında tərcümə et. <code>actionUrl</code>-u locale-siz saxlayıb
+          klik anında lokallaşdır.
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd>Bildiriş başlığı yazılma anında <strong>istifadəçinin dilində</strong> qurulur (<code>User.locale</code>), <code>actionUrl</code> isə dil prefiksi olmadan saxlanılır və klik anında oxucunun dilinə uyğunlaşdırılır. E-poçt qatı da üç dilli oldu.</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug med done">
+      <div class="bug-top">
+        <span class="bug-id">B8</span>
+        <span class="bug-title">404 sayğacı autentifikasiyasız və limitsiz yazır</span>
+        <span class="chip med">Orta</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/lib/queries.ts:1692 — recordNotFoundHit()</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Catch-all marşrutu hər tanınmayan URL üçün <code>NotFoundHit</code> cədvəlinə
+          upsert edir. <code>path</code> unikal açardır, uzunluğu məhdudlaşdırılmır,
+          sürət limiti yoxdur.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Təsadüfi URL-lərlə gəzən bir skaner cədvəldə limitsiz sətir yarada bilər.
+          Hər 404 həm də iki D1 sorğusu deməkdir (<code>findActiveRedirect</code> +
+          upsert) — bu, ucuz olmalı olan bir səhifəni bahalaşdırır.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          <code>path</code>-i 512 simvola kəs, cədvəlin ölçüsünə tavan qoy
+          (məs. yalnız mövcud sətri artır, yeni sətir üçün gündəlik kvota) və
+          sadə IP limiti əlavə et.
+        </dd></div>
+              <div class="fix"><dt>Düzəliş</dt><dd>Yol 512 simvola kəsilir, fərqli yolların sayına 5 000 tavan qoyuldu. Təkrar 404 indi <strong>bir</strong> sorğuya düşür (əvvəlcə <code>update</code>, yalnız yeni yol üçün <code>create</code>).</dd></div>
+      </dl>
+    </article>
+
+    <article class="bug med">
+      <div class="bug-top">
+        <span class="bug-id">B9</span>
+        <span class="bug-title">Admin panel tərcümə qatından tamamilə kənardadır</span>
+        <span class="chip med">Orta</span>
+      </div>
+      <div class="bug-loc">src/app/admin/** — 21 bölmədən 0-ı useTranslations işlədir</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          İctimai sayt tam lokallaşdırılıb, lakin <code>/admin</code> ağacı
+          <code>[locale]</code> seqmentindən kənardadır və bütün mətnlər koda
+          sabitlənib. <code>constants.ts</code>-dəki 22 <code>*_LABELS</code> dəsti də
+          yalnız azərbaycancadır.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Admin PRD bölmə 4 açıq şəkildə panel üçün də çoxdillilik tələb edir.
+          Bu, indi kiçik boşluqdur — hər yeni admin səhifəsi ilə köçürmə qiyməti artır.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug low">
+      <div class="bug-top">
+        <span class="bug-id">B10</span>
+        <span class="bug-title">Azərbaycan hərfləri ilə axtarış reqistrə həssasdır</span>
+        <span class="chip low">Aşağı · bilinən</span>
+      </div>
+      <div class="bug-loc">src/lib/queries.ts:213-217</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          D1 (SQLite) <code>mode: "insensitive"</code> dəstəkləmir; <code>LIKE</code>
+          yalnız ASCII hərflərində reqistrdən asılı deyil.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          «Şüvəlan» yazan istifadəçi «şüvəlan» yazılmış elanı tapmır. CLAUDE.md
+          bunu artıq sənədləşdirib, həll tətbiq olunmayıb.
+        </dd></div>
+        <div><dt>Həll</dt><dd>
+          Normallaşdırılmış (kiçik hərfli) axtarış sütunu + yazma anında doldurma.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug low">
+      <div class="bug-top">
+        <span class="bug-id">B11</span>
+        <span class="bug-title">Public marşrutlarda skeleton yoxdur</span>
+        <span class="chip low">Aşağı · qərar</span>
+      </div>
+      <div class="bug-loc">74052c8 commit-i 6 loading.tsx faylını silib</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Son commit <code>loading.tsx</code> fayllarını silib və eyni anda
+          <code>generateMetadata</code> içində <code>notFound()</code> çağırışına keçib.
+          Səbəb aydındır: <code>loading.tsx</code> streaming-i məcbur edir, streaming
+          isə HTTP başlıqlarını erkən göndərir və <strong>404 status kodunu qaytarmağa
+          imkan vermir</strong>.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          Bilərəkdən verilmiş güzəşt: düzgün 404 statusu qazanıldı, səhifə keçidlərində
+          skeleton itdi. Qeyd edilir ki, bu <em>bug deyil, qərardır</em> — amma nə
+          CLAUDE.md-də, nə MEMORY.md-də yazılmayıb, ona görə növbəti dəfə səhvən
+          «unudulmuş iş» kimi geri qaytarıla bilər.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug low">
+      <div class="bug-top">
+        <span class="bug-id">B12</span>
+        <span class="bug-title">Göndərici ünvanı hələ də resend.dev test domenidir</span>
+        <span class="chip low">Aşağı</span>
+      </div>
+      <div class="bug-loc">src/lib/email.ts:12 — DEFAULT_FROM_EMAIL</div>
+      <dl>
+        <div><dt>Nəticə</dt><dd>
+          <code>RESEND_FROM_EMAIL</code> secret-i qoyulmayıbsa, məktublar
+          <code>onboarding@resend.dev</code>-dən gedir — SPF/DKIM uyğunsuzluğuna görə
+          spam qovluğuna düşmə ehtimalı yüksəkdir. MEMORY.md bunu qeyd edir;
+          domen təsdiqi hələ edilməyib.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug low">
+      <div class="bug-top">
+        <span class="bug-id">B13</span>
+        <span class="bug-title">Ölü kod: istifadə olunmayan tezlik etiketləri</span>
+        <span class="chip low">Aşağı</span>
+      </div>
+      <div class="bug-loc">src/lib/constants.ts:346 — SAVED_SEARCH_FREQUENCY_LABELS</div>
+      <dl>
+        <div><dt>Nəticə</dt><dd>
+          İxrac edilir, heç yerdən idxal edilmir — UI tərcümə kataloqundan oxuyur.
+          Zərərsizdir, lakin gələcəkdə səhvən istifadə edilsə, B7-dəki eyni AZ-only
+          problemini yenidən gətirər.
+        </dd></div>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<section id="performans">
+  <h2>Donma və yubanmanın səbəbləri</h2>
+  <p class="sec-note">
+    «Səhifə keçidində təmiz qırılır, sonra bütöv yüklənir» şikayətinin arxasında bir səbəb
+    yox, bir-birini gücləndirən beş səbəb var. Aşağıda hər biri və tətbiq olunan həll.
+  </p>
+
+  <div class="bugs">
+
+    <article class="bug high done">
+      <div class="bug-top">
+        <span class="bug-id">P1</span>
+        <span class="bug-title">Keçiddə heç bir geri bildiriş yox idi — brauzer köhnə səhifədə donurdu</span>
+        <span class="chip high">Əsas səbəb</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">(site) ağacında loading.tsx yoxdur · 57 səhifə force-dynamic</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          App Router-də naviqasiya <strong>server cavabı gələnə qədər köhnə səhifəni ekranda
+          saxlayır</strong>. Adətən bunu <code>loading.tsx</code> örtür, amma o, <code>74052c8</code>
+          commit-ində qəsdən silinib: <code>loading.tsx</code> Suspense sərhədi yaradır, Suspense
+          streaming-i məcbur edir, streaming isə HTTP başlıqlarını erkən göndərib
+          <code>notFound()</code>-un 404 statusu qaytarmasına mane olur. Nəticədə klikdən sonra
+          1–3 saniyə <em>heç nə olmur</em>, sonra səhifə birdən dəyişir — «təmiz qırılma» hissi
+          məhz budur.
+        </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          İki addım, <strong>hər ikisi Suspense sərhədi yaratmadan</strong>, ona görə 404 statusları
+          toxunulmaz qalır:
+          <br><br>
+          <strong>1.</strong> <code>(site)/template.tsx</code> — hər naviqasiyada yenidən mount
+          olunur, 160 ms-lik yumşaq fade + 4 px sürüşmə verir. <code>template.tsx</code>
+          <code>loading.tsx</code>-dən fərqli olaraq Suspense yaratmır.
+          <br><br>
+          <strong>2.</strong> <code>NavigationProgress</code> — yuxarıda incə qızılı zolaq. Klik,
+          GET forma göndərişi və <code>popstate</code> hadisələrində işə düşür; dil dəyişdirici və
+          sıralama kimi proqram naviqasiyaları <code>startNavigationProgress()</code> ilə açıq
+          şəkildə siqnal verir. Zolaq 90%-də dayanır (real müddət bilinmir) və marşrut dəyişən
+          kimi sönür. <code>useSearchParams</code> tələb etdiyi Suspense sərhədi
+          <strong>yalnız zolağı</strong> əhatə edir, səhifə məzmununu yox.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug high done">
+      <div class="bug-top">
+        <span class="bug-id">P2</span>
+        <span class="bug-title">Kartlar 2400 px-lik master şəkilləri yükləyirdi</span>
+        <span class="chip high">Yüksək</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/lib/queries.ts — propertyCardSelect · src/components/site/property-card.tsx</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          <code>propertyCardSelect</code> <code>thumbUrl</code> sahəsini <strong>ümumiyyətlə
+          seçmirdi</strong>, ona görə kart həmişə <code>image.url</code> — yükləmə zamanı
+          hazırlanan 2400 px-lik master faylı — göstərirdi. Üstəlik <code>/media/</code> ünvanları
+          <code>unoptimized</code>-dir (zona səviyyəsində Cloudflare Images transformations hələ
+          açılmayıb), yəni <code>next/image</code> onu kiçiltmir.
+        </dd></div>
+        <div><dt>Nəticə</dt><dd>
+          12 kartlıq elan siyahısı təxminən <strong>4–6 MB</strong> şəkil yükləyirdi. Mobil
+          bağlantıda bu, həm uzun gözləmə, həm də sürüşdürmə zamanı «kəkələmə» deməkdir.
+          Yükləmə axını 640 px-lik nüsxəni onsuz da hazırlayır və R2-də saxlayırdı — sadəcə heç
+          kim ondan istifadə etmirdi.
+        </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          <code>thumbUrl</code> select-ə əlavə olundu; kart onu üstün tutur, yoxdursa master-ə
+          düşür. <code>featured</code> variantı master saxlayır — o, adətən səhifənin LCP
+          elementidir və 640 px orada yumşaq görünərdi. Üç test bu davranışı qoruyur.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug med done">
+      <div class="bug-top">
+        <span class="bug-id">P3</span>
+        <span class="bug-title">Hər naviqasiya üç əlavə D1 gedişi yaradırdı — biri yazma</span>
+        <span class="chip med">Orta</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/components/site/account-menu.tsx · /api/hesab/menu</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Effektin asılılığında <code>pathname</code> var idi: <strong>hər keçiddə</strong>
+          <code>/api/hesab/menu</code> yenidən çağırılırdı. Hər çağırış sessiya oxuması,
+          <code>touchSession()</code> <strong>yazması</strong> və oxunmamış bildiriş sayı —
+          yəni üç D1 gedişi. Üstəlik cavab gələnə qədər komponent <code>null</code> qaytarırdı,
+          ona görə hesab bölməsi hər keçiddə yox olub geri qayıdırdı: naviqasiyada gözlə görünən
+          sıçrayış.
+        </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          Vəziyyət modul səviyyəsində 60 saniyəlik keşdə saxlanılır və desktop/mobil menyu onu
+          bölüşür. Keçiddə köhnə dəyər dərhal göstərilir — sıçrayış yoxdur. Giriş, qeydiyyat,
+          kabinet və panel marşrutlarında keş etibarsız sayılır, ona görə giriş/çıxışdan sonra
+          menyu yenə dərhal uyğunlaşır.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug med done">
+      <div class="bug-top">
+        <span class="bug-id">P4</span>
+        <span class="bug-title">Elan siyahısı taksonomiyanı hər sorğuda keşsiz oxuyurdu</span>
+        <span class="chip med">Orta</span>
+        <span class="chip fixed">Düzəldildi</span>
+      </div>
+      <div class="bug-loc">src/app/[locale]/(site)/emlaklar/page.tsx</div>
+      <dl>
+        <div><dt>Səbəb</dt><dd>
+          Elanlar <code>getCachedProperties()</code> ilə keşlənirdi, filtr açılışları isə
+          keşsiz <code>getFilterOptions()</code> ilə oxunurdu — hər səhifə açılışına
+          <strong>dörd əlavə D1 sorğusu</strong>, halbuki əmlak növü, şəhər/rayon, metro və
+          xüsusiyyət siyahısı ayda bir dəfə dəyişir.
+        </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          <code>getCachedFilterOptions()</code> əlavə olundu — <code>taxonomy</code> teqinə
+          bağlıdır, ona görə paneldən taksonomiya dəyişəndə keş dərhal təmizlənir.
+        </dd></div>
+      </dl>
+    </article>
+
+    <article class="bug low">
+      <div class="bug-top">
+        <span class="bug-id">P5</span>
+        <span class="bug-title">Bütün ictimai səhifələr force-dynamic-dir</span>
+        <span class="chip low">Struktur · açıqdır</span>
+      </div>
+      <div class="bug-loc">57 səhifə · D1 binding build vaxtı əlçatan deyil</div>
+      <dl>
+        <div><dt>Vəziyyət</dt><dd>
+          Bu, arxitektura qərarıdır və qısa yolla dəyişmir: D1 binding-i yalnız sorğu
+          kontekstində əlçatandır, ona görə statik prerender mümkün deyil. Data qatı
+          <code>unstable_cache</code> ilə örtülüb (5 dəqiqə + teq əsaslı təmizləmə), amma
+          <strong>HTML hər sorğuda yenidən render olunur</strong>.
+        </dd></div>
+        <div><dt>Növbəti addım</dt><dd>
+          Ən çox baxılan səhifələr üçün ISR-ə keçmək mümkündür: <code>generateStaticParams</code>
+          + <code>revalidate</code>. Bu ayrıca işdir və yuxarıdakı dörd düzəlişdən sonra
+          ölçülməlidir — P1–P4 hiss olunan gecikmənin böyük hissəsini onsuz da götürür.
+        </dd></div>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<section id="drift">
+  <h2>Sənədlərin kodla uyğunsuzluğu</h2>
+  <p class="sec-note">
+    CLAUDE.md və MEMORY.md son iki həftədə kodun arxasınca yetişməyib. Aşağıdakı
+    bəndlər səhv məlumat verir və növbəti iş sessiyasını yanlış istiqamətləndirə bilər.
+  </p>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr><th>Sənəd deyir</th><th>Faktiki vəziyyət</th><th>Fayl</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>«Admin CRUD hələ tamamlanmayıb»</td>
+          <td>CRUD tamdır — əmlak, layihə, xidmət, bloq, lead, media, istifadəçi, parametrlər</td>
+          <td class="num">CLAUDE.md · MEMORY.md §6</td>
+        </tr>
+        <tr>
+          <td>«Media yükləmə axını yoxdur»</td>
+          <td>İki upload route işlək: <code>/api/admin/media</code>, <code>/api/hesab/media</code></td>
+          <td class="num">CLAUDE.md</td>
+        </tr>
+        <tr>
+          <td>«Hazırda yalnız AZ» / «UI mətnləri hardcode olunub»</td>
+          <td>Üç dil (az/en/ru) tam qurulub, 36 tərcümə kataloqu, parity testi var</td>
+          <td class="num">MEMORY.md §2, §6</td>
+        </tr>
+        <tr>
+          <td>«Test / CI / analitika — indilik yox»</td>
+          <td>279 test / 72 fayl mövcuddur; GA4 + GTM qurulub. CI hələ də yoxdur</td>
+          <td class="num">MEMORY.md §2</td>
+        </tr>
+        <tr>
+          <td>«Xüsusiyyət filtri UI-a bağlanmayıb»</td>
+          <td>Bağlanıb — <code>?xususiyyet=</code> parametri işləyir</td>
+          <td class="num">CLAUDE.md · MEMORY.md §3</td>
+        </tr>
+        <tr>
+          <td>«Auth kodu <code>feat/cloudflare-…</code> branch-ındadır, staging yoxlanmayıb»</td>
+          <td>main-ə birləşib, panel production-da açıqdır (<code>ADMIN_ENABLED=true</code>)</td>
+          <td class="num">MEMORY.md §9</td>
+        </tr>
+        <tr>
+          <td>«~6 700 sətir, 27 commit»</td>
+          <td>38 220 sətir, 274 commit</td>
+          <td class="num">MEMORY.md §7</td>
+        </tr>
+        <tr>
+          <td>«Saved Search + Recently Viewed + Notification — cari iş»</td>
+          <td>Üçü də tamamlanıb; sıradakı bənd artıq №2 (AI axtarış + rezervasiya)</td>
+          <td class="num">MEMORY.md §10</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="margin-top:22px">
+    Bir müsbət qeyd: <code>archive-HpKDcn/</code> qovluğu və <code>tsconfig.tsbuildinfo</code>
+    repo kökündə qalıb. Birincisi izlənilmirsə də, kökü qarışdırır.
+  </p>
+</section>
+
+<section id="tovsiye">
+  <h2>Tövsiyə olunan sıra</h2>
+  <p class="sec-note">
+    Sıra ardıcıldır — hər addım əvvəlkinin üzərində qurulur. Vaxt qiymətləri
+    mövcud kod bazasının vəziyyətinə görədir.
+  </p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-b">
+        <span class="step-t">Canlı saytdakı üç defekti bağla</span>
+        <p class="step-d">
+          B2 (spam qoruması), B3 (baxış sayğacı), B1 (filtr üzərinə yazma). Üçü də
+          canlı istifadəçiyə təsir edir və hər biri lokallaşdırılmış kiçik dəyişiklikdir.
+          B1 üçün <code>buildPropertyWhere</code> ətrafına regresiya testi əlavə et —
+          hazırda <code>queries.ts</code> filtr məntiqi test örtüyündən kənardadır.
+        </p>
+        <span class="step-m">~1 gün · yüksək təsir</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-b">
+        <span class="step-t">Saxlanmış axtarış zəncirini uca qədər bağla</span>
+        <p class="step-d">
+          B5 (döngə izolyasiyası) → B6 (filtr sxemi) → B4 (cron + digest) → B7
+          (bildiriş lokallaşdırması). Bu dördü bir işin hissələridir; ayrı-ayrı
+          görülsə, hər dəfə eyni fayllara qayıtmaq lazım gələcək.
+        </p>
+        <span class="step-m">~3-4 gün · funksiyanı vədinə uyğunlaşdırır</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-b">
+        <span class="step-t">CLAUDE.md və MEMORY.md-ni kodla uyğunlaşdır</span>
+        <p class="step-d">
+          Yuxarıdakı 8 sətirlik uyğunsuzluq cədvəlini tətbiq et. B11-dəki
+          <code>loading.tsx</code> güzəştini açıq şəkildə yaz — əks halda növbəti
+          sessiya onu «unudulmuş iş» kimi geri qaytaracaq.
+        </p>
+        <span class="step-m">~2 saat · gələcək işin qiymətini azaldır</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-n">4</div>
+      <div class="step-b">
+        <span class="step-t">GitHub Actions CI qur</span>
+        <p class="step-d">
+          <code>test + typecheck + lint + build</code>. Dörd qapının hamısı onsuz da
+          təmiz keçir — indi qurulsa, sıfır düzəliş tələb edir və gələcək
+          reqressiyaları avtomatik tutar. Repoda artıq issue/PR şablonları var,
+          workflow qovluğu isə boşdur.
+        </p>
+        <span class="step-m">~2 saat · ən yüksək fayda/əmək nisbəti</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-n">5</div>
+      <div class="step-b">
+        <span class="step-t">Agent profilini MEMORY.md sırasından yuxarı qaldırmağı düşün</span>
+        <p class="step-d">
+          Cari sıra AI axtarış + rezervasiyanı 2-ci, agent profilini 4-cü qoyur.
+          Lakin agent profili <strong>Phase 1 MVP bəndidir</strong> (Public PRD bölmə 178)
+          və əmlak detalındakı əlaqə kartı ondan asılıdır — hazırda hər elan şirkətin
+          ümumi nömrəsini göstərir. AI isə Phase 3 bəndidir. Bu, sizin qərarınızdır,
+          sadəcə sənədin öz prioritetləri ilə ziddiyyət təşkil edir.
+        </p>
+        <span class="step-m">qərar tələb edir</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-n">6</div>
+      <div class="step-b">
+        <span class="step-t">Qalan orta səviyyəli boşluqlar</span>
+        <p class="step-d">
+          B8 (404 yazma limiti), B9 (admin i18n), B10 (azərbaycanca axtarış),
+          B12 (Resend domeni). Heç biri bloklayıcı deyil, hamısı vaxt keçdikcə
+          bahalaşır — xüsusən B9.
+        </p>
+        <span class="step-m">fasilələrdə</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="metrik">
+  <h2>Ölçülər</h2>
+  <p class="sec-note">27 avqust 2026 tarixinə <code>main</code> branch-ı üzrə.</p>
+
+  <div class="scroller">
+    <table>
+      <thead>
+        <tr><th>Göstərici</th><th>Dəyər</th><th>Qeyd</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Mənbə kodu</td><td class="num">38 220 sətir</td><td><code>src/</code> altında .ts + .tsx</td></tr>
+        <tr><td>Test kodu</td><td class="num">4 063 sətir</td><td>ümumi həcmin ~%11-i</td></tr>
+        <tr><td>Testlər</td><td class="num">312 / 75 fayl</td><td>auth, i18n, SEO, UI, saved search, filtr, digest</td></tr>
+        <tr><td>Marşrutlar</td><td class="num">76</td><td>üç dil × ictimai + kabinet + admin</td></tr>
+        <tr><td>Verilənlər bazası modelləri</td><td class="num">28</td><td>12 miqrasiya</td></tr>
+        <tr><td>Commit-lər</td><td class="num">274</td><td>12-27 avqust 2026, 16 gün</td></tr>
+        <tr><td>Ən məhsuldar gün</td><td class="num">23 avqust</td><td>76 commit</td></tr>
+        <tr><td><code>force-dynamic</code> səhifələr</td><td class="num">57</td><td>D1 binding build vaxtı olmadığına görə</td></tr>
+        <tr><td>Server action faylları</td><td class="num">21</td><td>hamısı guard çağırır — yoxlanılıb</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  Luxe Home Estate · kod auditi · 27 avqust 2026 · main @ 74052c8
+</footer>
+
+</div>
