@@ -134,6 +134,7 @@ INSERT INTO "Partner" ("id", "name", "slug", "shortDescription", "shortDescripti
 ON CONFLICT("id") DO UPDATE SET
   "name" = excluded."name",
   "slug" = excluded."slug",
+  "legalName" = NULL,
   "shortDescription" = excluded."shortDescription",
   "shortDescriptionEn" = excluded."shortDescriptionEn",
   "shortDescriptionRu" = excluded."shortDescriptionRu",
@@ -157,6 +158,7 @@ ON CONFLICT("id") DO UPDATE SET
   "featured" = excluded."featured",
   "showPublicly" = excluded."showPublicly",
   "showOnHomepage" = excluded."showOnHomepage",
+  "officialSince" = NULL,
   "sortOrder" = excluded."sortOrder",
   "seoTitle" = excluded."seoTitle",
   "seoDescription" = excluded."seoDescription",

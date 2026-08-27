@@ -413,6 +413,7 @@ async function main() {
   // müqavilə və əməkdaşlıq tarixləri real sənəd olmadan təxmin edilmir.
   const trevaData = {
     name: "TREVA Real Estate",
+    legalName: null,
     websiteUrl: "https://treva.realestate/az",
     email: "info@treva.realestate",
     phone: "+994 50 277 26 62",
@@ -440,6 +441,7 @@ async function main() {
     featured: true,
     showPublicly: true,
     showOnHomepage: true,
+    officialSince: null,
     sortOrder: 0,
     seoTitle: "TREVA Real Estate — rəsmi tərəfdaş",
     seoDescription:
