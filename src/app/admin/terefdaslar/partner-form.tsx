@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminForm, FormSection } from "@/components/admin/form-shell";
+import { AdminForm, FormJumpNav, FormSection } from "@/components/admin/form-shell";
 import {
   AdminCheckbox,
   AdminInput,
@@ -25,6 +25,18 @@ const optionsOf = <T extends Record<string, string>>(
   labels: Record<string, string>,
 ) => Object.values(values).map((value) => ({ value, label: labels[value] }));
 
+const PARTNER_SECTIONS = [
+  { id: "esas-melumat", label: "Əsas" },
+  { id: "media", label: "Media" },
+  { id: "elaqe", label: "Əlaqə" },
+  { id: "terefdasliq", label: "Tərəfdaşlıq" },
+  { id: "qisa-tesvirler", label: "Qısa təsvirlər" },
+  { id: "emekdasliq-haqqinda", label: "Əməkdaşlıq" },
+  { id: "huquqi-bildiris", label: "Hüquqi bildiriş" },
+  { id: "seo", label: "SEO" },
+  { id: "muqavile", label: "Müqavilə" },
+] as const;
+
 export function PartnerForm({
   action,
   initial,
@@ -47,7 +59,13 @@ export function PartnerForm({
     >
       {initial.id ? <input type="hidden" name="id" value={initial.id} /> : null}
 
-      <FormSection title="Əsas məlumat" description="Tərəfdaşın adı, unikal ünvanı və biznes növü.">
+      <FormJumpNav
+        items={PARTNER_SECTIONS.filter(
+          (section) => section.id !== "muqavile" || canManageContract,
+        )}
+      />
+
+      <FormSection id="esas-melumat" title="Əsas məlumat" description="Tərəfdaşın adı, unikal ünvanı və biznes növü.">
         <AdminInput name="name" label="Ad" required defaultValue={initial.name} maxLength={160} />
         <AdminInput
           name="legalName"
@@ -72,7 +90,7 @@ export function PartnerForm({
         />
       </FormSection>
 
-      <FormSection title="Media" description="Loqolar kəsilmir; faylın öz aspect ratio-su qorunur.">
+      <FormSection id="media" title="Media" description="Loqolar kəsilmir; faylın öz aspect ratio-su qorunur.">
         <ImageDropzone
           name="logo"
           label="Əsas loqo"
@@ -114,7 +132,7 @@ export function PartnerForm({
         />
       </FormSection>
 
-      <FormSection title="Əlaqə">
+      <FormSection id="elaqe" title="Əlaqə">
         <AdminInput
           name="websiteUrl"
           label="Website"
@@ -133,6 +151,7 @@ export function PartnerForm({
       </FormSection>
 
       <FormSection
+        id="terefdasliq"
         title="Tərəfdaşlıq"
         description="Rəsmi badge yalnız ACTIVE + təsdiqlənmiş + rəsmi + public olduqda görünür."
         asFieldset
@@ -183,7 +202,7 @@ export function PartnerForm({
         />
       </FormSection>
 
-      <FormSection title="Qısa təsvirlər" description="AZ əsas dildir; EN/RU boş qalsa AZ göstərilir.">
+      <FormSection id="qisa-tesvirler" title="Qısa təsvirlər" description="AZ əsas dildir; EN/RU boş qalsa AZ göstərilir.">
         <FullWidth>
           <AdminTextarea
             name="shortDescription"
@@ -209,7 +228,7 @@ export function PartnerForm({
         />
       </FormSection>
 
-      <FormSection title="Əməkdaşlıq haqqında" description="HTML serverdə ağ siyahı üzrə təmizlənir.">
+      <FormSection id="emekdasliq-haqqinda" title="Əməkdaşlıq haqqında" description="HTML serverdə ağ siyahı üzrə təmizlənir.">
         <FullWidth>
           <ContentEditor name="description" label="Təsvir — AZ" defaultValue={initial.description} rows={12} />
         </FullWidth>
@@ -221,7 +240,7 @@ export function PartnerForm({
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Hüquqi bildiriş" description="Özbaşına mətn yaradılmır; yalnız təsdiqlənmiş mətni daxil edin.">
+      <FormSection id="huquqi-bildiris" title="Hüquqi bildiriş" description="Özbaşına mətn yaradılmır; yalnız təsdiqlənmiş mətni daxil edin.">
         <FullWidth>
           <AdminTextarea name="disclaimer" label="Bildiriş — AZ" rows={3} maxLength={600} defaultValue={initial.disclaimer} />
         </FullWidth>
@@ -229,7 +248,7 @@ export function PartnerForm({
         <AdminTextarea name="disclaimerRu" label="Bildiriş — RU" rows={3} maxLength={600} defaultValue={initial.disclaimerRu} />
       </FormSection>
 
-      <FormSection title="SEO">
+      <FormSection id="seo" title="SEO">
         <AdminInput name="seoTitle" label="SEO başlıq (AZ)" maxLength={70} defaultValue={initial.seoTitle} />
         <AdminInput
           name="seoDescription"
@@ -258,6 +277,7 @@ export function PartnerForm({
 
       {canManageContract ? (
         <FormSection
+          id="muqavile"
           title="Müqavilə metadatası"
           description="Yalnız Super Admin görür. Bu məlumat public sorğulara daxil edilmir."
         >

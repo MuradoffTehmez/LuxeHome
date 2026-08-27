@@ -93,7 +93,10 @@ export default async function AdminServicesPage() {
                   <span className="grid size-11 shrink-0 place-items-center rounded-xs bg-beige text-ink-soft">
                     <ServiceIcon name={service.icon} className="size-4.5" />
                   </span>
-                  <Link href={`${LIST_PATH}/${service.id}`} className="pt-2 transition-colors hover:text-gold-deep">
+                  <Link
+                    href={`${LIST_PATH}/${service.id}`}
+                    className="inline-flex min-h-11 items-center transition-colors hover:text-gold-deep"
+                  >
                     {service.title}
                   </Link>
                 </span>

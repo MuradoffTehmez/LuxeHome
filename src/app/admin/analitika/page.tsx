@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Eye, FileStack, Users, Zap } from "lucide-react";
 import { AdminCard, AdminPageHeader, AdminTable, AdminTableCell, AdminTableRow, StatCard } from "@/components/admin/admin-ui";
 import { EmptyState } from "@/components/ui/states";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getSearchAnalytics, type DailyTraffic } from "@/lib/analytics";
@@ -58,24 +62,50 @@ export default async function AdminAnalyticsPage() {
             />
           </div>
 
-          <AdminCard title="Gündəlik bölgü" bodyClassName="p-0">
-            <AdminTable
-              headers={[
-                { label: "Tarix" },
-                { label: "Sorğu", className: "text-right" },
-                { label: "Səhifə baxışı", className: "text-right" },
-                { label: "Unikal", className: "text-right" },
-              ]}
-            >
-              {[...result.days].reverse().map((day) => (
-                <AdminTableRow key={day.date}>
-                  <AdminTableCell>{dateFormatter.format(new Date(day.date))}</AdminTableCell>
-                  <AdminTableCell align="right">{numberFormatter.format(day.requests)}</AdminTableCell>
-                  <AdminTableCell align="right">{numberFormatter.format(day.pageViews)}</AdminTableCell>
-                  <AdminTableCell align="right">{numberFormatter.format(day.uniques)}</AdminTableCell>
-                </AdminTableRow>
-              ))}
-            </AdminTable>
+          <AdminCard title="Gündəlik bölgü" bodyClassName="p-4 lg:p-0">
+            <AdminResponsiveList
+              ariaLabel="Gündəlik trafik bölgüsü"
+              items={[...result.days].reverse()}
+              getKey={(day) => day.date}
+              empty={<EmptyState title="Hələ məlumat yoxdur" />}
+              renderCard={(day) => (
+                <AdminListCard title={dateFormatter.format(new Date(day.date))}>
+                  <dl className="grid grid-cols-3 gap-3 text-center">
+                    <div>
+                      <dt className="text-xs text-ink-muted">Sorğu</dt>
+                      <dd className="tabular mt-1 font-medium text-ink">{numberFormatter.format(day.requests)}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-ink-muted">Baxış</dt>
+                      <dd className="tabular mt-1 font-medium text-ink">{numberFormatter.format(day.pageViews)}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-ink-muted">Unikal</dt>
+                      <dd className="tabular mt-1 font-medium text-ink">{numberFormatter.format(day.uniques)}</dd>
+                    </div>
+                  </dl>
+                </AdminListCard>
+              )}
+              renderTable={(items) => (
+                <AdminTable
+                  headers={[
+                    { label: "Tarix" },
+                    { label: "Sorğu", className: "text-right" },
+                    { label: "Səhifə baxışı", className: "text-right" },
+                    { label: "Unikal", className: "text-right" },
+                  ]}
+                >
+                  {items.map((day) => (
+                    <AdminTableRow key={day.date}>
+                      <AdminTableCell>{dateFormatter.format(new Date(day.date))}</AdminTableCell>
+                      <AdminTableCell align="right">{numberFormatter.format(day.requests)}</AdminTableCell>
+                      <AdminTableCell align="right">{numberFormatter.format(day.pageViews)}</AdminTableCell>
+                      <AdminTableCell align="right">{numberFormatter.format(day.uniques)}</AdminTableCell>
+                    </AdminTableRow>
+                  ))}
+                </AdminTable>
+              )}
+            />
           </AdminCard>
         </>
       )}

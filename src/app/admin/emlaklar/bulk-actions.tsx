@@ -49,7 +49,7 @@ export function BulkActionsForm({
   return (
     <form ref={formRef} action={formAction}>
       <div className="flex flex-wrap items-center gap-3 border-b border-line bg-beige/40 px-4 py-2.5 lg:px-5">
-        <label className="flex items-center gap-2 text-xs font-medium text-ink-soft">
+        <label className="flex min-h-11 cursor-pointer items-center gap-2 text-xs font-medium text-ink-soft">
           <input
             type="checkbox"
             onChange={toggleAll}
@@ -65,7 +65,7 @@ export function BulkActionsForm({
                 type="submit"
                 name="intent"
                 value="publish"
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-success"
+                className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-success"
               >
                 <CheckCircle2 className="size-3.5" aria-hidden="true" />
                 Dərc et
@@ -74,7 +74,7 @@ export function BulkActionsForm({
                 type="submit"
                 name="intent"
                 value="archive"
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
+                className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
               >
                 <Archive className="size-3.5" aria-hidden="true" />
                 Arxivlə
@@ -83,7 +83,7 @@ export function BulkActionsForm({
                 type="submit"
                 name="intent"
                 value="delete"
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
+                className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
               >
                 <Trash2 className="size-3.5" aria-hidden="true" />
                 Sil
@@ -94,7 +94,7 @@ export function BulkActionsForm({
               type="submit"
               name="intent"
               value="restore"
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
+              className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
             >
               <RotateCcw className="size-3.5" aria-hidden="true" />
               Bərpa et

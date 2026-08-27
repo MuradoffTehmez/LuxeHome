@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AdminForm, FormSection } from "@/components/admin/form-shell";
+import { AdminForm, FormJumpNav, FormSection } from "@/components/admin/form-shell";
 import {
   AdminCheckbox,
   AdminInput,
@@ -46,6 +46,18 @@ const optionsOf = <T extends Record<string, string>>(
   labels: Record<string, string>,
 ) => Object.values(values).map((value) => ({ value, label: labels[value] }));
 
+const PROPERTY_SECTIONS = [
+  { id: "esas-melumat", label: "Əsas" },
+  { id: "qiymet", label: "Qiymət" },
+  { id: "yerlesme", label: "Yerləşmə" },
+  { id: "olculer", label: "Ölçülər" },
+  { id: "sertler", label: "Şərtlər" },
+  { id: "xususiyyetler", label: "Xüsusiyyətlər" },
+  { id: "sekiller", label: "Şəkillər" },
+  { id: "seo", label: "SEO" },
+  { id: "open-graph", label: "Open Graph" },
+] as const;
+
 export function PropertyForm({
   action,
   options,
@@ -83,7 +95,13 @@ export function PropertyForm({
     >
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
 
-      <FormSection title="Əsas məlumat" description="Elanın saytda görünən başlığı və təsviri.">
+      <FormJumpNav
+        items={PROPERTY_SECTIONS.filter(
+          (section) => section.id !== "xususiyyetler" || options.features.length > 0,
+        )}
+      />
+
+      <FormSection id="esas-melumat" title="Əsas məlumat" description="Elanın saytda görünən başlığı və təsviri.">
         <FullWidth>
           <AdminInput
             name="title"
@@ -123,7 +141,7 @@ export function PropertyForm({
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Elan növü və qiymət">
+      <FormSection id="qiymet" title="Elan növü və qiymət">
         <AdminSelect
           name="listingType"
           label="Elan növü"
@@ -162,7 +180,7 @@ export function PropertyForm({
         )}
       </FormSection>
 
-      <FormSection title="Yerləşmə">
+      <FormSection id="yerlesme" title="Yerləşmə">
         <AdminSelect
           name="typeId"
           label="Əmlak növü"
@@ -231,7 +249,7 @@ export function PropertyForm({
         />
       </FormSection>
 
-      <FormSection title="Ölçülər">
+      <FormSection id="olculer" title="Ölçülər">
         <AdminInput name="rooms" label="Otaq sayı" type="number" min={0} defaultValue={initial.rooms} />
         <AdminInput
           name="bedrooms"
@@ -274,7 +292,7 @@ export function PropertyForm({
         />
       </FormSection>
 
-      <FormSection title="Vəziyyət və şərtlər">
+      <FormSection id="sertler" title="Vəziyyət və şərtlər">
         <AdminSelect
           name="renovation"
           label="Təmir vəziyyəti"
@@ -326,7 +344,7 @@ export function PropertyForm({
       </FormSection>
 
       {options.features.length > 0 && (
-        <FormSection title="Xüsusiyyətlər" description="Axtarış filtrində istifadə olunur.">
+        <FormSection id="xususiyyetler" title="Xüsusiyyətlər" description="Axtarış filtrində istifadə olunur.">
           <FullWidth>
             <div className="flex flex-col gap-4">
               {Object.entries(featureGroups).map(([group, features]) => (
@@ -352,7 +370,7 @@ export function PropertyForm({
         </FormSection>
       )}
 
-      <FormSection title="Şəkillər" description="Birinci şəkil siyahılarda üz qabığı kimi görünür.">
+      <FormSection id="sekiller" title="Şəkillər" description="Birinci şəkil siyahılarda üz qabığı kimi görünür.">
         <FullWidth>
           <ImageDropzone
             name="images"
@@ -364,7 +382,7 @@ export function PropertyForm({
         </FullWidth>
       </FormSection>
 
-      <FormSection title="SEO" description="Boş buraxılsa, başlıq və təsvirdən qurulur.">
+      <FormSection id="seo" title="SEO" description="Boş buraxılsa, başlıq və təsvirdən qurulur.">
         <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Əmlak elanı"} fallbackDescription={initial.description || "Əmlak haqqında məlumat"} pathname={`/emlaklar/${initial.slug || "yeni-elan"}`} />
         <AdminInput
           name="canonicalUrl"
@@ -382,6 +400,7 @@ export function PropertyForm({
       </FormSection>
 
       <FormSection
+        id="open-graph"
         title="Open Graph"
         description="Sosial şəbəkədə paylaşılanda görünən başlıq/təsvir/şəkil. Boş buraxılsa meta sahələr istifadə olunur."
       >

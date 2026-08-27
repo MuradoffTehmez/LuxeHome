@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Pagination } from "@/components/ui/pagination";
+import { EmptyState } from "@/components/ui/states";
 import {
   AdminCard,
   AdminPageHeader,
@@ -12,11 +13,24 @@ import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminAuditLog } from "@/lib/queries";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 
 export const metadata: Metadata = { title: "Audit jurnalı" };
 export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function auditValue(value: string | null): unknown {
+  if (!value) return null;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
 
 export default async function AdminAuditPage({ searchParams }: { searchParams: SearchParams }) {
   await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
@@ -55,48 +69,74 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
             ],
           }]}
         />
-        <AdminTable
-          caption="Audit jurnalı"
-          headers={[
-            { label: "Tarix" },
-            { label: "Kim" },
-            { label: "Əməliyyat" },
-            { label: "Obyekt" },
-            { label: "Təfərrüat" },
-          ]}
-        >
-          {entries.map((entry) => (
-            <AdminTableRow key={entry.id}>
-              <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
-                {formatDateTime(entry.createdAt)}
-              </AdminTableCell>
-              <AdminTableCell className="text-xs">{entry.userEmail}</AdminTableCell>
-              <AdminTableCell>
-                <span className="rounded-xs bg-beige px-2 py-1 text-xs font-medium text-ink-soft">
-                  {entry.action}
-                </span>
-              </AdminTableCell>
-              <AdminTableCell className="text-xs text-ink-muted">
-                {entry.entity}
-                {entry.entityId && <span className="text-ink-muted"> · {entry.entityId.slice(0, 8)}</span>}
-              </AdminTableCell>
-              <AdminTableCell className="max-w-xs text-xs text-ink-muted [overflow-wrap:anywhere]">
-                <span>{entry.summary ?? "—"}</span>
+        <div className="p-4 lg:p-0">
+          <AdminResponsiveList
+            ariaLabel="Audit jurnalı"
+            items={entries}
+            getKey={(entry) => entry.id}
+            empty={<EmptyState title="Audit qeydi yoxdur" />}
+            renderCard={(entry) => (
+              <AdminListCard
+                title={`${entry.entity} · ${entry.action}`}
+                meta={`${formatDateTime(entry.createdAt)} · ${entry.userEmail}`}
+              >
+                <p className="[overflow-wrap:anywhere]">{entry.summary ?? "—"}</p>
+                {entry.entityId ? (
+                  <p className="mt-2 text-xs text-ink-muted [overflow-wrap:anywhere]">ID: {entry.entityId}</p>
+                ) : null}
                 {entry.oldValue || entry.newValue ? (
-                  <details className="mt-1">
-                    <summary className="cursor-pointer text-ink-soft">Dəyişiklik</summary>
-                    <pre className="mt-2 max-w-lg overflow-x-auto whitespace-pre-wrap rounded-xs bg-beige p-2 text-[11px] text-ink-soft">
-                      {JSON.stringify({
-                        əvvəl: entry.oldValue ? JSON.parse(entry.oldValue) : null,
-                        sonra: entry.newValue ? JSON.parse(entry.newValue) : null,
-                      }, null, 2)}
+                  <details className="mt-3">
+                    <summary className="min-h-11 cursor-pointer py-3 text-ink-soft">Dəyişiklik</summary>
+                    <pre className="max-w-full overflow-x-auto whitespace-pre-wrap rounded-xs bg-beige p-2 text-[11px] text-ink-soft">
+                      {JSON.stringify({ əvvəl: auditValue(entry.oldValue), sonra: auditValue(entry.newValue) }, null, 2)}
                     </pre>
                   </details>
                 ) : null}
-              </AdminTableCell>
-            </AdminTableRow>
-          ))}
-        </AdminTable>
+              </AdminListCard>
+            )}
+            renderTable={(items) => (
+              <AdminTable
+                caption="Audit jurnalı"
+                headers={[
+                  { label: "Tarix" },
+                  { label: "Kim" },
+                  { label: "Əməliyyat" },
+                  { label: "Obyekt" },
+                  { label: "Təfərrüat" },
+                ]}
+              >
+                {items.map((entry) => (
+                  <AdminTableRow key={entry.id}>
+                    <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
+                      {formatDateTime(entry.createdAt)}
+                    </AdminTableCell>
+                    <AdminTableCell className="text-xs">{entry.userEmail}</AdminTableCell>
+                    <AdminTableCell>
+                      <span className="rounded-xs bg-beige px-2 py-1 text-xs font-medium text-ink-soft">
+                        {entry.action}
+                      </span>
+                    </AdminTableCell>
+                    <AdminTableCell className="text-xs text-ink-muted">
+                      {entry.entity}
+                      {entry.entityId && <span className="text-ink-muted"> · {entry.entityId.slice(0, 8)}</span>}
+                    </AdminTableCell>
+                    <AdminTableCell className="max-w-xs text-xs text-ink-muted [overflow-wrap:anywhere]">
+                      <span>{entry.summary ?? "—"}</span>
+                      {entry.oldValue || entry.newValue ? (
+                        <details className="mt-1">
+                          <summary className="cursor-pointer text-ink-soft">Dəyişiklik</summary>
+                          <pre className="mt-2 max-w-lg overflow-x-auto whitespace-pre-wrap rounded-xs bg-beige p-2 text-[11px] text-ink-soft">
+                            {JSON.stringify({ əvvəl: auditValue(entry.oldValue), sonra: auditValue(entry.newValue) }, null, 2)}
+                          </pre>
+                        </details>
+                      ) : null}
+                    </AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTable>
+            )}
+          />
+        </div>
       </AdminCard>
 
       {pageCount > 1 && (

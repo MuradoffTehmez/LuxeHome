@@ -151,12 +151,14 @@ export function SubmitButton({
 
 /** Formanı məntiqi bloklara bölən başlıqlı bölmə. */
 export function FormSection({
+  id,
   title,
   description,
   children,
   className,
   asFieldset = false,
 }: {
+  id?: string;
   title: string;
   description?: string;
   children: React.ReactNode;
@@ -166,7 +168,7 @@ export function FormSection({
   const Tag = asFieldset ? "fieldset" : "section";
 
   return (
-    <Tag className={cn("min-w-0 rounded-md border border-line bg-paper", className)}>
+    <Tag id={id} className={cn("min-w-0 scroll-mt-32 rounded-md border border-line bg-paper", className)}>
       {asFieldset ? <legend className="sr-only">{title}</legend> : null}
       <header className="border-b border-line px-4 py-4 sm:px-5">
         <h2 className="font-display text-lg text-ink">{title}</h2>
@@ -174,5 +176,27 @@ export function FormSection({
       </header>
       <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">{children}</div>
     </Tag>
+  );
+}
+
+/** Uzun admin formalarında bölmələr arasında toxunma və klaviatura ilə sürətli keçid. */
+export function FormJumpNav({ items }: { items: readonly { id: string; label: string }[] }) {
+  return (
+    <nav
+      aria-label="Forma bölmələri"
+      className="sticky top-16 z-[var(--z-sticky)] -mx-4 overflow-x-auto border-y border-line bg-beige/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"
+    >
+      <div className="flex w-max min-w-full gap-2">
+        {items.map((item) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className="inline-flex min-h-11 shrink-0 items-center rounded-xs border border-line bg-paper px-3 text-xs font-medium text-ink-soft transition-colors hover:border-gold hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </nav>
   );
 }

@@ -9,6 +9,10 @@ import {
   AdminTableCell,
   AdminTableRow,
 } from "@/components/admin/admin-ui";
+import {
+  AdminListCard,
+  AdminResponsiveList,
+} from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatDateTime } from "@/lib/utils";
 import { PERMISSIONS } from "@/lib/constants";
@@ -100,75 +104,147 @@ export default async function AdminSecurityPage() {
           </AdminCard>
         )}
 
-        <AdminCard title="Aktiv sessiyalar" description={`${sessions.length} aktiv sessiya`} bodyClassName="p-0">
+        <AdminCard title="Aktiv sessiyalar" description={`${sessions.length} aktiv sessiya`} bodyClassName="p-4 lg:p-0">
           {sessions.length === 0 ? (
             <EmptyState title="Aktiv sessiya yoxdur" />
           ) : (
-            <AdminTable
-              caption="Aktiv sessiyalar"
-              headers={[
-                { label: "İstifadəçi" },
-                { label: "Cihaz" },
-                { label: "IP" },
-                { label: "Son aktivlik" },
-                { label: "İdarəetmə", className: "text-right" },
-              ]}
-            >
-              {sessions.map((session) => (
-                <AdminTableRow key={session.id}>
-                  <AdminTableCell>
-                    <span className="font-medium text-ink">{session.user.name}</span>
-                    <p className="text-xs text-ink-muted">{session.user.email}</p>
-                  </AdminTableCell>
-                  <AdminTableCell className="text-xs text-ink-muted">
-                    {deviceLabel(session.userAgent)}
-                  </AdminTableCell>
-                  <AdminTableCell className="text-xs text-ink-muted">{session.ip ?? "—"}</AdminTableCell>
-                  <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
-                    {formatDateTime(session.lastSeenAt)}
-                  </AdminTableCell>
-                  <AdminTableCell align="right">
-                    <div className="flex justify-end">
-                      <ConfirmAction
-                        action={revokeAdminSession}
-                        id={session.id}
-                        label={`${session.user.email} sessiyasını bağla`}
-                        title="Sessiyanı bağlamaq"
-                        description={`${session.user.name} (${session.user.email}) bu cihazdan çıxarılacaq.`}
-                        confirmLabel="Bağla"
-                        tone="danger"
-                        className="size-11"
-                      >
-                        <LogOut className="size-4" aria-hidden="true" />
-                      </ConfirmAction>
+            <AdminResponsiveList
+              ariaLabel="Aktiv sessiyalar"
+              items={sessions}
+              getKey={(session) => session.id}
+              empty={<EmptyState title="Aktiv sessiya yoxdur" />}
+              renderCard={(session) => (
+                <AdminListCard
+                  title={session.user.name}
+                  meta={session.user.email}
+                  actions={
+                    <ConfirmAction
+                      action={revokeAdminSession}
+                      id={session.id}
+                      label={`${session.user.email} sessiyasını bağla`}
+                      title="Sessiyanı bağlamaq"
+                      description={`${session.user.name} (${session.user.email}) bu cihazdan çıxarılacaq.`}
+                      confirmLabel="Bağla"
+                      tone="danger"
+                      className="size-11"
+                    >
+                      <LogOut className="size-4" aria-hidden="true" />
+                    </ConfirmAction>
+                  }
+                >
+                  <dl className="grid grid-cols-2 gap-3">
+                    <div>
+                      <dt className="text-xs text-ink-muted">Cihaz</dt>
+                      <dd className="mt-1 text-ink">{deviceLabel(session.userAgent)}</dd>
                     </div>
-                  </AdminTableCell>
-                </AdminTableRow>
-              ))}
-            </AdminTable>
+                    <div>
+                      <dt className="text-xs text-ink-muted">IP</dt>
+                      <dd className="mt-1 text-ink [overflow-wrap:anywhere]">{session.ip ?? "—"}</dd>
+                    </div>
+                    <div className="col-span-2">
+                      <dt className="text-xs text-ink-muted">Son aktivlik</dt>
+                      <dd className="mt-1 text-ink">{formatDateTime(session.lastSeenAt)}</dd>
+                    </div>
+                  </dl>
+                </AdminListCard>
+              )}
+              renderTable={(items) => (
+                <AdminTable
+                  caption="Aktiv sessiyalar"
+                  headers={[
+                    { label: "İstifadəçi" },
+                    { label: "Cihaz" },
+                    { label: "IP" },
+                    { label: "Son aktivlik" },
+                    { label: "İdarəetmə", className: "text-right" },
+                  ]}
+                >
+                  {items.map((session) => (
+                    <AdminTableRow key={session.id}>
+                      <AdminTableCell>
+                        <span className="font-medium text-ink">{session.user.name}</span>
+                        <p className="text-xs text-ink-muted">{session.user.email}</p>
+                      </AdminTableCell>
+                      <AdminTableCell className="text-xs text-ink-muted">
+                        {deviceLabel(session.userAgent)}
+                      </AdminTableCell>
+                      <AdminTableCell className="text-xs text-ink-muted">{session.ip ?? "—"}</AdminTableCell>
+                      <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
+                        {formatDateTime(session.lastSeenAt)}
+                      </AdminTableCell>
+                      <AdminTableCell align="right">
+                        <div className="flex justify-end">
+                          <ConfirmAction
+                            action={revokeAdminSession}
+                            id={session.id}
+                            label={`${session.user.email} sessiyasını bağla`}
+                            title="Sessiyanı bağlamaq"
+                            description={`${session.user.name} (${session.user.email}) bu cihazdan çıxarılacaq.`}
+                            confirmLabel="Bağla"
+                            tone="danger"
+                            className="size-11"
+                          >
+                            <LogOut className="size-4" aria-hidden="true" />
+                          </ConfirmAction>
+                        </div>
+                      </AdminTableCell>
+                    </AdminTableRow>
+                  ))}
+                </AdminTable>
+              )}
+            />
           )}
         </AdminCard>
 
-        <AdminCard title="Son giriş cəhdləri" bodyClassName="p-0">
-          <AdminTable
-            caption="Giriş cəhdləri"
-            headers={[{ label: "E-poçt" }, { label: "IP" }, { label: "Nəticə" }, { label: "Tarix" }]}
-          >
-            {attempts.map((attempt) => (
-              <AdminTableRow key={attempt.id}>
-                <AdminTableCell className="text-xs">{attempt.email}</AdminTableCell>
-                <AdminTableCell className="text-xs text-ink-muted">{attempt.ip ?? "—"}</AdminTableCell>
-                <AdminTableCell>
+        <AdminCard title="Son giriş cəhdləri" bodyClassName="p-4 lg:p-0">
+          <AdminResponsiveList
+            ariaLabel="Giriş cəhdləri"
+            items={attempts}
+            getKey={(attempt) => attempt.id}
+            empty={<EmptyState title="Giriş cəhdi yoxdur" />}
+            renderCard={(attempt) => (
+              <AdminListCard
+                title={attempt.email}
+                status={
                   <Badge tone={attempt.success ? "success" : "danger"}>
                     {REASON_LABELS[attempt.reason ?? ""] ?? (attempt.success ? "Uğurlu" : "Uğursuz")}
                   </Badge>
-                </AdminTableCell>
-                <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
-                  {formatDateTime(attempt.createdAt)}
-                </AdminTableCell>
-              </AdminTableRow>
-            ))}
-          </AdminTable>
+                }
+              >
+                <dl className="grid grid-cols-2 gap-3">
+                  <div>
+                    <dt className="text-xs text-ink-muted">IP</dt>
+                    <dd className="mt-1 text-ink [overflow-wrap:anywhere]">{attempt.ip ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-ink-muted">Tarix</dt>
+                    <dd className="mt-1 text-ink">{formatDateTime(attempt.createdAt)}</dd>
+                  </div>
+                </dl>
+              </AdminListCard>
+            )}
+            renderTable={(items) => (
+              <AdminTable
+                caption="Giriş cəhdləri"
+                headers={[{ label: "E-poçt" }, { label: "IP" }, { label: "Nəticə" }, { label: "Tarix" }]}
+              >
+                {items.map((attempt) => (
+                  <AdminTableRow key={attempt.id}>
+                    <AdminTableCell className="text-xs">{attempt.email}</AdminTableCell>
+                    <AdminTableCell className="text-xs text-ink-muted">{attempt.ip ?? "—"}</AdminTableCell>
+                    <AdminTableCell>
+                      <Badge tone={attempt.success ? "success" : "danger"}>
+                        {REASON_LABELS[attempt.reason ?? ""] ?? (attempt.success ? "Uğurlu" : "Uğursuz")}
+                      </Badge>
+                    </AdminTableCell>
+                    <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
+                      {formatDateTime(attempt.createdAt)}
+                    </AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTable>
+            )}
+          />
         </AdminCard>
       </div>
     </>

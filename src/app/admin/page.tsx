@@ -173,7 +173,10 @@ export default async function AdminDashboardPage() {
             renderCard={(lead) => (
               <AdminListCard
                 title={
-                  <Link href="/admin/muracietler" className="transition-colors hover:text-gold-deep">
+                  <Link
+                    href={`/admin/muracietler/${lead.id}`}
+                    className="inline-flex min-h-11 items-center transition-colors hover:text-gold-deep"
+                  >
                     {lead.name}
                   </Link>
                 }
@@ -206,8 +209,8 @@ export default async function AdminDashboardPage() {
                   <AdminTableRow key={lead.id}>
                     <AdminTableCell>
                       <Link
-                        href="/admin/muracietler"
-                        className="font-medium text-ink transition-colors hover:text-gold-deep"
+                        href={`/admin/muracietler/${lead.id}`}
+                        className="inline-flex min-h-11 items-center font-medium text-ink transition-colors hover:text-gold-deep"
                       >
                         {lead.name}
                       </Link>
@@ -256,7 +259,7 @@ export default async function AdminDashboardPage() {
                 <div className="min-w-0 flex-1">
                   <Link
                     href={`/admin/emlaklar/${property.id}`}
-                    className="line-clamp-1 text-sm font-medium text-ink transition-colors hover:text-gold-deep"
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-ink transition-colors hover:text-gold-deep"
                   >
                     {property.title}
                   </Link>
@@ -292,7 +295,7 @@ export default async function AdminDashboardPage() {
                 <div className="min-w-0 flex-1">
                   <Link
                     href={`/admin/emlaklar/${property.id}`}
-                    className="line-clamp-1 text-sm font-medium text-ink transition-colors hover:text-gold-deep"
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-ink transition-colors hover:text-gold-deep"
                   >
                     {property.title}
                   </Link>
