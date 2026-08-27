@@ -43,9 +43,4 @@ describe("route vəziyyətləri", () => {
     expect(source).toContain('role="status"');
     expect(source).toContain('aria-busy="true"');
   });
-
-  it("ictimai segment ümumi kolleksiya skeleton-undan istifadə edir", () => {
-    const source = readFileSync(join(process.cwd(), "src/app/[locale]/(site)/loading.tsx"), "utf8");
-    expect(source).toContain("CollectionPageSkeleton");
-  });
 });

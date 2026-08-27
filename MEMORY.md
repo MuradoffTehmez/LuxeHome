@@ -195,7 +195,8 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [ ] Resend-də `luxehomeestate.az` domenini təsdiqləmək (hazırda `onboarding@resend.dev`
       göndərici ünvanı işlədilir — production üçün uyğun deyil).
 - [ ] Cloudflare Images transformations-u zone səviyyəsində aktivləşdirmək.
-- [ ] Panel staging-də yoxlanandan sonra prod `vars`-ında `ADMIN_ENABLED="true"` etmək.
+- [x] Panel staging-də yoxlanandan sonra prod `vars`-ında `ADMIN_ENABLED="true"` edildi
+      (27 avqust 2026) — `/admin` və `/giris` artıq production-da açıqdır.
 - [ ] `npm run preview` (workerd) ilə lokal test axını qurmaq — `next dev` Node-da wasm
       engine-i yükləyə bilmir.
 

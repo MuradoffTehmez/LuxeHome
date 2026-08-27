@@ -82,11 +82,7 @@ export const metadata: Metadata = {
   },
   robots: isStaging()
     ? { index: false, follow: false }
-    : {
-        index: true,
-        follow: true,
-        googleBot: { index: true, follow: true, "max-image-preview": "large" },
-      },
+    : undefined,
 };
 
 export const viewport: Viewport = {

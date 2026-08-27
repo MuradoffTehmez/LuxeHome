@@ -33,10 +33,9 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const t = await getTranslations({ locale, namespace: "listings.detail" });
   const project = await getCachedProjectBySlug(slug);
 
-  if (!project) return { title: t("notFound") };
+  if (!project) notFound();
 
   return buildMetadata({
     title: project.metaTitle || project.name,

@@ -60,10 +60,9 @@ const DOCUMENT_KEYS: Record<string, "titleDeed" | "contract" | "municipal" | "de
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const content = await getTranslations({ locale, namespace: "content.propertyDetail" });
   const sourceProperty = await getCachedPropertyBySlug(slug);
 
-  if (!sourceProperty) return { title: content("notFound") };
+  if (!sourceProperty) notFound();
   const localizedProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
   const property = {
     ...localizedProperty,

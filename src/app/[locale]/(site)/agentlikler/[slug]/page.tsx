@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "listings.detail" });
   const data = await getAgencyBySlug(slug);
 
-  if (!data) return { title: t("notFound") };
+  if (!data) notFound();
 
   return buildMetadata({
     title: data.agency.name,
