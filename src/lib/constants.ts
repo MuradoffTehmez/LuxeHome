@@ -32,6 +32,12 @@ export const PERMISSIONS = {
   MEDIA_MANAGE: "media:manage",
   USER_MANAGE: "user:manage",
   SETTINGS_MANAGE: "settings:manage",
+  PARTNER_MANAGE: "partner:manage",
+  /**
+   * Müqavilə metadatası (nömrə, tarixlər, sənəd, daxili qeydlər) ayrıca icazədir:
+   * bu məlumat kommersiya sirridir və adi paneldə avtomatik görünməməlidir.
+   */
+  PARTNER_CONTRACT_MANAGE: "partner:contract",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -46,6 +52,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.BLOG_MANAGE,
     PERMISSIONS.LEAD_MANAGE,
     PERMISSIONS.MEDIA_MANAGE,
+    PERMISSIONS.PARTNER_MANAGE,
   ],
   EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.MEDIA_MANAGE],
 };
@@ -585,3 +592,182 @@ export const AGENCY_EMPLOYEE_STATUS_LABELS: Record<AgencyEmployeeStatus, string>
 
 /** Sahibdən əlavə maksimum əməkdaş sayı — PRD Phase 1 tələbi. */
 export const MAX_AGENCY_EMPLOYEES = 3;
+
+// ---------------------------------------------------------------------------
+// TƏRƏFDAŞLAR (PARTNERS)
+// ---------------------------------------------------------------------------
+
+/**
+ * Tərəfdaşlıq növü.
+ *
+ * Ayrıca taksonomiya cədvəli qəsdən yaradılmır: dəyər dəsti biznes qərarıdır,
+ * redaktor tərəfindən genişləndirilmir və digər status sahələri ilə eyni
+ * konvensiyaya (String sütun + burada sabit) tabedir.
+ */
+export const PARTNERSHIP_TYPES = {
+  BROKER: "BROKER",
+  REAL_ESTATE_AGENCY: "REAL_ESTATE_AGENCY",
+  DEVELOPER: "DEVELOPER",
+  CONSTRUCTION_COMPANY: "CONSTRUCTION_COMPANY",
+  INVESTMENT: "INVESTMENT",
+  BANK: "BANK",
+  MORTGAGE: "MORTGAGE",
+  INSURANCE: "INSURANCE",
+  TECHNOLOGY: "TECHNOLOGY",
+  MEDIA: "MEDIA",
+  MARKETING: "MARKETING",
+  SERVICE_PROVIDER: "SERVICE_PROVIDER",
+  STRATEGIC_PARTNER: "STRATEGIC_PARTNER",
+  OTHER: "OTHER",
+} as const;
+
+export type PartnershipType = (typeof PARTNERSHIP_TYPES)[keyof typeof PARTNERSHIP_TYPES];
+
+/** Panel etiketləri. İctimai tərəfdə mətn `partners` i18n namespace-indən gəlir. */
+export const PARTNERSHIP_TYPE_LABELS: Record<PartnershipType, string> = {
+  BROKER: "Broker",
+  REAL_ESTATE_AGENCY: "Daşınmaz əmlak agentliyi",
+  DEVELOPER: "Developer",
+  CONSTRUCTION_COMPANY: "Tikinti şirkəti",
+  INVESTMENT: "İnvestisiya",
+  BANK: "Bank",
+  MORTGAGE: "İpoteka",
+  INSURANCE: "Sığorta",
+  TECHNOLOGY: "Texnologiya",
+  MEDIA: "Media",
+  MARKETING: "Marketinq",
+  SERVICE_PROVIDER: "Xidmət təminatçısı",
+  STRATEGIC_PARTNER: "Strateji tərəfdaş",
+  OTHER: "Digər",
+};
+
+export const PARTNER_STATUSES = {
+  DRAFT: "DRAFT",
+  PENDING: "PENDING",
+  ACTIVE: "ACTIVE",
+  SUSPENDED: "SUSPENDED",
+  EXPIRED: "EXPIRED",
+  TERMINATED: "TERMINATED",
+  ARCHIVED: "ARCHIVED",
+} as const;
+
+export type PartnerStatus = (typeof PARTNER_STATUSES)[keyof typeof PARTNER_STATUSES];
+
+export const PARTNER_STATUS_LABELS: Record<PartnerStatus, string> = {
+  DRAFT: "Qaralama",
+  PENDING: "Gözləyir",
+  ACTIVE: "Aktiv",
+  SUSPENDED: "Dayandırılıb",
+  EXPIRED: "Müddəti bitib",
+  TERMINATED: "Xitam verilib",
+  ARCHIVED: "Arxiv",
+};
+
+export const PARTNER_STATUS_TONE: Record<
+  PartnerStatus,
+  "neutral" | "success" | "warning" | "danger" | "gold" | "info"
+> = {
+  DRAFT: "neutral",
+  PENDING: "warning",
+  ACTIVE: "success",
+  SUSPENDED: "warning",
+  EXPIRED: "danger",
+  TERMINATED: "danger",
+  ARCHIVED: "neutral",
+};
+
+/**
+ * İctimai tərəfdə görünə bilən yeganə status.
+ *
+ * Siyahı `PUBLIC_PROPERTY_STATUSES` ilə eyni rolu oynayır: hər ictimai tərəfdaş
+ * sorğusu bu şərtdən başlamalıdır, əks halda qaralama və xitam verilmiş
+ * tərəfdaşlar sayta sızır.
+ */
+export const PUBLIC_PARTNER_STATUSES: PartnerStatus[] = [PARTNER_STATUSES.ACTIVE];
+
+/**
+ * Tərəfdaşın konkret elan/layihə üzərindəki rolu.
+ *
+ * Bir əmlak eyni anda bir neçə şirkətlə əlaqəli ola bilir (developer + satış
+ * tərəfdaşı + agentlik), ona görə əlaqə çox-çoxadır və rol əlaqənin özündə saxlanılır.
+ */
+export const PARTNER_RELATION_ROLES = {
+  SOURCE: "SOURCE",
+  BROKER: "BROKER",
+  CO_BROKER: "CO_BROKER",
+  DEVELOPER: "DEVELOPER",
+  EXCLUSIVE_SALES: "EXCLUSIVE_SALES",
+  SALES_PARTNER: "SALES_PARTNER",
+  MARKETING_PARTNER: "MARKETING_PARTNER",
+  MANAGEMENT_PARTNER: "MANAGEMENT_PARTNER",
+  OTHER: "OTHER",
+} as const;
+
+export type PartnerRelationRole =
+  (typeof PARTNER_RELATION_ROLES)[keyof typeof PARTNER_RELATION_ROLES];
+
+export const PARTNER_RELATION_ROLE_LABELS: Record<PartnerRelationRole, string> = {
+  SOURCE: "Mənbə",
+  BROKER: "Broker",
+  CO_BROKER: "Ortaq broker",
+  DEVELOPER: "Developer",
+  EXCLUSIVE_SALES: "Eksklüziv satış",
+  SALES_PARTNER: "Satış tərəfdaşı",
+  MARKETING_PARTNER: "Marketinq tərəfdaşı",
+  MANAGEMENT_PARTNER: "İdarəetmə tərəfdaşı",
+  OTHER: "Digər",
+};
+
+/**
+ * İctimai filtr qrupları — bir neçə `PartnershipType` bir düymə altında toplanır,
+ * çünki ziyarətçi «Maliyyə» axtarır, «BANK / MORTGAGE / INSURANCE» yox.
+ * `slug` URL-dəki `?tip=` dəyəridir, `key` isə i18n açarıdır.
+ */
+export const PARTNER_FILTER_GROUPS = [
+  {
+    slug: "brokerler",
+    key: "brokers",
+    types: [PARTNERSHIP_TYPES.BROKER],
+  },
+  {
+    slug: "agentlikler",
+    key: "agencies",
+    types: [PARTNERSHIP_TYPES.REAL_ESTATE_AGENCY],
+  },
+  {
+    slug: "developerler",
+    key: "developers",
+    types: [PARTNERSHIP_TYPES.DEVELOPER, PARTNERSHIP_TYPES.CONSTRUCTION_COMPANY],
+  },
+  {
+    slug: "strateji",
+    key: "strategic",
+    types: [PARTNERSHIP_TYPES.STRATEGIC_PARTNER],
+  },
+  {
+    slug: "texnologiya",
+    key: "technology",
+    types: [PARTNERSHIP_TYPES.TECHNOLOGY, PARTNERSHIP_TYPES.MEDIA, PARTNERSHIP_TYPES.MARKETING],
+  },
+  {
+    slug: "maliyye",
+    key: "finance",
+    types: [
+      PARTNERSHIP_TYPES.INVESTMENT,
+      PARTNERSHIP_TYPES.BANK,
+      PARTNERSHIP_TYPES.MORTGAGE,
+      PARTNERSHIP_TYPES.INSURANCE,
+    ],
+  },
+  {
+    slug: "diger",
+    key: "other",
+    types: [PARTNERSHIP_TYPES.SERVICE_PROVIDER, PARTNERSHIP_TYPES.OTHER],
+  },
+] as const;
+
+export type PartnerFilterGroup = (typeof PARTNER_FILTER_GROUPS)[number];
+export type PartnerFilterGroupSlug = PartnerFilterGroup["slug"];
+
+/** Yüklənə bilən ən böyük loqo ölçüsü — `MAX_UPLOAD_SIZE`-dan kiçikdir, loqo ağır olmamalıdır. */
+export const MAX_PARTNER_LOGO_SIZE = 2 * 1024 * 1024;

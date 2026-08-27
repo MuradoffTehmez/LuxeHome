@@ -18,31 +18,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // ---------------------------------------------------------------------------
 // İSTİFADƏÇİLƏR VƏ ROLLAR
 // ---------------------------------------------------------------------------
 
 model User {
-  id           String    @id @default(cuid())
-  name         String
-  email        String    @unique
-  passwordHash String
-  role         String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  passwordHash    String
+  role            String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR
   /// Hesabın kim olduğu: STAFF | USER | OWNER | AGENCY.
   /// `role` yalnız panel səlahiyyətini göstərir — iki ölçü qəsdən ayrıdır.
-  accountType  String    @default("STAFF")
-  phone        String?
+  accountType     String    @default("STAFF")
+  phone           String?
   emailVerifiedAt DateTime?
-  isActive     Boolean   @default(true)
-  lastLoginAt  DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  isActive        Boolean   @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   /// İstifadəçinin seçdiyi dil: az | en | ru. `src/lib/constants.ts`-dəki LOCALES-dən.
-  locale           String @default("az")
+  locale          String @default("az")
   /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
-  themePreference  String @default("system")
+  themePreference String @default("system")
 
   /// AES-GCM ilə şifrələnmiş TOTP sirri. Açıq mətn heç vaxt saxlanılmır.
   totpSecret         String?
@@ -52,19 +51,23 @@ model User {
   failedAttempts     Int       @default(0)
   lockedUntil        DateTime?
 
-  properties Property[]  @relation("PropertyAuthor")
-  posts      BlogPost[]  @relation("PostAuthor")
-  media      Media[]     @relation("MediaUploader")
+  properties Property[] @relation("PropertyAuthor")
+  posts      BlogPost[] @relation("PostAuthor")
+  media      Media[]    @relation("MediaUploader")
   favorites  Favorite[]
-  leadNotes  Lead[]      @relation("LeadAssignee")
+  leadNotes  Lead[]     @relation("LeadAssignee")
 
-  sessions    Session[]
-  backupCodes BackupCode[]
-  agency      Agency?
+  sessions          Session[]
+  backupCodes       BackupCode[]
+  agency            Agency?
   agencyEmployments AgencyEmployee[]
 
   savedSearches SavedSearch[]
   notifications Notification[]
+
+  partnersCreated Partner[] @relation("PartnerCreatedBy")
+  partnersUpdated Partner[] @relation("PartnerUpdatedBy")
+  partnersDeleted Partner[] @relation("PartnerDeletedBy")
 
   @@index([role])
   @@index([accountType])
@@ -91,6 +94,7 @@ model Agency {
 
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   employees AgencyEmployee[]
+  partners  AgencyPartner[]
 
   @@index([isVerified])
 }
@@ -132,7 +136,7 @@ model Session {
   /// Sessiyanı açan TOTP addımı — eyni kodun təkrar oynadılmasının qarşısını alır
   totpCounter Int?
   /// STAFF_2FA | PUBLIC — sessiyanın hansı doğrulama axınından gəldiyi
-  authKind    String @default("STAFF_2FA")
+  authKind    String    @default("STAFF_2FA")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -209,12 +213,12 @@ model Location {
 
 /// Əmlak xüsusiyyətləri (hovuz, qaraj, lift, ...).
 model Feature {
-  id      String @id @default(cuid())
-  name    String
-  slug    String @unique
-  icon    String?
-  group   String @default("GENERAL") // GENERAL | INDOOR | OUTDOOR | SECURITY
-  order   Int    @default(0)
+  id    String  @id @default(cuid())
+  name  String
+  slug  String  @unique
+  icon  String?
+  group String  @default("GENERAL") // GENERAL | INDOOR | OUTDOOR | SECURITY
+  order Int     @default(0)
 
   properties PropertyFeature[]
 }
@@ -241,14 +245,14 @@ model Property {
   description String
 
   /// SALE = Satılır, RENT = Kirayə
-  listingType String @default("SALE")
+  listingType    String  @default("SALE")
   /// DRAFT | PENDING | PUBLISHED | RESERVED | SOLD | RENTED | ARCHIVED
-  status      String @default("DRAFT")
+  status         String  @default("DRAFT")
   /// Moderator PENDING elanı rədd edəndə yazdığı səbəb — sahibə "Elanlarım"da göstərilir.
   moderationNote String?
 
-  price    Float
-  currency String @default("AZN")
+  price       Float
+  currency    String  @default("AZN")
   /// Kirayə üçün: MONTH | DAY — satış üçün null
   pricePeriod String?
 
@@ -278,7 +282,7 @@ model Property {
 
   /// NEW = yeni tikili, OLD = köhnə tikili. Yerli bazarda bu, əmlak növündən ayrı
   /// ikinci ölçüdür: qiymət, sənəd vəziyyəti və ipoteka uyğunluğu birbaşa ondan asılıdır.
-  buildingType String? // NEW | OLD
+  buildingType         String? // NEW | OLD
   /// İpoteka Fondunun şərtlərinə uyğundur
   mortgageAvailable    Boolean @default(false)
   /// Tikinti şirkətinin daxili taksiti mövcuddur
@@ -311,11 +315,12 @@ model Property {
   author   User?        @relation("PropertyAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   authorId String?
 
-  images    PropertyImage[]
-  features  PropertyFeature[]
-  leads     Lead[]
-  favorites Favorite[]
+  images             PropertyImage[]
+  features           PropertyFeature[]
+  leads              Lead[]
+  favorites          Favorite[]
   savedSearchMatches SavedSearchMatch[]
+  partners           PropertyPartner[]
 
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
@@ -353,9 +358,9 @@ model PropertyImage {
 // ---------------------------------------------------------------------------
 
 model Project {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
-  slug        String @unique
+  slug        String  @unique
   description String
   summary     String?
 
@@ -364,8 +369,8 @@ model Project {
   /// PLANNED | ONGOING | COMPLETED
   status      String @default("ONGOING")
 
-  cityId  String?
-  address String?
+  cityId    String?
+  address   String?
   latitude  Float?
   longitude Float?
 
@@ -373,13 +378,13 @@ model Project {
   deliveryDate DateTime?
   year         Int?
 
-  totalArea   Float?
-  floors      Int?
-  unitCount   Int?
+  totalArea  Float?
+  floors     Int?
+  unitCount  Int?
   /// Sərbəst xüsusiyyət siyahısı — JSON massiv (string[]).
-  highlights  String?
+  highlights String?
   /// Tikinti mərhələləri — JSON massiv ({ step, title, done }[]).
-  timeline    String?
+  timeline   String?
 
   coverUrl String?
   isDemo   Boolean @default(false)
@@ -396,13 +401,14 @@ model Project {
   ogDescription   String?
   ogImage         String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  city       Location?      @relation("ProjectCity", fields: [cityId], references: [id], onDelete: SetNull)
+  city       Location?        @relation("ProjectCity", fields: [cityId], references: [id], onDelete: SetNull)
   images     ProjectImage[]
   properties Property[]
+  partners   ProjectPartner[]
 
   @@index([status])
   @@index([deletedAt])
@@ -528,15 +534,22 @@ model Lead {
   adminNote  String?
   assigneeId String?
 
+  /// Müraciətin hansı tərəfdaş/layihə kontekstindən gəldiyi — B2B atribusiya üçün.
+  /// Boş qalması normaldır: adi əlaqə formasının tərəfdaşla bağlantısı yoxdur.
+  partnerId String?
+  projectId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
   assignee User?     @relation("LeadAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  partner  Partner?  @relation(fields: [partnerId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([createdAt])
   @@index([propertyId])
+  @@index([partnerId])
 }
 
 // ---------------------------------------------------------------------------
@@ -565,16 +578,16 @@ model Favorite {
 /// İstifadəçinin saxladığı filtr kombinasiyası. `filters` PropertyFilters JSON-udur
 /// (queries.ts ilə eyni forma — axtarış səhifəsindəki filtrlərlə birbaşa uyğunlaşır).
 model SavedSearch {
-  id          String    @id @default(cuid())
-  userId      String
-  name        String
-  filters     String    // JSON — PropertyFilters (sort/page/pageSize xaric)
+  id             String    @id @default(cuid())
+  userId         String
+  name           String
+  filters        String // JSON — PropertyFilters (sort/page/pageSize xaric)
   /// IMMEDIATE | DAILY | WEEKLY | OFF
-  frequency   String    @default("DAILY")
-  enabled     Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  lastCheckedAt   DateTime?
-  lastNotifiedAt  DateTime?
+  frequency      String    @default("DAILY")
+  enabled        Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  lastCheckedAt  DateTime?
+  lastNotifiedAt DateTime?
 
   user    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   matches SavedSearchMatch[]
@@ -585,11 +598,11 @@ model SavedSearch {
 
 /// Təkrar bildirişin qarşısını alır — eyni əmlak eyni saxlanmış axtarışa bir dəfə əlavə olunur.
 model SavedSearchMatch {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   savedSearchId String
   propertyId    String
   notifiedAt    DateTime?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
 
   savedSearch SavedSearch @relation(fields: [savedSearchId], references: [id], onDelete: Cascade)
   property    Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
@@ -649,17 +662,17 @@ model Setting {
 /// Panel əməliyyatlarının izi: kim, nə vaxt, hansı qeydə nə etdi.
 /// Sətirlər heç vaxt yenilənmir və redaktorlar tərəfindən silinə bilmir.
 model AuditLog {
-  id       String @id @default(cuid())
-  userId   String?
+  id        String  @id @default(cuid())
+  userId    String?
   userEmail String
   /// CREATE | UPDATE | DELETE | RESTORE | PUBLISH | LOGIN_REVOKE | ROLE_CHANGE | UPLOAD
-  action   String
+  action    String
   /// Property | Project | BlogPost | Service | Lead | Media | User | Setting
-  entity   String
-  entityId String?
+  entity    String
+  entityId  String?
   /// Qısa insan oxunaqlı təsvir (məsələn elanın başlığı).
-  summary  String?
-  ip       String?
+  summary   String?
+  ip        String?
 
   createdAt DateTime @default(now())
 
@@ -673,7 +686,7 @@ model AuditLog {
 /// `AuditLog`-dan fərqi: bu, "kim etdi" deyil, "sistemdə nə baş verdi" səviyyəsidir
 /// və gələcəkdə bildiriş/analitika abunəçiləri üçün mənbədir.
 model DomainEvent {
-  id   String @id @default(cuid())
+  id         String  @id @default(cuid())
   /// property.published | agency.employee_requested | lead.created və s.
   type       String
   entityType String
@@ -694,14 +707,14 @@ model DomainEvent {
 /// Köhnə/dəyişmiş URL-ləri yeni ünvana yönləndirir. `/[...slug]` catch-all
 /// route-u hər 404-də bu cədvəli yoxlayır — uyğunluq tapılmasa əsl 404 göstərilir.
 model Redirect {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   /// Aparıcı `/` ilə, sorğu sətri olmadan — məsələn `/emlaklar/kohne-slug`.
-  fromPath   String   @unique
+  fromPath   String  @unique
   toPath     String
   /// 301 = daimi (SEO dəyərini ötürür), 302 = müvəqqəti.
-  statusCode Int      @default(301)
-  isActive   Boolean  @default(true)
-  hitCount   Int      @default(0)
+  statusCode Int     @default(301)
+  isActive   Boolean @default(true)
+  hitCount   Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -720,4 +733,187 @@ model NotFoundHit {
   lastSeenAt  DateTime @default(now())
 
   @@index([count])
+}
+
+// ---------------------------------------------------------------------------
+// TƏRƏFDAŞLAR (PARTNERS)
+// ---------------------------------------------------------------------------
+
+/// Rəsmi biznes tərəfdaşı — broker, agentlik, developer, bank, texnologiya şirkəti.
+///
+/// `Agency`-dən fərqi qəsdəndir: `Agency` saytda hesabı olan və elan yerləşdirən
+/// istifadəçi profilidir, `Partner` isə şirkətlə bağlanmış xarici əməkdaşlıqdır və
+/// istifadəçi hesabı tələb etmir. İkisi `AgencyPartner` üzərindən əlaqələndirilə bilir.
+///
+/// Public görünüş bir sahədən deyil, bir neçə şərtin birləşməsindən asılıdır —
+/// məntiq `src/lib/partners.ts`-də toplanıb və hər sorğu oradan keçir.
+model Partner {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String  @unique
+  /// Rəsmi hüquqi ad — dublikat yoxlamasında da istifadə olunur.
+  legalName String?
+
+  /// İctimai prose. AZ əsas dildir; EN/RU boş qalsa AZ mətni göstərilir.
+  shortDescription   String?
+  shortDescriptionEn String?
+  shortDescriptionRu String?
+  /// Zəngin mətn (HTML). Yazılmadan əvvəl `sanitizeContentHtml()` ilə süzülür.
+  description        String?
+  descriptionEn      String?
+  descriptionRu      String?
+  /// Admin tərəfindən idarə olunan hüquqi bildiriş — mətn heç vaxt koddan gəlmir.
+  disclaimer         String?
+  disclaimerEn       String?
+  disclaimerRu       String?
+
+  websiteUrl String?
+  email      String?
+  phone      String?
+  whatsapp   String?
+
+  /// Əsas loqo. `logoLight`/`logoDark` yalnız brend iki variant verəndə doldurulur;
+  /// boş qalsa hər iki temada `logoUrl` göstərilir.
+  logoUrl    String?
+  logoLight  String?
+  logoDark   String?
+  coverImage String?
+
+  country String?
+  city    String?
+  address String?
+
+  /// `PARTNERSHIP_TYPES` — `src/lib/constants.ts`.
+  partnershipType String @default("OTHER")
+  /// `PARTNER_STATUSES` — `src/lib/constants.ts`.
+  status          String @default("DRAFT")
+
+  /// Admin sənədlə təsdiqlədi. «Rəsmi tərəfdaş» nişanı üçün məcburi şərtlərdən biridir.
+  verified        Boolean   @default(false)
+  verifiedAt      DateTime?
+  officialPartner Boolean   @default(false)
+  featured        Boolean   @default(false)
+  showPublicly    Boolean   @default(false)
+  showOnHomepage  Boolean   @default(false)
+
+  officialSince      DateTime?
+  partnershipEndDate DateTime?
+
+  sortOrder Int @default(0)
+
+  seoTitle       String?
+  seoDescription String?
+  /// Vergüllə ayrılmış açar sözlər — `buildMetadata({ keywords })`-ə verilir.
+  seoKeywords    String?
+  ogImage        String?
+
+  // --- Müqavilə metadatası: yalnız `partner:contract` icazəsi ilə görünür ---
+  contractNumber    String?
+  contractStartDate DateTime?
+  contractEndDate   DateTime?
+  /// Sənədin R2 açarı və ya ünvanı. İctimai sorğu bu sahəni heç vaxt seçmir.
+  contractDocument  String?
+  internalNotes     String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  /// Yumşaq silmə — əlaqəli elan və layihələrin bütövlüyü pozulmasın deyə.
+  deletedAt DateTime?
+
+  createdById String?
+  updatedById String?
+  deletedById String?
+
+  createdBy User? @relation("PartnerCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("PartnerUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedBy User? @relation("PartnerDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
+
+  properties PropertyPartner[]
+  projects   ProjectPartner[]
+  agencies   AgencyPartner[]
+  leads      Lead[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([partnershipType])
+  @@index([featured])
+  @@index([showPublicly])
+  @@index([showOnHomepage])
+  @@index([officialSince])
+  @@index([deletedAt])
+  @@index([status, showPublicly, deletedAt])
+  @@index([sortOrder])
+}
+
+/// Elan ↔ tərəfdaş. Çox-çoxa: bir elanda developer, satış tərəfdaşı və broker
+/// eyni anda ola bilər, ona görə `Property.partnerId` kifayət etmir.
+/// (`Listing` bu layihədə `Property` adlanır — PRD-dəki `ListingPartner` budur.)
+model PropertyPartner {
+  id         String @id @default(cuid())
+  propertyId String
+  partnerId  String
+
+  /// `PARTNER_RELATION_ROLES` — `src/lib/constants.ts`.
+  role      String  @default("SOURCE")
+  /// Tərəfdaşın öz saytındakı elan ünvanı — mənbə şəffaflığı üçün.
+  sourceUrl String?
+  isPublic  Boolean @default(true)
+  /// Elan səhifəsində göstərilən əsas tərəfdaş. Tətbiq səviyyəsində birdən çox
+  /// olmaması təmin edilir — D1 tranzaksiya dəstəkləmədiyi üçün DB constraint etibarlı deyil.
+  isPrimary Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  partner  Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, partnerId, role])
+  @@index([partnerId])
+  @@index([propertyId, isPublic])
+}
+
+/// Yaşayış kompleksi ↔ tərəfdaş.
+model ProjectPartner {
+  id        String @id @default(cuid())
+  projectId String
+  partnerId String
+
+  role      String  @default("DEVELOPER")
+  isPublic  Boolean @default(true)
+  isPrimary Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, partnerId, role])
+  @@index([partnerId])
+  @@index([projectId, isPublic])
+}
+
+/// Agentlik ↔ tərəfdaş.
+///
+/// PRD-dəki `AgentPartner` bu layihədə agentlik səviyyəsinə düşür: ayrıca `Agent`
+/// modeli yoxdur, agent `AgencyEmployee` kimi agentliyə bağlıdır. Beləliklə
+/// «agent hansı tərəfdaşla işləyir» sualı agentlik üzərindən cavablanır və
+/// paralel model yaradılmır.
+model AgencyPartner {
+  id        String @id @default(cuid())
+  agencyId  String
+  partnerId String
+
+  role     String  @default("BROKER")
+  isPublic Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency  Agency  @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, partnerId])
+  @@index([partnerId])
 }

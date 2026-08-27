@@ -9,7 +9,9 @@ import {
   LOCALES,
   NOTIFICATION_TYPES,
   PAGE_SIZE,
+  PARTNER_STATUSES,
   POST_STATUSES,
+  PUBLIC_PARTNER_STATUSES,
   PUBLIC_PROPERTY_STATUSES,
   PROPERTY_STATUSES,
   SAVED_SEARCH_FREQUENCIES,
@@ -825,7 +827,7 @@ export async function getBlogCategories() {
 // ---------------------------------------------------------------------------
 
 export async function getSitemapEntries() {
-  const [properties, projects, services, posts, agencies, seoLandings, districts, metros] = await Promise.all([
+  const [properties, projects, services, posts, agencies, partners, seoLandings, districts, metros] = await Promise.all([
     prisma.property.findMany({
       where: {
         ...publicPropertyWhere(),
@@ -857,6 +859,7 @@ export async function getSitemapEntries() {
       where: { isVerified: true, user: { isActive: true } },
       select: { slug: true, updatedAt: true },
     }),
+    getSitemapPartners(),
     getIndexableSeoLandingEntries(),
     getIndexableTaxonomyLandings("DISTRICT"),
     getIndexableTaxonomyLandings("METRO"),
@@ -868,6 +871,7 @@ export async function getSitemapEntries() {
     services,
     posts,
     agencies,
+    partners,
     landings: [
       ...seoLandings,
       ...districts.map((item) => ({ path: `/rayon/${item.slug}`, updatedAt: item.updatedAt })),
@@ -2113,3 +2117,489 @@ export const savedSearchDigestStore: DigestStore = {
     });
   },
 };
+
+// ---------------------------------------------------------------------------
+// TƏRƏFDAŞLAR (PARTNERS)
+// ---------------------------------------------------------------------------
+
+/** Müqavilə tarixləri gün dəqiqliyindədir — son gün bütöv sayılır. */
+function startOfToday(now: Date): Date {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
+/**
+ * Hər ictimai tərəfdaş sorğusunun bazası.
+ *
+ * `publicPropertyWhere()` ilə eyni rolu oynayır və eyni intizamı tələb edir:
+ * **yeni ictimai tərəfdaş sorğusu mütləq bundan başlamalıdır**, əks halda
+ * qaralama, dayandırılmış və silinmiş tərəfdaşlar sayta sızır.
+ *
+ * `partnershipEndDate` şərti SQL səviyyəsində qəsdən yoxlanılır: cron gecikə
+ * bilər, amma müddəti bitmiş müqavilə həmin an görünməməlidir. `null` (müddətsiz)
+ * və gələcək tarix keçir; keçmiş tarix süzülür.
+ */
+function publicPartnerWhere(now: Date = new Date()): Prisma.PartnerWhereInput {
+  return {
+    deletedAt: null,
+    status: { in: PUBLIC_PARTNER_STATUSES },
+    showPublicly: true,
+    OR: [{ partnershipEndDate: null }, { partnershipEndDate: { gte: startOfToday(now) } }],
+  };
+}
+
+/**
+ * Kart komponentlərinin gözlədiyi dəqiq sahə dəsti.
+ *
+ * Müqavilə metadatası (`contractNumber`, `internalNotes` və s.) burada **yoxdur**
+ * və olmamalıdır: ictimai sorğu onu heç vaxt bazadan çıxarmır, beləliklə səhvən
+ * serializasiya olunub client bundle-a düşməsi mümkün deyil.
+ */
+export const partnerCardSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  shortDescription: true,
+  shortDescriptionEn: true,
+  shortDescriptionRu: true,
+  logoUrl: true,
+  logoLight: true,
+  logoDark: true,
+  partnershipType: true,
+  status: true,
+  verified: true,
+  officialPartner: true,
+  featured: true,
+  showPublicly: true,
+  showOnHomepage: true,
+  officialSince: true,
+  partnershipEndDate: true,
+  websiteUrl: true,
+  country: true,
+  city: true,
+  sortOrder: true,
+} satisfies Prisma.PartnerSelect;
+
+export type PartnerCardData = Prisma.PartnerGetPayload<{ select: typeof partnerCardSelect }>;
+
+/** Kartdakı sahələr + profil səhifəsinin əlavə tələb etdikləri. */
+const partnerDetailSelect = {
+  ...partnerCardSelect,
+  legalName: true,
+  description: true,
+  descriptionEn: true,
+  descriptionRu: true,
+  disclaimer: true,
+  disclaimerEn: true,
+  disclaimerRu: true,
+  coverImage: true,
+  email: true,
+  phone: true,
+  whatsapp: true,
+  address: true,
+  seoTitle: true,
+  seoDescription: true,
+  seoKeywords: true,
+  ogImage: true,
+  updatedAt: true,
+} satisfies Prisma.PartnerSelect;
+
+export type PartnerDetailData = Prisma.PartnerGetPayload<{ select: typeof partnerDetailSelect }>;
+
+const PARTNER_ORDER: Prisma.PartnerOrderByWithRelationInput[] = [
+  { featured: "desc" },
+  { sortOrder: "asc" },
+  { name: "asc" },
+];
+
+export const PARTNER_PAGE_SIZE = 24;
+
+/**
+ * İctimai tərəfdaş siyahısı.
+ *
+ * Səhifələmə server tərəfdədir — siyahı yüzlərlə tərəfdaşa qədər böyüyə bilər
+ * və hamısını bir sorğuda çəkmək siyahı səhifəsinin LCP-sini pozardı.
+ */
+export async function getPublicPartners(
+  filters: { types?: string[] | null; page?: number; pageSize?: number } = {},
+) {
+  const page = Math.max(1, filters.page ?? 1);
+  const pageSize = filters.pageSize ?? PARTNER_PAGE_SIZE;
+  const where: Prisma.PartnerWhereInput = {
+    ...publicPartnerWhere(),
+    ...(filters.types?.length ? { partnershipType: { in: filters.types } } : {}),
+  };
+
+  const [items, total] = await Promise.all([
+    prisma.partner.findMany({
+      where,
+      select: partnerCardSelect,
+      orderBy: PARTNER_ORDER,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.partner.count({ where }),
+  ]);
+
+  return { items, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
+}
+
+/** Filtr düymələrinin yanındakı saylar — qrupda tərəfdaş yoxdursa düymə gizlədilir. */
+export async function getPublicPartnerTypeCounts(): Promise<Record<string, number>> {
+  const rows = await prisma.partner.groupBy({
+    by: ["partnershipType"],
+    where: publicPartnerWhere(),
+    _count: { _all: true },
+  });
+
+  return Object.fromEntries(rows.map((row) => [row.partnershipType, row._count._all]));
+}
+
+/** Ana səhifədə göstərilən tərəfdaşlar — hamısı deyil, yalnız işarələnmişlər. */
+export async function getHomepagePartners(take = 6) {
+  return prisma.partner.findMany({
+    where: { ...publicPartnerWhere(), showOnHomepage: true },
+    select: partnerCardSelect,
+    orderBy: PARTNER_ORDER,
+    take,
+  });
+}
+
+/**
+ * Tərəfdaş profili və onunla əlaqəli ictimai məzmun.
+ *
+ * Əlaqələr `partnerId` üzrə indekslənmiş əlaqə cədvəllərindən bir sorğu ilə
+ * gətirilir — hər elan üçün ayrıca sorğu yoxdur, N+1 yaranmır. Elanlara
+ * `publicPropertyWhere()` yenidən tətbiq olunur: tərəfdaş ictimai olsa da
+ * onun qaralama elanı görünməməlidir.
+ */
+export async function getPartnerBySlug(slug: string) {
+  const partner = await prisma.partner.findFirst({
+    where: { ...publicPartnerWhere(), slug },
+    select: partnerDetailSelect,
+  });
+
+  if (!partner) return null;
+
+  const [propertyLinks, projectLinks, agencyLinks] = await Promise.all([
+    prisma.propertyPartner.findMany({
+      where: { partnerId: partner.id, isPublic: true, property: publicPropertyWhere() },
+      select: { role: true, property: { select: propertyCardSelect } },
+      orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
+      take: 6,
+    }),
+    prisma.projectPartner.findMany({
+      where: {
+        partnerId: partner.id,
+        isPublic: true,
+        project: { deletedAt: null, isDemo: false, isActive: true },
+      },
+      select: { role: true, project: { select: projectCardSelect } },
+      orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
+      take: 6,
+    }),
+    prisma.agencyPartner.findMany({
+      where: {
+        partnerId: partner.id,
+        isPublic: true,
+        agency: { isVerified: true, user: { isActive: true } },
+      },
+      select: {
+        role: true,
+        agency: { select: { id: true, name: true, slug: true, logoUrl: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+    }),
+  ]);
+
+  return {
+    partner,
+    properties: propertyLinks,
+    projects: projectLinks,
+    agencies: agencyLinks,
+  };
+}
+
+/**
+ * Elan səhifəsindəki tərəfdaş bloku.
+ *
+ * Yalnız `isPublic` əlaqələr və yalnız ictimai görünən tərəfdaşlar qaytarılır —
+ * dayandırılmış tərəfdaşın loqosu elan səhifəsində qalmamalıdır.
+ */
+export async function getPropertyPartners(propertyId: string) {
+  return prisma.propertyPartner.findMany({
+    where: { propertyId, isPublic: true, partner: publicPartnerWhere() },
+    select: { role: true, isPrimary: true, sourceUrl: true, partner: { select: partnerCardSelect } },
+    orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+  });
+}
+
+export type PropertyPartnerLink = Awaited<ReturnType<typeof getPropertyPartners>>[number];
+
+export async function getProjectPartners(projectId: string) {
+  return prisma.projectPartner.findMany({
+    where: { projectId, isPublic: true, partner: publicPartnerWhere() },
+    select: { role: true, isPrimary: true, partner: { select: partnerCardSelect } },
+    orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+  });
+}
+
+export type ProjectPartnerLink = Awaited<ReturnType<typeof getProjectPartners>>[number];
+
+/** Sitemap: yalnız ictimai görünən tərəfdaşlar. */
+export async function getSitemapPartners() {
+  return prisma.partner.findMany({
+    where: publicPartnerWhere(),
+    select: { slug: true, updatedAt: true },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// TƏRƏFDAŞLAR — PANEL
+// ---------------------------------------------------------------------------
+
+export type AdminPartnerFilters = {
+  search?: string;
+  status?: string;
+  type?: string;
+  verified?: string;
+  official?: string;
+  featured?: string;
+  homepage?: string;
+  country?: string;
+  page?: number;
+};
+
+const adminPartnerSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  legalName: true,
+  logoUrl: true,
+  logoLight: true,
+  logoDark: true,
+  partnershipType: true,
+  status: true,
+  verified: true,
+  officialPartner: true,
+  featured: true,
+  showPublicly: true,
+  showOnHomepage: true,
+  officialSince: true,
+  partnershipEndDate: true,
+  country: true,
+  city: true,
+  sortOrder: true,
+  updatedAt: true,
+  deletedAt: true,
+  _count: { select: { properties: true, projects: true } },
+} satisfies Prisma.PartnerSelect;
+
+export type AdminPartnerRow = Prisma.PartnerGetPayload<{ select: typeof adminPartnerSelect }>;
+
+/** «1»/«0» filtr dəyərini boolean şərtinə çevirir; boş dəyər filtri söndürür. */
+function partnerBooleanFilter(value: string | undefined): boolean | undefined {
+  if (value === "1") return true;
+  if (value === "0") return false;
+  return undefined;
+}
+
+export async function getAdminPartners(filters: AdminPartnerFilters = {}) {
+  const page = Math.max(1, filters.page ?? 1);
+  const search = filters.search?.trim();
+  const verified = partnerBooleanFilter(filters.verified);
+  const official = partnerBooleanFilter(filters.official);
+  const featured = partnerBooleanFilter(filters.featured);
+  const homepage = partnerBooleanFilter(filters.homepage);
+
+  const where: Prisma.PartnerWhereInput = {
+    // `ARCHIVED` adi statusdur və siyahıda görünür; `deletedAt` isə həqiqi
+    // yumşaq silmədir — silinmiş qeyd yalnız bərpa əməliyyatı ilə qayıdır.
+    deletedAt: null,
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.type ? { partnershipType: filters.type } : {}),
+    ...(filters.country ? { country: filters.country } : {}),
+    ...(verified !== undefined ? { verified } : {}),
+    ...(official !== undefined ? { officialPartner: official } : {}),
+    ...(featured !== undefined ? { featured } : {}),
+    ...(homepage !== undefined ? { showOnHomepage: homepage } : {}),
+    // D1 `mode: "insensitive"` dəstəkləmir — SQLite LIKE yalnız ASCII-də reqistrsizdir.
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search } },
+            { legalName: { contains: search } },
+            { websiteUrl: { contains: search } },
+            { email: { contains: search } },
+          ],
+        }
+      : {}),
+  };
+
+  const [items, total] = await Promise.all([
+    prisma.partner.findMany({
+      where,
+      select: adminPartnerSelect,
+      orderBy: [{ featured: "desc" }, { sortOrder: "asc" }, { updatedAt: "desc" }],
+      skip: (page - 1) * ADMIN_PAGE_SIZE,
+      take: ADMIN_PAGE_SIZE,
+    }),
+    prisma.partner.count({ where }),
+  ]);
+
+  return { items, total, page, totalPages: Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE)) };
+}
+
+/**
+ * Redaktə formasının məlumatı.
+ *
+ * `includeContract` **məcburi** parametrdir: çağıran tərəf `partner:contract`
+ * icazəsini yoxlamağa borcludur. Standart dəyər qoyulmayıb ki, unudulan çağırış
+ * səssizcə kommersiya sirrini forma HTML-inə çıxarmasın.
+ */
+export async function getAdminPartnerById(id: string, includeContract: boolean) {
+  return prisma.partner.findFirst({
+    where: { id, deletedAt: null },
+    select: {
+      ...adminPartnerSelect,
+      shortDescription: true,
+      shortDescriptionEn: true,
+      shortDescriptionRu: true,
+      description: true,
+      descriptionEn: true,
+      descriptionRu: true,
+      disclaimer: true,
+      disclaimerEn: true,
+      disclaimerRu: true,
+      coverImage: true,
+      websiteUrl: true,
+      email: true,
+      phone: true,
+      whatsapp: true,
+      address: true,
+      seoTitle: true,
+      seoDescription: true,
+      seoKeywords: true,
+      ogImage: true,
+      verifiedAt: true,
+      createdAt: true,
+      ...(includeContract
+        ? {
+            contractNumber: true,
+            contractStartDate: true,
+            contractEndDate: true,
+            contractDocument: true,
+            internalNotes: true,
+          }
+        : {}),
+    },
+  });
+}
+
+export type AdminPartnerDetail = NonNullable<Awaited<ReturnType<typeof getAdminPartnerById>>>;
+
+/** Filtr açılışındakı ölkə siyahısı — yalnız real istifadə olunan dəyərlər. */
+export async function getAdminPartnerCountries() {
+  const rows = await prisma.partner.findMany({
+    where: { deletedAt: null, country: { not: null } },
+    select: { country: true },
+    distinct: ["country"],
+    orderBy: { country: "asc" },
+  });
+  return rows.map((row) => row.country).filter((value): value is string => Boolean(value));
+}
+
+/** Status üzrə saylar — panelin alt naviqasiyasındakı rəqəmlər. */
+export async function getAdminPartnerStatusCounts(): Promise<Record<string, number>> {
+  const rows = await prisma.partner.groupBy({
+    by: ["status"],
+    where: { deletedAt: null },
+    _count: { _all: true },
+  });
+  return Object.fromEntries(rows.map((row) => [row.status, row._count._all]));
+}
+
+/**
+ * Dublikat xəbərdarlığı üçün namizədlər.
+ *
+ * Domen müqayisəsi SQL-də deyil tətbiqdə aparılır (`partnerDomain()`): `www.`
+ * prefiksi və protokol fərqi SQL `LIKE` ilə etibarlı tutulmur. Siyahı kiçikdir —
+ * tərəfdaş sayı minlərlə ölçülən kolleksiya deyil.
+ */
+export async function findPartnerDuplicateCandidates(excludeId?: string) {
+  return prisma.partner.findMany({
+    where: { deletedAt: null, ...(excludeId ? { id: { not: excludeId } } : {}) },
+    select: { id: true, name: true, slug: true, legalName: true, websiteUrl: true },
+  });
+}
+
+/** Elan/layihə formasında tərəfdaş seçimi — arxivlənmiş tərəfdaş təklif edilmir. */
+export async function getPartnerOptions() {
+  return prisma.partner.findMany({
+    where: { deletedAt: null, status: { not: PARTNER_STATUSES.ARCHIVED } },
+    select: { id: true, name: true, partnershipType: true, status: true },
+    orderBy: { name: "asc" },
+  });
+}
+
+/** Konkret elanın bütün tərəfdaş əlaqələri — paneldə redaktə üçün. */
+export async function getAdminPropertyPartnerLinks(propertyId: string) {
+  return prisma.propertyPartner.findMany({
+    where: { propertyId },
+    select: {
+      id: true,
+      partnerId: true,
+      role: true,
+      sourceUrl: true,
+      isPublic: true,
+      isPrimary: true,
+      partner: { select: { name: true, slug: true } },
+    },
+    orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+  });
+}
+
+export async function getAdminProjectPartnerLinks(projectId: string) {
+  return prisma.projectPartner.findMany({
+    where: { projectId },
+    select: {
+      id: true,
+      partnerId: true,
+      role: true,
+      isPublic: true,
+      isPrimary: true,
+      partner: { select: { name: true, slug: true } },
+    },
+    orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
+  });
+}
+
+/**
+ * Cron: müddəti bitmiş, amma hələ `ACTIVE` qalan tərəfdaşlar.
+ * Yekun qərar `shouldMarkExpired()`-də verilir — burada yalnız namizədlər daraldılır.
+ */
+export async function getExpiredActivePartners(now: Date = new Date()) {
+  return prisma.partner.findMany({
+    where: {
+      deletedAt: null,
+      status: PARTNER_STATUSES.ACTIVE,
+      partnershipEndDate: { not: null, lt: startOfToday(now) },
+    },
+    select: { id: true, name: true, status: true, partnershipEndDate: true, deletedAt: true },
+  });
+}
+
+/** Paneldə xəbərdarlıq üçün: müqaviləsi yaxınlaşan və ya bitmiş aktiv tərəfdaşlar. */
+export async function getPartnerExpiryAlerts(withinDays: number, now: Date = new Date()) {
+  const horizon = new Date(startOfToday(now).getTime() + withinDays * 24 * 60 * 60 * 1000);
+  return prisma.partner.findMany({
+    where: {
+      deletedAt: null,
+      status: { in: [PARTNER_STATUSES.ACTIVE, PARTNER_STATUSES.EXPIRED] },
+      partnershipEndDate: { not: null, lte: horizon },
+    },
+    select: { id: true, name: true, slug: true, status: true, partnershipEndDate: true },
+    orderBy: { partnershipEndDate: "asc" },
+    take: 10,
+  });
+}

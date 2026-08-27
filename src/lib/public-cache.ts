@@ -11,6 +11,10 @@ import {
   getProperties,
   getPropertyBySlug,
   getPropertyTypesWithCounts,
+  getHomepagePartners,
+  getPartnerBySlug,
+  getPublicPartners,
+  getPublicPartnerTypeCounts,
   getServiceBySlug,
   getServices,
   getSitemapEntries,
@@ -71,7 +75,7 @@ export const getCachedServiceBySlug = unstable_cache(
 
 export const getCachedHomePageData = unstable_cache(
   async () => {
-    const [featured, propertyTypes, services, projects, posts, filterOptions, categories] =
+    const [featured, propertyTypes, services, projects, posts, filterOptions, categories, partners] =
       await Promise.all([
         getFeaturedProperties(6),
         getPropertyTypesWithCounts(),
@@ -80,8 +84,9 @@ export const getCachedHomePageData = unstable_cache(
         getPosts({ pageSize: 3 }),
         getFilterOptions(),
         getBlogCategories(),
+        getHomepagePartners(),
       ]);
-    return { featured, propertyTypes, services, projects, posts, filterOptions, categories };
+    return { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners };
   },
   ["public-home-discovery-v1"],
   {
@@ -92,6 +97,7 @@ export const getCachedHomePageData = unstable_cache(
       PUBLIC_CACHE_TAGS.posts,
       PUBLIC_CACHE_TAGS.services,
       PUBLIC_CACHE_TAGS.agencies,
+      PUBLIC_CACHE_TAGS.partners,
       PUBLIC_CACHE_TAGS.taxonomy,
     ],
     revalidate: FIVE_MINUTES,
@@ -102,4 +108,38 @@ export const getCachedSitemapEntries = unstable_cache(
   getSitemapEntries,
   ["public-sitemap-entries-v1"],
   { tags: [PUBLIC_CACHE_TAGS.sitemap], revalidate: FIVE_MINUTES },
+);
+
+/**
+ * Tərəfdaş siyahısı və profili.
+ *
+ * `partners` teqi paneldəki hər tərəfdaş yazısında təmizlənir
+ * (`revalidatePublicContent("partner", slug)`), ona görə beş dəqiqəlik
+ * revalidate yalnız son çarə kimi işləyir — redaktə dərhal görünür.
+ */
+export const getCachedPublicPartners = unstable_cache(
+  async (filters: { types?: string[] | null; page?: number }) => getPublicPartners(filters),
+  ["public-partner-list-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.partners], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedPartnerTypeCounts = unstable_cache(
+  getPublicPartnerTypeCounts,
+  ["public-partner-type-counts-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.partners], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedPartnerBySlug = unstable_cache(
+  async (slug: string) => getPartnerBySlug(slug),
+  ["public-partner-detail-v1"],
+  {
+    // Profil əlaqəli elan və layihələri də göstərir — onlar dəyişəndə də
+    // yenilənməlidir, əks halda satılmış elan tərəfdaş səhifəsində qalır.
+    tags: [
+      PUBLIC_CACHE_TAGS.partners,
+      PUBLIC_CACHE_TAGS.properties,
+      PUBLIC_CACHE_TAGS.projects,
+    ],
+    revalidate: FIVE_MINUTES,
+  },
 );

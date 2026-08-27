@@ -10,6 +10,9 @@ import {
   PRICE_PERIODS,
   PROJECT_STATUSES,
   PROJECT_TYPES,
+  PARTNER_RELATION_ROLES,
+  PARTNER_STATUSES,
+  PARTNERSHIP_TYPES,
   PROPERTY_STATUSES,
   RENOVATIONS,
   ROLES,
@@ -312,3 +315,122 @@ export const settingSchema = z.object({
     .max(60),
   value: z.string().trim().max(2000),
 });
+
+// ---------------------------------------------------------------------------
+// TƏRƏFDAŞ
+// ---------------------------------------------------------------------------
+
+/** `YYYY-MM-DD` sahəsi — boş buraxıla bilər. */
+const optionalDate = z.date().nullable();
+
+const partnerBaseSchema = z.object({
+  name: requiredText("Ad", 2, 160),
+  legalName: optionalText(200),
+  slug: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9-]*$/, "Slug yalnız kiçik latın hərfi, rəqəm və defis ola bilər")
+    .max(90),
+  partnershipType: enumOf(PARTNERSHIP_TYPES),
+  status: enumOf(PARTNER_STATUSES),
+
+  shortDescription: optionalText(300),
+  shortDescriptionEn: optionalText(300),
+  shortDescriptionRu: optionalText(300),
+  description: z.string().trim().max(20000).nullable(),
+  descriptionEn: z.string().trim().max(20000).nullable(),
+  descriptionRu: z.string().trim().max(20000).nullable(),
+  disclaimer: optionalText(600),
+  disclaimerEn: optionalText(600),
+  disclaimerRu: optionalText(600),
+
+  websiteUrl: externalUrl,
+  email: z.string().trim().email("E-poçt ünvanı düzgün deyil").max(160).nullable(),
+  phone: optionalText(40),
+  whatsapp: optionalText(40),
+
+  country: optionalText(80),
+  city: optionalText(80),
+  address: optionalText(240),
+
+  verified: z.boolean(),
+  officialPartner: z.boolean(),
+  featured: z.boolean(),
+  showPublicly: z.boolean(),
+  showOnHomepage: z.boolean(),
+
+  officialSince: optionalDate,
+  partnershipEndDate: optionalDate,
+  sortOrder: z.number().int().min(0, "Sıra mənfi ola bilməz").max(9999),
+
+  seoTitle: optionalText(70),
+  seoDescription: optionalText(180),
+  seoKeywords: optionalText(300),
+  ogImage: optionalText(500),
+});
+
+/**
+ * Tərəfdaş forması.
+ *
+ * İki qayda `superRefine`-dədir, çünki hər ikisi sahələrarası münasibətdir və
+ * tək sahə səviyyəsində ifadə oluna bilmir:
+ *
+ * 1. `partnershipEndDate >= officialSince` — tərs müddət məlumat xətasıdır.
+ * 2. **«Rəsmi tərəfdaş» yalnız təsdiqlə birlikdə.** Redaktor `officialPartner`-i
+ *    işarələyib `verified`-i unutsa, ictimai tərəfdə nişan onsuz da görünməzdi
+ *    (`isOfficialPartnerVisible`) — nəticədə redaktor «işarələdim, amma görünmür»
+ *    vəziyyətində qalardı. Forma bunu qəbul anında izah edir.
+ */
+export const partnerSchema = partnerBaseSchema.superRefine((value, ctx) => {
+  if (
+    value.officialSince &&
+    value.partnershipEndDate &&
+    value.partnershipEndDate.getTime() < value.officialSince.getTime()
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["partnershipEndDate"],
+      message: "Bitmə tarixi başlama tarixindən əvvəl ola bilməz",
+    });
+  }
+
+  if (value.officialPartner && !value.verified) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["verified"],
+      message: "«Rəsmi tərəfdaş» nişanı yalnız təsdiqlənmiş tərəfdaşda göstərilir",
+    });
+  }
+
+  if (value.showOnHomepage && !value.showPublicly) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["showOnHomepage"],
+      message: "Ana səhifədə göstərmək üçün əvvəlcə «Saytda göstərilsin» seçilməlidir",
+    });
+  }
+});
+
+export type PartnerInput = z.infer<typeof partnerSchema>;
+
+/** Müqavilə metadatası — ayrıca sxem, çünki ayrıca icazə ilə qorunur. */
+export const partnerContractSchema = z.object({
+  contractNumber: optionalText(80),
+  contractStartDate: optionalDate,
+  contractEndDate: optionalDate,
+  contractDocument: optionalText(500),
+  internalNotes: z.string().trim().max(4000).nullable(),
+});
+
+export type PartnerContractInput = z.infer<typeof partnerContractSchema>;
+
+/** Elan/layihə ↔ tərəfdaş əlaqəsi. */
+export const partnerRelationSchema = z.object({
+  partnerId: cuid,
+  role: enumOf(PARTNER_RELATION_ROLES),
+  sourceUrl: externalUrl,
+  isPublic: z.boolean(),
+  isPrimary: z.boolean(),
+});
+
+export type PartnerRelationInput = z.infer<typeof partnerRelationSchema>;
