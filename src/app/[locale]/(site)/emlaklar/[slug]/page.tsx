@@ -20,7 +20,7 @@ import {
   type PropertyStatus,
   type Locale,
 } from "@/lib/constants";
-import { getSimilarProperties } from "@/lib/queries";
+import { getPropertyPartners, getSimilarProperties } from "@/lib/queries";
 import { getCachedPropertyBySlug } from "@/lib/public-cache";
 import { recordView } from "@/lib/view-counter";
 import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
@@ -37,6 +37,7 @@ import { PropertyMap } from "@/components/site/property-map";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { RecentlyViewedTracker } from "@/components/site/recently-viewed-tracker";
+import { PartnerRelations } from "@/components/site/partner-relations";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
@@ -134,7 +135,10 @@ export default async function PropertyDetailPage({ params }: Props) {
     .filter(Boolean)
     .join(", ");
 
-  const similarProperties = await getSimilarProperties(property, 4);
+  const [similarProperties, partnerLinks] = await Promise.all([
+    getSimilarProperties(property, 4),
+    getPropertyPartners(property.id),
+  ]);
   const propertyPath = `/emlaklar/${property.slug}`;
   const whatsappHref = whatsappLink(
     content("whatsappMessage", { title: property.title }),
@@ -368,6 +372,13 @@ export default async function PropertyDetailPage({ params }: Props) {
                   />
                 </div>
               )}
+
+              {/* Tərəfdaş bloku — elan ictimai tərəfdaşla əlaqəlidirsə */}
+              <PartnerRelations
+                links={partnerLinks}
+                locale={locale as Locale}
+                placement="property_detail"
+              />
 
               {/* Layihəyə bağlantı */}
               {property.project && (

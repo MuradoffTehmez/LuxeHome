@@ -19,6 +19,7 @@ describe("sitemap assembler", () => {
       services: [{ slug: "qiymetlendirme", updatedAt, noIndex: false, canonicalUrl: null }],
       posts: [{ slug: "ev-secimi", updatedAt, noIndex: false, canonicalUrl: null }],
       agencies: [{ slug: "etibar-emlak", updatedAt }],
+      partners: [{ slug: "treva", updatedAt }],
       landings: [{ path: "/satilan-emlaklar", updatedAt }],
     });
     const urls = sitemap.map((entry) => entry.url);
@@ -26,6 +27,8 @@ describe("sitemap assembler", () => {
     expect(urls).toContain("https://luxehomeestate.az/az/emlaklar/aktiv-villa");
     expect(urls).toContain("https://luxehomeestate.az/en/emlaklar/aktiv-villa");
     expect(urls).toContain("https://luxehomeestate.az/ru/agentlikler/etibar-emlak");
+    expect(urls).toContain("https://luxehomeestate.az/az/terefdaslar/treva");
+    expect(urls).toContain("https://luxehomeestate.az/en/terefdaslar/treva");
     expect(urls).toContain("https://luxehomeestate.az/az/satilan-emlaklar");
     expect(urls).not.toContain("https://luxehomeestate.az/az/emlaklar/satilib");
     expect(urls).not.toContain("https://luxehomeestate.az/az/emlaklar/noindex");
@@ -40,12 +43,14 @@ describe("sitemap assembler", () => {
       services: [],
       posts: [],
       agencies: [],
+      partners: [],
       landings: [],
     });
     const urls = sitemap.map((entry) => entry.url);
 
     for (const path of [
       "/agentlikler",
+      "/terefdaslar",
       "/suallar",
       "/haqqimizda",
       "/elaqe",

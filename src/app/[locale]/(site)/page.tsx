@@ -25,6 +25,7 @@ import { PropertyCard } from "@/components/site/property-card";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { ProjectCard } from "@/components/site/project-card";
 import { PostCard } from "@/components/site/post-card";
+import { FeaturedPartnership } from "@/components/site/featured-partnership";
 import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { buildMetadata } from "@/lib/seo";
@@ -87,7 +88,7 @@ export default async function HomePage({ params }: HomePageProps) {
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({ locale: resolvedLocale, namespace: "home" });
   const propertyT = await getTranslations({ locale: resolvedLocale, namespace: "property" });
-  const { featured, propertyTypes, services, projects, posts, filterOptions, categories } =
+  const { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners } =
     await getCachedHomePageData();
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
@@ -349,6 +350,16 @@ export default async function HomePage({ params }: HomePageProps) {
 
         </Container>
       </Section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* RƏSMİ TƏRƏFDAŞLAR                                                  */}
+      {/* ------------------------------------------------------------------ */}
+      {/*
+        Bölmə «Niyə Luxe Home Estate» ilə «Layihələr» arasındadır: etibar
+        siqnalları bir yerdə toplanır, amma bölmə hero-dan aşağıdadır və
+        ana səhifənin LCP elementinə toxunmur.
+      */}
+      <FeaturedPartnership partners={partners} locale={resolvedLocale} />
 
       {/* ------------------------------------------------------------------ */}
       {/* LAYİHƏLƏR                                                          */}

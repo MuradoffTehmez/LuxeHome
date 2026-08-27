@@ -1,0 +1,90 @@
+{
+  "navLabel": "Tərəfdaşlarımız",
+  "official": "Rəsmi tərəfdaş",
+  "verified": "Təsdiqlənib",
+  "partnership": "Tərəfdaşlıq",
+  "strategicPartnership": "STRATEJİ TƏRƏFDAŞLIQ",
+  "officialSince": "{year}-cı ildən rəsmi tərəfdaş",
+  "externalSite": "Rəsmi sayt",
+  "externalSiteAria": "{name} saytını yeni səhifədə aç",
+  "details": "Ətraflı",
+  "list": {
+    "metaTitle": "Rəsmi Tərəfdaşlarımız | Luxe Home Estate",
+    "metaDescription": "Luxe Home Estate-in rəsmi tərəfdaşları: brokerlər, agentliklər, developerlər və strateji tərəfdaşlar. Etibarlı əməkdaşlıqla daha geniş imkanlar.",
+    "eyebrow": "Əməkdaşlıq",
+    "title": "Tərəfdaşlarımız",
+    "description": "Etibarlı tərəfdaşlarla birlikdə daşınmaz əmlak sahəsində daha geniş imkanlar yaradırıq.",
+    "intro": "Tərəfdaşlıq şəbəkəmiz brokerlər, agentliklər, developerlər, maliyyə və texnologiya şirkətlərini bir araya gətirir. Hər tərəfdaşlıq rəsmi razılaşma əsasında qurulur.",
+    "featuredTitle": "Seçilmiş tərəfdaşlar",
+    "allTitle": "Bütün tərəfdaşlar",
+    "count": "{count, plural, one {# tərəfdaş} other {# tərəfdaş}}",
+    "emptyTitle": "Hazırda nümayiş etdirilən tərəfdaş yoxdur.",
+    "emptyDescription": "Yeni tərəfdaşlıqlar rəsmiləşdikcə bu səhifədə göstəriləcək.",
+    "filterAria": "Tərəfdaş növü üzrə filtr",
+    "ctaTitle": "Tərəfdaş olmaq istəyirsiniz?",
+    "ctaDescription": "Broker, agentlik, developer və ya xidmət təminatçısısınızsa, əməkdaşlıq şərtlərini müzakirə edək.",
+    "ctaAction": "Bizimlə əlaqə"
+  },
+  "detail": {
+    "metaTitle": "{name} — Rəsmi Tərəfdaş | Luxe Home Estate",
+    "metaDescriptionFallback": "{name} — Luxe Home Estate-in rəsmi tərəfdaşı. Əməkdaşlıq istiqamətləri, əlaqəli elanlar və layihələr.",
+    "aboutPartnership": "Əməkdaşlıq haqqında",
+    "directions": "Əməkdaşlıq istiqamətləri",
+    "relatedProjects": "Əlaqəli yaşayış kompleksləri",
+    "relatedProperties": "Əlaqəli elanlar",
+    "relatedAgencies": "Əlaqəli agentliklər",
+    "contact": "Əlaqə",
+    "visitWebsite": "Rəsmi sayta keçid",
+    "notFoundTitle": "Tərəfdaş tapılmadı",
+    "logoAlt": "{name} loqosu"
+  },
+  "property": {
+    "heading": "Tərəfdaş",
+    "sourceLink": "Tərəfdaşın saytındakı elan",
+    "aboutPartner": "Tərəfdaş haqqında"
+  },
+  "home": {
+    "overline": "Rəsmi tərəfdaşlarımız",
+    "title": "Rəsmi tərəfdaşlarımız",
+    "description": "Daşınmaz əmlak sektorunda daha geniş imkanlar və peşəkar xidmətlər yaratmaq üçün strateji əməkdaşlıq.",
+    "action": "Əməkdaşlıq haqqında",
+    "allPartners": "Bütün tərəfdaşlar"
+  },
+  "types": {
+    "BROKER": "Broker",
+    "REAL_ESTATE_AGENCY": "Daşınmaz əmlak agentliyi",
+    "DEVELOPER": "Developer",
+    "CONSTRUCTION_COMPANY": "Tikinti şirkəti",
+    "INVESTMENT": "İnvestisiya",
+    "BANK": "Bank",
+    "MORTGAGE": "İpoteka",
+    "INSURANCE": "Sığorta",
+    "TECHNOLOGY": "Texnologiya",
+    "MEDIA": "Media",
+    "MARKETING": "Marketinq",
+    "SERVICE_PROVIDER": "Xidmət təminatçısı",
+    "STRATEGIC_PARTNER": "Strateji tərəfdaş",
+    "OTHER": "Digər"
+  },
+  "roles": {
+    "SOURCE": "Mənbə",
+    "BROKER": "Broker",
+    "CO_BROKER": "Ortaq broker",
+    "DEVELOPER": "Developer",
+    "EXCLUSIVE_SALES": "Eksklüziv satış tərəfdaşı",
+    "SALES_PARTNER": "Satış tərəfdaşı",
+    "MARKETING_PARTNER": "Marketinq tərəfdaşı",
+    "MANAGEMENT_PARTNER": "İdarəetmə tərəfdaşı",
+    "OTHER": "Digər"
+  },
+  "filters": {
+    "all": "Hamısı",
+    "brokers": "Brokerlər",
+    "agencies": "Agentliklər",
+    "developers": "Developerlər",
+    "strategic": "Strateji tərəfdaşlar",
+    "technology": "Texnologiya",
+    "finance": "Maliyyə",
+    "other": "Digər"
+  }
+}

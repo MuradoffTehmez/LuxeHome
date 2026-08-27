@@ -473,6 +473,32 @@ p {
 }
 
 /* --------------------------------------------------------------------------
+   Tema üzrə şəkil variantı
+   --------------------------------------------------------------------------
+   Rəng tokenləri `.dark` altında yenidən təyin olunduğu üçün komponentlərdə
+   `dark:` prefiksi yazılmır. Loqo isə rəng deyil — fayl dəyişir, ona görə
+   token mexanizmi işləmir. Bu iki sinif həmin yeganə halı örtür: markup hər
+   iki variantı verir, hansının görünəcəyini CSS həll edir. Nəticədə komponent
+   `useTheme()` çağırmır və server-render olunmuş HTML hidrasiyaya qədər
+   düzgün loqonu göstərir (tema sıçraması yoxdur).
+   -------------------------------------------------------------------------- */
+.theme-light-only {
+  display: block;
+}
+
+.theme-dark-only {
+  display: none;
+}
+
+.dark .theme-light-only {
+  display: none;
+}
+
+.dark .theme-dark-only {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
    Hərəkət azaldılması — sistem tələbinə hörmət
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {

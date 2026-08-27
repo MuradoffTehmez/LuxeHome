@@ -433,6 +433,55 @@ export function agencySchema(agency: {
 }
 
 /**
+ * Tərəfdaş şirkəti.
+ *
+ * `Organization` seçilib, `RealEstateAgent` yox: tərəfdaş bank, texnologiya və ya
+ * media şirkəti də ola bilər, ona görə daha dar tip yanlış iddia olardı.
+ * `cleanJsonLd()` boş sahələri atır — məlumat yoxdursa schema-da uydurulmur.
+ */
+export function partnerSchema(partner: {
+  name: string;
+  slug: string;
+  legalName?: string | null;
+  description?: string | null;
+  logoUrl?: string | null;
+  websiteUrl?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+}, locale: Locale = DEFAULT_LOCALE) {
+  const url = siteUrl(localizePath(`/terefdaslar/${partner.slug}`, locale));
+  const hasAddress = Boolean(partner.address || partner.city || partner.country);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${url}#partner`,
+    name: partner.name,
+    legalName: partner.legalName,
+    description: partner.description ? truncateAtWord(partner.description, 400) : undefined,
+    url,
+    logo: partner.logoUrl,
+    image: partner.logoUrl,
+    email: partner.email,
+    telephone: partner.phone,
+    address: hasAddress
+      ? {
+          "@type": "PostalAddress",
+          streetAddress: partner.address,
+          addressLocality: partner.city,
+          addressCountry: partner.country,
+        }
+      : undefined,
+    // Rəsmi sayt `sameAs`-dədir: bu, tərəfdaşın kanonik kimliyini göstərir.
+    sameAs: partner.websiteUrl ? [partner.websiteUrl] : undefined,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+  };
+}
+
+/**
  * JSON-LD-ni HTML `<script>` kontekstinə təhlükəsiz serialize edir.
  * Təmizləmə schema-da boş massiv/string və `undefined` yaranmasının qarşısını alır.
  */

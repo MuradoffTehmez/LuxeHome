@@ -77,9 +77,17 @@ export const listingLinks = [
   { label: "Kirayə", href: "/kiraye-emlaklar" },
 ] as const;
 
-/** Footer-dəki köməkçi səhifələr — əsas naviqasiyada olmayanlar. */
+/**
+ * Footer-dəki köməkçi səhifələr — əsas naviqasiyada olmayanlar.
+ *
+ * «Tərəfdaşlarımız» qəsdən burada, header-də deyil: hazırda tərəfdaş sayı azdır
+ * və əsas naviqasiyanı yükləmək UX baxımından haqlı deyil. Gələcəkdə «Şirkət»
+ * qrupu (Haqqımızda / Komandamız / Tərəfdaşlarımız / Karyera / Əlaqə) bu
+ * siyahıdan qurulacaq — struktur artıq ona hazırdır.
+ */
 export const supportNavigation = [
   { label: "Haqqımızda", href: "/haqqimizda" },
+  { label: "Tərəfdaşlarımız", href: "/terefdaslar" },
   { label: "Tez-tez verilən suallar", href: "/suallar" },
 ] as const;
 

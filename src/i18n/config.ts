@@ -21,6 +21,7 @@ export const MESSAGE_NAMESPACES = [
   "content",
   "contact",
   "legal",
+  "partners",
   "seoLandings",
 ] as const;
 

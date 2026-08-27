@@ -12,6 +12,8 @@ import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getCachedProjectBySlug } from "@/lib/public-cache";
+import { getProjectPartners } from "@/lib/queries";
+import { PartnerRelations } from "@/components/site/partner-relations";
 import { siteConfig, siteUrl } from "@/config/site";
 import type { Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
@@ -83,6 +85,10 @@ export default async function ProjectDetailPage({ params }: Props) {
     image: project.images.map((img) => img.url),
     url: siteUrl(localizePath(`/layiheler/${project.slug}`, locale as Locale)),
   };
+
+  // Tərəfdaş əlaqələri layihə tapıldıqdan sonra oxunur — mövcud olmayan
+  // layihə üçün əlavə sorğu atılmır.
+  const partnerLinks = await getProjectPartners(project.id);
 
   const imagesForGallery = project.images.map((img) => ({
     url: img.url,
@@ -218,6 +224,19 @@ export default async function ProjectDetailPage({ params }: Props) {
           />
         </Container>
       </Section>
+
+      {/* Layihənin tərəfdaşları — developer, satış tərəfdaşı və s. */}
+      {partnerLinks.length > 0 && (
+        <Section tone="ivory" spacing="cozy">
+          <Container>
+            <PartnerRelations
+              links={partnerLinks.map((link) => ({ ...link, sourceUrl: null }))}
+              locale={locale as Locale}
+              placement="partner_detail"
+            />
+          </Container>
+        </Section>
+      )}
 
       {/* Layihəyə aid əmlaklar */}
       {project.properties && project.properties.length > 0 && (

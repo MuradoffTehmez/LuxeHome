@@ -11,13 +11,25 @@ export const ANALYTICS_EVENTS = [
   "agency_contact",
   "submission_start",
   "submission_complete",
+  "partner_card_click",
+  "partner_profile_view",
+  "partner_external_website_click",
+  "partner_listing_click",
 ] as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];
 export type AnalyticsPayload = Record<string, string | number | boolean>;
 
 const PII_KEY = /(name|email|phone|tel|address|message|surname|firstname|lastname|whatsapp|query|search_term)/i;
-const SAFE_KEY = /^(property_id|agency_id|content_id|content_type|placement|listing_type|filter_count|result_count|action|method|status)$/;
+/**
+ * Hadisə yükündə icazə verilən açarlar (ağ siyahı).
+ *
+ * `partner_name` qəsdən yoxdur: `PII_KEY` `name` fraqmentini bloklayır və həmin
+ * qorumanı tərəfdaş adı üçün zəiflətməyə dəyməz — ad `partner_id` üzərindən
+ * hesabatda onsuz da bərpa olunur.
+ */
+const SAFE_KEY =
+  /^(property_id|agency_id|partner_id|partner_type|content_id|content_type|placement|listing_type|filter_count|result_count|action|method|status)$/;
 
 export function analyticsRuntimeEnabled(input: {
   production: boolean;

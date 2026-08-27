@@ -1,0 +1,90 @@
+{
+  "navLabel": "Our partners",
+  "official": "Official Partner",
+  "verified": "Verified",
+  "partnership": "Partnership",
+  "strategicPartnership": "STRATEGIC PARTNERSHIP",
+  "officialSince": "Official partner since {year}",
+  "externalSite": "Official website",
+  "externalSiteAria": "Open the {name} website in a new tab",
+  "details": "Details",
+  "list": {
+    "metaTitle": "Our Official Partners | Luxe Home Estate",
+    "metaDescription": "The official partners of Luxe Home Estate: brokers, agencies, developers and strategic partners. Broader opportunities through trusted collaboration.",
+    "eyebrow": "Collaboration",
+    "title": "Our partners",
+    "description": "Together with trusted partners we create broader opportunities in real estate.",
+    "intro": "Our partner network brings together brokers, agencies, developers, financial and technology companies. Every partnership is based on a formal agreement.",
+    "featuredTitle": "Featured partners",
+    "allTitle": "All partners",
+    "count": "{count, plural, one {# partner} other {# partners}}",
+    "emptyTitle": "There are no partners on display at the moment.",
+    "emptyDescription": "New partnerships will appear on this page as they are formalised.",
+    "filterAria": "Filter by partner type",
+    "ctaTitle": "Would you like to become a partner?",
+    "ctaDescription": "If you are a broker, agency, developer or service provider, let us discuss the terms of collaboration.",
+    "ctaAction": "Get in touch"
+  },
+  "detail": {
+    "metaTitle": "{name} — Official Partner | Luxe Home Estate",
+    "metaDescriptionFallback": "{name} — an official partner of Luxe Home Estate. Areas of collaboration, related listings and projects.",
+    "aboutPartnership": "About the partnership",
+    "directions": "Areas of collaboration",
+    "relatedProjects": "Related residential complexes",
+    "relatedProperties": "Related listings",
+    "relatedAgencies": "Related agencies",
+    "contact": "Contact",
+    "visitWebsite": "Go to the official website",
+    "notFoundTitle": "Partner not found",
+    "logoAlt": "{name} logo"
+  },
+  "property": {
+    "heading": "Partner",
+    "sourceLink": "Listing on the partner's website",
+    "aboutPartner": "About the partner"
+  },
+  "home": {
+    "overline": "Our official partners",
+    "title": "Our official partners",
+    "description": "A strategic collaboration to create broader opportunities and professional services in the real estate sector.",
+    "action": "About the partnership",
+    "allPartners": "All partners"
+  },
+  "types": {
+    "BROKER": "Broker",
+    "REAL_ESTATE_AGENCY": "Real estate agency",
+    "DEVELOPER": "Developer",
+    "CONSTRUCTION_COMPANY": "Construction company",
+    "INVESTMENT": "Investment",
+    "BANK": "Bank",
+    "MORTGAGE": "Mortgage",
+    "INSURANCE": "Insurance",
+    "TECHNOLOGY": "Technology",
+    "MEDIA": "Media",
+    "MARKETING": "Marketing",
+    "SERVICE_PROVIDER": "Service provider",
+    "STRATEGIC_PARTNER": "Strategic partner",
+    "OTHER": "Other"
+  },
+  "roles": {
+    "SOURCE": "Source",
+    "BROKER": "Broker",
+    "CO_BROKER": "Co-broker",
+    "DEVELOPER": "Developer",
+    "EXCLUSIVE_SALES": "Exclusive sales partner",
+    "SALES_PARTNER": "Sales partner",
+    "MARKETING_PARTNER": "Marketing partner",
+    "MANAGEMENT_PARTNER": "Management partner",
+    "OTHER": "Other"
+  },
+  "filters": {
+    "all": "All",
+    "brokers": "Brokers",
+    "agencies": "Agencies",
+    "developers": "Developers",
+    "strategic": "Strategic partners",
+    "technology": "Technology",
+    "finance": "Finance",
+    "other": "Other"
+  }
+}

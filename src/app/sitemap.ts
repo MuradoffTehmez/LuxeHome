@@ -20,6 +20,7 @@ export type SitemapSource = {
   services: CanonicalEntity[];
   posts: CanonicalEntity[];
   agencies: Array<{ slug: string; updatedAt: Date }>;
+  partners: Array<{ slug: string; updatedAt: Date }>;
   landings: Array<{ path: string; updatedAt?: Date }>;
 };
 
@@ -47,6 +48,7 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
     ...localizedEntries("/emlaklar", { changeFrequency: "daily", priority: 0.9 }),
     ...localizedEntries("/layiheler", { changeFrequency: "weekly", priority: 0.8 }),
     ...localizedEntries("/agentlikler", { changeFrequency: "weekly", priority: 0.7 }),
+    ...localizedEntries("/terefdaslar", { changeFrequency: "weekly", priority: 0.6 }),
     ...localizedEntries("/xidmetler", { changeFrequency: "monthly", priority: 0.7 }),
     ...localizedEntries("/haqqimizda", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/suallar", { changeFrequency: "monthly", priority: 0.6 }),
@@ -89,6 +91,13 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
     ...source.agencies.flatMap((item) => localizedEntries(`/agentlikler/${item.slug}`, {
       lastModified: item.updatedAt,
       changeFrequency: "weekly" as const,
+      priority: 0.6,
+    })),
+    // Yalnız `getSitemapPartners()`-dən gələnlər — sorğu artıq `ACTIVE` +
+    // `showPublicly` + müddəti bitməmiş şərtini tətbiq edir.
+    ...source.partners.flatMap((item) => localizedEntries(`/terefdaslar/${item.slug}`, {
+      lastModified: item.updatedAt,
+      changeFrequency: "monthly" as const,
       priority: 0.6,
     })),
     ...source.landings.flatMap((item) => localizedEntries(item.path, {

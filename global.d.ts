@@ -9,6 +9,7 @@ import type listings from "./src/i18n/locales/az/listings.json";
 import type content from "./src/i18n/locales/az/content.json";
 import type contact from "./src/i18n/locales/az/contact.json";
 import type legal from "./src/i18n/locales/az/legal.json";
+import type partners from "./src/i18n/locales/az/partners.json";
 import type seoLandings from "./src/i18n/locales/az/seoLandings.json";
 
 /**
@@ -28,6 +29,7 @@ type Messages = {
   content: typeof content;
   contact: typeof contact;
   legal: typeof legal;
+  partners: typeof partners;
   seoLandings: typeof seoLandings;
 };
 
