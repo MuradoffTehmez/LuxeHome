@@ -12,6 +12,7 @@ import {
   AdminResponsiveList,
 } from "@/components/admin/admin-responsive-list";
 import { AccountToggle } from "./account-toggle";
+import { AccountApproval } from "./account-approval";
 import { formatRelative } from "@/lib/utils";
 import { ACCOUNT_TYPE_LABELS, PERMISSIONS, type AccountType } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
@@ -50,9 +51,19 @@ export default async function AdminPublicAccountsPage() {
               title={account.name}
               meta={account.email}
               status={<Badge tone={TYPE_TONE[account.accountType as AccountType]}>{ACCOUNT_TYPE_LABELS[account.accountType as AccountType]}</Badge>}
-              actions={<AccountToggle id={account.id} name={account.name} isActive={account.isActive} className="size-11" />}
+              actions={
+                <>
+                  <AccountApproval id={account.id} name={account.name} approved={Boolean(account.approvedAt)} className="size-11" />
+                  <AccountToggle id={account.id} name={account.name} isActive={account.isActive} className="size-11" />
+                </>
+              }
             >
-              {!account.isActive ? <Badge tone="neutral">Deaktiv</Badge> : null}
+              <div className="flex flex-wrap gap-2">
+                <Badge tone={account.approvedAt ? "success" : "warning"}>
+                  {account.approvedAt ? "Təsdiqlənib" : "Təsdiq gözləyir"}
+                </Badge>
+                {!account.isActive ? <Badge tone="neutral">Bloklanıb</Badge> : null}
+              </div>
               <dl className="mt-4 grid grid-cols-3 gap-3">
                 <div>
                   <dt className="text-xs text-ink-muted">Elan</dt>
@@ -75,6 +86,7 @@ export default async function AdminPublicAccountsPage() {
               headers={[
                 { label: "Hesab" },
                 { label: "Növ" },
+                { label: "Təsdiq" },
                 { label: "Elan" },
                 { label: "Favorit" },
                 { label: "Son giriş", className: "text-right" },
@@ -89,10 +101,20 @@ export default async function AdminPublicAccountsPage() {
                     {!account.isActive ? <Badge tone="neutral" className="mt-1">Deaktiv</Badge> : null}
                   </AdminTableCell>
                   <AdminTableCell><Badge tone={TYPE_TONE[account.accountType as AccountType]}>{ACCOUNT_TYPE_LABELS[account.accountType as AccountType]}</Badge></AdminTableCell>
+                  <AdminTableCell>
+                    <Badge tone={account.approvedAt ? "success" : "warning"}>
+                      {account.approvedAt ? "Təsdiqlənib" : "Gözləyir"}
+                    </Badge>
+                  </AdminTableCell>
                   <AdminTableCell className="tabular">{account._count.properties}</AdminTableCell>
                   <AdminTableCell className="tabular">{account._count.favorites}</AdminTableCell>
                   <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{account.lastLoginAt ? formatRelative(account.lastLoginAt) : "Heç vaxt"}</AdminTableCell>
-                  <AdminTableCell align="right"><div className="flex justify-end"><AccountToggle id={account.id} name={account.name} isActive={account.isActive} className="size-11" /></div></AdminTableCell>
+                  <AdminTableCell align="right">
+                    <div className="flex justify-end">
+                      <AccountApproval id={account.id} name={account.name} approved={Boolean(account.approvedAt)} className="size-11" />
+                      <AccountToggle id={account.id} name={account.name} isActive={account.isActive} className="size-11" />
+                    </div>
+                  </AdminTableCell>
                 </AdminTableRow>
               ))}
             </AdminTable>

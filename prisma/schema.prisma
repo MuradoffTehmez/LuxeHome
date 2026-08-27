@@ -33,6 +33,9 @@ model User {
   accountType     String    @default("STAFF")
   phone           String?
   emailVerifiedAt DateTime?
+  /// İdarə panelində hesabın biznes baxımından yoxlanılıb təsdiqləndiyi vaxt.
+  /// E-poçt doğrulamasından və bloklama (`isActive`) statusundan qəsdən ayrıdır.
+  approvedAt      DateTime?
   isActive        Boolean   @default(true)
   lastLoginAt     DateTime?
   createdAt       DateTime  @default(now())
@@ -71,6 +74,7 @@ model User {
 
   @@index([role])
   @@index([accountType])
+  @@index([approvedAt])
 }
 
 /// Agentlik profili — yalnız `accountType = "AGENCY"` hesablarında olur.

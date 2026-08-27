@@ -549,6 +549,8 @@ export async function getAdminPublicAccounts() {
       phone: true,
       accountType: true,
       isActive: true,
+      approvedAt: true,
+      emailVerifiedAt: true,
       createdAt: true,
       lastLoginAt: true,
       _count: { select: { properties: true, favorites: true } },
@@ -559,23 +561,28 @@ export async function getAdminPublicAccounts() {
 
 /** Panel — bütün agentliklər (təsdiqlənməmişlər daxil). */
 export async function getAdminAgencies() {
-  return prisma.agency.findMany({
+  return prisma.user.findMany({
+    where: { accountType: ACCOUNT_TYPES.AGENCY },
     select: {
       id: true,
       name: true,
-      slug: true,
+      email: true,
       phone: true,
-      isVerified: true,
+      isActive: true,
+      approvedAt: true,
       createdAt: true,
-      user: {
+      agency: {
         select: {
-          email: true,
-          isActive: true,
-          _count: { select: { properties: true } },
+          id: true,
+          name: true,
+          slug: true,
+          isVerified: true,
+          createdAt: true,
         },
       },
+      _count: { select: { properties: true } },
     },
-    orderBy: [{ isVerified: "asc" }, { createdAt: "desc" }],
+    orderBy: { createdAt: "desc" },
   });
 }
 

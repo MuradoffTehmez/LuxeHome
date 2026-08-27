@@ -18,6 +18,7 @@ import { AGENCY_EMPLOYEE_ROLE_LABELS, PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminAgencies, getAdminAgencyEmployeeQueue } from "@/lib/queries";
 import { approveAgencyEmployee, rejectAgencyEmployee, toggleAgencyVerification } from "./actions";
+import { AgencyProfileRepair } from "./agency-profile-repair";
 
 export const metadata: Metadata = { title: "Agentliklər" };
 export const dynamic = "force-dynamic";
@@ -94,55 +95,63 @@ export default async function AdminAgenciesPage() {
         <AdminResponsiveList
           ariaLabel="Agentliklər"
           items={agencies}
-          getKey={(agency) => agency.id}
+          getKey={(account) => account.id}
           empty={
             <p className="py-10 text-center text-sm text-ink-muted">
-              Hələ agentlik qeydiyyatdan keçməyib.
+              Hələ agentlik tipli hesab qeydiyyatdan keçməyib.
             </p>
           }
-          renderCard={(agency) => (
+          renderCard={(account) => (
             <AdminListCard
-              title={agency.name}
+              title={account.agency?.name ?? account.name}
               meta={
                 <>
-                  <span className="block">{agency.user.email}</span>
-                  <span className="mt-1 block">{formatDateTime(agency.createdAt)}</span>
+                  <span className="block">{account.email}</span>
+                  <span className="mt-1 block">{formatDateTime(account.createdAt)}</span>
                 </>
               }
               status={
-                agency.isVerified ? (
+                !account.agency ? (
+                  <Badge tone="danger">Profil yoxdur</Badge>
+                ) : account.agency.isVerified ? (
                   <Badge tone="success">Təsdiqlənib</Badge>
                 ) : (
                   <Badge tone="warning">Təsdiq gözləyir</Badge>
                 )
               }
-              actions={
+              actions={account.agency ? (
                 <ConfirmAction
                   action={toggleAgencyVerification}
-                  id={agency.id}
-                  label={agency.isVerified ? `«${agency.name}» təsdiqini ləğv et` : `«${agency.name}» təsdiqlə`}
-                  title={agency.isVerified ? "Təsdiqi ləğv etmək" : "Agentliyi təsdiqləmək"}
+                  id={account.agency.id}
+                  label={account.agency.isVerified ? `«${account.agency.name}» təsdiqini ləğv et` : `«${account.agency.name}» təsdiqlə`}
+                  title={account.agency.isVerified ? "Təsdiqi ləğv etmək" : "Agentliyi təsdiqləmək"}
                   description={
-                    agency.isVerified
+                    account.agency.isVerified
                       ? "Agentlik ictimai səhifədən gizlədiləcək. Elanları saytda qalır."
                       : "Agentlik ictimai /agentlikler səhifəsində görünəcək və yeni elanları avtomatik dərc olunacaq."
                   }
-                  confirmLabel={agency.isVerified ? "Ləğv et" : "Təsdiqlə"}
-                  tone={agency.isVerified ? "danger" : "neutral"}
+                  confirmLabel={account.agency.isVerified ? "Ləğv et" : "Təsdiqlə"}
+                  tone={account.agency.isVerified ? "danger" : "neutral"}
                   className="size-11"
                 >
-                  {agency.isVerified ? (
+                  {account.agency.isVerified ? (
                     <ShieldX className="size-4" aria-hidden="true" />
                   ) : (
                     <ShieldCheck className="size-4" aria-hidden="true" />
                   )}
                 </ConfirmAction>
-              }
+              ) : null}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="tabular">{agency.user._count.properties} elan</span>
-                {!agency.user.isActive ? <Badge tone="neutral">Deaktiv hesab</Badge> : null}
+                <span className="tabular">{account._count.properties} elan</span>
+                {!account.isActive ? <Badge tone="neutral">Deaktiv hesab</Badge> : null}
               </div>
+              {!account.agency ? (
+                <div className="mt-4 border-t border-line pt-4">
+                  <p className="mb-3 text-xs text-ink-muted">Köhnə qeydiyyat yarımçıq qalıb. İctimai adı yoxlayıb profil yaradın; sonra təsdiq düyməsi açılacaq.</p>
+                  <AgencyProfileRepair userId={account.id} defaultName={account.name} />
+                </div>
+              ) : null}
             </AdminListCard>
           )}
           renderTable={(items) => (
@@ -156,48 +165,54 @@ export default async function AdminAgenciesPage() {
                 { label: "İdarəetmə", className: "text-right" },
               ]}
             >
-              {items.map((agency) => (
-                <AdminTableRow key={agency.id}>
+              {items.map((account) => (
+                <AdminTableRow key={account.id}>
                   <AdminTableCell>
-                    <span className="font-medium text-ink">{agency.name}</span>
-                    <p className="mt-0.5 text-xs text-ink-muted">{agency.user.email}</p>
-                    {!agency.user.isActive && (
+                    <span className="font-medium text-ink">{account.agency?.name ?? account.name}</span>
+                    <p className="mt-0.5 text-xs text-ink-muted">{account.email}</p>
+                    {!account.isActive && (
                       <Badge tone="neutral" className="mt-1">Deaktiv hesab</Badge>
                     )}
                   </AdminTableCell>
-                  <AdminTableCell className="tabular">{agency.user._count.properties}</AdminTableCell>
+                  <AdminTableCell className="tabular">{account._count.properties}</AdminTableCell>
                   <AdminTableCell className="text-xs text-ink-muted">
-                    {formatDateTime(agency.createdAt)}
+                    {formatDateTime(account.createdAt)}
                   </AdminTableCell>
                   <AdminTableCell>
-                    {agency.isVerified ? (
+                    {!account.agency ? (
+                      <Badge tone="danger">Profil yoxdur</Badge>
+                    ) : account.agency.isVerified ? (
                       <Badge tone="success">Təsdiqlənib</Badge>
                     ) : (
                       <Badge tone="warning">Təsdiq gözləyir</Badge>
                     )}
                   </AdminTableCell>
                   <AdminTableCell align="right">
-                    <div className="flex justify-end">
+                    <div className="flex min-w-72 justify-end">
+                      {!account.agency ? (
+                        <AgencyProfileRepair userId={account.id} defaultName={account.name} />
+                      ) : (
                       <ConfirmAction
                         action={toggleAgencyVerification}
-                        id={agency.id}
-                        label={agency.isVerified ? `«${agency.name}» təsdiqini ləğv et` : `«${agency.name}» təsdiqlə`}
-                        title={agency.isVerified ? "Təsdiqi ləğv etmək" : "Agentliyi təsdiqləmək"}
+                        id={account.agency.id}
+                        label={account.agency.isVerified ? `«${account.agency.name}» təsdiqini ləğv et` : `«${account.agency.name}» təsdiqlə`}
+                        title={account.agency.isVerified ? "Təsdiqi ləğv etmək" : "Agentliyi təsdiqləmək"}
                         description={
-                          agency.isVerified
+                          account.agency.isVerified
                             ? "Agentlik ictimai səhifədən gizlədiləcək. Elanları saytda qalır."
                             : "Agentlik ictimai /agentlikler səhifəsində görünəcək və yeni elanları avtomatik dərc olunacaq."
                         }
-                        confirmLabel={agency.isVerified ? "Ləğv et" : "Təsdiqlə"}
-                        tone={agency.isVerified ? "danger" : "neutral"}
+                        confirmLabel={account.agency.isVerified ? "Ləğv et" : "Təsdiqlə"}
+                        tone={account.agency.isVerified ? "danger" : "neutral"}
                         className="size-11"
                       >
-                        {agency.isVerified ? (
+                        {account.agency.isVerified ? (
                           <ShieldX className="size-4" aria-hidden="true" />
                         ) : (
                           <ShieldCheck className="size-4" aria-hidden="true" />
                         )}
                       </ConfirmAction>
+                      )}
                     </div>
                   </AdminTableCell>
                 </AdminTableRow>

@@ -46,3 +46,41 @@ export async function togglePublicAccountActive(id: string): Promise<ActionState
     return unexpected("hesab yenilənmədi", error);
   }
 }
+
+/** İctimai hesabın biznes yoxlamasını təsdiqləyir və ya geri götürür. */
+export async function togglePublicAccountApproval(id: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  try {
+    const account = await prisma.user.findFirst({
+      where: {
+        id,
+        accountType: { in: [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY] },
+      },
+      select: { id: true, email: true, approvedAt: true },
+    });
+    if (!account) return failure("Hesab tapılmadı.");
+
+    const approvedAt = account.approvedAt ? null : new Date();
+    await prisma.user.update({ where: { id }, data: { approvedAt } });
+
+    await recordAudit(
+      actor,
+      "UPDATE",
+      "User",
+      id,
+      `${account.email} — ${approvedAt ? "hesab təsdiqləndi" : "hesab təsdiqi ləğv edildi"}`,
+    );
+    revalidatePath(LIST_PATH);
+    revalidatePath("/admin/agentlikler");
+    return success(approvedAt ? "Hesab təsdiqləndi." : "Hesab təsdiqi ləğv edildi.");
+  } catch (error) {
+    return unexpected("hesab təsdiqi yenilənmədi", error);
+  }
+}

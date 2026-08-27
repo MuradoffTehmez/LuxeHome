@@ -12,6 +12,8 @@ import {
 import { recordAudit } from "@/lib/admin/audit";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { uniqueSlug } from "@/lib/admin/slug";
+import * as form from "@/lib/admin/form";
 
 const LIST_PATH = "/admin/agentlikler";
 
@@ -33,7 +35,7 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
   try {
     const agency = await prisma.agency.findUnique({
       where: { id },
-      select: { id: true, name: true, isVerified: true },
+      select: { id: true, userId: true, name: true, isVerified: true },
     });
     if (!agency) return failure("Agentlik tapılmadı.");
 
@@ -43,6 +45,9 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
       where: { id },
       data: { isVerified: next, verifiedAt: next ? new Date() : null },
     });
+    if (next) {
+      await prisma.user.update({ where: { id: agency.userId }, data: { approvedAt: new Date() } });
+    }
 
     await recordAudit(
       actor,
@@ -57,6 +62,57 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
     return success(next ? "Agentlik təsdiqləndi." : "Agentliyin təsdiqi ləğv edildi.");
   } catch (error) {
     return unexpected("agentlik yenilənmədi", error);
+  }
+}
+
+/** Köhnə və ya yarımçıq agentlik hesabı üçün admin tərəfindən profil yaradır. */
+export async function createAgencyProfile(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const userId = form.text(formData, "userId");
+  const name = form.text(formData, "name").trim();
+  if (!userId || name.length < 2 || name.length > 160) {
+    return failure("Agentlik adı 2–160 simvol arasında olmalıdır.", {
+      name: "Düzgün agentlik adı yazın",
+    });
+  }
+
+  try {
+    const account = await prisma.user.findFirst({
+      where: { id: userId, accountType: "AGENCY" },
+      select: { id: true, email: true, phone: true, agency: { select: { id: true } } },
+    });
+    if (!account) return failure("Agentlik hesabı tapılmadı.");
+    if (account.agency) return failure("Bu hesabın agentlik profili artıq mövcuddur.");
+
+    const slug = await uniqueSlug(name, (candidate) =>
+      prisma.agency.findUnique({ where: { slug: candidate }, select: { id: true } }),
+    );
+    const agency = await prisma.agency.create({
+      data: {
+        userId,
+        name,
+        slug,
+        phone: account.phone,
+        isVerified: false,
+      },
+      select: { id: true },
+    });
+
+    await recordAudit(actor, "CREATE", "Agency", agency.id, `${name} · ${account.email}`);
+    revalidatePath(LIST_PATH);
+    return success("Agentlik profili yaradıldı. İndi onu yoxlayıb təsdiqləyə bilərsiniz.");
+  } catch (error) {
+    return unexpected("agentlik profili yaradılmadı", error);
   }
 }
 
