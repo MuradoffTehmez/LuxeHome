@@ -10,6 +10,7 @@ import { IDLE_STATE } from "@/lib/admin/action-state";
 import { accountAuthHref } from "@/lib/auth/public-account-policy";
 import { Link } from "@/i18n/navigation";
 import { registerAccount } from "../hesab/actions";
+import { TurnstileWidget } from "@/components/security/turnstile-widget";
 
 export function RegisterForm({ next }: { next?: string }) {
   const t = useTranslations("auth");
@@ -99,6 +100,8 @@ export function RegisterForm({ next }: { next?: string }) {
         hint={t("fields.passwordHint")}
         error={state.fieldErrors?.password}
       />
+
+      <TurnstileWidget action="registration" resetSignal={state.message} />
 
       <Button type="submit" loading={pending} fullWidth>
         <UserPlus className="size-4" aria-hidden="true" />

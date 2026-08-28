@@ -8,6 +8,7 @@ import { SameOriginError, assertSameOrigin } from "@/lib/request-origin";
 import { checkContactLimit, clientIp } from "@/lib/auth/rate-limit";
 import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
 import { z } from "zod";
+import { verifyTurnstile } from "@/lib/auth/turnstile";
 
 async function contactSchema() {
   let nameMin = "Ad ən azı 2 simvol olmalıdır";
@@ -40,11 +41,13 @@ export type ContactFormState = {
 };
 
 /** Spam qapısının rədd mesajları — tərcümə yoxdursa azərbaycancaya düşür. */
-async function rejectionMessage(kind: "origin" | "rateLimited"): Promise<string> {
+async function rejectionMessage(kind: "origin" | "rateLimited" | "turnstile"): Promise<string> {
   const fallback =
     kind === "origin"
       ? "Müraciət qəbul edilmədi. Səhifəni yeniləyib yenidən cəhd edin."
-      : "Çox sayda müraciət göndərildi. Bir dəqiqə gözləyin.";
+      : kind === "rateLimited"
+        ? "Çox sayda müraciət göndərildi. Bir dəqiqə gözləyin."
+        : "Təhlükəsizlik yoxlaması tamamlanmadı. Yenidən cəhd edin.";
   try {
     return (await getTranslations("validation"))(kind);
   } catch {
@@ -84,6 +87,9 @@ export async function submitContactForm(
   const ip = clientIp(await headers());
   if (!(await checkContactLimit(ip))) {
     return { success: false, error: await rejectionMessage("rateLimited") };
+  }
+  if (!(await verifyTurnstile(formData, "contact", ip))) {
+    return { success: false, error: await rejectionMessage("turnstile") };
   }
 
   const raw = {

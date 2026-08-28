@@ -9,6 +9,7 @@ import { IDLE_STATE } from "@/lib/admin/action-state";
 import { accountAuthHref } from "@/lib/auth/public-account-policy";
 import { Link } from "@/i18n/navigation";
 import { signInAccount } from "../hesab/actions";
+import { TurnstileWidget } from "@/components/security/turnstile-widget";
 
 /**
  * İctimai giriş forması.
@@ -45,6 +46,10 @@ export function LoginForm({ next }: { next?: string }) {
         error={state.fieldErrors?.email}
       />
 
+      <Link href="/hesab/parolu-unutdum" className="-mt-2 self-end text-sm text-gold-deep underline-offset-4 hover:underline">
+        {t("accountSecurity.forgotLink")}
+      </Link>
+
       <Input
         name="password"
         label={t("fields.password")}
@@ -54,6 +59,8 @@ export function LoginForm({ next }: { next?: string }) {
         placeholder="••••••••"
         error={state.fieldErrors?.password}
       />
+
+      <TurnstileWidget action="public_login" resetSignal={state.message} />
 
       <Button type="submit" loading={pending} fullWidth>
         <LogIn className="size-4" aria-hidden="true" />

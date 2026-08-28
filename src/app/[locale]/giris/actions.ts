@@ -45,6 +45,7 @@ import { verifyStaffPassword } from "@/lib/auth/staff-login-policy";
 import { sendEmail } from "@/lib/email";
 import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
+import { verifyTurnstile } from "@/lib/auth/turnstile";
 
 /**
  * Giriş axını.
@@ -145,6 +146,9 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   if (!(await checkLoginLimit(ip))) {
     await logRateLimited(email, ip);
     return { error: t("actions.rateLimited") };
+  }
+  if (!(await verifyTurnstile(formData, "staff_login", ip))) {
+    return { error: t("actions.securityCheck") };
   }
 
   const user = await prisma.user.findUnique({ where: { email } });

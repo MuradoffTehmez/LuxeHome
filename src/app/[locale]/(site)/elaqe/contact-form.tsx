@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { submitContactForm, type ContactFormState } from "./actions";
 import { trackEvent } from "@/lib/client-analytics";
 import { HONEYPOT_FIELD } from "@/lib/spam";
+import { TurnstileWidget } from "@/components/security/turnstile-widget";
 
 const initialState: ContactFormState = { success: false };
 
@@ -108,6 +109,8 @@ export function ContactForm() {
         rows={5}
         error={state.fieldErrors?.message}
       />
+
+      <TurnstileWidget action="contact" resetSignal={state.error ?? state.fieldErrors} />
 
       <Button type="submit" variant="primary" size="lg" loading={isPending} className="w-full sm:w-auto sm:self-start">
         {t("send")}

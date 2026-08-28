@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import type { FormState } from "@/lib/auth/types";
 import { signIn } from "./actions";
+import { TurnstileWidget } from "@/components/security/turnstile-widget";
 
 /**
  * Giriş forması.
@@ -79,6 +80,8 @@ export function LoginForm({ davam }: { davam?: string }) {
           {state.error}
         </p>
       )}
+
+      <TurnstileWidget action="staff_login" resetSignal={state.error} />
 
       <Button type="submit" size="lg" fullWidth loading={pending}>
         {!pending && <LogIn className="size-4.5" aria-hidden="true" />}
