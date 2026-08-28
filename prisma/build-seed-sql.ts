@@ -68,6 +68,16 @@ function literal(value: unknown): string {
   return `'${String(value).replace(/'/g, "''")}'`;
 }
 
+const ISO_DATE_COLUMNS: Readonly<Record<string, ReadonlySet<string>>> = {
+  Service: new Set(["createdAt", "updatedAt"]),
+  Setting: new Set(["updatedAt"]),
+};
+
+function normalizeBootstrapValue(table: string, column: string, value: unknown): unknown {
+  if (!ISO_DATE_COLUMNS[table]?.has(column) || typeof value !== "number") return value;
+  return new Date(value).toISOString();
+}
+
 const lines: string[] = [
   "-- Luxe Home Estate — D1 seed məlumatı",
   "-- Avtomatik yaradılıb: npm run db:seed:build",
@@ -82,7 +92,9 @@ for (const table of ordered) {
   const columns = Object.keys(rows[0]);
   lines.push(`-- ${table} (${rows.length})`);
   for (const row of rows) {
-    const values = columns.map((column) => literal(row[column])).join(", ");
+    const values = columns
+      .map((column) => literal(normalizeBootstrapValue(table, column, row[column])))
+      .join(", ");
     lines.push(
       `INSERT OR IGNORE INTO "${table}" (${columns.map((c) => `"${c}"`).join(", ")}) VALUES (${values});`,
     );
