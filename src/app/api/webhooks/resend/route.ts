@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { getResend } from "@/lib/email";
 import { recordEmailActivity } from "@/lib/email-activity";
+import { runtimeEnv } from "@/lib/runtime-env";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const resend = getResend();
-  const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
+  const webhookSecret = runtimeEnv("RESEND_WEBHOOK_SECRET");
   if (!resend || !webhookSecret) {
     return NextResponse.json({ error: "Webhook konfiqurasiya edilməyib" }, { status: 503 });
   }

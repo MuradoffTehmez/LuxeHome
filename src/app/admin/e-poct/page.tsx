@@ -10,6 +10,7 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminEmailActivities, getAdminEmailOverview } from "@/lib/queries";
 import { formatDateTime } from "@/lib/utils";
 import { corporateEmails } from "@/config/site";
+import { hasRuntimeEnv } from "@/lib/runtime-env";
 
 export const metadata: Metadata = { title: "Korporativ e-poçt" };
 export const dynamic = "force-dynamic";
@@ -56,8 +57,8 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
     getAdminEmailActivities(page, filters),
     getAdminEmailOverview(),
   ]);
-  const webhookConfigured = Boolean(process.env.RESEND_WEBHOOK_SECRET);
-  const senderConfigured = Boolean(process.env.RESEND_API_KEY);
+  const webhookConfigured = hasRuntimeEnv("RESEND_WEBHOOK_SECRET");
+  const senderConfigured = hasRuntimeEnv("RESEND_API_KEY");
 
   const buildHref = (target: number) => {
     const query = new URLSearchParams();

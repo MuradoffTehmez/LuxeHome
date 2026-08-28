@@ -4,6 +4,7 @@ import { corporateEmails, siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import { recordEmailActivity } from "@/lib/email-activity";
+import { runtimeEnv } from "@/lib/runtime-env";
 
 /**
  * E-poçt mətnləri.
@@ -98,7 +99,7 @@ const DEFAULT_FROM_EMAIL = `Luxe Home Estate <${corporateEmails.notifications}>`
 const FALLBACK_NOTIFICATION_EMAIL = corporateEmails.sales;
 
 function fromEmail(): string {
-  return process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
+  return runtimeEnv("RESEND_FROM_EMAIL") || DEFAULT_FROM_EMAIL;
 }
 
 /**
@@ -109,7 +110,7 @@ function fromEmail(): string {
  */
 async function notificationEmail(): Promise<string> {
   const configured = await getSetting(SETTING_KEYS.LEAD_NOTIFICATION_EMAIL);
-  return configured || process.env.NOTIFICATION_EMAIL || FALLBACK_NOTIFICATION_EMAIL;
+  return configured || runtimeEnv("NOTIFICATION_EMAIL") || FALLBACK_NOTIFICATION_EMAIL;
 }
 
 let resendClient: Resend | null | undefined;
@@ -117,7 +118,7 @@ let resendClient: Resend | null | undefined;
 /** Resend klienti — açar yoxdursa `null` qaytarır. */
 export function getResend(): Resend | null {
   if (resendClient === undefined) {
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = runtimeEnv("RESEND_API_KEY");
     resendClient = apiKey ? new Resend(apiKey) : null;
   }
   return resendClient;
