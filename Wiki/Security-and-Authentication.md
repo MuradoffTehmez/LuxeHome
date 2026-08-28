@@ -84,7 +84,7 @@ sequenceDiagram
 
 ## Public hesab axını
 
-`/qeydiyyat` və `/daxil-ol` yalnız `USER`, `OWNER`, `AGENCY` hesabları üçün `PUBLIC` sessiyası yaradır.
+`/{locale}/qeydiyyat` və `/{locale}/daxil-ol` yalnız `USER`, `OWNER`, `AGENCY` hesabları üçün `PUBLIC` sessiyası yaradır.
 
 Staff hesabı public login formunda düzgün parol versə belə public sessiya almır. Əks istiqamətdə public sessiya da `/admin` üçün yararlı deyil. Qoruma iki proyeksiyanı birlikdə tələb edir:
 
@@ -94,6 +94,8 @@ Staff hesabı public login formunda düzgün parol versə belə public sessiya a
 | Kabinet | `USER`, `OWNER`, `AGENCY` | `PUBLIC` |
 
 `OWNER` və `AGENCY` elan/media mutation-ı üçün əlavə `requireLister()` yoxlamasından keçir. `USER` profil kabinetinə daxil ola bilər, amma elan yerləşdirə bilməz.
+
+İctimai hesabın biznes təsdiqi `approvedAt`, girişə buraxılması isə `isActive` ilə ayrıca idarə olunur. Beləliklə hesab bloklanmadan təsdiq gözləyə və ya əvvəl təsdiqlənmiş hesab ayrıca deaktiv edilə bilər. Agentlik üçün public verification əlavə olaraq `Agency.isVerified` tələb edir.
 
 Hazırkı public auth məhdudiyyətləri:
 
@@ -123,10 +125,10 @@ JWT içindəki `uid`, `role`, `accountType` və `authKind` D1 sessiya/user proye
 `src/middleware.ts` aşağıdakı route-larda işləyir:
 
 - `/admin` və alt marşrutlar;
-- `/giris` və alt marşrutlar;
-- `/kabinet` və alt marşrutlar.
+- `/{locale}/giris` və alt marşrutlar;
+- `/{locale}/kabinet`, `/{locale}/daxil-ol`, `/{locale}/qeydiyyat` və alt marşrutlar.
 
-`ADMIN_ENABLED !== "true"` olduqda admin və staff login route-ları 404 görünüşünə rewrite edilir. Aktiv olduqda sessiyasız admin sorğusu `/giris?davam=...`-a yönləndirilir.
+`ADMIN_ENABLED !== "true"` olduqda admin və staff login route-ları 404 görünüşünə rewrite edilir. Aktiv olduqda sessiyasız admin sorğusu üstün tutulan locale ilə `/{locale}/giris?davam=...` ünvanına yönləndirilir.
 
 Middleware bütün matched response-lara admin sərtləşdirmə header-ları əlavə edir. Kabinet də matcher-də olduğu üçün eyni `no-store` və security header-ları alır.
 
@@ -142,14 +144,17 @@ Middleware bütün matched response-lara admin sərtləşdirmə header-ları əl
 - `media:manage`;
 - `user:manage`;
 - `settings:manage`.
+- `partner:view`, `partner:create`, `partner:update`, `partner:delete`;
+- `partner:verify`, `partner:publish`, `partner:relationships`;
+- `partner:contract` — kommersiya sirri olan müqavilə metadata-sı.
 
 ### Rol matrisi
 
 | Rol | Səlahiyyət |
 |---|---|
-| `SUPER_ADMIN` | Bütün permission-lar |
-| `ADMIN` | Property, project, service, blog, lead, media |
-| `EDITOR` | Blog və media |
+| `SUPER_ADMIN` | Bütün permission-lar, müqavilə metadata-sı və audit reset |
+| `ADMIN` | Property/project/service/blog/lead/media və müqavilə xaric tərəfdaş əməliyyatları |
+| `EDITOR` | Blog, media və tərəfdaşa read-only baxış |
 
 Layout yoxlaması kifayət sayılmır: Server Action birbaşa POST ilə çağırıla bildiyi üçün hər mutation öz permission guard-ını çağırır.
 
@@ -163,6 +168,8 @@ Layout yoxlaması kifayət sayılmır: Server Action birbaşa POST ilə çağır
 4. scope + user ID əsasında `ADMIN_LIMIT` tətbiq edir.
 
 Next.js Server Actions üçün `allowedOrigins` siyahısı yalnız production, staging və lokal domenlərdən ibarətdir.
+
+Əlaqə forması ayrıca üç mərhələli spam qapısı istifadə edir: görünməz `website` honeypot-u, same-origin yoxlaması və IP əsaslı `CONTACT_LIMIT`. Honeypot doludursa botu məlumatlandırmamaq üçün saxta uğur qaytarılır. Turnstile hazırda tətbiq olunmayıb.
 
 ## HTTP başlıqları
 
@@ -202,6 +209,9 @@ Upload endpoint-ləri aşağıdakıları yoxlayır:
 - Slug serverdə yaradılır və uniqueness yoxlanır.
 - Relation ID-ləri type/location/feature cədvəllərinə qarşı doğrulanır.
 - Audit log kritik admin mutation-larında actor, action, entity və summary saxlayır.
+- Audit snapshot-ları həssas sahələri maskalayır; jurnalı yalnız Super Admin sıfırlaya bilər və reset özü audit kimi qalır.
+- Resend webhook yalnız Svix imzası `RESEND_WEBHOOK_SECRET` ilə doğrulandıqda `EmailActivity` yazır; məktub body-si saxlanılmır.
+- Saved-search cron endpoint-i yalnız timing-safe müqayisədən keçən `CRON_SECRET` Bearer dəyərini qəbul edir, secret yoxdursa 404 qaytarır.
 
 ## İnfrastruktur izolyasiyası
 
@@ -218,11 +228,12 @@ Secret-lər:
 
 | Prioritet | Boşluq | Risk |
 |---|---|---|
-| P0 | Əlaqə action-ında `CONTACT_LIMIT`, honeypot və Turnstile yoxdur | Spam və Resend/D1 sui-istifadəsi |
+| P1 | Əlaqə formasında Turnstile yoxdur | Yüksək həcmli adaptiv botlara qarşı əlavə challenge qatı yoxdur |
 | P1 | Public e-poçt təsdiqi yoxdur | Saxta və ya səhv ünvanlı hesablar |
 | P1 | Parol bərpası yoxdur | Support müdaxiləsi və hesab əlçatanlığı |
 | P1 | GitHub Actions CI və E2E yoxdur | Auth/deploy regression-u gec aşkarlanır |
 | P1 | `AUTH_SECRET` üçün versiyalı rotasiya yoxdur | Rotasiya TOTP və session-ları kəsir |
+| P1 | `RESEND_WEBHOOK_SECRET` production-da ayrıca qurulmalıdır | Qurulmasa e-poçt event jurnalı 503 ilə bağlı qalır |
 | P2 | CSP-də `'unsafe-inline'` var | XSS müdafiəsi ideal strict səviyyədə deyil |
 | P2 | Login və qeydiyyat eyni limiter-i paylaşır | Abuse siyasəti incə tənzimlənməyib |
 

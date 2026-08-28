@@ -21,11 +21,11 @@
 ---
 
 > [!NOTE]
-> Bu sənəd `main` branch-indəki `f7348b2` commit-i əsasında 23 avqust 2026 tarixində yenilənib. Dərin texniki məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
+> Bu sənəd `main@ed93ba4` və 28 avqust 2026 production smoke yoxlaması əsasında yenilənib. Aktiv Worker versiyası `11ade039-1f72-4777-b1e7-33df3376aef9`-dur. Dərin texniki məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
 
 ## Layihə haqqında
 
-Luxe Home Estate Bakı və Azərbaycan daşınmaz əmlak bazarı üçün hazırlanmış tamölçülü veb platformadır. Platforma satış və kirayə elanlarını, yaşayış layihələrini, agentlikləri, xidmətləri və bloq məzmununu vahid Azərbaycan dilli interfeysdə birləşdirir.
+Luxe Home Estate Bakı və Azərbaycan daşınmaz əmlak bazarı üçün hazırlanmış tamölçülü veb platformadır. Platforma satış və kirayə elanlarını, yaşayış layihələrini, agentlikləri, rəsmi tərəfdaşları, xidmətləri və bloq məzmununu Azərbaycan, ingilis və rus dilli interfeysdə birləşdirir.
 
 Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Components üzərində işləyir. Məlumat qatı Prisma vasitəsilə Cloudflare D1-ə qoşulur; tətbiq OpenNext ilə Cloudflare Workers-ə yayımlanır. Media R2-də, şəkil çevirmələri Cloudflare Images üzərindən idarə olunur.
 
@@ -38,9 +38,11 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - Əmlak detalı, qalereya, oxşar elanlar, Leaflet xəritəsi və agentlik nişanı
 - Brauzerdə saxlanan favoritlər və ən çox 4 elanın cookie əsaslı müqayisəsi
 - Layihə, agentlik, xidmət və bloq siyahıları ilə detal səhifələri
-- Əlaqə forması, D1-də müraciət qeydi və Resend bildirişi
+- Rəsmi tərəfdaş kataloqu, çoxdilli profil, elan/layihə/agentlik əlaqələri və izlənən xarici keçidlər
+- Rayon, metro və axtarış niyyətli SEO landing səhifələri
+- Əlaqə forması, same-origin + honeypot + `CONTACT_LIMIT`, D1 müraciəti və Resend bildirişi
 - Tez-tez verilən suallar və hüquqi səhifələr
-- Canonical URL, Open Graph, Twitter Card, JSON-LD, sitemap və robots.txt
+- AZ/EN/RU locale prefiksi, hreflang, canonical URL, Open Graph, Twitter Card, JSON-LD, sitemap, robots.txt və `llms.txt`
 - Responsive interfeys, dark mode, görünən klaviatura fokusu və reduced-motion dəstəyi
 
 ### İctimai hesab və kabinet
@@ -52,6 +54,8 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - Mülk sahibi və təsdiqlənməmiş agentlik elanları üçün `PENDING` təsdiq axını
 - Təsdiqlənmiş agentlik elanlarının birbaşa dərc edilməsi
 - Təsdiqlənmiş agentliklərin açıq kataloqu və profil səhifəsi
+- Saxlanmış axtarışlar, gündəlik/həftəlik e-poçt digest-i, panel bildirişləri və son baxılan elanlar
+- Agentlik sahibi üçün ən çox 3 menecer/agent üzvlü komanda və təsdiq axını
 
 ### İdarə paneli
 
@@ -59,10 +63,15 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - `SUPER_ADMIN`, `ADMIN`, `EDITOR` rolları üçün icazə matrisi
 - Dashboard və real D1 statistikaları
 - Əmlak, layihə, xidmət, bloq və kateqoriya CRUD axınları
-- Müraciətlərin statusu, məsul əməkdaşı və daxili qeydləri
+- Müraciətlərin siyahıda sürətli statusu, məsul əməkdaşı, daxili qeydi və silinməsi
 - R2 media yükləmə, WebP çevirmə, thumbnail, alt mətn və silmə
 - Əməkdaş hesabları, parol/2FA sıfırlama və sessiyaların ləğvi
-- Agentlik təsdiqi, runtime parametrləri və audit jurnalı
+- İctimai hesabların ayrıca təsdiqi və bloklanması; çatışmayan agentlik profilinin paneldən yaradılması
+- Redaktə olunan staff profili, avatar, telefon, locale, tema və backup kodlarının yenilənməsi
+- Runtime əlaqə/tema parametrləri, cədvəlli audit jurnalı və yalnız Super Admin üçün sıfırlama
+- Tərəfdaş CRUD-u, silmədən public görünürlük, müqavilə metadatası və elan/layihə/agentlik əlaqələri
+- SEO auditı, 301/302 yönləndirmələr, 404 izləmə, trafik analitikası və moderasiya növbəsi
+- Resend imzalı webhook-u ilə korporativ e-poçt çatdırılma/qəbul metadata jurnalı
 - Server Action-larda origin, icazə və sürət limiti yoxlaması
 
 > [!IMPORTANT]
@@ -81,6 +90,7 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 | Media və keş | Cloudflare R2, Cloudflare Images, R2 incremental cache |
 | Auth | `jose`, Web Crypto PBKDF2, TOTP, AES-GCM |
 | E-poçt | Resend |
+| Lokallaşdırma | `next-intl`, AZ/EN/RU, həmişə locale prefiksi |
 | Validasiya və sanitizasiya | Zod, UltraHTML |
 | Test | Vitest, Cloudflare `workerd` runtime |
 
@@ -95,13 +105,14 @@ Cloudflare Worker / Next.js App Router
   ├── Server Actions ─────► auth/permission/origin guard ───────► D1
   ├── Media API ──────────► magic-byte yoxlaması ─► Images ─────► R2
   ├── Sessiya yoxlaması ──► imzalanmış cookie + D1 sessiyası
-  ├── Bildiriş ───────────► Resend
+  ├── Bildiriş/webhook ───► Resend
+  ├── Digest cron ────────► ayrıca Cloudflare scheduled Worker
   └── ISR cache ──────────► R2
 ```
 
 Əsas qaydalar:
 
-- İctimai səhifələr `src/app/(site)` route qrupundadır və məlumatı birbaşa `src/lib/queries.ts`-dən oxuyur.
+- İctimai səhifələr `src/app/[locale]/(site)`, kabinet isə `src/app/[locale]/(account)` route qrupundadır; məlumatı birbaşa `src/lib/queries.ts`-dən oxuyur.
 - Yazma əməliyyatları Server Action-lar və qorunan media Route Handler-ları ilə aparılır.
 - İctimai əmlak sorğuları `deletedAt: null`, `isDemo: false` və `PUBLIC_PROPERTY_STATUSES` qaydalarını daşıyır.
 - Kart komponentlərinin data müqaviləsi `propertyCardSelect`, `projectCardSelect` və `postCardSelect` ilə mərkəzləşdirilib.
@@ -112,14 +123,14 @@ Cloudflare Worker / Next.js App Router
 
 | Qrup | Marşrutlar |
 |---|---|
-| Əsas | `/`, `/emlaklar`, `/emlaklar/[slug]`, `/layiheler`, `/layiheler/[slug]` |
-| Məzmun | `/xidmetler`, `/xidmetler/[slug]`, `/blog`, `/blog/[slug]`, `/suallar` |
-| Agentlik və seçim | `/agentlikler`, `/agentlikler/[slug]`, `/favoritler`, `/muqayise` |
-| Şirkət və hüquqi | `/haqqimizda`, `/elaqe`, `/mexfilik-siyaseti`, `/istifade-sertleri`, `/cookie-siyaseti` |
-| İctimai hesab | `/qeydiyyat`, `/daxil-ol`, `/kabinet`, `/kabinet/profil`, `/kabinet/elanlar`, `/kabinet/elanlar/yeni` |
-| Əməkdaş auth | `/giris`, `/giris/dogrulama`, `/giris/2fa-qurulumu` |
-| Admin | `/admin` və əmlak, layihə, xidmət, bloq, müraciət, media, istifadəçi, agentlik, parametr alt marşrutları |
-| Texniki | `/api/admin/media`, `/api/hesab/media`, `/api/hesab/menu`, `/media/[...key]`, `/sitemap.xml`, `/robots.txt` |
+| Əsas | `/{locale}`, `/{locale}/emlaklar`, `/{locale}/emlaklar/[slug]`, `/{locale}/layiheler/[slug]` |
+| Məzmun | `/{locale}/xidmetler`, `/{locale}/blog`, `/{locale}/suallar`, SEO/rayon/metro landing-ləri |
+| Tərəfdaş və seçim | `/{locale}/agentlikler`, `/{locale}/terefdaslar`, `/{locale}/favoritler`, `/{locale}/muqayise` |
+| Şirkət və hüquqi | `/{locale}/haqqimizda`, `/{locale}/elaqe`, `/{locale}/mexfilik-siyaseti`, `/{locale}/istifade-sertleri`, `/{locale}/cookie-siyaseti` |
+| İctimai hesab | `/{locale}/qeydiyyat`, `/{locale}/daxil-ol`, kabinet, profil, komanda, elan, axtarış və bildiriş səhifələri |
+| Əməkdaş auth | `/{locale}/giris`, doğrulama və 2FA qurulumu |
+| Admin | `/admin` və kontent, CRM, tərəfdaş, SEO, analitika, təhlükəsizlik və sistem alt marşrutları |
+| Texniki | media API-ləri, saved-search cron, Resend webhook, `/media/[...key]`, `/sitemap.xml`, `/robots.txt`, `/llms.txt` |
 
 Tam marşrut inventarı və istifadəçi axınları Wiki-dəki [Funksiyalar və marşrutlar](https://github.com/MuradoffTehmez/LuxeHome/wiki/Features-and-Routes) səhifəsindədir.
 
@@ -129,7 +140,7 @@ Tam marşrut inventarı və istifadəçi axınları Wiki-dəki [Funksiyalar və 
 luxehome/
 ├── migrations/                 # Cloudflare D1 SQL miqrasiyaları
 ├── prisma/
-│   ├── schema.prisma           # 21 domen, auth və əməliyyat modeli
+│   ├── schema.prisma           # 33 domen, auth və əməliyyat modeli
 │   ├── seed.ts                 # Sistem/taksonomiya başlanğıc məlumatları
 │   ├── seed.sql                # D1 üçün yaradılmış seed
 │   ├── taxonomy-data.ts        # Əmlak və yerləşmə taksonomiyası
@@ -211,6 +222,9 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `RESEND_API_KEY` | Resend API açarı | E-poçt bildirişi üçün |
 | `RESEND_FROM_EMAIL` | Göndərən ünvan | E-poçt bildirişi üçün |
 | `NOTIFICATION_EMAIL` | Müraciət bildirişinin alıcısı | E-poçt bildirişi üçün |
+| `RESEND_WEBHOOK_SECRET` | Resend/Svix webhook imzasının doğrulanması | Korporativ e-poçt jurnalı üçün |
+| `CRON_SECRET` | Saved-search digest endpoint Bearer sirri | Digest cron üçün |
+| `CLOUDFLARE_ANALYTICS_TOKEN` | Cloudflare GraphQL analitika sorğusu (`Analytics:Read`) | Admin analitika üçün |
 
 Cloudflare secret nümunələri:
 
@@ -219,6 +233,10 @@ npx wrangler secret put AUTH_SECRET
 npx wrangler secret put RESEND_API_KEY
 npx wrangler secret put RESEND_FROM_EMAIL
 npx wrangler secret put NOTIFICATION_EMAIL
+npx wrangler secret put RESEND_WEBHOOK_SECRET
+npx wrangler secret put CRON_SECRET
+npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN
+npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc
 ```
 
 ## npm əmrləri
@@ -266,6 +284,8 @@ npx wrangler secret put NOTIFICATION_EMAIL
 | `npm run preview:staging` | Staging konfiqurasiyası ilə lokal preview |
 | `npm run deploy:staging` | İzolyasiya olunmuş staging Worker-i yayımlayır |
 | `npm run deploy` | Production Worker-i yayımlayır |
+| `npm run deploy:cron` | Production saved-search scheduled Worker-i yayımlayır |
+| `npm run deploy:cron:staging` | Staging scheduled Worker-i yayımlayır |
 
 > [!WARNING]
 > Remote miqrasiya, seed, taksonomiya və demo-təmizləmə əmrləri production məlumatını dəyişir. Hədəf mühiti, backup-u və SQL məzmununu ayrıca yoxlamadan bu əmrləri işlətməyin.
@@ -322,19 +342,17 @@ npm test
 npm run build
 ```
 
-Testlər auth, sessiya yönləndirməsi, ictimai hesab siyasəti, elan göndərmə, media rollback-i, admin sanitizasiyası və əsas public-content qaydalarını əhatə edir. D1 integration, browser E2E və GitHub Actions CI hazırda yoxdur.
+Cari qapı 81 Vitest faylında 335 testi əhatə edir. Auth, sessiya, lokallaşdırma, SEO, saved-search, tərəfdaşlıq, admin responsive siyahıları, media rollback-i və public-content sərhədləri yoxlanır. D1 integration və avtomatlaşdırılmış browser E2E/CI hazırda yoxdur; production browser smoke testi manual aparılır.
 
 ## Cari məhdudiyyətlər və yol xəritəsi
 
-- Əlaqə formasında `CONTACT_LIMIT` binding-i konfiqurasiya edilib, lakin action daxilində rate limit, honeypot və Turnstile hələ tətbiq olunmayıb.
 - İctimai kabinet elan yaratma və status izləmə verir; mövcud elanı redaktə/silmə axını yoxdur.
 - Qeydiyyatda e-poçt təsdiqi və “parolu unutdum” bərpa axını yoxdur.
-- Ətraflı əmlak filtrlərinin bir hissəsi sıralama/səhifələmə linklərində və aktiv filtr nişanlarında tam qorunmur.
-- `sitemap.ts` hazırda agentlik, FAQ və bəzi yeni ictimai marşrutları daxil etmir.
 - SQLite `LIKE` Azərbaycan hərflərində tam registrsiz axtarış vermir; normallaşdırılmış axtarış sahəsi tələb olunur.
-- CI və browser E2E testləri yoxdur; deploy və smoke test prosesi manualdır.
+- CI və avtomatlaşdırılmış browser E2E yoxdur; deploy və canlı smoke prosesi manualdır.
+- Korporativ e-poçt hadisələri yalnız `RESEND_WEBHOOK_SECRET` və Resend endpoint abunəliyi qurulduqdan sonra dolur; məzmun deyil, metadata saxlanılır.
+- Turnstile yoxdur; əlaqə forması hazırda same-origin, görünməz honeypot və `CONTACT_LIMIT` ilə qorunur.
 - Hüquqi mətnlər, ofis koordinatları və iş saatları şirkət/hüquqşünas təsdiqi tələb edir.
-- İctimai interfeys yalnız Azərbaycan dilindədir.
 
 Ətraflı prioritetlər Wiki-dəki [Cari vəziyyət və yol xəritəsi](https://github.com/MuradoffTehmez/LuxeHome/wiki/Status-and-Roadmap) səhifəsində saxlanılır.
 

@@ -54,8 +54,11 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `SEED_ADMIN_EMAIL` | Bootstrap/seed staff e-poçtu |
 | `SEED_ADMIN_PASSWORD` | Bootstrap/seed parolu |
 | `RESEND_API_KEY` | E-poçt göndərmə |
+| `RESEND_WEBHOOK_SECRET` | Resend/Svix webhook imzası |
 | `RESEND_FROM_EMAIL` | Göndərən |
 | `NOTIFICATION_EMAIL` | Lead bildiriş alıcısı |
+| `CRON_SECRET` | Saved-search digest endpoint Bearer açarı |
+| `CLOUDFLARE_ANALYTICS_TOKEN` | Admin trafik analitikası üçün `Analytics:Read` token-i |
 | `ADMIN_ENABLED` | Staff route feature flag-i |
 
 `IS_STAGING` əsasən Wrangler staging vars daxilində təyin olunur.
@@ -80,6 +83,7 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `npm run lint` | ESLint |
 | `npm test` | `vitest run` |
 | `npm run test:watch` | Vitest watch |
+| `npm run test:seo:routes` | Production SEO route status smoke testi |
 | `npm run preview` | OpenNext build + local Worker preview |
 | `npm run cf-typegen` | Wrangler binding type generation |
 
@@ -117,6 +121,8 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `npm run preview:staging` | Staging vars ilə local OpenNext preview |
 | `npm run deploy:staging` | `luxehomeestate-staging` Worker |
 | `npm run deploy` | Production Worker |
+| `npm run deploy:cron:staging` | Staging saved-search cron Worker |
+| `npm run deploy:cron` | Production saved-search cron Worker |
 
 ## Prisma/D1 dəyişiklik axını
 
@@ -142,11 +148,13 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 
 Remote seed və taksonomiya əmrləri idempotent və ya qeyri-destruktiv sayılmamalıdır. SQL-i və hədəf environment-i ayrıca yoxlayın.
 
+Prisma `DateTime` sahələri D1-də ISO-8601 mətn kimi saxlanılır. Seed, əl ilə SQL və yeni miqrasiya Unix integer yazmamalıdır; qarışıq format Prisma D1 adapterində runtime parse xətasına səbəb olur.
+
 ## Testlər
 
 Testlər `@cloudflare/vitest-plugin` ilə `workerd` runtime-da işləyir. Bu, Web Crypto davranışının production-a yaxın olmasını təmin edir.
 
-Audit snapshot-unda 21 test faylı aşağıdakı sahələri əhatə edir:
+Audit snapshot-unda 81 test faylı və 335 test aşağıdakı sahələri əhatə edir:
 
 - parol, crypto, TOTP və cookie;
 - lockout, permission və session policy/projection/routing;
@@ -158,7 +166,12 @@ Audit snapshot-unda 21 test faylı aşağıdakı sahələri əhatə edir:
 - media upload record rollback-i;
 - image dropzone config;
 - theme provider runtime;
-- public content guard qaydaları.
+- public content guard qaydaları;
+- locale middleware, canonical redirect, hreflang və SEO route-ları;
+- saved search, bildiriş və cron digest axını;
+- partner görünüşü, əlaqələri və admin action-ları;
+- lead statusu, hesab təsdiqi, agency recovery və audit reset;
+- Resend webhook, e-poçt jurnalı və Cloudflare analitika helper-ları.
 
 Hazırda yoxdur:
 
@@ -169,14 +182,14 @@ Hazırda yoxdur:
 
 ### Son audit nəticəsi
 
-23 avqust 2026, `main@f7348b2`:
+28 avqust 2026, `main@ed93ba4`:
 
 | Yoxlama | Nəticə |
 |---|---:|
 | TypeScript | ✅ Keçdi |
 | ESLint | ✅ Keçdi |
-| Vitest | ✅ 21 fayl, 107 test |
-| Next.js production build | ✅ Keçdi, 15 statik səhifə yaradıldı |
+| Vitest | ✅ 81 fayl, 335 test |
+| Next.js production build | ✅ Keçdi |
 
 ## Məcburi keyfiyyət qapısı
 
@@ -197,8 +210,9 @@ npm run build
 
 - identifier-lar ingiliscə;
 - şərhlər azərbaycanca;
-- istifadəçiyə görünən mətnlər azərbaycanca;
-- Azərbaycan dilli route və query müqaviləsi qorunur.
+- istifadəçiyə görünən mətnlər AZ/EN/RU message kataloqlarından gəlir;
+- public route həmişə `/{locale}` prefiksi daşıyır, admin isə locale-siz `/admin` qalır;
+- Azərbaycan dilli query müqaviləsi (`elan`, `sehife` və s.) locale-lər arasında sabit saxlanılır.
 
 ### Data
 
@@ -239,6 +253,7 @@ npm run build
 ## Yeni route checklist-i
 
 - [ ] Route doğru layout qrupundadır
+- [ ] Public route AZ/EN/RU locale prefiksi və message fallback-i ilə işləyir
 - [ ] Metadata və canonical var
 - [ ] Public/private render qərarı düzgündür
 - [ ] D1 oxuyursa request-time render nəzərə alınıb
@@ -270,3 +285,7 @@ Bu, D1/SQLite `LIKE` registr davranışının məlum məhdudiyyətidir. `mode: "
 ### Şəkil upload lokalda “media anbarı əlçatan deyil” deyir
 
 Miniflare/Wrangler `MEDIA` R2 binding-inin yükləndiyini və route-un OpenNext dev init-dən keçdiyini yoxlayın. Cloudflare Images olmadan original format fallback ola bilər, amma R2 binding olmadan upload edilmir.
+
+### D1 oxunuşunda `Inconsistent column data` və ya tarix parse xətası görünür
+
+Problemli cədvəldə Prisma `DateTime` sütunlarının `typeof()` və dəyərlərini yoxlayın. Tətbiq ISO-8601 mətn gözləyir; Unix integer qalıqları varsa əvvəl backup alın, sonra `0019_normalize_d1_datetime_storage.sql` invariantına uyğun normallaşdırın. Yeni seed və migration-larda tarixləri integer kimi yazmayın.

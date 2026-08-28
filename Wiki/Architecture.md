@@ -21,15 +21,18 @@ flowchart LR
     I --> R2[(Media R2)]
     N --> C[(R2 incremental cache)]
     SA --> E[Resend]
+    RH --> WH[Resend imzalı webhook]
+    N --> CR[Saved-search cron endpoint]
 ```
 
 ### Əsas sərhədlər
 
 | Sərhəd | Məsuliyyət |
 |---|---|
-| `src/app/(site)` | Navbar və Footer daxil olan ictimai sayt, public auth və kabinet |
+| `src/app/[locale]/(site)` | AZ/EN/RU Navbar və Footer daxil olan ictimai sayt |
+| `src/app/[locale]/(account)` | Public auth, kabinet, komanda, saxlanmış axtarış və bildirişlər |
 | `src/app/admin` | Staff sessiyası və permission tələb edən idarə paneli |
-| `src/app/giris` | Məcburi TOTP-li əməkdaş giriş axını |
+| `src/app/[locale]/giris` | Məcburi TOTP-li lokallaşdırılmış əməkdaş giriş axını |
 | `src/app/api` | Multipart media və hesab menyusu kimi Route Handler-lar |
 | `src/lib/queries.ts` | İctimai və admin oxuma sorğularının mərkəzi qatı |
 | `src/lib/auth` | Cookie, sessiya, parol, TOTP, lockout və guard-lar |
@@ -38,7 +41,7 @@ flowchart LR
 
 ## Render və məlumat axını
 
-İctimai data səhifələrinin çoxu Server Component-dir. D1 binding-i yalnız sorğu kontekstində əlçatan olduğuna görə data oxuyan səhifələr `dynamic = "force-dynamic"` istifadə edir.
+İctimai səhifələr Server Component-dir. Ana səhifə və sabit locale səhifələri SSG ola bilər; request-time D1 lazım olan detail, axtarış, sitemap və texniki marşrutlar dinamik render olunur. Tez-tez oxunan public sorğular `unstable_cache`, mərkəzi public tag-lər, D1 revalidation cədvəli və R2 incremental cache ilə idarə olunur. Runtime parametr build zamanı əlçatan olmadıqda təsdiqlənmiş `siteConfig` ehtiyat dəyərinə düşür.
 
 ```mermaid
 sequenceDiagram
@@ -47,7 +50,7 @@ sequenceDiagram
     participant Q as queries.ts
     participant DB as D1
 
-    U->>P: GET /emlaklar?elan=SALE&seher=baki
+    U->>P: GET /az/emlaklar?elan=SALE&seher=baki
     P->>P: Parametrləri normallaşdır
     P->>Q: getProperties(filters)
     Q->>Q: public predicate + filter + order
@@ -74,6 +77,8 @@ Ayrıca REST oxuma API-si yoxdur. Server Components birbaşa query qatını ça�
 `PUBLIC_PROPERTY_STATUSES` yalnız `PUBLISHED`, `RESERVED`, `SOLD` və `RENTED` dəyərlərini saxlayır. `DRAFT`, `PENDING`, `ARCHIVED`, soft-delete və demo qeydləri ictimai sorğulara düşmür.
 
 Eyni prinsip layihə və bloqda `deletedAt`, `isDemo`, aktivlik və publish statusu ilə tətbiq edilir.
+
+Tərəfdaş public sorğusu `deletedAt: null`, `status: ACTIVE`, `verified`, `officialPartner` və `showPublicly` şərtlərinin mərkəzi birləşməsindən keçir. Müqavilə və daxili qeydlər public select-lərə daxil edilmir.
 
 ## Query və UI data müqaviləsi
 
@@ -139,10 +144,11 @@ Cloudflare Images binding-i lokal mühitdə yoxdursa original baytlar saxlanır;
 | `NEXT_INC_CACHE_R2_BUCKET` | OpenNext ISR/revalidate nəticələri |
 | `IMAGES` | Şəkil məlumatı və WebP transformasiyası |
 | `LOGIN_LIMIT` | Login və qeydiyyat IP limiti |
-| `CONTACT_LIMIT` | Əlaqə forması üçün ayrılmış, hazırda action-a bağlanmamış limit |
+| `CONTACT_LIMIT` | Əlaqə forması üçün IP əsaslı limit; honeypot və origin qapısından sonra işləyir |
 | `ADMIN_LIMIT` | Admin və public kabinet mutation limit-i |
 | `WORKER_SELF_REFERENCE` | OpenNext revalidation self-reference |
 | `ASSETS` | Build statik asset-ləri |
+| `NEXT_TAG_CACHE_D1` | OpenNext tag revalidation metadata-sı (`revalidations`) |
 
 Production və staging üçün D1, R2, rate-limit namespace və Worker adları ayrıdır. `env.staging.routes = []` production custom domain-in staging Worker-ə keçməsinin qarşısını alır.
 
@@ -150,7 +156,13 @@ Production və staging üçün D1, R2, rate-limit namespace və Worker adları a
 
 Filtrlərin həqiqət mənbəyi URL query parametrləridir. `SearchPanel` cari vəziyyəti `useSearchParams` ilə deyil, server səhifəsindən gələn `initial` propu ilə alır. Bu yanaşma ana səhifənin statik render imkanını qoruyur.
 
-Əsas parametrlər: `elan`, `axtaris`, `tip`, `seher`, `rayon`, `otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `tikili`, `dovr`, `mertebe_min`, `mertebe_max`, `ilk_mertebe_yox`, `son_mertebe_yox`, `sekilli`, `xususiyyet`, `siralama`, `sehife`.
+Əsas parametrlər: `elan`, `axtaris`, `tip`, `seher`, `rayon`, `metro`, `otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `tikili`, `dovr`, `mertebe_min`, `mertebe_max`, `ilk_mertebe_yox`, `son_mertebe_yox`, `sekilli`, `xususiyyet`, `siralama`, `sehife`.
+
+## Lokallaşdırma sərhədi
+
+`next-intl` bütün istifadəçi səhifələrini həmişə locale prefiksi ilə təqdim edir: `/az`, `/en`, `/ru`. Prefikssiz köhnə public URL-lər middleware ilə uyğun locale-a yönləndirilir. `/admin`, `/api`, `/media`, sitemap, robots və `llms.txt` locale ağacından kənardadır. Köhnə `/{locale}/admin/...` ünvanları 308 ilə canonical `/admin/...` yoluna keçir.
+
+Kontentdə AZ əsas dildir. Tərəfdaşın EN/RU sahəsi boş olduqda AZ mətni fallback kimi göstərilir; UI mətnləri locale JSON namespace-lərindən gəlir.
 
 ## SEO qatı
 
@@ -158,13 +170,22 @@ Filtrlərin həqiqət mənbəyi URL query parametrləridir. `SearchPanel` cari v
 
 - `buildMetadata()` — title, description, canonical, Open Graph, Twitter və noindex;
 - `organizationSchema()` — `RealEstateAgent`;
+- `websiteSchema()`;
 - `propertySchema()` — `Product` + `Offer`;
 - `articleSchema()`;
 - `serviceSchema()`;
+- agentlik, tərəfdaş, FAQ və siyahı struktur datası;
 - `breadcrumbSchema()`;
 - `jsonLd()`.
 
 `SITE_URL` həm build, həm Worker runtime-da eyni mühitə uyğun ötürülməlidir. `IS_STAGING=true` bütün `buildMetadata` çağırışlarını noindex edir və `robots.ts` bütün staging route-larını bloklayır.
+
+## Asinxron əməliyyatlar
+
+- Əlaqə və saved-search e-poçtları Resend vasitəsilə göndərilir.
+- `luxehomeestate-cron` adlı ayrıca scheduled Worker hər gün 05:00 UTC-də qorunan `/api/cron/saved-search-digest` endpoint-inə `CRON_SECRET` ilə POST edir.
+- `/api/webhooks/resend` Svix imzasını `RESEND_WEBHOOK_SECRET` ilə yoxlayır və məktub məzmununu deyil, `EmailActivity` çatdırılma/qəbul metadatasını saxlayır.
+- `DomainEvent` kritik domen hadisələri üçün yüngül outbox rolunu daşıyır; tam event sourcing deyil.
 
 ## Dizayn sistemi
 

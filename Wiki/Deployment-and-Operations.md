@@ -7,6 +7,7 @@ Tətbiq `@opennextjs/cloudflare` ilə Cloudflare Worker formatına çevrilir. Pr
 | Resurs | Production | Staging |
 |---|---|---|
 | Worker | `luxehomeestate` | `luxehomeestate-staging` |
+| Saved-search cron Worker | `luxehomeestate-cron` | `luxehomeestate-cron-staging` |
 | URL | `luxehomeestate.az`, `www.luxehomeestate.az` | `luxehomeestate-staging.amiyevbahadur.workers.dev` |
 | D1 | `luxehome-db` | `luxehome-db-staging` |
 | Media R2 | `luxehome-media` | `luxehome-media-staging` |
@@ -26,12 +27,13 @@ Tətbiq `@opennextjs/cloudflare` ilə Cloudflare Worker formatına çevrilir. Pr
 |---|---|---|
 | `ASSETS` | Static assets | `.open-next/assets` |
 | `DB` | D1 | Prisma runtime |
+| `NEXT_TAG_CACHE_D1` | D1 | OpenNext tag revalidation (`revalidations` cədvəli) |
 | `MEDIA` | R2 | Yüklənən şəkillər |
 | `NEXT_INC_CACHE_R2_BUCKET` | R2 | OpenNext incremental cache |
 | `IMAGES` | Images | Resize, info və WebP output |
 | `WORKER_SELF_REFERENCE` | Service | Revalidation self-call |
 | `LOGIN_LIMIT` | Rate limit | Login və public qeydiyyat |
-| `CONTACT_LIMIT` | Rate limit | Əlaqə forması üçün rezerv; action-a hələ qoşulmayıb |
+| `CONTACT_LIMIT` | Rate limit | Əlaqə forması üçün IP əsaslı limit |
 | `ADMIN_LIMIT` | Rate limit | Admin/public listing mutation-ları |
 
 ## Secret-lər
@@ -43,6 +45,10 @@ npx wrangler secret put AUTH_SECRET
 npx wrangler secret put RESEND_API_KEY
 npx wrangler secret put RESEND_FROM_EMAIL
 npx wrangler secret put NOTIFICATION_EMAIL
+npx wrangler secret put RESEND_WEBHOOK_SECRET
+npx wrangler secret put CRON_SECRET
+npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN
+npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc
 ```
 
 Staging:
@@ -52,6 +58,10 @@ npx wrangler secret put AUTH_SECRET --env staging
 npx wrangler secret put RESEND_API_KEY --env staging
 npx wrangler secret put RESEND_FROM_EMAIL --env staging
 npx wrangler secret put NOTIFICATION_EMAIL --env staging
+npx wrangler secret put RESEND_WEBHOOK_SECRET --env staging
+npx wrangler secret put CRON_SECRET --env staging
+npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN --env staging
+npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc --env staging
 ```
 
 Qaydalar:
@@ -60,6 +70,9 @@ Qaydalar:
 - secret terminal tarixçəsi, issue, Wiki və commit-ə yazılmamalıdır;
 - `AUTH_SECRET` versiyasız rotasiya sessiya JWT-lərini etibarsız edir və TOTP secret-lərinin açılmasını poza bilər;
 - Resend credential sızma şübhəsində dərhal revoke edilməlidir.
+- `CRON_SECRET` əsas Worker və ayrıca cron Worker-də eyni mühit üçün eyni olmalıdır;
+- production və staging `CRON_SECRET` dəyərləri bir-birindən fərqli olmalıdır;
+- `CLOUDFLARE_ANALYTICS_TOKEN` yalnız `Analytics:Read` icazəsi ilə məhdudlaşdırılmalıdır.
 
 ## OpenNext konfiqurasiyası
 
@@ -108,13 +121,15 @@ Bu parametrlər deploy workaround-u deyil, cari runtime müqaviləsinin hissəsi
 
    ```bash
    npm run deploy:staging
+   npm run deploy:cron:staging
    ```
 
 6. Smoke test:
 
    - ana səhifə;
+   - AZ/EN/RU locale keçidi və canonical/hreflang;
    - əmlak siyahısı və detail;
-   - public login/qeydiyyat/kabinet;
+   - locale-prefiksli public login/qeydiyyat/kabinet;
    - staff login → TOTP → admin;
    - bir read-only admin səhifəsi;
    - test media upload;
@@ -138,6 +153,7 @@ Bu parametrlər deploy workaround-u deyil, cari runtime müqaviləsinin hissəsi
 
    ```bash
    npm run deploy
+   npm run deploy:cron
    ```
 
 7. Production smoke test aparın.
@@ -148,35 +164,44 @@ Production seed, taksonomiya və demo-clean əmrləri deploy runbook-un standart
 
 ## Production smoke checklist-i
 
-- [ ] `/` HTTP 200 və loqo/tema işləyir
-- [ ] `/emlaklar` filtr və səhifələmə işləyir
-- [ ] ən azı bir `/emlaklar/[slug]` detail açılır
+- [ ] `/az`, `/en`, `/ru` HTTP 200 və locale keçidi işləyir
+- [ ] `/az/emlaklar` filtr və səhifələmə işləyir
+- [ ] ən azı bir `/{locale}/emlaklar/[slug]` detail açılır
 - [ ] xəritə yalnız koordinat olduqda render olunur
 - [ ] favorit LocalStorage-də qalır
 - [ ] müqayisə limiti 4-dür
-- [ ] `/agentlikler` yalnız verified agentlikləri göstərir
-- [ ] `/qeydiyyat` və `/daxil-ol` açılır
-- [ ] sessiyasız `/kabinet` public login-ə yönləndirir
+- [ ] `/{locale}/agentlikler` yalnız verified agentlikləri göstərir
+- [ ] `/{locale}/terefdaslar` yalnız public görünüş şərtlərini keçən tərəfdaşları göstərir
+- [ ] `/{locale}/qeydiyyat` və `/{locale}/daxil-ol` açılır
+- [ ] sessiyasız `/{locale}/kabinet` public login-ə yönləndirir
 - [ ] sessiyasız `/admin` staff login-ə yönləndirir
+- [ ] `/{locale}/admin/...` `/admin/...` canonical marşrutuna 308 qaytarır
 - [ ] staff TOTP və admin permission işləyir
 - [ ] media yükləmə və `/media/...` delivery işləyir
 - [ ] əlaqə formu lead yaradır, Resend konfiqurasiya olunubsa bildiriş gəlir
+- [ ] əlaqə formunda honeypot, same-origin və `CONTACT_LIMIT` qoruması işləyir
+- [ ] saved-search cron qorunan endpoint-i uğurla çağırır
+- [ ] Resend webhook imzasız sorğunu rədd edir və imzalı event-i `EmailActivity`-yə yazır
 - [ ] `/sitemap.xml` və `/robots.txt` 200 qaytarır
 - [ ] production canonical-lar `https://luxehomeestate.az` göstərir
 - [ ] admin/kabinet response `no-store` alır
 
-## Canlı audit qeydi — 23 avqust 2026
+## Canlı audit qeydi — 28 avqust 2026
+
+`main@ed93ba4` kodu Worker deploy `11ade039-1f72-4777-b1e7-33df3376aef9` üzərində yoxlanıb. D1-də qarışıq tarix formatlarının Prisma adapterini çökdürməsi `0019_normalize_d1_datetime_storage.sql` ilə aradan qaldırılıb; public sayt və admin panel həmin deploy-dan sonra yenidən əlçatan olub.
 
 Browser User-Agent ilə aşağıdakı nəticələr alınıb:
 
 | URL | Nəticə |
 |---|---|
-| `/` | 200 |
-| `/emlaklar` | 200 |
-| `/agentlikler` | 200 |
-| `/muqayise` | 200 |
-| `/qeydiyyat` | 200 |
-| `/admin` | `/giris?davam=%2Fadmin&yeniden=1`-ə redirect, final 200 |
+| `/az`, `/en`, `/ru` | 200 |
+| `/az/emlaklar` | 200 |
+| `/az/agentlikler` | 200 |
+| `/az/terefdaslar` | 200 |
+| `/az/muqayise` | 200 |
+| `/az/qeydiyyat` | 200 |
+| `/admin` | `/az/giris?davam=%2Fadmin&yeniden=1`-ə redirect, final 200 |
+| `/az/admin/audit?sehife=2` | `/admin/audit?sehife=2`-yə 308 |
 | `/sitemap.xml` | 200 |
 | `/robots.txt` | 200 |
 
@@ -186,13 +211,13 @@ Cloudflare Managed Content/Bot qaydası default CLI User-Agent ilə bəzi HTML r
 
 Production `robots.txt` Cloudflare Managed Content Signals blokundan sonra tətbiqin öz qaydalarını da verir:
 
-- public route-lar allow;
+- locale-prefiksli public route-lar allow;
 - `/admin`, `/giris`, `/favoritler` disallow;
 - sitemap və host production domeninə bağlıdır.
 
 Staging `IS_STAGING=true` olduqda tətbiq bütün route-ları disallow edir.
 
-Sitemap D1-dən public property, project, service və blog qeydlərini oxuyur. Statik siyahıya yeni indexlənən route əlavə edildikdə `src/app/sitemap.ts` də yenilənməlidir.
+Sitemap D1-dən public property, project, service, blog, agency və partner qeydlərini oxuyur; AZ/EN/RU alternativləri ilə statik SEO səhifələrini də daxil edir. Yeni indexlənən route əlavə ediləndə `src/app/sitemap.ts` və locale alternativləri birlikdə yenilənməlidir.
 
 ## Miqrasiya təhlükəsizliyi
 
@@ -203,6 +228,8 @@ Sitemap D1-dən public property, project, service və blog qeydlərini oxuyur. S
 - Schema və tətbiq deploy sırası backward-compatible planlanır.
 - Seed migration əvəzi deyil.
 - Staging D1 production məlumatının yeganə backup-u sayılmır.
+- Prisma `DateTime` sahələri D1-də ISO-8601 mətn kimi saxlanmalıdır; Unix integer və ISO mətnin qarışması runtime parse xətası yaradır.
+- Tarix formatı dəyişikliklərində `0019_normalize_d1_datetime_storage.sql` miqrasiyasının invariantı qorunmalıdır.
 
 ### Rollback yanaşması
 
@@ -240,6 +267,8 @@ Wrangler observability production və staging üçün aktivdir. Tətbiq səviyy�
 - login `RATE_LIMITED`, `LOCKED`, `BAD_TOTP` artımı;
 - media conversion/R2 rollback xətası;
 - Resend delivery xətası;
+- Resend webhook signature/processing xətası və `EmailActivity` statusları;
+- saved-search cron çağırışı, digest nəticəsi və `CRON_SECRET` uyğunsuzluğu;
 - admin audit log-da kütləvi dəyişiklik;
 - sitemap və robots əlçatanlığı;
 - cache hit/revalidation problemləri.

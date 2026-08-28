@@ -1,11 +1,11 @@
 # Luxe Home Estate — Texniki Wiki
 
-> **Son tam audit:** 23 avqust 2026<br>
+> **Son tam audit:** 28 avqust 2026<br>
 > **Branch:** `main`<br>
-> **Audit bazası:** [`f7348b2`](https://github.com/MuradoffTehmez/LuxeHome/commit/f7348b22665b1230c8c01afac37eaa02d9e907da)<br>
-> **Production:** [luxehomeestate.az](https://luxehomeestate.az)
+> **Audit bazası:** [`ed93ba4`](https://github.com/MuradoffTehmez/LuxeHome/commit/ed93ba49aae705f7da5d10aa92b9e80fe177095e)<br>
+> **Production:** [luxehomeestate.az](https://luxehomeestate.az) · Worker `11ade039-1f72-4777-b1e7-33df3376aef9`
 
-Luxe Home Estate Azərbaycan bazarı üçün daşınmaz əmlak platformasıdır. Sistem ictimai elan kataloqunu, agentlik profilini, layihə və məzmun səhifələrini, istifadəçi kabinetini və rol əsaslı idarə panelini vahid Next.js tətbiqində birləşdirir.
+Luxe Home Estate Azərbaycan bazarı üçün çoxdilli daşınmaz əmlak platformasıdır. Sistem AZ/EN/RU ictimai elan kataloqunu, agentlik və rəsmi tərəfdaş profillərini, layihə və məzmun səhifələrini, istifadəçi kabinetini və rol əsaslı idarə panelini vahid Next.js tətbiqində birləşdirir.
 
 Bu Wiki planlaşdırılan arxitekturanı deyil, audit edilən commit-dəki faktiki kod vəziyyətini təsvir edir. Gələcək və ya yarımçıq imkanlar ayrıca **Cari vəziyyət və yol xəritəsi** səhifəsində qeyd olunur.
 
@@ -15,7 +15,7 @@ Bu Wiki planlaşdırılan arxitekturanı deyil, audit edilən commit-dəki fakti
 |---|---|
 | [[Arxitektura|Architecture]] | Sistem sərhədləri, data axını, Cloudflare və dizayn prinsipləri |
 | [[Funksiyalar və marşrutlar|Features-and-Routes]] | İctimai sayt, kabinet, admin və API inventarı |
-| [[Məlumat modeli|Data-Model]] | 21 Prisma modeli, domen qaydaları və status müqavilələri |
+| [[Məlumat modeli|Data-Model]] | 33 Prisma modeli, domen qaydaları və status müqavilələri |
 | [[Təhlükəsizlik və autentifikasiya|Security-and-Authentication]] | Staff 2FA, public auth, sessiya, RBAC, CSRF və media müdafiəsi |
 | [[İnkişaf təlimatı|Development-Guide]] | Lokal quraşdırma, əmrlər, konvensiyalar və keyfiyyət qapısı |
 | [[Deployment və əməliyyatlar|Deployment-and-Operations]] | Staging/production, D1/R2, secret, miqrasiya və runbook |
@@ -23,7 +23,7 @@ Bu Wiki planlaşdırılan arxitekturanı deyil, audit edilən commit-dəki fakti
 
 ## İcraçı xülasə
 
-Layihənin ictimai hissəsi production-da işləyir. 23 avqust 2026 tarixli smoke yoxlamasında ana səhifə, əmlak kataloqu, agentliklər, müqayisə və qeydiyyat marşrutları HTTP 200 qaytardı; `/admin` sessiyasız sorğunu `/giris` səhifəsinə yönləndirdi. `robots.txt` və `sitemap.xml` də əlçatan idi.
+28 avqust 2026 tarixində production ana səhifəsi, ictimai naviqasiya, əlaqə və TREVA tərəfdaş profili, həmçinin autentifikasiya olunmuş admin marşrutları real brauzerdə yoxlanıb. D1-də qarışıq `Service` DateTime tiplərinin yaratdığı ictimai səhifə xətası `0019` miqrasiyası ilə aradan qaldırılıb. Desktop və 390 px mobil yoxlamasında əsas admin səhifələrində üfüqi daşma və brauzer konsol xətası aşkarlanmayıb.
 
 ### Hazırlıq matrisi
 
@@ -32,30 +32,32 @@ Layihənin ictimai hissəsi production-da işləyir. 23 avqust 2026 tarixli smok
 | İctimai kataloq və detallar | ✅ Hazır | Filtr, sıralama, xəritə, qalereya, SEO |
 | Favorit və müqayisə | ✅ Hazır | LocalStorage favorit, ən çox 4 cookie əsaslı müqayisə |
 | Agentlik kataloqu | ✅ Hazır | Yalnız təsdiqlənmiş və aktiv agentliklər |
+| Tərəfdaşlıq sistemi | ✅ Hazır | Çoxdilli profil, görünürlük, müqavilə və entity əlaqələri |
 | İctimai hesab və kabinet | 🟡 Qismən | Qeydiyyat, profil, elan yaratma və status; edit/delete yoxdur |
+| Saxlanmış axtarış/bildiriş | ✅ Hazır | Dərhal/paket uyğunluq, panel bildirişi və cron digest |
 | Staff autentifikasiyası | ✅ Hazır | Parol, məcburi TOTP, backup kod, sessiya və lockout |
-| Admin panel | ✅ Əməliyyat | Əsas kontent/CRM/media/istifadəçi CRUD və audit |
+| Admin panel | ✅ Əməliyyat | Kontent, moderasiya, CRM, tərəfdaş, SEO, analitika, hesab və audit |
 | Media pipeline | ✅ Hazır | Magic-byte, Images çevirməsi, R2 master + thumbnail |
-| SEO | 🟡 Qismən | Metadata/JSON-LD/sitemap/robots var; yeni route-ların bir hissəsi sitemap-da deyil |
-| Əlaqə və lead | 🟡 Qismən | D1 + Resend var; anti-spam action-a bağlanmayıb |
-| Test və CI | 🟡 Qismən | 21 Vitest faylı var; D1 integration, E2E və CI yoxdur |
+| SEO | ✅ Əməliyyat | hreflang, metadata/JSON-LD, sitemap, robots, redirects, SEO audit və `llms.txt` |
+| Əlaqə və lead | ✅ Əməliyyat | Same-origin, honeypot, rate limit, D1, Resend və sürətli status |
+| Korporativ e-poçt | 🟡 Konfiqurasiya | UI/webhook hazırdır; production `RESEND_WEBHOOK_SECRET` tələb edir |
+| Test və CI | 🟡 Qismən | 81 Vitest faylı/335 test; avtomatlaşdırılmış D1 E2E və CI yoxdur |
 
 ## Audit snapshot-u
 
 | Metrika | Nəticə |
 |---|---:|
-| `page.tsx` marşrutu | 49 |
-| Prisma modeli | 21 |
-| Server Action faylı | 16 |
-| Route Handler | 4 |
-| Test faylı | 21 |
-| Vitest testi | 107 |
-| `src/` TypeScript/TSX/CSS faylı | 214 |
-| `src/` sətir sayı | 23 323 |
+| `page.tsx` faylı | 71 |
+| Prisma modeli | 33 |
+| D1 miqrasiya faylı | 20 |
+| Server Action faylı | 28 |
+| Route Handler | 7 |
+| Test faylı | 81 |
+| Vitest testi | 335 |
 
 Bu rəqəmlər audit tarixinin snapshot-udur və yeni commit-lərlə dəyişə bilər.
 
-Audit zamanı TypeScript, ESLint, 21 fayldakı 107 Vitest testi və Next.js production build uğurla keçib.
+Audit zamanı TypeScript, 81 fayldakı 335 Vitest testi, Next.js production build və OpenNext production deploy uğurla keçib.
 
 ## Əsas texnologiyalar
 
@@ -68,6 +70,7 @@ Audit zamanı TypeScript, ESLint, 21 fayldakı 107 Vitest testi və Next.js prod
 | Media | Cloudflare R2 və Images |
 | Auth | `jose`, Web Crypto PBKDF2, TOTP, AES-GCM |
 | E-poçt | Resend |
+| Lokallaşdırma | `next-intl`, AZ/EN/RU |
 | Test | Vitest və Cloudflare `workerd` runtime |
 
 ## Dəyişməz sahiblik qeydi

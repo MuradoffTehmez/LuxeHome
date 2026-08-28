@@ -1,18 +1,20 @@
 # Funksiyalar və marşrutlar
 
-Audit edilən commit-də 49 `page.tsx` marşrutu, 16 Server Action faylı və 4 Route Handler mövcuddur.
+`main@ed93ba4` snapshot-unda 71 `page.tsx` faylı, 28 Server Action faylı və 7 Route Handler mövcuddur. İstifadəçi səhifələri həmişə `/{locale}` prefiksi (`az`, `en`, `ru`) daşıyır; aşağıdakı public cədvəldə qısa yol göstərilir.
 
 ## İctimai sayt
 
 | Marşrut | Funksiya | Data/render |
 |---|---|---|
-| `/` | Ana səhifə, seçilmiş elanlar, layihə/xidmət/bloq blokları | D1 oxuyan dinamik səhifə |
+| `/` | Ana səhifə, seçilmiş elanlar, layihə/xidmət/bloq/tərəfdaş blokları | SSG + public cache |
 | `/emlaklar` | Kataloq, URL filtrləri, sıralama, aktiv filtr nişanları, səhifələmə | `getProperties`, `getFilterOptions` |
 | `/emlaklar/[slug]` | Elan detalı, qalereya, xəritə, agentlik nişanı, oxşar elanlar | Public predicate ilə D1 |
 | `/layiheler` | Aktiv və real layihələrin siyahısı | D1 |
 | `/layiheler/[slug]` | Layihə detalı və qalereya | D1 |
 | `/agentlikler` | Təsdiqlənmiş agentlik kataloqu | Aktiv user + `isVerified` |
 | `/agentlikler/[slug]` | Agentlik profili və public elanları | D1 |
+| `/terefdaslar` | Public/rəsmi tərəfdaş kataloqu və tip filtri | Public partner predicate |
+| `/terefdaslar/[slug]` | Çoxdilli tərəfdaş profili, əlaqəli elan/layihə və izlənən keçidlər | D1 + cache |
 | `/xidmetler` | Aktiv xidmətlər | D1 |
 | `/xidmetler/[slug]` | Xidmət detalı və JSON-LD | D1 |
 | `/blog` | Kateqoriya, axtarış və səhifələmə | D1 |
@@ -25,6 +27,9 @@ Audit edilən commit-də 49 `page.tsx` marşrutu, 16 Server Action faylı və 4 
 | `/mexfilik-siyaseti` | Məxfilik siyasəti | Statik |
 | `/istifade-sertleri` | İstifadə şərtləri | Statik |
 | `/cookie-siyaseti` | Cookie siyasəti | Statik |
+| `/rayon/[slug]`, `/metro/[slug]` | Yerə görə indekslənən əmlak landing-i | D1 |
+| `/[seoLanding]` | Satış/kirayə, tip və Bakı niyyətli SEO landing-ləri | D1 |
+| `/[...slug]` | Aktiv 301/302 redirect və 404 hit qeydiyyatı | D1 |
 
 ### Əmlak kataloqu
 
@@ -72,6 +77,10 @@ Hesab tələb olunmur və cihazlararası sinxronizasiya yoxdur. Prisma `Favorite
 | `/kabinet/profil` | Ad, telefon, agentlik məlumatı və parol |
 | `/kabinet/elanlar` | Hesaba aid elanlar və statusları |
 | `/kabinet/elanlar/yeni` | Mülk sahibi və agentlik üçün elan forması |
+| `/kabinet/axtarislarim` | Filtri saxlama, tezlik və aktivlik idarəetməsi |
+| `/kabinet/bildirisler` | Oxunmuş/oxunmamış bildirişlər |
+| `/kabinet/son-baxilanlar` | Brauzer tarixçəsinə əsaslanan son elanlar |
+| `/kabinet/komanda` | Agentlik sahibi üçün menecer/agent təsdiqi |
 
 ### Hesab növləri
 
@@ -82,7 +91,7 @@ Hesab tələb olunmur və cihazlararası sinxronizasiya yoxdur. Prisma `Favorite
 | `AGENCY` | ✅ | ✅ | ❌ |
 | `STAFF` | Yalnız admin/bootstrap | Admin CRUD | ✅ |
 
-Təsdiqlənməmiş agentliyin elanı `PENDING` olur. Admin `Agency.isVerified` dəyərini aktiv etdikdən sonra həmin agentliyin yeni elanları `PUBLISHED` statusu ilə birbaşa dərc olunur. Təsdiqi ləğv etmək əvvəl dərc edilmiş elanların statusunu avtomatik dəyişmir.
+İctimai hesabın `User.approvedAt` təsdiqi aktivlikdən ayrıdır. Agentlikdə bundan əlavə `Agency.isVerified` tələb olunur. Agentlik user-i profili olmadan qalıbsa admin panel profil yaradıb sonra təsdiqləyə bilir. Təsdiqlənməmiş agentliyin elanı `PENDING`, təsdiqlənmiş agentliyin yeni elanı `PUBLISHED` olur. Təsdiqi ləğv etmək əvvəl dərc edilmiş elanların statusunu avtomatik dəyişmir.
 
 ### İctimai elan göndərmə
 
@@ -132,16 +141,27 @@ Hazırda kabinet elan yaratma və status izləmə verir; redaktə və silmə rou
 | `/admin/muracietler/[id]` | Status, assignee, admin note və silmə | `lead:manage` |
 | `/admin/media` | Upload, axtarış, alt mətn və silmə | `media:manage` |
 | `/admin/istifadeciler` | Staff yaratma, rol/aktivlik, parol/2FA/session reset | `user:manage` |
-| `/admin/agentlikler` | Agentlik təsdiqi və ləğvi | `user:manage` |
-| `/admin/parametrler` | Runtime sayt parametrləri | `settings:manage` |
+| `/admin/moderation` | Pending elanlar, approve/reject və moderasiya qeydi | `property:manage` |
+| `/admin/taksonomiya` | Əmlak tipi, yerləşmə və xüsusiyyətlər | uyğun manage permission |
+| `/admin/agentlikler` | Profili çatışmayan AGENCY hesabı, profil yaratma və verification | `user:manage` |
+| `/admin/hesablar` | İctimai hesab təsdiqi və ayrıca aktiv/deaktiv | `user:manage` |
+| `/admin/terefdaslar` | Tərəfdaş CRUD, public görünürlük, müqavilə və entity əlaqələri | `partner:*` |
+| `/admin/seo` | Route və metadata auditı | Staff |
+| `/admin/redirects` | 301/302 və 404 hit idarəetməsi | `settings:manage` |
+| `/admin/analitika` | Cloudflare GraphQL trafik metrikləri | Staff + token |
+| `/admin/e-poct` | Resend e-poçt event metadata-sı | `lead:manage` |
+| `/admin/security` | Login və sessiya təhlükəsizlik görünüşü | `user:manage` |
+| `/admin/audit` | 12 sətirlik cədvəl, filtr və Super Admin sıfırlama | Staff / Super Admin reset |
+| `/admin/hesabim` | Ad, telefon, avatar, locale, tema, parol, backup kod və sessiya | Staff |
+| `/admin/parametrler` | Əlaqə, bildiriş və komanda runtime parametrləri | `settings:manage` |
 
 ### Rol matrisi
 
 | Rol | İcazələr |
 |---|---|
-| `SUPER_ADMIN` | Bütün 8 permission |
-| `ADMIN` | Əmlak, layihə, xidmət, bloq, lead və media |
-| `EDITOR` | Bloq və media |
+| `SUPER_ADMIN` | Bütün 16 permission, o cümlədən müqavilə və audit reset |
+| `ADMIN` | Əsas kontent/CRM/media və müqavilə xaric tərəfdaş əməliyyatları |
+| `EDITOR` | Bloq, media və tərəfdaşlara read-only baxış |
 
 User, agentlik və settings idarəetməsi yalnız `SUPER_ADMIN`-ə açıqdır.
 
@@ -153,6 +173,9 @@ User, agentlik və settings idarəetməsi yalnız `SUPER_ADMIN`-ə açıqdır.
 | `POST /api/hesab/media` | Public elan şəkli yükləmə | `OWNER`/`AGENCY`, ownership, origin, rate limit |
 | `GET /api/hesab/menu` | Cari hesab üçün header menu məlumatı | Optional public session |
 | `GET /media/[...key]` | R2 obyektinin public delivery-si | Key parser və cache metadata |
+| `POST /api/cron/saved-search-digest` | Daily/weekly axtarış uyğunluğu və digest | `CRON_SECRET` Bearer |
+| `POST /api/webhooks/resend` | Resend/Svix event qəbulu | `RESEND_WEBHOOK_SECRET` imzası |
+| `GET /llms.txt` | Maşın oxunaqlı public sayt xəritəsi | Public |
 
 ## Server Action inventarı
 
@@ -163,6 +186,7 @@ User, agentlik və settings idarəetməsi yalnız `SUPER_ADMIN`-ə açıqdır.
 - qeydiyyat, giriş və çıxış;
 - profil və parol yeniləmə;
 - public elan yaratma;
+- agentlik komandası, saxlanmış axtarış, bildiriş və son baxılanlar;
 - müqayisə datasının alınması.
 
 ### Staff
@@ -173,8 +197,11 @@ User, agentlik və settings idarəetməsi yalnız `SUPER_ADMIN`-ə açıqdır.
 - media alt mətni və silmə;
 - staff user lifecycle;
 - agentlik verification;
+- ictimai hesab approval/activation;
+- tərəfdaş və entity əlaqələri;
+- audit reset, redirect, moderasiya, taksonomiya və security əməliyyatları;
 - runtime settings;
-- hesab parolu və sessiyalar.
+- staff profili, avatar, backup kodu, parol və sessiyalar.
 
 ## SEO və sistem marşrutları
 
@@ -186,4 +213,4 @@ User, agentlik və settings idarəetməsi yalnız `SUPER_ADMIN`-ə açıqdır.
 | `error.tsx` | Brendli global xəta sərhədi |
 | `forbidden.tsx` | Permission rəddi üçün 403 görünüşü |
 
-Hazırkı sitemap statik siyahıda agentlik, FAQ, müqayisə və bəzi yeni public route-ları daxil etmir. Bu boşluq yol xəritəsində qeyd olunub.
+Sitemap locale-lar üzrə public baza səhifələrini, SEO landing-ləri və D1-dən self-canonical əmlak, layihə, xidmət, bloq, agentlik və tərəfdaş detallarını yaradır. Kabinet, auth, admin, favorit və müqayisə indexlənmir. `robots.txt` və metadata eyni locale/canonical siyasətini izləyir.

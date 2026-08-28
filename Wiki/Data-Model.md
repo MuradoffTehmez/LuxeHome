@@ -1,12 +1,13 @@
 # Məlumat modeli
 
-`prisma/schema.prisma` Cloudflare D1/SQLite üçün 21 model saxlayır. SQLite native enum vermədiyi üçün status, rol, hesab növü və kateqoriya dəyərləri `String` kimi yazılır; icazəli dəyərlərin tətbiq səviyyəli həqiqət mənbəyi `src/lib/constants.ts` faylıdır.
+`prisma/schema.prisma` Cloudflare D1/SQLite üçün 33 model saxlayır. SQLite native enum vermədiyi üçün status, rol, hesab növü və kateqoriya dəyərləri `String` kimi yazılır; icazəli dəyərlərin tətbiq səviyyəli həqiqət mənbəyi `src/lib/constants.ts` faylıdır.
 
 ## Domen xəritəsi
 
 ```mermaid
 erDiagram
     USER ||--o| AGENCY : owns
+    AGENCY ||--o{ AGENCY_EMPLOYEE : has
     USER ||--o{ SESSION : has
     USER ||--o{ BACKUP_CODE : owns
     USER ||--o{ PROPERTY : authors
@@ -25,6 +26,12 @@ erDiagram
     PROJECT ||--o{ PROPERTY : groups
     BLOG_CATEGORY ||--o{ BLOG_POST : groups
     PROPERTY ||--o{ LEAD : receives
+    USER ||--o{ SAVED_SEARCH : owns
+    SAVED_SEARCH ||--o{ SAVED_SEARCH_MATCH : finds
+    USER ||--o{ NOTIFICATION : receives
+    PARTNER ||--o{ PROPERTY_PARTNER : links
+    PARTNER ||--o{ PROJECT_PARTNER : links
+    PARTNER ||--o{ AGENCY_PARTNER : links
 ```
 
 ## 1. İstifadəçi və autentifikasiya
@@ -40,7 +47,8 @@ Həm staff, həm ictimai hesabların əsas modelidir.
 - `passwordHash`, `isActive`, `lastLoginAt`;
 - `totpSecret`, `totpEnabledAt`, `mustChangePassword`;
 - `failedAttempts`, `lockedUntil`;
-- profil üçün `name`, `email`, `phone`.
+- public hesab təsdiqi üçün `approvedAt`;
+- profil üçün `name`, `email`, `phone`, `avatarUrl`, `locale` və `theme`.
 
 `role` və `accountType` qəsdən ayrıdır. İctimai hesab sxem məcburiyyətinə görə rol sahəsi daşısa da `accountType !== STAFF` və `authKind !== STAFF_2FA` olduğu üçün admin panelə daxil ola bilmir.
 
@@ -52,6 +60,10 @@ Həm staff, həm ictimai hesabların əsas modelidir.
 - description, logo, telefon, ünvan, website;
 - `isVerified`, `verifiedAt`;
 - user deaktivdirsə və ya agentlik təsdiqlənməyibsə public kataloqda görünmür.
+
+### `AgencyEmployee`
+
+Agentlik sahibindən əlavə ən çox 3 komanda üzvünü saxlayır. E-poçt, ad, `MANAGER`/`AGENT` rolu və `PENDING`/`APPROVED`/`REJECTED` təsdiq statusu agentlik kabinetindən idarə olunur.
 
 ### `Session`
 
@@ -182,6 +194,12 @@ Kod sərt state machine tətbiq etmir; admin icazəli statuslardan istənilənin
 
 User və Property arasında persistent favorit modelidir. Hazırkı public favorit UI-si LocalStorage istifadə edir və bu modelə yazmır.
 
+### `SavedSearch`, `SavedSearchMatch`, `Notification`
+
+- `SavedSearch` istifadəçinin adlandırdığı filtr JSON-unu, `IMMEDIATE`/`DAILY`/`WEEKLY`/`OFF` tezliyini və son yoxlama/bildiriş vaxtını saxlayır.
+- `SavedSearchMatch` eyni əmlakın eyni axtarış üçün təkrar bildirişini bloklayır.
+- `Notification` kabinet bildirişinin başlığını, məzmununu, action URL-ni və `readAt` vəziyyətini saxlayır.
+
 ## 5. Media və sistem
 
 ### `Media`
@@ -209,6 +227,42 @@ Admin mutation auditi:
 - action və entity;
 - optional entity ID, summary və IP;
 - vaxt.
+
+Audit qeydləri cədvəlli admin görünüşündə səhifələnir. Tam sıfırlama yalnız Super Admin üçündür və sıfırlamanın özü yeni audit qeydi yaradır.
+
+### `EmailActivity`
+
+Korporativ məktubun məzmununu deyil, Resend provider ID-si, istiqamət, event, göndərən/alıcı ünvanları, mövzu, message ID, attachment sayı və son hadisə vaxtını saxlayır. `providerId` unikaldır və webhook event-ləri upsert olunur.
+
+### `DomainEvent`
+
+Kritik yazılardan sonra yaranan yüngül outbox qeydidir: event type, entity type/ID və optional JSON payload. `AuditLog` actor izidir; `DomainEvent` isə sistemdə baş verən hadisəni ifadə edir.
+
+### `Redirect`, `NotFoundHit`
+
+- `Redirect` aktiv 301/302 köhnə-yeni URL müqaviləsini və hit sayını saxlayır.
+- `NotFoundHit` yönləndirilməyən yolun ilk/son görünmə vaxtını, referrer və sayını toplayır.
+
+## 6. Rəsmi tərəfdaşlıq
+
+### `Partner`
+
+İstifadəçi hesabı tələb etməyən xarici biznes tərəfdaşıdır. `Agency` ilə qarışdırılmamalıdır. Əsas qruplar:
+
+- AZ/EN/RU qısa və tam təsvir, hüquqi disclaimer;
+- sayt, e-poçt, telefon, WhatsApp və ünvan;
+- əsas/açıq/tünd loqo və cover;
+- partnership type, status, verified/rəsmi/featured/public/homepage görünürlüyü;
+- yalnız təsdiqlənmiş `officialSince` və bitmə tarixi;
+- SEO və OG;
+- yalnız `partner:contract` icazəsi ilə müqavilə metadata-sı;
+- soft-delete və created/updated/deleted actor-ları.
+
+Public profil yalnız `ACTIVE + verified + officialPartner + showPublicly + deletedAt:null` olduqda görünür.
+
+### `PropertyPartner`, `ProjectPartner`, `AgencyPartner`
+
+Tərəfdaşı elan, layihə və agentliklə çox-çox əlaqələndirir. Əlaqədə rol və public görünürlük saxlanılır; elan/layihə üçün source URL və əsas tərəfdaş flag-i də var. Bir entity eyni tərəfdaşla müxtəlif rollarda əlaqələnə bilər.
 
 ## Domen sabitləri
 
@@ -249,6 +303,17 @@ Status və label-i komponentdə hardcode etmək olmaz. Dəyər dəsti, Azərbayc
 | `0003_audit_log.sql` | Admin audit jurnalı |
 | `0004_public_accounts.sql` | Account type, agency və public hesab bazası |
 | `0005_session_auth_kind.sql` | Staff/public sessiya ayrımı |
+| `0006_seo_fields.sql`–`0010_property_metro.sql` | SEO, redirect, Phase 1 bazası, moderasiya və metro |
+| `0011_normalize_service_timestamps.sql` | Köhnə service timestamp backfill-i |
+| `0012_saved_search_notifications.sql` | Saxlanmış axtarış, bildiriş, komanda və domen hadisəsi |
+| `0013_partners.sql` | Tərəfdaşlıq sistemi və əlaqə modelləri |
+| `0014_partner_audit_snapshots.sql` | Audit old/new snapshot-ları |
+| `0015_open_next_tag_cache.sql` | OpenNext `revalidations` cədvəli |
+| `0015_public_account_approval.sql` | İctimai hesab `approvedAt` təsdiqi |
+| `0016_staff_profile_avatar.sql` | Staff avatar/profil sahələri |
+| `0017_project_partner_source.sql` | Layihə tərəfdaş mənbə URL-si |
+| `0018_email_activity.sql` | Korporativ e-poçt metadata jurnalı |
+| `0019_normalize_d1_datetime_storage.sql` | Service/Setting DateTime-larını vahid ISO mətnə çevirir |
 
 Yeni Prisma sxem dəyişikliyi uyğun nömrəli D1 SQL miqrasiyası olmadan tamamlanmış sayılmır.
 
@@ -259,3 +324,4 @@ Yeni Prisma sxem dəyişikliyi uyğun nömrəli D1 SQL miqrasiyası olmadan tama
 - Köhnə demo qeydləri `isDemo` ilə public sorğulardan bloklanır.
 - `prisma/remove-demo-content.sql` yalnız demo qeydlərini təmizləmək üçündür.
 - Remote seed/taksonomiya əmri production məlumatına təsir edə bilər; əvvəl SQL və backup yoxlanmalıdır.
+- D1-də eyni DateTime sütununda integer və mətn storage class qarışdırılmamalıdır. Seed generatoru `Service` və `Setting` tarixlərini ISO-8601 mətnə normallaşdırır.

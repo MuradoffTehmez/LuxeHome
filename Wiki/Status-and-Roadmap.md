@@ -1,139 +1,121 @@
 # Cari vəziyyət və yol xəritəsi
 
-Bu səhifə 23 avqust 2026 tarixində `main@f7348b2` kod auditi və production smoke yoxlaması əsasında hazırlanıb. Prioritetlər faktiki boşluğu göstərir; buradakı maddə avtomatik olaraq təsdiqlənmiş məhsul planı demək deyil.
+Bu səhifə 28 avqust 2026 tarixində `main@ed93ba4` kod auditi, 81 test faylındakı 335 test və production smoke yoxlaması əsasında hazırlanıb. Prioritetlər faktiki boşluğu göstərir; buradakı maddə avtomatik olaraq təsdiqlənmiş məhsul planı demək deyil.
 
 ## Hazırlıq matrisi
 
 | Sahə | Vəziyyət | Qeyd |
 |---|---:|---|
-| Production sayt | ✅ İşlək | Əsas public route-lar canlı smoke test-dən keçib |
-| Əmlak kataloqu | ✅ İşlək | Geniş filtr, sort, pagination və detail |
-| Xəritə | ✅ İşlək | Koordinatlı property üçün Leaflet |
-| Favorit | ✅ İşlək | LocalStorage, hesabla sync deyil |
-| Müqayisə | ✅ İşlək | Cookie, maksimum 4 property |
-| Layihə/xidmət/bloq | ✅ İşlək | Public read və admin CRUD |
-| Agentlik kataloqu | ✅ İşlək | Verification və public profil |
-| Public auth | ✅ İşlək | Qeydiyyat, login, revoke edilə bilən sessiya |
-| Public kabinet | 🟡 Qismən | Profil və create listing; edit/delete yoxdur |
-| Staff auth | ✅ İşlək | TOTP, backup code, lockout, session guard |
-| Admin CRUD | ✅ İşlək | Əsas bütün əməliyyat sahələri |
-| Media | ✅ İşlək | Admin/public upload, R2, Images, thumbnail |
-| Lead/əlaqə | 🟡 Qismən | D1 + Resend; anti-spam və source konteksti çatmır |
-| SEO | 🟡 Qismən | Mərkəzi metadata var; sitemap yeni route-lardan geri qalır |
-| Test | 🟡 Qismən | 21 unit/helper test faylı; integration/E2E yoxdur |
+| Production sayt | ✅ İşlək | Worker deploy `11ade039-1f72-4777-b1e7-33df3376aef9`; AZ/EN/RU public route-lar işləyir |
+| Əmlak kataloqu | ✅ İşlək | Geniş filtr, sort, pagination, metro/rayon və detail |
+| Xəritə | ✅ İşlək | Koordinatlı əmlak üçün Leaflet |
+| Favorit | ✅ İşlək | LocalStorage; hesabla sync hələ yoxdur |
+| Müqayisə | ✅ İşlək | Cookie, maksimum 4 əmlak |
+| Layihə/xidmət/bloq | ✅ İşlək | Public read və permission əsaslı admin CRUD |
+| Tərəfdaşlıq sistemi | ✅ İşlək | Public kataloq/detail, property/project/agency əlaqələri, görünüş və audit |
+| Agentlik kataloqu | ✅ İşlək | Verification, public profil, əməkdaş heyəti və profil bərpası |
+| Public auth | ✅ İşlək | Qeydiyyat, login, approval/activation və revoke edilə bilən sessiya |
+| Public kabinet | 🟡 Qismən | Profil, elan yaratma, saved search, bildiriş və son baxılanlar; elan edit/delete yoxdur |
+| Staff auth | ✅ İşlək | TOTP, backup code, lockout, session və permission guard |
+| Admin panel | ✅ İşlək | Məzmun, CRM, hesab, agentlik, tərəfdaş, SEO, analitika, e-poçt və sistem idarəetməsi |
+| Media | ✅ İşlək | Admin/public upload, R2, Images və thumbnail |
+| Lead/əlaqə | ✅ İşlək | D1 + Resend, honeypot, same-origin və IP rate limit |
+| SEO | ✅ İşlək | Metadata, schema-lar, hreflang, sitemap, robots, redirect və 404 monitorinqi |
+| E-poçt əməliyyatları | 🟡 Konfiqurasiya | Admin jurnalı və imzalı webhook hazırdır; production Resend secret/endpoint tələb edir |
+| Test | 🟡 Qismən | 81 fayl, 335 test; browser E2E və real remote D1 integration yoxdur |
 | CI/CD | 🔴 Yoxdur | Manual quality gate və deploy |
 | Backup/DR | 🔴 Yoxdur | Avtomatlaşdırılmış export/restore drill yoxdur |
-| Çoxdillilik | 🔴 Yoxdur | Yalnız Azərbaycan dili |
+| Çoxdillilik | ✅ İşlək | Public AZ/EN/RU, locale-prefiksli URL və alternates |
 
 ## Son tamamlanan mərhələlər
 
+### Lokalizasiya və SEO
+
+- public səhifələr üçün məcburi `/az`, `/en`, `/ru` prefiksi;
+- locale dəyişdirici, message kataloqları və lokalizə edilmiş metadata;
+- canonical, Open Graph, Twitter və hreflang alternates;
+- `RealEstateAgent`, property, project, service, article, FAQ, breadcrumb, partner və website JSON-LD;
+- çoxdilli sitemap, robots, `llms.txt`, redirect və 404 hit idarəetməsi;
+- Cloudflare trafik/Search Analytics admin görünüşü.
+
+### Staff auth və admin əməliyyatları
+
+- PBKDF2 parol, məcburi TOTP, backup kod və lockout;
+- D1 sessiyası, ayrıca public/staff auth növü və permission guard;
+- əmlak, layihə, xidmət, bloq, kateqoriya, lead, media və setting idarəetməsi;
+- public hesab approval/activation və agency verification/recovery;
+- lead üçün sürətli status dəyişməsi;
+- cədvəl/səhifələmə əsaslı audit jurnalı və yalnız Super Admin üçün sıfırlama;
+- staff profil şəkli, ad, telefon, locale, tema və backup code regenerasiyası;
+- runtime əlaqə məlumatları və default tema parametrinin paneldən idarəsi;
+- korporativ e-poçt jurnalı, Resend webhook və notification parametrləri.
+
+### Public kabinet və bildirişlər
+
+- `USER`, `OWNER`, `AGENCY` qeydiyyatı və təsdiq vəziyyəti;
+- profil və qorunan media upload;
+- owner/agency property submission və moderation statusu;
+- saved search yaratma, redaktə, silmə və uyğunluq izləmə;
+- gündəlik/həftəlik digest üçün ayrıca scheduled Worker;
+- kabinet bildirişləri və son baxılan əmlaklar;
+- agency əməkdaşlarının dəvət və idarə edilməsi.
+
+### Rəsmi tərəfdaşlıq sistemi
+
+- partner CRUD, verification, status və public görünüşün ayrıca idarəsi;
+- public kataloq və SEO detail səhifəsi;
+- əmlak, layihə və agentliklərlə many-to-many əlaqələr;
+- layihə tərəfdaşı source URL-i və əlaqə metadata-sı;
+- public görünüş üçün `ACTIVE + verified + officialPartner + showPublicly + deletedAt=null` qaydası;
+- partner dəyişikliklərinin audit snapshot-ları.
+
 ### Cloudflare-native deployment
 
-- OpenNext Worker build;
-- production/staging izolyasiyası;
+- OpenNext Worker build və production/staging izolyasiyası;
 - Prisma D1 adapter və WASM runtime;
-- D1, R2, Images və incremental cache;
-- custom domain, sitemap və staging noindex.
-
-### Staff auth və admin
-
-- PBKDF2 parol;
-- məcburi TOTP və backup kod;
-- D1 sessiyası, lockout, permission guard;
-- admin dashboard;
-- əmlak, layihə, xidmət, bloq, kateqoriya, lead, media, user və settings idarəetməsi;
-- audit log.
-
-### Public hesab və marketplace
-
-- `USER`, `OWNER`, `AGENCY` qeydiyyatı;
-- public kabinet və profil;
-- qorunan public media upload;
-- owner/agency property submission;
-- pending/verified-agency publish siyasəti;
-- agentlik kataloqu və admin verification.
-
-### Axtarış və seçim
-
-- geniş əmlak taksonomiyası;
-- bina, mərtəbə, kirayə dövrü, şəkil və feature filtrləri;
-- FAQ və footer naviqasiyası;
-- Leaflet xəritəsi;
-- cookie əsaslı 4-lük müqayisə.
+- D1, R2, Cloudflare Images, incremental cache və D1 tag cache;
+- custom domain, staging noindex və server-side revalidation;
+- saved-search üçün ayrıca cron Worker;
+- qarışıq D1 tarix formatını normallaşdıran `0019` miqrasiyası.
 
 ## P0 — production riskinin azaldılması
 
-### Əlaqə forması anti-spam
-
-**Mövcud:** `CONTACT_LIMIT` Wrangler binding-i var, action istifadə etmir. Honeypot və Turnstile yoxdur.
-
-**Hədəf:**
-
-1. server action-da IP əsaslı `CONTACT_LIMIT`;
-2. görünməz honeypot;
-3. Cloudflare Turnstile server verification;
-4. uğursuz e-poçt göndərişinin retry/observability siyasəti;
-5. spam nəticəsini real şəxsi məlumat saxlamadan loglama.
-
 ### Backup və bərpa
 
-**Mövcud:** manual D1 migration/deploy, automated backup job və restore drill yoxdur.
+**Mövcud:** migration və deploy manual idarə olunur; avtomatlaşdırılmış D1 export, R2 inventory və restore drill yoxdur.
 
-**Hədəf:** D1 export schedule, retention, RPO/RTO, R2 inventory və dövri restore testi.
+**Hədəf:** planlı D1 export, retention siyasəti, RPO/RTO, R2 inventory/lifecycle, ayrıca şifrəli backup və dövri restore testi.
+
+### E-poçt və cron əməliyyat təsdiqi
+
+**Mövcud:** imzalı Resend webhook, `EmailActivity`, qorunan digest endpoint və cron Worker kodu hazırdır.
+
+**Hədəf:** production `RESEND_WEBHOOK_SECRET` və endpoint abunəliyini təsdiqləmək, əsas və cron Worker üçün eyni `CRON_SECRET` qurmaq, delivery/digest uğursuzluqlarına alert və runbook əlavə etmək.
 
 ## P1 — əsas məhsul boşluqları
 
 ### Public elan lifecycle
 
-Hazırda public user yeni elan yaradır və statusu izləyir. Lazımdır:
+Public user yeni elan yaradır və statusu izləyir. Hələ lazımdır:
 
 - yalnız sahibinə açıq edit;
 - statusa görə redaktə qaydası;
 - soft-delete və yenidən göndərmə;
-- admin rədd səbəbi və user feedback;
+- rədd səbəbinin kabinetdə aydın göstərilməsi;
 - şəkil orphan cleanup siyasəti;
-- verified agency statusu dəyişəndə mövcud elan qərarı.
+- agency verification dəyişəndə mövcud elanların davranış qərarı.
 
-### Public hesab bərpası və təsdiqi
+### Public hesab bərpası və məlumat hüquqları
 
 - e-poçt verification;
 - “parolu unutdum” token axını;
 - e-poçt dəyişmə təsdiqi;
 - optional public 2FA;
-- hesab silmə/export tələbi.
+- hesab silmə və data export tələbi.
 
-### Ətraflı filtr state-i
+### CI və browser E2E
 
-`mertebe_min`, `mertebe_max`, mərtəbə istisnaları, `sekilli` və `xususiyyet` query-ləri server filter-ə çatır. Lakin səhifədəki `buildHref()` və aktiv filter chip-ləri əsas `FILTER_KEYS` siyahısına tam daxil olmadığı üçün sort/pagination və chip təcrübəsində state itə bilər.
-
-**Hədəf:** bütün parametrlər üçün vahid parser/serializer və round-trip testləri.
-
-### Sitemap tamlığı
-
-Hazırkı statik sitemap siyahısında yoxdur:
-
-- `/agentlikler` və verified agentlik detalları;
-- `/suallar`;
-- `/muqayise` barədə index/noindex qərarı;
-- yeni public route-lar üçün vahid qeydiyyat mexanizmi.
-
-Kabinet və auth route-ları sitemap-a əlavə edilməməli, noindex qalmalıdır.
-
-### Azərbaycan dilində axtarış
-
-SQLite `LIKE` ə, ş, ç, ğ, ı, ö, ü hərflərində etibarlı registrsiz axtarış vermir.
-
-**Hədəf:** yazı zamanı yenilənən normallaşdırılmış search text/sütun və həmin sahə üzrə filter/index.
-
-### Lead konteksti
-
-Contact action bütün müraciəti `CONTACT` source ilə yaradır. Property/project/service detail-dən struktur lead yaratma action-ı yoxdur.
-
-**Hədəf:** source və entity ID-ni server tərəfindən təyin edən vahid lead action, ayrı CTA konteksti və admin linki.
-
-### CI və E2E
-
-GitHub Actions pipeline:
+GitHub Actions pipeline üçün minimum qapı:
 
 1. `npm ci`;
 2. typecheck;
@@ -144,68 +126,67 @@ GitHub Actions pipeline:
 
 Browser E2E minimum axınları:
 
-- search → detail → favorite/compare;
+- locale keçidi → search → detail → favorite/compare;
 - public register/login → media → listing submit;
+- saved search → uyğunluq → notification/digest;
 - staff login → TOTP → permission;
-- admin property CRUD;
-- contact submit və rate limit;
-- staging noindex və production canonical.
+- admin property/partner/agency CRUD;
+- contact submit, honeypot və rate limit;
+- Resend webhook imzası;
+- staging noindex və production canonical/hreflang.
+
+### Azərbaycan dilində axtarış normallaşdırması
+
+SQLite/D1 `LIKE` ə, ş, ç, ğ, ı, ö, ü hərflərində hər zaman etibarlı registrsiz nəticə vermir. Uzunmüddətli həll yazı zamanı yenilənən normallaşdırılmış search text/sütun və həmin sahə üzrə indeksdir.
 
 ## P2 — məhsul yetkinliyi
 
 ### Hesab əsaslı favorit
 
-Prisma `Favorite` modeli var, UI LocalStorage istifadə edir. Login zamanı lokal favoritləri user hesabına birləşdirən sync axını gələcəkdə əlavə oluna bilər.
+Prisma `Favorite` modeli var, UI LocalStorage istifadə edir. Login zamanı lokal favoritləri hesaba birləşdirən sync axını əlavə oluna bilər.
 
-### Agentlik profilinin tamlığı
+### Tərcümə və kontent idarəetməsi
 
-Agentlik profile edit-i ad, description, telefon, ünvan və HTTPS website verir. Logo upload və daha geniş əlaqə/komanda məlumatı üçün ayrıca qorunan axın yoxdur.
+Route və interfeys AZ/EN/RU işləyir. Növbəti mərhələdə admin tərəfindən daxil edilən property, project, service, blog və partner məzmunu üçün strukturlaşdırılmış tərcümə sahələri, fallback qaydası və locale parity audit-i lazımdır.
 
-### Çoxdillilik
+### Anti-spam və abuse müdafiəsinin genişləndirilməsi
 
-Hədəf AZ + RU ola bilər, lakin hazırda:
-
-- route locale strategiyası yoxdur;
-- UI mətnləri Azərbaycan dilində source daxilindədir;
-- Prisma kontent modellərində tərcümə strukturu yoxdur;
-- SEO hreflang və locale sitemap yoxdur.
-
-Bu iş ayrıca arxitektura qərarı tələb edir; yalnız label faylı əlavə etməklə həll olunmur.
+Əlaqə formunda honeypot, same-origin və rate limit aktivdir. Risk artarsa Turnstile server verification, risk siqnalı və şəxsi məlumat saxlamayan abuse metrikası əlavə edilə bilər.
 
 ### Observability və analitika
 
-- error tracking;
-- strukturlaşdırılmış log və alert;
-- Cloudflare Web Analytics və ya privacy-conscious analitika;
-- Search Console;
+- error tracking və alert;
+- strukturlaşdırılmış log korrelyasiyası;
 - Core Web Vitals monitorinqi;
-- admin audit anomaliya alert-i.
+- e-poçt delivery və cron digest alert-ləri;
+- audit jurnalında anomaliya siqnalları.
 
 ### Kontent və hüquqi təsdiq
 
 - hüquqi səhifələrin hüquqşünas yoxlaması;
-- `siteConfig.geo` dəqiq koordinatı;
-- `siteConfig.workingHours` təsdiqi;
+- `siteConfig.geo` koordinatının və iş saatlarının təsdiqi;
 - real şirkət foto arxivi;
-- xidmət və FAQ iddialarının hüquqi/əməliyyat təsdiqi;
-- Resend production sender domain doğrulaması.
+- xidmət və FAQ iddialarının əməliyyat təsdiqi;
+- Resend sender domain doğrulaması;
+- AZ/EN/RU kontent parity və terminologiya redaktəsi.
 
 ### UX və performans
 
-- route səviyyəli `loading.tsx`/skeleton;
+- browser əsaslı tam accessibility və responsive regressiya testi;
 - public listing edit UX;
 - media orphan cleanup;
-- uzun filter URL-ləri üçün test;
+- uzun filter URL-ləri üçün round-trip E2E;
 - xəritə bundle və Core Web Vitals ölçümü;
 - comparison/favorite üçün hesab sync qərarı.
 
 ## Bilinən əməliyyat qeydləri
 
-- Cloudflare Managed Content/Bot qaydası default CLI User-Agent ilə HTML route-larına 403 verə bilər; browser User-Agent ilə audit 200 alıb.
-- Production admin açıq feature flag ilə işləyir, lakin sessiyasız `/admin` staff login-ə yönləndirilir və layout/action guard-ları aktivdir.
+- Cloudflare Managed Content/Bot qaydası default CLI User-Agent ilə bəzi HTML route-larına 403 verə bilər; browser tipli User-Agent ilə ayrıca yoxlanmalıdır.
+- Admin locale-siz `/admin` marşrutundadır; `/{locale}/admin/...` canonical `/admin/...` ünvanına 308 qaytarır.
 - `AUTH_SECRET` rotasiyası versiyalı deyil və TOTP secret encryption-a təsir edir.
 - Cloudflare Images çevirməsi uğursuz olarsa original image fallback yazıla bilər.
 - D1 interactive transaction olmayan axınlar tətbiq səviyyəli kompensasiya istifadə edir.
+- Prisma `DateTime` sahələri D1-də ISO-8601 mətn olmalıdır; Unix integer ilə qarışdırılmamalıdır.
 - Demo content public query-də bloklansa da admin təmizləmə üçün görə bilər.
 
 ## Tamamlanma meyarı
