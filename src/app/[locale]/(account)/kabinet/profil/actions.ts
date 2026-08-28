@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
 import { requireAccount, currentSessionId } from "@/lib/auth/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { revokeAllSessions } from "@/lib/auth/session";
@@ -12,6 +12,10 @@ import { uniqueSlug } from "@/lib/admin/slug";
 import { type ActionState, failure, success, toFieldErrors, unexpected } from "@/lib/admin/action-state";
 import * as form from "@/lib/admin/form";
 import { localizePath } from "@/i18n/path-locale";
+import { clearSessionCookie } from "@/lib/auth/cookies";
+import { assertSameOrigin } from "@/lib/admin/guard";
+import { redirect } from "next/navigation";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 /**
  * Kabinet profili.
@@ -139,4 +143,40 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   } catch (error) {
     return unexpected("parol dəyişdirilmədi", error, t("actions.unexpected"));
   }
+}
+
+export async function deleteAccount(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  await assertSameOrigin();
+  const user = await requireAccount(locale);
+  const parsed = z.object({
+    password: z.string().min(1, t("actions.currentPasswordRequired")),
+    confirmation: z.literal(t("profile.deletePhrase"), {
+      error: t("actions.deleteConfirmationInvalid"),
+    }),
+  }).safeParse({
+    password: form.text(formData, "password"),
+    confirmation: form.text(formData, "confirmation").trim(),
+  });
+  if (!parsed.success) return failure(t("actions.invalidForm"), toFieldErrors(parsed.error));
+
+  const record = await prisma.user.findUnique({ where: { id: user.id }, select: { passwordHash: true } });
+  if (!record || !(await verifyPassword(parsed.data.password, record.passwordHash))) {
+    return failure(t("actions.badCurrentPassword"), { password: t("actions.badPasswordField") });
+  }
+
+  try {
+    await prisma.property.updateMany({
+      where: { authorId: user.id, deletedAt: null },
+      data: { deletedAt: new Date(), status: PROPERTY_STATUSES.ARCHIVED },
+    });
+    await prisma.user.delete({ where: { id: user.id } });
+  } catch (error) {
+    return unexpected("ictimai hesab silinmədi", error, t("actions.unexpected"));
+  }
+
+  await clearSessionCookie();
+  revalidatePublicContent("property");
+  redirect(`${localizePath("/", locale)}?hesab=silindi`);
 }

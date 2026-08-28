@@ -5,7 +5,7 @@ import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
-import { PasswordForm, ProfileForm } from "./profile-forms";
+import { AccountDataForm, PasswordForm, ProfileForm } from "./profile-forms";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -61,6 +61,11 @@ export default async function CabinetProfilePage() {
               : null
           }
         />
+      </section>
+
+      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+        <h2 className="mb-5 font-display text-lg text-ink">{t("dataSection")}</h2>
+        <AccountDataForm />
       </section>
 
       <section className="rounded-md border border-line bg-paper p-4 sm:p-6">

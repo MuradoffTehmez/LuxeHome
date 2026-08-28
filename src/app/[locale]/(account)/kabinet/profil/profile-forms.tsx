@@ -2,11 +2,11 @@
 
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AlertCircle, CheckCircle2, Download, Trash2 } from "lucide-react";
+import { Button, buttonClassName } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/field";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
-import { changePassword, updateProfile } from "./actions";
+import { changePassword, deleteAccount, updateProfile } from "./actions";
 
 /** Uğur və xəta mesajı — toast yerinə qalıcı sətir, çünki nəticə oxunmalıdır. */
 function StateMessage({ state }: { state: ActionState }) {
@@ -143,5 +143,34 @@ export function PasswordForm() {
         </Button>
       </div>
     </form>
+  );
+}
+
+export function AccountDataForm() {
+  const t = useTranslations("account.profile");
+  const [state, formAction, pending] = useActionState(deleteAccount, IDLE_STATE);
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h3 className="font-medium text-ink">{t("exportTitle")}</h3>
+        <p className="mt-1 text-sm leading-6 text-ink-soft">{t("exportDescription")}</p>
+        <a href="/api/hesab/export" download className={buttonClassName("outline", "sm", false, "mt-3")}>
+          <Download className="size-4" aria-hidden="true" />{t("exportButton")}
+        </a>
+      </div>
+
+      <form action={formAction} className="flex flex-col gap-4 border-t border-line pt-6" noValidate>
+        <div>
+          <h3 className="font-medium text-danger">{t("deleteTitle")}</h3>
+          <p className="mt-1 text-sm leading-6 text-ink-soft">{t("deleteDescription")}</p>
+        </div>
+        <StateMessage state={state} />
+        <Input name="password" type="password" autoComplete="current-password" required label={t("currentPassword")} error={state.fieldErrors?.password} />
+        <Input name="confirmation" required autoComplete="off" label={t("deleteConfirmation", { phrase: t("deletePhrase") })} error={state.fieldErrors?.confirmation} />
+        <Button type="submit" variant="danger" loading={pending} className="w-full sm:w-fit">
+          <Trash2 className="size-4" aria-hidden="true" />{t("deleteButton")}
+        </Button>
+      </form>
+    </div>
   );
 }
