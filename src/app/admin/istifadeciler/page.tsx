@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ShieldAlert, ShieldCheck } from "lucide-react";
+import { KeyRound, MonitorSmartphone, ShieldAlert, ShieldCheck, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   AdminCard,
@@ -7,6 +7,7 @@ import {
   AdminTable,
   AdminTableCell,
   AdminTableRow,
+  StatCard,
 } from "@/components/admin/admin-ui";
 import {
   AdminListCard,
@@ -30,6 +31,10 @@ const ROLE_TONES: Record<Role, "gold" | "dark" | "neutral"> = {
 export default async function AdminUsersPage() {
   const actor = await requireAdminRead(PERMISSIONS.USER_MANAGE);
   const [users, auditLog] = await Promise.all([getAdminUsers(), getAuditLog(20)]);
+  const activeUsers = users.filter((user) => user.isActive);
+  const withoutTwoFactor = activeUsers.filter((user) => !user.totpEnabledAt).length;
+  const mustChangePassword = activeUsers.filter((user) => user.mustChangePassword).length;
+  const openSessions = users.reduce((sum, user) => sum + user._count.sessions, 0);
 
   return (
     <>
@@ -38,6 +43,13 @@ export default async function AdminUsersPage() {
         description={`${users.filter((user) => user.isActive).length} aktiv hesab. Parollar heç vaxt göstərilmir — yalnız müvəqqəti parol yaradılır.`}
         breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "İstifadəçilər" }]}
       />
+
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Aktiv hesab" value={activeUsers.length} hint={`${users.length} ümumi hesab`} icon={UserCheck} tone="success" />
+        <StatCard label="2FA qurulmayıb" value={withoutTwoFactor} hint="Aktiv hesablarda" icon={ShieldAlert} tone={withoutTwoFactor > 0 ? "warning" : "success"} />
+        <StatCard label="Parol dəyişməlidir" value={mustChangePassword} hint="İlk giriş gözlənilir" icon={KeyRound} tone={mustChangePassword > 0 ? "warning" : "success"} />
+        <StatCard label="Açıq sessiya" value={openSessions} hint="Bütün əməkdaş cihazları" icon={MonitorSmartphone} />
+      </div>
 
       <AdminCard bodyClassName="p-4 lg:p-0" className="mb-6">
         <AdminResponsiveList
@@ -80,6 +92,7 @@ export default async function AdminUsersPage() {
                     isActive={user.isActive}
                     isSelf={user.id === actor.id}
                     sessionCount={user._count.sessions}
+                    totpEnabled={Boolean(user.totpEnabledAt)}
                     mobile
                   />
                 </div>
@@ -125,7 +138,7 @@ export default async function AdminUsersPage() {
                     </AdminTableCell>
                     <AdminTableCell align="right">
                       <div className="flex justify-end">
-                        <UserRow id={user.id} name={user.name} role={user.role} isActive={user.isActive} isSelf={user.id === actor.id} sessionCount={user._count.sessions} />
+                        <UserRow id={user.id} name={user.name} role={user.role} isActive={user.isActive} isSelf={user.id === actor.id} sessionCount={user._count.sessions} totpEnabled={Boolean(user.totpEnabledAt)} />
                       </div>
                     </AdminTableCell>
                   </AdminTableRow>

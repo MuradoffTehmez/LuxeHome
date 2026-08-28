@@ -49,6 +49,7 @@ export function UserRow({
   isActive,
   isSelf,
   sessionCount,
+  totpEnabled,
   mobile = false,
 }: {
   id: string;
@@ -57,6 +58,7 @@ export function UserRow({
   isActive: boolean;
   isSelf: boolean;
   sessionCount: number;
+  totpEnabled: boolean;
   mobile?: boolean;
 }) {
   const [state, formAction] = useActionState(updateUser, IDLE_STATE);
@@ -135,18 +137,20 @@ export function UserRow({
           <KeyRound className="size-4" aria-hidden="true" />
         </ConfirmAction>
 
-        <ConfirmAction
-          action={resetUserTwoFactor}
-          id={id}
-          label={`«${name}» üçün 2FA-nı sıfırla`}
-          title="2FA-nı sıfırlamaq"
-          description="Doğrulama sirri və ehtiyat kodlar silinəcək. İstifadəçi növbəti girişdə 2FA-nı yenidən quracaq."
-          confirmLabel="Sıfırla"
-          tone="neutral"
-          className="size-11"
-        >
-          <ShieldOff className="size-4" aria-hidden="true" />
-        </ConfirmAction>
+        {totpEnabled && (
+          <ConfirmAction
+            action={resetUserTwoFactor}
+            id={id}
+            label={`«${name}» üçün 2FA-nı sıfırla`}
+            title="2FA-nı sıfırlamaq"
+            description="Doğrulama sirri və ehtiyat kodlar silinəcək. İstifadəçi növbəti girişdə 2FA-nı yenidən quracaq."
+            confirmLabel="Sıfırla"
+            tone="neutral"
+            className="size-11"
+          >
+            <ShieldOff className="size-4" aria-hidden="true" />
+          </ConfirmAction>
+        )}
 
         {sessionCount > 0 && (
           <ConfirmAction

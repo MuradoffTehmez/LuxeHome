@@ -2187,6 +2187,25 @@ export async function getAdminEmailActivities(
   return { rows, total, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
+/** Panel — korporativ e-poçt sisteminin ümumi sağlamlıq göstəriciləri. */
+export async function getAdminEmailOverview() {
+  const problemEvents = [
+    "email.failed",
+    "email.bounced",
+    "email.complained",
+    "email.suppressed",
+  ];
+  const [total, outbound, inbound, delivered, problems] = await Promise.all([
+    prisma.emailActivity.count(),
+    prisma.emailActivity.count({ where: { direction: "OUTBOUND" } }),
+    prisma.emailActivity.count({ where: { direction: "INBOUND" } }),
+    prisma.emailActivity.count({ where: { eventType: "email.delivered" } }),
+    prisma.emailActivity.count({ where: { eventType: { in: problemEvents } } }),
+  ]);
+
+  return { total, outbound, inbound, delivered, problems };
+}
+
 /**
  * Hər ictimai tərəfdaş sorğusunun bazası.
  *
