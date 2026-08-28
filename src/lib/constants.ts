@@ -32,6 +32,7 @@ export const PERMISSIONS = {
   MEDIA_MANAGE: "media:manage",
   USER_MANAGE: "user:manage",
   SETTINGS_MANAGE: "settings:manage",
+  TRANSLATION_MANAGE: "translation:manage",
   PARTNER_VIEW: "partner:view",
   PARTNER_CREATE: "partner:create",
   PARTNER_UPDATE: "partner:update",
@@ -58,6 +59,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.BLOG_MANAGE,
     PERMISSIONS.LEAD_MANAGE,
     PERMISSIONS.MEDIA_MANAGE,
+    PERMISSIONS.TRANSLATION_MANAGE,
     PERMISSIONS.PARTNER_VIEW,
     PERMISSIONS.PARTNER_CREATE,
     PERMISSIONS.PARTNER_UPDATE,
@@ -66,8 +68,33 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.PARTNER_PUBLISH,
     PERMISSIONS.PARTNER_RELATION_MANAGE,
   ],
-  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.PARTNER_VIEW],
+  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.TRANSLATION_MANAGE, PERMISSIONS.PARTNER_VIEW],
 };
+
+export const TRANSLATION_STATUSES = {
+  DRAFT: "DRAFT",
+  READY: "READY",
+  PUBLISHED: "PUBLISHED",
+} as const;
+
+export type TranslationStatus =
+  (typeof TRANSLATION_STATUSES)[keyof typeof TRANSLATION_STATUSES];
+
+export const TRANSLATION_STATUS_LABELS: Record<TranslationStatus, string> = {
+  DRAFT: "Qaralama",
+  READY: "Yoxlamaya hazır",
+  PUBLISHED: "Dərc edilib",
+};
+
+export const TRANSLATION_ENTITY_TYPES = {
+  PROPERTY: "PROPERTY",
+  PROJECT: "PROJECT",
+  SERVICE: "SERVICE",
+  BLOG_POST: "BLOG_POST",
+} as const;
+
+export type TranslationEntityType =
+  (typeof TRANSLATION_ENTITY_TYPES)[keyof typeof TRANSLATION_ENTITY_TYPES];
 
 // ---------------------------------------------------------------------------
 // ƏMLAK

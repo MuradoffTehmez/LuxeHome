@@ -8,6 +8,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { webcrypto } from "node:crypto";
+import { normalizeSearchText } from "../src/lib/search-normalization";
 
 const prisma = new PrismaClient();
 
@@ -158,8 +159,8 @@ async function main() {
   for (const [index, type] of typeData.entries()) {
     const record = await prisma.propertyType.upsert({
       where: { slug: type.slug },
-      update: {},
-      create: { ...type, order: index },
+      update: { searchName: normalizeSearchText(type.name) },
+      create: { ...type, searchName: normalizeSearchText(type.name), order: index },
     });
     types[type.slug] = record.id;
   }
@@ -205,8 +206,8 @@ async function main() {
   for (const [cityIndex, city] of cityData.entries()) {
     const cityRecord = await prisma.location.upsert({
       where: { slug: city.slug },
-      update: {},
-      create: { name: city.name, slug: city.slug, kind: "CITY", order: cityIndex },
+      update: { searchName: normalizeSearchText(city.name) },
+      create: { name: city.name, searchName: normalizeSearchText(city.name), slug: city.slug, kind: "CITY", order: cityIndex },
     });
     cities[city.slug] = cityRecord.id;
 
@@ -224,9 +225,10 @@ async function main() {
 
       const districtRecord = await prisma.location.upsert({
         where: { slug: districtSlug },
-        update: {},
+        update: { searchName: normalizeSearchText(districtName) },
         create: {
           name: districtName,
+          searchName: normalizeSearchText(districtName),
           slug: districtSlug,
           kind: "DISTRICT",
           parentId: cityRecord.id,
@@ -268,8 +270,8 @@ async function main() {
   for (const [index, feature] of featureData.entries()) {
     const record = await prisma.feature.upsert({
       where: { slug: feature.slug },
-      update: {},
-      create: { ...feature, order: index },
+      update: { searchName: normalizeSearchText(feature.name) },
+      create: { ...feature, searchName: normalizeSearchText(feature.name), order: index },
     });
     features[feature.slug] = record.id;
   }

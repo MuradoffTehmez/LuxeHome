@@ -22,7 +22,7 @@ import {
 } from "@/lib/auth/cookies";
 import { hashPassword, needsRehash, verifyPassword } from "@/lib/auth/password";
 import { checkLoginLimit, clientIp, registerFailure, registerSuccess } from "@/lib/auth/rate-limit";
-import { createSession, revokeSession } from "@/lib/auth/session";
+import { createSession, revokeAllSessions, revokeSession } from "@/lib/auth/session";
 import { uniqueSlug } from "@/lib/admin/slug";
 import {
   canUsePublicSignIn,
@@ -30,9 +30,16 @@ import {
   safePublicTarget,
 } from "@/lib/auth/public-account-policy";
 import { createPublicAccount } from "@/lib/auth/public-account-registration";
-import { type ActionState, failure, toFieldErrors, unexpected } from "@/lib/admin/action-state";
+import { type ActionState, failure, success, toFieldErrors, unexpected } from "@/lib/admin/action-state";
 import { localizePath } from "@/i18n/path-locale";
 import * as form from "@/lib/admin/form";
+import {
+  consumePasswordResetToken,
+  issueEmailVerificationToken,
+  issuePasswordResetToken,
+} from "@/lib/auth/account-tokens";
+import { sendAccountVerificationEmail, sendPasswordResetEmail } from "@/lib/account-email";
+import { verifyTurnstile } from "@/lib/auth/turnstile";
 
 /**
  * İctimai hesab axını — qeydiyyat və giriş.
@@ -120,6 +127,9 @@ export async function registerAccount(
   if (!(await checkLoginLimit(ip))) {
     return failure(t("actions.rateLimited"));
   }
+  if (!(await verifyTurnstile(formData, "registration", ip))) {
+    return failure(t("actions.securityCheck"));
+  }
 
   const parsed = registerSchema.safeParse({
     name: form.text(formData, "name"),
@@ -186,8 +196,9 @@ export async function registerAccount(
     return unexpected("qeydiyyat tamamlanmadı", error, t("actions.unexpected"));
   }
 
-  // `startPublicSession` yönləndirmə atır və heç vaxt qayıtmır.
-  return startPublicSession(userId, safePublicTarget(formData.get("davam")));
+  const token = await issueEmailVerificationToken(userId);
+  await sendAccountVerificationEmail(parsed.data.email, token, await getLocale());
+  redirect(localizePath("/hesab/e-poct-gonderildi", await getLocale() as Locale));
 }
 
 export async function signInAccount(
@@ -198,6 +209,9 @@ export async function signInAccount(
   const ip = clientIp(await headers());
   if (!(await checkLoginLimit(ip))) {
     return failure(t("actions.rateLimited"));
+  }
+  if (!(await verifyTurnstile(formData, "public_login", ip))) {
+    return failure(t("actions.securityCheck"));
   }
 
   const parsed = z
@@ -230,6 +244,10 @@ export async function signInAccount(
 
   if (!user) return failure(t("actions.genericCredentials"));
 
+  if (!user.emailVerifiedAt) {
+    return failure(t("actions.emailUnverified"));
+  }
+
   if (needsRehash(user.passwordHash)) {
     await prisma.user.update({
       where: { id: user.id },
@@ -248,4 +266,86 @@ export async function signOutAccount(): Promise<void> {
 
   await clearSessionCookie();
   redirect(localizePath("/", locale));
+}
+
+/** Hesabın mövcudluğunu cavabda açıqlamadan yeni doğrulama linki göndərir. */
+export async function requestEmailVerification(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const t = await getTranslations("account");
+  const email = form.text(formData, "email").trim().toLowerCase();
+  const parsed = z.string().email().safeParse(email);
+  if (!parsed.success) return failure(t("actions.invalidEmail"), { email: t("actions.invalidEmail") });
+  const ip = clientIp(await headers());
+  if (!(await checkLoginLimit(ip))) return failure(t("actions.rateLimited"));
+  if (!(await verifyTurnstile(formData, "verification_resend", ip))) {
+    return failure(t("actions.securityCheck"));
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, email: true, locale: true, emailVerifiedAt: true, accountType: true, isActive: true },
+  });
+  if (user && user.isActive && !user.emailVerifiedAt && canUsePublicSignIn(user.accountType)) {
+    const token = await issueEmailVerificationToken(user.id);
+    await sendAccountVerificationEmail(user.email, token, user.locale);
+  }
+  return success(t("actions.verificationSentGeneric"));
+}
+
+/** Parol bərpası hesabın bazada olub-olmadığını heç vaxt açıqlamır. */
+export async function requestPasswordReset(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const t = await getTranslations("account");
+  const email = form.text(formData, "email").trim().toLowerCase();
+  const parsed = z.string().email().safeParse(email);
+  if (!parsed.success) return failure(t("actions.invalidEmail"), { email: t("actions.invalidEmail") });
+  const ip = clientIp(await headers());
+  if (!(await checkLoginLimit(ip))) return failure(t("actions.rateLimited"));
+  if (!(await verifyTurnstile(formData, "password_reset", ip))) {
+    return failure(t("actions.securityCheck"));
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, email: true, locale: true, accountType: true, isActive: true },
+  });
+  if (user && user.isActive && canUsePublicSignIn(user.accountType)) {
+    const token = await issuePasswordResetToken(user.id);
+    await sendPasswordResetEmail(user.email, token, user.locale);
+  }
+  return success(t("actions.passwordResetSentGeneric"));
+}
+
+export async function resetPassword(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  const parsed = z.object({
+    token: z.string().min(32).max(200),
+    password: z.string().min(10, t("actions.passwordMin")).max(200, t("actions.passwordLong")),
+    repeat: z.string().min(1),
+  }).refine((value) => value.password === value.repeat, {
+    path: ["repeat"],
+    message: t("actions.passwordMismatch"),
+  }).safeParse({
+    token: form.text(formData, "token"),
+    password: form.text(formData, "password"),
+    repeat: form.text(formData, "repeat"),
+  });
+  if (!parsed.success) return failure(t("actions.invalidForm"), toFieldErrors(parsed.error));
+
+  const userId = await consumePasswordResetToken(parsed.data.token);
+  if (!userId) return failure(t("actions.resetTokenInvalid"));
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash: await hashPassword(parsed.data.password), failedAttempts: 0, lockedUntil: null },
+  });
+  await revokeAllSessions(userId);
+  redirect(`${localizePath("/daxil-ol", locale)}?parol=yenilendi`);
 }

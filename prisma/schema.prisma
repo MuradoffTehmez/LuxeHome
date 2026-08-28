@@ -63,6 +63,8 @@ model User {
 
   sessions          Session[]
   backupCodes       BackupCode[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
   agency            Agency?
   agencyEmployments AgencyEmployee[]
 
@@ -76,6 +78,34 @@ model User {
   @@index([role])
   @@index([accountType])
   @@index([approvedAt])
+}
+
+/// E-poçt doğrulama linkinin yalnız SHA-256 hash-i saxlanılır.
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+/// Parol bərpası tokeni birdəfəlikdir və açıq dəyəri bazada saxlanılmır.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
 }
 
 /// Agentlik profili — yalnız `accountType = "AGENCY"` hesablarında olur.
@@ -177,6 +207,54 @@ model LoginAttempt {
   @@index([createdAt])
 }
 
+/// Brauzer error boundary-lərindən gələn, PII saxlamayan texniki xəta hadisəsi.
+model ClientErrorEvent {
+  id        String   @id @default(cuid())
+  message   String
+  digest    String?
+  path      String?
+  source    String   @default("client")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([digest, createdAt])
+}
+
+/// Real istifadəçidən gələn Core Web Vitals ölçümü.
+model WebVitalMetric {
+  id             String   @id @default(cuid())
+  name           String
+  value          Float
+  rating         String
+  path           String
+  navigationType String?
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([name, createdAt])
+}
+
+/// Adminin AZ mənbə kontenti üçün hazırladığı strukturlaşdırılmış EN/RU tərcümə.
+model ContentTranslation {
+  id              String   @id @default(cuid())
+  entityType      String
+  entityId        String
+  locale          String
+  status          String   @default("DRAFT")
+  title           String?
+  summary         String?
+  content         String?
+  metaTitle       String?
+  metaDescription String?
+  updatedById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([entityType, entityId, locale])
+  @@index([locale, status])
+  @@index([entityType, entityId])
+}
+
 // ---------------------------------------------------------------------------
 // TAKSONOMİYA
 // ---------------------------------------------------------------------------
@@ -184,6 +262,7 @@ model LoginAttempt {
 model PropertyType {
   id          String     @id @default(cuid())
   name        String
+  searchName  String     @default("")
   slug        String     @unique
   description String?
   icon        String?
@@ -199,6 +278,7 @@ model PropertyType {
 model Location {
   id       String  @id @default(cuid())
   name     String
+  searchName String @default("")
   slug     String  @unique
   kind     String  @default("CITY")
   parentId String?
@@ -220,6 +300,7 @@ model Location {
 model Feature {
   id    String  @id @default(cuid())
   name  String
+  searchName String @default("")
   slug  String  @unique
   icon  String?
   group String  @default("GENERAL") // GENERAL | INDOOR | OUTDOOR | SECURITY
@@ -248,6 +329,8 @@ model Property {
   title       String
   slug        String @unique
   description String
+  /// Azərbaycan diakritiklərindən asılı olmayan server axtarış indeksi.
+  searchText  String @default("")
 
   /// SALE = Satılır, RENT = Kirayə
   listingType    String  @default("SALE")
