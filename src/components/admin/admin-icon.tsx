@@ -9,6 +9,7 @@ import {
   Images,
   Inbox,
   LayoutDashboard,
+  Languages,
   Mail,
   Newspaper,
   Route,
@@ -50,6 +51,7 @@ const ICONS: Record<string, LucideIcon> = {
   History,
   Handshake,
   Mail,
+  Languages,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

@@ -39,6 +39,7 @@ export type AuditEntity =
   | "Partner"
   | "Redirect"
   | "Setting"
+  | "ContentTranslation"
   | "AuditLog";
 
 export async function recordAudit(
