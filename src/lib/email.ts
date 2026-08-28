@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
-import { siteUrl } from "@/config/site";
+import { corporateEmails, siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import { recordEmailActivity } from "@/lib/email-activity";
@@ -94,8 +94,8 @@ function emailCopy(locale: string | null | undefined): EmailCopy {
  * modul yüklənərkən oxunsa, dəyərlər boş qalır. Ona görə bütün konfiqurasiya
  * ilk istifadə anında (lazy) oxunur.
  */
-const DEFAULT_FROM_EMAIL = "Luxe Home Estate <onboarding@resend.dev>";
-const FALLBACK_NOTIFICATION_EMAIL = "info@luxehomeestate.az";
+const DEFAULT_FROM_EMAIL = `Luxe Home Estate <${corporateEmails.notifications}>`;
+const FALLBACK_NOTIFICATION_EMAIL = corporateEmails.sales;
 
 function fromEmail(): string {
   return process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
@@ -192,7 +192,7 @@ export async function sendEmail({
       to: resolvedTo,
       subject,
       html,
-      replyTo: replyTo || undefined,
+      replyTo: replyTo || corporateEmails.support,
     });
 
     if (error) {
@@ -625,7 +625,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
     to: recipient,
     subject,
     html,
-    replyTo: payload.email || undefined,
+    replyTo: payload.email || corporateEmails.info,
   });
 }
 
@@ -1037,6 +1037,7 @@ export async function sendShowcaseEmail(payload: ShowcaseEmailPayload) {
     to: payload.to,
     subject,
     html,
+    replyTo: corporateEmails.sales,
   });
 }
 
@@ -1141,7 +1142,12 @@ export async function sendSavedSearchMatchEmail(
 </html>
   `;
 
-  return sendEmail({ to: userEmail, subject, html });
+  return sendEmail({
+    to: userEmail,
+    subject,
+    html,
+    replyTo: corporateEmails.sales,
+  });
 }
 
 
@@ -1313,5 +1319,10 @@ ${moreRow}
 </html>
   `;
 
-  return sendEmail({ to: input.userEmail, subject, html });
+  return sendEmail({
+    to: input.userEmail,
+    subject,
+    html,
+    replyTo: corporateEmails.sales,
+  });
 }

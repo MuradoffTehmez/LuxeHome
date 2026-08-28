@@ -6,6 +6,17 @@
  * real məlumatlardır — istisnalar `stats` bölməsində açıq şəkildə qeyd olunub.
  */
 
+/** Google Workspace qəbul ünvanları və Resend göndərmə kimliyi. */
+export const corporateEmails = {
+  info: "info@luxehomeestate.az",
+  sales: "sales@luxehomeestate.az",
+  support: "support@luxehomeestate.az",
+  partners: "partners@luxehomeestate.az",
+  notifications: "notifications@luxehomeestate.az",
+  security: "security@luxehomeestate.az",
+  finance: "finance@luxehomeestate.az",
+} as const;
+
 export const siteConfig = {
   name: "Luxe Home Estate",
   legalName: "Luxe Home Estate MMC",
@@ -29,7 +40,7 @@ export const siteConfig = {
   whatsapp: "994519228585",
   address: "Əliyar Əliyev 109A",
   addressFull: "Əliyar Əliyev 109A, Nərimanov rayonu, Bakı AZ1033, Azərbaycan",
-  email: "info@luxehomeestate.az",
+  email: corporateEmails.info,
 
   /** Rəsmi qeydiyyat sənədləri (VÖEN, reyestr) əsasında — hüquqi ünvanla sinxron saxlanılmalıdır. */
   legal: {
