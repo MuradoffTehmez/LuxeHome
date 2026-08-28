@@ -23,6 +23,7 @@ import {
   getAdminLoginAttempts,
 } from "@/lib/queries";
 import { revokeAdminSession, unlockUserAccount } from "./actions";
+import { hasRuntimeEnv } from "@/lib/runtime-env";
 
 export const metadata: Metadata = { title: "Təhlükəsizlik" };
 export const dynamic = "force-dynamic";
@@ -58,6 +59,7 @@ export default async function AdminSecurityPage() {
     getAdminActiveSessions(100),
     getAdminLockedUsers(),
   ]);
+  const turnstileReady = hasRuntimeEnv("TURNSTILE_SITE_KEY") && hasRuntimeEnv("TURNSTILE_SECRET_KEY");
 
   return (
     <>
@@ -68,6 +70,12 @@ export default async function AdminSecurityPage() {
       />
 
       <div className="flex flex-col gap-6">
+        <AdminCard title="Bot müdafiəsi" description="Cloudflare Turnstile server tərəfli token yoxlaması">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="max-w-2xl text-sm text-ink-soft">Admin və istifadəçi girişi, qeydiyyat, parol bərpası və müraciət formaları qorunur. Token hər əməliyyat növünə ayrıca bağlanır.</p>
+            <Badge tone={turnstileReady ? "success" : "danger"}>{turnstileReady ? "Aktiv" : "Konfiqurasiya tamamlanmayıb"}</Badge>
+          </div>
+        </AdminCard>
         {lockedUsers.length > 0 && (
           <AdminCard
             title="Kilidlənmiş hesablar"

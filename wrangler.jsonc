@@ -26,6 +26,8 @@
     // Dinamik səhifələrdə runtime-da oxunur; statik səhifələr üçün deploy skripti
     // eyni dəyəri build prosesinə də ötürür
     "SITE_URL": "https://luxehomeestate.az",
+    // Public açardır; gizli açar `TURNSTILE_SECRET_KEY` Worker secret-i kimi saxlanılır
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAEfhXUNNmS0Ka_DO",
     // Admin "Search Analytics" paneli GraphQL Analytics API sorğusunda istifadə edir —
     // sirr deyil, sadəcə hansı zona/hesabın sorğulanacağını göstərir
     "CF_ZONE_ID": "d401a9f612bc47ed88e1c14e658141d1",
@@ -36,6 +38,7 @@
   "ratelimits": [
     { "name": "LOGIN_LIMIT", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } },
     { "name": "CONTACT_LIMIT", "namespace_id": "1002", "simple": { "limit": 5, "period": 60 } },
+    { "name": "MONITORING_LIMIT", "namespace_id": "1004", "simple": { "limit": 60, "period": 60 } },
     // Paneldəki yazma əməliyyatları — oğurlanmış sessiya ilə kütləvi dəyişikliyi ləngidir
     { "name": "ADMIN_LIMIT", "namespace_id": "1003", "simple": { "limit": 60, "period": 60 } }
   ],
@@ -122,6 +125,7 @@
       "ratelimits": [
         { "name": "LOGIN_LIMIT", "namespace_id": "2001", "simple": { "limit": 10, "period": 60 } },
         { "name": "CONTACT_LIMIT", "namespace_id": "2002", "simple": { "limit": 5, "period": 60 } },
+        { "name": "MONITORING_LIMIT", "namespace_id": "2004", "simple": { "limit": 60, "period": 60 } },
         { "name": "ADMIN_LIMIT", "namespace_id": "2003", "simple": { "limit": 60, "period": 60 } }
       ],
 

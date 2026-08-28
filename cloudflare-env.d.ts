@@ -7,6 +7,7 @@ interface __BaseEnv_CloudflareEnv {
 	DB: D1Database;
 	NEXT_TAG_CACHE_D1: D1Database;
 	LOGIN_LIMIT: RateLimit;
+	MONITORING_LIMIT: RateLimit;
 	CONTACT_LIMIT: RateLimit;
 	ADMIN_LIMIT: RateLimit;
 	IMAGES: ImagesBinding;

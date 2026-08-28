@@ -49,6 +49,15 @@ export async function checkContactLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/** Brauzer monitorinq hadisələri üçün ayrıca, daha geniş büdcə. */
+export async function checkMonitoringLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.MONITORING_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `monitoring:${ip}` });
+  return success;
+}
+
 export function isAccountLocked(lockedUntil: Date | null): boolean {
   return isLockActive(lockedUntil, new Date());
 }
