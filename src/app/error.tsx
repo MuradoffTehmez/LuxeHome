@@ -21,6 +21,17 @@ export default function GlobalError({
   const prefix = locale === "az" ? "" : `/${locale}`;
   useEffect(() => {
     console.error("Səhifə xətası:", error);
+    void fetch("/api/monitoring/error", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: error.message || error.name,
+        digest: error.digest,
+        path: window.location.pathname,
+        source: "global-error",
+      }),
+      keepalive: true,
+    });
   }, [error]);
 
   return (

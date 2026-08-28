@@ -6,6 +6,7 @@ import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { jsonLd, organizationSchema, websiteSchema } from "@/lib/seo";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
+import { WebVitalsReporter } from "@/components/analytics/web-vitals-reporter";
 import "./globals.css";
 
 /**
@@ -113,6 +114,7 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
             {children}
             <AnalyticsProvider />
+            <WebVitalsReporter />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
