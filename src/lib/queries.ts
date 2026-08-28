@@ -20,6 +20,7 @@ import {
 } from "@/lib/constants";
 import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
 import type { DigestStore } from "@/lib/saved-search-digest";
+import { normalizeSearchText } from "@/lib/search-normalization";
 
 const LOCALE_VALUES = Object.values(LOCALES);
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
@@ -242,8 +243,16 @@ export function buildPropertyWhere(filters: PropertyFilters): Prisma.PropertyWhe
   if (filters.search) {
     const term = filters.search.trim();
     if (term) {
+      const normalized = normalizeSearchText(term);
       andWhere(where, {
         OR: [
+          ...(normalized ? [
+            { searchText: { contains: normalized } },
+            { type: { searchName: { contains: normalized } } },
+            { city: { searchName: { contains: normalized } } },
+            { district: { searchName: { contains: normalized } } },
+            { metro: { searchName: { contains: normalized } } },
+          ] : []),
           { title: { contains: term } },
           { description: { contains: term } },
           { address: { contains: term } },
