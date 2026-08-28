@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,8 @@ import { buildMetadata } from "@/lib/seo";
 import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
+import { ConfirmAction } from "@/components/admin/confirm-action";
+import { deletePublicProperty } from "./actions";
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
@@ -92,10 +94,16 @@ export default async function CabinetPropertiesPage({
             </p>
           </div>
         </div>
-        <div className="mt-4 border-t border-line pt-3">
-          <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
-            {t(`status.${STATUS_KEYS[status]}`)}
-          </Badge>
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
+          <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>{t(`status.${STATUS_KEYS[status]}`)}</Badge>
+          <div className="flex items-center gap-1">
+            <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="ghost" size="sm" aria-label={t("editLabel", { title: property.title })}>
+              <Pencil className="size-4" aria-hidden="true" />{t("edit")}
+            </ButtonLink>
+            <ConfirmAction action={deletePublicProperty} id={property.id} title={t("deleteTitle")} description={t("deleteDescription", { title: property.title })} confirmLabel={t("delete")} label={t("deleteLabel", { title: property.title })}>
+              <Trash2 className="size-4" aria-hidden="true" />
+            </ConfirmAction>
+          </div>
         </div>
       </article>
     );
@@ -118,6 +126,12 @@ export default async function CabinetPropertiesPage({
               <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
                 {t(`status.${STATUS_KEYS[status]}`)}
               </Badge>
+              <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="outline" size="sm">
+                <Pencil className="size-4" aria-hidden="true" />{t("edit")}
+              </ButtonLink>
+              <ConfirmAction action={deletePublicProperty} id={property.id} title={t("deleteTitle")} description={t("deleteDescription", { title: property.title })} confirmLabel={t("delete")} label={t("deleteLabel", { title: property.title })}>
+                <Trash2 className="size-4" aria-hidden="true" />
+              </ConfirmAction>
             </li>
           );
         })}

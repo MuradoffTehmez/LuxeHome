@@ -16,6 +16,7 @@ import { uniqueSlug } from "@/lib/admin/slug";
 import { featureCreateSchema, propertyTypeCreateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { normalizeSearchText } from "@/lib/search-normalization";
 
 const LIST_PATH = "/admin/taksonomiya";
 
@@ -38,7 +39,7 @@ export async function createPropertyType(_prev: ActionState, formData: FormData)
     const maxOrder = await prisma.propertyType.aggregate({ _max: { order: true } });
 
     const type = await prisma.propertyType.create({
-      data: { name: parsed.data.name, slug, order: (maxOrder._max.order ?? 0) + 10 },
+      data: { name: parsed.data.name, searchName: normalizeSearchText(parsed.data.name), slug, order: (maxOrder._max.order ?? 0) + 10 },
       select: { id: true },
     });
 
@@ -128,6 +129,7 @@ export async function createFeature(_prev: ActionState, formData: FormData): Pro
     const feature = await prisma.feature.create({
       data: {
         name: parsed.data.name,
+        searchName: normalizeSearchText(parsed.data.name),
         slug,
         group: parsed.data.group,
         order: (maxOrder._max.order ?? 0) + 10,

@@ -10,7 +10,7 @@ import {
   AdminTextarea,
   FullWidth,
 } from "@/components/admin/form-fields";
-import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { ImageDropzone, type DropzoneImage } from "@/components/admin/image-dropzone";
 import type { ActionState } from "@/lib/admin/action-state";
 import {
   BUILDING_TYPES,
@@ -31,20 +31,52 @@ const optionsOf = <T extends Record<string, string>>(
   labels: Record<string, string>,
 ) => Object.values(values).map((value) => ({ value, label: labels[value] }));
 
+export type PublicPropertyFormInitial = {
+  title: string;
+  description: string;
+  listingType: string;
+  currency: string;
+  price: number;
+  pricePeriod: string | null;
+  typeId: string;
+  cityId: string;
+  districtId: string | null;
+  address: string | null;
+  rooms: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  area: number | null;
+  landArea: number | null;
+  floor: number | null;
+  totalFloors: number | null;
+  renovation: string | null;
+  documentStatus: string | null;
+  buildingType: string | null;
+  videoUrl: string | null;
+  mortgageAvailable: boolean;
+  installmentAvailable: boolean;
+  featureIds: string[];
+  images: DropzoneImage[];
+};
+
 /** İstifadəçi üçün məhdud elan forması; status və SEO yalnız paneldə idarə olunur. */
 export function PublicPropertyForm({
   action,
   options,
+  initial,
+  submitLabel,
 }: {
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
   options: PropertyFormOptions;
+  initial?: PublicPropertyFormInitial;
+  submitLabel?: string;
 }) {
   const locale = useLocale() as Locale;
   const t = useTranslations("account.newProperty");
   const searchT = useTranslations("listings.search");
   const propertyT = useTranslations("property");
-  const [listingType, setListingType] = useState<string>(LISTING_TYPES.SALE);
-  const [cityId, setCityId] = useState(options.cities[0]?.id ?? "");
+  const [listingType, setListingType] = useState<string>(initial?.listingType ?? LISTING_TYPES.SALE);
+  const [cityId, setCityId] = useState(initial?.cityId ?? options.cities[0]?.id ?? "");
   const districts = options.districts.filter((district) => district.parentId === cityId);
   const featureGroups = options.features.reduce<Record<string, typeof options.features>>(
     (groups, feature) => {
@@ -57,7 +89,7 @@ export function PublicPropertyForm({
   return (
     <AdminForm
       action={action}
-      submitLabel={t("submit")}
+      submitLabel={submitLabel ?? t("submit")}
       cancelHref={localizePath("/kabinet/elanlar", locale)}
     >
       <FormSection
@@ -72,6 +104,7 @@ export function PublicPropertyForm({
             required
             maxLength={160}
             hint={t("titleHint")}
+            defaultValue={initial?.title}
           />
         </FullWidth>
         <FullWidth>
@@ -82,6 +115,7 @@ export function PublicPropertyForm({
             rows={8}
             maxLength={8000}
             hint={t("descriptionHint")}
+            defaultValue={initial?.description}
           />
         </FullWidth>
       </FormSection>
@@ -99,16 +133,16 @@ export function PublicPropertyForm({
           name="currency"
           label={t("currency")}
           required
-          defaultValue={CURRENCIES.AZN}
+          defaultValue={initial?.currency ?? CURRENCIES.AZN}
           options={optionsOf(CURRENCIES, CURRENCY_LABELS)}
         />
-        <AdminInput name="price" label={t("price")} required type="number" min={0} step="0.01" />
+        <AdminInput name="price" label={t("price")} required type="number" min={0} step="0.01" defaultValue={initial?.price} />
         {listingType === LISTING_TYPES.RENT && (
           <AdminSelect
             name="pricePeriod"
             label={t("pricePeriod")}
             required
-            defaultValue={PRICE_PERIODS.MONTH}
+            defaultValue={initial?.pricePeriod ?? PRICE_PERIODS.MONTH}
             options={[{ value: PRICE_PERIODS.MONTH, label: searchT("monthly") }, { value: PRICE_PERIODS.DAY, label: searchT("daily") }]}
           />
         )}
@@ -120,6 +154,7 @@ export function PublicPropertyForm({
           label={t("propertyType")}
           required
           placeholder={t("select")}
+          defaultValue={initial?.typeId}
           options={options.types.map((type) => ({ value: type.id, label: type.name }))}
         />
         <AdminSelect
@@ -134,6 +169,7 @@ export function PublicPropertyForm({
           name="districtId"
           label={t("district")}
           placeholder={t("notSelected")}
+          defaultValue={initial?.districtId ?? ""}
           options={districts.map((district) => ({ value: district.id, label: district.name }))}
         />
         <FullWidth>
@@ -142,18 +178,19 @@ export function PublicPropertyForm({
             label={t("address")}
             maxLength={240}
             hint={t("addressHint")}
+            defaultValue={initial?.address ?? ""}
           />
         </FullWidth>
       </FormSection>
 
       <FormSection asFieldset title={t("planning")}>
-        <AdminInput name="rooms" label={t("rooms")} type="number" min={0} />
-        <AdminInput name="bedrooms" label={t("bedrooms")} type="number" min={0} />
-        <AdminInput name="bathrooms" label={t("bathrooms")} type="number" min={0} />
-        <AdminInput name="area" label={t("area")} type="number" min={0} step="0.01" />
-        <AdminInput name="landArea" label={t("landArea")} type="number" min={0} step="0.01" />
-        <AdminInput name="floor" label={t("floor")} type="number" min={0} />
-        <AdminInput name="totalFloors" label={t("totalFloors")} type="number" min={0} />
+        <AdminInput name="rooms" label={t("rooms")} type="number" min={0} defaultValue={initial?.rooms ?? ""} />
+        <AdminInput name="bedrooms" label={t("bedrooms")} type="number" min={0} defaultValue={initial?.bedrooms ?? ""} />
+        <AdminInput name="bathrooms" label={t("bathrooms")} type="number" min={0} defaultValue={initial?.bathrooms ?? ""} />
+        <AdminInput name="area" label={t("area")} type="number" min={0} step="0.01" defaultValue={initial?.area ?? ""} />
+        <AdminInput name="landArea" label={t("landArea")} type="number" min={0} step="0.01" defaultValue={initial?.landArea ?? ""} />
+        <AdminInput name="floor" label={t("floor")} type="number" min={0} defaultValue={initial?.floor ?? ""} />
+        <AdminInput name="totalFloors" label={t("totalFloors")} type="number" min={0} defaultValue={initial?.totalFloors ?? ""} />
       </FormSection>
 
       <FormSection asFieldset title={t("condition")}>
@@ -161,25 +198,28 @@ export function PublicPropertyForm({
           name="renovation"
           label={t("renovation")}
           placeholder={t("notSelected")}
+          defaultValue={initial?.renovation ?? ""}
           options={Object.values(RENOVATIONS).map((value) => ({ value, label: propertyT(`renovation.${value === "COSMETIC" ? "cosmetic" : value === "RENOVATED" ? "renovated" : value === "DESIGNER" ? "designer" : value === "UNRENOVATED" ? "unrenovated" : "newBuilding"}`) }))}
         />
         <AdminSelect
           name="documentStatus"
           label={t("document")}
           placeholder={t("notSelected")}
+          defaultValue={initial?.documentStatus ?? ""}
           options={Object.values(DOCUMENT_STATUSES).map((value) => ({ value, label: propertyT(`document.${value === "TITLE_DEED" ? "titleDeed" : value === "CONTRACT" ? "contract" : value === "MUNICIPAL" ? "municipal" : value === "DECREE" ? "decree" : value === "POWER_OF_ATTORNEY" ? "powerOfAttorney" : value === "EXTRACT_COMMERCIAL" ? "commercialExtract" : "none"}`) }))}
         />
         <AdminSelect
           name="buildingType"
           label={t("building")}
           placeholder={t("notSelected")}
+          defaultValue={initial?.buildingType ?? ""}
           options={Object.values(BUILDING_TYPES).map((value) => ({ value, label: propertyT(`building.${value === "NEW" ? "new" : "old"}`) }))}
         />
-        <AdminInput name="videoUrl" label={t("video")} type="url" hint={t("videoHint")} />
+        <AdminInput name="videoUrl" label={t("video")} type="url" hint={t("videoHint")} defaultValue={initial?.videoUrl ?? ""} />
         <FullWidth>
           <div className="flex flex-wrap gap-x-6 gap-y-1">
-            <AdminCheckbox name="mortgageAvailable" label={t("mortgage")} />
-            <AdminCheckbox name="installmentAvailable" label={t("installment")} />
+            <AdminCheckbox name="mortgageAvailable" label={t("mortgage")} defaultChecked={initial?.mortgageAvailable} />
+            <AdminCheckbox name="installmentAvailable" label={t("installment")} defaultChecked={initial?.installmentAvailable} />
           </div>
         </FullWidth>
       </FormSection>
@@ -200,6 +240,7 @@ export function PublicPropertyForm({
                         name="featureIds"
                         value={feature.id}
                         label={feature.name}
+                        defaultChecked={initial?.featureIds.includes(feature.id)}
                       />
                     ))}
                   </div>
@@ -218,6 +259,7 @@ export function PublicPropertyForm({
             folder="emlaklar"
             uploadUrl="/api/hesab/media"
             maxFiles={MAX_PROPERTY_IMAGES}
+            initial={initial?.images}
             hint={t("imageHint", { count: MAX_PROPERTY_IMAGES })}
           />
         </FullWidth>

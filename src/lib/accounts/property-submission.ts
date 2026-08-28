@@ -17,6 +17,11 @@ export const publicPropertySchema = propertyFieldsSchema
     isFeatured: true,
     metaTitle: true,
     metaDescription: true,
+    noIndex: true,
+    canonicalUrl: true,
+    ogTitle: true,
+    ogDescription: true,
+    ogImage: true,
   })
   .refine((data) => data.listingType !== "RENT" || data.pricePeriod !== null, {
     message: "Kirayə elanı üçün qiymət dövrü seçilməlidir",
@@ -39,6 +44,11 @@ export function readPublicPropertyForm(formData: FormData): PublicPropertyInput 
     "isFeatured",
     "metaTitle",
     "metaDescription",
+    "noIndex",
+    "canonicalUrl",
+    "ogTitle",
+    "ogDescription",
+    "ogImage",
   ];
   for (const key of restrictedKeys) {
     delete input[key];
@@ -69,6 +79,11 @@ export function buildPublicPropertyData(
     isFeatured: false,
     metaTitle: null,
     metaDescription: null,
+    noIndex: false,
+    canonicalUrl: null,
+    ogTitle: null,
+    ogDescription: null,
+    ogImage: null,
     authorId: identity.userId,
     isDemo: false,
     publishedAt: null,

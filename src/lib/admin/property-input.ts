@@ -1,6 +1,7 @@
 import { PROPERTY_STATUSES } from "@/lib/constants";
 import type { PropertyInput } from "./schemas";
 import * as form from "./form";
+import { propertySearchText } from "@/lib/search-normalization";
 
 /**
  * Əmlak formasının saf (baza ilə əlaqəsiz) hissəsi.
@@ -66,6 +67,7 @@ export function propertyData(input: PropertyInput) {
   return {
     title: input.title,
     description: input.description,
+    searchText: propertySearchText(input),
     listingType: input.listingType,
     status: input.status,
     price: input.price,
