@@ -15,8 +15,9 @@ import { getCachedProjectBySlug } from "@/lib/public-cache";
 import { getProjectPartners } from "@/lib/queries";
 import { PartnerRelations } from "@/components/site/partner-relations";
 import { siteConfig, siteUrl } from "@/config/site";
-import type { Locale } from "@/lib/constants";
+import { TRANSLATION_ENTITY_TYPES, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
+import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -35,9 +36,14 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const project = await getCachedProjectBySlug(slug);
+  const sourceProject = await getCachedProjectBySlug(slug);
 
-  if (!project) notFound();
+  if (!sourceProject) notFound();
+  const project = applyContentTranslation(
+    TRANSLATION_ENTITY_TYPES.PROJECT,
+    sourceProject,
+    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROJECT, sourceProject.id, locale as Locale),
+  );
 
   return buildMetadata({
     title: project.metaTitle || project.name,
@@ -59,9 +65,14 @@ export default async function ProjectDetailPage({ params }: Props) {
     getTranslations({ locale, namespace: "listings.detail" }),
     getTranslations({ locale, namespace: "navigation" }),
   ]);
-  const project = await getCachedProjectBySlug(slug);
+  const sourceProject = await getCachedProjectBySlug(slug);
 
-  if (!project) notFound();
+  if (!sourceProject) notFound();
+  const project = applyContentTranslation(
+    TRANSLATION_ENTITY_TYPES.PROJECT,
+    sourceProject,
+    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROJECT, sourceProject.id, locale as Locale),
+  );
 
   const projectTypeLabels: Record<string, string> = {
     RESIDENTIAL: t("projectTypeResidential"),

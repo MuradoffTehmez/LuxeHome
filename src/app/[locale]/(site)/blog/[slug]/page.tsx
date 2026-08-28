@@ -13,7 +13,8 @@ import { getRelatedPosts } from "@/lib/queries";
 import { getCachedPostBySlug } from "@/lib/public-cache";
 import { recordView } from "@/lib/view-counter";
 import { isUnoptimizedImage } from "@/lib/utils";
-import type { Locale } from "@/lib/constants";
+import { TRANSLATION_ENTITY_TYPES, type Locale } from "@/lib/constants";
+import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -26,9 +27,14 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const post = await getCachedPostBySlug(slug);
+  const sourcePost = await getCachedPostBySlug(slug);
 
-  if (!post) notFound();
+  if (!sourcePost) notFound();
+  const post = applyContentTranslation(
+    TRANSLATION_ENTITY_TYPES.BLOG_POST,
+    sourcePost,
+    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.BLOG_POST, sourcePost.id, locale as Locale),
+  );
 
   return buildMetadata({
     title: post.metaTitle || post.title,
@@ -52,9 +58,14 @@ export default async function BlogPostPage({ params }: Props) {
     getTranslations({ locale, namespace: "listings" }),
     getTranslations({ locale, namespace: "navigation" }),
   ]);
-  const post = await getCachedPostBySlug(slug);
+  const sourcePost = await getCachedPostBySlug(slug);
 
-  if (!post) notFound();
+  if (!sourcePost) notFound();
+  const post = applyContentTranslation(
+    TRANSLATION_ENTITY_TYPES.BLOG_POST,
+    sourcePost,
+    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.BLOG_POST, sourcePost.id, locale as Locale),
+  );
 
   // Sayğac cavabı gözlətmir — `waitUntil` ilə render bitdikdən sonra yazılır
   recordView("post", post.id, (await headers()).get("user-agent"));

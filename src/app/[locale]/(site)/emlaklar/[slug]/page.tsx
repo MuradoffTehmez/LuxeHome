@@ -17,6 +17,7 @@ import { formatPrice, toIsoDateTime } from "@/lib/utils";
 import {
   LISTING_TYPES,
   PROPERTY_STATUS_TONE,
+  TRANSLATION_ENTITY_TYPES,
   type PropertyStatus,
   type Locale,
 } from "@/lib/constants";
@@ -41,6 +42,7 @@ import { PartnerRelations } from "@/components/site/partner-relations";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
+import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -66,7 +68,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sourceProperty = await getCachedPropertyBySlug(slug);
 
   if (!sourceProperty) notFound();
-  const localizedProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
+  const knownProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
+  const localizedProperty = applyContentTranslation(
+    TRANSLATION_ENTITY_TYPES.PROPERTY,
+    knownProperty,
+    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROPERTY, sourceProperty.id, locale as Locale),
+  );
   const property = {
     ...localizedProperty,
     city: localizeLocation(localizedProperty.city, locale as Locale),
@@ -111,7 +118,12 @@ export default async function PropertyDetailPage({ params }: Props) {
   // Sayğac cavabı gözlətmir — `waitUntil` ilə render bitdikdən sonra yazılır
   recordView("property", sourceProperty.id, (await headers()).get("user-agent"));
 
-  const localizedProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
+  const knownProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
+  const localizedProperty = applyContentTranslation(
+    TRANSLATION_ENTITY_TYPES.PROPERTY,
+    knownProperty,
+    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROPERTY, sourceProperty.id, locale as Locale),
+  );
   const property = {
     ...localizedProperty,
     type: localizeKnownContent("propertyType", localizedProperty.type, locale as Locale),
