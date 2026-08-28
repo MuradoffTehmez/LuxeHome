@@ -13,6 +13,10 @@ import { ContactForm } from "./contact-form";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
+// Əlaqə məlumatları admin paneldən dəyişir. Səhifə request zamanı render olunur ki,
+// D1 parametrləri dərhal görünsün və production build statik Cloudflare konteksti istəməsin.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "contact" });

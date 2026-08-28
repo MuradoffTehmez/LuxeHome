@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT } from "jose/jwt/sign";
+import { jwtVerify } from "jose/jwt/verify";
 import {
   SESSION_COOKIE,
   SESSION_SUBJECT,

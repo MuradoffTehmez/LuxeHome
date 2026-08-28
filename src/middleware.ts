@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { jwtVerify } from "jose/jwt/verify";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { isStaging } from "@/config/site";
