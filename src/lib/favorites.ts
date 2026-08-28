@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { mergeFavoriteIds, sanitizeFavoriteIds } from "@/lib/favorite-sync";
 
 const STORAGE_KEY = "luxehomeestate:favorites";
 const CHANGE_EVENT = "luxehomeestate:favorites-changed";
@@ -15,10 +16,34 @@ function read(): string[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : [];
+    return sanitizeFavoriteIds(parsed);
   } catch {
     return [];
   }
+}
+
+async function readAccountFavorites(local: string[]): Promise<string[] | null> {
+  try {
+    const response = await fetch("/api/hesab/favoritler", { credentials: "same-origin", cache: "no-store" });
+    if (response.status === 401) return null;
+    if (!response.ok) throw new Error("Favorit sinxronu alınmadı");
+    const payload = await response.json() as { ids?: unknown };
+    const merged = mergeFavoriteIds(local, sanitizeFavoriteIds(payload.ids));
+    await persistAccountFavorites(merged);
+    return merged;
+  } catch {
+    return null;
+  }
+}
+
+async function persistAccountFavorites(ids: string[]): Promise<void> {
+  const response = await fetch("/api/hesab/favoritler", {
+    method: "PUT",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok && response.status !== 401) throw new Error("Favoritlər saxlanılmadı");
 }
 
 function write(ids: string[]) {
@@ -37,8 +62,15 @@ export function useFavorites() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setIds(read());
-    setReady(true);
+    const local = read();
+    setIds(local);
+    void readAccountFavorites(local).then((synced) => {
+      if (synced) {
+        write(synced);
+        setIds(synced);
+      }
+      setReady(true);
+    });
 
     const sync = () => setIds(read());
     window.addEventListener(CHANGE_EVENT, sync);
@@ -56,12 +88,14 @@ export function useFavorites() {
       : [...current, id];
     write(next);
     setIds(next);
+    void persistAccountFavorites(next).catch(() => undefined);
     return next.includes(id);
   }, []);
 
   const clear = useCallback(() => {
     write([]);
     setIds([]);
+    void persistAccountFavorites([]).catch(() => undefined);
   }, []);
 
   return { ids, ready, toggle, clear, count: ids.length };
