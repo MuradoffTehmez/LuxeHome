@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isTurnstileResponseValid } from "../turnstile";
+import { isTurnstileResponseValid, readTurnstileToken } from "../turnstile";
 
 describe("Turnstile cavabı", () => {
   it("uğurlu və doğru action cavabını qəbul edir", () => {
@@ -12,5 +12,17 @@ describe("Turnstile cavabı", () => {
 
   it("uğursuz Cloudflare cavabını rədd edir", () => {
     expect(isTurnstileResponseValid({ success: false, action: "contact" }, "contact")).toBe(false);
+  });
+
+  it("eyni adlı boş sahədən sonra gələn etibarlı tokeni seçir", () => {
+    const formData = new FormData();
+    formData.append("cf-turnstile-response", "");
+    formData.append("cf-turnstile-response", "etibarli-turnstile-tokeni");
+
+    expect(readTurnstileToken(formData)).toBe("etibarli-turnstile-tokeni");
+  });
+
+  it("token yoxdursa null qaytarır", () => {
+    expect(readTurnstileToken(new FormData())).toBeNull();
   });
 });

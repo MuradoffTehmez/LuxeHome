@@ -14,6 +14,8 @@ type TurnstileApi = {
       callback: (token: string) => void;
       "expired-callback": () => void;
       "error-callback": () => void;
+      "response-field": true;
+      "response-field-name": string;
     },
   ) => string;
   reset: (widgetId: string) => void;
@@ -62,7 +64,6 @@ export function TurnstileWidget({
   const widgetIdRef = useRef<string | null>(null);
   const initialResetRef = useRef(true);
   const [siteKey, setSiteKey] = useState<string | null>(null);
-  const [token, setToken] = useState("");
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -91,13 +92,11 @@ export function TurnstileWidget({
           sitekey: siteKey,
           action,
           appearance: "always",
-          callback: (value) => {
-            setToken(value);
-            setFailed(false);
-          },
-          "expired-callback": () => setToken(""),
+          "response-field": true,
+          "response-field-name": TURNSTILE_RESPONSE_FIELD,
+          callback: () => setFailed(false),
+          "expired-callback": () => undefined,
           "error-callback": () => {
-            setToken("");
             setFailed(true);
           },
         });
@@ -119,13 +118,11 @@ export function TurnstileWidget({
     }
     if (widgetIdRef.current && window.turnstile) {
       window.turnstile.reset(widgetIdRef.current);
-      setToken("");
     }
   }, [resetSignal]);
 
   return (
     <div className="min-h-[65px]" aria-label="Təhlükəsizlik yoxlaması">
-      <input type="hidden" name={TURNSTILE_RESPONSE_FIELD} value={token} />
       <div ref={containerRef} />
       {failed && (
         <p role="alert" className="mt-2 text-sm text-danger">

@@ -6,8 +6,22 @@ type TurnstileResponse = {
   success?: boolean;
   action?: string;
   hostname?: string;
+  "error-codes"?: string[];
   [key: string]: unknown;
 };
+
+/**
+ * Köhnə keşlənmiş client bundle-ları eyni adlı əlavə boş input göndərə bilər.
+ * Bütün dəyərləri oxuyub Cloudflare limitinə uyğun ilk dolu tokeni seçirik.
+ */
+export function readTurnstileToken(formData: FormData): string | null {
+  for (const value of formData.getAll(TURNSTILE_RESPONSE_FIELD)) {
+    if (typeof value !== "string") continue;
+    const token = value.trim();
+    if (token.length >= 10 && token.length <= 2_048) return token;
+  }
+  return null;
+}
 
 /** Cloudflare cavabını ayrıca saxlayırıq ki, şəbəkəsiz unit test edilə bilsin. */
 export function isTurnstileResponseValid(
@@ -30,8 +44,8 @@ export async function verifyTurnstile(
   const secret = runtimeEnv("TURNSTILE_SECRET_KEY");
   if (!secret) return process.env.NODE_ENV !== "production";
 
-  const token = formData.get(TURNSTILE_RESPONSE_FIELD);
-  if (typeof token !== "string" || token.length < 10 || token.length > 2_048) return false;
+  const token = readTurnstileToken(formData);
+  if (!token) return false;
 
   const body = new URLSearchParams({ secret, response: token });
   if (remoteIp && remoteIp !== "unknown") body.set("remoteip", remoteIp);
@@ -47,10 +61,17 @@ export async function verifyTurnstile(
       },
     );
     if (!response.ok) return false;
-    return isTurnstileResponseValid(
-      (await response.json()) as TurnstileResponse,
-      expectedAction,
-    );
+    const result = (await response.json()) as TurnstileResponse;
+    const valid = isTurnstileResponseValid(result, expectedAction);
+    if (!valid) {
+      console.warn("Turnstile yoxlaması rədd edildi", {
+        expectedAction,
+        action: result.action ?? null,
+        hostname: result.hostname ?? null,
+        errorCodes: result["error-codes"] ?? [],
+      });
+    }
+    return valid;
   } catch (error) {
     console.error("Turnstile yoxlaması tamamlanmadı", error);
     return false;
