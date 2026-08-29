@@ -59,7 +59,12 @@ export default async function AdminSecurityPage() {
     getAdminActiveSessions(100),
     getAdminLockedUsers(),
   ]);
-  const turnstileReady = hasRuntimeEnv("TURNSTILE_SITE_KEY") && hasRuntimeEnv("TURNSTILE_SECRET_KEY");
+  const turnstileSecretReady =
+    hasRuntimeEnv("TURNSTILE_SECRET") || hasRuntimeEnv("TURNSTILE_SECRET_KEY");
+  const turnstileReady =
+    hasRuntimeEnv("TURNSTILE_SITE_KEY") &&
+    turnstileSecretReady &&
+    hasRuntimeEnv("TURNSTILE_HOSTNAMES");
 
   return (
     <>

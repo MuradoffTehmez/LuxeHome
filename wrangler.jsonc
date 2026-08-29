@@ -26,8 +26,10 @@
     // Dinamik səhifələrdə runtime-da oxunur; statik səhifələr üçün deploy skripti
     // eyni dəyəri build prosesinə də ötürür
     "SITE_URL": "https://luxehomeestate.az",
-    // Public açardır; gizli açar `TURNSTILE_SECRET_KEY` Worker secret-i kimi saxlanılır
+    // Public açardır; gizli açar `TURNSTILE_SECRET` Worker secret-i kimi saxlanılır
     "TURNSTILE_SITE_KEY": "0x4AAAAAAEfhXUNNmS0Ka_DO",
+    // Siteverify cavabındakı hostname yalnız bu production frontend-lərdən biri olmalıdır
+    "TURNSTILE_HOSTNAMES": "luxehomeestate.az,www.luxehomeestate.az",
     // Admin "Search Analytics" paneli GraphQL Analytics API sorğusunda istifadə edir —
     // sirr deyil, sadəcə hansı zona/hesabın sorğulanacağını göstərir
     "CF_ZONE_ID": "d401a9f612bc47ed88e1c14e658141d1",
