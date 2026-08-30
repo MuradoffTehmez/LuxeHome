@@ -200,6 +200,7 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 .gate-v.pass { color: var(--ok); }
+.gate-v.warn { color: var(--warn); }
 .gate-n { font-size: 12.5px; color: var(--ink-muted); }
 
 /* --- Bölmə ---------------------------------------------------------------- */
@@ -473,16 +474,16 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
 <header class="masthead">
   <div class="eyebrow">
     <span>Layihə auditi</span>
-    <span>27 avqust 2026</span>
-    <span>audit + düzəlişlər</span>
-    <span>branch main · 74052c8</span>
+    <span>27 avqust 2026 · 30 avqust yeniləməsi</span>
+    <span>audit + düzəlişlər + Bilik Mərkəzi</span>
+    <span>branch main · 56b30aa</span>
   </div>
   <h1>Luxe Home Estate — kod bazasının vəziyyəti</h1>
   <p class="standfirst">
-    38 220 sətir mənbə kodu, 274 commit, 76 marşrut, 28 verilənlər bazası modeli və iki PRD
-    sənədi. Aşağıda faktiki tamamlanma dərəcəsi, təsdiqlənmiş 13 defekt və sənədləşmə
-    sürüşməsi verilib. Bütün tapıntılar kod üzərində yoxlanılıb — PRD-dəki niyyət deyil,
-    repoda olan davranış əsas götürülüb.
+    51 900 sətir mənbə kodu, 382 commit, 112 səhifə/API giriş nöqtəsi, 53 verilənlər bazası
+    modeli və iki PRD sənədi. 30 avqust izləməsində ayrıca Real Estate Knowledge Hub,
+    platforma FAQ-sı, hüquqi FAQ, lüğət və kalkulyator yoxlanılıb. Bütün nəticələr kod və
+    sənəd üzərində təsdiqlənib — PRD-dəki niyyət deyil, repoda olan davranış əsas götürülüb.
   </p>
 
   <div class="gates">
@@ -498,13 +499,13 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     </div>
     <div class="gate">
       <span class="gate-k">vitest</span>
-      <span class="gate-v pass">312</span>
-      <span class="gate-n">75 fayl, hamısı keçir</span>
+      <span class="gate-v pass">369</span>
+      <span class="gate-n">88 fayl, hamısı keçir</span>
     </div>
     <div class="gate">
       <span class="gate-k">next build</span>
-      <span class="gate-v pass">OK</span>
-      <span class="gate-n">76 marşrut</span>
+      <span class="gate-v warn">BLOCK</span>
+      <span class="gate-n">Cloudflare API tokeni tələb edir</span>
     </div>
     <div class="gate">
       <span class="gate-k">CI</span>
@@ -514,12 +515,64 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
   </div>
 </header>
 
+<section id="bilik-merkezi-izleme">
+  <h2>30 avqust izləməsi — Real Estate Knowledge Hub</h2>
+  <p class="sec-note">
+    İstifadəçinin əlavə etdiyi hüquqi araşdırma sənədi ilə kod bazasının müqayisəsi və yeni
+    modulun faktiki icra vəziyyəti.
+  </p>
+
+  <div class="callout">
+    <strong>Nəticə:</strong> Bilik Mərkəzi yalnız statik məqalə səhifəsi kimi deyil, D1/Prisma
+    modeli, təhlükəsiz public sorğu qatı, üçdilli təqdimat, tam admin CRUD, hüquqi status
+    paneli, lüğət, kalkulyator, FAQ ayrımı, sitemap və struktur data ilə bütöv modul kimi
+    qurulub. Dəyişikliklər 17 məqsədli commitə bölünüb; mənbə hüquqi sənəd ayrıca saxlanılıb.
+  </div>
+
+  <div class="scroller" style="margin-top:18px">
+    <table>
+      <thead>
+        <tr><th>Qat</th><th>Hazır vəziyyət</th><th>Əsas mənbə</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Məlumat modeli</td><td>Kateqoriya, məqalə, termin və FAQ; hüquqi status, risk, aktlar, sənədlər, prosedur, xərc və checklist sahələri</td><td><code>prisma/schema.prisma</code>, <code>migrations/0024_knowledge_hub.sql</code></td></tr>
+        <tr><td>İctimai bələdçilər</td><td>Kataloq, kateqoriya və detal səhifələri; yalnız yayımlanmış məzmun public sorğuya düşür</td><td><code>src/app/[locale]/(site)/bilik-merkezi/**</code></td></tr>
+        <tr><td>FAQ ayrımı</td><td><code>/suallar</code> sayt/platforma haqqında dəqiq 20 əsas sualdır; <code>/bilik-merkezi/suallar</code> əmlak və qanunlar üçündür</td><td><code>src/i18n/site-faq.ts</code>, <code>faq-groups.tsx</code></td></tr>
+        <tr><td>Yardımçı alətlər</td><td>Daşınmaz əmlak lüğəti və ipoteka/büdcə kalkulyatoru</td><td><code>/lugat</code>, <code>/kalkulyator</code></td></tr>
+        <tr><td>Admin CMS</td><td>Məqalə, kateqoriya, termin və FAQ CRUD; validasiya, audit, sanitizasiya, SEO/OG və cache invalidasiyası</td><td><code>src/app/admin/bilik-merkezi/**</code></td></tr>
+        <tr><td>Lokallaşdırma</td><td>AZ/EN/RU UI kataloqları və dinamik məzmunun tərcümə panelinə qoşulması</td><td><code>src/i18n/knowledge.ts</code>, <code>src/app/admin/tercumeler/**</code></td></tr>
+        <tr><td>SEO və kəşf</td><td>Article/DefinedTerm JSON-LD, naviqasiya, footer, admin menyusu və sitemap</td><td><code>src/lib/seo.ts</code>, <code>src/app/sitemap.ts</code></td></tr>
+        <tr><td>İlkin məlumat idxalı</td><td><code>Mövzu —</code> bölmələrini idempotent DRAFT SQL-ə çevirən generator var</td><td><code>prisma/build-knowledge-hub-sql.ts</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Qəbul meyarlarının vəziyyəti</h3>
+  <div class="modules">
+    <div class="mod done"><span class="mod-n">Sayt FAQ — 20 sual</span><span class="mod-d">platforma, elan, hesab, təhlükəsizlik və əlaqə mövzuları 4 qrupda</span></div>
+    <div class="mod done"><span class="mod-n">Əmlak və qanunlar FAQ</span><span class="mod-d">platforma suallarından ayrı route və CMS mənbəyi</span></div>
+    <div class="mod done"><span class="mod-n">Hüquqi məzmun modeli</span><span class="mod-d">mənbə, risk, yurisdiksiya və hüquqi baxış tarixi görünəndir</span></div>
+    <div class="mod done"><span class="mod-n">Təhlükəsiz HTML</span><span class="mod-d">əsas və tərcümə məzmunu saxlanarkən sanitizasiya olunur</span></div>
+    <div class="mod part"><span class="mod-n">Hüquqşünas təsdiqi</span><span class="mod-d">texniki workflow hazırdır; faktiki hüquqi təsdiq və tarix redaksiya məsuliyyətidir</span></div>
+    <div class="mod part"><span class="mod-n">İlkin importun icrası</span><span class="mod-d">generator hazırdır; cari hostda Node uv_os_get_passwd ENOMEM səbəbindən SQL yaradılması ayrıca işlədilməlidir</span></div>
+  </div>
+
+  <div class="callout" style="margin-top:18px">
+    <strong>Yayım bloklayıcıları:</strong> <code>0024_knowledge_hub.sql</code> əvvəl staging,
+    sonra production D1-ə tətbiq edilməli; mənbə sənədindən yaradılan qeydlər DRAFT qalmalı
+    və hüquqşünas/redaktor baxışından sonra yayımlanmalıdır. Lokal <code>next build</code> bu
+    yoxlamada kod xətasına görə deyil, qeyri-interaktiv Cloudflare remote proxy-nin
+    <code>CLOUDFLARE_API_TOKEN</code> tələb etməsinə görə tamamlanmayıb.
+  </div>
+</section>
+
 <section id="xulase">
   <h2>Bir abzasda</h2>
   <p class="sec-note">Layihənin ümumi sağlamlığı və əsas riski.</p>
 
   <p>
-    Kod bazası texniki cəhətdən sağlamdır: dörd keyfiyyət qapısının hamısı təmiz keçir,
+    Kod bazası texniki cəhətdən sağlamdır: test, typecheck və lint qapıları təmiz keçir;
+    production build isə bu hostda Cloudflare remote proxy tokeni olmadığı üçün bloklanır,
     auth qatı ciddi qurulub (D1-də ləğv edilə bilən sessiya, məcburi TOTP, CSRF + sürət
     limiti hər yazma əməliyyatında), i18n intizamı yüksəkdir və media yükləmə axını
     magic-byte yoxlaması ilə düzgün müdafiə olunub. Arxitektura sənədləşməsi (CLAUDE.md)
@@ -534,7 +587,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
   </p>
 
   <div class="callout">
-    <strong>Bu sessiyada:</strong> B1–B8 və B14 tam düzəldildi, donma/yubanmanın dörd səbəbi aradan qaldırıldı, səhifə keçid animasiyası və naviqasiya göstəricisi əlavə olundu, digest cron-u hər iki mühitdə qoşuldu. Production və staging yayımlandı; hər iki D1 miqrasiyaları ilə bərabərləşdirildi. 312 test, typecheck, lint və build təmizdir.<br><br><strong>Ən vacib üç iş idi:</strong> əlaqə formasına spam qoruması (B2), <code>viewCount</code>
+    <strong>27 avqust sessiyasında:</strong> B1–B8 və B14 tam düzəldildi, donma/yubanmanın dörd səbəbi aradan qaldırıldı, səhifə keçid animasiyası və naviqasiya göstəricisi əlavə olundu, digest cron-u hər iki mühitdə qoşuldu. Həmin sessiyanın qapıları 312 test, typecheck, lint və build ilə təmiz idi.<br><br><strong>Ən vacib üç iş idi:</strong> əlaqə formasına spam qoruması (B2), <code>viewCount</code>
     artımının bərpası (B3) və filtr birləşməsindəki üzərinə yazma xətası (B1). Üçü də
     kiçik dəyişiklikdir, üçü də bu gün canlı saytda istifadəçiyə təsir edir.
   </div>
@@ -1394,7 +1447,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
 
 <section id="metrik">
   <h2>Ölçülər</h2>
-  <p class="sec-note">27 avqust 2026 tarixinə <code>main</code> branch-ı üzrə.</p>
+  <p class="sec-note">30 avqust 2026 tarixinə <code>main</code> branch-ı üzrə təkrar ölçülüb.</p>
 
   <div class="scroller">
     <table>
@@ -1402,22 +1455,22 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
         <tr><th>Göstərici</th><th>Dəyər</th><th>Qeyd</th></tr>
       </thead>
       <tbody>
-        <tr><td>Mənbə kodu</td><td class="num">38 220 sətir</td><td><code>src/</code> altında .ts + .tsx</td></tr>
-        <tr><td>Test kodu</td><td class="num">4 063 sətir</td><td>ümumi həcmin ~%11-i</td></tr>
-        <tr><td>Testlər</td><td class="num">312 / 75 fayl</td><td>auth, i18n, SEO, UI, saved search, filtr, digest</td></tr>
-        <tr><td>Marşrutlar</td><td class="num">76</td><td>üç dil × ictimai + kabinet + admin</td></tr>
-        <tr><td>Verilənlər bazası modelləri</td><td class="num">28</td><td>12 miqrasiya</td></tr>
-        <tr><td>Commit-lər</td><td class="num">274</td><td>12-27 avqust 2026, 16 gün</td></tr>
+        <tr><td>Mənbə kodu</td><td class="num">51 900 sətir</td><td>508 ədəd <code>.ts</code> + <code>.tsx</code> faylı</td></tr>
+        <tr><td>Test kodu</td><td class="num">4 669 sətir</td><td>88 test faylında</td></tr>
+        <tr><td>Testlər</td><td class="num">369 / 88 fayl</td><td>30 avqust tam Vitest icrası, hamısı keçib</td></tr>
+        <tr><td>Səhifə / API girişləri</td><td class="num">112</td><td>100 <code>page.tsx</code> + 12 route handler</td></tr>
+        <tr><td>Verilənlər bazası modelləri</td><td class="num">53</td><td>25 D1 miqrasiya faylı</td></tr>
+        <tr><td>Commit-lər</td><td class="num">382</td><td>Knowledge Hub işi üçün son 17 commit ayrıca bölünüb</td></tr>
         <tr><td>Ən məhsuldar gün</td><td class="num">23 avqust</td><td>76 commit</td></tr>
-        <tr><td><code>force-dynamic</code> səhifələr</td><td class="num">57</td><td>D1 binding build vaxtı olmadığına görə</td></tr>
-        <tr><td>Server action faylları</td><td class="num">21</td><td>hamısı guard çağırır — yoxlanılıb</td></tr>
+        <tr><td><code>force-dynamic</code> girişlər</td><td class="num">92</td><td>D1 binding build vaxtı olmadığına görə</td></tr>
+        <tr><td>Server action faylları</td><td class="num">38</td><td>ictimai, kabinet və admin yazma axınları</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
 <footer>
-  Luxe Home Estate · kod auditi · 27 avqust 2026 · main @ 74052c8
+  Luxe Home Estate · kod auditi · 27 avqust 2026 · 30 avqust izləməsi · main @ 56b30aa
 </footer>
 
 </div>
