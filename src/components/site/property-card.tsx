@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { BedDouble, Building2, Layers, Maximize, MapPin } from "lucide-react";
+import { BedDouble, Building2, Crown, Layers, Maximize, MapPin } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
   LISTING_TYPES,
@@ -72,6 +72,7 @@ export function PropertyCard({
   const isSale = property.listingType === LISTING_TYPES.SALE;
   const isClosed =
     status === PROPERTY_STATUSES.SOLD || status === PROPERTY_STATUSES.RENTED;
+  const isPremium = property.isFeatured && (!property.featuredUntil || new Date(property.featuredUntil).getTime() >= Date.now());
 
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
@@ -130,6 +131,7 @@ export function PropertyCard({
       {/* --- Məzmun --- */}
       <div className={cn("flex flex-1 flex-col gap-4 p-5", variant === "featured" && "sm:p-7")}>
         <div className="flex flex-wrap gap-2">
+          {isPremium && <Badge tone="gold"><Crown className="mr-1 size-3" aria-hidden="true" />Premium</Badge>}
           <Badge tone={isSale ? "dark" : "gold"}>
             {isSale ? t("listingType.sale") : t("listingType.rent")}
           </Badge>

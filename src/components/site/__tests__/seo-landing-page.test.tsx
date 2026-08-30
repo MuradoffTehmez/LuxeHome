@@ -20,6 +20,7 @@ const property = {
   floor: 7,
   totalFloors: 16,
   isFeatured: false,
+  featuredUntil: null,
   publishedAt: new Date("2026-08-20T00:00:00Z"),
   createdAt: new Date("2026-08-20T00:00:00Z"),
   type: { name: "Mənzil", slug: "menziller" },

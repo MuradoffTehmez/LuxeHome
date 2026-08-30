@@ -21,6 +21,7 @@ import {
 import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
 import type { DigestStore } from "@/lib/saved-search-digest";
 import { normalizeSearchText } from "@/lib/search-normalization";
+import { localizePath } from "@/i18n/path-locale";
 
 const LOCALE_VALUES = Object.values(LOCALES);
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
@@ -45,6 +46,7 @@ export const propertyCardSelect = {
   floor: true,
   totalFloors: true,
   isFeatured: true,
+  featuredUntil: true,
   publishedAt: true,
   createdAt: true,
   type: { select: { name: true, slug: true } },
@@ -137,7 +139,7 @@ export type PropertyFilters = {
 };
 
 /** İctimai səhifələr üçün baza şərt — silinmiş və qaralama əmlaklar görünmür. */
-function publicPropertyWhere(): Prisma.PropertyWhereInput {
+export function publicPropertyWhere(): Prisma.PropertyWhereInput {
   return {
     deletedAt: null,
     isDemo: false,
@@ -288,6 +290,48 @@ export async function getProperties(filters: PropertyFilters = {}) {
   const pageSize = filters.pageSize ?? PAGE_SIZE;
   const where = buildPropertyWhere(filters);
 
+  if (filters.sort === "featured") {
+    const now = new Date();
+    const activePremium = {
+      AND: [
+        where,
+        { isFeatured: true },
+        { OR: [{ featuredUntil: null }, { featuredUntil: { gte: now } }] },
+      ],
+    } satisfies Prisma.PropertyWhereInput;
+    const premiumCount = await prisma.property.count({ where: activePremium });
+    const offset = (page - 1) * pageSize;
+    const premiumTake = Math.max(0, Math.min(pageSize, premiumCount - offset));
+    const premiumItems = premiumTake > 0
+      ? await prisma.property.findMany({
+          where: activePremium,
+          select: propertyCardSelect,
+          orderBy: [{ featuredUntil: "desc" }, { publishedAt: "desc" }],
+          skip: offset,
+          take: premiumTake,
+        })
+      : [];
+    const regularTake = pageSize - premiumItems.length;
+    const regularSkip = Math.max(0, offset - premiumCount);
+    const regularItems = regularTake > 0
+      ? await prisma.property.findMany({
+          where: { AND: [where, { NOT: activePremium }] },
+          select: propertyCardSelect,
+          orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+          skip: regularSkip,
+          take: regularTake,
+        })
+      : [];
+    const total = await prisma.property.count({ where });
+    return {
+      items: [...premiumItems, ...regularItems],
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    };
+  }
+
   const [items, total] = await Promise.all([
     prisma.property.findMany({
       where,
@@ -310,7 +354,11 @@ export async function getProperties(filters: PropertyFilters = {}) {
 
 export async function getFeaturedProperties(take = 6) {
   return prisma.property.findMany({
-    where: { ...publicPropertyWhere(), isFeatured: true },
+    where: {
+      ...publicPropertyWhere(),
+      isFeatured: true,
+      OR: [{ featuredUntil: null }, { featuredUntil: { gte: new Date() } }],
+    },
     select: propertyCardSelect,
     orderBy: [{ publishedAt: "desc" }],
     take,
@@ -323,11 +371,19 @@ export async function getPropertyBySlug(slug: string) {
     include: {
       type: true,
       city: true,
-      district: true,
+      district: { include: { neighborhoodProfile: true } },
       metro: true,
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { include: { feature: true } },
       project: { select: { name: true, slug: true } },
+      priceHistory: { orderBy: { changedAt: "desc" }, take: 20 },
+      nearbyPlaces: { orderBy: [{ category: "asc" }, { distanceMeters: "asc" }] },
+      assignedAgent: {
+        include: {
+          agency: { select: { name: true, slug: true } },
+          reviews: { where: { status: "APPROVED" }, orderBy: { createdAt: "desc" }, take: 5 },
+        },
+      },
     },
   });
 }
@@ -1379,7 +1435,7 @@ export async function getAdminPropertyById(id: string) {
 
 /** Formadakı bütün açılan siyahılar bir sorğu dəstində gətirilir. */
 export async function getPropertyFormOptions() {
-  const [types, cities, districts, metros, features, projects] = await Promise.all([
+  const [types, cities, districts, metros, features, projects, agents] = await Promise.all([
     prisma.propertyType.findMany({
       where: { isActive: true },
       select: { id: true, name: true, slug: true },
@@ -1409,9 +1465,14 @@ export async function getPropertyFormOptions() {
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     }),
+    prisma.agentProfile.findMany({
+      where: { isPublic: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
-  return { types, cities, districts, metros, features, projects };
+  return { types, cities, districts, metros, features, projects, agents };
 }
 
 export type PropertyFormOptions = Awaited<ReturnType<typeof getPropertyFormOptions>>;
@@ -1829,7 +1890,7 @@ type ActiveSavedSearch = {
   name: string;
   filters: string;
   frequency: string;
-  user: { email: string; locale: string };
+  user: { email: string; locale: string; notificationPreference?: { savedSearchPush: boolean } | null };
 };
 
 export type SavedSearchMatchStore = {
@@ -1849,6 +1910,7 @@ export type SavedSearchMatchStore = {
     property: SavedSearchMatchProperty,
     searchName: string,
   ): Promise<void>;
+  sendPush?(userId: string, title: string, property: SavedSearchMatchProperty, locale: string): Promise<void>;
 };
 
 export async function runSavedSearchMatching(
@@ -1907,6 +1969,14 @@ async function matchOneSavedSearch(
     actionUrl: `/emlaklar/${property.slug}`,
   });
 
+  if (search.user.notificationPreference?.savedSearchPush && store.sendPush) {
+    try {
+      await store.sendPush(search.userId, copy.title, property, search.user.locale);
+    } catch (error) {
+      console.error("[saved-search] push göndərilmədi:", error);
+    }
+  }
+
   // DAILY/WEEKLY üçün e-poçt burada getmir — uyğunluq `SavedSearchMatch`-də
   // `notifiedAt: null` kimi qalır və digest işi (`/api/cron/saved-search-digest`)
   // onu yığıb tək məktubda göndərir.
@@ -1949,7 +2019,7 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
         name: true,
         filters: true,
         frequency: true,
-        user: { select: { email: true, locale: true } },
+        user: { select: { email: true, locale: true, notificationPreference: { select: { savedSearchPush: true } } } },
       },
     });
   },
@@ -1998,6 +2068,12 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
         actionUrl: input.actionUrl,
       },
     });
+  },
+
+  async sendPush(userId, title, property, locale) {
+    const { sendPushToUser } = await import("@/lib/push");
+    const safeLocale = (LOCALE_VALUES as readonly string[]).includes(locale) ? locale as Locale : DEFAULT_LOCALE;
+    await sendPushToUser(userId, { title, body: property.title, url: localizePath(`/emlaklar/${property.slug}`, safeLocale), tag: `saved-search-${property.slug}` });
   },
 
   async notificationCopy(locale, searchName) {
