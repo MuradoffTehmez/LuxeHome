@@ -68,6 +68,8 @@ düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` q�
 |---|---|
 | `src/app/admin/**` | Paneldə `User.locale` seçimi olsa da UI mətnləri tərcümə qatına bağlanmayıb. |
 | Browser axınları | Avtomatlaşdırılmış Playwright/E2E yoxdur; production smoke testi manualdır. |
+| Phase 3 / AI | Semantik axtarış, Match Score, chatbot və map draw search yazılmayıb (PRD bölmə 180). Panel tərəfdə yalnız AI təsvir generatoru və foto məsləhətçisi var. |
+| Finance / CMS | Paket, ödəniş və statik səhifə redaktoru modulları yoxdur (Admin PRD). |
 
 Azərbaycan hərfləri ilə registrsiz axtarış 28 avqustda `searchText` / `searchName`
 sütunları və `normalizeSearchText()` ilə həll olunub.
@@ -292,7 +294,46 @@ seed edilməyib.
 
 ---
 
-## 12. Kod auditi izləməsi — 30 avqust 2026
+## 12. Phase 2 zəncirlərinin bağlanması — 30 avqust 2026
+
+Phase 2 modulları (bildiriş, agent, rezervasiya, premium, rayon analitikası) sxemdə və
+paneldə mövcud idi, lakin bir neçə zəncir uca qədər bağlanmamışdı: sütun və ya tərcümə
+açarı var idi, onu yazan/oxuyan kod yox idi. Bu sessiyada bağlananlar:
+
+| Boşluq | Nə edildi |
+|---|---|
+| `NotificationPreference` kanal açarları (PRD 57) | Kabinetdə tam seçim matrisi (Saxlanmış axtarış / Qiymət endirimi / Rezervasiya × E-poçt / Sayt / Push). `savedSearchEmail`, `savedSearchWeb`, `reservationEmail`, `reservationWeb` indi göndərmə qatında oxunur. |
+| `quietHoursStart` / `quietHoursEnd` (PRD 168) | Sütunlar heç yerdən oxunmurdu. `src/lib/notification-preferences.ts` + `sendPushToUser` sakit saatlara hörmət edir (Bakı vaxtı, gecə yarısını keçən aralıq daxil). E-poçt və sayt bildirişi kəsilmir. |
+| `AgentProfile.responseMinutes` (PRD 165) | Sütun və hər üç dildə `responseTime` açarı var idi, heç yerdə göstərilmirdi. Paneldən doldurulur, agent profilində və kataloq kartında yalnız dəyər varsa göstərilir. |
+| Agent profilinin redaktəsi | Modul yalnız yaratma + görünürlük açarı verirdi. İndi tam CRUD: `/admin/agentler/[id]` redaktə səhifəsi (avatar, WhatsApp, satış/icarə sayı, cavab müddəti daxil) və elan yoxlaması ilə silmə. |
+| Müştəri rəyləri (testimonial) | Yalnız yaradılırdı; siyahı və silmə əlavə olundu. |
+| Yaxın obyektlər | Yalnız yaradılırdı — səhv qeyd əmlak səhifəsində qalırdı. Siyahı + silmə əlavə olundu. |
+| Rayon analitikası | `upsert` forması həmişə boş açılırdı, ona görə bir göstəricini dəyişmək qalanlarını silirdi. İndi rayon seçiləndə saxlanmış dəyərlər yüklənir; siyahı və silmə var. `medianPrice` və `saleRentRatio` sütunları da forma və ictimai səthə bağlandı. |
+| Premium elanlar | Yalnız aktivləşdirilirdi. Aktiv premium siyahısı və vaxtından əvvəl dayandırma əlavə olundu. |
+| Rayon səhifəsi (PRD 49-50) | `NeighborhoodProfile` yalnız əmlak detalında görünürdü. `/rayon/[slug]` səhifəsinə lokallaşdırılmış təsvir + göstərici bloku əlavə olundu; boş göstərici uydurulmur. |
+| Rəy bütövlüyü (PRD 166) | Agent özünə, agentlik sahibi/əməkdaşı isə öz agentliyinin agentinə rəy yaza bilmir. Yoxlama serverdədir. |
+| QR kod (PRD 61-63) | Phase 1 MVP bəndi idi, ümumiyyətlə yox idi. `src/lib/property-qr.ts` canonical URL üçün SVG-ni server tərəfdə çəkir (kənar servis yoxdur), əmlak detalında PNG/SVG yükləmə düymələri var. |
+| `NotFoundHit.firstSeenAt` | Yazılırdı, göstərilmirdi. 404 monitorunda «İlk / Son» kimi görünür. |
+
+Bu sessiyada tapılan və düzəldilən iki qırıq:
+
+- `cabinet-navigation.test.ts` köhnəlmişdi — Phase 2 kabinetə iki bənd əlavə etmişdi, test
+  yenilənməmişdi, ona görə `npm run test` **qırmızı** idi (yerli olaraq).
+- `npm run lint` yerli maşında 1569 xəta verirdi: `tmp/` altındakı OpenNext bundle snapshot-u
+  ESLint ignore siyahısında yox idi (git onu `tmp/.gitignore` ilə buraxır, ESLint flat config
+  isə git-ignore oxumur). CI-də qovluq olmadığı üçün problem yalnız yerli işdə görünürdü və
+  layihənin öz xəbərdarlıqlarını gizlədirdi. `tmp/**` və `archive-*/**` ignore-a əlavə edildi,
+  ortaya çıxan üç xəbərdarlıq təmizləndi.
+- SSR komponent testləri hər işləmədə stderr-ə `getCloudflareContext` xətası tökürdü
+  (davranış düzgün idi — `getAllSettings()` boş obyektə qayıdır), Vitest onu «unhandled
+  error» kimi sayırdı. `setup-ui.ts`-də yalnız oxuma funksiyaları mock edildi.
+
+Keyfiyyət qapısı: 368 test / 88 fayl, typecheck, ESLint (0 xəta, 0 xəbərdarlıq) və
+production build təmizdir.
+
+---
+
+## 13. Kod auditi izləməsi — 30 avqust 2026
 
 `docs/audits/2026-08-27-kod-auditi.html` üzrə lokal bağlanan işlər:
 
