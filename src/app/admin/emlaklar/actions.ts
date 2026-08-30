@@ -18,6 +18,7 @@ import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { recordPropertyPriceChange } from "@/lib/price-drop";
 
 /**
  * Əmlak CRUD-u.
@@ -162,7 +163,7 @@ export async function updateProperty(
   try {
     const existing = await prisma.property.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true, publishedAt: true, status: true },
+      select: { id: true, publishedAt: true, status: true, price: true, currency: true },
     });
     if (!existing) return failure("Elan tapılmadı və ya silinib.");
 
@@ -177,6 +178,15 @@ export async function updateProperty(
     await prisma.property.update({
       where: { id },
       data: { ...propertyData(parsed.data), slug, publishedAt },
+    });
+
+    await recordPropertyPriceChange({
+      propertyId: id,
+      oldPrice: existing.price,
+      newPrice: parsed.data.price,
+      currency: existing.currency,
+      changedById: user.id,
+      source: "ADMIN",
     });
 
     await replaceRelations(id, parsed.data.featureIds, parseImages(formData, "images"));

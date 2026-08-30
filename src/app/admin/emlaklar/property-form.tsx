@@ -336,11 +336,30 @@ export function PropertyForm({
             />
             <AdminCheckbox
               name="isFeatured"
-              label="Ana səhifədə tövsiyə et"
+              label="Premium / Featured et"
               defaultChecked={initial.isFeatured}
+            />
+            <AdminCheckbox
+              name="reservationEnabled"
+              label="Rezervasiyanı aktiv et"
+              defaultChecked={initial.reservationEnabled}
             />
           </div>
         </FullWidth>
+        <AdminInput
+          name="featuredUntil"
+          label="Premium bitmə tarixi"
+          type="date"
+          defaultValue={initial.featuredUntil}
+          hint="Boş buraxılsa müddətsiz featured kimi qalır."
+        />
+        <AdminSelect
+          name="assignedAgentId"
+          label="Məsul agent"
+          defaultValue={initial.assignedAgentId}
+          placeholder="Agent seçilməyib"
+          options={options.agents.map((agent) => ({ value: agent.id, label: agent.name }))}
+        />
       </FormSection>
 
       {options.features.length > 0 && (

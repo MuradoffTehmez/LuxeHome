@@ -104,6 +104,9 @@ export const propertyFieldsSchema = z.object({
     mortgageAvailable: z.boolean(),
     installmentAvailable: z.boolean(),
     isFeatured: z.boolean(),
+    featuredUntil: z.coerce.date().nullable(),
+    reservationEnabled: z.boolean(),
+    assignedAgentId: cuid.nullable(),
 
     metaTitle: optionalText(70),
     metaDescription: optionalText(180),
