@@ -47,6 +47,20 @@ vi.mock("next-intl/server", async () => {
   };
 });
 
+/**
+ * SSR komponent testləri D1-ə getmir.
+ *
+ * `getAllSettings()` binding olmadıqda düzgün davranır — boş obyekt qaytarır və
+ * `siteConfig` ehtiyat dəyərləri işə düşür — lakin hər çağırışda stderr-ə
+ * `getCloudflareContext` xətası tökür və Vitest onu «unhandled error» kimi sayır.
+ * Yalnız oxuma funksiyaları əvəzlənir: `getOperationalSiteConfig` orijinal qalır,
+ * ona görə testlər eyni ehtiyat dəyərləri görür.
+ */
+vi.mock("@/lib/settings", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/settings")>();
+  return { ...actual, getAllSettings: async () => ({}), getSetting: async () => null };
+});
+
 vi.mock("@/i18n/navigation", () => ({
   Link: ({ href, children, ...props }: { href: string; children?: React.ReactNode }) =>
     React.createElement("a", { ...props, href }, children),

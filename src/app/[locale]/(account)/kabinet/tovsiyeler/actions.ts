@@ -7,7 +7,12 @@ import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import type { Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
-export async function toggleRecommendations(_id: string): Promise<ActionState> {
+/**
+ * `ConfirmAction` `(id: string) => Promise<ActionState>` gözləyir, lakin bu seçim
+ * cari istifadəçiyə aiddir — kənardan gələn ID-yə ehtiyac yoxdur. Parametrsiz
+ * funksiya həmin tipə uyğun gəlir, ona görə istifadə edilməyən arqument saxlanmır.
+ */
+export async function toggleRecommendations(): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   let user;
   try {

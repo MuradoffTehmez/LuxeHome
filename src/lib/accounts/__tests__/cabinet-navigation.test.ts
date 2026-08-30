@@ -14,6 +14,8 @@ describe("kabinet naviqasiyası", () => {
       "/kabinet",
       "/kabinet/axtarislarim",
       "/kabinet/bildirisler",
+      "/kabinet/rezervasiyalar",
+      "/kabinet/tovsiyeler",
       "/kabinet/son-baxilanlar",
       "/kabinet/profil",
     ]);

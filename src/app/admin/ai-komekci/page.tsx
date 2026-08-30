@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Check, ImageIcon, Sparkles } from "lucide-react";
+import { Check, ImageIcon } from "lucide-react";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { AdminForm } from "@/components/admin/form-shell";
