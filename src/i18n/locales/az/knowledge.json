@@ -110,6 +110,14 @@
       "PLATFORM": "Platforma"
     }
   },
+  "legalFaq": {
+    "eyebrow": "Bilik Mərkəzi",
+    "title": "Əmlak və qanunvericilik sualları",
+    "description": "Alqı-satqı, kirayə, ipoteka, vergi, qeydiyyat və əmlak hüququ barədə ayrıca cavablar.",
+    "metaTitle": "Əmlak və qanunvericilik üzrə suallar",
+    "metaDescription": "Azərbaycan daşınmaz əmlak hüququ, ipoteka, kirayə, vergi və sənədləşmə barədə tez-tez verilən suallar.",
+    "breadcrumb": "Əmlak və qanunlar"
+  },
   "nav": {
     "knowledge": "Bilik Mərkəzi",
     "glossary": "Lüğət",

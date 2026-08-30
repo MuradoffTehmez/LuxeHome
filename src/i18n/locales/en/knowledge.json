@@ -110,6 +110,14 @@
       "PLATFORM": "Platform"
     }
   },
+  "legalFaq": {
+    "eyebrow": "Knowledge Hub",
+    "title": "Property and legal questions",
+    "description": "Separate answers about transactions, rentals, mortgages, tax, registration and property law.",
+    "metaTitle": "Property and legal frequently asked questions",
+    "metaDescription": "Frequently asked questions about Azerbaijani property law, mortgages, rentals, tax and registration.",
+    "breadcrumb": "Property and law"
+  },
   "nav": {
     "knowledge": "Knowledge Hub",
     "glossary": "Glossary",

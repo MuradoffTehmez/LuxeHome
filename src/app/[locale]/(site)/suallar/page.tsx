@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { ChevronDown } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { FAQ_PAGE, getFaqContent } from "@/i18n/public-content";
+import { FaqGroups } from "@/components/site/faq-groups";
+import { FAQ_PAGE } from "@/i18n/public-content";
+import { getSiteFaqContent } from "@/i18n/site-faq";
 import { buildMetadata, faqSchema, jsonLd } from "@/lib/seo";
 import type { Locale } from "@/lib/constants";
 import { siteConfig, whatsappLink } from "@/config/site";
@@ -22,13 +23,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 }
 
-/** JavaScript tələb etməyən, klaviatura və axtarış motorları üçün açıq FAQ. */
+/**
+ * JavaScript tələb etməyən, klaviatura və axtarış motorları üçün açıq FAQ.
+ *
+ * Bu səhifə yalnız platformanın istifadəsi barədə əsas 20 sualdır. Əmlak və
+ * qanunvericilik sualları qəsdən `/bilik-merkezi/suallar` marşrutundadır.
+ */
 export default async function FaqPage({ params }: PageProps) {
   const { locale } = await params;
   const activeLocale = locale as Locale;
   const copy = FAQ_PAGE[activeLocale];
-  const groups = getFaqContent(activeLocale);
   const navigation = await getTranslations({ locale, namespace: "navigation" });
+  const groups = getSiteFaqContent(activeLocale);
+
   const items = groups.flatMap((group) => group.items);
 
   return (
@@ -48,27 +55,7 @@ export default async function FaqPage({ params }: PageProps) {
 
       <Section spacing="cozy">
         <Container size="narrow">
-          <div className="flex flex-col gap-10">
-            {groups.map((group) => (
-              <section key={group.title} className="flex flex-col gap-3">
-                <h2 className="font-display text-xl text-ink">{group.title}</h2>
-                <div className="flex flex-col divide-y divide-line rounded-md border border-line bg-paper">
-                  {group.items.map((item) => (
-                    <details key={item.question} className="group px-4 sm:px-5">
-                      <summary className="flex min-h-14 cursor-pointer items-center justify-between gap-4 py-2 text-left text-sm font-medium text-ink marker:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset">
-                        <span className="min-w-0 [overflow-wrap:anywhere]">{item.question}</span>
-                        <ChevronDown
-                          className="mt-0.5 size-4 shrink-0 text-ink-muted transition-transform duration-200 group-open:rotate-180"
-                          aria-hidden="true"
-                        />
-                      </summary>
-                      <p className="pb-4 text-sm leading-relaxed text-ink-soft [overflow-wrap:anywhere]">{item.answer}</p>
-                    </details>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
+          <FaqGroups groups={groups} />
 
           <div className="mt-12 rounded-md border border-line bg-beige/40 p-6 text-center">
             <p className="text-sm text-ink-soft">{copy.noAnswer}</p>

@@ -29,7 +29,7 @@ type CompanyFacts = {
   address: string;
 };
 
-const FAQ_CONTENT: Record<Locale, FaqGroup[]> = {
+const REAL_ESTATE_FAQ_CONTENT: Record<Locale, FaqGroup[]> = {
   az: [
     {
       title: "Alqı-satqı",
@@ -272,8 +272,8 @@ export const FAQ_PAGE: Record<Locale, {
   },
 };
 
-export function getFaqContent(locale: Locale) {
-  return FAQ_CONTENT[locale];
+export function getRealEstateFaqContent(locale: Locale) {
+  return REAL_ESTATE_FAQ_CONTENT[locale];
 }
 
 export function getLegalDocuments(locale: Locale, facts: CompanyFacts): Record<"privacy" | "terms" | "cookies", LegalDocument> {
