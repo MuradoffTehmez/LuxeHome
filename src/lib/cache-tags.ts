@@ -8,6 +8,7 @@ export const PUBLIC_CACHE_TAGS = {
   agents: "public:agents",
   partners: "public:partners",
   taxonomy: "public:taxonomy",
+  knowledge: "public:knowledge",
   sitemap: "public:sitemap",
 } as const;
 
@@ -19,9 +20,13 @@ export type PublicContentKind =
   | "agency"
   | "agent"
   | "partner"
-  | "taxonomy";
+  | "taxonomy"
+  | "knowledge";
 
-const CONFIG: Record<PublicContentKind, { tag: string; listPath: string; detailBase?: string }> = {
+const CONFIG: Record<
+  PublicContentKind,
+  { tag: string; listPath: string; detailBase?: string; extraPaths?: string[] }
+> = {
   property: { tag: PUBLIC_CACHE_TAGS.properties, listPath: "/emlaklar", detailBase: "/emlaklar" },
   project: { tag: PUBLIC_CACHE_TAGS.projects, listPath: "/layiheler", detailBase: "/layiheler" },
   post: { tag: PUBLIC_CACHE_TAGS.posts, listPath: "/blog", detailBase: "/blog" },
@@ -30,6 +35,16 @@ const CONFIG: Record<PublicContentKind, { tag: string; listPath: string; detailB
   agent: { tag: PUBLIC_CACHE_TAGS.agents, listPath: "/agentler", detailBase: "/agentler" },
   partner: { tag: PUBLIC_CACHE_TAGS.partners, listPath: "/terefdaslar", detailBase: "/terefdaslar" },
   taxonomy: { tag: PUBLIC_CACHE_TAGS.taxonomy, listPath: "/emlaklar" },
+  // Bilik Mərkəzi bələdçisi dəyişəndə lüğət və FAQ səhifələri də eyni teqdən asılıdır:
+  // üçü bir modulun səthidir və ayrı-ayrı teq saxlamaq keşi lazımsız parçalayardı.
+  knowledge: {
+    tag: PUBLIC_CACHE_TAGS.knowledge,
+    listPath: "/bilik-merkezi",
+    detailBase: "/bilik-merkezi",
+    // Lüğət və FAQ ayrı marşrutlardır, amma eyni teqdən qidalanır: bələdçi
+    // dəyişəndə hər üç səth eyni anda yenilənməlidir.
+    extraPaths: ["/lugat", "/suallar", "/kalkulyator"],
+  },
 };
 
 export function contentInvalidation(kind: PublicContentKind, slug?: string) {
@@ -42,6 +57,7 @@ export function contentInvalidation(kind: PublicContentKind, slug?: string) {
       ...localized("/"),
       ...localized(config.listPath),
       "/sitemap.xml",
+      ...(config.extraPaths ?? []).flatMap((path) => localized(path)),
       ...(slug && config.detailBase ? localized(`${config.detailBase}/${slug}`) : []),
     ],
   };

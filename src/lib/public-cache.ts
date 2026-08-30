@@ -20,6 +20,15 @@ import {
   getSitemapEntries,
   type PropertyFilters,
 } from "@/lib/queries";
+import {
+  getKnowledgeArticleBySlug,
+  getKnowledgeArticles,
+  getKnowledgeCategories,
+  getKnowledgeTerms,
+  getKnowledgeSitemapEntries,
+  getPublishedFaqEntries,
+  type KnowledgeArticleFilters,
+} from "@/lib/knowledge";
 
 const FIVE_MINUTES = 300;
 
@@ -142,4 +151,50 @@ export const getCachedPartnerBySlug = unstable_cache(
     ],
     revalidate: FIVE_MINUTES,
   },
+);
+
+// ---------------------------------------------------------------------------
+// BİLİK MƏRKƏZİ
+// ---------------------------------------------------------------------------
+
+/**
+ * Bilik Mərkəzi məzmunu bloq və elandan qat-qat nadir dəyişir — köhnəlməyən
+ * təlimat məzmunudur. Buna baxmayaraq revalidate müddəti sayt boyu vahid
+ * saxlanılır: paneldən yazma `knowledge` teqini onsuz da dərhal təmizləyir,
+ * ona görə uzun TTL yalnız gecikmiş nasazlıq halında fərq yaradardı.
+ */
+export const getCachedKnowledgeArticles = unstable_cache(
+  async (filters: KnowledgeArticleFilters) => getKnowledgeArticles(filters),
+  ["public-knowledge-list-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedKnowledgeArticleBySlug = unstable_cache(
+  async (slug: string) => getKnowledgeArticleBySlug(slug),
+  ["public-knowledge-detail-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedKnowledgeCategories = unstable_cache(
+  getKnowledgeCategories,
+  ["public-knowledge-categories-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedKnowledgeTerms = unstable_cache(
+  async (filters: { search?: string; initial?: string }) => getKnowledgeTerms(filters),
+  ["public-knowledge-terms-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedFaqEntries = unstable_cache(
+  getPublishedFaqEntries,
+  ["public-knowledge-faq-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedKnowledgeSitemapEntries = unstable_cache(
+  getKnowledgeSitemapEntries,
+  ["public-knowledge-sitemap-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.knowledge, PUBLIC_CACHE_TAGS.sitemap], revalidate: FIVE_MINUTES },
 );
