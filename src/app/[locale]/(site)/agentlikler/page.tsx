@@ -40,9 +40,8 @@ export default async function AgenciesPage({ params }: PageProps) {
 
       <Section tone="ivory">
         <Container>
-          <SectionHeader title={t("title")} description={t("description")} />
           {agencies.length > 0 ? (
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {agencies.map((agency, index) => (
                 <Reveal key={agency.id} delay={index * 60}>
                   <AgencyCard agency={agency} />

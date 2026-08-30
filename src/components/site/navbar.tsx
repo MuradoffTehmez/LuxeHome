@@ -84,7 +84,7 @@ export function Navbar({
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="shrink-0 max-[359px]:[&>span]:hidden xl:hidden"
+          className="shrink-0 max-[479px]:[&>span]:hidden xl:hidden"
         />
         <Logo
           tone={isOverlay ? "dark" : "light"}

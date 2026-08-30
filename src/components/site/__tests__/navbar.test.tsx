@@ -66,5 +66,6 @@ describe("Navbar", () => {
     expect(html).not.toContain("+994 51 922 85 85");
     expect(html).toContain("Elan ver");
     expect(html).toContain('href="/kabinet/elanlar/yeni"');
+    expect(html).toContain("max-[479px]:[&amp;&gt;span]:hidden");
   });
 });

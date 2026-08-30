@@ -9,8 +9,15 @@ import type { getPublicAgents } from "@/lib/phase2";
 type PublicAgent = Awaited<ReturnType<typeof getPublicAgents>>[number];
 
 /** Agent kataloqu və agentlik səhifəsi üçün vahid public agent kartı. */
-export async function AgentCard({ agent }: { agent: PublicAgent }) {
+export async function AgentCard({
+  agent,
+  headingLevel = "h3",
+}: {
+  agent: PublicAgent;
+  headingLevel?: "h2" | "h3";
+}) {
   const t = await getTranslations("phase2.agents");
+  const Heading = headingLevel;
   const rating = agent.reviews.length
     ? agent.reviews.reduce((sum, review) => sum + review.rating, 0) / agent.reviews.length
     : null;
@@ -21,7 +28,7 @@ export async function AgentCard({ agent }: { agent: PublicAgent }) {
         {agent.avatarUrl ? <Image src={agent.avatarUrl} alt="" fill sizes="64px" unoptimized={isUnoptimizedImage(agent.avatarUrl)} className="object-cover" /> : <UserRound className="size-7 text-ink-muted" aria-hidden="true" />}
       </div>
       <div className="min-w-0">
-        <h3 className="font-display text-xl text-ink"><Link href={`/agentler/${agent.slug}`} className="hover:text-gold-deep">{agent.name}</Link></h3>
+        <Heading className="font-display text-xl text-ink"><Link href={`/agentler/${agent.slug}`} className="hover:text-gold-deep">{agent.name}</Link></Heading>
         {agent.agency && <p className="text-sm text-ink-muted"><Link href={`/agentlikler/${agent.agency.slug}`} className="hover:text-gold-deep">{agent.agency.name}</Link></p>}
         <div className="mt-2 flex flex-wrap gap-2">
           {agent.isVerified && <Badge tone="gold">{t("verified")}</Badge>}
