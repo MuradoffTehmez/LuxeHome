@@ -6,6 +6,7 @@ import { type ActionState, failure, success, unexpected } from "@/lib/admin/acti
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { parseImages } from "@/lib/admin/images";
 import { propertyData } from "@/lib/admin/property-input";
+import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
 import {
   hasAllowedPropertyImageCount,
   hasExclusiveMediaOwnership,
@@ -116,6 +117,8 @@ export async function updatePublicProperty(
     : null;
   const policy = submissionPolicy(user.accountType, agency?.isVerified ?? false);
 
+  const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
+
   try {
     await prisma.property.update({
       where: { id: property.id },
@@ -136,7 +139,7 @@ export async function updatePublicProperty(
           ogTitle: property.ogTitle,
           ogDescription: property.ogDescription,
           ogImage: property.ogImage,
-        }),
+        }, paymentFlags),
         status: policy.status,
         moderationNote: null,
         publishedAt: policy.status === PROPERTY_STATUSES.PUBLISHED

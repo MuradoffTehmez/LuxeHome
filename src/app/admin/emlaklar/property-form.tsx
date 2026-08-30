@@ -324,16 +324,8 @@ export function PropertyForm({
 
         <FullWidth>
           <div className="flex flex-wrap gap-x-6 gap-y-1">
-            <AdminCheckbox
-              name="mortgageAvailable"
-              label="İpoteka mümkündür"
-              defaultChecked={initial.mortgageAvailable}
-            />
-            <AdminCheckbox
-              name="installmentAvailable"
-              label="Taksit mümkündür"
-              defaultChecked={initial.installmentAvailable}
-            />
+            {/* İpoteka / taksit burada deyil: aşağıdakı «Ödəniş şərtləri»
+                xüsusiyyət qrupundan seçilir və elanın sütunlarına oradan yazılır. */}
             <AdminCheckbox
               name="isFeatured"
               label="Premium / Featured et"

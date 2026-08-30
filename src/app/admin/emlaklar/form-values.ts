@@ -43,8 +43,6 @@ export type PropertyFormValues = {
   documentStatus: string;
   buildingType: string;
   videoUrl: string;
-  mortgageAvailable: boolean;
-  installmentAvailable: boolean;
   isFeatured: boolean;
   featuredUntil: string;
   reservationEnabled: boolean;
@@ -88,8 +86,6 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   documentStatus: "",
   buildingType: "",
   videoUrl: "",
-  mortgageAvailable: false,
-  installmentAvailable: false,
   isFeatured: false,
   featuredUntil: "",
   reservationEnabled: false,

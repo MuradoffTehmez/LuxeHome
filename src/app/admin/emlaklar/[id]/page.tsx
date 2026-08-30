@@ -62,8 +62,6 @@ export default async function EditPropertyPage({
     documentStatus: property.documentStatus ?? "",
     buildingType: property.buildingType ?? "",
     videoUrl: property.videoUrl ?? "",
-    mortgageAvailable: property.mortgageAvailable,
-    installmentAvailable: property.installmentAvailable,
     isFeatured: property.isFeatured,
     featuredUntil: property.featuredUntil ? property.featuredUntil.toISOString().slice(0, 10) : "",
     reservationEnabled: property.reservationEnabled,

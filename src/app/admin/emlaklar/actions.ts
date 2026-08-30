@@ -14,6 +14,7 @@ import {
   propertyData,
   readPropertyForm,
 } from "@/lib/admin/property-input";
+import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
@@ -110,9 +111,11 @@ export async function createProperty(
       prisma.property.findUnique({ where: { slug: candidate }, select: { id: true } }),
     );
 
+    const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
+
     const property = await prisma.property.create({
       data: {
-        ...propertyData(parsed.data),
+        ...propertyData(parsed.data, paymentFlags),
         slug,
         authorId: user.id,
         isDemo: false,
@@ -175,9 +178,11 @@ export async function updateProperty(
 
     const publishedAt = nextPublishedAt(parsed.data.status, existing.publishedAt);
 
+    const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
+
     await prisma.property.update({
       where: { id },
-      data: { ...propertyData(parsed.data), slug, publishedAt },
+      data: { ...propertyData(parsed.data, paymentFlags), slug, publishedAt },
     });
 
     await recordPropertyPriceChange({

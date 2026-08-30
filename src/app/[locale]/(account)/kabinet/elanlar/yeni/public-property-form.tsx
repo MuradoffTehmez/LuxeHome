@@ -53,8 +53,6 @@ export type PublicPropertyFormInitial = {
   documentStatus: string | null;
   buildingType: string | null;
   videoUrl: string | null;
-  mortgageAvailable: boolean;
-  installmentAvailable: boolean;
   featureIds: string[];
   images: DropzoneImage[];
 };
@@ -216,12 +214,7 @@ export function PublicPropertyForm({
           options={Object.values(BUILDING_TYPES).map((value) => ({ value, label: propertyT(`building.${value === "NEW" ? "new" : "old"}`) }))}
         />
         <AdminInput name="videoUrl" label={t("video")} type="url" hint={t("videoHint")} defaultValue={initial?.videoUrl ?? ""} />
-        <FullWidth>
-          <div className="flex flex-wrap gap-x-6 gap-y-1">
-            <AdminCheckbox name="mortgageAvailable" label={t("mortgage")} defaultChecked={initial?.mortgageAvailable} />
-            <AdminCheckbox name="installmentAvailable" label={t("installment")} defaultChecked={initial?.installmentAvailable} />
-          </div>
-        </FullWidth>
+        {/* İpoteka / taksit «Ödəniş şərtləri» xüsusiyyət qrupundan seçilir. */}
       </FormSection>
 
       {options.features.length > 0 && (

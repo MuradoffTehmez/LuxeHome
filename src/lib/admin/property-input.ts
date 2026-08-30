@@ -2,6 +2,7 @@ import { PROPERTY_STATUSES } from "@/lib/constants";
 import type { PropertyInput } from "./schemas";
 import * as form from "./form";
 import { propertySearchText } from "@/lib/search-normalization";
+import type { PaymentFlags } from "./payment-features";
 
 /**
  * Əmlak formasının saf (baza ilə əlaqəsiz) hissəsi.
@@ -46,8 +47,6 @@ export function readPropertyForm(formData: FormData): PropertyInput {
     buildingType: form.optionalText(formData, "buildingType"),
 
     videoUrl: form.optionalText(formData, "videoUrl"),
-    mortgageAvailable: form.boolean(formData, "mortgageAvailable"),
-    installmentAvailable: form.boolean(formData, "installmentAvailable"),
     isFeatured: form.boolean(formData, "isFeatured"),
     featuredUntil: form.optionalText(formData, "featuredUntil"),
     reservationEnabled: form.boolean(formData, "reservationEnabled"),
@@ -65,8 +64,15 @@ export function readPropertyForm(formData: FormData): PropertyInput {
   } as PropertyInput;
 }
 
-/** Elanın sahələrini Prisma-nın gözlədiyi formaya salır. */
-export function propertyData(input: PropertyInput) {
+/**
+ * Elanın sahələrini Prisma-nın gözlədiyi formaya salır.
+ *
+ * `payment` seçilmiş `PAYMENT` qrupu xüsusiyyətlərindən törədilir
+ * (`src/lib/admin/payment-features.ts`). Formada ayrıca checkbox yoxdur:
+ * eyni faktın iki yerdə saxlanılması onların bir-birinə ziddiyyət təşkil
+ * etməsinə gətirirdi.
+ */
+export function propertyData(input: PropertyInput, payment: PaymentFlags) {
   return {
     title: input.title,
     description: input.description,
@@ -96,8 +102,8 @@ export function propertyData(input: PropertyInput) {
     documentStatus: input.documentStatus,
     buildingType: input.buildingType,
     videoUrl: input.videoUrl,
-    mortgageAvailable: input.mortgageAvailable,
-    installmentAvailable: input.installmentAvailable,
+    mortgageAvailable: payment.mortgageAvailable,
+    installmentAvailable: payment.installmentAvailable,
     isFeatured: input.isFeatured,
     featuredUntil: input.isFeatured ? input.featuredUntil : null,
     reservationEnabled: input.reservationEnabled,

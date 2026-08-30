@@ -43,6 +43,9 @@ function minimalSaleForm(): FormData {
   return formData;
 }
 
+/** Ödəniş bayraqları artıq formadan deyil, xüsusiyyət seçimindən gəlir. */
+const NO_PAYMENT = { mortgageAvailable: false, installmentAvailable: false };
+
 describe("əmlak formasının oxunması", () => {
   it("minimal satış elanını qəbul edir", () => {
     const parsed = propertySchema.safeParse(readPropertyForm(minimalSaleForm()));
@@ -51,8 +54,8 @@ describe("əmlak formasının oxunması", () => {
 
   it("işarələnməmiş checkbox-ları false kimi oxuyur", () => {
     const parsed = propertySchema.parse(readPropertyForm(minimalSaleForm()));
-    expect(parsed.mortgageAvailable).toBe(false);
     expect(parsed.isFeatured).toBe(false);
+    expect(parsed.reservationEnabled).toBe(false);
   });
 
   it("vergüllü onluq ayırıcını qəbul edir", () => {
@@ -80,7 +83,7 @@ describe("əmlak formasının oxunması", () => {
   it("satış elanında qiymət dövrünü təmizləyir", () => {
     const formData = minimalSaleForm();
     formData.set("pricePeriod", "MONTH");
-    const data = propertyData(propertySchema.parse(readPropertyForm(formData)));
+    const data = propertyData(propertySchema.parse(readPropertyForm(formData)), NO_PAYMENT);
     expect(data.pricePeriod).toBeNull();
   });
 
@@ -97,7 +100,7 @@ describe("əmlak formasının oxunması", () => {
   it("optional metro əlaqəsini formadan Prisma datasına ötürür", () => {
     const formData = minimalSaleForm();
     formData.set("metroId", "metro_nerimanov");
-    const data = propertyData(propertySchema.parse(readPropertyForm(formData)));
+    const data = propertyData(propertySchema.parse(readPropertyForm(formData)), NO_PAYMENT);
 
     expect(data.metroId).toBe("metro_nerimanov");
   });

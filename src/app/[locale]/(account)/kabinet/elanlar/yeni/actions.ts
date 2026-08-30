@@ -7,6 +7,7 @@ import { type ActionState, failure, unexpected } from "@/lib/admin/action-state"
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { parseImages } from "@/lib/admin/images";
 import { propertyData } from "@/lib/admin/property-input";
+import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
 import { uniqueSlug } from "@/lib/admin/slug";
 import {
   buildPublicPropertyData,
@@ -121,13 +122,15 @@ export async function createPublicProperty(
       }),
       slug,
     };
+    // Ödəniş bayraqları formadan deyil, seçilmiş `PAYMENT` xüsusiyyətlərindən gəlir.
+    const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
 
     const created = await createPropertyWithRelations(
       {
         createProperty: (propertyInput) =>
           prisma.property.create({
             data: {
-              ...propertyData(propertyInput),
+              ...propertyData(propertyInput, paymentFlags),
               slug: propertyInput.slug,
               authorId: propertyInput.authorId,
               isDemo: propertyInput.isDemo,
