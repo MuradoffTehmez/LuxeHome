@@ -50,13 +50,22 @@ Real hesab `npm run auth:create-admin` ilə qurulur.
 Yeni miqrasiya: `npm run db:migrate:new -- --output migrations/000N_ad.sql`
 (`prisma migrate diff --from-local-d1` işlədir, ona görə əvvəlcə `npm run db:migrate:local`).
 
-Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run build` — dəyişiklikdən sonra
-hər üçü işlədilməlidir. Testlər yalnız auth qatını (`src/lib/auth/__tests__`) əhatə edir və
-`@cloudflare/vitest-plugin` vasitəsilə workerd runtime-ında işləyir; UI və sorğu qatı hələ
-örtülməyib.
+Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run lint` + `npm run build` —
+dəyişiklikdən sonra dördü də işlədilməlidir. Testlər `@cloudflare/vitest-plugin` vasitəsilə
+workerd runtime-ında (domen qatı) və Node layihəsində (SSR komponentləri) işləyir.
+
+**`npm run build`-i buraxma.** Digər üç qapı təmiz olsa da build sınıq qala bilər: Server
+Action qaydaları yalnız webpack mərhələsində yoxlanılır. `"use server"` faylındakı **hər
+ixrac** Server Action-dır və **`async` olmalıdır** — Promise qaytaran sinxron sarğı belə
+build-i saxlayır (`fix(build): agent rəy action-larını async et`).
 
 Yayımdan əvvəl `npm run preview` ilə workerd runtime-ında yoxlamaq tövsiyə olunur, çünki bəzi
 problemlər yalnız orada üzə çıxır.
+
+**Miqrasiyanın repoda olması onun tətbiq edildiyi demək deyil.** Yayımdan əvvəl
+`npx wrangler d1 migrations list DB --remote` (və `--env staging`) ilə hər iki mühitin
+vəziyyəti yoxlanmalıdır — kod cədvəl gözləyib bazada tapmayanda xəta çox vaxt `try/catch`
+içində səssizcə udulur.
 
 ## Arxitektura
 
