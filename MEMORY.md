@@ -38,6 +38,7 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 | Lead bildirişi | **Telegram bot.** Yeni müraciət gələndə sistem bot vasitəsilə bildiriş göndərəcək. |
 | Spam qoruma | Same-origin + honeypot + IP rate limit + Cloudflare Turnstile tətbiq olunub. |
 | Test / CI / analitika | Vitest və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. Browser E2E hələ yoxdur. |
+| Real Estate Knowledge Hub | D1 əsaslı bələdçi, hüquqi FAQ, lüğət, kalkulyator və admin CMS hazırdır. Mənbə hüquqi araşdırma DRAFT idxal edilir; yayımdan əvvəl hüquqşünas baxışı tələb olunur. |
 
 ---
 
@@ -69,7 +70,7 @@ düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` q�
 | `src/app/admin/**` | Paneldə `User.locale` seçimi olsa da UI mətnləri tərcümə qatına bağlanmayıb. |
 | Browser axınları | Avtomatlaşdırılmış Playwright/E2E yoxdur; production smoke testi manualdır. |
 | Phase 3 / AI | Semantik axtarış, Match Score, chatbot və map draw search yazılmayıb (PRD bölmə 180). Panel tərəfdə yalnız AI təsvir generatoru və foto məsləhətçisi var. |
-| Finance / CMS | Paket, ödəniş və statik səhifə redaktoru modulları yoxdur (Admin PRD). |
+| Finance / statik CMS | Knowledge Hub üçün domen CMS-i hazırdır; paket, ödəniş və ümumi statik səhifə redaktoru hələ yoxdur (Admin PRD). |
 
 Azərbaycan hərfləri ilə registrsiz axtarış 28 avqustda `searchText` / `searchName`
 sütunları və `normalizeSearchText()` ilə həll olunub.
@@ -153,9 +154,9 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 ## 7. Layihənin texniki sağlamlığı (30 avqust 2026)
 
-- Mənbə kodu: təxminən 44 000 sətir (`src/` altında `.ts` + `.tsx`).
-- 86 Vitest faylı; dəqiq test sayı son keyfiyyət qapısının çıxışında saxlanılır.
-- 38 Prisma modeli, 23 D1 miqrasiyası və 330-dan çox commit.
+- Mənbə kodu: 51 900 sətir / 508 fayl (`src/` altında `.ts` + `.tsx`).
+- 88 Vitest faylı, 369 test; 30 avqust tam icrasında hamısı keçib.
+- 53 Prisma modeli, 25 D1 miqrasiya faylı və 382 commit.
 - GitHub Actions hər PR və `main` push-unda test, typecheck, lint və build işlədir.
 - Avtomatlaşdırılmış browser E2E yoxdur.
 - `.env` düzgün şəkildə `.gitignore`-dadır; yalnız `.env.example` izlənir.
@@ -345,3 +346,46 @@ production build təmizdir.
 - P5 (`force-dynamic` public HTML render-i) ölçmə və arxitektura işi olaraq açıqdır;
 - avtomatlaşdırılmış browser E2E və Resend/Cloudflare kimi xarici sistemlərin canlı smoke
   yoxlamaları repository daxilində tam əvəz edilə bilmir.
+
+---
+
+## 14. Real Estate Knowledge Hub və FAQ ayrımı — 30 avqust 2026
+
+İstifadəçinin `docs/Real Estate Knowledge Hub/Real Estate Knowledge Hub.md` araşdırması mənbə
+sənəd kimi saxlanılıb. Sistem həmin sənədi birbaşa public HTML kimi göstərmir: məzmun DRAFT
+statusunda idarə olunan strukturlaşdırılmış domen qeydlərinə çevrilir və hüquqi baxışdan sonra
+yayımlanır.
+
+### Public səthlər
+
+| Ünvan | Məsuliyyət |
+|---|---|
+| `/[locale]/bilik-merkezi` | Bələdçi kataloqu, kateqoriyalar və axtarış |
+| `/[locale]/bilik-merkezi/[slug]` | Hüquqi status, risk, mənbələr, sənədlər, prosedur, xərclər və checklist ilə məqalə |
+| `/[locale]/bilik-merkezi/suallar` | Əmlak və qanunlar üzrə CMS əsaslı FAQ |
+| `/[locale]/suallar` | Sayt/platforma haqqında ayrıca 20 əsas sual-cavab |
+| `/[locale]/lugat` | Daşınmaz əmlak terminləri lüğəti |
+| `/[locale]/kalkulyator` | İpoteka ödənişi və alış büdcəsi hesablaması |
+
+### İdarəetmə və məlumat axını
+
+- `KnowledgeCategory`, `KnowledgeArticle`, `KnowledgeTerm`, `KnowledgeFaq` modelləri və
+  `migrations/0024_knowledge_hub.sql` əlavə edilib.
+- `/admin/bilik-merkezi` altında məqalə, kateqoriya, termin və FAQ CRUD-u var; yazma əməliyyatları
+  `KNOWLEDGE_MANAGE` icazəsi, audit jurnalı, Zod validasiyası, HTML sanitizasiyası və public keş
+  invalidasiyası ilə qorunur.
+- Dinamik məqalə, termin və FAQ məzmunu mövcud tərcümə panelinə qoşulub; public UI AZ/EN/RU-dur.
+- Article və DefinedTerm struktur datası, sitemap girişləri, footer və admin naviqasiyası qoşulub.
+- `prisma/build-knowledge-hub-sql.ts` mənbə sənədindəki `Mövzu —` bölmələrindən idempotent
+  DRAFT SQL yaradır. Əmrlər: `db:knowledge:build`, `db:knowledge:local`,
+  `db:knowledge:staging`, `db:knowledge:remote`.
+
+### Yayım və hüquqi qəbul qapısı
+
+- `0024_knowledge_hub.sql` staging və production D1-ə ayrıca tətbiq edilməlidir.
+- Generatorun çıxardığı qeydlər avtomatik yayımlanmır. Hüquqi əsas, mənbə URL-ləri,
+  `legalReviewedAt` və risk səviyyəsi redaktor/hüquqşünas tərəfindən təsdiqlənməlidir.
+- Cari hostda import generatorunun icrası Node-un `uv_os_get_passwd ENOMEM` xətası ilə bloklanıb;
+  generator typecheck-dən keçir, lakin `prisma/knowledge-hub.sql` sağlam Node mühitində yaradılmalıdır.
+- Bu sessiyada Vitest 369/369 keçib. `next build` kod xətasına görə deyil, qeyri-interaktiv
+  Cloudflare remote proxy üçün `CLOUDFLARE_API_TOKEN` olmadığına görə tamamlanmayıb.

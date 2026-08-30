@@ -28,6 +28,10 @@ npm run deploy       # OpenNext bundle + Cloudflare Workers-ə yayım (productio
 npm run cf-typegen   # wrangler.jsonc-dən CloudflareEnv tiplərini yenidən yaradır
 
 npm run auth:create-admin  # ilk SUPER_ADMIN üçün INSERT ifadəsi çap edir
+npm run db:knowledge:build    # hüquqi mənbə sənədindən DRAFT Knowledge Hub SQL yaradır
+npm run db:knowledge:local    # yaradılmış Knowledge Hub SQL-i lokal D1-ə tətbiq edir
+npm run db:knowledge:staging  # eyni SQL-i staging D1-ə tətbiq edir
+npm run db:knowledge:remote   # eyni SQL-i production D1-ə tətbiq edir
 ```
 
 Verilənlər bazası (D1) axını:
@@ -73,7 +77,13 @@ içində səssizcə udulur.
 
 Bütün ictimai səhifələr `src/app/(site)/` qrupundadır və `(site)/layout.tsx` Navbar + Footer
 sarğısını verir. Marşrut adları azərbaycancadır və URL-in bir hissəsidir:
-`/emlaklar`, `/xidmetler`, `/layiheler`, `/haqqimizda`, `/blog`, `/elaqe`.
+`/emlaklar`, `/xidmetler`, `/layiheler`, `/haqqimizda`, `/blog`, `/elaqe`,
+`/bilik-merkezi`, `/lugat`, `/kalkulyator`, `/suallar`.
+
+FAQ iki ayrı məhsul səthidir və yenidən birləşdirilməməlidir:
+
+- `/suallar` — sayt/platforma haqqında 20 əsas sual; mənbə `src/i18n/site-faq.ts`-dir.
+- `/bilik-merkezi/suallar` — əmlak və qanunlar üzrə CMS məzmunu; `KnowledgeFaq` modelindən oxuyur.
 
 Query parametrləri də azərbaycancadır və `emlaklar/page.tsx`-də əl ilə map olunur:
 `?elan=` (listingType), `?tip=` (əmlak növü), `?seher=` (şəhər), `?min=`/`?max=` (qiymət),
@@ -102,6 +112,23 @@ Yazma əməliyyatları Server Action ilə gedir (`(site)/elaqe/actions.ts`, `(si
 - `propertyCardSelect` / `projectCardSelect` / `postCardSelect` — kart komponentlərinin gözlədiyi
   dəqiq sahə dəsti. Kart komponentləri bu `select`-dən çıxarılan tiplə (`PropertyCardData` və s.)
   yazılıb, ona görə select dəyişəndə komponent tipi avtomatik uyğunlaşır.
+
+### Real Estate Knowledge Hub
+
+Modulun public sorğuları `src/lib/knowledge.ts`, admin yazmaları
+`src/app/admin/bilik-merkezi/actions.ts` üzərindən gedir. Məlumat modeli `KnowledgeCategory`,
+`KnowledgeArticle`, `KnowledgeTerm` və `KnowledgeFaq` cədvəllərindən ibarətdir.
+
+- Public sorğu yalnız yayımlanmış və soft-delete edilməmiş məzmunu qaytarmalıdır.
+- Hüquqi məqalənin `legalStatus`, `riskLevel`, `legalReviewedAt`, `legalActs`, `sourceUrls` və
+  strukturlaşdırılmış prosedur/checklist sahələri redaksiya provenance-i üçün saxlanmalıdır.
+- HTML həm əsas məzmun, həm də tərcümə yazılarkən sanitizasiya olunur; bunu yalnız render
+  sərhədinə köçürmək və ya tərcümə action-ında ötürmək olmaz.
+- Bilik məzmunu dəyişəndə `public:knowledge` keşi və əlaqəli list/detail/sitemap yolları
+  invalidasiya edilməlidir.
+- `docs/Real Estate Knowledge Hub/Real Estate Knowledge Hub.md` hüquqi mənbə materialıdır,
+  avtomatik dərc müqaviləsi deyil. `prisma/build-knowledge-hub-sql.ts` qeydləri DRAFT yaradır;
+  hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilməməlidir.
 
 ### Domen sabitləri
 
