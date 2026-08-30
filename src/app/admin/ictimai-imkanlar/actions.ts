@@ -6,11 +6,23 @@ import { recordAudit } from "@/lib/admin/audit";
 import { failure, invalid, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
-import { NEARBY_PLACE_CATEGORIES, PERMISSIONS, PREMIUM_DURATIONS_DAYS } from "@/lib/constants";
+import { LOCALES, NEARBY_PLACE_CATEGORIES, PERMISSIONS, PREMIUM_DURATIONS_DAYS, type Locale } from "@/lib/constants";
+import { localizePath } from "@/i18n/path-locale";
 import { prisma } from "@/lib/prisma";
 
 function numberValue(formData: FormData, name: string) {
   return form.number(formData, name);
+}
+
+/**
+ * İctimai marşrutlar `/[locale]/...` altındadır, ona görə prefiksiz `revalidatePath`
+ * heç bir səhifəyə dəymir. Rayon analitikası dəyişəndə hər üç dilin səhifəsi
+ * təzələnməlidir.
+ */
+function revalidateDistrictPage(slug: string) {
+  for (const locale of Object.values(LOCALES)) {
+    revalidatePath(localizePath(`/rayon/${slug}`, locale as Locale));
+  }
 }
 
 const nearbySchema = z.object({
@@ -32,7 +44,7 @@ export async function createNearbyPlace(_previous: ActionState, formData: FormDa
   });
   if (!parsed.success) return invalid(parsed.error);
   try {
-    const place = await prisma.nearbyPlace.create({ data: { ...parsed.data, source: parsed.data.source || null } });
+    await prisma.nearbyPlace.create({ data: { ...parsed.data, source: parsed.data.source || null } });
     await recordAudit(actor, "CREATE", "Property", parsed.data.propertyId, `Yaxın obyekt: ${parsed.data.name}`);
     revalidatePath("/admin/ictimai-imkanlar");
     revalidatePath("/emlaklar");
@@ -43,7 +55,8 @@ export async function createNearbyPlace(_previous: ActionState, formData: FormDa
 const neighborhoodSchema = z.object({
   locationId: z.string().min(1),
   description: z.string().trim().max(3000).optional(), descriptionEn: z.string().trim().max(3000).optional(), descriptionRu: z.string().trim().max(3000).optional(),
-  averagePrice: z.number().min(0).nullable(), averagePricePerSqm: z.number().min(0).nullable(), annualChangePercent: z.number().min(-100).max(1000).nullable(),
+  averagePrice: z.number().min(0).nullable(), medianPrice: z.number().min(0).nullable(), averagePricePerSqm: z.number().min(0).nullable(),
+  annualChangePercent: z.number().min(-100).max(1000).nullable(), saleRentRatio: z.number().min(0).max(10000).nullable(),
   averageRent: z.number().min(0).nullable(), rentalYieldPercent: z.number().min(-100).max(1000).nullable(),
   dataSource: z.string().trim().max(500).optional(), measuredAt: z.date().nullable(),
 });
@@ -54,16 +67,21 @@ export async function upsertNeighborhoodProfile(_previous: ActionState, formData
   catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
   const parsed = neighborhoodSchema.safeParse({
     locationId: form.text(formData, "locationId"), description: form.text(formData, "description"), descriptionEn: form.text(formData, "descriptionEn"), descriptionRu: form.text(formData, "descriptionRu"),
-    averagePrice: numberValue(formData, "averagePrice"), averagePricePerSqm: numberValue(formData, "averagePricePerSqm"), annualChangePercent: numberValue(formData, "annualChangePercent"),
+    averagePrice: numberValue(formData, "averagePrice"), medianPrice: numberValue(formData, "medianPrice"), averagePricePerSqm: numberValue(formData, "averagePricePerSqm"),
+    annualChangePercent: numberValue(formData, "annualChangePercent"), saleRentRatio: numberValue(formData, "saleRentRatio"),
     averageRent: numberValue(formData, "averageRent"), rentalYieldPercent: numberValue(formData, "rentalYieldPercent"), dataSource: form.text(formData, "dataSource"), measuredAt: form.date(formData, "measuredAt"),
   });
   if (!parsed.success) return invalid(parsed.error);
   try {
     const data = { ...parsed.data, description: parsed.data.description || null, descriptionEn: parsed.data.descriptionEn || null, descriptionRu: parsed.data.descriptionRu || null, dataSource: parsed.data.dataSource || null };
     await prisma.neighborhoodProfile.upsert({ where: { locationId: parsed.data.locationId }, create: data, update: data });
-    await recordAudit(actor, "UPDATE", "Property", null, "Rayon analitikası yeniləndi");
+    const location = await prisma.location.findUnique({
+      where: { id: parsed.data.locationId },
+      select: { name: true, slug: true },
+    });
+    await recordAudit(actor, "UPDATE", "Property", null, `Rayon analitikası yeniləndi: ${location?.name ?? parsed.data.locationId}`);
     revalidatePath("/admin/ictimai-imkanlar");
-    revalidatePath("/emlaklar");
+    if (location) revalidateDistrictPage(location.slug);
     return success("Rayon analitikası yadda saxlanıldı.");
   } catch (error) { return unexpected("rayon analitikası yenilənmədi", error); }
 }
@@ -83,4 +101,73 @@ export async function activatePremiumListing(_previous: ActionState, formData: F
     revalidatePath("/admin/ictimai-imkanlar"); revalidatePath("/emlaklar"); revalidatePath(`/emlaklar/${property.slug}`); revalidatePath("/");
     return success(`Elan ${parsed.data.durationDays} gün premium edildi.`);
   } catch (error) { return unexpected("premium elan aktiv edilmədi", error); }
+}
+
+/**
+ * Yaxın obyekti silir.
+ *
+ * Modul əvvəl yalnız yaratma axını verirdi: səhv yazılmış obyekt əmlak səhifəsində
+ * qalır və panel vasitəsilə götürülə bilmirdi — mənbəli məlumat vədi ilə ziddiyyət
+ * təşkil edirdi.
+ */
+export async function deleteNearbyPlace(id: string): Promise<ActionState> {
+  let actor;
+  try { actor = await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE); }
+  catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
+  try {
+    const place = await prisma.nearbyPlace.findUnique({
+      where: { id },
+      select: { name: true, propertyId: true, property: { select: { slug: true } } },
+    });
+    if (!place) return failure("Yaxın obyekt tapılmadı.");
+    await prisma.nearbyPlace.delete({ where: { id } });
+    await recordAudit(actor, "DELETE", "Property", place.propertyId, `Yaxın obyekt silindi: ${place.name}`);
+    revalidatePath("/admin/ictimai-imkanlar");
+    revalidatePath(`/emlaklar/${place.property.slug}`);
+    return success("Yaxın obyekt silindi.");
+  } catch (error) { return unexpected("yaxın obyekt silinmədi", error); }
+}
+
+/** Rayon analitikasını tamamilə götürür — ictimai səhifədə bölmə yox olur. */
+export async function deleteNeighborhoodProfile(id: string): Promise<ActionState> {
+  let actor;
+  try { actor = await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE); }
+  catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
+  try {
+    const profile = await prisma.neighborhoodProfile.findUnique({
+      where: { id },
+      select: { location: { select: { name: true, slug: true } } },
+    });
+    if (!profile) return failure("Rayon analitikası tapılmadı.");
+    await prisma.neighborhoodProfile.delete({ where: { id } });
+    await recordAudit(actor, "DELETE", "Property", null, `Rayon analitikası silindi: ${profile.location.name}`);
+    revalidatePath("/admin/ictimai-imkanlar");
+    revalidateDistrictPage(profile.location.slug);
+    return success("Rayon analitikası silindi.");
+  } catch (error) { return unexpected("rayon analitikası silinmədi", error); }
+}
+
+/**
+ * Premium statusu vaxtından əvvəl bitirir.
+ *
+ * `featuredUntil` də sıfırlanır: yalnız `isFeatured` söndürülsəydi, gündəlik
+ * maintenance işi qeydi «müddəti bitmiş premium» kimi saymağa davam edərdi.
+ */
+export async function cancelPremiumListing(id: string): Promise<ActionState> {
+  let actor;
+  try { actor = await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE); }
+  catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
+  try {
+    const property = await prisma.property.update({
+      where: { id },
+      data: { isFeatured: false, featuredUntil: null },
+      select: { title: true, slug: true },
+    });
+    await recordAudit(actor, "UPDATE", "Property", id, `${property.title} — premium dayandırıldı`);
+    revalidatePath("/admin/ictimai-imkanlar");
+    revalidatePath("/emlaklar");
+    revalidatePath(`/emlaklar/${property.slug}`);
+    revalidatePath("/");
+    return success("Premium status dayandırıldı.");
+  } catch (error) { return unexpected("premium status dayandırılmadı", error); }
 }
