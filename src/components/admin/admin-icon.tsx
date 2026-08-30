@@ -1,7 +1,9 @@
 import {
   BarChart3,
+  CalendarCheck,
   Blocks,
   Building2,
+  BrainCircuit,
   ClipboardCheck,
   Contact,
   History,
@@ -11,6 +13,7 @@ import {
   LayoutDashboard,
   Languages,
   Mail,
+  MapPinned,
   Newspaper,
   Route,
   SearchCheck,
@@ -20,6 +23,7 @@ import {
   Sparkles,
   Tags,
   UserCog,
+  UserRoundCheck,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -32,6 +36,7 @@ import {
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
   Building2,
+  BrainCircuit,
   Contact,
   Blocks,
   Newspaper,
@@ -47,11 +52,14 @@ const ICONS: Record<string, LucideIcon> = {
   ShieldCheck,
   Tags,
   BarChart3,
+  CalendarCheck,
   ClipboardCheck,
   History,
   Handshake,
   Mail,
+  MapPinned,
   Languages,
+  UserRoundCheck,
 };
 
 export function AdminIcon({ name, className }: { name: string; className?: string }) {

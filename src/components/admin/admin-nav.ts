@@ -34,6 +34,9 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Xidmətlər", href: "/admin/xidmetler", icon: "Sparkles" },
       { label: "Media", href: "/admin/media", icon: "Images" },
       { label: "Agentliklər", href: "/admin/agentlikler", icon: "ShieldCheck" },
+      { label: "Agentlər və rəylər", href: "/admin/agentler", icon: "UserRoundCheck" },
+      { label: "İctimai imkanlar", href: "/admin/ictimai-imkanlar", icon: "MapPinned" },
+      { label: "AI köməkçi", href: "/admin/ai-komekci", icon: "BrainCircuit" },
       { label: "Tərəfdaşlar", href: "/admin/terefdaslar", icon: "Handshake" },
       { label: "SEO auditı", href: "/admin/seo", icon: "SearchCheck" },
       { label: "Yönləndirmələr", href: "/admin/redirects", icon: "Route" },
@@ -44,6 +47,7 @@ export const adminNav: AdminNavGroup[] = [
     title: "Satış",
     items: [
       { label: "Müraciətlər", href: "/admin/muracietler", icon: "Inbox", badgeKey: "newLeads" },
+      { label: "Rezervasiyalar", href: "/admin/rezervasiyalar", icon: "CalendarCheck" },
       { label: "Korporativ e-poçt", href: "/admin/e-poct", icon: "Mail" },
     ],
   },
