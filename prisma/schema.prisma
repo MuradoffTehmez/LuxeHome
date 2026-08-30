@@ -61,15 +61,22 @@ model User {
   favorites  Favorite[]
   leadNotes  Lead[]     @relation("LeadAssignee")
 
-  sessions          Session[]
-  backupCodes       BackupCode[]
+  sessions                Session[]
+  backupCodes             BackupCode[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
-  agency            Agency?
-  agencyEmployments AgencyEmployee[]
+  agency                  Agency?
+  agencyEmployments       AgencyEmployee[]
 
-  savedSearches SavedSearch[]
-  notifications Notification[]
+  savedSearches          SavedSearch[]
+  notifications          Notification[]
+  pushSubscriptions      PushSubscription[]
+  notificationPreference NotificationPreference?
+  reservations           Reservation[]
+  reservationEvents      ReservationEvent[]      @relation("ReservationEventActor")
+  agentProfile           AgentProfile?
+  agentReviews           AgentReview[]           @relation("AgentReviewCustomer")
+  aiContentDrafts        AiContentDraft[]
 
   partnersCreated Partner[] @relation("PartnerCreatedBy")
   partnersUpdated Partner[] @relation("PartnerUpdatedBy")
@@ -127,9 +134,11 @@ model Agency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  employees AgencyEmployee[]
-  partners  AgencyPartner[]
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employees     AgencyEmployee[]
+  partners      AgencyPartner[]
+  agentProfiles AgentProfile[]
+  testimonials  Testimonial[]
 
   @@index([isVerified])
 }
@@ -276,21 +285,22 @@ model PropertyType {
 /// hər hansı biri ilə axtarır: rayon, metro, qəsəbə/mikrorayon, nişangah.
 /// kind = "CITY" | "DISTRICT" | "METRO" | "SETTLEMENT" | "LANDMARK"
 model Location {
-  id       String  @id @default(cuid())
-  name     String
-  searchName String @default("")
-  slug     String  @unique
-  kind     String  @default("CITY")
-  parentId String?
-  order    Int     @default(0)
+  id         String  @id @default(cuid())
+  name       String
+  searchName String  @default("")
+  slug       String  @unique
+  kind       String  @default("CITY")
+  parentId   String?
+  order      Int     @default(0)
 
   parent   Location?  @relation("LocationTree", fields: [parentId], references: [id], onDelete: SetNull)
   children Location[] @relation("LocationTree")
 
-  propertiesInCity     Property[] @relation("PropertyCity")
-  propertiesInDistrict Property[] @relation("PropertyDistrict")
-  propertiesNearMetro  Property[] @relation("PropertyMetro")
-  projects             Project[]  @relation("ProjectCity")
+  propertiesInCity     Property[]           @relation("PropertyCity")
+  propertiesInDistrict Property[]           @relation("PropertyDistrict")
+  propertiesNearMetro  Property[]           @relation("PropertyMetro")
+  projects             Project[]            @relation("ProjectCity")
+  neighborhoodProfile  NeighborhoodProfile?
 
   @@index([parentId])
   @@index([kind])
@@ -298,13 +308,13 @@ model Location {
 
 /// Əmlak xüsusiyyətləri (hovuz, qaraj, lift, ...).
 model Feature {
-  id    String  @id @default(cuid())
-  name  String
-  searchName String @default("")
-  slug  String  @unique
-  icon  String?
-  group String  @default("GENERAL") // GENERAL | INDOOR | OUTDOOR | SECURITY
-  order Int     @default(0)
+  id         String  @id @default(cuid())
+  name       String
+  searchName String  @default("")
+  slug       String  @unique
+  icon       String?
+  group      String  @default("GENERAL") // GENERAL | INDOOR | OUTDOOR | SECURITY
+  order      Int     @default(0)
 
   properties PropertyFeature[]
 }
@@ -376,9 +386,13 @@ model Property {
   /// Tikinti şirkətinin daxili taksiti mövcuddur
   installmentAvailable Boolean @default(false)
 
-  isFeatured Boolean @default(false)
+  isFeatured         Boolean   @default(false)
+  /// Premium boost yalnız bu tarix gələcəkdədirsə aktivdir; null köhnə müddətsiz featured qeydlər üçündür.
+  featuredUntil      DateTime?
+  /// Rezervasiya CTA-sı yalnız açıq şəkildə aktiv edilən elanlarda göstərilir.
+  reservationEnabled Boolean   @default(false)
   /// Nümunə/demo qeydi — real məlumatla əvəzlənəndə false olur.
-  isDemo     Boolean @default(false)
+  isDemo             Boolean   @default(false)
 
   viewCount   Int       @default(0)
   publishedAt DateTime?
@@ -396,12 +410,14 @@ model Property {
   ogDescription   String?
   ogImage         String?
 
-  type     PropertyType @relation(fields: [typeId], references: [id])
-  city     Location     @relation("PropertyCity", fields: [cityId], references: [id])
-  district Location?    @relation("PropertyDistrict", fields: [districtId], references: [id], onDelete: SetNull)
-  metro    Location?    @relation("PropertyMetro", fields: [metroId], references: [id], onDelete: SetNull)
-  author   User?        @relation("PropertyAuthor", fields: [authorId], references: [id], onDelete: SetNull)
-  authorId String?
+  type            PropertyType  @relation(fields: [typeId], references: [id])
+  city            Location      @relation("PropertyCity", fields: [cityId], references: [id])
+  district        Location?     @relation("PropertyDistrict", fields: [districtId], references: [id], onDelete: SetNull)
+  metro           Location?     @relation("PropertyMetro", fields: [metroId], references: [id], onDelete: SetNull)
+  author          User?         @relation("PropertyAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId        String?
+  assignedAgent   AgentProfile? @relation(fields: [assignedAgentId], references: [id], onDelete: SetNull)
+  assignedAgentId String?
 
   images             PropertyImage[]
   features           PropertyFeature[]
@@ -409,6 +425,10 @@ model Property {
   favorites          Favorite[]
   savedSearchMatches SavedSearchMatch[]
   partners           PropertyPartner[]
+  priceHistory       PropertyPriceHistory[]
+  reservations       Reservation[]
+  nearbyPlaces       NearbyPlace[]
+  aiContentDrafts    AiContentDraft[]
 
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
@@ -420,21 +440,28 @@ model Property {
   @@index([metroId])
   @@index([price])
   @@index([isFeatured])
+  @@index([featuredUntil])
+  @@index([reservationEnabled, status])
+  @@index([assignedAgentId])
   @@index([deletedAt])
   @@index([publishedAt])
   @@index([authorId])
 }
 
 model PropertyImage {
-  id         String  @id @default(cuid())
-  propertyId String
-  url        String
-  thumbUrl   String?
-  alt        String  @default("")
-  width      Int?
-  height     Int?
-  order      Int     @default(0)
-  isCover    Boolean @default(false)
+  id            String    @id @default(cuid())
+  propertyId    String
+  url           String
+  thumbUrl      String?
+  alt           String    @default("")
+  width         Int?
+  height        Int?
+  order         Int       @default(0)
+  isCover       Boolean   @default(false)
+  qualityScore  Int?
+  /// JSON massiv: blur, dark, low_resolution və s. maşınla oxunan xəbərdarlıqlar.
+  qualityIssues String?
+  analyzedAt    DateTime?
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
@@ -709,6 +736,8 @@ model Notification {
   title     String
   content   String
   actionUrl String?
+  /// Eyni domen hadisəsinin iki dəfə bildiriş yaratmasını bloklayan optional açar.
+  dedupeKey String?   @unique
   readAt    DateTime?
   createdAt DateTime  @default(now())
 
@@ -716,6 +745,250 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// PUBLIC PLATFORM — PHASE 2
+// ---------------------------------------------------------------------------
+
+/// Brauzerin Web Push endpoint-i. Endpoint və açarlar yalnız server tərəfində istifadə olunur.
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  locale     String    @default("az")
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  lastUsedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Bildiriş kanalları və push sakit saatları istifadəçi üzrə bir sətirdə saxlanılır.
+model NotificationPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  savedSearchEmail      Boolean  @default(true)
+  savedSearchWeb        Boolean  @default(true)
+  savedSearchPush       Boolean  @default(false)
+  priceDropEmail        Boolean  @default(true)
+  priceDropWeb          Boolean  @default(true)
+  priceDropPush         Boolean  @default(false)
+  reservationEmail      Boolean  @default(true)
+  reservationWeb        Boolean  @default(true)
+  reservationPush       Boolean  @default(false)
+  recommendationEnabled Boolean  @default(true)
+  quietHoursStart       String?
+  quietHoursEnd         String?
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Append-only qiymət dəyişikliyi. UI və Price Drop alert bu cədvəldən oxuyur.
+model PropertyPriceHistory {
+  id          String   @id @default(cuid())
+  propertyId  String
+  oldPrice    Float
+  newPrice    Float
+  currency    String   @default("AZN")
+  source      String   @default("ADMIN") // ADMIN | OWNER | IMPORT | SYSTEM
+  changedById String?
+  changedAt   DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, changedAt])
+}
+
+/// İctimai agent profili User hesabından ayrıdır, amma lazım olduqda bir hesaba bağlanır.
+model AgentProfile {
+  id              String   @id @default(cuid())
+  userId          String?  @unique
+  agencyId        String?
+  slug            String   @unique
+  name            String
+  avatarUrl       String?
+  roleTitle       String?
+  specialization  String?
+  experienceYears Int?
+  bio             String?
+  phone           String?
+  whatsapp        String?
+  email           String?
+  languages       String   @default("[]")
+  areas           String   @default("[]")
+  isVerified      Boolean  @default(false)
+  isPublic        Boolean  @default(false)
+  soldCount       Int      @default(0)
+  rentedCount     Int      @default(0)
+  responseMinutes Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agency       Agency?       @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  properties   Property[]
+  reviews      AgentReview[]
+  testimonials Testimonial[]
+  reservations Reservation[]
+
+  @@index([agencyId, isPublic])
+  @@index([isVerified, isPublic])
+}
+
+/// Agent rəyi yalnız APPROVED statusunda ictimai görünür.
+model AgentReview {
+  id             String    @id @default(cuid())
+  agentId        String
+  customerId     String?
+  customerName   String
+  rating         Int
+  comment        String
+  serviceType    String?
+  status         String    @default("PENDING") // PENDING | APPROVED | REJECTED | HIDDEN
+  moderationNote String?
+  createdAt      DateTime  @default(now())
+  moderatedAt    DateTime?
+
+  agent    AgentProfile @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  customer User?        @relation("AgentReviewCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([agentId, status, createdAt])
+  @@index([customerId])
+}
+
+/// Şirkət rəyi admin təsdiqindən sonra home/haqqımızda səthlərində göstərilə bilər.
+model Testimonial {
+  id           String    @id @default(cuid())
+  customerName String
+  avatarUrl    String?
+  review       String
+  rating       Int
+  serviceType  String?
+  agentId      String?
+  agencyId     String?
+  status       String    @default("PENDING")
+  occurredAt   DateTime?
+  createdAt    DateTime  @default(now())
+  approvedAt   DateTime?
+
+  agent  AgentProfile? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  agency Agency?       @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([agentId])
+  @@index([agencyId])
+}
+
+/// Rayon üzrə təsdiqlənmiş statistik/prose məlumatı. Null göstəricilər UI-da uydurulmur.
+model NeighborhoodProfile {
+  id                  String    @id @default(cuid())
+  locationId          String    @unique
+  description         String?
+  descriptionEn       String?
+  descriptionRu       String?
+  coverUrl            String?
+  averagePrice        Float?
+  medianPrice         Float?
+  averagePricePerSqm  Float?
+  saleRentRatio       Float?
+  annualChangePercent Float?
+  averageRent         Float?
+  rentalYieldPercent  Float?
+  dataSource          String?
+  measuredAt          DateTime?
+  updatedAt           DateTime  @updatedAt
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+}
+
+/// Əmlaka yaxın təsdiqlənmiş obyekt; mənbə və məsafə üsulu açıq saxlanılır.
+model NearbyPlace {
+  id             String   @id @default(cuid())
+  propertyId     String
+  category       String
+  name           String
+  latitude       Float?
+  longitude      Float?
+  distanceMeters Int?
+  walkingMinutes Int?
+  source         String?
+  createdAt      DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, category])
+}
+
+/// Rezervasiyanın cari vəziyyəti; bütün status keçidləri ReservationEvent-də append-only qalır.
+model Reservation {
+  id              String    @id @default(cuid())
+  propertyId      String
+  userId          String
+  agentId         String?
+  firstName       String
+  lastName        String
+  phone           String
+  email           String
+  requestedFor    DateTime
+  message         String?
+  status          String    @default("REQUESTED")
+  termsAcceptedAt DateTime
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  property Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent    AgentProfile?      @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  events   ReservationEvent[]
+
+  @@index([userId, createdAt])
+  @@index([propertyId, status])
+  @@index([agentId, status])
+}
+
+model ReservationEvent {
+  id            String   @id @default(cuid())
+  reservationId String
+  status        String
+  note          String?
+  changedById   String?
+  source        String   @default("USER")
+  createdAt     DateTime @default(now())
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  changedBy   User?       @relation("ReservationEventActor", fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([reservationId, createdAt])
+}
+
+/// AI mətn nəticəsi həmişə draft kimi saxlanılır və insan təsdiqi olmadan əmlaka yazılmır.
+model AiContentDraft {
+  id            String    @id @default(cuid())
+  propertyId    String?
+  requestedById String
+  locale        String    @default("az")
+  inputJson     String
+  outputJson    String
+  provider      String
+  model         String
+  status        String    @default("DRAFT") // DRAFT | APPLIED | DISCARDED
+  createdAt     DateTime  @default(now())
+  appliedAt     DateTime?
+
+  property    Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  requestedBy User      @relation(fields: [requestedById], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, createdAt])
+  @@index([requestedById, createdAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -761,8 +1034,8 @@ model AuditLog {
   /// Qısa insan oxunaqlı təsvir (məsələn elanın başlığı).
   summary   String?
   /// Həssas dəyərlər yazılmadan əvvəl çağıran tərəfindən maskalanmış JSON snapshot.
-  oldValue String?
-  newValue String?
+  oldValue  String?
+  newValue  String?
   ip        String?
 
   createdAt DateTime @default(now())
@@ -775,7 +1048,7 @@ model AuditLog {
 model EmailActivity {
   id              String   @id @default(cuid())
   providerId      String   @unique
-  direction       String   // OUTBOUND | INBOUND
+  direction       String // OUTBOUND | INBOUND
   eventType       String
   fromAddress     String?
   toAddresses     String   @default("[]")
