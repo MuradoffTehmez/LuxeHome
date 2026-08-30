@@ -16,7 +16,11 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
  */
 
 /** Mətn modeli — təlimatı izləyən, JSON sxeminə uyğun cavab verə bilən. */
-const DEFAULT_TEXT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const DEFAULT_TEXT_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
+const FALLBACK_TEXT_MODELS = [
+  "@cf/meta/llama-3.1-8b-instruct-fast",
+  "@cf/meta/llama-3.2-3b-instruct",
+] as const;
 
 /** Şəkil modeli — foto keyfiyyət analizi üçün. */
 const DEFAULT_VISION_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
@@ -54,6 +58,12 @@ function extractText(payload: unknown): string {
   if (!payload || typeof payload !== "object") return "";
   const record = payload as Record<string, unknown>;
   if (typeof record.response === "string") return record.response.trim();
+  if (typeof record.output_text === "string") return record.output_text.trim();
+  if (Array.isArray(record.choices)) {
+    const choice = record.choices[0] as { message?: { content?: unknown }; text?: unknown } | undefined;
+    if (typeof choice?.message?.content === "string") return choice.message.content.trim();
+    if (typeof choice?.text === "string") return choice.text.trim();
+  }
   if (record.result && typeof record.result === "object") {
     return extractText(record.result);
   }
@@ -93,7 +103,7 @@ export async function runAiText(input: {
   maxTokens?: number;
 }): Promise<AiResult> {
   const ai = await aiBinding();
-  const model = textModel();
+  const configuredModel = textModel();
   const payload: Record<string, unknown> = {
     messages: [
       { role: "system", content: input.instructions },
@@ -102,11 +112,29 @@ export async function runAiText(input: {
     max_tokens: input.maxTokens ?? 1600,
     temperature: 0.3,
   };
-  if (input.jsonSchema) payload.guided_json = input.jsonSchema;
+  // `guided_json` bütün Workers AI Llama variantlarında dəstəklənmir və
+  // production-da 400 qaytarırdı. Sxem prompta verilir, yekun sərhəd isə
+  // çağıran tərəfdə parse + Zod/allow-list yoxlamasıdır.
+  if (input.jsonSchema) {
+    payload.messages = [
+      ...(payload.messages as Array<Record<string, unknown>>),
+      { role: "system", content: `Yekun cavab bu JSON sxeminə uyğun olmalıdır: ${JSON.stringify(input.jsonSchema)}` },
+    ];
+  }
 
-  const text = extractText(await ai.run(model, payload));
-  if (!text) throw new Error("AI boş cavab qaytardı.");
-  return { text, model };
+  const models = [configuredModel, ...FALLBACK_TEXT_MODELS.filter((item) => item !== configuredModel)];
+  let lastError: unknown;
+  for (const model of models) {
+    try {
+      const text = extractText(await ai.run(model, payload));
+      if (!text) throw new Error("AI boş cavab qaytardı.");
+      return { text, model };
+    } catch (error) {
+      lastError = error;
+      console.error("[workers-ai] mətn modeli xətası", { model, error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  throw new Error(`Workers AI cavab vermədi: ${lastError instanceof Error ? lastError.message : "naməlum xəta"}`);
 }
 
 /**

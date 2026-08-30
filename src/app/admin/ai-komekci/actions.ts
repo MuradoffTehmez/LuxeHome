@@ -8,6 +8,7 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
 import { AI_CONTENT_DRAFT_STATUSES, PERMISSIONS } from "@/lib/constants";
 import { parseAiJson, runAiText, runAiVision } from "@/lib/ai";
+import { AI_SYSTEM_PROMPTS } from "@/lib/ai-prompts";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 
@@ -34,6 +35,26 @@ async function guard() {
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
+  }
+}
+
+/** Binding/model zəncirini real sorğu ilə yoxlayır; saxta "configured" statusu göstərmir. */
+export async function testAiProvider(): Promise<ActionState> {
+  const actor = await guard();
+  if ("status" in actor) return actor;
+  try {
+    const response = await runAiText({
+      instructions: "Yalnız JSON qaytar. Verilməyən faktı uydurma.",
+      prompt: "Sağlıq yoxlaması. {\"ok\":true} qaytar.",
+      jsonSchema: { type: "object", properties: { ok: { type: "boolean" } }, required: ["ok"], additionalProperties: false },
+      maxTokens: 40,
+    });
+    const parsed = parseAiJson<{ ok?: boolean }>(response.text);
+    if (parsed.ok !== true) return failure("Workers AI cavab verdi, amma sağlıq sxeminə uyğun olmadı.");
+    await recordAudit(actor, "TEST", "AiProvider", null, `Workers AI sağlıq yoxlaması: ${response.model}`);
+    return success(`Workers AI işləyir: ${response.model}`);
+  } catch (error) {
+    return unexpected("Workers AI işləmir", error, error instanceof Error ? error.message : undefined);
   }
 }
 
@@ -93,11 +114,7 @@ export async function generatePropertyDescription(
     };
 
     const response = await runAiText({
-      instructions:
-        "Sən daşınmaz əmlak redaktorusan. Yalnız verilmiş faktlardan istifadə et; heç bir imkan, " +
-        "lokasiya üstünlüyü, investisiya gəliri və ya hüquqi iddia uydurma. Faktlarda olmayan " +
-        "detalı yazma. Cavabı yalnız JSON kimi qaytar: {\"title\":string,\"description\":string," +
-        "\"highlights\":string[]}. Mətn peşəkar, aydın və seçilmiş dildə olsun.",
+      instructions: AI_SYSTEM_PROMPTS.description,
       prompt: `Dil: ${locale}. Elan faktları: ${JSON.stringify(facts)}`,
       jsonSchema: DESCRIPTION_SCHEMA,
     });
@@ -152,12 +169,7 @@ export async function analyzePropertyPhotos(
       if (!bytes) continue;
       try {
         const response = await runAiVision({
-          instructions:
-            "Daşınmaz əmlak foto keyfiyyəti məsləhətçisisən. Şəkli texniki və təqdimat " +
-            "keyfiyyətinə görə 0-100 arası qiymətləndir. Obyektin özünü dəyişdirməyi təklif " +
-            "etmə; yalnız işıq, kadr, bulanıqlıq, şaquli xətlər, məxfilik və artıq əşya kimi " +
-            "çəkiliş problemlərini qeyd et. Yalnız JSON qaytar: " +
-            "{\"score\":number,\"issues\":string[]}",
+          instructions: AI_SYSTEM_PROMPTS.photoAdvisor,
           prompt: `Elan: ${property.title}. Şəkli qiymətləndir.`,
           image: bytes,
         });

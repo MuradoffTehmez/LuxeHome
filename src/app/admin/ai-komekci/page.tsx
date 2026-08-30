@@ -9,7 +9,7 @@ import { AI_CONTENT_DRAFT_STATUSES, PERMISSIONS } from "@/lib/constants";
 import { aiProviderLabel } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
-import { analyzePropertyPhotos, applyDescriptionDraft, discardDescriptionDraft, generatePropertyDescription } from "./actions";
+import { analyzePropertyPhotos, applyDescriptionDraft, discardDescriptionDraft, generatePropertyDescription, testAiProvider } from "./actions";
 
 export const metadata: Metadata = { title: "AI köməkçi" };
 export const dynamic = "force-dynamic";
@@ -25,6 +25,7 @@ export default async function AiAssistantPage() {
   const propertySelect = <>{<option value="">Elan seçin</option>}{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</>;
   return <>
     <AdminPageHeader title="AI köməkçi" description={`Faktlara əsaslanan mətn qaralaması və foto keyfiyyəti məsləhətləri. Heç bir mətn insan təsdiqi olmadan dərc edilmir. Provayder: ${aiProviderLabel()}`} breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "AI köməkçi" }]} />
+    <AdminCard title="Workers AI sağlıq yoxlaması" description="Binding-i və model fallback zəncirini real sorğu ilə yoxlayır." className="mb-6"><AdminForm action={testAiProvider} submitLabel="Provayderi yoxla"><p className="text-sm text-ink-muted">Nəticə saxta konfiqurasiya statusu deyil; modeldən sxemə uyğun cavab alınmalıdır.</p></AdminForm></AdminCard>
     <div className="grid gap-6 xl:grid-cols-2">
       <AdminCard title="Elan təsviri yarat" description="Nəticə əvvəlcə qaralama kimi saxlanılır."><AdminForm action={generatePropertyDescription} submitLabel="Qaralama yarat" className="gap-4"><label className="text-sm text-ink-soft">Elan<select name="propertyId" className={inputClass}>{propertySelect}</select></label><label className="text-sm text-ink-soft">Dil<select name="locale" className={inputClass}><option value="az">Azərbaycan</option><option value="en">English</option><option value="ru">Русский</option></select></label></AdminForm></AdminCard>
       <AdminCard title="Foto məsləhətçisi" description="İşıq, kadr, bulanıqlıq və məxfilik problemlərini qiymətləndirir."><AdminForm action={analyzePropertyPhotos} submitLabel="Şəkilləri analiz et" className="gap-4"><label className="text-sm text-ink-soft">Elan<select name="propertyId" className={inputClass}>{propertySelect}</select></label><p className="flex items-start gap-2 text-sm text-ink-muted"><ImageIcon className="mt-0.5 size-4 shrink-0" />Analiz nəticəsi şəkillərin yanında bal və problemlər kimi saxlanılır.</p></AdminForm></AdminCard>
