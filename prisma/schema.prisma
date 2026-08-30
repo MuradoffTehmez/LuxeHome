@@ -82,6 +82,8 @@ model User {
   partnersUpdated Partner[] @relation("PartnerUpdatedBy")
   partnersDeleted Partner[] @relation("PartnerDeletedBy")
 
+  knowledgeArticles KnowledgeArticle[] @relation("KnowledgeArticleAuthor")
+
   @@index([role])
   @@index([accountType])
   @@index([approvedAt])
@@ -1301,4 +1303,166 @@ model AgencyPartner {
 
   @@unique([agencyId, partnerId])
   @@index([partnerId])
+}
+
+// ---------------------------------------------------------------------------
+// BİLİK MƏRKƏZİ (REAL ESTATE KNOWLEDGE HUB)
+// ---------------------------------------------------------------------------
+
+/// Bilik Mərkəzinin kateqoriyası — bələdçilər və lüğət terminləri eyni ağacı bölüşür.
+///
+/// Bloq kateqoriyasından **ayrıdır**: bloq xəbər/kampaniya axınıdır, Bilik Mərkəzi isə
+/// köhnəlməyən təlimat məzmunudur. İki axını bir cədvəldə birləşdirmək SEO baxımından
+/// da səhv olardı — bələdçi `Article` deyil, `HowTo`/`FAQPage` siqnalı verir.
+model KnowledgeCategory {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String
+  /// Azərbaycan diakritiklərindən asılı olmayan axtarış indeksi (`normalizeSearchText`).
+  searchName  String  @default("")
+  description String?
+  /// lucide-react ikon adı — `admin-icon.tsx`-dəki icazə siyahısından.
+  icon        String?
+  order       Int     @default(0)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles KnowledgeArticle[]
+  terms    KnowledgeTerm[]
+
+  @@index([isActive, order])
+}
+
+/// Bilik Mərkəzi bələdçisi — addım-addım təlimat və izah məzmunu.
+model KnowledgeArticle {
+  id      String @id @default(cuid())
+  slug    String @unique
+  title   String
+  /// Registrsiz/diakritiksiz axtarış üçün normallaşdırılmış başlıq + xülasə.
+  searchText String @default("")
+  excerpt String
+  /// `sanitizeRichText()`-dən keçmiş HTML. Bazadakı dəyər həmişə təhlükəsizdir.
+  content String
+
+  categoryId String?
+  /// BUYER | SELLER | RENTER | LANDLORD | INVESTOR — kimə ünvanlanıb.
+  audience   String  @default("BUYER")
+  /// BEGINNER | INTERMEDIATE | ADVANCED
+  level      String  @default("BEGINNER")
+  /// DRAFT | PUBLISHED — `POST_STATUSES` ilə eyni dəyər dəsti.
+  status     String  @default("DRAFT")
+
+  /// CURRENT | PROPOSAL | MIXED — qüvvədə olan norma ilə təşəbbüsü ayırır.
+  legalStatus    String   @default("CURRENT")
+  /// GREEN | YELLOW | RED | LEGAL_REVIEW — məqalənin universal risk siqnalı.
+  riskLevel      String   @default("YELLOW")
+  jurisdiction   String   @default("Azərbaycan Respublikası")
+  /// Hüquqşünasın məzmunu son dəfə qüvvədə olan aktlarla yoxladığı tarix.
+  legalReviewedAt DateTime?
+  /// JSON sətir massivləri: D1 native array saxlamır.
+  legalActs       String?
+  sourceUrls      String?
+
+  /// Sənəddə müəyyən edilən vahid hüquqi bloklar; HTML yazı anında sanitizasiya olunur.
+  legalBasis       String?
+  requiredDocuments String?
+  procedure        String?
+  duration         String?
+  costs            String?
+  risks            String?
+  checklist        String?
+  template         String?
+  courtPosition    String?
+
+  readMinutes Int     @default(1)
+  isFeatured  Boolean @default(false)
+  viewCount   Int     @default(0)
+  /// Nümunə/demo qeydi — ictimai sorğular yalnız `false` qaytarır.
+  isDemo      Boolean @default(false)
+
+  coverUrl String?
+  coverAlt String  @default("")
+
+  authorId String?
+
+  metaTitle       String?
+  metaDescription String?
+  noIndex         Boolean @default(false)
+  canonicalUrl    String?
+  ogTitle         String?
+  ogDescription   String?
+  ogImage         String?
+
+  publishedAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  category KnowledgeCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author   User?              @relation("KnowledgeArticleAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([audience])
+  @@index([legalStatus, legalReviewedAt])
+  @@index([riskLevel])
+  @@index([isFeatured])
+  @@index([deletedAt])
+}
+
+/// Daşınmaz əmlak terminlərinin lüğəti.
+///
+/// Ayrıca model saxlanılır, çünki termin səhifəsi `DefinedTerm` struktur datası verir
+/// və uzun bələdçidən fərqli olaraq bir abzaslıq cavab üçün optimallaşdırılır.
+model KnowledgeTerm {
+  id   String @id @default(cuid())
+  slug String @unique
+  term String
+  /// Normallaşdırılmış termin — registrsiz axtarış üçün.
+  searchName String @default("")
+  /// Bir cümləlik tərif — kart və snippet üçün.
+  shortDefinition String
+  /// Genişləndirilmiş izah (sanitizasiya olunmuş HTML). Boş buraxıla bilər.
+  definition      String?
+  /// Terminin ilk hərfi (normallaşdırılmış, böyük) — hərf indeksində qruplaşdırma üçün.
+  initial         String  @default("")
+
+  categoryId String?
+  /// DRAFT | PUBLISHED
+  status     String  @default("DRAFT")
+  order      Int     @default(0)
+
+  /// Əlaqəli terminlərin slug-ları — JSON massiv. D1-də massiv tipi yoxdur.
+  relatedSlugs String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category KnowledgeCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([status, initial])
+  @@index([categoryId])
+}
+
+/// CMS-dən idarə olunan FAQ (Public PRD §86-87).
+///
+/// Əvvəl suallar `src/i18n/public-content.ts`-də sabit idi: yeni sual əlavə etmək
+/// yayım tələb edirdi. İndi baza boşdursa həmin sabit kataloq fallback kimi işləyir,
+/// ona görə keçid sıfır boşluqla gedir.
+model KnowledgeFaq {
+  id       String @id @default(cuid())
+  question String
+  /// Sanitizasiya olunmuş HTML cavab.
+  answer   String
+  /// PURCHASE | RENT | RESERVATION | AGENCY | PAYMENT | LEGAL | PLATFORM
+  category String @default("PLATFORM")
+  status   String @default("DRAFT")
+  order    Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, category, order])
 }
