@@ -20,6 +20,7 @@ const requiredNamespaces = [
   "partners",
   "seoLandings",
   "phase2",
+  "phase3",
   "knowledge",
 ] as const;
 

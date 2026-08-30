@@ -123,7 +123,7 @@ function ContactDetails() {
 }
 
 const NAV_KEY_BY_HREF = {
-  "/": "home", "/emlaklar": "properties", "/ai-axtaris": "aiSearch", "/layiheler": "projects",
+  "/": "home", "/emlaklar": "properties", "/layiheler": "projects",
   "/agentlikler": "agencies", "/agentler": "agents", "/xidmetler": "services", "/blog": "blog",
   "/elaqe": "contact", "/haqqimizda": "about", "/suallar": "faq",
   "/terefdaslar": "partners",

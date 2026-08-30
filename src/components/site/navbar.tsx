@@ -17,12 +17,12 @@ import { ThemeToggle } from "./theme-toggle";
 
 /** `siteConfig.navigation`-dakı href → tərcümə açarı. Kompakt (xl-dən aşağı) etiket
  * də eyni açardan gəlir — ayrıca sabit lüğət artıq lazım deyil. */
-const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" | "agents" | "services" | "blog" | "contact"> = {
+const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" | "services" | "blog" | "contact" | "partners"> = {
   "/": "home",
   "/emlaklar": "properties",
   "/layiheler": "projects",
   "/agentlikler": "agencies",
-  "/agentler": "agents",
+  "/terefdaslar": "partners",
   "/xidmetler": "services",
   "/blog": "blog",
   "/elaqe": "contact",
@@ -161,10 +161,11 @@ export function Navbar({
 
           <Link
             href="/kabinet/elanlar/yeni"
-            className={buttonClassName("primary", "sm", false, "hidden px-3 xl:inline-flex xl:px-4")}
+            aria-label={t("listProperty")}
+            className={buttonClassName("primary", "sm", false, "inline-flex min-w-11 px-2.5 sm:px-3 xl:px-4")}
           >
             <Plus className="size-4" aria-hidden="true" />
-            {t("listProperty")}
+            <span className="hidden sm:inline">{t("listProperty")}</span>
           </Link>
 
           <IconButton
@@ -216,6 +217,14 @@ export function Navbar({
         <div className="mt-7 border-t border-line pt-6">
           <p className="editorial-kicker mb-4 text-ink-muted">{t("quickLinks")}</p>
           <div className="flex flex-col gap-3">
+            <Link
+              href="/kabinet/elanlar/yeni"
+              onClick={() => setMenuOpen(false)}
+              className={buttonClassName("primary", "lg", true)}
+            >
+              <Plus className="size-4" aria-hidden="true" />
+              {t("listProperty")}
+            </Link>
             <Link
               href="/emlaklar"
               onClick={() => setMenuOpen(false)}

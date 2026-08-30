@@ -23,6 +23,7 @@ import { buttonClassName } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Hero } from "@/components/site/hero";
+import { AiSearchForm } from "@/components/site/ai-search-form";
 import { HomeSeoIntro } from "@/components/site/home-seo-intro";
 import { MobileCategoryRail } from "@/components/site/mobile-category-rail";
 import { PropertyCard } from "@/components/site/property-card";
@@ -96,6 +97,7 @@ export default async function HomePage({ params }: HomePageProps) {
   const phase2T = await getTranslations({ locale: resolvedLocale, namespace: "phase2.testimonials" });
   const wizardT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.wizard" });
   const agentsT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.agents" });
+  const aiSearchT = await getTranslations({ locale: resolvedLocale, namespace: "phase3.search" });
   const { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners } =
     await getCachedHomePageData();
   const testimonials = await getApprovedTestimonials(6);
@@ -126,6 +128,25 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <>
       <Hero types={typeOptions} cities={cityOptions} />
+      <Section tone="beige" spacing="cozy">
+        <Container size="wide">
+          <SectionHeader
+            overline={aiSearchT("overline")}
+            title={aiSearchT("title")}
+            description={aiSearchT("description")}
+          />
+          <div className="mt-8">
+            <AiSearchForm
+              initialQuery=""
+              labels={{
+                placeholder: aiSearchT("placeholder"),
+                submit: aiSearchT("submit"),
+                example: aiSearchT("example"),
+              }}
+            />
+          </div>
+        </Container>
+      </Section>
       <HomeSeoIntro locale={resolvedLocale} />
 
       {/* ------------------------------------------------------------------ */}

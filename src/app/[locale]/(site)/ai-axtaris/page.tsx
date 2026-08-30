@@ -8,7 +8,7 @@ import { PropertyCard } from "@/components/site/property-card";
 import { buildMetadata } from "@/lib/seo";
 import { searchPropertiesWithAi } from "@/lib/phase3-search";
 import type { Locale } from "@/lib/constants";
-import { AiSearchForm } from "./ai-search-form";
+import { AiSearchForm } from "@/components/site/ai-search-form";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ q?: string }> };

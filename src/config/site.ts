@@ -59,10 +59,9 @@ export const PRODUCTION_SITE_URL = "https://luxehomeestate.az";
 export const navigation = [
   { label: "Ana səhifə", href: "/" },
   { label: "Əmlaklar", href: "/emlaklar" },
-  { label: "AI Axtarış", href: "/ai-axtaris" },
   { label: "Yaşayış kompleksləri", href: "/layiheler" },
-  { label: "Agentliklər", href: "/agentlikler" },
-  { label: "Agentlər", href: "/agentler" },
+  { label: "Agentliklər və agentlər", href: "/agentlikler" },
+  { label: "Tərəfdaşlar", href: "/terefdaslar" },
   { label: "Xidmətlər", href: "/xidmetler" },
   { label: "Bloq", href: "/blog" },
   { label: "Əlaqə", href: "/elaqe" },
@@ -93,14 +92,10 @@ export const listingLinks = [
 /**
  * Footer-dəki köməkçi səhifələr — əsas naviqasiyada olmayanlar.
  *
- * «Tərəfdaşlarımız» qəsdən burada, header-də deyil: hazırda tərəfdaş sayı azdır
- * və əsas naviqasiyanı yükləmək UX baxımından haqlı deyil. Gələcəkdə «Şirkət»
- * qrupu (Haqqımızda / Komandamız / Tərəfdaşlarımız / Karyera / Əlaqə) bu
- * siyahıdan qurulacaq — struktur artıq ona hazırdır.
+ * Əsas naviqasiyada olmayan yardımçı kontent səhifələri.
  */
 export const supportNavigation = [
   { label: "Haqqımızda", href: "/haqqimizda" },
-  { label: "Tərəfdaşlarımız", href: "/terefdaslar" },
   { label: "Bilik Mərkəzi", href: "/bilik-merkezi" },
   { label: "Əmlak lüğəti", href: "/lugat" },
   { label: "İpoteka kalkulyatoru", href: "/kalkulyator" },

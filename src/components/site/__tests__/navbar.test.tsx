@@ -7,7 +7,8 @@ vi.mock("next-intl", () => ({
       home: "Ana səhifə",
       properties: "Əmlaklar",
       projects: "Yaşayış kompleksləri",
-      agencies: "Agentliklər",
+      agencies: "Agentliklər və agentlər",
+      partners: "Tərəfdaşlar",
       services: "Xidmətlər",
       blog: "Bloq",
       contact: "Əlaqə",
@@ -58,7 +59,12 @@ describe("Navbar", () => {
     const html = renderToStaticMarkup(<Navbar />);
 
     expect(html).toContain("Yaşayış kompleksləri");
+    expect(html).toContain("Agentliklər və agentlər");
+    expect(html).toContain("Tərəfdaşlar");
+    expect(html).not.toContain("AI Axtarış");
+    expect(html).not.toContain('href="/agentler"');
     expect(html).not.toContain("+994 51 922 85 85");
     expect(html).toContain("Elan ver");
+    expect(html).toContain('href="/kabinet/elanlar/yeni"');
   });
 });
