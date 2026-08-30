@@ -12,6 +12,7 @@ import type legal from "./src/i18n/locales/az/legal.json";
 import type partners from "./src/i18n/locales/az/partners.json";
 import type seoLandings from "./src/i18n/locales/az/seoLandings.json";
 import type phase2 from "./src/i18n/locales/az/phase2.json";
+import type knowledge from "./src/i18n/locales/az/knowledge.json";
 
 /**
  * `useTranslations()`/`getTranslations()` üçün açar avtotamamlama.
@@ -33,6 +34,7 @@ type Messages = {
   partners: typeof partners;
   seoLandings: typeof seoLandings;
   phase2: typeof phase2;
+  knowledge: typeof knowledge;
 };
 
 declare module "next-intl" {

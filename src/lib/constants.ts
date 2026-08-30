@@ -28,6 +28,7 @@ export const PERMISSIONS = {
   PROJECT_MANAGE: "project:manage",
   SERVICE_MANAGE: "service:manage",
   BLOG_MANAGE: "blog:manage",
+  KNOWLEDGE_MANAGE: "knowledge:manage",
   LEAD_MANAGE: "lead:manage",
   MEDIA_MANAGE: "media:manage",
   USER_MANAGE: "user:manage",
@@ -57,6 +58,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.PROJECT_MANAGE,
     PERMISSIONS.SERVICE_MANAGE,
     PERMISSIONS.BLOG_MANAGE,
+    PERMISSIONS.KNOWLEDGE_MANAGE,
     PERMISSIONS.LEAD_MANAGE,
     PERMISSIONS.MEDIA_MANAGE,
     PERMISSIONS.TRANSLATION_MANAGE,
@@ -68,7 +70,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.PARTNER_PUBLISH,
     PERMISSIONS.PARTNER_RELATION_MANAGE,
   ],
-  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.TRANSLATION_MANAGE, PERMISSIONS.PARTNER_VIEW],
+  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.KNOWLEDGE_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.TRANSLATION_MANAGE, PERMISSIONS.PARTNER_VIEW],
 };
 
 export const TRANSLATION_STATUSES = {
@@ -91,6 +93,9 @@ export const TRANSLATION_ENTITY_TYPES = {
   PROJECT: "PROJECT",
   SERVICE: "SERVICE",
   BLOG_POST: "BLOG_POST",
+  KNOWLEDGE_ARTICLE: "KNOWLEDGE_ARTICLE",
+  KNOWLEDGE_TERM: "KNOWLEDGE_TERM",
+  KNOWLEDGE_FAQ: "KNOWLEDGE_FAQ",
 } as const;
 
 export type TranslationEntityType =
@@ -499,6 +504,118 @@ export const AI_CONTENT_DRAFT_STATUSES = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// BİLİK MƏRKƏZİ (KNOWLEDGE HUB)
+// ---------------------------------------------------------------------------
+
+/**
+ * Bələdçinin ünvanlandığı auditoriya.
+ *
+ * Kateqoriyadan ayrı ölçüdür: «İpoteka» kateqoriyasındakı bir bələdçi alıcıya,
+ * digəri isə investora ünvanlana bilər. İctimai səhifədə filtr kimi işlədilir.
+ */
+export const KNOWLEDGE_AUDIENCES = {
+  BUYER: "BUYER",
+  SELLER: "SELLER",
+  RENTER: "RENTER",
+  LANDLORD: "LANDLORD",
+  INVESTOR: "INVESTOR",
+} as const;
+
+export type KnowledgeAudience =
+  (typeof KNOWLEDGE_AUDIENCES)[keyof typeof KNOWLEDGE_AUDIENCES];
+
+export const KNOWLEDGE_AUDIENCE_LABELS: Record<KnowledgeAudience, string> = {
+  BUYER: "Alıcı",
+  SELLER: "Satıcı",
+  RENTER: "Kirayəçi",
+  LANDLORD: "Ev sahibi",
+  INVESTOR: "İnvestor",
+};
+
+/** Məzmunun dərinliyi — oxucuya nə qədər ilkin bilik lazım olduğunu göstərir. */
+export const KNOWLEDGE_LEVELS = {
+  BEGINNER: "BEGINNER",
+  INTERMEDIATE: "INTERMEDIATE",
+  ADVANCED: "ADVANCED",
+} as const;
+
+export type KnowledgeLevel = (typeof KNOWLEDGE_LEVELS)[keyof typeof KNOWLEDGE_LEVELS];
+
+export const KNOWLEDGE_LEVEL_LABELS: Record<KnowledgeLevel, string> = {
+  BEGINNER: "Başlanğıc",
+  INTERMEDIATE: "Orta",
+  ADVANCED: "Dərin",
+};
+
+/** Bələdçi və lüğət statusu — bloq ilə eyni dəyər dəsti qəsdən saxlanılır. */
+export const KNOWLEDGE_STATUSES = {
+  DRAFT: "DRAFT",
+  PUBLISHED: "PUBLISHED",
+} as const;
+
+export type KnowledgeStatus = (typeof KNOWLEDGE_STATUSES)[keyof typeof KNOWLEDGE_STATUSES];
+
+export const KNOWLEDGE_STATUS_LABELS: Record<KnowledgeStatus, string> = {
+  DRAFT: "Qaralama",
+  PUBLISHED: "Dərc edilib",
+};
+
+/** Qüvvədə olan hüquq norması ilə qanun layihəsi/təşəbbüsü qarışdırılmır. */
+export const LEGAL_CONTENT_STATUSES = {
+  CURRENT: "CURRENT",
+  PROPOSAL: "PROPOSAL",
+  MIXED: "MIXED",
+} as const;
+export type LegalContentStatus =
+  (typeof LEGAL_CONTENT_STATUSES)[keyof typeof LEGAL_CONTENT_STATUSES];
+export const LEGAL_CONTENT_STATUS_LABELS: Record<LegalContentStatus, string> = {
+  CURRENT: "Qüvvədə olan norma",
+  PROPOSAL: "Təklif / təşəbbüs",
+  MIXED: "Qüvvədə olan norma + təklif",
+};
+
+export const KNOWLEDGE_RISK_LEVELS = {
+  GREEN: "GREEN",
+  YELLOW: "YELLOW",
+  RED: "RED",
+  LEGAL_REVIEW: "LEGAL_REVIEW",
+} as const;
+export type KnowledgeRiskLevel =
+  (typeof KNOWLEDGE_RISK_LEVELS)[keyof typeof KNOWLEDGE_RISK_LEVELS];
+export const KNOWLEDGE_RISK_LEVEL_LABELS: Record<KnowledgeRiskLevel, string> = {
+  GREEN: "Əsas sənədlər qaydasındadır",
+  YELLOW: "Əlavə yoxlama tələb olunur",
+  RED: "Ciddi hüquqi risk",
+  LEGAL_REVIEW: "Hüquqi rəy tələb olunur",
+};
+
+/** FAQ kateqoriyaları — Public PRD §86-dakı siyahı ilə birbaşa uyğundur. */
+export const FAQ_CATEGORIES = {
+  PURCHASE: "PURCHASE",
+  RENT: "RENT",
+  RESERVATION: "RESERVATION",
+  AGENCY: "AGENCY",
+  PAYMENT: "PAYMENT",
+  LEGAL: "LEGAL",
+  PLATFORM: "PLATFORM",
+} as const;
+
+export type FaqCategory = (typeof FAQ_CATEGORIES)[keyof typeof FAQ_CATEGORIES];
+
+export const FAQ_CATEGORY_LABELS: Record<FaqCategory, string> = {
+  PURCHASE: "Alış",
+  RENT: "Kirayə",
+  RESERVATION: "Rezervasiya",
+  AGENCY: "Agentlik",
+  PAYMENT: "Ödəniş",
+  LEGAL: "Hüquqi",
+  PLATFORM: "Platforma",
+};
+
+/** Bilik Mərkəzi siyahılarında bir səhifədə göstərilən bələdçi sayı. */
+export const KNOWLEDGE_PAGE_SIZE = 9;
+
+// ---------------------------------------------------------------------------
 // SIRALAMA VƏ SƏHİFƏLƏMƏ
 // ---------------------------------------------------------------------------
 
@@ -635,9 +752,14 @@ export const LISTING_ACCOUNT_TYPES: AccountType[] = [
  * Alıcının ödəniş imkanları.
  *
  * Ayrıca cədvəl yaradılmır: bu dəyərlər `Feature` taksonomiyasında `PAYMENT`
- * qrupunda saxlanılır və mövcud `featureSlugs` filtri onları pulsuz dəstəkləyir.
- * `Property.mortgageAvailable` və `installmentAvailable` sahələri geriyə uyğunluq
- * üçün qalır və müvafiq slug ilə sinxron yazılır.
+ * qrupunda saxlanılır (`prisma/taxonomy-data.ts`) və mövcud `featureSlugs` filtri
+ * onları pulsuz dəstəkləyir. Göstərilən ad `Feature.name`-dən oxunur, ona görə
+ * burada ayrıca etiket dəsti saxlanılmır — iki mənbə bir-birindən sürüşərdi.
+ *
+ * `Property.mortgageAvailable` və `installmentAvailable` sütunları geriyə
+ * uyğunluq üçün qalır və **`src/lib/admin/payment-features.ts` vasitəsilə**
+ * seçilmiş slug-lardan törədilir. Formada bu sütunlar üçün ayrıca checkbox yoxdur.
+ * Qrup adı `FEATURE_GROUPS.PAYMENT`-dədir.
  */
 export const PAYMENT_OPTIONS = {
   CREDIT: "kredit",
@@ -649,18 +771,6 @@ export const PAYMENT_OPTIONS = {
 } as const;
 
 export type PaymentOption = (typeof PAYMENT_OPTIONS)[keyof typeof PAYMENT_OPTIONS];
-
-export const PAYMENT_OPTION_LABELS: Record<PaymentOption, string> = {
-  kredit: "Kredit",
-  "faizsiz-kredit": "Faizsiz kredit",
-  ipoteka: "İpoteka",
-  "hazir-ipoteka": "Hazır ipoteka",
-  barter: "Barter",
-  taksit: "Taksit",
-};
-
-/** `Feature.group` dəyəri — ödəniş şərtləri adi xüsusiyyətlərdən ayrı göstərilir. */
-export const PAYMENT_FEATURE_GROUP = "PAYMENT";
 
 // ---------------------------------------------------------------------------
 // DİL (i18n)

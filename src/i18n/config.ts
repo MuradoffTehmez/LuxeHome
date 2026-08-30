@@ -24,6 +24,7 @@ export const MESSAGE_NAMESPACES = [
   "partners",
   "seoLandings",
   "phase2",
+  "knowledge",
 ] as const;
 
 export type MessageNamespace = (typeof MESSAGE_NAMESPACES)[number];
