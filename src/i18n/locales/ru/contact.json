@@ -11,9 +11,16 @@
   "sending": "Отправка…",
   "success": "Ваше обращение принято. Мы скоро свяжемся с вами.",
   "metaDescription": "Свяжитесь с {legalName}. Адрес: {address}. Телефон: {phone}.",
-  "eyebrow": "Контакты", "home": "Главная", "sendEnquiry": "Отправить заявку", "contactDetails": "Контактные данные",
+  "eyebrow": "Контакты",
+  "home": "Главная",
+  "sendEnquiry": "Отправить заявку",
+  "contactDetails": "Контактные данные",
   "whatsappMessage": "Здравствуйте, я хотел бы получить информацию о Luxe Home Estate.",
-  "website": "Веб-сайт", "fullName": "Имя и фамилия", "namePlaceholder": "Введите имя",
-  "subjectPlaceholder": "Тема обращения", "messagePlaceholder": "Напишите обращение...",
-  "successTitle": "Ваше обращение отправлено!", "successDescription": "Наша команда свяжется с вами в ближайшее время."
+  "website": "Веб-сайт",
+  "fullName": "Имя и фамилия",
+  "namePlaceholder": "Введите имя",
+  "subjectPlaceholder": "Тема обращения",
+  "messagePlaceholder": "Напишите обращение...",
+  "successTitle": "Ваше обращение отправлено!",
+  "successDescription": "Наша команда свяжется с вами в ближайшее время."
 }
