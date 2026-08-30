@@ -6,6 +6,8 @@ export type CabinetNavItem = {
     | "team"
     | "saved-searches"
     | "notifications"
+    | "reservations"
+    | "recommendations"
     | "recently-viewed"
     | "profile";
   href: string;
@@ -28,6 +30,8 @@ const TEAM_ITEM: CabinetNavItem = { id: "team", href: "/kabinet/komanda", label:
 const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
   { id: "saved-searches", href: "/kabinet/axtarislarim", label: "Saxlanmış axtarışlarım" },
   { id: "notifications", href: "/kabinet/bildirisler", label: "Bildirişlər" },
+  { id: "reservations", href: "/kabinet/rezervasiyalar", label: "Rezervasiyalarım" },
+  { id: "recommendations", href: "/kabinet/tovsiyeler", label: "Sizin üçün" },
   { id: "recently-viewed", href: "/kabinet/son-baxilanlar", label: "Son baxılanlar" },
 ];
 

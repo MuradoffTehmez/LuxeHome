@@ -12,10 +12,15 @@ import {
   CheckCircle2,
   Phone,
   ArrowRight,
+  Crown,
+  History,
+  Navigation,
+  Star,
 } from "lucide-react";
 import { formatPrice, toIsoDateTime } from "@/lib/utils";
 import {
   LISTING_TYPES,
+  AUTH_KINDS,
   PROPERTY_STATUS_TONE,
   TRANSLATION_ENTITY_TYPES,
   type PropertyStatus,
@@ -43,6 +48,8 @@ import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
+import { getOptionalUser } from "@/lib/auth/guard";
+import { ReservationForm } from "./reservation-form";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -61,6 +68,12 @@ const RENOVATION_KEYS: Record<string, "cosmetic" | "renovated" | "designer" | "u
 };
 const DOCUMENT_KEYS: Record<string, "titleDeed" | "contract" | "municipal" | "decree" | "powerOfAttorney" | "commercialExtract" | "none"> = {
   TITLE_DEED: "titleDeed", CONTRACT: "contract", MUNICIPAL: "municipal", DECREE: "decree", POWER_OF_ATTORNEY: "powerOfAttorney", COMMERCIAL_EXTRACT: "commercialExtract", NONE: "none",
+};
+const NEARBY_KEYS: Record<string, "metro" | "bus" | "school" | "university" | "kindergarten" | "hospital" | "clinic" | "pharmacy" | "supermarket" | "restaurant" | "park" | "shoppingCenter"> = {
+  METRO: "metro", BUS: "bus", SCHOOL: "school", UNIVERSITY: "university",
+  KINDERGARTEN: "kindergarten", HOSPITAL: "hospital", CLINIC: "clinic",
+  PHARMACY: "pharmacy", SUPERMARKET: "supermarket", RESTAURANT: "restaurant",
+  PARK: "park", SHOPPING_CENTER: "shoppingCenter",
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -105,11 +118,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { locale, slug } = await params;
-  const [content, propertyText, navigation, commonContent] = await Promise.all([
+  const [content, propertyText, navigation, commonContent, reservationText, neighborhoodText] = await Promise.all([
     getTranslations({ locale, namespace: "content.propertyDetail" }),
     getTranslations({ locale, namespace: "property" }),
     getTranslations({ locale, namespace: "navigation" }),
     getTranslations({ locale, namespace: "content" }),
+    getTranslations({ locale, namespace: "phase2.reservation" }),
+    getTranslations({ locale, namespace: "phase2.neighborhood" }),
   ]);
   const sourceProperty = await getCachedPropertyBySlug(slug);
 
@@ -139,6 +154,9 @@ export default async function PropertyDetailPage({ params }: Props) {
   const isSale = property.listingType === LISTING_TYPES.SALE;
   const status = property.status as PropertyStatus;
   const isClosed = status === "SOLD" || status === "RENTED";
+  const isPremium = property.isFeatured && (
+    property.featuredUntil == null || new Date(property.featuredUntil).getTime() > Date.now()
+  );
   const period = property.pricePeriod
     ? property.pricePeriod === "MONTH" ? propertyText("pricePeriod.month") : propertyText("pricePeriod.day")
     : null;
@@ -151,6 +169,9 @@ export default async function PropertyDetailPage({ params }: Props) {
     getSimilarProperties(property, 4),
     getPropertyPartners(property.id),
   ]);
+  const reservationUser = property.reservationEnabled && !isClosed
+    ? await getOptionalUser(AUTH_KINDS.PUBLIC)
+    : null;
   const propertyPath = `/emlaklar/${property.slug}`;
   const whatsappHref = whatsappLink(
     content("whatsappMessage", { title: property.title }),
@@ -237,6 +258,12 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <Badge tone="neutral" className="bg-paper border-line">
                   {property.type.name}
                 </Badge>
+                {isPremium && (
+                  <Badge tone="gold">
+                    <Crown className="mr-1 size-3.5" aria-hidden="true" />
+                    {commonContent("phase2.premium")}
+                  </Badge>
+                )}
               </div>
               
               <h1 className="font-display text-2xl leading-tight text-ink sm:text-3xl lg:text-4xl">
@@ -338,6 +365,121 @@ export default async function PropertyDetailPage({ params }: Props) {
                   ))}
                 </div>
               </div>
+
+              {property.priceHistory.length > 0 && (
+                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                  <h2 className="flex items-center gap-2 font-display text-xl text-ink">
+                    <History className="size-5 text-gold-deep" aria-hidden="true" />
+                    {commonContent("phase2.priceHistory")}
+                  </h2>
+                  <ol className="mt-4 divide-y divide-line">
+                    {property.priceHistory.map((entry) => (
+                      <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 py-3 first:pt-0 last:pb-0">
+                        <time className="text-sm text-ink-muted" dateTime={entry.changedAt.toISOString()}>
+                          {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(entry.changedAt)}
+                        </time>
+                        <span className="tabular text-sm text-ink-soft">
+                          <span className="line-through">{formatPrice(entry.oldPrice, entry.currency)}</span>
+                          <span aria-hidden="true"> → </span>
+                          <strong className="font-semibold text-ink">{formatPrice(entry.newPrice, entry.currency)}</strong>
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )}
+
+              {property.nearbyPlaces.length > 0 && (
+                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                  <h2 className="flex items-center gap-2 font-display text-xl text-ink">
+                    <Navigation className="size-5 text-gold-deep" aria-hidden="true" />
+                    {commonContent("phase2.nearby")}
+                  </h2>
+                  <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {property.nearbyPlaces.map((place) => (
+                      <li key={place.id} className="rounded-xs border border-line bg-paper-light p-3">
+                        <p className="text-xs font-semibold tracking-wide text-gold-deep uppercase">
+                          {commonContent(`phase2.nearbyCategories.${NEARBY_KEYS[place.category] ?? "park"}`)}
+                        </p>
+                        <p className="mt-1 font-medium text-ink">{place.name}</p>
+                        {(place.distanceMeters != null || place.walkingMinutes != null) && (
+                          <p className="mt-1 text-sm text-ink-muted">
+                            {place.distanceMeters != null ? `${place.distanceMeters} m` : ""}
+                            {place.distanceMeters != null && place.walkingMinutes != null ? " · " : ""}
+                            {place.walkingMinutes != null
+                              ? commonContent("phase2.walkingMinutes", { count: place.walkingMinutes })
+                              : ""}
+                          </p>
+                        )}
+                        {place.source && <p className="mt-1 text-xs text-ink-muted">{commonContent("phase2.source")}: {place.source}</p>}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {property.district?.neighborhoodProfile && (
+                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                  <h2 className="font-display text-xl text-ink">{property.district.name} — {neighborhoodText("title")}</h2>
+                  {(() => {
+                    const profile = property.district.neighborhoodProfile;
+                    const description = locale === "en" ? profile.descriptionEn : locale === "ru" ? profile.descriptionRu : profile.description;
+                    const metrics = [
+                      profile.averagePrice != null && [neighborhoodText("averagePrice"), formatPrice(profile.averagePrice)],
+                      profile.averagePricePerSqm != null && [neighborhoodText("pricePerSqm"), `${formatPrice(profile.averagePricePerSqm)}/m²`],
+                      profile.annualChangePercent != null && [neighborhoodText("annualChange"), `${profile.annualChangePercent > 0 ? "+" : ""}${profile.annualChangePercent}%`],
+                      profile.averageRent != null && [neighborhoodText("averageRent"), formatPrice(profile.averageRent)],
+                      profile.rentalYieldPercent != null && [neighborhoodText("rentalYield"), `${profile.rentalYieldPercent}%`],
+                    ].filter((item): item is [string, string] => Boolean(item));
+                    return <>
+                      {description ? <p className="mt-3 leading-relaxed text-ink-soft">{description}</p> : null}
+                      {metrics.length > 0 ? <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-xs border border-line bg-paper-light p-3"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
+                      {(profile.dataSource || profile.measuredAt) ? <p className="mt-4 text-xs text-ink-muted">{profile.dataSource ? `${neighborhoodText("source")}: ${profile.dataSource}` : ""}{profile.dataSource && profile.measuredAt ? " · " : ""}{profile.measuredAt ? `${neighborhoodText("measuredAt")}: ${new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(profile.measuredAt)}` : ""}</p> : null}
+                    </>;
+                  })()}
+                </section>
+              )}
+
+              {property.assignedAgent && (
+                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-semibold tracking-wide text-gold-deep uppercase">{commonContent("phase2.responsibleAgent")}</p>
+                      <h2 className="mt-1 font-display text-xl text-ink">{property.assignedAgent.name}</h2>
+                      {property.assignedAgent.agency && <p className="text-sm text-ink-muted">{property.assignedAgent.agency.name}</p>}
+                    </div>
+                    {property.assignedAgent.reviews.length > 0 && (
+                      <p className="flex items-center gap-1 text-sm font-medium text-ink">
+                        <Star className="size-4 fill-gold text-gold-deep" aria-hidden="true" />
+                        {(property.assignedAgent.reviews.reduce((sum, review) => sum + review.rating, 0) / property.assignedAgent.reviews.length).toFixed(1)}
+                      </p>
+                    )}
+                  </div>
+                  <Link href={`/agentler/${property.assignedAgent.slug}`} className={buttonClassName("outline", "sm", false, "mt-4")}>
+                    {commonContent("phase2.viewAgent")}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </section>
+              )}
+
+              {property.reservationEnabled && !isClosed && (
+                <ReservationForm
+                  propertyId={property.id}
+                  initial={reservationUser ? { name: reservationUser.name, phone: null, email: reservationUser.email } : null}
+                  labels={{
+                    title: reservationText("title"),
+                    description: reservationText("description"),
+                    firstName: reservationText("firstName"),
+                    lastName: reservationText("lastName"),
+                    phone: reservationText("phone"),
+                    email: reservationText("email"),
+                    date: reservationText("date"),
+                    message: reservationText("message"),
+                    terms: reservationText("terms"),
+                    submit: reservationText("submit"),
+                  }}
+                />
+              )}
 
               {relatedLandingLinks.length > 0 && (
                 <nav aria-label={content("relatedSearchesAria")} className="border-y border-line py-5">
