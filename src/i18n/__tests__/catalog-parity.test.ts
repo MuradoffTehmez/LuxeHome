@@ -19,6 +19,7 @@ const requiredNamespaces = [
   "legal",
   "partners",
   "seoLandings",
+  "phase2",
 ] as const;
 
 const catalogModules = import.meta.glob("../locales/*/*.json", {
