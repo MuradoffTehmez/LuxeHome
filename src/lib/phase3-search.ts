@@ -124,7 +124,8 @@ export async function searchPropertiesWithAi(rawQuery: string) {
   });
   const items = candidates.map((property) => {
     const match = scoreProperty(property, criteria);
-    const { features: _features, ...card } = property;
+    const card = { ...property };
+    delete (card as Partial<typeof property>).features;
     return { property: card, ...match };
   }).sort((a, b) => b.score - a.score).slice(0, 12);
   return { query, criteria, model, items, clarification: criteria.clarification };
