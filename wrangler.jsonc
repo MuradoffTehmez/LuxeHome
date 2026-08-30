@@ -125,6 +125,9 @@
         // robots.ts və seo.ts bunu görüb bütün səhifələri indeksdən çıxarır
         "IS_STAGING": "true",
         "SITE_URL": "https://luxehomeestate-staging.amiyevbahadur.workers.dev",
+        // Public site key sirr deyil. Staging Turnstile secret-i ayrıca Worker secret-i kimi saxlanılır.
+        "TURNSTILE_SITE_KEY": "0x4AAAAAAEfhXUNNmS0Ka_DO",
+        "TURNSTILE_HOSTNAMES": "luxehomeestate-staging.amiyevbahadur.workers.dev",
         // `vars` mühitlərə irsi ötürülmür — bu iki açar yuxarıda olsa da burada
         // təkrarlanmalıdır, əks halda staging-də «Trafik analitikası» paneli
         // GraphQL sorğusunu qura bilmir. Zona və hesab prod ilə eynidir:
