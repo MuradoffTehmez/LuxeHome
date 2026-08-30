@@ -39,7 +39,6 @@ import { ButtonAnchor, buttonClassName } from "@/components/ui/button";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyActionToolbar } from "@/components/site/property-action-toolbar";
-import { PropertyQr } from "@/components/site/property-qr";
 import { propertyQrSvg } from "@/lib/property-qr";
 import { PropertyMap } from "@/components/site/property-map";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
@@ -296,6 +295,8 @@ export default async function PropertyDetailPage({ params }: Props) {
             title={property.title}
             phone={siteConfig.phoneHref}
             whatsappHref={whatsappHref}
+            qrSvg={propertyQrSvg(propertyPath)}
+            slug={property.slug}
           />
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-14">
@@ -484,9 +485,6 @@ export default async function PropertyDetailPage({ params }: Props) {
                   }}
                 />
               )}
-
-              {/* QR kod — PRD bölmə 61-63: canonical URL, PNG/SVG yükləmə. */}
-              <PropertyQr svg={propertyQrSvg(propertyPath)} slug={property.slug} />
 
               {relatedLandingLinks.length > 0 && (
                 <nav aria-label={content("relatedSearchesAria")} className="border-y border-line py-5">

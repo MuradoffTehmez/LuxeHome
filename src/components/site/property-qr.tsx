@@ -3,12 +3,13 @@
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Download, QrCode } from "lucide-react";
+import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
-const ITEM =
+const DOWNLOAD =
   "inline-flex min-h-11 items-center gap-2 rounded-xs border border-line-strong px-3.5 " +
   "text-sm text-ink-soft transition-colors duration-200 " +
-  "hover:border-gold hover:text-gold-deep cursor-pointer";
+  "hover:border-gold hover:text-gold-deep cursor-pointer disabled:opacity-60";
 
 /** Fayl adında istifadə üçün slug-u təhlükəsiz saxlayır. */
 function fileBase(slug: string): string {
@@ -30,23 +31,33 @@ function triggerDownload(href: string, filename: string) {
  * SVG server tərəfdə hazırlanıb `svg` propu ilə gəlir — brauzerdə QR kitabxanası
  * yüklənmir. PNG həmin SVG-dən `canvas` üzərində çıxarılır: ayrıca server marşrutu
  * və ya kənar servis lazım gəlmir, çap üçün isə 1024 px kifayət qədər böyükdür.
+ *
+ * QR paylaşma əməli olduğu üçün detalın əməl panelində, «Paylaş» düyməsinin yanında
+ * durur; kod özü modal içində açılır ki, səhifə axını uzanmasın.
  */
-export function PropertyQr({ svg, slug, className }: { svg: string; slug: string; className?: string }) {
+export function PropertyQr({
+  svg,
+  slug,
+  className,
+}: {
+  svg: string;
+  slug: string;
+  className?: string;
+}) {
   const t = useTranslations("property.qr");
+  const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const objectUrls = useRef<string[]>([]);
+  const revoked = useRef<number | null>(null);
 
   function svgBlobUrl(): string {
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
-    objectUrls.current.push(url);
-    return url;
+    return URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
   }
 
   function downloadSvg() {
     const url = svgBlobUrl();
     triggerDownload(url, `${fileBase(slug)}-qr.svg`);
-    // Yükləmə başladıqdan sonra URL-i buraxmaq olar; kiçik gecikmə Safari üçündür.
-    window.setTimeout(() => URL.revokeObjectURL(url), 4000);
+    // Yükləmə başladıqdan sonra URL buraxılır; kiçik gecikmə Safari üçündür.
+    revoked.current = window.setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
 
   function downloadPng() {
@@ -76,35 +87,43 @@ export function PropertyQr({ svg, slug, className }: { svg: string; slug: string
   }
 
   return (
-    <details className={cn("group", className)}>
-      <summary className={cn(ITEM, "list-none marker:hidden")}>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={t("label")}
+        className={cn(
+          "inline-flex min-h-14 w-full items-center justify-center gap-2 text-sm " +
+            "text-ink transition-colors hover:bg-beige focus-visible:outline-gold cursor-pointer",
+          className,
+        )}
+      >
         <QrCode className="size-4" aria-hidden="true" />
-        {t("label")}
-      </summary>
+        <span className="hidden sm:inline">{t("label")}</span>
+      </button>
 
-      <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-        <div
-          className="w-40 shrink-0 rounded-xs border border-line bg-white p-2 [&>svg]:h-auto [&>svg]:w-full"
-          // QR mənbəyi server tərəfdə `qrcode-svg` ilə çəkilir; istifadəçi girişi
-          // yalnız elanın öz slug-udur, ona görə HTML kimi yerləşdirmək təhlükəsizdir.
-          dangerouslySetInnerHTML={{ __html: svg }}
-          role="img"
-          aria-label={t("alt")}
-        />
-        <div className="flex flex-col gap-2">
-          <p className="max-w-sm text-sm text-ink-soft">{t("description")}</p>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={downloadPng} className={ITEM} disabled={busy}>
+      <Modal open={open} onClose={() => setOpen(false)} title={t("label")} description={t("description")} size="sm">
+        <div className="flex flex-col items-center gap-5">
+          <div
+            className="w-56 max-w-full rounded-xs border border-line bg-white p-3 [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
+            // QR mənbəyi server tərəfdə `qrcode-svg` ilə çəkilir; istifadəçi girişi
+            // yalnız elanın öz slug-udur, ona görə HTML kimi yerləşdirmək təhlükəsizdir.
+            dangerouslySetInnerHTML={{ __html: svg }}
+            role="img"
+            aria-label={t("alt")}
+          />
+          <div className="flex flex-wrap justify-center gap-2">
+            <button type="button" onClick={downloadPng} className={DOWNLOAD} disabled={busy}>
               <Download className="size-4" aria-hidden="true" />
               {t("downloadPng")}
             </button>
-            <button type="button" onClick={downloadSvg} className={ITEM}>
+            <button type="button" onClick={downloadSvg} className={DOWNLOAD}>
               <Download className="size-4" aria-hidden="true" />
               {t("downloadSvg")}
             </button>
           </div>
         </div>
-      </div>
-    </details>
+      </Modal>
+    </>
   );
 }

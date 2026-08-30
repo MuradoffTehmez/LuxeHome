@@ -25,7 +25,7 @@ describe("əmlak detal discovery və conversion əməliyyatları", () => {
     expect(html).toContain('aria-label="Qonaq otağı şəklini tam ekranda aç"');
   });
 
-  it("favorit, müqayisə, paylaşma və mobil əlaqə CTA-larını vahid toolbar-da saxlayır", () => {
+  it("favorit, müqayisə, paylaşma, QR və mobil əlaqə CTA-larını vahid toolbar-da saxlayır", () => {
     const html = renderToStaticMarkup(
       <ToastProvider>
         <PropertyActionToolbar
@@ -34,6 +34,8 @@ describe("əmlak detal discovery və conversion əməliyyatları", () => {
           title="Sahil villası"
           phone="tel:+994519228585"
           whatsappHref="https://wa.me/994519228585?text=Salam"
+          qrSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"></svg>'
+          slug="sahil-villasi"
         />
       </ToastProvider>,
     );
@@ -42,6 +44,7 @@ describe("əmlak detal discovery və conversion əməliyyatları", () => {
     expect(html).toContain('aria-label="Favoritlərə əlavə et"');
     expect(html).toContain('aria-label="Müqayisəyə əlavə et"');
     expect(html).toContain('aria-label="Elanı paylaş"');
+    expect(html).toContain('aria-label="QR kod"');
     expect(html).toContain('aria-label="Səhifə əməliyyatları"');
     expect(html).toContain('href="tel:+994519228585"');
     expect(html).toContain('href="https://wa.me/994519228585?text=Salam"');

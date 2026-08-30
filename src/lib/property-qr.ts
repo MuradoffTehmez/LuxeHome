@@ -19,10 +19,14 @@ export function propertyQrSvg(path: string, size = 240): string {
     padding: 1,
     width: size,
     height: size,
-    // Çap materialında (bolme 62) kod qismən zədələnə bilər — «M» səviyyəsi
+    // Çap materialında (bölmə 62) kod qismən zədələnə bilər — «M» səviyyəsi
     // təxminən 15% itkini bərpa edir və ölçünü həddindən artıq böyütmür.
     ecl: "M",
     color: "#14181c",
     background: "#ffffff",
+    // `svg-viewbox` konteyneri `viewBox` atributu verir və sabit `width`/`height`
+    // yazmır. Adi `svg` konteyneri ilə element CSS-də eninə uyğunlaşanda hündürlük
+    // 240 px-də ilişib qalırdı və kodun aşağı hissəsi kəsilirdi.
+    container: "svg-viewbox",
   }).svg();
 }
