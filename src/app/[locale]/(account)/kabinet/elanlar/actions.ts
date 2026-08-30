@@ -18,6 +18,7 @@ import { ACCOUNT_TYPES, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES, type Locale } fr
 import { localizePath } from "@/i18n/path-locale";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { recordPropertyPriceChange } from "@/lib/price-drop";
 
 const LIST_PATH = "/kabinet/elanlar";
 
@@ -30,6 +31,9 @@ async function ownerAndGuard(id: string, locale: Locale) {
       slug: true,
       projectId: true,
       isFeatured: true,
+      featuredUntil: true,
+      reservationEnabled: true,
+      assignedAgentId: true,
       metaTitle: true,
       metaDescription: true,
       noIndex: true,
@@ -38,6 +42,8 @@ async function ownerAndGuard(id: string, locale: Locale) {
       ogDescription: true,
       ogImage: true,
       publishedAt: true,
+      price: true,
+      currency: true,
       images: { select: { url: true } },
     },
   });
@@ -120,6 +126,9 @@ export async function updatePublicProperty(
           status: policy.status,
           projectId: property.projectId,
           isFeatured: property.isFeatured,
+          featuredUntil: property.featuredUntil,
+          reservationEnabled: property.reservationEnabled,
+          assignedAgentId: property.assignedAgentId,
           metaTitle: property.metaTitle,
           metaDescription: property.metaDescription,
           noIndex: property.noIndex,
@@ -134,6 +143,15 @@ export async function updatePublicProperty(
           ? (property.publishedAt ?? policy.publishedAt)
           : property.publishedAt,
       },
+    });
+
+    await recordPropertyPriceChange({
+      propertyId: property.id,
+      oldPrice: property.price,
+      newPrice: parsed.data.price,
+      currency: property.currency,
+      changedById: user.id,
+      source: "OWNER",
     });
 
     await prisma.propertyFeature.deleteMany({ where: { propertyId: property.id } });

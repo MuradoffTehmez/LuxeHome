@@ -10,7 +10,9 @@ import {
   Building2,
   Eye,
   Handshake,
+  Quote,
   ShieldCheck,
+  Star,
   Users,
 } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
@@ -32,6 +34,7 @@ import { buildMetadata } from "@/lib/seo";
 import { getCachedHomePageData } from "@/lib/public-cache";
 import { getCategoryImageUrl } from "@/lib/category-images";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
+import { getApprovedTestimonials } from "@/lib/phase2";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -88,8 +91,10 @@ export default async function HomePage({ params }: HomePageProps) {
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({ locale: resolvedLocale, namespace: "home" });
   const propertyT = await getTranslations({ locale: resolvedLocale, namespace: "property" });
+  const phase2T = await getTranslations({ locale: resolvedLocale, namespace: "phase2.testimonials" });
   const { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners } =
     await getCachedHomePageData();
+  const testimonials = await getApprovedTestimonials(6);
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 
@@ -156,6 +161,36 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </Container>
       </Section>
+
+      {testimonials.length > 0 && (
+        <Section tone="ivory">
+          <Container size="wide">
+            <SectionHeader
+              overline={phase2T("overline")}
+              title={phase2T("title")}
+              description={phase2T("description")}
+              align="center"
+            />
+            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {testimonials.map((testimonial, index) => (
+                <Reveal key={testimonial.id} delay={index * 50}>
+                  <blockquote className="flex h-full flex-col rounded-md border border-line bg-paper p-6">
+                    <Quote className="size-7 text-gold-deep" aria-hidden="true" />
+                    <p className="mt-5 flex-1 text-base leading-relaxed text-ink-soft">“{testimonial.review}”</p>
+                    <footer className="mt-6 border-t border-line pt-4">
+                      <div className="flex gap-0.5 text-gold-deep" aria-label={`${testimonial.rating}/5`}>
+                        {Array.from({ length: testimonial.rating }, (_, star) => <Star key={star} className="size-4 fill-current" aria-hidden="true" />)}
+                      </div>
+                      <p className="mt-2 font-medium text-ink">{testimonial.customerName}</p>
+                      <p className="text-xs text-ink-muted">{testimonial.serviceType ?? testimonial.agent?.name ?? testimonial.agency?.name}</p>
+                    </footer>
+                  </blockquote>
+                </Reveal>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* KATEQORİYALAR                                                      */}
