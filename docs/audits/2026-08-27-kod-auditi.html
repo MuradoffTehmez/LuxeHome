@@ -508,8 +508,8 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     </div>
     <div class="gate">
       <span class="gate-k">CI</span>
-      <span class="gate-v" style="color:var(--bad)">yox</span>
-      <span class="gate-n">workflow faylı yoxdur</span>
+      <span class="gate-v pass">var</span>
+      <span class="gate-n">30 avqustda əlavə olundu</span>
     </div>
   </div>
 </header>
@@ -537,6 +537,15 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <strong>Bu sessiyada:</strong> B1–B8 və B14 tam düzəldildi, donma/yubanmanın dörd səbəbi aradan qaldırıldı, səhifə keçid animasiyası və naviqasiya göstəricisi əlavə olundu, digest cron-u hər iki mühitdə qoşuldu. Production və staging yayımlandı; hər iki D1 miqrasiyaları ilə bərabərləşdirildi. 312 test, typecheck, lint və build təmizdir.<br><br><strong>Ən vacib üç iş idi:</strong> əlaqə formasına spam qoruması (B2), <code>viewCount</code>
     artımının bərpası (B3) və filtr birləşməsindəki üzərinə yazma xətası (B1). Üçü də
     kiçik dəyişiklikdir, üçü də bu gün canlı saytda istifadəçiyə təsir edir.
+  </div>
+  <div class="callout" style="margin-top:14px">
+    <strong>30 avqust izləməsi:</strong> Auditdən sonra B10 Azərbaycan axtarış normallaşdırması
+    ilə, B12 korporativ <code>notifications@luxehomeestate.az</code> fallback-i ilə bağlandı;
+    bu tamamlamada B13 ölü ixracı silindi, GitHub Actions CI əlavə olundu və
+    <code>CLAUDE.md</code> / <code>MEMORY.md</code> cari kodla uyğunlaşdırıldı. B9 (admin UI-ının
+    üçdilli edilməsi) ayrıca böyük modul, P5 isə ölçmə tələb edən arxitektura işi kimi açıqdır.
+    Resend domeninin faktiki təsdiqi və canlı Cloudflare smoke yoxlaması xarici mühitdə
+    əməliyyat yoxlaması olaraq qalır.
   </div>
 </section>
 
@@ -965,11 +974,12 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
       </dl>
     </article>
 
-    <article class="bug low">
+    <article class="bug low done">
       <div class="bug-top">
         <span class="bug-id">B10</span>
         <span class="bug-title">Azərbaycan hərfləri ilə axtarış reqistrə həssasdır</span>
-        <span class="chip low">Aşağı · bilinən</span>
+        <span class="chip low">Aşağı</span>
+        <span class="chip fixed">Düzəldildi</span>
       </div>
       <div class="bug-loc">src/lib/queries.ts:213-217</div>
       <dl>
@@ -984,14 +994,21 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
         <div><dt>Həll</dt><dd>
           Normallaşdırılmış (kiçik hərfli) axtarış sütunu + yazma anında doldurma.
         </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          <code>Property.searchText</code> və taksonomiya <code>searchName</code> sütunları,
+          <code>normalizeSearchText()</code>, backfill miqrasiyası və regresiya testləri əlavə
+          olundu. Azərbaycan hərfləri ASCII ekvivalentinə normallaşdırıldığı üçün həm registr,
+          həm də diakritika fərqi axtarışı pozmur.
+        </dd></div>
       </dl>
     </article>
 
-    <article class="bug low">
+    <article class="bug low done">
       <div class="bug-top">
         <span class="bug-id">B11</span>
         <span class="bug-title">Public marşrutlarda skeleton yoxdur</span>
         <span class="chip low">Aşağı · qərar</span>
+        <span class="chip fixed">Sənədləşdirildi</span>
       </div>
       <div class="bug-loc">74052c8 commit-i 6 loading.tsx faylını silib</div>
       <dl>
@@ -1008,14 +1025,20 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
           CLAUDE.md-də, nə MEMORY.md-də yazılmayıb, ona görə növbəti dəfə səhvən
           «unudulmuş iş» kimi geri qaytarıla bilər.
         </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          Güzəşt <code>CLAUDE.md</code> və <code>MEMORY.md</code>-də açıq şəkildə yazıldı.
+          Public keçid geribildirimi route skeleton-u əvəzinə <code>(site)/template.tsx</code>
+          və <code>NavigationProgress</code> ilə verilir; düzgün 404 statusu qorunur.
+        </dd></div>
       </dl>
     </article>
 
-    <article class="bug low">
+    <article class="bug low done">
       <div class="bug-top">
         <span class="bug-id">B12</span>
         <span class="bug-title">Göndərici ünvanı hələ də resend.dev test domenidir</span>
         <span class="chip low">Aşağı</span>
+        <span class="chip fixed">Kodda düzəldildi</span>
       </div>
       <div class="bug-loc">src/lib/email.ts:12 — DEFAULT_FROM_EMAIL</div>
       <dl>
@@ -1025,14 +1048,21 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
           spam qovluğuna düşmə ehtimalı yüksəkdir. MEMORY.md bunu qeyd edir;
           domen təsdiqi hələ edilməyib.
         </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          Kod fallback-i və <code>.env.example</code> artıq
+          <code>notifications@luxehomeestate.az</code> işlədir; <code>onboarding@resend.dev</code>
+          repository-dən çıxarılıb. Domenin Resend panelində təsdiqi və production göndəriş
+          smoke testi deployment əməliyyatıdır və ayrıca yoxlanmalıdır.
+        </dd></div>
       </dl>
     </article>
 
-    <article class="bug low">
+    <article class="bug low done">
       <div class="bug-top">
         <span class="bug-id">B13</span>
         <span class="bug-title">Ölü kod: istifadə olunmayan tezlik etiketləri</span>
         <span class="chip low">Aşağı</span>
+        <span class="chip fixed">Düzəldildi</span>
       </div>
       <div class="bug-loc">src/lib/constants.ts:346 — SAVED_SEARCH_FREQUENCY_LABELS</div>
       <dl>
@@ -1040,6 +1070,10 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
           İxrac edilir, heç yerdən idxal edilmir — UI tərcümə kataloqundan oxuyur.
           Zərərsizdir, lakin gələcəkdə səhvən istifadə edilsə, B7-dəki eyni AZ-only
           problemini yenidən gətirər.
+        </dd></div>
+        <div class="fix"><dt>Düzəliş</dt><dd>
+          İstifadə olunmayan <code>SAVED_SEARCH_FREQUENCY_LABELS</code> ixracı silindi.
+          İctimai UI tezlik mətnlərini yalnız AZ/EN/RU tərcümə kataloqlarından oxuyur.
         </dd></div>
       </dl>
     </article>
@@ -1256,6 +1290,12 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     Bir müsbət qeyd: <code>archive-HpKDcn/</code> qovluğu və <code>tsconfig.tsbuildinfo</code>
     repo kökündə qalıb. Birincisi izlənilmirsə də, kökü qarışdırır.
   </p>
+  <div class="callout" style="margin-top:14px">
+    <strong>30 avqust:</strong> Cədvəldəki səkkiz uyğunsuzluq <code>CLAUDE.md</code> və
+    <code>MEMORY.md</code>-də düzəldildi; B11-in public <code>loading.tsx</code> qərarı da
+    ayrıca invariant kimi sənədləşdirildi. CI əlavə edildiyi üçün README keyfiyyət və
+    məhdudiyyət bölmələri də yeniləndi.
+  </div>
 </section>
 
 <section id="tovsiye">
@@ -1297,7 +1337,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <div class="step">
       <div class="step-n">3</div>
       <div class="step-b">
-        <span class="step-t">CLAUDE.md və MEMORY.md-ni kodla uyğunlaşdır</span>
+        <span class="step-t">CLAUDE.md və MEMORY.md-ni kodla uyğunlaşdır — tamamlandı</span>
         <p class="step-d">
           Yuxarıdakı 8 sətirlik uyğunsuzluq cədvəlini tətbiq et. B11-dəki
           <code>loading.tsx</code> güzəştini açıq şəkildə yaz — əks halda növbəti
@@ -1310,7 +1350,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <div class="step">
       <div class="step-n">4</div>
       <div class="step-b">
-        <span class="step-t">GitHub Actions CI qur</span>
+        <span class="step-t">GitHub Actions CI qur — tamamlandı</span>
         <p class="step-d">
           <code>test + typecheck + lint + build</code>. Dörd qapının hamısı onsuz da
           təmiz keçir — indi qurulsa, sıfır düzəliş tələb edir və gələcək
@@ -1341,9 +1381,9 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
       <div class="step-b">
         <span class="step-t">Qalan orta səviyyəli boşluqlar</span>
         <p class="step-d">
-          B8 (404 yazma limiti), B9 (admin i18n), B10 (azərbaycanca axtarış),
-          B12 (Resend domeni). Heç biri bloklayıcı deyil, hamısı vaxt keçdikcə
-          bahalaşır — xüsusən B9.
+          B8 və B10 bağlanıb; B12-nin repository tərəfi korporativ göndəriciyə keçib.
+          Açıq qalan əsas kod işi B9 (admin i18n), xarici əməliyyat işi isə Resend domen
+          təsdiqi və canlı göndəriş smoke testidir. B9 hər yeni səhifə ilə bahalaşır.
         </p>
         <span class="step-m">fasilələrdə</span>
       </div>
