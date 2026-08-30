@@ -24,6 +24,7 @@ export const MESSAGE_NAMESPACES = [
   "partners",
   "seoLandings",
   "phase2",
+  "phase3",
   "knowledge",
 ] as const;
 

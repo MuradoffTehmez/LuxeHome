@@ -1,0 +1,18 @@
+{
+    "search": {
+        "overline": "Ağıllı əmlak axtarışı",
+        "title": "AI Əmlak Köməkçisi",
+        "description": "İstəyinizi gündəlik dildə yazın. Sistem sorğunu filtrlərə çevirib yalnız bazadakı real elanları göstərəcək.",
+        "placeholder": "Məsələn: Bakıda 200 000 AZN-dək 3 otaqlı, dənizə yaxın mənzil",
+        "submit": "AI ilə axtar",
+        "example": "Bakıda 200 000 AZN-dək 3 otaqlı, dənizə yaxın mənzil istəyirəm",
+        "results": "{count} uyğun real elan",
+        "realOnly": "Nəticələr yalnız aktiv Luxe Home Estate elanlarından seçilir; AI elan yaratmır.",
+        "match": "uyğun",
+        "fallback": "Qayda əsaslı axtarış",
+        "aiParsed": "Workers AI ilə strukturlaşdırılıb",
+        "emptyTitle": "Tam uyğun elan tapılmadı",
+        "emptyDescription": "Sorğunu bir qədər genişləndirin və ya bütün elanlara baxın.",
+        "allListings": "Bütün elanlar"
+    }
+}

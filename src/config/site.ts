@@ -59,6 +59,7 @@ export const PRODUCTION_SITE_URL = "https://luxehomeestate.az";
 export const navigation = [
   { label: "Ana səhifə", href: "/" },
   { label: "Əmlaklar", href: "/emlaklar" },
+  { label: "AI Axtarış", href: "/ai-axtaris" },
   { label: "Yaşayış kompleksləri", href: "/layiheler" },
   { label: "Agentliklər", href: "/agentlikler" },
   { label: "Agentlər", href: "/agentler" },

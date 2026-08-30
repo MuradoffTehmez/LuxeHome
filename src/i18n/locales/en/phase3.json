@@ -1,0 +1,18 @@
+{
+    "search": {
+        "overline": "Intelligent property search",
+        "title": "AI Property Assistant",
+        "description": "Describe what you need naturally. The system converts it to filters and only returns real database listings.",
+        "placeholder": "Example: a 3-room apartment in Baku under 200,000 AZN near the sea",
+        "submit": "Search with AI",
+        "example": "I want a 3-room apartment in Baku under 200,000 AZN near the sea",
+        "results": "{count} matching real listings",
+        "realOnly": "Results only contain active Luxe Home Estate listings; AI never invents properties.",
+        "match": "match",
+        "fallback": "Rule-based search",
+        "aiParsed": "Structured with Workers AI",
+        "emptyTitle": "No exact match found",
+        "emptyDescription": "Broaden your request or browse all listings.",
+        "allListings": "All listings"
+    }
+}
