@@ -13,17 +13,20 @@ import { deleteTranslation } from "./actions";
 export const metadata: Metadata = { title: "Tərcümələr" };
 export const dynamic = "force-dynamic";
 
-const entityLabels: Record<string, string> = { PROPERTY: "Əmlak", PROJECT: "Layihə", SERVICE: "Xidmət", BLOG_POST: "Bloq" };
+const entityLabels: Record<string, string> = { PROPERTY: "Əmlak", PROJECT: "Layihə", SERVICE: "Xidmət", BLOG_POST: "Bloq", KNOWLEDGE_ARTICLE: "Bələdçi", KNOWLEDGE_TERM: "Termin", KNOWLEDGE_FAQ: "Sual" };
 
 export default async function AdminTranslationsPage({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   await requireAdminRead(PERMISSIONS.TRANSLATION_MANAGE);
   const { id } = await searchParams;
-  const [translations, properties, projects, services, posts] = await Promise.all([
+  const [translations, properties, projects, services, posts, guides, terms, faqs] = await Promise.all([
     prisma.contentTranslation.findMany({ orderBy: { updatedAt: "desc" }, take: 100 }),
     prisma.property.findMany({ where: { deletedAt: null }, select: { id: true, title: true }, orderBy: { updatedAt: "desc" }, take: 200 }),
     prisma.project.findMany({ where: { deletedAt: null }, select: { id: true, name: true }, orderBy: { updatedAt: "desc" }, take: 100 }),
     prisma.service.findMany({ select: { id: true, title: true }, orderBy: { updatedAt: "desc" } }),
     prisma.blogPost.findMany({ where: { deletedAt: null }, select: { id: true, title: true }, orderBy: { updatedAt: "desc" }, take: 100 }),
+    prisma.knowledgeArticle.findMany({ where: { deletedAt: null }, select: { id: true, title: true }, orderBy: { updatedAt: "desc" }, take: 100 }),
+    prisma.knowledgeTerm.findMany({ select: { id: true, term: true }, orderBy: { term: "asc" }, take: 200 }),
+    prisma.knowledgeFaq.findMany({ select: { id: true, question: true }, orderBy: { order: "asc" }, take: 200 }),
   ]);
   const current = id ? translations.find((item) => item.id === id) ?? null : null;
   const entities = [
@@ -31,6 +34,9 @@ export default async function AdminTranslationsPage({ searchParams }: { searchPa
     ...projects.map((item) => ({ value: `PROJECT:${item.id}`, label: `Layihə · ${item.name}` })),
     ...services.map((item) => ({ value: `SERVICE:${item.id}`, label: `Xidmət · ${item.title}` })),
     ...posts.map((item) => ({ value: `BLOG_POST:${item.id}`, label: `Bloq · ${item.title}` })),
+    ...guides.map((item) => ({ value: `KNOWLEDGE_ARTICLE:${item.id}`, label: `Bələdçi · ${item.title}` })),
+    ...terms.map((item) => ({ value: `KNOWLEDGE_TERM:${item.id}`, label: `Termin · ${item.term}` })),
+    ...faqs.map((item) => ({ value: `KNOWLEDGE_FAQ:${item.id}`, label: `Sual · ${item.question}` })),
   ];
   const sourceNames = new Map(entities.map((item) => [item.value, item.label]));
 

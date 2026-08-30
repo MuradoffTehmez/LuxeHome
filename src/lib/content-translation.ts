@@ -46,6 +46,17 @@ export function applyContentTranslation<T extends object>(
   } else if (entityType === TRANSLATION_ENTITY_TYPES.BLOG_POST) {
     set("excerpt", translation.summary);
     set("content", translation.content);
+  } else if (entityType === TRANSLATION_ENTITY_TYPES.KNOWLEDGE_ARTICLE) {
+    set("excerpt", translation.summary);
+    set("content", translation.content);
+  } else if (entityType === TRANSLATION_ENTITY_TYPES.KNOWLEDGE_TERM) {
+    // Termində «title» = termin adının özüdür; qısa tərif summary, geniş izah content.
+    set("term", translation.title);
+    set("shortDefinition", translation.summary);
+    set("definition", translation.content);
+  } else if (entityType === TRANSLATION_ENTITY_TYPES.KNOWLEDGE_FAQ) {
+    set("question", translation.title);
+    set("answer", translation.content);
   } else {
     set("description", translation.content);
   }
