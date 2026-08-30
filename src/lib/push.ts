@@ -1,5 +1,6 @@
 import webpush from "web-push";
 import { prisma } from "@/lib/prisma";
+import { isWithinQuietHours } from "@/lib/notification-preferences";
 
 type PushPayload = { title: string; body: string; url: string; tag?: string };
 
@@ -12,9 +13,22 @@ function configure(): boolean {
   return true;
 }
 
-/** Push kritik yol deyil; bir cihazın köhnə endpoint-i digər kanalları dayandırmır. */
+/**
+ * Push kritik yol deyil; bir cihazın köhnə endpoint-i digər kanalları dayandırmır.
+ *
+ * Sakit saat aralığı (PRD bölmə 168) yalnız push-a aiddir: e-poçt və sayt daxili
+ * bildiriş həmişə yazılır, istifadəçi səhər onları paneldə görür. Push isə telefonu
+ * gecə işıqlandırdığı üçün susdurulur — təxirə salınmır, sadəcə buraxılır, əks halda
+ * səhər saat 08:00-da bir neçə saatlıq yığılmış bildiriş eyni anda partlayardı.
+ */
 export async function sendPushToUser(userId: string, payload: PushPayload): Promise<void> {
   if (!configure()) return;
+  const preference = await prisma.notificationPreference.findUnique({
+    where: { userId },
+    select: { quietHoursStart: true, quietHoursEnd: true },
+  });
+  if (isWithinQuietHours(preference?.quietHoursStart ?? null, preference?.quietHoursEnd ?? null)) return;
+
   const subscriptions = await prisma.pushSubscription.findMany({ where: { userId } });
   for (const subscription of subscriptions) {
     try {

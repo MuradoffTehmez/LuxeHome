@@ -46,7 +46,13 @@ export async function updateReservationStatus(
         status: true,
         userId: true,
         email: true,
-        user: { select: { notificationPreference: { select: { reservationPush: true } } } },
+        user: {
+          select: {
+            notificationPreference: {
+              select: { reservationEmail: true, reservationWeb: true, reservationPush: true },
+            },
+          },
+        },
         property: { select: { title: true } },
       },
     });
@@ -74,22 +80,28 @@ export async function updateReservationStatus(
     await recordAudit(actor, "STATUS_CHANGE", "Reservation", parsed.data.id, `${reservation.property.title} — ${RESERVATION_STATUS_LABELS[nextStatus]}`);
 
     const title = `Rezervasiya: ${RESERVATION_STATUS_LABELS[nextStatus]}`;
-    await prisma.notification.create({
-      data: {
-        userId: reservation.userId,
-        type: NOTIFICATION_TYPES.RESERVATION_STATUS,
-        title,
-        content: reservation.property.title,
-        actionUrl: "/kabinet/rezervasiyalar",
-        dedupeKey: `reservation-status:${parsed.data.id}:${nextStatus}`,
-      },
-    });
-    await sendEmail({
-      to: reservation.email,
-      subject: `${reservation.property.title} — ${RESERVATION_STATUS_LABELS[nextStatus]}`,
-      html: `<p>${title}</p><p>${reservation.property.title}</p>${parsed.data.note ? `<p>${parsed.data.note}</p>` : ""}`,
-    });
-    if (reservation.user.notificationPreference?.reservationPush) {
+    // Kanal seçimləri (PRD bölmə 57) — sətir yoxdursa sxem defoltları qüvvədədir.
+    const preference = reservation.user.notificationPreference;
+    if (preference?.reservationWeb ?? true) {
+      await prisma.notification.create({
+        data: {
+          userId: reservation.userId,
+          type: NOTIFICATION_TYPES.RESERVATION_STATUS,
+          title,
+          content: reservation.property.title,
+          actionUrl: "/kabinet/rezervasiyalar",
+          dedupeKey: `reservation-status:${parsed.data.id}:${nextStatus}`,
+        },
+      });
+    }
+    if (preference?.reservationEmail ?? true) {
+      await sendEmail({
+        to: reservation.email,
+        subject: `${reservation.property.title} — ${RESERVATION_STATUS_LABELS[nextStatus]}`,
+        html: `<p>${title}</p><p>${reservation.property.title}</p>${parsed.data.note ? `<p>${parsed.data.note}</p>` : ""}`,
+      });
+    }
+    if (preference?.reservationPush) {
       await sendPushToUser(reservation.userId, { title, body: reservation.property.title, url: "/kabinet/rezervasiyalar", tag: `reservation-${parsed.data.id}` });
     }
 

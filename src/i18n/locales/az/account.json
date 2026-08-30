@@ -251,7 +251,39 @@
     "notFound": "Bildiriş tapılmadı.",
     "delete": "Sil",
     "savedSearchMatch": "«{name}» axtarışına uyğun yeni elan",
-    "digestSubject": "«{name}» axtarışınıza uyğun {count} yeni elan"
+    "digestSubject": "«{name}» axtarışınıza uyğun {count} yeni elan",
+    "push": {
+      "title": "Web Push",
+      "description": "Qiymət endirimi, yeni uyğun elan və rezervasiya yeniliklərini brauzerdə alın.",
+      "enable": "Aktiv et",
+      "disable": "Söndür",
+      "unsupported": "Dəstəklənmir",
+      "missingKey": "Push açarı konfiqurasiya edilməyib.",
+      "denied": "Brauzer bildiriş icazəsi verilmədi."
+    },
+    "preferences": {
+      "title": "Bildiriş seçimləri",
+      "description": "Hansı bildirişi hansı kanalda almaq istədiyinizi seçin.",
+      "rows": {
+        "savedSearch": "Saxlanmış axtarış",
+        "priceDrop": "Qiymət endirimi",
+        "reservation": "Rezervasiya"
+      },
+      "channels": {
+        "email": "E-poçt",
+        "web": "Sayt",
+        "push": "Push"
+      },
+      "quietHours": {
+        "title": "Sakit saatlar",
+        "description": "Seçilən aralıqda push bildirişi göndərilmir; e-poçt və sayt bildirişi qalır. Bakı vaxtı ilə.",
+        "start": "Başlanğıc",
+        "end": "Son"
+      },
+      "submit": "Seçimləri yadda saxla",
+      "saved": "Bildiriş seçimləri yadda saxlanıldı.",
+      "failed": "Bildiriş seçimləri saxlanılmadı. Yenidən cəhd edin."
+    }
   },
   "recentlyViewed": {
     "metaTitle": "Son baxılanlar",

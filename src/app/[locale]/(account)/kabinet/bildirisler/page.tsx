@@ -7,7 +7,9 @@ import { type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
+import { resolveNotificationPreferences } from "@/lib/notification-preferences";
 import { NotificationList, type NotificationListItem } from "./notification-list";
+import { NotificationPreferences } from "./notification-preferences";
 import { PushPreferences } from "./push-preferences";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -45,11 +47,15 @@ export default async function NotificationsPage() {
   const user = await requireAccount(locale);
   const t = await getTranslations("account.notifications");
 
-  const notifications = await prisma.notification.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
+  const [notifications, storedPreference] = await Promise.all([
+    prisma.notification.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    }),
+    prisma.notificationPreference.findUnique({ where: { userId: user.id } }),
+  ]);
+  const preferences = resolveNotificationPreferences(storedPreference);
 
   const items: NotificationListItem[] = notifications.map((notification) => ({
     id: notification.id,
@@ -67,6 +73,7 @@ export default async function NotificationsPage() {
 
       <div className="mt-8">
         <PushPreferences />
+        <NotificationPreferences values={preferences} />
         {items.length > 0 ? (
           <NotificationList items={items} />
         ) : (

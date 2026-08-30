@@ -95,6 +95,54 @@ describe("saxlanmış axtarış uyğunluq mühərriki", () => {
     expect(calls.sendImmediateEmail).toHaveLength(0);
   });
 
+  it("sayt bildirişi söndürülübsə yalnız e-poçt göndərir", async () => {
+    const { store, calls } = createFakeStore({
+      findActiveSavedSearches: async () => [
+        search({
+          frequency: "IMMEDIATE",
+          user: {
+            email: "user1@example.com",
+            locale: "az",
+            notificationPreference: {
+              savedSearchEmail: true,
+              savedSearchWeb: false,
+              savedSearchPush: false,
+            },
+          },
+        }),
+      ],
+    });
+
+    await runSavedSearchMatching("property-1", store);
+
+    expect(calls.createNotification).toHaveLength(0);
+    expect(calls.sendImmediateEmail).toHaveLength(1);
+  });
+
+  it("e-poçt söndürülübsə yalnız sayt bildirişi yaradır", async () => {
+    const { store, calls } = createFakeStore({
+      findActiveSavedSearches: async () => [
+        search({
+          frequency: "IMMEDIATE",
+          user: {
+            email: "user1@example.com",
+            locale: "az",
+            notificationPreference: {
+              savedSearchEmail: false,
+              savedSearchWeb: true,
+              savedSearchPush: false,
+            },
+          },
+        }),
+      ],
+    });
+
+    await runSavedSearchMatching("property-1", store);
+
+    expect(calls.createNotification).toHaveLength(1);
+    expect(calls.sendImmediateEmail).toHaveLength(0);
+  });
+
   it("uyğun gəlməyən axtarış üçün heç nə yaratmır", async () => {
     const { store, calls } = createFakeStore({
       findActiveSavedSearches: async () => [search()],

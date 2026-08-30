@@ -251,7 +251,39 @@
     "notFound": "Notification not found.",
     "delete": "Delete",
     "savedSearchMatch": "New listing matching “{name}”",
-    "digestSubject": "{count} new listings matching “{name}”"
+    "digestSubject": "{count} new listings matching “{name}”",
+    "push": {
+      "title": "Web Push",
+      "description": "Get price drops, new matching listings and reservation updates in your browser.",
+      "enable": "Enable",
+      "disable": "Disable",
+      "unsupported": "Not supported",
+      "missingKey": "The push key is not configured.",
+      "denied": "The browser did not grant notification permission."
+    },
+    "preferences": {
+      "title": "Notification preferences",
+      "description": "Choose which notification reaches you on which channel.",
+      "rows": {
+        "savedSearch": "Saved search",
+        "priceDrop": "Price drop",
+        "reservation": "Reservation"
+      },
+      "channels": {
+        "email": "Email",
+        "web": "Web",
+        "push": "Push"
+      },
+      "quietHours": {
+        "title": "Quiet hours",
+        "description": "No push notification is sent during this window; email and on-site notifications continue. Baku time.",
+        "start": "Start",
+        "end": "End"
+      },
+      "submit": "Save preferences",
+      "saved": "Notification preferences saved.",
+      "failed": "Notification preferences were not saved. Please try again."
+    }
   },
   "recentlyViewed": {
     "metaTitle": "Recently viewed",

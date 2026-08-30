@@ -33,7 +33,12 @@ export type DigestSavedSearch = {
   name: string;
   frequency: string;
   lastNotifiedAt: Date | null;
-  user: { email: string; locale: string };
+  user: {
+    email: string;
+    locale: string;
+    /** PRD bölmə 57 — «Saved Search · Email» açarı. Sətir yoxdursa defolt `true`. */
+    notificationPreference?: { savedSearchEmail: boolean } | null;
+  };
 };
 
 export type DigestProperty = {
@@ -93,6 +98,8 @@ export type DigestResult = {
   sent: number;
   /** İstisna ilə keçilən axtarış sayı. */
   failed: number;
+  /** E-poçt kanalı söndürüldüyü üçün göndərilməyən axtarış sayı. */
+  skipped: number;
 };
 
 /**
@@ -106,7 +113,7 @@ export async function runSavedSearchDigest(
   now: Date = new Date(),
 ): Promise<DigestResult> {
   const searches = await store.findDigestSavedSearches();
-  const result: DigestResult = { checked: 0, sent: 0, failed: 0 };
+  const result: DigestResult = { checked: 0, sent: 0, failed: 0, skipped: 0 };
 
   for (const search of searches) {
     if (!isDigestDue(search.frequency, search.lastNotifiedAt, now)) continue;
@@ -120,6 +127,14 @@ export async function runSavedSearchDigest(
         // Yeni nəticə yoxdur: `lastNotifiedAt` toxunulmur ki, növbəti nəticə
         // gələn kimi göndəriş vaxtı yenidən hesablanmasın
         await store.markChecked(search.id, now);
+        continue;
+      }
+
+      // E-poçt kanalı söndürülübsə məktub getmir, amma uyğunluqlar
+      // `notifiedAt: null` qalır — istifadəçi onları kabinetdə «yeni» kimi görməlidir.
+      if (search.user.notificationPreference?.savedSearchEmail === false) {
+        await store.markChecked(search.id, now);
+        result.skipped += 1;
         continue;
       }
 

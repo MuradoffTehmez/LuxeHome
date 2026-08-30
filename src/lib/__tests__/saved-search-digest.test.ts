@@ -93,7 +93,7 @@ describe("runSavedSearchDigest", () => {
 
     const result = await runSavedSearchDigest(store, NOW);
 
-    expect(result).toEqual({ checked: 1, sent: 1, failed: 0 });
+    expect(result).toEqual({ checked: 1, sent: 1, failed: 0, skipped: 0 });
     expect(calls.sendDigestEmail).toHaveLength(1);
     expect(calls.sendDigestEmail[0]).toMatchObject({
       email: "user1@example.com",
@@ -115,8 +115,30 @@ describe("runSavedSearchDigest", () => {
 
     const result = await runSavedSearchDigest(store, NOW);
 
-    expect(result).toEqual({ checked: 1, sent: 0, failed: 0 });
+    expect(result).toEqual({ checked: 1, sent: 0, failed: 0, skipped: 0 });
     expect(calls.sendDigestEmail).toHaveLength(0);
+    expect(calls.markChecked).toEqual([{ savedSearchId: "search-1", at: NOW }]);
+  });
+
+  it("e-poçt kanalı söndürülübsə məktub göndərmir, uyğunluqları da möhürləmir", async () => {
+    const { store, calls } = createFakeStore({
+      findDigestSavedSearches: async () => [
+        search({
+          user: {
+            email: "user1@example.com",
+            locale: "az",
+            notificationPreference: { savedSearchEmail: false },
+          },
+        }),
+      ],
+    });
+
+    const result = await runSavedSearchDigest(store, NOW);
+
+    expect(result).toEqual({ checked: 1, sent: 0, failed: 0, skipped: 1 });
+    expect(calls.sendDigestEmail).toHaveLength(0);
+    // `notifiedAt` toxunulmur: elanlar kabinetdə hələ də «yeni» kimi görünməlidir
+    expect(calls.markNotified).toHaveLength(0);
     expect(calls.markChecked).toEqual([{ savedSearchId: "search-1", at: NOW }]);
   });
 
@@ -129,7 +151,7 @@ describe("runSavedSearchDigest", () => {
 
     const result = await runSavedSearchDigest(store, NOW);
 
-    expect(result).toEqual({ checked: 0, sent: 0, failed: 0 });
+    expect(result).toEqual({ checked: 0, sent: 0, failed: 0, skipped: 0 });
     expect(calls.sendDigestEmail).toHaveLength(0);
     expect(calls.markChecked).toHaveLength(0);
   });
@@ -162,7 +184,7 @@ describe("runSavedSearchDigest", () => {
 
     const result = await runSavedSearchDigest(store, NOW);
 
-    expect(result).toEqual({ checked: 2, sent: 1, failed: 1 });
+    expect(result).toEqual({ checked: 2, sent: 1, failed: 1, skipped: 0 });
     expect(calls.markNotified).toEqual([
       { savedSearchId: "search-ok", propertyIds: ["property-1"], at: NOW },
     ]);

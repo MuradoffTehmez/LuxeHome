@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
@@ -13,6 +14,7 @@ function applicationServerKey(value: string): Uint8Array<ArrayBuffer> {
 }
 
 export function PushPreferences() {
+  const t = useTranslations("account.notifications.push");
   const [supported, setSupported] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -38,9 +40,9 @@ export function PushPreferences() {
         return;
       }
       const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-      if (!publicKey) { toast("Push açarı konfiqurasiya edilməyib.", "error"); return; }
+      if (!publicKey) { toast(t("missingKey"), "error"); return; }
       const permission = await Notification.requestPermission();
-      if (permission !== "granted") { toast("Brauzer bildiriş icazəsi verilmədi.", "error"); return; }
+      if (permission !== "granted") { toast(t("denied"), "error"); return; }
       const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: applicationServerKey(publicKey) });
       const json = subscription.toJSON();
       const result = await savePushSubscription({ endpoint: subscription.endpoint, keys: { p256dh: json.keys?.p256dh ?? "", auth: json.keys?.auth ?? "" } });
@@ -51,8 +53,8 @@ export function PushPreferences() {
 
   return (
     <section className="mb-6 flex flex-col gap-4 rounded-md border border-line bg-paper p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-full bg-gold/15 text-gold-deep"><BellRing className="size-5" /></span><div><h2 className="font-medium text-ink">Web Push</h2><p className="mt-0.5 text-sm text-ink-muted">Qiymət endirimi, yeni uyğun elan və rezervasiya yeniliklərini brauzerdə alın.</p></div></div>
-      <Button type="button" variant={enabled ? "outline" : "primary"} size="sm" onClick={toggle} loading={pending} disabled={!supported}>{!supported ? "Dəstəklənmir" : enabled ? "Söndür" : "Aktiv et"}</Button>
+      <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-full bg-gold/15 text-gold-deep"><BellRing className="size-5" /></span><div><h2 className="font-medium text-ink">{t("title")}</h2><p className="mt-0.5 text-sm text-ink-muted">{t("description")}</p></div></div>
+      <Button type="button" variant={enabled ? "outline" : "primary"} size="sm" onClick={toggle} loading={pending} disabled={!supported}>{!supported ? t("unsupported") : enabled ? t("disable") : t("enable")}</Button>
     </section>
   );
 }

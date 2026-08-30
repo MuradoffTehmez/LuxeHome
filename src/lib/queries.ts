@@ -993,7 +993,16 @@ export async function getTaxonomyLandingProperties(
 ) {
   const location = await prisma.location.findFirst({
     where: { slug, kind },
-    select: { id: true, name: true, slug: true, kind: true, parent: { select: { name: true } } },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      kind: true,
+      parent: { select: { name: true } },
+      // Rayon analitikası (PRD bölmə 49-50) paneldən idarə olunur, lakin rayon
+      // səhifəsində göstərilmirdi — məlumat yalnız əmlak detalına düşürdü.
+      neighborhoodProfile: true,
+    },
   });
   if (!location) return null;
 
@@ -1890,7 +1899,15 @@ type ActiveSavedSearch = {
   name: string;
   filters: string;
   frequency: string;
-  user: { email: string; locale: string; notificationPreference?: { savedSearchPush: boolean } | null };
+  user: {
+    email: string;
+    locale: string;
+    notificationPreference?: {
+      savedSearchEmail: boolean;
+      savedSearchWeb: boolean;
+      savedSearchPush: boolean;
+    } | null;
+  };
 };
 
 export type SavedSearchMatchStore = {
@@ -1958,18 +1975,25 @@ async function matchOneSavedSearch(
 
   const copy = await store.notificationCopy(search.user.locale, search.name);
 
-  await store.createNotification({
-    userId: search.userId,
-    type: NOTIFICATION_TYPES.SAVED_SEARCH_MATCH,
-    title: copy.title,
-    content: property.title,
-    // Dil prefiksi qəsdən yoxdur: link klik anında oxucunun cari dilinə
-    // uyğunlaşdırılır (bax `bildirisler/notification-list.tsx`). Yazılma anında
-    // sabitlənsəydi, rus dilində gəzən istifadəçi AZ versiyaya düşərdi.
-    actionUrl: `/emlaklar/${property.slug}`,
-  });
+  // Kanal seçimləri (PRD bölmə 57) — sətir yoxdursa sxem defoltları qüvvədədir.
+  const preference = search.user.notificationPreference;
+  const wantsWeb = preference?.savedSearchWeb ?? true;
+  const wantsEmail = preference?.savedSearchEmail ?? true;
 
-  if (search.user.notificationPreference?.savedSearchPush && store.sendPush) {
+  if (wantsWeb) {
+    await store.createNotification({
+      userId: search.userId,
+      type: NOTIFICATION_TYPES.SAVED_SEARCH_MATCH,
+      title: copy.title,
+      content: property.title,
+      // Dil prefiksi qəsdən yoxdur: link klik anında oxucunun cari dilinə
+      // uyğunlaşdırılır (bax `bildirisler/notification-list.tsx`). Yazılma anında
+      // sabitlənsəydi, rus dilində gəzən istifadəçi AZ versiyaya düşərdi.
+      actionUrl: `/emlaklar/${property.slug}`,
+    });
+  }
+
+  if (preference?.savedSearchPush && store.sendPush) {
     try {
       await store.sendPush(search.userId, copy.title, property, search.user.locale);
     } catch (error) {
@@ -1980,7 +2004,7 @@ async function matchOneSavedSearch(
   // DAILY/WEEKLY üçün e-poçt burada getmir — uyğunluq `SavedSearchMatch`-də
   // `notifiedAt: null` kimi qalır və digest işi (`/api/cron/saved-search-digest`)
   // onu yığıb tək məktubda göndərir.
-  if (search.frequency === SAVED_SEARCH_FREQUENCIES.IMMEDIATE) {
+  if (search.frequency === SAVED_SEARCH_FREQUENCIES.IMMEDIATE && wantsEmail) {
     try {
       await store.sendImmediateEmail(
         search.user.email,
@@ -2019,7 +2043,15 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
         name: true,
         filters: true,
         frequency: true,
-        user: { select: { email: true, locale: true, notificationPreference: { select: { savedSearchPush: true } } } },
+        user: {
+          select: {
+            email: true,
+            locale: true,
+            notificationPreference: {
+              select: { savedSearchEmail: true, savedSearchWeb: true, savedSearchPush: true },
+            },
+          },
+        },
       },
     });
   },
@@ -2145,7 +2177,13 @@ export const savedSearchDigestStore: DigestStore = {
         name: true,
         frequency: true,
         lastNotifiedAt: true,
-        user: { select: { email: true, locale: true } },
+        user: {
+          select: {
+            email: true,
+            locale: true,
+            notificationPreference: { select: { savedSearchEmail: true } },
+          },
+        },
       },
     });
   },

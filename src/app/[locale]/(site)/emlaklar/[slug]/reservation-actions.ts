@@ -53,7 +53,18 @@ export async function createReservation(
         title: true,
         slug: true,
         assignedAgentId: true,
-        assignedAgent: { select: { userId: true, user: { select: { notificationPreference: { select: { reservationPush: true } } } } } },
+        assignedAgent: {
+          select: {
+            userId: true,
+            user: {
+              select: {
+                notificationPreference: {
+                  select: { reservationWeb: true, reservationPush: true },
+                },
+              },
+            },
+          },
+        },
       },
     });
     if (!property) return failure(t("disabled"));
@@ -103,27 +114,36 @@ export async function createReservation(
     });
 
     if (property.assignedAgent?.userId) {
-      await prisma.notification.create({
-        data: {
-          userId: property.assignedAgent.userId,
-          type: NOTIFICATION_TYPES.RESERVATION_STATUS,
-          title: "Yeni rezervasiya sorğusu",
-          content: property.title,
-          actionUrl: "/admin/rezervasiyalar",
-          dedupeKey: `reservation-requested:${reservation.id}`,
-        },
-      });
-      if (property.assignedAgent.user?.notificationPreference?.reservationPush) {
+      const agentPreference = property.assignedAgent.user?.notificationPreference;
+      if (agentPreference?.reservationWeb ?? true) {
+        await prisma.notification.create({
+          data: {
+            userId: property.assignedAgent.userId,
+            type: NOTIFICATION_TYPES.RESERVATION_STATUS,
+            title: "Yeni rezervasiya sorğusu",
+            content: property.title,
+            actionUrl: "/admin/rezervasiyalar",
+            dedupeKey: `reservation-requested:${reservation.id}`,
+          },
+        });
+      }
+      if (agentPreference?.reservationPush) {
         await sendPushToUser(property.assignedAgent.userId, { title: "Yeni rezervasiya sorğusu", body: property.title, url: "/admin/rezervasiyalar", tag: `reservation-${reservation.id}` });
       }
     }
 
-    const propertyUrl = siteUrl(localizePath(`/emlaklar/${property.slug}`, locale));
-    await sendEmail({
-      to: user.email,
-      subject: `${property.title} — ${t("success")}`,
-      html: `<p>${t("success")}</p><p><a href="${propertyUrl}">${property.title}</a></p>`,
+    const requesterPreference = await prisma.notificationPreference.findUnique({
+      where: { userId: user.id },
+      select: { reservationEmail: true },
     });
+    if (requesterPreference?.reservationEmail ?? true) {
+      const propertyUrl = siteUrl(localizePath(`/emlaklar/${property.slug}`, locale));
+      await sendEmail({
+        to: user.email,
+        subject: `${property.title} — ${t("success")}`,
+        html: `<p>${t("success")}</p><p><a href="${propertyUrl}">${property.title}</a></p>`,
+      });
+    }
     return success(t("success"));
   } catch (error) {
     return unexpected("rezervasiya yaradıla bilmədi", error, t("description"));
