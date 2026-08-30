@@ -331,6 +331,90 @@ export function articleSchema(post: ArticleSchemaInput, locale: Locale = DEFAULT
   };
 }
 
+/**
+ * Bilik Mərkəzi bələdçisi.
+ *
+ * `BlogPosting` deyil, `Article`: bələdçi xəbər axını deyil, köhnəlməyən
+ * təlimatdır. `articleSchema()` bloq marşrutuna sabitlənib, ona görə ayrıca
+ * generator saxlanılır — ortaq funksiyaya sıxışdırmaq marşrut parametri əlavə
+ * etməyi tələb edərdi və hər iki çağırış yerini oxunmaz edərdi.
+ */
+export function knowledgeArticleSchema(
+  article: {
+    title: string;
+    description: string;
+    slug: string;
+    image?: string | null;
+    publishedAt?: Date | string | null;
+    updatedAt?: Date | string | null;
+    authorName?: string | null;
+    section?: string | null;
+  },
+  locale: Locale = DEFAULT_LOCALE,
+) {
+  const url = siteUrl(localizePath(`/bilik-merkezi/${article.slug}`, locale));
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${url}#article`,
+    headline: article.title,
+    description: article.description,
+    image: article.image ? [article.image] : undefined,
+    url,
+    articleSection: article.section || undefined,
+    datePublished: article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined,
+    dateModified: article.updatedAt ? new Date(article.updatedAt).toISOString() : undefined,
+    author: { "@type": "Organization", name: article.authorName || siteConfig.legalName },
+    publisher: {
+      "@id": `${siteUrl()}/#organization`,
+      logo: { "@type": "ImageObject", url: siteUrl("/logo-full.png") },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    inLanguage: { az: "az-AZ", en: "en-US", ru: "ru-RU" }[locale],
+  };
+}
+
+/** Lüğət termini — `DefinedTerm`, lüğətin özü isə `DefinedTermSet`. */
+export function definedTermSchema(
+  term: { term: string; slug: string; definition: string },
+  locale: Locale = DEFAULT_LOCALE,
+) {
+  const url = siteUrl(localizePath(`/lugat/${term.slug}`, locale));
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTerm",
+    "@id": `${url}#term`,
+    name: term.term,
+    description: term.definition,
+    url,
+    inDefinedTermSet: {
+      "@type": "DefinedTermSet",
+      "@id": `${siteUrl(localizePath("/lugat", locale))}#glossary`,
+      name: "Daşınmaz əmlak lüğəti",
+      url: siteUrl(localizePath("/lugat", locale)),
+    },
+  };
+}
+
+export function definedTermSetSchema(
+  terms: Array<{ term: string; slug: string }>,
+  locale: Locale = DEFAULT_LOCALE,
+) {
+  const url = siteUrl(localizePath("/lugat", locale));
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    "@id": `${url}#glossary`,
+    url,
+    name: "Daşınmaz əmlak lüğəti",
+    hasDefinedTerm: terms.slice(0, 100).map((item) => ({
+      "@type": "DefinedTerm",
+      name: item.term,
+      url: siteUrl(localizePath(`/lugat/${item.slug}`, locale)),
+    })),
+  };
+}
+
 export function serviceSchema(service: {
   title: string;
   description: string;

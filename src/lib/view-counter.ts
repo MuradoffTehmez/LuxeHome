@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 /**
  * Baxış sayğacı.
  *
- * `Property.viewCount` və `BlogPost.viewCount` sütunları sxemdə əvvəldən var idi
+ * `Property.viewCount`, `BlogPost.viewCount` və `KnowledgeArticle.viewCount`
+ * sütunları sxemdə əvvəldən var idi
  * və panel dashboard-u, «ən çox baxılan» bloku, bloq yazısının «N baxış» sətri
  * onlardan oxuyurdu — amma heç yerdən artırılmırdı, ona görə hər dəyər sıfır
  * qalırdı və dashboard bloku həmişə boş görünürdü.
@@ -27,12 +28,16 @@ export function isLikelyBot(userAgent: string | null | undefined): boolean {
   return BOT_PATTERN.test(userAgent);
 }
 
-type ViewTarget = "property" | "post";
+type ViewTarget = "property" | "post" | "knowledge";
 
 function incrementQuery(target: ViewTarget, id: string): Promise<unknown> {
-  return target === "property"
-    ? prisma.property.update({ where: { id }, data: { viewCount: { increment: 1 } } })
-    : prisma.blogPost.update({ where: { id }, data: { viewCount: { increment: 1 } } });
+  if (target === "property") {
+    return prisma.property.update({ where: { id }, data: { viewCount: { increment: 1 } } });
+  }
+  if (target === "knowledge") {
+    return prisma.knowledgeArticle.update({ where: { id }, data: { viewCount: { increment: 1 } } });
+  }
+  return prisma.blogPost.update({ where: { id }, data: { viewCount: { increment: 1 } } });
 }
 
 /**
