@@ -104,11 +104,13 @@ async function moderateReview(id: string, status: string): Promise<ActionState> 
   }
 }
 
-export function approveAgentReview(id: string) {
+// `"use server"` faylındakı hər ixrac Server Action-dır və **async olmalıdır**.
+// Sinxron sarğı Promise qaytarsa da Next.js build-i webpack mərhələsində saxlayır.
+export async function approveAgentReview(id: string): Promise<ActionState> {
   return moderateReview(id, REVIEW_STATUSES.APPROVED);
 }
 
-export function rejectAgentReview(id: string) {
+export async function rejectAgentReview(id: string): Promise<ActionState> {
   return moderateReview(id, REVIEW_STATUSES.REJECTED);
 }
 
