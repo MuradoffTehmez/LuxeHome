@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
+import { NeighborhoodAnalytics } from "@/components/site/neighborhood-analytics";
 import { SeoLandingPage } from "@/components/site/seo-landing-page";
 import { routing } from "@/i18n/routing";
 import { type Locale } from "@/lib/constants";
@@ -63,6 +64,13 @@ export default async function DistrictLandingPage({ params, searchParams }: Prop
       <script {...jsonLd(faqSchema(landing.faq, landing.path, localeValue))} />
       <script {...jsonLd(itemListSchema(result.items.map((item) => ({ name: item.title, path: `/emlaklar/${item.slug}` })), localeValue))} />
       <SeoLandingPage landing={landing} locale={localeValue} {...result} />
+      {result.location.neighborhoodProfile && (
+        <NeighborhoodAnalytics
+          name={landing.h1}
+          profile={result.location.neighborhoodProfile}
+          locale={localeValue}
+        />
+      )}
     </>
   );
 }
