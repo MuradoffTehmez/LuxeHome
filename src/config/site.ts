@@ -61,6 +61,7 @@ export const navigation = [
   { label: "Əmlaklar", href: "/emlaklar" },
   { label: "Yaşayış kompleksləri", href: "/layiheler" },
   { label: "Agentliklər", href: "/agentlikler" },
+  { label: "Agentlər", href: "/agentler" },
   { label: "Xidmətlər", href: "/xidmetler" },
   { label: "Bloq", href: "/blog" },
   { label: "Əlaqə", href: "/elaqe" },

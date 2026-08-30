@@ -20,7 +20,9 @@
     "reviewSuccess": "Your review was sent for moderation.",
     "reviewDuplicate": "You have already reviewed this agent.",
     "loginHint": "Sign in to leave a review.",
-    "reviewSelf": "You cannot review an agent from your own agency."
+    "reviewSelf": "You cannot review an agent from your own agency.",
+    "homeTitle": "The specialists who will help you",
+    "homeAll": "All agents"
   },
   "reservation": {
     "title": "Reserve this property",
@@ -69,7 +71,13 @@
     "document": "Document",
     "mortgage": "Mortgage eligibility",
     "priority": "Main priority",
-    "any": "Any"
+    "any": "Any",
+    "homeCta": "Start the assistant",
+    "homeNote": "You need to sign in to your account to use this service.",
+    "loginTitle": "The property finder requires an account",
+    "loginDescription": "Your answers are tied to your profile — results are saved and later recommendations build on them.",
+    "loginCta": "Sign in",
+    "registerCta": "Create an account"
   },
   "neighborhood": {
     "title": "Neighborhood analytics",

@@ -12,9 +12,11 @@ import {
   Handshake,
   Quote,
   ShieldCheck,
+  Sparkles,
   Star,
   Users,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
 import { buttonClassName } from "@/components/ui/button";
@@ -34,7 +36,7 @@ import { buildMetadata } from "@/lib/seo";
 import { getCachedHomePageData } from "@/lib/public-cache";
 import { getCategoryImageUrl } from "@/lib/category-images";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
-import { getApprovedTestimonials } from "@/lib/phase2";
+import { getApprovedTestimonials, getPublicAgents } from "@/lib/phase2";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -92,9 +94,12 @@ export default async function HomePage({ params }: HomePageProps) {
   const t = await getTranslations({ locale: resolvedLocale, namespace: "home" });
   const propertyT = await getTranslations({ locale: resolvedLocale, namespace: "property" });
   const phase2T = await getTranslations({ locale: resolvedLocale, namespace: "phase2.testimonials" });
+  const wizardT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.wizard" });
+  const agentsT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.agents" });
   const { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners } =
     await getCachedHomePageData();
   const testimonials = await getApprovedTestimonials(6);
+  const agents = (await getPublicAgents()).slice(0, 3);
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 
@@ -191,6 +196,93 @@ export default async function HomePage({ params }: HomePageProps) {
           </Container>
         </Section>
       )}
+
+      {/* ------------------------------------------------------------------ */}
+      {/* AGENTLƏR — PRD bölmə 5.5                                           */}
+      {/* ------------------------------------------------------------------ */}
+      {agents.length > 0 && (
+        <Section tone="paper">
+          <Container size="wide">
+            <SectionHeader
+              overline={agentsT("title")}
+              title={agentsT("homeTitle")}
+              description={agentsT("description")}
+              action={{ label: agentsT("homeAll"), href: "/agentler" }}
+            />
+
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {agents.map((agent, index) => {
+                const rating = agent.reviews.length
+                  ? agent.reviews.reduce((sum, review) => sum + review.rating, 0) / agent.reviews.length
+                  : null;
+                return (
+                  <Reveal key={agent.id} delay={index * 60}>
+                    <article className="flex h-full flex-col rounded-md border border-line bg-ivory p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige">
+                          {agent.avatarUrl ? (
+                            <Image src={agent.avatarUrl} alt="" fill sizes="64px" unoptimized={isUnoptimizedImage(agent.avatarUrl)} className="object-cover" />
+                          ) : (
+                            <Users className="size-7 text-ink-muted" aria-hidden="true" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-display text-xl text-ink">
+                            <Link href={`/agentler/${agent.slug}`} className="hover:text-gold-deep">{agent.name}</Link>
+                          </h3>
+                          {agent.agency && <p className="text-sm text-ink-muted">{agent.agency.name}</p>}
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {agent.isVerified && <Badge tone="gold">{agentsT("verified")}</Badge>}
+                            {rating != null && (
+                              <Badge tone="neutral">
+                                <Star className="mr-1 size-3.5 fill-gold text-gold-deep" aria-hidden="true" />
+                                {rating.toFixed(1)}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="mt-4 flex-1 text-sm text-ink-soft">
+                        {agent.specialization || agent.roleTitle || agentsT("about")}
+                      </p>
+                      <p className="mt-3 text-xs text-ink-muted">
+                        {agentsT("soldRented", { sold: agent.soldCount, rented: agent.rentedCount })} · {agent._count.properties} {agentsT("listings").toLocaleLowerCase()}
+                      </p>
+                    </article>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      {/* ------------------------------------------------------------------ */}
+      {/* ƏMLAK TAPMA KÖMƏKÇİSİ                                              */}
+      {/* ------------------------------------------------------------------ */}
+      <Section tone="navy">
+        <Container size="wide">
+          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="min-w-0">
+              <p className="editorial-kicker text-gold">{wizardT("eyebrow")}</p>
+              <h2 className="mt-3 max-w-2xl font-display text-[clamp(2rem,3.4vw,3.25rem)] leading-[1.05] tracking-[-0.03em] text-ivory">
+                {wizardT("title")}
+              </h2>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-ivory/75">
+                {wizardT("description")}
+              </p>
+              <p className="mt-3 flex items-center gap-2 text-sm text-ivory/60">
+                <Sparkles className="size-4 shrink-0 text-gold" aria-hidden="true" />
+                {wizardT("homeNote")}
+              </p>
+            </div>
+            <Link href="/mene-emlak-tap" className={buttonClassName("onDark", "lg")}>
+              {wizardT("homeCta")}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </Container>
+      </Section>
 
       {/* ------------------------------------------------------------------ */}
       {/* KATEQORİYALAR                                                      */}

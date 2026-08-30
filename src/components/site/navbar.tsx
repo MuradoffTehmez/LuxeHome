@@ -17,11 +17,12 @@ import { ThemeToggle } from "./theme-toggle";
 
 /** `siteConfig.navigation`-dakı href → tərcümə açarı. Kompakt (xl-dən aşağı) etiket
  * də eyni açardan gəlir — ayrıca sabit lüğət artıq lazım deyil. */
-const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" | "services" | "blog" | "contact"> = {
+const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" | "agents" | "services" | "blog" | "contact"> = {
   "/": "home",
   "/emlaklar": "properties",
   "/layiheler": "projects",
   "/agentlikler": "agencies",
+  "/agentler": "agents",
   "/xidmetler": "services",
   "/blog": "blog",
   "/elaqe": "contact",
