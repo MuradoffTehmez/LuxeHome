@@ -247,27 +247,31 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
 
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
-- **Auth qatı hazırdır, CRUD hələ tamamlanmayıb.** Giriş axını işləyir: PBKDF2 parol, məcburi TOTP
-  2FA (`src/app/giris`), D1-də saxlanan ləğv edilə bilən sessiyalar, rol əsaslı `requirePermission()`
-  və iki laylı sürət limiti. `/admin/hesabim`, dashboard və əmlak siyahısı D1-dən oxuyur;
-  əmlak CRUD və media yükləmə axını yazılmayıb.
-- **Panel production-da bağlıdır.** `ADMIN_ENABLED` yalnız staging-də `"true"`-dur; prod-da
-  `src/middleware.ts` `/admin` və `/giris` marşrutlarını 404-ə çevirir. Panel staging-də tam
-  yoxlanandan sonra prod `vars`-ında açılır.
-- Contact form-da rate limit / honeypot / Turnstile yoxdur.
-- `emlaklar/page.tsx` `queries.ts`-in dəstəklədiyi filtrlərin hamısını ötürmür
-  (xüsusiyyət filtri `featureSlugs` bağlanmayıb).
-- Media yükləmə axını yoxdur: R2 bucket (`MEDIA` binding) hazırdır, upload route və admin
-  inteqrasiyası yazılmayıb.
-- `loading.tsx` fayl(lar)ı yoxdur — səhifə keçidlərində skeleton göstərilmir.
-- CI yoxdur. Testlər yalnız auth qatını əhatə edir.
+- **Admin auth və əsas CRUD hazırdır.** PBKDF2 parol, məcburi TOTP 2FA, D1 sessiyaları,
+  RBAC, dashboard, əmlak/layihə/xidmət/bloq/lead/media/istifadəçi/parametr axınları və audit
+  jurnalı işləyir. Panel production-da `ADMIN_ENABLED="true"` ilə açıqdır.
+- **İctimai sayt AZ/EN/RU dillərindədir.** Bütün ictimai marşrutlar locale prefikslidir,
+  tərcümə kataloqları parity testi ilə qorunur. Admin panelin UI mətnləri isə hələ yalnız
+  azərbaycancadır; `User.locale` seçimi panel səthinə tam bağlanmayıb.
+- Əlaqə və auth formaları same-origin, honeypot, IP sürət limiti və Cloudflare Turnstile ilə
+  qorunur. Turnstile gizli açarı Worker secret-i kimi saxlanılır.
+- Əmlak filtrlərinin bütün dəstəklənən sahələri, o cümlədən `featureSlugs`, UI-a bağlıdır.
+- Media yükləmə admin və kabinet üçün R2 + Cloudflare Images axını ilə işləyir; magic-byte,
+  ölçü və MIME yoxlamaları tətbiq olunur.
+- Public ağacda route səviyyəli `loading.tsx` qəsdən istifadə edilmir: Suspense streaming
+  başlıqları erkən göndərib `notFound()` cavablarının düzgün 404 statusunu poza bilər.
+  Keçid geribildirimi `(site)/template.tsx` və `NavigationProgress` ilə, Suspense sərhədi
+  yaratmadan verilir. Admin/kabinet kimi 404 semantikası tələb etməyən ağaclarda skeleton var.
+- GitHub Actions CI `test + typecheck + lint + build` qapılarını hər PR və `main` push-unda
+  işlədir. Cloudflare secret-ləri qoyularsa `main` push-unda remote D1 miqrasiya vəziyyəti də
+  yoxlanılır. Avtomatlaşdırılmış browser E2E hələ yoxdur.
 
 ## Diqqət tələb edən məqamlar
 
 - **Verilənlər bazası Cloudflare D1-dir (SQLite).** `mode: "insensitive"` D1-də dəstəklənmir və
-  yazılmamalıdır. SQLite `LIKE` yalnız ASCII hərflərində reqistrdən asılı deyil — `ə`, `ş`, `ç`,
-  `ğ`, `ı`, `ö`, `ü` hərfləri **reqistrə həssasdır**. Azərbaycanca mətn axtarışı buna görə
-  natamamdır; həll yolu axtarış üçün əvvəlcədən kiçik hərfə salınmış ayrıca sütun saxlamaqdır.
+  yazılmamalıdır. Azərbaycanca registrsiz axtarış `src/lib/search-normalization.ts` və
+  `Property.searchText` / taksonomiya `searchName` sütunları ilə həll olunur. Əmlak və
+  taksonomiya yazma axınlarında bu normallaşdırılmış sahələri doldurmağı unutma.
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
 - `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər) və

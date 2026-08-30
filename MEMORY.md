@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 25 avqust 2026.
+Son yenilənmə: 30 avqust 2026.
 
 ---
 
@@ -31,29 +31,22 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 
 | Mövzu | Qərar |
 |---|---|
-| Admin panel | **Tam admin panel qurulacaq.** Auth qatı 21 avqust 2026-da tamamlandı (bax bölmə 9); CRUD hələ qalır. |
+| Admin panel | Auth və əsas CRUD hazırdır; növbəti böyük boşluqlar Finance/CMS və panel UI-ının çoxdilliliyidir. |
 | Verilənlər bazası + hosting | **Qərar verilib (20 avqust 2026): tam Cloudflare.** Workers (OpenNext), D1, R2, Images. Supabase və PostgreSQL layihədən çıxarılıb. |
-| Media yükləmə | **Cloudflare R2** — `luxehome-media` bucket və `MEDIA` binding hazırdır. Upload route və admin inteqrasiyası hələ yazılmayıb. |
-| Dil | **AZ + RU.** Hazırda yalnız AZ. Çoxdilliliyin gec əlavə edilməsi baha başa gəlir — arxitektura qərarları buna hazırlıqlı verilməlidir. |
+| Media yükləmə | **Cloudflare R2 + Images** — admin və kabinet upload route-ları, WebP/thumbnail və magic-byte yoxlaması işləyir. |
+| Dil | İctimai sayt və kabinet **AZ + EN + RU** dillərindədir; admin panel UI-ı hələ yalnız AZ-dır. |
 | Lead bildirişi | **Telegram bot.** Yeni müraciət gələndə sistem bot vasitəsilə bildiriş göndərəcək. |
-| Spam qoruma | Honeypot + rate limit **və** Cloudflare Turnstile — hər ikisi olacaq, amma frontend-dən sonra. |
-| Test / CI / analitika | **İndilik yox.** `npm run typecheck` + `npm run build` yeganə qapı olaraq qalır. |
+| Spam qoruma | Same-origin + honeypot + IP rate limit + Cloudflare Turnstile tətbiq olunub. |
+| Test / CI / analitika | Vitest və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. Browser E2E hələ yoxdur. |
 
 ---
 
-## 3. Frontend prioritetləri (cari mərhələ)
+## 3. Frontend vəziyyəti
 
-Müştəri təqdimatı üçün dördü də vacib sayılıb:
-
-1. ~~**Filtr/axtarış UI-ın tamamlanması**~~ — **tamamlandı (13 avqust 2026)**, bax bölmə 5b.
-   Yalnız xüsusiyyət filtri (`featureSlugs`) hələ UI-a bağlanmayıb — çoxseçimli olduğu üçün
-   ayrıca komponent tələb edir.
-2. **Vizual cəlbedicilik** — hover, animasiya, scroll reveal, səhifə keçidləri. Son commit-lər
-   bu istiqamətdə idi (`695b769`, `a5e1895`, `558fa3c`).
-3. **Mobil təcrübə** — ziyarətçilərin əksəriyyəti telefondan baxır. Drawer, sticky CTA, toxunma
-   sahələri, qalereya swipe, filtr üçün bottom-sheet.
-4. **Əmlak detal səhifəsi** — ən çox konversiya verən səhifə. `emlaklar/[slug]/page.tsx`-də
-   4 istifadə olunmayan import var (`Link`, `Info`, `cn`, `isClosed`) — yarımçıq qalmış işə işarədir.
+İlkin təqdimat prioritetləri tamamlanıb: bütün filtrlər (xüsusiyyətlər daxil), mobil
+bottom-sheet/drawer, sticky CTA-lar, qalereya və əmlak detal axını işləyir. Səhifə keçidində
+düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` qəsdən yoxdur;
+`(site)/template.tsx` və `NavigationProgress` Suspense yaratmadan geribildirim verir.
 
 ---
 
@@ -63,16 +56,21 @@ Müştəri təqdimatı üçün dördü də vacib sayılıb:
   alıb ictimai əmlakları qaytarır.
 - ~~Hüquqi səhifələr~~ — `/mexfilik-siyaseti`, `/istifade-sertleri`, `/cookie-siyaseti` qurulub
   (`components/site/legal-article.tsx` ümumi çərçivə). **Mətnlər hüquqşünas təsdiqi gözləyir.**
-- ~~`not-found.tsx`, `error.tsx`~~ — brendli AZ versiyaları var. `loading.tsx` hələ yoxdur.
+- ~~`not-found.tsx`, `error.tsx`~~ — üçdilli brend versiyaları var. Public `loading.tsx`-in
+  olmaması unudulmuş iş deyil, düzgün HTTP 404 statusu üçün qəbul edilmiş güzəştdir.
 - ~~`sitemap.ts` + `robots.ts`~~ — qurulub, `getSitemapEntries()` çağırılır.
 
 ---
 
-## 5. Bilinən buglar
+## 5. Bilinən boşluqlar
 
 | Yer | Problem |
 |---|---|
-| `queries.ts` | SQLite `LIKE` Azərbaycan hərflərində (ə, ş, ç, ğ, ı, ö, ü) reqistrə həssasdır — mətn axtarışı böyük hərflə yazılmış sorğuları tapmır. |
+| `src/app/admin/**` | Paneldə `User.locale` seçimi olsa da UI mətnləri tərcümə qatına bağlanmayıb. |
+| Browser axınları | Avtomatlaşdırılmış Playwright/E2E yoxdur; production smoke testi manualdır. |
+
+Azərbaycan hərfləri ilə registrsiz axtarış 28 avqustda `searchText` / `searchName`
+sütunları və `normalizeSearchText()` ilə həll olunub.
 
 ---
 
@@ -121,29 +119,26 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 ### Backend / infrastruktur
 - [x] Admin panel auth — **tamamlandı 21 avqust 2026**, bax bölmə 9.
-- [ ] Admin CRUD: əmlak, layihə, xidmət, blog, lead, media, istifadəçi, parametrlər.
-- [ ] Dashboard səhifəsi — `getDashboardStats()` hazırdır, çağıran yoxdur.
-- [ ] Media yükləmə: R2 (`MEDIA` binding) hazırdır. Upload route (`/api/upload`), `Media` modelinə
-      yazma və admin `ImageDropzone` inteqrasiyası qalır.
+- [x] Admin CRUD: əmlak, layihə, xidmət, bloq, lead, media, istifadəçi, parametr və tərəfdaşlar.
+- [x] Dashboard səhifəsi real D1 statistikalarını göstərir.
+- [x] Media yükləmə: admin və kabinet R2 upload route-ları, `Media` yazması və `ImageDropzone`.
 - [ ] Telegram bot inteqrasiyası — yeni lead bildirişi.
-- [ ] **Contact form spam qoruması: honeypot + rate limit, sonra Cloudflare Turnstile.**
-      Hazırda `elaqe/actions.ts` heç bir qorumaya malik deyil.
+- [x] Contact/auth form spam qoruması: origin + honeypot + rate limit + Turnstile.
 - [x] `prisma/remove-demo-content.sql` və lokal/remote təmizləmə scriptləri əlavə edildi.
-- [ ] Azərbaycanca axtarış üçün normallaşdırılmış (kiçik hərfli) sütun əlavə etmək —
-      `mode: "insensitive"` D1-də yoxdur.
+- [x] Azərbaycanca axtarış üçün normallaşdırılmış `searchText` / `searchName` sütunları.
 
-### Çoxdillilik (AZ + RU)
-- [ ] Routing strategiyası seç (`[locale]` seqmenti və ya domen/subdomen).
-- [ ] Sxemə tərcümə sahələri və ya tərcümə cədvəlləri əlavə et (`Property`, `Project`, `Service`,
-      `BlogPost`, `PropertyType`, `Location`, `Feature`).
-- [ ] UI mətnlərini kodun içindən çıxar (hazırda hamısı hardcode olunub).
+### Çoxdillilik (AZ + EN + RU)
+- [x] `[locale]` routing, middleware və locale cookie-si.
+- [x] İctimai kontent üçün tərcümə sahələri/cədvəlləri və admin tərcümə modulu.
+- [x] İctimai sayt və kabinet mətnləri `next-intl` kataloqlarına çıxarılıb.
+- [ ] Admin panel UI mətnlərini tərcümə qatına qoşmaq.
 
 ### Keyfiyyət
-- [ ] Xüsusiyyət filtri (`featureSlugs`) — çoxseçimli komponent, hovuz/qaraj/lift və s.
-- [ ] GitHub Actions CI: test + typecheck + build + lint.
-- [ ] Vitest — `queries.ts` filtr məntiqi üçün unit testlər (auth qatı artıq örtülüb, 40 test).
+- [x] Xüsusiyyət filtri (`featureSlugs`) — çoxseçimli komponent, hovuz/qaraj/lift və s.
+- [x] GitHub Actions CI: test + typecheck + lint + build; secret olduqda remote D1 statusu.
+- [x] Vitest — filtr birləşməsi və axtarış normallaşdırması üçün regresiya testləri.
 - [ ] Playwright — kritik axın (axtarış → detal → müraciət) üçün e2e.
-- [ ] Analitika (GA4 / Plausible) + Google Search Console.
+- [x] GA/GTM consent qapısı və Web Vitals/brauzer xəta monitorinqi.
 
 ### Kontent
 - [ ] `siteConfig.geo` — ofisin dəqiq koordinatları şirkətdən alınmalıdır (hazırkı dəyər təxminidir).
@@ -154,13 +149,13 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 ---
 
-## 7. Layihənin texniki sağlamlığı (13 avqust 2026)
+## 7. Layihənin texniki sağlamlığı (30 avqust 2026)
 
-- `npx tsc --noEmit` → 0 error.
-- `npx next build` → uğurlu, 13 route (7 statik, 6 dinamik), First Load JS 103 kB shared.
-- `npx eslint .` → 0 error, 6 warning (istifadə olunmayan importlar).
-- Mənbə kodu: ~6 700 sətir (`src/`).
-- Git: `main` branch, 27 commit.
+- Mənbə kodu: təxminən 44 000 sətir (`src/` altında `.ts` + `.tsx`).
+- 86 Vitest faylı; dəqiq test sayı son keyfiyyət qapısının çıxışında saxlanılır.
+- 38 Prisma modeli, 23 D1 miqrasiyası və 330-dan çox commit.
+- GitHub Actions hər PR və `main` push-unda test, typecheck, lint və build işlədir.
+- Avtomatlaşdırılmış browser E2E yoxdur.
 - `.env` düzgün şəkildə `.gitignore`-dadır; yalnız `.env.example` izlənir.
 
 
@@ -171,10 +166,10 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 **Vəziyyət: ictimai sayt canlıdır.**
 
 - Worker: `luxehomeestate` → `https://luxehomeestate.az` və `https://www.luxehomeestate.az`
-- D1: `luxehome-db` (`86d5f7e0-ffe6-48d8-bd84-d88163550b2a`) — `migrations/0001_init.sql`
-  tətbiq olunub; demo məzmun 21 avqust 2026 tarixində təmizlənib
+- D1: `luxehome-db` (`86d5f7e0-ffe6-48d8-bd84-d88163550b2a`) — miqrasiyalar ayrıca
+  production/staging əmrləri ilə idarə olunur; demo məzmun 21 avqustda təmizlənib
 - R2: `luxehome-media`, `luxehome-next-cache`
-- Secret-lər: `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`
+- Secret-lər: auth, Resend, cron və Turnstile açarları Cloudflare secret-lərində saxlanılır
 
 ### Yayım zamanı həll edilən problemlər
 
@@ -192,8 +187,9 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
       Canonical URL-lər, sitemap və robots.txt production ünvanını göstərir.
       `workers.dev` alt domeni custom domain əlavə olunduqdan sonra söndü.
 - [ ] R2 üçün `media.luxehomeestate.az` public custom domain qurmaq.
-- [ ] Resend-də `luxehomeestate.az` domenini təsdiqləmək (hazırda `onboarding@resend.dev`
-      göndərici ünvanı işlədilir — production üçün uyğun deyil).
+- [x] Kod və nümunə konfiqurasiya `notifications@luxehomeestate.az` korporativ göndəricisinə
+      keçirilib; `onboarding@resend.dev` fallback-i silinib. Resend panelində domenin faktiki
+      təsdiqi deployment smoke yoxlamasının bir hissəsidir.
 - [ ] Cloudflare Images transformations-u zone səviyyəsində aktivləşdirmək.
 - [x] Panel staging-də yoxlanandan sonra prod `vars`-ında `ADMIN_ENABLED="true"` edildi
       (27 avqust 2026) — `/admin` və `/giris` artıq production-da açıqdır.
@@ -204,8 +200,7 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 
 ## 9. Admin auth qatı — 21 avqust 2026
 
-**Vəziyyət: kod hazırdır və `feat/cloudflare-workers-d1-deployment` branch-ındadır.
-Staging yayımı və əl ilə yoxlama hələ icra olunmayıb.**
+**Vəziyyət: main branch-a birləşdirilib, staging yoxlanıb və panel production-da açıqdır.**
 
 Plan: `docs/superpowers/plans/2026-08-21-staging-ve-auth.md` (10 task).
 Dizayn: `docs/superpowers/specs/2026-08-20-staging-ve-auth-design.md`.
@@ -236,15 +231,11 @@ Keyfiyyət qapısı: 40 test, `typecheck` və `build` təmiz.
 - **`seed.ts` artıq giriş edilə bilən hesab yaratmır** — `seed.sql` git-ə commit olunur,
   orada işlək hash saxlamaq repoya parol yerləşdirmək deməkdir.
 
-### Qalan addımlar (Task 10, əl ilə icra)
+### Əməliyyat qeydi
 
-1. Staging secret-ləri: `AUTH_SECRET` (prod-dan **fərqli**), `RESEND_API_KEY`,
-   `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL` — `npx wrangler secret put <AD> --env staging`.
-2. `npm run db:migrate:staging` və `npm run db:seed:staging`.
-3. `npm run auth:create-admin` → çıxan INSERT-i `npx wrangler d1 execute luxehome-db-staging
-   --remote --env staging --command "<INSERT>"` ilə tətbiq et.
-4. `npm run deploy:staging`, sonra prod-un toxunulmadığını yoxla.
-5. Spec bölmə 7-dəki 13 bəndlik əl ilə yoxlama siyahısı.
+Staging və production ayrı secret, D1 və R2 resursları işlədir. Yeni miqrasiya yayımdan əvvəl
+hər iki mühitə tətbiq edilməli, sonra cron/API smoke yoxlaması aparılmalıdır. CI-də Cloudflare
+secret-ləri olduqda `main` push-u remote production miqrasiya siyahısını da yoxlayır.
 
 ---
 
@@ -259,7 +250,8 @@ koda köçürülməlidir.** 25 avqust 2026 tarixli audit: Phase 1 MVP üzrə hə
 İş rejimi **ardıcıldır** — hər maddə tamamlanıb təsdiqlənəndən sonra növbətiyə keçilir,
 paralel deyil. Təsdiqlənmiş sıra:
 
-1. **Saved Search + Recently Viewed + Notification Center** — cari iş.
+1. ~~**Saved Search + Recently Viewed + Notification Center**~~ — tamamlanıb; immediate və
+   gündəlik/həftəlik digest zənciri production/staging-də işləyir.
 2. AI axtarış + Reservation (görüş sistemi) — təqvim inteqrasiyalı (Google Calendar). AI
    provider hələ qəti deyil, namizəd: **Cloudflare Workers AI**.
 3. Telegram bot qurulumu (lead bildirişi) — bot token/chat ID hələ yoxdur, əvvəlcə yaradılmalıdır.
@@ -297,3 +289,18 @@ təmizdir. İctimai siyahı/profil 320–1920 px enlərində horizontal overflow
 Kontent addımları: TREVA-nın real logo faylı, hüquqi/müqavilə rekvizitləri və geniş AZ/EN/RU
 mətnləri etibarlı mənbə təqdim ediləndən sonra admin paneldən əlavə edilməlidir. Uydurma məlumat
 seed edilməyib.
+
+---
+
+## 12. Kod auditi izləməsi — 30 avqust 2026
+
+`docs/audits/2026-08-27-kod-auditi.html` üzrə lokal bağlanan işlər:
+
+- B1–B8 və B14 audit sessiyasında bağlanmışdı;
+- B10 Azərbaycan axtarış normallaşdırması ilə, B12 korporativ göndərici fallback-i ilə bağlandı;
+- B13 istifadə olunmayan `SAVED_SEARCH_FREQUENCY_LABELS` ixracının silinməsi ilə bağlandı;
+- GitHub Actions CI əlavə edildi və public `loading.tsx` güzəşti sənədləşdirildi;
+- B9 (admin UI-ının AZ/EN/RU lokallaşdırılması) ayrıca böyük modul kimi açıqdır;
+- P5 (`force-dynamic` public HTML render-i) ölçmə və arxitektura işi olaraq açıqdır;
+- avtomatlaşdırılmış browser E2E və Resend/Cloudflare kimi xarici sistemlərin canlı smoke
+  yoxlamaları repository daxilində tam əvəz edilə bilmir.

@@ -49,12 +49,13 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 
 - `USER`, `OWNER` və `AGENCY` hesabları üçün qeydiyyat və giriş
 - D1-də saxlanan və dərhal ləğv edilə bilən sessiyalar
-- Profil və parol idarəetməsi
-- Mülk sahibi və agentlik üçün şəkilli elan göndərmə
+- Profil, parol, e-poçt təsdiqi, parol bərpası və şəxsi data ixracı
+- Mülk sahibi və agentlik üçün şəkilli elan yaratma, redaktə və silmə
 - Mülk sahibi və təsdiqlənməmiş agentlik elanları üçün `PENDING` təsdiq axını
 - Təsdiqlənmiş agentlik elanlarının birbaşa dərc edilməsi
 - Təsdiqlənmiş agentliklərin açıq kataloqu və profil səhifəsi
-- Saxlanmış axtarışlar, gündəlik/həftəlik e-poçt digest-i, panel bildirişləri və son baxılan elanlar
+- Hesablar arasında sinxron favoritlər, saxlanmış axtarışlar, gündəlik/həftəlik e-poçt digest-i,
+  panel bildirişləri və son baxılan elanlar
 - Agentlik sahibi üçün ən çox 3 menecer/agent üzvlü komanda və təsdiq axını
 
 ### İdarə paneli
@@ -342,16 +343,20 @@ npm test
 npm run build
 ```
 
-Cari qapı 81 Vitest faylında 335 testi əhatə edir. Auth, sessiya, lokallaşdırma, SEO, saved-search, tərəfdaşlıq, admin responsive siyahıları, media rollback-i və public-content sərhədləri yoxlanır. D1 integration və avtomatlaşdırılmış browser E2E/CI hazırda yoxdur; production browser smoke testi manual aparılır.
+Cari qapı 86 Vitest faylını əhatə edir. Auth, sessiya, lokallaşdırma, SEO, saved-search,
+tərəfdaşlıq, axtarış normallaşdırması, Turnstile, admin responsive siyahıları, media rollback-i
+və public-content sərhədləri yoxlanır. GitHub Actions eyni dörd əmri hər PR və `main` push-unda
+işlədir; D1 integration və avtomatlaşdırılmış browser E2E hələ yoxdur, production browser smoke
+testi manual aparılır.
 
 ## Cari məhdudiyyətlər və yol xəritəsi
 
-- İctimai kabinet elan yaratma və status izləmə verir; mövcud elanı redaktə/silmə axını yoxdur.
-- Qeydiyyatda e-poçt təsdiqi və “parolu unutdum” bərpa axını yoxdur.
-- SQLite `LIKE` Azərbaycan hərflərində tam registrsiz axtarış vermir; normallaşdırılmış axtarış sahəsi tələb olunur.
-- CI və avtomatlaşdırılmış browser E2E yoxdur; deploy və canlı smoke prosesi manualdır.
+- İctimai hesab şəxsi data ixracını verir; hesabın self-service silinməsi hələ yoxdur.
+- Admin paneldə locale seçimi saxlanılır, lakin panel UI mətnləri hələ yalnız azərbaycancadır.
+- Avtomatlaşdırılmış browser E2E yoxdur; deploy və canlı smoke prosesi manualdır.
 - Korporativ e-poçt hadisələri yalnız `RESEND_WEBHOOK_SECRET` və Resend endpoint abunəliyi qurulduqdan sonra dolur; məzmun deyil, metadata saxlanılır.
-- Turnstile yoxdur; əlaqə forması hazırda same-origin, görünməz honeypot və `CONTACT_LIMIT` ilə qorunur.
+- Turnstile əlaqə, qeydiyyat, ictimai giriş və hesab təhlükəsizliyi formalarına bağlıdır; gizli
+  açar və hostname allowlist Cloudflare mühitində düzgün saxlanmalıdır.
 - Hüquqi mətnlər, ofis koordinatları və iş saatları şirkət/hüquqşünas təsdiqi tələb edir.
 
 Ətraflı prioritetlər Wiki-dəki [Cari vəziyyət və yol xəritəsi](https://github.com/MuradoffTehmez/LuxeHome/wiki/Status-and-Roadmap) səhifəsində saxlanılır.
