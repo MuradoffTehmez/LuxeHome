@@ -100,6 +100,9 @@ export const listingLinks = [
 export const supportNavigation = [
   { label: "Haqqımızda", href: "/haqqimizda" },
   { label: "Tərəfdaşlarımız", href: "/terefdaslar" },
+  { label: "Bilik Mərkəzi", href: "/bilik-merkezi" },
+  { label: "Əmlak lüğəti", href: "/lugat" },
+  { label: "İpoteka kalkulyatoru", href: "/kalkulyator" },
   { label: "Tez-tez verilən suallar", href: "/suallar" },
 ] as const;
 

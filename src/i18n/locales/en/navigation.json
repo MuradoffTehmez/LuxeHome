@@ -48,5 +48,8 @@
     "ownership": "The website and the «{brand}» brand and trademark belong to {owner}.",
     "vat": "Tax ID: {value}"
   },
-  "agents": "Agents"
+  "agents": "Agents",
+  "knowledgeHub": "Knowledge Hub",
+  "glossary": "Real estate glossary",
+  "calculator": "Mortgage calculator"
 }

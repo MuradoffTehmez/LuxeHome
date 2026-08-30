@@ -48,5 +48,8 @@
     "ownership": "Sayt, «{brand}» brendi və markası {owner}-na məxsusdur.",
     "vat": "VÖEN: {value}"
   },
-  "agents": "Agentlər"
+  "agents": "Agentlər",
+  "knowledgeHub": "Bilik Mərkəzi",
+  "glossary": "Əmlak lüğəti",
+  "calculator": "İpoteka kalkulyatoru"
 }

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { PRODUCTION_SITE_URL } from "@/config/site";
 import { LOCALES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
-import { getCachedSitemapEntries } from "@/lib/public-cache";
+import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib/public-cache";
 
 // Sitemap D1-dən oxuyur — build zamanı deyil, sorğu anında qurulur.
 export const dynamic = "force-dynamic";
@@ -22,6 +22,7 @@ export type SitemapSource = {
   agencies: Array<{ slug: string; updatedAt: Date }>;
   partners: Array<{ slug: string; updatedAt: Date }>;
   landings: Array<{ path: string; updatedAt?: Date }>;
+  knowledge?: Array<{ path: string; updatedAt?: Date }>;
 };
 
 function absoluteUrl(path: string): string {
@@ -53,6 +54,9 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
     ...localizedEntries("/haqqimizda", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/suallar", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/blog", { changeFrequency: "weekly", priority: 0.6 }),
+    ...localizedEntries("/bilik-merkezi", { changeFrequency: "weekly", priority: 0.7 }),
+    ...localizedEntries("/lugat", { changeFrequency: "monthly", priority: 0.6 }),
+    ...localizedEntries("/kalkulyator", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/elaqe", { changeFrequency: "yearly", priority: 0.5 }),
     ...localizedEntries("/mexfilik-siyaseti", { changeFrequency: "yearly", priority: 0.2 }),
     ...localizedEntries("/istifade-sertleri", { changeFrequency: "yearly", priority: 0.2 }),
@@ -105,9 +109,18 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
       changeFrequency: "daily" as const,
       priority: 0.75,
     })),
+    ...(source.knowledge ?? []).flatMap((item) => localizedEntries(item.path, {
+      ...(item.updatedAt ? { lastModified: item.updatedAt } : {}),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
   ];
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  return buildSitemap(await getCachedSitemapEntries());
+  const [source, knowledge] = await Promise.all([
+    getCachedSitemapEntries(),
+    getCachedKnowledgeSitemapEntries(),
+  ]);
+  return buildSitemap({ ...source, knowledge });
 }
