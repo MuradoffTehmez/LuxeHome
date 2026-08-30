@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { timingSafeEqual } from "@/lib/auth/crypto";
 import { runSavedSearchDigest } from "@/lib/saved-search-digest";
 import { savedSearchDigestStore } from "@/lib/queries";
+import { runPhase2Maintenance } from "@/lib/phase2-maintenance";
 
 /**
  * «Gündəlik» / «Həftəlik» saxlanmış axtarış digest-inin işə salma nöqtəsi.
@@ -47,8 +48,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await runSavedSearchDigest(savedSearchDigestStore);
-    return NextResponse.json(result, {
+    const [digest, maintenance] = await Promise.all([
+      runSavedSearchDigest(savedSearchDigestStore),
+      runPhase2Maintenance(),
+    ]);
+    return NextResponse.json({ ...digest, maintenance }, {
       headers: { "Cache-Control": "no-store, max-age=0" },
     });
   } catch (error) {
