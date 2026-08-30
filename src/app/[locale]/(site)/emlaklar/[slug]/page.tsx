@@ -39,6 +39,8 @@ import { ButtonAnchor, buttonClassName } from "@/components/ui/button";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyActionToolbar } from "@/components/site/property-action-toolbar";
+import { PropertyQr } from "@/components/site/property-qr";
+import { propertyQrSvg } from "@/lib/property-qr";
 import { PropertyMap } from "@/components/site/property-map";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
@@ -426,6 +428,8 @@ export default async function PropertyDetailPage({ params }: Props) {
                     const description = locale === "en" ? profile.descriptionEn : locale === "ru" ? profile.descriptionRu : profile.description;
                     const metrics = [
                       profile.averagePrice != null && [neighborhoodText("averagePrice"), formatPrice(profile.averagePrice)],
+                      profile.medianPrice != null && [neighborhoodText("medianPrice"), formatPrice(profile.medianPrice)],
+                      profile.saleRentRatio != null && [neighborhoodText("saleRentRatio"), `${profile.saleRentRatio}`],
                       profile.averagePricePerSqm != null && [neighborhoodText("pricePerSqm"), `${formatPrice(profile.averagePricePerSqm)}/m²`],
                       profile.annualChangePercent != null && [neighborhoodText("annualChange"), `${profile.annualChangePercent > 0 ? "+" : ""}${profile.annualChangePercent}%`],
                       profile.averageRent != null && [neighborhoodText("averageRent"), formatPrice(profile.averageRent)],
@@ -480,6 +484,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                   }}
                 />
               )}
+
+              {/* QR kod — PRD bölmə 61-63: canonical URL, PNG/SVG yükləmə. */}
+              <PropertyQr svg={propertyQrSvg(propertyPath)} slug={property.slug} />
 
               {relatedLandingLinks.length > 0 && (
                 <nav aria-label={content("relatedSearchesAria")} className="border-y border-line py-5">
