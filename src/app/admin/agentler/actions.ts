@@ -9,6 +9,7 @@ import * as form from "@/lib/admin/form";
 import { PERMISSIONS, REVIEW_STATUSES } from "@/lib/constants";
 import { parseSingleImage } from "@/lib/admin/images";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { slugify } from "@/lib/utils";
 
 const agentSchema = z.object({
@@ -109,16 +110,17 @@ export async function saveAgentProfile(_previous: ActionState, formData: FormDat
       await recordAudit(actor, "UPDATE", "AgentProfile", id, parsed.data.name);
       revalidatePath("/admin/agentler");
       revalidatePath(`/admin/agentler/${id}`);
-      revalidatePath("/agentler");
-      revalidatePath(`/agentler/${previous.slug}`);
-      if (previous.slug !== slug) revalidatePath(`/agentler/${slug}`);
+      revalidatePublicContent("agent", previous.slug);
+      if (previous.slug !== slug) revalidatePublicContent("agent", slug);
+      // Agent kartı əmlak detalında da göstərilir və orada keşli sorğudan gəlir.
+      revalidatePublicContent("property");
       return success("Agent profili yeniləndi.");
     }
 
     const agent = await prisma.agentProfile.create({ data });
     await recordAudit(actor, "CREATE", "AgentProfile", agent.id, parsed.data.name);
     revalidatePath("/admin/agentler");
-    revalidatePath("/agentler");
+    revalidatePublicContent("agent", slug);
     return success("Agent profili yaradıldı.");
   } catch (error) {
     return unexpected("agent profili saxlanılmadı", error, "Agent profili saxlanıla bilmədi. URL adı və bağlı hesab təkrarsız olmalıdır.");
@@ -153,8 +155,8 @@ export async function deleteAgentProfile(id: string): Promise<ActionState> {
     await prisma.agentProfile.delete({ where: { id } });
     await recordAudit(actor, "DELETE", "AgentProfile", id, agent.name);
     revalidatePath("/admin/agentler");
-    revalidatePath("/agentler");
-    revalidatePath(`/agentler/${agent.slug}`);
+    revalidatePublicContent("agent", agent.slug);
+    revalidatePublicContent("property");
     return success("Agent profili silindi.");
   } catch (error) {
     return unexpected("agent profili silinmədi", error);
@@ -177,7 +179,8 @@ async function moderateReview(id: string, status: string): Promise<ActionState> 
     });
     await recordAudit(actor, "STATUS_CHANGE", "AgentReview", id, `${review.customerName} — ${status}`);
     revalidatePath("/admin/agentler");
-    revalidatePath(`/agentler/${review.agent.slug}`);
+    revalidatePublicContent("agent", review.agent.slug);
+    revalidatePublicContent("property");
     return success(status === REVIEW_STATUSES.APPROVED ? "Rəy təsdiqləndi." : "Rəy rədd edildi.");
   } catch (error) {
     return unexpected("agent rəyi moderasiya edilmədi", error);
@@ -208,8 +211,8 @@ export async function toggleAgentVisibility(id: string): Promise<ActionState> {
     await prisma.agentProfile.update({ where: { id }, data: { isPublic: !current.isPublic } });
     await recordAudit(actor, "UPDATE", "AgentProfile", id, `${current.name} — ${current.isPublic ? "gizlədildi" : "dərc edildi"}`);
     revalidatePath("/admin/agentler");
-    revalidatePath("/agentler");
-    revalidatePath(`/agentler/${current.slug}`);
+    revalidatePublicContent("agent", current.slug);
+    revalidatePublicContent("property");
     return success(current.isPublic ? "Agent ictimai kataloqdan gizlədildi." : "Agent ictimai kataloqda dərc edildi.");
   } catch (error) {
     return unexpected("agent görünürlüğü dəyişmədi", error);
@@ -252,7 +255,7 @@ export async function createTestimonial(_previous: ActionState, formData: FormDa
     });
     await recordAudit(actor, "CREATE", "Testimonial", item.id, parsed.data.customerName);
     revalidatePath("/admin/agentler");
-    revalidatePath("/");
+    revalidatePublicContent("property");
     return success("Müştəri rəyi dərc edildi.");
   } catch (error) {
     return unexpected("testimonial yaradılmadı", error);
@@ -273,7 +276,7 @@ export async function deleteTestimonial(id: string): Promise<ActionState> {
     await prisma.testimonial.delete({ where: { id } });
     await recordAudit(actor, "DELETE", "Testimonial", id, item.customerName);
     revalidatePath("/admin/agentler");
-    revalidatePath("/");
+    revalidatePublicContent("property");
     return success("Müştəri rəyi silindi.");
   } catch (error) {
     return unexpected("müştəri rəyi silinmədi", error);

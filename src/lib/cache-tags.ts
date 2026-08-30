@@ -5,6 +5,7 @@ export const PUBLIC_CACHE_TAGS = {
   posts: "public:posts",
   services: "public:services",
   agencies: "public:agencies",
+  agents: "public:agents",
   partners: "public:partners",
   taxonomy: "public:taxonomy",
   sitemap: "public:sitemap",
@@ -16,6 +17,7 @@ export type PublicContentKind =
   | "post"
   | "service"
   | "agency"
+  | "agent"
   | "partner"
   | "taxonomy";
 
@@ -25,6 +27,7 @@ const CONFIG: Record<PublicContentKind, { tag: string; listPath: string; detailB
   post: { tag: PUBLIC_CACHE_TAGS.posts, listPath: "/blog", detailBase: "/blog" },
   service: { tag: PUBLIC_CACHE_TAGS.services, listPath: "/xidmetler", detailBase: "/xidmetler" },
   agency: { tag: PUBLIC_CACHE_TAGS.agencies, listPath: "/agentlikler", detailBase: "/agentlikler" },
+  agent: { tag: PUBLIC_CACHE_TAGS.agents, listPath: "/agentler", detailBase: "/agentler" },
   partner: { tag: PUBLIC_CACHE_TAGS.partners, listPath: "/terefdaslar", detailBase: "/terefdaslar" },
   taxonomy: { tag: PUBLIC_CACHE_TAGS.taxonomy, listPath: "/emlaklar" },
 };
