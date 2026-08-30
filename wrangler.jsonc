@@ -50,6 +50,14 @@
     "binding": "IMAGES"
   },
 
+  // Workers AI — elan təsviri və foto keyfiyyət analizi (`src/lib/ai.ts`).
+  // Xarici AI provayderi (OpenAI) qəsdən işlədilmir: binding hesab daxilində qalır,
+  // ayrıca API açarı saxlanmır və elan məlumatı üçüncü tərəfə göndərilmir.
+  // Bir Worker layihəsində yalnız bir AI binding ola bilər.
+  "ai": {
+    "binding": "AI"
+  },
+
   // ISR/revalidate üçün OpenNext-in özünə müraciəti
   "services": [
     {
@@ -109,6 +117,7 @@
       },
 
       "images": { "binding": "IMAGES" },
+      "ai": { "binding": "AI" },
 
       "vars": {
         // Panel yalnız staging-də açıqdır

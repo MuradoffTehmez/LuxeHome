@@ -1,101 +1,263 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
 import { AI_CONTENT_DRAFT_STATUSES, PERMISSIONS } from "@/lib/constants";
-import { createPhase2AiResponse, parseAiJson } from "@/lib/openai-phase2";
+import { parseAiJson, runAiText, runAiVision } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
-import { siteUrl } from "@/config/site";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 type DescriptionOutput = { title?: string; description: string; highlights?: string[] };
-type PhotoOutput = { images: Array<{ id: string; score: number; issues: string[] }> };
+type PhotoIssue = { score: number; issues: string[] };
+
+/** Model cavabını forma məcbur edən sxem — sərbəst mətn təmizləməkdən etibarlıdır. */
+const DESCRIPTION_SCHEMA = {
+  type: "object",
+  properties: {
+    title: { type: "string" },
+    description: { type: "string" },
+    highlights: { type: "array", items: { type: "string" } },
+  },
+  required: ["description"],
+} as const;
+
+/** Bir çağırışda analiz edilən maksimum şəkil — xərci və icra vaxtını məhdudlaşdırır. */
+const MAX_ANALYZED_IMAGES = 6;
 
 async function guard() {
-  try { return await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE); }
-  catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
+  try {
+    return await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
 }
 
-export async function generatePropertyDescription(_previous: ActionState, formData: FormData): Promise<ActionState> {
+/**
+ * Elan şəklini R2-dən bayt massivi kimi oxuyur.
+ *
+ * `image.url` `/media/<açar>` formatındadır. Şəkli ictimai URL üzərindən çəkmək
+ * əvəzinə birbaşa binding-dən oxumaq həm bir şəbəkə gedişini aradan qaldırır,
+ * həm də hələ dərc edilməmiş elanın şəkli üçün də işləyir.
+ */
+async function readImageBytes(url: string): Promise<Uint8Array | null> {
+  const key = url.startsWith("/media/") ? url.slice("/media/".length) : null;
+  if (!key) return null;
+  const bucket = getCloudflareContext().env.MEDIA;
+  const object = await bucket?.get(key);
+  if (!object) return null;
+  return new Uint8Array(await object.arrayBuffer());
+}
+
+export async function generatePropertyDescription(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const actor = await guard();
   if ("status" in actor) return actor;
+
   const propertyId = form.text(formData, "propertyId");
   const locale = form.text(formData, "locale") || "az";
   if (!propertyId) return failure("Elan seçin.");
+
   try {
     const property = await prisma.property.findUnique({
       where: { id: propertyId },
       include: { type: true, city: true, district: true, features: { include: { feature: true } } },
     });
     if (!property) return failure("Elan tapılmadı.");
+
     const facts = {
-      currentTitle: property.title, listingType: property.listingType, propertyType: property.type.name,
-      city: property.city.name, district: property.district?.name, address: property.address,
-      price: property.price, currency: property.currency, rooms: property.rooms, bedrooms: property.bedrooms,
-      bathrooms: property.bathrooms, area: property.area, landArea: property.landArea, floor: property.floor,
-      totalFloors: property.totalFloors, renovation: property.renovation, documentStatus: property.documentStatus,
+      currentTitle: property.title,
+      listingType: property.listingType,
+      propertyType: property.type.name,
+      city: property.city.name,
+      district: property.district?.name,
+      address: property.address,
+      price: property.price,
+      currency: property.currency,
+      rooms: property.rooms,
+      bedrooms: property.bedrooms,
+      bathrooms: property.bathrooms,
+      area: property.area,
+      landArea: property.landArea,
+      floor: property.floor,
+      totalFloors: property.totalFloors,
+      renovation: property.renovation,
+      documentStatus: property.documentStatus,
       features: property.features.map((item) => item.feature.name),
     };
-    const response = await createPhase2AiResponse({
-      userId: actor.id,
-      instructions: "Sən daşınmaz əmlak redaktorusan. Yalnız verilmiş faktlardan istifadə et, heç bir imkan, lokasiya üstünlüyü və ya hüquqi iddia uydurma. Cavabı yalnız etibarlı JSON kimi qaytar: {\"title\":string,\"description\":string,\"highlights\":string[]}. Mətn peşəkar, aydın və seçilmiş dildə olsun.",
-      text: `Dil: ${locale}. Elan faktları: ${JSON.stringify(facts)}`,
+
+    const response = await runAiText({
+      instructions:
+        "Sən daşınmaz əmlak redaktorusan. Yalnız verilmiş faktlardan istifadə et; heç bir imkan, " +
+        "lokasiya üstünlüyü, investisiya gəliri və ya hüquqi iddia uydurma. Faktlarda olmayan " +
+        "detalı yazma. Cavabı yalnız JSON kimi qaytar: {\"title\":string,\"description\":string," +
+        "\"highlights\":string[]}. Mətn peşəkar, aydın və seçilmiş dildə olsun.",
+      prompt: `Dil: ${locale}. Elan faktları: ${JSON.stringify(facts)}`,
+      jsonSchema: DESCRIPTION_SCHEMA,
     });
+
     const output = parseAiJson<DescriptionOutput>(response.text);
     if (!output.description?.trim()) return failure("AI cavabında təsvir yoxdur.");
+
     const draft = await prisma.aiContentDraft.create({
-      data: { propertyId, requestedById: actor.id, locale, inputJson: JSON.stringify(facts), outputJson: JSON.stringify(output), provider: "openai", model: response.model },
+      data: {
+        propertyId,
+        requestedById: actor.id,
+        locale,
+        inputJson: JSON.stringify(facts),
+        outputJson: JSON.stringify(output),
+        provider: "workers-ai",
+        model: response.model,
+      },
     });
     await recordAudit(actor, "CREATE", "Property", propertyId, `AI mətn qaralaması: ${draft.id}`);
     revalidatePath("/admin/ai-komekci");
     return success("AI təsvir qaralaması yaradıldı. Dərc etməzdən əvvəl yoxlayın.");
-  } catch (error) { return unexpected("AI təsvir yaradılmadı", error, error instanceof Error ? error.message : undefined); }
+  } catch (error) {
+    return unexpected("AI təsvir yaradılmadı", error, error instanceof Error ? error.message : undefined);
+  }
 }
 
-export async function analyzePropertyPhotos(_previous: ActionState, formData: FormData): Promise<ActionState> {
+export async function analyzePropertyPhotos(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const actor = await guard();
   if ("status" in actor) return actor;
+
   const propertyId = form.text(formData, "propertyId");
   if (!propertyId) return failure("Elan seçin.");
+
   try {
-    const property = await prisma.property.findUnique({ where: { id: propertyId }, select: { title: true, images: { orderBy: { order: "asc" }, take: 12, select: { id: true, url: true } } } });
-    if (!property || property.images.length === 0) return failure("Elanın analiz ediləcək şəkli yoxdur.");
-    const imageUrls = property.images.map((image) => image.url.startsWith("http") ? image.url : siteUrl(image.url));
-    const response = await createPhase2AiResponse({
-      userId: actor.id,
-      instructions: "Daşınmaz əmlak foto keyfiyyəti məsləhətçisisən. Hər şəkli texniki və təqdimat keyfiyyətinə görə 0-100 qiymətləndir. Obyektin özünü dəyişdirməyi təklif etmə; işıq, kadr, bulanıqlıq, şaquli xətlər, məxfilik və təkrarı qeyd et. Şəkillər giriş sırasındadır. Yalnız JSON qaytar: {\"images\":[{\"id\":string,\"score\":number,\"issues\":string[]}]}",
-      text: `Elan: ${property.title}. Şəkil ID-ləri sıra ilə: ${property.images.map((image) => image.id).join(", ")}`,
-      imageUrls,
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId },
+      select: {
+        title: true,
+        images: { orderBy: { order: "asc" }, take: MAX_ANALYZED_IMAGES, select: { id: true, url: true } },
+      },
     });
-    const output = parseAiJson<PhotoOutput>(response.text);
-    const allowed = new Set(property.images.map((image) => image.id));
-    for (const result of output.images ?? []) {
-      if (!allowed.has(result.id)) continue;
-      const score = Math.max(0, Math.min(100, Math.round(Number(result.score) || 0)));
-      const issues = Array.isArray(result.issues) ? result.issues.filter((issue) => typeof issue === "string").slice(0, 12) : [];
-      await prisma.propertyImage.update({ where: { id: result.id }, data: { qualityScore: score, qualityIssues: JSON.stringify(issues), analyzedAt: new Date() } });
+    if (!property || property.images.length === 0) return failure("Elanın analiz ediləcək şəkli yoxdur.");
+
+    // Vision modeli bir çağırışda bir şəkil qəbul edir, ona görə şəkillər bir-bir gedir.
+    const results: Array<{ id: string; score: number; issues: string[] }> = [];
+    let model = "";
+    for (const image of property.images) {
+      const bytes = await readImageBytes(image.url);
+      if (!bytes) continue;
+      try {
+        const response = await runAiVision({
+          instructions:
+            "Daşınmaz əmlak foto keyfiyyəti məsləhətçisisən. Şəkli texniki və təqdimat " +
+            "keyfiyyətinə görə 0-100 arası qiymətləndir. Obyektin özünü dəyişdirməyi təklif " +
+            "etmə; yalnız işıq, kadr, bulanıqlıq, şaquli xətlər, məxfilik və artıq əşya kimi " +
+            "çəkiliş problemlərini qeyd et. Yalnız JSON qaytar: " +
+            "{\"score\":number,\"issues\":string[]}",
+          prompt: `Elan: ${property.title}. Şəkli qiymətləndir.`,
+          image: bytes,
+        });
+        model = response.model;
+        const parsed = parseAiJson<PhotoIssue>(response.text);
+        const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 0)));
+        const issues = Array.isArray(parsed.issues)
+          ? parsed.issues.filter((issue) => typeof issue === "string").slice(0, 12)
+          : [];
+        results.push({ id: image.id, score, issues });
+      } catch (error) {
+        // Bir şəklin analizi alınmasa qalanları dayandırmır — nəticə qismən olur.
+        console.error(`[ai] «${image.id}» şəkli analiz edilmədi:`, error);
+      }
     }
-    await prisma.aiContentDraft.create({ data: { propertyId, requestedById: actor.id, inputJson: JSON.stringify({ imageIds: property.images.map((image) => image.id) }), outputJson: JSON.stringify(output), provider: "openai", model: response.model } });
+
+    if (results.length === 0) return failure("Heç bir şəkil analiz edilə bilmədi.");
+
+    for (const result of results) {
+      await prisma.propertyImage.update({
+        where: { id: result.id },
+        data: {
+          qualityScore: result.score,
+          qualityIssues: JSON.stringify(result.issues),
+          analyzedAt: new Date(),
+        },
+      });
+    }
+
+    await prisma.aiContentDraft.create({
+      data: {
+        propertyId,
+        requestedById: actor.id,
+        inputJson: JSON.stringify({ imageIds: results.map((result) => result.id) }),
+        outputJson: JSON.stringify({ images: results }),
+        provider: "workers-ai",
+        model,
+      },
+    });
     await recordAudit(actor, "UPDATE", "Property", propertyId, "AI foto keyfiyyəti analizi");
     revalidatePath("/admin/ai-komekci");
-    return success("Foto analizi tamamlandı.");
-  } catch (error) { return unexpected("AI foto analizi tamamlanmadı", error, error instanceof Error ? error.message : undefined); }
+    return success(`${results.length} şəkil analiz edildi.`);
+  } catch (error) {
+    return unexpected("AI foto analizi tamamlanmadı", error, error instanceof Error ? error.message : undefined);
+  }
 }
 
 export async function applyDescriptionDraft(id: string): Promise<ActionState> {
   const actor = await guard();
   if ("status" in actor) return actor;
+
   try {
-    const draft = await prisma.aiContentDraft.findFirst({ where: { id, status: AI_CONTENT_DRAFT_STATUSES.DRAFT, propertyId: { not: null } } });
+    const draft = await prisma.aiContentDraft.findFirst({
+      where: { id, status: AI_CONTENT_DRAFT_STATUSES.DRAFT, propertyId: { not: null } },
+    });
     if (!draft?.propertyId) return failure("Qaralama tapılmadı və ya artıq işlənib.");
+
     const output = parseAiJson<DescriptionOutput>(draft.outputJson);
     if (!output.description?.trim()) return failure("Qaralamada təsvir yoxdur.");
-    const property = await prisma.property.update({ where: { id: draft.propertyId }, data: { description: output.description.trim(), ...(output.title?.trim() ? { title: output.title.trim() } : {}) }, select: { slug: true } });
-    await prisma.aiContentDraft.update({ where: { id }, data: { status: AI_CONTENT_DRAFT_STATUSES.APPLIED, appliedAt: new Date() } });
+
+    const property = await prisma.property.update({
+      where: { id: draft.propertyId },
+      data: {
+        description: output.description.trim(),
+        ...(output.title?.trim() ? { title: output.title.trim() } : {}),
+      },
+      select: { slug: true },
+    });
+    await prisma.aiContentDraft.update({
+      where: { id },
+      data: { status: AI_CONTENT_DRAFT_STATUSES.APPLIED, appliedAt: new Date() },
+    });
     await recordAudit(actor, "UPDATE", "Property", draft.propertyId, `AI qaralaması insan təsdiqi ilə tətbiq edildi: ${id}`);
-    revalidatePath("/admin/ai-komekci"); revalidatePath(`/emlaklar/${property.slug}`);
+    revalidatePath("/admin/ai-komekci");
+    revalidatePublicContent("property", property.slug);
     return success("Qaralama elana tətbiq edildi.");
-  } catch (error) { return unexpected("AI qaralaması tətbiq edilmədi", error); }
+  } catch (error) {
+    return unexpected("AI qaralaması tətbiq edilmədi", error);
+  }
+}
+
+export async function discardDescriptionDraft(id: string): Promise<ActionState> {
+  const actor = await guard();
+  if ("status" in actor) return actor;
+
+  try {
+    const draft = await prisma.aiContentDraft.findFirst({
+      where: { id, status: AI_CONTENT_DRAFT_STATUSES.DRAFT },
+      select: { id: true },
+    });
+    if (!draft) return failure("Qaralama tapılmadı və ya artıq işlənib.");
+
+    await prisma.aiContentDraft.update({
+      where: { id },
+      data: { status: AI_CONTENT_DRAFT_STATUSES.DISCARDED },
+    });
+    await recordAudit(actor, "UPDATE", "Property", null, `AI qaralaması rədd edildi: ${id}`);
+    revalidatePath("/admin/ai-komekci");
+    return success("Qaralama rədd edildi.");
+  } catch (error) {
+    return unexpected("AI qaralaması rədd edilmədi", error);
+  }
 }
