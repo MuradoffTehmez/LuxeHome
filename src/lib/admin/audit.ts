@@ -40,6 +40,10 @@ export type AuditEntity =
   | "Redirect"
   | "Setting"
   | "ContentTranslation"
+  | "Reservation"
+  | "AgentProfile"
+  | "AgentReview"
+  | "Testimonial"
   | "AuditLog";
 
 export async function recordAudit(

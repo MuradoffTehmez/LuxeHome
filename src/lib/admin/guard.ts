@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { requireLister, requirePermission } from "@/lib/auth/guard";
+import { requireAccount, requireLister, requirePermission } from "@/lib/auth/guard";
 import { clientIp } from "@/lib/auth/rate-limit";
 import {
   SameOriginError,
@@ -61,11 +61,13 @@ export async function requireAdminAction(permission: Permission): Promise<AuthUs
 
 /** İctimai kabinet yazıları üçün CSRF, hesab növü və ayrıca sürət limiti qapısı. */
 export async function requirePublicAction(
-  scope: "media" | "property",
+  scope: "media" | "property" | "review" | "reservation" | "preferences" | "push",
   locale: Locale = DEFAULT_LOCALE,
 ): Promise<AuthUser> {
   await assertSameOrigin();
-  const user = await requireLister(locale);
+  const user = scope === "media" || scope === "property"
+    ? await requireLister(locale)
+    : await requireAccount(locale);
   await assertWriteLimit(user.id, `public:${scope}`);
   return user;
 }
