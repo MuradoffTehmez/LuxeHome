@@ -389,13 +389,6 @@ export const SAVED_SEARCH_FREQUENCIES = {
 export type SavedSearchFrequency =
   (typeof SAVED_SEARCH_FREQUENCIES)[keyof typeof SAVED_SEARCH_FREQUENCIES];
 
-export const SAVED_SEARCH_FREQUENCY_LABELS: Record<SavedSearchFrequency, string> = {
-  IMMEDIATE: "Dərhal",
-  DAILY: "Gündəlik",
-  WEEKLY: "Həftəlik",
-  OFF: "Söndürülüb",
-};
-
 /**
  * Bildiriş növləri. Hazırda yalnız saxlanmış axtarış uyğunluğu istehsal edir —
  * gələcək alt-layihələr PRICE_DROP (qiymət düşməsi) və MEETING_REMINDER (görüş
@@ -404,6 +397,10 @@ export const SAVED_SEARCH_FREQUENCY_LABELS: Record<SavedSearchFrequency, string>
  */
 export const NOTIFICATION_TYPES = {
   SAVED_SEARCH_MATCH: "SAVED_SEARCH_MATCH",
+  PRICE_DROP: "PRICE_DROP",
+  RESERVATION_STATUS: "RESERVATION_STATUS",
+  RECOMMENDATION: "RECOMMENDATION",
+  MEETING_REMINDER: "MEETING_REMINDER",
 } as const;
 
 export type NotificationType =
@@ -411,7 +408,95 @@ export type NotificationType =
 
 export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   SAVED_SEARCH_MATCH: "Saxlanmış axtarışa uyğun elan",
+  PRICE_DROP: "Qiymət endirimi",
+  RESERVATION_STATUS: "Rezervasiya statusu",
+  RECOMMENDATION: "Fərdi tövsiyə",
+  MEETING_REMINDER: "Görüş xatırlatması",
 };
+
+// ---------------------------------------------------------------------------
+// PUBLIC PLATFORM — PHASE 2
+// ---------------------------------------------------------------------------
+
+export const RESERVATION_STATUSES = {
+  REQUESTED: "REQUESTED",
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  CANCELLED: "CANCELLED",
+  EXPIRED: "EXPIRED",
+  COMPLETED: "COMPLETED",
+} as const;
+
+export type ReservationStatus =
+  (typeof RESERVATION_STATUSES)[keyof typeof RESERVATION_STATUSES];
+
+export const RESERVATION_STATUS_LABELS: Record<ReservationStatus, string> = {
+  REQUESTED: "Sorğu göndərilib",
+  PENDING: "Baxılır",
+  APPROVED: "Təsdiqlənib",
+  REJECTED: "Rədd edilib",
+  CANCELLED: "Ləğv edilib",
+  EXPIRED: "Müddəti bitib",
+  COMPLETED: "Tamamlanıb",
+};
+
+export const REVIEW_STATUSES = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  HIDDEN: "HIDDEN",
+} as const;
+
+export type ReviewStatus = (typeof REVIEW_STATUSES)[keyof typeof REVIEW_STATUSES];
+
+export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
+  PENDING: "Moderasiya gözləyir",
+  APPROVED: "Təsdiqlənib",
+  REJECTED: "Rədd edilib",
+  HIDDEN: "Gizlədilib",
+};
+
+export const NEARBY_PLACE_CATEGORIES = {
+  METRO: "METRO",
+  BUS: "BUS",
+  SCHOOL: "SCHOOL",
+  UNIVERSITY: "UNIVERSITY",
+  KINDERGARTEN: "KINDERGARTEN",
+  HOSPITAL: "HOSPITAL",
+  CLINIC: "CLINIC",
+  PHARMACY: "PHARMACY",
+  SUPERMARKET: "SUPERMARKET",
+  RESTAURANT: "RESTAURANT",
+  PARK: "PARK",
+  SHOPPING_CENTER: "SHOPPING_CENTER",
+} as const;
+
+export type NearbyPlaceCategory =
+  (typeof NEARBY_PLACE_CATEGORIES)[keyof typeof NEARBY_PLACE_CATEGORIES];
+
+export const NEARBY_PLACE_CATEGORY_LABELS: Record<NearbyPlaceCategory, string> = {
+  METRO: "Metro",
+  BUS: "Avtobus dayanacağı",
+  SCHOOL: "Məktəb",
+  UNIVERSITY: "Universitet",
+  KINDERGARTEN: "Uşaq bağçası",
+  HOSPITAL: "Xəstəxana",
+  CLINIC: "Klinika",
+  PHARMACY: "Aptek",
+  SUPERMARKET: "Supermarket",
+  RESTAURANT: "Restoran",
+  PARK: "Park",
+  SHOPPING_CENTER: "Ticarət mərkəzi",
+};
+
+export const PREMIUM_DURATIONS_DAYS = [3, 7, 14, 30] as const;
+
+export const AI_CONTENT_DRAFT_STATUSES = {
+  DRAFT: "DRAFT",
+  APPLIED: "APPLIED",
+  DISCARDED: "DISCARDED",
+} as const;
 
 // ---------------------------------------------------------------------------
 // SIRALAMA VƏ SƏHİFƏLƏMƏ
