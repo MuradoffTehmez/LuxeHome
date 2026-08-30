@@ -71,6 +71,7 @@ export default async function AdminRedirectsPage() {
                 path={hit.path}
                 count={hit.count}
                 lastSeenAt={formatRelative(hit.lastSeenAt)}
+                firstSeenAt={formatRelative(hit.firstSeenAt)}
               />
             ))}
           </ul>

@@ -89,17 +89,20 @@ export function NotFoundHitRow({
   path,
   count,
   lastSeenAt,
+  firstSeenAt,
 }: {
   id: string;
   path: string;
   count: number;
   lastSeenAt: string;
+  /** İlk qeyd tarixi — yolun köhnə sınıq link, yoxsa yeni skaner olduğunu ayırır. */
+  firstSeenAt: string;
 }) {
   return (
     <li className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5 last:border-0">
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="text-sm text-ink [overflow-wrap:anywhere]">{path}</span>
-        <span className="text-xs text-ink-muted">Son: {lastSeenAt}</span>
+        <span className="text-xs text-ink-muted">İlk: {firstSeenAt} · Son: {lastSeenAt}</span>
       </div>
       <div className="flex shrink-0 items-center gap-2">
         <span className="tabular text-xs font-medium text-ink-muted">{count}×</span>
