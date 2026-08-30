@@ -45,6 +45,34 @@ const CATEGORIES = [
   ["agentlik-brokerlik", "Agentlik və brokerlik", "Handshake"],
 ] as const;
 
+const TERMS = [
+  ["cixaris-kupca", "Çıxarış (kupça)", "Əmlak üzərində mülkiyyət hüququnun dövlət reyestrində qeydiyyata alındığını təsdiqləyən rəsmi sənəd.", "qeydiyyat-notariat"],
+  ["payli-mulkiyyet", "Paylı mülkiyyət", "Bir əmlakda hər bir mülkiyyətçinin payının faiz və ya kəsr şəklində əvvəlcədən müəyyən edildiyi mülkiyyət forması.", "alqi-satqi"],
+  ["birge-mulkiyyet", "Birgə mülkiyyət", "Paylar əvvəlcədən müəyyən edilmədən əmlakın bir neçə şəxsə, adətən ər-arvada, birlikdə məxsus olması.", "alqi-satqi"],
+  ["ipoteka", "İpoteka", "Borclunun öhdəliyinə təminat kimi daşınmaz əmlakın kreditorun xeyrinə yüklü edilməsi.", "ipoteka-maliyye"],
+  ["beh", "Beh", "Müqavilənin bağlandığını təsdiqləyən və icrasını təmin edən qabaqcadan ödəniş; avansla eyni hüquqi nəticəni daşımır.", "alqi-satqi"],
+  ["vindikasiya-iddiasi", "Vindikasiya iddiası", "Mülkiyyətçinin əmlakını başqasının qanunsuz sahibliyindən geri tələb etməsi barədə iddia.", "mehkemeler"],
+  ["neqator-iddia", "Neqator iddia", "Mülkiyyətçinin sahiblikdən məhrum edilmədən əmlakdan istifadəsinə yaradılan maneələrin aradan qaldırılması tələbi.", "mehkemeler"],
+  ["torpagin-teyinati", "Torpağın təyinatı", "Torpaq sahəsindən hansı məqsədlə istifadə oluna biləcəyini müəyyən edən hüquqi kateqoriya və istifadə rejimi.", "torpaq"],
+  ["agent", "Agent", "Müştərinin marağında əmlakın tapılması, təqdimatı, danışıqlar və əməliyyat koordinasiyasını həyata keçirən şəxs.", "agentlik-brokerlik"],
+  ["broker", "Broker", "Müqavilənin bağlanmasına brokerlik müqaviləsi çərçivəsində vasitəçilik edən şəxs.", "agentlik-brokerlik"],
+  ["numayende", "Nümayəndə", "Etibarnamə və ya başqa qanuni əsasla şəxsin adından hüquqi hərəkət etmək səlahiyyəti olan şəxs.", "agentlik-brokerlik"],
+  ["ilkin-muqavile", "İlkin müqavilə", "Tərəflərin gələcəkdə əsas müqaviləni bağlamaq öhdəliyini müəyyən edən, lakin özü mülkiyyət hüququ yaratmayan müqavilə.", "yeni-tikili"],
+] as const;
+
+const FAQS = [
+  ["Çıxarış olmadan notarial mənzil satışı mümkündürmü?", "Dövlət reyestrində qeydiyyat tələb olunan daşınmaz əmlakın adi alqı-satqısı üçün mülkiyyət hüququnun qeydiyyatı əsas şərtdir.", "PURCHASE"],
+  ["Kupçası olmayan, yalnız MTK müqaviləsi olan evi ipoteka ilə almaq mümkündürmü?", "Adətən xeyr. Bank ipotekası üçün alınan yaşayış sahəsi üzərində mülkiyyət hüququ dövlət qeydiyyatında olmalı və əmlak ipoteka predmeti kimi qəbul edilməlidir.", "PAYMENT"],
+  ["Mənzil satılarkən MTK-nın sənəd dəyişikliyi üçün əlavə faiz tələb etməsi qanunidirmi?", "Ümumi qanunvericilikdə MTK üçün satış qiymətindən məcburi faiz nəzərdə tutulmur. Tələb olunan hər ödənişin hüquqi və müqavilə əsası yazılı şəkildə göstərilməlidir.", "LEGAL"],
+  ["Əmlak kirayəyə veriləndə vergini kim ödəyir?", "Ödəmə mexanizmi kirayəçinin vergi statusundan asılıdır. Hüquqi şəxs ödəmə mənbəyində vergi tuta bilər; fiziki şəxsə kirayədə isə ev sahibinin uçot və bəyannamə öhdəliyi yarana bilər.", "RENT"],
+  ["Daşınmaz əmlakın icbari sığortası məcburidirmi?", "Qanunda nəzərdə tutulan daşınmaz əmlak üçün icbari sığorta tələb olunur. Məbləğ və məsuliyyət əmlakın yerləşdiyi əraziyə və şəxsin statusuna görə dəyişir.", "LEGAL"],
+  ["Binanın idarəetməsini MTK-dan sakinlərin idarəetməsinə keçirmək mümkündürmü?", "Mənzil mülkiyyətçiləri qanunda nəzərdə tutulan ümumi yığıncaq və səs çoxluğu qaydalarına əməl etməklə müştərək idarəetmə qurumu yarada bilərlər.", "LEGAL"],
+  ["Altı ay keçdikdə miras hüququ avtomatik itirilirmi?", "Xeyr. Bu mövzuda köhnə internet izahlarına güvənmək olmaz; 2023-cü il Konstitusiya Məhkəməsi qərarının nəticələri və konkret vərəsəlik faktları ayrıca qiymətləndirilməlidir.", "LEGAL"],
+  ["Agent komissiyanı yalnız şifahi razılaşma əsasında tələb edə bilərmi?", "Faktiki münasibətin sübutundan asılı olaraq mübahisə yarana bilər, lakin komissiya, yaranma anı və xidmət həcmi yazılı broker və ya agentlik müqaviləsində göstərilməlidir.", "AGENCY"],
+  ["Agent satıcının adından müqavilə imzalaya bilərmi?", "Yalnız qanuni nümayəndəlik səlahiyyəti, məsələn etibarlı etibarnamə varsa. Agentlik xidməti öz-özünə müştərinin adından əqd bağlamaq hüququ vermir.", "AGENCY"],
+  ["Daşınmaz əmlak agenti üçün 2 faiz məcburi komissiyadırmı?", "Xeyr. Ümumi daşınmaz əmlak əməliyyatları üçün qanuni sabit 2 faiz komissiya norması yoxdur; haqq və ödəniş şərtləri müqavilədə müəyyən edilir.", "AGENCY"],
+] as const;
+
 function quote(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }
@@ -132,5 +160,30 @@ for (const section of sections) {
   );
 }
 
+sql.push(
+  `UPDATE "KnowledgeArticle" SET "status"='PUBLISHED', "legalReviewedAt"='2026-08-30T00:00:00.000Z', "updatedAt"=${now} WHERE "id" LIKE 'knowledge_article_%';`,
+);
+
+for (const [order, [slug, term, shortDefinition, categorySlug]] of TERMS.entries()) {
+  sql.push(
+    `INSERT INTO "KnowledgeTerm" ("id","slug","term","searchName","shortDefinition","definition","initial","categoryId","status","order","createdAt","updatedAt") VALUES (` +
+      `${quote(`knowledge_term_${slug}`)},${quote(slug)},${quote(term)},${quote(slug.replace(/-/g, " "))},${quote(shortDefinition)},` +
+      `${quote(`<p>${escapeHtml(shortDefinition)}</p>`)},${quote(term[0].toLocaleUpperCase("az-AZ"))},` +
+      `(SELECT "id" FROM "KnowledgeCategory" WHERE "slug"=${quote(categorySlug)}),'PUBLISHED',${order * 10},${now},${now}) ` +
+      `ON CONFLICT("id") DO UPDATE SET "term"=excluded."term","searchName"=excluded."searchName","shortDefinition"=excluded."shortDefinition",` +
+      `"definition"=excluded."definition","initial"=excluded."initial","categoryId"=excluded."categoryId","status"='PUBLISHED',"order"=excluded."order","updatedAt"=${now};`,
+  );
+}
+
+for (const [order, [question, answer, category]] of FAQS.entries()) {
+  const slug = slugify(question);
+  sql.push(
+    `INSERT INTO "KnowledgeFaq" ("id","question","answer","category","status","order","createdAt","updatedAt") VALUES (` +
+      `${quote(`knowledge_faq_${slug}`)},${quote(question)},${quote(`<p>${escapeHtml(answer)}</p>`)},${quote(category)},'PUBLISHED',${order * 10},${now},${now}) ` +
+      `ON CONFLICT("id") DO UPDATE SET "question"=excluded."question","answer"=excluded."answer","category"=excluded."category",` +
+      `"status"='PUBLISHED',"order"=excluded."order","updatedAt"=${now};`,
+  );
+}
+
 writeFileSync(outputPath, `${sql.join("\n")}\n`, "utf8");
-console.log(`✓ ${sections.length} bələdçi və ${CATEGORIES.length} mövzu → ${outputPath}`);
+console.log(`✓ ${sections.length} bələdçi, ${CATEGORIES.length} mövzu, ${TERMS.length} termin və ${FAQS.length} FAQ → ${outputPath}`);
