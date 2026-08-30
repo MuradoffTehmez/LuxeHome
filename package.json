@@ -55,6 +55,7 @@
     "sharp": "^0.35.3",
     "tailwind-merge": "^3.6.0",
     "ultrahtml": "^1.7.0",
+    "web-push": "^3.6.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -67,6 +68,7 @@
     "@types/qrcode-svg": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/web-push": "^3.6.4",
     "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.23",

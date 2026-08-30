@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { buildMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
 import { NotificationList, type NotificationListItem } from "./notification-list";
+import { PushPreferences } from "./push-preferences";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -65,6 +66,7 @@ export default async function NotificationsPage() {
       <PageHeader contained compact eyebrow={t("eyebrow")} title={t("title")} description={t("count", { count: items.length })} />
 
       <div className="mt-8">
+        <PushPreferences />
         {items.length > 0 ? (
           <NotificationList items={items} />
         ) : (
