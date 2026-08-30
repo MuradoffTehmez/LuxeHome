@@ -476,11 +476,11 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <span>Layihə auditi</span>
     <span>27 avqust 2026 · 30 avqust yeniləməsi</span>
     <span>audit + düzəlişlər + Bilik Mərkəzi</span>
-    <span>branch main · 56b30aa</span>
+    <span>branch main · 922bb0f bazası</span>
   </div>
   <h1>Luxe Home Estate — kod bazasının vəziyyəti</h1>
   <p class="standfirst">
-    51 900 sətir mənbə kodu, 382 commit, 112 səhifə/API giriş nöqtəsi, 53 verilənlər bazası
+    51 900 sətir mənbə kodu, 388 commit, 112 səhifə/API giriş nöqtəsi, 53 verilənlər bazası
     modeli və iki PRD sənədi. 30 avqust izləməsində ayrıca Real Estate Knowledge Hub,
     platforma FAQ-sı, hüquqi FAQ, lüğət və kalkulyator yoxlanılıb. Bütün nəticələr kod və
     sənəd üzərində təsdiqlənib — PRD-dəki niyyət deyil, repoda olan davranış əsas götürülüb.
@@ -504,8 +504,8 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     </div>
     <div class="gate">
       <span class="gate-k">next build</span>
-      <span class="gate-v warn">BLOCK</span>
-      <span class="gate-n">Cloudflare API tokeni tələb edir</span>
+      <span class="gate-v pass">PASS</span>
+      <span class="gate-n">production build tamamlanıb</span>
     </div>
     <div class="gate">
       <span class="gate-k">CI</span>
@@ -560,9 +560,9 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
   <div class="callout" style="margin-top:18px">
     <strong>Yayım bloklayıcıları:</strong> <code>0024_knowledge_hub.sql</code> əvvəl staging,
     sonra production D1-ə tətbiq edilməli; mənbə sənədindən yaradılan qeydlər DRAFT qalmalı
-    və hüquqşünas/redaktor baxışından sonra yayımlanmalıdır. Lokal <code>next build</code> bu
-    yoxlamada kod xətasına görə deyil, qeyri-interaktiv Cloudflare remote proxy-nin
-    <code>CLOUDFLARE_API_TOKEN</code> tələb etməsinə görə tamamlanmayıb.
+    və hüquqşünas/redaktor baxışından sonra yayımlanmalıdır. Miqrasiya production-a
+    tətbiq olunub; son <code>next build</code>, deploy və canlı smoke yoxlaması tamamlanıb.
+    Növbəti idxal paketləri yenə DRAFT saxlanılmalıdır.
   </div>
 </section>
 
@@ -572,18 +572,19 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
 
   <p>
     Kod bazası texniki cəhətdən sağlamdır: test, typecheck və lint qapıları təmiz keçir;
-    production build isə bu hostda Cloudflare remote proxy tokeni olmadığı üçün bloklanır,
+    production build və 369 test son yoxlamada təmiz keçir,
     auth qatı ciddi qurulub (D1-də ləğv edilə bilən sessiya, məcburi TOTP, CSRF + sürət
     limiti hər yazma əməliyyatında), i18n intizamı yüksəkdir və media yükləmə axını
     magic-byte yoxlaması ilə düzgün müdafiə olunub. Arxitektura sənədləşməsi (CLAUDE.md)
     qeyri-adi dərəcədə keyfiyyətlidir — «niyə belədir» izahları real qərarları saxlayır.
   </p>
   <p>
-    Əsas risk funksionallıq boşluğunda deyil, <strong>yarımçıq bağlanmış zəncirlərdədir</strong>:
-    UI istifadəçiyə vəd verir, arxa tərəfdə isə həmin vəd yerinə yetirilmir. Saxlanmış axtarışın
-    «Gündəlik / Həftəlik» seçimi heç vaxt göndərilmir, baxış sayğacı heç vaxt artmır,
-    əlaqə forması tamamilə qorunmamışdır. Bunların heç biri testdən keçmir, çünki
-    testlər həmin zəncirlərin uclarını yoxlamır.
+    Əsas qalan risk artıq Phase 1–2 funksionallıq boşluğu deyil, <strong>production
+    konfiqurasiyası və Phase 3 qəbul meyarlarıdır</strong>. Saxlanmış axtarış digest-i,
+    baxış sayğacı, spam qoruması, Web Push, Price Drop, rezervasiya, agent profili/rəyi,
+    premium elan, nearby places, tövsiyə və wizard zəncirləri kod bazasında bağlanıb.
+    Canlı Push çatdırılması VAPID sirrlərindən, e-poçt Resend domen təsdiqindən,
+    yeni D1 modelləri isə production miqrasiyalarının tətbiqindən asılıdır.
   </p>
 
   <div class="callout">
@@ -597,8 +598,8 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     bu tamamlamada B13 ölü ixracı silindi, GitHub Actions CI əlavə olundu və
     <code>CLAUDE.md</code> / <code>MEMORY.md</code> cari kodla uyğunlaşdırıldı. B9 (admin UI-ının
     üçdilli edilməsi) ayrıca böyük modul, P5 isə ölçmə tələb edən arxitektura işi kimi açıqdır.
-    Resend domeninin faktiki təsdiqi və canlı Cloudflare smoke yoxlaması xarici mühitdə
-    əməliyyat yoxlaması olaraq qalır.
+    Build, Cloudflare deploy və canlı smoke yoxlaması son buraxılışda tamamlanıb;
+    Resend domeninin faktiki təsdiqi ayrı xarici əməliyyat yoxlaması olaraq qalır.
   </div>
 </section>
 
@@ -613,39 +614,44 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <div>
       <div class="meter-head">
         <span class="meter-name">Public PRD — Phase 1 MVP (bölmə 178)</span>
-        <span class="meter-pct">~80%</span>
+        <span class="meter-pct">100%</span>
       </div>
-      <div class="track"><div class="fill" style="width:80%"></div></div>
+      <div class="track"><div class="fill" style="width:100%"></div></div>
       <p class="meter-sub">
         Home, axtarış, filtrlər, əmlak detalı, agentliklər, rayon/metro səhifələri, üç dil,
         tema, qeydiyyat, favorit, son baxılanlar, saxlanmış axtarış, bildiriş və bütün SEO
-        bəndləri hazırdır. Çatışmayan: <strong>agent profili</strong>, <strong>qiymət tarixçəsi</strong>,
-        <strong>QR kod</strong>, <strong>görüş sorğusu</strong>.
+        bəndləri hazırdır. Əvvəl çatışmayan agent profili, qiymət tarixçəsi,
+        QR/paylaşma və görüş-rezervasiya axını da tamamlanıb.
       </p>
     </div>
 
     <div>
       <div class="meter-head">
         <span class="meter-name">Public PRD — Phase 2 (bölmə 179)</span>
-        <span class="meter-pct">~8%</span>
+        <span class="meter-pct">100%</span>
       </div>
-      <div class="track"><div class="fill low" style="width:8%"></div></div>
+      <div class="track"><div class="fill" style="width:100%"></div></div>
       <p class="meter-sub">
-        13 bənddən yalnız <strong>Müqayisə</strong> hazırdır. Web Push, Price Drop, Rezervasiya,
-        agent rəyləri, testimonial, nearby places, premium elan, tövsiyə mühərriki və
-        wizard yazılmayıb.
+        <strong>13/13 bənd kod səviyyəsində hazırdır:</strong> Web Push, Price Drop Alert,
+        rezervasiya, müqayisə, agent rəyləri, testimonial, rayon analitikası, nearby places,
+        premium elan, tövsiyə mühərriki, 12 suallı wizard, AI elan mətni və AI Photo
+        Advisor. Push-un canlı çatdırılması üçün VAPID production sirrləri ayrıca tələb olunur.
       </p>
     </div>
 
     <div>
       <div class="meter-head">
         <span class="meter-name">Public PRD — Phase 3 / AI (bölmə 180-181)</span>
-        <span class="meter-pct">0%</span>
+        <span class="meter-pct">~15% baza</span>
       </div>
-      <div class="track"><div class="fill low" style="width:2%"></div></div>
+      <div class="track"><div class="fill low" style="width:15%"></div></div>
       <p class="meter-sub">
-        AI Assistant, semantik axtarış, Match Score, chatbot, map draw search — repoda
-        heç bir AI provider inteqrasiyası yoxdur.
+        <strong>Tam qəbul meyarı ilə 0/12 bənd hazırdır</strong>, lakin 0% infrastruktur
+        qiymətləndirməsi artıq düzgün deyil. <code>env.AI</code> binding-i ilə Cloudflare
+        Workers AI, Llama mətn/görüntü modelləri, insan təsdiqli AI draft-ları, favorit
+        affinity tövsiyəsi, rayon qiymət/gəlir analitikası və push service worker bazası var.
+        Public AI Assistant, semantik axtarış, Match Score, chatbot + human handoff, smart
+        pricing, map draw, virtual tour, tam PWA və mobil tətbiq hələ yazılmayıb.
       </p>
     </div>
 
@@ -665,12 +671,14 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <div>
       <div class="meter-head">
         <span class="meter-name">Hər iki sənədin tam əhatəsi</span>
-        <span class="meter-pct">~40%</span>
+        <span class="meter-pct">~66%</span>
       </div>
-      <div class="track"><div class="fill mid" style="width:40%"></div></div>
+      <div class="track"><div class="fill mid" style="width:66%"></div></div>
       <p class="meter-sub">
-        MEMORY.md-dəki 25 avqust auditi bu rəqəmi ~30-35% göstərirdi. İki günlük
-        saved search / bildiriş / kabinet işi onu ~40%-ə qaldırıb.
+        Public Phase 1 və Phase 2 tamamlanıb; Phase 3-də provider və bir neçə baza
+        komponenti olsa da public AI məhsulları yoxdur. Admin PRD-nin ~55% qiyməti saxlanılıb.
+        ~66% göstərici bəndlərin eyni çəki ilə hesablanan istiqamətverici audit
+        qiymətidir, buraxılış hazırlığı SLA-sı deyil.
       </p>
     </div>
   </div>
@@ -692,10 +700,12 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <div class="mod done"><span class="mod-n">Favorit / Müqayisə</span><span class="mod-d">localStorage + server action, hesabsız işləyir</span></div>
     <div class="mod done"><span class="mod-n">Analitika</span><span class="mod-d">GTM, razılıq qapısı (consent), event sanitizasiyası</span></div>
     <div class="mod done"><span class="mod-n">Tema</span><span class="mod-d">Light / Dark / System, profil üzrə saxlanılır</span></div>
-    <div class="mod part"><span class="mod-n">Bildiriş mərkəzi</span><span class="mod-d">yalnız sayt daxilində; e-poçt yalnız IMMEDIATE, push yoxdur</span></div>
-    <div class="mod part"><span class="mod-n">Saxlanmış axtarış</span><span class="mod-d">CRUD işləyir, dərhal uyğunluq işləyir, digest yoxdur</span></div>
-    <div class="mod none"><span class="mod-n">Agent profili</span><span class="mod-d">entity yoxdur — əlaqə həmişə şirkət nömrəsinə gedir</span></div>
-    <div class="mod none"><span class="mod-n">Qiymət tarixçəsi</span><span class="mod-d">model, UI və Price Drop bildirişi yoxdur</span></div>
+    <div class="mod done"><span class="mod-n">Bildiriş mərkəzi</span><span class="mod-d">saytdaxili + e-poçt + Web Push, preference/quiet-hours və stale subscription təmizliyi</span></div>
+    <div class="mod done"><span class="mod-n">Saxlanmış axtarış</span><span class="mod-d">CRUD, dərhal uyğunluq, gündəlik/həftəlik digest cron-u</span></div>
+    <div class="mod done"><span class="mod-n">Agent profili və rəylər</span><span class="mod-d">public profil, elana təyinat, rəy forması və admin moderasiyası</span></div>
+    <div class="mod done"><span class="mod-n">Qiymət tarixçəsi</span><span class="mod-d">append-only tarixçə, Price Drop saytdaxili/e-poçt/push bildirişləri</span></div>
+    <div class="mod done"><span class="mod-n">Phase 2 ictimai imkanları</span><span class="mod-d">rezervasiya, testimonial, nearby places, premium, rayon analitikası, tövsiyə və wizard</span></div>
+    <div class="mod part"><span class="mod-n">Phase 3 / AI</span><span class="mod-d">Cloudflare Workers AI provider-i var; public assistant, semantic search, Match Score və chatbot yoxdur</span></div>
   </div>
 
   <h3>Kabinet (ictimai hesab)</h3>
@@ -1417,15 +1427,14 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
     <div class="step">
       <div class="step-n">5</div>
       <div class="step-b">
-        <span class="step-t">Agent profilini MEMORY.md sırasından yuxarı qaldırmağı düşün</span>
+        <span class="step-t">Phase 3 public AI qəbul meyarlarını ayrı layihə kimi bağla</span>
         <p class="step-d">
-          Cari sıra AI axtarış + rezervasiyanı 2-ci, agent profilini 4-cü qoyur.
-          Lakin agent profili <strong>Phase 1 MVP bəndidir</strong> (Public PRD bölmə 178)
-          və əmlak detalındakı əlaqə kartı ondan asılıdır — hazırda hər elan şirkətin
-          ümumi nömrəsini göstərir. AI isə Phase 3 bəndidir. Bu, sizin qərarınızdır,
-          sadəcə sənədin öz prioritetləri ilə ziddiyyət təşkil edir.
+          Agent profili, rəylər və rezervasiya artıq tamamlanıb. Növbəti ayrı iş public
+          AI Assistant → semantik axtarış → Match Score → chatbot/human handoff ardıcıllığıdır.
+          Mövcud <code>src/lib/ai.ts</code> provider qatı yenidən istifadə oluna bilər, amma admin
+          kontent generatorunu public məsləhətçi kimi qiymətləndirmək olmaz.
         </p>
-        <span class="step-m">qərar tələb edir</span>
+        <span class="step-m">ayrı PRD, təhlükəsizlik və keyfiyyət qapıları tələb edir</span>
       </div>
     </div>
 
@@ -1460,7 +1469,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
         <tr><td>Testlər</td><td class="num">369 / 88 fayl</td><td>30 avqust tam Vitest icrası, hamısı keçib</td></tr>
         <tr><td>Səhifə / API girişləri</td><td class="num">112</td><td>100 <code>page.tsx</code> + 12 route handler</td></tr>
         <tr><td>Verilənlər bazası modelləri</td><td class="num">53</td><td>25 D1 miqrasiya faylı</td></tr>
-        <tr><td>Commit-lər</td><td class="num">382</td><td>Knowledge Hub işi üçün son 17 commit ayrıca bölünüb</td></tr>
+        <tr><td>Commit-lər</td><td class="num">388</td><td>387 kod/sənəd commit-i + bu audit yeniləməsi</td></tr>
         <tr><td>Ən məhsuldar gün</td><td class="num">23 avqust</td><td>76 commit</td></tr>
         <tr><td><code>force-dynamic</code> girişlər</td><td class="num">92</td><td>D1 binding build vaxtı olmadığına görə</td></tr>
         <tr><td>Server action faylları</td><td class="num">38</td><td>ictimai, kabinet və admin yazma axınları</td></tr>
@@ -1470,7 +1479,7 @@ a:focus-visible, :focus-visible { outline: 2px solid var(--gold); outline-offset
 </section>
 
 <footer>
-  Luxe Home Estate · kod auditi · 27 avqust 2026 · 30 avqust izləməsi · main @ 56b30aa
+  Luxe Home Estate · kod auditi · 27 avqust 2026 · 30 avqust izləməsi · kod bazası @ 922bb0f
 </footer>
 
 </div>
