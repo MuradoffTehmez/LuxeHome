@@ -6,6 +6,12 @@ import {
   FEATURE_GROUPS,
   LEAD_STATUSES,
   LISTING_TYPES,
+  FAQ_CATEGORIES,
+  KNOWLEDGE_AUDIENCES,
+  KNOWLEDGE_LEVELS,
+  KNOWLEDGE_RISK_LEVELS,
+  KNOWLEDGE_STATUSES,
+  LEGAL_CONTENT_STATUSES,
   POST_STATUSES,
   PRICE_PERIODS,
   PROJECT_STATUSES,
@@ -101,8 +107,8 @@ export const propertyFieldsSchema = z.object({
     buildingType: enumOf(BUILDING_TYPES).nullable(),
 
     videoUrl: externalUrl,
-    mortgageAvailable: z.boolean(),
-    installmentAvailable: z.boolean(),
+    // `mortgageAvailable` / `installmentAvailable` burada yoxdur: dəyər `PAYMENT`
+    // qrupundakı xüsusiyyət seçimindən törədilir (`admin/payment-features.ts`).
     isFeatured: z.boolean(),
     featuredUntil: z.coerce.date().nullable(),
     reservationEnabled: z.boolean(),
@@ -218,6 +224,86 @@ export const blogCategorySchema = z.object({
     .regex(/^[a-z0-9-]*$/, "Slug yalnız kiçik latın hərfi, rəqəm və defis ola bilər")
     .max(90),
   description: optionalText(300),
+  order: z.number().int().min(0).max(9999),
+});
+
+// ---------------------------------------------------------------------------
+// BİLİK MƏRKƏZİ
+// ---------------------------------------------------------------------------
+
+const knowledgeSlug = z
+  .string()
+  .trim()
+  .regex(/^[a-z0-9-]*$/, "Slug yalnız kiçik latın hərfi, rəqəm və defis ola bilər")
+  .max(90);
+
+export const knowledgeCategorySchema = z.object({
+  name: requiredText("Ad", 2, 80),
+  slug: knowledgeSlug,
+  /**
+   * Kateqoriya izahı **məcburidir və uzundur**: Bilik Mərkəzinin girişində hər
+   * mövzu üçün oxucuya nə tapacağını izah edən mətn göstərilir. Qısa etiket
+   * kifayət etmir — istifadəçi hansı bölməyə girəcəyini oradan seçir.
+   */
+  description: requiredText("İzah", 40, 1200),
+  icon: optionalText(40),
+  order: z.number().int().min(0).max(9999),
+  isActive: z.boolean(),
+});
+
+export const knowledgeArticleSchema = z.object({
+  title: requiredText("Başlıq", 5, 180),
+  slug: knowledgeSlug,
+  excerpt: requiredText("Qısa təsvir", 20, 400),
+  content: requiredText("Mətn", 50, 200000),
+  coverAlt: optionalText(160),
+  categoryId: cuid.nullable(),
+  audience: enumOf(KNOWLEDGE_AUDIENCES),
+  level: enumOf(KNOWLEDGE_LEVELS),
+  status: enumOf(KNOWLEDGE_STATUSES),
+  isFeatured: z.boolean(),
+  legalStatus: enumOf(LEGAL_CONTENT_STATUSES),
+  riskLevel: enumOf(KNOWLEDGE_RISK_LEVELS),
+  jurisdiction: requiredText("Yurisdiksiya", 3, 120),
+  legalReviewedAt: z.coerce.date().nullable(),
+  legalActs: z.array(z.string().trim().min(2).max(300)).max(30),
+  sourceUrls: z.array(z.string().url("Rəsmi mənbə URL-i düzgün deyil").max(1000)).max(30),
+  legalBasis: optionalText(40000),
+  requiredDocuments: optionalText(40000),
+  procedure: optionalText(40000),
+  duration: optionalText(10000),
+  costs: optionalText(40000),
+  risks: optionalText(40000),
+  checklist: optionalText(40000),
+  template: optionalText(80000),
+  courtPosition: optionalText(40000),
+  metaTitle: optionalText(70),
+  metaDescription: optionalText(180),
+  noIndex: z.boolean(),
+  canonicalUrl: optionalText(300),
+  ogTitle: optionalText(70),
+  ogDescription: optionalText(200),
+  ogImage: optionalText(500),
+});
+
+export type KnowledgeArticleInput = z.infer<typeof knowledgeArticleSchema>;
+
+export const knowledgeTermSchema = z.object({
+  term: requiredText("Termin", 2, 120),
+  slug: knowledgeSlug,
+  shortDefinition: requiredText("Qısa tərif", 10, 400),
+  definition: optionalText(40000),
+  categoryId: cuid.nullable(),
+  status: enumOf(KNOWLEDGE_STATUSES),
+  order: z.number().int().min(0).max(9999),
+  relatedSlugs: z.array(z.string().trim().max(90)).max(10),
+});
+
+export const knowledgeFaqSchema = z.object({
+  question: requiredText("Sual", 8, 300),
+  answer: requiredText("Cavab", 10, 8000),
+  category: enumOf(FAQ_CATEGORIES),
+  status: enumOf(KNOWLEDGE_STATUSES),
   order: z.number().int().min(0).max(9999),
 });
 

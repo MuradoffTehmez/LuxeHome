@@ -44,6 +44,10 @@ export type AuditEntity =
   | "AgentProfile"
   | "AgentReview"
   | "Testimonial"
+  | "KnowledgeArticle"
+  | "KnowledgeCategory"
+  | "KnowledgeTerm"
+  | "KnowledgeFaq"
   | "AuditLog";
 
 export async function recordAudit(
