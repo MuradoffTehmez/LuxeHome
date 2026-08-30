@@ -19,7 +19,8 @@
     "submitReview": "Send review for moderation",
     "reviewSuccess": "Your review was sent for moderation.",
     "reviewDuplicate": "You have already reviewed this agent.",
-    "loginHint": "Sign in to leave a review."
+    "loginHint": "Sign in to leave a review.",
+    "reviewSelf": "You cannot review an agent from your own agency."
   },
   "reservation": {
     "title": "Reserve this property",
@@ -78,7 +79,12 @@
     "averageRent": "Average rent",
     "rentalYield": "Rental yield",
     "measuredAt": "Data date",
-    "source": "Data source"
+    "source": "Data source",
+    "medianPrice": "Median price",
+    "saleRentRatio": "Sale / rent ratio"
   },
-  "common": {"loading": "Loading…", "unexpected": "The operation could not be completed. Try again."}
+  "common": {
+    "loading": "Loading…",
+    "unexpected": "The operation could not be completed. Try again."
+  }
 }

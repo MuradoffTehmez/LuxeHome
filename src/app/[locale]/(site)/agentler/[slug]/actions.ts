@@ -40,7 +40,7 @@ export async function submitAgentReview(
     const [agent, duplicate] = await Promise.all([
       prisma.agentProfile.findFirst({
         where: { id: parsed.data.agentId, isPublic: true },
-        select: { id: true },
+        select: { id: true, userId: true, agencyId: true },
       }),
       prisma.agentReview.findFirst({
         where: { agentId: parsed.data.agentId, customerId: user.id },
@@ -49,6 +49,20 @@ export async function submitAgentReview(
     ]);
     if (!agent) return failure(t("notFound"));
     if (duplicate) return failure(t("reviewDuplicate"));
+
+    // PRD bölmə 166 — agent özünə, agentlik əməkdaşı isə öz agentliyinin agentinə
+    // rəy yaza bilməz. Yoxlama serverdədir: forma gizlədilsə də POST açıq qalır.
+    if (agent.userId && agent.userId === user.id) return failure(t("reviewSelf"));
+    if (agent.agencyId) {
+      const insider = await prisma.agency.findFirst({
+        where: {
+          id: agent.agencyId,
+          OR: [{ userId: user.id }, { employees: { some: { userId: user.id } } }],
+        },
+        select: { id: true },
+      });
+      if (insider) return failure(t("reviewSelf"));
+    }
 
     await prisma.agentReview.create({
       data: {

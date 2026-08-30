@@ -19,7 +19,8 @@
     "submitReview": "Rəyi moderasiyaya göndər",
     "reviewSuccess": "Rəyiniz moderasiyaya göndərildi.",
     "reviewDuplicate": "Bu agent üçün artıq rəy göndərmisiniz.",
-    "loginHint": "Rəy yazmaq üçün hesabınıza daxil olun."
+    "loginHint": "Rəy yazmaq üçün hesabınıza daxil olun.",
+    "reviewSelf": "Öz agentliyinizin agenti haqqında rəy yaza bilməzsiniz."
   },
   "reservation": {
     "title": "Əmlakı rezervasiya et",
@@ -78,7 +79,12 @@
     "averageRent": "Orta icarə",
     "rentalYield": "İcarə gəlirliliyi",
     "measuredAt": "Məlumat tarixi",
-    "source": "Məlumat mənbəyi"
+    "source": "Məlumat mənbəyi",
+    "medianPrice": "Median qiymət",
+    "saleRentRatio": "Satış / icarə nisbəti"
   },
-  "common": {"loading": "Yüklənir…", "unexpected": "Əməliyyat tamamlanmadı. Yenidən cəhd edin."}
+  "common": {
+    "loading": "Yüklənir…",
+    "unexpected": "Əməliyyat tamamlanmadı. Yenidən cəhd edin."
+  }
 }
