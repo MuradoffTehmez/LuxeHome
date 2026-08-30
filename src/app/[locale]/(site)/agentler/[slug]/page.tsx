@@ -63,6 +63,8 @@ export default async function AgentPage({ params }: Props) {
               <div className="mt-4 flex flex-wrap gap-2">
                 {agent.experienceYears != null && <Badge tone="neutral">{t("experience", { count: agent.experienceYears })}</Badge>}
                 <Badge tone="neutral">{t("soldRented", { sold: agent.soldCount, rented: agent.rentedCount })}</Badge>
+                {/* PRD bölmə 165 — metrik yalnız real ölçü daxil ediləndə göstərilir. */}
+                {agent.responseMinutes != null && <Badge tone="neutral">{t("responseTime", { count: agent.responseMinutes })}</Badge>}
                 {rating != null && <Badge tone="gold"><Star className="mr-1 size-3.5 fill-current" aria-hidden="true" />{rating.toFixed(1)} ({agent.reviews.length})</Badge>}
               </div>
             </div>

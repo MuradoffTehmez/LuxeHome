@@ -56,6 +56,7 @@ export default async function AgentsPage({ params }: { params: Promise<{ locale:
                     </div>
                     <p className="mt-4 text-sm text-ink-soft">{agent.specialization || agent.roleTitle || t("about")}</p>
                     <p className="mt-3 text-xs text-ink-muted">{t("soldRented", { sold: agent.soldCount, rented: agent.rentedCount })} · {agent._count.properties} {t("listings").toLocaleLowerCase()}</p>
+                    {agent.responseMinutes != null && <p className="mt-1 text-xs text-ink-muted">{t("responseTime", { count: agent.responseMinutes })}</p>}
                   </article>
                 );
               })}
