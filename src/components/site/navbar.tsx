@@ -296,8 +296,9 @@ export function Navbar({
             className={buttonClassName("primary", "sm", false, "inline-flex min-w-11 px-2.5 sm:px-3 xl:px-4")}
           >
             <Plus className="size-4" aria-hidden="true" />
-            <span className="hidden sm:inline min-[1440px]:hidden">{t("listProperty")}</span>
-            <span className="hidden min-[1800px]:inline">{t("listProperty")}</span>
+            <span className="max-sm:hidden [@media(min-width:1440px)_and_(max-width:1799px)]:sr-only">
+              {t("listProperty")}
+            </span>
           </Link>
 
           <IconButton

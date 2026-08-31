@@ -68,6 +68,8 @@ describe("Navbar", () => {
     expect(html).not.toContain("+994 51 922 85 85");
     expect(html).toContain("Elan ver");
     expect(html).toContain('href="/kabinet/elanlar/yeni"');
+    expect(html.match(/Elan ver/g)).toHaveLength(2);
+    expect(html).toContain("[@media(min-width:1440px)_and_(max-width:1799px)]:sr-only");
     expect(html).toContain("max-[639px]:[&amp;&gt;span]:hidden");
     expect(html).toContain("min-[1440px]:grid");
     expect(html).toContain("min-[1800px]:max-w-[120rem]");
