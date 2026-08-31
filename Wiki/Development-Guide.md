@@ -2,10 +2,36 @@
 
 ## Tələblər
 
-- Node.js 20 və ya daha yeni LTS;
-- npm və repozitoriyadakı `package-lock.json`;
+- Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` — CI `.nvmrc` faylındakı `24` versiyasını işlədir;
+- **npm 12** və repozitoriyadakı `package-lock.json` (`package.json` → `packageManager: "npm@12.0.1"`);
 - remote D1 və deploy üçün Cloudflare hesabı;
 - lokal secret-lər üçün `.env`.
+
+### npm versiyası niyə pinlənib
+
+`package-lock.json`-un formatı npm major versiyasından asılıdır:
+
+- **npm 12** opsional peer asılılıqlarını (məsələn `next-intl` → `@swc/core` → `@swc/helpers@0.5.23`)
+  lock faylına yazmır;
+- **npm 10 və 11** həmin qeydi lock faylında görməyi tələb edir və tapmayanda `npm ci` işə düşmür:
+
+  ```text
+  npm error code EUSAGE
+  npm error `npm ci` can only install packages when your package.json and
+  npm error package-lock.json ... are in sync.
+  npm error Missing: @swc/helpers@0.5.23 from lock file
+  ```
+
+Bu, 30–31 avqust 2026-da GitHub Actions-ın hər `main` push-unda 3–16 saniyə ərzində uğursuz
+olmasının səbəbi idi: lock faylı lokal npm 12 ilə yaradılırdı, CI isə `node-version: 22` ilə gələn
+npm 10-u işlədirdi. Testlərə heç çatmırdı, çünki `npm ci` addımı sınırdı.
+
+Həll: `package.json`-da `packageManager` sahəsi həqiqət mənbəyidir, CI isə asılılıqları
+quraşdırmazdan əvvəl həmin dəyəri oxuyub eyni npm-i qurur. Lokal npm versiyanızı dəyişsəniz:
+
+1. `package.json` → `packageManager` dəyərini yeniləyin;
+2. `npm install --package-lock-only` ilə lock faylını yenidən yaradın;
+3. hər ikisini eyni commit-də göndərin.
 
 ## İlk quraşdırma
 
@@ -84,6 +110,7 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `npm test` | `vitest run` |
 | `npm run test:watch` | Vitest watch |
 | `npm run test:seo:routes` | Production SEO route status smoke testi |
+| `npm run test:seo:live` | Production SERP qəbul (acceptance) testi |
 | `npm run preview` | OpenNext build + local Worker preview |
 | `npm run cf-typegen` | Wrangler binding type generation |
 
@@ -112,6 +139,10 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `npm run db:taxonomy:local` | Lokal D1 taksonomiyası |
 | `npm run db:taxonomy:staging` | Staging D1 taksonomiyası |
 | `npm run db:taxonomy:remote` | Production D1 taksonomiyası |
+| `npm run db:knowledge:build` | `prisma/knowledge-hub.sql` (DRAFT) yaradır |
+| `npm run db:knowledge:local` | Lokal D1 Bilik Mərkəzi idxalı |
+| `npm run db:knowledge:staging` | Staging D1 Bilik Mərkəzi idxalı |
+| `npm run db:knowledge:remote` | Production D1 Bilik Mərkəzi idxalı |
 | `npm run auth:create-admin` | İlk staff user üçün SQL generatoru |
 
 ### Deployment
@@ -154,7 +185,7 @@ Prisma `DateTime` sahələri D1-də ISO-8601 mətn kimi saxlanılır. Seed, əl 
 
 Testlər `@cloudflare/vitest-plugin` ilə `workerd` runtime-da işləyir. Bu, Web Crypto davranışının production-a yaxın olmasını təmin edir.
 
-Audit snapshot-unda 81 test faylı və 335 test aşağıdakı sahələri əhatə edir:
+Audit snapshot-unda 89 test faylı və 373 test aşağıdakı sahələri əhatə edir:
 
 - parol, crypto, TOTP və cookie;
 - lockout, permission və session policy/projection/routing;
@@ -171,25 +202,45 @@ Audit snapshot-unda 81 test faylı və 335 test aşağıdakı sahələri əhatə
 - saved search, bildiriş və cron digest axını;
 - partner görünüşü, əlaqələri və admin action-ları;
 - lead statusu, hesab təsdiqi, agency recovery və audit reset;
-- Resend webhook, e-poçt jurnalı və Cloudflare analitika helper-ları.
+- Resend webhook, e-poçt jurnalı və Cloudflare analitika helper-ları;
+- SERP siyasəti, idarə olunan metadata, sitemap data mənbələri və Cloudflare crawler challenge
+  təsnifatı.
 
 Hazırda yoxdur:
 
 - real lokal D1 binding-i ilə integration test;
 - Server Action integration test;
-- Playwright/Cypress browser E2E;
-- GitHub Actions CI.
+- Playwright/Cypress browser E2E.
+
+### GitHub Actions CI
+
+`.github/workflows/ci.yml` hər pull request və `main` push-unda işləyir:
+
+1. `actions/checkout@v4`;
+2. `actions/setup-node@v4` — Node versiyası `.nvmrc`-dən (`node-version-file`);
+3. `package.json`-dakı `packageManager` dəyərinə uyğun npm-in quraşdırılması;
+4. `npm ci`;
+5. `npm run test`;
+6. `npm run typecheck`;
+7. `npm run lint`;
+8. `npm run build`;
+9. yalnız `main` push-unda və Cloudflare secret-ləri qoyulubsa —
+   `npx wrangler d1 migrations list DB --remote` ilə production miqrasiya drift yoxlaması.
+
+3-cü addım qəsdən `npm ci`-dən əvvəldir: onsuz runner-in npm versiyası lock faylının formatı ilə
+uyuşmaya bilər və pipeline testlərə çatmadan sınır.
 
 ### Son audit nəticəsi
 
-28 avqust 2026, `main@ed93ba4`:
+31 avqust 2026, `main`:
 
 | Yoxlama | Nəticə |
 |---|---:|
 | TypeScript | ✅ Keçdi |
 | ESLint | ✅ Keçdi |
-| Vitest | ✅ 81 fayl, 335 test |
+| Vitest | ✅ 89 fayl, 373 test |
 | Next.js production build | ✅ Keçdi |
+| OpenNext production deploy | ✅ Keçdi |
 
 ## Məcburi keyfiyyət qapısı
 
@@ -265,6 +316,15 @@ npm run build
 - [ ] Test, typecheck, lint və build keçib
 
 ## Troubleshooting
+
+### `npm ci` `EUSAGE` / `Missing: ... from lock file` deyir
+
+Lokal npm versiyası ilə lock faylını yaradan npm versiyası uyğun gəlmir. `npm --version` çıxışını
+`package.json`-dakı `packageManager` dəyəri ilə tutuşdurun. Fərqlidirsə ya həmin npm-i quraşdırın
+(`npm install -g npm@<versiya>`), ya da versiyanı qəsdən dəyişirsinizsə `packageManager` sahəsini
+yeniləyib `npm install --package-lock-only` ilə lock faylını yenidən yaradın. Lock faylını
+`npm ci`-nin təklif etdiyi kimi sadəcə `npm install` ilə "düzəltmək" problemi digər tərəfə keçirir:
+CI-da işləyən lock lokal mühitdə sınır.
 
 ### Build zamanı D1 binding tapılmır
 

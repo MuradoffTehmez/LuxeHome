@@ -87,6 +87,20 @@ Qaydalar:
 
 Bu parametrlər deploy workaround-u deyil, cari runtime müqaviləsinin hissəsidir.
 
+## Davamlı inteqrasiya (CI)
+
+`.github/workflows/ci.yml` hər pull request və `main` push-unda `npm ci` → Vitest → typecheck →
+lint → production build ardıcıllığını işlədir. `main` push-unda, əgər `CLOUDFLARE_API_TOKEN` və
+`CLOUDFLARE_ACCOUNT_ID` secret-ləri qoyulubsa, `npx wrangler d1 migrations list DB --remote` ilə
+production miqrasiya drift-i də yoxlanılır.
+
+Pipeline Node versiyasını `.nvmrc`-dən, npm versiyasını isə `package.json` → `packageManager`
+sahəsindən götürür. Bu ikinci addım məcburidir: `package-lock.json`-un formatı npm major
+versiyasından asılıdır və uyğunsuz npm `npm ci`-ni `EUSAGE` ilə sındırır. Toolchain dəyişəndə
+`.nvmrc`, `packageManager` və lock faylı **eyni commit-də** yenilənməlidir.
+
+CI deploy etmir — yayım hələ manualdır (`npm run deploy`).
+
 ## Staging deploy runbook-u
 
 1. İş ağacını və commit-i yoxlayın:
@@ -105,6 +119,9 @@ Bu parametrlər deploy workaround-u deyil, cari runtime müqaviləsinin hissəsi
    npm test
    npm run build
    ```
+
+   `npm ci` `EUSAGE` verirsə npm versiyanız `package.json` → `packageManager` dəyəri ilə uyğun
+   deyil; həll [[İnkişaf təlimatı|Development-Guide]] səhifəsindədir.
 
 3. Secret-lərin mövcudluğunu və staging üçün fərqli olduğunu yoxlayın.
 4. Miqrasiyanı və lazım olduqda seed/taksonomiyanı tətbiq edin:
@@ -186,6 +203,28 @@ Production seed, taksonomiya və demo-clean əmrləri deploy runbook-un standart
 - [ ] production canonical-lar `https://luxehomeestate.az` göstərir
 - [ ] admin/kabinet response `no-store` alır
 
+## Deploy qeydi — 31 avqust 2026
+
+`main` branch-ı production-a yayımlanıb. Aktiv Worker versiyası **`a88cf4ab-6a5e-4b84-a038-2a6c82f0ae92`**;
+`luxehomeestate.az` və `www.luxehomeestate.az` custom domain-ləri həmin versiyaya bağlıdır.
+Deploy öncəsi vəziyyət:
+
+| Yoxlama | Nəticə |
+|---|---|
+| `npm run test` | ✅ 89 fayl, 373 test |
+| `npm run typecheck` | ✅ Keçdi |
+| `npm run lint` | ✅ Keçdi |
+| `npm run build` | ✅ Keçdi |
+| `npx wrangler d1 migrations list DB --remote` | ✅ `No migrations to apply` (`0025` daxil tətbiq olunub) |
+
+Deploy sonrası brauzer User-Agent-i ilə `/`, `/az`, `/en`, `/ru`, `/az/emlaklar`,
+`/az/bilik-merkezi`, `/az/kalkulyator`, `/sitemap.xml`, `/sitemap-index.xml`, `/robots.txt` və
+`/llms.txt` marşrutları 200 qaytarıb. `luxehomeestate-cron` Worker-i 27 avqustdan bəri
+dəyişmədiyi üçün yenidən yayımlanmayıb.
+
+Eyni gündə GitHub Actions CI-nın davamlı uğursuzluğu da aradan qaldırılıb; səbəb tətbiq kodunda
+deyil, `npm ci` mərhələsindəki npm/lock formatı uyğunsuzluğunda idi.
+
 ## Canlı audit qeydi — 28 avqust 2026
 
 `main@ed93ba4` kodu Worker deploy `11ade039-1f72-4777-b1e7-33df3376aef9` üzərində yoxlanıb. D1-də qarışıq tarix formatlarının Prisma adapterini çökdürməsi `0019_normalize_d1_datetime_storage.sql` ilə aradan qaldırılıb; public sayt və admin panel həmin deploy-dan sonra yenidən əlçatan olub.
@@ -217,7 +256,11 @@ Production `robots.txt` Cloudflare Managed Content Signals blokundan sonra tətb
 
 Staging `IS_STAGING=true` olduqda tətbiq bütün route-ları disallow edir.
 
-Sitemap D1-dən public property, project, service, blog, agency və partner qeydlərini oxuyur; AZ/EN/RU alternativləri ilə statik SEO səhifələrini də daxil edir. Yeni indexlənən route əlavə ediləndə `src/app/sitemap.ts` və locale alternativləri birlikdə yenilənməlidir.
+Sitemap D1-dən public property, project, service, blog, agency, partner, Bilik Mərkəzi və idarə
+olunan SEO landing qeydlərini oxuyur; AZ/EN/RU alternativləri ilə statik SEO səhifələrini də daxil
+edir. `/sitemap.xml`-dən əlavə locale və entity üzrə bölünmüş `/sitemap-index.xml` və
+`/sitemaps/[feed]` feed-ləri verilir. Yeni indexlənən route əlavə ediləndə `src/app/sitemap.ts`,
+feed mənbələri və locale alternativləri birlikdə yenilənməlidir.
 
 ## Miqrasiya təhlükəsizliyi
 

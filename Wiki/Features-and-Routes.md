@@ -1,6 +1,6 @@
 # Funksiyalar və marşrutlar
 
-`main@ed93ba4` snapshot-unda 71 `page.tsx` faylı, 28 Server Action faylı və 7 Route Handler mövcuddur. İstifadəçi səhifələri həmişə `/{locale}` prefiksi (`az`, `en`, `ru`) daşıyır; aşağıdakı public cədvəldə qısa yol göstərilir.
+31 avqust 2026 snapshot-unda `main` branch-ında 119 `page.tsx` faylı, 45 Server Action faylı və 14 Route Handler mövcuddur. İstifadəçi səhifələri həmişə `/{locale}` prefiksi (`az`, `en`, `ru`) daşıyır; aşağıdakı public cədvəldə qısa yol göstərilir.
 
 ## İctimai sayt
 
@@ -18,6 +18,19 @@
 | `/xidmetler` | Aktiv xidmətlər | D1 |
 | `/xidmetler/[slug]` | Xidmət detalı və JSON-LD | D1 |
 | `/blog` | Kateqoriya, axtarış və səhifələmə | D1 |
+| `/agentler` | İctimai agent kataloqu | D1 |
+| `/agentler/[slug]` | Agent profili, metrikləri və moderasiyadan keçmiş rəylər | D1 |
+| `/bilik-merkezi` | Hüquqi bələdçi kataloqu | `src/lib/knowledge.ts` (yalnız yayımlanmış) |
+| `/bilik-merkezi/[slug]` | Bələdçi məqaləsi, hüquqi status və prosedur blokları | D1 + `Article` JSON-LD |
+| `/bilik-merkezi/kateqoriya/[slug]` | Bilik kateqoriyası | D1 |
+| `/bilik-merkezi/suallar` | Hüquqi CMS FAQ-ı (`KnowledgeFaq`) | D1 |
+| `/lugat`, `/lugat/[slug]` | Əmlak lüğəti | D1 + `DefinedTerm` JSON-LD |
+| `/kalkulyator` | İpoteka və büdcə hesablayıcısı | Client hesablama |
+| `/ai-axtaris` | Workers AI ilə təbii dildə axtarış və Match Score | Workers AI + D1 |
+| `/mene-emlak-tap` | Əmlak sehrbazı | D1 |
+| `/bazar-analitikasi`, `/bazar-analitikasi/[slug]` | Çoxdilli bazar hesabatları | D1 |
+| `/suallar` | Platforma FAQ-ı (`src/i18n/site-faq.ts`) | Statik kataloq |
+| `/[seoLanding]` | Bazadan idarə olunan SEO landing runtime-ı | D1 |
 | `/blog/[slug]` | Sanitizasiya olunmuş məqalə və əlaqəli yazılar | D1 |
 | `/favoritler` | Brauzerdə saxlanan favoritlərin kartları | LocalStorage ID → Server Action |
 | `/muqayise` | Ən çox 4 elanın yan-yana müqayisəsi | Cookie ID → Server Action |

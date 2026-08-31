@@ -1,6 +1,6 @@
 # Məlumat modeli
 
-`prisma/schema.prisma` Cloudflare D1/SQLite üçün 33 model saxlayır. SQLite native enum vermədiyi üçün status, rol, hesab növü və kateqoriya dəyərləri `String` kimi yazılır; icazəli dəyərlərin tətbiq səviyyəli həqiqət mənbəyi `src/lib/constants.ts` faylıdır.
+`prisma/schema.prisma` Cloudflare D1/SQLite üçün 60 model saxlayır (Phase 2 ictimai imkanlar, Bilik Mərkəzi və SERP ekosistemi daxil; son miqrasiya `0025_serp_ecosystem.sql`). SQLite native enum vermədiyi üçün status, rol, hesab növü və kateqoriya dəyərləri `String` kimi yazılır; icazəli dəyərlərin tətbiq səviyyəli həqiqət mənbəyi `src/lib/constants.ts` faylıdır.
 
 ## Domen xəritəsi
 

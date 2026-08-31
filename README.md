@@ -21,7 +21,7 @@
 ---
 
 > [!NOTE]
-> Bu sənəd `main@ed93ba4` və 28 avqust 2026 production smoke yoxlaması əsasında yenilənib. Aktiv Worker versiyası `11ade039-1f72-4777-b1e7-33df3376aef9`-dur. Dərin texniki məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
+> Bu sənəd 31 avqust 2026 tarixli `main` auditi, tam keçən keyfiyyət qapısı (89 test faylı / 373 test) və production deploy əsasında yenilənib. Aktiv Worker versiyası `a88cf4ab-6a5e-4b84-a038-2a6c82f0ae92`-dir. Dərin texniki məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
 
 ## Layihə haqqında
 
@@ -39,9 +39,15 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - Brauzerdə saxlanan favoritlər və ən çox 4 elanın cookie əsaslı müqayisəsi
 - Layihə, agentlik, xidmət və bloq siyahıları ilə detal səhifələri
 - Rəsmi tərəfdaş kataloqu, çoxdilli profil, elan/layihə/agentlik əlaqələri və izlənən xarici keçidlər
-- Rayon, metro və axtarış niyyətli SEO landing səhifələri
+- Rayon, metro və axtarış niyyətli SEO landing səhifələri; paneldən idarə olunan landing runtime-ı
+- Bilik Mərkəzi: hüquqi bələdçi kataloqu, kateqoriya səhifələri, əmlak lüğəti və CMS FAQ-ı
+- İpoteka və büdcə kalkulyatoru
+- Cloudflare Workers AI ilə işləyən public AI axtarışı, Match Score və «Mənə əmlak tap» sehrbazı
+- İctimai agent kataloqu, agent profili və moderasiyadan keçən rəylər
+- Çoxdilli bazar analitikası hesabatları
 - Əlaqə forması, same-origin + honeypot + `CONTACT_LIMIT`, D1 müraciəti və Resend bildirişi
-- Tez-tez verilən suallar və hüquqi səhifələr
+- Sayt haqqında `/suallar` və Bilik Mərkəzinin `/bilik-merkezi/suallar` FAQ səthləri (ayrı məhsullar)
+- Hüquqi səhifələr
 - AZ/EN/RU locale prefiksi, hreflang, canonical URL, Open Graph, Twitter Card, JSON-LD, sitemap, robots.txt və `llms.txt`
 - Responsive interfeys, dark mode, görünən klaviatura fokusu və reduced-motion dəstəyi
 
@@ -57,6 +63,9 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - Hesablar arasında sinxron favoritlər, saxlanmış axtarışlar, gündəlik/həftəlik e-poçt digest-i,
   panel bildirişləri və son baxılan elanlar
 - Agentlik sahibi üçün ən çox 3 menecer/agent üzvlü komanda və təsdiq axını
+- Əmlak rezervasiyası axını və kabinet paneli
+- Qiymət dəyişikliyi izləmə, Web Push bildirişləri, kanal seçimləri və sakit saatlar
+- Fərdi tövsiyələr
 
 ### İdarə paneli
 
@@ -72,6 +81,12 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - Runtime əlaqə/tema parametrləri, cədvəlli audit jurnalı və yalnız Super Admin üçün sıfırlama
 - Tərəfdaş CRUD-u, silmədən public görünürlük, müqavilə metadatası və elan/layihə/agentlik əlaqələri
 - SEO auditı, 301/302 yönləndirmələr, 404 izləmə, trafik analitikası və moderasiya növbəsi
+- SERP idarəetmə mərkəzi: metadata redaktoru və SERP preview, açar söz/entity idarəsi, idarə olunan
+  landing menecceri, audit kontent və media iş siyahıları, monitorinq/alert, Search Console və
+  indeksləmə nəzarəti, schema/sitemap və daxili link diaqnostikası, robots və lokal SEO parametrləri
+- Bilik Mərkəzi CMS-i: məqalə, kateqoriya, lüğət termini və FAQ CRUD-u ilə tərcümə axını
+- Rezervasiya idarəetməsi, agent profilləri, rəy moderasiyası və ictimai imkanlar paneli
+- AI köməkçi paneli (Cloudflare Workers AI)
 - Resend imzalı webhook-u ilə korporativ e-poçt çatdırılma/qəbul metadata jurnalı
 - Server Action-larda origin, icazə və sürət limiti yoxlaması
 
@@ -91,6 +106,8 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 | Media və keş | Cloudflare R2, Cloudflare Images, R2 incremental cache |
 | Auth | `jose`, Web Crypto PBKDF2, TOTP, AES-GCM |
 | E-poçt | Resend |
+| AI | Cloudflare Workers AI (public AI axtarışı və admin köməkçisi) |
+| Bildiriş | Web Push (`web-push`), panel bildirişləri, e-poçt digest-i |
 | Lokallaşdırma | `next-intl`, AZ/EN/RU, həmişə locale prefiksi |
 | Validasiya və sanitizasiya | Zod, UltraHTML |
 | Test | Vitest, Cloudflare `workerd` runtime |
@@ -125,13 +142,16 @@ Cloudflare Worker / Next.js App Router
 | Qrup | Marşrutlar |
 |---|---|
 | Əsas | `/{locale}`, `/{locale}/emlaklar`, `/{locale}/emlaklar/[slug]`, `/{locale}/layiheler/[slug]` |
-| Məzmun | `/{locale}/xidmetler`, `/{locale}/blog`, `/{locale}/suallar`, SEO/rayon/metro landing-ləri |
+| Məzmun | `/{locale}/xidmetler`, `/{locale}/blog`, `/{locale}/suallar`, `/{locale}/bazar-analitikasi`, SEO/rayon/metro landing-ləri |
+| Bilik Mərkəzi | `/{locale}/bilik-merkezi`, `/{locale}/bilik-merkezi/kateqoriya/[slug]`, `/{locale}/bilik-merkezi/suallar`, `/{locale}/lugat`, `/{locale}/kalkulyator` |
+| Kəşf və AI | `/{locale}/ai-axtaris`, `/{locale}/mene-emlak-tap`, `/{locale}/agentler`, `/{locale}/agentler/[slug]` |
 | Tərəfdaş və seçim | `/{locale}/agentlikler`, `/{locale}/terefdaslar`, `/{locale}/favoritler`, `/{locale}/muqayise` |
 | Şirkət və hüquqi | `/{locale}/haqqimizda`, `/{locale}/elaqe`, `/{locale}/mexfilik-siyaseti`, `/{locale}/istifade-sertleri`, `/{locale}/cookie-siyaseti` |
 | İctimai hesab | `/{locale}/qeydiyyat`, `/{locale}/daxil-ol`, kabinet, profil, komanda, elan, axtarış və bildiriş səhifələri |
 | Əməkdaş auth | `/{locale}/giris`, doğrulama və 2FA qurulumu |
 | Admin | `/admin` və kontent, CRM, tərəfdaş, SEO, analitika, təhlükəsizlik və sistem alt marşrutları |
-| Texniki | media API-ləri, saved-search cron, Resend webhook, `/media/[...key]`, `/sitemap.xml`, `/robots.txt`, `/llms.txt` |
+| Admin SERP | `/admin/serp` və metadata, açar söz, entity, landing, audit, media, monitorinq, indeksləmə, Search Console, schema, sitemap, link, robots, parametrlər alt marşrutları |
+| Texniki | media API-ləri, saved-search cron, Resend webhook, `/media/[...key]`, `/sitemap.xml`, `/sitemap-index.xml`, `/sitemaps/[feed]`, `/robots.txt`, `/llms.txt` |
 
 Tam marşrut inventarı və istifadəçi axınları Wiki-dəki [Funksiyalar və marşrutlar](https://github.com/MuradoffTehmez/LuxeHome/wiki/Features-and-Routes) səhifəsindədir.
 
@@ -165,9 +185,16 @@ luxehome/
 
 ### Tələblər
 
-- Node.js 20 və ya daha yeni LTS versiyası
-- npm
+- Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` (`.nvmrc`: 24)
+- npm 12 (`package.json` → `packageManager: "npm@12.0.1"`)
 - Remote D1 və deployment üçün Cloudflare hesabı
+
+> [!IMPORTANT]
+> `package-lock.json`-un formatı npm major versiyasından asılıdır. npm 12 opsional peer
+> qeydlərini (məsələn `@swc/helpers`) lock faylından çıxarır, npm 10 və 11 isə həmin qeydləri
+> tələb edir — nəticədə fərqli npm ilə `npm ci` `EUSAGE` xətası verir. Ona görə lokal mühit və
+> GitHub Actions eyni npm versiyasını işlədir; CI həmin dəyəri `packageManager` sahəsindən oxuyur.
+> npm versiyanızı dəyişdirsəniz `packageManager` sahəsini də yeniləyin və lock faylını yenidən yaradın.
 
 ### 1. Repozitoriyanı hazırlayın
 
@@ -253,6 +280,8 @@ npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.
 | `npm run lint` | ESLint |
 | `npm test` | Vitest suite-i `workerd` mühitində işlədir |
 | `npm run test:watch` | Vitest watch rejimi |
+| `npm run test:seo:routes` | Production SEO route status smoke testi |
+| `npm run test:seo:live` | Production SERP qəbul (acceptance) testi |
 | `npm run preview` | OpenNext build və lokal Worker preview |
 | `npm run cf-typegen` | Wrangler binding tiplərini yeniləyir |
 
@@ -276,6 +305,10 @@ npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.
 | `npm run db:taxonomy:local` | Taksonomiyanı lokal D1-ə tətbiq edir |
 | `npm run db:taxonomy:staging` | Taksonomiyanı staging D1-ə tətbiq edir |
 | `npm run db:taxonomy:remote` | Taksonomiyanı production D1-ə tətbiq edir |
+| `npm run db:knowledge:build` | Hüquqi mənbə sənədindən DRAFT Bilik Mərkəzi SQL-i yaradır |
+| `npm run db:knowledge:local` | Bilik Mərkəzi SQL-ini lokal D1-ə tətbiq edir |
+| `npm run db:knowledge:staging` | Bilik Mərkəzi SQL-ini staging D1-ə tətbiq edir |
+| `npm run db:knowledge:remote` | Bilik Mərkəzi SQL-ini production D1-ə tətbiq edir |
 | `npm run auth:create-admin` | İlk əməkdaş üçün təhlükəsiz bootstrap SQL-i yaradır |
 
 ### Deployment
@@ -343,17 +376,25 @@ npm test
 npm run build
 ```
 
-Cari qapı 86 Vitest faylını əhatə edir. Auth, sessiya, lokallaşdırma, SEO, saved-search,
-tərəfdaşlıq, axtarış normallaşdırması, Turnstile, admin responsive siyahıları, media rollback-i
-və public-content sərhədləri yoxlanır. GitHub Actions eyni dörd əmri hər PR və `main` push-unda
-işlədir; D1 integration və avtomatlaşdırılmış browser E2E hələ yoxdur, production browser smoke
-testi manual aparılır.
+Cari qapı **89 Vitest faylındakı 373 testi** əhatə edir. Auth, sessiya, lokallaşdırma, SEO/SERP,
+sitemap data mənbələri, saved-search, tərəfdaşlıq, axtarış normallaşdırması, Turnstile, admin
+responsive siyahıları, media rollback-i və public-content sərhədləri yoxlanır. GitHub Actions eyni
+dörd əmri hər PR və `main` push-unda işlədir; D1 integration və avtomatlaşdırılmış browser E2E hələ
+yoxdur, production browser smoke testi manual aparılır.
+
+CI iş axını asılılıqları quraşdırmazdan əvvəl `package.json`-dakı `packageManager` dəyərini oxuyub
+eyni npm versiyasını qurur, Node versiyasını isə `.nvmrc`-dən götürür. Bu, lock faylı formatının
+npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xətasının qarşısını alır.
 
 ## Cari məhdudiyyətlər və yol xəritəsi
 
 - İctimai hesab şəxsi data ixracını verir; hesabın self-service silinməsi hələ yoxdur.
 - Admin paneldə locale seçimi saxlanılır, lakin panel UI mətnləri hələ yalnız azərbaycancadır.
-- Avtomatlaşdırılmış browser E2E yoxdur; deploy və canlı smoke prosesi manualdır.
+- Avtomatlaşdırılmış browser E2E yoxdur; deploy və canlı smoke prosesi manualdır. `npm run
+  test:seo:routes` və `npm run test:seo:live` production SEO/SERP qəbul yoxlamasını avtomatlaşdırır,
+  lakin tam brauzer axını əhatə etmir.
+- Avtomatlaşdırılmış D1 backup/restore drill hələ qurulmayıb.
+- Bilik Mərkəzinin idxal paketi DRAFT yaradır; hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilmir.
 - Korporativ e-poçt hadisələri yalnız `RESEND_WEBHOOK_SECRET` və Resend endpoint abunəliyi qurulduqdan sonra dolur; məzmun deyil, metadata saxlanılır.
 - Turnstile əlaqə, qeydiyyat, ictimai giriş və hesab təhlükəsizliyi formalarına bağlıdır; gizli
   açar və hostname allowlist Cloudflare mühitində düzgün saxlanmalıdır.

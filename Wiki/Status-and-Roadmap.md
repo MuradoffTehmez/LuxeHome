@@ -1,29 +1,35 @@
 # Cari vəziyyət və yol xəritəsi
 
-Bu səhifə 28 avqust 2026 tarixində `main@ed93ba4` kod auditi, 81 test faylındakı 335 test və production smoke yoxlaması əsasında hazırlanıb. Prioritetlər faktiki boşluğu göstərir; buradakı maddə avtomatik olaraq təsdiqlənmiş məhsul planı demək deyil.
+Bu səhifə 31 avqust 2026 tarixində `main` kod auditi, 89 test faylındakı 373 test və production deploy əsasında hazırlanıb. Prioritetlər faktiki boşluğu göstərir; buradakı maddə avtomatik olaraq təsdiqlənmiş məhsul planı demək deyil.
 
 ## Hazırlıq matrisi
 
 | Sahə | Vəziyyət | Qeyd |
 |---|---:|---|
-| Production sayt | ✅ İşlək | Worker deploy `11ade039-1f72-4777-b1e7-33df3376aef9`; AZ/EN/RU public route-lar işləyir |
+| Production sayt | ✅ İşlək | Worker deploy `a88cf4ab-6a5e-4b84-a038-2a6c82f0ae92`; AZ/EN/RU public route-lar işləyir |
 | Əmlak kataloqu | ✅ İşlək | Geniş filtr, sort, pagination, metro/rayon və detail |
 | Xəritə | ✅ İşlək | Koordinatlı əmlak üçün Leaflet |
-| Favorit | ✅ İşlək | LocalStorage; hesabla sync hələ yoxdur |
+| Favorit | ✅ İşlək | LocalStorage və hesabla sinxronizasiya |
 | Müqayisə | ✅ İşlək | Cookie, maksimum 4 əmlak |
 | Layihə/xidmət/bloq | ✅ İşlək | Public read və permission əsaslı admin CRUD |
 | Tərəfdaşlıq sistemi | ✅ İşlək | Public kataloq/detail, property/project/agency əlaqələri, görünüş və audit |
 | Agentlik kataloqu | ✅ İşlək | Verification, public profil, əməkdaş heyəti və profil bərpası |
 | Public auth | ✅ İşlək | Qeydiyyat, login, approval/activation və revoke edilə bilən sessiya |
-| Public kabinet | 🟡 Qismən | Profil, elan yaratma, saved search, bildiriş və son baxılanlar; elan edit/delete yoxdur |
+| Public kabinet | ✅ İşlək | Profil, elan CRUD-u, saved search, rezervasiya, tövsiyə, bildiriş və son baxılanlar |
 | Staff auth | ✅ İşlək | TOTP, backup code, lockout, session və permission guard |
 | Admin panel | ✅ İşlək | Məzmun, CRM, hesab, agentlik, tərəfdaş, SEO, analitika, e-poçt və sistem idarəetməsi |
 | Media | ✅ İşlək | Admin/public upload, R2, Images və thumbnail |
 | Lead/əlaqə | ✅ İşlək | D1 + Resend, honeypot, same-origin və IP rate limit |
 | SEO | ✅ İşlək | Metadata, schema-lar, hreflang, sitemap, robots, redirect və 404 monitorinqi |
+| SERP ekosistemi | ✅ İşlək | İdarə olunan metadata/landing runtime-ı, entity schema mühərriki, sitemap index feed-ləri, açar söz/entity idarəsi, monitorinq/alert, Search Console və indeksləmə nəzarəti, link diaqnostikası |
+| Bilik Mərkəzi | ✅ İşlək | Bələdçi, lüğət, CMS FAQ, kalkulyator, tərcümə və audit |
+| AI | ✅ İşlək | Cloudflare Workers AI ilə public axtarış, Match Score və admin köməkçisi |
+| Rezervasiya və agentlər | ✅ İşlək | Rezervasiya axını, agent kataloqu, profil və rəy moderasiyası |
+| Web Push | ✅ İşlək | Abunə, kanal seçimləri və sakit saatlar |
 | E-poçt əməliyyatları | 🟡 Konfiqurasiya | Admin jurnalı və imzalı webhook hazırdır; production Resend secret/endpoint tələb edir |
-| Test | 🟡 Qismən | 81 fayl, 335 test; browser E2E və real remote D1 integration yoxdur |
-| CI/CD | 🔴 Yoxdur | Manual quality gate və deploy |
+| Test | 🟡 Qismən | 89 fayl, 373 test; browser E2E və real remote D1 integration yoxdur |
+| CI | ✅ İşlək | GitHub Actions `test + typecheck + lint + build` + miqrasiya drift yoxlaması |
+| CD | 🟡 Qismən | Deploy hələ manualdır (`npm run deploy`); avtomatik yayım pipeline-ı yoxdur |
 | Backup/DR | 🔴 Yoxdur | Avtomatlaşdırılmış export/restore drill yoxdur |
 | Çoxdillilik | ✅ İşlək | Public AZ/EN/RU, locale-prefiksli URL və alternates |
 
@@ -69,6 +75,41 @@ Bu səhifə 28 avqust 2026 tarixində `main@ed93ba4` kod auditi, 81 test faylın
 - public görünüş üçün `ACTIVE + verified + officialPartner + showPublicly + deletedAt=null` qaydası;
 - partner dəyişikliklərinin audit snapshot-ları.
 
+### SERP ekosistemi
+
+- D1-də saxlanan SERP persistence modelləri və granular SEO icazələri;
+- SERP siyasəti/validasiya primitivləri və slug redirect avtomatlaşdırması (zəncir rədd edilir);
+- idarə olunan metadata mühərriki, entity schema və public route-larda tətbiqi;
+- bazadan idarə olunan landing runtime-ı və nəzarətli landing menecceri;
+- locale və entity üzrə sitemap index feed-ləri (`/sitemap-index.xml`, `/sitemaps/[feed]`);
+- organik lead atribusiyası və hadisə jurnalı;
+- semantik WebP watermark upload pipeline-ı;
+- elan dərc bütövlüyü və saxlama (retention) qaydaları;
+- 16 səhifəlik admin SERP mərkəzi: metadata/SERP preview, açar sözlər, entity-lər, landing-lər,
+  audit kontenti və media iş siyahıları, monitorinq/alert, Search Console və indeksləmə,
+  schema/sitemap və daxili link diaqnostikası, robots və lokal SEO parametrləri;
+- `npm run test:seo:live` ilə production qəbul testi və Cloudflare crawler challenge təsnifatı.
+
+### Real Estate Knowledge Hub
+
+- `KnowledgeCategory`, `KnowledgeArticle`, `KnowledgeTerm` və `KnowledgeFaq` modelləri;
+- public bələdçi kataloqu, hüquqi status səhifələri, lüğət və CMS FAQ;
+- ipoteka/büdcə kalkulyatoru;
+- `/suallar` (platforma) və `/bilik-merkezi/suallar` (hüquqi CMS) səthlərinin ayrılması;
+- `Article` və `DefinedTerm` struktur datası, public keş və invalidasiya zənciri;
+- tam admin CRUD-u, tərcümə axını, validasiya və audit;
+- hüquqi araşdırmadan yaradılan **DRAFT** idxal paketi (redaktor təsdiqi olmadan PUBLISHED edilmir).
+
+### Phase 2 ictimai imkanlar
+
+- əmlak rezervasiya axını və admin/kabinet panelləri;
+- ictimai agent kataloqu, agent profili və rəy moderasiyası;
+- qiymət dəyişikliyi izləmə və alert sistemi;
+- Web Push infrastrukturu, kanal seçimləri və sakit saatlar;
+- fərdi tövsiyələr, əmlak sehrbazı və ana səhifə kəşf bölmələri;
+- Cloudflare Workers AI inteqrasiyası: public AI axtarışı, Match Score və admin köməkçisi;
+- ictimai imkanların paneldən idarəsi və müddət təmizləmə maintenance job-u.
+
 ### Cloudflare-native deployment
 
 - OpenNext Worker build və production/staging izolyasiyası;
@@ -113,18 +154,14 @@ Public user yeni elan yaradır və statusu izləyir. Hələ lazımdır:
 - optional public 2FA;
 - hesab silmə və data export tələbi.
 
-### CI və browser E2E
+### Browser E2E
 
-GitHub Actions pipeline üçün minimum qapı:
+GitHub Actions pipeline **qurulub və işləyir** (`.github/workflows/ci.yml`): `npm ci`, Vitest,
+typecheck, lint, production build və `main` push-unda production miqrasiya drift yoxlaması.
+Pipeline runner-in npm versiyasını `package.json` → `packageManager` dəyərindən pinləyir; bu addım
+olmadan lock faylı formatı uyğunsuzluğu `npm ci`-ni sındırır (bax [[İnkişaf təlimatı|Development-Guide]]).
 
-1. `npm ci`;
-2. typecheck;
-3. lint;
-4. Vitest;
-5. production build;
-6. migration drift yoxlaması.
-
-Browser E2E minimum axınları:
+Qalan boşluq brauzer E2E-dir. Minimum axınlar:
 
 - locale keçidi → search → detail → favorite/compare;
 - public register/login → media → listing submit;
@@ -137,13 +174,11 @@ Browser E2E minimum axınları:
 
 ### Azərbaycan dilində axtarış normallaşdırması
 
-SQLite/D1 `LIKE` ə, ş, ç, ğ, ı, ö, ü hərflərində hər zaman etibarlı registrsiz nəticə vermir. Uzunmüddətli həll yazı zamanı yenilənən normallaşdırılmış search text/sütun və həmin sahə üzrə indeksdir.
+**Həll olunub.** `0021_azerbaijani_search_normalization.sql` miqrasiyası, `src/lib/search-normalization.ts`
+və `Property.searchText` / taksonomiya `searchName` sütunları registrsiz axtarışı təmin edir. Yeni
+yazma axınlarında bu normallaşdırılmış sahələri doldurmaq qalan öhdəlikdir.
 
 ## P2 — məhsul yetkinliyi
-
-### Hesab əsaslı favorit
-
-Prisma `Favorite` modeli var, UI LocalStorage istifadə edir. Login zamanı lokal favoritləri hesaba birləşdirən sync axını əlavə oluna bilər.
 
 ### Tərcümə və kontent idarəetməsi
 
