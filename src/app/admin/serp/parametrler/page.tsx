@@ -27,7 +27,7 @@ export default async function SeoSettingsPage() {
   });
   const local = parseJsonObject<LocalSeoSettings>(byKey.get(SEO_SETTING_KEYS.LOCAL), {
     businessName: siteConfig.name, legalName: siteConfig.legalName, address: siteConfig.addressFull,
-    latitude: null, longitude: null, phone: siteConfig.phone, email: siteConfig.email, openingHours: [], serviceAreas: ["Bakı"],
+    latitude: null, longitude: null, phone: siteConfig.phone, email: siteConfig.email, openingHours: [], serviceAreas: [t("pages.misc.baki")],
     googleMapsUrl: "", googleBusinessProfileUrl: "", socialProfiles: [siteConfig.instagramUrl],
   });
   const localeOptions = Object.values(LOCALES).map((value) => ({ value, label: value.toUpperCase() }));

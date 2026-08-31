@@ -86,8 +86,8 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
         title={project.name}
         description={
           project.deletedAt
-            ? `Bu layihə ${formatDateTime(project.deletedAt)} tarixində silinib.`
-            : `Son yenilənmə: ${formatDateTime(project.updatedAt)}`
+            ? t("pages.common.buLayiheTarixindeSilinib", { p0: formatDateTime(project.deletedAt) })
+            : t("pages.common.sonYenilenme", { p0: formatDateTime(project.updatedAt) })
         }
         breadcrumbs={[
           { label: t("pages.projects.idarePaneli"), href: "/admin" },

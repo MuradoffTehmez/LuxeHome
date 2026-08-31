@@ -107,7 +107,7 @@ export default async function AdminKnowledgePage({
                 <>
                   <Link
                     href={`${LIST_PATH}/${article.id}`}
-                    aria-label={`«${article.title}» bələdçisini redaktə et`}
+                    aria-label={t("pages.common.beledcisiniRedakteEt", { p0: article.title })}
                     title={t("pages.knowledge.redakteEt")}
                     className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                   >
@@ -116,7 +116,7 @@ export default async function AdminKnowledgePage({
                   <ConfirmAction
                     action={deleteKnowledgeArticle}
                     id={article.id}
-                    label={`«${article.title}» bələdçisini sil`}
+                    label={t("pages.common.beledcisiniSil", { p0: article.title })}
                     title={t("pages.knowledge.beledciniSilmek")}
                     description={t("pages.knowledge.beledciSaytdanCixarilacaqAudit")}
                     className="size-11"
@@ -193,7 +193,7 @@ export default async function AdminKnowledgePage({
                     <div className="flex items-center justify-end gap-0.5">
                       <Link
                         href={`${LIST_PATH}/${article.id}`}
-                        aria-label={`«${article.title}» bələdçisini redaktə et`}
+                        aria-label={t("pages.common.beledcisiniRedakteEt", { p0: article.title })}
                         title={t("pages.knowledge.redakteEt")}
                         className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                       >
@@ -202,7 +202,7 @@ export default async function AdminKnowledgePage({
                       <ConfirmAction
                         action={deleteKnowledgeArticle}
                         id={article.id}
-                        label={`«${article.title}» bələdçisini sil`}
+                        label={t("pages.common.beledcisiniSil", { p0: article.title })}
                         title={t("pages.knowledge.beledciniSilmek")}
                         description={t("pages.knowledge.beledciSaytdanCixarilacaqAudit")}
                         className="size-11"

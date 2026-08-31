@@ -65,7 +65,7 @@ export default async function AdminPublicAccountsPage() {
             >
               <div className="flex flex-wrap gap-2">
                 <Badge tone={account.approvedAt ? "success" : "warning"}>
-                  {account.approvedAt ? "Təsdiqlənib" : "Təsdiq gözləyir"}
+                  {account.approvedAt ? t("pages.misc.tesdiqlenib") : t("pages.misc.tesdiqGozleyir")}
                 </Badge>
                 {!account.isActive ? <Badge tone="neutral">{t("pages.users.bloklanib")}</Badge> : null}
               </div>
@@ -80,7 +80,7 @@ export default async function AdminPublicAccountsPage() {
                 </div>
                 <div>
                   <dt className="text-xs text-ink-muted">{t("pages.users.sonGiris")}</dt>
-                  <dd className="mt-1 text-ink">{account.lastLoginAt ? formatRelative(account.lastLoginAt) : "Heç vaxt"}</dd>
+                  <dd className="mt-1 text-ink">{account.lastLoginAt ? formatRelative(account.lastLoginAt) : t("pages.misc.hecVaxt")}</dd>
                 </div>
               </dl>
             </AdminListCard>
@@ -108,12 +108,12 @@ export default async function AdminPublicAccountsPage() {
                   <AdminTableCell><Badge tone={TYPE_TONE[account.accountType as AccountType]}>{t(`labels.accountType.${account.accountType as AccountType}`)}</Badge></AdminTableCell>
                   <AdminTableCell>
                     <Badge tone={account.approvedAt ? "success" : "warning"}>
-                      {account.approvedAt ? "Təsdiqlənib" : "Gözləyir"}
+                      {account.approvedAt ? t("pages.misc.tesdiqlenib") : t("pages.misc.gozleyir")}
                     </Badge>
                   </AdminTableCell>
                   <AdminTableCell className="tabular">{account._count.properties}</AdminTableCell>
                   <AdminTableCell className="tabular">{account._count.favorites}</AdminTableCell>
-                  <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{account.lastLoginAt ? formatRelative(account.lastLoginAt) : "Heç vaxt"}</AdminTableCell>
+                  <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{account.lastLoginAt ? formatRelative(account.lastLoginAt) : t("pages.misc.hecVaxt")}</AdminTableCell>
                   <AdminTableCell align="right">
                     <div className="flex justify-end">
                       <AccountApproval id={account.id} name={account.name} approved={Boolean(account.approvedAt)} className="size-11" />

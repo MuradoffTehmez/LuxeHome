@@ -32,7 +32,7 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
 
     for (const file of selected) {
       if (file.size > MAX_UPLOAD_SIZE) {
-        toast(`«${file.name}» 8 MB-dan böyükdür.`, "error");
+        toast(t("pages.common.8MbDanBoyukdur", { p0: file.name }), "error");
         setPending((count) => count - 1);
         continue;
       }
@@ -45,18 +45,18 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
         const response = await fetch("/api/admin/media", { method: "POST", body });
         if (!response.ok) {
           const payload = (await response.json()) as { error?: string };
-          throw new Error(payload.error ?? "Yükləmə alınmadı");
+          throw new Error(payload.error ?? t("pages.misc.yuklemeAlinmadi"));
         }
         uploaded += 1;
       } catch (error) {
-        toast(error instanceof Error ? error.message : "Yükləmə alınmadı", "error");
+        toast(error instanceof Error ? error.message : t("pages.misc.yuklemeAlinmadi"), "error");
       } finally {
         setPending((count) => count - 1);
       }
     }
 
     if (uploaded > 0) {
-      toast(`${uploaded} fayl yükləndi.`, "success");
+      toast(t("pages.common.faylYuklendi", { p0: uploaded }), "success");
       router.refresh();
     }
   }
@@ -93,8 +93,8 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
         </span>
         <span className="text-sm font-medium text-ink">
           {pending > 0
-            ? `${pending} fayl yüklənir…`
-            : "Şəkilləri bura sürüşdürün və ya seçmək üçün klikləyin"}
+            ? t("pages.common.faylYuklenir", { p0: pending })
+            : t("pages.misc.sekilleriBuraSurusdurunVe")}
         </span>
         <span className="text-xs text-ink-muted">
           {t("pages.settings.jpgPngWebpVe")}

@@ -72,7 +72,7 @@ export function AgentForm({
 }) {
   const t = useTranslations("admin");
   return (
-    <AdminForm action={saveAgentProfile} submitLabel={initial.id ? "Dəyişiklikləri saxla" : "Agent yarat"} className="gap-4">
+    <AdminForm action={saveAgentProfile} submitLabel={initial.id ? t("pages.misc.deyisiklikleriSaxla") : "Agent yarat"} className="gap-4">
       <input type="hidden" name="id" value={initial.id} />
 
       <FormSection title={t("pages.agents.profil")} description={t("pages.agents.ictimaiAgentKataloqundaVe")}>

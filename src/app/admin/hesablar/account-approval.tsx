@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { BadgeCheck, BadgeX } from "lucide-react";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { togglePublicAccountApproval } from "./actions";
@@ -15,18 +16,19 @@ export function AccountApproval({
   approved: boolean;
   className?: string;
 }) {
+  const t = useTranslations("admin");
   return (
     <ConfirmAction
       action={togglePublicAccountApproval}
       id={id}
-      label={approved ? `«${name}» hesabının təsdiqini ləğv et` : `«${name}» hesabını təsdiqlə`}
-      title={approved ? "Hesab təsdiqini ləğv etmək" : "Hesabı təsdiqləmək"}
+      label={approved ? t("pages.common.hesabininTesdiqiniLegvEt", { p0: name }) : t("pages.common.hesabiniTesdiqle", { p0: name })}
+      title={approved ? t("pages.misc.hesabTesdiqiniLegvEtmek") : t("pages.misc.hesabiTesdiqlemek")}
       description={
         approved
-          ? "Hesab aktiv qala bilər, amma admin yoxlamasından keçmiş statusunu itirəcək."
-          : "Hesab admin tərəfindən yoxlanılmış kimi işarələnəcək. Bu əməliyyat e-poçt doğrulaması deyil."
+          ? t("pages.misc.hesabAktivQalaBiler")
+          : t("pages.misc.hesabAdminTerefindenYoxlanilmis")
       }
-      confirmLabel={approved ? "Təsdiqi ləğv et" : "Təsdiqlə"}
+      confirmLabel={approved ? t("pages.misc.tesdiqiLegvEt") : t("pages.misc.tesdiqle")}
       tone={approved ? "danger" : "neutral"}
       className={className}
     >

@@ -73,7 +73,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
       <>
         <Link
           href={`${LIST_PATH}/${lead.id}`}
-          aria-label={`«${lead.name}» müraciətini aç`}
+          aria-label={t("pages.common.muracietiniAc", { p0: lead.name })}
           title={t("pages.leads.etrafli")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -82,7 +82,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
         <ConfirmAction
           action={deleteLead}
           id={lead.id}
-          label={`«${lead.name}» müraciətini sil`}
+          label={t("pages.common.muracietiniSil", { p0: lead.name })}
           title={t("pages.leads.muracietiSilmek")}
           description={t("pages.leads.muracietTamamileSilinecekVe")}
           className="size-11"
@@ -97,7 +97,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
     <>
       <AdminPageHeader
         title={t("pages.leads.muracietler")}
-        description={`Ümumilikdə ${total} müraciət tapıldı.`}
+        description={t("pages.common.umumilikdeMuracietTapildi", { p0: total })}
         breadcrumbs={[{ label: t("pages.leads.idarePaneli"), href: "/admin" }, { label: t("pages.leads.muracietler") }]}
       />
 
@@ -106,7 +106,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder={t("pages.leads.adTelefonEPoct")}
-          resultLabel={`${total} müraciət tapıldı`}
+          resultLabel={t("pages.common.muracietTapildi", { p0: total })}
           selects={[
             {
               name: "status",
@@ -143,8 +143,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
             empty={
               <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.source
-                  ? "Bu filtrlərə uyğun müraciət tapılmadı."
-                  : "Hələ müraciət yoxdur."}
+                  ? t("pages.misc.buFiltrlereUygunMuraciet")
+                  : t("pages.misc.heleMuracietYoxdur")}
               </p>
             }
             renderCard={(lead) => (
@@ -163,7 +163,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                 status={<LeadQuickStatus id={lead.id} status={lead.status as LeadStatus} name={lead.name} />}
                 actions={renderActions(lead)}
               >
-                <p className="[overflow-wrap:anywhere]">{lead.subject ?? lead.property?.title ?? "Mövzu yoxdur"}</p>
+                <p className="[overflow-wrap:anywhere]">{lead.subject ?? lead.property?.title ?? t("pages.misc.movzuYoxdur")}</p>
                 <dl className="mt-4 grid grid-cols-2 gap-3">
                   <div>
                     <dt className="text-xs text-ink-muted">{t("pages.leads.menbe")}</dt>
@@ -171,7 +171,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                   </div>
                   <div>
                     <dt className="text-xs text-ink-muted">{t("pages.leads.mesul")}</dt>
-                    <dd className="mt-1 text-ink">{lead.assignee?.name ?? "Təyin edilməyib"}</dd>
+                    <dd className="mt-1 text-ink">{lead.assignee?.name ?? t("pages.misc.teyinEdilmeyib")}</dd>
                   </div>
                   <div className="col-span-2">
                     <dt className="text-xs text-ink-muted">{t("pages.leads.vaxt")}</dt>
@@ -216,7 +216,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
-            {total === 0 ? "0 müraciət göstərilir" : `${total} müraciətdən ${rows.length} göstərilir`}
+            {total === 0 ? t("pages.misc.0MuracietGosterilir") : t("pages.common.muracietdenGosterilir", { p0: total, p1: rows.length })}
           </span>
           <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
         </div>

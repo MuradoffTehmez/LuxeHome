@@ -108,7 +108,7 @@ export function PostForm({
       </FormSection>
 
       <FormSection title="SEO" description={t("pages.blog.bosBuraxilsaBasliqVe")}>
-        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Bloq yazısı"} fallbackDescription={initial.excerpt || "Məqalənin qısa təsviri"} pathname={`/blog/${initial.slug || "yeni-yazi"}`} />
+        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || t("pages.misc.bloqYazisi")} fallbackDescription={initial.excerpt || t("pages.misc.meqaleninQisaTesviri")} pathname={`/blog/${initial.slug || "yeni-yazi"}`} />
         <AdminInput
           name="canonicalUrl"
           label={t("pages.blog.canonicalUrl")}

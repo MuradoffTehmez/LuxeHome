@@ -136,7 +136,7 @@ export default async function PublicFeaturesAdminPage() {
                       {expired ? <Badge tone="warning">{t("pages.amenities.muddetiBitib")}</Badge> : <Badge tone="gold">{t("pages.amenities.premium")}</Badge>}
                     </div>
                     <p className="mt-1 text-xs text-ink-muted">
-                      {property.featuredUntil ? `Bitmə tarixi: ${formatDate(property.featuredUntil)}` : "Müddətsiz"}
+                      {property.featuredUntil ? t("pages.common.bitmeTarixi", { p0: formatDate(property.featuredUntil) }) : t("pages.misc.muddetsiz")}
                     </p>
                   </div>
                   <div className="flex shrink-0">
@@ -164,7 +164,7 @@ export default async function PublicFeaturesAdminPage() {
                   <p className="mt-1 text-xs text-ink-muted">
                     {place.property.title}
                     {place.distanceMeters != null ? ` · ${place.distanceMeters} m` : ""}
-                    {place.walkingMinutes != null ? ` · ${place.walkingMinutes} dəq piyada` : ""}
+                    {place.walkingMinutes != null ? t("pages.common.deqPiyada", { p0: place.walkingMinutes }) : ""}
                     {place.source ? ` · ${place.source}` : ""}
                   </p>
                 </div>
@@ -197,7 +197,7 @@ export default async function PublicFeaturesAdminPage() {
                 <div className="min-w-0">
                   <p className="font-medium text-ink">{profile.location.name}</p>
                   <p className="mt-1 text-xs text-ink-muted">
-                    {profile.dataSource ? `Mənbə: ${profile.dataSource}` : "Mənbə qeyd edilməyib"}
+                    {profile.dataSource ? t("pages.common.menbe", { p0: profile.dataSource }) : t("pages.misc.menbeQeydEdilmeyib")}
                     {profile.measuredAt ? ` · ${formatDate(profile.measuredAt)}` : ""}
                   </p>
                 </div>

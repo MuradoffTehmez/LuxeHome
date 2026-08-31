@@ -70,13 +70,13 @@ export function RedirectRow({
             type="submit"
             className="rounded-xs px-2 py-1 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
           >
-            {isActive ? "Deaktiv et" : "Aktivləşdir"}
+            {isActive ? "Deaktiv et" : t("pages.misc.aktivlesdir")}
           </button>
         </form>
         <ConfirmAction
           action={deleteRedirect}
           id={id}
-          label={`«${fromPath}» yönləndirməsini sil`}
+          label={t("pages.common.yonlendirmesiniSil", { p0: fromPath })}
           title={t("pages.serp.yonlendirmeniSilmek")}
           description={t("pages.serp.buYonlendirmeSilinecekZiyaretciler")}
           confirmLabel={t("pages.serp.sil")}

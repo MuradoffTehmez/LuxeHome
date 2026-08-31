@@ -81,20 +81,20 @@ export default async function AdminAgentsPage() {
                 {agent.isPublic ? <Badge tone="gold">{t("pages.agents.ictimai")}</Badge> : <Badge tone="neutral">{t("pages.agents.gizli")}</Badge>}
               </div>
               <p className="mt-1 text-xs text-ink-muted">
-                {agent.agency?.name ?? "Müstəqil"} · {agent._count.properties} elan · {agent._count.reviews} rəy ·{" "}
-                {agent.responseMinutes != null ? `${agent.responseMinutes} dəq cavab` : "cavab müddəti yoxdur"} ·{" "}
-                {parseJsonArray(agent.languages).join(", ") || "Dil qeyd edilməyib"}
+                {agent.agency?.name ?? t("pages.misc.musteqil")} · {t("pages.misc.elanRey", { p0: agent._count.properties, p1: agent._count.reviews })} ·{" "}
+                {agent.responseMinutes != null ? t("pages.common.deqCavab", { p0: agent.responseMinutes }) : t("pages.misc.cavabMuddetiYoxdur")} ·{" "}
+                {parseJsonArray(agent.languages).join(", ") || t("pages.misc.dilQeydEdilmeyib")}
               </p>
             </div>
             <div className="flex shrink-0 items-center">
               <Link
                 href={`/admin/agentler/${agent.id}`}
-                aria-label={`${agent.name} profilini redaktə et`}
+                aria-label={t("pages.common.profiliniRedakteEt", { p0: agent.name })}
                 className="inline-flex size-11 items-center justify-center rounded-xs text-ink-soft transition-colors hover:text-gold-deep"
               >
                 <Pencil className="size-4" />
               </Link>
-              <ConfirmAction action={toggleAgentVisibility} id={agent.id} label={t("pages.agents.gorunurluguDeyis")} title={agent.isPublic ? "Agent gizlədilsin?" : "Agent dərc edilsin?"} description={t("pages.agents.ictimaiAgentKataloqundakiGorunurluk")} confirmLabel={agent.isPublic ? "Gizlət" : "Dərc et"} tone="neutral">{agent.isPublic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}</ConfirmAction>
+              <ConfirmAction action={toggleAgentVisibility} id={agent.id} label={t("pages.agents.gorunurluguDeyis")} title={agent.isPublic ? t("pages.misc.agentGizledilsin") : t("pages.misc.agentDercEdilsin")} description={t("pages.agents.ictimaiAgentKataloqundakiGorunurluk")} confirmLabel={agent.isPublic ? t("pages.misc.gizlet") : t("pages.misc.dercEt")} tone="neutral">{agent.isPublic ? <EyeOff className="size-4" /> : <Eye className="size-4" />}</ConfirmAction>
               <ConfirmAction action={deleteAgentProfile} id={agent.id} label={t("pages.agents.agentiSil")} title={t("pages.agents.agentProfiliSilinsin")} description={t("pages.agents.profilReyleriVeTestimonial")} confirmLabel={t("pages.agents.sil")}><Trash2 className="size-4" /></ConfirmAction>
             </div>
           </li>
@@ -117,7 +117,7 @@ export default async function AdminAgentsPage() {
                 {item.status === "APPROVED" ? <Badge tone="success">{t("pages.agents.dercEdilib")}</Badge> : <Badge tone="warning">{t("pages.agents.gozleyir")}</Badge>}
               </div>
               <p className="mt-1 max-w-3xl text-sm text-ink-soft">{item.review}</p>
-              <p className="mt-1 text-xs text-ink-muted">{item.agent?.name ?? "Şirkət rəyi"} · {formatDateTime(item.createdAt)}</p>
+              <p className="mt-1 text-xs text-ink-muted">{item.agent?.name ?? t("pages.misc.sirketReyi")} · {formatDateTime(item.createdAt)}</p>
             </div>
             <div className="flex shrink-0">
               <ConfirmAction action={deleteTestimonial} id={item.id} label={t("pages.agents.reyiSil")} title={t("pages.agents.musteriReyiSilinsin")} description={t("pages.agents.reyAnaSehifedenDerhal")} confirmLabel={t("pages.agents.sil")}><Trash2 className="size-4" /></ConfirmAction>

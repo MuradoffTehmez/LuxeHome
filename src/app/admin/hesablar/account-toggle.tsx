@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Power, PowerOff } from "lucide-react";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { togglePublicAccountActive } from "./actions";
@@ -15,18 +16,19 @@ export function AccountToggle({
   isActive: boolean;
   className?: string;
 }) {
+  const t = useTranslations("admin");
   return (
     <ConfirmAction
       action={togglePublicAccountActive}
       id={id}
-      label={isActive ? `«${name}» hesabını deaktiv et` : `«${name}» hesabını aktivləşdir`}
-      title={isActive ? "Hesabı deaktiv etmək" : "Hesabı aktivləşdirmək"}
+      label={isActive ? t("pages.common.hesabiniDeaktivEt", { p0: name }) : t("pages.common.hesabiniAktivlesdir", { p0: name })}
+      title={isActive ? t("pages.misc.hesabiDeaktivEtmek") : t("pages.misc.hesabiAktivlesdirmek")}
       description={
         isActive
-          ? "Hesab dərhal girişi itirəcək və bütün açıq sessiyaları bağlanacaq."
-          : "Hesab yenidən giriş edə biləcək."
+          ? t("pages.misc.hesabDerhalGirisiItirecek")
+          : t("pages.misc.hesabYenidenGirisEde")
       }
-      confirmLabel={isActive ? "Deaktiv et" : "Aktivləşdir"}
+      confirmLabel={isActive ? "Deaktiv et" : t("pages.misc.aktivlesdir")}
       tone={isActive ? "danger" : "neutral"}
       className={className}
     >

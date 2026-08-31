@@ -95,7 +95,7 @@ export default async function AdminPropertiesPage({
       <ConfirmAction
         action={restoreProperty}
         id={property.id}
-        label={`«${property.title}» elanını bərpa et`}
+        label={t("pages.common.elaniniBerpaEt", { p0: property.title })}
         title={t("pages.properties.elaniBerpaEtmek")}
         description={t("pages.properties.elanYenidenAktivSiyahiya")}
         confirmLabel={t("pages.properties.berpaEt")}
@@ -110,7 +110,7 @@ export default async function AdminPropertiesPage({
           href={localizePath(`/emlaklar/${property.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
-          aria-label={`«${property.title}» elanını saytda aç`}
+          aria-label={t("pages.common.elaniniSaytdaAc", { p0: property.title })}
           title={t("pages.properties.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -118,7 +118,7 @@ export default async function AdminPropertiesPage({
         </Link>
         <Link
           href={`${LIST_PATH}/${property.id}`}
-          aria-label={`«${property.title}» elanını redaktə et`}
+          aria-label={t("pages.common.elaniniRedakteEt", { p0: property.title })}
           title={t("pages.properties.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -127,7 +127,7 @@ export default async function AdminPropertiesPage({
         <ConfirmAction
           action={deleteProperty}
           id={property.id}
-          label={`«${property.title}» elanını sil`}
+          label={t("pages.common.elaniniSil", { p0: property.title })}
           title={t("pages.properties.elaniSilmek")}
           description={t("pages.properties.elanSaytdanCixarilacaqAmma")}
           className="size-11"
@@ -141,16 +141,16 @@ export default async function AdminPropertiesPage({
   return (
     <>
       <AdminPageHeader
-        title={deleted ? "Silinmiş elanlar" : "Əmlaklar"}
+        title={deleted ? t("pages.misc.silinmisElanlar") : t("pages.misc.emlaklar")}
         description={
           deleted
-            ? "Silinmiş elanlar burada saxlanılır və bərpa edilə bilər."
-            : `Ümumilikdə ${total} elan tapıldı.`
+            ? t("pages.misc.silinmisElanlarBuradaSaxlanilir")
+            : t("pages.common.umumilikdeElanTapildi", { p0: total })
         }
         breadcrumbs={[
           { label: t("pages.properties.idarePaneli"), href: "/admin" },
           ...(deleted ? [{ label: t("pages.properties.emlaklar"), href: LIST_PATH }] : []),
-          { label: deleted ? "Silinmişlər" : "Əmlaklar" },
+          { label: deleted ? t("pages.misc.silinmisler") : t("pages.misc.emlaklar") },
         ]}
         actions={
           <>
@@ -174,7 +174,7 @@ export default async function AdminPropertiesPage({
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder={t("pages.properties.basliqUnvanVeYa")}
-          resultLabel={`${total} elan tapıldı`}
+          resultLabel={t("pages.common.elanTapildi", { p0: total })}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
@@ -231,8 +231,8 @@ export default async function AdminPropertiesPage({
             empty={
               <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.listingType
-                  ? "Bu filtrlərə uyğun elan tapılmadı."
-                  : "Hələ əmlak əlavə edilməyib."}
+                  ? t("pages.misc.buFiltrlereUygunElan")
+                  : t("pages.misc.heleEmlakElaveEdilmeyib")}
               </p>
             }
             renderCard={(property) => (
@@ -362,7 +362,7 @@ export default async function AdminPropertiesPage({
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
-            {total === 0 ? "0 elan göstərilir" : `${total} elandan ${rows.length} göstərilir`}
+            {total === 0 ? t("pages.misc.0ElanGosterilir") : t("pages.common.elandanGosterilir", { p0: total, p1: rows.length })}
           </span>
           <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
         </div>

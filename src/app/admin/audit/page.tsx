@@ -51,7 +51,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
     <>
       <AdminPageHeader
         title={t("pages.security.auditJurnali")}
-        description={`Panel əməliyyatlarının peşəkar izləmə cədvəli · ${total} qeyd.`}
+        description={t("pages.common.panelEmeliyyatlarininPesekarIzleme", { p0: total })}
         breadcrumbs={[{ label: t("pages.security.idarePaneli"), href: "/admin" }, { label: t("pages.security.auditJurnali") }]}
         actions={user.role === ROLES.SUPER_ADMIN && total > 0 ? (
           <ConfirmAction
@@ -59,7 +59,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
             id="all"
             label={t("pages.security.auditJurnaliniSifirla")}
             title={t("pages.security.auditJurnaliniSifirlamaq")}
-            description={`${total} qeyd silinəcək. Bu əməliyyat geri qaytarılmır; sıfırlama faktının özü yeni audit qeydi kimi saxlanılacaq.`}
+            description={t("pages.common.qeydSilinecekBuEmeliyyat", { p0: total })}
             confirmLabel={t("pages.security.jurnaliSifirla")}
           >
             <Trash2 className="size-4" aria-hidden="true" />

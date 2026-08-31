@@ -15,28 +15,29 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-const METRIC_LABELS = {
-  indexable: "İndekslənə bilən",
-  sitemapEligible: "Sitemap üçün uyğun",
-  completeMeta: "Tam meta məlumatı",
-  missingAlt: "Alt mətni çatışmır",
-  thinContent: "Nazik məzmun",
-  schemaReady: "Schema üçün hazır",
-  orphanPages: "Daxili linksiz səhifə",
-} as const;
+/** Etiketlər dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+const metricLabels = (t: Awaited<ReturnType<typeof getAdminT>>) => ({
+  indexable: t("pages.misc.indeksleneBilen"),
+  sitemapEligible: t("pages.misc.sitemapUcunUygun"),
+  completeMeta: t("pages.misc.tamMetaMelumati"),
+  missingAlt: t("pages.misc.altMetniCatismir"),
+  thinContent: t("pages.misc.nazikMezmun"),
+  schemaReady: t("pages.misc.schemaUcunHazir"),
+  orphanPages: t("pages.misc.daxiliLinksizSehife"),
+});
 
-const SEVERITY_LABELS: Record<SeoIssueSeverity, string> = {
-  error: "Kritik",
-  warning: "Xəbərdarlıq",
-  info: "Məlumat",
-};
+const severityLabels = (t: Awaited<ReturnType<typeof getAdminT>>): Record<SeoIssueSeverity, string> => ({
+  error: t("pages.misc.kritik"),
+  warning: t("pages.misc.xeberdarliq"),
+  info: t("pages.misc.melumat"),
+});
 
-const KIND_LABELS = {
-  property: "Əmlak",
-  post: "Bloq",
-  project: "Layihə",
-  service: "Xidmət",
-} as const;
+const kindLabels = (t: Awaited<ReturnType<typeof getAdminT>>): Record<string, string> => ({
+  property: t("pages.misc.emlak"),
+  post: t("pages.misc.bloq"),
+  project: t("pages.misc.layihe"),
+  service: t("pages.misc.xidmet"),
+});
 
 type Props = { searchParams: Promise<{ severity?: string }> };
 
@@ -58,12 +59,12 @@ export default async function AdminSeoPage({ searchParams }: Props) {
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {(Object.keys(METRIC_LABELS) as Array<keyof typeof METRIC_LABELS>).map((key) => (
+        {(Object.keys(metricLabels(t)) as Array<keyof ReturnType<typeof metricLabels>>).map((key) => (
           <div key={key} className="rounded-md border border-line bg-paper p-4">
-            <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">{METRIC_LABELS[key]}</p>
+            <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">{metricLabels(t)[key]}</p>
             <p className="tabular mt-2 font-display text-3xl text-ink">{metrics[key]}</p>
             {!["missingAlt", "thinContent", "orphanPages"].includes(key) && (
-              <p className="mt-1 text-xs text-ink-muted">cəmi {metrics.total} səhifədən</p>
+              <p className="mt-1 text-xs text-ink-muted">{t("pages.misc.cemiSehifeden", { p0: metrics.total })}</p>
             )}
           </div>
         ))}
@@ -74,7 +75,7 @@ export default async function AdminSeoPage({ searchParams }: Props) {
           <Link href="/admin/seo" className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${!selected ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>{t("pages.serp.hamisi")}</Link>
           {(["error", "warning", "info"] as const).map((severity) => (
             <Link key={severity} href={`/admin/seo?severity=${severity}`} className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${selected === severity ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>
-              {SEVERITY_LABELS[severity]}
+              {severityLabels(t)[severity]}
             </Link>
           ))}
         </div>
@@ -89,7 +90,7 @@ export default async function AdminSeoPage({ searchParams }: Props) {
               <li key={`${issue.contentId}-${issue.code}-${index}`} className="grid min-w-0 gap-3 px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-5">
                 {issue.severity === "error" ? <AlertCircle className="size-5 text-danger" aria-hidden="true" /> : issue.severity === "warning" ? <AlertTriangle className="size-5 text-warning" aria-hidden="true" /> : <CheckCircle2 className="size-5 text-info" aria-hidden="true" />}
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-ink-muted">{KIND_LABELS[issue.kind]} · {SEVERITY_LABELS[issue.severity]}</p>
+                  <p className="text-xs font-semibold text-ink-muted">{kindLabels(t)[issue.kind]} · {severityLabels(t)[issue.severity]}</p>
                   <Link href={issue.adminPath} className="mt-1 block font-medium text-ink hover:text-gold-deep [overflow-wrap:anywhere]">{issue.title}</Link>
                   <p className="mt-1 text-sm text-ink-soft">{issue.message}</p>
                 </div>

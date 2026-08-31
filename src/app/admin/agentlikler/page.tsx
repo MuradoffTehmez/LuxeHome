@@ -68,9 +68,9 @@ export default async function AdminAgenciesPage() {
                   <ConfirmAction
                     action={approveAgencyEmployee}
                     id={employee.id}
-                    label={`${employee.user.name} təsdiqlə`}
+                    label={t("pages.common.tesdiqle", { p0: employee.user.name })}
                     title={t("pages.agents.emekdasiTesdiqlemek")}
-                    description={`${employee.user.name} (${employee.user.email}) "${employee.agency.name}" agentliyinə əməkdaş kimi əlavə olunacaq.`}
+                    description={t("pages.common.agentliyineEmekdasKimiElave", { p0: employee.user.name, p1: employee.user.email, p2: employee.agency.name })}
                     confirmLabel={t("pages.agents.tesdiqle")}
                     tone="neutral"
                     className="size-11"
@@ -80,9 +80,9 @@ export default async function AdminAgenciesPage() {
                   <ConfirmAction
                     action={rejectAgencyEmployee}
                     id={employee.id}
-                    label={`${employee.user.name} dəvətini rədd et`}
+                    label={t("pages.common.devetiniReddEt", { p0: employee.user.name })}
                     title={t("pages.agents.devetiReddEtmek")}
-                    description={`${employee.user.name} üçün komanda dəvəti rədd olunacaq.`}
+                    description={t("pages.common.ucunKomandaDevetiRedd", { p0: employee.user.name })}
                     confirmLabel={t("pages.agents.reddEt")}
                     tone="danger"
                     className="size-11"
@@ -128,14 +128,14 @@ export default async function AdminAgenciesPage() {
                 <ConfirmAction
                   action={toggleAgencyVerification}
                   id={account.agency.id}
-                  label={account.agency.isVerified ? `«${account.agency.name}» təsdiqini ləğv et` : `«${account.agency.name}» təsdiqlə`}
-                  title={account.agency.isVerified ? "Təsdiqi ləğv etmək" : "Agentliyi təsdiqləmək"}
+                  label={account.agency.isVerified ? t("pages.common.tesdiqiniLegvEt", { p0: account.agency.name }) : t("pages.common.tesdiqle2", { p0: account.agency.name })}
+                  title={account.agency.isVerified ? t("pages.misc.tesdiqiLegvEtmek") : t("pages.misc.agentliyiTesdiqlemek")}
                   description={
                     account.agency.isVerified
-                      ? "Agentlik ictimai səhifədən gizlədiləcək. Elanları saytda qalır."
-                      : "Agentlik ictimai /agentlikler səhifəsində görünəcək və yeni elanları avtomatik dərc olunacaq."
+                      ? t("pages.misc.agentlikIctimaiSehifedenGizledilecek")
+                      : t("pages.misc.agentlikIctimaiAgentliklerSehifesinde")
                   }
-                  confirmLabel={account.agency.isVerified ? "Ləğv et" : "Təsdiqlə"}
+                  confirmLabel={account.agency.isVerified ? t("pages.misc.legvEt") : t("pages.misc.tesdiqle")}
                   tone={account.agency.isVerified ? "danger" : "neutral"}
                   className="size-11"
                 >
@@ -200,14 +200,14 @@ export default async function AdminAgenciesPage() {
                       <ConfirmAction
                         action={toggleAgencyVerification}
                         id={account.agency.id}
-                        label={account.agency.isVerified ? `«${account.agency.name}» təsdiqini ləğv et` : `«${account.agency.name}» təsdiqlə`}
-                        title={account.agency.isVerified ? "Təsdiqi ləğv etmək" : "Agentliyi təsdiqləmək"}
+                        label={account.agency.isVerified ? t("pages.common.tesdiqiniLegvEt", { p0: account.agency.name }) : t("pages.common.tesdiqle2", { p0: account.agency.name })}
+                        title={account.agency.isVerified ? t("pages.misc.tesdiqiLegvEtmek") : t("pages.misc.agentliyiTesdiqlemek")}
                         description={
                           account.agency.isVerified
-                            ? "Agentlik ictimai səhifədən gizlədiləcək. Elanları saytda qalır."
-                            : "Agentlik ictimai /agentlikler səhifəsində görünəcək və yeni elanları avtomatik dərc olunacaq."
+                            ? t("pages.misc.agentlikIctimaiSehifedenGizledilecek")
+                            : t("pages.misc.agentlikIctimaiAgentliklerSehifesinde")
                         }
-                        confirmLabel={account.agency.isVerified ? "Ləğv et" : "Təsdiqlə"}
+                        confirmLabel={account.agency.isVerified ? t("pages.misc.legvEt") : t("pages.misc.tesdiqle")}
                         tone={account.agency.isVerified ? "danger" : "neutral"}
                         className="size-11"
                       >

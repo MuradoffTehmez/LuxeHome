@@ -112,7 +112,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
     <ConfirmAction
       action={restorePartner}
       id={partner.id}
-      label={`«${partner.name}» tərəfdaşını bərpa et`}
+      label={t("pages.common.terefdasiniBerpaEt", { p0: partner.name })}
       title={t("pages.partners.terefdasiBerpaEtmek")}
       description={t("pages.partners.qeydArxivStatusundaBerpa")}
       confirmLabel={t("pages.partners.berpaEt")}
@@ -126,10 +126,10 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
         <ConfirmAction
           action={togglePartnerVisibility}
           id={partner.id}
-          label={partner.showPublicly ? `«${partner.name}» tərəfdaşını saytdan gizlət` : `«${partner.name}» tərəfdaşını saytda göstər`}
-          title={partner.showPublicly ? "Tərəfdaşı saytdan gizlətmək" : "Tərəfdaşı saytda göstərmək"}
-          description={partner.showPublicly ? "Məlumat silinməyəcək; ictimai profil və ana səhifə görünüşü bağlanacaq." : "Aktiv tərəfdaşın ictimai profili dərhal açılacaq."}
-          confirmLabel={partner.showPublicly ? "Gizlət" : "Saytda göstər"}
+          label={partner.showPublicly ? t("pages.common.terefdasiniSaytdanGizlet", { p0: partner.name }) : t("pages.common.terefdasiniSaytdaGoster", { p0: partner.name })}
+          title={partner.showPublicly ? t("pages.misc.terefdasiSaytdanGizletmek") : t("pages.misc.terefdasiSaytdaGostermek")}
+          description={partner.showPublicly ? t("pages.misc.melumatSilinmeyecekIctimaiProfil") : t("pages.misc.aktivTerefdasinIctimaiProfili")}
+          confirmLabel={partner.showPublicly ? t("pages.misc.gizlet") : t("pages.misc.saytdaGoster")}
           tone={partner.showPublicly ? "danger" : "neutral"}
         >
           {partner.showPublicly ? <EyeOff className="size-4" aria-hidden="true" /> : <ScanEye className="size-4" aria-hidden="true" />}
@@ -141,7 +141,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           target="_blank"
           rel="noreferrer"
           className="grid size-11 place-items-center rounded-xs text-ink-muted hover:bg-beige hover:text-ink"
-          aria-label={`${partner.name} profilini saytda aç`}
+          aria-label={t("pages.common.profiliniSaytdaAc", { p0: partner.name })}
         >
           <Eye className="size-4" aria-hidden="true" />
         </Link>
@@ -150,7 +150,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
         <Link
           href={`${LIST_PATH}/${partner.id}`}
           className="grid size-11 place-items-center rounded-xs text-ink-muted hover:bg-beige hover:text-ink"
-          aria-label={`${partner.name} tərəfdaşını redaktə et`}
+          aria-label={t("pages.common.terefdasiniRedakteEt", { p0: partner.name })}
         >
           <Pencil className="size-4" aria-hidden="true" />
         </Link>
@@ -159,7 +159,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
         <ConfirmAction
           action={deletePartner}
           id={partner.id}
-          label={`«${partner.name}» tərəfdaşını sil`}
+          label={t("pages.common.terefdasiniSil", { p0: partner.name })}
           title={t("pages.partners.terefdasiSilmek")}
           description={t("pages.partners.qeydSoftDeleteEdilecek")}
         >
@@ -207,7 +207,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
                 <li key={partner.id} className="flex flex-wrap items-center gap-2 text-sm text-warning">
                   <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
                   <Link href={`${LIST_PATH}/${partner.id}`} className="font-medium underline-offset-4 hover:underline">{partner.name}</Link>
-                  <span>{days !== null && days < 0 ? "müddəti bitib" : `${days} gün qalıb`}</span>
+                  <span>{days !== null && days < 0 ? t("pages.common.muddetiBitib") : t("pages.common.gunQalib", { p0: days ?? 0 })}</span>
                 </li>
               );
             })}
@@ -220,7 +220,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           action={LIST_PATH}
           searchValue={filters.search}
           searchPlaceholder={t("pages.partners.adHuquqiAdSayt")}
-          resultLabel={`${total} tərəfdaş`}
+          resultLabel={t("pages.common.terefdas", { p0: total })}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             { name: "status", label: t("pages.partners.status"), value: filters.status, options: [{ value: "", label: t("pages.partners.butunStatuslar") }, ...Object.values(PARTNER_STATUSES).map((value) => ({ value, label: t(`labels.partnerStatus.${value}`) }))] },
@@ -243,13 +243,13 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
             renderCard={(partner) => (
               <AdminListCard
                 title={partner.name}
-                meta={`${t(`labels.partnershipType.${partner.partnershipType as PartnershipType}`) ?? partner.partnershipType} · ${partner.city || partner.country || "Yerləşmə yoxdur"}`}
+                meta={`${t(`labels.partnershipType.${partner.partnershipType as PartnershipType}`) ?? partner.partnershipType} · ${partner.city || partner.country || t("pages.misc.yerlesmeYoxdur")}`}
                 status={statusBadge(partner.status, t)}
                 actions={renderActions(partner)}
               >
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <span>Elan: {partner._count.properties}</span><span>Layihə: {partner._count.projects}</span>
-                  <span>{partner.verified ? "Təsdiqlənib" : "Təsdiqsiz"}</span><span>{partner.showOnHomepage ? "Ana səhifədə" : "Ana səhifədə deyil"}</span>
+                  <span>{partner.verified ? t("pages.misc.tesdiqlenib") : t("pages.misc.tesdiqsiz")}</span><span>{partner.showOnHomepage ? t("pages.misc.anaSehifede") : t("pages.misc.anaSehifedeDeyil")}</span>
                 </div>
               </AdminListCard>
             )}
@@ -275,8 +275,8 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
                     </AdminTableCell>
                     <AdminTableCell>{t(`labels.partnershipType.${partner.partnershipType as PartnershipType}`) ?? partner.partnershipType}</AdminTableCell>
                     <AdminTableCell>{statusBadge(partner.status, t)}</AdminTableCell>
-                    <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.verified ? "Təsdiqlənib" : "Təsdiqsiz"}</span><span>{partner.officialPartner ? "Rəsmi" : "Rəsmi deyil"}</span></div></AdminTableCell>
-                    <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.featured ? "Seçilmiş" : "Adi"}</span><span>{partner.showOnHomepage ? "Ana səhifədə" : "Göstərilmir"}</span></div></AdminTableCell>
+                    <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.verified ? t("pages.misc.tesdiqlenib") : t("pages.misc.tesdiqsiz")}</span><span>{partner.officialPartner ? t("pages.misc.resmi") : t("pages.misc.resmiDeyil")}</span></div></AdminTableCell>
+                    <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.featured ? t("pages.misc.secilmis") : "Adi"}</span><span>{partner.showOnHomepage ? t("pages.misc.anaSehifede") : t("pages.misc.gosterilmir")}</span></div></AdminTableCell>
                     <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.officialSince?.toLocaleDateString("az-AZ") ?? "—"}</span><span>{partner.partnershipEndDate?.toLocaleDateString("az-AZ") ?? "—"}</span></div></AdminTableCell>
                     <AdminTableCell>{partner._count.properties} / {partner._count.projects}</AdminTableCell>
                     <AdminTableCell className="whitespace-nowrap text-xs text-ink-muted">{formatRelative(partner.updatedAt)}</AdminTableCell>

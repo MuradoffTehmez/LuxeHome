@@ -18,10 +18,10 @@ export default async function SerpOverviewPage() {
     prisma.notFoundHit.count(), prisma.seoSearchMetric.count(),
   ]);
   const metrics = [
-    ["Metadata override", metadataCount, "/admin/serp/metadata"], ["Landing səhifə", landingCount, "/admin/serp/landingler"],
+    ["Metadata override", metadataCount, "/admin/serp/metadata"], [t("pages.misc.landingSehife"), landingCount, "/admin/serp/landingler"],
     ["Keyword", keywordCount, "/admin/serp/acar-sozler"], ["Semantic entity", entityCount, "/admin/serp/entities"],
-    ["Açıq audit problemi", openIssues, "/admin/serp/audit"], ["Aktiv redirect", redirects, "/admin/redirects"],
-    ["404 URL", notFound, "/admin/redirects#not-found"], ["Search Console sətri", searchMetrics, "/admin/serp/search-console"],
+    [t("pages.misc.aciqAuditProblemi"), openIssues, "/admin/serp/audit"], ["Aktiv redirect", redirects, "/admin/redirects"],
+    ["404 URL", notFound, "/admin/redirects#not-found"], [t("pages.misc.searchConsoleSetri"), searchMetrics, "/admin/serp/search-console"],
   ] as const;
   return <>
     <AdminPageHeader title={t("pages.serp.serpVeSeo")} description={t("pages.serp.indekslenmeEntityLandingMetadata")} breadcrumbs={[{ label: t("pages.serp.idarePaneli"), href: "/admin" }, { label: t("pages.serp.serpVeSeo") }]} />

@@ -84,7 +84,7 @@ export default async function BlogCategoriesPage({
                   <>
                     <Link
                       href={`${PATH}?duzelis=${category.id}`}
-                      aria-label={`«${category.name}» kateqoriyasını redaktə et`}
+                      aria-label={t("pages.common.kateqoriyasiniRedakteEt", { p0: category.name })}
                       title={t("pages.blog.redakteEt")}
                       className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                     >
@@ -93,12 +93,12 @@ export default async function BlogCategoriesPage({
                     <ConfirmAction
                       action={deleteBlogCategory}
                       id={category.id}
-                      label={`«${category.name}» kateqoriyasını sil`}
+                      label={t("pages.common.kateqoriyasiniSil", { p0: category.name })}
                       title={t("pages.blog.kateqoriyaniSilmek")}
                       description={
                         category._count.posts > 0
-                          ? `${category._count.posts} məqalə kateqoriyasız qalacaq. Məqalələr silinmir.`
-                          : "Kateqoriya tamamilə silinəcək."
+                          ? t("pages.common.meqaleKateqoriyasizQalacaqMeqaleler", { p0: category._count.posts })
+                          : t("pages.misc.kateqoriyaTamamileSilinecek")
                       }
                       className="size-11"
                     >
@@ -145,7 +145,7 @@ export default async function BlogCategoriesPage({
                       <div className="flex items-center justify-end gap-0.5">
                         <Link
                           href={`${PATH}?duzelis=${category.id}`}
-                          aria-label={`«${category.name}» kateqoriyasını redaktə et`}
+                          aria-label={t("pages.common.kateqoriyasiniRedakteEt", { p0: category.name })}
                           title={t("pages.blog.redakteEt")}
                           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                         >
@@ -154,12 +154,12 @@ export default async function BlogCategoriesPage({
                         <ConfirmAction
                           action={deleteBlogCategory}
                           id={category.id}
-                          label={`«${category.name}» kateqoriyasını sil`}
+                          label={t("pages.common.kateqoriyasiniSil", { p0: category.name })}
                           title={t("pages.blog.kateqoriyaniSilmek")}
                           description={
                             category._count.posts > 0
-                              ? `${category._count.posts} məqalə kateqoriyasız qalacaq. Məqalələr silinmir.`
-                              : "Kateqoriya tamamilə silinəcək."
+                              ? t("pages.common.meqaleKateqoriyasizQalacaqMeqaleler", { p0: category._count.posts })
+                              : t("pages.misc.kateqoriyaTamamileSilinecek")
                           }
                           className="size-11"
                         >

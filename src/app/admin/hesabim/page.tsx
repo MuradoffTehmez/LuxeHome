@@ -17,15 +17,15 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 /** Sessiya siyahısında cihazın kobud adı — tam user-agent sətri oxunmur. */
-function deviceLabel(userAgent: string | null): string {
-  if (!userAgent) return "Naməlum cihaz";
+function deviceLabel(userAgent: string | null, t: Awaited<ReturnType<typeof getAdminT>>): string {
+  if (!userAgent) return t("pages.misc.namelumCihaz");
   const browser =
     /Edg\//.test(userAgent) ? "Edge"
     : /OPR\//.test(userAgent) ? "Opera"
     : /Chrome\//.test(userAgent) ? "Chrome"
     : /Safari\//.test(userAgent) ? "Safari"
     : /Firefox\//.test(userAgent) ? "Firefox"
-    : "Naməlum brauzer";
+    : t("pages.misc.namelumBrauzer");
   const platform =
     /Android/.test(userAgent) ? "Android"
     : /iPhone|iPad/.test(userAgent) ? "iOS"
@@ -119,7 +119,7 @@ export default async function AccountPage({
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm text-ink">
-                    {deviceLabel(session.userAgent)}
+                    {deviceLabel(session.userAgent, t)}
                     {isCurrent && (
                       <span className="ml-2 rounded-full bg-success-bg px-2 py-0.5 text-xs text-success">
                         {t("pages.account.buCihaz")}

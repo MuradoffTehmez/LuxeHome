@@ -82,7 +82,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
       <ConfirmAction
         action={restorePost}
         id={post.id}
-        label={`«${post.title}» məqaləsini bərpa et`}
+        label={t("pages.common.meqalesiniBerpaEt", { p0: post.title })}
         title={t("pages.blog.meqaleniBerpaEtmek")}
         description={t("pages.blog.meqaleYenidenAktivSiyahiya")}
         confirmLabel={t("pages.blog.berpaEt")}
@@ -97,7 +97,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
           href={localizePath(`/blog/${post.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
-          aria-label={`«${post.title}» məqaləsini saytda aç`}
+          aria-label={t("pages.common.meqalesiniSaytdaAc", { p0: post.title })}
           title={t("pages.blog.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -105,7 +105,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
         </Link>
         <Link
           href={`${LIST_PATH}/${post.id}`}
-          aria-label={`«${post.title}» məqaləsini redaktə et`}
+          aria-label={t("pages.common.meqalesiniRedakteEt", { p0: post.title })}
           title={t("pages.blog.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -114,7 +114,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
         <ConfirmAction
           action={deletePost}
           id={post.id}
-          label={`«${post.title}» məqaləsini sil`}
+          label={t("pages.common.meqalesiniSil", { p0: post.title })}
           title={t("pages.blog.meqaleniSilmek")}
           description={t("pages.blog.meqaleSaytdanCixarilacaqAmma")}
           className="size-11"
@@ -128,16 +128,16 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
   return (
     <>
       <AdminPageHeader
-        title={deleted ? "Silinmiş məqalələr" : "Bloq"}
+        title={deleted ? t("pages.misc.silinmisMeqaleler") : "Bloq"}
         description={
           deleted
-            ? "Silinmiş məqalələr burada saxlanılır və bərpa edilə bilər."
-            : `Ümumilikdə ${total} məqalə tapıldı.`
+            ? t("pages.misc.silinmisMeqalelerBuradaSaxlanilir")
+            : t("pages.common.umumilikdeMeqaleTapildi", { p0: total })
         }
         breadcrumbs={[
           { label: t("pages.blog.idarePaneli"), href: "/admin" },
           ...(deleted ? [{ label: t("pages.blog.bloq"), href: LIST_PATH }] : []),
-          { label: deleted ? "Silinmişlər" : "Bloq" },
+          { label: deleted ? t("pages.misc.silinmisler") : "Bloq" },
         ]}
         actions={
           <>
@@ -150,7 +150,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
               variant="outline"
               size="sm"
             >
-              {deleted ? "Aktiv məqalələr" : "Zibil qutusu"}
+              {deleted ? t("pages.misc.aktivMeqaleler") : "Zibil qutusu"}
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />
@@ -165,7 +165,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder={t("pages.blog.basliqVeYaSlug")}
-          resultLabel={`${total} məqalə tapıldı`}
+          resultLabel={t("pages.common.meqaleTapildi", { p0: total })}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
@@ -200,8 +200,8 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             empty={
               <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.categoryId
-                  ? "Bu filtrlərə uyğun məqalə tapılmadı."
-                  : "Hələ məqalə yazılmayıb."}
+                  ? t("pages.misc.buFiltrlereUygunMeqale")
+                  : t("pages.misc.heleMeqaleYazilmayib")}
               </p>
             }
             renderCard={(post) => (
@@ -225,7 +225,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
                   <div>
                     <dt className="text-xs text-ink-muted">{t("pages.blog.kateqoriya")}</dt>
-                    <dd className="mt-1 text-ink">{post.category?.name ?? "Kateqoriyasız"}</dd>
+                    <dd className="mt-1 text-ink">{post.category?.name ?? t("pages.misc.kateqoriyasiz")}</dd>
                   </div>
                   <div>
                     <dt className="text-xs text-ink-muted">{t("pages.blog.muellif")}</dt>
@@ -278,7 +278,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
-            {total === 0 ? "0 məqalə göstərilir" : `${total} məqalədən ${rows.length} göstərilir`}
+            {total === 0 ? t("pages.misc.0MeqaleGosterilir") : t("pages.common.meqaledenGosterilir", { p0: total, p1: rows.length })}
           </span>
           <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
         </div>

@@ -54,7 +54,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
     <>
       <AdminPageHeader
         title={service.title}
-        description={`Son yenilənmə: ${formatDateTime(service.updatedAt)}`}
+        description={t("pages.common.sonYenilenme", { p0: formatDateTime(service.updatedAt) })}
         breadcrumbs={[
           { label: t("pages.services.idarePaneli"), href: "/admin" },
           { label: t("pages.services.xidmetler"), href: "/admin/xidmetler" },

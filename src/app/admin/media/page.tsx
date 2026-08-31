@@ -44,7 +44,7 @@ export default async function AdminMediaPage({
     <>
       <AdminPageHeader
         title={t("pages.settings.media")}
-        description={`${total} fayl. Yüklənən şəkillər avtomatik WebP formatına çevrilir.`}
+        description={t("pages.common.faylYuklenenSekillerAvtomatik", { p0: total })}
         breadcrumbs={[{ label: t("pages.settings.idarePaneli"), href: "/admin" }, { label: t("pages.settings.media") }]}
       />
 
@@ -57,12 +57,12 @@ export default async function AdminMediaPage({
           action={LIST_PATH}
           searchValue={q}
           searchPlaceholder={t("pages.settings.faylAdiVeYa")}
-          resultLabel={`${total} fayl tapıldı`}
+          resultLabel={t("pages.common.faylTapildi", { p0: total })}
         />
 
         {rows.length === 0 ? (
           <p className="px-5 py-10 text-center text-sm text-ink-muted">
-            {q ? "Bu axtarışa uyğun fayl tapılmadı." : "Hələ fayl yüklənməyib."}
+            {q ? t("pages.misc.buAxtarisaUygunFayl") : t("pages.misc.heleFaylYuklenmeyib")}
           </p>
         ) : (
           <ul className="grid gap-4 p-4 min-[480px]:grid-cols-2 lg:grid-cols-3 lg:p-5 xl:grid-cols-4">
@@ -89,7 +89,7 @@ export default async function AdminMediaPage({
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
-            {total === 0 ? "0 fayl göstərilir" : `${total} fayldan ${rows.length} göstərilir`}
+            {total === 0 ? t("pages.misc.0FaylGosterilir") : t("pages.common.fayldanGosterilir", { p0: total, p1: rows.length })}
           </span>
           <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
         </div>

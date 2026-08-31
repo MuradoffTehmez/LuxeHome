@@ -85,7 +85,7 @@ export default async function AdminLeadPage({ params }: { params: Promise<{ id: 
                 <dt className="sr-only">{t("pages.leads.whatsapp")}</dt>
                 <dd>
                   <a
-                    href={whatsappLink(`Salam, ${lead.name}. Luxe Home Estate ilə əlaqə saxladığınız üçün təşəkkür edirik.`)}
+                    href={whatsappLink(t("pages.common.salamLuxeHomeEstate", { p0: lead.name }))}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex min-h-11 items-center text-ink transition-colors hover:text-gold-deep"

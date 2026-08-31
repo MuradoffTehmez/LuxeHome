@@ -59,7 +59,7 @@ export default async function AdminReservationsPage() {
                       <Badge tone={STATUS_TONES[status]}>{t(`labels.reservationStatus.${status}`)}</Badge>
                     </div>
                     <p className="mt-1 text-sm text-ink-soft">{reservation.firstName} {reservation.lastName} · {reservation.phone} · {reservation.email}</p>
-                    <p className="mt-1 text-xs text-ink-muted">İstənilən vaxt: {formatDateTime(reservation.requestedFor)}{reservation.agent ? ` · Agent: ${reservation.agent.name}` : ""}</p>
+                    <p className="mt-1 text-xs text-ink-muted">{t("pages.misc.istenilenVaxt", { p0: formatDateTime(reservation.requestedFor) })}{reservation.agent ? t("pages.misc.agentQeydi", { p0: reservation.agent.name }) : ""}</p>
                     {reservation.message ? <p className="mt-2 text-sm text-ink-muted">{reservation.message}</p> : null}
                   </div>
                   <ReservationStatusForm id={reservation.id} status={status} />

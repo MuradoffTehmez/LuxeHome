@@ -41,15 +41,17 @@ const EMPTY: Omit<NeighborhoodProfileValues, "locationId"> = {
   measuredAt: "",
 };
 
-const NUMBER_FIELDS = [
-  ["averagePrice", "Orta qiymət"],
-  ["medianPrice", "Median qiymət"],
-  ["averagePricePerSqm", "m² qiyməti"],
-  ["annualChangePercent", "İllik dəyişiklik %"],
-  ["saleRentRatio", "Satış / icarə nisbəti"],
-  ["averageRent", "Orta icarə"],
-  ["rentalYieldPercent", "İcarə gəlirliliyi %"],
-] as const;
+/** Sahə adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+const numberFields = (t: ReturnType<typeof useTranslations<"admin">>) =>
+  [
+    ["averagePrice", t("pages.misc.ortaQiymet")],
+    ["medianPrice", t("pages.misc.medianQiymet")],
+    ["averagePricePerSqm", t("pages.misc.mQiymeti")],
+    ["annualChangePercent", t("pages.misc.illikDeyisiklik")],
+    ["saleRentRatio", t("pages.misc.satisIcareNisbeti")],
+    ["averageRent", t("pages.misc.ortaIcare")],
+    ["rentalYieldPercent", t("pages.misc.icareGelirliliyi")],
+  ] as const;
 
 const inputClass = "mt-1 min-h-11 w-full rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink";
 
@@ -95,7 +97,7 @@ export function NeighborhoodEditor({
 
       <div key={locationId || "empty"} className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {NUMBER_FIELDS.map(([name, label]) => (
+          {numberFields(t).map(([name, label]) => (
             <label key={name} className="text-sm text-ink-soft">
               {label}
               <input className={inputClass} name={name} type="number" step="0.01" defaultValue={values[name]} />

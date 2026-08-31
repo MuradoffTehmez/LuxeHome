@@ -86,7 +86,7 @@ export default async function AdminProjectsPage({
       <ConfirmAction
         action={restoreProject}
         id={project.id}
-        label={`«${project.name}» layihəsini bərpa et`}
+        label={t("pages.common.layihesiniBerpaEt", { p0: project.name })}
         title={t("pages.projects.layiheniBerpaEtmek")}
         description={t("pages.projects.layiheYenidenAktivSiyahiya")}
         confirmLabel={t("pages.projects.berpaEt")}
@@ -101,7 +101,7 @@ export default async function AdminProjectsPage({
           href={localizePath(`/layiheler/${project.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
-          aria-label={`«${project.name}» layihəsini saytda aç`}
+          aria-label={t("pages.common.layihesiniSaytdaAc", { p0: project.name })}
           title={t("pages.projects.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -109,7 +109,7 @@ export default async function AdminProjectsPage({
         </Link>
         <Link
           href={`${LIST_PATH}/${project.id}`}
-          aria-label={`«${project.name}» layihəsini redaktə et`}
+          aria-label={t("pages.common.layihesiniRedakteEt", { p0: project.name })}
           title={t("pages.projects.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -118,7 +118,7 @@ export default async function AdminProjectsPage({
         <ConfirmAction
           action={deleteProject}
           id={project.id}
-          label={`«${project.name}» layihəsini sil`}
+          label={t("pages.common.layihesiniSil", { p0: project.name })}
           title={t("pages.projects.layiheniSilmek")}
           description={t("pages.projects.layiheSaytdanCixarilacaqAmma")}
           className="size-11"
@@ -132,16 +132,16 @@ export default async function AdminProjectsPage({
   return (
     <>
       <AdminPageHeader
-        title={deleted ? "Silinmiş layihələr" : "Layihələr"}
+        title={deleted ? t("pages.misc.silinmisLayiheler") : t("pages.misc.layiheler")}
         description={
           deleted
-            ? "Silinmiş layihələr burada saxlanılır və bərpa edilə bilər."
-            : `Ümumilikdə ${total} layihə tapıldı.`
+            ? t("pages.misc.silinmisLayihelerBuradaSaxlanilir")
+            : t("pages.common.umumilikdeLayiheTapildi", { p0: total })
         }
         breadcrumbs={[
           { label: t("pages.projects.idarePaneli"), href: "/admin" },
           ...(deleted ? [{ label: t("pages.projects.layiheler"), href: LIST_PATH }] : []),
-          { label: deleted ? "Silinmişlər" : "Layihələr" },
+          { label: deleted ? t("pages.misc.silinmisler") : t("pages.misc.layiheler") },
         ]}
         actions={
           <>
@@ -150,7 +150,7 @@ export default async function AdminProjectsPage({
               variant="outline"
               size="sm"
             >
-              {deleted ? "Aktiv layihələr" : "Zibil qutusu"}
+              {deleted ? t("pages.misc.aktivLayiheler") : "Zibil qutusu"}
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />
@@ -165,7 +165,7 @@ export default async function AdminProjectsPage({
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder={t("pages.projects.adVeYaSlug")}
-          resultLabel={`${total} layihə tapıldı`}
+          resultLabel={t("pages.common.layiheTapildi", { p0: total })}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
@@ -203,8 +203,8 @@ export default async function AdminProjectsPage({
             empty={
               <p className="py-10 text-center text-sm text-ink-muted">
                 {filters.q || filters.status || filters.projectType
-                  ? "Bu filtrlərə uyğun layihə tapılmadı."
-                  : "Hələ layihə əlavə edilməyib."}
+                  ? t("pages.misc.buFiltrlereUygunLayihe")
+                  : t("pages.misc.heleLayiheElaveEdilmeyib")}
               </p>
             }
             renderCard={(project) => (
@@ -293,7 +293,7 @@ export default async function AdminProjectsPage({
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
-            {total === 0 ? "0 layihə göstərilir" : `${total} layihədən ${rows.length} göstərilir`}
+            {total === 0 ? t("pages.misc.0LayiheGosterilir") : t("pages.common.layihedenGosterilir", { p0: total, p1: rows.length })}
           </span>
           <Pagination page={page} totalPages={totalPages} buildHref={buildHref} />
         </div>

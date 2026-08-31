@@ -74,7 +74,7 @@ export function PartnerRelationsManager({
         </label>
         {entityType === "property" || entityType === "project" ? (
           <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
-            {entityType === "project" ? "Layihənin tərəfdaş səhifəsi" : "Mənbə URL"}
+            {entityType === "project" ? t("pages.misc.layiheninTerefdasSehifesi") : t("pages.misc.menbeUrl")}
             <input name="sourceUrl" type="url" className={fieldClass} placeholder="https://…" />
           </label>
         ) : <div />}
@@ -193,14 +193,14 @@ function RelationList({
                 <Link href={item.href} className="font-medium text-ink hover:text-gold-deep">{item.label}</Link>
                 <p className="mt-0.5 text-xs text-ink-muted">
                   {t(`labels.partnerRelationRole.${item.role as keyof typeof PARTNER_RELATION_ROLE_LABELS}`) ?? item.role}
-                  {item.isPrimary ? " · əsas" : ""}{item.isPublic ? " · public" : " · gizli"}
+                  {item.isPrimary ? t("pages.misc.esas") : ""}{item.isPublic ? " · public" : " · gizli"}
                 </p>
               </div>
               <form action={action}>
                 <input type="hidden" name="partnerId" value={partnerId} />
                 <input type="hidden" name="entityType" value={entityType} />
                 <input type="hidden" name="relationId" value={item.id} />
-                <button type="submit" className="grid size-11 place-items-center rounded-xs text-danger hover:bg-danger-bg" aria-label={`${item.label} əlaqəsini sil`}>
+                <button type="submit" className="grid size-11 place-items-center rounded-xs text-danger hover:bg-danger-bg" aria-label={t("pages.common.elaqesiniSil", { p0: item.label })}>
                   <Trash2 className="size-4" aria-hidden="true" />
                 </button>
               </form>

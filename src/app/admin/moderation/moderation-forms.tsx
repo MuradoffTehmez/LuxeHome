@@ -19,9 +19,9 @@ export function ApprovePropertyButton({ id, title }: { id: string; title: string
     <ConfirmAction
       action={approveModerationProperty}
       id={id}
-      label={`${title} təsdiqlə`}
+      label={t("pages.common.tesdiqle", { p0: title })}
       title={t("pages.moderation.elaniTesdiqlemek")}
-      description={`"${title}" dərc olunacaq və saytda ictimai görünəcək.`}
+      description={t("pages.common.dercOlunacaqVeSaytda", { p0: title })}
       confirmLabel={t("pages.moderation.tesdiqle")}
       tone="neutral"
       className="size-11"
@@ -52,8 +52,8 @@ export function RejectPropertyButton({ id, title }: { id: string; title: string 
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label={`${title} rədd et`}
-        title={`${title} rədd et`}
+        aria-label={t("pages.common.reddEt", { p0: title })}
+        title={t("pages.common.reddEt", { p0: title })}
         className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-danger-bg hover:text-danger"
       >
         <X className="size-4" aria-hidden="true" />
@@ -63,7 +63,7 @@ export function RejectPropertyButton({ id, title }: { id: string; title: string 
         open={open}
         onClose={() => setOpen(false)}
         title={t("pages.moderation.elaniReddEtmek")}
-        description={`"${title}" qaralamaya qaytarılacaq. Sahib "Elanlarım"da səbəbi görəcək.`}
+        description={t("pages.common.qaralamayaQaytarilacaqSahibElanlarim", { p0: title })}
         size="sm"
         footer={
           <>

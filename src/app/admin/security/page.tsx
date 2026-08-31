@@ -32,17 +32,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-const REASON_LABELS: Record<string, string> = {
-  OK: "Uğurlu",
-  BAD_PASSWORD: "Yanlış parol",
-  BAD_TOTP: "Yanlış 2FA kodu",
-  LOCKED: "Hesab kilidli",
-  RATE_LIMITED: "Sürət limiti",
-  INACTIVE: "Deaktiv hesab",
-};
+/** Etiketlər dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+const reasonLabels = (t: Awaited<ReturnType<typeof getAdminT>>): Record<string, string> => ({
+  OK: t("pages.misc.ugurlu"),
+  BAD_PASSWORD: t("pages.misc.yanlisParol"),
+  BAD_TOTP: t("pages.misc.yanlis2faKodu"),
+  LOCKED: t("pages.misc.hesabKilidli"),
+  RATE_LIMITED: t("pages.misc.suretLimiti"),
+  INACTIVE: t("pages.misc.deaktivHesab"),
+});
 
-function deviceLabel(userAgent: string | null): string {
-  if (!userAgent) return "Naməlum cihaz";
+function deviceLabel(userAgent: string | null, t: Awaited<ReturnType<typeof getAdminT>>): string {
+  if (!userAgent) return t("pages.misc.namelumCihaz");
   const browser = /Edg\//.test(userAgent)
     ? "Edge"
     : /Chrome\//.test(userAgent)
@@ -51,7 +52,7 @@ function deviceLabel(userAgent: string | null): string {
         ? "Safari"
         : /Firefox\//.test(userAgent)
           ? "Firefox"
-          : "Naməlum brauzer";
+          : t("pages.misc.namelumBrauzer");
   return browser;
 }
 
@@ -83,7 +84,7 @@ export default async function AdminSecurityPage() {
         <AdminCard title={t("pages.security.botMudafiesi")} description={t("pages.security.cloudflareTurnstileServerTerefli")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="max-w-2xl text-sm text-ink-soft">Admin və istifadəçi girişi, qeydiyyat, parol bərpası və müraciət formaları qorunur. Token hər əməliyyat növünə ayrıca bağlanır.</p>
-            <Badge tone={turnstileReady ? "success" : "danger"}>{turnstileReady ? "Aktiv" : "Konfiqurasiya tamamlanmayıb"}</Badge>
+            <Badge tone={turnstileReady ? "success" : "danger"}>{turnstileReady ? "Aktiv" : t("pages.misc.konfiqurasiyaTamamlanmayib")}</Badge>
           </div>
         </AdminCard>
         {lockedUsers.length > 0 && (
@@ -107,9 +108,9 @@ export default async function AdminSecurityPage() {
                   <ConfirmAction
                     action={unlockUserAccount}
                     id={user.id}
-                    label={`${user.name} kilidini aç`}
+                    label={t("pages.common.kilidiniAc", { p0: user.name })}
                     title={t("pages.security.kilidiAcmaq")}
-                    description={`${user.name} (${user.email}) dərhal yenidən giriş edə biləcək.`}
+                    description={t("pages.common.derhalYenidenGirisEde", { p0: user.name, p1: user.email })}
                     confirmLabel={t("pages.security.kilidiAc")}
                     tone="neutral"
                     className="size-11 shrink-0"
@@ -139,9 +140,9 @@ export default async function AdminSecurityPage() {
                     <ConfirmAction
                       action={revokeAdminSession}
                       id={session.id}
-                      label={`${session.user.email} sessiyasını bağla`}
+                      label={t("pages.common.sessiyasiniBagla", { p0: session.user.email })}
                       title={t("pages.security.sessiyaniBaglamaq")}
-                      description={`${session.user.name} (${session.user.email}) bu cihazdan çıxarılacaq.`}
+                      description={t("pages.common.buCihazdanCixarilacaq", { p0: session.user.name, p1: session.user.email })}
                       confirmLabel={t("pages.security.bagla")}
                       tone="danger"
                       className="size-11"
@@ -153,7 +154,7 @@ export default async function AdminSecurityPage() {
                   <dl className="grid grid-cols-2 gap-3">
                     <div>
                       <dt className="text-xs text-ink-muted">{t("pages.security.cihaz")}</dt>
-                      <dd className="mt-1 text-ink">{deviceLabel(session.userAgent)}</dd>
+                      <dd className="mt-1 text-ink">{deviceLabel(session.userAgent, t)}</dd>
                     </div>
                     <div>
                       <dt className="text-xs text-ink-muted">IP</dt>
@@ -184,7 +185,7 @@ export default async function AdminSecurityPage() {
                         <p className="text-xs text-ink-muted">{session.user.email}</p>
                       </AdminTableCell>
                       <AdminTableCell className="text-xs text-ink-muted">
-                        {deviceLabel(session.userAgent)}
+                        {deviceLabel(session.userAgent, t)}
                       </AdminTableCell>
                       <AdminTableCell className="text-xs text-ink-muted">{session.ip ?? "—"}</AdminTableCell>
                       <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
@@ -195,9 +196,9 @@ export default async function AdminSecurityPage() {
                           <ConfirmAction
                             action={revokeAdminSession}
                             id={session.id}
-                            label={`${session.user.email} sessiyasını bağla`}
+                            label={t("pages.common.sessiyasiniBagla", { p0: session.user.email })}
                             title={t("pages.security.sessiyaniBaglamaq")}
-                            description={`${session.user.name} (${session.user.email}) bu cihazdan çıxarılacaq.`}
+                            description={t("pages.common.buCihazdanCixarilacaq", { p0: session.user.name, p1: session.user.email })}
                             confirmLabel={t("pages.security.bagla")}
                             tone="danger"
                             className="size-11"
@@ -225,7 +226,7 @@ export default async function AdminSecurityPage() {
                 title={attempt.email}
                 status={
                   <Badge tone={attempt.success ? "success" : "danger"}>
-                    {REASON_LABELS[attempt.reason ?? ""] ?? (attempt.success ? "Uğurlu" : "Uğursuz")}
+                    {reasonLabels(t)[attempt.reason ?? ""] ?? (attempt.success ? t("pages.misc.ugurlu") : t("pages.misc.ugursuz"))}
                   </Badge>
                 }
               >
@@ -252,7 +253,7 @@ export default async function AdminSecurityPage() {
                     <AdminTableCell className="text-xs text-ink-muted">{attempt.ip ?? "—"}</AdminTableCell>
                     <AdminTableCell>
                       <Badge tone={attempt.success ? "success" : "danger"}>
-                        {REASON_LABELS[attempt.reason ?? ""] ?? (attempt.success ? "Uğurlu" : "Uğursuz")}
+                        {reasonLabels(t)[attempt.reason ?? ""] ?? (attempt.success ? t("pages.misc.ugurlu") : t("pages.misc.ugursuz"))}
                       </Badge>
                     </AdminTableCell>
                     <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">

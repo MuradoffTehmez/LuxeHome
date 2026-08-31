@@ -46,7 +46,7 @@ export default async function AdminServicesPage() {
           href={localizePath(`/xidmetler/${service.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
-          aria-label={`«${service.title}» xidmətini saytda aç`}
+          aria-label={t("pages.common.xidmetiniSaytdaAc", { p0: service.title })}
           title={t("pages.services.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -54,7 +54,7 @@ export default async function AdminServicesPage() {
         </Link>
         <Link
           href={`${LIST_PATH}/${service.id}`}
-          aria-label={`«${service.title}» xidmətini redaktə et`}
+          aria-label={t("pages.common.xidmetiniRedakteEt", { p0: service.title })}
           title={t("pages.services.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
@@ -63,7 +63,7 @@ export default async function AdminServicesPage() {
         <ConfirmAction
           action={deleteService}
           id={service.id}
-          label={`«${service.title}» xidmətini sil`}
+          label={t("pages.common.xidmetiniSil", { p0: service.title })}
           title={t("pages.services.xidmetiSilmek")}
           description={t("pages.services.xidmetTamamileSilinecekVe")}
           className="size-11"
@@ -78,7 +78,7 @@ export default async function AdminServicesPage() {
     <>
       <AdminPageHeader
         title={t("pages.services.xidmetler")}
-        description={`${services.length} xidmət. Sıra kiçikdən böyüyə göstərilir.`}
+        description={t("pages.common.xidmetSiraKicikdenBoyuye", { p0: services.length })}
         breadcrumbs={[{ label: t("pages.services.idarePaneli"), href: "/admin" }, { label: t("pages.services.xidmetler") }]}
         actions={
           <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">

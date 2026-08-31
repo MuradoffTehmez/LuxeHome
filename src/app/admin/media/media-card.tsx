@@ -53,7 +53,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast("Ünvan kopyalanmadı.", "error");
+      toast(t("pages.misc.unvanKopyalanmadi"), "error");
     }
   }
 
@@ -107,7 +107,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
                 type="button"
                 onClick={copyUrl}
                 aria-label={t("pages.settings.unvaniKopyala")}
-                title={copied ? "Kopyalandı" : "Ünvanı kopyala"}
+                title={copied ? t("pages.misc.kopyalandi") : t("pages.misc.unvaniKopyala")}
                 className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
               >
                 {copied ? (
@@ -120,7 +120,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
               <ConfirmAction
                 action={deleteMedia}
                 id={item.id}
-                label={`«${item.originalName}» faylını sil`}
+                label={t("pages.common.fayliniSil", { p0: item.originalName })}
                 title={t("pages.settings.fayliSilmek")}
                 description={t("pages.settings.faylAnbardanTamamileSilinecek")}
                 className="size-11"

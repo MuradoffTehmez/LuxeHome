@@ -55,8 +55,8 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
         title={post.title}
         description={
           post.deletedAt
-            ? `Bu məqalə ${formatDateTime(post.deletedAt)} tarixində silinib.`
-            : `Son yenilənmə: ${formatDateTime(post.updatedAt)} · ${post.viewCount} baxış`
+            ? t("pages.common.buMeqaleTarixindeSilinib", { p0: formatDateTime(post.deletedAt) })
+            : t("pages.common.sonYenilenmeBaxis", { p0: formatDateTime(post.updatedAt), p1: post.viewCount })
         }
         breadcrumbs={[
           { label: t("pages.blog.idarePaneli"), href: "/admin" },

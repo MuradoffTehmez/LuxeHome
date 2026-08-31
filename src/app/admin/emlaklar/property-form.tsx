@@ -405,7 +405,7 @@ export function PropertyForm({
       </FormSection>
 
       <FormSection id="seo" title="SEO" description={t("pages.properties.bosBuraxilsaBasliqVe")}>
-        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Əmlak elanı"} fallbackDescription={initial.description || "Əmlak haqqında məlumat"} pathname={`/emlaklar/${initial.slug || "yeni-elan"}`} />
+        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || t("pages.misc.emlakElani")} fallbackDescription={initial.description || t("pages.misc.emlakHaqqindaMelumat")} pathname={`/emlaklar/${initial.slug || "yeni-elan"}`} />
         <AdminInput
           name="canonicalUrl"
           label={t("pages.properties.canonicalUrl")}

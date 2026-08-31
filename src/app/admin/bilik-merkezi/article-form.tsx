@@ -177,8 +177,8 @@ export function KnowledgeArticleForm({
         <SeoFields
           initialTitle={initial.metaTitle}
           initialDescription={initial.metaDescription}
-          fallbackTitle={initial.title || "Bilik Mərkəzi bələdçisi"}
-          fallbackDescription={initial.excerpt || "Bələdçinin qısa təsviri"}
+          fallbackTitle={initial.title || t("pages.misc.bilikMerkeziBeledcisi")}
+          fallbackDescription={initial.excerpt || t("pages.misc.beledcininQisaTesviri")}
           pathname={`/bilik-merkezi/${initial.slug || "yeni-beledci"}`}
         />
         <AdminInput

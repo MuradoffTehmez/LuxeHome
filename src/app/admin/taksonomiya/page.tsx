@@ -52,7 +52,7 @@ export default async function AdminTaxonomyPage() {
       <div className="grid min-w-0 gap-6 xl:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-6">
           <section id="emlak-novleri" className="scroll-mt-32">
-            <AdminCard title={t("pages.taxonomy.emlakNovleri")} description={`${types.length} növ`} bodyClassName="p-0">
+            <AdminCard title={t("pages.taxonomy.emlakNovleri")} description={t("pages.common.nov", { p0: types.length })} bodyClassName="p-0">
               <ul>
                 {types.map((type) => (
                   <PropertyTypeRow
@@ -71,7 +71,7 @@ export default async function AdminTaxonomyPage() {
 
         <div className="flex min-w-0 flex-col gap-6">
           <section id="xususiyyetler" className="scroll-mt-32">
-            <AdminCard title={t("pages.taxonomy.xususiyyetler")} description={`${features.length} xüsusiyyət`} bodyClassName="p-0">
+            <AdminCard title={t("pages.taxonomy.xususiyyetler")} description={t("pages.common.xususiyyet", { p0: features.length })} bodyClassName="p-0">
               <div className="flex flex-col">
                 {Array.from(featuresByGroup.entries()).map(([group, items]) => (
                   <div key={group} className="border-b border-line last:border-0">

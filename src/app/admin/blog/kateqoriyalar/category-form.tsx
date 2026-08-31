@@ -21,12 +21,12 @@ export function CategoryForm({ initial }: { initial: CategoryFormValues }) {
       // sahələr köhnə dəyərlərlə qalır
       key={initial.id ?? "new"}
       action={saveBlogCategory}
-      submitLabel={initial.id ? "Yenilə" : "Kateqoriya yarat"}
+      submitLabel={initial.id ? t("pages.misc.yenile") : "Kateqoriya yarat"}
       cancelHref={initial.id ? "/admin/blog/kateqoriyalar" : undefined}
     >
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
 
-      <FormSection title={initial.id ? "Kateqoriyanı redaktə et" : "Yeni kateqoriya"}>
+      <FormSection title={initial.id ? t("pages.misc.kateqoriyaniRedakteEt") : "Yeni kateqoriya"}>
         <AdminInput name="name" label={t("pages.blog.ad")} required defaultValue={initial.name} maxLength={80} />
         <AdminInput
           name="slug"

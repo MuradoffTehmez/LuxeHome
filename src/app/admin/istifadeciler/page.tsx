@@ -45,12 +45,12 @@ export default async function AdminUsersPage() {
     <>
       <AdminPageHeader
         title={t("pages.users.istifadeciler")}
-        description={`${users.filter((user) => user.isActive).length} aktiv hesab. Parollar heç vaxt göstərilmir — yalnız müvəqqəti parol yaradılır.`}
+        description={t("pages.common.aktivHesabParollarHec", { p0: users.filter((user) => user.isActive).length })}
         breadcrumbs={[{ label: t("pages.users.idarePaneli"), href: "/admin" }, { label: t("pages.users.istifadeciler") }]}
       />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label={t("pages.users.aktivHesab")} value={activeUsers.length} hint={`${users.length} ümumi hesab`} icon={UserCheck} tone="success" />
+        <StatCard label={t("pages.users.aktivHesab")} value={activeUsers.length} hint={t("pages.common.umumiHesab", { p0: users.length })} icon={UserCheck} tone="success" />
         <StatCard label={t("pages.users.2faQurulmayib")} value={withoutTwoFactor} hint={t("pages.users.aktivHesablarda")} icon={ShieldAlert} tone={withoutTwoFactor > 0 ? "warning" : "success"} />
         <StatCard label={t("pages.users.parolDeyismelidir")} value={mustChangePassword} hint={t("pages.users.ilkGirisGozlenilir")} icon={KeyRound} tone={mustChangePassword > 0 ? "warning" : "success"} />
         <StatCard label={t("pages.users.aciqSessiya")} value={openSessions} hint={t("pages.users.butunEmekdasCihazlari")} icon={MonitorSmartphone} />
@@ -80,12 +80,12 @@ export default async function AdminUsersPage() {
                   <div>
                     <dt className="text-xs text-ink-muted">{t("pages.users.ikiMerheleliDogrulama")}</dt>
                     <dd className={user.totpEnabledAt ? "mt-1 text-success" : "mt-1 text-warning"}>
-                      {user.totpEnabledAt ? "Qurulub" : "Qurulmayıb"}
+                      {user.totpEnabledAt ? "Qurulub" : t("pages.misc.qurulmayib")}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-xs text-ink-muted">{t("pages.users.sonGiris")}</dt>
-                    <dd className="mt-1 text-ink">{user.lastLoginAt ? formatRelative(user.lastLoginAt) : "Heç vaxt"}</dd>
+                    <dd className="mt-1 text-ink">{user.lastLoginAt ? formatRelative(user.lastLoginAt) : t("pages.misc.hecVaxt")}</dd>
                     <dd className="mt-1 text-xs text-ink-muted">{user._count.sessions} açıq sessiya</dd>
                   </div>
                 </dl>
@@ -138,7 +138,7 @@ export default async function AdminUsersPage() {
                       )}
                     </AdminTableCell>
                     <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
-                      {user.lastLoginAt ? formatRelative(user.lastLoginAt) : "Heç vaxt"}
+                      {user.lastLoginAt ? formatRelative(user.lastLoginAt) : t("pages.misc.hecVaxt")}
                       <p className="mt-0.5">{user._count.sessions} açıq sessiya</p>
                     </AdminTableCell>
                     <AdminTableCell align="right">

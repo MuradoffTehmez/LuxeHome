@@ -1,8 +1,11 @@
 import { Skeleton, TableSkeleton } from "@/components/ui/states";
+import { getAdminT } from "@/lib/admin-i18n";
 
-export default function AdminLoading() {
+export default async function AdminLoading() {
+  const t = await getAdminT();
+
   return (
-    <div role="status" aria-label="İdarə paneli yüklənir" aria-busy="true" className="min-w-0">
+    <div role="status" aria-label={t("pages.misc.idarePaneliYuklenir")} aria-busy="true" className="min-w-0">
       <Skeleton className="h-10 w-full max-w-sm" />
       <Skeleton className="mt-3 h-5 w-full max-w-2xl" />
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

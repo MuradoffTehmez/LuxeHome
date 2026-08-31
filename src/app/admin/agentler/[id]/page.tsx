@@ -63,7 +63,7 @@ export default async function EditAgentPage({ params }: { params: Promise<{ id: 
     <>
       <AdminPageHeader
         title={agent.name}
-        description={`Son yenilənmə: ${formatDateTime(agent.updatedAt)}`}
+        description={t("pages.common.sonYenilenme", { p0: formatDateTime(agent.updatedAt) })}
         breadcrumbs={[
           { label: t("pages.agents.idarePaneli"), href: "/admin" },
           { label: t("pages.agents.agentlerVeReyler"), href: "/admin/agentler" },

@@ -67,12 +67,12 @@ export function ProjectPartnersManager({ projectId, links, options }: { projectI
             <li key={link.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
               <div className="min-w-0">
                 <Link href={`/admin/terefdaslar/${link.partnerId}`} className="font-medium text-ink hover:text-gold-deep">{link.partner.name}</Link>
-                <p className="mt-1 text-xs text-ink-muted">{t(`labels.partnerRelationRole.${link.role as keyof typeof PARTNER_RELATION_ROLE_LABELS}`) ?? link.role}{link.isPrimary ? " · əsas" : ""}{link.isPublic ? " · saytda görünür" : " · gizli"}</p>
+                <p className="mt-1 text-xs text-ink-muted">{t(`labels.partnerRelationRole.${link.role as keyof typeof PARTNER_RELATION_ROLE_LABELS}`) ?? link.role}{link.isPrimary ? t("pages.misc.esas") : ""}{link.isPublic ? t("pages.misc.saytdaGorunur") : t("pages.misc.gizli")}</p>
                 {link.sourceUrl ? <a href={link.sourceUrl} target="_blank" rel="noreferrer" className="mt-1 block truncate text-xs text-gold-deep underline-offset-4 hover:underline">{link.sourceUrl}</a> : null}
               </div>
               <form action={removeAction}>
                 <input type="hidden" name="entityType" value="project" /><input type="hidden" name="relationId" value={link.id} /><input type="hidden" name="partnerId" value={link.partnerId} />
-                <button type="submit" className="grid size-11 place-items-center rounded-xs text-danger hover:bg-danger-bg" aria-label={`${link.partner.name} əlaqəsini sil`}><Trash2 className="size-4" aria-hidden="true" /></button>
+                <button type="submit" className="grid size-11 place-items-center rounded-xs text-danger hover:bg-danger-bg" aria-label={t("pages.common.elaqesiniSil", { p0: link.partner.name })}><Trash2 className="size-4" aria-hidden="true" /></button>
               </form>
             </li>
           ))}

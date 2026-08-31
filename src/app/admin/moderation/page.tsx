@@ -63,7 +63,7 @@ export default async function AdminModerationPage() {
                         {property.city && ` · ${property.city.name}`}
                       </p>
                       <p className="mt-0.5 truncate text-xs text-ink-muted">
-                        {property.author?.name ?? "Naməlum"} ({property.author?.email})
+                        {property.author?.name ?? t("pages.misc.namelum")} ({property.author?.email})
                         {property.author && ` · ${t(`labels.accountType.${property.author.accountType as keyof typeof ACCOUNT_TYPE_LABELS}`) ?? property.author.accountType}`}
                         {property.author?.agency && !property.author.agency.isVerified && (
                           <Badge tone="warning" className="ml-1.5">{t("pages.moderation.tesdiqlenmemisAgentlik")}</Badge>

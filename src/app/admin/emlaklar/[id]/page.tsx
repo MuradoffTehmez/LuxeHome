@@ -95,8 +95,8 @@ export default async function EditPropertyPage({
         title={property.title}
         description={
           property.deletedAt
-            ? `Bu elan ${formatDateTime(property.deletedAt)} tarixində silinib.`
-            : `Son yenilənmə: ${formatDateTime(property.updatedAt)} · ${property.viewCount} baxış`
+            ? t("pages.common.buElanTarixindeSilinib", { p0: formatDateTime(property.deletedAt) })
+            : t("pages.common.sonYenilenmeBaxis", { p0: formatDateTime(property.updatedAt), p1: property.viewCount })
         }
         breadcrumbs={[
           { label: t("pages.properties.idarePaneli"), href: "/admin" },

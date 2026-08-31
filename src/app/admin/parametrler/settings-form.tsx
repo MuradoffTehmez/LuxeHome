@@ -55,7 +55,7 @@ export function SettingsForm({
             label={t("pages.settings.bildirisEPoctu")}
             type="email"
             defaultValue={notificationEmail}
-            hint={`Boş buraxılsa, mühit dəyişənindəki ünvan işlədilir: ${fallbackEmail}`}
+            hint={t("pages.common.bosBuraxilsaMuhitDeyisenindeki", { p0: fallbackEmail })}
           />
         </FullWidth>
 

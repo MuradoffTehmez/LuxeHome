@@ -132,7 +132,7 @@ export function UserRow({
         <ConfirmAction
           action={resetUserPassword}
           id={id}
-          label={`«${name}» üçün parolu sıfırla`}
+          label={t("pages.common.ucunParoluSifirla", { p0: name })}
           title={t("pages.users.paroluSifirlamaq")}
           description={t("pages.users.yeniMuveqqetiParolYaradilacaq")}
           confirmLabel={t("pages.users.sifirla")}
@@ -146,7 +146,7 @@ export function UserRow({
           <ConfirmAction
             action={resetUserTwoFactor}
             id={id}
-            label={`«${name}» üçün 2FA-nı sıfırla`}
+            label={t("pages.common.ucun2faNiSifirla", { p0: name })}
             title={t("pages.users.2faNiSifirlamaq")}
             description={t("pages.users.dogrulamaSirriVeEhtiyat")}
             confirmLabel={t("pages.users.sifirla")}
@@ -161,9 +161,9 @@ export function UserRow({
           <ConfirmAction
             action={revokeUserSessions}
             id={id}
-            label={`«${name}» üçün sessiyaları bağla`}
+            label={t("pages.common.ucunSessiyalariBagla", { p0: name })}
             title={t("pages.users.sessiyalariBaglamaq")}
-            description={`${sessionCount} açıq sessiya dərhal bağlanacaq və istifadəçi yenidən daxil olmalı olacaq.`}
+            description={t("pages.common.aciqSessiyaDerhalBaglanacaq", { p0: sessionCount })}
             confirmLabel={t("pages.users.bagla")}
             tone="neutral"
             className="size-11"
@@ -176,7 +176,7 @@ export function UserRow({
           <ConfirmAction
             action={deleteUser}
             id={id}
-            label={`«${name}» hesabını sil`}
+            label={t("pages.common.hesabiniSil", { p0: name })}
             title={t("pages.users.hesabiSilmek")}
             description={t("pages.users.hesabTamamileSilinecekYazdigi")}
             className="size-11"

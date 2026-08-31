@@ -84,13 +84,13 @@ export function PropertyTypeRow({
             type="submit"
             className="inline-flex min-h-11 items-center rounded-xs px-3 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
           >
-            {isActive ? "Deaktiv et" : "Aktivləşdir"}
+            {isActive ? "Deaktiv et" : t("pages.misc.aktivlesdir")}
           </button>
         </form>
         <ConfirmAction
           action={deletePropertyType}
           id={id}
-          label={`«${name}» növünü sil`}
+          label={t("pages.common.novunuSil", { p0: name })}
           title={t("pages.taxonomy.emlakNovunuSilmek")}
           description={t("pages.taxonomy.buNovdeEmlakYoxdursa")}
           confirmLabel={t("pages.taxonomy.sil")}
@@ -121,7 +121,7 @@ export function FeatureRow({
       <ConfirmAction
         action={deleteFeature}
         id={id}
-        label={`«${name}» xüsusiyyətini sil`}
+        label={t("pages.common.xususiyyetiniSil", { p0: name })}
         title={t("pages.taxonomy.xususiyyetiSilmek")}
         description={t("pages.taxonomy.buXususiyyetHecBir")}
         confirmLabel={t("pages.taxonomy.sil")}

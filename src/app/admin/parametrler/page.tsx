@@ -53,9 +53,9 @@ export default async function AdminSettingsPage() {
 
             <dl className="grid gap-2">
               {[
-                ["Şirkət", siteConfig.legalName],
-                ["Hüquqi sahib", siteConfig.owner.name],
-                ["VÖEN", siteConfig.legal.voen],
+                [t("pages.misc.sirket"), siteConfig.legalName],
+                [t("pages.misc.huquqiSahib"), siteConfig.owner.name],
+                [t("pages.misc.voen"), siteConfig.legal.voen],
               ].map(([label, value]) => (
                 <div key={label} className="flex min-w-0 flex-wrap justify-between gap-2 border-b border-line pb-2">
                   <dt className="text-xs tracking-wide text-ink-muted uppercase">{label}</dt>

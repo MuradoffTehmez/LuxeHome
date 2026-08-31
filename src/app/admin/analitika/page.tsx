@@ -46,7 +46,7 @@ export default async function AdminAnalyticsPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label={t("pages.ops.brauzerXetasi")} value={errors.length} hint={t("pages.ops.son7Gun")} icon={AlertTriangle} tone={errors.length ? "warning" : "success"} />
-        <StatCard label={t("pages.ops.zeifCwvOlcumu")} value={poorVitals} hint={`${vitals.length} ölçü içində`} icon={Activity} tone={poorVitals ? "warning" : "success"} />
+        <StatCard label={t("pages.ops.zeifCwvOlcumu")} value={poorVitals} hint={t("pages.common.olcuIcinde", { p0: vitals.length })} icon={Activity} tone={poorVitals ? "warning" : "success"} />
         <StatCard label={t("pages.ops.ortaLcp")} value={vitalAverage("LCP") === null ? "—" : `${vitalAverage("LCP")} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
         <StatCard label={t("pages.ops.ortaInp")} value={vitalAverage("INP") === null ? "—" : `${vitalAverage("INP")} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
       </div>

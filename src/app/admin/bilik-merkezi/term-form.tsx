@@ -11,9 +11,9 @@ import { useTranslations } from "next-intl";
 export function KnowledgeTermForm({ initial, categories }: { initial: KnowledgeTermFormValues; categories: { id: string; name: string }[] }) {
   const t = useTranslations("admin");
   return (
-    <AdminForm key={initial.id ?? "new"} action={saveKnowledgeTerm} submitLabel={initial.id ? "Termini yenilə" : "Termin əlavə et"} cancelHref={initial.id ? "/admin/bilik-merkezi/lugat" : undefined}>
+    <AdminForm key={initial.id ?? "new"} action={saveKnowledgeTerm} submitLabel={initial.id ? t("pages.misc.terminiYenile") : t("pages.misc.terminElaveEt")} cancelHref={initial.id ? "/admin/bilik-merkezi/lugat" : undefined}>
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
-      <FormSection title={initial.id ? "Termini redaktə et" : "Yeni termin"}>
+      <FormSection title={initial.id ? t("pages.misc.terminiRedakteEt") : "Yeni termin"}>
         <AdminInput name="term" label={t("pages.knowledge.termin")} required maxLength={120} defaultValue={initial.term} />
         <AdminInput name="slug" label={t("pages.knowledge.slug")} maxLength={90} defaultValue={initial.slug} hint={t("pages.knowledge.bosBuraxsanizTermindenYaradilir")} />
         <AdminSelect name="categoryId" label={t("pages.knowledge.movzu")} defaultValue={initial.categoryId} placeholder={t("pages.knowledge.movzusuz")} options={categories.map(({ id, name }) => ({ value: id, label: name }))} />

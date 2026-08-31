@@ -82,9 +82,9 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
     seoKeywords: partner.seoKeywords ?? "",
     ogImage: partner.ogImage ?? "",
     logo: image(partner.logoUrl, `${partner.name} loqosu`),
-    logoLight: image(partner.logoLight, `${partner.name} açıq tema loqosu`),
-    logoDark: image(partner.logoDark, `${partner.name} tünd tema loqosu`),
-    coverImage: image(partner.coverImage, `${partner.name} üz qabığı`),
+    logoLight: image(partner.logoLight, t("pages.common.aciqTemaLoqosu", { p0: partner.name })),
+    logoDark: image(partner.logoDark, t("pages.common.tundTemaLoqosu", { p0: partner.name })),
+    coverImage: image(partner.coverImage, t("pages.common.uzQabigi", { p0: partner.name })),
     contractNumber: "contractNumber" in partner ? (partner.contractNumber ?? "") : "",
     contractStartDate: "contractStartDate" in partner ? dateInput(partner.contractStartDate) : "",
     contractEndDate: "contractEndDate" in partner ? dateInput(partner.contractEndDate) : "",
@@ -124,7 +124,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
             <ConfirmAction
               action={deletePartner}
               id={partner.id}
-              label={`«${partner.name}» tərəfdaşını sil`}
+              label={t("pages.common.terefdasiniSil", { p0: partner.name })}
               title={t("pages.partners.terefdasiSilmek")}
               description={t("pages.partners.qeydSoftDeleteEdilecek")}
               redirectTo="/admin/terefdaslar"
@@ -146,7 +146,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
       ) : null}
 
       <p className="mt-6 text-xs text-ink-muted">
-        Son yenilənmə: {partner.updatedAt.toLocaleString("az-AZ")}. Audit qeydləri{" "}
+        {t("pages.misc.sonYenilenmeAuditQeydleri", { p0: partner.updatedAt.toLocaleString(locale) })}{" "}
         <Link href={`/admin/audit?entity=Partner&q=${partner.id}`} className="underline hover:text-ink">
           {t("pages.partners.auditJurnalinda")}
         </Link>{" "}
