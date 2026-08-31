@@ -8,6 +8,8 @@ type SeoFieldsProps = {
   fallbackTitle: string;
   fallbackDescription: string;
   pathname: string;
+  titleName?: string;
+  descriptionName?: string;
 };
 
 function Preview({
@@ -39,6 +41,8 @@ export function SeoFields({
   fallbackTitle,
   fallbackDescription,
   pathname,
+  titleName = "metaTitle",
+  descriptionName = "metaDescription",
 }: SeoFieldsProps) {
   const titleId = useId();
   const descriptionId = useId();
@@ -54,7 +58,7 @@ export function SeoFields({
           <label htmlFor={titleId} className="text-sm font-medium text-ink">Meta başlıq</label>
           <span className={`tabular text-xs ${title.length > 60 ? "text-danger" : "text-ink-muted"}`}>{title.length} / 60</span>
         </div>
-        <input id={titleId} name="metaTitle" value={title} onChange={(event) => setTitle(event.target.value)} maxLength={70} className="min-h-11 w-full rounded-xs border border-line bg-paper px-3 text-sm text-ink focus:border-gold focus:outline-none" />
+        <input id={titleId} name={titleName} value={title} onChange={(event) => setTitle(event.target.value)} maxLength={70} className="min-h-11 w-full rounded-xs border border-line bg-paper px-3 text-sm text-ink focus:border-gold focus:outline-none" />
         <p className="text-xs text-ink-muted">Tövsiyə olunan uzunluq: 25–60 simvol.</p>
       </div>
 
@@ -63,7 +67,7 @@ export function SeoFields({
           <label htmlFor={descriptionId} className="text-sm font-medium text-ink">Meta təsvir</label>
           <span className={`tabular text-xs ${description.length > 160 ? "text-danger" : "text-ink-muted"}`}>{description.length} / 160</span>
         </div>
-        <textarea id={descriptionId} name="metaDescription" value={description} onChange={(event) => setDescription(event.target.value)} maxLength={180} rows={4} className="w-full rounded-xs border border-line bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+        <textarea id={descriptionId} name={descriptionName} value={description} onChange={(event) => setDescription(event.target.value)} maxLength={180} rows={4} className="w-full rounded-xs border border-line bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
         <p className="text-xs text-ink-muted">Tövsiyə olunan uzunluq: 70–160 simvol.</p>
       </div>
 
