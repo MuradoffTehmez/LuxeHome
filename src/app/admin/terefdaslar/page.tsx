@@ -34,7 +34,10 @@ import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Tərəfdaşlar" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.partners.terefdaslar") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/terefdaslar";
@@ -110,9 +113,9 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
       action={restorePartner}
       id={partner.id}
       label={`«${partner.name}» tərəfdaşını bərpa et`}
-      title="Tərəfdaşı bərpa etmək"
-      description="Qeyd arxiv statusunda bərpa ediləcək və avtomatik public olmayacaq."
-      confirmLabel="Bərpa et"
+      title={t("pages.partners.terefdasiBerpaEtmek")}
+      description={t("pages.partners.qeydArxivStatusundaBerpa")}
+      confirmLabel={t("pages.partners.berpaEt")}
       tone="neutral"
     >
       <RotateCcw className="size-4" aria-hidden="true" />
@@ -157,8 +160,8 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           action={deletePartner}
           id={partner.id}
           label={`«${partner.name}» tərəfdaşını sil`}
-          title="Tərəfdaşı silmək"
-          description="Qeyd soft-delete ediləcək; əlaqələr və audit izi saxlanılacaq."
+          title={t("pages.partners.terefdasiSilmek")}
+          description={t("pages.partners.qeydSoftDeleteEdilecek")}
         >
           <Trash2 className="size-4" aria-hidden="true" />
         </ConfirmAction>
@@ -169,19 +172,19 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
   return (
     <>
       <AdminPageHeader
-        title="Tərəfdaşlar"
-        description="Rəsmi tərəfdaş profilləri, statuslar, müqavilə müddətləri və əlaqələr."
+        title={t("pages.partners.terefdaslar")}
+        description={t("pages.partners.resmiTerefdasProfilleriStatuslar")}
         actions={
           <>
-            <ButtonLink href={`${LIST_PATH}?silinmis=1`} variant="outline" size="sm">Silinmişlər</ButtonLink>
-            {canCreate ? <ButtonLink href={`${LIST_PATH}/yeni`} size="sm"><Plus className="size-4" aria-hidden="true" />Yeni tərəfdaş</ButtonLink> : null}
+            <ButtonLink href={`${LIST_PATH}?silinmis=1`} variant="outline" size="sm">{t("pages.partners.silinmisler")}</ButtonLink>
+            {canCreate ? <ButtonLink href={`${LIST_PATH}/yeni`} size="sm"><Plus className="size-4" aria-hidden="true" />{t("pages.partners.yeniTerefdas")}</ButtonLink> : null}
           </>
         }
       />
 
-      <nav aria-label="Tərəfdaş statusları" className="mb-5 flex gap-2 overflow-x-auto pb-1">
+      <nav aria-label={t("pages.partners.terefdasStatuslari")} className="mb-5 flex gap-2 overflow-x-auto pb-1">
         <Link href={LIST_PATH} className="inline-flex min-h-11 shrink-0 items-center rounded-xs border border-line px-4 text-sm text-ink">
-          Hamısı <span className="ml-2 text-ink-muted">{Object.values(counts).reduce((sum, value) => sum + value, 0)}</span>
+          {t("pages.partners.hamisi")} <span className="ml-2 text-ink-muted">{Object.values(counts).reduce((sum, value) => sum + value, 0)}</span>
         </Link>
         {[
           PARTNER_STATUSES.ACTIVE,
@@ -196,7 +199,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
       </nav>
 
       {alerts.length > 0 ? (
-        <AdminCard className="mb-5" title="Müqavilə müddəti xəbərdarlığı">
+        <AdminCard className="mb-5" title={t("pages.partners.muqavileMuddetiXeberdarligi")}>
           <ul className="space-y-2">
             {alerts.map((partner) => {
               const days = daysUntilPartnershipEnd(partner);
@@ -216,27 +219,27 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
         <AdminFilterBar
           action={LIST_PATH}
           searchValue={filters.search}
-          searchPlaceholder="Ad, hüquqi ad, sayt və ya e-poçt…"
+          searchPlaceholder={t("pages.partners.adHuquqiAdSayt")}
           resultLabel={`${total} tərəfdaş`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
-            { name: "status", label: "Status", value: filters.status, options: [{ value: "", label: "Bütün statuslar" }, ...Object.values(PARTNER_STATUSES).map((value) => ({ value, label: t(`labels.partnerStatus.${value}`) }))] },
-            { name: "tip", label: "Tip", value: filters.type, options: [{ value: "", label: "Bütün növlər" }, ...Object.values(PARTNERSHIP_TYPES).map((value) => ({ value, label: t(`labels.partnershipType.${value}`) }))] },
-            { name: "tesdiq", label: "Təsdiq", value: filters.verified, options: [{ value: "", label: "Təsdiq: hamısı" }, { value: "1", label: "Təsdiqlənib" }, { value: "0", label: "Təsdiqlənməyib" }] },
-            { name: "resmi", label: "Rəsmi", value: filters.official, options: [{ value: "", label: "Rəsmi: hamısı" }, { value: "1", label: "Rəsmi" }, { value: "0", label: "Rəsmi deyil" }] },
-            { name: "secilmis", label: "Seçilmiş", value: filters.featured, options: [{ value: "", label: "Seçilmiş: hamısı" }, { value: "1", label: "Seçilmiş" }, { value: "0", label: "Seçilməyib" }] },
-            { name: "ana_sehife", label: "Ana səhifə", value: filters.homepage, options: [{ value: "", label: "Ana səhifə: hamısı" }, { value: "1", label: "Göstərilir" }, { value: "0", label: "Göstərilmir" }] },
-            { name: "olke", label: "Ölkə", value: filters.country, options: [{ value: "", label: "Bütün ölkələr" }, ...countries.map((value) => ({ value, label: value }))] },
-            { name: "yaradilma", label: "Yaradılma", value: period, options: [{ value: "", label: "Bütün tarixlər" }, { value: "7", label: "Son 7 gün" }, { value: "30", label: "Son 30 gün" }, { value: "365", label: "Son 1 il" }] },
+            { name: "status", label: t("pages.partners.status"), value: filters.status, options: [{ value: "", label: t("pages.partners.butunStatuslar") }, ...Object.values(PARTNER_STATUSES).map((value) => ({ value, label: t(`labels.partnerStatus.${value}`) }))] },
+            { name: "tip", label: t("pages.partners.tip"), value: filters.type, options: [{ value: "", label: t("pages.partners.butunNovler") }, ...Object.values(PARTNERSHIP_TYPES).map((value) => ({ value, label: t(`labels.partnershipType.${value}`) }))] },
+            { name: "tesdiq", label: t("pages.partners.tesdiq"), value: filters.verified, options: [{ value: "", label: t("pages.partners.tesdiqHamisi") }, { value: "1", label: t("pages.partners.tesdiqlenib") }, { value: "0", label: t("pages.partners.tesdiqlenmeyib") }] },
+            { name: "resmi", label: t("pages.partners.resmi"), value: filters.official, options: [{ value: "", label: t("pages.partners.resmiHamisi") }, { value: "1", label: t("pages.partners.resmi") }, { value: "0", label: t("pages.partners.resmiDeyil") }] },
+            { name: "secilmis", label: t("pages.partners.secilmis"), value: filters.featured, options: [{ value: "", label: t("pages.partners.secilmisHamisi") }, { value: "1", label: t("pages.partners.secilmis") }, { value: "0", label: t("pages.partners.secilmeyib") }] },
+            { name: "ana_sehife", label: t("pages.partners.anaSehife"), value: filters.homepage, options: [{ value: "", label: t("pages.partners.anaSehifeHamisi") }, { value: "1", label: t("pages.partners.gosterilir") }, { value: "0", label: t("pages.partners.gosterilmir") }] },
+            { name: "olke", label: t("pages.partners.olke"), value: filters.country, options: [{ value: "", label: t("pages.partners.butunOlkeler") }, ...countries.map((value) => ({ value, label: value }))] },
+            { name: "yaradilma", label: t("pages.partners.yaradilma"), value: period, options: [{ value: "", label: t("pages.partners.butunTarixler") }, { value: "7", label: t("pages.partners.son7Gun") }, { value: "30", label: t("pages.partners.son30Gun") }, { value: "365", label: t("pages.partners.son1Il") }] },
           ]}
         />
 
         <div className="p-4 sm:p-5">
           <AdminResponsiveList
-            ariaLabel="Tərəfdaş siyahısı"
+            ariaLabel={t("pages.partners.terefdasSiyahisi")}
             items={items}
             getKey={(partner) => partner.id}
-            empty={<EmptyState title="Tərəfdaş tapılmadı" description="Filtrləri dəyişin və ya yeni tərəfdaş yaradın." />}
+            empty={<EmptyState title={t("pages.partners.terefdasTapilmadi")} description={t("pages.partners.filtrleriDeyisinVeYa")} />}
             renderCard={(partner) => (
               <AdminListCard
                 title={partner.name}
@@ -252,12 +255,12 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
             )}
             renderTable={(rows) => (
               <AdminTable
-                caption="Tərəfdaşlar"
+                caption={t("pages.partners.terefdaslar")}
                 headers={[
-                  { label: "Loqo / Ad" }, { label: "Tip" }, { label: "Status" },
-                  { label: "Təsdiq / Rəsmi" }, { label: "Seçilmiş / Ana səhifə" },
-                  { label: "Başlama / Bitmə" }, { label: "Elan / Layihə" },
-                  { label: "Son yenilənmə" }, { label: "Əməliyyat", srOnly: true },
+                  { label: t("pages.partners.loqoAd") }, { label: t("pages.partners.tip") }, { label: t("pages.partners.status") },
+                  { label: t("pages.partners.tesdiqResmi") }, { label: t("pages.partners.secilmisAnaSehife") },
+                  { label: t("pages.partners.baslamaBitme") }, { label: t("pages.partners.elanLayihe") },
+                  { label: t("pages.partners.sonYenilenme") }, { label: t("pages.partners.emeliyyat"), srOnly: true },
                 ]}
               >
                 {rows.map((partner) => (

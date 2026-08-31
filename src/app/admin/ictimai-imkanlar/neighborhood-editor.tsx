@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { AdminForm } from "@/components/admin/form-shell";
 import { upsertNeighborhoodProfile } from "./actions";
@@ -67,13 +68,14 @@ export function NeighborhoodEditor({
   locations: NeighborhoodLocationOption[];
   profiles: Record<string, Omit<NeighborhoodProfileValues, "locationId">>;
 }) {
+  const t = useTranslations("admin");
   const [locationId, setLocationId] = useState("");
   const values = profiles[locationId] ?? EMPTY;
 
   return (
-    <AdminForm action={upsertNeighborhoodProfile} submitLabel="Analitikanı yadda saxla" className="gap-4">
+    <AdminForm action={upsertNeighborhoodProfile} submitLabel={t("pages.amenities.analitikaniYaddaSaxla")} className="gap-4">
       <label className="text-sm text-ink-soft">
-        Rayon / qəsəbə
+        {t("pages.amenities.rayonQesebe")}
         <select
           className={inputClass}
           name="locationId"
@@ -81,7 +83,7 @@ export function NeighborhoodEditor({
           value={locationId}
           onChange={(event) => setLocationId(event.target.value)}
         >
-          <option value="">Seçin</option>
+          <option value="">{t("pages.amenities.secin")}</option>
           {locations.map((location) => (
             <option key={location.id} value={location.id}>
               {location.label}
@@ -101,13 +103,13 @@ export function NeighborhoodEditor({
           ))}
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
-          <label className="text-sm text-ink-soft">AZ təsvir<textarea className={`${inputClass} min-h-28 py-2`} name="description" defaultValue={values.description} /></label>
-          <label className="text-sm text-ink-soft">EN təsvir<textarea className={`${inputClass} min-h-28 py-2`} name="descriptionEn" defaultValue={values.descriptionEn} /></label>
-          <label className="text-sm text-ink-soft">RU təsvir<textarea className={`${inputClass} min-h-28 py-2`} name="descriptionRu" defaultValue={values.descriptionRu} /></label>
+          <label className="text-sm text-ink-soft">{t("pages.amenities.azTesvir")}<textarea className={`${inputClass} min-h-28 py-2`} name="description" defaultValue={values.description} /></label>
+          <label className="text-sm text-ink-soft">{t("pages.amenities.enTesvir")}<textarea className={`${inputClass} min-h-28 py-2`} name="descriptionEn" defaultValue={values.descriptionEn} /></label>
+          <label className="text-sm text-ink-soft">{t("pages.amenities.ruTesvir")}<textarea className={`${inputClass} min-h-28 py-2`} name="descriptionRu" defaultValue={values.descriptionRu} /></label>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm text-ink-soft">Mənbə<input className={inputClass} name="dataSource" defaultValue={values.dataSource} /></label>
-          <label className="text-sm text-ink-soft">Məlumat tarixi<input className={inputClass} name="measuredAt" type="date" defaultValue={values.measuredAt} /></label>
+          <label className="text-sm text-ink-soft">{t("pages.amenities.menbe")}<input className={inputClass} name="dataSource" defaultValue={values.dataSource} /></label>
+          <label className="text-sm text-ink-soft">{t("pages.amenities.melumatTarixi")}<input className={inputClass} name="measuredAt" type="date" defaultValue={values.measuredAt} /></label>
         </div>
       </div>
     </AdminForm>

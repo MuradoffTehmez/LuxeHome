@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -20,7 +21,10 @@ import { PartnerRelationsManager } from "../partner-relations-manager";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Tərəfdaşı redaktə et" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.partners.terefdasiRedakteEt") };
+}
 export const dynamic = "force-dynamic";
 
 function dateInput(value: Date | null | undefined): string {
@@ -32,6 +36,7 @@ function image(value: string | null | undefined, alt: string) {
 }
 
 export default async function EditPartnerPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   const user = await requireAdminRead(PERMISSIONS.PARTNER_UPDATE);
   const { id } = await params;
@@ -95,15 +100,15 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
     <>
       <AdminPageHeader
         title={partner.name}
-        description="Profil, status, media, SEO və daxili tərəfdaşlıq məlumatlarını idarə edin."
+        description={t("pages.partners.profilStatusMediaSeo")}
         breadcrumbs={[
-          { label: "Tərəfdaşlar", href: "/admin/terefdaslar" },
+          { label: t("pages.partners.terefdaslar"), href: "/admin/terefdaslar" },
           { label: partner.name },
         ]}
         actions={
           partner.showPublicly ? (
             <ButtonLink href={localizePath(`/terefdaslar/${partner.slug}`, locale)} target="_blank" variant="outline" size="sm">
-              Saytda bax <ExternalLink className="size-4" aria-hidden="true" />
+              {t("pages.partners.saytdaBax")} <ExternalLink className="size-4" aria-hidden="true" />
             </ButtonLink>
           ) : null
         }
@@ -112,7 +117,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
       <PartnerForm
         action={updatePartner}
         initial={initial}
-        submitLabel="Dəyişiklikləri saxla"
+        submitLabel={t("pages.partners.deyisiklikleriSaxla")}
         canManageContract={canManageContract}
         extraActions={
           hasPermission(user.role, PERMISSIONS.PARTNER_DELETE) ? (
@@ -120,8 +125,8 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
               action={deletePartner}
               id={partner.id}
               label={`«${partner.name}» tərəfdaşını sil`}
-              title="Tərəfdaşı silmək"
-              description="Qeyd soft-delete ediləcək, public profili və badge-ləri dərhal gizlənəcək."
+              title={t("pages.partners.terefdasiSilmek")}
+              description={t("pages.partners.qeydSoftDeleteEdilecek")}
               redirectTo="/admin/terefdaslar"
             >
               <Trash2 className="size-4" aria-hidden="true" />
@@ -132,8 +137,8 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
 
       {relationData ? (
         <AdminCard
-          title="Elan, layihə və agentlik əlaqələri"
-          description="Bir qeyd üçün müxtəlif rollarda birdən çox tərəfdaş saxlanıla bilər."
+          title={t("pages.partners.elanLayiheVeAgentlik")}
+          description={t("pages.partners.birQeydUcunMuxtelif")}
           className="mt-8"
         >
           <PartnerRelationsManager partnerId={id} relations={relationData[0]} options={relationData[1]} />
@@ -143,7 +148,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
       <p className="mt-6 text-xs text-ink-muted">
         Son yenilənmə: {partner.updatedAt.toLocaleString("az-AZ")}. Audit qeydləri{" "}
         <Link href={`/admin/audit?entity=Partner&q=${partner.id}`} className="underline hover:text-ink">
-          audit jurnalında
+          {t("pages.partners.auditJurnalinda")}
         </Link>{" "}
         saxlanılır.
       </p>

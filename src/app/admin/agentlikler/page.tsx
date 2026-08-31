@@ -21,7 +21,10 @@ import { approveAgencyEmployee, rejectAgencyEmployee, toggleAgencyVerification }
 import { AgencyProfileRepair } from "./agency-profile-repair";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Agentliklər" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.agents.agentlikler") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function AdminAgenciesPage() {
@@ -35,15 +38,15 @@ export default async function AdminAgenciesPage() {
   return (
     <>
       <AdminPageHeader
-        title="Agentliklər"
-        description="Yalnız təsdiqlənmiş agentliklər ictimai /agentlikler səhifəsində və elanları avtomatik dərc olunmuş görünür."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Agentliklər" }]}
+        title={t("pages.agents.agentlikler")}
+        description={t("pages.agents.yalnizTesdiqlenmisAgentliklerIctimai")}
+        breadcrumbs={[{ label: t("pages.agents.idarePaneli"), href: "/admin" }, { label: t("pages.agents.agentlikler") }]}
       />
 
       {employeeQueue.length > 0 && (
         <AdminCard
-          title="Komanda dəvətləri"
-          description="Agentlik sahiblərinin dəvət etdiyi əməkdaşlar — təsdiqlənənə qədər panelə giriş almırlar."
+          title={t("pages.agents.komandaDevetleri")}
+          description={t("pages.agents.agentlikSahiblerininDevetEtdiyi")}
           bodyClassName="p-0"
           className="mb-6"
         >
@@ -66,9 +69,9 @@ export default async function AdminAgenciesPage() {
                     action={approveAgencyEmployee}
                     id={employee.id}
                     label={`${employee.user.name} təsdiqlə`}
-                    title="Əməkdaşı təsdiqləmək"
+                    title={t("pages.agents.emekdasiTesdiqlemek")}
                     description={`${employee.user.name} (${employee.user.email}) "${employee.agency.name}" agentliyinə əməkdaş kimi əlavə olunacaq.`}
-                    confirmLabel="Təsdiqlə"
+                    confirmLabel={t("pages.agents.tesdiqle")}
                     tone="neutral"
                     className="size-11"
                   >
@@ -78,9 +81,9 @@ export default async function AdminAgenciesPage() {
                     action={rejectAgencyEmployee}
                     id={employee.id}
                     label={`${employee.user.name} dəvətini rədd et`}
-                    title="Dəvəti rədd etmək"
+                    title={t("pages.agents.devetiReddEtmek")}
                     description={`${employee.user.name} üçün komanda dəvəti rədd olunacaq.`}
-                    confirmLabel="Rədd et"
+                    confirmLabel={t("pages.agents.reddEt")}
                     tone="danger"
                     className="size-11"
                   >
@@ -95,12 +98,12 @@ export default async function AdminAgenciesPage() {
 
       <AdminCard bodyClassName="p-4 lg:p-0">
         <AdminResponsiveList
-          ariaLabel="Agentliklər"
+          ariaLabel={t("pages.agents.agentlikler")}
           items={agencies}
           getKey={(account) => account.id}
           empty={
             <p className="py-10 text-center text-sm text-ink-muted">
-              Hələ agentlik tipli hesab qeydiyyatdan keçməyib.
+              {t("pages.agents.heleAgentlikTipliHesab")}
             </p>
           }
           renderCard={(account) => (
@@ -114,11 +117,11 @@ export default async function AdminAgenciesPage() {
               }
               status={
                 !account.agency ? (
-                  <Badge tone="danger">Profil yoxdur</Badge>
+                  <Badge tone="danger">{t("pages.agents.profilYoxdur")}</Badge>
                 ) : account.agency.isVerified ? (
-                  <Badge tone="success">Təsdiqlənib</Badge>
+                  <Badge tone="success">{t("pages.agents.tesdiqlenib")}</Badge>
                 ) : (
-                  <Badge tone="warning">Təsdiq gözləyir</Badge>
+                  <Badge tone="warning">{t("pages.agents.tesdiqGozleyir")}</Badge>
                 )
               }
               actions={account.agency ? (
@@ -146,11 +149,11 @@ export default async function AdminAgenciesPage() {
             >
               <div className="flex flex-wrap items-center gap-2">
                 <span className="tabular">{account._count.properties} elan</span>
-                {!account.isActive ? <Badge tone="neutral">Deaktiv hesab</Badge> : null}
+                {!account.isActive ? <Badge tone="neutral">{t("pages.agents.deaktivHesab")}</Badge> : null}
               </div>
               {!account.agency ? (
                 <div className="mt-4 border-t border-line pt-4">
-                  <p className="mb-3 text-xs text-ink-muted">Köhnə qeydiyyat yarımçıq qalıb. İctimai adı yoxlayıb profil yaradın; sonra təsdiq düyməsi açılacaq.</p>
+                  <p className="mb-3 text-xs text-ink-muted">{t("pages.agents.kohneQeydiyyatYarimciqQalib")}</p>
                   <AgencyProfileRepair userId={account.id} defaultName={account.name} />
                 </div>
               ) : null}
@@ -158,13 +161,13 @@ export default async function AdminAgenciesPage() {
           )}
           renderTable={(items) => (
             <AdminTable
-              caption="Agentliklər"
+              caption={t("pages.agents.agentlikler")}
               headers={[
-                { label: "Agentlik" },
-                { label: "Elan sayı" },
-                { label: "Qeydiyyat tarixi" },
-                { label: "Status" },
-                { label: "İdarəetmə", className: "text-right" },
+                { label: t("pages.agents.agentlik") },
+                { label: t("pages.agents.elanSayi") },
+                { label: t("pages.agents.qeydiyyatTarixi") },
+                { label: t("pages.agents.status") },
+                { label: t("pages.agents.idareetme"), className: "text-right" },
               ]}
             >
               {items.map((account) => (
@@ -173,7 +176,7 @@ export default async function AdminAgenciesPage() {
                     <span className="font-medium text-ink">{account.agency?.name ?? account.name}</span>
                     <p className="mt-0.5 text-xs text-ink-muted">{account.email}</p>
                     {!account.isActive && (
-                      <Badge tone="neutral" className="mt-1">Deaktiv hesab</Badge>
+                      <Badge tone="neutral" className="mt-1">{t("pages.agents.deaktivHesab")}</Badge>
                     )}
                   </AdminTableCell>
                   <AdminTableCell className="tabular">{account._count.properties}</AdminTableCell>
@@ -182,11 +185,11 @@ export default async function AdminAgenciesPage() {
                   </AdminTableCell>
                   <AdminTableCell>
                     {!account.agency ? (
-                      <Badge tone="danger">Profil yoxdur</Badge>
+                      <Badge tone="danger">{t("pages.agents.profilYoxdur")}</Badge>
                     ) : account.agency.isVerified ? (
-                      <Badge tone="success">Təsdiqlənib</Badge>
+                      <Badge tone="success">{t("pages.agents.tesdiqlenib")}</Badge>
                     ) : (
-                      <Badge tone="warning">Təsdiq gözləyir</Badge>
+                      <Badge tone="warning">{t("pages.agents.tesdiqGozleyir")}</Badge>
                     )}
                   </AdminTableCell>
                   <AdminTableCell align="right">

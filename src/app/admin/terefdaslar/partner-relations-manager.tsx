@@ -43,29 +43,29 @@ export function PartnerRelationsManager({
       <form action={addAction} className="grid gap-4 rounded-md border border-line bg-paper p-4 sm:grid-cols-2 sm:p-5">
         <input type="hidden" name="partnerId" value={partnerId} />
         <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
-          Əlaqə növü
+          {t("pages.partners.elaqeNovu")}
           <select
             name="entityType"
             value={entityType}
             onChange={(event) => setEntityType(event.target.value as EntityType)}
             className={fieldClass}
           >
-            <option value="property">Elan</option>
-            <option value="project">Layihə</option>
-            <option value="agency">Agentlik</option>
+            <option value="property">{t("pages.partners.elan")}</option>
+            <option value="project">{t("pages.partners.layihe")}</option>
+            <option value="agency">{t("pages.partners.agentlik")}</option>
           </select>
         </label>
         <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
-          Qeyd
+          {t("pages.partners.qeyd")}
           <select name="entityId" required className={fieldClass} defaultValue="">
-            <option value="" disabled>Seçin</option>
+            <option value="" disabled>{t("pages.partners.secin")}</option>
             {entityOptions.map((item) => (
               <option key={item.value} value={item.value}>{item.label}</option>
             ))}
           </select>
         </label>
         <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
-          Rol
+          {t("pages.partners.rol")}
           <select name="role" className={fieldClass} defaultValue={PARTNER_RELATION_ROLES.SOURCE}>
             {Object.values(PARTNER_RELATION_ROLES).map((role) => (
               <option key={role} value={role}>{t(`labels.partnerRelationRole.${role}`)}</option>
@@ -80,12 +80,12 @@ export function PartnerRelationsManager({
         ) : <div />}
         <label className="flex min-h-11 items-center gap-2 text-sm text-ink">
           <input name="isPublic" type="checkbox" defaultChecked className="size-4 accent-gold" />
-          Public səhifədə göstərilsin
+          {t("pages.partners.publicSehifedeGosterilsin")}
         </label>
         {entityType !== "agency" ? (
           <label className="flex min-h-11 items-center gap-2 text-sm text-ink">
             <input name="isPrimary" type="checkbox" className="size-4 accent-gold" />
-            Əsas tərəfdaş kimi göstərilsin
+            {t("pages.partners.esasTerefdasKimiGosterilsin")}
           </label>
         ) : null}
         <div className="sm:col-span-2 flex flex-wrap items-center justify-between gap-3">
@@ -96,7 +96,7 @@ export function PartnerRelationsManager({
 
       <ActionMessage state={removeState} />
       <RelationList
-        title="Əlaqəli elanlar"
+        title={t("pages.partners.elaqeliElanlar")}
         entityType="property"
         partnerId={partnerId}
         action={removeAction}
@@ -110,7 +110,7 @@ export function PartnerRelationsManager({
         }))}
       />
       <RelationList
-        title="Əlaqəli layihələr"
+        title={t("pages.partners.elaqeliLayiheler")}
         entityType="project"
         partnerId={partnerId}
         action={removeAction}
@@ -124,7 +124,7 @@ export function PartnerRelationsManager({
         }))}
       />
       <RelationList
-        title="Əlaqəli agentliklər"
+        title={t("pages.partners.elaqeliAgentlikler")}
         entityType="agency"
         partnerId={partnerId}
         action={removeAction}
@@ -184,7 +184,7 @@ function RelationList({
         <h3 className="font-display text-base text-ink">{title}</h3>
       </header>
       {items.length === 0 ? (
-        <p className="p-4 text-sm text-ink-muted sm:p-5">Əlaqə yoxdur.</p>
+        <p className="p-4 text-sm text-ink-muted sm:p-5">{t("pages.partners.elaqeYoxdur")}</p>
       ) : (
         <ul className="divide-y divide-line">
           {items.map((item) => (

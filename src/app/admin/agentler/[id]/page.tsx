@@ -14,7 +14,10 @@ import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Agent profilinin redaktəsi" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.agents.agentProfilininRedaktesi") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function EditAgentPage({ params }: { params: Promise<{ id: string }> }) {
@@ -62,9 +65,9 @@ export default async function EditAgentPage({ params }: { params: Promise<{ id: 
         title={agent.name}
         description={`Son yenilənmə: ${formatDateTime(agent.updatedAt)}`}
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Agentlər və rəylər", href: "/admin/agentler" },
-          { label: "Redaktə" },
+          { label: t("pages.agents.idarePaneli"), href: "/admin" },
+          { label: t("pages.agents.agentlerVeReyler"), href: "/admin/agentler" },
+          { label: t("pages.agents.redakte") },
         ]}
         actions={
           agent.isPublic ? (
@@ -75,7 +78,7 @@ export default async function EditAgentPage({ params }: { params: Promise<{ id: 
               className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
             >
               <ExternalLink className="size-4" aria-hidden="true" />
-              Saytda bax
+              {t("pages.agents.saytdaBax")}
             </Link>
           ) : null
         }
@@ -87,9 +90,9 @@ export default async function EditAgentPage({ params }: { params: Promise<{ id: 
         agencies={agencies.map((agency) => ({ id: agency.id, label: agency.name }))}
       />
 
-      <AdminCard title="Bütün rəylər" description="Moderasiya növbəsi siyahı səhifəsindədir; burada tarixçə göstərilir." className="mt-6" bodyClassName="p-0">
+      <AdminCard title={t("pages.agents.butunReyler")} description={t("pages.agents.moderasiyaNovbesiSiyahiSehifesindedir")} className="mt-6" bodyClassName="p-0">
         {agent.reviews.length === 0 ? (
-          <div className="p-5"><EmptyState title="Rəy yoxdur" /></div>
+          <div className="p-5"><EmptyState title={t("pages.agents.reyYoxdur")} /></div>
         ) : (
           <ul className="divide-y divide-line">
             {agent.reviews.map((review) => (

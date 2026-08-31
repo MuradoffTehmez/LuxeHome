@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { IDLE_STATE } from "@/lib/admin/action-state";
 import { createAgencyProfile } from "./actions";
 
 export function AgencyProfileRepair({ userId, defaultName }: { userId: string; defaultName: string }) {
+  const t = useTranslations("admin");
   const [state, action, pending] = useActionState(createAgencyProfile, IDLE_STATE);
   const { toast } = useToast();
   const router = useRouter();
@@ -22,7 +24,7 @@ export function AgencyProfileRepair({ userId, defaultName }: { userId: string; d
     <form action={action} className="flex min-w-60 flex-col gap-2 sm:flex-row sm:items-end">
       <input type="hidden" name="userId" value={userId} />
       <label className="min-w-0 flex-1 text-xs text-ink-muted">
-        Agentliyin ictimai adı
+        {t("pages.agents.agentliyinIctimaiAdi")}
         <input
           name="name"
           defaultValue={defaultName}
@@ -33,7 +35,7 @@ export function AgencyProfileRepair({ userId, defaultName }: { userId: string; d
         />
       </label>
       <Button type="submit" size="sm" loading={pending} className="min-h-11 shrink-0">
-        Profil yarat
+        {t("pages.agents.profilYarat")}
       </Button>
       {state.fieldErrors?.name ? <p className="text-xs text-danger sm:col-span-2">{state.fieldErrors.name}</p> : null}
     </form>

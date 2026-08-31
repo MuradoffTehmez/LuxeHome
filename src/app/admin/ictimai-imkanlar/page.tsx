@@ -28,7 +28,10 @@ import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "İctimai imkanlar" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.amenities.ictimaiImkanlar") };
+}
 export const dynamic = "force-dynamic";
 const inputClass = "mt-1 min-h-11 w-full rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink";
 
@@ -91,36 +94,36 @@ export default async function PublicFeaturesAdminPage() {
   return (
     <>
       <AdminPageHeader
-        title="İctimai imkanlar"
-        description="Premium müddətlər, yaxın obyektlər və mənbəli rayon analitikası."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "İctimai imkanlar" }]}
+        title={t("pages.amenities.ictimaiImkanlar")}
+        description={t("pages.amenities.premiumMuddetlerYaxinObyektler")}
+        breadcrumbs={[{ label: t("pages.amenities.idarePaneli"), href: "/admin" }, { label: t("pages.amenities.ictimaiImkanlar") }]}
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <AdminCard title="Premium elan" description="Yalnız uyğun nəticələr daxilində sıralama üstünlüyü verir.">
-          <AdminForm action={activatePremiumListing} submitLabel="Premium aktiv et" className="gap-4">
-            <label className="text-sm text-ink-soft">Elan<select className={inputClass} name="propertyId" required><option value="">Seçin</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
-            <label className="text-sm text-ink-soft">Müddət<select className={inputClass} name="durationDays">{PREMIUM_DURATIONS_DAYS.map((days) => <option key={days} value={days}>{days} gün</option>)}</select></label>
+        <AdminCard title={t("pages.amenities.premiumElan")} description={t("pages.amenities.yalnizUygunNeticelerDaxilinde")}>
+          <AdminForm action={activatePremiumListing} submitLabel={t("pages.amenities.premiumAktivEt")} className="gap-4">
+            <label className="text-sm text-ink-soft">{t("pages.amenities.elan")}<select className={inputClass} name="propertyId" required><option value="">{t("pages.amenities.secin")}</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
+            <label className="text-sm text-ink-soft">{t("pages.amenities.muddet")}<select className={inputClass} name="durationDays">{PREMIUM_DURATIONS_DAYS.map((days) => <option key={days} value={days}>{days} gün</option>)}</select></label>
           </AdminForm>
         </AdminCard>
 
-        <AdminCard title="Yaxın obyekt">
-          <AdminForm action={createNearbyPlace} submitLabel="Obyekti əlavə et" className="gap-4">
-            <label className="text-sm text-ink-soft">Elan<select className={inputClass} name="propertyId" required><option value="">Seçin</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
-            <label className="text-sm text-ink-soft">Kateqoriya<select className={inputClass} name="category">{Object.entries(NEARBY_PLACE_CATEGORY_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-            <label className="text-sm text-ink-soft">Ad<input className={inputClass} name="name" required /></label>
+        <AdminCard title={t("pages.amenities.yaxinObyekt")}>
+          <AdminForm action={createNearbyPlace} submitLabel={t("pages.amenities.obyektiElaveEt")} className="gap-4">
+            <label className="text-sm text-ink-soft">{t("pages.amenities.elan")}<select className={inputClass} name="propertyId" required><option value="">{t("pages.amenities.secin")}</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
+            <label className="text-sm text-ink-soft">{t("pages.amenities.kateqoriya")}<select className={inputClass} name="category">{Object.entries(NEARBY_PLACE_CATEGORY_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+            <label className="text-sm text-ink-soft">{t("pages.amenities.ad")}<input className={inputClass} name="name" required /></label>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm text-ink-soft">Məsafə (metr)<input className={inputClass} name="distanceMeters" type="number" min="0" /></label>
-              <label className="text-sm text-ink-soft">Piyada (dəqiqə)<input className={inputClass} name="walkingMinutes" type="number" min="0" /></label>
+              <label className="text-sm text-ink-soft">{t("pages.amenities.mesafeMetr")}<input className={inputClass} name="distanceMeters" type="number" min="0" /></label>
+              <label className="text-sm text-ink-soft">{t("pages.amenities.piyadaDeqiqe")}<input className={inputClass} name="walkingMinutes" type="number" min="0" /></label>
             </div>
-            <label className="text-sm text-ink-soft">Mənbə<input className={inputClass} name="source" /></label>
+            <label className="text-sm text-ink-soft">{t("pages.amenities.menbe")}<input className={inputClass} name="source" /></label>
           </AdminForm>
         </AdminCard>
       </div>
 
-      <AdminCard title="Aktiv premium elanlar" description="Müddət bitəndə gündəlik iş statusu avtomatik söndürür." className="mt-6" bodyClassName="p-0">
+      <AdminCard title={t("pages.amenities.aktivPremiumElanlar")} description={t("pages.amenities.muddetBitendeGundelikIs")} className="mt-6" bodyClassName="p-0">
         {premiumProperties.length === 0 ? (
-          <div className="p-5"><EmptyState title="Aktiv premium elan yoxdur" /></div>
+          <div className="p-5"><EmptyState title={t("pages.amenities.aktivPremiumElanYoxdur")} /></div>
         ) : (
           <ul className="divide-y divide-line">
             {premiumProperties.map((property) => {
@@ -130,14 +133,14 @@ export default async function PublicFeaturesAdminPage() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium text-ink">{property.title}</p>
-                      {expired ? <Badge tone="warning">Müddəti bitib</Badge> : <Badge tone="gold">Premium</Badge>}
+                      {expired ? <Badge tone="warning">{t("pages.amenities.muddetiBitib")}</Badge> : <Badge tone="gold">{t("pages.amenities.premium")}</Badge>}
                     </div>
                     <p className="mt-1 text-xs text-ink-muted">
                       {property.featuredUntil ? `Bitmə tarixi: ${formatDate(property.featuredUntil)}` : "Müddətsiz"}
                     </p>
                   </div>
                   <div className="flex shrink-0">
-                    <ConfirmAction action={cancelPremiumListing} id={property.id} label="Premium statusu dayandır" title="Premium dayandırılsın?" description="Elan adi sıralamaya qayıdacaq." confirmLabel="Dayandır"><Trash2 className="size-4" /></ConfirmAction>
+                    <ConfirmAction action={cancelPremiumListing} id={property.id} label={t("pages.amenities.premiumStatusuDayandir")} title={t("pages.amenities.premiumDayandirilsin")} description={t("pages.amenities.elanAdiSiralamayaQayidacaq")} confirmLabel={t("pages.amenities.dayandir")}><Trash2 className="size-4" /></ConfirmAction>
                   </div>
                 </li>
               );
@@ -146,9 +149,9 @@ export default async function PublicFeaturesAdminPage() {
         )}
       </AdminCard>
 
-      <AdminCard title="Yaxın obyektlər" description="Əmlak səhifəsində göstərilən mənbəli siyahı." className="mt-6" bodyClassName="p-0">
+      <AdminCard title={t("pages.amenities.yaxinObyektler")} description={t("pages.amenities.emlakSehifesindeGosterilenMenbeli")} className="mt-6" bodyClassName="p-0">
         {nearbyPlaces.length === 0 ? (
-          <div className="p-5"><EmptyState title="Yaxın obyekt əlavə edilməyib" /></div>
+          <div className="p-5"><EmptyState title={t("pages.amenities.yaxinObyektElaveEdilmeyib")} /></div>
         ) : (
           <ul className="divide-y divide-line">
             {nearbyPlaces.map((place) => (
@@ -166,7 +169,7 @@ export default async function PublicFeaturesAdminPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0">
-                  <ConfirmAction action={deleteNearbyPlace} id={place.id} label="Obyekti sil" title="Yaxın obyekt silinsin?" description="Obyekt əmlak səhifəsindən dərhal götürüləcək." confirmLabel="Sil"><Trash2 className="size-4" /></ConfirmAction>
+                  <ConfirmAction action={deleteNearbyPlace} id={place.id} label={t("pages.amenities.obyektiSil")} title={t("pages.amenities.yaxinObyektSilinsin")} description={t("pages.amenities.obyektEmlakSehifesindenDerhal")} confirmLabel={t("pages.amenities.sil")}><Trash2 className="size-4" /></ConfirmAction>
                 </div>
               </li>
             ))}
@@ -174,7 +177,7 @@ export default async function PublicFeaturesAdminPage() {
         )}
       </AdminCard>
 
-      <AdminCard title="Rayon analitikası" description="Rayon seçiləndə saxlanmış göstəricilər forma sahələrinə yüklənir. Göstərici yoxdursa ictimai səhifədə uydurulmur." className="mt-6">
+      <AdminCard title={t("pages.amenities.rayonAnalitikasi")} description={t("pages.amenities.rayonSecilendeSaxlanmisGostericiler")} className="mt-6">
         <NeighborhoodEditor
           locations={locations.map((location) => ({
             id: location.id,
@@ -184,9 +187,9 @@ export default async function PublicFeaturesAdminPage() {
         />
       </AdminCard>
 
-      <AdminCard title="Saxlanmış rayon analitikası" className="mt-6" bodyClassName="p-0">
+      <AdminCard title={t("pages.amenities.saxlanmisRayonAnalitikasi")} className="mt-6" bodyClassName="p-0">
         {neighborhoodProfiles.length === 0 ? (
-          <div className="p-5"><EmptyState title="Rayon analitikası yoxdur" /></div>
+          <div className="p-5"><EmptyState title={t("pages.amenities.rayonAnalitikasiYoxdur")} /></div>
         ) : (
           <ul className="divide-y divide-line">
             {neighborhoodProfiles.map((profile) => (
@@ -205,9 +208,9 @@ export default async function PublicFeaturesAdminPage() {
                     rel="noreferrer"
                     className="inline-flex min-h-11 items-center px-3 text-sm text-ink-soft transition-colors hover:text-gold-deep"
                   >
-                    Saytda bax
+                    {t("pages.amenities.saytdaBax")}
                   </Link>
-                  <ConfirmAction action={deleteNeighborhoodProfile} id={profile.id} label="Analitikanı sil" title="Rayon analitikası silinsin?" description="Rayon səhifəsindəki analitika bölməsi göstərilməyəcək." confirmLabel="Sil"><Trash2 className="size-4" /></ConfirmAction>
+                  <ConfirmAction action={deleteNeighborhoodProfile} id={profile.id} label={t("pages.amenities.analitikaniSil")} title={t("pages.amenities.rayonAnalitikasiSilinsin")} description={t("pages.amenities.rayonSehifesindekiAnalitikaBolmesi")} confirmLabel={t("pages.amenities.sil")}><Trash2 className="size-4" /></ConfirmAction>
                 </div>
               </li>
             ))}

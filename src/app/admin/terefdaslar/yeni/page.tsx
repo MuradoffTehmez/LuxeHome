@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { AdminPageHeader } from "@/components/admin/admin-ui";
 import { PERMISSIONS } from "@/lib/constants";
@@ -7,25 +8,29 @@ import { createPartner } from "../actions";
 import { EMPTY_PARTNER } from "../form-values";
 import { PartnerForm } from "../partner-form";
 
-export const metadata: Metadata = { title: "Yeni tərəfdaş" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.partners.yeniTerefdas") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function NewPartnerPage() {
+  const t = await getAdminT();
   const user = await requireAdminRead(PERMISSIONS.PARTNER_CREATE);
   return (
     <>
       <AdminPageHeader
-        title="Yeni tərəfdaş"
-        description="Public profil, tərəfdaşlıq statusu və media məlumatlarını yaradın."
+        title={t("pages.partners.yeniTerefdas")}
+        description={t("pages.partners.publicProfilTerefdasliqStatusu")}
         breadcrumbs={[
-          { label: "Tərəfdaşlar", href: "/admin/terefdaslar" },
-          { label: "Yeni tərəfdaş" },
+          { label: t("pages.partners.terefdaslar"), href: "/admin/terefdaslar" },
+          { label: t("pages.partners.yeniTerefdas") },
         ]}
       />
       <PartnerForm
         action={createPartner}
         initial={EMPTY_PARTNER}
-        submitLabel="Tərəfdaşı yarat"
+        submitLabel={t("pages.partners.terefdasiYarat")}
         canManageContract={hasPermission(user.role, PERMISSIONS.PARTNER_CONTRACT_MANAGE)}
       />
     </>
