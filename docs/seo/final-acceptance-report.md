@@ -1,150 +1,135 @@
-# Luxe Home Estate — production SEO qəbul hesabatı
+# Luxe Home Estate — SERP Ecosystem production qəbul hesabatı
 
-**Tarix:** 24 avqust 2026  
-**Branch:** `codex/production-seo`  
-**Canonical host:** `https://luxehomeestate.az`  
-**Baseline:** Seobility auditində 54%; meta 95%, page quality 38%, page structure 79%, link structure 25%, server 0%.
+**Tarix:** 31 avqust 2026
+**Branch:** `main`
+**Canonical host:** `https://luxehomeestate.az`
+**PRD:** `docs/LuxeHomeEstate — SERP Ecosystem PRD.md`
+**Production Worker version:** `d88313a3-e461-494d-a7a6-05fd3db56e14`
 
-## 1. Ümumi nəticə
+## 1. Nəticə
 
-P0/P1/P2 kod scope-u production build və real OpenNext/Cloudflare local preview üzərində tamamlanıb. AZ prefikssiz canonical variantdır. DB məzmunu hələ tərcümə olunmadığı üçün RU/EN variantları təhlükəsiz `noindex, follow` və AZ canonical saxlanılır. Sitemap yalnız public, canonical və indexable AZ URL-lərindən qurulur; demo, draft, soft-deleted, closed/noIndex və private route-lar çıxarılır.
+SERP Ecosystem PRD-nin tətbiq daxilində olan funksional scope-u production-a çıxarılıb: məlumat modeli, migrasiya, granular SEO RBAC, publication quality gate, redirect/404 idarəsi, media SEO, metadata və hreflang mühərriki, entity schema-ları, DB əsaslı landing-lər, sitemap index/feed-ləri, organic attribution, bazar analitikası və vahid SERP admin mərkəzi işləyir.
 
-Seobility tapıntılarındakı ana səhifə H1/content, query-param daxili link, logo alt, canonical/host, sitemap/robots və server siyasəti problemləri kod səviyyəsində aradan qaldırılıb. Auditdəki `45A` ünvanı tətbiq edilməyib; mövcud təsdiqlənmiş mənbə `Əliyar Əliyev 109A` saxlanılıb və ziddiyyət biznes blocker-i kimi qeyd olunub.
+Production qəbulunda iki xarici əməliyyat açıq qalır:
 
-**Cari sübutlu SEO readiness balı: 92/100.** Bu, daxili acceptance rubric balıdır, Google sıralama və ya indeks zəmanəti deyil. Lighthouse/field CWV, canlı GSC, GBP/NAP və production edge sübutu olmadan 100/100 iddiası verilmir.
+1. `GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN` Worker secret-i verilməyib; admin GSC sync bunu idarəli xəta ilə göstərir. Google Search Console property-si brauzerdə təsdiqlənib və sitemap işləyir, lakin API snapshot sync credential olmadan mümkün deyil.
+2. `/az` üçün Google URL Inspection canlı testində səhifə indekslənə bilən kimi təsdiqlənib, amma Google-a “İndekslənməsini istə” sorğusu ayrıca istifadəçi adından submission olduğuna görə hələ göndərilməyib.
 
-## 2. Dəyişən fayllar və məqsədi
+Bu iki maddə kod qüsuru deyil və repository daxilində credential uydurmaqla bağlana bilməz.
 
-Branch `main`-dən 100-dən çox faylda məqsədli SEO dəyişiklikləri saxlayır. Tam siyahı `git diff --name-only main...codex/production-seo` ilə alınır; funksional qruplar:
+## 2. İcra edilmiş əsas qatlar
 
-| Qrup | Əsas fayllar | Məqsəd |
-| --- | --- | --- |
-| SEO nüvəsi | `src/lib/seo.ts`, `seo-host.ts`, `seo-indexing.ts`, `seo-landings.ts` | URL/canonical, metadata, index policy, JSON-LD, faceted navigation və landing registry üçün tək mənbə |
-| Host və runtime | `src/middleware.ts`, `next.config.ts`, `.env.example` | HTTPS/apex redirect fallback-i, staging noindex, HSTS, env əsaslı verification/analytics |
-| Sitemap/robots | `src/app/sitemap.ts`, `src/app/robots.ts`, `src/lib/queries.ts`, `src/lib/public-cache.ts` | Yalnız public canonical URL-lər, real `updatedAt`, cache və utility/private siyasəti |
-| Public route-lar | `src/app/[locale]/(site)/**` | Unikal metadata/H1, pagination/facet siyasəti, schema, E-E-A-T və clean landing route-ları |
-| Landing UI | `seo-landing-page.tsx`, `breadcrumbs.tsx`, `home-seo-intro.tsx`, `footer.tsx` | Breadcrumb, 250–500 söz copy, FAQ, ItemList, daxili discovery və premium responsiv təqdimat |
-| Schema | `src/lib/seo.ts` və property/blog/service/agency/FAQ route-ları | Stable `@id`, RealEstateListing/residence/Offer/location, BlogPosting, Service, agency və visible FAQ parity |
-| Admin SEO | `src/lib/seo-audit.ts`, `src/app/admin/seo/page.tsx`, `seo-fields.tsx`, form/dropzone faylları | Meta/alt/thin/schema/author/orphan auditləri, severity, SERP preview və sayğaclar |
-| Analytics | `client-analytics.ts`, `analytics-provider.tsx`, conversion komponent/action-ları | Consent-li, env əsaslı GA/GTM və PII-siz event allowlist |
-| Cache/revalidation | `cache-tags.ts`, `public-cache.ts`, `revalidate-public.ts`, admin/public mutation action-ları | 5 dəqiqəlik public discovery cache-i və hədəfli invalidation; private data cache-dən kənar |
-| Data modeli | `prisma/schema.prisma`, `0010_property_metro.sql`, admin property form/input | Nullable metro relation/index və taxonomy landing dəstəyi |
-| D1 uyğunluğu | `0011_normalize_service_timestamps.sql`, `prisma/services-add.sql` | Legacy mətn service timestamp-lərini Prisma-nın gözlədiyi Unix millisecond integer-a çevirmək |
-| Etibar qatı | `business-trust-panel.tsx`, `article-trust-meta.tsx`, About/Contact/Blog/Footer | Hüquqi ad, owner, VÖEN, NAP, müəllif və tarix; unverified geo/hours/stock team vizualının çıxarılması |
-| Tests/smoke | `src/**/__tests__/*seo*`, `scripts/seo-smoke.mjs` | Saf policy/schema/audit/cache testləri və real HTTP metadata/link/sitemap smoke-u |
-| Operations | `docs/seo/*.md`, spec və implementation plan | Cloudflare, ölçmə, blocker, 90 günlük off-page/content və qəbul sübutu |
+| Qat | Production nəticəsi |
+| --- | --- |
+| Data modeli | SEO metadata, landing, keyword, semantic entity, GSC metric, SERP snapshot, SEO audit/alert və redirect əlaqələri Prisma + D1-dədir |
+| Publication quality gate | Kritik listing mismatch, duplicate və retention qaydaları publish axınında tətbiq olunur |
+| Media SEO | Semantik ad, WebP çevirmə, watermark, checksum, alt/metadata və audit dəstəyi işləyir |
+| Metadata | Mərkəzi title/description/canonical/robots/OG/Twitter generatoru və DB override-ları işləyir |
+| Multilingual | `/az`, `/en`, `/ru` self-canonical; bidirectional `az/en/ru/x-default` hreflang işləyir |
+| Schema | Organization/LocalBusiness/RealEstateAgent, WebSite, BreadcrumbList, ItemList, Dataset və entity schema-ları valid JSON-LD verir |
+| Faceted navigation | Query/filter səhifələri `noindex, follow`; idarəli landing-lər ayrıca canonical entity-dir |
+| Sitemap | `/sitemap.xml` index, locale/entity feed-ləri və yalnız canonical query-siz URL-lər |
+| Robots | Public crawl açıq, admin/giriş private; Cloudflare managed content signals ilə birlikdə canonical sitemap elan edilir |
+| Local/entity SEO | Agent, agentlik, bazar analitikası, bilik mərkəzi və entity graph public route-ları işləyir |
+| Admin | 18 faktiki SERP/redirect modulu auth + permission sərhədində production-da açılır |
+| Measurement | Organic attribution/conversion, GSC snapshot modeli, SERP monitorinq, audit, alert və real-user Web Vitals saxlanılır |
 
-## 3. P0/P1/P2 nəticələri
+## 3. Commit və keyfiyyət qapıları
 
-### P0 — indeks və texniki baza
+PRD işi məntiqi qruplara bölünmüş **28 commit** ilə tamamlanıb; minimum 20 commit tələbi keçilib. Qruplar data/auth/policy, listing/media/redirect, metadata/schema/landing/sitemap, analytics/market/public routes, admin modulları və test/production acceptance qatları üzrə ayrılıb.
 
-- Canonical production URL yalnız HTTPS apex host verir; HTTP/www fallback bir hop 308-dir.
-- Staging full `noindex, nofollow`; RU/EN content hazır olana qədər `noindex, follow` + AZ canonical-dır.
-- Seobility verification meta əlavə edilib: `915a7ee78cdfc3bf8b2b272351e8ac86`.
-- Ana səhifədə tək H1: “Bakıda daşınmaz əmlak satışı və icarəsi”; 100–180 söz lokal giriş və clean discovery linkləri var.
-- Utility route-lar `noindex, follow`, private/admin route-lar `noindex, nofollow`; robots/noindex ziddiyyəti aradan qaldırılıb.
-- Facet/search/sort URL-ləri `noindex, follow`; yalnız ekvivalent registry mapping olduqda clean landing canonical verilir.
-- Sitemap static hub-ları və real public property/project/service/blog/agency/landing URL-lərini əhatə edir.
-- Cloudflare edge qaydaları və rollback `cloudflare-production-checklist.md`-dədir.
+Yekun kod qapıları:
 
-### P1 — discovery, schema, audit və ölçmə
+- `npm run typecheck` — **pass**.
+- `npm test` — **89 test faylı, 373 test pass, 0 failure**.
+- `npm run build` — **pass**; lint, type validation və production route generation tamamlandı.
+- `npm run test:seo:routes` — **8/8 true 404 + noindex pass**.
+- `npm run test:seo:live` — **42 pass, 2 Cloudflare challenge skip, 0 failure**.
 
-- 9 kommersiya landing-i və data-backed `/rayon/[slug]`, `/metro/[slug]` arxitekturası qurulub; minimum 3 public elan qapısı var.
-- Property metro relation/index və admin seçimi əlavə edilib; null geriyə uyğun qalır.
-- Property, BlogPosting, Service, agency, FAQ, Breadcrumb və ItemList schema-ları vahid serializer ilə qurulub.
-- Organization schema-dan təsdiqlənməmiş geo/iş saatı çıxarılıb; bütün NAP `siteConfig`-dən gəlir.
-- Admin audit missing/duplicate/length meta, thin copy, cover/alt, slug, location/schema, author/date və orphan risklərini göstərir.
-- GA4/GTM yalnız production + explicit consent + env olduqda yüklənir; PII payload rədd edilir.
-- Public home/list/detail/sitemap cache-lənir; publish/update/delete/moderation action-ları uyğun tag/path revalidation edir.
+İki skip `/` və `www` üçün unverified sintetik HTTP agentinə verilən Cloudflare Managed Challenge-dir. Eyni iki axın real Chrome-da ayrıca yoxlanıb və hər ikisi `https://luxehomeestate.az/az` ünvanına düşüb.
 
-### P2 — Local SEO və E-E-A-T
+## 4. D1 və deploy sübutu
 
-- About/Contact trust panel hüquqi ad, VÖEN, owner, ünvan, telefon və e-poçtu mərkəzi config-dən göstərir.
-- Blog real DB müəllifini, yoxdursa hüquqi publisher-i, dərc və meaningful update tarixini göstərir.
-- Stok team fotosu, təxmini geo, təsdiqlənməmiş iş saatı və rəqəmli uydurma şirkət statistikası public təqdimatdan çıxarılıb.
-- Real team/ofis vizualı yalnız real URL verildikdə render olunan slotla hazırdır.
-- Off-page/content 90 günlük plan, ölçmə runbook-u və biznes blocker siyahısı yaradılıb; xarici işlər tamamlanmış kimi göstərilmir.
+- Production D1 migration: `0025_serp_ecosystem.sql`.
+- Nəticə: **63 command uğurla tətbiq edilib**.
+- Deploy domenləri: `luxehomeestate.az`, `www.luxehomeestate.az`.
+- Worker version: `d88313a3-e461-494d-a7a6-05fd3db56e14`.
+- Production deploy və OpenNext-in deploy build-i uğurla tamamlanıb.
 
-## 4. Test, build və runtime sübutu
+## 5. Canlı HTTP və brauzer qəbulu
 
-Yekun komanda nəticələri bu hesabatın son commitindən dərhal əvvəl təzə işçi ağacında yenidən işlədilib:
+Real Chrome DOM qəbulu:
 
-- `npm test`: **64 test faylı, 233 test — pass; 0 failure**.
-- `npm run typecheck`: **exit 0**.
-- `npm run build`: **exit 0**, compile/lint/type validation pass, **50/50 static page generation**.
-- `npm run db:migrate:local`: `0010` və `0011` tətbiq edilib; `metroId` index və 11/11 Service timestamp integer storage read-only yoxlanıb.
+- `/az`, `/en`, `/ru`: 200, unikal title/H1, self-canonical, dörd hreflang və valid JSON-LD.
+- `/az/emlaklar?otaq=3&siralama=qiymet-artan`: `noindex, follow` və işlək filter nəticəsi.
+- `/az/bazar-analitikasi` və `/az/bazar-analitikasi/baki`: 200; Dataset schema, mənbə və metodologiya görünür.
+- `/az/agentler`, `/az/agentlikler`, `/az/bilik-merkezi`: 200 və canonical entity səhifələri.
+- Naməlum public URL: həqiqi 404 UI + `noindex`; ayrıca HTTP smoke 404 statusunu təsdiqləyir.
+- Ana səhifədə “Əmlaklara bax” naviqasiyası `/az/emlaklar` səhifəsinə keçir və filter formu işlək görünür.
+- Root və `www` Chrome-da canonical apex `/az`-a düşür.
 
-OpenNext/Cloudflare preview real D1/R2 binding-ləri ilə `http://127.0.0.1:8787` üzərində qaldırılıb. Canonical production proxy-ni simulyasiya etmək üçün `Host: luxehomeestate.az` və `X-Forwarded-Proto: https` verilib.
+Admin brauzer qəbulu aşağıdakı faktiki route-larda 404/application error olmadan keçib:
 
-`scripts/seo-smoke.mjs` nəticəsi:
+- ümumi baxış, qlobal/local SEO, metadata, landing-lər;
+- redirects/404, schema, sitemap, robots, entities;
+- content, media, keyword cluster, SERP monitorinq, audit;
+- Search Console, indexing və daxili/qırıq linklər.
 
-- 6/6 əsas template 200: `/`, `/emlaklar`, `/blog`, `/xidmetler`, `/haqqimizda`, `/elaqe`.
-- Hər template: title, description, canonical, effektiv index/follow, OG, tək H1, parse olunan JSON-LD və daxili href — pass.
-- `/robots.txt` və `/sitemap.xml` — 200/pass.
-- 23/23 sitemap URL-si — 200.
-- 55/55 discovery daxili linki — 4xx/5xx yoxdur.
-- Cold preview-də sitemap əvvəl legacy Service timestamp səbəbilə P2023/500 verdi; `0011` migration-dan sonra eyni smoke 200/pass oldu.
+## 6. Cloudflare verified bot siyasəti
 
-## 5. Render, schema, 404 və Lighthouse
+Security Analytics əvvəl crawler sorğularının `manage definite bots` managed qaydasına düşdüyünü göstərdi. Production-a aşağıdakı dar istisna əlavə edilib:
 
-- Render edilmiş HTML metadata/H1/OG/JSON-LD smoke ilə yoxlanıb.
-- JSON-LD bütün əsas səhifələrdə parse olunur; unit testlər schema type, stable `@id`, visible FAQ parity, location/Offer və təhlükəsiz escape davranışını yoxlayır.
-- Parametrli facet, utility, RU/EN və data qapısını keçməyən landing-lər `noindex` qaytarır.
-- **Qalıq framework riski:** Next.js streamed `notFound()` local OpenNext preview-də 404 UI + `noindex` versə də HTTP statusu 200 qaytara bilir (soft-404). Sitemap və əsas discovery crawl-da belə URL yoxdur, lakin production deploy-dan sonra bot URL Inspection ilə ayrıca yoxlanmalı və lazım gələrsə edge 404 siyasəti tətbiq edilməlidir.
-- Lokal mühitdə `chrome`, `msedge` və `lighthouse` CLI tapılmadığı üçün Lighthouse balı ölçülməyib. Bal uydurulmur.
-- Field CWV hədəfləri production trafikində p75 üzrə qalır: LCP ≤2.5s, INP ≤200ms, CLS ≤0.1.
+- ad: `Allow verified search bots`;
+- expression: `(cf.client.bot)`;
+- action: `Skip`;
+- scope: remaining custom rules, managed rules və Super Bot Fight Mode;
+- order/status: **First / Active**.
 
-## 6. Texniki SEO rubric-i
+Ümumi WAF və bot qoruması söndürülməyib. Yalnız Cloudflare-in həqiqətən doğruladığı Googlebot/Bingbot kimi botlar challenge-dən azaddır.
 
-| Sahə | Bal | Sübut / çıxılma |
+## 7. Google Search Console canlı sübutu
+
+Search Console brauzer qəbulu:
+
+- Domain property `sc-domain:luxehomeestate.az` mövcuddur və hesabda açılır.
+- Ümumi baxış **9 web search click** göstərir.
+- HTTPS hesabatı: **13 HTTPS, 0 non-HTTPS**.
+- Breadcrumb enhancement: **7 valid, 0 invalid**.
+- `https://luxehomeestate.az/sitemap.xml`: **Successful**.
+- Son oxunma: **30 avqust 2026**.
+- Aşkarlanmış səhifə: **90**.
+- `/az` stored index statusu hazırda Google indeksində deyil; canlı test görünüşü səhifənin indekslənə bilən olduğunu göstərib.
+
+Admin GSC API sync düzgün şəkildə `GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN secret-i konfiqurasiya edilməyib` xəbərdarlığını verir. Workspace `.env`/`.dev.vars` və production Worker secret siyahısında həmin token yoxdur.
+
+## 8. Core Web Vitals və performans
+
+Production `WebVitalMetric` RUM qeydlərinin son 7 günlük public p75 nəticəsi:
+
+| Metrik | p75 | Qiymət |
 | --- | ---: | --- |
-| Crawl, host, index siyasəti | 17/20 | canonical/robots/facet pass; live edge və streamed soft-404 üçün 3 bal saxlanılıb |
-| Metadata, H1 və content | 15/15 | real HTML 6/6 pass, home intent/copy testli |
-| Sitemap və daxili linklər | 15/15 | 23 sitemap + 55 daxili URL HTTP pass |
-| Structured data | 13/15 | parse/unit parity pass; external live Rich Results validation gözləyir |
-| Landing və admin quality gate | 14/15 | registry/audit hazır; production inventory ilə landing coverage hələ ölçülməyib |
-| Cache və Core Web Vitals | 6/10 | cache/revalidation/build hazır; Lighthouse/field data yoxdur |
-| Measurement/privacy | 6/10 | consent/PII/env hazır; real GSC/GA/GTM access/ID yoxdur |
-| Local SEO və E-E-A-T | 6/10 | hüquqi trust hazır; address conflict, geo/hours, GBP və real foto açıqdır |
-| **Cəmi** | **92/100** | 100/100 yalnız aşağıdakı canlı/manual sübutlardan sonra |
+| CLS | 0.002 | Good |
+| FCP | 968 ms | Good |
+| INP | 40 ms | Good |
+| LCP | 1,066.4 ms | Good |
+| TTFB | 796 ms | Good |
 
-Bu rubric Seobility-nin proprietary balı ilə birbaşa müqayisə edilmir.
+Son 24 saatın seçilmiş kritik SERP route-larında CLS 0.002, LCP 1,422 ms və INP 40 ms-dir; üç Core Web Vital hədd daxilindədir. Həmin seçimdə TTFB p75 975 ms olaraq “needs improvement” olsa da TTFB Core Web Vital deyil və LCP/INP/CLS qəbulunu pozmur.
 
-## 7. Manual görüləcək işlər
+Google PageSpeed public API yoxlaması anonim gündəlik kvotanın tükənməsinə görə HTTP 429 qaytardı. Bal uydurulmur; real production RUM yuxarıda verilib.
 
-1. Production deploy-dan əvvəl D1 snapshot/export al və `npm run db:migrate:remote` ilə `0010` + `0011` tətbiq et.
-2. Cloudflare checklist üzrə HTTP/www redirect, HSTS, WAF/verified bot skip və rollback qaydalarını zone-da tətbiq et.
-3. GSC Domain property-ni DNS ilə təsdiqlə, sitemap təqdim et və əsas template-ləri URL Inspection-dan keçir.
-4. `NEXT_PUBLIC_GTM_ID` və ya `NEXT_PUBLIC_GA_MEASUREMENT_ID` yalnız hüquqi consent təsdiqindən sonra production-a əlavə et.
-5. Production-da Lighthouse mobile və GSC/CrUX p75 CWV baseline ölç.
-6. Property/blog/service/FAQ nümunələrini Google Rich Results Test və Schema Markup Validator ilə live validate et.
-7. Google Business Profile və seçilmiş kataloqlarda yalnız vahid təsdiqlənmiş NAP istifadə et.
+## 9. Risk və rollback
 
-## 8. İstifadəçidən tələb olunan məlumat və girişlər
+- Kod rollback-i məntiqi commitlər üzrə `git revert` ilə edilə bilər.
+- D1 rollback yalnız migration öncəsi snapshot və seçilmiş restore ilə aparılmalıdır; destruktiv schema reverse avtomatlaşdırılmayıb.
+- Verified bot qaydası problem yaratsa Cloudflare custom rule deaktiv edilə bilər; ümumi WAF qaydaları dəyişdirilməyib.
+- Index itkisi üçün yoxlama sırası: deploy → Cloudflare Security Events → robots → canonical/hreflang → sitemap → GSC URL Inspection.
 
-- `109A`/`45A` ünvan ziddiyyətinin hüquqi sənəd + GBP/Maps əsasında qərarı.
-- GSC/DNS və Cloudflare zone admin girişi.
-- Google Business Profile owner/manager girişi.
-- GA4/GTM ID və consent/hüquqi siyasət təsdiqi.
-- Dəqiq geo pin və real iş/bayram saatları.
-- Real logo master asseti, ofis/komanda fotoları və istifadə icazələri.
-- Davamlı inventara əsaslanan prioritet rayon/metro siyahısı.
-- VÖEN artıq məlumdur (`1507750271`); yenidən tələb edilmir, yalnız public dərc səlahiyyəti təsdiqlənməlidir.
+## 10. Qalan istifadəçi səlahiyyəti
 
-Detallı cədvəl: `docs/seo/business-data-blockers.md`.
+Tam operational bağlanış üçün:
 
-## 9. 30/60/90 plan
+1. Google OAuth-dan Search Console read access token verilməli və Worker secret kimi saxlanmalıdır.
+2. `/az` URL-si üçün Search Console-da indekslənmə sorğusunun göndərilməsinə istifadəçi təsdiqi verilməlidir.
 
-- **0–30:** GBP sahiblik, NAP qərarı, Maps pin/kateqoriya, real foto/post ritmi, etik review prosesi, GSC baseline.
-- **31–60:** keyfiyyətli local directory sitatları, real tərəfdaş materialları, Bakı alış/kirayə/sənəd/ipoteka content klasterləri, CTR testləri.
-- **61–90:** ekspert/media materialları, backlink keyfiyyət analizi, content consolidation, GBP/GSC/consent-li conversion nəticələri və rüblük audit.
-
-Tam plan: `docs/seo/off-page-and-content-90-day-plan.md`.
-
-## 10. Risk və rollback
-
-- Kod rollback-i commit qrupları üzrə reverse revert ilə aparılır: P2 docs/trust → cache → P1 discovery/audit → P0 foundation.
-- `0011` yalnız text timestamp-ləri eyni anın integer formasına çevirir; remote tətbiqdən əvvəl D1 export saxlanılmalıdır. Geri dönüş yalnız həmin export-dan seçilmiş restore ilə edilməlidir.
-- Redirect/HSTS/WAF dəyişikliyində əvvəlki Cloudflare rule export-u saxlanılır; HSTS dərhal maksimum/preload ilə aktivləşdirilmir.
-- Analytics PII/consent şübhəsində GA/GTM env söndürülür və əvvəlki container versiyasına qayıdılır.
-- Index itkisi halında ilk yoxlama sırası: deploy → `X-Robots-Tag` → robots → canonical → sitemap → Cloudflare redirect/cache.
+Bu məlumatlar olmadan sistem credential yaratmır, Google hesabına daimi giriş vermir və istifadəçi adından indeks submission göndərmir.
