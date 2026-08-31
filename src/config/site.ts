@@ -99,6 +99,7 @@ export const supportNavigation = [
   { label: "Bilik Mərkəzi", href: "/bilik-merkezi" },
   { label: "Əmlak lüğəti", href: "/lugat" },
   { label: "İpoteka kalkulyatoru", href: "/kalkulyator" },
+  { label: "Bazar analitikası", href: "/bazar-analitikasi" },
   { label: "Tez-tez verilən suallar", href: "/suallar" },
 ] as const;
 
