@@ -14,11 +14,15 @@ import type seoLandings from "./src/i18n/locales/az/seoLandings.json";
 import type phase2 from "./src/i18n/locales/az/phase2.json";
 import type phase3 from "./src/i18n/locales/az/phase3.json";
 import type knowledge from "./src/i18n/locales/az/knowledge.json";
+import type admin from "./src/i18n/locales/az/admin.json";
 
 /**
  * `useTranslations()`/`getTranslations()` üçün açar avtotamamlama.
  * Mənbə dil AZ-dır (default) — `en`/`ru` faylları struktur baxımından bunun eyni
  * olmalıdır, əks halda TypeScript deyil, `next-intl`-in özü işarə edəcək.
+ *
+ * `admin` kataloqu da buradadır ki, panel açarları avtotamamlansın. Runtime-da o,
+ * ictimai sorğulara yüklənmir — yalnız `/admin` ağacına (`src/i18n/admin.ts`).
  */
 type Messages = {
   common: typeof common;
@@ -37,6 +41,7 @@ type Messages = {
   phase2: typeof phase2;
   phase3: typeof phase3;
   knowledge: typeof knowledge;
+  admin: typeof admin;
 };
 
 declare module "next-intl" {

@@ -1,0 +1,383 @@
+{
+  "shell": {
+    "title": "Admin panel",
+    "titleTemplate": "%s | Luxe Home Estate admin panel",
+    "brandSubtitle": "ADMIN PANEL",
+    "menuTitle": "Admin panel menu",
+    "openMenu": "Open menu",
+    "navLabel": "Admin navigation",
+    "openSite": "Open site",
+    "signOut": "Sign out",
+    "ownedBy": "Owner: {name}",
+    "languageLabel": "Panel language",
+    "languageChanged": "Panel language updated"
+  },
+  "nav": {
+    "groups": {
+      "general": "General",
+      "content": "Content",
+      "sales": "Sales",
+      "system": "System"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "properties": "Properties",
+      "moderation": "Moderation",
+      "taxonomy": "Taxonomy",
+      "projects": "Developments",
+      "blog": "Blog",
+      "knowledge": "Knowledge Hub",
+      "translations": "Translations",
+      "services": "Services",
+      "media": "Media",
+      "agencies": "Agencies",
+      "agents": "Agents and reviews",
+      "publicAmenities": "Public amenities",
+      "aiAssistant": "AI assistant",
+      "partners": "Partners",
+      "serp": "SERP and SEO",
+      "redirects": "Redirects",
+      "analytics": "Traffic analytics",
+      "leads": "Enquiries",
+      "reservations": "Reservations",
+      "email": "Corporate email",
+      "users": "Users",
+      "accounts": "Accounts",
+      "security": "Security",
+      "audit": "Audit log",
+      "profile": "My account",
+      "settings": "Settings"
+    }
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "back": "Back",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "apply": "Apply",
+    "view": "View",
+    "duplicate": "Duplicate",
+    "restore": "Restore",
+    "export": "Export",
+    "refresh": "Refresh",
+    "more": "More"
+  },
+  "state": {
+    "empty": "No data",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "required": "This field is required",
+    "unsavedChanges": "You have unsaved changes"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {current} of {total}",
+    "total": "{count, plural, one {# record} other {# records}}"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Overall state of the site, recent enquiries and content activity.",
+    "newProperty": "New property",
+    "writePost": "Write a post",
+    "alerts": {
+      "pendingProperties": "{count, plural, one {# listing awaiting approval} other {# listings awaiting approval}}",
+      "unverifiedAgencies": "{count, plural, one {# agency awaiting approval} other {# agencies awaiting approval}}",
+      "lockedUsers": "{count, plural, one {# staff account locked} other {# staff accounts locked}}"
+    },
+    "stats": {
+      "activeProperties": "Active properties",
+      "activePropertiesHint": "{count, plural, one {# draft waiting} other {# drafts waiting}}",
+      "newLeads": "New enquiries",
+      "newLeadsHint": "{count, plural, one {# enquiry in total} other {# enquiries in total}}",
+      "activeProjects": "Active developments",
+      "activeProjectsHint": "Construction under way",
+      "publishedPosts": "Published posts",
+      "publishedPostsHint": "Articles visible on the blog"
+    },
+    "recentLeads": {
+      "title": "Recent enquiries",
+      "description": "The five most recent enquiries",
+      "viewAll": "View all",
+      "empty": "No enquiries yet.",
+      "customer": "Customer",
+      "source": "Source",
+      "status": "Status",
+      "time": "Time"
+    },
+    "recentProperties": {
+      "title": "Recently updated properties",
+      "viewAll": "View all",
+      "empty": "No properties added yet."
+    },
+    "topViewed": {
+      "title": "Most viewed listings",
+      "description": "By number of views",
+      "empty": "No views recorded yet."
+    },
+    "leadBreakdown": {
+      "title": "Enquiries by status",
+      "description": "Count per status",
+      "empty": "No enquiries yet."
+    },
+    "quickActions": {
+      "newProperty": "New property listing",
+      "newProject": "New development",
+      "newPost": "New article",
+      "viewLeads": "View enquiries"
+    }
+  },
+  "labels": {
+    "accountType": {
+      "STAFF": "Company staff",
+      "USER": "User",
+      "OWNER": "Property owner",
+      "AGENCY": "Agency"
+    },
+    "agencyEmployeeRole": {
+      "MANAGER": "Manager",
+      "AGENT": "Agent"
+    },
+    "agencyEmployeeStatus": {
+      "PENDING": "Awaiting approval",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "buildingType": {
+      "NEW": "New building",
+      "OLD": "Older building"
+    },
+    "currency": {
+      "AZN": "AZN (₼)",
+      "USD": "USD ($)",
+      "EUR": "EUR (€)"
+    },
+    "documentStatus": {
+      "TITLE_DEED": "Title deed (extract)",
+      "CONTRACT": "Contract",
+      "MUNICIPAL": "Municipal document",
+      "DECREE": "Decree",
+      "POWER_OF_ATTORNEY": "Power of attorney",
+      "EXTRACT_COMMERCIAL": "Extract (non-residential)",
+      "NONE": "No title deed"
+    },
+    "faqCategory": {
+      "PURCHASE": "Buying",
+      "RENT": "Renting",
+      "RESERVATION": "Reservation",
+      "AGENCY": "Agency",
+      "PAYMENT": "Payment",
+      "LEGAL": "Legal",
+      "PLATFORM": "Platform"
+    },
+    "featureGroup": {
+      "GENERAL": "General",
+      "UTILITY": "Utilities",
+      "PAYMENT": "Payment terms",
+      "INDOOR": "Indoor",
+      "OUTDOOR": "Outdoor",
+      "SECURITY": "Security"
+    },
+    "knowledgeAudience": {
+      "BUYER": "Buyer",
+      "SELLER": "Seller",
+      "RENTER": "Tenant",
+      "LANDLORD": "Landlord",
+      "INVESTOR": "Investor"
+    },
+    "knowledgeLevel": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    },
+    "knowledgeRiskLevel": {
+      "GREEN": "Core documents are in order",
+      "YELLOW": "Additional checks required",
+      "RED": "Serious legal risk",
+      "LEGAL_REVIEW": "Legal opinion required"
+    },
+    "knowledgeStatus": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published"
+    },
+    "leadSource": {
+      "PROPERTY": "Property page",
+      "CONTACT": "Contact page",
+      "SERVICE": "Service page",
+      "PROJECT": "Development page"
+    },
+    "leadStatus": {
+      "NEW": "New",
+      "CONTACTED": "Contacted",
+      "IN_PROGRESS": "In progress",
+      "COMPLETED": "Completed",
+      "CLOSED": "Closed"
+    },
+    "legalContentStatus": {
+      "CURRENT": "Law in force",
+      "PROPOSAL": "Proposal / initiative",
+      "MIXED": "Law in force + proposal"
+    },
+    "listingType": {
+      "SALE": "For sale",
+      "RENT": "For rent"
+    },
+    "locale": {
+      "az": "Azərbaycan",
+      "en": "English",
+      "ru": "Русский"
+    },
+    "nearbyPlaceCategory": {
+      "METRO": "Metro",
+      "BUS": "Bus stop",
+      "SCHOOL": "School",
+      "UNIVERSITY": "University",
+      "KINDERGARTEN": "Kindergarten",
+      "HOSPITAL": "Hospital",
+      "CLINIC": "Clinic",
+      "PHARMACY": "Pharmacy",
+      "SUPERMARKET": "Supermarket",
+      "RESTAURANT": "Restaurant",
+      "PARK": "Park",
+      "SHOPPING_CENTER": "Shopping centre"
+    },
+    "notificationType": {
+      "SAVED_SEARCH_MATCH": "Listing matching a saved search",
+      "PRICE_DROP": "Price drop",
+      "RESERVATION_STATUS": "Reservation status",
+      "RECOMMENDATION": "Personal recommendation",
+      "MEETING_REMINDER": "Viewing reminder"
+    },
+    "partnershipType": {
+      "BROKER": "Broker",
+      "REAL_ESTATE_AGENCY": "Real estate agency",
+      "DEVELOPER": "Developer",
+      "CONSTRUCTION_COMPANY": "Construction company",
+      "INVESTMENT": "Investment",
+      "BANK": "Bank",
+      "MORTGAGE": "Mortgage",
+      "INSURANCE": "Insurance",
+      "TECHNOLOGY": "Technology",
+      "MEDIA": "Media",
+      "MARKETING": "Marketing",
+      "SERVICE_PROVIDER": "Service provider",
+      "STRATEGIC_PARTNER": "Strategic partner",
+      "OTHER": "Other"
+    },
+    "partnerRelationRole": {
+      "SOURCE": "Source",
+      "BROKER": "Broker",
+      "CO_BROKER": "Co-broker",
+      "DEVELOPER": "Developer",
+      "EXCLUSIVE_SALES": "Exclusive sales",
+      "SALES_PARTNER": "Sales partner",
+      "MARKETING_PARTNER": "Marketing partner",
+      "MANAGEMENT_PARTNER": "Management partner",
+      "OTHER": "Other"
+    },
+    "partnerStatus": {
+      "DRAFT": "Draft",
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "EXPIRED": "Expired",
+      "TERMINATED": "Terminated",
+      "ARCHIVED": "Archived"
+    },
+    "postStatus": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published",
+      "ARCHIVED": "Archived"
+    },
+    "pricePeriod": {
+      "MONTH": "month",
+      "DAY": "day"
+    },
+    "projectImageCategory": {
+      "EXTERIOR": "Exterior",
+      "INTERIOR": "Interior",
+      "CONSTRUCTION": "Construction",
+      "LANDSCAPE": "Landscape"
+    },
+    "projectStatus": {
+      "PLANNED": "Planned",
+      "ONGOING": "In progress",
+      "COMPLETED": "Completed"
+    },
+    "projectType": {
+      "RESIDENTIAL": "Residential development",
+      "COMMERCIAL": "Commercial development",
+      "VILLA": "Villa development",
+      "MIXED": "Mixed-use"
+    },
+    "propertyStatus": {
+      "DRAFT": "Draft",
+      "PENDING": "Awaiting approval",
+      "PUBLISHED": "Published",
+      "RESERVED": "Reserved",
+      "SOLD": "Sold",
+      "RENTED": "Rented",
+      "ARCHIVED": "Archived"
+    },
+    "renovation": {
+      "NEW_BUILDING": "New building",
+      "DESIGNER": "Designer renovation",
+      "RENOVATED": "Excellent condition",
+      "COSMETIC": "Cosmetic renovation",
+      "UNRENOVATED": "Unrenovated"
+    },
+    "reservationStatus": {
+      "REQUESTED": "Request sent",
+      "PENDING": "Under review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled",
+      "EXPIRED": "Expired",
+      "COMPLETED": "Completed"
+    },
+    "reviewStatus": {
+      "PENDING": "Awaiting moderation",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "HIDDEN": "Hidden"
+    },
+    "role": {
+      "SUPER_ADMIN": "Super Admin",
+      "ADMIN": "Admin",
+      "EDITOR": "Editor"
+    },
+    "translationStatus": {
+      "DRAFT": "Draft",
+      "READY": "Ready for review",
+      "PUBLISHED": "Published"
+    }
+  },
+  "profile": {
+    "title": "My account",
+    "description": "Personal details, panel language and security settings.",
+    "submit": "Save profile",
+    "section": "Personal details",
+    "sectionHint": "The name, contact details and appearance shown in the panel.",
+    "name": "Full name",
+    "phone": "Phone",
+    "language": "Panel language",
+    "languageHint": "Every text in the panel is shown in the selected language.",
+    "theme": "Appearance",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "Device setting",
+    "themeHint": "New users start on the light theme; you can change it at any time.",
+    "avatar": "Profile picture"
+  }
+}

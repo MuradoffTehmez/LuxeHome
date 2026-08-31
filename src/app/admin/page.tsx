@@ -26,13 +26,11 @@ import {
 } from "@/components/admin/admin-responsive-list";
 import { formatPrice, formatRelative } from "@/lib/utils";
 import {
-  LEAD_SOURCE_LABELS,
-  LEAD_STATUS_LABELS,
-  PROPERTY_STATUS_LABELS,
   type LeadSource,
   type LeadStatus,
   type PropertyStatus,
 } from "@/lib/constants";
+import { getAdminT } from "@/lib/admin-i18n";
 import {
   getAdminAlerts,
   getDashboardStats,
@@ -44,6 +42,7 @@ import {
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
 
 export default async function AdminDashboardPage() {
+  const t = await getAdminT();
   const [stats, recentLeads, recentProperties, announcement, alerts, topViewed, leadBreakdown] =
     await Promise.all([
       getDashboardStats(),
@@ -57,15 +56,15 @@ export default async function AdminDashboardPage() {
 
   const alertItems = [
     alerts.pendingProperties > 0 && {
-      label: `${alerts.pendingProperties} elan təsdiq gözləyir`,
+      label: t("dashboard.alerts.pendingProperties", { count: alerts.pendingProperties }),
       href: "/admin/emlaklar?status=PENDING",
     },
     alerts.unverifiedAgencies > 0 && {
-      label: `${alerts.unverifiedAgencies} agentlik təsdiq gözləyir`,
+      label: t("dashboard.alerts.unverifiedAgencies", { count: alerts.unverifiedAgencies }),
       href: "/admin/agentlikler",
     },
     alerts.lockedUsers > 0 && {
-      label: `${alerts.lockedUsers} əməkdaş hesabı kilidli`,
+      label: t("dashboard.alerts.lockedUsers", { count: alerts.lockedUsers }),
       href: "/admin/istifadeciler",
     },
   ].filter((item): item is { label: string; href: string } => Boolean(item));
@@ -75,17 +74,17 @@ export default async function AdminDashboardPage() {
   return (
     <>
       <AdminPageHeader
-        title="İdarə paneli"
-        description="Saytın ümumi vəziyyəti, son müraciətlər və kontent fəaliyyəti."
+        title={t("dashboard.title")}
+        description={t("dashboard.description")}
         actions={
           <>
             <ButtonLink href="/admin/emlaklar/yeni" variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />
-              Yeni əmlak
+              {t("dashboard.newProperty")}
             </ButtonLink>
             <ButtonLink href="/admin/blog/yeni" variant="outline" size="sm">
               <FileEdit className="size-4" aria-hidden="true" />
-              Məqalə yaz
+              {t("dashboard.writePost")}
             </ButtonLink>
           </>
         }
@@ -118,33 +117,33 @@ export default async function AdminDashboardPage() {
       {/* --- Sayğaclar --- */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Aktiv əmlaklar"
+          label={t("dashboard.stats.activeProperties")}
           value={stats.activeProperties}
-          hint={`${stats.draftProperties} qaralama gözləyir`}
+          hint={t("dashboard.stats.activePropertiesHint", { count: stats.draftProperties })}
           icon={Building2}
           tone="gold"
           href="/admin/emlaklar"
         />
         <StatCard
-          label="Yeni müraciətlər"
+          label={t("dashboard.stats.newLeads")}
           value={stats.newLeads}
-          hint={`Ümumi ${stats.totalLeads} müraciət`}
+          hint={t("dashboard.stats.newLeadsHint", { count: stats.totalLeads })}
           icon={Inbox}
           tone="warning"
           href="/admin/muracietler"
         />
         <StatCard
-          label="Aktiv layihələr"
+          label={t("dashboard.stats.activeProjects")}
           value={stats.activeProjects}
-          hint="Davam edən tikintilər"
+          hint={t("dashboard.stats.activeProjectsHint")}
           icon={Blocks}
           tone="neutral"
           href="/admin/layiheler"
         />
         <StatCard
-          label="Dərc edilmiş yazılar"
+          label={t("dashboard.stats.publishedPosts")}
           value={stats.publishedPosts}
-          hint="Bloqda görünən məqalələr"
+          hint={t("dashboard.stats.publishedPostsHint")}
           icon={Newspaper}
           tone="success"
         />
@@ -153,23 +152,23 @@ export default async function AdminDashboardPage() {
       <div className="grid gap-6 xl:grid-cols-[1.15fr_1fr]">
         {/* --- Son müraciətlər --- */}
         <AdminCard
-          title="Son müraciətlər"
-          description="Ən son gələn beş müraciət"
+          title={t("dashboard.recentLeads.title")}
+          description={t("dashboard.recentLeads.description")}
           bodyClassName="p-4 lg:p-0"
           actions={
             <Link
               href="/admin/muracietler"
               className="inline-flex min-h-11 items-center text-sm text-gold-deep underline-offset-4 transition-colors hover:underline"
             >
-              Hamısı
+              {t("dashboard.recentLeads.viewAll")}
             </Link>
           }
         >
           <AdminResponsiveList
-            ariaLabel="Son müraciətlər"
+            ariaLabel={t("dashboard.recentLeads.title")}
             items={recentLeads}
             getKey={(lead) => lead.id}
-            empty={<p className="py-8 text-center text-sm text-ink-muted">Hələ müraciət yoxdur.</p>}
+            empty={<p className="py-8 text-center text-sm text-ink-muted">{t("dashboard.recentLeads.empty")}</p>}
             renderCard={(lead) => (
               <AdminListCard
                 title={
@@ -188,21 +187,21 @@ export default async function AdminDashboardPage() {
                 status={
                   <StatusBadge
                     status={lead.status as LeadStatus}
-                    label={LEAD_STATUS_LABELS[lead.status as LeadStatus]}
+                    label={t(`labels.leadStatus.${lead.status as LeadStatus}`)}
                   />
                 }
               >
-                {LEAD_SOURCE_LABELS[lead.source as LeadSource]}
+                {t(`labels.leadSource.${lead.source as LeadSource}`)}
               </AdminListCard>
             )}
             renderTable={(items) => (
               <AdminTable
-                caption="Son müraciətlər"
+                caption={t("dashboard.recentLeads.title")}
                 headers={[
-                  { label: "Müştəri" },
-                  { label: "Mənbə" },
-                  { label: "Status" },
-                  { label: "Vaxt", className: "text-right" },
+                  { label: t("dashboard.recentLeads.customer") },
+                  { label: t("dashboard.recentLeads.source") },
+                  { label: t("dashboard.recentLeads.status") },
+                  { label: t("dashboard.recentLeads.time"), className: "text-right" },
                 ]}
               >
                 {items.map((lead) => (
@@ -217,12 +216,12 @@ export default async function AdminDashboardPage() {
                       <p className="tabular mt-0.5 text-xs text-ink-muted">{lead.phone}</p>
                     </AdminTableCell>
                     <AdminTableCell className="text-sm text-ink-soft">
-                      {LEAD_SOURCE_LABELS[lead.source as LeadSource]}
+                      {t(`labels.leadSource.${lead.source as LeadSource}`)}
                     </AdminTableCell>
                     <AdminTableCell>
                       <StatusBadge
                         status={lead.status as LeadStatus}
-                        label={LEAD_STATUS_LABELS[lead.status as LeadStatus]}
+                        label={t(`labels.leadStatus.${lead.status as LeadStatus}`)}
                       />
                     </AdminTableCell>
                     <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
@@ -237,21 +236,21 @@ export default async function AdminDashboardPage() {
 
         {/* --- Son əmlaklar --- */}
         <AdminCard
-          title="Son yenilənən əmlaklar"
+          title={t("dashboard.recentProperties.title")}
           bodyClassName="p-0"
           actions={
             <Link
               href="/admin/emlaklar"
               className="inline-flex min-h-11 items-center text-sm text-gold-deep underline-offset-4 transition-colors hover:underline"
             >
-              Hamısı
+              {t("dashboard.recentProperties.viewAll")}
             </Link>
           }
         >
           <ul className="divide-y divide-line">
             {recentProperties.length === 0 && (
               <li className="px-5 py-8 text-center text-sm text-ink-muted">
-                Hələ əmlak əlavə edilməyib.
+                {t("dashboard.recentProperties.empty")}
               </li>
             )}
             {recentProperties.map((property) => (
@@ -270,7 +269,7 @@ export default async function AdminDashboardPage() {
                 </div>
                 <StatusBadge
                   status={property.status as PropertyStatus}
-                  label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]}
+                  label={t(`labels.propertyStatus.${property.status as PropertyStatus}`)}
                 />
               </li>
             ))}
@@ -280,11 +279,11 @@ export default async function AdminDashboardPage() {
 
       {/* --- Analitika --- */}
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_1fr]">
-        <AdminCard title="Ən çox baxılan elanlar" description="Baxış sayına görə" bodyClassName="p-0">
+        <AdminCard title={t("dashboard.topViewed.title")} description={t("dashboard.topViewed.description")} bodyClassName="p-0">
           <ul className="divide-y divide-line">
             {topViewed.length === 0 && (
               <li className="px-5 py-8 text-center text-sm text-ink-muted">
-                Hələ baxış qeydə alınmayıb.
+                {t("dashboard.topViewed.empty")}
               </li>
             )}
             {topViewed.map((property, index) => (
@@ -312,15 +311,15 @@ export default async function AdminDashboardPage() {
           </ul>
         </AdminCard>
 
-        <AdminCard title="Müraciətlər üzrə bölgü" description="Status üzrə say" bodyClassName="p-5">
+        <AdminCard title={t("dashboard.leadBreakdown.title")} description={t("dashboard.leadBreakdown.description")} bodyClassName="p-5">
           {leadBreakdown.length === 0 ? (
-            <p className="py-8 text-center text-sm text-ink-muted">Hələ müraciət yoxdur.</p>
+            <p className="py-8 text-center text-sm text-ink-muted">{t("dashboard.leadBreakdown.empty")}</p>
           ) : (
             <ul className="flex flex-col gap-3">
               {leadBreakdown.map((row) => (
                 <li key={row.status} className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-ink">{LEAD_STATUS_LABELS[row.status as LeadStatus]}</span>
+                    <span className="text-ink">{t(`labels.leadStatus.${row.status as LeadStatus}`)}</span>
                     <span className="tabular font-medium text-ink">{row.count}</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-beige">
@@ -339,10 +338,10 @@ export default async function AdminDashboardPage() {
       {/* --- Sürətli keçidlər --- */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Yeni əmlak elanı", href: "/admin/emlaklar/yeni", icon: Building2 },
-          { label: "Yeni layihə", href: "/admin/layiheler/yeni", icon: Blocks },
-          { label: "Yeni məqalə", href: "/admin/blog/yeni", icon: Newspaper },
-          { label: "Müraciətlərə bax", href: "/admin/muracietler", icon: Inbox },
+          { label: t("dashboard.quickActions.newProperty"), href: "/admin/emlaklar/yeni", icon: Building2 },
+          { label: t("dashboard.quickActions.newProject"), href: "/admin/layiheler/yeni", icon: Blocks },
+          { label: t("dashboard.quickActions.newPost"), href: "/admin/blog/yeni", icon: Newspaper },
+          { label: t("dashboard.quickActions.viewLeads"), href: "/admin/muracietler", icon: Inbox },
         ].map((action) => (
           <Link
             key={action.href}

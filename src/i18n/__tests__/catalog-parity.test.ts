@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { MESSAGE_NAMESPACES } from "../config";
+import { ADMIN_MESSAGE_NAMESPACES } from "../admin";
 
 const locales = ["az", "en", "ru"] as const;
 const requiredNamespaces = [
@@ -23,6 +24,12 @@ const requiredNamespaces = [
   "phase3",
   "knowledge",
 ] as const;
+
+/**
+ * Panel kataloqları ictimai siyahıda deyil (hər ictimai sorğuda yüklənməsinlər),
+ * amma dil paritetinə eyni sərtliklə tabedirlər.
+ */
+const requiredAdminNamespaces = ["admin"] as const;
 
 const catalogModules = import.meta.glob("../locales/*/*.json", {
   eager: true,
@@ -46,6 +53,24 @@ describe("i18n message catalogs", () => {
     expect(MESSAGE_NAMESPACES).toEqual(requiredNamespaces);
   });
 
+  it("declares every admin namespace", () => {
+    expect(ADMIN_MESSAGE_NAMESPACES).toEqual(requiredAdminNamespaces);
+  });
+
+  it("keeps admin namespaces out of the public request config", () => {
+    for (const namespace of requiredAdminNamespaces) {
+      expect(MESSAGE_NAMESPACES).not.toContain(namespace);
+    }
+  });
+
+  it.each(requiredAdminNamespaces)("keeps recursive key parity for %s", (namespace) => {
+    const baseline = leafKeys(readCatalog("az", namespace)).sort();
+
+    for (const locale of locales.slice(1)) {
+      expect(leafKeys(readCatalog(locale, namespace)).sort()).toEqual(baseline);
+    }
+  });
+
   it.each(requiredNamespaces)("keeps recursive key parity for %s", (namespace) => {
     const baseline = leafKeys(readCatalog("az", namespace)).sort();
 
@@ -55,7 +80,7 @@ describe("i18n message catalogs", () => {
   });
 
   it.each(locales)("does not ship blank leaf messages for %s", (locale) => {
-    for (const namespace of requiredNamespaces) {
+    for (const namespace of [...requiredNamespaces, ...requiredAdminNamespaces]) {
       const catalog = readCatalog(locale, namespace);
       const serialized = JSON.stringify(catalog);
       expect(serialized).not.toMatch(/:\s*"\s*"/);

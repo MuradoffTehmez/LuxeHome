@@ -1,10 +1,17 @@
 /**
  * Admin panelin naviqasiya strukturu.
  * Ayrı fayldadır ki, həm sidebar, həm mobil çekmece eyni mənbədən oxusun.
+ *
+ * Etiketlər burada saxlanılmır: `labelKey` / `titleKey` `admin.nav` kataloqundakı
+ * açarlardır, mətn render anında istifadəçinin dilinə görə seçilir. Açar tipləri
+ * kataloqdan törəyir — tərcüməsi olmayan menyu sətri tip yoxlamasından keçmir.
  */
 
+import type { AdminNavGroupKey, AdminNavItemKey } from "@/i18n/admin";
+
 export type AdminNavItem = {
-  label: string;
+  /** `admin.nav.items` altındakı açar. */
+  labelKey: AdminNavItemKey;
   href: string;
   /** lucide-react ikon adı — `admin-icon.tsx` içindəki icazə siyahısından seçilir. */
   icon: string;
@@ -13,54 +20,55 @@ export type AdminNavItem = {
 };
 
 export type AdminNavGroup = {
-  title: string;
+  /** `admin.nav.groups` altındakı açar. */
+  titleKey: AdminNavGroupKey;
   items: AdminNavItem[];
 };
 
 export const adminNav: AdminNavGroup[] = [
   {
-    title: "Ümumi",
-    items: [{ label: "İdarə paneli", href: "/admin", icon: "LayoutDashboard" }],
+    titleKey: "general",
+    items: [{ labelKey: "dashboard", href: "/admin", icon: "LayoutDashboard" }],
   },
   {
-    title: "Kontent",
+    titleKey: "content",
     items: [
-      { label: "Əmlaklar", href: "/admin/emlaklar", icon: "Building2", badgeKey: "draftProperties" },
-      { label: "Moderasiya", href: "/admin/moderation", icon: "ClipboardCheck", badgeKey: "pendingModeration" },
-      { label: "Taksonomiya", href: "/admin/taksonomiya", icon: "Tags" },
-      { label: "Layihələr", href: "/admin/layiheler", icon: "Blocks" },
-      { label: "Bloq", href: "/admin/blog", icon: "Newspaper" },
-      { label: "Bilik Mərkəzi", href: "/admin/bilik-merkezi", icon: "BookOpen" },
-      { label: "Tərcümələr", href: "/admin/tercumeler", icon: "Languages" },
-      { label: "Xidmətlər", href: "/admin/xidmetler", icon: "Sparkles" },
-      { label: "Media", href: "/admin/media", icon: "Images" },
-      { label: "Agentliklər", href: "/admin/agentlikler", icon: "ShieldCheck" },
-      { label: "Agentlər və rəylər", href: "/admin/agentler", icon: "UserRoundCheck" },
-      { label: "İctimai imkanlar", href: "/admin/ictimai-imkanlar", icon: "MapPinned" },
-      { label: "AI köməkçi", href: "/admin/ai-komekci", icon: "BrainCircuit" },
-      { label: "Tərəfdaşlar", href: "/admin/terefdaslar", icon: "Handshake" },
-      { label: "SERP və SEO", href: "/admin/serp", icon: "SearchCheck" },
-      { label: "Yönləndirmələr", href: "/admin/redirects", icon: "Route" },
-      { label: "Trafik analitikası", href: "/admin/analitika", icon: "BarChart3" },
+      { labelKey: "properties", href: "/admin/emlaklar", icon: "Building2", badgeKey: "draftProperties" },
+      { labelKey: "moderation", href: "/admin/moderation", icon: "ClipboardCheck", badgeKey: "pendingModeration" },
+      { labelKey: "taxonomy", href: "/admin/taksonomiya", icon: "Tags" },
+      { labelKey: "projects", href: "/admin/layiheler", icon: "Blocks" },
+      { labelKey: "blog", href: "/admin/blog", icon: "Newspaper" },
+      { labelKey: "knowledge", href: "/admin/bilik-merkezi", icon: "BookOpen" },
+      { labelKey: "translations", href: "/admin/tercumeler", icon: "Languages" },
+      { labelKey: "services", href: "/admin/xidmetler", icon: "Sparkles" },
+      { labelKey: "media", href: "/admin/media", icon: "Images" },
+      { labelKey: "agencies", href: "/admin/agentlikler", icon: "ShieldCheck" },
+      { labelKey: "agents", href: "/admin/agentler", icon: "UserRoundCheck" },
+      { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar", icon: "MapPinned" },
+      { labelKey: "aiAssistant", href: "/admin/ai-komekci", icon: "BrainCircuit" },
+      { labelKey: "partners", href: "/admin/terefdaslar", icon: "Handshake" },
+      { labelKey: "serp", href: "/admin/serp", icon: "SearchCheck" },
+      { labelKey: "redirects", href: "/admin/redirects", icon: "Route" },
+      { labelKey: "analytics", href: "/admin/analitika", icon: "BarChart3" },
     ],
   },
   {
-    title: "Satış",
+    titleKey: "sales",
     items: [
-      { label: "Müraciətlər", href: "/admin/muracietler", icon: "Inbox", badgeKey: "newLeads" },
-      { label: "Rezervasiyalar", href: "/admin/rezervasiyalar", icon: "CalendarCheck" },
-      { label: "Korporativ e-poçt", href: "/admin/e-poct", icon: "Mail" },
+      { labelKey: "leads", href: "/admin/muracietler", icon: "Inbox", badgeKey: "newLeads" },
+      { labelKey: "reservations", href: "/admin/rezervasiyalar", icon: "CalendarCheck" },
+      { labelKey: "email", href: "/admin/e-poct", icon: "Mail" },
     ],
   },
   {
-    title: "Sistem",
+    titleKey: "system",
     items: [
-      { label: "İstifadəçilər", href: "/admin/istifadeciler", icon: "Users" },
-      { label: "Hesablar", href: "/admin/hesablar", icon: "Contact" },
-      { label: "Təhlükəsizlik", href: "/admin/security", icon: "ShieldAlert" },
-      { label: "Audit jurnalı", href: "/admin/audit", icon: "History" },
-      { label: "Hesabım", href: "/admin/hesabim", icon: "UserCog" },
-      { label: "Parametrlər", href: "/admin/parametrler", icon: "Settings" },
+      { labelKey: "users", href: "/admin/istifadeciler", icon: "Users" },
+      { labelKey: "accounts", href: "/admin/hesablar", icon: "Contact" },
+      { labelKey: "security", href: "/admin/security", icon: "ShieldAlert" },
+      { labelKey: "audit", href: "/admin/audit", icon: "History" },
+      { labelKey: "profile", href: "/admin/hesabim", icon: "UserCog" },
+      { labelKey: "settings", href: "/admin/parametrler", icon: "Settings" },
     ],
   },
 ];

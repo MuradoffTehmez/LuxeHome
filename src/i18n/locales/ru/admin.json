@@ -1,0 +1,383 @@
+{
+  "shell": {
+    "title": "Панель управления",
+    "titleTemplate": "%s | Панель управления Luxe Home Estate",
+    "brandSubtitle": "ПАНЕЛЬ УПРАВЛЕНИЯ",
+    "menuTitle": "Меню панели управления",
+    "openMenu": "Открыть меню",
+    "navLabel": "Навигация панели",
+    "openSite": "Открыть сайт",
+    "signOut": "Выйти",
+    "ownedBy": "Владелец: {name}",
+    "languageLabel": "Язык панели",
+    "languageChanged": "Язык панели обновлён"
+  },
+  "nav": {
+    "groups": {
+      "general": "Общее",
+      "content": "Контент",
+      "sales": "Продажи",
+      "system": "Система"
+    },
+    "items": {
+      "dashboard": "Панель управления",
+      "properties": "Объекты",
+      "moderation": "Модерация",
+      "taxonomy": "Таксономия",
+      "projects": "Жилые комплексы",
+      "blog": "Блог",
+      "knowledge": "База знаний",
+      "translations": "Переводы",
+      "services": "Услуги",
+      "media": "Медиа",
+      "agencies": "Агентства",
+      "agents": "Агенты и отзывы",
+      "publicAmenities": "Городская инфраструктура",
+      "aiAssistant": "ИИ-помощник",
+      "partners": "Партнёры",
+      "serp": "SERP и SEO",
+      "redirects": "Переадресации",
+      "analytics": "Аналитика трафика",
+      "leads": "Заявки",
+      "reservations": "Бронирования",
+      "email": "Корпоративная почта",
+      "users": "Пользователи",
+      "accounts": "Аккаунты",
+      "security": "Безопасность",
+      "audit": "Журнал аудита",
+      "profile": "Мой профиль",
+      "settings": "Настройки"
+    }
+  },
+  "actions": {
+    "save": "Сохранить",
+    "saving": "Сохранение…",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "add": "Добавить",
+    "back": "Назад",
+    "close": "Закрыть",
+    "confirm": "Подтвердить",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "reset": "Сбросить",
+    "apply": "Применить",
+    "view": "Открыть",
+    "duplicate": "Дублировать",
+    "restore": "Восстановить",
+    "export": "Экспорт",
+    "refresh": "Обновить",
+    "more": "Ещё"
+  },
+  "state": {
+    "empty": "Нет данных",
+    "loading": "Загрузка…",
+    "error": "Произошла ошибка",
+    "saved": "Сохранено",
+    "deleted": "Удалено",
+    "required": "Это поле обязательно",
+    "unsavedChanges": "Есть несохранённые изменения"
+  },
+  "pagination": {
+    "previous": "Назад",
+    "next": "Вперёд",
+    "page": "Страница {current} из {total}",
+    "total": "{count, plural, one {# запись} few {# записи} many {# записей} other {# записей}}"
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "description": "Общее состояние сайта, последние заявки и активность по контенту.",
+    "newProperty": "Новый объект",
+    "writePost": "Написать статью",
+    "alerts": {
+      "pendingProperties": "{count, plural, one {# объявление ожидает одобрения} few {# объявления ожидают одобрения} many {# объявлений ожидают одобрения} other {# объявлений ожидают одобрения}}",
+      "unverifiedAgencies": "{count, plural, one {# агентство ожидает подтверждения} few {# агентства ожидают подтверждения} many {# агентств ожидают подтверждения} other {# агентств ожидают подтверждения}}",
+      "lockedUsers": "{count, plural, one {# аккаунт сотрудника заблокирован} few {# аккаунта сотрудников заблокированы} many {# аккаунтов сотрудников заблокированы} other {# аккаунтов сотрудников заблокированы}}"
+    },
+    "stats": {
+      "activeProperties": "Активные объекты",
+      "activePropertiesHint": "{count, plural, one {# черновик ожидает} few {# черновика ожидают} many {# черновиков ожидают} other {# черновиков ожидают}}",
+      "newLeads": "Новые заявки",
+      "newLeadsHint": "{count, plural, one {всего # заявка} few {всего # заявки} many {всего # заявок} other {всего # заявок}}",
+      "activeProjects": "Активные комплексы",
+      "activeProjectsHint": "Идёт строительство",
+      "publishedPosts": "Опубликованные записи",
+      "publishedPostsHint": "Статьи, видимые в блоге"
+    },
+    "recentLeads": {
+      "title": "Последние заявки",
+      "description": "Пять последних заявок",
+      "viewAll": "Все",
+      "empty": "Заявок пока нет.",
+      "customer": "Клиент",
+      "source": "Источник",
+      "status": "Статус",
+      "time": "Время"
+    },
+    "recentProperties": {
+      "title": "Недавно обновлённые объекты",
+      "viewAll": "Все",
+      "empty": "Объекты пока не добавлены."
+    },
+    "topViewed": {
+      "title": "Самые просматриваемые объявления",
+      "description": "По количеству просмотров",
+      "empty": "Просмотры пока не зафиксированы."
+    },
+    "leadBreakdown": {
+      "title": "Заявки по статусам",
+      "description": "Количество по статусу",
+      "empty": "Заявок пока нет."
+    },
+    "quickActions": {
+      "newProperty": "Новое объявление",
+      "newProject": "Новый комплекс",
+      "newPost": "Новая статья",
+      "viewLeads": "Смотреть заявки"
+    }
+  },
+  "labels": {
+    "accountType": {
+      "STAFF": "Сотрудник компании",
+      "USER": "Пользователь",
+      "OWNER": "Собственник",
+      "AGENCY": "Агентство"
+    },
+    "agencyEmployeeRole": {
+      "MANAGER": "Менеджер",
+      "AGENT": "Агент"
+    },
+    "agencyEmployeeStatus": {
+      "PENDING": "Ожидает подтверждения",
+      "APPROVED": "Подтверждён",
+      "REJECTED": "Отклонён"
+    },
+    "buildingType": {
+      "NEW": "Новостройка",
+      "OLD": "Старый фонд"
+    },
+    "currency": {
+      "AZN": "AZN (₼)",
+      "USD": "USD ($)",
+      "EUR": "EUR (€)"
+    },
+    "documentStatus": {
+      "TITLE_DEED": "Купчая (выписка)",
+      "CONTRACT": "Договор",
+      "MUNICIPAL": "Муниципальный документ",
+      "DECREE": "Распоряжение",
+      "POWER_OF_ATTORNEY": "Доверенность",
+      "EXTRACT_COMMERCIAL": "Выписка (нежилое)",
+      "NONE": "Без купчей"
+    },
+    "faqCategory": {
+      "PURCHASE": "Покупка",
+      "RENT": "Аренда",
+      "RESERVATION": "Бронирование",
+      "AGENCY": "Агентство",
+      "PAYMENT": "Оплата",
+      "LEGAL": "Юридические вопросы",
+      "PLATFORM": "Платформа"
+    },
+    "featureGroup": {
+      "GENERAL": "Общее",
+      "UTILITY": "Коммунальные услуги",
+      "PAYMENT": "Условия оплаты",
+      "INDOOR": "Внутри",
+      "OUTDOOR": "Снаружи",
+      "SECURITY": "Безопасность"
+    },
+    "knowledgeAudience": {
+      "BUYER": "Покупатель",
+      "SELLER": "Продавец",
+      "RENTER": "Арендатор",
+      "LANDLORD": "Арендодатель",
+      "INVESTOR": "Инвестор"
+    },
+    "knowledgeLevel": {
+      "BEGINNER": "Начальный",
+      "INTERMEDIATE": "Средний",
+      "ADVANCED": "Продвинутый"
+    },
+    "knowledgeRiskLevel": {
+      "GREEN": "Основные документы в порядке",
+      "YELLOW": "Требуется дополнительная проверка",
+      "RED": "Серьёзный юридический риск",
+      "LEGAL_REVIEW": "Требуется юридическое заключение"
+    },
+    "knowledgeStatus": {
+      "DRAFT": "Черновик",
+      "PUBLISHED": "Опубликовано"
+    },
+    "leadSource": {
+      "PROPERTY": "Страница объекта",
+      "CONTACT": "Страница контактов",
+      "SERVICE": "Страница услуги",
+      "PROJECT": "Страница комплекса"
+    },
+    "leadStatus": {
+      "NEW": "Новая",
+      "CONTACTED": "Связались",
+      "IN_PROGRESS": "В работе",
+      "COMPLETED": "Завершена",
+      "CLOSED": "Закрыта"
+    },
+    "legalContentStatus": {
+      "CURRENT": "Действующая норма",
+      "PROPOSAL": "Предложение / инициатива",
+      "MIXED": "Действующая норма + предложение"
+    },
+    "listingType": {
+      "SALE": "Продажа",
+      "RENT": "Аренда"
+    },
+    "locale": {
+      "az": "Azərbaycan",
+      "en": "English",
+      "ru": "Русский"
+    },
+    "nearbyPlaceCategory": {
+      "METRO": "Метро",
+      "BUS": "Автобусная остановка",
+      "SCHOOL": "Школа",
+      "UNIVERSITY": "Университет",
+      "KINDERGARTEN": "Детский сад",
+      "HOSPITAL": "Больница",
+      "CLINIC": "Клиника",
+      "PHARMACY": "Аптека",
+      "SUPERMARKET": "Супермаркет",
+      "RESTAURANT": "Ресторан",
+      "PARK": "Парк",
+      "SHOPPING_CENTER": "Торговый центр"
+    },
+    "notificationType": {
+      "SAVED_SEARCH_MATCH": "Объявление по сохранённому поиску",
+      "PRICE_DROP": "Снижение цены",
+      "RESERVATION_STATUS": "Статус бронирования",
+      "RECOMMENDATION": "Персональная рекомендация",
+      "MEETING_REMINDER": "Напоминание о просмотре"
+    },
+    "partnershipType": {
+      "BROKER": "Брокер",
+      "REAL_ESTATE_AGENCY": "Агентство недвижимости",
+      "DEVELOPER": "Застройщик",
+      "CONSTRUCTION_COMPANY": "Строительная компания",
+      "INVESTMENT": "Инвестиции",
+      "BANK": "Банк",
+      "MORTGAGE": "Ипотека",
+      "INSURANCE": "Страхование",
+      "TECHNOLOGY": "Технологии",
+      "MEDIA": "Медиа",
+      "MARKETING": "Маркетинг",
+      "SERVICE_PROVIDER": "Поставщик услуг",
+      "STRATEGIC_PARTNER": "Стратегический партнёр",
+      "OTHER": "Другое"
+    },
+    "partnerRelationRole": {
+      "SOURCE": "Источник",
+      "BROKER": "Брокер",
+      "CO_BROKER": "Со-брокер",
+      "DEVELOPER": "Застройщик",
+      "EXCLUSIVE_SALES": "Эксклюзивные продажи",
+      "SALES_PARTNER": "Партнёр по продажам",
+      "MARKETING_PARTNER": "Партнёр по маркетингу",
+      "MANAGEMENT_PARTNER": "Партнёр по управлению",
+      "OTHER": "Другое"
+    },
+    "partnerStatus": {
+      "DRAFT": "Черновик",
+      "PENDING": "Ожидает",
+      "ACTIVE": "Активен",
+      "SUSPENDED": "Приостановлен",
+      "EXPIRED": "Истёк",
+      "TERMINATED": "Расторгнут",
+      "ARCHIVED": "Архив"
+    },
+    "postStatus": {
+      "DRAFT": "Черновик",
+      "PUBLISHED": "Опубликовано",
+      "ARCHIVED": "Архив"
+    },
+    "pricePeriod": {
+      "MONTH": "месяц",
+      "DAY": "день"
+    },
+    "projectImageCategory": {
+      "EXTERIOR": "Экстерьер",
+      "INTERIOR": "Интерьер",
+      "CONSTRUCTION": "Строительство",
+      "LANDSCAPE": "Ландшафт"
+    },
+    "projectStatus": {
+      "PLANNED": "Планируется",
+      "ONGOING": "Строится",
+      "COMPLETED": "Завершён"
+    },
+    "projectType": {
+      "RESIDENTIAL": "Жилой комплекс",
+      "COMMERCIAL": "Коммерческий комплекс",
+      "VILLA": "Комплекс вилл",
+      "MIXED": "Смешанного назначения"
+    },
+    "propertyStatus": {
+      "DRAFT": "Черновик",
+      "PENDING": "Ожидает подтверждения",
+      "PUBLISHED": "Опубликовано",
+      "RESERVED": "Забронировано",
+      "SOLD": "Продано",
+      "RENTED": "Сдано",
+      "ARCHIVED": "Архив"
+    },
+    "renovation": {
+      "NEW_BUILDING": "Новостройка",
+      "DESIGNER": "Дизайнерский ремонт",
+      "RENOVATED": "Отличный ремонт",
+      "COSMETIC": "Косметический ремонт",
+      "UNRENOVATED": "Без ремонта"
+    },
+    "reservationStatus": {
+      "REQUESTED": "Запрос отправлен",
+      "PENDING": "На рассмотрении",
+      "APPROVED": "Подтверждено",
+      "REJECTED": "Отклонено",
+      "CANCELLED": "Отменено",
+      "EXPIRED": "Истекло",
+      "COMPLETED": "Завершено"
+    },
+    "reviewStatus": {
+      "PENDING": "Ожидает модерации",
+      "APPROVED": "Одобрен",
+      "REJECTED": "Отклонён",
+      "HIDDEN": "Скрыт"
+    },
+    "role": {
+      "SUPER_ADMIN": "Супер-админ",
+      "ADMIN": "Админ",
+      "EDITOR": "Редактор"
+    },
+    "translationStatus": {
+      "DRAFT": "Черновик",
+      "READY": "Готов к проверке",
+      "PUBLISHED": "Опубликовано"
+    }
+  },
+  "profile": {
+    "title": "Мой профиль",
+    "description": "Личные данные, язык панели и настройки безопасности.",
+    "submit": "Сохранить профиль",
+    "section": "Личные данные",
+    "sectionHint": "Имя, контакты и оформление, отображаемые в панели.",
+    "name": "Имя и фамилия",
+    "phone": "Телефон",
+    "language": "Язык панели",
+    "languageHint": "Все тексты панели отображаются на выбранном языке.",
+    "theme": "Оформление",
+    "themeLight": "Светлое",
+    "themeDark": "Тёмное",
+    "themeSystem": "Как на устройстве",
+    "themeHint": "Новые пользователи начинают со светлой темы; её можно изменить в любой момент.",
+    "avatar": "Фото профиля"
+  }
+}

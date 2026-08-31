@@ -1,0 +1,383 @@
+{
+  "shell": {
+    "title": "İdarə paneli",
+    "titleTemplate": "%s | Luxe Home Estate idarə paneli",
+    "brandSubtitle": "İDARƏ PANELİ",
+    "menuTitle": "İdarə paneli menyusu",
+    "openMenu": "Menyunu aç",
+    "navLabel": "Admin naviqasiyası",
+    "openSite": "Saytı aç",
+    "signOut": "Çıxış",
+    "ownedBy": "Sahibi: {name}",
+    "languageLabel": "Panel dili",
+    "languageChanged": "Panel dili yeniləndi"
+  },
+  "nav": {
+    "groups": {
+      "general": "Ümumi",
+      "content": "Kontent",
+      "sales": "Satış",
+      "system": "Sistem"
+    },
+    "items": {
+      "dashboard": "İdarə paneli",
+      "properties": "Əmlaklar",
+      "moderation": "Moderasiya",
+      "taxonomy": "Taksonomiya",
+      "projects": "Layihələr",
+      "blog": "Bloq",
+      "knowledge": "Bilik Mərkəzi",
+      "translations": "Tərcümələr",
+      "services": "Xidmətlər",
+      "media": "Media",
+      "agencies": "Agentliklər",
+      "agents": "Agentlər və rəylər",
+      "publicAmenities": "İctimai imkanlar",
+      "aiAssistant": "AI köməkçi",
+      "partners": "Tərəfdaşlar",
+      "serp": "SERP və SEO",
+      "redirects": "Yönləndirmələr",
+      "analytics": "Trafik analitikası",
+      "leads": "Müraciətlər",
+      "reservations": "Rezervasiyalar",
+      "email": "Korporativ e-poçt",
+      "users": "İstifadəçilər",
+      "accounts": "Hesablar",
+      "security": "Təhlükəsizlik",
+      "audit": "Audit jurnalı",
+      "profile": "Hesabım",
+      "settings": "Parametrlər"
+    }
+  },
+  "actions": {
+    "save": "Yadda saxla",
+    "saving": "Saxlanılır…",
+    "cancel": "Ləğv et",
+    "delete": "Sil",
+    "edit": "Redaktə et",
+    "create": "Yarat",
+    "add": "Əlavə et",
+    "back": "Geri",
+    "close": "Bağla",
+    "confirm": "Təsdiqlə",
+    "search": "Axtar",
+    "filter": "Filtr",
+    "reset": "Sıfırla",
+    "apply": "Tətbiq et",
+    "view": "Bax",
+    "duplicate": "Nüsxələ",
+    "restore": "Bərpa et",
+    "export": "İxrac et",
+    "refresh": "Yenilə",
+    "more": "Daha çox"
+  },
+  "state": {
+    "empty": "Məlumat yoxdur",
+    "loading": "Yüklənir…",
+    "error": "Xəta baş verdi",
+    "saved": "Yadda saxlanıldı",
+    "deleted": "Silindi",
+    "required": "Bu sahə mütləqdir",
+    "unsavedChanges": "Yadda saxlanmamış dəyişikliklər var"
+  },
+  "pagination": {
+    "previous": "Əvvəlki",
+    "next": "Növbəti",
+    "page": "Səhifə {current} / {total}",
+    "total": "{count, plural, one {# qeyd} other {# qeyd}}"
+  },
+  "dashboard": {
+    "title": "İdarə paneli",
+    "description": "Saytın ümumi vəziyyəti, son müraciətlər və kontent fəaliyyəti.",
+    "newProperty": "Yeni əmlak",
+    "writePost": "Məqalə yaz",
+    "alerts": {
+      "pendingProperties": "{count, plural, other {# elan təsdiq gözləyir}}",
+      "unverifiedAgencies": "{count, plural, other {# agentlik təsdiq gözləyir}}",
+      "lockedUsers": "{count, plural, other {# əməkdaş hesabı kilidli}}"
+    },
+    "stats": {
+      "activeProperties": "Aktiv əmlaklar",
+      "activePropertiesHint": "{count, plural, other {# qaralama gözləyir}}",
+      "newLeads": "Yeni müraciətlər",
+      "newLeadsHint": "{count, plural, other {Ümumi # müraciət}}",
+      "activeProjects": "Aktiv layihələr",
+      "activeProjectsHint": "Davam edən tikintilər",
+      "publishedPosts": "Dərc edilmiş yazılar",
+      "publishedPostsHint": "Bloqda görünən məqalələr"
+    },
+    "recentLeads": {
+      "title": "Son müraciətlər",
+      "description": "Ən son gələn beş müraciət",
+      "viewAll": "Hamısı",
+      "empty": "Hələ müraciət yoxdur.",
+      "customer": "Müştəri",
+      "source": "Mənbə",
+      "status": "Status",
+      "time": "Vaxt"
+    },
+    "recentProperties": {
+      "title": "Son yenilənən əmlaklar",
+      "viewAll": "Hamısı",
+      "empty": "Hələ əmlak əlavə edilməyib."
+    },
+    "topViewed": {
+      "title": "Ən çox baxılan elanlar",
+      "description": "Baxış sayına görə",
+      "empty": "Hələ baxış qeydə alınmayıb."
+    },
+    "leadBreakdown": {
+      "title": "Müraciətlər üzrə bölgü",
+      "description": "Status üzrə say",
+      "empty": "Hələ müraciət yoxdur."
+    },
+    "quickActions": {
+      "newProperty": "Yeni əmlak elanı",
+      "newProject": "Yeni layihə",
+      "newPost": "Yeni məqalə",
+      "viewLeads": "Müraciətlərə bax"
+    }
+  },
+  "labels": {
+    "accountType": {
+      "STAFF": "Şirkət əməkdaşı",
+      "USER": "İstifadəçi",
+      "OWNER": "Mülk sahibi",
+      "AGENCY": "Agentlik"
+    },
+    "agencyEmployeeRole": {
+      "MANAGER": "Menecer",
+      "AGENT": "Agent"
+    },
+    "agencyEmployeeStatus": {
+      "PENDING": "Təsdiq gözləyir",
+      "APPROVED": "Təsdiqləndi",
+      "REJECTED": "Rədd edildi"
+    },
+    "buildingType": {
+      "NEW": "Yeni tikili",
+      "OLD": "Köhnə tikili"
+    },
+    "currency": {
+      "AZN": "AZN (₼)",
+      "USD": "USD ($)",
+      "EUR": "EUR (€)"
+    },
+    "documentStatus": {
+      "TITLE_DEED": "Kupça (Çıxarış)",
+      "CONTRACT": "Müqavilə",
+      "MUNICIPAL": "Bələdiyyə sənədi",
+      "DECREE": "Sərəncam",
+      "POWER_OF_ATTORNEY": "Etibarnamə",
+      "EXTRACT_COMMERCIAL": "Çıxarış (qeyri-yaşayış)",
+      "NONE": "Kupçasız"
+    },
+    "faqCategory": {
+      "PURCHASE": "Alış",
+      "RENT": "Kirayə",
+      "RESERVATION": "Rezervasiya",
+      "AGENCY": "Agentlik",
+      "PAYMENT": "Ödəniş",
+      "LEGAL": "Hüquqi",
+      "PLATFORM": "Platforma"
+    },
+    "featureGroup": {
+      "GENERAL": "Ümumi",
+      "UTILITY": "Kommunal",
+      "PAYMENT": "Ödəniş şərtləri",
+      "INDOOR": "Daxili",
+      "OUTDOOR": "Xarici",
+      "SECURITY": "Təhlükəsizlik"
+    },
+    "knowledgeAudience": {
+      "BUYER": "Alıcı",
+      "SELLER": "Satıcı",
+      "RENTER": "Kirayəçi",
+      "LANDLORD": "Ev sahibi",
+      "INVESTOR": "İnvestor"
+    },
+    "knowledgeLevel": {
+      "BEGINNER": "Başlanğıc",
+      "INTERMEDIATE": "Orta",
+      "ADVANCED": "Dərin"
+    },
+    "knowledgeRiskLevel": {
+      "GREEN": "Əsas sənədlər qaydasındadır",
+      "YELLOW": "Əlavə yoxlama tələb olunur",
+      "RED": "Ciddi hüquqi risk",
+      "LEGAL_REVIEW": "Hüquqi rəy tələb olunur"
+    },
+    "knowledgeStatus": {
+      "DRAFT": "Qaralama",
+      "PUBLISHED": "Dərc edilib"
+    },
+    "leadSource": {
+      "PROPERTY": "Əmlak səhifəsi",
+      "CONTACT": "Əlaqə səhifəsi",
+      "SERVICE": "Xidmət səhifəsi",
+      "PROJECT": "Layihə səhifəsi"
+    },
+    "leadStatus": {
+      "NEW": "Yeni",
+      "CONTACTED": "Əlaqə saxlanılıb",
+      "IN_PROGRESS": "İşlənir",
+      "COMPLETED": "Tamamlanıb",
+      "CLOSED": "Bağlanıb"
+    },
+    "legalContentStatus": {
+      "CURRENT": "Qüvvədə olan norma",
+      "PROPOSAL": "Təklif / təşəbbüs",
+      "MIXED": "Qüvvədə olan norma + təklif"
+    },
+    "listingType": {
+      "SALE": "Satılır",
+      "RENT": "Kirayə"
+    },
+    "locale": {
+      "az": "Azərbaycan",
+      "en": "English",
+      "ru": "Русский"
+    },
+    "nearbyPlaceCategory": {
+      "METRO": "Metro",
+      "BUS": "Avtobus dayanacağı",
+      "SCHOOL": "Məktəb",
+      "UNIVERSITY": "Universitet",
+      "KINDERGARTEN": "Uşaq bağçası",
+      "HOSPITAL": "Xəstəxana",
+      "CLINIC": "Klinika",
+      "PHARMACY": "Aptek",
+      "SUPERMARKET": "Supermarket",
+      "RESTAURANT": "Restoran",
+      "PARK": "Park",
+      "SHOPPING_CENTER": "Ticarət mərkəzi"
+    },
+    "notificationType": {
+      "SAVED_SEARCH_MATCH": "Saxlanmış axtarışa uyğun elan",
+      "PRICE_DROP": "Qiymət endirimi",
+      "RESERVATION_STATUS": "Rezervasiya statusu",
+      "RECOMMENDATION": "Fərdi tövsiyə",
+      "MEETING_REMINDER": "Görüş xatırlatması"
+    },
+    "partnershipType": {
+      "BROKER": "Broker",
+      "REAL_ESTATE_AGENCY": "Daşınmaz əmlak agentliyi",
+      "DEVELOPER": "Developer",
+      "CONSTRUCTION_COMPANY": "Tikinti şirkəti",
+      "INVESTMENT": "İnvestisiya",
+      "BANK": "Bank",
+      "MORTGAGE": "İpoteka",
+      "INSURANCE": "Sığorta",
+      "TECHNOLOGY": "Texnologiya",
+      "MEDIA": "Media",
+      "MARKETING": "Marketinq",
+      "SERVICE_PROVIDER": "Xidmət təminatçısı",
+      "STRATEGIC_PARTNER": "Strateji tərəfdaş",
+      "OTHER": "Digər"
+    },
+    "partnerRelationRole": {
+      "SOURCE": "Mənbə",
+      "BROKER": "Broker",
+      "CO_BROKER": "Ortaq broker",
+      "DEVELOPER": "Developer",
+      "EXCLUSIVE_SALES": "Eksklüziv satış",
+      "SALES_PARTNER": "Satış tərəfdaşı",
+      "MARKETING_PARTNER": "Marketinq tərəfdaşı",
+      "MANAGEMENT_PARTNER": "İdarəetmə tərəfdaşı",
+      "OTHER": "Digər"
+    },
+    "partnerStatus": {
+      "DRAFT": "Qaralama",
+      "PENDING": "Gözləyir",
+      "ACTIVE": "Aktiv",
+      "SUSPENDED": "Dayandırılıb",
+      "EXPIRED": "Müddəti bitib",
+      "TERMINATED": "Xitam verilib",
+      "ARCHIVED": "Arxiv"
+    },
+    "postStatus": {
+      "DRAFT": "Qaralama",
+      "PUBLISHED": "Dərc olunub",
+      "ARCHIVED": "Arxiv"
+    },
+    "pricePeriod": {
+      "MONTH": "ay",
+      "DAY": "gün"
+    },
+    "projectImageCategory": {
+      "EXTERIOR": "Eksteryer",
+      "INTERIOR": "İnteryer",
+      "CONSTRUCTION": "Tikinti",
+      "LANDSCAPE": "Landşaft"
+    },
+    "projectStatus": {
+      "PLANNED": "Planlaşdırılır",
+      "ONGOING": "Davam edir",
+      "COMPLETED": "Tamamlanıb"
+    },
+    "projectType": {
+      "RESIDENTIAL": "Yaşayış layihəsi",
+      "COMMERCIAL": "Kommersiya layihəsi",
+      "VILLA": "Villa layihəsi",
+      "MIXED": "Qarışıq təyinatlı"
+    },
+    "propertyStatus": {
+      "DRAFT": "Qaralama",
+      "PENDING": "Təsdiq gözləyir",
+      "PUBLISHED": "Dərc olunub",
+      "RESERVED": "Beh alınıb",
+      "SOLD": "Satılıb",
+      "RENTED": "Kirayə verilib",
+      "ARCHIVED": "Arxiv"
+    },
+    "renovation": {
+      "NEW_BUILDING": "Yeni tikili",
+      "DESIGNER": "Dizayner təmiri",
+      "RENOVATED": "Əla təmirli",
+      "COSMETIC": "Kosmetik təmir",
+      "UNRENOVATED": "Təmirsiz"
+    },
+    "reservationStatus": {
+      "REQUESTED": "Sorğu göndərilib",
+      "PENDING": "Baxılır",
+      "APPROVED": "Təsdiqlənib",
+      "REJECTED": "Rədd edilib",
+      "CANCELLED": "Ləğv edilib",
+      "EXPIRED": "Müddəti bitib",
+      "COMPLETED": "Tamamlanıb"
+    },
+    "reviewStatus": {
+      "PENDING": "Moderasiya gözləyir",
+      "APPROVED": "Təsdiqlənib",
+      "REJECTED": "Rədd edilib",
+      "HIDDEN": "Gizlədilib"
+    },
+    "role": {
+      "SUPER_ADMIN": "Super Admin",
+      "ADMIN": "Admin",
+      "EDITOR": "Redaktor"
+    },
+    "translationStatus": {
+      "DRAFT": "Qaralama",
+      "READY": "Yoxlamaya hazır",
+      "PUBLISHED": "Dərc edilib"
+    }
+  },
+  "profile": {
+    "title": "Hesabım",
+    "description": "Şəxsi məlumatlar, panel dili və təhlükəsizlik parametrləri.",
+    "submit": "Profili saxla",
+    "section": "Şəxsi məlumatlar",
+    "sectionHint": "Paneldə görünən ad, əlaqə və fərdi görünüş seçimi.",
+    "name": "Ad və soyad",
+    "phone": "Telefon",
+    "language": "Panel dili",
+    "languageHint": "Panelin bütün mətnləri seçilmiş dildə göstərilir.",
+    "theme": "Görünüş",
+    "themeLight": "Açıq",
+    "themeDark": "Tünd",
+    "themeSystem": "Cihaz ayarı",
+    "themeHint": "Sistem yeni istifadəçilər üçün açıq tema ilə başlayır; istədiyiniz vaxt dəyişə bilərsiniz.",
+    "avatar": "Profil şəkli"
+  }
+}

@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ExternalLink, LogOut, Menu } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
-import { ROLE_LABELS } from "@/lib/constants";
 import type { AuthUser } from "@/lib/auth/types";
 import { signOut } from "@/app/[locale]/giris/actions";
 import { adminNav } from "./admin-nav";
@@ -38,6 +38,7 @@ function initials(name: string): string {
 }
 
 export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
+  const t = useTranslations("admin");
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -54,7 +55,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
       <Overlay
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        title="İdarə paneli menyusu"
+        title={t("shell.menuTitle")}
         placement="left"
         className="w-[min(20rem,88vw)] lg:hidden"
       >
@@ -72,7 +73,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            aria-label="Menyunu aç"
+            aria-label={t("shell.openMenu")}
             aria-haspopup="dialog"
             aria-expanded={drawerOpen}
             className="inline-flex size-11 cursor-pointer items-center justify-center rounded-xs text-ink transition-colors hover:bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:hidden"
@@ -83,7 +84,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
           <div className="ml-auto flex items-center gap-2">
             <Link href="/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xs px-3 text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink">
               <ExternalLink className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Saytı aç</span>
+              <span className="hidden sm:inline">{t("shell.openSite")}</span>
             </Link>
             <div className="hidden h-8 w-px bg-line sm:block" aria-hidden="true" />
             <div className="flex min-w-0 items-center gap-3 pl-1">
@@ -96,7 +97,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
               )}
               <div className="hidden min-w-0 leading-tight sm:block">
                 <p className="max-w-48 truncate text-sm font-medium text-ink">{user.name}</p>
-                <p className="text-xs text-ink-muted">{ROLE_LABELS[user.role]}</p>
+                <p className="text-xs text-ink-muted">{t(`labels.role.${user.role}`)}</p>
               </div>
             </div>
           </div>
@@ -109,6 +110,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
 }
 
 function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarContentProps) {
+  const t = useTranslations("admin");
   const dark = tone === "dark";
 
   return (
@@ -118,15 +120,15 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
           <Image src="/logo-mark.png" alt="" width={512} height={512} className="size-9 shrink-0" />
           <span className="min-w-0">
             <span className="block truncate font-display text-sm tracking-[0.14em]">LUXE HOME ESTATE</span>
-            <span className={cn("mt-1 block text-[10px] tracking-[0.2em]", dark ? "text-gold-soft" : "text-gold-deep")}>İDARƏ PANELİ</span>
+            <span className={cn("mt-1 block text-[10px] tracking-[0.2em]", dark ? "text-gold-soft" : "text-gold-deep")}>{t("shell.brandSubtitle")}</span>
           </span>
         </Link>
       </div>
 
-      <nav aria-label="Admin naviqasiyası" className="min-h-0 flex-1 overflow-y-auto px-3 py-5">
+      <nav aria-label={t("shell.navLabel")} className="min-h-0 flex-1 overflow-y-auto px-3 py-5">
         {adminNav.map((group) => (
-          <div key={group.title} className="mb-6 last:mb-0">
-            <p className={cn("px-3 pb-2 text-[11px] font-semibold tracking-[0.16em] uppercase", dark ? "text-white/45" : "text-ink-muted")}>{group.title}</p>
+          <div key={group.titleKey} className="mb-6 last:mb-0">
+            <p className={cn("px-3 pb-2 text-[11px] font-semibold tracking-[0.16em] uppercase", dark ? "text-white/45" : "text-ink-muted")}>{t(`nav.groups.${group.titleKey}`)}</p>
             <ul className="flex flex-col gap-0.5">
               {group.items.map((item) => {
                 const isActive = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
@@ -146,7 +148,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
                       )}
                     >
                       <AdminIcon name={item.icon} className="size-4.5 shrink-0" />
-                      <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                      <span className="min-w-0 flex-1 truncate">{t(`nav.items.${item.labelKey}`)}</span>
                       {badge ? <span className="inline-flex min-w-6 justify-center rounded-full bg-gold px-1.5 py-0.5 text-[11px] font-semibold text-ink tabular-nums">{badge}</span> : null}
                     </Link>
                   </li>
@@ -165,11 +167,11 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
         <form action={signOut}>
           <button type="submit" className={cn("flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-xs px-3 text-sm transition-colors", dark ? "text-white/75 hover:bg-white/8 hover:text-white" : "text-ink-soft hover:bg-danger-bg hover:text-danger")}>
             <LogOut className="size-4.5 shrink-0" aria-hidden="true" />
-            Çıxış
+            {t("shell.signOut")}
           </button>
         </form>
         <p className={cn("px-3 pt-3 text-[11px] leading-relaxed", dark ? "text-white/40" : "text-ink-muted")}>
-          {siteConfig.legalName}<br />Sahibi: {siteConfig.owner.name}
+          {siteConfig.legalName}<br />{t("shell.ownedBy", { name: siteConfig.owner.name })}
         </p>
       </div>
     </div>
