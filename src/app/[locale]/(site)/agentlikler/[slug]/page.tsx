@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { PageHeader } from "@/components/ui/page-header";
 import { PropertyCard } from "@/components/site/property-card";
-import { agencySchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
+import { agencySchema, buildManagedMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getAgencyBySlug } from "@/lib/queries";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { TrackedAnchor } from "@/components/analytics/analytics-event";
@@ -29,12 +29,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) notFound();
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: data.agency.name,
     description: data.agency.description || t("agencyFallback", { name: data.agency.name }),
     path: `/agentlikler/${data.agency.slug}`,
     image: data.agency.logoUrl ?? undefined,
     locale: locale as Locale,
+    managedEntity: { type: "AGENCY", id: data.agency.id },
   });
 }
 

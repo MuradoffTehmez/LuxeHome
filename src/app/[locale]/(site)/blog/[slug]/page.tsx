@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { PostCard } from "@/components/site/post-card";
 import { ArticleTrustMeta } from "@/components/site/article-trust-meta";
-import { articleSchema, buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
+import { articleSchema, buildManagedMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getRelatedPosts } from "@/lib/queries";
 import { getCachedPostBySlug } from "@/lib/public-cache";
 import { recordView } from "@/lib/view-counter";
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.BLOG_POST, sourcePost.id, locale as Locale),
   );
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: post.metaTitle || post.title,
     description: post.metaDescription || post.excerpt,
     path: `/blog/${post.slug}`,
@@ -48,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogDescription: post.ogDescription,
     ogImage: post.ogImage,
     locale: locale as Locale,
+    managedEntity: { type: TRANSLATION_ENTITY_TYPES.BLOG_POST, id: sourcePost.id },
   });
 }
 

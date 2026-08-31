@@ -9,7 +9,7 @@ import { PublicDetailLayout } from "@/components/ui/public-detail-layout";
 import { ServiceIcon } from "@/components/site/service-icon";
 import { ButtonAnchor } from "@/components/ui/button";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
-import { buildMetadata, jsonLd, serviceSchema, breadcrumbSchema } from "@/lib/seo";
+import { buildManagedMetadata, jsonLd, serviceSchema, breadcrumbSchema } from "@/lib/seo";
 import { getCachedServiceBySlug } from "@/lib/public-cache";
 import { siteConfig } from "@/config/site";
 import { isUnoptimizedImage } from "@/lib/utils";
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.SERVICE, sourceService.id, locale as Locale),
   );
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: service.metaTitle || service.title,
     description: service.metaDescription || service.shortDescription,
     path: `/xidmetler/${service.slug}`,
@@ -50,6 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogDescription: service.ogDescription,
     ogImage: service.ogImage,
     locale: locale as Locale,
+    managedEntity: { type: TRANSLATION_ENTITY_TYPES.SERVICE, id: sourceService.id },
   });
 }
 

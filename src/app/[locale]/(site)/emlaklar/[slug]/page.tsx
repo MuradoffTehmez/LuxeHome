@@ -29,7 +29,7 @@ import {
 import { getPropertyPartners, getSimilarProperties } from "@/lib/queries";
 import { getCachedPropertyBySlug } from "@/lib/public-cache";
 import { recordView } from "@/lib/view-counter";
-import { buildMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
+import { buildManagedMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
 
@@ -96,24 +96,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const image = property.images[0]?.url || null;
   const isClosed = property.status === "SOLD" || property.status === "RENTED";
+  const retainedForIndex = isClosed && property.retentionUntil != null && property.retentionUntil.getTime() >= Date.now();
 
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
     .join(", ");
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: property.metaTitle || `${property.title} | ${location}`,
     description: property.metaDescription || truncateAtWord(property.description, 160),
     path: `/emlaklar/${property.slug}`,
     image,
     type: "website",
     publishedTime: toIsoDateTime(property.publishedAt),
-    indexPolicy: property.noIndex || isClosed ? "noindex-follow" : "index",
+    indexPolicy: property.noIndex || (isClosed && !retainedForIndex) ? "noindex-follow" : "index",
     canonicalPath: property.canonicalUrl || undefined,
     ogTitle: property.ogTitle,
     ogDescription: property.ogDescription,
     ogImage: property.ogImage,
     locale: locale as Locale,
+    managedEntity: { type: TRANSLATION_ENTITY_TYPES.PROPERTY, id: sourceProperty.id },
   });
 }
 
@@ -209,7 +211,12 @@ export default async function PropertyDetailPage({ params }: Props) {
             price: property.price,
             currency: property.currency,
             listingType: property.listingType,
-            images: property.images.map((img) => img.url),
+            images: property.images.map((img) => ({
+              url: img.url,
+              width: img.width,
+              height: img.height,
+              caption: img.caption || img.alt,
+            })),
             city: property.city.name,
             district: property.district?.name,
             address: property.address,
@@ -220,6 +227,12 @@ export default async function PropertyDetailPage({ params }: Props) {
             bedrooms: property.bedrooms,
             bathrooms: property.bathrooms,
             status: property.status,
+            propertyType: property.type.name,
+            agent: property.assignedAgent ? {
+              name: property.assignedAgent.name,
+              slug: property.assignedAgent.slug,
+              agency: property.assignedAgent.agency,
+            } : null,
           }, locale as Locale),
         )}
       />

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { MessageCircle, Phone, Star, UserRound } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { buildMetadata } from "@/lib/seo";
+import { agentSchema, buildManagedMetadata, jsonLd } from "@/lib/seo";
 import { getPublicAgentBySlug } from "@/lib/phase2";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { Container, Section } from "@/components/ui/container";
@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PropertyCard } from "@/components/site/property-card";
 import type { Locale } from "@/lib/constants";
 import { AgentReviewForm } from "./review-form";
+import { TrackedAnchor } from "@/components/analytics/analytics-event";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +23,13 @@ export async function generateMetadata({ params }: Props) {
   const { locale, slug } = await params;
   const agent = await getPublicAgentBySlug(slug);
   if (!agent) notFound();
-  return buildMetadata({
+  return buildManagedMetadata({
     title: agent.name,
     description: agent.bio || agent.specialization || agent.roleTitle || agent.name,
     path: `/agentler/${agent.slug}`,
     image: agent.avatarUrl || undefined,
     locale: locale as Locale,
+    managedEntity: { type: "AGENT", id: agent.id },
   });
 }
 
@@ -39,9 +41,27 @@ export default async function AgentPage({ params }: Props) {
   const rating = agent.reviews.length
     ? agent.reviews.reduce((sum, review) => sum + review.rating, 0) / agent.reviews.length
     : null;
+  const stringList = (value: string) => {
+    try { const parsed: unknown = JSON.parse(value); return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : []; }
+    catch { return []; }
+  };
 
   return (
     <>
+      <script {...jsonLd(agentSchema({
+        name: agent.name,
+        slug: agent.slug,
+        roleTitle: agent.roleTitle,
+        bio: agent.bio,
+        avatarUrl: agent.avatarUrl,
+        phone: agent.phone,
+        email: agent.email,
+        languages: stringList(agent.languages),
+        serviceAreas: stringList(agent.areas),
+        agency: agent.agency,
+        rating,
+        reviewCount: agent.reviews.length,
+      }, locale as Locale))} />
       <PageHeader
         compact
         eyebrow={agent.isVerified ? t("verified") : undefined}
@@ -70,8 +90,8 @@ export default async function AgentPage({ params }: Props) {
             </div>
             <aside className="rounded-md border border-line bg-paper p-5">
               <div className="flex flex-col gap-2 text-sm">
-                {agent.phone && <a href={`tel:${agent.phone}`} className="flex min-h-11 items-center gap-2 text-ink hover:text-gold-deep"><Phone className="size-4" aria-hidden="true" />{agent.phone}</a>}
-                {agent.whatsapp && <a href={`https://wa.me/${agent.whatsapp.replace(/\D/g, "")}`} className="flex min-h-11 items-center gap-2 text-ink hover:text-gold-deep"><MessageCircle className="size-4" aria-hidden="true" />WhatsApp</a>}
+                {agent.phone && <TrackedAnchor event="agent_contact" payload={{ content_id: agent.id, method: "phone" }} href={`tel:${agent.phone}`} className="flex min-h-11 items-center gap-2 text-ink hover:text-gold-deep"><Phone className="size-4" aria-hidden="true" />{agent.phone}</TrackedAnchor>}
+                {agent.whatsapp && <TrackedAnchor event="agent_contact" payload={{ content_id: agent.id, method: "whatsapp" }} href={`https://wa.me/${agent.whatsapp.replace(/\D/g, "")}`} className="flex min-h-11 items-center gap-2 text-ink hover:text-gold-deep"><MessageCircle className="size-4" aria-hidden="true" />WhatsApp</TrackedAnchor>}
                 {agent.agency && <Link href={`/agentlikler/${agent.agency.slug}`} className="min-h-11 py-3 text-ink hover:text-gold-deep">{agent.agency.name}</Link>}
               </div>
             </aside>

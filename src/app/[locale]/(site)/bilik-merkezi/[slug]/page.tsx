@@ -14,7 +14,7 @@ import { KnowledgeCard } from "@/components/site/knowledge-card";
 import { ArticleTrustMeta } from "@/components/site/article-trust-meta";
 import {
   breadcrumbSchema,
-  buildMetadata,
+  buildManagedMetadata,
   jsonLd,
   knowledgeArticleSchema,
 } from "@/lib/seo";
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = await loadArticle(slug, locale);
   if (!article) notFound();
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: article.metaTitle || article.title,
     description: article.metaDescription || article.excerpt,
     path: `/bilik-merkezi/${article.slug}`,
@@ -69,6 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogDescription: article.ogDescription,
     ogImage: article.ogImage,
     locale: locale as Locale,
+    managedEntity: { type: TRANSLATION_ENTITY_TYPES.KNOWLEDGE_ARTICLE, id: article.id },
   });
 }
 

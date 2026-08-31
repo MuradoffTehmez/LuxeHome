@@ -10,7 +10,7 @@ import { PublicDetailLayout } from "@/components/ui/public-detail-layout";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
-import { buildMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
+import { buildManagedMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getCachedProjectBySlug } from "@/lib/public-cache";
 import { getProjectPartners } from "@/lib/queries";
 import { PartnerRelations } from "@/components/site/partner-relations";
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROJECT, sourceProject.id, locale as Locale),
   );
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: project.metaTitle || project.name,
     description: project.metaDescription || project.summary || project.description,
     path: `/layiheler/${project.slug}`,
@@ -56,6 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogDescription: project.ogDescription,
     ogImage: project.ogImage,
     locale: locale as Locale,
+    managedEntity: { type: TRANSLATION_ENTITY_TYPES.PROJECT, id: sourceProject.id },
   });
 }
 
