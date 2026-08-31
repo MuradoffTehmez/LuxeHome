@@ -24,6 +24,7 @@ export function FavoriteButton({
   const label = isFavorite ? t("remove") : t("add");
   const handleToggle = () => {
     trackEvent(isFavorite ? "favorite_remove" : "favorite_add", { property_id: propertyId });
+    if (!isFavorite) trackEvent("saved_property", { property_id: propertyId });
     toggle();
   };
 

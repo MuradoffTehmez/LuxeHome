@@ -9,6 +9,7 @@ import { submitContactForm, type ContactFormState } from "./actions";
 import { trackEvent } from "@/lib/client-analytics";
 import { HONEYPOT_FIELD } from "@/lib/spam";
 import { TurnstileWidget } from "@/components/security/turnstile-widget";
+import { AttributionFields } from "@/components/analytics/attribution-fields";
 
 const initialState: ContactFormState = { success: false };
 
@@ -19,7 +20,10 @@ export function ContactForm() {
     initialState,
   );
   useEffect(() => {
-    if (state.success) trackEvent("contact_submit", { status: "success" });
+    if (state.success) {
+      trackEvent("contact_submit", { status: "success" });
+      trackEvent("form_submit", { status: "success", placement: "contact_form" });
+    }
   }, [state.success]);
 
   if (state.success) {
@@ -40,6 +44,7 @@ export function ContactForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
+      <AttributionFields />
       {/*
         Honeypot — ziyarətçi görmür, bot doldurur. Ekrandan kənara çıxarılır,
         `display: none` işlədilmir: botların bir hissəsi məhz həmin xassəyə görə

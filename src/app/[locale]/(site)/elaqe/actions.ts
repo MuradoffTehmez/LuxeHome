@@ -9,6 +9,7 @@ import { checkContactLimit, clientIp } from "@/lib/auth/rate-limit";
 import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
 import { z } from "zod";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
+import { readLeadAttribution } from "@/lib/lead-attribution";
 
 async function contactSchema() {
   let nameMin = "Ad ən azı 2 simvol olmalıdır";
@@ -122,6 +123,7 @@ export async function submitContactForm(
         message: result.data.message,
         source: "CONTACT",
         status: "NEW",
+        ...readLeadAttribution(formData),
       },
     });
 

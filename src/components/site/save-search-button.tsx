@@ -12,6 +12,7 @@ import { IDLE_STATE } from "@/lib/admin/action-state";
 import { SAVED_SEARCH_FREQUENCIES } from "@/lib/constants";
 import type { PropertyFilters } from "@/lib/queries";
 import { createSavedSearch } from "@/app/[locale]/(account)/kabinet/axtarislarim/actions";
+import { trackEvent } from "@/lib/client-analytics";
 
 type SavableFilters = Omit<PropertyFilters, "sort" | "page" | "pageSize">;
 
@@ -30,6 +31,7 @@ export function SaveSearchButton({ filters }: { filters: SavableFilters }) {
   useEffect(() => {
     if (state.status === "success") {
       toast(state.message ?? "", "success");
+      trackEvent("saved_search", { status: "success" });
       setOpen(false);
     }
   }, [state, toast]);

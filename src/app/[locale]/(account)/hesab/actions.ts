@@ -198,7 +198,7 @@ export async function registerAccount(
 
   const token = await issueEmailVerificationToken(userId);
   await sendAccountVerificationEmail(parsed.data.email, token, await getLocale());
-  redirect(localizePath("/hesab/e-poct-gonderildi", await getLocale() as Locale));
+  redirect(`${localizePath("/hesab/e-poct-gonderildi", await getLocale() as Locale)}?yeni=1`);
 }
 
 export async function signInAccount(
