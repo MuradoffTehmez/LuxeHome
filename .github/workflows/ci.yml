@@ -64,9 +64,6 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -87,12 +84,30 @@ jobs:
           npm --version
           npm ci
 
+      # Secret-ə düşən artıq boşluq/sətir sonu wrangler-i "Invalid account ID" ilə saxlayır,
+      # ona görə dəyərlər təmizlənir, formatı yoxlanılır və sonrakı step-lərə maskalanmış
+      # şəkildə ötürülür. Job səviyyəsində env yazılmır ki, GITHUB_ENV ilə ziddiyyət olmasın.
       - name: Verify Cloudflare credentials
         shell: bash
+        env:
+          RAW_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAW_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          : "${CLOUDFLARE_API_TOKEN:?CLOUDFLARE_API_TOKEN secret is not configured}"
-          : "${CLOUDFLARE_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID secret is not configured}"
+          : "${RAW_API_TOKEN:?CLOUDFLARE_API_TOKEN secret is not configured}"
+          : "${RAW_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID secret is not configured}"
+          API_TOKEN="$(printf '%s' "${RAW_API_TOKEN}" | tr -d '[:space:]')"
+          ACCOUNT_ID="$(printf '%s' "${RAW_ACCOUNT_ID}" | tr -d '[:space:]')"
+          if [[ ! "${ACCOUNT_ID}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; it may only contain alphanumeric characters, hyphens and underscores."
+            exit 1
+          fi
+          echo "::add-mask::${API_TOKEN}"
+          echo "::add-mask::${ACCOUNT_ID}"
+          {
+            echo "CLOUDFLARE_API_TOKEN=${API_TOKEN}"
+            echo "CLOUDFLARE_ACCOUNT_ID=${ACCOUNT_ID}"
+          } >> "${GITHUB_ENV}"
           echo "Cloudflare credentials are present."
 
       # Miqrasiyanın repoda olması onun tətbiq edildiyi demək deyil — kod cədvəl gözləyib
@@ -109,9 +124,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: production
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -131,6 +143,30 @@ jobs:
           npm install -g "npm@${NPM_VERSION}"
           npm --version
           npm ci
+
+      # Eyni normallaşdırma deploy-da da lazımdır: GITHUB_ENV job-lar arasında ötürülmür.
+      - name: Verify Cloudflare credentials
+        shell: bash
+        env:
+          RAW_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAW_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          : "${RAW_API_TOKEN:?CLOUDFLARE_API_TOKEN secret is not configured}"
+          : "${RAW_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID secret is not configured}"
+          API_TOKEN="$(printf '%s' "${RAW_API_TOKEN}" | tr -d '[:space:]')"
+          ACCOUNT_ID="$(printf '%s' "${RAW_ACCOUNT_ID}" | tr -d '[:space:]')"
+          if [[ ! "${ACCOUNT_ID}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; it may only contain alphanumeric characters, hyphens and underscores."
+            exit 1
+          fi
+          echo "::add-mask::${API_TOKEN}"
+          echo "::add-mask::${ACCOUNT_ID}"
+          {
+            echo "CLOUDFLARE_API_TOKEN=${API_TOKEN}"
+            echo "CLOUDFLARE_ACCOUNT_ID=${ACCOUNT_ID}"
+          } >> "${GITHUB_ENV}"
+          echo "Cloudflare credentials are present."
 
       # `wrangler.jsonc` → `main: .open-next/worker.js`. Bundle olmadan deploy mümkün deyil,
       # ona görə package.json-dakı `deploy` skriptinin build mərhələsi eyni dəyişənlərlə
