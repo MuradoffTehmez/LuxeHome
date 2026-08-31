@@ -50,7 +50,13 @@ export type AuditEntity =
   | "KnowledgeTerm"
   | "KnowledgeFaq"
   | "AuditLog"
-  | "AiProvider";
+  | "AiProvider"
+  | "SeoMetadata"
+  | "SeoLandingPage"
+  | "SeoKeyword"
+  | "EntityProfile"
+  | "SeoAuditIssue"
+  | "SeoSearchMetric";
 
 export async function recordAudit(
   user: Pick<AuthUser, "id" | "email">,

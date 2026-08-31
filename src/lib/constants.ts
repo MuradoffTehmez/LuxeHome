@@ -41,6 +41,12 @@ export const PERMISSIONS = {
   PARTNER_VERIFY: "partner:verify",
   PARTNER_PUBLISH: "partner:publish",
   PARTNER_RELATION_MANAGE: "partner:relationships",
+  SEO_VIEW: "seo:view",
+  SEO_EDIT: "seo:edit",
+  SEO_PUBLISH: "seo:publish",
+  SEO_REDIRECT_MANAGE: "seo:redirect:manage",
+  SEO_SCHEMA_MANAGE: "seo:schema:manage",
+  SEO_SETTINGS_MANAGE: "seo:settings:manage",
   /**
    * Müqavilə metadatası (nömrə, tarixlər, sənəd, daxili qeydlər) ayrıca icazədir:
    * bu məlumat kommersiya sirridir və adi paneldə avtomatik görünməməlidir.
@@ -69,9 +75,62 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.PARTNER_VERIFY,
     PERMISSIONS.PARTNER_PUBLISH,
     PERMISSIONS.PARTNER_RELATION_MANAGE,
+    PERMISSIONS.SEO_VIEW,
+    PERMISSIONS.SEO_EDIT,
+    PERMISSIONS.SEO_PUBLISH,
+    PERMISSIONS.SEO_REDIRECT_MANAGE,
+    PERMISSIONS.SEO_SCHEMA_MANAGE,
   ],
-  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.KNOWLEDGE_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.TRANSLATION_MANAGE, PERMISSIONS.PARTNER_VIEW],
+  EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.KNOWLEDGE_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.TRANSLATION_MANAGE, PERMISSIONS.PARTNER_VIEW, PERMISSIONS.SEO_VIEW],
 };
+
+// ---------------------------------------------------------------------------
+// SERP EKOSİSTEMİ
+// ---------------------------------------------------------------------------
+
+export const SEO_INTENTS = {
+  TRANSACTIONAL: "TRANSACTIONAL",
+  COMMERCIAL: "COMMERCIAL",
+  INFORMATIONAL: "INFORMATIONAL",
+  LOCAL: "LOCAL",
+  BRAND: "BRAND",
+} as const;
+
+export const SEO_LANDING_STATUSES = {
+  DRAFT: "DRAFT",
+  PUBLISHED: "PUBLISHED",
+  ARCHIVED: "ARCHIVED",
+} as const;
+
+export const SEO_AUDIT_SEVERITIES = {
+  CRITICAL: "CRITICAL",
+  HIGH: "HIGH",
+  MEDIUM: "MEDIUM",
+  LOW: "LOW",
+  INFO: "INFO",
+} as const;
+
+export const SEO_ENTITY_TYPES = {
+  PAGE: "PAGE",
+  PROPERTY: "PROPERTY",
+  PROJECT: "PROJECT",
+  SERVICE: "SERVICE",
+  BLOG_POST: "BLOG_POST",
+  KNOWLEDGE_ARTICLE: "KNOWLEDGE_ARTICLE",
+  AGENT: "AGENT",
+  AGENCY: "AGENCY",
+  ORGANIZATION: "ORGANIZATION",
+  OFFICE: "OFFICE",
+  LOCATION: "LOCATION",
+} as const;
+
+export const SEO_SETTING_KEYS = {
+  GLOBAL: "seo.global",
+  LOCAL: "seo.local",
+  ROBOTS: "seo.robots",
+  RETENTION: "seo.retention",
+  SEARCH_CONSOLE: "seo.search-console",
+} as const;
 
 export const TRANSLATION_STATUSES = {
   DRAFT: "DRAFT",
