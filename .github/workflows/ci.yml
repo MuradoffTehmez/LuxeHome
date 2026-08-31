@@ -99,7 +99,11 @@ jobs:
           API_TOKEN="$(printf '%s' "${RAW_API_TOKEN}" | tr -d '[:space:]')"
           ACCOUNT_ID="$(printf '%s' "${RAW_ACCOUNT_ID}" | tr -d '[:space:]')"
           if [[ ! "${ACCOUNT_ID}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; it may only contain alphanumeric characters, hyphens and underscores."
+            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; store the bare value, without a NAME= prefix or quotes."
+            exit 1
+          fi
+          if [[ ! "${API_TOKEN}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "::error::CLOUDFLARE_API_TOKEN secret is malformed; store the bare token, without a NAME= prefix or quotes."
             exit 1
           fi
           echo "::add-mask::${API_TOKEN}"
@@ -157,7 +161,11 @@ jobs:
           API_TOKEN="$(printf '%s' "${RAW_API_TOKEN}" | tr -d '[:space:]')"
           ACCOUNT_ID="$(printf '%s' "${RAW_ACCOUNT_ID}" | tr -d '[:space:]')"
           if [[ ! "${ACCOUNT_ID}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; it may only contain alphanumeric characters, hyphens and underscores."
+            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; store the bare value, without a NAME= prefix or quotes."
+            exit 1
+          fi
+          if [[ ! "${API_TOKEN}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "::error::CLOUDFLARE_API_TOKEN secret is malformed; store the bare token, without a NAME= prefix or quotes."
             exit 1
           fi
           echo "::add-mask::${API_TOKEN}"
