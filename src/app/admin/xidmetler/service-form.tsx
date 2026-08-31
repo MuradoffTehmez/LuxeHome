@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import {
   AdminCheckbox,
@@ -25,6 +26,7 @@ export function ServiceForm({
   submitLabel: string;
   extraActions?: React.ReactNode;
 }) {
+  const t = useTranslations("admin");
   return (
     <AdminForm
       action={action}
@@ -34,11 +36,11 @@ export function ServiceForm({
     >
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
 
-      <FormSection title="Xidmət">
+      <FormSection title={t("pages.services.xidmet")}>
         <FullWidth>
           <AdminInput
             name="title"
-            label="Başlıq"
+            label={t("pages.services.basliq")}
             required
             defaultValue={initial.title}
             maxLength={160}
@@ -47,26 +49,26 @@ export function ServiceForm({
 
         <AdminInput
           name="slug"
-          label="Slug"
+          label={t("pages.services.slug")}
           defaultValue={initial.slug}
           maxLength={90}
-          hint="Boş buraxsanız başlıqdan yaradılır."
+          hint={t("pages.services.bosBuraxsanizBasliqdanYaradilir")}
         />
 
-        <AdminInput name="order" label="Sıra" type="number" min={0} defaultValue={initial.order} />
+        <AdminInput name="order" label={t("pages.services.sira")} type="number" min={0} defaultValue={initial.order} />
 
         <AdminSelect
           name="icon"
-          label="İkon"
+          label={t("pages.services.ikon")}
           required
           defaultValue={initial.icon}
           options={SERVICE_ICON_NAMES.map((name) => ({ value: name, label: name }))}
-          hint="Sayt üçün icazə verilən ikon dəsti."
+          hint={t("pages.services.saytUcunIcazeVerilen")}
         />
 
         <AdminCheckbox
           name="isActive"
-          label="Saytda göstərilsin"
+          label={t("pages.services.saytdaGosterilsin")}
           defaultChecked={initial.isActive}
           className="sm:mt-8"
         />
@@ -74,7 +76,7 @@ export function ServiceForm({
         <FullWidth>
           <AdminTextarea
             name="shortDescription"
-            label="Qısa təsvir"
+            label={t("pages.services.qisaTesvir")}
             required
             rows={2}
             maxLength={300}
@@ -85,7 +87,7 @@ export function ServiceForm({
         <FullWidth>
           <AdminTextarea
             name="description"
-            label="Təsvir"
+            label={t("pages.services.tesvir")}
             required
             rows={8}
             defaultValue={initial.description}
@@ -95,19 +97,19 @@ export function ServiceForm({
         <FullWidth>
           <AdminTextarea
             name="bullets"
-            label="Maddələr"
+            label={t("pages.services.maddeler")}
             rows={5}
             defaultValue={initial.bullets}
-            hint="Hər sətirdə bir maddə."
+            hint={t("pages.services.herSetirdeBirMadde")}
           />
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Şəkil">
+      <FormSection title={t("pages.services.sekil")}>
         <FullWidth>
           <ImageDropzone
             name="image"
-            label="Xidmət şəkli"
+            label={t("pages.services.xidmetSekli")}
             folder="xidmetler"
             mode="single"
             initial={initial.image}
@@ -119,35 +121,35 @@ export function ServiceForm({
         <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Daşınmaz əmlak xidməti"} fallbackDescription={initial.shortDescription || initial.description || "Xidmət haqqında məlumat"} pathname={`/xidmetler/${initial.slug || "yeni-xidmet"}`} />
         <AdminInput
           name="canonicalUrl"
-          label="Canonical URL"
+          label={t("pages.services.canonicalUrl")}
           defaultValue={initial.canonicalUrl}
-          placeholder="Boş buraxılsa öz ünvanına işarə edir"
+          placeholder={t("pages.services.bosBuraxilsaOzUnvanina")}
         />
         <FullWidth>
           <AdminCheckbox
             name="noIndex"
-            label="Axtarış motorlarında gizlət (noindex)"
+            label={t("pages.services.axtarisMotorlarindaGizletNoindex")}
             defaultChecked={initial.noIndex}
           />
         </FullWidth>
       </FormSection>
 
       <FormSection
-        title="Open Graph"
-        description="Sosial şəbəkədə paylaşılanda görünən başlıq/təsvir/şəkil. Boş buraxılsa meta sahələr istifadə olunur."
+        title={t("pages.services.openGraph")}
+        description={t("pages.services.sosialSebekedePaylasilandaGorunen")}
       >
-        <AdminInput name="ogTitle" label="OG başlıq" defaultValue={initial.ogTitle} maxLength={70} />
+        <AdminInput name="ogTitle" label={t("pages.services.ogBasliq")} defaultValue={initial.ogTitle} maxLength={70} />
         <AdminInput
           name="ogDescription"
-          label="OG təsvir"
+          label={t("pages.services.ogTesvir")}
           defaultValue={initial.ogDescription}
           maxLength={200}
         />
         <AdminInput
           name="ogImage"
-          label="OG şəkil URL"
+          label={t("pages.services.ogSekilUrl")}
           defaultValue={initial.ogImage}
-          placeholder="Boş buraxılsa xidmət şəkli istifadə olunur"
+          placeholder={t("pages.services.bosBuraxilsaXidmetSekli")}
         />
       </FormSection>
     </AdminForm>

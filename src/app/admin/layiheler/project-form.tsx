@@ -41,24 +41,24 @@ export function ProjectForm({
     >
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
 
-      <FormSection title="Əsas məlumat">
+      <FormSection title={t("pages.projects.esasMelumat")}>
         <FullWidth>
-          <AdminInput name="name" label="Ad" required defaultValue={initial.name} maxLength={160} />
+          <AdminInput name="name" label={t("pages.projects.ad")} required defaultValue={initial.name} maxLength={160} />
         </FullWidth>
 
         <AdminInput
           name="slug"
-          label="Slug"
+          label={t("pages.projects.slug")}
           defaultValue={initial.slug}
           maxLength={90}
-          hint="Boş buraxsanız addan yaradılır."
+          hint={t("pages.projects.bosBuraxsanizAddanYaradilir")}
         />
 
-        <AdminInput name="order" label="Sıra" type="number" min={0} defaultValue={initial.order} />
+        <AdminInput name="order" label={t("pages.projects.sira")} type="number" min={0} defaultValue={initial.order} />
 
         <AdminSelect
           name="projectType"
-          label="Layihə növü"
+          label={t("pages.projects.layiheNovu")}
           required
           defaultValue={initial.projectType}
           options={Object.values(PROJECT_TYPES).map((value) => ({
@@ -69,7 +69,7 @@ export function ProjectForm({
 
         <AdminSelect
           name="status"
-          label="Status"
+          label={t("pages.projects.status")}
           required
           defaultValue={initial.status}
           options={Object.values(PROJECT_STATUSES).map((value) => ({
@@ -81,18 +81,18 @@ export function ProjectForm({
         <FullWidth>
           <AdminTextarea
             name="summary"
-            label="Qısa təsvir"
+            label={t("pages.projects.qisaTesvir")}
             rows={2}
             maxLength={300}
             defaultValue={initial.summary}
-            hint="Kartlarda görünən bir-iki cümlə."
+            hint={t("pages.projects.kartlardaGorunenBirIki")}
           />
         </FullWidth>
 
         <FullWidth>
           <AdminTextarea
             name="description"
-            label="Təsvir"
+            label={t("pages.projects.tesvir")}
             required
             rows={8}
             defaultValue={initial.description}
@@ -100,51 +100,51 @@ export function ProjectForm({
         </FullWidth>
 
         <FullWidth>
-          <AdminCheckbox name="isActive" label="Saytda göstərilsin" defaultChecked={initial.isActive} />
+          <AdminCheckbox name="isActive" label={t("pages.projects.saytdaGosterilsin")} defaultChecked={initial.isActive} />
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Yerləşmə">
+      <FormSection title={t("pages.projects.yerlesme")}>
         <AdminSelect
           name="cityId"
-          label="Şəhər"
+          label={t("pages.projects.seher")}
           defaultValue={initial.cityId}
-          placeholder="Seçilməyib"
+          placeholder={t("pages.projects.secilmeyib")}
           options={cities.map((city) => ({ value: city.id, label: city.name }))}
         />
-        <AdminInput name="address" label="Ünvan" defaultValue={initial.address} maxLength={240} />
+        <AdminInput name="address" label={t("pages.projects.unvan")} defaultValue={initial.address} maxLength={240} />
         <AdminInput
           name="latitude"
-          label="Enlik (latitude)"
+          label={t("pages.projects.enlikLatitude")}
           type="number"
           step="any"
           defaultValue={initial.latitude}
         />
         <AdminInput
           name="longitude"
-          label="Uzunluq (longitude)"
+          label={t("pages.projects.uzunluqLongitude")}
           type="number"
           step="any"
           defaultValue={initial.longitude}
         />
       </FormSection>
 
-      <FormSection title="Tikinti göstəriciləri">
+      <FormSection title={t("pages.projects.tikintiGostericileri")}>
         <AdminInput
           name="startDate"
-          label="Başlanğıc tarixi"
+          label={t("pages.projects.baslangicTarixi")}
           type="date"
           defaultValue={initial.startDate}
         />
         <AdminInput
           name="deliveryDate"
-          label="Təhvil tarixi"
+          label={t("pages.projects.tehvilTarixi")}
           type="date"
           defaultValue={initial.deliveryDate}
         />
         <AdminInput
           name="year"
-          label="İl"
+          label={t("pages.projects.il")}
           type="number"
           min={1990}
           max={2100}
@@ -152,7 +152,7 @@ export function ProjectForm({
         />
         <AdminInput
           name="totalArea"
-          label="Ümumi sahə (m²)"
+          label={t("pages.projects.umumiSaheM")}
           type="number"
           min={0}
           step="0.01"
@@ -160,49 +160,49 @@ export function ProjectForm({
         />
         <AdminInput
           name="floors"
-          label="Mərtəbə sayı"
+          label={t("pages.projects.mertebeSayi")}
           type="number"
           min={0}
           defaultValue={initial.floors}
         />
         <AdminInput
           name="unitCount"
-          label="Mənzil sayı"
+          label={t("pages.projects.menzilSayi")}
           type="number"
           min={0}
           defaultValue={initial.unitCount}
         />
       </FormSection>
 
-      <FormSection title="Üstünlüklər və mərhələlər">
+      <FormSection title={t("pages.projects.ustunluklerVeMerheleler")}>
         <FullWidth>
           <AdminTextarea
             name="highlights"
-            label="Üstünlüklər"
+            label={t("pages.projects.ustunlukler")}
             rows={5}
             defaultValue={initial.highlights}
-            hint="Hər sətirdə bir maddə."
+            hint={t("pages.projects.herSetirdeBirMadde")}
           />
         </FullWidth>
         <FullWidth>
           <AdminTextarea
             name="timeline"
-            label="Tikinti mərhələləri"
+            label={t("pages.projects.tikintiMerheleleri")}
             rows={5}
             defaultValue={initial.timeline}
-            hint="Hər sətirdə bir mərhələ. Tamamlanmış mərhələni «[x] » ilə başlayın."
+            hint={t("pages.projects.herSetirdeBirMerhele")}
           />
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Şəkillər">
+      <FormSection title={t("pages.projects.sekiller")}>
         <FullWidth>
           <ImageDropzone
             name="images"
-            label="Qalereya"
+            label={t("pages.projects.qalereya")}
             folder="layiheler"
             initial={initial.images}
-            hint="Üz qabığı seçilmiş şəkil kartlarda görünür."
+            hint={t("pages.projects.uzQabigiSecilmisSekil")}
           />
         </FullWidth>
       </FormSection>
@@ -211,35 +211,35 @@ export function ProjectForm({
         <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.name || "Yaşayış layihəsi"} fallbackDescription={initial.summary || initial.description || "Layihə haqqında məlumat"} pathname={`/layiheler/${initial.slug || "yeni-layihe"}`} />
         <AdminInput
           name="canonicalUrl"
-          label="Canonical URL"
+          label={t("pages.projects.canonicalUrl")}
           defaultValue={initial.canonicalUrl}
-          placeholder="Boş buraxılsa öz ünvanına işarə edir"
+          placeholder={t("pages.projects.bosBuraxilsaOzUnvanina")}
         />
         <FullWidth>
           <AdminCheckbox
             name="noIndex"
-            label="Axtarış motorlarında gizlət (noindex)"
+            label={t("pages.projects.axtarisMotorlarindaGizletNoindex")}
             defaultChecked={initial.noIndex}
           />
         </FullWidth>
       </FormSection>
 
       <FormSection
-        title="Open Graph"
-        description="Sosial şəbəkədə paylaşılanda görünən başlıq/təsvir/şəkil. Boş buraxılsa meta sahələr istifadə olunur."
+        title={t("pages.projects.openGraph")}
+        description={t("pages.projects.sosialSebekedePaylasilandaGorunen")}
       >
-        <AdminInput name="ogTitle" label="OG başlıq" defaultValue={initial.ogTitle} maxLength={70} />
+        <AdminInput name="ogTitle" label={t("pages.projects.ogBasliq")} defaultValue={initial.ogTitle} maxLength={70} />
         <AdminInput
           name="ogDescription"
-          label="OG təsvir"
+          label={t("pages.projects.ogTesvir")}
           defaultValue={initial.ogDescription}
           maxLength={200}
         />
         <AdminInput
           name="ogImage"
-          label="OG şəkil URL"
+          label={t("pages.projects.ogSekilUrl")}
           defaultValue={initial.ogImage}
-          placeholder="Boş buraxılsa üz qabığı şəkli istifadə olunur"
+          placeholder={t("pages.projects.bosBuraxilsaUzQabigi")}
         />
       </FormSection>
     </AdminForm>

@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { AdminPageHeader } from "@/components/admin/admin-ui";
 import { PERMISSIONS } from "@/lib/constants";
@@ -7,22 +8,26 @@ import { createPost } from "../actions";
 import { EMPTY_POST } from "../form-values";
 import { PostForm } from "../post-form";
 
-export const metadata: Metadata = { title: "Yeni məqalə" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.blog.yeniMeqale") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function NewPostPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.BLOG_MANAGE);
   const categories = await getAdminBlogCategories();
 
   return (
     <>
       <AdminPageHeader
-        title="Yeni məqalə"
-        description="Məqalə qaralama kimi saxlanıla və sonra dərc edilə bilər."
+        title={t("pages.blog.yeniMeqale")}
+        description={t("pages.blog.meqaleQaralamaKimiSaxlanila")}
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Bloq", href: "/admin/blog" },
-          { label: "Yeni məqalə" },
+          { label: t("pages.blog.idarePaneli"), href: "/admin" },
+          { label: t("pages.blog.bloq"), href: "/admin/blog" },
+          { label: t("pages.blog.yeniMeqale") },
         ]}
       />
 
@@ -30,7 +35,7 @@ export default async function NewPostPage() {
         action={createPost}
         initial={EMPTY_POST}
         categories={categories}
-        submitLabel="Məqaləni yarat"
+        submitLabel={t("pages.blog.meqaleniYarat")}
       />
     </>
   );

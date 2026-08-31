@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
@@ -19,7 +20,10 @@ import { getAdminBlogCategories } from "@/lib/queries";
 import { deleteBlogCategory } from "../actions";
 import { CategoryForm, type CategoryFormValues } from "./category-form";
 
-export const metadata: Metadata = { title: "Bloq kateqoriyaları" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.blog.bloqKateqoriyalari") };
+}
 export const dynamic = "force-dynamic";
 
 const PATH = "/admin/blog/kateqoriyalar";
@@ -31,6 +35,7 @@ export default async function BlogCategoriesPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.BLOG_MANAGE);
 
   const params = await searchParams;
@@ -51,24 +56,24 @@ export default async function BlogCategoriesPage({
   return (
     <>
       <AdminPageHeader
-        title="Bloq kateqoriyaları"
-        description="Kateqoriya silinsə, məqalələr qalır və kateqoriyasız olur."
+        title={t("pages.blog.bloqKateqoriyalari")}
+        description={t("pages.blog.kateqoriyaSilinseMeqalelerQalir")}
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Bloq", href: "/admin/blog" },
-          { label: "Kateqoriyalar" },
+          { label: t("pages.blog.idarePaneli"), href: "/admin" },
+          { label: t("pages.blog.bloq"), href: "/admin/blog" },
+          { label: t("pages.blog.kateqoriyalar") },
         ]}
       />
 
       <div className="grid min-w-0 gap-6 xl:grid-cols-[1.2fr_1fr]">
         <AdminCard bodyClassName="p-4 lg:p-0">
           <AdminResponsiveList
-            ariaLabel="Bloq kateqoriyaları"
+            ariaLabel={t("pages.blog.bloqKateqoriyalari")}
             items={categories}
             getKey={(category) => category.id}
             empty={
               <p className="py-10 text-center text-sm text-ink-muted">
-                Hələ kateqoriya yaradılmayıb.
+                {t("pages.blog.heleKateqoriyaYaradilmayib")}
               </p>
             }
             renderCard={(category) => (
@@ -80,7 +85,7 @@ export default async function BlogCategoriesPage({
                     <Link
                       href={`${PATH}?duzelis=${category.id}`}
                       aria-label={`«${category.name}» kateqoriyasını redaktə et`}
-                      title="Redaktə et"
+                      title={t("pages.blog.redakteEt")}
                       className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                     >
                       <Pencil className="size-4" aria-hidden="true" />
@@ -89,7 +94,7 @@ export default async function BlogCategoriesPage({
                       action={deleteBlogCategory}
                       id={category.id}
                       label={`«${category.name}» kateqoriyasını sil`}
-                      title="Kateqoriyanı silmək"
+                      title={t("pages.blog.kateqoriyaniSilmek")}
                       description={
                         category._count.posts > 0
                           ? `${category._count.posts} məqalə kateqoriyasız qalacaq. Məqalələr silinmir.`
@@ -104,11 +109,11 @@ export default async function BlogCategoriesPage({
               >
                 <dl className="grid grid-cols-2 gap-3">
                   <div>
-                    <dt className="text-xs text-ink-muted">Sıra</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.blog.sira")}</dt>
                     <dd className="tabular mt-1 text-ink">{category.order}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Məqalə</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.blog.meqale")}</dt>
                     <dd className="tabular mt-1 text-ink">{category._count.posts}</dd>
                   </div>
                 </dl>
@@ -116,12 +121,12 @@ export default async function BlogCategoriesPage({
             )}
             renderTable={(items) => (
               <AdminTable
-                caption="Kateqoriyalar"
+                caption={t("pages.blog.kateqoriyalar")}
                 headers={[
-                  { label: "Ad" },
-                  { label: "Sıra", className: "text-right" },
-                  { label: "Məqalə", className: "text-right" },
-                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                  { label: t("pages.blog.ad") },
+                  { label: t("pages.blog.sira"), className: "text-right" },
+                  { label: t("pages.blog.meqale"), className: "text-right" },
+                  { label: t("pages.blog.emeliyyatlar"), srOnly: true, className: "text-right" },
                 ]}
               >
                 {items.map((category) => (
@@ -141,7 +146,7 @@ export default async function BlogCategoriesPage({
                         <Link
                           href={`${PATH}?duzelis=${category.id}`}
                           aria-label={`«${category.name}» kateqoriyasını redaktə et`}
-                          title="Redaktə et"
+                          title={t("pages.blog.redakteEt")}
                           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                         >
                           <Pencil className="size-4" aria-hidden="true" />
@@ -150,7 +155,7 @@ export default async function BlogCategoriesPage({
                           action={deleteBlogCategory}
                           id={category.id}
                           label={`«${category.name}» kateqoriyasını sil`}
-                          title="Kateqoriyanı silmək"
+                          title={t("pages.blog.kateqoriyaniSilmek")}
                           description={
                             category._count.posts > 0
                               ? `${category._count.posts} məqalə kateqoriyasız qalacaq. Məqalələr silinmir.`

@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,7 +16,10 @@ import { ProjectPartnersManager } from "../project-partners-manager";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Layihənin redaktəsi" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.projects.layiheninRedaktesi") };
+}
 export const dynamic = "force-dynamic";
 
 const num = (value: number | null): string => (value === null ? "" : String(value));
@@ -24,6 +28,7 @@ const num = (value: number | null): string => (value === null ? "" : String(valu
 const day = (value: Date | null): string => (value ? value.toISOString().slice(0, 10) : "");
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROJECT_MANAGE);
 
@@ -85,9 +90,9 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
             : `Son yenilənmə: ${formatDateTime(project.updatedAt)}`
         }
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Layihələr", href: "/admin/layiheler" },
-          { label: "Redaktə" },
+          { label: t("pages.projects.idarePaneli"), href: "/admin" },
+          { label: t("pages.projects.layiheler"), href: "/admin/layiheler" },
+          { label: t("pages.projects.redakte") },
         ]}
         actions={
           <Link
@@ -97,7 +102,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
             className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
           >
             <ExternalLink className="size-4" aria-hidden="true" />
-            Saytda bax
+            {t("pages.projects.saytdaBax")}
           </Link>
         }
       />
@@ -106,15 +111,15 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
         action={updateProject}
         initial={initial}
         cities={cities}
-        submitLabel="Dəyişiklikləri saxla"
+        submitLabel={t("pages.projects.deyisiklikleriSaxla")}
         extraActions={
           project.deletedAt ? null : (
             <ConfirmAction
               action={deleteProject}
               id={project.id}
-              label="Layihəni sil"
-              title="Layihəni silmək"
-              description="Layihə saytdan çıxarılacaq, amma zibil qutusunda qalacaq."
+              label={t("pages.projects.layiheniSil")}
+              title={t("pages.projects.layiheniSilmek")}
+              description={t("pages.projects.layiheSaytdanCixarilacaqAmma")}
               redirectTo="/admin/layiheler"
               className="mr-auto"
             >

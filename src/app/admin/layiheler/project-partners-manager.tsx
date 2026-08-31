@@ -33,35 +33,35 @@ export function ProjectPartnersManager({ projectId, links, options }: { projectI
   return (
     <section className="mt-8 overflow-hidden rounded-md border border-line bg-paper">
       <header className="border-b border-line px-4 py-4 sm:px-6">
-        <h2 className="font-display text-lg text-ink">Layihənin tərəfdaşları</h2>
-        <p className="mt-1 text-sm text-ink-muted">Developer, satış tərəfdaşı, broker və mənbə rolunu layihənin özündən idarə edin.</p>
+        <h2 className="font-display text-lg text-ink">{t("pages.projects.layiheninTerefdaslari")}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t("pages.projects.developerSatisTerefdasiBroker")}</p>
       </header>
       <form action={addAction} className="grid gap-4 border-b border-line p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
         <input type="hidden" name="entityType" value="project" />
         <input type="hidden" name="entityId" value={projectId} />
-        <label className="text-sm text-ink-soft">Tərəfdaş
+        <label className="text-sm text-ink-soft">{t("pages.projects.terefdas")}
           <select name="partnerId" required defaultValue="" className={`${fieldClass} mt-1`}>
-            <option value="" disabled>Seçin</option>
+            <option value="" disabled>{t("pages.projects.secin")}</option>
             {options.filter((option) => !linkedIds.has(option.id)).map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
           </select>
         </label>
-        <label className="text-sm text-ink-soft">Rol
+        <label className="text-sm text-ink-soft">{t("pages.projects.rol")}
           <select name="role" defaultValue={PARTNER_RELATION_ROLES.DEVELOPER} className={`${fieldClass} mt-1`}>
             {Object.values(PARTNER_RELATION_ROLES).map((role) => <option key={role} value={role}>{t(`labels.partnerRelationRole.${role}`)}</option>)}
           </select>
         </label>
-        <label className="text-sm text-ink-soft">Tərəfdaşın layihə səhifəsi
+        <label className="text-sm text-ink-soft">{t("pages.projects.terefdasinLayiheSehifesi")}
           <input name="sourceUrl" type="url" placeholder="https://…" className={`${fieldClass} mt-1`} />
         </label>
-        <label className="flex min-h-11 items-center gap-2 text-sm text-ink"><input name="isPublic" type="checkbox" defaultChecked className="size-4 accent-gold" />Saytda göstərilsin</label>
-        <label className="flex min-h-11 items-center gap-2 text-sm text-ink"><input name="isPrimary" type="checkbox" className="size-4 accent-gold" />Əsas tərəfdaşdır</label>
+        <label className="flex min-h-11 items-center gap-2 text-sm text-ink"><input name="isPublic" type="checkbox" defaultChecked className="size-4 accent-gold" />{t("pages.projects.saytdaGosterilsin")}</label>
+        <label className="flex min-h-11 items-center gap-2 text-sm text-ink"><input name="isPrimary" type="checkbox" className="size-4 accent-gold" />{t("pages.projects.esasTerefdasdir")}</label>
         <div className="flex flex-wrap items-center justify-between gap-3 lg:col-span-3">
           {addState.message ? <p className={addState.status === "error" ? "text-sm text-danger" : "text-sm text-success"}>{addState.message}</p> : <span />}
           <SubmitButton />
         </div>
       </form>
       {removeState.message ? <p className={removeState.status === "error" ? "px-4 pt-4 text-sm text-danger" : "px-4 pt-4 text-sm text-success"}>{removeState.message}</p> : null}
-      {links.length === 0 ? <p className="p-6 text-sm text-ink-muted">Bu layihəyə tərəfdaş bağlanmayıb.</p> : (
+      {links.length === 0 ? <p className="p-6 text-sm text-ink-muted">{t("pages.projects.buLayiheyeTerefdasBaglanmayib")}</p> : (
         <ul className="divide-y divide-line">
           {links.map((link) => (
             <li key={link.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">

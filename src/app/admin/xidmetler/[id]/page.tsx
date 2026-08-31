@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,10 +15,14 @@ import { ServiceForm } from "../service-form";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Xidmətin redaktəsi" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.services.xidmetinRedaktesi") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function EditServicePage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.SERVICE_MANAGE);
 
@@ -51,9 +56,9 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
         title={service.title}
         description={`Son yenilənmə: ${formatDateTime(service.updatedAt)}`}
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Xidmətlər", href: "/admin/xidmetler" },
-          { label: "Redaktə" },
+          { label: t("pages.services.idarePaneli"), href: "/admin" },
+          { label: t("pages.services.xidmetler"), href: "/admin/xidmetler" },
+          { label: t("pages.services.redakte") },
         ]}
         actions={
           <Link
@@ -63,7 +68,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
             className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
           >
             <ExternalLink className="size-4" aria-hidden="true" />
-            Saytda bax
+            {t("pages.services.saytdaBax")}
           </Link>
         }
       />
@@ -71,14 +76,14 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
       <ServiceForm
         action={saveService}
         initial={initial}
-        submitLabel="Dəyişiklikləri saxla"
+        submitLabel={t("pages.services.deyisiklikleriSaxla")}
         extraActions={
           <ConfirmAction
             action={deleteService}
             id={service.id}
-            label="Xidməti sil"
-            title="Xidməti silmək"
-            description="Xidmət tamamilə silinəcək və bərpa edilə bilməyəcək."
+            label={t("pages.services.xidmetiSil")}
+            title={t("pages.services.xidmetiSilmek")}
+            description={t("pages.services.xidmetTamamileSilinecekVe")}
             redirectTo="/admin/xidmetler"
             className="mr-auto"
           >

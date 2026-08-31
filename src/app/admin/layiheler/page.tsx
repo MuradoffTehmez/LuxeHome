@@ -33,7 +33,10 @@ import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Layihələr" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.projects.layiheler") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/layiheler";
@@ -84,9 +87,9 @@ export default async function AdminProjectsPage({
         action={restoreProject}
         id={project.id}
         label={`«${project.name}» layihəsini bərpa et`}
-        title="Layihəni bərpa etmək"
-        description="Layihə yenidən aktiv siyahıya qayıdacaq."
-        confirmLabel="Bərpa et"
+        title={t("pages.projects.layiheniBerpaEtmek")}
+        description={t("pages.projects.layiheYenidenAktivSiyahiya")}
+        confirmLabel={t("pages.projects.berpaEt")}
         tone="neutral"
         className="size-11"
       >
@@ -99,7 +102,7 @@ export default async function AdminProjectsPage({
           target="_blank"
           rel="noreferrer"
           aria-label={`«${project.name}» layihəsini saytda aç`}
-          title="Saytda bax"
+          title={t("pages.projects.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Eye className="size-4" aria-hidden="true" />
@@ -107,7 +110,7 @@ export default async function AdminProjectsPage({
         <Link
           href={`${LIST_PATH}/${project.id}`}
           aria-label={`«${project.name}» layihəsini redaktə et`}
-          title="Redaktə et"
+          title={t("pages.projects.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Pencil className="size-4" aria-hidden="true" />
@@ -116,8 +119,8 @@ export default async function AdminProjectsPage({
           action={deleteProject}
           id={project.id}
           label={`«${project.name}» layihəsini sil`}
-          title="Layihəni silmək"
-          description="Layihə saytdan çıxarılacaq, amma zibil qutusunda qalacaq. Ona bağlı elanlar silinmir."
+          title={t("pages.projects.layiheniSilmek")}
+          description={t("pages.projects.layiheSaytdanCixarilacaqAmma")}
           className="size-11"
         >
           <Trash2 className="size-4" aria-hidden="true" />
@@ -136,8 +139,8 @@ export default async function AdminProjectsPage({
             : `Ümumilikdə ${total} layihə tapıldı.`
         }
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          ...(deleted ? [{ label: "Layihələr", href: LIST_PATH }] : []),
+          { label: t("pages.projects.idarePaneli"), href: "/admin" },
+          ...(deleted ? [{ label: t("pages.projects.layiheler"), href: LIST_PATH }] : []),
           { label: deleted ? "Silinmişlər" : "Layihələr" },
         ]}
         actions={
@@ -151,7 +154,7 @@ export default async function AdminProjectsPage({
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />
-              Yeni layihə
+              {t("pages.projects.yeniLayihe")}
             </ButtonLink>
           </>
         }
@@ -161,16 +164,16 @@ export default async function AdminProjectsPage({
         <AdminFilterBar
           action={LIST_PATH}
           searchValue={filters.q}
-          searchPlaceholder="Ad və ya slug üzrə axtar…"
+          searchPlaceholder={t("pages.projects.adVeYaSlug")}
           resultLabel={`${total} layihə tapıldı`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
               name: "status",
-              label: "Status",
+              label: t("pages.projects.status"),
               value: filters.status,
               options: [
-                { value: "", label: "Bütün statuslar" },
+                { value: "", label: t("pages.projects.butunStatuslar") },
                 ...Object.values(PROJECT_STATUSES).map((value) => ({
                   value,
                   label: t(`labels.projectStatus.${value}`),
@@ -179,10 +182,10 @@ export default async function AdminProjectsPage({
             },
             {
               name: "tip",
-              label: "Layihə növü",
+              label: t("pages.projects.layiheNovu"),
               value: filters.projectType,
               options: [
-                { value: "", label: "Bütün növlər" },
+                { value: "", label: t("pages.projects.butunNovler") },
                 ...Object.values(PROJECT_TYPES).map((value) => ({
                   value,
                   label: t(`labels.projectType.${value}`),
@@ -194,7 +197,7 @@ export default async function AdminProjectsPage({
 
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
-            ariaLabel="Layihələr"
+            ariaLabel={t("pages.projects.layiheler")}
             items={rows}
             getKey={(project) => project.id}
             empty={
@@ -229,15 +232,15 @@ export default async function AdminProjectsPage({
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge tone="neutral">{t(`labels.projectType.${project.projectType as ProjectType}`)}</Badge>
-                  {!project.isActive ? <Badge tone="neutral">Saytda gizlidir</Badge> : null}
+                  {!project.isActive ? <Badge tone="neutral">{t("pages.projects.saytdaGizlidir")}</Badge> : null}
                 </div>
                 <dl className="mt-4 grid grid-cols-2 gap-3">
                   <div>
-                    <dt className="text-xs text-ink-muted">Elan</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.projects.elan")}</dt>
                     <dd className="tabular mt-1 text-ink">{project._count.properties}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Şəkil</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.projects.sekil")}</dt>
                     <dd className="tabular mt-1 text-ink">{project._count.images}</dd>
                   </div>
                 </dl>
@@ -245,15 +248,15 @@ export default async function AdminProjectsPage({
             )}
             renderTable={(items) => (
               <AdminTable
-                caption="Layihələr"
+                caption={t("pages.projects.layiheler")}
                 headers={[
-                  { label: "Layihə" },
-                  { label: "Növ" },
-                  { label: "Status" },
-                  { label: "Elan", className: "text-right" },
-                  { label: "Şəkil", className: "text-right" },
-                  { label: "Yenilənib", className: "text-right" },
-                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                  { label: t("pages.projects.layihe") },
+                  { label: t("pages.projects.nov") },
+                  { label: t("pages.projects.status") },
+                  { label: t("pages.projects.elan"), className: "text-right" },
+                  { label: t("pages.projects.sekil"), className: "text-right" },
+                  { label: t("pages.projects.yenilenib"), className: "text-right" },
+                  { label: t("pages.projects.emeliyyatlar"), srOnly: true, className: "text-right" },
                 ]}
               >
                 {items.map((project) => (
@@ -270,7 +273,7 @@ export default async function AdminProjectsPage({
                     </AdminTableCell>
                     <AdminTableCell>
                       <Badge tone="neutral">{t(`labels.projectType.${project.projectType as ProjectType}`)}</Badge>
-                      {!project.isActive ? <p className="mt-1 text-xs text-ink-muted">Saytda gizlidir</p> : null}
+                      {!project.isActive ? <p className="mt-1 text-xs text-ink-muted">{t("pages.projects.saytdaGizlidir")}</p> : null}
                     </AdminTableCell>
                     <AdminTableCell>
                       <StatusBadge status={project.status as ProjectStatus} label={t(`labels.projectStatus.${project.status as ProjectStatus}`)} />

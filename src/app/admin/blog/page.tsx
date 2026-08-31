@@ -30,7 +30,10 @@ import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Bloq" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.blog.bloq") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/blog";
@@ -80,9 +83,9 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
         action={restorePost}
         id={post.id}
         label={`«${post.title}» məqaləsini bərpa et`}
-        title="Məqaləni bərpa etmək"
-        description="Məqalə yenidən aktiv siyahıya qayıdacaq."
-        confirmLabel="Bərpa et"
+        title={t("pages.blog.meqaleniBerpaEtmek")}
+        description={t("pages.blog.meqaleYenidenAktivSiyahiya")}
+        confirmLabel={t("pages.blog.berpaEt")}
         tone="neutral"
         className="size-11"
       >
@@ -95,7 +98,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
           target="_blank"
           rel="noreferrer"
           aria-label={`«${post.title}» məqaləsini saytda aç`}
-          title="Saytda bax"
+          title={t("pages.blog.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Eye className="size-4" aria-hidden="true" />
@@ -103,7 +106,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
         <Link
           href={`${LIST_PATH}/${post.id}`}
           aria-label={`«${post.title}» məqaləsini redaktə et`}
-          title="Redaktə et"
+          title={t("pages.blog.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Pencil className="size-4" aria-hidden="true" />
@@ -112,8 +115,8 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
           action={deletePost}
           id={post.id}
           label={`«${post.title}» məqaləsini sil`}
-          title="Məqaləni silmək"
-          description="Məqalə saytdan çıxarılacaq, amma zibil qutusunda qalacaq."
+          title={t("pages.blog.meqaleniSilmek")}
+          description={t("pages.blog.meqaleSaytdanCixarilacaqAmma")}
           className="size-11"
         >
           <Trash2 className="size-4" aria-hidden="true" />
@@ -132,15 +135,15 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             : `Ümumilikdə ${total} məqalə tapıldı.`
         }
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          ...(deleted ? [{ label: "Bloq", href: LIST_PATH }] : []),
+          { label: t("pages.blog.idarePaneli"), href: "/admin" },
+          ...(deleted ? [{ label: t("pages.blog.bloq"), href: LIST_PATH }] : []),
           { label: deleted ? "Silinmişlər" : "Bloq" },
         ]}
         actions={
           <>
             <ButtonLink href={`${LIST_PATH}/kateqoriyalar`} variant="outline" size="sm">
               <FolderTree className="size-4" aria-hidden="true" />
-              Kateqoriyalar
+              {t("pages.blog.kateqoriyalar")}
             </ButtonLink>
             <ButtonLink
               href={deleted ? LIST_PATH : `${LIST_PATH}?silinmis=1`}
@@ -151,7 +154,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />
-              Yeni məqalə
+              {t("pages.blog.yeniMeqale")}
             </ButtonLink>
           </>
         }
@@ -161,16 +164,16 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
         <AdminFilterBar
           action={LIST_PATH}
           searchValue={filters.q}
-          searchPlaceholder="Başlıq və ya slug üzrə axtar…"
+          searchPlaceholder={t("pages.blog.basliqVeYaSlug")}
           resultLabel={`${total} məqalə tapıldı`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
               name: "status",
-              label: "Status",
+              label: t("pages.blog.status"),
               value: filters.status,
               options: [
-                { value: "", label: "Bütün statuslar" },
+                { value: "", label: t("pages.blog.butunStatuslar") },
                 ...Object.values(POST_STATUSES).map((value) => ({
                   value,
                   label: t(`labels.postStatus.${value}`),
@@ -179,10 +182,10 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             },
             {
               name: "kateqoriya",
-              label: "Kateqoriya",
+              label: t("pages.blog.kateqoriya"),
               value: filters.categoryId,
               options: [
-                { value: "", label: "Bütün kateqoriyalar" },
+                { value: "", label: t("pages.blog.butunKateqoriyalar") },
                 ...categories.map((category) => ({ value: category.id, label: category.name })),
               ],
             },
@@ -191,7 +194,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
 
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
-            ariaLabel="Bloq məqalələri"
+            ariaLabel={t("pages.blog.bloqMeqaleleri")}
             items={rows}
             getKey={(post) => post.id}
             empty={
@@ -221,15 +224,15 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
               >
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
                   <div>
-                    <dt className="text-xs text-ink-muted">Kateqoriya</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.blog.kateqoriya")}</dt>
                     <dd className="mt-1 text-ink">{post.category?.name ?? "Kateqoriyasız"}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Müəllif</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.blog.muellif")}</dt>
                     <dd className="mt-1 text-ink">{post.author?.name ?? "—"}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Baxış</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.blog.baxis")}</dt>
                     <dd className="tabular mt-1 text-ink">{formatNumber(post.viewCount)}</dd>
                   </div>
                 </dl>
@@ -237,15 +240,15 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             )}
             renderTable={(items) => (
               <AdminTable
-                caption="Bloq məqalələri"
+                caption={t("pages.blog.bloqMeqaleleri")}
                 headers={[
-                  { label: "Məqalə" },
-                  { label: "Kateqoriya" },
-                  { label: "Müəllif" },
-                  { label: "Status" },
-                  { label: "Baxış", className: "text-right" },
-                  { label: "Yenilənib", className: "text-right" },
-                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                  { label: t("pages.blog.meqale") },
+                  { label: t("pages.blog.kateqoriya") },
+                  { label: t("pages.blog.muellif") },
+                  { label: t("pages.blog.status") },
+                  { label: t("pages.blog.baxis"), className: "text-right" },
+                  { label: t("pages.blog.yenilenib"), className: "text-right" },
+                  { label: t("pages.blog.emeliyyatlar"), srOnly: true, className: "text-right" },
                 ]}
               >
                 {items.map((post) => (
@@ -255,7 +258,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
                       <p className="mt-0.5 text-xs text-ink-muted">{post.readMinutes} dəq oxu · /{post.slug}</p>
                     </AdminTableCell>
                     <AdminTableCell className="text-sm text-ink-soft">
-                      {post.category?.name ?? <span className="text-ink-muted">Kateqoriyasız</span>}
+                      {post.category?.name ?? <span className="text-ink-muted">{t("pages.blog.kateqoriyasiz")}</span>}
                     </AdminTableCell>
                     <AdminTableCell className="text-sm text-ink-soft">{post.author?.name ?? "—"}</AdminTableCell>
                     <AdminTableCell>

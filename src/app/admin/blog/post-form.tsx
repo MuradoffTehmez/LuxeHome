@@ -39,11 +39,11 @@ export function PostForm({
     >
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
 
-      <FormSection title="Məqalə">
+      <FormSection title={t("pages.blog.meqale")}>
         <FullWidth>
           <AdminInput
             name="title"
-            label="Başlıq"
+            label={t("pages.blog.basliq")}
             required
             defaultValue={initial.title}
             maxLength={160}
@@ -52,15 +52,15 @@ export function PostForm({
 
         <AdminInput
           name="slug"
-          label="Slug"
+          label={t("pages.blog.slug")}
           defaultValue={initial.slug}
           maxLength={90}
-          hint="Boş buraxsanız başlıqdan avtomatik yaradılır."
+          hint={t("pages.blog.bosBuraxsanizBasliqdanAvtomatik")}
         />
 
         <AdminSelect
           name="status"
-          label="Status"
+          label={t("pages.blog.status")}
           required
           defaultValue={initial.status}
           options={Object.values(POST_STATUSES).map((value) => ({
@@ -71,75 +71,75 @@ export function PostForm({
 
         <AdminSelect
           name="categoryId"
-          label="Kateqoriya"
+          label={t("pages.blog.kateqoriya")}
           defaultValue={initial.categoryId}
-          placeholder="Kateqoriyasız"
+          placeholder={t("pages.blog.kateqoriyasiz")}
           options={categories.map((category) => ({ value: category.id, label: category.name }))}
         />
 
         <FullWidth>
           <AdminTextarea
             name="excerpt"
-            label="Qısa təsvir"
+            label={t("pages.blog.qisaTesvir")}
             required
             rows={3}
             maxLength={300}
             defaultValue={initial.excerpt}
-            hint="Siyahılarda və paylaşım kartlarında görünür."
+            hint={t("pages.blog.siyahilardaVePaylasimKartlarinda")}
           />
         </FullWidth>
 
         <FullWidth>
-          <ContentEditor name="content" label="Mətn" defaultValue={initial.content} />
+          <ContentEditor name="content" label={t("pages.blog.metn")} defaultValue={initial.content} />
         </FullWidth>
       </FormSection>
 
-      <FormSection title="Üz qabığı">
+      <FormSection title={t("pages.blog.uzQabigi")}>
         <FullWidth>
           <ImageDropzone
             name="cover"
-            label="Üz qabığı şəkli"
+            label={t("pages.blog.uzQabigiSekli")}
             folder="bloq"
             mode="single"
             initial={initial.cover}
-            hint="Şəkil avtomatik WebP formatına çevrilir. Alt mətni doldurun — SEO və ekran oxuyucular üçün vacibdir."
+            hint={t("pages.blog.sekilAvtomatikWebpFormatina")}
           />
         </FullWidth>
       </FormSection>
 
-      <FormSection title="SEO" description="Boş buraxılsa, başlıq və qısa təsvirdən qurulur.">
+      <FormSection title="SEO" description={t("pages.blog.bosBuraxilsaBasliqVe")}>
         <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Bloq yazısı"} fallbackDescription={initial.excerpt || "Məqalənin qısa təsviri"} pathname={`/blog/${initial.slug || "yeni-yazi"}`} />
         <AdminInput
           name="canonicalUrl"
-          label="Canonical URL"
+          label={t("pages.blog.canonicalUrl")}
           defaultValue={initial.canonicalUrl}
-          placeholder="Boş buraxılsa öz ünvanına işarə edir"
+          placeholder={t("pages.blog.bosBuraxilsaOzUnvanina")}
         />
         <FullWidth>
           <AdminCheckbox
             name="noIndex"
-            label="Axtarış motorlarında gizlət (noindex)"
+            label={t("pages.blog.axtarisMotorlarindaGizletNoindex")}
             defaultChecked={initial.noIndex}
           />
         </FullWidth>
       </FormSection>
 
       <FormSection
-        title="Open Graph"
-        description="Sosial şəbəkədə paylaşılanda görünən başlıq/təsvir/şəkil. Boş buraxılsa meta sahələr istifadə olunur."
+        title={t("pages.blog.openGraph")}
+        description={t("pages.blog.sosialSebekedePaylasilandaGorunen")}
       >
-        <AdminInput name="ogTitle" label="OG başlıq" defaultValue={initial.ogTitle} maxLength={70} />
+        <AdminInput name="ogTitle" label={t("pages.blog.ogBasliq")} defaultValue={initial.ogTitle} maxLength={70} />
         <AdminInput
           name="ogDescription"
-          label="OG təsvir"
+          label={t("pages.blog.ogTesvir")}
           defaultValue={initial.ogDescription}
           maxLength={200}
         />
         <AdminInput
           name="ogImage"
-          label="OG şəkil URL"
+          label={t("pages.blog.ogSekilUrl")}
           defaultValue={initial.ogImage}
-          placeholder="Boş buraxılsa üz qabığı şəkli istifadə olunur"
+          placeholder={t("pages.blog.bosBuraxilsaUzQabigi")}
         />
       </FormSection>
     </AdminForm>

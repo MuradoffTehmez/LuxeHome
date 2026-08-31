@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
@@ -24,12 +25,16 @@ import { deleteService } from "./actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Xidmətlər" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.services.xidmetler") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/xidmetler";
 
 export default async function AdminServicesPage() {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.SERVICE_MANAGE);
   const services = await getAdminServices();
@@ -42,7 +47,7 @@ export default async function AdminServicesPage() {
           target="_blank"
           rel="noreferrer"
           aria-label={`«${service.title}» xidmətini saytda aç`}
-          title="Saytda bax"
+          title={t("pages.services.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Eye className="size-4" aria-hidden="true" />
@@ -50,7 +55,7 @@ export default async function AdminServicesPage() {
         <Link
           href={`${LIST_PATH}/${service.id}`}
           aria-label={`«${service.title}» xidmətini redaktə et`}
-          title="Redaktə et"
+          title={t("pages.services.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Pencil className="size-4" aria-hidden="true" />
@@ -59,8 +64,8 @@ export default async function AdminServicesPage() {
           action={deleteService}
           id={service.id}
           label={`«${service.title}» xidmətini sil`}
-          title="Xidməti silmək"
-          description="Xidmət tamamilə silinəcək və bərpa edilə bilməyəcək. Müvəqqəti gizlətmək üçün «Saytda göstərilsin» seçimini söndürün."
+          title={t("pages.services.xidmetiSilmek")}
+          description={t("pages.services.xidmetTamamileSilinecekVe")}
           className="size-11"
         >
           <Trash2 className="size-4" aria-hidden="true" />
@@ -72,23 +77,23 @@ export default async function AdminServicesPage() {
   return (
     <>
       <AdminPageHeader
-        title="Xidmətlər"
+        title={t("pages.services.xidmetler")}
         description={`${services.length} xidmət. Sıra kiçikdən böyüyə göstərilir.`}
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Xidmətlər" }]}
+        breadcrumbs={[{ label: t("pages.services.idarePaneli"), href: "/admin" }, { label: t("pages.services.xidmetler") }]}
         actions={
           <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
             <Plus className="size-4" aria-hidden="true" />
-            Yeni xidmət
+            {t("pages.services.yeniXidmet")}
           </ButtonLink>
         }
       />
 
       <AdminCard bodyClassName="p-4 lg:p-0">
         <AdminResponsiveList
-          ariaLabel="Xidmətlər"
+          ariaLabel={t("pages.services.xidmetler")}
           items={services}
           getKey={(service) => service.id}
-          empty={<p className="py-10 text-center text-sm text-ink-muted">Hələ xidmət əlavə edilməyib.</p>}
+          empty={<p className="py-10 text-center text-sm text-ink-muted">{t("pages.services.heleXidmetElaveEdilmeyib")}</p>}
           renderCard={(service) => (
             <AdminListCard
               title={
@@ -110,11 +115,11 @@ export default async function AdminServicesPage() {
             >
               <dl className="grid grid-cols-2 gap-3">
                 <div>
-                  <dt className="text-xs text-ink-muted">Sıra</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.services.sira")}</dt>
                   <dd className="tabular mt-1 text-ink">{service.order}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Yenilənib</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.services.yenilenib")}</dt>
                   <dd className="mt-1 text-ink">{formatRelative(service.updatedAt)}</dd>
                 </div>
               </dl>
@@ -122,13 +127,13 @@ export default async function AdminServicesPage() {
           )}
           renderTable={(items) => (
             <AdminTable
-              caption="Xidmətlər"
+              caption={t("pages.services.xidmetler")}
               headers={[
-                { label: "Xidmət" },
-                { label: "Vəziyyət" },
-                { label: "Sıra", className: "text-right" },
-                { label: "Yenilənib", className: "text-right" },
-                { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                { label: t("pages.services.xidmet") },
+                { label: t("pages.services.veziyyet") },
+                { label: t("pages.services.sira"), className: "text-right" },
+                { label: t("pages.services.yenilenib"), className: "text-right" },
+                { label: t("pages.services.emeliyyatlar"), srOnly: true, className: "text-right" },
               ]}
             >
               {items.map((service) => (

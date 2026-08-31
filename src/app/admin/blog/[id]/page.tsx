@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,10 +15,14 @@ import { PostForm } from "../post-form";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Məqalənin redaktəsi" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.blog.meqaleninRedaktesi") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.BLOG_MANAGE);
 
@@ -54,9 +59,9 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
             : `Son yenilənmə: ${formatDateTime(post.updatedAt)} · ${post.viewCount} baxış`
         }
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Bloq", href: "/admin/blog" },
-          { label: "Redaktə" },
+          { label: t("pages.blog.idarePaneli"), href: "/admin" },
+          { label: t("pages.blog.bloq"), href: "/admin/blog" },
+          { label: t("pages.blog.redakte") },
         ]}
         actions={
           <Link
@@ -66,7 +71,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
             className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
           >
             <ExternalLink className="size-4" aria-hidden="true" />
-            Saytda bax
+            {t("pages.blog.saytdaBax")}
           </Link>
         }
       />
@@ -75,15 +80,15 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
         action={updatePost}
         initial={initial}
         categories={categories}
-        submitLabel="Dəyişiklikləri saxla"
+        submitLabel={t("pages.blog.deyisiklikleriSaxla")}
         extraActions={
           post.deletedAt ? null : (
             <ConfirmAction
               action={deletePost}
               id={post.id}
-              label="Məqaləni sil"
-              title="Məqaləni silmək"
-              description="Məqalə saytdan çıxarılacaq, amma zibil qutusunda qalacaq."
+              label={t("pages.blog.meqaleniSil")}
+              title={t("pages.blog.meqaleniSilmek")}
+              description={t("pages.blog.meqaleSaytdanCixarilacaqAmma")}
               redirectTo="/admin/blog"
               className="mr-auto"
             >

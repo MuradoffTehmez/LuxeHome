@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import { AdminInput, AdminTextarea, FullWidth } from "@/components/admin/form-fields";
 import { saveBlogCategory } from "../actions";
@@ -13,6 +14,7 @@ export type CategoryFormValues = {
 };
 
 export function CategoryForm({ initial }: { initial: CategoryFormValues }) {
+  const t = useTranslations("admin");
   return (
     <AdminForm
       // `key` olmadan React eyni formanı təkrar istifadə edir və redaktəyə keçəndə
@@ -25,17 +27,17 @@ export function CategoryForm({ initial }: { initial: CategoryFormValues }) {
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
 
       <FormSection title={initial.id ? "Kateqoriyanı redaktə et" : "Yeni kateqoriya"}>
-        <AdminInput name="name" label="Ad" required defaultValue={initial.name} maxLength={80} />
+        <AdminInput name="name" label={t("pages.blog.ad")} required defaultValue={initial.name} maxLength={80} />
         <AdminInput
           name="slug"
-          label="Slug"
+          label={t("pages.blog.slug")}
           defaultValue={initial.slug}
           maxLength={90}
-          hint="Boş buraxsanız addan yaradılır."
+          hint={t("pages.blog.bosBuraxsanizAddanYaradilir")}
         />
         <AdminInput
           name="order"
-          label="Sıra"
+          label={t("pages.blog.sira")}
           type="number"
           min={0}
           defaultValue={String(initial.order)}
@@ -43,7 +45,7 @@ export function CategoryForm({ initial }: { initial: CategoryFormValues }) {
         <FullWidth>
           <AdminTextarea
             name="description"
-            label="Təsvir"
+            label={t("pages.blog.tesvir")}
             rows={3}
             maxLength={300}
             defaultValue={initial.description}
