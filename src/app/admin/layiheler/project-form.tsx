@@ -11,13 +11,12 @@ import {
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { SeoFields } from "@/components/admin/seo-fields";
 import {
-  PROJECT_STATUS_LABELS,
   PROJECT_STATUSES,
-  PROJECT_TYPE_LABELS,
   PROJECT_TYPES,
 } from "@/lib/constants";
 import type { ActionState } from "@/lib/admin/action-state";
 import type { ProjectFormValues } from "./form-values";
+import { useTranslations } from "next-intl";
 
 export function ProjectForm({
   action,
@@ -32,6 +31,7 @@ export function ProjectForm({
   submitLabel: string;
   extraActions?: React.ReactNode;
 }) {
+  const t = useTranslations("admin");
   return (
     <AdminForm
       action={action}
@@ -63,7 +63,7 @@ export function ProjectForm({
           defaultValue={initial.projectType}
           options={Object.values(PROJECT_TYPES).map((value) => ({
             value,
-            label: PROJECT_TYPE_LABELS[value],
+            label: t(`labels.projectType.${value}`),
           }))}
         />
 
@@ -74,7 +74,7 @@ export function ProjectForm({
           defaultValue={initial.status}
           options={Object.values(PROJECT_STATUSES).map((value) => ({
             value,
-            label: PROJECT_STATUS_LABELS[value],
+            label: t(`labels.projectStatus.${value}`),
           }))}
         />
 

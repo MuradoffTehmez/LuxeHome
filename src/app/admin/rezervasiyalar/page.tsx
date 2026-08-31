@@ -4,10 +4,11 @@ import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { PERMISSIONS, RESERVATION_STATUS_LABELS, type ReservationStatus } from "@/lib/constants";
+import { PERMISSIONS, type ReservationStatus } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime } from "@/lib/utils";
 import { ReservationStatusForm } from "./reservation-status-form";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Rezervasiyalar" };
 export const dynamic = "force-dynamic";
@@ -23,6 +24,7 @@ const STATUS_TONES = {
 } as const;
 
 export default async function AdminReservationsPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.LEAD_MANAGE);
   const reservations = await prisma.reservation.findMany({
     include: {
@@ -51,7 +53,7 @@ export default async function AdminReservationsPage() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <Link href={`/admin/emlaklar/${reservation.propertyId}`} className="font-medium text-ink hover:text-gold-deep">{reservation.property.title}</Link>
-                      <Badge tone={STATUS_TONES[status]}>{RESERVATION_STATUS_LABELS[status]}</Badge>
+                      <Badge tone={STATUS_TONES[status]}>{t(`labels.reservationStatus.${status}`)}</Badge>
                     </div>
                     <p className="mt-1 text-sm text-ink-soft">{reservation.firstName} {reservation.lastName} · {reservation.phone} · {reservation.email}</p>
                     <p className="mt-1 text-xs text-ink-muted">İstənilən vaxt: {formatDateTime(reservation.requestedFor)}{reservation.agent ? ` · Agent: ${reservation.agent.name}` : ""}</p>

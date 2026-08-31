@@ -8,6 +8,7 @@ import { IDLE_STATE } from "@/lib/admin/action-state";
 import { PARTNER_RELATION_ROLE_LABELS, PARTNER_RELATION_ROLES } from "@/lib/constants";
 import type { getAdminProjectPartnerLinks, getPartnerOptions } from "@/lib/queries";
 import { addPartnerRelation, removePartnerRelation } from "../terefdaslar/actions";
+import { useTranslations } from "next-intl";
 
 type Links = Awaited<ReturnType<typeof getAdminProjectPartnerLinks>>;
 type Options = Awaited<ReturnType<typeof getPartnerOptions>>;
@@ -24,6 +25,7 @@ function SubmitButton() {
 }
 
 export function ProjectPartnersManager({ projectId, links, options }: { projectId: string; links: Links; options: Options }) {
+  const t = useTranslations("admin");
   const [addState, addAction] = useActionState(addPartnerRelation, IDLE_STATE);
   const [removeState, removeAction] = useActionState(removePartnerRelation, IDLE_STATE);
   const linkedIds = new Set(links.map((link) => link.partnerId));
@@ -45,7 +47,7 @@ export function ProjectPartnersManager({ projectId, links, options }: { projectI
         </label>
         <label className="text-sm text-ink-soft">Rol
           <select name="role" defaultValue={PARTNER_RELATION_ROLES.DEVELOPER} className={`${fieldClass} mt-1`}>
-            {Object.values(PARTNER_RELATION_ROLES).map((role) => <option key={role} value={role}>{PARTNER_RELATION_ROLE_LABELS[role]}</option>)}
+            {Object.values(PARTNER_RELATION_ROLES).map((role) => <option key={role} value={role}>{t(`labels.partnerRelationRole.${role}`)}</option>)}
           </select>
         </label>
         <label className="text-sm text-ink-soft">Tərəfdaşın layihə səhifəsi
@@ -65,7 +67,7 @@ export function ProjectPartnersManager({ projectId, links, options }: { projectI
             <li key={link.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
               <div className="min-w-0">
                 <Link href={`/admin/terefdaslar/${link.partnerId}`} className="font-medium text-ink hover:text-gold-deep">{link.partner.name}</Link>
-                <p className="mt-1 text-xs text-ink-muted">{PARTNER_RELATION_ROLE_LABELS[link.role as keyof typeof PARTNER_RELATION_ROLE_LABELS] ?? link.role}{link.isPrimary ? " · əsas" : ""}{link.isPublic ? " · saytda görünür" : " · gizli"}</p>
+                <p className="mt-1 text-xs text-ink-muted">{t(`labels.partnerRelationRole.${link.role as keyof typeof PARTNER_RELATION_ROLE_LABELS}`) ?? link.role}{link.isPrimary ? " · əsas" : ""}{link.isPublic ? " · saytda görünür" : " · gizli"}</p>
                 {link.sourceUrl ? <a href={link.sourceUrl} target="_blank" rel="noreferrer" className="mt-1 block truncate text-xs text-gold-deep underline-offset-4 hover:underline">{link.sourceUrl}</a> : null}
               </div>
               <form action={removeAction}>

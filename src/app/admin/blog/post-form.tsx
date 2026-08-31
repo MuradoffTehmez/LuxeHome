@@ -11,9 +11,10 @@ import {
 import { ContentEditor } from "@/components/admin/content-editor";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { SeoFields } from "@/components/admin/seo-fields";
-import { POST_STATUS_LABELS, POST_STATUSES } from "@/lib/constants";
+import { POST_STATUSES } from "@/lib/constants";
 import type { ActionState } from "@/lib/admin/action-state";
 import type { PostFormValues } from "./form-values";
+import { useTranslations } from "next-intl";
 
 export function PostForm({
   action,
@@ -28,6 +29,7 @@ export function PostForm({
   submitLabel: string;
   extraActions?: React.ReactNode;
 }) {
+  const t = useTranslations("admin");
   return (
     <AdminForm
       action={action}
@@ -63,7 +65,7 @@ export function PostForm({
           defaultValue={initial.status}
           options={Object.values(POST_STATUSES).map((value) => ({
             value,
-            label: POST_STATUS_LABELS[value],
+            label: t(`labels.postStatus.${value}`),
           }))}
         />
 

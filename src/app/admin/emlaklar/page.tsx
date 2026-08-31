@@ -20,9 +20,7 @@ import {
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatArea, formatNumber, formatPrice, formatRelative } from "@/lib/utils";
 import {
-  LISTING_TYPE_LABELS,
   LISTING_TYPES,
-  PROPERTY_STATUS_LABELS,
   PROPERTY_STATUSES,
   type ListingType,
   type PropertyStatus,
@@ -32,8 +30,12 @@ import { deleteProperty, restoreProperty } from "./actions";
 import { BulkActionsForm, RowCheckbox } from "./bulk-actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Əmlaklar" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.properties.emlaklar") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/emlaklar";
@@ -50,6 +52,7 @@ export default async function AdminPropertiesPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   const params = await searchParams;
   const deleted = one(params, "silinmis") === "1";
@@ -93,9 +96,9 @@ export default async function AdminPropertiesPage({
         action={restoreProperty}
         id={property.id}
         label={`«${property.title}» elanını bərpa et`}
-        title="Elanı bərpa etmək"
-        description="Elan yenidən aktiv siyahıya qayıdacaq. Statusu dəyişmir."
-        confirmLabel="Bərpa et"
+        title={t("pages.properties.elaniBerpaEtmek")}
+        description={t("pages.properties.elanYenidenAktivSiyahiya")}
+        confirmLabel={t("pages.properties.berpaEt")}
         tone="neutral"
         className="size-11"
       >
@@ -108,7 +111,7 @@ export default async function AdminPropertiesPage({
           target="_blank"
           rel="noreferrer"
           aria-label={`«${property.title}» elanını saytda aç`}
-          title="Saytda bax"
+          title={t("pages.properties.saytdaBax")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Eye className="size-4" aria-hidden="true" />
@@ -116,7 +119,7 @@ export default async function AdminPropertiesPage({
         <Link
           href={`${LIST_PATH}/${property.id}`}
           aria-label={`«${property.title}» elanını redaktə et`}
-          title="Redaktə et"
+          title={t("pages.properties.redakteEt")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Pencil className="size-4" aria-hidden="true" />
@@ -125,8 +128,8 @@ export default async function AdminPropertiesPage({
           action={deleteProperty}
           id={property.id}
           label={`«${property.title}» elanını sil`}
-          title="Elanı silmək"
-          description="Elan saytdan çıxarılacaq, amma zibil qutusunda qalacaq və bərpa edilə bilər."
+          title={t("pages.properties.elaniSilmek")}
+          description={t("pages.properties.elanSaytdanCixarilacaqAmma")}
           className="size-11"
         >
           <Trash2 className="size-4" aria-hidden="true" />
@@ -145,8 +148,8 @@ export default async function AdminPropertiesPage({
             : `Ümumilikdə ${total} elan tapıldı.`
         }
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          ...(deleted ? [{ label: "Əmlaklar", href: LIST_PATH }] : []),
+          { label: t("pages.properties.idarePaneli"), href: "/admin" },
+          ...(deleted ? [{ label: t("pages.properties.emlaklar"), href: LIST_PATH }] : []),
           { label: deleted ? "Silinmişlər" : "Əmlaklar" },
         ]}
         actions={
@@ -160,7 +163,7 @@ export default async function AdminPropertiesPage({
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />
-              Yeni elan
+              {t("pages.properties.yeniElan")}
             </ButtonLink>
           </>
         }
@@ -170,49 +173,49 @@ export default async function AdminPropertiesPage({
         <AdminFilterBar
           action={LIST_PATH}
           searchValue={filters.q}
-          searchPlaceholder="Başlıq, ünvan və ya slug üzrə axtar…"
+          searchPlaceholder={t("pages.properties.basliqUnvanVeYa")}
           resultLabel={`${total} elan tapıldı`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
             {
               name: "status",
-              label: "Status",
+              label: t("pages.properties.status"),
               value: filters.status,
               options: [
-                { value: "", label: "Bütün statuslar" },
+                { value: "", label: t("pages.properties.butunStatuslar") },
                 ...Object.values(PROPERTY_STATUSES).map((value) => ({
                   value,
-                  label: PROPERTY_STATUS_LABELS[value],
+                  label: t(`labels.propertyStatus.${value}`),
                 })),
               ],
             },
             {
               name: "elan",
-              label: "Elan növü",
+              label: t("pages.properties.elanNovu"),
               value: filters.listingType,
               options: [
-                { value: "", label: "Hamısı" },
+                { value: "", label: t("pages.properties.hamisi") },
                 ...Object.values(LISTING_TYPES).map((value) => ({
                   value,
-                  label: LISTING_TYPE_LABELS[value],
+                  label: t(`labels.listingType.${value}`),
                 })),
               ],
             },
             {
               name: "tip",
-              label: "Əmlak növü",
+              label: t("pages.properties.emlakNovu"),
               value: filters.typeId,
               options: [
-                { value: "", label: "Bütün növlər" },
+                { value: "", label: t("pages.properties.butunNovler") },
                 ...options.types.map((type) => ({ value: type.id, label: type.name })),
               ],
             },
             {
               name: "seher",
-              label: "Şəhər",
+              label: t("pages.properties.seher"),
               value: filters.cityId,
               options: [
-                { value: "", label: "Bütün şəhərlər" },
+                { value: "", label: t("pages.properties.butunSeherler") },
                 ...options.cities.map((city) => ({ value: city.id, label: city.name })),
               ],
             },
@@ -222,7 +225,7 @@ export default async function AdminPropertiesPage({
         <BulkActionsForm mode={deleted ? "deleted" : "active"}>
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
-            ariaLabel="Əmlak elanları"
+            ariaLabel={t("pages.properties.emlakElanlari")}
             items={rows}
             getKey={(property) => property.id}
             empty={
@@ -238,7 +241,7 @@ export default async function AdminPropertiesPage({
                   <span className="flex items-start gap-2">
                     <RowCheckbox id={property.id} />
                     {property.isFeatured ? (
-                      <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label="Tövsiyə olunan" />
+                      <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label={t("pages.properties.tovsiyeOlunan")} />
                     ) : null}
                     <Link href={`${LIST_PATH}/${property.id}`} className="transition-colors hover:text-gold-deep">
                       {property.title}
@@ -254,34 +257,34 @@ export default async function AdminPropertiesPage({
                 status={
                   <StatusBadge
                     status={property.status as PropertyStatus}
-                    label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]}
+                    label={t(`labels.propertyStatus.${property.status as PropertyStatus}`)}
                   />
                 }
                 actions={renderActions(property)}
               >
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
                   <div>
-                    <dt className="text-xs text-ink-muted">Elan</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.properties.elan")}</dt>
                     <dd className="mt-1 flex flex-wrap items-center gap-2">
                       <Badge tone={property.listingType === "SALE" ? "dark" : "gold"}>
-                        {LISTING_TYPE_LABELS[property.listingType as ListingType]}
+                        {t(`labels.listingType.${property.listingType as ListingType}`)}
                       </Badge>
                       <span>{property.type.name}</span>
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Qiymət</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.properties.qiymet")}</dt>
                     <dd className="tabular mt-1 font-medium text-ink">{formatPrice(property.price, property.currency)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Ölçü</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.properties.olcu")}</dt>
                     <dd className="tabular mt-1 text-ink">
                       {property.area ? formatArea(property.area) : "—"}
                       {property.rooms ? ` · ${property.rooms} otaq` : ""}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Baxış</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.properties.baxis")}</dt>
                     <dd className="tabular mt-1 text-ink">{formatNumber(property.viewCount)}</dd>
                   </div>
                 </dl>
@@ -289,17 +292,17 @@ export default async function AdminPropertiesPage({
             )}
             renderTable={(items) => (
               <AdminTable
-                caption="Əmlak elanları"
+                caption={t("pages.properties.emlakElanlari")}
                 headers={[
-                  { label: "Seç", srOnly: true },
-                  { label: "Elan" },
-                  { label: "Növ" },
-                  { label: "Qiymət", className: "text-right" },
-                  { label: "Ölçü", className: "text-right" },
-                  { label: "Status" },
-                  { label: "Baxış", className: "text-right" },
-                  { label: "Yenilənib", className: "text-right" },
-                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                  { label: t("pages.properties.sec"), srOnly: true },
+                  { label: t("pages.properties.elan") },
+                  { label: t("pages.properties.nov") },
+                  { label: t("pages.properties.qiymet"), className: "text-right" },
+                  { label: t("pages.properties.olcu"), className: "text-right" },
+                  { label: t("pages.properties.status") },
+                  { label: t("pages.properties.baxis"), className: "text-right" },
+                  { label: t("pages.properties.yenilenib"), className: "text-right" },
+                  { label: t("pages.properties.emeliyyatlar"), srOnly: true, className: "text-right" },
                 ]}
               >
                 {items.map((property) => (
@@ -310,7 +313,7 @@ export default async function AdminPropertiesPage({
                     <AdminTableCell className="max-w-xs">
                       <div className="flex items-start gap-2">
                         {property.isFeatured ? (
-                          <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label="Tövsiyə olunan" />
+                          <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label={t("pages.properties.tovsiyeOlunan")} />
                         ) : null}
                         <div className="min-w-0">
                           <Link href={`${LIST_PATH}/${property.id}`} className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep">
@@ -325,7 +328,7 @@ export default async function AdminPropertiesPage({
                     <AdminTableCell>
                       <div className="flex flex-col gap-1">
                         <Badge tone={property.listingType === "SALE" ? "dark" : "gold"}>
-                          {LISTING_TYPE_LABELS[property.listingType as ListingType]}
+                          {t(`labels.listingType.${property.listingType as ListingType}`)}
                         </Badge>
                         <span className="text-xs text-ink-muted">{property.type.name}</span>
                       </div>
@@ -338,7 +341,7 @@ export default async function AdminPropertiesPage({
                       {property.rooms ? ` · ${property.rooms} otaq` : ""}
                     </AdminTableCell>
                     <AdminTableCell>
-                      <StatusBadge status={property.status as PropertyStatus} label={PROPERTY_STATUS_LABELS[property.status as PropertyStatus]} />
+                      <StatusBadge status={property.status as PropertyStatus} label={t(`labels.propertyStatus.${property.status as PropertyStatus}`)} />
                     </AdminTableCell>
                     <AdminTableCell align="right" className="tabular text-sm text-ink-soft">
                       {formatNumber(property.viewCount)}

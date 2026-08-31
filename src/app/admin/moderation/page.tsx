@@ -9,24 +9,29 @@ import { ACCOUNT_TYPE_LABELS, LISTING_TYPE_LABELS, PERMISSIONS } from "@/lib/con
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getModerationQueue } from "@/lib/queries";
 import { ApprovePropertyButton, RejectPropertyButton } from "./moderation-forms";
+import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Moderasiya" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.moderation.moderasiya") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function AdminModerationPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
   const queue = await getModerationQueue();
 
   return (
     <>
       <AdminPageHeader
-        title="Moderasiya"
-        description="Mülk sahibi və ya təsdiqlənməmiş agentliyin göndərdiyi elanlar — dərc olunmadan əvvəl burada nəzərdən keçirilir."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Moderasiya" }]}
+        title={t("pages.moderation.moderasiya")}
+        description={t("pages.moderation.mulkSahibiVeYa")}
+        breadcrumbs={[{ label: t("pages.moderation.idarePaneli"), href: "/admin" }, { label: t("pages.moderation.moderasiya") }]}
       />
 
       {queue.length === 0 ? (
-        <EmptyState title="Növbə boşdur" description="Təsdiq gözləyən elan yoxdur." />
+        <EmptyState title={t("pages.moderation.novbeBosdur")} description={t("pages.moderation.tesdiqGozleyenElanYoxdur")} />
       ) : (
         <AdminCard bodyClassName="p-0">
           <ul className="divide-y divide-line">
@@ -51,7 +56,7 @@ export default async function AdminModerationPage() {
                         {property.title}
                       </Link>
                       <p className="mt-0.5 truncate text-xs text-ink-muted">
-                        {LISTING_TYPE_LABELS[property.listingType as keyof typeof LISTING_TYPE_LABELS] ?? property.listingType}
+                        {t(`labels.listingType.${property.listingType as keyof typeof LISTING_TYPE_LABELS}`) ?? property.listingType}
                         {" · "}
                         {formatPrice(property.price, property.currency)}
                         {property.type && ` · ${property.type.name}`}
@@ -59,9 +64,9 @@ export default async function AdminModerationPage() {
                       </p>
                       <p className="mt-0.5 truncate text-xs text-ink-muted">
                         {property.author?.name ?? "Naməlum"} ({property.author?.email})
-                        {property.author && ` · ${ACCOUNT_TYPE_LABELS[property.author.accountType as keyof typeof ACCOUNT_TYPE_LABELS] ?? property.author.accountType}`}
+                        {property.author && ` · ${t(`labels.accountType.${property.author.accountType as keyof typeof ACCOUNT_TYPE_LABELS}`) ?? property.author.accountType}`}
                         {property.author?.agency && !property.author.agency.isVerified && (
-                          <Badge tone="warning" className="ml-1.5">Təsdiqlənməmiş agentlik</Badge>
+                          <Badge tone="warning" className="ml-1.5">{t("pages.moderation.tesdiqlenmemisAgentlik")}</Badge>
                         )}
                         {" · "}
                         {formatDateTime(property.createdAt)}

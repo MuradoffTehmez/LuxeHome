@@ -11,16 +11,18 @@ import { useToast } from "@/components/ui/toast";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { approveModerationProperty, rejectModerationProperty } from "./actions";
+import { useTranslations } from "next-intl";
 
 export function ApprovePropertyButton({ id, title }: { id: string; title: string }) {
+  const t = useTranslations("admin");
   return (
     <ConfirmAction
       action={approveModerationProperty}
       id={id}
       label={`${title} təsdiqlə`}
-      title="Elanı təsdiqləmək"
+      title={t("pages.moderation.elaniTesdiqlemek")}
       description={`"${title}" dərc olunacaq və saytda ictimai görünəcək.`}
-      confirmLabel="Təsdiqlə"
+      confirmLabel={t("pages.moderation.tesdiqle")}
       tone="neutral"
       className="size-11"
     >
@@ -30,6 +32,7 @@ export function ApprovePropertyButton({ id, title }: { id: string; title: string
 }
 
 export function RejectPropertyButton({ id, title }: { id: string; title: string }) {
+  const t = useTranslations("admin");
   const [open, setOpen] = useState(false);
   const [state, formAction, pending] = useActionState(rejectModerationProperty, IDLE_STATE);
   const { toast } = useToast();
@@ -59,16 +62,16 @@ export function RejectPropertyButton({ id, title }: { id: string; title: string 
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="Elanı rədd etmək"
+        title={t("pages.moderation.elaniReddEtmek")}
         description={`"${title}" qaralamaya qaytarılacaq. Sahib "Elanlarım"da səbəbi görəcək.`}
         size="sm"
         footer={
           <>
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={pending}>
-              Ləğv et
+              {t("pages.moderation.legvEt")}
             </Button>
             <Button type="submit" form={`reject-form-${id}`} variant="danger" size="sm" loading={pending}>
-              Rədd et
+              {t("pages.moderation.reddEt")}
             </Button>
           </>
         }
@@ -77,8 +80,8 @@ export function RejectPropertyButton({ id, title }: { id: string; title: string 
           <input type="hidden" name="id" value={id} />
           <Textarea
             name="reason"
-            label="Səbəb (istəyə görə)"
-            placeholder="Şəkillər aydın deyil, qiymət bazar dəyərinə uyğun deyil və s."
+            label={t("pages.moderation.sebebIsteyeGore")}
+            placeholder={t("pages.moderation.sekillerAydinDeyilQiymet")}
             maxLength={500}
           />
         </form>

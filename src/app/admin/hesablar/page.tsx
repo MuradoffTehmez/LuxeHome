@@ -14,9 +14,10 @@ import {
 import { AccountToggle } from "./account-toggle";
 import { AccountApproval } from "./account-approval";
 import { formatRelative } from "@/lib/utils";
-import { ACCOUNT_TYPE_LABELS, PERMISSIONS, type AccountType } from "@/lib/constants";
+import { PERMISSIONS, type AccountType } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminPublicAccounts } from "@/lib/queries";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Hesablar" };
 export const dynamic = "force-dynamic";
@@ -29,6 +30,7 @@ const TYPE_TONE: Record<AccountType, "gold" | "dark" | "neutral"> = {
 };
 
 export default async function AdminPublicAccountsPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
   const accounts = await getAdminPublicAccounts();
 
@@ -50,7 +52,7 @@ export default async function AdminPublicAccountsPage() {
             <AdminListCard
               title={account.name}
               meta={account.email}
-              status={<Badge tone={TYPE_TONE[account.accountType as AccountType]}>{ACCOUNT_TYPE_LABELS[account.accountType as AccountType]}</Badge>}
+              status={<Badge tone={TYPE_TONE[account.accountType as AccountType]}>{t(`labels.accountType.${account.accountType as AccountType}`)}</Badge>}
               actions={
                 <>
                   <AccountApproval id={account.id} name={account.name} approved={Boolean(account.approvedAt)} className="size-11" />
@@ -100,7 +102,7 @@ export default async function AdminPublicAccountsPage() {
                     <p className="mt-0.5 text-xs text-ink-muted">{account.email}</p>
                     {!account.isActive ? <Badge tone="neutral" className="mt-1">Deaktiv</Badge> : null}
                   </AdminTableCell>
-                  <AdminTableCell><Badge tone={TYPE_TONE[account.accountType as AccountType]}>{ACCOUNT_TYPE_LABELS[account.accountType as AccountType]}</Badge></AdminTableCell>
+                  <AdminTableCell><Badge tone={TYPE_TONE[account.accountType as AccountType]}>{t(`labels.accountType.${account.accountType as AccountType}`)}</Badge></AdminTableCell>
                   <AdminTableCell>
                     <Badge tone={account.approvedAt ? "success" : "warning"}>
                       {account.approvedAt ? "Təsdiqlənib" : "Gözləyir"}

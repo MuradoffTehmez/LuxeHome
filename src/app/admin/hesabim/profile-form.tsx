@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import { AdminInput, AdminSelect, FullWidth } from "@/components/admin/form-fields";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
-import { LOCALES, LOCALE_LABELS } from "@/lib/constants";
+import { LOCALES } from "@/lib/constants";
 import { saveProfile } from "./actions";
 
 export function ProfileForm({ initial }: { initial: { name: string; phone: string; locale: string; themePreference: string; avatarUrl: string | null } }) {
@@ -15,7 +15,7 @@ export function ProfileForm({ initial }: { initial: { name: string; phone: strin
   // dilindən asılı olmamalıdır, əks halda tanımadığı dilə keçmək çətinləşir.
   const localeOptions = Object.values(LOCALES).map((value) => ({
     value,
-    label: LOCALE_LABELS[value],
+    label: t(`labels.locale.${value}`),
   }));
 
   return (

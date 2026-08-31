@@ -20,7 +20,6 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatNumber, formatRelative } from "@/lib/utils";
 import {
   PERMISSIONS,
-  POST_STATUS_LABELS,
   POST_STATUSES,
   type PostStatus,
 } from "@/lib/constants";
@@ -29,6 +28,7 @@ import { getAdminBlogCategories, getAdminPosts } from "@/lib/queries";
 import { deletePost, restorePost } from "./actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Bloq" };
 export const dynamic = "force-dynamic";
@@ -43,6 +43,7 @@ function one(params: Record<string, string | string[] | undefined>, key: string)
 }
 
 export default async function AdminBlogPage({ searchParams }: { searchParams: SearchParams }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.BLOG_MANAGE);
 
@@ -172,7 +173,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
                 { value: "", label: "Bütün statuslar" },
                 ...Object.values(POST_STATUSES).map((value) => ({
                   value,
-                  label: POST_STATUS_LABELS[value],
+                  label: t(`labels.postStatus.${value}`),
                 })),
               ],
             },
@@ -214,7 +215,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
                   </>
                 }
                 status={
-                  <StatusBadge status={post.status as PostStatus} label={POST_STATUS_LABELS[post.status as PostStatus]} />
+                  <StatusBadge status={post.status as PostStatus} label={t(`labels.postStatus.${post.status as PostStatus}`)} />
                 }
                 actions={renderActions(post)}
               >
@@ -258,7 +259,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
                     </AdminTableCell>
                     <AdminTableCell className="text-sm text-ink-soft">{post.author?.name ?? "—"}</AdminTableCell>
                     <AdminTableCell>
-                      <StatusBadge status={post.status as PostStatus} label={POST_STATUS_LABELS[post.status as PostStatus]} />
+                      <StatusBadge status={post.status as PostStatus} label={t(`labels.postStatus.${post.status as PostStatus}`)} />
                     </AdminTableCell>
                     <AdminTableCell align="right" className="tabular text-sm text-ink-soft">{formatNumber(post.viewCount)}</AdminTableCell>
                     <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{formatRelative(post.updatedAt)}</AdminTableCell>

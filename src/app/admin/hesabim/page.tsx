@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { currentSessionId, requireStaff } from "@/lib/auth/guard";
 import { listSessions } from "@/lib/auth/session";
-import { ROLE_LABELS } from "@/lib/constants";
 import { PasswordForm } from "./password-form";
 import { ProfileForm } from "./profile-form";
 import { BackupCodesForm } from "./backup-codes-form";
 import { revokeOne, revokeOtherSessions } from "./actions";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Hesabım" };
 
@@ -38,6 +38,7 @@ export default async function AccountPage({
 }: {
   searchParams: Promise<{ parol?: string }>;
 }) {
+  const t = await getAdminT();
   const [user, { parol }] = await Promise.all([requireStaff(), searchParams]);
   const [sessions, activeSid, remainingCodes, profile] = await Promise.all([
     listSessions(user.id),
@@ -56,7 +57,7 @@ export default async function AccountPage({
       <header className="min-w-0">
         <h1 className="font-display text-2xl text-ink">Hesabım</h1>
         <p className="mt-1 text-sm text-ink-soft [overflow-wrap:anywhere]">
-          {user.email} · {ROLE_LABELS[user.role]}
+          {user.email} · {t(`labels.role.${user.role}`)}
         </p>
       </header>
 

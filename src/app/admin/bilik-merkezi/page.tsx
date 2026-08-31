@@ -17,8 +17,6 @@ import {
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatNumber, formatRelative } from "@/lib/utils";
 import {
-  KNOWLEDGE_AUDIENCE_LABELS,
-  KNOWLEDGE_STATUS_LABELS,
   PERMISSIONS,
   type KnowledgeAudience,
   type KnowledgeStatus,
@@ -26,6 +24,7 @@ import {
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminKnowledgeArticles } from "@/lib/knowledge";
 import { deleteKnowledgeArticle } from "./actions";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Bilik Mərkəzi" };
 export const dynamic = "force-dynamic";
@@ -43,6 +42,7 @@ export default async function AdminKnowledgePage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.KNOWLEDGE_MANAGE);
 
   const params = await searchParams;
@@ -95,7 +95,7 @@ export default async function AdminKnowledgePage({
               status={
                 <StatusBadge
                   status={article.status as "DRAFT" | "PUBLISHED"}
-                  label={KNOWLEDGE_STATUS_LABELS[article.status as KnowledgeStatus] ?? article.status}
+                  label={t(`labels.knowledgeStatus.${article.status as KnowledgeStatus}`) ?? article.status}
                 />
               }
               actions={
@@ -129,7 +129,7 @@ export default async function AdminKnowledgePage({
                 <div>
                   <dt className="text-xs text-ink-muted">Auditoriya</dt>
                   <dd className="mt-1 text-ink">
-                    {KNOWLEDGE_AUDIENCE_LABELS[article.audience as KnowledgeAudience] ??
+                    {t(`labels.knowledgeAudience.${article.audience as KnowledgeAudience}`) ??
                       article.audience}
                   </dd>
                 </div>
@@ -167,14 +167,14 @@ export default async function AdminKnowledgePage({
                     {article.category?.name ?? "—"}
                   </AdminTableCell>
                   <AdminTableCell className="text-sm text-ink-soft">
-                    {KNOWLEDGE_AUDIENCE_LABELS[article.audience as KnowledgeAudience] ??
+                    {t(`labels.knowledgeAudience.${article.audience as KnowledgeAudience}`) ??
                       article.audience}
                   </AdminTableCell>
                   <AdminTableCell>
                     <StatusBadge
                       status={article.status as "DRAFT" | "PUBLISHED"}
                       label={
-                        KNOWLEDGE_STATUS_LABELS[article.status as KnowledgeStatus] ?? article.status
+                        t(`labels.knowledgeStatus.${article.status as KnowledgeStatus}`) ?? article.status
                       }
                     />
                   </AdminTableCell>

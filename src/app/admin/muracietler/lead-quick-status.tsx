@@ -3,8 +3,9 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/toast";
-import { LEAD_STATUS_LABELS, LEAD_STATUS_TONE, LEAD_STATUSES, type LeadStatus } from "@/lib/constants";
+import { LEAD_STATUS_TONE, LEAD_STATUSES, type LeadStatus } from "@/lib/constants";
 import { setLeadStatus } from "./actions";
+import { useTranslations } from "next-intl";
 
 /**
  * Status tonuna uyğun nöqtə rəngi.
@@ -23,6 +24,7 @@ const TONE_DOT: Record<(typeof LEAD_STATUS_TONE)[LeadStatus], string> = {
 };
 
 export function LeadQuickStatus({ id, status, name }: { id: string; status: LeadStatus; name: string }) {
+  const t = useTranslations("admin");
   const [value, setValue] = useState<LeadStatus>(status);
   const [pending, startTransition] = useTransition();
   const { toast } = useToast();
@@ -55,7 +57,7 @@ export function LeadQuickStatus({ id, status, name }: { id: string; status: Lead
         aria-label={`${name} müraciətinin statusu`}
       >
         {Object.values(LEAD_STATUSES).map((item) => (
-          <option key={item} value={item}>{LEAD_STATUS_LABELS[item]}</option>
+          <option key={item} value={item}>{t(`labels.leadStatus.${item}`)}</option>
         ))}
         </select>
       </span>

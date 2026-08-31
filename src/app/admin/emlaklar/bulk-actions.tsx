@@ -5,6 +5,7 @@ import { Archive, CheckCircle2, RotateCcw, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { bulkUpdateProperties } from "./actions";
+import { useTranslations } from "next-intl";
 
 /**
  * Siyahını bütöv əhatə edən forma.
@@ -21,6 +22,7 @@ export function BulkActionsForm({
   mode: "active" | "deleted";
   children: React.ReactNode;
 }) {
+  const t = useTranslations("admin");
   const [state, formAction] = useActionState(bulkUpdateProperties, IDLE_STATE);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -55,7 +57,7 @@ export function BulkActionsForm({
             onChange={toggleAll}
             className="size-4 rounded-xs border-line-strong accent-gold"
           />
-          Hamısını seç
+          {t("pages.properties.hamisiniSec")}
         </label>
 
         <div className="flex flex-wrap items-center gap-1">
@@ -68,7 +70,7 @@ export function BulkActionsForm({
                 className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-success"
               >
                 <CheckCircle2 className="size-3.5" aria-hidden="true" />
-                Dərc et
+                {t("pages.properties.dercEt")}
               </button>
               <button
                 type="submit"
@@ -77,7 +79,7 @@ export function BulkActionsForm({
                 className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
               >
                 <Archive className="size-3.5" aria-hidden="true" />
-                Arxivlə
+                {t("pages.properties.arxivle")}
               </button>
               <button
                 type="submit"
@@ -86,7 +88,7 @@ export function BulkActionsForm({
                 className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
               >
                 <Trash2 className="size-3.5" aria-hidden="true" />
-                Sil
+                {t("pages.properties.sil")}
               </button>
             </>
           ) : (
@@ -97,7 +99,7 @@ export function BulkActionsForm({
               className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs px-2.5 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
             >
               <RotateCcw className="size-3.5" aria-hidden="true" />
-              Bərpa et
+              {t("pages.properties.berpaEt")}
             </button>
           )}
         </div>
@@ -109,12 +111,14 @@ export function BulkActionsForm({
 }
 
 export function RowCheckbox({ id }: { id: string }) {
+  const t = useTranslations("admin");
+
   return (
     <input
       type="checkbox"
       name="ids"
       value={id}
-      aria-label="Seç"
+      aria-label={t("pages.properties.sec")}
       onClick={(event) => event.stopPropagation()}
       className="size-4 shrink-0 rounded-xs border-line-strong accent-gold"
     />

@@ -1,12 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import { AdminInput, AdminSelect } from "@/components/admin/form-fields";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
-import { FEATURE_GROUPS, FEATURE_GROUP_LABELS } from "@/lib/constants";
+import { FEATURE_GROUPS } from "@/lib/constants";
 import {
   createFeature,
   createPropertyType,
@@ -15,10 +16,12 @@ import {
   togglePropertyTypeActive,
 } from "./actions";
 
-const FEATURE_GROUP_OPTIONS = Object.values(FEATURE_GROUPS).map((value) => ({
-  value,
-  label: FEATURE_GROUP_LABELS[value],
-}));
+/** Qrup adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+const featureGroupOptions = (t: ReturnType<typeof useTranslations<"admin">>) =>
+  Object.values(FEATURE_GROUPS).map((value) => ({
+    value,
+    label: t(`labels.featureGroup.${value}`),
+  }));
 
 export function CreatePropertyTypeForm() {
   return (
@@ -31,6 +34,7 @@ export function CreatePropertyTypeForm() {
 }
 
 export function CreateFeatureForm() {
+  const t = useTranslations("admin");
   return (
     <AdminForm action={createFeature} submitLabel="Xüsusiyyət əlavə et">
       <FormSection title="Yeni xüsusiyyət" description="Qrup filtr panelində hansı bölmədə görünəcəyini müəyyən edir.">
@@ -40,7 +44,7 @@ export function CreateFeatureForm() {
           label="Qrup"
           required
           defaultValue={FEATURE_GROUPS.GENERAL}
-          options={FEATURE_GROUP_OPTIONS}
+          options={featureGroupOptions(t)}
         />
       </FormSection>
     </AdminForm>

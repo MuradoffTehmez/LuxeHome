@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { FormJumpNav } from "@/components/admin/form-shell";
-import { PERMISSIONS, FEATURE_GROUP_LABELS, type FeatureGroup } from "@/lib/constants";
+import { PERMISSIONS, type FeatureGroup } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminTaxonomy } from "@/lib/queries";
+import { getAdminT } from "@/lib/admin-i18n";
 import {
   CreateFeatureForm,
   CreatePropertyTypeForm,
@@ -22,6 +23,7 @@ const TAXONOMY_SECTIONS = [
 ] as const;
 
 export default async function AdminTaxonomyPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
   const { types, features } = await getAdminTaxonomy();
 
@@ -69,7 +71,7 @@ export default async function AdminTaxonomyPage() {
                 {Array.from(featuresByGroup.entries()).map(([group, items]) => (
                   <div key={group} className="border-b border-line last:border-0">
                     <p className="px-4 py-2 text-xs font-medium tracking-wide text-ink-muted uppercase">
-                      {FEATURE_GROUP_LABELS[group as FeatureGroup] ?? group}
+                      {t(`labels.featureGroup.${group as FeatureGroup}`) ?? group}
                     </p>
                     <ul>
                       {items.map((feature) => (

@@ -6,11 +6,16 @@ import { getPropertyFormOptions } from "@/lib/queries";
 import { createProperty } from "../actions";
 import { EMPTY_PROPERTY } from "../form-values";
 import { PropertyForm } from "../property-form";
+import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Yeni elan" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.properties.yeniElan") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function NewPropertyPage() {
+  const t = await getAdminT();
   // Layout guard-ı sessiyanı yoxlayır; burada əlavə olaraq səlahiyyət tələb olunur —
   // EDITOR rolu bloq idarə edir, əmlak yarada bilmir
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
@@ -20,12 +25,12 @@ export default async function NewPropertyPage() {
   return (
     <>
       <AdminPageHeader
-        title="Yeni elan"
-        description="Elan qaralama kimi saxlanıla və sonra dərc edilə bilər."
+        title={t("pages.properties.yeniElan")}
+        description={t("pages.properties.elanQaralamaKimiSaxlanila")}
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Əmlaklar", href: "/admin/emlaklar" },
-          { label: "Yeni elan" },
+          { label: t("pages.properties.idarePaneli"), href: "/admin" },
+          { label: t("pages.properties.emlaklar"), href: "/admin/emlaklar" },
+          { label: t("pages.properties.yeniElan") },
         ]}
       />
 
@@ -37,7 +42,7 @@ export default async function NewPropertyPage() {
           typeId: options.types[0]?.id ?? "",
           cityId: options.cities[0]?.id ?? "",
         }}
-        submitLabel="Elanı yarat"
+        submitLabel={t("pages.properties.elaniYarat")}
       />
     </>
   );

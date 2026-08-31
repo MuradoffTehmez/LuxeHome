@@ -12,19 +12,15 @@ import { ContentEditor } from "@/components/admin/content-editor";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { SeoFields } from "@/components/admin/seo-fields";
 import {
-  KNOWLEDGE_AUDIENCE_LABELS,
   KNOWLEDGE_AUDIENCES,
-  KNOWLEDGE_LEVEL_LABELS,
   KNOWLEDGE_LEVELS,
-  KNOWLEDGE_RISK_LEVEL_LABELS,
   KNOWLEDGE_RISK_LEVELS,
-  KNOWLEDGE_STATUS_LABELS,
   KNOWLEDGE_STATUSES,
-  LEGAL_CONTENT_STATUS_LABELS,
   LEGAL_CONTENT_STATUSES,
 } from "@/lib/constants";
 import type { ActionState } from "@/lib/admin/action-state";
 import type { KnowledgeArticleFormValues } from "./form-values";
+import { useTranslations } from "next-intl";
 
 export function KnowledgeArticleForm({
   action,
@@ -39,6 +35,7 @@ export function KnowledgeArticleForm({
   submitLabel: string;
   extraActions?: React.ReactNode;
 }) {
+  const t = useTranslations("admin");
   return (
     <AdminForm
       action={action}
@@ -77,7 +74,7 @@ export function KnowledgeArticleForm({
           defaultValue={initial.status}
           options={Object.values(KNOWLEDGE_STATUSES).map((value) => ({
             value,
-            label: KNOWLEDGE_STATUS_LABELS[value],
+            label: t(`labels.knowledgeStatus.${value}`),
           }))}
         />
 
@@ -96,7 +93,7 @@ export function KnowledgeArticleForm({
           defaultValue={initial.audience}
           options={Object.values(KNOWLEDGE_AUDIENCES).map((value) => ({
             value,
-            label: KNOWLEDGE_AUDIENCE_LABELS[value],
+            label: t(`labels.knowledgeAudience.${value}`),
           }))}
         />
 
@@ -107,7 +104,7 @@ export function KnowledgeArticleForm({
           defaultValue={initial.level}
           options={Object.values(KNOWLEDGE_LEVELS).map((value) => ({
             value,
-            label: KNOWLEDGE_LEVEL_LABELS[value],
+            label: t(`labels.knowledgeLevel.${value}`),
           }))}
         />
 
@@ -140,8 +137,8 @@ export function KnowledgeArticleForm({
         title="Hüquqi status"
         description="Qüvvədə olan normanı təklifdən ayırın və hüquqşünas yoxlamasının tarixini göstərin."
       >
-        <AdminSelect name="legalStatus" label="Normanın statusu" required defaultValue={initial.legalStatus} options={Object.values(LEGAL_CONTENT_STATUSES).map((value) => ({ value, label: LEGAL_CONTENT_STATUS_LABELS[value] }))} />
-        <AdminSelect name="riskLevel" label="Risk siqnalı" required defaultValue={initial.riskLevel} options={Object.values(KNOWLEDGE_RISK_LEVELS).map((value) => ({ value, label: KNOWLEDGE_RISK_LEVEL_LABELS[value] }))} />
+        <AdminSelect name="legalStatus" label="Normanın statusu" required defaultValue={initial.legalStatus} options={Object.values(LEGAL_CONTENT_STATUSES).map((value) => ({ value, label: t(`labels.legalContentStatus.${value}`) }))} />
+        <AdminSelect name="riskLevel" label="Risk siqnalı" required defaultValue={initial.riskLevel} options={Object.values(KNOWLEDGE_RISK_LEVELS).map((value) => ({ value, label: t(`labels.knowledgeRiskLevel.${value}`) }))} />
         <AdminInput name="jurisdiction" label="Yurisdiksiya" required maxLength={120} defaultValue={initial.jurisdiction} />
         <AdminInput name="legalReviewedAt" label="Son hüquqi yoxlama" type="date" defaultValue={initial.legalReviewedAt} />
         <FullWidth><AdminTextarea name="legalActs" label="Əsas hüquqi aktlar" rows={5} defaultValue={initial.legalActs} hint="Hər sətirdə bir qanun, məcəllə və ya məhkəmə qərarı." /></FullWidth>

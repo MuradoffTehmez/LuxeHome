@@ -14,10 +14,11 @@ import {
   AdminResponsiveList,
 } from "@/components/admin/admin-responsive-list";
 import { formatDateTime, formatRelative } from "@/lib/utils";
-import { PERMISSIONS, ROLE_LABELS, type Role } from "@/lib/constants";
+import { PERMISSIONS, type Role } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminUsers, getAuditLog } from "@/lib/queries";
 import { CreateUserForm, UserRow } from "./user-forms";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "İstifadəçilər" };
 export const dynamic = "force-dynamic";
@@ -29,6 +30,7 @@ const ROLE_TONES: Record<Role, "gold" | "dark" | "neutral"> = {
 };
 
 export default async function AdminUsersPage() {
+  const t = await getAdminT();
   const actor = await requireAdminRead(PERMISSIONS.USER_MANAGE);
   const [users, auditLog] = await Promise.all([getAdminUsers(), getAuditLog(20)]);
   const activeUsers = users.filter((user) => user.isActive);
@@ -63,7 +65,7 @@ export default async function AdminUsersPage() {
               <AdminListCard
                 title={user.name}
                 meta={user.email}
-                status={<Badge tone={ROLE_TONES[user.role as Role]}>{ROLE_LABELS[user.role as Role]}</Badge>}
+                status={<Badge tone={ROLE_TONES[user.role as Role]}>{t(`labels.role.${user.role as Role}`)}</Badge>}
               >
                 <div className="flex flex-wrap gap-1.5">
                   {!user.isActive ? <Badge tone="neutral">Deaktiv</Badge> : null}
@@ -124,7 +126,7 @@ export default async function AdminUsersPage() {
                         {user.id === actor.id ? <Badge tone="gold">Siz</Badge> : null}
                       </div>
                     </AdminTableCell>
-                    <AdminTableCell><Badge tone={ROLE_TONES[user.role as Role]}>{ROLE_LABELS[user.role as Role]}</Badge></AdminTableCell>
+                    <AdminTableCell><Badge tone={ROLE_TONES[user.role as Role]}>{t(`labels.role.${user.role as Role}`)}</Badge></AdminTableCell>
                     <AdminTableCell>
                       {user.totpEnabledAt ? (
                         <span className="inline-flex items-center gap-1.5 text-sm text-success"><ShieldCheck className="size-4" aria-hidden="true" />Qurulub</span>

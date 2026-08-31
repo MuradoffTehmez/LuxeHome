@@ -6,17 +6,19 @@ import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { PERMISSIONS, REVIEW_STATUS_LABELS, type ReviewStatus } from "@/lib/constants";
+import { PERMISSIONS, type ReviewStatus } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { AgentForm, type AgentFormValues } from "../agent-form";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Agent profilinin redaktəsi" };
 export const dynamic = "force-dynamic";
 
 export default async function EditAgentPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
 
@@ -96,7 +98,7 @@ export default async function EditAgentPage({ params }: { params: Promise<{ id: 
                   <p className="font-medium text-ink">{review.customerName}</p>
                   <span className="flex items-center gap-1 text-sm text-gold-deep"><Star className="size-4 fill-current" /> {review.rating}</span>
                   <Badge tone={review.status === "APPROVED" ? "success" : review.status === "PENDING" ? "warning" : "neutral"}>
-                    {REVIEW_STATUS_LABELS[review.status as ReviewStatus] ?? review.status}
+                    {t(`labels.reviewStatus.${review.status as ReviewStatus}`) ?? review.status}
                   </Badge>
                 </div>
                 <p className="mt-1 max-w-3xl text-sm text-ink-soft">{review.comment}</p>

@@ -2,8 +2,9 @@
 
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import { AdminInput, AdminSelect, AdminTextarea, FullWidth } from "@/components/admin/form-fields";
-import { TRANSLATION_STATUS_LABELS, TRANSLATION_STATUSES } from "@/lib/constants";
+import { TRANSLATION_STATUSES } from "@/lib/constants";
 import { saveTranslation } from "./actions";
+import { useTranslations } from "next-intl";
 
 type Initial = {
   id: string;
@@ -25,13 +26,14 @@ export function TranslationForm({
   entities: { value: string; label: string }[];
   initial: Initial;
 }) {
+  const t = useTranslations("admin");
   return (
     <AdminForm action={saveTranslation} submitLabel="Tərcüməni saxla">
       {initial && <input type="hidden" name="id" value={initial.id} />}
       <FormSection title="Məzmun və dil" description="Azərbaycan dilindəki mənbə kontenti seçin; EN/RU versiyası ayrıca statusla idarə olunur.">
         <AdminSelect name="entity" label="Mənbə məzmun" options={entities} placeholder="Məzmun seçin" defaultValue={initial ? `${initial.entityType}:${initial.entityId}` : ""} required />
         <AdminSelect name="locale" label="Tərcümə dili" options={[{ value: "en", label: "English" }, { value: "ru", label: "Русский" }]} defaultValue={initial?.locale ?? "en"} required />
-        <AdminSelect name="status" label="İş axını statusu" options={Object.values(TRANSLATION_STATUSES).map((value) => ({ value, label: TRANSLATION_STATUS_LABELS[value] }))} defaultValue={initial?.status ?? TRANSLATION_STATUSES.DRAFT} required />
+        <AdminSelect name="status" label="İş axını statusu" options={Object.values(TRANSLATION_STATUSES).map((value) => ({ value, label: t(`labels.translationStatus.${value}`) }))} defaultValue={initial?.status ?? TRANSLATION_STATUSES.DRAFT} required />
       </FormSection>
       <FormSection title="Tərcümə" description="Boş saxlanılan sahələr saytda Azərbaycan dilindəki mənbə dəyərinə geri düşür.">
         <FullWidth><AdminInput name="title" label="Başlıq" defaultValue={initial?.title ?? ""} required maxLength={240} /></FullWidth>

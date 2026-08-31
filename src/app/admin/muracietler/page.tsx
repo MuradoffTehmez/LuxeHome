@@ -17,9 +17,7 @@ import {
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatPhone, formatRelative } from "@/lib/utils";
 import {
-  LEAD_SOURCE_LABELS,
   LEAD_SOURCES,
-  LEAD_STATUS_LABELS,
   LEAD_STATUSES,
   PERMISSIONS,
   type LeadSource,
@@ -29,8 +27,12 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminLeads } from "@/lib/queries";
 import { deleteLead } from "./actions";
 import { LeadQuickStatus } from "./lead-quick-status";
+import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Müraciətlər" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.leads.muracietler") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/muracietler";
@@ -43,6 +45,7 @@ function one(params: Record<string, string | string[] | undefined>, key: string)
 }
 
 export default async function AdminLeadsPage({ searchParams }: { searchParams: SearchParams }) {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.LEAD_MANAGE);
 
   const params = await searchParams;
@@ -71,7 +74,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
         <Link
           href={`${LIST_PATH}/${lead.id}`}
           aria-label={`«${lead.name}» müraciətini aç`}
-          title="Ətraflı"
+          title={t("pages.leads.etrafli")}
           className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
         >
           <Eye className="size-4" aria-hidden="true" />
@@ -80,8 +83,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
           action={deleteLead}
           id={lead.id}
           label={`«${lead.name}» müraciətini sil`}
-          title="Müraciəti silmək"
-          description="Müraciət tamamilə silinəcək və bərpa edilə bilməyəcək."
+          title={t("pages.leads.muracietiSilmek")}
+          description={t("pages.leads.muracietTamamileSilinecekVe")}
           className="size-11"
         >
           <Trash2 className="size-4" aria-hidden="true" />
@@ -93,39 +96,39 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
   return (
     <>
       <AdminPageHeader
-        title="Müraciətlər"
+        title={t("pages.leads.muracietler")}
         description={`Ümumilikdə ${total} müraciət tapıldı.`}
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Müraciətlər" }]}
+        breadcrumbs={[{ label: t("pages.leads.idarePaneli"), href: "/admin" }, { label: t("pages.leads.muracietler") }]}
       />
 
       <AdminCard bodyClassName="p-0">
         <AdminFilterBar
           action={LIST_PATH}
           searchValue={filters.q}
-          searchPlaceholder="Ad, telefon, e-poçt və ya mətn üzrə axtar…"
+          searchPlaceholder={t("pages.leads.adTelefonEPoct")}
           resultLabel={`${total} müraciət tapıldı`}
           selects={[
             {
               name: "status",
-              label: "Status",
+              label: t("pages.leads.status"),
               value: filters.status,
               options: [
-                { value: "", label: "Bütün statuslar" },
+                { value: "", label: t("pages.leads.butunStatuslar") },
                 ...Object.values(LEAD_STATUSES).map((value) => ({
                   value,
-                  label: LEAD_STATUS_LABELS[value],
+                  label: t(`labels.leadStatus.${value}`),
                 })),
               ],
             },
             {
               name: "menbe",
-              label: "Mənbə",
+              label: t("pages.leads.menbe"),
               value: filters.source,
               options: [
-                { value: "", label: "Bütün mənbələr" },
+                { value: "", label: t("pages.leads.butunMenbeler") },
                 ...Object.values(LEAD_SOURCES).map((value) => ({
                   value,
-                  label: LEAD_SOURCE_LABELS[value],
+                  label: t(`labels.leadSource.${value}`),
                 })),
               ],
             },
@@ -134,7 +137,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
 
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
-            ariaLabel="Müraciətlər"
+            ariaLabel={t("pages.leads.muracietler")}
             items={rows}
             getKey={(lead) => lead.id}
             empty={
@@ -163,15 +166,15 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                 <p className="[overflow-wrap:anywhere]">{lead.subject ?? lead.property?.title ?? "Mövzu yoxdur"}</p>
                 <dl className="mt-4 grid grid-cols-2 gap-3">
                   <div>
-                    <dt className="text-xs text-ink-muted">Mənbə</dt>
-                    <dd className="mt-1 text-ink">{LEAD_SOURCE_LABELS[lead.source as LeadSource]}</dd>
+                    <dt className="text-xs text-ink-muted">{t("pages.leads.menbe")}</dt>
+                    <dd className="mt-1 text-ink">{t(`labels.leadSource.${lead.source as LeadSource}`)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Məsul</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.leads.mesul")}</dt>
                     <dd className="mt-1 text-ink">{lead.assignee?.name ?? "Təyin edilməyib"}</dd>
                   </div>
                   <div className="col-span-2">
-                    <dt className="text-xs text-ink-muted">Vaxt</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.leads.vaxt")}</dt>
                     <dd className="mt-1 text-ink">{formatRelative(lead.createdAt)}</dd>
                   </div>
                 </dl>
@@ -179,15 +182,15 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
             )}
             renderTable={(items) => (
               <AdminTable
-                caption="Müraciətlər"
+                caption={t("pages.leads.muracietler")}
                 headers={[
-                  { label: "Müştəri" },
-                  { label: "Mövzu" },
-                  { label: "Mənbə" },
-                  { label: "Məsul" },
-                  { label: "Status" },
-                  { label: "Vaxt", className: "text-right" },
-                  { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                  { label: t("pages.leads.musteri") },
+                  { label: t("pages.leads.movzu") },
+                  { label: t("pages.leads.menbe") },
+                  { label: t("pages.leads.mesul") },
+                  { label: t("pages.leads.status") },
+                  { label: t("pages.leads.vaxt"), className: "text-right" },
+                  { label: t("pages.leads.emeliyyatlar"), srOnly: true, className: "text-right" },
                 ]}
               >
                 {items.map((lead) => (
@@ -199,8 +202,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
                       </a>
                     </AdminTableCell>
                     <AdminTableCell className="max-w-xs"><span className="line-clamp-1 text-sm text-ink-soft">{lead.subject ?? lead.property?.title ?? "—"}</span></AdminTableCell>
-                    <AdminTableCell className="text-sm text-ink-soft">{LEAD_SOURCE_LABELS[lead.source as LeadSource]}</AdminTableCell>
-                    <AdminTableCell className="text-sm text-ink-soft">{lead.assignee?.name ?? <span className="text-ink-muted">Təyin edilməyib</span>}</AdminTableCell>
+                    <AdminTableCell className="text-sm text-ink-soft">{t(`labels.leadSource.${lead.source as LeadSource}`)}</AdminTableCell>
+                    <AdminTableCell className="text-sm text-ink-soft">{lead.assignee?.name ?? <span className="text-ink-muted">{t("pages.leads.teyinEdilmeyib")}</span>}</AdminTableCell>
                     <AdminTableCell><LeadQuickStatus id={lead.id} status={lead.status as LeadStatus} name={lead.name} /></AdminTableCell>
                     <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{formatRelative(lead.createdAt)}</AdminTableCell>
                     <AdminTableCell align="right"><div className="flex items-center justify-end gap-0.5">{renderActions(lead)}</div></AdminTableCell>

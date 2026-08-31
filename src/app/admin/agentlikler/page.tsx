@@ -19,11 +19,13 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminAgencies, getAdminAgencyEmployeeQueue } from "@/lib/queries";
 import { approveAgencyEmployee, rejectAgencyEmployee, toggleAgencyVerification } from "./actions";
 import { AgencyProfileRepair } from "./agency-profile-repair";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Agentliklər" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminAgenciesPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
   const [agencies, employeeQueue] = await Promise.all([
     getAdminAgencies(),
@@ -55,7 +57,7 @@ export default async function AdminAgenciesPage() {
                   <p className="truncate text-sm font-medium text-ink">{employee.user.name}</p>
                   <p className="mt-0.5 truncate text-xs text-ink-muted">
                     {employee.user.email} · {employee.agency.name} ·{" "}
-                    {AGENCY_EMPLOYEE_ROLE_LABELS[employee.role as keyof typeof AGENCY_EMPLOYEE_ROLE_LABELS] ??
+                    {t(`labels.agencyEmployeeRole.${employee.role as keyof typeof AGENCY_EMPLOYEE_ROLE_LABELS}`) ??
                       employee.role}
                   </p>
                 </div>

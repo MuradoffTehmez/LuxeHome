@@ -26,6 +26,7 @@ import {
 import { NeighborhoodEditor, type NeighborhoodProfileValues } from "./neighborhood-editor";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "İctimai imkanlar" };
 export const dynamic = "force-dynamic";
@@ -37,6 +38,7 @@ function numberField(value: number | null): string {
 }
 
 export default async function PublicFeaturesAdminPage() {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
   const [properties, locations, nearbyPlaces, neighborhoodProfiles, premiumProperties] = await Promise.all([
@@ -154,7 +156,7 @@ export default async function PublicFeaturesAdminPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium text-ink">{place.name}</p>
-                    <Badge tone="neutral">{NEARBY_PLACE_CATEGORY_LABELS[place.category as NearbyPlaceCategory] ?? place.category}</Badge>
+                    <Badge tone="neutral">{t(`labels.nearbyPlaceCategory.${place.category as NearbyPlaceCategory}`) ?? place.category}</Badge>
                   </div>
                   <p className="mt-1 text-xs text-ink-muted">
                     {place.property.title}

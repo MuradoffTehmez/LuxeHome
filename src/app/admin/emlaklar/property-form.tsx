@@ -18,7 +18,6 @@ import {
   CURRENCY_LABELS,
   DOCUMENT_STATUS_LABELS,
   DOCUMENT_STATUSES,
-  FEATURE_GROUP_LABELS,
   LISTING_TYPE_LABELS,
   LISTING_TYPES,
   PRICE_PERIOD_LABELS,
@@ -32,6 +31,7 @@ import {
 import type { ActionState } from "@/lib/admin/action-state";
 import type { PropertyFormOptions } from "@/lib/queries";
 import type { PropertyFormValues } from "./form-values";
+import { useTranslations } from "next-intl";
 
 /**
  * Əmlak elanının forması.
@@ -46,17 +46,20 @@ const optionsOf = <T extends Record<string, string>>(
   labels: Record<string, string>,
 ) => Object.values(values).map((value) => ({ value, label: labels[value] }));
 
-const PROPERTY_SECTIONS = [
-  { id: "esas-melumat", label: "Əsas" },
-  { id: "qiymet", label: "Qiymət" },
-  { id: "yerlesme", label: "Yerləşmə" },
-  { id: "olculer", label: "Ölçülər" },
-  { id: "sertler", label: "Şərtlər" },
-  { id: "xususiyyetler", label: "Xüsusiyyətlər" },
-  { id: "sekiller", label: "Şəkillər" },
-  { id: "seo", label: "SEO" },
-  { id: "open-graph", label: "Open Graph" },
-] as const;
+/** Bölmə adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+function buildPropertySections(t: ReturnType<typeof useTranslations<"admin">>) {
+  return [
+    { id: "esas-melumat", label: t("pages.properties.esas") },
+    { id: "qiymet", label: t("pages.properties.qiymet") },
+    { id: "yerlesme", label: t("pages.properties.yerlesme") },
+    { id: "olculer", label: t("pages.properties.olculer") },
+    { id: "sertler", label: t("pages.properties.sertler") },
+    { id: "xususiyyetler", label: t("pages.properties.xususiyyetler") },
+    { id: "sekiller", label: t("pages.properties.sekiller") },
+    { id: "seo", label: "SEO" },
+    { id: "open-graph", label: t("pages.properties.openGraph") },
+  ] as const;
+}
 
 export function PropertyForm({
   action,
@@ -71,6 +74,7 @@ export function PropertyForm({
   submitLabel: string;
   extraActions?: React.ReactNode;
 }) {
+  const t = useTranslations("admin");
   const [listingType, setListingType] = useState(initial.listingType);
   const [cityId, setCityId] = useState(initial.cityId || options.cities[0]?.id || "");
   const [typeId, setTypeId] = useState(initial.typeId);
@@ -100,34 +104,34 @@ export function PropertyForm({
       {initial.id && <input type="hidden" name="id" value={initial.id} />}
 
       <FormJumpNav
-        items={PROPERTY_SECTIONS.filter(
+        items={buildPropertySections(t).filter(
           (section) => section.id !== "xususiyyetler" || options.features.length > 0,
         )}
       />
 
-      <FormSection id="esas-melumat" title="Əsas məlumat" description="Elanın saytda görünən başlığı və təsviri.">
+      <FormSection id="esas-melumat" title={t("pages.properties.esasMelumat")} description={t("pages.properties.elaninSaytdaGorunenBasligi")}>
         <FullWidth>
           <AdminInput
             name="title"
-            label="Başlıq"
+            label={t("pages.properties.basliq")}
             required
             defaultValue={initial.title}
             maxLength={160}
-            hint="Məsələn: «Xətai rayonunda 3 otaqlı yeni tikili mənzil»"
+            hint={t("pages.properties.meselenXetaiRayonunda3")}
           />
         </FullWidth>
 
         <AdminInput
           name="slug"
-          label="Slug"
+          label={t("pages.properties.slug")}
           defaultValue={initial.slug}
           maxLength={90}
-          hint="Boş buraxsanız başlıqdan avtomatik yaradılır."
+          hint={t("pages.properties.bosBuraxsanizBasliqdanAvtomatik")}
         />
 
         <AdminSelect
           name="status"
-          label="Status"
+          label={t("pages.properties.status")}
           required
           defaultValue={initial.status}
           options={optionsOf(PROPERTY_STATUSES, PROPERTY_STATUS_LABELS)}
@@ -136,19 +140,19 @@ export function PropertyForm({
         <FullWidth>
           <AdminTextarea
             name="description"
-            label="Təsvir"
+            label={t("pages.properties.tesvir")}
             required
             rows={8}
             defaultValue={initial.description}
-            hint="Elanın tam mətni. Ən azı 20 simvol."
+            hint={t("pages.properties.elaninTamMetniEn")}
           />
         </FullWidth>
       </FormSection>
 
-      <FormSection id="qiymet" title="Elan növü və qiymət">
+      <FormSection id="qiymet" title={t("pages.properties.elanNovuVeQiymet")}>
         <AdminSelect
           name="listingType"
-          label="Elan növü"
+          label={t("pages.properties.elanNovu")}
           required
           value={listingType}
           onChange={(event) => setListingType(event.target.value)}
@@ -157,7 +161,7 @@ export function PropertyForm({
 
         <AdminSelect
           name="currency"
-          label="Valyuta"
+          label={t("pages.properties.valyuta")}
           required
           defaultValue={initial.currency}
           options={optionsOf(CURRENCIES, CURRENCY_LABELS)}
@@ -165,7 +169,7 @@ export function PropertyForm({
 
         <AdminInput
           name="price"
-          label="Qiymət"
+          label={t("pages.properties.qiymet")}
           required
           type="number"
           min={0}
@@ -176,7 +180,7 @@ export function PropertyForm({
         {listingType === LISTING_TYPES.RENT && (
           <AdminSelect
             name="pricePeriod"
-            label="Qiymət dövrü"
+            label={t("pages.properties.qiymetDovru")}
             required
             defaultValue={initial.pricePeriod || PRICE_PERIODS.MONTH}
             options={optionsOf(PRICE_PERIODS, PRICE_PERIOD_LABELS)}
@@ -184,20 +188,20 @@ export function PropertyForm({
         )}
       </FormSection>
 
-      <FormSection id="yerlesme" title="Yerləşmə">
+      <FormSection id="yerlesme" title={t("pages.properties.yerlesme")}>
         <AdminSelect
           name="typeId"
-          label="Əmlak növü"
+          label={t("pages.properties.emlakNovu")}
           required
           value={typeId}
           onChange={(event) => setTypeId(event.target.value)}
-          placeholder="Seçin"
+          placeholder={t("pages.properties.secin")}
           options={options.types.map((type) => ({ value: type.id, label: type.name }))}
         />
 
         <AdminSelect
           name="cityId"
-          label="Şəhər"
+          label={t("pages.properties.seher")}
           required
           value={cityId}
           onChange={(event) => setCityId(event.target.value)}
@@ -206,74 +210,74 @@ export function PropertyForm({
 
         <AdminSelect
           name="districtId"
-          label="Rayon / qəsəbə"
+          label={t("pages.properties.rayonQesebe")}
           value={districtId}
           onChange={(event) => setDistrictId(event.target.value)}
-          placeholder="Seçilməyib"
+          placeholder={t("pages.properties.secilmeyib")}
           options={districts.map((district) => ({ value: district.id, label: district.name }))}
         />
 
         <AdminSelect
           name="metroId"
-          label="Metro"
+          label={t("pages.properties.metro")}
           defaultValue={initial.metroId}
-          placeholder="Seçilməyib"
+          placeholder={t("pages.properties.secilmeyib")}
           options={metros.map((metro) => ({ value: metro.id, label: metro.name }))}
         />
 
         <AdminSelect
           name="projectId"
-          label="Layihə"
+          label={t("pages.properties.layihe")}
           defaultValue={initial.projectId}
-          placeholder="Layihəyə aid deyil"
+          placeholder={t("pages.properties.layiheyeAidDeyil")}
           options={options.projects.map((project) => ({ value: project.id, label: project.name }))}
         />
 
         <FullWidth>
           <AdminInput
             name="address"
-            label="Ünvan"
+            label={t("pages.properties.unvan")}
             defaultValue={initial.address}
             maxLength={240}
-            hint="Küçə və bina — dəqiq mənzil nömrəsi yazılmır."
+            hint={t("pages.properties.kuceVeBinaDeqiq")}
           />
         </FullWidth>
 
         <AdminInput
           name="latitude"
-          label="Enlik (latitude)"
+          label={t("pages.properties.enlikLatitude")}
           type="number"
           step="any"
           defaultValue={initial.latitude}
         />
         <AdminInput
           name="longitude"
-          label="Uzunluq (longitude)"
+          label={t("pages.properties.uzunluqLongitude")}
           type="number"
           step="any"
           defaultValue={initial.longitude}
         />
       </FormSection>
 
-      <FormSection id="olculer" title="Ölçülər">
-        <AdminInput name="rooms" label="Otaq sayı" type="number" min={0} value={rooms} onChange={(event) => setRooms(event.target.value)} />
+      <FormSection id="olculer" title={t("pages.properties.olculer")}>
+        <AdminInput name="rooms" label={t("pages.properties.otaqSayi")} type="number" min={0} value={rooms} onChange={(event) => setRooms(event.target.value)} />
         <AdminInput
           name="bedrooms"
-          label="Yataq otağı"
+          label={t("pages.properties.yataqOtagi")}
           type="number"
           min={0}
           defaultValue={initial.bedrooms}
         />
         <AdminInput
           name="bathrooms"
-          label="Sanitar qovşaq"
+          label={t("pages.properties.sanitarQovsaq")}
           type="number"
           min={0}
           defaultValue={initial.bathrooms}
         />
         <AdminInput
           name="area"
-          label="Sahə (m²)"
+          label={t("pages.properties.saheM")}
           type="number"
           min={0}
           step="0.01"
@@ -281,51 +285,51 @@ export function PropertyForm({
         />
         <AdminInput
           name="landArea"
-          label="Torpaq sahəsi (sot)"
+          label={t("pages.properties.torpaqSahesiSot")}
           type="number"
           min={0}
           step="0.01"
           defaultValue={initial.landArea}
-          hint="1 sot = 100 m². Torpaq və həyət evi elanlarında doldurulur."
+          hint={t("pages.properties.1Sot100M")}
         />
-        <AdminInput name="floor" label="Mərtəbə" type="number" min={0} defaultValue={initial.floor} />
+        <AdminInput name="floor" label={t("pages.properties.mertebe")} type="number" min={0} defaultValue={initial.floor} />
         <AdminInput
           name="totalFloors"
-          label="Binanın mərtəbəsi"
+          label={t("pages.properties.binaninMertebesi")}
           type="number"
           min={0}
           defaultValue={initial.totalFloors}
         />
       </FormSection>
 
-      <FormSection id="sertler" title="Vəziyyət və şərtlər">
+      <FormSection id="sertler" title={t("pages.properties.veziyyetVeSertler")}>
         <AdminSelect
           name="renovation"
-          label="Təmir vəziyyəti"
+          label={t("pages.properties.temirVeziyyeti")}
           defaultValue={initial.renovation}
-          placeholder="Seçilməyib"
+          placeholder={t("pages.properties.secilmeyib")}
           options={optionsOf(RENOVATIONS, RENOVATION_LABELS)}
         />
         <AdminSelect
           name="documentStatus"
-          label="Sənəd"
+          label={t("pages.properties.sened")}
           defaultValue={initial.documentStatus}
-          placeholder="Seçilməyib"
+          placeholder={t("pages.properties.secilmeyib")}
           options={optionsOf(DOCUMENT_STATUSES, DOCUMENT_STATUS_LABELS)}
         />
         <AdminSelect
           name="buildingType"
-          label="Tikili növü"
+          label={t("pages.properties.tikiliNovu")}
           defaultValue={initial.buildingType}
-          placeholder="Seçilməyib"
+          placeholder={t("pages.properties.secilmeyib")}
           options={optionsOf(BUILDING_TYPES, BUILDING_TYPE_LABELS)}
         />
         <AdminInput
           name="videoUrl"
-          label="Video ünvanı"
+          label={t("pages.properties.videoUnvani")}
           type="url"
           defaultValue={initial.videoUrl}
-          hint="YouTube və ya Vimeo linki — yalnız https://"
+          hint={t("pages.properties.youtubeVeYaVimeo")}
         />
 
         <FullWidth>
@@ -334,40 +338,40 @@ export function PropertyForm({
                 xüsusiyyət qrupundan seçilir və elanın sütunlarına oradan yazılır. */}
             <AdminCheckbox
               name="isFeatured"
-              label="Premium / Featured et"
+              label={t("pages.properties.premiumFeaturedEt")}
               defaultChecked={initial.isFeatured}
             />
             <AdminCheckbox
               name="reservationEnabled"
-              label="Rezervasiyanı aktiv et"
+              label={t("pages.properties.rezervasiyaniAktivEt")}
               defaultChecked={initial.reservationEnabled}
             />
           </div>
         </FullWidth>
         <AdminInput
           name="featuredUntil"
-          label="Premium bitmə tarixi"
+          label={t("pages.properties.premiumBitmeTarixi")}
           type="date"
           defaultValue={initial.featuredUntil}
-          hint="Boş buraxılsa müddətsiz featured kimi qalır."
+          hint={t("pages.properties.bosBuraxilsaMuddetsizFeatured")}
         />
         <AdminSelect
           name="assignedAgentId"
-          label="Məsul agent"
+          label={t("pages.properties.mesulAgent")}
           defaultValue={initial.assignedAgentId}
-          placeholder="Agent seçilməyib"
+          placeholder={t("pages.properties.agentSecilmeyib")}
           options={options.agents.map((agent) => ({ value: agent.id, label: agent.name }))}
         />
       </FormSection>
 
       {options.features.length > 0 && (
-        <FormSection id="xususiyyetler" title="Xüsusiyyətlər" description="Axtarış filtrində istifadə olunur.">
+        <FormSection id="xususiyyetler" title={t("pages.properties.xususiyyetler")} description={t("pages.properties.axtarisFiltrindeIstifadeOlunur")}>
           <FullWidth>
             <div className="flex flex-col gap-4">
               {Object.entries(featureGroups).map(([group, features]) => (
                 <fieldset key={group} className="flex flex-col gap-1">
                   <legend className="mb-1 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                    {FEATURE_GROUP_LABELS[group as FeatureGroup] ?? group}
+                    {t(`labels.featureGroup.${group as FeatureGroup}`) ?? group}
                   </legend>
                   <div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
                     {features.map((feature) => (
@@ -387,31 +391,31 @@ export function PropertyForm({
         </FormSection>
       )}
 
-      <FormSection id="sekiller" title="Şəkillər" description="Birinci şəkil siyahılarda üz qabığı kimi görünür.">
+      <FormSection id="sekiller" title={t("pages.properties.sekiller")} description={t("pages.properties.birinciSekilSiyahilardaUz")}>
         <FullWidth>
           <ImageDropzone
             name="images"
-            label="Qalereya"
+            label={t("pages.properties.qalereya")}
             folder="emlaklar"
             initial={initial.images}
-            hint="Yüklənən şəkillər avtomatik WebP formatına çevrilir və ölçüsü kiçildilir."
+            hint={t("pages.properties.yuklenenSekillerAvtomatikWebp")}
             seoNamePrefix={`${options.districts.find((item) => item.id === districtId)?.slug ?? "baki"}-${options.types.find((item) => item.id === typeId)?.slug ?? "emlak"}-${rooms || "0"}-otaqli-${uploadReference}`}
           />
         </FullWidth>
       </FormSection>
 
-      <FormSection id="seo" title="SEO" description="Boş buraxılsa, başlıq və təsvirdən qurulur.">
+      <FormSection id="seo" title="SEO" description={t("pages.properties.bosBuraxilsaBasliqVe")}>
         <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || "Əmlak elanı"} fallbackDescription={initial.description || "Əmlak haqqında məlumat"} pathname={`/emlaklar/${initial.slug || "yeni-elan"}`} />
         <AdminInput
           name="canonicalUrl"
-          label="Canonical URL"
+          label={t("pages.properties.canonicalUrl")}
           defaultValue={initial.canonicalUrl}
-          placeholder="Boş buraxılsa öz ünvanına işarə edir"
+          placeholder={t("pages.properties.bosBuraxilsaOzUnvanina")}
         />
         <FullWidth>
           <AdminCheckbox
             name="noIndex"
-            label="Axtarış motorlarında gizlət (noindex)"
+            label={t("pages.properties.axtarisMotorlarindaGizletNoindex")}
             defaultChecked={initial.noIndex}
           />
         </FullWidth>
@@ -419,21 +423,21 @@ export function PropertyForm({
 
       <FormSection
         id="open-graph"
-        title="Open Graph"
-        description="Sosial şəbəkədə paylaşılanda görünən başlıq/təsvir/şəkil. Boş buraxılsa meta sahələr istifadə olunur."
+        title={t("pages.properties.openGraph")}
+        description={t("pages.properties.sosialSebekedePaylasilandaGorunen")}
       >
-        <AdminInput name="ogTitle" label="OG başlıq" defaultValue={initial.ogTitle} maxLength={70} />
+        <AdminInput name="ogTitle" label={t("pages.properties.ogBasliq")} defaultValue={initial.ogTitle} maxLength={70} />
         <AdminInput
           name="ogDescription"
-          label="OG təsvir"
+          label={t("pages.properties.ogTesvir")}
           defaultValue={initial.ogDescription}
           maxLength={200}
         />
         <AdminInput
           name="ogImage"
-          label="OG şəkil URL"
+          label={t("pages.properties.ogSekilUrl")}
           defaultValue={initial.ogImage}
-          placeholder="Boş buraxılsa qalereyanın üz qabığı istifadə olunur"
+          placeholder={t("pages.properties.bosBuraxilsaQalereyaninUz")}
         />
       </FormSection>
     </AdminForm>

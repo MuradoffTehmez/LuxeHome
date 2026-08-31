@@ -14,7 +14,6 @@ import {
   PARTNER_STATUS_LABELS,
   PARTNER_STATUS_TONE,
   PARTNER_STATUSES,
-  PARTNERSHIP_TYPE_LABELS,
   PARTNERSHIP_TYPES,
   PERMISSIONS,
   type PartnerStatus,
@@ -33,6 +32,7 @@ import { formatRelative, isUnoptimizedImage } from "@/lib/utils";
 import { deletePartner, restorePartner, togglePartnerVisibility } from "./actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Tərəfdaşlar" };
 export const dynamic = "force-dynamic";
@@ -51,12 +51,13 @@ function createdFrom(period: string): Date | undefined {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 }
 
-function statusBadge(status: string) {
+function statusBadge(status: string, t: Awaited<ReturnType<typeof getAdminT>>) {
   const normalized = status in PARTNER_STATUS_LABELS ? (status as PartnerStatus) : PARTNER_STATUSES.DRAFT;
-  return <Badge tone={PARTNER_STATUS_TONE[normalized]}>{PARTNER_STATUS_LABELS[normalized]}</Badge>;
+  return <Badge tone={PARTNER_STATUS_TONE[normalized]}>{t(`labels.partnerStatus.${normalized}`)}</Badge>;
 }
 
 export default async function AdminPartnersPage({ searchParams }: { searchParams: SearchParams }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   const user = await requireAdminRead(PERMISSIONS.PARTNER_VIEW);
   const canCreate = hasPermission(user.role, PERMISSIONS.PARTNER_CREATE);
@@ -189,7 +190,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           PARTNER_STATUSES.ARCHIVED,
         ].map((status) => (
           <Link key={status} href={`${LIST_PATH}?status=${status}`} className="inline-flex min-h-11 shrink-0 items-center rounded-xs border border-line px-4 text-sm text-ink">
-            {PARTNER_STATUS_LABELS[status]} <span className="ml-2 text-ink-muted">{counts[status] ?? 0}</span>
+            {t(`labels.partnerStatus.${status}`)} <span className="ml-2 text-ink-muted">{counts[status] ?? 0}</span>
           </Link>
         ))}
       </nav>
@@ -219,8 +220,8 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           resultLabel={`${total} tərəfdaş`}
           hidden={deleted ? { silinmis: "1" } : {}}
           selects={[
-            { name: "status", label: "Status", value: filters.status, options: [{ value: "", label: "Bütün statuslar" }, ...Object.values(PARTNER_STATUSES).map((value) => ({ value, label: PARTNER_STATUS_LABELS[value] }))] },
-            { name: "tip", label: "Tip", value: filters.type, options: [{ value: "", label: "Bütün növlər" }, ...Object.values(PARTNERSHIP_TYPES).map((value) => ({ value, label: PARTNERSHIP_TYPE_LABELS[value] }))] },
+            { name: "status", label: "Status", value: filters.status, options: [{ value: "", label: "Bütün statuslar" }, ...Object.values(PARTNER_STATUSES).map((value) => ({ value, label: t(`labels.partnerStatus.${value}`) }))] },
+            { name: "tip", label: "Tip", value: filters.type, options: [{ value: "", label: "Bütün növlər" }, ...Object.values(PARTNERSHIP_TYPES).map((value) => ({ value, label: t(`labels.partnershipType.${value}`) }))] },
             { name: "tesdiq", label: "Təsdiq", value: filters.verified, options: [{ value: "", label: "Təsdiq: hamısı" }, { value: "1", label: "Təsdiqlənib" }, { value: "0", label: "Təsdiqlənməyib" }] },
             { name: "resmi", label: "Rəsmi", value: filters.official, options: [{ value: "", label: "Rəsmi: hamısı" }, { value: "1", label: "Rəsmi" }, { value: "0", label: "Rəsmi deyil" }] },
             { name: "secilmis", label: "Seçilmiş", value: filters.featured, options: [{ value: "", label: "Seçilmiş: hamısı" }, { value: "1", label: "Seçilmiş" }, { value: "0", label: "Seçilməyib" }] },
@@ -239,8 +240,8 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
             renderCard={(partner) => (
               <AdminListCard
                 title={partner.name}
-                meta={`${PARTNERSHIP_TYPE_LABELS[partner.partnershipType as PartnershipType] ?? partner.partnershipType} · ${partner.city || partner.country || "Yerləşmə yoxdur"}`}
-                status={statusBadge(partner.status)}
+                meta={`${t(`labels.partnershipType.${partner.partnershipType as PartnershipType}`) ?? partner.partnershipType} · ${partner.city || partner.country || "Yerləşmə yoxdur"}`}
+                status={statusBadge(partner.status, t)}
                 actions={renderActions(partner)}
               >
                 <div className="grid grid-cols-2 gap-2 text-xs">
@@ -269,8 +270,8 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
                         <div><p className="font-medium text-ink">{partner.name}</p><p className="text-xs text-ink-muted">/{partner.slug}</p></div>
                       </div>
                     </AdminTableCell>
-                    <AdminTableCell>{PARTNERSHIP_TYPE_LABELS[partner.partnershipType as PartnershipType] ?? partner.partnershipType}</AdminTableCell>
-                    <AdminTableCell>{statusBadge(partner.status)}</AdminTableCell>
+                    <AdminTableCell>{t(`labels.partnershipType.${partner.partnershipType as PartnershipType}`) ?? partner.partnershipType}</AdminTableCell>
+                    <AdminTableCell>{statusBadge(partner.status, t)}</AdminTableCell>
                     <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.verified ? "Təsdiqlənib" : "Təsdiqsiz"}</span><span>{partner.officialPartner ? "Rəsmi" : "Rəsmi deyil"}</span></div></AdminTableCell>
                     <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.featured ? "Seçilmiş" : "Adi"}</span><span>{partner.showOnHomepage ? "Ana səhifədə" : "Göstərilmir"}</span></div></AdminTableCell>
                     <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.officialSince?.toLocaleDateString("az-AZ") ?? "—"}</span><span>{partner.partnershipEndDate?.toLocaleDateString("az-AZ") ?? "—"}</span></div></AdminTableCell>

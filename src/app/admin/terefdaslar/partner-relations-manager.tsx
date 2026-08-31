@@ -8,6 +8,7 @@ import { IDLE_STATE } from "@/lib/admin/action-state";
 import { PARTNER_RELATION_ROLE_LABELS, PARTNER_RELATION_ROLES } from "@/lib/constants";
 import type { getAdminPartnerRelations, getPartnerRelationOptions } from "@/lib/queries";
 import { addPartnerRelation, removePartnerRelation } from "./actions";
+import { useTranslations } from "next-intl";
 
 type Relations = Awaited<ReturnType<typeof getAdminPartnerRelations>>;
 type Options = Awaited<ReturnType<typeof getPartnerRelationOptions>>;
@@ -25,6 +26,7 @@ export function PartnerRelationsManager({
   relations: Relations;
   options: Options;
 }) {
+  const t = useTranslations("admin");
   const [entityType, setEntityType] = useState<EntityType>("property");
   const [addState, addAction] = useActionState(addPartnerRelation, IDLE_STATE);
   const [removeState, removeAction] = useActionState(removePartnerRelation, IDLE_STATE);
@@ -66,7 +68,7 @@ export function PartnerRelationsManager({
           Rol
           <select name="role" className={fieldClass} defaultValue={PARTNER_RELATION_ROLES.SOURCE}>
             {Object.values(PARTNER_RELATION_ROLES).map((role) => (
-              <option key={role} value={role}>{PARTNER_RELATION_ROLE_LABELS[role]}</option>
+              <option key={role} value={role}>{t(`labels.partnerRelationRole.${role}`)}</option>
             ))}
           </select>
         </label>
@@ -175,6 +177,7 @@ function RelationList({
   action: (formData: FormData) => void;
   items: Array<{ id: string; label: string; href: string; role: string; isPublic: boolean; isPrimary: boolean }>;
 }) {
+  const t = useTranslations("admin");
   return (
     <section className="overflow-hidden rounded-md border border-line bg-paper">
       <header className="border-b border-line px-4 py-3 sm:px-5">
@@ -189,7 +192,7 @@ function RelationList({
               <div className="min-w-0">
                 <Link href={item.href} className="font-medium text-ink hover:text-gold-deep">{item.label}</Link>
                 <p className="mt-0.5 text-xs text-ink-muted">
-                  {PARTNER_RELATION_ROLE_LABELS[item.role as keyof typeof PARTNER_RELATION_ROLE_LABELS] ?? item.role}
+                  {t(`labels.partnerRelationRole.${item.role as keyof typeof PARTNER_RELATION_ROLE_LABELS}`) ?? item.role}
                   {item.isPrimary ? " · əsas" : ""}{item.isPublic ? " · public" : " · gizli"}
                 </p>
               </div>

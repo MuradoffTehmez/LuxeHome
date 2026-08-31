@@ -13,8 +13,12 @@ import type { PropertyFormValues } from "../form-values";
 import { PropertyForm } from "../property-form";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Elanın redaktəsi" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.properties.elaninRedaktesi") };
+}
 export const dynamic = "force-dynamic";
 
 /** Rəqəm sahələri formada sətir kimi yaşayır — `null` boş input deməkdir. */
@@ -25,6 +29,7 @@ export default async function EditPropertyPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
 
@@ -94,9 +99,9 @@ export default async function EditPropertyPage({
             : `Son yenilənmə: ${formatDateTime(property.updatedAt)} · ${property.viewCount} baxış`
         }
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Əmlaklar", href: "/admin/emlaklar" },
-          { label: "Redaktə" },
+          { label: t("pages.properties.idarePaneli"), href: "/admin" },
+          { label: t("pages.properties.emlaklar"), href: "/admin/emlaklar" },
+          { label: t("pages.properties.redakte") },
         ]}
         actions={
           <Link
@@ -106,7 +111,7 @@ export default async function EditPropertyPage({
             className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
           >
             <ExternalLink className="size-4" aria-hidden="true" />
-            Saytda bax
+            {t("pages.properties.saytdaBax")}
           </Link>
         }
       />
@@ -115,15 +120,15 @@ export default async function EditPropertyPage({
         action={updateProperty}
         options={options}
         initial={initial}
-        submitLabel="Dəyişiklikləri saxla"
+        submitLabel={t("pages.properties.deyisiklikleriSaxla")}
         extraActions={
           property.deletedAt ? null : (
             <ConfirmAction
               action={deleteProperty}
               id={property.id}
-              label="Elanı sil"
-              title="Elanı silmək"
-              description="Elan saytdan çıxarılacaq, amma zibil qutusunda qalacaq və bərpa edilə bilər."
+              label={t("pages.properties.elaniSil")}
+              title={t("pages.properties.elaniSilmek")}
+              description={t("pages.properties.elanSaytdanCixarilacaqAmma")}
               redirectTo="/admin/emlaklar"
               className="mr-auto"
             >

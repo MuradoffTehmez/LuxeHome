@@ -6,9 +6,10 @@ import { AdminForm, FormSection, SubmitButton } from "@/components/admin/form-sh
 import { AdminCheckbox, AdminInput, AdminSelect } from "@/components/admin/form-fields";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { useToast } from "@/components/ui/toast";
-import { ROLE_LABELS, ROLES } from "@/lib/constants";
+import { ROLES } from "@/lib/constants";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import {
   createUser,
   deleteUser,
@@ -18,10 +19,13 @@ import {
   updateUser,
 } from "./actions";
 
-const ROLE_OPTIONS = Object.values(ROLES).map((value) => ({ value, label: ROLE_LABELS[value] }));
+/** Rol adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+const roleOptions = (t: ReturnType<typeof useTranslations<"admin">>) =>
+  Object.values(ROLES).map((value) => ({ value, label: t(`labels.role.${value}`) }));
 
 /** Yeni hesab — müvəqqəti parol cavabda bir dəfə göstərilir. */
 export function CreateUserForm() {
+  const t = useTranslations("admin");
   return (
     <AdminForm action={createUser} submitLabel="Hesab yarat">
       <FormSection
@@ -30,7 +34,7 @@ export function CreateUserForm() {
       >
         <AdminInput name="name" label="Ad Soyad" required maxLength={120} />
         <AdminInput name="email" label="E-poçt" type="email" required autoComplete="off" />
-        <AdminSelect name="role" label="Rol" required defaultValue={ROLES.EDITOR} options={ROLE_OPTIONS} />
+        <AdminSelect name="role" label="Rol" required defaultValue={ROLES.EDITOR} options={roleOptions(t)} />
       </FormSection>
     </AdminForm>
   );
@@ -61,6 +65,7 @@ export function UserRow({
   totpEnabled: boolean;
   mobile?: boolean;
 }) {
+  const t = useTranslations("admin");
   const [state, formAction] = useActionState(updateUser, IDLE_STATE);
   const { toast } = useToast();
 
@@ -105,7 +110,7 @@ export function UserRow({
             mobile ? "w-full text-base sm:text-sm" : "text-xs",
           )}
         >
-          {ROLE_OPTIONS.map((option) => (
+          {roleOptions(t).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

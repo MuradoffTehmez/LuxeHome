@@ -21,9 +21,7 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatRelative } from "@/lib/utils";
 import {
   PERMISSIONS,
-  PROJECT_STATUS_LABELS,
   PROJECT_STATUSES,
-  PROJECT_TYPE_LABELS,
   PROJECT_TYPES,
   type ProjectStatus,
   type ProjectType,
@@ -33,6 +31,7 @@ import { getAdminProjects } from "@/lib/queries";
 import { deleteProject, restoreProject } from "./actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { getAdminT } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Layihələr" };
 export const dynamic = "force-dynamic";
@@ -51,6 +50,7 @@ export default async function AdminProjectsPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const t = await getAdminT();
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROJECT_MANAGE);
 
@@ -173,7 +173,7 @@ export default async function AdminProjectsPage({
                 { value: "", label: "Bütün statuslar" },
                 ...Object.values(PROJECT_STATUSES).map((value) => ({
                   value,
-                  label: PROJECT_STATUS_LABELS[value],
+                  label: t(`labels.projectStatus.${value}`),
                 })),
               ],
             },
@@ -185,7 +185,7 @@ export default async function AdminProjectsPage({
                 { value: "", label: "Bütün növlər" },
                 ...Object.values(PROJECT_TYPES).map((value) => ({
                   value,
-                  label: PROJECT_TYPE_LABELS[value],
+                  label: t(`labels.projectType.${value}`),
                 })),
               ],
             },
@@ -222,13 +222,13 @@ export default async function AdminProjectsPage({
                 status={
                   <StatusBadge
                     status={project.status as ProjectStatus}
-                    label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]}
+                    label={t(`labels.projectStatus.${project.status as ProjectStatus}`)}
                   />
                 }
                 actions={renderActions(project)}
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone="neutral">{PROJECT_TYPE_LABELS[project.projectType as ProjectType]}</Badge>
+                  <Badge tone="neutral">{t(`labels.projectType.${project.projectType as ProjectType}`)}</Badge>
                   {!project.isActive ? <Badge tone="neutral">Saytda gizlidir</Badge> : null}
                 </div>
                 <dl className="mt-4 grid grid-cols-2 gap-3">
@@ -269,11 +269,11 @@ export default async function AdminProjectsPage({
                       </p>
                     </AdminTableCell>
                     <AdminTableCell>
-                      <Badge tone="neutral">{PROJECT_TYPE_LABELS[project.projectType as ProjectType]}</Badge>
+                      <Badge tone="neutral">{t(`labels.projectType.${project.projectType as ProjectType}`)}</Badge>
                       {!project.isActive ? <p className="mt-1 text-xs text-ink-muted">Saytda gizlidir</p> : null}
                     </AdminTableCell>
                     <AdminTableCell>
-                      <StatusBadge status={project.status as ProjectStatus} label={PROJECT_STATUS_LABELS[project.status as ProjectStatus]} />
+                      <StatusBadge status={project.status as ProjectStatus} label={t(`labels.projectStatus.${project.status as ProjectStatus}`)} />
                     </AdminTableCell>
                     <AdminTableCell align="right" className="tabular text-sm text-ink-soft">{project._count.properties}</AdminTableCell>
                     <AdminTableCell align="right" className="tabular text-sm text-ink-soft">{project._count.images}</AdminTableCell>
