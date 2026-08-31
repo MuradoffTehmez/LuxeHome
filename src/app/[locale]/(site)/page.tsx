@@ -34,10 +34,9 @@ import { FeaturedPartnership } from "@/components/site/featured-partnership";
 import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { buildManagedMetadata } from "@/lib/seo";
-import { getCachedHomePageData } from "@/lib/public-cache";
+import { getCachedHomePageData, getCachedHomeSocialProof } from "@/lib/public-cache";
 import { getCategoryImageUrl } from "@/lib/category-images";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
-import { getApprovedTestimonials, getPublicAgents } from "@/lib/phase2";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -98,10 +97,10 @@ export default async function HomePage({ params }: HomePageProps) {
   const wizardT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.wizard" });
   const agentsT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.agents" });
   const aiSearchT = await getTranslations({ locale: resolvedLocale, namespace: "phase3.search" });
-  const { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners } =
-    await getCachedHomePageData();
-  const testimonials = await getApprovedTestimonials(6);
-  const agents = (await getPublicAgents()).slice(0, 3);
+  const [
+    { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners },
+    { testimonials, agents },
+  ] = await Promise.all([getCachedHomePageData(), getCachedHomeSocialProof()]);
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 

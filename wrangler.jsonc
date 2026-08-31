@@ -10,6 +10,11 @@
     "binding": "ASSETS"
   },
 
+  // Worker D1-in yerləşdiyi bölgəyə yaxın icra olunur. Səhifə render-i bir neçə
+  // ardıcıl D1 sorğusu atır; uzaq bölgədən hər sorğu ayrıca gediş-gəliş idi və
+  // TTFB-nin 0.3s-dən 2.8s-ə qədər sıçramasının əsas səbəbi bu idi.
+  "placement": { "mode": "smart" },
+
   "observability": {
     "enabled": true
   },

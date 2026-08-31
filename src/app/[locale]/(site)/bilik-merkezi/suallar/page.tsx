@@ -8,7 +8,7 @@ import { getCachedFaqEntries } from "@/lib/public-cache";
 import { groupFaqByCategory } from "@/lib/knowledge";
 import { getRealEstateFaqContent } from "@/i18n/public-content";
 import { TRANSLATION_ENTITY_TYPES, type FaqCategory, type Locale } from "@/lib/constants";
-import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
+import { applyContentTranslation, getPublishedContentTranslations } from "@/lib/content-translation";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ locale: string }> };
@@ -29,7 +29,19 @@ export default async function RealEstateFaqPage({ params }: Props) {
     getCachedFaqEntries(),
   ]);
   const realEstateEntries = entries.filter((entry) => entry.category !== "PLATFORM");
-  const localized = await Promise.all(realEstateEntries.map(async (entry) => applyContentTranslation(TRANSLATION_ENTITY_TYPES.KNOWLEDGE_FAQ, entry, await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.KNOWLEDGE_FAQ, entry.id, activeLocale))));
+  // Tərcümələr tək sorğu ilə gətirilir — element başına D1 gediş-gəlişi yox idi.
+  const translations = await getPublishedContentTranslations(
+    TRANSLATION_ENTITY_TYPES.KNOWLEDGE_FAQ,
+    realEstateEntries.map((entry) => entry.id),
+    activeLocale,
+  );
+  const localized = realEstateEntries.map((entry) =>
+    applyContentTranslation(
+      TRANSLATION_ENTITY_TYPES.KNOWLEDGE_FAQ,
+      entry,
+      translations.get(entry.id) ?? null,
+    ),
+  );
   const groups = localized.length > 0
     ? groupFaqByCategory(localized).map(([category, items]) => ({ title: knowledge(`faq.categories.${category as FaqCategory}`), items: items.map(({ question, answer }) => ({ question, answer })) }))
     : getRealEstateFaqContent(activeLocale);

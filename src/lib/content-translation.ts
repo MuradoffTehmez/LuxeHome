@@ -1,3 +1,5 @@
+import type { ContentTranslation } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 import {
   DEFAULT_LOCALE,
@@ -18,6 +20,32 @@ export async function getPublishedContentTranslation(
   }).then((translation) =>
     translation?.status === TRANSLATION_STATUSES.PUBLISHED ? translation : null,
   );
+}
+
+/**
+ * Siyahılar üçün toplu variant.
+ *
+ * `getPublishedContentTranslation()` hər element üçün ayrıca `findUnique` atır;
+ * 50 elementlik FAQ siyahısı EN/RU-da 50 D1 gediş-gəlişi demək idi. Burada eyni
+ * nəticə tək `findMany` ilə alınır və `Map` şəklində qaytarılır.
+ */
+export async function getPublishedContentTranslations(
+  entityType: TranslationEntityType,
+  entityIds: readonly string[],
+  locale: Locale,
+): Promise<Map<string, ContentTranslation>> {
+  if (locale === DEFAULT_LOCALE || entityIds.length === 0) return new Map();
+
+  const rows = await prisma.contentTranslation.findMany({
+    where: {
+      entityType,
+      locale,
+      status: TRANSLATION_STATUSES.PUBLISHED,
+      entityId: { in: [...entityIds] },
+    },
+  });
+
+  return new Map(rows.map((row) => [row.entityId, row]));
 }
 
 /** Boş tərcümə sahəsi mənbə AZ məzmununa təhlükəsiz fallback edir. */

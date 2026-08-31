@@ -67,3 +67,83 @@ export function createAdminTranslator(locale: Locale, messages: AdminMessages) {
     },
   });
 }
+
+/**
+ * Client-ə göndərilən mesajların marşruta görə süzülməsi.
+ *
+ * `NextIntlClientProvider` aldığı hər şeyi RSC payload-una serializə edir. Tam
+ * `admin` kataloqu 83 KB (RU-da 132 KB) idi və hər panel səhifəsində təkrar
+ * göndərilirdi, halbuki bir səhifənin client komponentləri yalnız öz bölməsini
+ * oxuyur.
+ *
+ * Siyahı təxmini deyil: hər marşrutun client komponentləri skan edilib. Naməlum
+ * marşrut tam kataloqa düşür — yeni səhifə heç vaxt açar adı göstərmir.
+ */
+const SHARED_SECTIONS = ["shell", "nav", "actions", "labels", "components"] as const;
+
+const ROUTE_SECTIONS: Record<string, readonly string[]> = {
+  agentler: ["pages.agents", "pages.misc"],
+  agentlikler: ["pages.agents"],
+  "bilik-merkezi": ["pages.knowledge", "pages.misc"],
+  blog: ["pages.blog", "pages.misc"],
+  emlaklar: ["pages.misc", "pages.properties"],
+  hesabim: ["pages.account", "profile"],
+  hesablar: ["pages.common", "pages.misc"],
+  "ictimai-imkanlar": ["pages.amenities", "pages.misc"],
+  istifadeciler: ["pages.common", "pages.users"],
+  layiheler: ["pages.common", "pages.misc", "pages.projects"],
+  media: ["pages.common", "pages.misc", "pages.settings"],
+  moderation: ["pages.common", "pages.moderation"],
+  muracietler: ["pages.common", "pages.leads"],
+  parametrler: ["pages.common", "pages.settings"],
+  redirects: ["pages.common", "pages.misc", "pages.serp"],
+  rezervasiyalar: ["pages.ops"],
+  taksonomiya: ["pages.common", "pages.misc", "pages.taxonomy"],
+  tercumeler: ["pages.translations"],
+  terefdaslar: ["pages.common", "pages.misc", "pages.partners"],
+  xidmetler: ["pages.misc", "pages.services"],
+  // Client komponenti tərcümə işlətməyən ağaclar yalnız ortaq bölmələri alır
+  "ai-komekci": [],
+  analitika: [],
+  audit: [],
+  "e-poct": [],
+  security: [],
+  seo: [],
+  serp: [],
+  "": [],
+};
+
+function assign(target: Record<string, unknown>, path: string, value: unknown) {
+  const [head, tail] = path.split(".") as [string, string | undefined];
+  if (!tail) {
+    target[head] = value;
+    return;
+  }
+  const nested = (target[head] ??= {}) as Record<string, unknown>;
+  nested[tail] = value;
+}
+
+function read(source: Record<string, unknown>, path: string): unknown {
+  return path
+    .split(".")
+    .reduce<unknown>((acc, key) => (acc as Record<string, unknown> | undefined)?.[key], source);
+}
+
+/** `/admin/emlaklar/123` → `emlaklar`; `/admin` → `""`. */
+export function adminRouteSegment(pathname: string): string {
+  return pathname.replace(/^\/admin\/?/, "").split("/")[0] ?? "";
+}
+
+export function pickAdminMessages(messages: AdminMessages, pathname: string): AdminMessages {
+  const sections = ROUTE_SECTIONS[adminRouteSegment(pathname)];
+  if (!sections) return messages;
+
+  const source = messages.admin as unknown as Record<string, unknown>;
+  const picked: Record<string, unknown> = {};
+  for (const path of [...SHARED_SECTIONS, ...sections]) {
+    const value = read(source, path);
+    if (value !== undefined) assign(picked, path, value);
+  }
+
+  return { admin: picked } as AdminMessages;
+}

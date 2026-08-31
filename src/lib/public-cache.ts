@@ -20,6 +20,7 @@ import {
   getSitemapEntries,
   type PropertyFilters,
 } from "@/lib/queries";
+import { getApprovedTestimonials, getPublicAgents } from "@/lib/phase2";
 import {
   getKnowledgeArticleBySlug,
   getKnowledgeArticles,
@@ -109,6 +110,28 @@ export const getCachedHomePageData = unstable_cache(
       PUBLIC_CACHE_TAGS.partners,
       PUBLIC_CACHE_TAGS.taxonomy,
     ],
+    revalidate: FIVE_MINUTES,
+  },
+);
+
+/**
+ * Ana səhifədəki agent və müştəri rəyi blokları.
+ *
+ * Bunlar `getCachedHomePageData()`-dan kənarda qalmışdı: hər ana səhifə
+ * yüklənişində iki əlavə D1 sorğusu, üstəlik ardıcıl gedirdi. Məzmun günlərlə
+ * dəyişmir, ona görə eyni beş dəqiqəlik pəncərəyə salınır.
+ */
+export const getCachedHomeSocialProof = unstable_cache(
+  async () => {
+    const [testimonials, agents] = await Promise.all([
+      getApprovedTestimonials(6),
+      getPublicAgents(),
+    ]);
+    return { testimonials, agents: agents.slice(0, 3) };
+  },
+  ["public-home-social-proof-v1"],
+  {
+    tags: [PUBLIC_CACHE_TAGS.home, PUBLIC_CACHE_TAGS.agents],
     revalidate: FIVE_MINUTES,
   },
 );

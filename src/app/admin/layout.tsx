@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { ThemeSync } from "@/components/theme-sync";
 import { ToastProvider } from "@/components/ui/toast";
 import { requireStaff } from "@/lib/auth/guard";
+import { pickAdminMessages } from "@/i18n/admin";
 import { getAdminI18n, getAdminMetadataT } from "@/lib/admin-i18n";
 import { prisma } from "@/lib/prisma";
 
@@ -44,6 +45,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // Marşrut middleware-in qoyduğu başlıqdan oxunur — hesab səhifəsinin özündə
   // yönləndirmə təkrarlanmamalıdır, əks halda dövrə yaranır.
   const pathname = (await headers()).get("x-pathname") ?? "";
+  // Client-ə yalnız bu marşrutun ehtiyac duyduğu bölmələr göndərilir
+  const clientMessages = pickAdminMessages(messages, pathname);
   if (user.mustChangePassword && !pathname.startsWith("/admin/hesabim")) {
     redirect("/admin/hesabim?parol=deyis");
   }
@@ -55,7 +58,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ]);
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={clientMessages}>
       <ToastProvider>
         <ThemeSync preference={user.themePreference} />
         <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration }}>
