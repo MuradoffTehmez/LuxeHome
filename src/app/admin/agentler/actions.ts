@@ -11,6 +11,7 @@ import { parseSingleImage } from "@/lib/admin/images";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { slugify } from "@/lib/utils";
+import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 
 const agentSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -107,6 +108,7 @@ export async function saveAgentProfile(_previous: ActionState, formData: FormDat
       const previous = await prisma.agentProfile.findUnique({ where: { id }, select: { slug: true } });
       if (!previous) return failure("Agent tapılmadı.");
       await prisma.agentProfile.update({ where: { id }, data });
+      await ensureSlugRedirect("/agentler", previous.slug, slug, actor);
       await recordAudit(actor, "UPDATE", "AgentProfile", id, parsed.data.name);
       revalidatePath("/admin/agentler");
       revalidatePath(`/admin/agentler/${id}`);

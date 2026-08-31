@@ -12,6 +12,7 @@ import { sanitizeRichText, stripTags } from "@/lib/admin/html";
 import { parseSingleImage } from "@/lib/admin/images";
 import { blogCategorySchema, postSchema } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
+import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 
@@ -131,7 +132,7 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
   try {
     const existing = await prisma.blogPost.findFirst({
       where: { id, deletedAt: null },
-      select: { publishedAt: true },
+      select: { publishedAt: true, slug: true },
     });
     if (!existing) return failure("Məqalə tapılmadı və ya silinib.");
 
@@ -171,6 +172,7 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
       },
     });
 
+    await ensureSlugRedirect("/blog", existing.slug, slug, user);
     await recordAudit(user, "UPDATE", "BlogPost", id, parsed.data.title);
     revalidatePath(LIST_PATH);
     revalidatePath(`/blog/${slug}`);

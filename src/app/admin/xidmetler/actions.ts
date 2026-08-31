@@ -11,6 +11,7 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { parseSingleImage } from "@/lib/admin/images";
 import { serviceSchema } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
+import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 
@@ -98,6 +99,7 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
 
     if (id) {
       await prisma.service.update({ where: { id }, data });
+      if (existing) await ensureSlugRedirect("/xidmetler", existing.slug, slug, user);
       await recordAudit(user, "UPDATE", "Service", id, parsed.data.title);
       revalidatePath(LIST_PATH);
       revalidatePath(`/xidmetler/${slug}`);

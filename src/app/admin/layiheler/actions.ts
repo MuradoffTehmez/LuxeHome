@@ -10,6 +10,7 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { parseImages } from "@/lib/admin/images";
 import { projectSchema, type ProjectInput } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
+import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 
@@ -146,7 +147,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
 
     const project = await prisma.project.create({
       data: { ...toData(parsed.data, cover?.url ?? null), slug, isDemo: false },
-      select: { id: true },
+      select: { id: true, slug: true },
     });
     projectId = project.id;
 
@@ -179,7 +180,7 @@ export async function updateProject(_prev: ActionState, formData: FormData): Pro
   try {
     const existing = await prisma.project.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true },
+      select: { id: true, slug: true },
     });
     if (!existing) return failure("Layihə tapılmadı və ya silinib.");
 
@@ -198,6 +199,7 @@ export async function updateProject(_prev: ActionState, formData: FormData): Pro
     });
 
     await replaceImages(id, images);
+    await ensureSlugRedirect("/layiheler", existing.slug, slug, user);
     await recordAudit(user, "UPDATE", "Project", id, parsed.data.name);
 
     revalidatePath(LIST_PATH);

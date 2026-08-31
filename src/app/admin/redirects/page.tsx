@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Yönləndirmələr" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminRedirectsPage() {
-  await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
+  await requireAdminRead(PERMISSIONS.SEO_VIEW);
   const [redirects, notFoundHits] = await Promise.all([
     getAdminRedirects(),
     getTopNotFoundHits(),

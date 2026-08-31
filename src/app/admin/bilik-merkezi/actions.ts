@@ -17,6 +17,7 @@ import {
   knowledgeTermSchema,
 } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
+import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { normalizeSearchText } from "@/lib/search-normalization";
 import { knowledgeSearchText, termInitial } from "@/lib/knowledge";
@@ -240,6 +241,7 @@ export async function updateKnowledgeArticle(
       },
     });
 
+    await ensureSlugRedirect("/bilik-merkezi", existing.slug, slug, user);
     await recordAudit(user, "UPDATE", "KnowledgeArticle", id, parsed.data.title);
     revalidatePath(LIST_PATH);
     revalidatePath(`${LIST_PATH}/${id}`);

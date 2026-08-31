@@ -14,13 +14,14 @@ import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { redirectCreateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
+import { findRedirectChain } from "@/lib/serp";
 
 const LIST_PATH = "/admin/redirects";
 
 export async function createRedirect(_prev: ActionState, formData: FormData): Promise<ActionState> {
   let actor;
   try {
-    actor = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+    actor = await requireAdminAction(PERMISSIONS.SEO_REDIRECT_MANAGE);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
@@ -45,9 +46,17 @@ export async function createRedirect(_prev: ActionState, formData: FormData): Pr
     if (existing) {
       return failure("Bu ünvan üçün artıq yönləndirmə var.", { fromPath: "Artıq mövcuddur" });
     }
+    const activeRules = await prisma.redirect.findMany({
+      where: { isActive: true },
+      select: { fromPath: true, toPath: true, isActive: true },
+    });
+    const chain = findRedirectChain(parsed.data.fromPath, parsed.data.toPath, activeRules);
+    if (chain) {
+      return failure(`Redirect chain/loop yarana bilər: ${chain.join(" → ")}. Son canonical ünvana birbaşa yönləndirin.`);
+    }
 
     const redirect = await prisma.redirect.create({
-      data: parsed.data,
+      data: { ...parsed.data, createdBy: actor.email },
       select: { id: true },
     });
 
@@ -71,7 +80,7 @@ export async function createRedirect(_prev: ActionState, formData: FormData): Pr
 export async function toggleRedirectActive(id: string): Promise<ActionState> {
   let actor;
   try {
-    actor = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+    actor = await requireAdminAction(PERMISSIONS.SEO_REDIRECT_MANAGE);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
@@ -102,7 +111,7 @@ export async function toggleRedirectActive(id: string): Promise<ActionState> {
 export async function deleteRedirect(id: string): Promise<ActionState> {
   let actor;
   try {
-    actor = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+    actor = await requireAdminAction(PERMISSIONS.SEO_REDIRECT_MANAGE);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
@@ -122,7 +131,7 @@ export async function deleteRedirect(id: string): Promise<ActionState> {
 export async function dismissNotFoundHit(id: string): Promise<ActionState> {
   let actor;
   try {
-    actor = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+    actor = await requireAdminAction(PERMISSIONS.SEO_REDIRECT_MANAGE);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
