@@ -27,6 +27,8 @@ import {
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminBlogCategories, getAdminPosts } from "@/lib/queries";
 import { deletePost, restorePost } from "./actions";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Bloq" };
 export const dynamic = "force-dynamic";
@@ -41,6 +43,7 @@ function one(params: Record<string, string | string[] | undefined>, key: string)
 }
 
 export default async function AdminBlogPage({ searchParams }: { searchParams: SearchParams }) {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.BLOG_MANAGE);
 
   const params = await searchParams;
@@ -87,7 +90,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
     ) : (
       <>
         <Link
-          href={`/blog/${post.slug}`}
+          href={localizePath(`/blog/${post.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
           aria-label={`«${post.title}» məqaləsini saytda aç`}

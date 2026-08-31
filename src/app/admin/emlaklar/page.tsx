@@ -30,6 +30,8 @@ import {
 import { getAdminProperties, getPropertyFormOptions } from "@/lib/queries";
 import { deleteProperty, restoreProperty } from "./actions";
 import { BulkActionsForm, RowCheckbox } from "./bulk-actions";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Əmlaklar" };
 export const dynamic = "force-dynamic";
@@ -48,6 +50,7 @@ export default async function AdminPropertiesPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const { locale } = await getAdminI18n();
   const params = await searchParams;
   const deleted = one(params, "silinmis") === "1";
 
@@ -101,7 +104,7 @@ export default async function AdminPropertiesPage({
     ) : (
       <>
         <Link
-          href={`/emlaklar/${property.slug}`}
+          href={localizePath(`/emlaklar/${property.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
           aria-label={`«${property.title}» elanını saytda aç`}

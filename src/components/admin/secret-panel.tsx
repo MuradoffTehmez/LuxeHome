@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState } from "react";
 import { Check, Copy, KeyRound } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,7 +15,7 @@ import { cn } from "@/lib/utils";
  */
 export function SecretPanel({
   secret,
-  title = "Müvəqqəti parol — bir dəfə göstərilir",
+  title,
   note,
   className,
 }: {
@@ -22,6 +24,7 @@ export function SecretPanel({
   note?: string;
   className?: string;
 }) {
+  const t = useTranslations("admin");
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -44,7 +47,7 @@ export function SecretPanel({
     >
       <p className="flex items-center gap-2 text-sm font-medium text-ink">
         <KeyRound className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
-        {title}
+        {title ?? t("components.secret.title")}
       </p>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -61,13 +64,13 @@ export function SecretPanel({
           ) : (
             <Copy className="size-4" aria-hidden="true" />
           )}
-          {copied ? "Kopyalandı" : "Kopyala"}
+          {copied ? t("components.secret.copied") : t("components.secret.copy")}
         </button>
       </div>
 
       <p className="text-xs text-ink-soft">
         {note ??
-          "İstifadəçiyə təhlükəsiz kanalla ötürün. O, ilk girişdə parolu dəyişməli və 2FA quracaq."}
+          t("components.secret.hint")}
       </p>
     </div>
   );

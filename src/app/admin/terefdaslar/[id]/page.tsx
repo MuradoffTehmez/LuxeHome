@@ -17,6 +17,8 @@ import { deletePartner, updatePartner } from "../actions";
 import type { PartnerFormValues } from "../form-values";
 import { PartnerForm } from "../partner-form";
 import { PartnerRelationsManager } from "../partner-relations-manager";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Tərəfdaşı redaktə et" };
 export const dynamic = "force-dynamic";
@@ -30,6 +32,7 @@ function image(value: string | null | undefined, alt: string) {
 }
 
 export default async function EditPartnerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { locale } = await getAdminI18n();
   const user = await requireAdminRead(PERMISSIONS.PARTNER_UPDATE);
   const { id } = await params;
   const canManageContract = hasPermission(user.role, PERMISSIONS.PARTNER_CONTRACT_MANAGE);
@@ -99,7 +102,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
         ]}
         actions={
           partner.showPublicly ? (
-            <ButtonLink href={`/terefdaslar/${partner.slug}`} target="_blank" variant="outline" size="sm">
+            <ButtonLink href={localizePath(`/terefdaslar/${partner.slug}`, locale)} target="_blank" variant="outline" size="sm">
               Saytda bax <ExternalLink className="size-4" aria-hidden="true" />
             </ButtonLink>
           ) : null

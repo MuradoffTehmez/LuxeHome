@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { ListFilter, Search, X } from "lucide-react";
@@ -35,6 +37,7 @@ export function AdminFilterBar({
   resultLabel,
   className,
 }: AdminFilterBarProps) {
+  const t = useTranslations("admin");
   const [open, setOpen] = useState(false);
   const hasFilters = searchValue !== "" || selects.some((select) => select.value);
   const shared = { action, searchName, searchValue, searchPlaceholder, selects, hidden, hasFilters };
@@ -43,7 +46,7 @@ export function AdminFilterBar({
     <div className={cn("border-b border-line bg-paper-light", className)}>
       <div className="flex min-h-14 items-center justify-between gap-3 p-3 lg:hidden">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-ink">Siyahı filtrləri</p>
+          <p className="text-sm font-medium text-ink">{t("components.filterBar.title")}</p>
           {resultLabel ? <p className="truncate text-xs text-ink-muted">{resultLabel}</p> : null}
         </div>
         <button
@@ -54,7 +57,7 @@ export function AdminFilterBar({
           className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xs border border-line-strong px-4 text-sm font-medium text-ink"
         >
           <ListFilter className="size-4" aria-hidden="true" />
-          Filtrlər{hasFilters ? <span className="size-2 rounded-full bg-gold" aria-label="Aktiv filtr var" /> : null}
+          {t("components.filterBar.button")}{hasFilters ? <span className="size-2 rounded-full bg-gold" aria-label={t("components.filterBar.activeFilter")} /> : null}
         </button>
       </div>
 
@@ -62,7 +65,7 @@ export function AdminFilterBar({
         <FilterForm {...shared} />
       </div>
 
-      <Overlay open={open} onClose={() => setOpen(false)} title="Siyahı filtrləri" placement="bottom">
+      <Overlay open={open} onClose={() => setOpen(false)} title={t("components.filterBar.title")} placement="bottom">
         <FilterForm {...shared} mobile />
       </Overlay>
     </div>
@@ -82,6 +85,7 @@ function FilterForm({
   hasFilters: boolean;
   mobile?: boolean;
 }) {
+  const t = useTranslations("admin");
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
@@ -117,11 +121,11 @@ function FilterForm({
           </select>
         ))}
         <button type="submit" className="min-h-11 cursor-pointer rounded-xs border border-line-strong bg-gold px-4 text-sm font-medium text-ink transition-colors hover:bg-gold-soft">
-          Tətbiq et
+          {t("actions.apply")}
         </button>
         {hasFilters ? (
           <Link href={action} className="inline-flex min-h-11 items-center justify-center gap-1 rounded-xs px-3 text-sm text-ink-muted transition-colors hover:text-danger">
-            <X className="size-4" aria-hidden="true" />Sıfırla
+            <X className="size-4" aria-hidden="true" />{t("actions.reset")}
           </Link>
         ) : null}
       </div>

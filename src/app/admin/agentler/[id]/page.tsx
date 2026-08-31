@@ -10,11 +10,14 @@ import { PERMISSIONS, REVIEW_STATUS_LABELS, type ReviewStatus } from "@/lib/cons
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { AgentForm, type AgentFormValues } from "../agent-form";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Agent profilinin redaktəsi" };
 export const dynamic = "force-dynamic";
 
 export default async function EditAgentPage({ params }: { params: Promise<{ id: string }> }) {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
 
   const { id } = await params;
@@ -64,7 +67,7 @@ export default async function EditAgentPage({ params }: { params: Promise<{ id: 
         actions={
           agent.isPublic ? (
             <Link
-              href={`/agentler/${agent.slug}`}
+              href={localizePath(`/agentler/${agent.slug}`, locale)}
               target="_blank"
               rel="noreferrer"
               className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"

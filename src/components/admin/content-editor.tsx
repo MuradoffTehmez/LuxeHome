@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useRef, useState } from "react";
 import {
   AlertCircle,
@@ -27,23 +29,31 @@ type Tool = {
   sample?: string;
 };
 
-const TOOLS: Tool[][] = [
-  [
-    { label: "Abzas", icon: Pilcrow, wrap: ["<p>", "</p>"] },
-    { label: "Qalın", icon: Bold, wrap: ["<strong>", "</strong>"] },
-    { label: "Kursiv", icon: Italic, wrap: ["<em>", "</em>"] },
-    { label: "Link", icon: Link2, wrap: ['<a href="https://">', "</a>"] },
-  ],
-  [
-    { label: "Başlıq 2", icon: Heading2, wrap: ["<h2>", "</h2>"] },
-    { label: "Başlıq 3", icon: Heading3, wrap: ["<h3>", "</h3>"] },
-    { label: "Sitat", icon: Quote, wrap: ["<blockquote>", "</blockquote>"] },
-  ],
-  [
-    { label: "Nişanlı siyahı", icon: List, wrap: ["<ul>\n  <li>", "</li>\n</ul>"] },
-    { label: "Nömrəli siyahı", icon: ListOrdered, wrap: ["<ol>\n  <li>", "</li>\n</ol>"] },
-  ],
-];
+type Translate = ReturnType<typeof useTranslations<"admin">>;
+
+/**
+ * Alət sətri dilə bağlıdır, ona görə modul səviyyəsində sabit kimi saxlanmır —
+ * `t` yalnız komponent daxilində mövcuddur.
+ */
+function buildTools(t: Translate): Tool[][] {
+  return [
+    [
+      { label: t("components.editor.paragraph"), icon: Pilcrow, wrap: ["<p>", "</p>"] },
+      { label: t("components.editor.bold"), icon: Bold, wrap: ["<strong>", "</strong>"] },
+      { label: t("components.editor.italic"), icon: Italic, wrap: ["<em>", "</em>"] },
+      { label: t("components.editor.link"), icon: Link2, wrap: ['<a href="https://">', "</a>"] },
+    ],
+    [
+      { label: t("components.editor.heading2"), icon: Heading2, wrap: ["<h2>", "</h2>"] },
+      { label: t("components.editor.heading3"), icon: Heading3, wrap: ["<h3>", "</h3>"] },
+      { label: t("components.editor.quote"), icon: Quote, wrap: ["<blockquote>", "</blockquote>"] },
+    ],
+    [
+      { label: t("components.editor.bulletList"), icon: List, wrap: ["<ul>\n  <li>", "</li>\n</ul>"] },
+      { label: t("components.editor.numberedList"), icon: ListOrdered, wrap: ["<ol>\n  <li>", "</li>\n</ol>"] },
+    ],
+  ];
+}
 
 /**
  * Məqalə mətni üçün HTML redaktoru.
@@ -60,7 +70,7 @@ export function ContentEditor({
   name,
   label,
   defaultValue = "",
-  placeholder = "Məqalənin mətnini bura yazın…",
+  placeholder,
   rows = 18,
 }: {
   name: string;
@@ -69,6 +79,8 @@ export function ContentEditor({
   placeholder?: string;
   rows?: number;
 }) {
+  const t = useTranslations("admin");
+  const tools = buildTools(t);
   const ref = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState(defaultValue);
   const error = useFieldError(name);
@@ -79,7 +91,7 @@ export function ContentEditor({
     if (!textarea) return;
 
     const { selectionStart, selectionEnd } = textarea;
-    const selected = value.slice(selectionStart, selectionEnd) || tool.sample || "mətn";
+    const selected = value.slice(selectionStart, selectionEnd) || tool.sample || t("components.editor.sampleText");
     const replacement = `${tool.wrap[0]}${selected}${tool.wrap[1]}`;
 
     setValue(value.slice(0, selectionStart) + replacement + value.slice(selectionEnd));
@@ -112,7 +124,7 @@ export function ContentEditor({
         )}
       >
         <div className="flex flex-wrap items-center gap-1 border-b border-line bg-ivory px-2 py-1.5">
-          {TOOLS.map((group, groupIndex) => (
+          {tools.map((group, groupIndex) => (
             <div key={groupIndex} className="flex items-center gap-0.5">
               {groupIndex > 0 && <span className="mx-1 h-5 w-px bg-line" aria-hidden="true" />}
               {group.map((tool) => (
@@ -143,8 +155,8 @@ export function ContentEditor({
             <button
               type="button"
               onClick={() => document.execCommand("redo")}
-              title="Təkrarla"
-              aria-label="Təkrarla"
+              title={t("components.editor.redo")}
+              aria-label={t("components.editor.redo")}
               className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
             >
               <Redo2 className="size-4" aria-hidden="true" />
@@ -160,16 +172,16 @@ export function ContentEditor({
           rows={rows}
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t("components.editor.placeholder")}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${editorId}-error` : undefined}
           className="w-full resize-y bg-paper px-4 py-3 font-mono text-sm leading-relaxed text-ink placeholder:text-ink-muted"
         />
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line bg-ivory px-4 py-2 text-xs text-ink-muted">
-          <span>HTML dəstəklənir — yalnız icazəli teqlər saxlanılır</span>
+          <span>{t("components.editor.htmlNote")}</span>
           <span className="tabular">
-            {words} söz · təxminən {minutes} dəq oxu
+            {t("components.editor.readStats", { words, minutes })}
           </span>
         </div>
       </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useId, useState } from "react";
 
 type SeoFieldsProps = {
@@ -44,6 +46,7 @@ export function SeoFields({
   titleName = "metaTitle",
   descriptionName = "metaDescription",
 }: SeoFieldsProps) {
+  const t = useTranslations("admin");
   const titleId = useId();
   const descriptionId = useId();
   const [title, setTitle] = useState(initialTitle ?? "");
@@ -55,25 +58,25 @@ export function SeoFields({
     <>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-3">
-          <label htmlFor={titleId} className="text-sm font-medium text-ink">Meta başlıq</label>
+          <label htmlFor={titleId} className="text-sm font-medium text-ink">{t("components.seo.metaTitle")}</label>
           <span className={`tabular text-xs ${title.length > 60 ? "text-danger" : "text-ink-muted"}`}>{title.length} / 60</span>
         </div>
         <input id={titleId} name={titleName} value={title} onChange={(event) => setTitle(event.target.value)} maxLength={70} className="min-h-11 w-full rounded-xs border border-line bg-paper px-3 text-sm text-ink focus:border-gold focus:outline-none" />
-        <p className="text-xs text-ink-muted">Tövsiyə olunan uzunluq: 25–60 simvol.</p>
+        <p className="text-xs text-ink-muted">{t("components.seo.metaTitleHint")}</p>
       </div>
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between gap-3">
-          <label htmlFor={descriptionId} className="text-sm font-medium text-ink">Meta təsvir</label>
+          <label htmlFor={descriptionId} className="text-sm font-medium text-ink">{t("components.seo.metaDescription")}</label>
           <span className={`tabular text-xs ${description.length > 160 ? "text-danger" : "text-ink-muted"}`}>{description.length} / 160</span>
         </div>
         <textarea id={descriptionId} name={descriptionName} value={description} onChange={(event) => setDescription(event.target.value)} maxLength={180} rows={4} className="w-full rounded-xs border border-line bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
-        <p className="text-xs text-ink-muted">Tövsiyə olunan uzunluq: 70–160 simvol.</p>
+        <p className="text-xs text-ink-muted">{t("components.seo.metaDescriptionHint")}</p>
       </div>
 
       <div className="sm:col-span-2 grid gap-4 lg:grid-cols-2">
-        <Preview label="Desktop önbaxış" title={previewTitle} description={previewDescription} pathname={pathname} />
-        <Preview label="Mobil önbaxış" title={previewTitle} description={previewDescription} pathname={pathname} mobile />
+        <Preview label={t("components.seo.desktopPreview")} title={previewTitle} description={previewDescription} pathname={pathname} />
+        <Preview label={t("components.seo.mobilePreview")} title={previewTitle} description={previewDescription} pathname={pathname} mobile />
       </div>
     </>
   );

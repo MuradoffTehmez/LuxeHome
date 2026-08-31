@@ -21,6 +21,8 @@ import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminServices } from "@/lib/queries";
 import { deleteService } from "./actions";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Xidmətlər" };
 export const dynamic = "force-dynamic";
@@ -28,6 +30,7 @@ export const dynamic = "force-dynamic";
 const LIST_PATH = "/admin/xidmetler";
 
 export default async function AdminServicesPage() {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.SERVICE_MANAGE);
   const services = await getAdminServices();
 
@@ -35,7 +38,7 @@ export default async function AdminServicesPage() {
     return (
       <>
         <Link
-          href={`/xidmetler/${service.slug}`}
+          href={localizePath(`/xidmetler/${service.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
           aria-label={`«${service.title}» xidmətini saytda aç`}

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -47,6 +49,7 @@ export function ConfirmAction({
   tone = "danger",
   redirectTo,
 }: ConfirmActionProps) {
+  const t = useTranslations("admin");
   const [open, setOpen] = useState(false);
   const [secret, setSecret] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -98,18 +101,18 @@ export function ConfirmAction({
       <Modal
         open={open}
         onClose={close}
-        title={secret ? "Əməliyyat tamamlandı" : title}
+        title={secret ? t("components.confirm.done") : title}
         description={secret ? undefined : description}
         size="sm"
         footer={
           secret ? (
             <Button variant="primary" size="sm" onClick={close}>
-              Bağla
+              {t("actions.close")}
             </Button>
           ) : (
             <>
               <Button variant="ghost" size="sm" onClick={close} disabled={pending}>
-                Ləğv et
+                {t("actions.cancel")}
               </Button>
               <Button
                 variant={tone === "danger" ? "danger" : "primary"}

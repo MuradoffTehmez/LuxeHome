@@ -31,6 +31,8 @@ import {
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminProjects } from "@/lib/queries";
 import { deleteProject, restoreProject } from "./actions";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Layihələr" };
 export const dynamic = "force-dynamic";
@@ -49,6 +51,7 @@ export default async function AdminProjectsPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROJECT_MANAGE);
 
   const params = await searchParams;
@@ -92,7 +95,7 @@ export default async function AdminProjectsPage({
     ) : (
       <>
         <Link
-          href={`/layiheler/${project.slug}`}
+          href={localizePath(`/layiheler/${project.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
           aria-label={`«${project.name}» layihəsini saytda aç`}

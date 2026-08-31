@@ -11,6 +11,8 @@ import { getAdminPropertyById, getPropertyFormOptions } from "@/lib/queries";
 import { deleteProperty, updateProperty } from "../actions";
 import type { PropertyFormValues } from "../form-values";
 import { PropertyForm } from "../property-form";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Elanın redaktəsi" };
 export const dynamic = "force-dynamic";
@@ -23,6 +25,7 @@ export default async function EditPropertyPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
 
   const { id } = await params;
@@ -97,7 +100,7 @@ export default async function EditPropertyPage({
         ]}
         actions={
           <Link
-            href={`/emlaklar/${property.slug}`}
+            href={localizePath(`/emlaklar/${property.slug}`, locale)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"

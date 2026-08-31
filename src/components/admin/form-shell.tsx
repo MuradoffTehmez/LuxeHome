@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { createContext, useActionState, useContext, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
@@ -40,11 +42,12 @@ type AdminFormProps = {
 export function AdminForm({
   action,
   children,
-  submitLabel = "Yadda saxla",
+  submitLabel,
   cancelHref,
   extraActions,
   className,
 }: AdminFormProps) {
+  const t = useTranslations("admin");
   const [state, formAction] = useActionState(action, IDLE_STATE);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -101,10 +104,10 @@ export function AdminForm({
               href={cancelHref}
               className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
             >
-              Ləğv et
+              {t("actions.cancel")}
             </Link>
           )}
-          <SubmitButton label={submitLabel} />
+          <SubmitButton label={submitLabel ?? t("actions.save")} />
         </div>
       </form>
     </FormStateContext.Provider>
@@ -118,12 +121,13 @@ export function AdminForm({
  * ayrıca komponentdir, `AdminForm`-un öz gövdəsində deyil.
  */
 export function SubmitButton({
-  label = "Yadda saxla",
+  label,
   className,
 }: {
   label?: string;
   className?: string;
 }) {
+  const t = useTranslations("admin");
   const { pending } = useFormStatus();
 
   return (
@@ -144,7 +148,7 @@ export function SubmitButton({
       ) : (
         <Save className="size-4" aria-hidden="true" />
       )}
-      {label}
+      {label ?? t("actions.save")}
     </button>
   );
 }
@@ -181,9 +185,11 @@ export function FormSection({
 
 /** Uzun admin formalarında bölmələr arasında toxunma və klaviatura ilə sürətli keçid. */
 export function FormJumpNav({ items }: { items: readonly { id: string; label: string }[] }) {
+  const t = useTranslations("admin");
+
   return (
     <nav
-      aria-label="Forma bölmələri"
+      aria-label={t("components.form.sections")}
       className="sticky top-16 z-[var(--z-sticky)] -mx-4 overflow-x-auto border-y border-line bg-beige/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"
     >
       <div className="flex w-max min-w-full gap-2">

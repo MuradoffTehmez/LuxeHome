@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { getAdminT } from "@/lib/admin-i18n";
 
 // ---------------------------------------------------------------------------
 // SƏHİFƏ BAŞLIĞI
@@ -9,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 type Breadcrumb = { label: string; href?: string };
 
-export function AdminPageHeader({
+export async function AdminPageHeader({
   title,
   description,
   breadcrumbs = [],
@@ -20,10 +21,12 @@ export function AdminPageHeader({
   breadcrumbs?: Breadcrumb[];
   actions?: React.ReactNode;
 }) {
+  const t = await getAdminT();
+
   return (
     <div className="mb-6 flex flex-col gap-4 sm:mb-8">
       {breadcrumbs.length > 0 && (
-        <nav aria-label="Səhifə yolu">
+        <nav aria-label={t("components.breadcrumb.label")}>
           <ol className="flex flex-wrap items-center gap-1 text-xs text-ink-muted">
             {breadcrumbs.map((crumb, index) => (
               <li key={`${crumb.label}-${index}`} className="flex items-center gap-1">

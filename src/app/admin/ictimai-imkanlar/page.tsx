@@ -24,6 +24,8 @@ import {
   deleteNeighborhoodProfile,
 } from "./actions";
 import { NeighborhoodEditor, type NeighborhoodProfileValues } from "./neighborhood-editor";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "İctimai imkanlar" };
 export const dynamic = "force-dynamic";
@@ -35,6 +37,7 @@ function numberField(value: number | null): string {
 }
 
 export default async function PublicFeaturesAdminPage() {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
   const [properties, locations, nearbyPlaces, neighborhoodProfiles, premiumProperties] = await Promise.all([
     prisma.property.findMany({
@@ -195,7 +198,7 @@ export default async function PublicFeaturesAdminPage() {
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
                   <Link
-                    href={`/rayon/${profile.location.slug}`}
+                    href={localizePath(`/rayon/${profile.location.slug}`, locale)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex min-h-11 items-center px-3 text-sm text-ink-soft transition-colors hover:text-gold-deep"

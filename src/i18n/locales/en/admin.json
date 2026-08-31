@@ -379,5 +379,71 @@
     "themeSystem": "Device setting",
     "themeHint": "New users start on the light theme; you can change it at any time.",
     "avatar": "Profile picture"
+  },
+  "components": {
+    "filterBar": {
+      "title": "List filters",
+      "button": "Filters",
+      "activeFilter": "Filters are active"
+    },
+    "breadcrumb": {
+      "label": "Breadcrumb"
+    },
+    "confirm": {
+      "done": "Action completed"
+    },
+    "form": {
+      "sections": "Form sections"
+    },
+    "seo": {
+      "metaTitle": "Meta title",
+      "metaTitleHint": "Recommended length: 25–60 characters.",
+      "metaDescription": "Meta description",
+      "metaDescriptionHint": "Recommended length: 70–160 characters.",
+      "desktopPreview": "Desktop preview",
+      "mobilePreview": "Mobile preview"
+    },
+    "secret": {
+      "title": "Temporary password — shown only once",
+      "copy": "Copy",
+      "copied": "Copied",
+      "hint": "Send it to the user over a secure channel. They must change the password and set up 2FA on first sign-in."
+    },
+    "editor": {
+      "bold": "Bold",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bulleted list",
+      "numberedList": "Numbered list",
+      "placeholder": "Write the body of the article here…",
+      "sampleText": "text",
+      "redo": "Redo",
+      "htmlNote": "HTML is supported — only allowed tags are kept",
+      "readStats": "{words} words · about {minutes} min read",
+      "paragraph": "Paragraph",
+      "italic": "Italic",
+      "link": "Link",
+      "quote": "Quote"
+    },
+    "dropzone": {
+      "tooLarge": "The file is larger than {size} MB",
+      "uploadFailed": "Upload failed",
+      "count": "{count, plural, one {# image} other {# images}}",
+      "prompt": "Drag images here, or click to choose them",
+      "formats": "JPG, PNG, WebP or AVIF — up to {size} MB per file",
+      "cover": "Cover",
+      "altLabel": "Image alt text",
+      "altPlaceholder": "Alt text (SEO)",
+      "altEmptyStrong": "Alt text is empty.",
+      "altEmptyRest": "Describe the image briefly and specifically; leave it empty only if it is decorative.",
+      "moveFirst": "Move to the front",
+      "moveFirstShort": "To front",
+      "moveLast": "Move to the end",
+      "makeCover": "Set as cover",
+      "remove": "Delete image",
+      "removeFailed": "Remove the failed image from the list",
+      "removeShort": "Remove",
+      "addMore": "Add more"
+    }
   }
 }

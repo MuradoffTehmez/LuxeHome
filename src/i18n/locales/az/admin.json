@@ -379,5 +379,71 @@
     "themeSystem": "Cihaz ayarı",
     "themeHint": "Sistem yeni istifadəçilər üçün açıq tema ilə başlayır; istədiyiniz vaxt dəyişə bilərsiniz.",
     "avatar": "Profil şəkli"
+  },
+  "components": {
+    "filterBar": {
+      "title": "Siyahı filtrləri",
+      "button": "Filtrlər",
+      "activeFilter": "Aktiv filtr var"
+    },
+    "breadcrumb": {
+      "label": "Səhifə yolu"
+    },
+    "confirm": {
+      "done": "Əməliyyat tamamlandı"
+    },
+    "form": {
+      "sections": "Forma bölmələri"
+    },
+    "seo": {
+      "metaTitle": "Meta başlıq",
+      "metaTitleHint": "Tövsiyə olunan uzunluq: 25–60 simvol.",
+      "metaDescription": "Meta təsvir",
+      "metaDescriptionHint": "Tövsiyə olunan uzunluq: 70–160 simvol.",
+      "desktopPreview": "Desktop önbaxış",
+      "mobilePreview": "Mobil önbaxış"
+    },
+    "secret": {
+      "title": "Müvəqqəti parol — bir dəfə göstərilir",
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "hint": "İstifadəçiyə təhlükəsiz kanalla ötürün. O, ilk girişdə parolu dəyişməli və 2FA quracaq."
+    },
+    "editor": {
+      "bold": "Qalın",
+      "heading2": "Başlıq 2",
+      "heading3": "Başlıq 3",
+      "bulletList": "Nişanlı siyahı",
+      "numberedList": "Nömrəli siyahı",
+      "placeholder": "Məqalənin mətnini bura yazın…",
+      "sampleText": "mətn",
+      "redo": "Təkrarla",
+      "htmlNote": "HTML dəstəklənir — yalnız icazəli teqlər saxlanılır",
+      "readStats": "{words} söz · təxminən {minutes} dəq oxu",
+      "paragraph": "Abzas",
+      "italic": "Kursiv",
+      "link": "Link",
+      "quote": "Sitat"
+    },
+    "dropzone": {
+      "tooLarge": "Fayl {size} MB-dan böyükdür",
+      "uploadFailed": "Yükləmə alınmadı",
+      "count": "{count, plural, other {# şəkil}}",
+      "prompt": "Şəkilləri bura sürüşdürün və ya seçmək üçün klikləyin",
+      "formats": "JPG, PNG, WebP və ya AVIF — hər fayl ən çoxu {size} MB",
+      "cover": "Üz qabığı",
+      "altLabel": "Şəklin alt mətni",
+      "altPlaceholder": "Alt mətn (SEO)",
+      "altEmptyStrong": "Alt mətn boşdur.",
+      "altEmptyRest": "Şəkli qısa və konkret təsvir edin; yalnız dekorativdirsə boş saxlayın.",
+      "moveFirst": "Sırada əvvələ apar",
+      "moveFirstShort": "Əvvələ",
+      "moveLast": "Sırada sona apar",
+      "makeCover": "Üz qabığı et",
+      "remove": "Şəkli sil",
+      "removeFailed": "Uğursuz şəkli siyahıdan çıxar",
+      "removeShort": "Çıxar",
+      "addMore": "Daha əlavə et"
+    }
   }
 }

@@ -11,11 +11,14 @@ import { getAdminServiceById } from "@/lib/queries";
 import { deleteService, saveService } from "../actions";
 import type { ServiceFormValues } from "../form-values";
 import { ServiceForm } from "../service-form";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Xidmətin redaktəsi" };
 export const dynamic = "force-dynamic";
 
 export default async function EditServicePage({ params }: { params: Promise<{ id: string }> }) {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.SERVICE_MANAGE);
 
   const { id } = await params;
@@ -54,7 +57,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
         ]}
         actions={
           <Link
-            href={`/xidmetler/${service.slug}`}
+            href={localizePath(`/xidmetler/${service.slug}`, locale)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"

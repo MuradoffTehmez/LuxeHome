@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ExternalLink, LogOut, Menu } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
 import { cn } from "@/lib/utils";
+import { localizePath } from "@/i18n/path-locale";
+import type { Locale } from "@/lib/constants";
 import { siteConfig } from "@/config/site";
 import type { AuthUser } from "@/lib/auth/types";
 import { signOut } from "@/app/[locale]/giris/actions";
@@ -39,6 +41,8 @@ function initials(name: string): string {
 
 export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
   const t = useTranslations("admin");
+  // Paneldən ictimai sayta keçid istifadəçinin panel dilində açılır
+  const locale = useLocale() as Locale;
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -82,7 +86,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
           </button>
 
           <div className="ml-auto flex items-center gap-2">
-            <Link href="/" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xs px-3 text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink">
+            <Link href={localizePath("/", locale)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xs px-3 text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink">
               <ExternalLink className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">{t("shell.openSite")}</span>
             </Link>

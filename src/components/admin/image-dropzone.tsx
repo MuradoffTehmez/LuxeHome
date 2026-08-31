@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useId, useRef, useState } from "react";
 import Image from "next/image";
 import {
@@ -87,6 +89,7 @@ export function ImageDropzone({
   const fieldId = useId();
   const fieldError = useFieldError(name);
   const [dragActive, setDragActive] = useState(false);
+  const t = useTranslations("admin");
   const [items, setItems] = useState<Item[]>(() =>
     withCover(
       initial.map((image, index) => ({
@@ -105,7 +108,7 @@ export function ImageDropzone({
             ? {
                 ...item,
                 status: "error",
-                error: `Fayl ${Math.round(maxFileSize / 1024 / 1024)} MB-dan böyükdür`,
+                error: t("components.dropzone.tooLarge", { size: Math.round(maxFileSize / 1024 / 1024) }),
               }
             : item,
         ),
@@ -123,7 +126,7 @@ export function ImageDropzone({
       const payload = (await response.json()) as { url?: string; error?: string };
 
       if (!response.ok || !payload.url) {
-        throw new Error(payload.error ?? "Yükləmə alınmadı");
+        throw new Error(payload.error ?? t("components.dropzone.uploadFailed"));
       }
 
       setItems((current) =>
@@ -140,7 +143,7 @@ export function ImageDropzone({
             ? {
                 ...item,
                 status: "error",
-                error: error instanceof Error ? error.message : "Yükləmə alınmadı",
+                error: error instanceof Error ? error.message : t("components.dropzone.uploadFailed"),
               }
             : item,
         ),
@@ -209,7 +212,7 @@ export function ImageDropzone({
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-sm font-medium text-ink">{label}</span>
         {uploaded.length > 0 && (
-          <span className="tabular text-xs text-ink-muted">{uploaded.length} şəkil</span>
+          <span className="tabular text-xs text-ink-muted">{t("components.dropzone.count", { count: uploaded.length })}</span>
         )}
       </div>
 
@@ -239,10 +242,10 @@ export function ImageDropzone({
             <UploadCloud className="size-6" aria-hidden="true" />
           </span>
           <span className="text-sm font-medium text-ink">
-            Şəkilləri bura sürüşdürün və ya seçmək üçün klikləyin
+            {t("components.dropzone.prompt")}
           </span>
           <span className="text-xs text-ink-muted">
-            JPG, PNG, WebP və ya AVIF — hər fayl ən çoxu 8 MB
+            {t("components.dropzone.formats", { size: 8 })}
           </span>
         </button>
 
@@ -298,7 +301,7 @@ export function ImageDropzone({
               {item.isCover && item.status === "ready" && (
                 <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-xs bg-gold px-2 py-1 text-[11px] font-semibold text-ink">
                   <Star className="size-3 fill-current" aria-hidden="true" />
-                  Üz qabığı
+                  {t("components.dropzone.cover")}
                 </span>
               )}
 
@@ -311,21 +314,21 @@ export function ImageDropzone({
               {item.status === "ready" && (
                 <div className="flex flex-col gap-1.5 bg-paper px-2 py-2">
                   <label className="sr-only" htmlFor={`${fieldId}-alt-${item.id}`}>
-                    Şəklin alt mətni
+                    {t("components.dropzone.altLabel")}
                   </label>
                   <input
                     id={`${fieldId}-alt-${item.id}`}
                     type="text"
                     value={item.alt}
                     onChange={(event) => setAlt(item.id, event.target.value)}
-                    placeholder="Alt mətn (SEO)"
+                    placeholder={t("components.dropzone.altPlaceholder")}
                     maxLength={160}
                     className="min-h-11 w-full rounded-xs border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
                   />
                   {!item.alt.trim() && (
                     <p className="flex items-start gap-1 text-[11px] leading-4 text-warning">
                       <AlertCircle className="mt-0.5 size-3 shrink-0" aria-hidden="true" />
-                      <span><strong>Alt mətn boşdur.</strong> Şəkli qısa və konkret təsvir edin; yalnız dekorativdirsə boş saxlayın.</span>
+                      <span><strong>{t("components.dropzone.altEmptyStrong")}</strong> {t("components.dropzone.altEmptyRest")}</span>
                     </p>
                   )}
 
@@ -336,8 +339,8 @@ export function ImageDropzone({
                           type="button"
                           onClick={() => move(item.id, -1)}
                           disabled={index === 0}
-                          aria-label="Sırada əvvələ apar"
-                          title="Əvvələ"
+                          aria-label={t("components.dropzone.moveFirst")}
+                          title={t("components.dropzone.moveFirstShort")}
                           className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                         >
                           <ChevronLeft className="size-4" aria-hidden="true" />
@@ -346,7 +349,7 @@ export function ImageDropzone({
                           type="button"
                           onClick={() => move(item.id, 1)}
                           disabled={index === items.length - 1}
-                          aria-label="Sırada sona apar"
+                          aria-label={t("components.dropzone.moveLast")}
                           title="Sona"
                           className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                         >
@@ -362,8 +365,8 @@ export function ImageDropzone({
                         <button
                           type="button"
                           onClick={() => setCover(item.id)}
-                          aria-label="Üz qabığı et"
-                          title="Üz qabığı et"
+                          aria-label={t("components.dropzone.makeCover")}
+                          title={t("components.dropzone.makeCover")}
                           className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-beige hover:text-gold-deep"
                         >
                           <Star className="size-4" aria-hidden="true" />
@@ -372,7 +375,7 @@ export function ImageDropzone({
                       <button
                         type="button"
                         onClick={() => remove(item.id)}
-                        aria-label="Şəkli sil"
+                        aria-label={t("components.dropzone.remove")}
                         title="Sil"
                         className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
                       >
@@ -388,8 +391,8 @@ export function ImageDropzone({
                   <button
                     type="button"
                     onClick={() => remove(item.id)}
-                    aria-label="Uğursuz şəkli siyahıdan çıxar"
-                    title="Çıxar"
+                    aria-label={t("components.dropzone.removeFailed")}
+                    title={t("components.dropzone.removeShort")}
                     className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
@@ -407,7 +410,7 @@ export function ImageDropzone({
                 className="flex min-h-11 aspect-4/3 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xs border-2 border-dashed border-line-strong text-ink-muted transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
               >
                 <ImagePlus className="size-6" aria-hidden="true" />
-                <span className="text-xs font-medium">Daha əlavə et</span>
+                <span className="text-xs font-medium">{t("components.dropzone.addMore")}</span>
               </button>
             </li>
           )}

@@ -12,6 +12,8 @@ import { deleteProject, updateProject } from "../actions";
 import type { ProjectFormValues } from "../form-values";
 import { ProjectForm } from "../project-form";
 import { ProjectPartnersManager } from "../project-partners-manager";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Layihənin redaktəsi" };
 export const dynamic = "force-dynamic";
@@ -22,6 +24,7 @@ const num = (value: number | null): string => (value === null ? "" : String(valu
 const day = (value: Date | null): string => (value ? value.toISOString().slice(0, 10) : "");
 
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.PROJECT_MANAGE);
 
   const { id } = await params;
@@ -88,7 +91,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
         ]}
         actions={
           <Link
-            href={`/layiheler/${project.slug}`}
+            href={localizePath(`/layiheler/${project.slug}`, locale)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"

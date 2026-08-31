@@ -31,6 +31,8 @@ import {
 import { daysUntilPartnershipEnd } from "@/lib/partners";
 import { formatRelative, isUnoptimizedImage } from "@/lib/utils";
 import { deletePartner, restorePartner, togglePartnerVisibility } from "./actions";
+import { localizePath } from "@/i18n/path-locale";
+import { getAdminI18n } from "@/lib/admin-i18n";
 
 export const metadata: Metadata = { title: "Tərəfdaşlar" };
 export const dynamic = "force-dynamic";
@@ -55,6 +57,7 @@ function statusBadge(status: string) {
 }
 
 export default async function AdminPartnersPage({ searchParams }: { searchParams: SearchParams }) {
+  const { locale } = await getAdminI18n();
   const user = await requireAdminRead(PERMISSIONS.PARTNER_VIEW);
   const canCreate = hasPermission(user.role, PERMISSIONS.PARTNER_CREATE);
   const canUpdate = hasPermission(user.role, PERMISSIONS.PARTNER_UPDATE);
@@ -130,7 +133,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
       ) : null}
       {partner.showPublicly ? (
         <Link
-          href={`/terefdaslar/${partner.slug}`}
+          href={localizePath(`/terefdaslar/${partner.slug}`, locale)}
           target="_blank"
           rel="noreferrer"
           className="grid size-11 place-items-center rounded-xs text-ink-muted hover:bg-beige hover:text-ink"
