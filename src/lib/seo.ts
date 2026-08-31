@@ -41,6 +41,10 @@ type PageMetaInput = {
   ogTitle?: string | null;
   ogDescription?: string | null;
   ogImage?: string | null;
+  robotsOverride?: { index: boolean; follow: boolean };
+  managedEntity?: { type: string; id: string };
+  /** Yalnız real və qarşılıqlı dil variantları. Verilməzsə bütün statik locale-lər istifadə olunur. */
+  alternateLocales?: Locale[];
 };
 
 /** Səhifə üçün tam metadata (canonical + Open Graph + Twitter) qurur. */
@@ -59,20 +63,25 @@ export function buildMetadata({
   ogTitle,
   ogDescription,
   ogImage,
+  robotsOverride,
+  alternateLocales,
 }: PageMetaInput): Metadata {
   const localizedPath = localizePath(path, locale);
   const url = siteUrl(localizedPath);
   // `null` qeyri-ekvivalent faceted səhifədə canonical-ın qəsdən buraxılmasıdır.
   const canonicalSource = canonicalPath === undefined ? path : canonicalPath;
+  const canonicalIsAbsolute = typeof canonicalSource === "string" && /^https:\/\//i.test(canonicalSource);
   const canonicalUrl =
-    canonicalSource === null ? null : siteUrl(localizePath(canonicalSource, locale));
-  const languageAlternates = canonicalSource === null
+    canonicalSource === null ? null : canonicalIsAbsolute ? canonicalSource : siteUrl(localizePath(canonicalSource, locale));
+  const languageAlternates = canonicalSource === null || canonicalIsAbsolute
     ? undefined
     : {
         ...Object.fromEntries(
-          Object.values(LOCALES).map((code) => [code, siteUrl(localizePath(canonicalSource, code))]),
+          (alternateLocales ?? Object.values(LOCALES)).map((code) => [code, siteUrl(localizePath(canonicalSource, code))]),
         ),
-        "x-default": siteUrl(localizePath(canonicalSource, DEFAULT_LOCALE)),
+        ...((alternateLocales ?? Object.values(LOCALES)).includes(DEFAULT_LOCALE)
+          ? { "x-default": siteUrl(localizePath(canonicalSource, DEFAULT_LOCALE)) }
+          : {}),
       };
   const resolvedOgTitle = ogTitle || title;
   const resolvedOgDescription = ogDescription || description;
@@ -95,7 +104,13 @@ export function buildMetadata({
         ? "noindex-follow"
         : "index";
   const robots: Metadata["robots"] =
-    effectivePolicy === "index"
+    robotsOverride
+      ? {
+          index: robotsOverride.index,
+          follow: robotsOverride.follow,
+          googleBot: { index: robotsOverride.index, follow: robotsOverride.follow, "max-image-preview": "large" },
+        }
+      : effectivePolicy === "index"
       ? undefined
       : effectivePolicy === "noindex-follow"
         ? {
@@ -137,6 +152,63 @@ export function buildMetadata({
   };
 }
 
+/**
+ * Admin `SeoMetadata` override-i ilə avtomatik generatoru birləşdirir.
+ * Entity-ə xas qeyd tapılmasa PAGE + route path fallback-i yoxlanılır.
+ */
+export async function buildManagedMetadata(input: PageMetaInput): Promise<Metadata> {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const refs = [
+      ...(input.managedEntity ? [input.managedEntity] : []),
+      { type: "PAGE", id: input.path.split("?", 1)[0] },
+    ];
+    const overrides = await prisma.seoMetadata.findMany({
+      where: {
+        locale: input.locale ?? DEFAULT_LOCALE,
+        OR: refs.map((ref) => ({ entityType: ref.type, entityId: ref.id })),
+      },
+      take: 2,
+    });
+    const override = refs.map((ref) => overrides.find((item) => item.entityType === ref.type && item.entityId === ref.id)).find(Boolean);
+    let alternateLocales = input.alternateLocales;
+    let missingTranslation = false;
+    if (input.managedEntity && alternateLocales === undefined) {
+      const translatableTypes = new Set(["PROPERTY", "PROJECT", "SERVICE", "BLOG_POST", "KNOWLEDGE_ARTICLE"]);
+      if (translatableTypes.has(input.managedEntity.type)) {
+        const translations = await prisma.contentTranslation.findMany({
+          where: { entityType: input.managedEntity.type, entityId: input.managedEntity.id, status: "PUBLISHED" },
+          select: { locale: true },
+        });
+        alternateLocales = [DEFAULT_LOCALE, ...translations.map((item) => item.locale as Locale)]
+          .filter((value, index, values): value is Locale => Object.values(LOCALES).includes(value) && values.indexOf(value) === index);
+        missingTranslation = (input.locale ?? DEFAULT_LOCALE) !== DEFAULT_LOCALE && !alternateLocales.includes(input.locale ?? DEFAULT_LOCALE);
+      } else if (["AGENT", "AGENCY"].includes(input.managedEntity.type)) {
+        alternateLocales = [DEFAULT_LOCALE];
+        missingTranslation = (input.locale ?? DEFAULT_LOCALE) !== DEFAULT_LOCALE;
+      }
+    }
+    const resolvedInput: PageMetaInput = {
+      ...input,
+      alternateLocales,
+      ...(missingTranslation ? { indexPolicy: "noindex-follow" as const } : {}),
+      ...(override ? {
+        title: override.title || input.title,
+        description: override.description || input.description,
+        canonicalPath: override.canonical || input.canonicalPath,
+        ogTitle: override.ogTitle || input.ogTitle,
+        ogDescription: override.ogDescription || input.ogDescription,
+        ogImage: override.ogImage || input.ogImage,
+        robotsOverride: missingTranslation ? { index: false, follow: true } : { index: override.robotsIndex, follow: override.robotsFollow },
+      } : {}),
+    };
+    return buildMetadata(resolvedInput);
+  } catch {
+    // Miqrasiya deploy-dan əvvəl metadata generatoru public səhifəni 500 etməməlidir.
+    return buildMetadata(input);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // STRUKTUR DATA (JSON-LD)
 // ---------------------------------------------------------------------------
@@ -145,7 +217,7 @@ export function buildMetadata({
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "RealEstateAgent",
+    "@type": ["Organization", "LocalBusiness", "RealEstateAgent"],
     "@id": `${siteUrl()}/#organization`,
     name: siteConfig.fullName,
     alternateName: siteConfig.name,
@@ -223,7 +295,7 @@ type PropertySchemaInput = {
   price: number;
   currency: string;
   listingType: string;
-  images: string[];
+  images: Array<string | { url: string; width?: number | null; height?: number | null; caption?: string | null }>;
   city: string;
   district?: string | null;
   address?: string | null;
@@ -234,6 +306,8 @@ type PropertySchemaInput = {
   bedrooms?: number | null;
   bathrooms?: number | null;
   status: string;
+  propertyType?: string | null;
+  agent?: { name: string; slug: string; agency?: { name: string; slug: string } | null } | null;
 };
 
 /** Əmlak elanı: listing + təsvir edilən obyekt + kommersiya təklifi. */
@@ -246,16 +320,29 @@ export function propertySchema(property: PropertySchemaInput, locale: Locale = D
         : "https://schema.org/InStock";
 
   const url = siteUrl(localizePath(`/emlaklar/${property.slug}`, locale));
+  const images = property.images.map((image) => typeof image === "string" ? image : {
+    "@type": "ImageObject",
+    contentUrl: image.url,
+    width: image.width,
+    height: image.height,
+    caption: image.caption,
+    representativeOfPage: true,
+  });
+  const residenceType = property.propertyType?.toLocaleLowerCase("az-AZ").includes("villa")
+    ? "House"
+    : property.propertyType?.toLocaleLowerCase("az-AZ").includes("mənzil")
+      ? "Apartment"
+      : "Residence";
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
     "@id": `${url}#listing`,
     name: property.title,
     description: property.description.slice(0, 400),
-    image: property.images,
+    image: images,
     url,
     about: {
-      "@type": "Residence",
+      "@type": residenceType,
       "@id": `${url}#property`,
       name: property.title,
       floorSize: property.area
@@ -286,9 +373,77 @@ export function propertySchema(property: PropertySchemaInput, locale: Locale = D
       priceCurrency: property.currency,
       availability,
       url,
-      seller: { "@id": `${siteUrl()}/#organization` },
+      seller: property.agent
+        ? { "@id": `${siteUrl(localizePath(`/agentler/${property.agent.slug}`, locale))}#person` }
+        : { "@id": `${siteUrl()}/#organization` },
     },
+    broker: property.agent ? {
+      "@type": "Person",
+      "@id": `${siteUrl(localizePath(`/agentler/${property.agent.slug}`, locale))}#person`,
+      name: property.agent.name,
+      worksFor: property.agent.agency
+        ? { "@id": `${siteUrl(localizePath(`/agentlikler/${property.agent.agency.slug}`, locale))}#agency` }
+        : { "@id": `${siteUrl()}/#organization` },
+    } : undefined,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
+  };
+}
+
+export function webPageSchema(input: { path: string; name: string; description: string }, locale: Locale = DEFAULT_LOCALE) {
+  const url = siteUrl(localizePath(input.path, locale));
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${url}#webpage`,
+    url,
+    name: input.name,
+    description: input.description,
+    isPartOf: { "@id": `${siteUrl()}/#website` },
+    about: { "@id": `${siteUrl()}/#organization` },
+    inLanguage: { az: "az-AZ", en: "en-US", ru: "ru-RU" }[locale],
+  };
+}
+
+export function agentSchema(agent: {
+  name: string;
+  slug: string;
+  roleTitle?: string | null;
+  bio?: string | null;
+  avatarUrl?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  languages?: string[];
+  serviceAreas?: string[];
+  agency?: { name: string; slug: string } | null;
+  rating?: number | null;
+  reviewCount?: number;
+}, locale: Locale = DEFAULT_LOCALE) {
+  const url = siteUrl(localizePath(`/agentler/${agent.slug}`, locale));
+  const personId = `${url}#person`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": `${url}#profile`,
+    url,
+    mainEntity: {
+      "@type": "Person",
+      "@id": personId,
+      name: agent.name,
+      jobTitle: agent.roleTitle,
+      description: agent.bio,
+      image: agent.avatarUrl,
+      telephone: agent.phone,
+      email: agent.email,
+      knowsLanguage: agent.languages,
+      areaServed: agent.serviceAreas,
+      worksFor: agent.agency
+        ? { "@id": `${siteUrl(localizePath(`/agentlikler/${agent.agency.slug}`, locale))}#agency`, name: agent.agency.name }
+        : { "@id": `${siteUrl()}/#organization` },
+      aggregateRating: agent.rating && agent.reviewCount
+        ? { "@type": "AggregateRating", ratingValue: agent.rating, reviewCount: agent.reviewCount }
+        : undefined,
+    },
+    isPartOf: { "@id": `${siteUrl()}/#website` },
   };
 }
 
