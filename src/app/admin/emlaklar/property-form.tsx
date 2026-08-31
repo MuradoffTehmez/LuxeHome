@@ -73,6 +73,10 @@ export function PropertyForm({
 }) {
   const [listingType, setListingType] = useState(initial.listingType);
   const [cityId, setCityId] = useState(initial.cityId || options.cities[0]?.id || "");
+  const [typeId, setTypeId] = useState(initial.typeId);
+  const [districtId, setDistrictId] = useState(initial.districtId);
+  const [rooms, setRooms] = useState(initial.rooms);
+  const [uploadReference] = useState(() => initial.id ? `LHE${initial.id.slice(-8)}` : `LHE${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`);
 
   // Rayon siyahısı seçilmiş şəhərdən asılıdır — kaskad ictimai axtarışdakı ilə eynidir
   const districts = options.districts.filter((district) => district.parentId === cityId);
@@ -185,7 +189,8 @@ export function PropertyForm({
           name="typeId"
           label="Əmlak növü"
           required
-          defaultValue={initial.typeId}
+          value={typeId}
+          onChange={(event) => setTypeId(event.target.value)}
           placeholder="Seçin"
           options={options.types.map((type) => ({ value: type.id, label: type.name }))}
         />
@@ -202,7 +207,8 @@ export function PropertyForm({
         <AdminSelect
           name="districtId"
           label="Rayon / qəsəbə"
-          defaultValue={initial.districtId}
+          value={districtId}
+          onChange={(event) => setDistrictId(event.target.value)}
           placeholder="Seçilməyib"
           options={districts.map((district) => ({ value: district.id, label: district.name }))}
         />
@@ -250,7 +256,7 @@ export function PropertyForm({
       </FormSection>
 
       <FormSection id="olculer" title="Ölçülər">
-        <AdminInput name="rooms" label="Otaq sayı" type="number" min={0} defaultValue={initial.rooms} />
+        <AdminInput name="rooms" label="Otaq sayı" type="number" min={0} value={rooms} onChange={(event) => setRooms(event.target.value)} />
         <AdminInput
           name="bedrooms"
           label="Yataq otağı"
@@ -389,6 +395,7 @@ export function PropertyForm({
             folder="emlaklar"
             initial={initial.images}
             hint="Yüklənən şəkillər avtomatik WebP formatına çevrilir və ölçüsü kiçildilir."
+            seoNamePrefix={`${options.districts.find((item) => item.id === districtId)?.slug ?? "baki"}-${options.types.find((item) => item.id === typeId)?.slug ?? "emlak"}-${rooms || "0"}-otaqli-${uploadReference}`}
           />
         </FullWidth>
       </FormSection>

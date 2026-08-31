@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   const rawFolder = String(formData.get("folder") ?? "umumi");
   const folder: MediaFolder = isFolder(rawFolder) ? rawFolder : "umumi";
 
-  const result = await putImage(file, folder);
+  const result = await putImage(file, folder, String(formData.get("seoName") ?? ""));
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
@@ -55,6 +55,8 @@ export async function POST(request: Request) {
       width: result.width ?? null,
       height: result.height ?? null,
       uploaderId: user.id,
+      checksum: result.checksum,
+      watermarkApplied: result.watermarkApplied,
     },
     select: { id: true, url: true, thumbUrl: true, originalName: true },
   });

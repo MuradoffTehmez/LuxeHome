@@ -56,6 +56,8 @@ type ImageDropzoneProps = {
   uploadUrl?: string;
   /** Client tərəfdə erkən yoxlama; server qovluğa görə limiti yenidən tətbiq edir. */
   maxFileSize?: number;
+  /** Əmlak şəkilləri üçün `{rayon}-{tip}-{otaq}-{elan}-{sıra}` prefiksi. */
+  seoNamePrefix?: string;
 };
 
 function withCover(items: Item[]): Item[] {
@@ -79,6 +81,7 @@ export function ImageDropzone({
   maxFiles,
   uploadUrl = DEFAULT_IMAGE_UPLOAD_URL,
   maxFileSize = MAX_UPLOAD_SIZE,
+  seoNamePrefix,
 }: ImageDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldId = useId();
@@ -94,7 +97,7 @@ export function ImageDropzone({
     ),
   );
 
-  async function upload(file: File, id: string) {
+  async function upload(file: File, id: string, sequence: number) {
     if (file.size > maxFileSize) {
       setItems((current) =>
         current.map((item) =>
@@ -113,6 +116,7 @@ export function ImageDropzone({
     const body = new FormData();
     body.append("file", file);
     body.append("folder", folder);
+    if (seoNamePrefix) body.append("seoName", `${seoNamePrefix}-${String(sequence).padStart(2, "0")}`);
 
     try {
       const response = await fetch(uploadUrl, { method: "POST", body });
@@ -162,7 +166,7 @@ export function ImageDropzone({
     }));
 
     setItems((current) => withCover(mode === "single" ? pending : [...current, ...pending]));
-    limited.forEach((file, index) => void upload(file, pending[index].id));
+    limited.forEach((file, index) => void upload(file, pending[index].id, currentCount + index + 1));
   }
 
   function remove(id: string) {

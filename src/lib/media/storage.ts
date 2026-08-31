@@ -93,18 +93,26 @@ async function toWebp(
   source: AllowedMime,
   width: number,
   quality: number,
+  watermark = false,
 ): Promise<Converted> {
-  const images = getCloudflareContext().env.IMAGES;
+  const { IMAGES: images, ASSETS: assets } = getCloudflareContext().env;
   if (!images) {
     return { bytes: buffer, contentType: source, extension: EXTENSIONS[source] };
   }
 
   try {
-    const result = await images
+    let transformer = images
       .input(streamOf(buffer))
       // `scale-down` kiçik şəkli böyütmür — yalnız böyükləri kiçildir
-      .transform({ width, fit: "scale-down" })
-      .output({ format: "image/webp", quality });
+      .transform({ width, fit: "scale-down" });
+    if (watermark && assets) {
+      const watermarkResponse = await assets.fetch("https://assets.local/logo-mark.webp");
+      if (watermarkResponse.ok && watermarkResponse.body) {
+        const overlay = images.input(watermarkResponse.body).transform({ width: Math.min(160, Math.round(width * 0.12)), fit: "scale-down" });
+        transformer = transformer.draw(overlay, { bottom: 20, right: 20, opacity: 0.55 });
+      }
+    }
+    const result = await transformer.output({ format: "image/webp", quality });
 
     return {
       bytes: await result.response().arrayBuffer(),
@@ -140,10 +148,25 @@ export type UploadResult =
       size: number;
       width?: number;
       height?: number;
+      checksum: string;
+      watermarkApplied: boolean;
     }
   | { ok: false; error: string };
 
-export async function putImage(file: File, folder: MediaFolder): Promise<UploadResult> {
+function safeSeoName(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const normalized = value.toLocaleLowerCase("az-AZ").normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-{2,}/g, "-").replace(/^-|-$/g, "").slice(0, 150);
+  return normalized || null;
+}
+
+async function sha256(buffer: ArrayBuffer): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export async function putImage(file: File, folder: MediaFolder, seoName?: string | null): Promise<UploadResult> {
   const maxSize = folder === "terefdaslar-logo" ? MAX_PARTNER_LOGO_SIZE : MAX_UPLOAD_SIZE;
   if (file.size === 0) return { ok: false, error: "Fayl boşdur." };
   if (file.size > maxSize) {
@@ -162,16 +185,19 @@ export async function putImage(file: File, folder: MediaFolder): Promise<UploadR
   const bucket = getCloudflareContext().env.MEDIA;
   if (!bucket) return { ok: false, error: "Media anbarı əlçatan deyil." };
 
-  const master = await toWebp(buffer, sourceType, MASTER_WIDTH, MASTER_QUALITY);
-  const thumb = await toWebp(buffer, sourceType, THUMB_WIDTH, THUMB_QUALITY);
+  const applyWatermark = folder === "emlaklar";
+  const master = await toWebp(buffer, sourceType, MASTER_WIDTH, MASTER_QUALITY, applyWatermark);
+  const thumb = await toWebp(buffer, sourceType, THUMB_WIDTH, THUMB_QUALITY, applyWatermark);
   const size = await dimensions(master.bytes);
+  const checksum = await sha256(master.bytes);
 
   const now = new Date();
+  const generatedName = safeSeoName(seoName);
   const prefix = [
     folder,
     now.getUTCFullYear(),
     String(now.getUTCMonth() + 1).padStart(2, "0"),
-    crypto.randomUUID(),
+    generatedName || crypto.randomUUID(),
   ].join("/");
 
   const key = `${prefix}.${master.extension}`;
@@ -196,6 +222,8 @@ export async function putImage(file: File, folder: MediaFolder): Promise<UploadR
     mimeType: master.contentType,
     size: master.bytes.byteLength,
     ...size,
+    checksum,
+    watermarkApplied: applyWatermark && master.contentType === "image/webp",
   };
 }
 
