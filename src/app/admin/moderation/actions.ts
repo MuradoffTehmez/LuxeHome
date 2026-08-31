@@ -15,6 +15,8 @@ import { recordDomainEvent } from "@/lib/admin/events";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { propertyRetentionDays, validateStoredPropertyForPublication } from "@/lib/property-publish-validation";
+import { propertyLifecycleData } from "@/lib/admin/property-input";
 
 const LIST_PATH = "/admin/moderation";
 
@@ -30,13 +32,23 @@ export async function approveModerationProperty(id: string): Promise<ActionState
   try {
     const property = await prisma.property.findFirst({
       where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
-      select: { title: true, slug: true },
+      select: { title: true, slug: true, publishedAt: true, closedAt: true },
     });
     if (!property) return failure("Elan tapılmadı və ya artıq nəzərdən keçirilib.");
 
+    const publication = await validateStoredPropertyForPublication(id);
+    if (Object.keys(publication.errors).length > 0) {
+      return failure("Elan dərc tələblərini ödəmir.", publication.errors);
+    }
+
     await prisma.property.update({
       where: { id },
-      data: { status: PROPERTY_STATUSES.PUBLISHED, publishedAt: new Date(), moderationNote: null },
+      data: {
+        status: PROPERTY_STATUSES.PUBLISHED,
+        ...propertyLifecycleData(PROPERTY_STATUSES.PUBLISHED, property, await propertyRetentionDays()),
+        contentFingerprint: publication.fingerprint,
+        moderationNote: null,
+      },
     });
 
     await recordAudit(actor, "PUBLISH", "Property", id, `${property.title} — moderasiyadan təsdiqləndi`);

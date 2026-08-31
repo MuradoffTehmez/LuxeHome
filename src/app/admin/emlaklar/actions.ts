@@ -10,16 +10,22 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { parseImages } from "@/lib/admin/images";
 import { propertySchema, type PropertyInput } from "@/lib/admin/schemas";
 import {
-  nextPublishedAt,
+  propertyLifecycleData,
   propertyData,
   readPropertyForm,
 } from "@/lib/admin/property-input";
 import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
 import { uniqueSlug } from "@/lib/admin/slug";
+import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
+import {
+  propertyRetentionDays,
+  validatePropertyForPublication,
+  validateStoredPropertyForPublication,
+} from "@/lib/property-publish-validation";
 
 /**
  * Əmlak CRUD-u.
@@ -76,9 +82,23 @@ async function replaceRelations(
   }
 
   await prisma.propertyImage.deleteMany({ where: { propertyId } });
+  const media = await prisma.media.findMany({
+    where: { url: { in: images.map((image) => image.url) } },
+    select: { url: true, checksum: true, caption: true },
+  });
+  const mediaByUrl = new Map(media.map((item) => [item.url, item]));
   for (const [order, image] of images.entries()) {
+    const mediaRecord = mediaByUrl.get(image.url);
     await prisma.propertyImage.create({
-      data: { propertyId, url: image.url, alt: image.alt, order, isCover: image.isCover },
+      data: {
+        propertyId,
+        url: image.url,
+        alt: image.alt,
+        caption: mediaRecord?.caption,
+        checksum: mediaRecord?.checksum,
+        order,
+        isCover: image.isCover,
+      },
     });
   }
 }
@@ -104,6 +124,12 @@ export async function createProperty(
   }
 
   const images = parseImages(formData, "images");
+  if (parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
+    const publication = await validatePropertyForPublication(parsed.data, images);
+    if (Object.keys(publication.errors).length > 0) {
+      return failure("Elan dərc tələblərini ödəmir.", publication.errors);
+    }
+  }
   let propertyId: string;
 
   try {
@@ -119,7 +145,7 @@ export async function createProperty(
         slug,
         authorId: user.id,
         isDemo: false,
-        publishedAt: nextPublishedAt(parsed.data.status, null),
+        ...propertyLifecycleData(parsed.data.status, { publishedAt: null }, await propertyRetentionDays()),
       },
       select: { id: true },
     });
@@ -164,9 +190,10 @@ export async function updateProperty(
   }
 
   try {
+    const images = parseImages(formData, "images");
     const existing = await prisma.property.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true, publishedAt: true, status: true, price: true, currency: true },
+      select: { id: true, slug: true, publishedAt: true, closedAt: true, status: true, price: true, currency: true },
     });
     if (!existing) return failure("Elan tapılmadı və ya silinib.");
 
@@ -176,13 +203,19 @@ export async function updateProperty(
       id,
     );
 
-    const publishedAt = nextPublishedAt(parsed.data.status, existing.publishedAt);
+    if (parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
+      const publication = await validatePropertyForPublication(parsed.data, images, id);
+      if (Object.keys(publication.errors).length > 0) {
+        return failure("Elan dərc tələblərini ödəmir.", publication.errors);
+      }
+    }
+    const lifecycle = propertyLifecycleData(parsed.data.status, existing, await propertyRetentionDays());
 
     const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
 
     await prisma.property.update({
       where: { id },
-      data: { ...propertyData(parsed.data, paymentFlags), slug, publishedAt },
+      data: { ...propertyData(parsed.data, paymentFlags), slug, ...lifecycle },
     });
 
     await recordPropertyPriceChange({
@@ -194,7 +227,8 @@ export async function updateProperty(
       source: "ADMIN",
     });
 
-    await replaceRelations(id, parsed.data.featureIds, parseImages(formData, "images"));
+    await replaceRelations(id, parsed.data.featureIds, images);
+    await ensureSlugRedirect("/emlaklar", existing.slug, slug, user);
     await recordAudit(user, "UPDATE", "Property", id, parsed.data.title);
 
     if (existing.publishedAt === null && parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
@@ -280,15 +314,25 @@ export async function setPropertyStatus(id: string, status: string): Promise<Act
   try {
     const existing = await prisma.property.findFirst({
       where: { id, deletedAt: null },
-      select: { publishedAt: true, title: true, slug: true },
+      select: { publishedAt: true, closedAt: true, title: true, slug: true },
     });
     if (!existing) return failure("Elan tapılmadı.");
+
+    let fingerprint: string | undefined;
+    if (status === PROPERTY_STATUSES.PUBLISHED) {
+      const publication = await validateStoredPropertyForPublication(id);
+      if (Object.keys(publication.errors).length > 0) {
+        return failure("Elan dərc tələblərini ödəmir.", publication.errors);
+      }
+      fingerprint = publication.fingerprint;
+    }
 
     await prisma.property.update({
       where: { id },
       data: {
         status,
-        publishedAt: nextPublishedAt(status, existing.publishedAt),
+        ...propertyLifecycleData(status, existing, await propertyRetentionDays()),
+        ...(fingerprint ? { contentFingerprint: fingerprint } : {}),
       },
     });
 
@@ -361,15 +405,6 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
   const intent = form.text(formData, "intent") as BulkIntent;
   if (!BULK_INTENTS.includes(intent)) return failure("Naməlum əməliyyat.");
 
-  const data =
-    intent === "publish"
-      ? { status: PROPERTY_STATUSES.PUBLISHED, publishedAt: new Date() }
-      : intent === "archive"
-        ? { status: PROPERTY_STATUSES.ARCHIVED }
-        : intent === "delete"
-          ? { deletedAt: new Date() }
-          : { deletedAt: null };
-
   // Yalnız ilk dəfə dərc olunanlar (əvvəllər `publishedAt` boş olan) saxlanmış axtarış
   // bildirişinə səbəb olur — artıq dərc edilmiş elanın statusu təkrar "publish" ilə
   // toxunulsa belə, bildiriş təkrarlanmır.
@@ -386,8 +421,27 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
       : null;
 
   let done = 0;
+  const retentionDays = await propertyRetentionDays();
   for (const id of ids) {
     try {
+      const current = await prisma.property.findUnique({
+        where: { id },
+        select: { publishedAt: true, closedAt: true },
+      });
+      if (!current) continue;
+      let data: Record<string, unknown>;
+      if (intent === "publish") {
+        const publication = await validateStoredPropertyForPublication(id);
+        if (Object.keys(publication.errors).length > 0) continue;
+        data = {
+          status: PROPERTY_STATUSES.PUBLISHED,
+          ...propertyLifecycleData(PROPERTY_STATUSES.PUBLISHED, current, retentionDays),
+          contentFingerprint: publication.fingerprint,
+        };
+      } else if (intent === "archive") {
+        data = { status: PROPERTY_STATUSES.ARCHIVED, ...propertyLifecycleData(PROPERTY_STATUSES.ARCHIVED, current, retentionDays) };
+      } else if (intent === "delete") data = { deletedAt: new Date() };
+      else data = { deletedAt: null };
       await prisma.property.update({ where: { id }, data });
       done += 1;
       if (previouslyUnpublished?.has(id)) {

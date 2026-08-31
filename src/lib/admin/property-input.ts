@@ -3,6 +3,7 @@ import type { PropertyInput } from "./schemas";
 import * as form from "./form";
 import { propertySearchText } from "@/lib/search-normalization";
 import type { PaymentFlags } from "./payment-features";
+import { DEFAULT_EXPIRED_RETENTION_DAYS, propertyContentFingerprint } from "@/lib/serp";
 
 /**
  * Əmlak formasının saf (baza ilə əlaqəsiz) hissəsi.
@@ -115,6 +116,7 @@ export function propertyData(input: PropertyInput, payment: PaymentFlags) {
     ogTitle: input.ogTitle,
     ogDescription: input.ogDescription,
     ogImage: input.ogImage,
+    contentFingerprint: propertyContentFingerprint(input),
   };
 }
 
@@ -127,4 +129,25 @@ export function propertyData(input: PropertyInput, payment: PaymentFlags) {
 export function nextPublishedAt(status: string, current: Date | null): Date | null {
   if (status !== PROPERTY_STATUSES.PUBLISHED) return current;
   return current ?? new Date();
+}
+
+export function propertyLifecycleData(
+  status: string,
+  current: { publishedAt: Date | null; closedAt?: Date | null },
+  retentionDays = DEFAULT_EXPIRED_RETENTION_DAYS,
+) {
+  const isClosed = [
+    PROPERTY_STATUSES.SOLD,
+    PROPERTY_STATUSES.RENTED,
+    PROPERTY_STATUSES.ARCHIVED,
+  ].includes(status as never);
+  const closedAt = isClosed ? (current.closedAt ?? new Date()) : current.closedAt ?? null;
+  const retentionUntil = isClosed
+    ? new Date(closedAt!.getTime() + retentionDays * 86_400_000)
+    : null;
+  return {
+    publishedAt: nextPublishedAt(status, current.publishedAt),
+    closedAt,
+    retentionUntil,
+  };
 }
