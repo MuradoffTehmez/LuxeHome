@@ -11,9 +11,11 @@ import {
   faqSchema,
   itemListSchema,
   jsonLd,
-  buildMetadata,
+  buildManagedMetadata,
 } from "@/lib/seo";
 import { findSeoLanding, getSeoLandingRouteLabels, localizeSeoLanding, seoLandingIndexPolicy } from "@/lib/seo-landings";
+import { getPublishedDbSeoLanding } from "@/lib/seo-db-landings";
+import { landingCanBeIndexed } from "@/lib/serp";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,7 @@ type Props = {
 };
 
 const getLandingResult = cache(getSeoLandingProperties);
+const getDbLanding = cache(getPublishedDbSeoLanding);
 
 function readPage(value: string | string[] | undefined): number | null {
   if (value === undefined) return 1;
@@ -33,38 +36,41 @@ function readPage(value: string | string[] | undefined): number | null {
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const [{ locale, seoLanding }, query] = await Promise.all([params, searchParams]);
+  const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
   const sourceLanding = findSeoLanding(seoLanding);
-  if (!sourceLanding) return {};
+  const dbLanding = sourceLanding ? null : await getDbLanding(seoLanding, resolvedLocale);
+  if (!sourceLanding && !dbLanding) return {};
   const page = readPage(query.sehife);
   if (!page) return {};
-  const result = await getLandingResult(sourceLanding, page);
-  const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
-  const landing = localizeSeoLanding(sourceLanding, resolvedLocale);
+  const landing = sourceLanding ? localizeSeoLanding(sourceLanding, resolvedLocale) : dbLanding!.landing;
+  const result = await getLandingResult(landing, page);
   const labels = getSeoLandingRouteLabels(resolvedLocale);
   const canonicalPath = page && page > 1 ? `${landing.path}?sehife=${page}` : landing.path;
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: page && page > 1 ? `${landing.title}${labels.pageSuffix(page)}` : landing.title,
     description: landing.description,
     path: canonicalPath,
-    canonicalPath,
-    indexPolicy:
-      page > result.totalPages ? "noindex-follow" : seoLandingIndexPolicy(result.total),
+    indexPolicy: page > result.totalPages ? "noindex-follow" : dbLanding
+      ? (landingCanBeIndexed({ indexable: dbLanding.policy.indexable, indexEmpty: dbLanding.policy.indexEmpty, inventoryCount: result.total, minInventory: dbLanding.policy.minInventory, hasUniqueContent: landing.content.join(" ").split(/\s+/).length >= 80 }) ? "index" : "noindex-follow")
+      : seoLandingIndexPolicy(result.total),
+    canonicalPath: dbLanding?.policy.canonical || canonicalPath,
     locale: resolvedLocale,
   });
 }
 
 export default async function FixedSeoLandingPage({ params, searchParams }: Props) {
   const [{ locale, seoLanding }, query] = await Promise.all([params, searchParams]);
+  const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
   const sourceLanding = findSeoLanding(seoLanding);
+  const dbLanding = sourceLanding ? null : await getDbLanding(seoLanding, resolvedLocale);
   const page = readPage(query.sehife);
   const hasExtraParams = Object.keys(query).some((key) => key !== "sehife");
-  if (!sourceLanding || !page || hasExtraParams) notFound();
+  if ((!sourceLanding && !dbLanding) || !page || hasExtraParams) notFound();
 
-  const result = await getLandingResult(sourceLanding, page);
+  const landing = sourceLanding ? localizeSeoLanding(sourceLanding, resolvedLocale) : dbLanding!.landing;
+  const result = await getLandingResult(landing, page);
   if (page > result.totalPages) notFound();
-  const resolvedLocale = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
-  const landing = localizeSeoLanding(sourceLanding, resolvedLocale);
   const labels = getSeoLandingRouteLabels(resolvedLocale);
 
   return (
