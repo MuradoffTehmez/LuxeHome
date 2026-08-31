@@ -26,6 +26,7 @@ import { localizePath } from "@/i18n/path-locale";
 const LOCALE_VALUES = Object.values(LOCALES);
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
 import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
+import { landingCanBeIndexed } from "@/lib/serp";
 
 // ---------------------------------------------------------------------------
 // SEÇİM (SELECT) TƏRİFLƏRİ — kart və detal görünüşləri üçün
@@ -918,23 +919,26 @@ export async function getBlogCategories() {
 // ---------------------------------------------------------------------------
 
 export async function getSitemapEntries() {
-  const [properties, projects, services, posts, agencies, partners, seoLandings, districts, metros] = await Promise.all([
+  const [properties, projects, services, posts, agencies, agents, partners, seoLandings, dbLandings, districts, metros] = await Promise.all([
     prisma.property.findMany({
       where: {
         ...publicPropertyWhere(),
-        status: { in: [PROPERTY_STATUSES.PUBLISHED, PROPERTY_STATUSES.RESERVED] },
+        OR: [
+          { status: { in: [PROPERTY_STATUSES.PUBLISHED, PROPERTY_STATUSES.RESERVED] } },
+          { status: { in: [PROPERTY_STATUSES.SOLD, PROPERTY_STATUSES.RENTED] }, retentionUntil: { gte: new Date() } },
+        ],
         noIndex: false,
         canonicalUrl: null,
       },
-      select: { slug: true, updatedAt: true, status: true, noIndex: true, canonicalUrl: true },
+      select: { id: true, slug: true, updatedAt: true, status: true, noIndex: true, canonicalUrl: true, retentionUntil: true },
     }),
     prisma.project.findMany({
       where: { deletedAt: null, isDemo: false, isActive: true, noIndex: false, canonicalUrl: null },
-      select: { slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
+      select: { id: true, slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
     }),
     prisma.service.findMany({
       where: { isActive: true, noIndex: false, canonicalUrl: null },
-      select: { slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
+      select: { id: true, slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
     }),
     prisma.blogPost.findMany({
       where: {
@@ -944,17 +948,35 @@ export async function getSitemapEntries() {
         noIndex: false,
         canonicalUrl: null,
       },
-      select: { slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
+      select: { id: true, slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
     }),
     prisma.agency.findMany({
       where: { isVerified: true, user: { isActive: true } },
       select: { slug: true, updatedAt: true },
     }),
+    prisma.agentProfile.findMany({
+      where: { isPublic: true, isVerified: true },
+      select: { slug: true, updatedAt: true },
+    }),
     getSitemapPartners(),
     getIndexableSeoLandingEntries(),
+    prisma.seoLandingPage.findMany({
+      where: { status: "PUBLISHED", indexable: true },
+      select: { locale: true, slug: true, filtersJson: true, indexable: true, indexEmpty: true, minInventory: true, introContent: true, updatedAt: true },
+    }),
     getIndexableTaxonomyLandings("DISTRICT"),
     getIndexableTaxonomyLandings("METRO"),
   ]);
+
+  const indexableDbLandings: Array<{ path: string; locale: Locale; updatedAt: Date }> = [];
+  for (const landing of dbLandings) {
+    let filters: PropertyFilters;
+    try { filters = JSON.parse(landing.filtersJson) as PropertyFilters; } catch { continue; }
+    const inventory = await getProperties({ ...filters, statuses: INDEXABLE_LISTING_STATUSES, page: 1, pageSize: 1 });
+    if (landingCanBeIndexed({ indexable: landing.indexable, indexEmpty: landing.indexEmpty, inventoryCount: inventory.total, minInventory: landing.minInventory, hasUniqueContent: landing.introContent.trim().split(/\s+/).length >= 80 })) {
+      indexableDbLandings.push({ path: `/${landing.slug}`, locale: landing.locale as Locale, updatedAt: landing.updatedAt });
+    }
+  }
 
   return {
     properties,
@@ -962,12 +984,14 @@ export async function getSitemapEntries() {
     services,
     posts,
     agencies,
+    agents,
     partners,
     landings: [
       ...seoLandings,
       ...districts.map((item) => ({ path: `/rayon/${item.slug}`, updatedAt: item.updatedAt })),
       ...metros.map((item) => ({ path: `/metro/${item.slug}`, updatedAt: item.updatedAt })),
     ],
+    dbLandings: indexableDbLandings,
   };
 }
 

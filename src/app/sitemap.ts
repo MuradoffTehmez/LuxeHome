@@ -8,10 +8,12 @@ import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib
 export const dynamic = "force-dynamic";
 
 type CanonicalEntity = {
+  id?: string;
   slug: string;
   updatedAt: Date;
   noIndex: boolean;
   canonicalUrl: string | null;
+  retentionUntil?: Date | null;
 };
 
 export type SitemapSource = {
@@ -20,9 +22,11 @@ export type SitemapSource = {
   services: CanonicalEntity[];
   posts: CanonicalEntity[];
   agencies: Array<{ slug: string; updatedAt: Date }>;
+  agents?: Array<{ slug: string; updatedAt: Date }>;
   partners: Array<{ slug: string; updatedAt: Date }>;
   landings: Array<{ path: string; updatedAt?: Date }>;
   knowledge?: Array<{ path: string; updatedAt?: Date }>;
+  dbLandings?: Array<{ path: string; locale: Locale; updatedAt: Date }>;
 };
 
 function absoluteUrl(path: string): string {
@@ -70,7 +74,9 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
         (item) =>
           isSelfCanonical(item) &&
           (item.status === PROPERTY_STATUSES.PUBLISHED ||
-            item.status === PROPERTY_STATUSES.RESERVED),
+            item.status === PROPERTY_STATUSES.RESERVED ||
+            ((item.status === PROPERTY_STATUSES.SOLD || item.status === PROPERTY_STATUSES.RENTED) &&
+              item.retentionUntil != null && item.retentionUntil.getTime() >= Date.now())),
       )
       .flatMap((item) => localizedEntries(`/emlaklar/${item.slug}`, {
         lastModified: item.updatedAt,
@@ -109,10 +115,21 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
       changeFrequency: "daily" as const,
       priority: 0.75,
     })),
+    ...(source.agents ?? []).flatMap((item) => localizedEntries(`/agentler/${item.slug}`, {
+      lastModified: item.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.65,
+    })),
     ...(source.knowledge ?? []).flatMap((item) => localizedEntries(item.path, {
       ...(item.updatedAt ? { lastModified: item.updatedAt } : {}),
       changeFrequency: "monthly" as const,
       priority: 0.6,
+    })),
+    ...(source.dbLandings ?? []).map((item) => ({
+      url: absoluteUrl(localizePath(item.path, item.locale)),
+      lastModified: item.updatedAt,
+      changeFrequency: "daily" as const,
+      priority: 0.75,
     })),
   ];
 }

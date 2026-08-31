@@ -131,6 +131,12 @@ export async function middleware(request: NextRequest) {
   });
   if (canonicalRedirect) return NextResponse.redirect(canonicalRedirect, 308);
 
+  // Next metadata route-u flat URL set qaytarır; PRD sitemap index tələb etdiyi üçün
+  // public `/sitemap.xml` daxildə index route-na rewrite olunur.
+  if (pathname === "/sitemap.xml") {
+    return NextResponse.rewrite(new URL("/sitemap-index.xml", request.url));
+  }
+
   const canonicalAdmin = canonicalAdminPath(pathname, search);
   if (canonicalAdmin) return NextResponse.redirect(new URL(canonicalAdmin, request.url), 308);
 
@@ -173,5 +179,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   // `api`, `_next`, `media` (R2 şəkil route-u) və uzantılı fayllar middleware-dən keçmir
-  matcher: ["/((?!api|_next|media|llms\\.txt|.*\\..*).*)"],
+  matcher: ["/sitemap.xml", "/((?!api|_next|media|llms\\.txt|.*\\..*).*)"],
 };
