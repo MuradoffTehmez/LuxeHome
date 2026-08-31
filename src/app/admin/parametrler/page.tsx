@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { Info } from "lucide-react";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
@@ -7,19 +8,23 @@ import { SETTING_KEYS, getAllSettings } from "@/lib/settings";
 import { siteConfig } from "@/config/site";
 import { SettingsForm } from "./settings-form";
 
-export const metadata: Metadata = { title: "Parametrlər" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.settings.parametrler") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
   const settings = await getAllSettings();
 
   return (
     <>
       <AdminPageHeader
-        title="Parametrlər"
-        description="Saytın defolt görünüşü, əlaqə məlumatları, müraciət bildirişləri və komanda qeydi."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Parametrlər" }]}
+        title={t("pages.settings.parametrler")}
+        description={t("pages.settings.saytinDefoltGorunusuElaqe")}
+        breadcrumbs={[{ label: t("pages.settings.idarePaneli"), href: "/admin" }, { label: t("pages.settings.parametrler") }]}
       />
 
       <div className="grid min-w-0 gap-6 xl:grid-cols-[1.1fr_1fr]">
@@ -36,7 +41,7 @@ export default async function AdminSettingsPage() {
           contactWhatsapp={settings[SETTING_KEYS.CONTACT_WHATSAPP] ?? siteConfig.whatsapp}
         />
 
-        <AdminCard title="Qorunan hüquqi məlumatlar" className="min-w-0">
+        <AdminCard title={t("pages.settings.qorunanHuquqiMelumatlar")} className="min-w-0">
           <div className="flex min-w-0 flex-col gap-4 text-sm text-ink-soft">
             <p className="flex items-start gap-2.5">
               <Info className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />

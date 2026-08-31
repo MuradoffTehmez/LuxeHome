@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
 import {
   AdminCheckbox,
@@ -30,27 +31,28 @@ export function SettingsForm({
   contactInstagram: string;
   contactWhatsapp: string;
 }) {
+  const t = useTranslations("admin");
   return (
-    <AdminForm action={saveSettings} submitLabel="Parametrləri saxla">
+    <AdminForm action={saveSettings} submitLabel={t("pages.settings.parametrleriSaxla")}>
       <FormSection
-        title="Əməliyyat əlaqə məlumatları"
-        description="Əlaqə səhifəsi və footer bu dəyərləri dərhal istifadə edir. Boş sahə kodda təsdiqlənmiş ehtiyat dəyərə qayıdır."
+        title={t("pages.settings.emeliyyatElaqeMelumatlari")}
+        description={t("pages.settings.elaqeSehifesiVeFooter")}
       >
-        <AdminInput name="contactPhone" label="Telefon" defaultValue={contactPhone} maxLength={30} />
-        <AdminInput name="contactEmail" label="Korporativ e-poçt" type="email" defaultValue={contactEmail} maxLength={160} />
-        <FullWidth><AdminInput name="contactAddress" label="Ünvan" defaultValue={contactAddress} maxLength={300} /></FullWidth>
-        <AdminInput name="contactInstagram" label="Instagram istifadəçi adı" defaultValue={contactInstagram} maxLength={100} />
-        <AdminInput name="contactWhatsapp" label="WhatsApp nömrəsi" defaultValue={contactWhatsapp} maxLength={30} hint="Məsələn: 994519228585" />
+        <AdminInput name="contactPhone" label={t("pages.settings.telefon")} defaultValue={contactPhone} maxLength={30} />
+        <AdminInput name="contactEmail" label={t("pages.settings.korporativEPoct")} type="email" defaultValue={contactEmail} maxLength={160} />
+        <FullWidth><AdminInput name="contactAddress" label={t("pages.settings.unvan")} defaultValue={contactAddress} maxLength={300} /></FullWidth>
+        <AdminInput name="contactInstagram" label={t("pages.settings.instagramIstifadeciAdi")} defaultValue={contactInstagram} maxLength={100} />
+        <AdminInput name="contactWhatsapp" label={t("pages.settings.whatsappNomresi")} defaultValue={contactWhatsapp} maxLength={30} hint={t("pages.settings.meselen994519228585")} />
       </FormSection>
 
       <FormSection
-        title="Müraciət bildirişləri"
-        description="Saytdan yeni müraciət gələndə göndərilən e-poçt."
+        title={t("pages.settings.muracietBildirisleri")}
+        description={t("pages.settings.saytdanYeniMuracietGelende")}
       >
         <FullWidth>
           <AdminInput
             name="notificationEmail"
-            label="Bildiriş e-poçtu"
+            label={t("pages.settings.bildirisEPoctu")}
             type="email"
             defaultValue={notificationEmail}
             hint={`Boş buraxılsa, mühit dəyişənindəki ünvan işlədilir: ${fallbackEmail}`}
@@ -60,24 +62,24 @@ export function SettingsForm({
         <FullWidth>
           <AdminCheckbox
             name="notifyEnabled"
-            label="Yeni müraciət gələndə e-poçt göndərilsin"
+            label={t("pages.settings.yeniMuracietGelendeE")}
             defaultChecked={notifyEnabled}
           />
         </FullWidth>
       </FormSection>
 
       <FormSection
-        title="Komanda qeydi"
-        description="Yalnız panel istifadəçiləri görür — idarə səhifəsinin yuxarısında göstərilir."
+        title={t("pages.settings.komandaQeydi")}
+        description={t("pages.settings.yalnizPanelIstifadecileriGorur")}
       >
         <FullWidth>
           <AdminTextarea
             name="announcement"
-            label="Elan"
+            label={t("pages.settings.elan")}
             rows={3}
             maxLength={500}
             defaultValue={announcement}
-            hint="Boş buraxsanız, idarə səhifəsində heç nə göstərilmir."
+            hint={t("pages.settings.bosBuraxsanizIdareSehifesinde")}
           />
         </FullWidth>
       </FormSection>

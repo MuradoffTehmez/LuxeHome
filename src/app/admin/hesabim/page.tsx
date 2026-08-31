@@ -8,7 +8,10 @@ import { BackupCodesForm } from "./backup-codes-form";
 import { revokeOne, revokeOtherSessions } from "./actions";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Hesabım" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.account.hesabim") };
+}
 
 // Sessiya siyahısı hər baxışda təzə olmalıdır
 export const dynamic = "force-dynamic";
@@ -55,7 +58,7 @@ export default async function AccountPage({
   return (
     <div className="mx-auto flex min-w-0 w-full max-w-3xl flex-col gap-6 sm:gap-8">
       <header className="min-w-0">
-        <h1 className="font-display text-2xl text-ink">Hesabım</h1>
+        <h1 className="font-display text-2xl text-ink">{t("pages.account.hesabim")}</h1>
         <p className="mt-1 text-sm text-ink-soft [overflow-wrap:anywhere]">
           {user.email} · {t(`labels.role.${user.role}`)}
         </p>
@@ -72,20 +75,20 @@ export default async function AccountPage({
       </section>
 
       <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
-        <h2 className="font-display text-lg text-ink">Parolu dəyiş</h2>
+        <h2 className="font-display text-lg text-ink">{t("pages.account.paroluDeyis")}</h2>
         <div className="mt-4 max-w-md">
           <PasswordForm mustChange={parol === "deyis" || user.mustChangePassword} />
         </div>
       </section>
 
       <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
-        <h2 className="font-display text-lg text-ink">İki mərhələli doğrulama</h2>
+        <h2 className="font-display text-lg text-ink">{t("pages.account.ikiMerheleliDogrulama")}</h2>
         <p className="mt-2 text-sm text-ink-soft">
-          Aktivdir. İşlənməmiş ehtiyat kod sayı: <strong className="text-ink">{remainingCodes}</strong>
+          {t("pages.account.aktivdirIslenmemisEhtiyatKod")} <strong className="text-ink">{remainingCodes}</strong>
         </p>
         {remainingCodes < 3 && (
           <p className="mt-3 rounded-xs border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
-            Ehtiyat kodlarınız azalıb. Cari parolunuzla yeni dəst yarada bilərsiniz.
+            {t("pages.account.ehtiyatKodlarinizAzalibCari")}
           </p>
         )}
         <BackupCodesForm />
@@ -93,14 +96,14 @@ export default async function AccountPage({
 
       <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display text-lg text-ink">Aktiv sessiyalar</h2>
+          <h2 className="font-display text-lg text-ink">{t("pages.account.aktivSessiyalar")}</h2>
           {otherSessions.length > 0 && (
             <form action={revokeOtherSessions}>
               <button
                 type="submit"
                 className="min-h-11 cursor-pointer text-sm text-ink-soft underline-offset-4 transition-colors duration-200 hover:text-danger hover:underline"
               >
-                Digər cihazların hamısını bağla
+                {t("pages.account.digerCihazlarinHamisiniBagla")}
               </button>
             </form>
           )}
@@ -119,7 +122,7 @@ export default async function AccountPage({
                     {deviceLabel(session.userAgent)}
                     {isCurrent && (
                       <span className="ml-2 rounded-full bg-success-bg px-2 py-0.5 text-xs text-success">
-                        bu cihaz
+                        {t("pages.account.buCihaz")}
                       </span>
                     )}
                   </p>
@@ -136,7 +139,7 @@ export default async function AccountPage({
                       type="submit"
                       className="min-h-11 cursor-pointer text-sm text-danger underline-offset-4 transition-colors duration-200 hover:underline"
                     >
-                      Bağla
+                      {t("pages.account.bagla")}
                     </button>
                   </form>
                 )}

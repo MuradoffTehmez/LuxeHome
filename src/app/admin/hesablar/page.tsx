@@ -19,7 +19,10 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminPublicAccounts } from "@/lib/queries";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Hesablar" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.users.hesablar") };
+}
 export const dynamic = "force-dynamic";
 
 const TYPE_TONE: Record<AccountType, "gold" | "dark" | "neutral"> = {
@@ -37,17 +40,17 @@ export default async function AdminPublicAccountsPage() {
   return (
     <>
       <AdminPageHeader
-        title="Hesablar"
-        description="İctimai qeydiyyatdan keçən istifadəçi, mülk sahibi və agentlik hesabları. Əməkdaş hesabları «İstifadəçilər» bölməsindədir."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Hesablar" }]}
+        title={t("pages.users.hesablar")}
+        description={t("pages.users.ictimaiQeydiyyatdanKecenIstifadeci")}
+        breadcrumbs={[{ label: t("pages.users.idarePaneli"), href: "/admin" }, { label: t("pages.users.hesablar") }]}
       />
 
       <AdminCard bodyClassName="p-4 lg:p-0">
         <AdminResponsiveList
-          ariaLabel="İctimai hesablar"
+          ariaLabel={t("pages.users.ictimaiHesablar")}
           items={accounts}
           getKey={(account) => account.id}
-          empty={<p className="py-10 text-center text-sm text-ink-muted">Hələ ictimai hesab yoxdur.</p>}
+          empty={<p className="py-10 text-center text-sm text-ink-muted">{t("pages.users.heleIctimaiHesabYoxdur")}</p>}
           renderCard={(account) => (
             <AdminListCard
               title={account.name}
@@ -64,19 +67,19 @@ export default async function AdminPublicAccountsPage() {
                 <Badge tone={account.approvedAt ? "success" : "warning"}>
                   {account.approvedAt ? "Təsdiqlənib" : "Təsdiq gözləyir"}
                 </Badge>
-                {!account.isActive ? <Badge tone="neutral">Bloklanıb</Badge> : null}
+                {!account.isActive ? <Badge tone="neutral">{t("pages.users.bloklanib")}</Badge> : null}
               </div>
               <dl className="mt-4 grid grid-cols-3 gap-3">
                 <div>
-                  <dt className="text-xs text-ink-muted">Elan</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.users.elan")}</dt>
                   <dd className="tabular mt-1 text-ink">{account._count.properties}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Favorit</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.users.favorit")}</dt>
                   <dd className="tabular mt-1 text-ink">{account._count.favorites}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Son giriş</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.users.sonGiris")}</dt>
                   <dd className="mt-1 text-ink">{account.lastLoginAt ? formatRelative(account.lastLoginAt) : "Heç vaxt"}</dd>
                 </div>
               </dl>
@@ -84,15 +87,15 @@ export default async function AdminPublicAccountsPage() {
           )}
           renderTable={(items) => (
             <AdminTable
-              caption="Hesablar"
+              caption={t("pages.users.hesablar")}
               headers={[
-                { label: "Hesab" },
-                { label: "Növ" },
-                { label: "Təsdiq" },
-                { label: "Elan" },
-                { label: "Favorit" },
-                { label: "Son giriş", className: "text-right" },
-                { label: "İdarəetmə", className: "text-right" },
+                { label: t("pages.users.hesab") },
+                { label: t("pages.users.nov") },
+                { label: t("pages.users.tesdiq") },
+                { label: t("pages.users.elan") },
+                { label: t("pages.users.favorit") },
+                { label: t("pages.users.sonGiris"), className: "text-right" },
+                { label: t("pages.users.idareetme"), className: "text-right" },
               ]}
             >
               {items.map((account) => (
@@ -100,7 +103,7 @@ export default async function AdminPublicAccountsPage() {
                   <AdminTableCell>
                     <span className="font-medium text-ink">{account.name}</span>
                     <p className="mt-0.5 text-xs text-ink-muted">{account.email}</p>
-                    {!account.isActive ? <Badge tone="neutral" className="mt-1">Deaktiv</Badge> : null}
+                    {!account.isActive ? <Badge tone="neutral" className="mt-1">{t("pages.users.deaktiv")}</Badge> : null}
                   </AdminTableCell>
                   <AdminTableCell><Badge tone={TYPE_TONE[account.accountType as AccountType]}>{t(`labels.accountType.${account.accountType as AccountType}`)}</Badge></AdminTableCell>
                   <AdminTableCell>

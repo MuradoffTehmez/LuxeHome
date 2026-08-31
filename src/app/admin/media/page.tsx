@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { Pagination } from "@/components/ui/pagination";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
@@ -9,7 +10,10 @@ import { getAdminMedia } from "@/lib/queries";
 import { MediaCard } from "./media-card";
 import { MediaUploader } from "./media-uploader";
 
-export const metadata: Metadata = { title: "Media" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.settings.media") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/media";
@@ -19,6 +23,7 @@ export default async function AdminMediaPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.MEDIA_MANAGE);
 
   const params = await searchParams;
@@ -38,9 +43,9 @@ export default async function AdminMediaPage({
   return (
     <>
       <AdminPageHeader
-        title="Media"
+        title={t("pages.settings.media")}
         description={`${total} fayl. Yüklənən şəkillər avtomatik WebP formatına çevrilir.`}
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Media" }]}
+        breadcrumbs={[{ label: t("pages.settings.idarePaneli"), href: "/admin" }, { label: t("pages.settings.media") }]}
       />
 
       <div className="mb-6">
@@ -51,7 +56,7 @@ export default async function AdminMediaPage({
         <AdminFilterBar
           action={LIST_PATH}
           searchValue={q}
-          searchPlaceholder="Fayl adı və ya alt mətn üzrə axtar…"
+          searchPlaceholder={t("pages.settings.faylAdiVeYa")}
           resultLabel={`${total} fayl tapıldı`}
         />
 

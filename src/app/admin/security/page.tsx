@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { LogOut, ShieldAlert, Unlock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +26,10 @@ import {
 import { revokeAdminSession, unlockUserAccount } from "./actions";
 import { hasRuntimeEnv } from "@/lib/runtime-env";
 
-export const metadata: Metadata = { title: "Təhlükəsizlik" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.security.tehlukesizlik") };
+}
 export const dynamic = "force-dynamic";
 
 const REASON_LABELS: Record<string, string> = {
@@ -52,6 +56,7 @@ function deviceLabel(userAgent: string | null): string {
 }
 
 export default async function AdminSecurityPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
 
   const [attempts, sessions, lockedUsers] = await Promise.all([
@@ -69,13 +74,13 @@ export default async function AdminSecurityPage() {
   return (
     <>
       <AdminPageHeader
-        title="Təhlükəsizlik"
-        description="Giriş cəhdləri, aktiv sessiyalar və kilidlənmiş hesablar."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Təhlükəsizlik" }]}
+        title={t("pages.security.tehlukesizlik")}
+        description={t("pages.security.girisCehdleriAktivSessiyalar")}
+        breadcrumbs={[{ label: t("pages.security.idarePaneli"), href: "/admin" }, { label: t("pages.security.tehlukesizlik") }]}
       />
 
       <div className="flex flex-col gap-6">
-        <AdminCard title="Bot müdafiəsi" description="Cloudflare Turnstile server tərəfli token yoxlaması">
+        <AdminCard title={t("pages.security.botMudafiesi")} description={t("pages.security.cloudflareTurnstileServerTerefli")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="max-w-2xl text-sm text-ink-soft">Admin və istifadəçi girişi, qeydiyyat, parol bərpası və müraciət formaları qorunur. Token hər əməliyyat növünə ayrıca bağlanır.</p>
             <Badge tone={turnstileReady ? "success" : "danger"}>{turnstileReady ? "Aktiv" : "Konfiqurasiya tamamlanmayıb"}</Badge>
@@ -83,8 +88,8 @@ export default async function AdminSecurityPage() {
         </AdminCard>
         {lockedUsers.length > 0 && (
           <AdminCard
-            title="Kilidlənmiş hesablar"
-            description="Ardıcıl uğursuz giriş cəhdlərindən sonra müvəqqəti bağlanıb."
+            title={t("pages.security.kilidlenmisHesablar")}
+            description={t("pages.security.ardicilUgursuzGirisCehdlerinden")}
             bodyClassName="p-0"
           >
             <ul className="divide-y divide-line">
@@ -103,9 +108,9 @@ export default async function AdminSecurityPage() {
                     action={unlockUserAccount}
                     id={user.id}
                     label={`${user.name} kilidini aç`}
-                    title="Kilidi açmaq"
+                    title={t("pages.security.kilidiAcmaq")}
                     description={`${user.name} (${user.email}) dərhal yenidən giriş edə biləcək.`}
-                    confirmLabel="Kilidi aç"
+                    confirmLabel={t("pages.security.kilidiAc")}
                     tone="neutral"
                     className="size-11 shrink-0"
                   >
@@ -117,15 +122,15 @@ export default async function AdminSecurityPage() {
           </AdminCard>
         )}
 
-        <AdminCard title="Aktiv sessiyalar" description={`${sessions.length} aktiv sessiya`} bodyClassName="p-4 lg:p-0">
+        <AdminCard title={t("pages.security.aktivSessiyalar")} description={`${sessions.length} aktiv sessiya`} bodyClassName="p-4 lg:p-0">
           {sessions.length === 0 ? (
-            <EmptyState title="Aktiv sessiya yoxdur" />
+            <EmptyState title={t("pages.security.aktivSessiyaYoxdur")} />
           ) : (
             <AdminResponsiveList
-              ariaLabel="Aktiv sessiyalar"
+              ariaLabel={t("pages.security.aktivSessiyalar")}
               items={sessions}
               getKey={(session) => session.id}
-              empty={<EmptyState title="Aktiv sessiya yoxdur" />}
+              empty={<EmptyState title={t("pages.security.aktivSessiyaYoxdur")} />}
               renderCard={(session) => (
                 <AdminListCard
                   title={session.user.name}
@@ -135,9 +140,9 @@ export default async function AdminSecurityPage() {
                       action={revokeAdminSession}
                       id={session.id}
                       label={`${session.user.email} sessiyasını bağla`}
-                      title="Sessiyanı bağlamaq"
+                      title={t("pages.security.sessiyaniBaglamaq")}
                       description={`${session.user.name} (${session.user.email}) bu cihazdan çıxarılacaq.`}
-                      confirmLabel="Bağla"
+                      confirmLabel={t("pages.security.bagla")}
                       tone="danger"
                       className="size-11"
                     >
@@ -147,7 +152,7 @@ export default async function AdminSecurityPage() {
                 >
                   <dl className="grid grid-cols-2 gap-3">
                     <div>
-                      <dt className="text-xs text-ink-muted">Cihaz</dt>
+                      <dt className="text-xs text-ink-muted">{t("pages.security.cihaz")}</dt>
                       <dd className="mt-1 text-ink">{deviceLabel(session.userAgent)}</dd>
                     </div>
                     <div>
@@ -155,7 +160,7 @@ export default async function AdminSecurityPage() {
                       <dd className="mt-1 text-ink [overflow-wrap:anywhere]">{session.ip ?? "—"}</dd>
                     </div>
                     <div className="col-span-2">
-                      <dt className="text-xs text-ink-muted">Son aktivlik</dt>
+                      <dt className="text-xs text-ink-muted">{t("pages.security.sonAktivlik")}</dt>
                       <dd className="mt-1 text-ink">{formatDateTime(session.lastSeenAt)}</dd>
                     </div>
                   </dl>
@@ -163,13 +168,13 @@ export default async function AdminSecurityPage() {
               )}
               renderTable={(items) => (
                 <AdminTable
-                  caption="Aktiv sessiyalar"
+                  caption={t("pages.security.aktivSessiyalar")}
                   headers={[
-                    { label: "İstifadəçi" },
-                    { label: "Cihaz" },
+                    { label: t("pages.security.istifadeci") },
+                    { label: t("pages.security.cihaz") },
                     { label: "IP" },
-                    { label: "Son aktivlik" },
-                    { label: "İdarəetmə", className: "text-right" },
+                    { label: t("pages.security.sonAktivlik") },
+                    { label: t("pages.security.idareetme"), className: "text-right" },
                   ]}
                 >
                   {items.map((session) => (
@@ -191,9 +196,9 @@ export default async function AdminSecurityPage() {
                             action={revokeAdminSession}
                             id={session.id}
                             label={`${session.user.email} sessiyasını bağla`}
-                            title="Sessiyanı bağlamaq"
+                            title={t("pages.security.sessiyaniBaglamaq")}
                             description={`${session.user.name} (${session.user.email}) bu cihazdan çıxarılacaq.`}
-                            confirmLabel="Bağla"
+                            confirmLabel={t("pages.security.bagla")}
                             tone="danger"
                             className="size-11"
                           >
@@ -209,12 +214,12 @@ export default async function AdminSecurityPage() {
           )}
         </AdminCard>
 
-        <AdminCard title="Son giriş cəhdləri" bodyClassName="p-4 lg:p-0">
+        <AdminCard title={t("pages.security.sonGirisCehdleri")} bodyClassName="p-4 lg:p-0">
           <AdminResponsiveList
-            ariaLabel="Giriş cəhdləri"
+            ariaLabel={t("pages.security.girisCehdleri")}
             items={attempts}
             getKey={(attempt) => attempt.id}
-            empty={<EmptyState title="Giriş cəhdi yoxdur" />}
+            empty={<EmptyState title={t("pages.security.girisCehdiYoxdur")} />}
             renderCard={(attempt) => (
               <AdminListCard
                 title={attempt.email}
@@ -230,7 +235,7 @@ export default async function AdminSecurityPage() {
                     <dd className="mt-1 text-ink [overflow-wrap:anywhere]">{attempt.ip ?? "—"}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-ink-muted">Tarix</dt>
+                    <dt className="text-xs text-ink-muted">{t("pages.security.tarix")}</dt>
                     <dd className="mt-1 text-ink">{formatDateTime(attempt.createdAt)}</dd>
                   </div>
                 </dl>
@@ -238,8 +243,8 @@ export default async function AdminSecurityPage() {
             )}
             renderTable={(items) => (
               <AdminTable
-                caption="Giriş cəhdləri"
-                headers={[{ label: "E-poçt" }, { label: "IP" }, { label: "Nəticə" }, { label: "Tarix" }]}
+                caption={t("pages.security.girisCehdleri")}
+                headers={[{ label: t("pages.security.ePoct") }, { label: "IP" }, { label: t("pages.security.netice") }, { label: t("pages.security.tarix") }]}
               >
                 {items.map((attempt) => (
                   <AdminTableRow key={attempt.id}>

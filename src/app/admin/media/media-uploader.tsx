@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, UploadCloud } from "lucide-react";
@@ -15,6 +16,7 @@ import { MAX_UPLOAD_SIZE } from "@/lib/constants";
  * ünvanını istifadə edə bilir.
  */
 export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
+  const t = useTranslations("admin");
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
@@ -95,7 +97,7 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
             : "Şəkilləri bura sürüşdürün və ya seçmək üçün klikləyin"}
         </span>
         <span className="text-xs text-ink-muted">
-          JPG, PNG, WebP və ya AVIF — hər fayl ən çoxu 8 MB
+          {t("pages.settings.jpgPngWebpVe")}
         </span>
       </button>
 
@@ -109,7 +111,7 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
           event.target.value = "";
         }}
         className="sr-only"
-        aria-label="Media faylı seç"
+        aria-label={t("pages.settings.mediaFayliSec")}
       />
     </div>
   );

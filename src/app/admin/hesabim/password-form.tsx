@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,17 +12,18 @@ const CONTROL =
   "transition-colors duration-200 placeholder:text-ink-muted hover:border-ink-muted focus:border-gold";
 
 export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
+  const t = useTranslations("admin");
   const [state, formAction, pending] = useActionState<AccountState, FormData>(changePassword, {});
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
       {mustChange && !state.success && (
         <p className="rounded-xs border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
-          Sizə müvəqqəti parol verilib. Panelə keçməzdən əvvəl onu dəyişməlisiniz.
+          {t("pages.account.sizeMuveqqetiParolVerilib")}
         </p>
       )}
 
-      <Field label="Cari parol" htmlFor="current-password" required>
+      <Field label={t("pages.account.cariParol")} htmlFor="current-password" required>
         <input
           id="current-password"
           name="current"
@@ -33,9 +35,9 @@ export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
       </Field>
 
       <Field
-        label="Yeni parol"
+        label={t("pages.account.yeniParol")}
         htmlFor="next-password"
-        hint="Ən azı 10 simvol. Parol menecerinin yaratdığı təsadüfi parol tövsiyə olunur."
+        hint={t("pages.account.enAzi10Simvol")}
         required
       >
         <input
@@ -49,7 +51,7 @@ export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
         />
       </Field>
 
-      <Field label="Yeni parolun təkrarı" htmlFor="confirm-password" required>
+      <Field label={t("pages.account.yeniParolunTekrari")} htmlFor="confirm-password" required>
         <input
           id="confirm-password"
           name="confirm"

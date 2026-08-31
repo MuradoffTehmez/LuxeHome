@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
 import { Check, Copy, Trash2 } from "lucide-react";
@@ -36,6 +37,7 @@ function formatSize(bytes: number): string {
  * bütün kitabxananı bir formada göndərmək lazım gəlmir.
  */
 export function MediaCard({ item }: { item: MediaItem }) {
+  const t = useTranslations("admin");
   const [state, formAction] = useActionState(updateMediaAlt, IDLE_STATE);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -85,26 +87,26 @@ export function MediaCard({ item }: { item: MediaItem }) {
         <form action={formAction} className="mt-auto flex flex-col gap-2 pt-1">
           <input type="hidden" name="id" value={item.id} />
           <label className="sr-only" htmlFor={`alt-${item.id}`}>
-            Alt mətn
+            {t("pages.settings.altMetn")}
           </label>
           <input
             id={`alt-${item.id}`}
             name="alt"
             type="text"
             defaultValue={item.alt}
-            placeholder="Alt mətn (SEO)"
+            placeholder={t("pages.settings.altMetnSeo")}
             maxLength={160}
             className="min-h-11 w-full rounded-xs border border-line px-3 text-base text-ink placeholder:text-ink-muted focus:border-gold sm:text-sm"
           />
 
           <div className="flex items-center justify-between gap-1">
-            <SubmitButton label="Saxla" className="min-h-11 px-3 text-xs" />
+            <SubmitButton label={t("pages.settings.saxla")} className="min-h-11 px-3 text-xs" />
 
             <div className="flex items-center gap-0.5">
               <button
                 type="button"
                 onClick={copyUrl}
-                aria-label="Ünvanı kopyala"
+                aria-label={t("pages.settings.unvaniKopyala")}
                 title={copied ? "Kopyalandı" : "Ünvanı kopyala"}
                 className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
               >
@@ -119,8 +121,8 @@ export function MediaCard({ item }: { item: MediaItem }) {
                 action={deleteMedia}
                 id={item.id}
                 label={`«${item.originalName}» faylını sil`}
-                title="Faylı silmək"
-                description="Fayl anbardan tamamilə silinəcək. Elan və məqalələrdə istifadə olunursa, orada şəkil yerinə boşluq qalacaq."
+                title={t("pages.settings.fayliSilmek")}
+                description={t("pages.settings.faylAnbardanTamamileSilinecek")}
                 className="size-11"
               >
                 <Trash2 className="size-4" aria-hidden="true" />

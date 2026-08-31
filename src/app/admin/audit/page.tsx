@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { Trash2 } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
@@ -17,7 +18,10 @@ import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { clearAuditLog } from "./actions";
 
-export const metadata: Metadata = { title: "Audit jurnalı" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.security.auditJurnali") };
+}
 export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -32,6 +36,7 @@ function auditValue(value: string | null): unknown {
 }
 
 export default async function AdminAuditPage({ searchParams }: { searchParams: SearchParams }) {
+  const t = await getAdminT();
   const user = await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
 
   const params = await searchParams;
@@ -45,17 +50,17 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
   return (
     <>
       <AdminPageHeader
-        title="Audit jurnalı"
+        title={t("pages.security.auditJurnali")}
         description={`Panel əməliyyatlarının peşəkar izləmə cədvəli · ${total} qeyd.`}
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Audit jurnalı" }]}
+        breadcrumbs={[{ label: t("pages.security.idarePaneli"), href: "/admin" }, { label: t("pages.security.auditJurnali") }]}
         actions={user.role === ROLES.SUPER_ADMIN && total > 0 ? (
           <ConfirmAction
             action={clearAuditLog}
             id="all"
-            label="Audit jurnalını sıfırla"
-            title="Audit jurnalını sıfırlamaq"
+            label={t("pages.security.auditJurnaliniSifirla")}
+            title={t("pages.security.auditJurnaliniSifirlamaq")}
             description={`${total} qeyd silinəcək. Bu əməliyyat geri qaytarılmır; sıfırlama faktının özü yeni audit qeydi kimi saxlanılacaq.`}
-            confirmLabel="Jurnalı sıfırla"
+            confirmLabel={t("pages.security.jurnaliSifirla")}
           >
             <Trash2 className="size-4" aria-hidden="true" />
           </ConfirmAction>
@@ -66,30 +71,30 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
         <AdminFilterBar
           action="/admin/audit"
           searchValue={query}
-          searchPlaceholder="ID, istifadəçi və ya təfərrüat…"
+          searchPlaceholder={t("pages.security.idIstifadeciVeYa")}
           selects={[{
             name: "entity",
-            label: "Obyekt",
+            label: t("pages.security.obyekt"),
             value: entity,
             options: [
-              { value: "", label: "Bütün obyektlər" },
-              { value: "Partner", label: "Tərəfdaş" },
-              { value: "Property", label: "Əmlak" },
-              { value: "Project", label: "Layihə" },
-              { value: "User", label: "İstifadəçi" },
+              { value: "", label: t("pages.security.butunObyektler") },
+              { value: "Partner", label: t("pages.security.terefdas") },
+              { value: "Property", label: t("pages.security.emlak") },
+              { value: "Project", label: t("pages.security.layihe") },
+              { value: "User", label: t("pages.security.istifadeci") },
             ],
           }]}
         />
         <div className="p-0">
-          {entries.length === 0 ? <EmptyState title="Audit qeydi yoxdur" /> : (
+          {entries.length === 0 ? <EmptyState title={t("pages.security.auditQeydiYoxdur")} /> : (
             <AdminTable
-                caption="Audit jurnalı"
+                caption={t("pages.security.auditJurnali")}
                 headers={[
-                  { label: "Tarix" },
-                  { label: "Kim" },
-                  { label: "Əməliyyat" },
-                  { label: "Obyekt" },
-                  { label: "Təfərrüat" },
+                  { label: t("pages.security.tarix") },
+                  { label: t("pages.security.kim") },
+                  { label: t("pages.security.emeliyyat") },
+                  { label: t("pages.security.obyekt") },
+                  { label: t("pages.security.teferruat") },
                 ]}
               >
                 {entries.map((entry) => (
@@ -111,7 +116,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
                       <span>{entry.summary ?? "—"}</span>
                       {entry.oldValue || entry.newValue ? (
                         <details className="mt-1">
-                          <summary className="cursor-pointer text-ink-soft">Dəyişiklik</summary>
+                          <summary className="cursor-pointer text-ink-soft">{t("pages.security.deyisiklik")}</summary>
                           <pre className="mt-2 max-w-lg overflow-x-auto whitespace-pre-wrap rounded-xs bg-beige p-2 text-[11px] text-ink-soft">
                             {JSON.stringify({ əvvəl: auditValue(entry.oldValue), sonra: auditValue(entry.newValue) }, null, 2)}
                           </pre>

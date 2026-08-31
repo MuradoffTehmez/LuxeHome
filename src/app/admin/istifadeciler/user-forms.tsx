@@ -27,14 +27,14 @@ const roleOptions = (t: ReturnType<typeof useTranslations<"admin">>) =>
 export function CreateUserForm() {
   const t = useTranslations("admin");
   return (
-    <AdminForm action={createUser} submitLabel="Hesab yarat">
+    <AdminForm action={createUser} submitLabel={t("pages.users.hesabYarat")}>
       <FormSection
-        title="Yeni istifadəçi"
-        description="Sistem müvəqqəti parol yaradır; istifadəçi ilk girişdə onu dəyişir və 2FA qurur."
+        title={t("pages.users.yeniIstifadeci")}
+        description={t("pages.users.sistemMuveqqetiParolYaradir")}
       >
-        <AdminInput name="name" label="Ad Soyad" required maxLength={120} />
-        <AdminInput name="email" label="E-poçt" type="email" required autoComplete="off" />
-        <AdminSelect name="role" label="Rol" required defaultValue={ROLES.EDITOR} options={roleOptions(t)} />
+        <AdminInput name="name" label={t("pages.users.adSoyad")} required maxLength={120} />
+        <AdminInput name="email" label={t("pages.users.ePoct")} type="email" required autoComplete="off" />
+        <AdminSelect name="role" label={t("pages.users.rol")} required defaultValue={ROLES.EDITOR} options={roleOptions(t)} />
       </FormSection>
     </AdminForm>
   );
@@ -83,7 +83,7 @@ export function UserRow({
         <input type="hidden" name="id" value={id} />
 
         <label className="sr-only" htmlFor={`name-${id}`}>
-          Ad Soyad
+          {t("pages.users.adSoyad")}
         </label>
         <input
           id={`name-${id}`}
@@ -98,7 +98,7 @@ export function UserRow({
         />
 
         <label className="sr-only" htmlFor={`role-${id}`}>
-          Rol
+          {t("pages.users.rol")}
         </label>
         <select
           id={`role-${id}`}
@@ -119,13 +119,13 @@ export function UserRow({
 
         <AdminCheckbox
           name="isActive"
-          label="Aktiv"
+          label={t("pages.users.aktiv")}
           defaultChecked={isActive}
           disabled={isSelf}
           className="min-h-11 text-xs"
         />
 
-        <SubmitButton label="Saxla" className="min-h-11 px-3 text-xs" />
+        <SubmitButton label={t("pages.users.saxla")} className="min-h-11 px-3 text-xs" />
       </form>
 
       <div className="flex flex-wrap items-center gap-0.5">
@@ -133,9 +133,9 @@ export function UserRow({
           action={resetUserPassword}
           id={id}
           label={`«${name}» üçün parolu sıfırla`}
-          title="Parolu sıfırlamaq"
-          description="Yeni müvəqqəti parol yaradılacaq və istifadəçinin bütün sessiyaları bağlanacaq. Parol bir dəfə göstəriləcək."
-          confirmLabel="Sıfırla"
+          title={t("pages.users.paroluSifirlamaq")}
+          description={t("pages.users.yeniMuveqqetiParolYaradilacaq")}
+          confirmLabel={t("pages.users.sifirla")}
           tone="neutral"
           className="size-11"
         >
@@ -147,9 +147,9 @@ export function UserRow({
             action={resetUserTwoFactor}
             id={id}
             label={`«${name}» üçün 2FA-nı sıfırla`}
-            title="2FA-nı sıfırlamaq"
-            description="Doğrulama sirri və ehtiyat kodlar silinəcək. İstifadəçi növbəti girişdə 2FA-nı yenidən quracaq."
-            confirmLabel="Sıfırla"
+            title={t("pages.users.2faNiSifirlamaq")}
+            description={t("pages.users.dogrulamaSirriVeEhtiyat")}
+            confirmLabel={t("pages.users.sifirla")}
             tone="neutral"
             className="size-11"
           >
@@ -162,9 +162,9 @@ export function UserRow({
             action={revokeUserSessions}
             id={id}
             label={`«${name}» üçün sessiyaları bağla`}
-            title="Sessiyaları bağlamaq"
+            title={t("pages.users.sessiyalariBaglamaq")}
             description={`${sessionCount} açıq sessiya dərhal bağlanacaq və istifadəçi yenidən daxil olmalı olacaq.`}
-            confirmLabel="Bağla"
+            confirmLabel={t("pages.users.bagla")}
             tone="neutral"
             className="size-11"
           >
@@ -177,8 +177,8 @@ export function UserRow({
             action={deleteUser}
             id={id}
             label={`«${name}» hesabını sil`}
-            title="Hesabı silmək"
-            description="Hesab tamamilə silinəcək. Yazdığı elan və məqalələr qalır, sadəcə müəllifsiz olur."
+            title={t("pages.users.hesabiSilmek")}
+            description={t("pages.users.hesabTamamileSilinecekYazdigi")}
             className="size-11"
           >
             <Trash2 className="size-4" aria-hidden="true" />
