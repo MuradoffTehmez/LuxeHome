@@ -19,6 +19,7 @@
     "submitReview": "Rəyi moderasiyaya göndər",
     "reviewSuccess": "Rəyiniz moderasiyaya göndərildi.",
     "reviewDuplicate": "Bu agent üçün artıq rəy göndərmisiniz.",
+    "reviewFailed": "Rəy göndərilmədi. Yenidən cəhd edin.",
     "loginHint": "Rəy yazmaq üçün hesabınıza daxil olun.",
     "reviewSelf": "Öz agentliyinizin agenti haqqında rəy yaza bilməzsiniz.",
     "homeTitle": "Sizə kömək edəcək mütəxəssislər",
@@ -39,7 +40,19 @@
     "disabled": "Bu elan üçün rezervasiya aktiv deyil.",
     "dashboardTitle": "Rezervasiyalarım",
     "empty": "Hələ rezervasiya sorğunuz yoxdur.",
-    "cancel": "Sorğunu ləğv et"
+    "cancel": "Sorğunu ləğv et",
+    "cancelUnavailable": "Rezervasiya tapılmadı və ya artıq ləğv edilə bilməz.",
+    "cancelled": "Rezervasiya sorğusu ləğv edildi.",
+    "cancelFailed": "Rezervasiya ləğv edilmədi. Yenidən cəhd edin.",
+    "status": {
+      "requested": "Sorğu göndərilib",
+      "pending": "Baxılır",
+      "approved": "Təsdiqlənib",
+      "rejected": "Rədd edilib",
+      "cancelled": "Ləğv edilib",
+      "expired": "Müddəti bitib",
+      "completed": "Tamamlanıb"
+    }
   },
   "testimonials": {
     "overline": "Müştəri təcrübəsi",
@@ -52,7 +65,16 @@
     "description": "Favorit və axtarış seçimlərinizə uyğun aktiv elanlar.",
     "empty": "Fərdi tövsiyə üçün əvvəlcə favorit əlavə edin və ya əmlak tapma köməkçisindən istifadə edin.",
     "disabled": "Fərdi tövsiyələr profil ayarlarınızda söndürülüb.",
-    "wizard": "Əmlak tapma köməkçisi"
+    "wizard": "Əmlak tapma köməkçisi",
+    "toggleLabel": "Tövsiyə seçimini dəyiş",
+    "enableTitle": "Tövsiyələr aktiv edilsin?",
+    "disableTitle": "Tövsiyələr söndürülsün?",
+    "toggleDescription": "Bu seçim fərdi tövsiyə mühərrikini idarə edir.",
+    "enable": "Aktiv et",
+    "disable": "Söndür",
+    "enabled": "Fərdi tövsiyələr aktiv edildi.",
+    "disabledSuccess": "Fərdi tövsiyələr söndürüldü.",
+    "failed": "Tövsiyə seçimi dəyişdirilmədi. Yenidən cəhd edin."
   },
   "wizard": {
     "eyebrow": "12 addımlı köməkçi",
@@ -72,6 +94,13 @@
     "mortgage": "İpotekaya uyğunluq",
     "priority": "Əsas prioritet",
     "any": "Fərqi yoxdur",
+    "yes": "Bəli",
+    "priorityOptions": {
+      "newest": "Ən yeni",
+      "price": "Ən uyğun qiymət",
+      "area": "Ən geniş sahə",
+      "featured": "Premium seçimlər"
+    },
     "homeCta": "Köməkçini başlat",
     "homeNote": "Xidmətdən istifadə üçün hesabınıza daxil olmalısınız.",
     "loginTitle": "Əmlak tapma köməkçisi hesab tələb edir",

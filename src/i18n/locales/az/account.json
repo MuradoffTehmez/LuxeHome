@@ -114,6 +114,10 @@
     "emailFieldUsed": "Bu e-poçt artıq istifadə olunur",
     "staffAccount": "Bu hesab şirkət panelinə aiddir. «İdarə paneli» girişindən istifadə edin.",
     "locked": "Hesab müvəqqəti olaraq bağlanıb. 15 dəqiqə sonra yenidən cəhd edin.",
+    "lockedEmailSubject": "Luxe Home Estate — hesabınız müvəqqəti bağlandı",
+    "lockedEmailIntro": "Hesabınıza ardıcıl 5 uğursuz giriş cəhdi oldu və hesab 15 dəqiqəlik bağlandı.",
+    "lockedEmailAdvice": "Cəhd sizin deyilsə, kilid açılan kimi parolunuzu dəyişin.",
+    "lockedEmailIp": "Cəhdin gəldiyi IP",
     "verificationExpired": "Doğrulama müddəti bitdi. Yenidən daxil olun.",
     "invalidCode": "Kod yanlışdır.",
     "usedCode": "Bu kod artıq istifadə olunub. Növbəti kodu gözləyin.",
@@ -259,7 +263,11 @@
       "disable": "Söndür",
       "unsupported": "Dəstəklənmir",
       "missingKey": "Push açarı konfiqurasiya edilməyib.",
-      "denied": "Brauzer bildiriş icazəsi verilmədi."
+      "denied": "Brauzer bildiriş icazəsi verilmədi.",
+      "incomplete": "Push abunəliyi natamamdır.",
+      "enabled": "Push bildirişləri aktiv edildi.",
+      "disabled": "Push bildirişləri söndürüldü.",
+      "failed": "Push seçimi saxlanılmadı. Yenidən cəhd edin."
     },
     "preferences": {
       "title": "Bildiriş seçimləri",

@@ -75,6 +75,7 @@ function SelectField({
   placeholder,
   options,
   onChange,
+  className,
 }: {
   id: string;
   name: string;
@@ -83,9 +84,10 @@ function SelectField({
   placeholder: string;
   options: readonly { value: string; label: string }[];
   onChange?: (value: string) => void;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
       <label htmlFor={id} className={LABEL_CLASS}>{label}</label>
       <div className="relative">
         <select
@@ -223,7 +225,7 @@ export function PropertyFilterFields({
   }, [features]);
 
   return (
-    <div className={cn("grid gap-4", mode === "compact" ? "lg:grid-cols-12 lg:items-end" : "sm:grid-cols-2 lg:grid-cols-3")}>
+    <div className={cn("grid gap-4", mode === "compact" ? "md:grid-cols-2 lg:grid-cols-12 lg:items-end" : "sm:grid-cols-2 lg:grid-cols-3")}>
       {initial.siralama && initial.siralama !== "newest" ? (
         <input type="hidden" name="siralama" value={initial.siralama} />
       ) : null}
@@ -252,7 +254,7 @@ export function PropertyFilterFields({
         </div>
       </fieldset>
 
-      <div className={cn("flex flex-col gap-1.5", mode === "compact" && "sm:col-span-2 lg:col-span-4")}>
+      <div className={cn("flex min-w-0 flex-col gap-1.5", mode === "compact" && "lg:col-span-4")}>
         <label htmlFor={`${id}-query`} className={LABEL_CLASS}>{t("search")}</label>
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" aria-hidden="true" />
@@ -275,6 +277,7 @@ export function PropertyFilterFields({
         placeholder={t("all")}
         defaultValue={initial.tip}
         options={types}
+        className={mode === "compact" ? "lg:col-span-2" : undefined}
       />
       <SelectField
         id={`${id}-city`}
@@ -284,6 +287,7 @@ export function PropertyFilterFields({
         defaultValue={initial.seher}
         options={cities}
         onChange={setCitySlug}
+        className={mode === "compact" ? "lg:col-span-3" : undefined}
       />
 
       {mode === "full" ? (

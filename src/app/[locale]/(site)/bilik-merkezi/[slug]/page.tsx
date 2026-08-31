@@ -23,8 +23,6 @@ import { getRelatedKnowledgeArticles } from "@/lib/knowledge";
 import { recordView } from "@/lib/view-counter";
 import { isUnoptimizedImage, parseJsonArray } from "@/lib/utils";
 import {
-  KNOWLEDGE_RISK_LEVEL_LABELS,
-  LEGAL_CONTENT_STATUS_LABELS,
   TRANSLATION_ENTITY_TYPES,
   type KnowledgeAudience,
   type KnowledgeLevel,
@@ -37,6 +35,18 @@ import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/c
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
+
+const LEGAL_STATUS_KEYS: Record<LegalContentStatus, "current" | "proposal" | "mixed"> = {
+  CURRENT: "current",
+  PROPOSAL: "proposal",
+  MIXED: "mixed",
+};
+const RISK_LEVEL_KEYS: Record<KnowledgeRiskLevel, "green" | "yellow" | "red" | "legalReview"> = {
+  GREEN: "green",
+  YELLOW: "yellow",
+  RED: "red",
+  LEGAL_REVIEW: "legalReview",
+};
 
 async function loadArticle(slug: string, locale: string) {
   const source = await getCachedKnowledgeArticleBySlug(slug);
@@ -191,8 +201,8 @@ export default async function KnowledgeArticlePage({ params }: Props) {
                 <div className="min-w-0 flex-1">
                   <h2 className="font-display text-xl text-ink">{t("article.legalStatusPanel")}</h2>
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                    <div><dt className="text-ink-muted">{t("article.normStatus")}</dt><dd className="font-medium text-ink">{LEGAL_CONTENT_STATUS_LABELS[article.legalStatus as LegalContentStatus]}</dd></div>
-                    <div><dt className="text-ink-muted">{t("article.riskLevel")}</dt><dd className="font-medium text-ink">{KNOWLEDGE_RISK_LEVEL_LABELS[article.riskLevel as KnowledgeRiskLevel]}</dd></div>
+                    <div><dt className="text-ink-muted">{t("article.normStatus")}</dt><dd className="font-medium text-ink">{t(`article.legalStatus.${LEGAL_STATUS_KEYS[article.legalStatus as LegalContentStatus]}`)}</dd></div>
+                    <div><dt className="text-ink-muted">{t("article.riskLevel")}</dt><dd className="font-medium text-ink">{t(`article.riskLevels.${RISK_LEVEL_KEYS[article.riskLevel as KnowledgeRiskLevel]}`)}</dd></div>
                     <div><dt className="text-ink-muted">{t("article.jurisdiction")}</dt><dd className="font-medium text-ink">{article.jurisdiction}</dd></div>
                     <div><dt className="text-ink-muted">{t("article.legalReviewedAt")}</dt><dd className="font-medium text-ink">{article.legalReviewedAt ? new Intl.DateTimeFormat(locale).format(article.legalReviewedAt) : t("article.notReviewed")}</dd></div>
                   </dl>

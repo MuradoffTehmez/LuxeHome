@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { Heart, Menu, Phone, Plus, Search } from "lucide-react";
+import { ChevronDown, Heart, Menu, Phone, Plus, Search } from "lucide-react";
 import { navigation, siteConfig } from "@/config/site";
 import { isNavigationItemActive } from "@/lib/ui/navigation";
 import { cn } from "@/lib/utils";
@@ -29,6 +29,18 @@ const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" |
 };
 
 /**
+ * Uzun lokallaşdırılmış etiketlərdə header-i sıxmamaq üçün əsas sətrdə yalnız
+ * ən çox istifadə olunan keçidlər saxlanılır. Ana səhifə loqodan da əlçatandır,
+ * tərəfdaşlar isə desktop overflow və mobil menyuda qalır. Əlaqə hər zaman əsas
+ * sətrdədir — locale uzunluğu onun görünməsinə təsir etmir.
+ */
+const OVERFLOW_HREFS = new Set(["/", "/terefdaslar"]);
+export const desktopNavigationGroups = {
+  primary: navigation.filter((item) => !OVERFLOW_HREFS.has(item.href)),
+  overflow: navigation.filter((item) => OVERFLOW_HREFS.has(item.href)),
+};
+
+/**
  * Fixed, responsive ictimai sayt başlığı.
  *
  * Dil seçici cari locale-prefiksli marşrutda qalaraq bütün ictimai və hesab
@@ -43,6 +55,9 @@ export function Navbar({
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [overflowOpen, setOverflowOpen] = useState(false);
+  const overflowRef = useRef<HTMLLIElement>(null);
+  const overflowButtonRef = useRef<HTMLButtonElement>(null);
   const transparent = pathname === "/";
 
   useEffect(() => {
@@ -54,7 +69,29 @@ export function Navbar({
 
   useEffect(() => {
     setMenuOpen(false);
+    setOverflowOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!overflowOpen) return;
+
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!overflowRef.current?.contains(event.target as Node)) setOverflowOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOverflowOpen(false);
+        overflowButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [overflowOpen]);
 
   const isOverlay = transparent && !scrolled && !menuOpen;
 
@@ -63,7 +100,7 @@ export function Navbar({
       className={cn(
         "fixed inset-x-0 top-0 z-[var(--z-header)] border-b transition-[background-color,box-shadow] duration-300",
         isOverlay
-          ? "border-white/10 bg-transparent"
+          ? "border-white/15 bg-charcoal/[0.66] backdrop-blur-md"
           : "border-line bg-paper/95 shadow-[0_10px_30px_rgba(24,29,39,0.06)] backdrop-blur-xl",
       )}
     >
@@ -77,26 +114,118 @@ export function Navbar({
       <Container
         size="wide"
         className={cn(
-          "flex min-h-[var(--header-h)] min-w-0 items-center gap-2 xl:grid xl:grid-cols-[auto_minmax(0,1fr)_auto] xl:gap-4 2xl:gap-6",
+          "flex min-h-[var(--header-h)] min-w-0 items-center gap-2 min-[1440px]:grid min-[1440px]:grid-cols-[auto_minmax(0,1fr)_auto] min-[1440px]:gap-3 min-[1800px]:max-w-[120rem] min-[1800px]:gap-5 min-[2200px]:gap-7",
           isOverlay && "on-dark",
         )}
       >
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="shrink-0 max-[479px]:[&>span]:hidden xl:hidden"
+          className="shrink-0 max-[639px]:[&>span]:hidden min-[1440px]:hidden"
         />
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
-          className="hidden shrink-0 xl:inline-flex [&>span]:hidden"
+          className="hidden shrink-0 min-[1440px]:inline-flex [&>span]:hidden min-[1800px]:[&>span]:flex"
         />
 
         <nav
           aria-label={t("mainNavigation")}
-          className="hidden min-w-0 overflow-hidden xl:flex xl:justify-center"
+          className="hidden min-w-0 justify-center min-[1440px]:flex min-[1800px]:hidden"
+          data-navigation-section="desktop"
+          data-navigation-mode="compact"
         >
-          <ul className="flex items-center gap-0.5 xl:gap-1">
+          <ul className="flex min-w-0 items-center gap-1">
+            {desktopNavigationGroups.primary.map((item) => {
+              const active = isNavigationItemActive(pathname, item.href);
+
+              return (
+                <li key={item.href} className="shrink-0">
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2.5 text-sm font-medium transition-colors duration-300",
+                      isOverlay
+                        ? active
+                          ? "text-gold-soft"
+                          : "text-white hover:text-gold-soft"
+                        : active
+                          ? "text-gold-deep"
+                          : "text-ink-soft hover:text-ink",
+                    )}
+                  >
+                    {NAV_KEYS[item.href] ? t(NAV_KEYS[item.href]) : item.label}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute inset-x-2 bottom-1.5 h-px origin-left transition-transform duration-300 ease-out-soft",
+                        isOverlay ? "bg-gold-soft" : "bg-gold-deep",
+                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
+                      )}
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+
+            <li ref={overflowRef} className="relative shrink-0">
+              <button
+                ref={overflowButtonRef}
+                type="button"
+                aria-expanded={overflowOpen}
+                aria-controls="desktop-navigation-overflow"
+                onClick={() => setOverflowOpen((open) => !open)}
+                className={cn(
+                  "inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-xs px-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                  isOverlay
+                    ? "text-white hover:text-gold-soft"
+                    : "text-ink-soft hover:text-ink",
+                )}
+              >
+                {t("more")}
+                <ChevronDown
+                  aria-hidden="true"
+                  className={cn("size-4 transition-transform", overflowOpen && "rotate-180")}
+                />
+              </button>
+
+              {overflowOpen ? (
+                <ul
+                  id="desktop-navigation-overflow"
+                  className="absolute top-[calc(100%+0.5rem)] right-0 min-w-52 rounded-sm border border-line bg-paper p-2 shadow-editorial"
+                >
+                  {desktopNavigationGroups.overflow.map((item) => {
+                    const active = isNavigationItemActive(pathname, item.href);
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          aria-current={active ? "page" : undefined}
+                          onClick={() => setOverflowOpen(false)}
+                          className={cn(
+                            "flex min-h-11 items-center rounded-xs px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                            active ? "bg-beige text-gold-deep" : "text-ink hover:bg-beige/60",
+                          )}
+                        >
+                          {NAV_KEYS[item.href] ? t(NAV_KEYS[item.href]) : item.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : null}
+            </li>
+          </ul>
+        </nav>
+
+        <nav
+          aria-label={t("mainNavigation")}
+          className="hidden min-w-0 justify-center min-[1800px]:flex"
+          data-navigation-section="desktop-full"
+          data-navigation-mode="full"
+        >
+          <ul className="flex min-w-0 items-center gap-0 min-[2200px]:gap-1">
             {navigation.map((item) => {
               const active = isNavigationItemActive(pathname, item.href);
 
@@ -106,7 +235,7 @@ export function Navbar({
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2 text-xs font-medium transition-colors duration-300 xl:px-2.5 xl:text-sm",
+                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2 text-[0.8125rem] font-medium transition-colors duration-300 min-[2200px]:px-2.5 min-[2200px]:text-sm",
                       isOverlay
                         ? active
                           ? "text-gold-soft"
@@ -132,8 +261,8 @@ export function Navbar({
           </ul>
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1 xl:ml-0 xl:gap-1.5">
-          <ThemeToggle />
+        <div className="ml-auto flex shrink-0 items-center gap-1 min-[1440px]:ml-0 min-[1440px]:gap-1.5">
+          <ThemeToggle isOverlay={isOverlay} />
           {showLocaleSwitcher && (
             <LocaleSwitcher isOverlay={isOverlay} />
           )}
@@ -143,8 +272,10 @@ export function Navbar({
             aria-label={t("myFavorites")}
             title={t("favorites")}
             className={cn(
-              "hidden size-11 items-center justify-center rounded-xs transition-colors duration-200 xl:inline-flex",
-              isOverlay ? "text-white hover:text-gold-soft" : "text-ink-soft hover:text-gold-deep",
+              "hidden size-11 items-center justify-center rounded-full transition-colors duration-200 min-[1440px]:inline-flex",
+              isOverlay
+                ? "text-white/90 hover:bg-white/10 hover:text-gold-soft"
+                : "text-ink-soft hover:bg-beige hover:text-gold-deep",
             )}
           >
             <Heart className="size-5" aria-hidden="true" />
@@ -152,7 +283,7 @@ export function Navbar({
 
           <div
             className={cn(
-              "hidden items-center border-l pl-1 xl:ml-0.5 xl:flex xl:pl-2",
+              "hidden items-center border-l pl-1 min-[1440px]:ml-0.5 min-[1440px]:flex min-[1440px]:pl-2",
               isOverlay ? "border-white/20" : "border-line",
             )}
           >
@@ -165,7 +296,8 @@ export function Navbar({
             className={buttonClassName("primary", "sm", false, "inline-flex min-w-11 px-2.5 sm:px-3 xl:px-4")}
           >
             <Plus className="size-4" aria-hidden="true" />
-            <span className="hidden sm:inline">{t("listProperty")}</span>
+            <span className="hidden sm:inline min-[1440px]:hidden">{t("listProperty")}</span>
+            <span className="hidden min-[1800px]:inline">{t("listProperty")}</span>
           </Link>
 
           <IconButton
@@ -173,7 +305,7 @@ export function Navbar({
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
             className={cn(
-              "xl:hidden",
+              "min-[1440px]:hidden",
               isOverlay ? "text-ink-invert hover:bg-white/10" : "text-ink",
             )}
           >

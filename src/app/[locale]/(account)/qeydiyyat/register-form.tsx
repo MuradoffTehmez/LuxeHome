@@ -71,7 +71,7 @@ export function RegisterForm({ next }: { next?: string }) {
         inputMode="email"
         required
         autoComplete="email"
-        placeholder="ad@nümunə.az"
+        placeholder="name@example.com"
         error={state.fieldErrors?.email}
       />
 

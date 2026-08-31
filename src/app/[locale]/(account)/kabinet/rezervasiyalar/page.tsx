@@ -7,7 +7,6 @@ import { Link } from "@/i18n/navigation";
 import { requireAccount } from "@/lib/auth/guard";
 import {
   RESERVATION_STATUSES,
-  RESERVATION_STATUS_LABELS,
   type Locale,
   type ReservationStatus,
 } from "@/lib/constants";
@@ -31,6 +30,16 @@ const STATUS_TONES = {
   EXPIRED: "neutral",
   COMPLETED: "success",
 } as const;
+
+const STATUS_KEYS: Record<ReservationStatus, "requested" | "pending" | "approved" | "rejected" | "cancelled" | "expired" | "completed"> = {
+  REQUESTED: "requested",
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  CANCELLED: "cancelled",
+  EXPIRED: "expired",
+  COMPLETED: "completed",
+};
 
 export default async function ReservationsPage() {
   const locale = await getLocale() as Locale;
@@ -72,7 +81,7 @@ export default async function ReservationsPage() {
                       ) : null}
                     </div>
                     <div className="flex shrink-0 flex-wrap items-center gap-2">
-                      <Badge tone={STATUS_TONES[status]}>{RESERVATION_STATUS_LABELS[status]}</Badge>
+                      <Badge tone={STATUS_TONES[status]}>{t(`status.${STATUS_KEYS[status]}`)}</Badge>
                       {cancellable ? <CancelReservationButton id={reservation.id} /> : null}
                     </div>
                   </div>

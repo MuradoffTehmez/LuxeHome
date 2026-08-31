@@ -180,11 +180,11 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
     if (locked) {
       await sendEmail({
         to: user.email,
-        subject: "Luxe Home Estate — hesabınız müvəqqəti bağlandı",
+        subject: t("actions.lockedEmailSubject"),
         html:
-          "<p>Hesabınıza ardıcıl 5 uğursuz giriş cəhdi oldu və hesab 15 dəqiqəlik bağlandı.</p>" +
-          "<p>Cəhd sizin deyilsə, kilid açılan kimi parolunuzu dəyişin.</p>" +
-          `<p>Cəhdin gəldiyi IP: <strong>${ip}</strong></p>`,
+          `<p>${t("actions.lockedEmailIntro")}</p>` +
+          `<p>${t("actions.lockedEmailAdvice")}</p>` +
+          `<p>${t("actions.lockedEmailIp")}: <strong>${ip}</strong></p>`,
       });
     }
     return { error: t("actions.genericCredentials") };

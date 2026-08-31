@@ -45,7 +45,7 @@ export function InviteEmployeeForm({ disabled }: { disabled: boolean }) {
           type="email"
           label={t("email")}
           required
-          placeholder="istifadeci@nümunə.az"
+          placeholder="user@example.com"
           error={state.fieldErrors?.email}
         />
       </div>

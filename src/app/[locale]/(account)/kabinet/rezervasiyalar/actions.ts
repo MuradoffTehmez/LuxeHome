@@ -1,6 +1,6 @@
 "use server";
 
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function cancelReservation(id: string): Promise<ActionState> {
   const locale = await getLocale() as Locale;
+  const t = await getTranslations("phase2.reservation");
   let user;
   try {
     user = await requirePublicAction("reservation", locale);
@@ -30,7 +31,7 @@ export async function cancelReservation(id: string): Promise<ActionState> {
         agent: { select: { userId: true } },
       },
     });
-    if (!reservation) return failure("Rezervasiya tapılmadı və ya artıq ləğv edilə bilməz.");
+    if (!reservation) return failure(t("cancelUnavailable"));
 
     await prisma.reservation.update({
       where: { id },
@@ -60,8 +61,8 @@ export async function cancelReservation(id: string): Promise<ActionState> {
 
     revalidatePath("/kabinet/rezervasiyalar");
     revalidatePath("/admin/rezervasiyalar");
-    return success("Rezervasiya sorğusu ləğv edildi.");
+    return success(t("cancelled"));
   } catch (error) {
-    return unexpected("rezervasiya ləğv edilmədi", error);
+    return unexpected("rezervasiya ləğv edilmədi", error, t("cancelFailed"));
   }
 }

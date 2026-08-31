@@ -6,9 +6,14 @@ import { ButtonLink } from "@/components/ui/button";
 import { consumeEmailVerificationToken } from "@/lib/auth/account-tokens";
 import { localizePath } from "@/i18n/path-locale";
 import type { Locale } from "@/lib/constants";
+import { buildManagedMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "E-poçt təsdiqi", robots: { index: false, follow: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations({ locale, namespace: "auth.accountSecurity" });
+  return buildManagedMetadata({ title: t("verificationMetaTitle"), description: t("verificationMetaDescription"), path: "/hesab/e-poct-tesdiqi", noIndex: true, locale });
+}
 
 export default async function VerifyEmailPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const locale = await getLocale() as Locale;

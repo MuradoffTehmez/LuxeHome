@@ -28,8 +28,8 @@ export default async function RecommendationsPage() {
       <PageHeader contained compact eyebrow={t("eyebrow")} title={t("title")} description={result.disabled ? t("disabled") : t("description")} />
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <ButtonLink href="/mene-emlak-tap" size="sm">{t("wizard")}</ButtonLink>
-        <ConfirmAction action={toggleRecommendations} id="preference" label="Tövsiyə seçimini dəyiş" title={result.disabled ? "Tövsiyələr aktiv edilsin?" : "Tövsiyələr söndürülsün?"} description="Bu seçim fərdi tövsiyə mühərrikini idarə edir." confirmLabel={result.disabled ? "Aktiv et" : "Söndür"} tone="neutral" className="w-auto px-4">
-          <Power className="mr-2 size-4" aria-hidden="true" />{result.disabled ? "Aktiv et" : "Söndür"}
+        <ConfirmAction action={toggleRecommendations} id="preference" label={t("toggleLabel")} title={result.disabled ? t("enableTitle") : t("disableTitle")} description={t("toggleDescription")} confirmLabel={result.disabled ? t("enable") : t("disable")} tone="neutral" className="w-auto px-4">
+          <Power className="mr-2 size-4" aria-hidden="true" />{result.disabled ? t("enable") : t("disable")}
         </ConfirmAction>
       </div>
       <div className="mt-8">

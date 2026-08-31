@@ -26,5 +26,8 @@ describe("SearchPanel", () => {
     expect(html).toContain('name="elan"');
     expect(html).toContain('name="axtaris"');
     expect(html).not.toContain('name="sahe_min"');
+    expect(html).toContain("lg:grid-cols-[minmax(0,1fr)_auto]");
+    expect(html).toContain("md:grid-cols-2");
+    expect(html).toContain("lg:col-span-3");
   });
 });

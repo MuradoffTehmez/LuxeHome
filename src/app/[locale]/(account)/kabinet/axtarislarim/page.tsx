@@ -7,10 +7,10 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
 import {
-  BUILDING_TYPE_LABELS,
-  DOCUMENT_STATUS_LABELS,
-  LISTING_TYPE_LABELS,
-  RENOVATION_LABELS,
+  BUILDING_TYPES,
+  DOCUMENT_STATUSES,
+  LISTING_TYPES,
+  RENOVATIONS,
   type Locale,
   type SavedSearchFrequency,
 } from "@/lib/constants";
@@ -19,6 +19,7 @@ import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
 import { SavedSearchActions } from "./saved-search-list";
+import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -29,22 +30,31 @@ export async function generateMetadata(): Promise<Metadata> {
 /** `PropertyFilters` JSON-unu insan-oxunaqlı etiket siyahısına çevirir. */
 function summarizeFilters(
   filters: PropertyFilters,
-  labels: { types: Map<string, string>; cities: Map<string, string>; metros: Map<string, string> },
+  labels: {
+    types: Map<string, string>;
+    cities: Map<string, string>;
+    metros: Map<string, string>;
+    listingTypes: Map<string, string>;
+    renovations: Map<string, string>;
+    documents: Map<string, string>;
+    buildings: Map<string, string>;
+    room: (count: number) => string;
+  },
 ): string[] {
   const parts: string[] = [];
 
-  if (filters.listingType) parts.push(LISTING_TYPE_LABELS[filters.listingType as keyof typeof LISTING_TYPE_LABELS] ?? filters.listingType);
+  if (filters.listingType) parts.push(labels.listingTypes.get(filters.listingType) ?? filters.listingType);
   if (filters.typeSlug) parts.push(labels.types.get(filters.typeSlug) ?? filters.typeSlug);
   if (filters.citySlug) parts.push(labels.cities.get(filters.citySlug) ?? filters.citySlug);
   if (filters.districtSlug) parts.push(labels.cities.get(filters.districtSlug) ?? filters.districtSlug);
   if (filters.metroSlug) parts.push(labels.metros.get(filters.metroSlug) ?? filters.metroSlug);
-  if (filters.rooms !== undefined) parts.push(filters.rooms >= 5 ? "5+ otaq" : `${filters.rooms} otaq`);
+  if (filters.rooms !== undefined) parts.push(labels.room(filters.rooms));
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
     parts.push(`${filters.minPrice ?? 0}–${filters.maxPrice ?? "∞"} ₼`);
   }
-  if (filters.renovation) parts.push(RENOVATION_LABELS[filters.renovation as keyof typeof RENOVATION_LABELS] ?? filters.renovation);
-  if (filters.documentStatus) parts.push(DOCUMENT_STATUS_LABELS[filters.documentStatus as keyof typeof DOCUMENT_STATUS_LABELS] ?? filters.documentStatus);
-  if (filters.buildingType) parts.push(BUILDING_TYPE_LABELS[filters.buildingType as keyof typeof BUILDING_TYPE_LABELS] ?? filters.buildingType);
+  if (filters.renovation) parts.push(labels.renovations.get(filters.renovation) ?? filters.renovation);
+  if (filters.documentStatus) parts.push(labels.documents.get(filters.documentStatus) ?? filters.documentStatus);
+  if (filters.buildingType) parts.push(labels.buildings.get(filters.buildingType) ?? filters.buildingType);
   if (filters.search) parts.push(`"${filters.search}"`);
 
   return parts;
@@ -76,11 +86,16 @@ const FREQUENCY_KEYS: Record<SavedSearchFrequency, "immediate" | "daily" | "week
   WEEKLY: "weekly",
   OFF: "off",
 };
+const RENOVATION_KEYS = { COSMETIC: "cosmetic", RENOVATED: "renovated", DESIGNER: "designer", UNRENOVATED: "unrenovated", NEW_BUILDING: "newBuilding" } as const;
+const DOCUMENT_KEYS = { TITLE_DEED: "titleDeed", CONTRACT: "contract", MUNICIPAL: "municipal", DECREE: "decree", POWER_OF_ATTORNEY: "powerOfAttorney", EXTRACT_COMMERCIAL: "commercialExtract", NONE: "none" } as const;
+const BUILDING_KEYS = { NEW: "new", OLD: "old" } as const;
 
 export default async function SavedSearchesPage() {
   const locale = (await getLocale()) as Locale;
   const user = await requireAccount(locale);
   const t = await getTranslations("account.savedSearches");
+  const propertyT = await getTranslations("property");
+  const searchT = await getTranslations("listings.search");
 
   const [searches, filterOptions] = await Promise.all([
     prisma.savedSearch.findMany({
@@ -100,20 +115,33 @@ export default async function SavedSearchesPage() {
     });
   }
 
-  const typeLabels = new Map(filterOptions.types.map((type) => [type.slug, type.name]));
+  const typeLabels = new Map(filterOptions.types.map((type) => [type.slug, localizeKnownContent("propertyType", type, locale).name]));
   const cityLabels = new Map(
     filterOptions.cities.flatMap((city) => [
-      [city.slug, city.name] as const,
-      ...city.children.map((district) => [district.slug, district.name] as const),
+      [city.slug, localizeLocation(city, locale).name] as const,
+      ...city.children.map((district) => [district.slug, localizeLocation(district, locale).name] as const),
     ]),
   );
-  const metroLabels = new Map(filterOptions.metros.map((metro) => [metro.slug, metro.name]));
+  const metroLabels = new Map(filterOptions.metros.map((metro) => [metro.slug, localizeLocation(metro, locale).name]));
+  const summaryLabels = {
+    types: typeLabels,
+    cities: cityLabels,
+    metros: metroLabels,
+    listingTypes: new Map([
+      [LISTING_TYPES.SALE, propertyT("listingType.sale")],
+      [LISTING_TYPES.RENT, propertyT("listingType.rent")],
+    ]),
+    renovations: new Map(Object.values(RENOVATIONS).map((value) => [value, propertyT(`renovation.${RENOVATION_KEYS[value]}`)])),
+    documents: new Map(Object.values(DOCUMENT_STATUSES).map((value) => [value, propertyT(`document.${DOCUMENT_KEYS[value]}`)])),
+    buildings: new Map(Object.values(BUILDING_TYPES).map((value) => [value, propertyT(`building.${BUILDING_KEYS[value]}`)])),
+    room: (count: number) => count >= 5 ? searchT("fivePlusRooms") : searchT("roomOption", { count }),
+  };
 
   type SavedSearchRow = (typeof searches)[number];
 
   function renderCard(item: SavedSearchRow) {
     const filters = JSON.parse(item.filters) as PropertyFilters;
-    const summary = summarizeFilters(filters, { types: typeLabels, cities: cityLabels, metros: metroLabels });
+    const summary = summarizeFilters(filters, summaryLabels);
     return (
       <article className="min-w-0 rounded-md border border-line bg-paper p-4 shadow-sm">
         <div className="flex min-w-0 items-start justify-between gap-3">

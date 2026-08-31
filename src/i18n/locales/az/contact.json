@@ -22,5 +22,6 @@
   "subjectPlaceholder": "Müraciətin mövzusu",
   "messagePlaceholder": "Müraciətinizi yazın...",
   "successTitle": "Müraciətiniz göndərildi!",
-  "successDescription": "Komandamız ən qısa zamanda sizinlə əlaqə saxlayacaq."
+  "successDescription": "Komandamız ən qısa zamanda sizinlə əlaqə saxlayacaq.",
+  "error": "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin."
 }

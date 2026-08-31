@@ -95,7 +95,7 @@ export function ContactForm() {
           name="email"
           label={t("email")}
           type="email"
-          placeholder="ad@domen.az"
+          placeholder="name@example.com"
           error={state.fieldErrors?.email}
         />
         <Input

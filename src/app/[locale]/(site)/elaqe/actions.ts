@@ -143,9 +143,15 @@ export async function submitContactForm(
 
     return { success: true };
   } catch {
+    let error = "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.";
+    try {
+      error = (await getTranslations("contact"))("error");
+    } catch {
+      // Test/request konteksti olmadıqda təhlükəsiz AZ fallback saxlanılır.
+    }
     return {
       success: false,
-      error: "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
+      error,
     };
   }
 }

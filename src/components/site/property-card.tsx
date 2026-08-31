@@ -58,6 +58,7 @@ export function PropertyCard({
   variant = "standard",
 }: PropertyCardProps) {
   const t = useTranslations("property");
+  const contentT = useTranslations("content.phase2");
   const format = useFormatter();
   const locale = useLocale() as Locale;
   const localizedProperty = localizeKnownContent("property", sourceProperty, locale);
@@ -131,7 +132,7 @@ export function PropertyCard({
       {/* --- Məzmun --- */}
       <div className={cn("flex flex-1 flex-col gap-4 p-5", variant === "featured" && "sm:p-7")}>
         <div className="flex flex-wrap gap-2">
-          {isPremium && <Badge tone="gold"><Crown className="mr-1 size-3" aria-hidden="true" />Premium</Badge>}
+          {isPremium && <Badge tone="gold"><Crown className="mr-1 size-3" aria-hidden="true" />{contentT("premium")}</Badge>}
           <Badge tone={isSale ? "dark" : "gold"}>
             {isSale ? t("listingType.sale") : t("listingType.rent")}
           </Badge>

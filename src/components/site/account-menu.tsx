@@ -124,8 +124,8 @@ export function AccountMenu({
 
   const linkClass = cn(
     "inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xs text-sm font-medium whitespace-nowrap transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
-    variant === "mobile" ? "w-full justify-center" : "min-w-11 justify-center px-2 2xl:min-w-0 2xl:justify-start 2xl:px-0",
-    isOverlay ? "text-ink-invert-soft hover:text-gold-soft" : "text-ink-soft hover:text-gold-deep",
+    variant === "mobile" ? "w-full justify-center" : "min-w-11 justify-center rounded-full px-2 min-[1800px]:min-w-0 min-[1800px]:justify-start min-[1800px]:px-1",
+    isOverlay ? "text-white hover:bg-white/10 hover:text-gold-soft" : "text-ink hover:bg-beige hover:text-gold-deep",
   );
 
   if (state.status === "anonymous") {
@@ -133,7 +133,7 @@ export function AccountMenu({
       <div className={cn("flex items-center gap-3", variant === "mobile" && "flex-col items-stretch gap-2")}>
         <Link href="/daxil-ol" aria-label={t("login")} className={linkClass}>
           <LogIn className="size-4" aria-hidden="true" />
-          <span className={cn(variant === "desktop" && "sr-only 2xl:not-sr-only")}>{t("login")}</span>
+          <span className={cn(variant === "desktop" && "sr-only min-[1800px]:not-sr-only")}>{t("login")}</span>
         </Link>
         <Link
           href="/qeydiyyat"
@@ -158,7 +158,7 @@ export function AccountMenu({
       ) : (
         <UserRound className="size-4" aria-hidden="true" />
       )}
-      <span className={cn("max-w-28 truncate", variant === "desktop" && "sr-only 2xl:not-sr-only")}>
+      <span className={cn("max-w-28 truncate", variant === "desktop" && "sr-only min-[1800px]:not-sr-only")}>
         {state.isStaff ? t("adminPanel") : state.name}
       </span>
     </>
@@ -181,7 +181,7 @@ export function AccountMenu({
             ? t("notificationsUnread", { count: state.unreadNotifications })
             : t("notifications")
         }
-        className={cn(linkClass, "relative", variant === "desktop" && "min-w-11 2xl:min-w-11 2xl:justify-center 2xl:px-0")}
+        className={cn(linkClass, "relative", variant === "desktop" && "min-w-11 min-[1800px]:min-w-11 min-[1800px]:justify-center min-[1800px]:px-0")}
       >
         <Bell className="size-4" aria-hidden="true" />
         {state.unreadNotifications > 0 && (

@@ -49,7 +49,18 @@
     "risks": "Risks and warnings",
     "checklist": "Checklist",
     "template": "Template and example",
-    "courtPosition": "Court position"
+    "courtPosition": "Court position",
+    "legalStatus": {
+      "current": "Current law",
+      "proposal": "Proposal / initiative",
+      "mixed": "Current law + proposal"
+    },
+    "riskLevels": {
+      "green": "Core documents are in order",
+      "yellow": "Additional checks required",
+      "red": "Serious legal risk",
+      "legalReview": "Legal review required"
+    }
   },
   "audience": {
     "BUYER": "Buyer",

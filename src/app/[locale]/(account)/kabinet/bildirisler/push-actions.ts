@@ -1,6 +1,6 @@
 "use server";
 
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import type { Locale } from "@/lib/constants";
@@ -10,10 +10,11 @@ type BrowserSubscription = { endpoint: string; keys: { p256dh: string; auth: str
 
 export async function savePushSubscription(subscription: BrowserSubscription): Promise<ActionState> {
   const locale = await getLocale() as Locale;
+  const t = await getTranslations("account.notifications.push");
   let user;
   try { user = await requirePublicAction("push", locale); }
   catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
-  if (!subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) return failure("Push abunəliyi natamamdır.");
+  if (!subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) return failure(t("incomplete"));
   try {
     await prisma.pushSubscription.upsert({
       where: { endpoint: subscription.endpoint },
@@ -25,12 +26,13 @@ export async function savePushSubscription(subscription: BrowserSubscription): P
       create: { userId: user.id, savedSearchPush: true, priceDropPush: true, reservationPush: true },
       update: { savedSearchPush: true, priceDropPush: true, reservationPush: true },
     });
-    return success("Push bildirişləri aktiv edildi.");
-  } catch (error) { return unexpected("push abunəliyi saxlanılmadı", error); }
+    return success(t("enabled"));
+  } catch (error) { return unexpected("push abunəliyi saxlanılmadı", error, t("failed")); }
 }
 
 export async function removePushSubscription(endpoint: string): Promise<ActionState> {
   const locale = await getLocale() as Locale;
+  const t = await getTranslations("account.notifications.push");
   let user;
   try { user = await requirePublicAction("push", locale); }
   catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
@@ -41,6 +43,6 @@ export async function removePushSubscription(endpoint: string): Promise<ActionSt
       create: { userId: user.id, savedSearchPush: false, priceDropPush: false, reservationPush: false },
       update: { savedSearchPush: false, priceDropPush: false, reservationPush: false },
     });
-    return success("Push bildirişləri söndürüldü.");
-  } catch (error) { return unexpected("push abunəliyi silinmədi", error); }
+    return success(t("disabled"));
+  } catch (error) { return unexpected("push abunəliyi silinmədi", error, t("failed")); }
 }

@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { ButtonLink } from "@/components/ui/button";
 import { ResetPasswordForm } from "../account-security-forms";
+import type { Locale } from "@/lib/constants";
+import { buildManagedMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Parolu yenilə", robots: { index: false, follow: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations({ locale, namespace: "auth.accountSecurity" });
+  return buildManagedMetadata({ title: t("resetTitle"), description: t("resetDescription"), path: "/hesab/parolu-yenile", noIndex: true, locale });
+}
 
 export default async function ResetPasswordPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const t = await getTranslations("auth.accountSecurity");

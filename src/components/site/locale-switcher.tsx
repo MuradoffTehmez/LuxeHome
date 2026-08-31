@@ -40,7 +40,9 @@ export function LocaleSwitcher({
         aria-label={t("switch")}
         className={cn(
           "flex size-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-deep",
-          isOverlay ? "text-ink-invert-soft hover:bg-white/10" : "text-ink-soft hover:bg-beige hover:text-ink",
+          isOverlay
+            ? "text-white/90 hover:bg-white/10 hover:text-white focus-visible:ring-gold-soft"
+            : "text-ink-soft hover:bg-beige hover:text-ink",
         )}
       >
         <Globe className="size-5" aria-hidden="true" />

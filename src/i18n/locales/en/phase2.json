@@ -19,6 +19,7 @@
     "submitReview": "Send review for moderation",
     "reviewSuccess": "Your review was sent for moderation.",
     "reviewDuplicate": "You have already reviewed this agent.",
+    "reviewFailed": "The review was not submitted. Please try again.",
     "loginHint": "Sign in to leave a review.",
     "reviewSelf": "You cannot review an agent from your own agency.",
     "homeTitle": "The specialists who will help you",
@@ -39,7 +40,19 @@
     "disabled": "Reservations are not enabled for this listing.",
     "dashboardTitle": "My reservations",
     "empty": "You do not have any reservation requests yet.",
-    "cancel": "Cancel request"
+    "cancel": "Cancel request",
+    "cancelUnavailable": "The reservation was not found or can no longer be cancelled.",
+    "cancelled": "The reservation request was cancelled.",
+    "cancelFailed": "The reservation could not be cancelled. Please try again.",
+    "status": {
+      "requested": "Request sent",
+      "pending": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "expired": "Expired",
+      "completed": "Completed"
+    }
   },
   "testimonials": {
     "overline": "Client experience",
@@ -52,7 +65,16 @@
     "description": "Active listings matched to your favorites and searches.",
     "empty": "Add a favorite or use the property finder to receive personalized recommendations.",
     "disabled": "Personalized recommendations are disabled in your profile settings.",
-    "wizard": "Property finder"
+    "wizard": "Property finder",
+    "toggleLabel": "Change recommendation preference",
+    "enableTitle": "Enable recommendations?",
+    "disableTitle": "Disable recommendations?",
+    "toggleDescription": "This setting controls the personalized recommendation engine.",
+    "enable": "Enable",
+    "disable": "Disable",
+    "enabled": "Personalized recommendations were enabled.",
+    "disabledSuccess": "Personalized recommendations were disabled.",
+    "failed": "The recommendation preference was not changed. Please try again."
   },
   "wizard": {
     "eyebrow": "12-step assistant",
@@ -72,6 +94,13 @@
     "mortgage": "Mortgage eligibility",
     "priority": "Main priority",
     "any": "Any",
+    "yes": "Yes",
+    "priorityOptions": {
+      "newest": "Newest",
+      "price": "Best price",
+      "area": "Largest area",
+      "featured": "Premium picks"
+    },
     "homeCta": "Start the assistant",
     "homeNote": "You need to sign in to your account to use this service.",
     "loginTitle": "The property finder requires an account",

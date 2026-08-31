@@ -1,6 +1,6 @@
 "use server";
 
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
@@ -14,6 +14,7 @@ import { prisma } from "@/lib/prisma";
  */
 export async function toggleRecommendations(): Promise<ActionState> {
   const locale = await getLocale() as Locale;
+  const t = await getTranslations("phase2.recommendations");
   let user;
   try {
     user = await requirePublicAction("preferences", locale);
@@ -30,8 +31,8 @@ export async function toggleRecommendations(): Promise<ActionState> {
       update: { recommendationEnabled: enabled },
     });
     revalidatePath("/kabinet/tovsiyeler");
-    return success(enabled ? "Fərdi tövsiyələr aktiv edildi." : "Fərdi tövsiyələr söndürüldü.");
+    return success(enabled ? t("enabled") : t("disabledSuccess"));
   } catch (error) {
-    return unexpected("tövsiyə seçimi dəyişmədi", error);
+    return unexpected("tövsiyə seçimi dəyişmədi", error, t("failed"));
   }
 }

@@ -49,7 +49,18 @@
     "risks": "Risklər və xəbərdarlıqlar",
     "checklist": "Yoxlama siyahısı",
     "template": "Şablon və nümunə",
-    "courtPosition": "Məhkəmə mövqeyi"
+    "courtPosition": "Məhkəmə mövqeyi",
+    "legalStatus": {
+      "current": "Qüvvədə olan norma",
+      "proposal": "Təklif / təşəbbüs",
+      "mixed": "Qüvvədə olan norma + təklif"
+    },
+    "riskLevels": {
+      "green": "Əsas sənədlər qaydasındadır",
+      "yellow": "Əlavə yoxlama tələb olunur",
+      "red": "Ciddi hüquqi risk",
+      "legalReview": "Hüquqi rəy tələb olunur"
+    }
   },
   "audience": {
     "BUYER": "Alıcı",

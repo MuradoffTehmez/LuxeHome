@@ -114,6 +114,10 @@
     "emailFieldUsed": "This email is already in use",
     "staffAccount": "This account belongs to the company panel. Use the staff login instead.",
     "locked": "The account is temporarily locked. Try again in 15 minutes.",
+    "lockedEmailSubject": "Luxe Home Estate — your account has been temporarily locked",
+    "lockedEmailIntro": "Five consecutive failed login attempts were made and your account has been locked for 15 minutes.",
+    "lockedEmailAdvice": "If this was not you, change your password as soon as the lock expires.",
+    "lockedEmailIp": "Attempt source IP",
     "verificationExpired": "Verification expired. Log in again.",
     "invalidCode": "The code is incorrect.",
     "usedCode": "This code has already been used. Wait for the next code.",
@@ -259,7 +263,11 @@
       "disable": "Disable",
       "unsupported": "Not supported",
       "missingKey": "The push key is not configured.",
-      "denied": "The browser did not grant notification permission."
+      "denied": "The browser did not grant notification permission.",
+      "incomplete": "The push subscription is incomplete.",
+      "enabled": "Push notifications were enabled.",
+      "disabled": "Push notifications were disabled.",
+      "failed": "The push preference was not saved. Please try again."
     },
     "preferences": {
       "title": "Notification preferences",

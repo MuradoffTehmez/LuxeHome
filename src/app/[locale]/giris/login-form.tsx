@@ -40,7 +40,7 @@ export function LoginForm({ davam }: { davam?: string }) {
           inputMode="email"
           autoComplete="username"
           required
-          placeholder="ad@luxehomeestate.az"
+          placeholder="name@luxehomeestate.az"
           className={controlClass}
         />
       </Field>

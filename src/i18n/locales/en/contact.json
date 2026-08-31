@@ -22,5 +22,6 @@
   "subjectPlaceholder": "Subject of your enquiry",
   "messagePlaceholder": "Write your enquiry...",
   "successTitle": "Your enquiry has been sent!",
-  "successDescription": "Our team will contact you as soon as possible."
+  "successDescription": "Our team will contact you as soon as possible.",
+  "error": "Something went wrong while sending your enquiry. Please try again shortly."
 }

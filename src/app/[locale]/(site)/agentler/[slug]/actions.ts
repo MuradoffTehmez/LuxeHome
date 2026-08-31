@@ -76,6 +76,6 @@ export async function submitAgentReview(
     });
     return success(t("reviewSuccess"));
   } catch (error) {
-    return unexpected("agent rəyi yaradıla bilmədi", error);
+    return unexpected("agent rəyi yaradıla bilmədi", error, t("reviewFailed"));
   }
 }

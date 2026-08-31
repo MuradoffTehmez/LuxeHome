@@ -53,7 +53,10 @@ export function SearchPanel({
         className,
       )}
     >
-      <form action={localizePath("/emlaklar", locale)} method="get" className="flex flex-col gap-5" onSubmit={(event) => {
+      <form action={localizePath("/emlaklar", locale)} method="get" className={cn(
+        "gap-5",
+        isPage ? "flex flex-col" : "grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-4",
+      )} onSubmit={(event) => {
         const data = new FormData(event.currentTarget);
         const filterCount = Array.from(data.entries()).filter(([, value]) => String(value).trim()).length;
         trackEvent("filter_submit", { filter_count: filterCount, placement: variant });
@@ -67,7 +70,10 @@ export function SearchPanel({
           mode={isPage ? "full" : "compact"}
         />
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+        <div className={cn(
+          "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end",
+          !isPage && "lg:block",
+        )}>
           {isPage ? (
             <Link
               href="/emlaklar"
@@ -77,7 +83,7 @@ export function SearchPanel({
               {t("reset")}
             </Link>
           ) : null}
-          <Button type="submit" size="md" className="sm:min-w-40">
+          <Button type="submit" size="md" className={cn("sm:min-w-40", !isPage && "w-full sm:w-auto lg:min-w-36")}>
             <Search className="size-4" aria-hidden="true" />
             {t("submit")}
           </Button>
