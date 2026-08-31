@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import {
   breadcrumbSchema,
-  buildMetadata,
+  buildManagedMetadata,
   definedTermSetSchema,
   jsonLd,
 } from "@/lib/seo";
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolved = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({ locale: resolved, namespace: "knowledge.glossary" });
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
     path: "/lugat",

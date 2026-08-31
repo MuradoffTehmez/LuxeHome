@@ -6,7 +6,7 @@ import { requireLister } from "@/lib/auth/guard";
 import { type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { getPropertyFormOptions } from "@/lib/queries";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { updatePublicProperty } from "../actions";
 import {
@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "account.newProperty" });
-  return buildMetadata({
+  return buildManagedMetadata({
     title: t("editMetaTitle"),
     description: t("editMetaDescription"),
     path: "/kabinet/elanlar",

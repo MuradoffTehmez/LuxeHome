@@ -5,14 +5,14 @@ import { CheckCircle2 } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { RegisterForm } from "./register-form";
 import { localizePath } from "@/i18n/path-locale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "auth.registration" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/qeydiyyat", indexPolicy: "noindex-follow", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/qeydiyyat", indexPolicy: "noindex-follow", locale: locale as Locale });
 }
 
 export const dynamic = "force-dynamic";

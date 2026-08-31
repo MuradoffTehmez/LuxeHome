@@ -33,7 +33,7 @@ import { PostCard } from "@/components/site/post-card";
 import { FeaturedPartnership } from "@/components/site/featured-partnership";
 import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { getCachedHomePageData } from "@/lib/public-cache";
 import { getCategoryImageUrl } from "@/lib/category-images";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({ locale: resolvedLocale, namespace: "home" });
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
     path: "/",

@@ -12,14 +12,14 @@ import {
   type ReservationStatus,
 } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { formatDateTime } from "@/lib/utils";
 import { CancelReservationButton } from "./cancel-reservation-button";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations({ locale, namespace: "phase2.reservation" });
-  return buildMetadata({ title: t("dashboardTitle"), description: t("description"), path: "/kabinet/rezervasiyalar", noIndex: true, locale });
+  return buildManagedMetadata({ title: t("dashboardTitle"), description: t("description"), path: "/kabinet/rezervasiyalar", noIndex: true, locale });
 }
 
 const STATUS_TONES = {

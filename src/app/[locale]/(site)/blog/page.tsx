@@ -10,7 +10,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { PostCard } from "@/components/site/post-card";
 import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { classifyBlogSearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
 import { getBlogCategories } from "@/lib/queries";
@@ -33,7 +33,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const decision = classifyBlogSearchParams(query);
   const pageSuffix = decision.page > 1 ? t("pageSuffix", { page: decision.page }) : "";
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: `${t("metaTitle")}${pageSuffix}`,
     description: t("metaDescription"),
     path: decision.canonicalPath ?? "/blog",

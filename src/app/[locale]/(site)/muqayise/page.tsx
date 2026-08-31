@@ -3,7 +3,7 @@ import type { Locale } from "@/lib/constants";
 import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { CompareTable } from "./compare-table";
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -11,7 +11,7 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "listings.comparePage" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/muqayise", locale: locale as Locale, indexPolicy: "noindex-follow" });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/muqayise", locale: locale as Locale, indexPolicy: "noindex-follow" });
 }
 
 export default async function ComparePage({ params }: PageProps) {

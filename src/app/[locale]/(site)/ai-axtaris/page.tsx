@@ -5,7 +5,7 @@ import { Container, Section } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/states";
 import { SectionHeader } from "@/components/ui/section-header";
 import { PropertyCard } from "@/components/site/property-card";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { searchPropertiesWithAi } from "@/lib/phase3-search";
 import type { Locale } from "@/lib/constants";
 import { AiSearchForm } from "@/components/site/ai-search-form";
@@ -15,7 +15,7 @@ type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ q?: 
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params; const t = await getTranslations({ locale, namespace: "phase3.search" });
-  return buildMetadata({ title: t("title"), description: t("description"), path: "/ai-axtaris", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("title"), description: t("description"), path: "/ai-axtaris", locale: locale as Locale });
 }
 
 export default async function AiSearchPage({ params, searchParams }: Props) {

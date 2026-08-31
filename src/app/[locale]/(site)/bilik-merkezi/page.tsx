@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Pagination } from "@/components/ui/pagination";
 import { KnowledgeCard } from "@/components/site/knowledge-card";
-import { buildMetadata, breadcrumbSchema, itemListSchema, jsonLd } from "@/lib/seo";
+import { buildManagedMetadata, breadcrumbSchema, itemListSchema, jsonLd } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 import { KNOWLEDGE_AUDIENCES, type Locale } from "@/lib/constants";
 import {
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolved = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({ locale: resolved, namespace: "knowledge.hub" });
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
     path: "/bilik-merkezi",

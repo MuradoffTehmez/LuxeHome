@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { getPublicAgents } from "@/lib/phase2";
 import { Container, Section } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/states";
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "phase2.agents" });
-  return buildMetadata({ title: t("title"), description: t("description"), path: "/agentler", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("title"), description: t("description"), path: "/agentler", locale: locale as Locale });
 }
 
 export default async function AgentsPage({ params }: { params: Promise<{ locale: string }> }) {

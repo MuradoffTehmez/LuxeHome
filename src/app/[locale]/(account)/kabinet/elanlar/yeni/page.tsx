@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { getPropertyFormOptions } from "@/lib/queries";
 import { requireLister } from "@/lib/auth/guard";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { createPublicProperty } from "./actions";
 import { PublicPropertyForm } from "./public-property-form";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
@@ -13,7 +13,7 @@ import type { Locale } from "@/lib/constants";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "account.newProperty" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/elanlar/yeni", noIndex: true, locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/elanlar/yeni", noIndex: true, locale: locale as Locale });
 }
 
 export default async function NewPropertyPage() {

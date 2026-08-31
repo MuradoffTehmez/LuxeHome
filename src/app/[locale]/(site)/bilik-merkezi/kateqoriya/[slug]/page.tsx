@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Pagination } from "@/components/ui/pagination";
 import { KnowledgeCard } from "@/components/site/knowledge-card";
-import { breadcrumbSchema, buildMetadata, itemListSchema, jsonLd } from "@/lib/seo";
+import { breadcrumbSchema, buildManagedMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { getCachedKnowledgeArticles } from "@/lib/public-cache";
 import { getKnowledgeCategoryBySlug, getKnowledgeTerms } from "@/lib/knowledge";
 import type { Locale } from "@/lib/constants";
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = await getKnowledgeCategoryBySlug(slug);
   if (!category) notFound();
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: category.name,
     description: category.description ?? category.name,
     path: `/bilik-merkezi/kateqoriya/${category.slug}`,

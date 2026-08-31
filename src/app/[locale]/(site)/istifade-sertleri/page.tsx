@@ -3,7 +3,7 @@ import { LocalizedLegalPage } from "@/components/site/localized-legal-page";
 import { siteConfig } from "@/config/site";
 import { getLegalDocuments } from "@/i18n/public-content";
 import type { Locale } from "@/lib/constants";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
@@ -21,7 +21,7 @@ function documents(locale: Locale) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const document = documents(locale as Locale).terms;
-  return buildMetadata({
+  return buildManagedMetadata({
     title: document.title,
     description: document.metaDescription,
     path: "/istifade-sertleri",

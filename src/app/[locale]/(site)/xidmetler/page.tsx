@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { ServiceIcon } from "@/components/site/service-icon";
 import { buttonClassName } from "@/components/ui/button";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { getServices } from "@/lib/queries";
 import { localizeKnownContent } from "@/i18n/dynamic-content";
 
@@ -23,7 +23,7 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "listings.servicesPage" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/xidmetler", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/xidmetler", locale: locale as Locale });
 }
 
 export default async function ServicesPage({ params }: PageProps) {

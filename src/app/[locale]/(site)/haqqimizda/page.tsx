@@ -17,7 +17,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { buttonClassName } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { siteConfig } from "@/config/site";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { BusinessTrustPanel } from "@/components/site/business-trust-panel";
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -25,7 +25,7 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "home.about" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription", { legalName: siteConfig.legalName }), path: "/haqqimizda", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription", { legalName: siteConfig.legalName }), path: "/haqqimizda", locale: locale as Locale });
 }
 
 const WHY_ITEMS = [

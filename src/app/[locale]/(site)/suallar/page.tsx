@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { FaqGroups } from "@/components/site/faq-groups";
 import { FAQ_PAGE } from "@/i18n/public-content";
 import { getSiteFaqContent } from "@/i18n/site-faq";
-import { buildMetadata, faqSchema, jsonLd } from "@/lib/seo";
+import { buildManagedMetadata, faqSchema, jsonLd } from "@/lib/seo";
 import type { Locale } from "@/lib/constants";
 import { siteConfig, whatsappLink } from "@/config/site";
 
@@ -15,7 +15,7 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const copy = FAQ_PAGE[locale as Locale];
-  return buildMetadata({
+  return buildManagedMetadata({
     title: copy.title,
     description: copy.metaDescription,
     path: "/suallar",

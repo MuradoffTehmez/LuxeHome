@@ -7,7 +7,7 @@ import { SeoLandingPage } from "@/components/site/seo-landing-page";
 import { routing } from "@/i18n/routing";
 import { type Locale } from "@/lib/constants";
 import { getTaxonomyLandingProperties } from "@/lib/queries";
-import { breadcrumbSchema, buildMetadata, faqSchema, itemListSchema, jsonLd } from "@/lib/seo";
+import { breadcrumbSchema, buildManagedMetadata, faqSchema, itemListSchema, jsonLd } from "@/lib/seo";
 import { buildTaxonomyLandingDescriptor, getSeoLandingRouteLabels, seoLandingIndexPolicy } from "@/lib/seo-landings";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +37,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const landing = buildTaxonomyLandingDescriptor("DISTRICT", result.location, localeValue);
   const labels = getSeoLandingRouteLabels(localeValue);
   const canonicalPath = page > 1 ? `${landing.path}?sehife=${page}` : landing.path;
-  return buildMetadata({
+  return buildManagedMetadata({
     title: page > 1 ? `${landing.title}${labels.pageSuffix(page)}` : landing.title,
     description: landing.description,
     path: canonicalPath,

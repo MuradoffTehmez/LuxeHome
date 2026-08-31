@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
 import { type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
 import { resolveNotificationPreferences } from "@/lib/notification-preferences";
 import { NotificationList, type NotificationListItem } from "./notification-list";
@@ -15,7 +15,7 @@ import { PushPreferences } from "./push-preferences";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "account.notifications" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/bildirisler", noIndex: true, locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/bildirisler", noIndex: true, locale: locale as Locale });
 }
 
 const DIVISIONS: { amount: number; unit: Intl.RelativeTimeFormatUnit }[] = [

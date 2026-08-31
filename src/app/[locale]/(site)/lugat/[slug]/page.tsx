@@ -7,7 +7,7 @@ import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import {
   breadcrumbSchema,
-  buildMetadata,
+  buildManagedMetadata,
   definedTermSchema,
   jsonLd,
 } from "@/lib/seo";
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const term = await loadTerm(slug, locale);
   if (!term) notFound();
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: term.term,
     description: term.shortDefinition,
     path: `/lugat/${term.slug}`,

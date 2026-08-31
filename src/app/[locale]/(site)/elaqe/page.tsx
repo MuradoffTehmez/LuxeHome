@@ -6,7 +6,7 @@ import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { InstagramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { siteConfig } from "@/config/site";
 import { getOperationalSiteConfig } from "@/lib/settings";
 import { ContactForm } from "./contact-form";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "contact" });
   const operational = await getOperationalSiteConfig();
-  return buildMetadata({ title: t("eyebrow"), description: t("metaDescription", { legalName: siteConfig.legalName, address: operational.addressFull, phone: operational.phone }), path: "/elaqe", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("eyebrow"), description: t("metaDescription", { legalName: siteConfig.legalName, address: operational.addressFull, phone: operational.phone }), path: "/elaqe", locale: locale as Locale });
 }
 
 export default async function ContactPage({ params }: PageProps) {

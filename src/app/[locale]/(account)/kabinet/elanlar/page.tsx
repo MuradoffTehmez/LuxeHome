@@ -14,7 +14,7 @@ import {
   type PropertyStatus,
 } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
@@ -29,7 +29,7 @@ const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "r
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "account.listings" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/elanlar", noIndex: true, locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/elanlar", noIndex: true, locale: locale as Locale });
 }
 
 export default async function CabinetPropertiesPage({

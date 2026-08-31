@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, MAX_AGENCY_EMPLOYEES, type Locale } from "@/lib/constants";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencyEmployees, getAgencyForOwner } from "@/lib/queries";
 import { InviteEmployeeForm, RemoveEmployeeButton } from "./team-forms";
 import { forbidden } from "next/navigation";
@@ -12,7 +12,7 @@ import { forbidden } from "next/navigation";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "account.team" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/komanda", noIndex: true, locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/komanda", noIndex: true, locale: locale as Locale });
 }
 
 export const dynamic = "force-dynamic";

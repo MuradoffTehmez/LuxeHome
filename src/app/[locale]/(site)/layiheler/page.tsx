@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { ProjectCard } from "@/components/site/project-card";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { getProjects } from "@/lib/queries";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -19,7 +19,7 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "listings.projectsPage" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/layiheler", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/layiheler", locale: locale as Locale });
 }
 
 export default async function ProjectsPage({ params }: PageProps) {

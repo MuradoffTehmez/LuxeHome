@@ -10,7 +10,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { buttonClassName } from "@/components/ui/button";
 import { PartnerGrid } from "@/components/site/partner-grid";
 import { PartnerTypeFilter } from "@/components/site/partner-type-filter";
-import { buildMetadata, breadcrumbSchema, itemListSchema, jsonLd } from "@/lib/seo";
+import { buildManagedMetadata, breadcrumbSchema, itemListSchema, jsonLd } from "@/lib/seo";
 import { getCachedPartnerTypeCounts, getCachedPublicPartners } from "@/lib/public-cache";
 import { parsePartnerFilterGroup, partnershipTypesForGroup } from "@/lib/partners";
 import type { Locale } from "@/lib/constants";
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "partners.list" });
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
     path: "/terefdaslar",

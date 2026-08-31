@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { FaqGroups } from "@/components/site/faq-groups";
-import { buildMetadata, faqSchema, jsonLd } from "@/lib/seo";
+import { buildManagedMetadata, faqSchema, jsonLd } from "@/lib/seo";
 import { getCachedFaqEntries } from "@/lib/public-cache";
 import { groupFaqByCategory } from "@/lib/knowledge";
 import { getRealEstateFaqContent } from "@/i18n/public-content";
@@ -16,7 +16,7 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "knowledge.legalFaq" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/bilik-merkezi/suallar", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/bilik-merkezi/suallar", locale: locale as Locale });
 }
 
 export default async function RealEstateFaqPage({ params }: Props) {

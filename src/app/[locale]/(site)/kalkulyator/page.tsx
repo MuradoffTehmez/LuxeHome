@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { MortgageCalculator } from "@/components/site/mortgage-calculator";
-import { breadcrumbSchema, buildMetadata, jsonLd } from "@/lib/seo";
+import { breadcrumbSchema, buildManagedMetadata, jsonLd } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/lib/constants";
 
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolved = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({ locale: resolved, namespace: "knowledge.calculator" });
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: t("metaTitle"),
     description: t("metaDescription"),
     path: "/kalkulyator",

@@ -8,7 +8,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { AgencyCard } from "@/components/site/agency-card";
 import { AgentCard } from "@/components/site/agent-card";
 import { SectionHeader } from "@/components/ui/section-header";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencies } from "@/lib/queries";
 import { getPublicAgents } from "@/lib/phase2";
 
@@ -21,7 +21,7 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "listings.agenciesPage" });
-  return buildMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/agentlikler", locale: locale as Locale });
+  return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/agentlikler", locale: locale as Locale });
 }
 
 export default async function AgenciesPage({ params }: PageProps) {

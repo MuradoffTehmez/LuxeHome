@@ -14,7 +14,7 @@ import { SaveSearchButton } from "@/components/site/save-search-button";
 import { SearchPanel } from "@/components/site/search-panel";
 import { SortSelect } from "@/components/site/sort-select";
 import { Pagination } from "@/components/ui/pagination";
-import { buildMetadata, itemListSchema, jsonLd } from "@/lib/seo";
+import { buildManagedMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { classifyPropertySearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
 import { getCachedFilterOptions, getCachedProperties } from "@/lib/public-cache";
@@ -45,7 +45,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const decision = classifyPropertySearchParams(query);
   const pageSuffix = decision.page > 1 ? t("pageSuffix", { page: decision.page }) : "";
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: `${t("metaTitle")}${pageSuffix}`,
     description: t("metaDescription"),
     path: decision.canonicalPath ?? "/emlaklar",

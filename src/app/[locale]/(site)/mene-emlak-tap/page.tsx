@@ -11,7 +11,7 @@ import { routing } from "@/i18n/routing";
 import { AUTH_KINDS } from "@/lib/constants";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { getCachedFilterOptions } from "@/lib/public-cache";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import type { Locale } from "@/lib/constants";
 import { PropertyWizard } from "./property-wizard";
 
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const resolved = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const t = await getTranslations({ locale: resolved, namespace: "phase2.wizard" });
-  return buildMetadata({ title: t("title"), description: t("description"), path: "/mene-emlak-tap", locale: resolved });
+  return buildManagedMetadata({ title: t("title"), description: t("description"), path: "/mene-emlak-tap", locale: resolved });
 }
 
 export default async function PropertyWizardPage({ params }: Props) {

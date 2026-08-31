@@ -9,13 +9,13 @@ import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
 import type { Locale } from "@/lib/constants";
 import { getPersonalizedRecommendations } from "@/lib/phase2";
-import { buildMetadata } from "@/lib/seo";
+import { buildManagedMetadata } from "@/lib/seo";
 import { toggleRecommendations } from "./actions";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations({ locale, namespace: "phase2.recommendations" });
-  return buildMetadata({ title: t("title"), description: t("description"), path: "/kabinet/tovsiyeler", noIndex: true, locale });
+  return buildManagedMetadata({ title: t("title"), description: t("description"), path: "/kabinet/tovsiyeler", noIndex: true, locale });
 }
 
 export default async function RecommendationsPage() {

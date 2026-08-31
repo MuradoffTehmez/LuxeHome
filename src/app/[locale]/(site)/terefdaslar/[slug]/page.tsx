@@ -18,7 +18,7 @@ import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { Badge } from "@/components/ui/badge";
 import {
   breadcrumbSchema,
-  buildMetadata,
+  buildManagedMetadata,
   jsonLd,
   partnerSchema,
   truncateAtWord,
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Azərbaycan dilində metadata göstərməkdənsə lokallaşdırılmış məzmun işlədilir.
   const useCustomSeo = locale === "az";
 
-  return buildMetadata({
+  return buildManagedMetadata({
     title: (useCustomSeo && partner.seoTitle) || t("detail.metaTitle", { name: partner.name }),
     description: (useCustomSeo && partner.seoDescription) || fallbackDescription,
     path: `/terefdaslar/${partner.slug}`,
