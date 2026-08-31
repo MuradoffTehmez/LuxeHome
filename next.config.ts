@@ -103,4 +103,13 @@ export default withNextIntl(nextConfig);
 
 // `next dev` zamanı Cloudflare binding-lərini (D1, R2) lokal miniflare üzərindən açır,
 // beləliklə development production ilə eyni kod yolunu işlədir.
-initOpenNextCloudflareForDev();
+//
+// Çağırış qəsdən yalnız development-də edilir. `ai` və `images` binding-lərinin lokal
+// emulyasiyası yoxdur, ona görə Wrangler onlar üçün remote proxy sessiyası açır və bu sessiya
+// Cloudflare kimlik məlumatı tələb edir. Şərtsiz çağırışda `next build` də həmin sessiyanı
+// açmağa çalışır və token olmayan mühitdə (GitHub Actions) build belə sınır:
+//   Failed to start the remote proxy session ... necessary to set a CLOUDFLARE_API_TOKEN
+// Build zamanı binding lazım deyil: D1-dən oxuyan səhifələr onsuz da request-time render olunur.
+if (process.env.NODE_ENV === "development") {
+  initOpenNextCloudflareForDev();
+}

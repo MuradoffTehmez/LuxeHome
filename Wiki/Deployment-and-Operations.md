@@ -99,6 +99,11 @@ sahəsindən götürür. Bu ikinci addım məcburidir: `package-lock.json`-un fo
 versiyasından asılıdır və uyğunsuz npm `npm ci`-ni `EUSAGE` ilə sındırır. Toolchain dəyişəndə
 `.nvmrc`, `packageManager` və lock faylı **eyni commit-də** yenilənməlidir.
 
+CI-da Cloudflare kimlik məlumatı yalnız miqrasiya drift addımı üçün istifadə olunur; `npm run build`
+credential olmadan da keçməlidir. Bunun üçün `next.config.ts`-dəki `initOpenNextCloudflareForDev()`
+çağırışı yalnız development-də işə düşür — əks halda `ai`/`images` binding-ləri üçün açılan remote
+proxy sessiyası tokensiz mühitdə build-i sındırır.
+
 CI deploy etmir — yayım hələ manualdır (`npm run deploy`).
 
 ## Staging deploy runbook-u

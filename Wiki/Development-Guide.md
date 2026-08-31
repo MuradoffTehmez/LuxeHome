@@ -326,6 +326,24 @@ yeniləyib `npm install --package-lock-only` ilə lock faylını yenidən yarad�
 `npm ci`-nin təklif etdiyi kimi sadəcə `npm install` ilə "düzəltmək" problemi digər tərəfə keçirir:
 CI-da işləyən lock lokal mühitdə sınır.
 
+### Build «Failed to start the remote proxy session» deyir
+
+`wrangler.jsonc`-dəki `ai` və `images` binding-lərinin lokal emulyasiyası yoxdur; Wrangler onlar
+üçün **remote proxy sessiyası** açır və bu sessiya Cloudflare kimlik məlumatı tələb edir. Ona görə
+`next.config.ts`-dəki `initOpenNextCloudflareForDev()` çağırışı yalnız
+`process.env.NODE_ENV === "development"` olduqda işə düşür.
+
+Şərt silinsə `next build` də həmin sessiyanı açmağa çalışır və token olmayan mühitdə (məsələn
+GitHub Actions) build sınır:
+
+```text
+unhandledRejection [Error: Failed to start the remote proxy session.
+  ... it's necessary to set a CLOUDFLARE_API_TOKEN environment variable ...]
+```
+
+Lokal maşında xəta görünmür, çünki `wrangler login` sessiyası mövcuddur — problem yalnız CI-da üzə
+çıxır. Build zamanı binding lazım deyil: D1-dən oxuyan səhifələr onsuz da request-time render olunur.
+
 ### Build zamanı D1 binding tapılmır
 
 Data oxuyan səhifənin request-time render olduğunu və Prisma-nın `src/lib/prisma.ts` proxy-si ilə istifadə edildiyini yoxlayın. Modul səviyyəsində `new PrismaClient()` yaratmayın.
