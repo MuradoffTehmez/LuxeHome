@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { Save } from "lucide-react";
@@ -9,15 +10,17 @@ import { RESERVATION_STATUS_LABELS, type ReservationStatus } from "@/lib/constan
 import { updateReservationStatus } from "./actions";
 
 function Submit() {
+  const t = useTranslations("admin");
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending} className="grid size-11 place-items-center rounded-xs bg-gold text-ink hover:bg-gold-soft disabled:opacity-50" aria-label="Statusu yadda saxla">
+    <button type="submit" disabled={pending} className="grid size-11 place-items-center rounded-xs bg-gold text-ink hover:bg-gold-soft disabled:opacity-50" aria-label={t("pages.ops.statusuYaddaSaxla")}>
       <Save className="size-4" aria-hidden="true" />
     </button>
   );
 }
 
 export function ReservationStatusForm({ id, status }: { id: string; status: ReservationStatus }) {
+  const t = useTranslations("admin");
   const [state, action] = useActionState(updateReservationStatus, IDLE_STATE);
   const { toast } = useToast();
   useEffect(() => {
@@ -32,7 +35,7 @@ export function ReservationStatusForm({ id, status }: { id: string; status: Rese
           <option key={value} value={value}>{label}</option>
         ))}
       </select>
-      <input name="note" maxLength={500} placeholder="Qeyd (istəyə bağlı)" className="min-h-11 min-w-48 rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink" />
+      <input name="note" maxLength={500} placeholder={t("pages.ops.qeydIsteyeBagli")} className="min-h-11 min-w-48 rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink" />
       <Submit />
     </form>
   );

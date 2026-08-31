@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { Activity, AlertTriangle, Eye, FileStack, Gauge, Users, Zap } from "lucide-react";
 import { AdminCard, AdminPageHeader, AdminTable, AdminTableCell, AdminTableRow, StatCard } from "@/components/admin/admin-ui";
@@ -11,13 +12,17 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getSearchAnalytics, type DailyTraffic } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 
-export const metadata: Metadata = { title: "Trafik analitikası" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.ops.trafikAnalitikasi") };
+}
 export const dynamic = "force-dynamic";
 
 const dateFormatter = new Intl.DateTimeFormat("az-AZ", { day: "2-digit", month: "2-digit" });
 const numberFormatter = new Intl.NumberFormat("az-AZ");
 
 export default async function AdminAnalyticsPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1_000);
   const [result, errors, vitals] = await Promise.all([
@@ -34,23 +39,23 @@ export default async function AdminAnalyticsPage() {
   return (
     <>
       <AdminPageHeader
-        title="Trafik analitikası"
-        description="Cloudflare trafiki, real istifadəçi Core Web Vitals ölçüləri və brauzer xətaları bir paneldə."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Trafik analitikası" }]}
+        title={t("pages.ops.trafikAnalitikasi")}
+        description={t("pages.ops.cloudflareTrafikiRealIstifadeci")}
+        breadcrumbs={[{ label: t("pages.ops.idarePaneli"), href: "/admin" }, { label: t("pages.ops.trafikAnalitikasi") }]}
       />
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Brauzer xətası" value={errors.length} hint="Son 7 gün" icon={AlertTriangle} tone={errors.length ? "warning" : "success"} />
-        <StatCard label="Zəif CWV ölçümü" value={poorVitals} hint={`${vitals.length} ölçü içində`} icon={Activity} tone={poorVitals ? "warning" : "success"} />
-        <StatCard label="Orta LCP" value={vitalAverage("LCP") === null ? "—" : `${vitalAverage("LCP")} ms`} hint="Son 7 gün" icon={Gauge} tone="neutral" />
-        <StatCard label="Orta INP" value={vitalAverage("INP") === null ? "—" : `${vitalAverage("INP")} ms`} hint="Son 7 gün" icon={Gauge} tone="neutral" />
+        <StatCard label={t("pages.ops.brauzerXetasi")} value={errors.length} hint={t("pages.ops.son7Gun")} icon={AlertTriangle} tone={errors.length ? "warning" : "success"} />
+        <StatCard label={t("pages.ops.zeifCwvOlcumu")} value={poorVitals} hint={`${vitals.length} ölçü içində`} icon={Activity} tone={poorVitals ? "warning" : "success"} />
+        <StatCard label={t("pages.ops.ortaLcp")} value={vitalAverage("LCP") === null ? "—" : `${vitalAverage("LCP")} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
+        <StatCard label={t("pages.ops.ortaInp")} value={vitalAverage("INP") === null ? "—" : `${vitalAverage("INP")} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
       </div>
 
-      <AdminCard title="Son brauzer xətaları" description="Şəxsi məlumatlar və query parametrləri saxlanılmır." bodyClassName="p-4 lg:p-0" className="mb-6">
+      <AdminCard title={t("pages.ops.sonBrauzerXetalari")} description={t("pages.ops.sexsiMelumatlarVeQuery")} bodyClassName="p-4 lg:p-0" className="mb-6">
         {errors.length === 0 ? (
-          <EmptyState title="Xəta qeydə alınmayıb" description="Son 7 gündə error boundary hadisəsi yoxdur." />
+          <EmptyState title={t("pages.ops.xetaQeydeAlinmayib")} description={t("pages.ops.son7GundeError")} />
         ) : (
-          <AdminTable headers={[{ label: "Vaxt" }, { label: "Marşrut" }, { label: "Xəta" }, { label: "Kod" }]}>
+          <AdminTable headers={[{ label: t("pages.ops.vaxt") }, { label: t("pages.ops.marsrut") }, { label: t("pages.ops.xeta") }, { label: t("pages.ops.kod") }]}>
             {errors.slice(0, 20).map((error) => (
               <AdminTableRow key={error.id}>
                 <AdminTableCell className="whitespace-nowrap text-xs text-ink-muted">{error.createdAt.toLocaleString("az-AZ")}</AdminTableCell>
@@ -64,58 +69,58 @@ export default async function AdminAnalyticsPage() {
       </AdminCard>
 
       {!result.available ? (
-        <EmptyState title="Analitika əlçatan deyil" description={result.reason} />
+        <EmptyState title={t("pages.ops.analitikaElcatanDeyil")} description={result.reason} />
       ) : result.days.length === 0 ? (
-        <EmptyState title="Hələ məlumat yoxdur" description="Seçilmiş dövrdə Cloudflare zonası üçün trafik qeydə alınmayıb." />
+        <EmptyState title={t("pages.ops.heleMelumatYoxdur")} description={t("pages.ops.secilmisDovrdeCloudflareZonasi")} />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
-              label="Ümumi sorğu"
+              label={t("pages.ops.umumiSorgu")}
               value={numberFormatter.format(totalOf(result.days, "requests"))}
               icon={Zap}
               tone="gold"
             />
             <StatCard
-              label="Səhifə baxışı"
+              label={t("pages.ops.sehifeBaxisi")}
               value={numberFormatter.format(totalOf(result.days, "pageViews"))}
               icon={Eye}
               tone="neutral"
             />
             <StatCard
-              label="Unikal ziyarətçi"
+              label={t("pages.ops.unikalZiyaretci")}
               value={numberFormatter.format(totalOf(result.days, "uniques"))}
               icon={Users}
               tone="success"
             />
             <StatCard
-              label="Keşdən verilən"
+              label={t("pages.ops.kesdenVerilen")}
               value={`${cacheRatio(result.days)}%`}
-              hint="Ümumi sorğudan"
+              hint={t("pages.ops.umumiSorgudan")}
               icon={FileStack}
               tone="neutral"
             />
           </div>
 
-          <AdminCard title="Gündəlik bölgü" bodyClassName="p-4 lg:p-0">
+          <AdminCard title={t("pages.ops.gundelikBolgu")} bodyClassName="p-4 lg:p-0">
             <AdminResponsiveList
-              ariaLabel="Gündəlik trafik bölgüsü"
+              ariaLabel={t("pages.ops.gundelikTrafikBolgusu")}
               items={[...result.days].reverse()}
               getKey={(day) => day.date}
-              empty={<EmptyState title="Hələ məlumat yoxdur" />}
+              empty={<EmptyState title={t("pages.ops.heleMelumatYoxdur")} />}
               renderCard={(day) => (
                 <AdminListCard title={dateFormatter.format(new Date(day.date))}>
                   <dl className="grid grid-cols-3 gap-3 text-center">
                     <div>
-                      <dt className="text-xs text-ink-muted">Sorğu</dt>
+                      <dt className="text-xs text-ink-muted">{t("pages.ops.sorgu")}</dt>
                       <dd className="tabular mt-1 font-medium text-ink">{numberFormatter.format(day.requests)}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs text-ink-muted">Baxış</dt>
+                      <dt className="text-xs text-ink-muted">{t("pages.ops.baxis")}</dt>
                       <dd className="tabular mt-1 font-medium text-ink">{numberFormatter.format(day.pageViews)}</dd>
                     </div>
                     <div>
-                      <dt className="text-xs text-ink-muted">Unikal</dt>
+                      <dt className="text-xs text-ink-muted">{t("pages.ops.unikal")}</dt>
                       <dd className="tabular mt-1 font-medium text-ink">{numberFormatter.format(day.uniques)}</dd>
                     </div>
                   </dl>
@@ -124,10 +129,10 @@ export default async function AdminAnalyticsPage() {
               renderTable={(items) => (
                 <AdminTable
                   headers={[
-                    { label: "Tarix" },
-                    { label: "Sorğu", className: "text-right" },
-                    { label: "Səhifə baxışı", className: "text-right" },
-                    { label: "Unikal", className: "text-right" },
+                    { label: t("pages.ops.tarix") },
+                    { label: t("pages.ops.sorgu"), className: "text-right" },
+                    { label: t("pages.ops.sehifeBaxisi"), className: "text-right" },
+                    { label: t("pages.ops.unikal"), className: "text-right" },
                   ]}
                 >
                   {items.map((day) => (

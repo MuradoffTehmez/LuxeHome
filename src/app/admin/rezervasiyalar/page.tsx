@@ -10,7 +10,10 @@ import { formatDateTime } from "@/lib/utils";
 import { ReservationStatusForm } from "./reservation-status-form";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Rezervasiyalar" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.ops.rezervasiyalar") };
+}
 export const dynamic = "force-dynamic";
 
 const STATUS_TONES = {
@@ -39,11 +42,11 @@ export default async function AdminReservationsPage() {
   return (
     <>
       <AdminPageHeader
-        title="Rezervasiyalar"
-        description="Əmlak baxışı və rezervasiya sorğularını status tarixçəsi ilə idarə edin."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Rezervasiyalar" }]}
+        title={t("pages.ops.rezervasiyalar")}
+        description={t("pages.ops.emlakBaxisiVeRezervasiya")}
+        breadcrumbs={[{ label: t("pages.ops.idarePaneli"), href: "/admin" }, { label: t("pages.ops.rezervasiyalar") }]}
       />
-      {reservations.length === 0 ? <EmptyState title="Rezervasiya yoxdur" description="İctimai elanlardan göndərilən sorğular burada görünəcək." /> : (
+      {reservations.length === 0 ? <EmptyState title={t("pages.ops.rezervasiyaYoxdur")} description={t("pages.ops.ictimaiElanlardanGonderilenSorgular")} /> : (
         <AdminCard bodyClassName="p-0">
           <ul className="divide-y divide-line">
             {reservations.map((reservation) => {

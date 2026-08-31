@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import Link from "next/link";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
@@ -15,9 +16,10 @@ const sections = [
 ] as const;
 
 export default async function SerpLayout({ children }: { children: React.ReactNode }) {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.SEO_VIEW);
   return <div className="min-w-0">
-    <nav aria-label="SERP və SEO bölmələri" className="mb-6 overflow-x-auto rounded-md border border-line bg-paper p-2">
+    <nav aria-label={t("pages.serp.serpVeSeoBolmeleri")} className="mb-6 overflow-x-auto rounded-md border border-line bg-paper p-2">
       <ul className="flex min-w-max gap-1">{sections.map(([label, href]) => <li key={href}><Link href={href} className="inline-flex min-h-11 items-center rounded-xs px-3 text-sm text-ink-soft hover:bg-beige hover:text-ink">{label}</Link></li>)}</ul>
     </nav>
     {children}

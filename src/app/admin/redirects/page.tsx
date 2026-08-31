@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { formatRelative } from "@/lib/utils";
@@ -6,10 +7,14 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminRedirects, getTopNotFoundHits } from "@/lib/queries";
 import { CreateRedirectForm, NotFoundHitRow, RedirectRow } from "./redirect-forms";
 
-export const metadata: Metadata = { title: "Yönləndirmələr" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.serp.yonlendirmeler") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function AdminRedirectsPage() {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.SEO_VIEW);
   const [redirects, notFoundHits] = await Promise.all([
     getAdminRedirects(),
@@ -19,22 +24,22 @@ export default async function AdminRedirectsPage() {
   return (
     <>
       <AdminPageHeader
-        title="Yönləndirmələr"
-        description="Köhnə URL-ləri yeni ünvana yönləndirin. 404 monitoru ən çox rast gəlinən boş yolları göstərir."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Yönləndirmələr" }]}
+        title={t("pages.serp.yonlendirmeler")}
+        description={t("pages.serp.kohneUrlLeriYeni")}
+        breadcrumbs={[{ label: t("pages.serp.idarePaneli"), href: "/admin" }, { label: t("pages.serp.yonlendirmeler") }]}
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-6">
           <AdminCard
-            title="Aktiv yönləndirmələr"
+            title={t("pages.serp.aktivYonlendirmeler")}
             description={`${redirects.length} qeyd`}
             bodyClassName="p-0"
           >
             <ul>
               {redirects.length === 0 && (
                 <li className="px-4 py-8 text-center text-sm text-ink-muted">
-                  Hələ yönləndirmə yoxdur.
+                  {t("pages.serp.heleYonlendirmeYoxdur")}
                 </li>
               )}
               {redirects.map((redirect) => (
@@ -54,14 +59,14 @@ export default async function AdminRedirectsPage() {
         </div>
 
         <AdminCard
-          title="404 monitoru"
-          description="Yönləndirməsi olmayan, ən çox rast gəlinən yollar."
+          title={t("pages.serp.404Monitoru")}
+          description={t("pages.serp.yonlendirmesiOlmayanEnCox")}
           bodyClassName="p-0"
         >
           <ul>
             {notFoundHits.length === 0 && (
               <li className="px-4 py-8 text-center text-sm text-ink-muted">
-                Hələ qeydə alınmış 404 yoxdur.
+                {t("pages.serp.heleQeydeAlinmis404")}
               </li>
             )}
             {notFoundHits.map((hit) => (

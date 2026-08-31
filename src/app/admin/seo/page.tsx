@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AlertCircle, AlertTriangle, CheckCircle2, ExternalLink } from "lucide-react";
@@ -8,7 +9,10 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getSeoAuditItems } from "@/lib/queries";
 import type { SeoIssueSeverity } from "@/lib/seo-audit";
 
-export const metadata: Metadata = { title: "SEO auditı" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.serp.seoAuditi") };
+}
 export const dynamic = "force-dynamic";
 
 const METRIC_LABELS = {
@@ -37,6 +41,7 @@ const KIND_LABELS = {
 type Props = { searchParams: Promise<{ severity?: string }> };
 
 export default async function AdminSeoPage({ searchParams }: Props) {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
   const [{ metrics, issues }, query] = await Promise.all([getSeoAuditItems(), searchParams]);
   const selected = (["error", "warning", "info"] as const).includes(query.severity as SeoIssueSeverity)
@@ -47,9 +52,9 @@ export default async function AdminSeoPage({ searchParams }: Props) {
   return (
     <>
       <AdminPageHeader
-        title="SEO auditı"
-        description="İctimai əmlak, layihə, xidmət və bloq səhifələrinin indeks, meta, məzmun, şəkil və schema hazırlığını vahid yerdə izləyin."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "SEO auditı" }]}
+        title={t("pages.serp.seoAuditi")}
+        description={t("pages.serp.ictimaiEmlakLayiheXidmet")}
+        breadcrumbs={[{ label: t("pages.serp.idarePaneli"), href: "/admin" }, { label: t("pages.serp.seoAuditi") }]}
       />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -64,9 +69,9 @@ export default async function AdminSeoPage({ searchParams }: Props) {
         ))}
       </div>
 
-      <AdminCard title="Aşkar edilmiş problemlər" description={`${issues.length} audit qeydi`} className="mt-6" bodyClassName="p-0">
+      <AdminCard title={t("pages.serp.askarEdilmisProblemler")} description={`${issues.length} audit qeydi`} className="mt-6" bodyClassName="p-0">
         <div className="flex flex-wrap gap-2 border-b border-line p-4">
-          <Link href="/admin/seo" className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${!selected ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>Hamısı</Link>
+          <Link href="/admin/seo" className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${!selected ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>{t("pages.serp.hamisi")}</Link>
           {(["error", "warning", "info"] as const).map((severity) => (
             <Link key={severity} href={`/admin/seo?severity=${severity}`} className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${selected === severity ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>
               {SEVERITY_LABELS[severity]}
@@ -76,7 +81,7 @@ export default async function AdminSeoPage({ searchParams }: Props) {
 
         {visibleIssues.length === 0 ? (
           <div className="p-5">
-            <EmptyState title="Bu filtr üzrə problem yoxdur" description="Audit meyarlarını keçən məzmun burada qeyd yaratmır." />
+            <EmptyState title={t("pages.serp.buFiltrUzreProblem")} description={t("pages.serp.auditMeyarlariniKecenMezmun")} />
           </div>
         ) : (
           <ul className="divide-y divide-line">
@@ -89,8 +94,8 @@ export default async function AdminSeoPage({ searchParams }: Props) {
                   <p className="mt-1 text-sm text-ink-soft">{issue.message}</p>
                 </div>
                 <div className="flex gap-2 sm:justify-end">
-                  <Link href={issue.adminPath} className="inline-flex min-h-11 items-center rounded-xs border border-line px-3 text-sm text-ink-soft hover:border-gold hover:text-gold-deep">Düzəlt</Link>
-                  <a href={issue.publicPath} target="_blank" rel="noreferrer" aria-label="İctimai səhifəni aç" className="grid size-11 place-items-center rounded-xs border border-line text-ink-soft hover:border-gold hover:text-gold-deep"><ExternalLink className="size-4" aria-hidden="true" /></a>
+                  <Link href={issue.adminPath} className="inline-flex min-h-11 items-center rounded-xs border border-line px-3 text-sm text-ink-soft hover:border-gold hover:text-gold-deep">{t("pages.serp.duzelt")}</Link>
+                  <a href={issue.publicPath} target="_blank" rel="noreferrer" aria-label={t("pages.serp.ictimaiSehifeniAc")} className="grid size-11 place-items-center rounded-xs border border-line text-ink-soft hover:border-gold hover:text-gold-deep"><ExternalLink className="size-4" aria-hidden="true" /></a>
                 </div>
               </li>
             ))}
