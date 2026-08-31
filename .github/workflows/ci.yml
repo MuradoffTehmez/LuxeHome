@@ -29,8 +29,18 @@ jobs:
       - name: Node.js qur
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
+
+      # package-lock.json-un formatı npm major versiyasından asılıdır: npm 12 opsional
+      # peer qeydlərini (məs. @swc/helpers) lock-dan çıxarır, npm 10/11 isə onları tələb edir.
+      # Ona görə CI package.json-dakı `packageManager` dəyəri ilə eyni npm-i quraşdırır.
+      - name: package.json-dakı npm versiyasını qur
+        run: |
+          NPM_VERSION="$(node -p "require('./package.json').packageManager.split('@').pop()")"
+          echo "packageManager: npm@${NPM_VERSION}"
+          npm install -g "npm@${NPM_VERSION}"
+          npm --version
 
       - name: Asılılıqları quraşdır
         run: npm ci
