@@ -12,7 +12,10 @@ import { EMPTY_KNOWLEDGE_TERM } from "../form-values";
 import { KnowledgeTermForm } from "../term-form";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Daşınmaz əmlak lüğəti" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.knowledge.dasinmazEmlakLugeti") };
+}
 export const dynamic = "force-dynamic";
 const PATH = "/admin/bilik-merkezi/lugat";
 
@@ -25,11 +28,11 @@ export default async function AdminKnowledgeTermsPage({ searchParams }: { search
 
   return (
     <>
-      <AdminPageHeader title="Daşınmaz əmlak lüğəti" description="Hüquqi, maliyyə və texniki terminlərin aydın təriflərini idarə edin." breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Bilik Mərkəzi", href: "/admin/bilik-merkezi" }, { label: "Lüğət" }]} />
+      <AdminPageHeader title={t("pages.knowledge.dasinmazEmlakLugeti")} description={t("pages.knowledge.huquqiMaliyyeVeTexniki")} breadcrumbs={[{ label: t("pages.knowledge.idarePaneli"), href: "/admin" }, { label: t("pages.knowledge.bilikMerkezi"), href: "/admin/bilik-merkezi" }, { label: t("pages.knowledge.luget") }]} />
       <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
         <AdminCard bodyClassName="p-0">
-          <AdminTable caption="Lüğət terminləri" headers={[{ label: "Termin" }, { label: "Mövzu" }, { label: "Status" }, { label: "Əməliyyatlar", srOnly: true, className: "text-right" }]}>
-            {terms.map((term) => <AdminTableRow key={term.id}><AdminTableCell className="max-w-96"><p className="font-medium">{term.term}</p><p className="truncate text-xs text-ink-muted">{term.shortDefinition}</p></AdminTableCell><AdminTableCell className="text-sm text-ink-soft">{term.category?.name ?? "—"}</AdminTableCell><AdminTableCell><StatusBadge status={term.status as "DRAFT" | "PUBLISHED"} label={t(`labels.knowledgeStatus.${term.status as KnowledgeStatus}`) ?? term.status} /></AdminTableCell><AdminTableCell align="right"><div className="flex justify-end"><Link href={`${PATH}?duzelis=${term.id}`} className="grid size-11 place-items-center text-ink-muted" aria-label={`«${term.term}» terminini redaktə et`}><Pencil className="size-4" /></Link><ConfirmAction action={deleteKnowledgeTerm} id={term.id} label={`«${term.term}» terminini sil`} title="Termini silmək" description="Termin lüğətdən birdəfəlik silinəcək." className="size-11"><Trash2 className="size-4" /></ConfirmAction></div></AdminTableCell></AdminTableRow>)}
+          <AdminTable caption={t("pages.knowledge.lugetTerminleri")} headers={[{ label: t("pages.knowledge.termin") }, { label: t("pages.knowledge.movzu") }, { label: t("pages.knowledge.status") }, { label: t("pages.knowledge.emeliyyatlar"), srOnly: true, className: "text-right" }]}>
+            {terms.map((term) => <AdminTableRow key={term.id}><AdminTableCell className="max-w-96"><p className="font-medium">{term.term}</p><p className="truncate text-xs text-ink-muted">{term.shortDefinition}</p></AdminTableCell><AdminTableCell className="text-sm text-ink-soft">{term.category?.name ?? "—"}</AdminTableCell><AdminTableCell><StatusBadge status={term.status as "DRAFT" | "PUBLISHED"} label={t(`labels.knowledgeStatus.${term.status as KnowledgeStatus}`) ?? term.status} /></AdminTableCell><AdminTableCell align="right"><div className="flex justify-end"><Link href={`${PATH}?duzelis=${term.id}`} className="grid size-11 place-items-center text-ink-muted" aria-label={`«${term.term}» terminini redaktə et`}><Pencil className="size-4" /></Link><ConfirmAction action={deleteKnowledgeTerm} id={term.id} label={`«${term.term}» terminini sil`} title={t("pages.knowledge.terminiSilmek")} description={t("pages.knowledge.terminLugetdenBirdefelikSilinecek")} className="size-11"><Trash2 className="size-4" /></ConfirmAction></div></AdminTableCell></AdminTableRow>)}
           </AdminTable>
         </AdminCard>
         <KnowledgeTermForm initial={initial} categories={categories.map(({ id, name }) => ({ id, name }))} />

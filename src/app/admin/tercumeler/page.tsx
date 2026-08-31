@@ -11,7 +11,10 @@ import { TranslationForm } from "./translation-form";
 import { deleteTranslation } from "./actions";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Tərcümələr" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.translations.tercumeler") };
+}
 export const dynamic = "force-dynamic";
 
 const entityLabels: Record<string, string> = { PROPERTY: "Əmlak", PROJECT: "Layihə", SERVICE: "Xidmət", BLOG_POST: "Bloq", KNOWLEDGE_ARTICLE: "Bələdçi", KNOWLEDGE_TERM: "Termin", KNOWLEDGE_FAQ: "Sual" };
@@ -44,20 +47,20 @@ export default async function AdminTranslationsPage({ searchParams }: { searchPa
 
   return (
     <>
-      <AdminPageHeader title="Strukturlaşdırılmış tərcümələr" description="AZ mənbə kontentinin EN/RU versiyalarını qaralama, yoxlama və dərc mərhələləri ilə idarə edin." breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Tərcümələr" }]} />
+      <AdminPageHeader title={t("pages.translations.strukturlasdirilmisTercumeler")} description={t("pages.translations.azMenbeKontentininEn")} breadcrumbs={[{ label: t("pages.translations.idarePaneli"), href: "/admin" }, { label: t("pages.translations.tercumeler") }]} />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,0.8fr)]">
         <AdminCard title={current ? "Tərcüməni redaktə et" : "Yeni tərcümə"}>
           <TranslationForm key={current?.id ?? "new"} entities={entities} initial={current} />
         </AdminCard>
-        <AdminCard title="Tərcümə jurnalı" description={`${translations.length} dil versiyası`} bodyClassName="p-0">
-          {translations.length === 0 ? <p className="p-6 text-sm text-ink-muted">Hələ tərcümə yaradılmayıb.</p> : (
-            <AdminTable headers={[{ label: "Məzmun" }, { label: "Dil" }, { label: "Status" }, { label: "Əməliyyat", srOnly: true }]}>
+        <AdminCard title={t("pages.translations.tercumeJurnali")} description={`${translations.length} dil versiyası`} bodyClassName="p-0">
+          {translations.length === 0 ? <p className="p-6 text-sm text-ink-muted">{t("pages.translations.heleTercumeYaradilmayib")}</p> : (
+            <AdminTable headers={[{ label: t("pages.translations.mezmun") }, { label: t("pages.translations.dil") }, { label: t("pages.translations.status") }, { label: t("pages.translations.emeliyyat"), srOnly: true }]}>
               {translations.map((item) => (
                 <AdminTableRow key={item.id}>
                   <AdminTableCell className="max-w-72"><p className="truncate font-medium">{item.title || sourceNames.get(`${item.entityType}:${item.entityId}`) || entityLabels[item.entityType]}</p><p className="mt-1 text-xs text-ink-muted">{sourceNames.get(`${item.entityType}:${item.entityId}`) || `${entityLabels[item.entityType]} · silinmiş mənbə`}</p></AdminTableCell>
                   <AdminTableCell className="uppercase">{item.locale}</AdminTableCell>
                   <AdminTableCell><Badge tone={item.status === "PUBLISHED" ? "success" : item.status === "READY" ? "warning" : "neutral"}>{t(`labels.translationStatus.${item.status as TranslationStatus}`) ?? item.status}</Badge></AdminTableCell>
-                  <AdminTableCell align="right"><div className="flex justify-end"><Link href={`/admin/tercumeler?id=${item.id}`} aria-label="Tərcüməni redaktə et" className="grid size-11 place-items-center rounded-xs text-ink-muted hover:bg-beige hover:text-ink"><Pencil className="size-4" /></Link><ConfirmAction action={deleteTranslation} id={item.id} label="Tərcüməni sil" title="Tərcüməni silmək" description="Bu dil versiyası silinəcək; mənbə Azərbaycan kontenti dəyişməyəcək."><Trash2 className="size-4" /></ConfirmAction></div></AdminTableCell>
+                  <AdminTableCell align="right"><div className="flex justify-end"><Link href={`/admin/tercumeler?id=${item.id}`} aria-label={t("pages.translations.tercumeniRedakteEt")} className="grid size-11 place-items-center rounded-xs text-ink-muted hover:bg-beige hover:text-ink"><Pencil className="size-4" /></Link><ConfirmAction action={deleteTranslation} id={item.id} label={t("pages.translations.tercumeniSil")} title={t("pages.translations.tercumeniSilmek")} description={t("pages.translations.buDilVersiyasiSilinecek")}><Trash2 className="size-4" /></ConfirmAction></div></AdminTableCell>
                 </AdminTableRow>
               ))}
             </AdminTable>

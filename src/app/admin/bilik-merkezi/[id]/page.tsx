@@ -1,3 +1,4 @@
+import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/admin-ui";
@@ -12,7 +13,10 @@ import { deleteKnowledgeArticle, updateKnowledgeArticle } from "../actions";
 import { KnowledgeArticleForm } from "../article-form";
 import type { KnowledgeArticleFormValues } from "../form-values";
 
-export const metadata: Metadata = { title: "Bələdçini redaktə et" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.knowledge.beledciniRedakteEt") };
+}
 export const dynamic = "force-dynamic";
 
 export default async function EditKnowledgeArticlePage({
@@ -20,6 +24,7 @@ export default async function EditKnowledgeArticlePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.KNOWLEDGE_MANAGE);
   const { id } = await params;
   const [article, categories] = await Promise.all([
@@ -72,10 +77,10 @@ export default async function EditKnowledgeArticlePage({
     <>
       <AdminPageHeader
         title={article.title}
-        description="Bələdçinin məzmununu, auditoriyasını və SEO siqnallarını idarə edin."
+        description={t("pages.knowledge.beledcininMezmununuAuditoriyasiniVe")}
         breadcrumbs={[
-          { label: "İdarə paneli", href: "/admin" },
-          { label: "Bilik Mərkəzi", href: "/admin/bilik-merkezi" },
+          { label: t("pages.knowledge.idarePaneli"), href: "/admin" },
+          { label: t("pages.knowledge.bilikMerkezi"), href: "/admin/bilik-merkezi" },
           { label: article.title },
         ]}
       />
@@ -83,14 +88,14 @@ export default async function EditKnowledgeArticlePage({
         action={updateKnowledgeArticle}
         initial={initial}
         categories={categories.map(({ id: categoryId, name }) => ({ id: categoryId, name }))}
-        submitLabel="Bələdçini yenilə"
+        submitLabel={t("pages.knowledge.beledciniYenile")}
         extraActions={
           <ConfirmAction
             action={deleteKnowledgeArticle}
             id={article.id}
-            label="Bələdçini sil"
-            title="Bələdçini silmək"
-            description="Bələdçi ictimai saytdan çıxarılacaq; audit izi saxlanacaq."
+            label={t("pages.knowledge.beledciniSil")}
+            title={t("pages.knowledge.beledciniSilmek")}
+            description={t("pages.knowledge.beledciIctimaiSaytdanCixarilacaq")}
           >
             <Trash2 className="size-4" aria-hidden="true" />
           </ConfirmAction>

@@ -12,15 +12,20 @@ import {
   PropertyTypeRow,
 } from "./taxonomy-forms";
 
-export const metadata: Metadata = { title: "Taksonomiya" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.taxonomy.taksonomiya") };
+}
 export const dynamic = "force-dynamic";
 
-const TAXONOMY_SECTIONS = [
-  { id: "emlak-novleri", label: "Əmlak növləri" },
-  { id: "yeni-emlak-novu", label: "Yeni növ" },
-  { id: "xususiyyetler", label: "Xüsusiyyətlər" },
-  { id: "yeni-xususiyyet", label: "Yeni xüsusiyyət" },
-] as const;
+/** Bölmə adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+const taxonomySections = (t: Awaited<ReturnType<typeof getAdminT>>) =>
+  [
+    { id: "emlak-novleri", label: t("pages.taxonomy.emlakNovleri") },
+    { id: "yeni-emlak-novu", label: t("pages.taxonomy.yeniNov") },
+    { id: "xususiyyetler", label: t("pages.taxonomy.xususiyyetler") },
+    { id: "yeni-xususiyyet", label: t("pages.taxonomy.yeniXususiyyet") },
+  ] as const;
 
 export default async function AdminTaxonomyPage() {
   const t = await getAdminT();
@@ -37,17 +42,17 @@ export default async function AdminTaxonomyPage() {
   return (
     <>
       <AdminPageHeader
-        title="Taksonomiya"
-        description="Əmlak növləri və xüsusiyyətlər — filtr panelində və elan formasında görünən kateqoriyalar. Şəhər/rayon siyahısı ayrıca idxal skripti ilə idarə olunur."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Taksonomiya" }]}
+        title={t("pages.taxonomy.taksonomiya")}
+        description={t("pages.taxonomy.emlakNovleriVeXususiyyetler")}
+        breadcrumbs={[{ label: t("pages.taxonomy.idarePaneli"), href: "/admin" }, { label: t("pages.taxonomy.taksonomiya") }]}
       />
 
-      <FormJumpNav items={TAXONOMY_SECTIONS} />
+      <FormJumpNav items={taxonomySections(t)} />
 
       <div className="grid min-w-0 gap-6 xl:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-6">
           <section id="emlak-novleri" className="scroll-mt-32">
-            <AdminCard title="Əmlak növləri" description={`${types.length} növ`} bodyClassName="p-0">
+            <AdminCard title={t("pages.taxonomy.emlakNovleri")} description={`${types.length} növ`} bodyClassName="p-0">
               <ul>
                 {types.map((type) => (
                   <PropertyTypeRow
@@ -66,7 +71,7 @@ export default async function AdminTaxonomyPage() {
 
         <div className="flex min-w-0 flex-col gap-6">
           <section id="xususiyyetler" className="scroll-mt-32">
-            <AdminCard title="Xüsusiyyətlər" description={`${features.length} xüsusiyyət`} bodyClassName="p-0">
+            <AdminCard title={t("pages.taxonomy.xususiyyetler")} description={`${features.length} xüsusiyyət`} bodyClassName="p-0">
               <div className="flex flex-col">
                 {Array.from(featuresByGroup.entries()).map(([group, items]) => (
                   <div key={group} className="border-b border-line last:border-0">

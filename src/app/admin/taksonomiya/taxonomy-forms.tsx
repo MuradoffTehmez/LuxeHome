@@ -24,10 +24,11 @@ const featureGroupOptions = (t: ReturnType<typeof useTranslations<"admin">>) =>
   }));
 
 export function CreatePropertyTypeForm() {
+  const t = useTranslations("admin");
   return (
-    <AdminForm action={createPropertyType} submitLabel="Növ əlavə et">
-      <FormSection title="Yeni əmlak növü" description="Sadə ad kifayətdir — slug avtomatik yaradılır.">
-        <AdminInput name="name" label="Ad" required maxLength={80} placeholder="məs. Villa" />
+    <AdminForm action={createPropertyType} submitLabel={t("pages.taxonomy.novElaveEt")}>
+      <FormSection title={t("pages.taxonomy.yeniEmlakNovu")} description={t("pages.taxonomy.sadeAdKifayetdirSlug")}>
+        <AdminInput name="name" label={t("pages.taxonomy.ad")} required maxLength={80} placeholder={t("pages.taxonomy.mesVilla")} />
       </FormSection>
     </AdminForm>
   );
@@ -36,12 +37,12 @@ export function CreatePropertyTypeForm() {
 export function CreateFeatureForm() {
   const t = useTranslations("admin");
   return (
-    <AdminForm action={createFeature} submitLabel="Xüsusiyyət əlavə et">
-      <FormSection title="Yeni xüsusiyyət" description="Qrup filtr panelində hansı bölmədə görünəcəyini müəyyən edir.">
-        <AdminInput name="name" label="Ad" required maxLength={80} placeholder="məs. Lift" />
+    <AdminForm action={createFeature} submitLabel={t("pages.taxonomy.xususiyyetElaveEt")}>
+      <FormSection title={t("pages.taxonomy.yeniXususiyyet")} description={t("pages.taxonomy.qrupFiltrPanelindeHansi")}>
+        <AdminInput name="name" label={t("pages.taxonomy.ad")} required maxLength={80} placeholder={t("pages.taxonomy.mesLift")} />
         <AdminSelect
           name="group"
-          label="Qrup"
+          label={t("pages.taxonomy.qrup")}
           required
           defaultValue={FEATURE_GROUPS.GENERAL}
           options={featureGroupOptions(t)}
@@ -62,6 +63,7 @@ export function PropertyTypeRow({
   isActive: boolean;
   propertyCount: number;
 }) {
+  const t = useTranslations("admin");
   const { toast } = useToast();
 
   return (
@@ -69,7 +71,7 @@ export function PropertyTypeRow({
       <div className="flex min-w-0 flex-wrap items-center gap-2">
         <span className="text-sm text-ink [overflow-wrap:anywhere]">{name}</span>
         <span className="tabular text-xs text-ink-muted">({propertyCount})</span>
-        {!isActive && <Badge tone="neutral">Deaktiv</Badge>}
+        {!isActive && <Badge tone="neutral">{t("pages.taxonomy.deaktiv")}</Badge>}
       </div>
       <div className="flex items-center justify-end gap-1 sm:shrink-0">
         <form
@@ -89,9 +91,9 @@ export function PropertyTypeRow({
           action={deletePropertyType}
           id={id}
           label={`«${name}» növünü sil`}
-          title="Əmlak növünü silmək"
-          description="Bu növdə əmlak yoxdursa silinə bilər. Əməliyyat geri qaytarıla bilməz."
-          confirmLabel="Sil"
+          title={t("pages.taxonomy.emlakNovunuSilmek")}
+          description={t("pages.taxonomy.buNovdeEmlakYoxdursa")}
+          confirmLabel={t("pages.taxonomy.sil")}
         >
           <Trash2 className="size-4" aria-hidden="true" />
         </ConfirmAction>
@@ -109,6 +111,7 @@ export function FeatureRow({
   name: string;
   propertyCount: number;
 }) {
+  const t = useTranslations("admin");
   return (
     <li className="flex min-w-0 items-center justify-between gap-3 border-b border-line px-4 py-3 last:border-0">
       <div className="flex min-w-0 flex-wrap items-center gap-2">
@@ -119,9 +122,9 @@ export function FeatureRow({
         action={deleteFeature}
         id={id}
         label={`«${name}» xüsusiyyətini sil`}
-        title="Xüsusiyyəti silmək"
-        description="Bu xüsusiyyət heç bir əmlaka bağlı deyilsə silinə bilər."
-        confirmLabel="Sil"
+        title={t("pages.taxonomy.xususiyyetiSilmek")}
+        description={t("pages.taxonomy.buXususiyyetHecBir")}
+        confirmLabel={t("pages.taxonomy.sil")}
       >
         <Trash2 className="size-4" aria-hidden="true" />
       </ConfirmAction>

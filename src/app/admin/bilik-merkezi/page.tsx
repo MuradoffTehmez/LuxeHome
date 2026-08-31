@@ -26,16 +26,21 @@ import { getAdminKnowledgeArticles } from "@/lib/knowledge";
 import { deleteKnowledgeArticle } from "./actions";
 import { getAdminT } from "@/lib/admin-i18n";
 
-export const metadata: Metadata = { title: "Bilik Mərkəzi" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getAdminT();
+  return { title: t("pages.knowledge.bilikMerkezi") };
+}
 export const dynamic = "force-dynamic";
 
 const LIST_PATH = "/admin/bilik-merkezi";
 
-const SUB_PAGES = [
-  { href: `${LIST_PATH}/kateqoriyalar`, label: "Mövzular", icon: FolderTree },
-  { href: `${LIST_PATH}/lugat`, label: "Lüğət", icon: BookOpen },
-  { href: `${LIST_PATH}/suallar`, label: "Suallar (FAQ)", icon: HelpCircle },
-] as const;
+/** Alt səhifə adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
+const subPages = (t: Awaited<ReturnType<typeof getAdminT>>) =>
+  [
+    { href: `${LIST_PATH}/kateqoriyalar`, label: t("pages.knowledge.movzular"), icon: FolderTree },
+    { href: `${LIST_PATH}/lugat`, label: t("pages.knowledge.luget"), icon: BookOpen },
+    { href: `${LIST_PATH}/suallar`, label: t("pages.knowledge.suallarFaq"), icon: HelpCircle },
+  ] as const;
 
 export default async function AdminKnowledgePage({
   searchParams,
@@ -54,19 +59,19 @@ export default async function AdminKnowledgePage({
   return (
     <>
       <AdminPageHeader
-        title="Bilik Mərkəzi"
-        description="Daşınmaz əmlak bələdçiləri, termin lüğəti və CMS-dən idarə olunan suallar. Məzmun Azərbaycan Respublikasının qanunvericiliyinə istinad etməlidir."
-        breadcrumbs={[{ label: "İdarə paneli", href: "/admin" }, { label: "Bilik Mərkəzi" }]}
+        title={t("pages.knowledge.bilikMerkezi")}
+        description={t("pages.knowledge.dasinmazEmlakBeledcileriTermin")}
+        breadcrumbs={[{ label: t("pages.knowledge.idarePaneli"), href: "/admin" }, { label: t("pages.knowledge.bilikMerkezi") }]}
         actions={
           <ButtonLink href={`${LIST_PATH}/yeni`}>
             <Plus className="size-4" aria-hidden="true" />
-            Yeni bələdçi
+            {t("pages.knowledge.yeniBeledci")}
           </ButtonLink>
         }
       />
 
-      <nav aria-label="Bilik Mərkəzi bölmələri" className="mb-6 flex flex-wrap gap-2">
-        {SUB_PAGES.map((page) => (
+      <nav aria-label={t("pages.knowledge.bilikMerkeziBolmeleri")} className="mb-6 flex flex-wrap gap-2">
+        {subPages(t).map((page) => (
           <Link
             key={page.href}
             href={page.href}
@@ -80,12 +85,12 @@ export default async function AdminKnowledgePage({
 
       <AdminCard bodyClassName="p-4 lg:p-0">
         <AdminResponsiveList
-          ariaLabel="Bələdçilər"
+          ariaLabel={t("pages.knowledge.beledciler")}
           items={articles}
           getKey={(article) => article.id}
           empty={
             <p className="py-10 text-center text-sm text-ink-muted">
-              Hələ bələdçi yaradılmayıb.
+              {t("pages.knowledge.heleBeledciYaradilmayib")}
             </p>
           }
           renderCard={(article) => (
@@ -103,7 +108,7 @@ export default async function AdminKnowledgePage({
                   <Link
                     href={`${LIST_PATH}/${article.id}`}
                     aria-label={`«${article.title}» bələdçisini redaktə et`}
-                    title="Redaktə et"
+                    title={t("pages.knowledge.redakteEt")}
                     className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                   >
                     <Pencil className="size-4" aria-hidden="true" />
@@ -112,8 +117,8 @@ export default async function AdminKnowledgePage({
                     action={deleteKnowledgeArticle}
                     id={article.id}
                     label={`«${article.title}» bələdçisini sil`}
-                    title="Bələdçini silmək"
-                    description="Bələdçi saytdan çıxarılacaq. Audit jurnalında qeyd qalır."
+                    title={t("pages.knowledge.beledciniSilmek")}
+                    description={t("pages.knowledge.beledciSaytdanCixarilacaqAudit")}
                     className="size-11"
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
@@ -123,22 +128,22 @@ export default async function AdminKnowledgePage({
             >
               <dl className="grid grid-cols-2 gap-3">
                 <div>
-                  <dt className="text-xs text-ink-muted">Mövzu</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.knowledge.movzu")}</dt>
                   <dd className="mt-1 text-ink">{article.category?.name ?? "—"}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Auditoriya</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.knowledge.auditoriya")}</dt>
                   <dd className="mt-1 text-ink">
                     {t(`labels.knowledgeAudience.${article.audience as KnowledgeAudience}`) ??
                       article.audience}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Baxış</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.knowledge.baxis")}</dt>
                   <dd className="tabular mt-1 text-ink">{formatNumber(article.viewCount)}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-muted">Yenilənib</dt>
+                  <dt className="text-xs text-ink-muted">{t("pages.knowledge.yenilenib")}</dt>
                   <dd className="mt-1 text-ink">{formatRelative(article.updatedAt)}</dd>
                 </div>
               </dl>
@@ -146,15 +151,15 @@ export default async function AdminKnowledgePage({
           )}
           renderTable={(items) => (
             <AdminTable
-              caption="Bilik Mərkəzi bələdçiləri"
+              caption={t("pages.knowledge.bilikMerkeziBeledcileri")}
               headers={[
-                { label: "Başlıq" },
-                { label: "Mövzu" },
-                { label: "Auditoriya" },
-                { label: "Status" },
-                { label: "Baxış", className: "text-right" },
-                { label: "Yenilənib", className: "text-right" },
-                { label: "Əməliyyatlar", srOnly: true, className: "text-right" },
+                { label: t("pages.knowledge.basliq") },
+                { label: t("pages.knowledge.movzu") },
+                { label: t("pages.knowledge.auditoriya") },
+                { label: t("pages.knowledge.status") },
+                { label: t("pages.knowledge.baxis"), className: "text-right" },
+                { label: t("pages.knowledge.yenilenib"), className: "text-right" },
+                { label: t("pages.knowledge.emeliyyatlar"), srOnly: true, className: "text-right" },
               ]}
             >
               {items.map((article) => (
@@ -189,7 +194,7 @@ export default async function AdminKnowledgePage({
                       <Link
                         href={`${LIST_PATH}/${article.id}`}
                         aria-label={`«${article.title}» bələdçisini redaktə et`}
-                        title="Redaktə et"
+                        title={t("pages.knowledge.redakteEt")}
                         className="grid size-11 place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink"
                       >
                         <Pencil className="size-4" aria-hidden="true" />
@@ -198,8 +203,8 @@ export default async function AdminKnowledgePage({
                         action={deleteKnowledgeArticle}
                         id={article.id}
                         label={`«${article.title}» bələdçisini sil`}
-                        title="Bələdçini silmək"
-                        description="Bələdçi saytdan çıxarılacaq. Audit jurnalında qeyd qalır."
+                        title={t("pages.knowledge.beledciniSilmek")}
+                        description={t("pages.knowledge.beledciSaytdanCixarilacaqAudit")}
                         className="size-11"
                       >
                         <Trash2 className="size-4" aria-hidden="true" />
