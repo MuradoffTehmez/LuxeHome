@@ -27,6 +27,8 @@ const database = vi.hoisted(() => ({
   blogCategoryFindMany: vi.fn(),
   serviceFindMany: vi.fn(),
   agencyFindMany: vi.fn(),
+  agentProfileFindMany: vi.fn(),
+  seoLandingPageFindMany: vi.fn(),
   locationFindMany: vi.fn(),
   partnerFindMany: vi.fn(),
 }));
@@ -53,6 +55,8 @@ vi.mock("@/lib/prisma", () => ({
     blogCategory: { findMany: database.blogCategoryFindMany },
     service: { findMany: database.serviceFindMany },
     agency: { findMany: database.agencyFindMany },
+    agentProfile: { findMany: database.agentProfileFindMany },
+    seoLandingPage: { findMany: database.seoLandingPageFindMany },
     location: { findMany: database.locationFindMany },
     partner: { findMany: database.partnerFindMany },
   },
@@ -212,6 +216,8 @@ describe("ictimai məzmun sərhədi", () => {
     ]);
     database.serviceFindMany.mockResolvedValue([]);
     database.agencyFindMany.mockResolvedValue([]);
+    database.agentProfileFindMany.mockResolvedValue([]);
+    database.seoLandingPageFindMany.mockResolvedValue([]);
     database.partnerFindMany.mockResolvedValue([]);
   });
 
