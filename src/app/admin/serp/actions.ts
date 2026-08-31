@@ -167,6 +167,8 @@ export async function saveEntityProfile(_state: ActionState, data: FormData): Pr
 export async function deleteEntityProfile(id: string): Promise<ActionState> { const user = await actor(PERMISSIONS.SEO_SCHEMA_MANAGE); if (!user) return failure("Entity silmək səlahiyyətiniz yoxdur."); try { const item = await prisma.entityProfile.delete({ where: { id } }); await recordAudit(user, "DELETE", "EntityProfile", id, item.name); refresh(`${ROOT}/entities`); return success("Entity silindi."); } catch (error) { return unexpected("entity silinmədi", error); } }
 
 export async function runSeoAudit(_state: ActionState, _data: FormData): Promise<ActionState> {
+  void _state;
+  void _data;
   const user = await actor(PERMISSIONS.SEO_VIEW); if (!user) return failure("SEO audit səlahiyyətiniz yoxdur.");
   try {
     const [{ issues }, redirects] = await Promise.all([getSeoAuditItems(), prisma.redirect.findMany({ where: { isActive: true } })]);
