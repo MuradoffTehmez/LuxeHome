@@ -98,14 +98,20 @@ jobs:
           : "${RAW_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID secret is not configured}"
           API_TOKEN="$(printf '%s' "${RAW_API_TOKEN}" | tr -d '[:space:]')"
           ACCOUNT_ID="$(printf '%s' "${RAW_ACCOUNT_ID}" | tr -d '[:space:]')"
-          if [[ ! "${ACCOUNT_ID}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; store the bare value, without a NAME= prefix or quotes."
-            exit 1
-          fi
-          if [[ ! "${API_TOKEN}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "::error::CLOUDFLARE_API_TOKEN secret is malformed; store the bare token, without a NAME= prefix or quotes."
-            exit 1
-          fi
+          # Dəyər maskalandığı üçün log-da görünmür; diaqnostika kimi yalnız uzunluq və
+          # qaydaya uymayan simvolların sayı yazılır (terminal paste işarələri, dırnaq, `=`).
+          check_format() {
+            local label="$1" value="$2" expected="$3"
+            if [[ "${value}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+              return 0
+            fi
+            local bad
+            bad="$(printf '%s' "${value}" | tr -d 'A-Za-z0-9_-' | wc -c | tr -d ' ')"
+            echo "::error::${label} secret is malformed: length=${#value}, ${bad} unexpected character(s); expected ${expected}. Store the bare value only — no NAME= prefix, quotes or terminal paste markers."
+            return 1
+          }
+          check_format "CLOUDFLARE_ACCOUNT_ID" "${ACCOUNT_ID}" "32 hexadecimal characters"
+          check_format "CLOUDFLARE_API_TOKEN" "${API_TOKEN}" "40 letters, digits, underscores or hyphens"
           echo "::add-mask::${API_TOKEN}"
           echo "::add-mask::${ACCOUNT_ID}"
           {
@@ -160,14 +166,20 @@ jobs:
           : "${RAW_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID secret is not configured}"
           API_TOKEN="$(printf '%s' "${RAW_API_TOKEN}" | tr -d '[:space:]')"
           ACCOUNT_ID="$(printf '%s' "${RAW_ACCOUNT_ID}" | tr -d '[:space:]')"
-          if [[ ! "${ACCOUNT_ID}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is malformed; store the bare value, without a NAME= prefix or quotes."
-            exit 1
-          fi
-          if [[ ! "${API_TOKEN}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "::error::CLOUDFLARE_API_TOKEN secret is malformed; store the bare token, without a NAME= prefix or quotes."
-            exit 1
-          fi
+          # Dəyər maskalandığı üçün log-da görünmür; diaqnostika kimi yalnız uzunluq və
+          # qaydaya uymayan simvolların sayı yazılır (terminal paste işarələri, dırnaq, `=`).
+          check_format() {
+            local label="$1" value="$2" expected="$3"
+            if [[ "${value}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+              return 0
+            fi
+            local bad
+            bad="$(printf '%s' "${value}" | tr -d 'A-Za-z0-9_-' | wc -c | tr -d ' ')"
+            echo "::error::${label} secret is malformed: length=${#value}, ${bad} unexpected character(s); expected ${expected}. Store the bare value only — no NAME= prefix, quotes or terminal paste markers."
+            return 1
+          }
+          check_format "CLOUDFLARE_ACCOUNT_ID" "${ACCOUNT_ID}" "32 hexadecimal characters"
+          check_format "CLOUDFLARE_API_TOKEN" "${API_TOKEN}" "40 letters, digits, underscores or hyphens"
           echo "::add-mask::${API_TOKEN}"
           echo "::add-mask::${ACCOUNT_ID}"
           {
