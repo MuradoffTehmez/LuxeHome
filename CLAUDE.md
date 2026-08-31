@@ -175,6 +175,29 @@ Aralıq mərhələ ayrıca `subject`-li cookie ilə işarələnir, ona görə ik
 düşmək mümkün deyil. `?davam=` parametri bu cookie-nin içində daşınır və yalnız `/admin` ilə
 başlayan marşrutlar qəbul edilir (açıq yönləndirmə qorunması).
 
+### Admin panelin tərcüməsi
+
+`/admin` locale prefiksi daşımır (`routing.ts`), ona görə `request.ts`-dəki
+`getRequestConfig` axını orada işləmir — dil URL-də deyil, `User.locale`-dadır.
+Panel öz yolunu işlədir:
+
+- `src/i18n/admin.ts` — `admin` namespace-i, kataloq yükləyicisi və `createTranslator`.
+  Bu namespace `MESSAGE_NAMESPACES`-ə **salınmır**: əks halda hər ictimai sorğu panel
+  mesajlarını da yükləyərdi. Testlər bunu yoxlayır.
+- `src/lib/admin-i18n.ts` — `getAdminI18n()` / `getAdminT()`; `cache()` sayəsində
+  sessiya sorğu başına bir dəfə oxunur.
+- **Server komponentlərində `useTranslations()` işlətmə** — o, mesajları ictimai request
+  konfiqurasiyasından oxuyur və `/admin` üçün həmişə AZ-a düşər. `await getAdminT()` işlət.
+  Client komponentləri `useTranslations("admin")` işlədir; mesajlar `admin/layout.tsx`-dəki
+  `NextIntlClientProvider` vasitəsilə gəlir.
+- **Etiket siyahılarını modul sabiti kimi saxlama.** `const SECTIONS = [{ label: t(...) }]`
+  modul yüklənəndə hesablanır və `t`-ni görmür; onları `(t) => [...]` funksiyasına çevir.
+- `*_LABELS` sabitləri domen qatının mənbəyidir, panel isə `labels.*` kataloqundan oxuyur.
+  İkisinin sinxronluğunu `admin-label-sync.test.ts` qoruyur — sabitə yeni dəyər əlavə
+  edəndə kataloqu da yenilə.
+- Paneldən ictimai sayta gedən keçidlər `localizePath(path, locale)` ilə qurulur ki,
+  redaktor öz panel dilindəki səhifəni açsın.
+
 ### Dizayn sistemi və dark mode
 
 `src/app/globals.css` Tailwind v4 `@theme` bloku ilə brend tokenlərini elan edir
@@ -286,9 +309,9 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
 - **Admin auth və əsas CRUD hazırdır.** PBKDF2 parol, məcburi TOTP 2FA, D1 sessiyaları,
   RBAC, dashboard, əmlak/layihə/xidmət/bloq/lead/media/istifadəçi/parametr axınları və audit
   jurnalı işləyir. Panel production-da `ADMIN_ENABLED="true"` ilə açıqdır.
-- **İctimai sayt AZ/EN/RU dillərindədir.** Bütün ictimai marşrutlar locale prefikslidir,
-  tərcümə kataloqları parity testi ilə qorunur. Admin panelin UI mətnləri isə hələ yalnız
-  azərbaycancadır; `User.locale` seçimi panel səthinə tam bağlanmayıb.
+- **İctimai sayt və admin panel AZ/EN/RU dillərindədir.** İctimai marşrutlar locale
+  prefikslidir; panel isə qəsdən prefiks daşımır və dili `User.locale`-dan götürür
+  («Hesabım» → «Panel dili»). Tərcümə kataloqları parity testi ilə qorunur.
 - Əlaqə və auth formaları same-origin, honeypot, IP sürət limiti və Cloudflare Turnstile ilə
   qorunur. Turnstile gizli açarı Worker secret-i kimi saxlanılır.
 - Əmlak filtrlərinin bütün dəstəklənən sahələri, o cümlədən `featureSlugs`, UI-a bağlıdır.
