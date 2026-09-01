@@ -62,6 +62,16 @@ export default defineConfig({
     userAgent: USER_AGENT,
 
     /**
+     * Eyni User-Agent başlıq kimi də verilir.
+     *
+     * `use.userAgent` yalnız `page` kontekstinə tətbiq olunur; `request`
+     * fixture-u (APIRequestContext) onu görmür və standart Playwright UA ilə
+     * gedir. Production-da Cloudflare bot qoruması belə sorğulara 403 verir —
+     * nəticədə API və sitemap testləri saytda problem olmadığı halda sınırdı.
+     */
+    extraHTTPHeaders: { "user-agent": USER_AGENT },
+
+    /**
      * Reveal animasiyası söndürülür.
      *
      * `[data-reveal]` elementləri scroll zamanı `opacity: 0 → 1` keçidi edir.

@@ -112,8 +112,9 @@ test.describe("Semantik struktur", () => {
   test("hər səhifədə tək h1 var", async ({ page }) => {
     for (const target of AUDITED_PAGES) {
       await visit(page, target.path);
-      const count = await page.locator("h1").count();
-      expect(count, `${target.path}: h1 sayı ${count}`).toBe(1);
+      // `count()` anlıq oxuyur və yavaş cavabda 0 verirdi; `toHaveCount` isə
+      // Playwright-in avtomatik təkrarı ilə DOM hazır olana qədər gözləyir.
+      await expect(page.locator("h1"), `${target.path}: h1 sayı`).toHaveCount(1);
     }
   });
 

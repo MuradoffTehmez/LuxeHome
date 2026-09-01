@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { LOCALES, PUBLIC_ROUTES, collectConsoleErrors, expectPageOk } from "../support/helpers";
+import {
+  LOCALES,
+  PUBLIC_ROUTES,
+  bodyOf,
+  collectConsoleErrors,
+  expectPageOk,
+  statusOf,
+} from "../support/helpers";
 
 /**
  * Smoke — hər ictimai marşrutun açıldığını yoxlayır.
@@ -35,24 +42,20 @@ test.describe("Locale prefiksi", () => {
 });
 
 test.describe("Texniki marşrutlar", () => {
-  test("robots.txt cavab verir", async ({ request }) => {
-    const response = await request.get("/robots.txt");
-    expect(response.status()).toBe(200);
-    const body = await response.text();
-    expect(body).toContain("User-Agent");
+  test("robots.txt cavab verir", async ({ page }) => {
+    expect(await statusOf(page, "/robots.txt")).toBe(200);
+    expect(await bodyOf(page, "/robots.txt")).toContain("User-Agent");
   });
 
-  test("sitemap.xml düzgün XML qaytarır", async ({ request }) => {
-    const response = await request.get("/sitemap.xml");
-    expect(response.status()).toBe(200);
-    const body = await response.text();
-    expect(body).toContain("<?xml");
-    expect(body).toMatch(/<(urlset|sitemapindex)/);
+  test("sitemap.xml düzgün XML qaytarır", async ({ page }) => {
+    expect(await statusOf(page, "/sitemap.xml")).toBe(200);
+    // Brauzer XML-i ağac kimi göstərir, ona görə mətn deyil, xam məzmun oxunur.
+    const xml = await page.content();
+    expect(xml).toMatch(/<(urlset|sitemapindex)/);
   });
 
-  test("llms.txt cavab verir", async ({ request }) => {
-    const response = await request.get("/llms.txt");
-    expect([200, 404]).toContain(response.status());
+  test("llms.txt cavab verir", async ({ page }) => {
+    expect([200, 404]).toContain(await statusOf(page, "/llms.txt"));
   });
 });
 

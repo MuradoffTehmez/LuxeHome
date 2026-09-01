@@ -97,23 +97,32 @@ test.describe("Kalkulyator", () => {
   test("ipoteka kalkulyatoru hesablama aparır", async ({ page }) => {
     await visit(page, "/az/kalkulyator");
     await expect(page.locator("h1")).toBeVisible();
+    // Hesablama client-side-dır: `before` oxunmazdan əvvəl hidratasiya bitməlidir,
+    // əks halda müqayisə hələ dolmamış nəticə ilə aparılır.
+    await page.waitForLoadState("load");
 
     const numberInputs = page.locator('input[type="number"], input[inputmode="numeric"]');
     test.skip((await numberInputs.count()) === 0, "kalkulyator sahələri tapılmadı");
 
     const firstInput = numberInputs.first();
+    await expect(firstInput).toBeVisible();
     const currentValue = await firstInput.inputValue();
     const before = await page.locator("main").innerText();
 
     // Sahə defolt dəyərlə gəlir (məs. 150000); eyni dəyəri yazmaq heç nə
     // dəyişmir, ona görə mövcuddan fərqli məbləğ verilir.
-    const nextValue = currentValue === "250000" ? "180000" : "250000";
+    // Fərq böyük götürülür ki, yuvarlaqlaşma nəticəni eyni saxlamasın.
+    const nextValue = currentValue === "480000" ? "90000" : "480000";
     await firstInput.fill(nextValue);
     await firstInput.blur();
-    await page.waitForTimeout(1200);
 
-    const after = await page.locator("main").innerText();
-    // Dəyər dəyişəndə nəticə də yenilənməlidir (client-side hesablama).
-    expect(after, "kalkulyator nəticəsi yenilənmədi").not.toBe(before);
+    // Hesablama client-side-dır və debounce ilə gedir; sabit gözləmə əvəzinə
+    // nəticənin faktiki dəyişməsi gözlənilir.
+    await expect
+      .poll(async () => page.locator("main").innerText(), {
+        message: "kalkulyator nəticəsi yenilənmədi",
+        timeout: 15_000,
+      })
+      .not.toBe(before);
   });
 });

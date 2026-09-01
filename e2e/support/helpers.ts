@@ -228,3 +228,35 @@ export async function settlePage(page: Page): Promise<void> {
   });
   await page.waitForTimeout(200);
 }
+
+/**
+ * URL-in HTTP statusunu **naviqasiya ilə** oxuyur.
+ *
+ * Playwright-in `request` fixture-u (və `page.request`) production-da
+ * Cloudflare bot qorumasına düşür və 403 alır: qoruma TLS/HTTP fingerprint-ə
+ * baxır, User-Agent başlığı onu keçmir. Brauzer naviqasiyası isə normal keçir,
+ * ona görə status yoxlamaları `page.goto()` üzərindən aparılır.
+ *
+ * Yalnız GET üçündür — POST/PUT yoxlamaları naviqasiya ilə mümkün deyil.
+ */
+export async function statusOf(page: Page, path: string): Promise<number> {
+  const response = await page.goto(path, { waitUntil: "domcontentloaded" }).catch(() => null);
+  return response?.status() ?? 0;
+}
+
+/** Naviqasiya ilə açılan cavabın gövdəsini qaytarır. */
+export async function bodyOf(page: Page, path: string): Promise<string> {
+  await page.goto(path, { waitUntil: "domcontentloaded" }).catch(() => null);
+  return page.evaluate(() => document.body?.innerText ?? "");
+}
+
+/**
+ * Bot qoruması sorğu-səviyyəli testləri bloklayan mühitdə `true`.
+ *
+ * Production Cloudflare arxasındadır; staging `workers.dev` altındadır və
+ * eyni qaydalar orada tətbiq olunmur. POST və başlıq yoxlamaları yalnız
+ * qorumasız mühitdə aparıla bilir.
+ */
+export function botProtectionActive(baseURL: string | undefined): boolean {
+  return Boolean(baseURL && !baseURL.includes("workers.dev") && !baseURL.includes("localhost"));
+}

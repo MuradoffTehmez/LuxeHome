@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { LOCALES, jsonLdBlocks, metaContent, visit } from "../support/helpers";
+import { LOCALES, bodyOf, jsonLdBlocks, metaContent, visit } from "../support/helpers";
 
 /**
  * SEO qatı.
@@ -108,9 +108,8 @@ test.describe("Struktur data", () => {
 });
 
 test.describe("robots və sitemap", () => {
-  test("robots.txt admin marşrutlarını bağlayır", async ({ request }) => {
-    const response = await request.get("/robots.txt");
-    const body = await response.text();
+  test("robots.txt admin marşrutlarını bağlayır", async ({ page }) => {
+    const body = await bodyOf(page, "/robots.txt");
 
     // Staging tam `Disallow: /` verir — orada ayrıca qayda gözlənilmir.
     if (/Disallow:\s*\/\s*$/m.test(body.split("\n").slice(0, 5).join("\n"))) {
@@ -128,9 +127,9 @@ test.describe("robots və sitemap", () => {
    * indeksdə alternativ host yaratmamalıdır. Ona görə staging-də də
    * production hostu gözlənilir, təki hamısı eyni olsun.
    */
-  test("sitemap URL-ləri mütləqdir və vahid hostdadır", async ({ request }) => {
-    const response = await request.get("/sitemap.xml");
-    const body = await response.text();
+  test("sitemap URL-ləri mütləqdir və vahid hostdadır", async ({ page }) => {
+    await page.goto("/sitemap.xml", { waitUntil: "domcontentloaded" });
+    const body = await page.content();
 
     const urls = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
     test.skip(urls.length === 0, "sitemap boşdur");
@@ -148,10 +147,9 @@ test.describe("robots və sitemap", () => {
    * `indexablePropertyWhere()` bunu təmin edir. Rejim söndürüləndən sonra
    * indeksdə qırıq URL qalmasının qarşısı burada alınır.
    */
-  test("sitemap nümunə məzmun daşımır", async ({ request }) => {
-    const response = await request.get("/sitemap.xml");
-    const body = await response.text();
-    expect(body, "sitemap-da demo URL var").not.toContain("/demo-");
+  test("sitemap nümunə məzmun daşımır", async ({ page }) => {
+    await page.goto("/sitemap.xml", { waitUntil: "domcontentloaded" });
+    expect(await page.content(), "sitemap-da demo URL var").not.toContain("/demo-");
   });
 });
 

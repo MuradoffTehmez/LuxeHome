@@ -82,9 +82,9 @@ test.describe("Sessiya cookie-ləri", () => {
 });
 
 test.describe("Təhlükəsizlik başlıqları", () => {
-  test("əsas başlıqlar mövcuddur", async ({ request }) => {
-    const response = await request.get("/az");
-    const headers = response.headers();
+  test("əsas başlıqlar mövcuddur", async ({ page }) => {
+    const response = await page.goto("/az", { waitUntil: "domcontentloaded" });
+    const headers = response?.headers() ?? {};
 
     // MIME sniffing və clickjacking qorumaları minimum tələbdir.
     expect(headers["x-content-type-options"] ?? "").toBe("nosniff");
@@ -98,20 +98,19 @@ test.describe("Təhlükəsizlik başlıqları", () => {
    * (`luxehomeestate.az`) tətbiq olunur. Staging `workers.dev` altındadır,
    * zona qaydalarından kənardır — orada başlığın olmaması gözləniləndir.
    */
-  test("production-da HSTS elan olunur", async ({ request, baseURL }) => {
+  test("production-da HSTS elan olunur", async ({ page, baseURL }) => {
     test.skip(!baseURL!.startsWith("https://"), "yalnız HTTPS mühitində");
     test.skip(baseURL!.includes("workers.dev"), "workers.dev zona qaydalarından kənardır");
 
-    const response = await request.get("/az");
-    const hsts = response.headers()["strict-transport-security"];
+    const response = await page.goto("/az", { waitUntil: "domcontentloaded" });
+    const hsts = response?.headers()["strict-transport-security"];
     expect(hsts, "HSTS başlığı yoxdur").toBeTruthy();
     expect(hsts).toMatch(/max-age=\d+/);
   });
 
-  test("server texnologiyasını ifşa edən başlıqlar yoxdur", async ({ request }) => {
-    const response = await request.get("/az");
-    const headers = response.headers();
-    expect(headers["x-powered-by"], "x-powered-by ifşa olunur").toBeUndefined();
+  test("server texnologiyasını ifşa edən başlıqlar yoxdur", async ({ page }) => {
+    const response = await page.goto("/az", { waitUntil: "domcontentloaded" });
+    expect(response?.headers()["x-powered-by"], "x-powered-by ifşa olunur").toBeUndefined();
   });
 });
 
