@@ -26,7 +26,7 @@ import {
   parsePropertySearchParams,
 } from "@/lib/property-search";
 import { SORT_OPTIONS, type Locale } from "@/lib/constants";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { localizePath } from "@/i18n/path-locale";
 import { Link } from "@/i18n/navigation";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
@@ -72,27 +72,48 @@ function ViewToggle({
   mapHref,
   listLabel,
   mapLabel,
+  compact = false,
 }: {
   isMapView: boolean;
   listHref: string;
   mapHref: string;
   listLabel: string;
   mapLabel: string;
+  /**
+   * Mobil toolbar-da yalnız ikon göstərilir.
+   *
+   * Mətnli variant 375 px-də «Filtrlər» və sıralama seçimi ilə birlikdə sətrə
+   * sığmırdı və **bütün səhifəyə horizontal overflow** verirdi (423 px). Etiket
+   * itmir — ekran oxuyucusu üçün `sr-only` qalır.
+   */
+  compact?: boolean;
 }) {
-  const base =
-    "inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-medium transition-colors";
+  const base = cn(
+    "inline-flex min-h-11 items-center justify-center gap-1.5 text-sm font-medium transition-colors",
+    compact ? "w-11" : "px-3",
+  );
   const active = "bg-ink text-ink-invert";
   const idle = "text-ink-soft hover:text-gold-deep";
 
   return (
     <div className="inline-flex shrink-0 overflow-hidden rounded-xs border border-line">
-      <Link href={listHref} aria-current={!isMapView} className={`${base} ${isMapView ? idle : active}`}>
-        <LayoutGrid className="size-4" aria-hidden="true" />
-        {listLabel}
+      <Link
+        href={listHref}
+        aria-current={!isMapView}
+        title={compact ? listLabel : undefined}
+        className={cn(base, isMapView ? idle : active)}
+      >
+        <LayoutGrid className="size-4 shrink-0" aria-hidden="true" />
+        <span className={compact ? "sr-only" : undefined}>{listLabel}</span>
       </Link>
-      <Link href={mapHref} aria-current={isMapView} className={`${base} border-l border-line ${isMapView ? active : idle}`}>
-        <MapIcon className="size-4" aria-hidden="true" />
-        {mapLabel}
+      <Link
+        href={mapHref}
+        aria-current={isMapView}
+        title={compact ? mapLabel : undefined}
+        className={cn(base, "border-l border-line", isMapView ? active : idle)}
+      >
+        <MapIcon className="size-4 shrink-0" aria-hidden="true" />
+        <span className={compact ? "sr-only" : undefined}>{mapLabel}</span>
       </Link>
     </div>
   );
@@ -322,8 +343,9 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                   resultCount={total}
                   activeCount={activeFilters.length}
                 />
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex min-w-0 shrink items-center gap-2">
                   <ViewToggle
+                    compact
                     isMapView={isMapView}
                     listHref={buildPropertySearchHref(searchState, { gorunus: null })}
                     mapHref={buildPropertySearchHref(searchState, { gorunus: "xerite" })}

@@ -76,9 +76,10 @@ const ADMIN_CSP = [
   "form-action 'self'",
   "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
-  // Xəritə tile-ları `/api/map-tiles/...` proxy-si üzərindən gəlir, ona görə
-  // kənar tile hostu siyahıya düşmür. Marker ikonu da inline SVG-dir.
-  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az",
+  // Xəritə tile-ları `/api/map-tiles/...` proxy-si üzərindən gəlir. `tile.openstreetmap.org`
+  // yalnız proxy cavab verməyəndə işə düşən ehtiyat mənbədir (`FALLBACK_TILES`) —
+  // xəritə boş qalmasın deyə. Marker ikonu inline SVG-dir.
+  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az https://tile.openstreetmap.org",
   "font-src 'self' data:",
   "connect-src 'self' https://challenges.cloudflare.com",
   "frame-src https://challenges.cloudflare.com",

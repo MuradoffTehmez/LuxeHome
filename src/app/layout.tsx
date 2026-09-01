@@ -4,6 +4,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { Geist, Playfair_Display } from "next/font/google";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
 import { jsonLd, organizationSchema, websiteSchema } from "@/lib/seo";
+import { getLocalBusinessProfile } from "@/lib/local-business";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { WebVitalsReporter } from "@/components/analytics/web-vitals-reporter";
@@ -102,6 +103,9 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  // Paneldə təsdiqlənmiş koordinat / iş saatları / xidmət bölgələri struktur dataya
+  // buradan qoşulur. Nəticə keşlənir, ona görə hər sorğuda D1-ə müraciət olmur.
+  const localBusiness = await getLocalBusinessProfile();
 
   return (
     <html lang={locale} suppressHydrationWarning className={`${playfair.variable} ${geist.variable}`}>
@@ -109,7 +113,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_RUNTIME_SHIM }} />
       </head>
       <body className="min-h-dvh antialiased">
-        <script {...jsonLd(organizationSchema())} />
+        <script {...jsonLd(organizationSchema(localBusiness))} />
         <script {...jsonLd(websiteSchema())} />
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>

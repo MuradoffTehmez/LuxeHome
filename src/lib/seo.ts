@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
+import type { LocalBusinessProfile } from "@/lib/local-business";
 import {
   DEFAULT_LOCALE,
   LOCALES,
@@ -213,8 +214,29 @@ export async function buildManagedMetadata(input: PageMetaInput): Promise<Metada
 // STRUKTUR DATA (JSON-LD)
 // ---------------------------------------------------------------------------
 
-/** Şirkət — yalnız təsdiqlənmiş, mərkəzi konfiqurasiyadan gələn NAP məlumatı. */
-export function organizationSchema() {
+/**
+ * Şirkət — yalnız təsdiqlənmiş NAP məlumatı.
+ *
+ * Baza `siteConfig`-dədir. `profile` paneldən (`Parametrlər` + `SERP → Local SEO`)
+ * gələn və redaktor tərəfindən təsdiqlənmiş əlavələri daşıyır: koordinat, iş
+ * saatları, xidmət bölgələri, rəsmi sosial profillər. **Profil verilməyəndə sxem
+ * heç bir əlavə sahə qazanmır** — uydurma `geo` və ya `openingHours` göndərmək
+ * Local SEO-da zərərlidir, ona görə boş dəyər sadəcə buraxılır.
+ */
+export function organizationSchema(profile?: LocalBusinessProfile | null) {
+  const geo = profile?.latitude != null && profile.longitude != null
+    ? { geo: { "@type": "GeoCoordinates", latitude: profile.latitude, longitude: profile.longitude } }
+    : {};
+  const openingHours = profile?.openingHours.length
+    ? { openingHours: profile.openingHours }
+    : {};
+  const hasMap = profile?.googleMapsUrl ? { hasMap: profile.googleMapsUrl } : {};
+  const areaServed = profile?.serviceAreas.length
+    ? { areaServed: profile.serviceAreas.map((name) => ({ "@type": "AdministrativeArea", name })) }
+    : { areaServed: { "@type": "Country", name: "Azərbaycan" } };
+  const sameAs = [siteConfig.instagramUrl, ...(profile?.socialProfiles ?? [])]
+    .filter((value, index, list) => value && list.indexOf(value) === index);
+
   return {
     "@context": "https://schema.org",
     "@type": ["Organization", "LocalBusiness", "RealEstateAgent"],
@@ -235,8 +257,11 @@ export function organizationSchema() {
       addressLocality: "Bakı",
       addressCountry: "AZ",
     },
-    sameAs: [siteConfig.instagramUrl],
-    areaServed: { "@type": "Country", name: "Azərbaycan" },
+    sameAs,
+    ...areaServed,
+    ...geo,
+    ...openingHours,
+    ...hasMap,
     // Sayt, brend və marka hüquqlarının sahibi
     owner: { "@type": "Person", name: siteConfig.owner.name },
     brand: {

@@ -6,6 +6,8 @@ import { Expand, Minimize2, Crosshair } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   BAKU_CENTER,
+  FALLBACK_ATTRIBUTION,
+  FALLBACK_TILES,
   MAP_ATTRIBUTION,
   MAP_TILES,
 } from "./tiles";
@@ -134,6 +136,8 @@ export function LeafletMap({
   const onSelectRef = useRef(onSelect);
   const [ready, setReady] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+  // Tile mənbəyi cavab vermirsə açarsız OSM-ə keçilir (bax aşağıdakı `tileerror`).
+  const [degraded, setDegraded] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -224,8 +228,11 @@ export function LeafletMap({
     if (!ready || !L || !map) return;
 
     tileRef.current?.remove();
-    tileRef.current = L.tileLayer(isDark ? MAP_TILES.dark : MAP_TILES.light, {
-      attribution: MAP_ATTRIBUTION,
+    const source = degraded
+      ? FALLBACK_TILES
+      : isDark ? MAP_TILES.dark : MAP_TILES.light;
+    tileRef.current = L.tileLayer(source, {
+      attribution: degraded ? FALLBACK_ATTRIBUTION : MAP_ATTRIBUTION,
       maxZoom: 20,
       // `{r}` Leaflet tərəfindən retina ekranlarda `@2x` ilə əvəzlənir (CARTO hər
       // iki variantı verir). `detectRetina` **qəsdən açılmır**: o, tile ölçüsünü
@@ -233,7 +240,16 @@ export function LeafletMap({
       // böyüdərdi.
     }).addTo(map);
     tileRef.current.setZIndex(0);
-  }, [ready, isDark]);
+
+    if (degraded) return;
+    // Bir neçə tile ardıcıl uğursuz olarsa xəritəni boş qoymuruq: açarsız OSM
+    // mənbəyinə keçirik. Tək xəta (şəbəkə sıçrayışı) rejimi dəyişdirməməlidir.
+    let failures = 0;
+    tileRef.current.on("tileerror", () => {
+      failures += 1;
+      if (failures >= 4) setDegraded(true);
+    });
+  }, [ready, isDark, degraded]);
 
   // 3) Markerlərin yenilənməsi.
   useEffect(() => {

@@ -36,7 +36,10 @@ const TILE_ENDPOINT = "https://maps.geoapify.com/v1/tile";
 /** Bir aylıq brauzer keşi: tile məzmunu z/x/y üçün praktiki olaraq dəyişmir. */
 const BROWSER_CACHE = "public, max-age=2592000, immutable";
 
-const TILE_PATTERN = /^(\d{1,3})(@2x)?\.png$/;
+// `y` maksimum zoom 20-də 7 rəqəmə çata bilər (2^20 = 1 048 576). Əvvəlki
+// `\d{1,3}` yalnız 3 rəqəmi qəbul edirdi, ona görə 9-dan yuxarı zoom-da **bütün**
+// tile-lar 404 alırdı və xəritə boş görünürdü.
+const TILE_PATTERN = /^(\d{1,7})(@2x)?\.png$/;
 
 type ParsedTile = { style: StyleKey; z: number; x: number; y: number; retina: boolean };
 
