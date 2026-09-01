@@ -99,3 +99,21 @@ artefaktı kimi 14 gün saxlanılır.
 Sitemap **hər iki mühitdə production hostunu** yazır (`src/app/sitemap.ts`):
 unudulmuş env dəyəri indeksdə alternativ host yaratmasın deyə canonical host
 qəsdən sabitdir.
+
+## Bot qoruması və sorğu üsulu
+
+Production Cloudflare bot qoruması arxasındadır. Qoruma TLS/HTTP fingerprint-ə
+baxır, ona görə Playwright-in `request` fixture-u **403 alır** — User-Agent
+başlığı bunu keçmir. Brauzer naviqasiyası isə normal keçir.
+
+Buna görə status və gövdə yoxlamaları naviqasiya əsaslıdır:
+
+```ts
+const status = await statusOf(page, "/api/monitoring/vitals");  // 405
+const body = await bodyOf(page, "/robots.txt");
+```
+
+`request` fixture-u yalnız **POST** testlərində qalır (naviqasiya ilə POST
+mümkün deyil) və onlar `botProtectionActive(baseURL)` şərti ilə qorumalı
+mühitdə atlanır. Staging `workers.dev` altındadır — orada qayda tətbiq
+olunmur, ona görə həmin testlər CI-də tam işləyir.
