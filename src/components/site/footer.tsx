@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { ChevronDown, Globe, MapPin, Phone } from "lucide-react";
+import { ChevronDown, Globe, MapPin, Navigation, Phone } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
 import {
@@ -100,7 +100,20 @@ function PropertyLinks({
   );
 }
 
-function ContactDetails() {
+/**
+ * Footer-də quraşdırılmış xəritə **qəsdən yoxdur.**
+ *
+ * Footer bütün səhifələrdədir; Leaflet paketini hər yüklənişə qoşmaq (və ofis
+ * koordinatını D1-dən oxumaq) səkkiz statik səhifəni də dinamikə çevirərdi.
+ * Əvəzinə ünvan mətnindən qurulan naviqasiya keçidi verilir: konfiqurasiya
+ * tələb etmir, statik səhifədə də işləyir və istifadəçini birbaşa xəritə
+ * tətbiqinə aparır. Tam xəritə «Əlaqə» səhifəsindədir.
+ */
+function ContactDetails({ directionsLabel }: { directionsLabel: string }) {
+  const directionsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    siteConfig.addressFull,
+  )}`;
+
   return (
     <address className="flex flex-col gap-3 text-sm not-italic text-ink-invert-soft">
       <a
@@ -112,7 +125,18 @@ function ContactDetails() {
       </a>
       <span className="flex items-start gap-3 py-2">
         <MapPin className="mt-0.5 size-4 shrink-0 text-gold-soft" aria-hidden="true" />
-        {siteConfig.addressFull}
+        <span className="flex flex-col items-start gap-1">
+          {siteConfig.addressFull}
+          <a
+            href={directionsHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-xs text-gold-soft underline-offset-4 transition-colors hover:text-gold-deep hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          >
+            <Navigation className="size-3.5" aria-hidden="true" />
+            {directionsLabel}
+          </a>
+        </span>
       </span>
       <span className="flex items-start gap-3 py-2">
         <Globe className="mt-0.5 size-4 shrink-0 text-gold-soft" aria-hidden="true" />
@@ -195,7 +219,7 @@ export async function Footer() {
           </FooterSection>
 
           <FooterSection title={t("contact")}>
-            <ContactDetails />
+            <ContactDetails directionsLabel={t("footer.directions")} />
           </FooterSection>
         </div>
 

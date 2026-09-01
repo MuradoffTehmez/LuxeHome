@@ -14,9 +14,12 @@
     "open": "Открыть {alt} на весь экран",
     "title": "{title} — фото {index} из {total}",
     "previous": "Предыдущее фото",
-    "next": "Следующее фото"
+    "next": "Следующее фото",
+    "showAll": "Показать все фото ({count})",
+    "thumbnail": "Перейти к фото {index}",
+    "cover": "Главное фото",
+    "thumbnailRail": "{title} — лента фотографий"
   },
-  "mapLabel": "{title} на карте",
   "trust": {
     "aria": "Юридические и контактные данные компании",
     "officeAlt": "Офис {brand}",
@@ -86,6 +89,38 @@
     "closedDescription": "Посмотрите похожие активные объявления или свяжитесь с нами для нового подбора.",
     "contactDescription": "Заинтересовал этот объект? Оставьте заявку или позвоните нам.",
     "orEnquiry": "или оставьте заявку",
-    "similarDescription": "Посмотрите другие предложения, похожие на этот объект."
+    "similarDescription": "Посмотрите другие предложения, похожие на этот объект.",
+    "keyFacts": "Ключевые показатели",
+    "pricePerSqm": "Цена за м²",
+    "bedrooms": "Спальни",
+    "bathrooms": "Санузлы",
+    "buildingType": "Здание",
+    "mortgage": "Ипотека",
+    "installment": "Рассрочка",
+    "eligible": "Доступно",
+    "listingCode": "Код объявления",
+    "publishedAt": "Опубликовано",
+    "views": "Просмотры",
+    "metroNearby": "Метро",
+    "addressLabel": "Адрес"
+  },
+  "map": {
+    "region": "{title} на карте",
+    "zoomIn": "Приблизить",
+    "zoomOut": "Отдалить",
+    "expand": "Открыть карту на весь экран",
+    "collapse": "Выйти из полноэкранного режима",
+    "recenter": "Отцентрировать карту",
+    "scrollHint": "Нажмите на карту, чтобы включить зум колёсиком",
+    "directions": "Маршрут",
+    "openInGoogle": "Открыть в Google Maps",
+    "openInWaze": "Навигация в Waze",
+    "copyCoordinates": "Копировать координаты",
+    "coordinatesCopied": "Координаты скопированы",
+    "officeTitle": "Наш офис на карте",
+    "listView": "Список",
+    "mapView": "Карта",
+    "mapEmpty": "Ни у одного объявления по этому фильтру не указаны координаты.",
+    "markerCount": "{count, plural, other {# объявлений на карте}}"
   }
 }

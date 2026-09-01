@@ -9,6 +9,7 @@ import {
   getProjectBySlug,
   getProjects,
   getProperties,
+  getPropertiesForMap,
   getPropertyBySlug,
   getPropertyTypesWithCounts,
   getHomepagePartners,
@@ -36,6 +37,12 @@ const FIVE_MINUTES = 300;
 export const getCachedProperties = unstable_cache(
   async (filters: PropertyFilters) => getProperties(filters),
   ["public-property-list-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedPropertiesForMap = unstable_cache(
+  async (filters: PropertyFilters) => getPropertiesForMap(filters),
+  ["public-property-map-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 

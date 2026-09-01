@@ -10,6 +10,7 @@ import {
   FullWidth,
 } from "@/components/admin/form-fields";
 import { ImageDropzone } from "@/components/admin/image-dropzone";
+import { AdminLocationPicker } from "@/components/admin/location-picker-field";
 import { SeoFields } from "@/components/admin/seo-fields";
 import {
   BUILDING_TYPE_LABELS,
@@ -243,20 +244,13 @@ export function PropertyForm({
           />
         </FullWidth>
 
-        <AdminInput
-          name="latitude"
-          label={t("pages.properties.enlikLatitude")}
-          type="number"
-          step="any"
-          defaultValue={initial.latitude}
-        />
-        <AdminInput
-          name="longitude"
-          label={t("pages.properties.uzunluqLongitude")}
-          type="number"
-          step="any"
-          defaultValue={initial.longitude}
-        />
+        <FullWidth>
+          <AdminLocationPicker
+            defaultLatitude={initial.latitude}
+            defaultLongitude={initial.longitude}
+            initialQuery={initial.address ?? ""}
+          />
+        </FullWidth>
       </FormSection>
 
       <FormSection id="olculer" title={t("pages.properties.olculer")}>

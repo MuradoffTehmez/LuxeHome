@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
+import { LayoutGrid, Map as MapIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
@@ -10,6 +11,7 @@ import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyFilterSheet } from "@/components/site/property-filter-sheet";
+import { PropertyResultsMap } from "@/components/site/property-results-map";
 import { SaveSearchSlot } from "@/components/site/save-search-slot";
 import { SearchPanel } from "@/components/site/search-panel";
 import { SortSelect } from "@/components/site/sort-select";
@@ -17,13 +19,16 @@ import { Pagination } from "@/components/ui/pagination";
 import { buildManagedMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { classifyPropertySearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
-import { getCachedFilterOptions, getCachedProperties } from "@/lib/public-cache";
+import { getCachedFilterOptions, getCachedProperties, getCachedPropertiesForMap } from "@/lib/public-cache";
 import {
   buildActivePropertyFilters,
   buildPropertySearchHref,
   parsePropertySearchParams,
 } from "@/lib/property-search";
 import { SORT_OPTIONS, type Locale } from "@/lib/constants";
+import { formatPrice } from "@/lib/utils";
+import { localizePath } from "@/i18n/path-locale";
+import { Link } from "@/i18n/navigation";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -55,6 +60,44 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
 
+/**
+ * Siyahı ↔ xəritə keçidi.
+ *
+ * Klient vəziyyəti yoxdur: rejim URL-dədir (`?gorunus=xerite`), ona görə keçid
+ * adi linkdir — paylaşıla, geri düyməsi ilə qaytarıla və serverdə render oluna bilir.
+ */
+function ViewToggle({
+  isMapView,
+  listHref,
+  mapHref,
+  listLabel,
+  mapLabel,
+}: {
+  isMapView: boolean;
+  listHref: string;
+  mapHref: string;
+  listLabel: string;
+  mapLabel: string;
+}) {
+  const base =
+    "inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-medium transition-colors";
+  const active = "bg-ink text-ink-invert";
+  const idle = "text-ink-soft hover:text-gold-deep";
+
+  return (
+    <div className="inline-flex shrink-0 overflow-hidden rounded-xs border border-line">
+      <Link href={listHref} aria-current={!isMapView} className={`${base} ${isMapView ? idle : active}`}>
+        <LayoutGrid className="size-4" aria-hidden="true" />
+        {listLabel}
+      </Link>
+      <Link href={mapHref} aria-current={isMapView} className={`${base} border-l border-line ${isMapView ? active : idle}`}>
+        <MapIcon className="size-4" aria-hidden="true" />
+        {mapLabel}
+      </Link>
+    </div>
+  );
+}
+
 /** Yalnız müsbət ədədləri qəbul edir — «abc» və ya «-5» filtri sındırmasın. */
 function positiveNumber(value: string | undefined): number | undefined {
   if (value === undefined) return undefined;
@@ -66,6 +109,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
   const [{ locale }, params] = await Promise.all([routeParams, searchParams]);
   const t = await getTranslations({ locale, namespace: "listings" });
   const propertyT = await getTranslations({ locale, namespace: "property" });
+  const mapText = await getTranslations({ locale, namespace: "content.map" });
   const indexDecision = classifyPropertySearchParams(params);
   if (!indexDecision.validPage) notFound();
 
@@ -100,9 +144,15 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     page: searchState.page,
   };
 
-  const [{ items, total, page, totalPages }, filterOptions] = await Promise.all([
+  // Görünüş rejimi filtr deyil — `parsePropertySearchParams` ona toxunmur, çünki
+  // nəticə dəstini dəyişmir, yalnız təqdimatını. `?gorunus=` mövcud olduğu üçün
+  // səhifə onsuz da `noindex` təsnifatına düşür (`seo-indexing.ts`).
+  const isMapView = params.gorunus === "xerite";
+
+  const [{ items, total, page, totalPages }, filterOptions, mapResult] = await Promise.all([
     getCachedProperties(filters),
     getCachedFilterOptions(),
+    isMapView ? getCachedPropertiesForMap(filters) : Promise.resolve(null),
   ]);
   if (page > totalPages) notFound();
 
@@ -135,7 +185,11 @@ export default async function PropertiesPage({ params: routeParams, searchParams
   }));
 
   const buildHref = (overrides: Record<string, string | number | null> = {}) =>
-    buildPropertySearchHref(searchState, overrides);
+    buildPropertySearchHref(searchState, {
+      // Rejim `searchState`-də saxlanmır, ona görə hər keçiddə açıq şəkildə daşınır.
+      ...(isMapView ? { gorunus: "xerite" } : {}),
+      ...overrides,
+    });
 
   const sortHrefs = Object.fromEntries(
     SORT_VALUES.map((value) => [
@@ -178,6 +232,24 @@ export default async function PropertiesPage({ params: routeParams, searchParams
       return fallback;
     },
   });
+
+  const mapPoints = (mapResult?.items ?? [])
+    .filter((item) => item.latitude != null && item.longitude != null)
+    .map((item) => ({
+      id: item.id,
+      title: item.title,
+      slug: item.slug,
+      latitude: item.latitude as number,
+      longitude: item.longitude as number,
+      subtitle:
+        [item.district?.name, item.city.name].filter(Boolean).join(", ") || null,
+      priceLabel:
+        formatPrice(item.price, item.currency)
+        + (item.pricePeriod
+          ? ` ${item.pricePeriod === "MONTH" ? propertyT("pricePeriod.month") : propertyT("pricePeriod.day")}`
+          : ""),
+      imageUrl: item.images[0]?.thumbUrl ?? item.images[0]?.url ?? null,
+    }));
 
   const listingLabel = raw.elan === "SALE"
     ? t("search.sale")
@@ -250,12 +322,16 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                   resultCount={total}
                   activeCount={activeFilters.length}
                 />
-                <SortSelect
-                  value={sort}
-                  hrefs={sortHrefs}
-                  compact
-                  className="shrink-0"
-                />
+                <div className="flex shrink-0 items-center gap-2">
+                  <ViewToggle
+                    isMapView={isMapView}
+                    listHref={buildPropertySearchHref(searchState, { gorunus: null })}
+                    mapHref={buildPropertySearchHref(searchState, { gorunus: "xerite" })}
+                    listLabel={mapText("listView")}
+                    mapLabel={mapText("mapView")}
+                  />
+                  <SortSelect value={sort} hrefs={sortHrefs} compact />
+                </div>
               </div>
             }
             desktop={
@@ -268,6 +344,13 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                   </p>
                 )}
                 <div className="flex shrink-0 items-center gap-3">
+                  <ViewToggle
+                    isMapView={isMapView}
+                    listHref={buildPropertySearchHref(searchState, { gorunus: null })}
+                    mapHref={buildPropertySearchHref(searchState, { gorunus: "xerite" })}
+                    listLabel={mapText("listView")}
+                    mapLabel={mapText("mapView")}
+                  />
                   <SaveSearchSlot filters={saveableFilters} />
                   <SortSelect value={sort} hrefs={sortHrefs} />
                 </div>
@@ -287,7 +370,14 @@ export default async function PropertiesPage({ params: routeParams, searchParams
             </p>
           )}
 
-          {items.length > 0 ? (
+          {isMapView ? (
+            <PropertyResultsMap
+              points={mapPoints}
+              hrefBase={localizePath("/emlaklar", locale as Locale)}
+              shownCount={mapPoints.length}
+              total={mapResult?.total ?? 0}
+            />
+          ) : items.length > 0 ? (
             <>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {items.map((property, index) => (

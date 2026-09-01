@@ -8,6 +8,7 @@ import {
   AdminTextarea,
   FullWidth,
 } from "@/components/admin/form-fields";
+import { AdminLocationPicker } from "@/components/admin/location-picker-field";
 import { saveSettings } from "./actions";
 
 export function SettingsForm({
@@ -20,6 +21,8 @@ export function SettingsForm({
   contactAddress,
   contactInstagram,
   contactWhatsapp,
+  contactLatitude,
+  contactLongitude,
 }: {
   notificationEmail: string;
   notifyEnabled: boolean;
@@ -30,6 +33,8 @@ export function SettingsForm({
   contactAddress: string;
   contactInstagram: string;
   contactWhatsapp: string;
+  contactLatitude: string;
+  contactLongitude: string;
 }) {
   const t = useTranslations("admin");
   return (
@@ -43,6 +48,21 @@ export function SettingsForm({
         <FullWidth><AdminInput name="contactAddress" label={t("pages.settings.unvan")} defaultValue={contactAddress} maxLength={300} /></FullWidth>
         <AdminInput name="contactInstagram" label={t("pages.settings.instagramIstifadeciAdi")} defaultValue={contactInstagram} maxLength={100} />
         <AdminInput name="contactWhatsapp" label={t("pages.settings.whatsappNomresi")} defaultValue={contactWhatsapp} maxLength={30} hint={t("pages.settings.meselen994519228585")} />
+      </FormSection>
+
+      <FormSection
+        title={t("pages.settings.ofisKoordinati")}
+        description={t("pages.settings.ofisKoordinatiHint")}
+      >
+        <FullWidth>
+          <AdminLocationPicker
+            defaultLatitude={contactLatitude}
+            defaultLongitude={contactLongitude}
+            initialQuery={contactAddress}
+            latitudeName="contactLatitude"
+            longitudeName="contactLongitude"
+          />
+        </FullWidth>
       </FormSection>
 
       <FormSection

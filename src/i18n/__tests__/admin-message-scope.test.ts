@@ -2,15 +2,22 @@
 
 import { describe, expect, it } from "vitest";
 
-import { adminRouteSegment, pickAdminMessages, type AdminMessages } from "../admin";
 import azAdmin from "../locales/az/admin.json";
+import enAdmin from "../locales/en/admin.json";
+import ruAdmin from "../locales/ru/admin.json";
 
 /**
- * `pickAdminMessages()` client-ə göndərilən kataloqu marşruta görə süzür.
+ * Panel client komponentlərinin oxuduğu bölmələr kataloqda mövcud olmalıdır.
  *
- * Süzgəc siyahısı əl ilə yazılıb, ona görə bu test onu mənbədən yenidən hesablayır:
- * bir marşrutun client komponenti işlətdiyi bölmə siyahıda yoxdursa, paneldə
- * mətn əvəzinə açar adı görünərdi. Test həmin uyğunsuzluğu tutur.
+ * Əvvəl bu test marşruta görə süzgəcin (`pickAdminMessages`) hər marşruta lazım
+ * olan bölməni göndərdiyini yoxlayırdı. Süzgəc götürüldü — səbəbi `../admin.ts`
+ * sonundakı qeyddədir: layout client naviqasiyasında yenidən render olunmadığı
+ * üçün süzgəc keçid anında köhnə bölmələrlə qalırdı və paneldə tərcümə açarları
+ * görünürdü.
+ *
+ * Yoxlamanın özü hələ də dəyərlidir, sadəcə hədəfi dəyişib: indi hər üç dil
+ * kataloqunun client komponentlərinin istinad etdiyi bölmələri daşıdığını təsdiq
+ * edir. Bölmə adı dəyişəndə və ya tərcümə faylı bir dildə unudulanda test tutur.
  */
 
 const clientModules = import.meta.glob("../../app/admin/**/*.tsx", {
@@ -35,66 +42,38 @@ function sectionsIn(source: string): string[] {
   return [...source.matchAll(SECTION)].map((m) => m[1]);
 }
 
-function routeOf(path: string): string {
-  const rest = path.replace(/^\.\.\/\.\.\/app\/admin\/?/, "");
-  const segment = rest.split("/")[0] ?? "";
-  return segment.endsWith(".tsx") ? "" : segment;
-}
+const usedSections = [
+  ...new Set(
+    Object.entries({ ...clientModules, ...sharedModules })
+      .filter(([path, src]) => !path.includes("__tests__") && isClient(src))
+      .flatMap(([, src]) => sectionsIn(src)),
+  ),
+].sort();
 
-const sharedSections = new Set(
-  Object.entries(sharedModules)
-    .filter(([path, src]) => !path.includes("__tests__") && isClient(src))
-    .flatMap(([, src]) => sectionsIn(src)),
-);
-
-const requiredByRoute = new Map<string, Set<string>>();
-for (const [path, src] of Object.entries(clientModules)) {
-  if (path.includes("__tests__") || !isClient(src)) continue;
-  const route = routeOf(path);
-  const bucket = requiredByRoute.get(route) ?? new Set<string>();
-  for (const section of sectionsIn(src)) bucket.add(section);
-  requiredByRoute.set(route, bucket);
-}
-
-const messages = { admin: azAdmin } as unknown as AdminMessages;
-
-function has(picked: AdminMessages, path: string): boolean {
+function has(catalog: object, path: string): boolean {
   return (
     path
       .split(".")
       .reduce<unknown>(
         (acc, key) => (acc as Record<string, unknown> | undefined)?.[key],
-        picked.admin as unknown as Record<string, unknown>,
+        catalog as Record<string, unknown>,
       ) !== undefined
   );
 }
 
-describe("admin message scope", () => {
-  it("derives the route segment from the pathname", () => {
-    expect(adminRouteSegment("/admin")).toBe("");
-    expect(adminRouteSegment("/admin/emlaklar")).toBe("emlaklar");
-    expect(adminRouteSegment("/admin/emlaklar/abc-123")).toBe("emlaklar");
-    expect(adminRouteSegment("/admin/bilik-merkezi/suallar")).toBe("bilik-merkezi");
+describe("admin message catalog", () => {
+  it("finds the sections the panel actually reads", () => {
+    // Skan boşa düşərsə test səssizcə hər şeyi keçirərdi
+    expect(usedSections.length).toBeGreaterThan(5);
   });
 
-  it.each([...requiredByRoute.keys()].sort())(
-    "ships every section the client components of /admin/%s use",
-    (route) => {
-      const picked = pickAdminMessages(messages, `/admin/${route}`);
-      for (const section of [...(requiredByRoute.get(route) ?? []), ...sharedSections]) {
-        expect(has(picked, section), `${route} → ${section}`).toBe(true);
-      }
-    },
-  );
-
-  it("actually trims the payload it sends", () => {
-    const full = JSON.stringify(messages).length;
-    const trimmed = JSON.stringify(pickAdminMessages(messages, "/admin/serp")).length;
-    expect(trimmed).toBeLessThan(full / 2);
-  });
-
-  it("falls back to the whole catalog for an unknown route", () => {
-    const picked = pickAdminMessages(messages, "/admin/yeni-bolme");
-    expect(JSON.stringify(picked)).toBe(JSON.stringify(messages));
+  it.each([
+    ["az", azAdmin],
+    ["en", enAdmin],
+    ["ru", ruAdmin],
+  ])("%s catalog ships every section the panel client components use", (locale, catalog) => {
+    for (const section of usedSections) {
+      expect(has(catalog, section), `${locale} → ${section}`).toBe(true);
+    }
   });
 });

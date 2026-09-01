@@ -4,11 +4,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
-  BedDouble,
-  FileCheck,
-  Maximize,
   MapPin,
-  Layers,
   CheckCircle2,
   Phone,
   ArrowRight,
@@ -40,7 +36,8 @@ import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyActionToolbar } from "@/components/site/property-action-toolbar";
 import { propertyQrSvg } from "@/lib/property-qr";
-import { PropertyMap } from "@/components/site/property-map";
+import { PlaceMap } from "@/components/map/place-map";
+import { PropertyKeyFacts } from "@/components/site/property-key-facts";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { RecentlyViewedTracker } from "@/components/site/recently-viewed-tracker";
@@ -63,12 +60,6 @@ type Props = {
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved", SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
-};
-const RENOVATION_KEYS: Record<string, "cosmetic" | "renovated" | "designer" | "unrenovated" | "newBuilding"> = {
-  COSMETIC: "cosmetic", RENOVATED: "renovated", DESIGNER: "designer", UNRENOVATED: "unrenovated", NEW_BUILDING: "newBuilding",
-};
-const DOCUMENT_KEYS: Record<string, "titleDeed" | "contract" | "municipal" | "decree" | "powerOfAttorney" | "commercialExtract" | "none"> = {
-  TITLE_DEED: "titleDeed", CONTRACT: "contract", MUNICIPAL: "municipal", DECREE: "decree", POWER_OF_ATTORNEY: "powerOfAttorney", COMMERCIAL_EXTRACT: "commercialExtract", NONE: "none",
 };
 const NEARBY_KEYS: Record<string, "metro" | "bus" | "school" | "university" | "kindergarten" | "hospital" | "clinic" | "pharmacy" | "supermarket" | "restaurant" | "park" | "shoppingCenter"> = {
   METRO: "metro", BUS: "bus", SCHOOL: "school", UNIVERSITY: "university",
@@ -318,59 +309,8 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Qalereya */}
               <Gallery images={property.images} title={property.title} />
 
-              {/* Sürətli parametrlər */}
-              <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-4">
-                {property.rooms != null && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <BedDouble className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">{content("rooms")}</span>
-                    <span className="tabular font-medium text-ink">{property.rooms}</span>
-                  </div>
-                )}
-                {property.area != null && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <Maximize className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">{content("area")}</span>
-                    <span className="tabular font-medium text-ink">{propertyText("area", { value: property.area })}</span>
-                  </div>
-                )}
-                {property.floor != null && property.totalFloors != null && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <Layers className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">{content("floor")}</span>
-                    <span className="tabular font-medium text-ink">
-                      {property.floor} / {property.totalFloors}
-                    </span>
-                  </div>
-                )}
-                {property.renovation != null && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <CheckCircle2 className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">{content("renovation")}</span>
-                    <span className="font-medium text-ink">
-                      {propertyText(`renovation.${RENOVATION_KEYS[property.renovation]}`)}
-                    </span>
-                  </div>
-                )}
-                {property.documentStatus != null && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <FileCheck className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">{content("document")}</span>
-                    <span className="font-medium text-ink">
-                      {propertyText(`document.${DOCUMENT_KEYS[property.documentStatus]}`)}
-                    </span>
-                  </div>
-                )}
-                {property.landArea != null && property.area == null && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <Maximize className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium text-ink-muted uppercase">{content("landArea")}</span>
-                    <span className="tabular font-medium text-ink">
-                      {propertyText("landUnit", { value: property.landArea })}
-                    </span>
-                  </div>
-                )}
-              </div>
+              {/* Əsas göstəricilər */}
+              <PropertyKeyFacts locale={locale as Locale} property={property} />
 
               {/* Təsvir */}
               <div className="flex flex-col gap-4">
@@ -536,11 +476,12 @@ export default async function PropertyDetailPage({ params }: Props) {
               {property.latitude != null && property.longitude != null && (
                 <div className="flex flex-col gap-4">
                   <h2 className="font-display text-xl text-ink">{content("onMap")}</h2>
-                  <PropertyMap
+                  <PlaceMap
                     latitude={property.latitude}
                     longitude={property.longitude}
                     title={property.title}
-                    className="h-80 w-full overflow-hidden rounded-md border border-line"
+                    subtitle={property.address || location || null}
+                    mapClassName="h-80 sm:h-96"
                   />
                 </div>
               )}

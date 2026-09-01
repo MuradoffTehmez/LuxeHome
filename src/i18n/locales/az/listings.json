@@ -112,7 +112,8 @@
     "projectTypeMixed": "Qarışıq tipli",
     "projectStatusPlanned": "Planlaşdırılır",
     "projectStatusOngoing": "Davam edir",
-    "projectStatusCompleted": "Tamamlanıb"
+    "projectStatusCompleted": "Tamamlanıb",
+    "onMap": "Xəritədə"
   },
   "search": {
     "listingType": "Elan növü",

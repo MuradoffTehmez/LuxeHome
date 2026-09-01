@@ -14,9 +14,12 @@
     "open": "{alt} şəklini tam ekranda aç",
     "title": "{title} — şəkil {index} / {total}",
     "previous": "Əvvəlki şəkil",
-    "next": "Növbəti şəkil"
+    "next": "Növbəti şəkil",
+    "showAll": "Bütün şəkilləri göstər ({count})",
+    "thumbnail": "{index}-ci şəklə keç",
+    "cover": "Əsas şəkil",
+    "thumbnailRail": "{title} — şəkil lenti"
   },
-  "mapLabel": "{title} xəritədə",
   "trust": {
     "aria": "Şirkətin hüquqi və əlaqə məlumatları",
     "officeAlt": "{brand} ofisi",
@@ -86,6 +89,38 @@
     "closedDescription": "Oxşar aktiv elanlara baxa və ya yeni seçim üçün bizimlə əlaqə saxlaya bilərsiniz.",
     "contactDescription": "Bu əmlakla maraqlanırsınız? Müraciət göndərin və ya zəng edin.",
     "orEnquiry": "və ya müraciət yazın",
-    "similarDescription": "Bu əmlaka oxşar digər təkliflərə göz atın."
+    "similarDescription": "Bu əmlaka oxşar digər təkliflərə göz atın.",
+    "keyFacts": "Əsas göstəricilər",
+    "pricePerSqm": "1 m² qiyməti",
+    "bedrooms": "Yataq otağı",
+    "bathrooms": "Sanitar qovşaq",
+    "buildingType": "Tikili",
+    "mortgage": "İpoteka",
+    "installment": "Taksit",
+    "eligible": "Uyğundur",
+    "listingCode": "Elan kodu",
+    "publishedAt": "Dərc tarixi",
+    "views": "Baxış",
+    "metroNearby": "Metro",
+    "addressLabel": "Ünvan"
+  },
+  "map": {
+    "region": "{title} xəritədə",
+    "zoomIn": "Yaxınlaşdır",
+    "zoomOut": "Uzaqlaşdır",
+    "expand": "Xəritəni tam ekranda aç",
+    "collapse": "Tam ekrandan çıx",
+    "recenter": "Xəritəni mərkəzləşdir",
+    "scrollHint": "Zoom üçün xəritəyə klikləyin",
+    "directions": "Yol göstər",
+    "openInGoogle": "Google Maps-də aç",
+    "openInWaze": "Waze ilə get",
+    "copyCoordinates": "Koordinatı kopyala",
+    "coordinatesCopied": "Koordinat kopyalandı",
+    "officeTitle": "Ofisimiz xəritədə",
+    "listView": "Siyahı",
+    "mapView": "Xəritə",
+    "mapEmpty": "Bu filtrə uyğun elanların heç birində xəritə koordinatı göstərilməyib.",
+    "markerCount": "{count, plural, other {Xəritədə # elan}}"
   }
 }

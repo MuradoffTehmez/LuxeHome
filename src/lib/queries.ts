@@ -353,6 +353,52 @@ export async function getProperties(filters: PropertyFilters = {}) {
   };
 }
 
+/** Xeritə görünüşü üçün minimal sahə dəsti — kart məlumatı marker popup-ından ibarətdir. */
+export const propertyMapSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  price: true,
+  currency: true,
+  pricePeriod: true,
+  latitude: true,
+  longitude: true,
+  city: { select: { name: true } },
+  district: { select: { name: true } },
+  images: { orderBy: [{ isCover: "desc" }, { order: "asc" }], take: 1, select: { thumbUrl: true, url: true } },
+} satisfies Prisma.PropertySelect;
+
+export type PropertyMapData = Prisma.PropertyGetPayload<{ select: typeof propertyMapSelect }>;
+
+/** Xəritə görünüşündə göstərilən ən çox elan sayı. */
+export const PROPERTY_MAP_LIMIT = 200;
+
+/**
+ * Filtrə uyğun, koordinatı olan elanlar.
+ *
+ * Səhifələmə yoxdur: xəritədə «2-ci səhifə» anlayışı mənasızdır, ona görə nəticə
+ * `PROPERTY_MAP_LIMIT` ilə kəsilir və istifadəçiyə neçə markerin göstərildiyi
+ * bildirilir. Koordinatsız elanlar sorğu səviyyəsində kənarlaşdırılır — əks halda
+ * xəritə boş görünər, siyahı isə dolu olardı.
+ */
+export async function getPropertiesForMap(filters: PropertyFilters = {}) {
+  const where: Prisma.PropertyWhereInput = {
+    AND: [buildPropertyWhere(filters), { latitude: { not: null } }, { longitude: { not: null } }],
+  };
+
+  const [items, total] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: propertyMapSelect,
+      orderBy: buildPropertyOrderBy(filters.sort === "featured" ? undefined : filters.sort),
+      take: PROPERTY_MAP_LIMIT,
+    }),
+    prisma.property.count({ where }),
+  ]);
+
+  return { items, total };
+}
+
 export async function getFeaturedProperties(take = 6) {
   return prisma.property.findMany({
     where: {

@@ -9,6 +9,7 @@ import { InstagramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
 import { buildManagedMetadata } from "@/lib/seo";
 import { siteConfig } from "@/config/site";
 import { getOperationalSiteConfig } from "@/lib/settings";
+import { PlaceMap } from "@/components/map/place-map";
 import { ContactForm } from "./contact-form";
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -26,7 +27,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ContactPage({ params }: PageProps) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "contact" });
+  const [t, mapText] = await Promise.all([
+    getTranslations({ locale, namespace: "contact" }),
+    getTranslations({ locale, namespace: "content.map" }),
+  ]);
   const operational = await getOperationalSiteConfig();
   const contactItems = [
     { icon: Phone, label: t("phone"), value: operational.phone, href: operational.phoneHref },
@@ -95,6 +99,21 @@ export default async function ContactPage({ params }: PageProps) {
                   </Reveal>
                 ))}
               </div>
+
+              {/* Ofis xəritəsi — koordinat «Parametrlər → Ofisin xəritədəki yeri»
+                  bölməsində təyin edilir; boş olduqda blok göstərilmir. */}
+              {operational.latitude != null && operational.longitude != null && (
+                <div className="flex min-w-0 flex-col gap-3">
+                  <h3 className="font-display text-lg text-ink">{mapText("officeTitle")}</h3>
+                  <PlaceMap
+                    latitude={operational.latitude}
+                    longitude={operational.longitude}
+                    title={siteConfig.legalName}
+                    subtitle={operational.addressFull}
+                    mapClassName="h-64 sm:h-72"
+                  />
+                </div>
+              )}
             </div>
 
           </div>

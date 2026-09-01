@@ -473,6 +473,29 @@
       "removeFailed": "Remove the failed image from the list",
       "removeShort": "Remove",
       "addMore": "Add more"
+    },
+    "locationPicker": {
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "searchLabel": "Find the address on the map",
+      "searchPlaceholder": "For example: Aliyar Aliyev 109A, Baku",
+      "searchAction": "Search",
+      "searching": "Searching…",
+      "noResults": "Address not found. Try a broader query or click the map directly.",
+      "searchError": "The address service did not respond. Try again shortly.",
+      "useMyLocation": "Use my current location",
+      "locationDenied": "The browser denied location access. Pick the point on the map instead.",
+      "clear": "Clear coordinates",
+      "hint": "Search for the address, then drag the marker to fine-tune the point.",
+      "map": {
+        "region": "Coordinate picker map",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "expand": "Open map in full screen",
+        "collapse": "Exit full screen",
+        "recenter": "Recentre the map",
+        "scrollHint": "Click the map to set the point"
+      }
     }
   },
   "pages": {
@@ -921,7 +944,9 @@
       "mediaFayliSec": "Choose a media file",
       "jpgPngWebpVe": "JPG, PNG, WebP or AVIF — up to 8 MB per file",
       "media": "Media",
-      "faylAdiVeYa": "Search by file name or alt text…"
+      "faylAdiVeYa": "Search by file name or alt text…",
+      "ofisKoordinati": "Office location on the map",
+      "ofisKoordinatiHint": "Once the coordinates are set, the office map appears on the Contact page and in the footer."
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA backup codes — shown once",

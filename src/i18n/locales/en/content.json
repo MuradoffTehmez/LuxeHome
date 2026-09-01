@@ -14,9 +14,12 @@
     "open": "Open {alt} in full screen",
     "title": "{title} — image {index} of {total}",
     "previous": "Previous image",
-    "next": "Next image"
+    "next": "Next image",
+    "showAll": "Show all photos ({count})",
+    "thumbnail": "Go to photo {index}",
+    "cover": "Cover photo",
+    "thumbnailRail": "{title} — photo strip"
   },
-  "mapLabel": "{title} on the map",
   "trust": {
     "aria": "Company legal and contact details",
     "officeAlt": "{brand} office",
@@ -86,6 +89,38 @@
     "closedDescription": "Browse similar active listings or contact us for a new selection.",
     "contactDescription": "Interested in this property? Send an enquiry or call us.",
     "orEnquiry": "or send an enquiry",
-    "similarDescription": "Explore other properties similar to this listing."
+    "similarDescription": "Explore other properties similar to this listing.",
+    "keyFacts": "Key figures",
+    "pricePerSqm": "Price per m²",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "buildingType": "Building",
+    "mortgage": "Mortgage",
+    "installment": "Instalments",
+    "eligible": "Eligible",
+    "listingCode": "Listing code",
+    "publishedAt": "Published",
+    "views": "Views",
+    "metroNearby": "Metro",
+    "addressLabel": "Address"
+  },
+  "map": {
+    "region": "{title} on the map",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "expand": "Open map in full screen",
+    "collapse": "Exit full screen",
+    "recenter": "Recentre the map",
+    "scrollHint": "Click the map to zoom with the wheel",
+    "directions": "Directions",
+    "openInGoogle": "Open in Google Maps",
+    "openInWaze": "Navigate with Waze",
+    "copyCoordinates": "Copy coordinates",
+    "coordinatesCopied": "Coordinates copied",
+    "officeTitle": "Our office on the map",
+    "listView": "List",
+    "mapView": "Map",
+    "mapEmpty": "None of the listings matching this filter has map coordinates.",
+    "markerCount": "{count, plural, other {# listings on the map}}"
   }
 }

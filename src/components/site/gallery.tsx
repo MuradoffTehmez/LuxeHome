@@ -20,21 +20,47 @@ type GalleryProps = {
   className?: string;
 };
 
-/** Mobil scroll-snap rail, desktop grid və əlçatan fullscreen lightbox. */
+/**
+ * Elan qalereyası: sabit hündürlüklü əsas şəkil + altında kiçik şəkil lenti.
+ *
+ * **Niyə şəbəkə deyil.** Əvvəl bütün şəkillər `sm:grid-cols-2` şəbəkəsində açılırdı
+ * və 10 şəkilli elanda qalereya beş sıralıq divara çevrilirdi: qiymət, təsvir və
+ * əlaqə forması ekrandan çox aşağı düşürdü. İndi hündürlük şəkil sayından asılı
+ * deyil — 3 şəkil də, 30 şəkil də eyni yer tutur.
+ *
+ * Əsas şəkil `scroll-snap` lentidir: toxunma ekranında sürüşdürmə brauzerin öz
+ * jestidir (əl ilə swipe kodu yazılmır), desktopda isə oxlar və kiçik şəkillər
+ * həmin lenti proqram yolu ilə sürüşdürür.
+ */
 export function Gallery({ images, title, className }: GalleryProps) {
   const t = useTranslations("content.gallery");
   const [index, setIndex] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
+  const thumbRailRef = useRef<HTMLDivElement>(null);
   const total = images.length;
+
+  const scrollToIndex = useCallback(
+    (nextIndex: number, behavior: ScrollBehavior = "smooth") => {
+      const rail = railRef.current;
+      if (!rail || total === 0) return;
+      const target = ((nextIndex % total) + total) % total;
+      rail.scrollTo({ left: target * rail.clientWidth, behavior });
+      setIndex(target);
+    },
+    [total],
+  );
 
   const go = useCallback(
     (nextIndex: number) => {
       if (total === 0) return;
-      setIndex(((nextIndex % total) + total) % total);
+      const target = ((nextIndex % total) + total) % total;
+      if (fullscreen) setIndex(target);
+      else scrollToIndex(target);
     },
-    [total],
+    [fullscreen, scrollToIndex, total],
   );
+
   const next = useCallback(() => go(index + 1), [go, index]);
   const previous = useCallback(() => go(index - 1), [go, index]);
 
@@ -49,6 +75,21 @@ export function Gallery({ images, title, className }: GalleryProps) {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [fullscreen, next, previous]);
+
+  // Lightbox-da oxlarla gəzdikdən sonra əsas lent həmin şəkildə qalmalıdır —
+  // əks halda pəncərə bağlananda qalereya köhnə mövqeyə "qayıdır".
+  const wasFullscreen = useRef(false);
+  useEffect(() => {
+    if (wasFullscreen.current && !fullscreen) scrollToIndex(index, "auto");
+    wasFullscreen.current = fullscreen;
+  }, [fullscreen, index, scrollToIndex]);
+
+  // Aktiv kiçik şəkil həmişə görünən sahədə qalmalıdır.
+  useEffect(() => {
+    const rail = thumbRailRef.current;
+    const active = rail?.children[index];
+    active?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  }, [index]);
 
   function openAt(nextIndex: number) {
     setIndex(nextIndex);
@@ -76,48 +117,104 @@ export function Gallery({ images, title, className }: GalleryProps) {
   }
 
   const current = images[index];
+  const arrowClassName =
+    "pointer-events-auto inline-flex size-10 items-center justify-center rounded-full bg-charcoal/55 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
 
   return (
-    <div className={cn("relative", className)}>
-      <div
-        ref={railRef}
-        onScroll={handleRailScroll}
-        className="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible [&::-webkit-scrollbar]:hidden"
-      >
-        {images.map((image, imageIndex) => {
-          const alt = image.alt || t("imageAlt", { title, index: imageIndex + 1 });
-          return (
+    <div className={cn("flex flex-col gap-3", className)}>
+      <div className="relative overflow-hidden rounded-md bg-beige">
+        <div
+          ref={railRef}
+          onScroll={handleRailScroll}
+          className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {images.map((image, imageIndex) => {
+            const alt = image.alt || t("imageAlt", { title, index: imageIndex + 1 });
+            return (
+              <button
+                key={image.url}
+                type="button"
+                onClick={() => openAt(imageIndex)}
+                aria-label={t("open", { alt })}
+                className="group relative aspect-4/3 w-full shrink-0 snap-center cursor-zoom-in overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset sm:aspect-16/10"
+              >
+                <Image
+                  src={image.url}
+                  alt={alt}
+                  fill
+                  unoptimized={isUnoptimizedImage(image.url)}
+                  priority={imageIndex === 0}
+                  loading={imageIndex === 0 ? undefined : "lazy"}
+                  sizes="(max-width: 1023px) 100vw, 760px"
+                  className="image-lift object-cover"
+                />
+              </button>
+            );
+          })}
+        </div>
+
+        {total > 1 && (
+          <div className="pointer-events-none absolute inset-x-3 top-1/2 flex -translate-y-1/2 items-center justify-between">
+            <button type="button" onClick={previous} aria-label={t("previous")} className={arrowClassName}>
+              <ChevronLeft className="size-5" aria-hidden="true" />
+            </button>
+            <button type="button" onClick={next} aria-label={t("next")} className={arrowClassName}>
+              <ChevronRight className="size-5" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
+        <p
+          aria-live="polite"
+          className="tabular pointer-events-none absolute bottom-3 left-3 rounded-xs bg-charcoal/65 px-2.5 py-1 text-xs text-white backdrop-blur-sm"
+        >
+          {index + 1} / {total}
+        </p>
+
+        <button
+          type="button"
+          onClick={() => openAt(index)}
+          className="absolute right-3 bottom-3 inline-flex min-h-9 items-center gap-2 rounded-xs bg-charcoal/65 px-3 text-xs font-medium text-white backdrop-blur-sm transition-colors hover:bg-charcoal/85"
+        >
+          <Expand className="size-4" aria-hidden="true" />
+          {t("showAll", { count: total })}
+        </button>
+      </div>
+
+      {total > 1 && (
+        <div
+          ref={thumbRailRef}
+          role="group"
+          aria-label={t("thumbnailRail", { title })}
+          className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5"
+        >
+          {images.map((image, imageIndex) => (
             <button
-              key={image.url}
+              key={`thumb-${image.url}`}
               type="button"
-              onClick={() => openAt(imageIndex)}
-              aria-label={t("open", { alt })}
-              className="group relative aspect-4/3 w-full shrink-0 snap-center cursor-zoom-in overflow-hidden bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset sm:rounded-sm"
+              onClick={() => scrollToIndex(imageIndex)}
+              aria-label={t("thumbnail", { index: imageIndex + 1 })}
+              aria-current={imageIndex === index}
+              className={cn(
+                "relative aspect-4/3 w-20 shrink-0 overflow-hidden rounded-xs bg-beige transition-opacity sm:w-24",
+                imageIndex === index
+                  ? "ring-2 ring-gold ring-offset-1 ring-offset-ivory"
+                  : "opacity-65 hover:opacity-100",
+              )}
             >
               <Image
                 src={image.url}
-                alt={alt}
+                alt=""
                 fill
                 unoptimized={isUnoptimizedImage(image.url)}
-                priority={imageIndex === 0}
-                loading={imageIndex === 0 ? undefined : "lazy"}
-                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 390px"
-                className="image-lift object-cover"
+                loading="lazy"
+                sizes="96px"
+                className="object-cover"
               />
-              <span className="absolute right-3 bottom-3 inline-flex size-11 items-center justify-center rounded-full bg-charcoal/50 text-white opacity-100 backdrop-blur-sm transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
-                <Expand className="size-4" aria-hidden="true" />
-              </span>
             </button>
-          );
-        })}
-      </div>
-
-      <p
-        aria-live="polite"
-        className="tabular pointer-events-none absolute bottom-3 left-0 rounded-r-xs bg-charcoal/65 px-3 py-1.5 text-xs text-white backdrop-blur-sm sm:hidden"
-      >
-        {index + 1} / {total}
-      </p>
+          ))}
+        </div>
+      )}
 
       <Overlay
         open={fullscreen}

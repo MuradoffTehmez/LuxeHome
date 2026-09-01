@@ -1,0 +1,83 @@
+/*
+ * Leaflet-in öz stilləri dizayn sisteminin tokenlərini tanımır: idarə düymələri,
+ * popup və atribusiya paneli sabit ağ fon daşıyır və tünd temada göz alır.
+ *
+ * Fayl `leaflet/dist/leaflet.css`-dən **dərhal sonra** idxal olunur (bax
+ * `leaflet-map.tsx`) — ardıcıllıq vacibdir, əks halda override-lar Leaflet-in
+ * öz qaydaları ilə üst-üstə düşüb işləmir. Rənglər `globals.css`-dəki
+ * dəyişənlərdən gəlir, ona görə `.dark` klassı dəyişəndə xəritə də uyğunlaşır.
+ */
+
+.lhe-map .leaflet-container {
+  background: var(--color-beige);
+  font-family: inherit;
+}
+
+.lhe-map .leaflet-bar,
+.lhe-map .leaflet-bar a,
+.lhe-map .leaflet-control-attribution {
+  background: var(--color-paper);
+  color: var(--color-ink-soft);
+  border-color: var(--color-line);
+}
+
+.lhe-map .leaflet-bar a:hover,
+.lhe-map .leaflet-bar a:focus-visible {
+  background: var(--color-beige);
+  color: var(--color-ink);
+}
+
+.lhe-map .leaflet-bar a.leaflet-disabled {
+  background: var(--color-beige);
+  color: var(--color-ink-muted);
+}
+
+.lhe-map .leaflet-control-attribution a {
+  color: var(--color-gold-deep);
+}
+
+.lhe-map .leaflet-popup-content-wrapper,
+.lhe-map .leaflet-popup-tip {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border-radius: 0.25rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+
+.lhe-map .leaflet-popup-content {
+  margin: 0;
+  width: 15rem !important;
+}
+
+.lhe-map .leaflet-popup-close-button {
+  color: var(--color-ink-muted) !important;
+  padding: 6px 8px 0 0 !important;
+}
+
+/* Marker `divIcon`-dur: standart ağ fon və çərçivə söndürülür. */
+.lhe-map .lhe-marker {
+  background: transparent;
+  border: none;
+}
+
+.lhe-map .lhe-marker svg {
+  display: block;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
+}
+
+/* Sürüklənə bilən marker seçim rejimində kursoru dəyişir. */
+.lhe-map .lhe-marker--draggable {
+  cursor: grab;
+}
+
+/* Tünd temada tile-ların ağ kənarları görünməsin deyə konteyner fonu bağlanır. */
+.dark .lhe-map .leaflet-container {
+  background: var(--color-navy-soft, #202c39);
+}
+
+/* Fokus halqası dizayn sistemi ilə eyni olsun. */
+.lhe-map .leaflet-container:focus-visible,
+.lhe-map .leaflet-interactive:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}

@@ -76,7 +76,9 @@ const ADMIN_CSP = [
   "form-action 'self'",
   "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az",
+  // `basemaps.cartocdn.com` — koordinat seçicisinin xəritə tile-ları
+  // (`src/components/map/tiles.ts`). Marker ikonu inline SVG-dir, kənar şəkil deyil.
+  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az https://*.basemaps.cartocdn.com",
   "font-src 'self' data:",
   "connect-src 'self' https://challenges.cloudflare.com",
   "frame-src https://challenges.cloudflare.com",
@@ -87,9 +89,12 @@ function harden(response: NextResponse): NextResponse {
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "no-referrer");
+  // `geolocation=(self)`: elan formasındakı «cari yerimi götür» düyməsi üçün lazımdır.
+  // İcazə yalnız öz mənşəyimizə verilir — daxil edilmiş kənar freym oxuya bilmir və
+  // brauzer istifadəçidən onsuz da açıq icazə soruşur.
   response.headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+    "camera=(), microphone=(), geolocation=(self), payment=(), usb=()",
   );
   // Panel səhifələri heç vaxt paylaşılan keşdə saxlanılmamalıdır
   response.headers.set("Cache-Control", "no-store, max-age=0");

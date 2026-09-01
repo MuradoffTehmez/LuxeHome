@@ -473,6 +473,29 @@
       "removeFailed": "Uğursuz şəkli siyahıdan çıxar",
       "removeShort": "Çıxar",
       "addMore": "Daha əlavə et"
+    },
+    "locationPicker": {
+      "latitude": "Enlik (latitude)",
+      "longitude": "Uzunluq (longitude)",
+      "searchLabel": "Ünvanı xəritədə tap",
+      "searchPlaceholder": "Məsələn: Əliyar Əliyev 109A, Bakı",
+      "searchAction": "Axtar",
+      "searching": "Axtarılır…",
+      "noResults": "Bu ünvan tapılmadı. Daha ümumi yazın və ya xəritəyə birbaşa klikləyin.",
+      "searchError": "Ünvan xidməti cavab vermədi. Bir azdan yenidən yoxlayın.",
+      "useMyLocation": "Cari yerimi götür",
+      "locationDenied": "Brauzer yerləşmə icazəsi vermədi. Xəritəyə klikləyərək nöqtəni özünüz seçin.",
+      "clear": "Koordinatı sil",
+      "hint": "Ünvanı yazıb axtarın, sonra dəqiqləşdirmək üçün xəritədə markeri sürükləyin.",
+      "map": {
+        "region": "Koordinat seçimi xəritəsi",
+        "zoomIn": "Yaxınlaşdır",
+        "zoomOut": "Uzaqlaşdır",
+        "expand": "Xəritəni tam ekranda aç",
+        "collapse": "Tam ekrandan çıx",
+        "recenter": "Xəritəni mərkəzləşdir",
+        "scrollHint": "Nöqtəni təyin etmək üçün xəritəyə klikləyin"
+      }
     }
   },
   "pages": {
@@ -921,7 +944,9 @@
       "mediaFayliSec": "Media faylı seç",
       "jpgPngWebpVe": "JPG, PNG, WebP və ya AVIF — hər fayl ən çoxu 8 MB",
       "media": "Media",
-      "faylAdiVeYa": "Fayl adı və ya alt mətn üzrə axtar…"
+      "faylAdiVeYa": "Fayl adı və ya alt mətn üzrə axtar…",
+      "ofisKoordinati": "Ofisin xəritədəki yeri",
+      "ofisKoordinatiHint": "Koordinat təyin edildikdən sonra ofisin xəritəsi «Əlaqə» səhifəsində və footer-də görünür."
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA ehtiyat kodları — bir dəfə göstərilir",

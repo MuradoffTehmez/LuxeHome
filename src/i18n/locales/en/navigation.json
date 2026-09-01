@@ -53,7 +53,8 @@
     "rightsReserved": "All rights reserved.",
     "description": "Professional real estate services for apartments, villas, land and commercial property.",
     "ownership": "The website and the «{brand}» brand and trademark belong to {owner}.",
-    "vat": "Tax ID: {value}"
+    "vat": "Tax ID: {value}",
+    "directions": "Get directions"
   },
   "agents": "Agents",
   "knowledgeHub": "Knowledge Hub",

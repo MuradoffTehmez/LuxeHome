@@ -112,7 +112,8 @@
     "projectTypeMixed": "Mixed-use",
     "projectStatusPlanned": "Planned",
     "projectStatusOngoing": "In progress",
-    "projectStatusCompleted": "Completed"
+    "projectStatusCompleted": "Completed",
+    "onMap": "On the map"
   },
   "search": {
     "listingType": "Listing type",

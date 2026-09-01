@@ -39,6 +39,8 @@ export default async function AdminSettingsPage() {
           contactAddress={settings[SETTING_KEYS.CONTACT_ADDRESS] ?? siteConfig.addressFull}
           contactInstagram={settings[SETTING_KEYS.CONTACT_INSTAGRAM] ?? siteConfig.instagram}
           contactWhatsapp={settings[SETTING_KEYS.CONTACT_WHATSAPP] ?? siteConfig.whatsapp}
+          contactLatitude={settings[SETTING_KEYS.CONTACT_LATITUDE] ?? ""}
+          contactLongitude={settings[SETTING_KEYS.CONTACT_LONGITUDE] ?? ""}
         />
 
         <AdminCard title={t("pages.settings.qorunanHuquqiMelumatlar")} className="min-w-0">

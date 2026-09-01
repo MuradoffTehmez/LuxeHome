@@ -16,6 +16,18 @@ export default defineConfig({
       runtime: "automatic",
     },
   },
+  /**
+   * Testlərdə PostCSS söndürülür.
+   *
+   * Komponentlərdən biri (`components/map/leaflet-map.tsx`) Leaflet-in öz CSS
+   * faylını idxal edir. Vite həmin faylı emal edərkən layihənin
+   * `postcss.config.mjs`-ini oxuyur və Tailwind v4 plagini Vitest-in Node
+   * mühitində yüklənmir. Testlər CSS-ə baxmır — boş plagin siyahısı ilə fayl
+   * sadəcə keçir.
+   */
+  css: {
+    postcss: { plugins: [] },
+  },
   // `@/*` alias-ı tsconfig-dədir, Vite onu avtomatik oxumur
   resolve: {
     alias: {

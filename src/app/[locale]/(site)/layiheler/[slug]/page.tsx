@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Calendar, MapPin, CheckCircle2, Phone, Building2 } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
+import { PlaceMap } from "@/components/map/place-map";
 import { Badge } from "@/components/ui/badge";
 import { ButtonAnchor } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -205,6 +206,19 @@ export default async function ProjectDetailPage({ params }: Props) {
                   ))}
                 </div>
               </div>
+
+              {project.latitude != null && project.longitude != null && (
+                <div className="flex flex-col gap-4">
+                  <h2 className="font-display text-xl text-ink">{t("onMap")}</h2>
+                  <PlaceMap
+                    latitude={project.latitude}
+                    longitude={project.longitude}
+                    title={project.name}
+                    subtitle={[project.address, project.city?.name].filter(Boolean).join(", ") || null}
+                    mapClassName="h-80"
+                  />
+                </div>
+              )}
             </div>
             }
             aside={

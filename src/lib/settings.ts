@@ -22,6 +22,13 @@ export const SETTING_KEYS = {
   CONTACT_ADDRESS: "site.contact_address",
   CONTACT_INSTAGRAM: "site.contact_instagram",
   CONTACT_WHATSAPP: "site.contact_whatsapp",
+  /**
+   * Ofisin xəritə koordinatı. Kodda defolt dəyər **qəsdən yoxdur**: təxmini nöqtə
+   * ziyarətçini yanlış ünvana aparardı. Parametr boş olduqda «Əlaqə» səhifəsi və
+   * footer sadəcə xəritəsiz göstərilir.
+   */
+  CONTACT_LATITUDE: "site.contact_latitude",
+  CONTACT_LONGITUDE: "site.contact_longitude",
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
@@ -44,6 +51,8 @@ export async function getOperationalSiteConfig() {
   const addressFull = settings[SETTING_KEYS.CONTACT_ADDRESS]?.trim() || siteConfig.addressFull;
   const instagram = settings[SETTING_KEYS.CONTACT_INSTAGRAM]?.trim().replace(/^@/, "") || siteConfig.instagram;
   const whatsapp = settings[SETTING_KEYS.CONTACT_WHATSAPP]?.replace(/\D/g, "") || siteConfig.whatsapp;
+  const latitude = toCoordinate(settings[SETTING_KEYS.CONTACT_LATITUDE]);
+  const longitude = toCoordinate(settings[SETTING_KEYS.CONTACT_LONGITUDE]);
   return {
     phone,
     phoneHref: `tel:${phone.replace(/[^+\d]/g, "")}`,
@@ -52,7 +61,18 @@ export async function getOperationalSiteConfig() {
     instagram,
     instagramUrl: `https://instagram.com/${instagram}`,
     whatsapp,
+    // Hər ikisi doldurulmayıbsa xəritə göstərilmir — yarımçıq koordinat mənasızdır.
+    latitude: latitude != null && longitude != null ? latitude : null,
+    longitude: latitude != null && longitude != null ? longitude : null,
   };
+}
+
+/** Boş, pozulmuş və ya diapazondan kənar dəyər `null` qaytarır. */
+function toCoordinate(value: string | undefined): number | null {
+  if (!value?.trim()) return null;
+  const parsed = Number(value.trim());
+  if (!Number.isFinite(parsed) || Math.abs(parsed) > 180) return null;
+  return parsed;
 }
 
 export async function getAllSettings(): Promise<Record<string, string>> {

@@ -6,7 +6,7 @@ import { PropertyActionToolbar } from "../property-action-toolbar";
 import { ShareButtons } from "../share-buttons";
 
 describe("əmlak detal discovery və conversion əməliyyatları", () => {
-  it("qalereyanı mobil swipe rail və desktop grid kimi eyni şəkillərlə render edir", () => {
+  it("qalereyanı sabit hündürlüklü hero lenti və kiçik şəkil zolağı kimi render edir", () => {
     const html = renderToStaticMarkup(
       <Gallery
         title="Sahil villası"
@@ -17,9 +17,15 @@ describe("əmlak detal discovery və conversion əməliyyatları", () => {
       />,
     );
 
-    expect(html).toContain("-mx-4");
+    // Hero lenti: toxunma ekranında swipe brauzerin öz `scroll-snap` jestidir
     expect(html).toContain("snap-mandatory");
-    expect(html).toContain("sm:grid-cols-2");
+    // Şəkil sayı nə olursa olsun hündürlük sabitdir — şəbəkə divarı geri qayıtmamalıdır
+    expect(html).not.toContain("sm:grid-cols-2");
+    expect(html).toContain("sm:aspect-16/10");
+    // Kiçik şəkil zolağı və aktiv şəklin işarəsi
+    expect(html).toContain('aria-label="1-ci şəklə keç"');
+    expect(html).toContain('aria-label="2-ci şəklə keç"');
+    expect(html).toContain("Bütün şəkilləri göstər (2)");
     expect(html).toContain('aria-live="polite"');
     expect(html).toContain('aria-label="Fasad şəklini tam ekranda aç"');
     expect(html).toContain('aria-label="Qonaq otağı şəklini tam ekranda aç"');

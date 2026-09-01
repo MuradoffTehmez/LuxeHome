@@ -112,7 +112,8 @@
     "projectTypeMixed": "Многофункциональный",
     "projectStatusPlanned": "Планируется",
     "projectStatusOngoing": "Строится",
-    "projectStatusCompleted": "Завершён"
+    "projectStatusCompleted": "Завершён",
+    "onMap": "На карте"
   },
   "search": {
     "listingType": "Тип объявления",
