@@ -8,7 +8,8 @@ const TONES: Record<Tone, string> = {
   warning: "bg-warning-bg text-warning border-warning/25",
   danger: "bg-danger-bg text-danger border-danger/25",
   info: "bg-info-bg text-info border-info/25",
-  gold: "bg-gold text-ink border-transparent",
+  // `text-ink` yox: o, tünd rejimdə açığa dönür və qızıl fonda kontrast itir.
+  gold: "bg-gold text-on-gold border-transparent",
   dark: "bg-charcoal text-ink-invert border-transparent",
 };
 

@@ -22,7 +22,10 @@
   /* --- Rənglər: mətn (WCAG AA yoxlanılıb) --- */
   --color-ink: #14181c; /* ivory üzərində 15.9:1 */
   --color-ink-soft: #454c54; /* ivory üzərində 8.4:1 */
-  --color-ink-muted: #666d74; /* ivory üzərində 4.74:1, paper üzərində 5.24:1 — WCAG AA */
+  /* İkinci dərəcəli mətn. Dəyər **ən tünd fona görə** seçilir: token həm ivory,
+     həm paper, həm də beige üzərində işlədilir və beige ən aşağı nisbəti verir.
+     ivory 5.42:1 · paper 5.75:1 · beige 4.85:1 — hamısı WCAG AA-dan yuxarı. */
+  --color-ink-muted: #5d646b;
   --color-ink-invert: #f7f4ef; /* navy üzərində 15.2:1 */
   --color-ink-invert-soft: #b9c0c9; /* navy üzərində 8.7:1 */
 
@@ -31,6 +34,11 @@
   --color-gold-soft: #c4a575; /* tünd fonda mətn/ikon — 7:1-dən yuxarı */
   --color-gold-deep: #806237; /* açıq fonda link mətni — WCAG AA */
   --color-gold-line: #d9c7a6; /* incə ayırıcı və border */
+  /* Qızıl fon **hər iki rejimdə açıqdır** (açıq #aa8754, tünd #c9a870), ona görə
+     onun üzərindəki mətn həmişə tünd qalmalıdır. `text-ink` işlədilsəydi, tünd
+     rejimdə mətn də açığa dönür və kontrast 2.05:1-ə düşürdü.
+     #aa8754 üzərində 5.35:1 · #c9a870 üzərində 7.92:1 — hər ikisi WCAG AA. */
+  --color-on-gold: #14181c;
 
   /* --- Rənglər: kənar və sərhəd --- */
   --color-line: #e4ddd2;

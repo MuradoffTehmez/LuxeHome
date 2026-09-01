@@ -122,7 +122,10 @@ export function TurnstileWidget({
   }, [resetSignal]);
 
   return (
-    <div className="min-h-[65px]" aria-label="Təhlükəsizlik yoxlaması">
+    // `aria-label` yalnız rolu olan elementdə keçərlidir; role-suz `div`-də
+    // axe onu «aria-prohibited-attr» kimi işarələyir (WCAG 4.1.2). Widget
+    // qrup kimi elan olunur ki, etiket ekran oxuyucuya çatsın.
+    <div className="min-h-[65px]" role="group" aria-label="Təhlükəsizlik yoxlaması">
       <div ref={containerRef} />
       {failed && (
         <p role="alert" className="mt-2 text-sm text-danger">

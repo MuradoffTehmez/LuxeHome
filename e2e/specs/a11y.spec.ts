@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { visit } from "../support/helpers";
+import { settlePage, visit } from "../support/helpers";
 
 /**
  * Əlçatanlıq (WCAG).
@@ -27,6 +27,7 @@ for (const target of AUDITED_PAGES) {
   test(`${target.name} — ciddi əlçatanlıq pozuntusu yoxdur`, async ({ page }, testInfo) => {
     await visit(page, target.path);
     await page.waitForLoadState("load");
+    await settlePage(page);
 
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -158,6 +159,7 @@ test.describe("Dark rejim kontrastı", () => {
     await page.emulateMedia({ colorScheme: "dark" });
     await visit(page, "/az/emlaklar");
     await page.waitForLoadState("load");
+    await settlePage(page);
 
     const isDark = await page.evaluate(() =>
       document.documentElement.classList.contains("dark"),

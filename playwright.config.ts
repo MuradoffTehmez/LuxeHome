@@ -60,6 +60,22 @@ export default defineConfig({
   use: {
     baseURL,
     userAgent: USER_AGENT,
+
+    /**
+     * Reveal animasiyası söndürülür.
+     *
+     * `[data-reveal]` elementləri scroll zamanı `opacity: 0 → 1` keçidi edir.
+     * Keçidin ortasında tutulan element yarı-şəffaf olur və axe onu fonla
+     * qarışmış rəngdə ölçür — nəticədə mövcud olmayan kontrast pozuntuları
+     * hesabata düşür (məsələn `#aa8754` qızıl fon `#bca077` kimi görünür).
+     * `globals.css`-dəki `prefers-reduced-motion: reduce` bloku həmin
+     * elementləri dərhal `opacity: 1` edir, ona görə emulyasiya problemi
+     * kökündən həll edir və eyni zamanda testləri sürətləndirir.
+     *
+     * Parametr `contextOptions` altındadır: `reducedMotion` brauzer kontekstinin
+     * seçimidir, `use` səviyyəsində birbaşa qəbul edilmir.
+     */
+    contextOptions: { reducedMotion: "reduce" },
     // İlk uğursuzluqdan sonrakı təkrarda iz saxlanılır — CI-də debug üçün kifayətdir.
     trace: "on-first-retry",
     screenshot: "only-on-failure",
