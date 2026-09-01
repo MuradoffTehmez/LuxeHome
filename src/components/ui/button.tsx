@@ -15,7 +15,7 @@ type Size = "sm" | "md" | "lg";
 const VARIANTS: Record<Variant, string> = {
   // Champagne gold — səhifədə yalnız bir əsas CTA
   primary:
-    "bg-gold text-ink hover:bg-gold-soft active:bg-gold-deep active:text-paper border border-transparent",
+    "bg-gold text-on-gold hover:bg-gold-soft active:bg-gold-deep active:text-paper border border-transparent",
   secondary:
     "bg-charcoal text-ink-invert hover:bg-charcoal-soft border border-transparent",
   outline:

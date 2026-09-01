@@ -120,7 +120,7 @@ function FilterForm({
             {select.options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
         ))}
-        <button type="submit" className="min-h-11 cursor-pointer rounded-md border border-line-strong bg-gold px-4 text-sm font-medium text-ink shadow-xs transition-colors hover:bg-gold-soft">
+        <button type="submit" className="min-h-11 cursor-pointer rounded-md border border-line-strong bg-gold px-4 text-sm font-medium text-on-gold shadow-xs transition-colors hover:bg-gold-soft">
           {t("actions.apply")}
         </button>
         {hasFilters ? (

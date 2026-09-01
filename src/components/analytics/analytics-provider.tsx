@@ -73,7 +73,7 @@ export function AnalyticsProvider() {
       <p className="font-medium text-ink">{t("title")}</p>
       <p className="mt-1 text-sm leading-6 text-ink-soft">{t("description")}</p>
       <div className="mt-4 flex flex-wrap gap-2">
-        <button type="button" onClick={() => { writeConsent("granted"); setConsent("granted"); }} className="inline-flex min-h-11 items-center rounded-xs bg-gold px-4 text-sm font-medium text-ink hover:bg-gold-soft">{t("accept")}</button>
+        <button type="button" onClick={() => { writeConsent("granted"); setConsent("granted"); }} className="inline-flex min-h-11 items-center rounded-xs bg-gold px-4 text-sm font-medium text-on-gold hover:bg-gold-soft">{t("accept")}</button>
         <button type="button" onClick={() => { writeConsent("denied"); setConsent("denied"); }} className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-4 text-sm font-medium text-ink hover:border-gold">{t("decline")}</button>
       </div>
     </aside>

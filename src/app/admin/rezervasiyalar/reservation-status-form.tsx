@@ -13,7 +13,7 @@ function Submit() {
   const t = useTranslations("admin");
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending} className="grid size-11 place-items-center rounded-xs bg-gold text-ink hover:bg-gold-soft disabled:opacity-50" aria-label={t("pages.ops.statusuYaddaSaxla")}>
+    <button type="submit" disabled={pending} className="grid size-11 place-items-center rounded-xs bg-gold text-on-gold hover:bg-gold-soft disabled:opacity-50" aria-label={t("pages.ops.statusuYaddaSaxla")}>
       <Save className="size-4" aria-hidden="true" />
     </button>
   );

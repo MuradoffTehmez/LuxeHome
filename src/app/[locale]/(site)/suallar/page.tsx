@@ -62,7 +62,7 @@ export default async function FaqPage({ params }: PageProps) {
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <Link
                 href="/elaqe"
-                className="inline-flex min-h-11 items-center rounded-xs bg-gold px-5 text-sm font-medium text-ink transition-colors hover:bg-gold-soft"
+                className="inline-flex min-h-11 items-center rounded-xs bg-gold px-5 text-sm font-medium text-on-gold transition-colors hover:bg-gold-soft"
               >
                 {copy.contactForm}
               </Link>

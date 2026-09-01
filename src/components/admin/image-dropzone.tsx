@@ -299,7 +299,7 @@ export function ImageDropzone({
               </div>
 
               {item.isCover && item.status === "ready" && (
-                <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-xs bg-gold px-2 py-1 text-[11px] font-semibold text-ink">
+                <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-xs bg-gold px-2 py-1 text-[11px] font-semibold text-on-gold">
                   <Star className="size-3 fill-current" aria-hidden="true" />
                   {t("components.dropzone.cover")}
                 </span>

@@ -92,7 +92,7 @@ function FilterButton({
         "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xs border px-4 text-sm font-medium",
         "transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
         active
-          ? "border-gold bg-gold text-ink"
+          ? "border-gold bg-gold text-on-gold"
           : "border-line-strong text-ink-soft hover:border-gold hover:text-gold-deep",
       )}
     >

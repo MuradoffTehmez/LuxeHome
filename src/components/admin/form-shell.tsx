@@ -136,7 +136,7 @@ export function SubmitButton({
       disabled={pending}
       aria-busy={pending || undefined}
       className={cn(
-        "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xs border border-transparent bg-gold px-5 text-sm font-medium text-ink",
+        "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xs border border-transparent bg-gold px-5 text-sm font-medium text-on-gold",
         "transition-colors duration-300 ease-out-soft hover:bg-gold-soft",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",

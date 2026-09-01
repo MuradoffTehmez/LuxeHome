@@ -188,7 +188,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
                       >
                         <AdminIcon name={item.icon} className="size-4.5 shrink-0" />
                         <span className="min-w-0 flex-1 truncate">{t(`nav.items.${item.labelKey}`)}</span>
-                        {badge ? <span className="inline-flex min-w-6 justify-center rounded-full bg-gold px-1.5 py-0.5 text-[11px] font-semibold text-ink tabular-nums">{badge}</span> : null}
+                        {badge ? <span className="inline-flex min-w-6 justify-center rounded-full bg-gold px-1.5 py-0.5 text-[11px] font-semibold text-on-gold tabular-nums">{badge}</span> : null}
                       </Link>
                       {hasChildren && (
                         <button

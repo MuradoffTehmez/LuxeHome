@@ -43,7 +43,7 @@ export function PropertyWizard({ types, cities }: { types: Option[]; cities: Cit
         <label className="text-sm text-ink-soft">11. {t("mortgage")}<select name="xususiyyet" className={fieldClass}><option value="">{t("any")}</option><option value="ipoteka">{t("yes")}</option></select></label>
         <label className="text-sm text-ink-soft">12. {t("priority")}<select name="siralama" className={fieldClass}><option value="newest">{t("priorityOptions.newest")}</option><option value="price_asc">{t("priorityOptions.price")}</option><option value="area_desc">{t("priorityOptions.area")}</option><option value="featured">{t("priorityOptions.featured")}</option></select></label>
       </div>
-      <button type="submit" className="mt-7 inline-flex min-h-12 items-center justify-center rounded-xs bg-gold px-6 text-sm font-medium text-ink transition-colors hover:bg-gold-soft">{t("submit")}</button>
+      <button type="submit" className="mt-7 inline-flex min-h-12 items-center justify-center rounded-xs bg-gold px-6 text-sm font-medium text-on-gold transition-colors hover:bg-gold-soft">{t("submit")}</button>
     </form>
   );
 }

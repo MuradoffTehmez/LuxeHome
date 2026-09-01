@@ -147,7 +147,7 @@ function SubmitRelationButton() {
     <button
       type="submit"
       disabled={pending}
-      className="inline-flex min-h-11 items-center gap-2 rounded-xs bg-gold px-4 text-sm font-medium text-ink disabled:opacity-50"
+      className="inline-flex min-h-11 items-center gap-2 rounded-xs bg-gold px-4 text-sm font-medium text-on-gold disabled:opacity-50"
     >
       {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Plus className="size-4" aria-hidden="true" />}
       Əlaqə əlavə et
