@@ -1,31 +1,27 @@
 /**
- * Xəritə tile mənbələri.
+ * Xeritə tile mənbələri.
  *
  * OpenStreetMap-ın standart tile-ları (`tile.openstreetmap.org`) rəngli POI
- * ikonları ilə doludur — əmlak elanının yanında xəritə səliqəsiz görünürdü — və
- * OSMF-in istifadə siyasəti kommersiya yükünü açıq şəkildə məhdudlaşdırır.
+ * ikonları ilə doludur və OSMF siyasəti kommersiya yükünü məhdudlaşdırır.
+ * CARTO basemap-ları isə artıq açarsız işləmir: sorğu cavab verir, amma hər
+ * tile-ın üstünə «API KEY REQUIRED» yazısı basılır.
  *
- * CARTO basemap-ları eyni OSM datasından qurulur, amma sadələşdirilmiş dizayna
- * malikdir və **açıq/tünd üçün ayrı stil** verir: `.dark` klassı ilə işləyən
- * dizayn sistemində xəritənin də temaya uyğunlaşması vacibdir, əks halda tünd
- * səhifədə ağ düzbucaqlı kimi görünür. API açarı tələb olunmur; atribusiya
- * məcburidir və `attribution` sətrində saxlanılır.
+ * Ona görə tile-lar layihədə onsuz da mövcud olan **Geoapify** açarı ilə
+ * çəkilir. URL öz mənşəyimizə baxır (`/api/map-tiles/...`): proxy açarı
+ * serverdə saxlayır və panelin sərt CSP-si üçün `img-src 'self'` kifayət edir.
+ *
+ * `{r}` Leaflet tərəfindən retina ekranlarda `@2x` ilə əvəzlənir.
  */
 
 export const MAP_TILES = {
-  light: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-  dark: "https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png",
+  light: "/api/map-tiles/light/{z}/{x}/{y}{r}.png",
+  dark: "/api/map-tiles/dark/{z}/{x}/{y}{r}.png",
 } as const;
 
+/** Provayderin atribusiya tələbi — xəritədən silinməməlidir. */
 export const MAP_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
+  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <a href="https://www.geoapify.com/" target="_blank" rel="noopener">Geoapify</a>';
 
-/** CSP `img-src` siyahısına düşməli olan tile hostu (`src/middleware.ts`). */
-export const MAP_TILE_HOST = "https://*.basemaps.cartocdn.com";
-
-export const MAP_SUBDOMAINS = "abcd";
-
-/** Bakının mərkəzi — koordinatı olmayan xəritələr üçün başlanğıc nöqtə. */
 export const BAKU_CENTER: readonly [number, number] = [40.3777, 49.892];
 
 /** Xarici naviqasiya tətbiqlərinə keçidlər. */

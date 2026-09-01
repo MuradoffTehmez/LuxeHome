@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import {
   BAKU_CENTER,
   MAP_ATTRIBUTION,
-  MAP_SUBDOMAINS,
   MAP_TILES,
 } from "./tiles";
 
@@ -227,7 +226,6 @@ export function LeafletMap({
     tileRef.current?.remove();
     tileRef.current = L.tileLayer(isDark ? MAP_TILES.dark : MAP_TILES.light, {
       attribution: MAP_ATTRIBUTION,
-      subdomains: MAP_SUBDOMAINS,
       maxZoom: 20,
       // `{r}` Leaflet tərəfindən retina ekranlarda `@2x` ilə əvəzlənir (CARTO hər
       // iki variantı verir). `detectRetina` **qəsdən açılmır**: o, tile ölçüsünü
