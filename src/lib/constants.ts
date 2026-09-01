@@ -849,6 +849,17 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   ru: "Русский",
 };
 
+/**
+ * `az` kimi qısa etiket bəzi Workers `Intl` quruluşlarında ayı `M08` kimi
+ * qaytarır. Tarix və rəqəm formatlamasında tam BCP 47 etiketindən istifadə
+ * olunmalıdır.
+ */
+export const LOCALE_TAGS: Record<Locale, string> = {
+  az: "az-AZ",
+  en: "en-GB",
+  ru: "ru-RU",
+};
+
 export const DEFAULT_LOCALE: Locale = LOCALES.AZ;
 
 // ---------------------------------------------------------------------------

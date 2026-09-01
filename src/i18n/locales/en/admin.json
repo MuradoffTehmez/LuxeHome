@@ -487,6 +487,7 @@
       "locationDenied": "The browser denied location access. Pick the point on the map instead.",
       "clear": "Clear coordinates",
       "hint": "Search for the address, then drag the marker to fine-tune the point.",
+      "providerAttribution": "Address search and reverse geocoding by:",
       "map": {
         "region": "Coordinate picker map",
         "zoomIn": "Zoom in",

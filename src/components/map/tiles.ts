@@ -29,10 +29,31 @@ export const MAP_SUBDOMAINS = "abcd";
 export const BAKU_CENTER: readonly [number, number] = [40.3777, 49.892];
 
 /** Xarici naviqasiya tətbiqlərinə keçidlər. */
-export function directionsLinks(latitude: number, longitude: number) {
+export function directionsLinks(
+  latitude: number,
+  longitude: number,
+  destination?: { title?: string | null; address?: string | null; locale?: "az" | "en" | "ru" },
+) {
+  const title = destination?.title?.trim() || `${latitude}, ${longitude}`;
+  const address = destination?.address?.trim() || `${latitude}, ${longitude}`;
+  const uber = new URL("https://m.uber.com/looking");
+  uber.searchParams.set("pickup", "my_location");
+  uber.searchParams.set("drop[0]", JSON.stringify({
+    latitude,
+    longitude,
+    addressLine1: title,
+    addressLine2: address,
+  }));
+
   return {
     google: `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`,
     googlePlace: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
     waze: `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`,
+    uber: uber.toString(),
+    // Bolt ixtiyari koordinatla təyinat nöqtəsi verən ictimai deep-link təqdim
+    // etmir. Rəsmi Bakı səhifəsi açılır; PlaceMap eyni anda ünvanı kopyalayır.
+    bolt: destination?.locale === "az"
+      ? "https://bolt.eu/az-az/cities/baku/"
+      : "https://bolt.eu/en-az/cities/baku/",
   };
 }

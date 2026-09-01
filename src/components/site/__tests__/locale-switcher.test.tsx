@@ -25,11 +25,11 @@ describe("LocaleSwitcher", () => {
   it("mobil menyuda üç dili bayraq və tam adı ilə birbaşa göstərir", () => {
     const html = renderToStaticMarkup(<LocaleSwitcher variant="mobile" />);
 
-    expect(html).toContain("🇦🇿");
+    expect(html).toContain('data-locale-flag="az"');
     expect(html).toContain("Azərbaycan");
-    expect(html).toContain("🇬🇧");
+    expect(html).toContain('data-locale-flag="en"');
     expect(html).toContain("English");
-    expect(html).toContain("🇷🇺");
+    expect(html).toContain('data-locale-flag="ru"');
     expect(html).toContain("Русский");
     expect(html).toContain('aria-pressed="true"');
     expect(html).not.toContain("role=\"dialog\"");
@@ -38,7 +38,7 @@ describe("LocaleSwitcher", () => {
   it("desktopda cari dili kompakt dropdown düyməsində göstərir", () => {
     const html = renderToStaticMarkup(<LocaleSwitcher />);
 
-    expect(html).toContain("🇦🇿");
+    expect(html).toContain('data-locale-flag="az"');
     expect(html).toContain(">az<");
     expect(html).toContain('aria-expanded="false"');
     expect(html).toContain('aria-label="Dili dəyiş"');

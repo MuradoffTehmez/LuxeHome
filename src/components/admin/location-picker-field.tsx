@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { LocationPicker } from "@/components/map/location-picker";
 import { useFieldError } from "./form-shell";
@@ -28,6 +28,7 @@ export function AdminLocationPicker({
   longitudeName?: string;
 }) {
   const t = useTranslations("admin");
+  const locale = useLocale();
 
   return (
     <LocationPicker
@@ -38,6 +39,7 @@ export function AdminLocationPicker({
       longitudeName={longitudeName}
       latitudeError={useFieldError(latitudeName)}
       longitudeError={useFieldError(longitudeName)}
+      language={locale === "en" || locale === "ru" ? locale : "az"}
       labels={{
         latitude: t("components.locationPicker.latitude"),
         longitude: t("components.locationPicker.longitude"),
@@ -51,6 +53,7 @@ export function AdminLocationPicker({
         locationDenied: t("components.locationPicker.locationDenied"),
         clear: t("components.locationPicker.clear"),
         hint: t("components.locationPicker.hint"),
+        providerAttribution: t("components.locationPicker.providerAttribution"),
         map: {
           region: t("components.locationPicker.map.region"),
           zoomIn: t("components.locationPicker.map.zoomIn"),

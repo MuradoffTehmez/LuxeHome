@@ -248,6 +248,7 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `SEED_ADMIN_EMAIL` | Seed/bootstrap admin ünvanı | Lokal/bootstrap üçün |
 | `SEED_ADMIN_PASSWORD` | Seed/bootstrap admin parolu | Lokal/bootstrap üçün |
 | `RESEND_API_KEY` | Resend API açarı | E-poçt bildirişi üçün |
+| `GEOAPIFY_API_KEY` | Geoapify geokod açarı | Paneldə ünvan axtarışı və xəritədən ünvan seçimi üçün |
 | `RESEND_FROM_EMAIL` | Göndərən ünvan | E-poçt bildirişi üçün |
 | `NOTIFICATION_EMAIL` | Müraciət bildirişinin alıcısı | E-poçt bildirişi üçün |
 | `RESEND_WEBHOOK_SECRET` | Resend/Svix webhook imzasının doğrulanması | Korporativ e-poçt jurnalı üçün |
@@ -259,6 +260,7 @@ Cloudflare secret nümunələri:
 ```bash
 npx wrangler secret put AUTH_SECRET
 npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put GEOAPIFY_API_KEY
 npx wrangler secret put RESEND_FROM_EMAIL
 npx wrangler secret put NOTIFICATION_EMAIL
 npx wrangler secret put RESEND_WEBHOOK_SECRET

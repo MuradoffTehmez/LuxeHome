@@ -19,6 +19,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { formatPrice } from "@/lib/utils";
 import type { Locale } from "@/lib/constants";
+import { formatLocalizedDate } from "@/i18n/date";
 
 // Tərcümə açarları birləşmə tipidir — `t()` şablon sətrini yalnız belə qəbul edir.
 const RENOVATION_KEYS: Record<string, "cosmetic" | "renovated" | "designer" | "unrenovated" | "newBuilding"> = {
@@ -61,18 +62,6 @@ export type PropertyKeyFactsData = {
 };
 
 type Fact = { key: string; icon: LucideIcon; label: string; value: string };
-
-/**
- * D1-də `DateTime` sadəcə mətn sütunudur — köhnə və ya kənardan idxal edilmiş
- * qeyd oxunmayan dəyər daşıya bilər. `Intl` belə dəyərdə `RangeError` atır və
- * bir sətir bütün elan səhifəsini çökdürərdi; ona görə tarix susqun buraxılır.
- */
-function formatDate(value: Date | null, locale: Locale): string | null {
-  if (!value) return null;
-  const time = value instanceof Date ? value.getTime() : new Date(value).getTime();
-  if (!Number.isFinite(time)) return null;
-  return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(time);
-}
 
 /**
  * Elanın rəqəmlə ifadə olunan bütün göstəriciləri.
@@ -173,7 +162,7 @@ export async function PropertyKeyFacts({
         : null,
   );
   push("metro", TrainFront, content("metroNearby"), property.metro?.name ?? null);
-  push("publishedAt", CalendarDays, content("publishedAt"), formatDate(property.publishedAt, locale));
+  push("publishedAt", CalendarDays, content("publishedAt"), formatLocalizedDate(property.publishedAt, locale));
   push("views", Eye, content("views"), property.viewCount > 0 ? String(property.viewCount) : null);
   // Elan kodu — dəstəklə danışarkən istifadəçinin oxuya biləcəyi qısa istinad.
   push("code", Hash, content("listingCode"), property.id.slice(-6).toUpperCase());

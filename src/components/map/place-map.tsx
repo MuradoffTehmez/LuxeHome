@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
-import { Copy, Check, Navigation } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { Copy, Check, Navigation, CarFront } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Locale } from "@/lib/constants";
 import { LeafletMap, type MapMarker } from "./leaflet-map";
 import { directionsLinks } from "./tiles";
 
@@ -36,14 +37,16 @@ export function PlaceMap({
   showActions = true,
 }: PlaceMapProps) {
   const t = useTranslations("content.map");
+  const locale = useLocale() as Locale;
   const [copied, setCopied] = useState(false);
+  const [boltCopied, setBoltCopied] = useState(false);
 
   const markers = useMemo<MapMarker[]>(
     () => [{ id: "place", latitude, longitude, title, subtitle }],
     [latitude, longitude, title, subtitle],
   );
 
-  const links = directionsLinks(latitude, longitude);
+  const links = directionsLinks(latitude, longitude, { title, address: subtitle, locale });
   const coordinates = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
 
   async function copyCoordinates() {
@@ -54,6 +57,16 @@ export function PlaceMap({
     } catch {
       // Clipboard icazəsi yoxdursa səssiz qalırıq — koordinat onsuz da ekrandadır.
     }
+  }
+
+  function copyDestinationForBolt() {
+    const destination = [title, subtitle, coordinates].filter(Boolean).join(", ");
+    void navigator.clipboard.writeText(destination).then(() => {
+      setBoltCopied(true);
+      window.setTimeout(() => setBoltCopied(false), 2500);
+    }).catch(() => {
+      // Clipboard bloklansa belə rəsmi Bolt səhifəsi yeni tabda açılır.
+    });
   }
 
   return (
@@ -90,6 +103,26 @@ export function PlaceMap({
             className="inline-flex min-h-11 items-center gap-2 rounded-xs border border-line px-3 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
           >
             {t("openInWaze")}
+          </a>
+          <a
+            href={links.uber}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xs border border-line px-3 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
+          >
+            <CarFront className="size-4" aria-hidden="true" />
+            {t("openInUber")}
+          </a>
+          <a
+            href={links.bolt}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={copyDestinationForBolt}
+            title={t("boltCopyHint")}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xs border border-line px-3 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
+          >
+            {boltCopied ? <Check className="size-4 text-success" aria-hidden="true" /> : <CarFront className="size-4" aria-hidden="true" />}
+            <span aria-live="polite">{boltCopied ? t("boltAddressCopied") : t("openInBolt")}</span>
           </a>
           <button
             type="button"

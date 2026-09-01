@@ -9,12 +9,7 @@ import { LOCALE_LABELS, type Locale } from "@/lib/constants";
 import { saveLocalePreference } from "@/lib/locale-actions";
 import { cn } from "@/lib/utils";
 import { startNavigationProgress } from "@/components/site/navigation-progress";
-
-const LOCALE_FLAGS: Record<Locale, string> = {
-  az: "🇦🇿",
-  en: "🇬🇧",
-  ru: "🇷🇺",
-};
+import { LocaleFlag } from "@/components/site/locale-flag";
 
 type LocaleSwitcherProps = {
   isOverlay?: boolean;
@@ -82,7 +77,7 @@ export function LocaleSwitcher({
                   : "border-line bg-paper text-ink-soft hover:border-line-strong hover:text-ink",
               )}
             >
-              <span className="text-xl leading-none" aria-hidden="true">{LOCALE_FLAGS[code]}</span>
+              <LocaleFlag locale={code} className="h-4 w-6" />
               <span className="min-w-0 flex-1 truncate">{LOCALE_LABELS[code]}</span>
               {active ? <Check className="size-4 shrink-0 text-gold-deep" aria-hidden="true" /> : null}
             </button>
@@ -108,7 +103,7 @@ export function LocaleSwitcher({
             : "text-ink-soft hover:bg-beige hover:text-ink",
         )}
       >
-        <span className="text-lg leading-none" aria-hidden="true">{LOCALE_FLAGS[locale]}</span>
+        <LocaleFlag locale={locale} />
         <span className="uppercase">{locale}</span>
         <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden="true" />
       </button>
@@ -128,7 +123,7 @@ export function LocaleSwitcher({
                   code === locale ? "bg-beige font-medium text-ink" : "text-ink-soft hover:bg-beige/60 hover:text-ink",
                 )}
               >
-                <span className="text-lg leading-none" aria-hidden="true">{LOCALE_FLAGS[code]}</span>
+                <LocaleFlag locale={code} />
                 <span className="min-w-0 flex-1 truncate text-left">{LOCALE_LABELS[code]}</span>
                 {code === locale ? <Check className="size-4 shrink-0 text-gold-deep" aria-hidden="true" /> : null}
               </button>

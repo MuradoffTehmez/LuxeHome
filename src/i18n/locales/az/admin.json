@@ -487,6 +487,7 @@
       "locationDenied": "Brauzer yerləşmə icazəsi vermədi. Xəritəyə klikləyərək nöqtəni özünüz seçin.",
       "clear": "Koordinatı sil",
       "hint": "Ünvanı yazıb axtarın, sonra dəqiqləşdirmək üçün xəritədə markeri sürükləyin.",
+      "providerAttribution": "Ünvan axtarışı və əks geokod:",
       "map": {
         "region": "Koordinat seçimi xəritəsi",
         "zoomIn": "Yaxınlaşdır",

@@ -20,6 +20,7 @@ export type LocationPickerLabels = {
   locationDenied: string;
   clear: string;
   hint: string;
+  providerAttribution: string;
   map: LeafletMapLabels;
 };
 
@@ -36,6 +37,8 @@ type LocationPickerProps = {
   longitudeError?: string;
   /** Axtarış qutusuna ilkin dəyər (adətən elanın ünvanı). */
   initialQuery?: string;
+  /** Geoapify nəticələrinin dilidir; koordinat və sahə adlarına təsir etmir. */
+  language?: "az" | "en" | "ru";
   className?: string;
 };
 
@@ -65,6 +68,7 @@ export function LocationPicker({
   latitudeError,
   longitudeError,
   initialQuery = "",
+  language = "az",
   className,
 }: LocationPickerProps) {
   const [latitude, setLatitude] = useState(() => toFieldValue(defaultLatitude));
@@ -92,13 +96,41 @@ export function LocationPicker({
     [hasPoint, parsedLatitude, parsedLongitude, labels.searchLabel],
   );
 
-  const select = useCallback((nextLatitude: number, nextLongitude: number) => {
+  const select = useCallback((nextLatitude: number, nextLongitude: number, label?: string) => {
     // Altı onluq rəqəm ≈ 10 sm dəqiqlik — elan üçün lazım olandan artıqdır.
     setLatitude(nextLatitude.toFixed(6));
     setLongitude(nextLongitude.toFixed(6));
     setResults([]);
     setStatus("idle");
+    if (label) setQuery(label);
   }, []);
+
+  async function resolvePoint(nextLatitude: number, nextLongitude: number) {
+    select(nextLatitude, nextLongitude);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setStatus("loading");
+
+    try {
+      const params = new URLSearchParams({
+        lat: String(nextLatitude),
+        lon: String(nextLongitude),
+        lang: language,
+      });
+      const response = await fetch(`/api/geocode?${params.toString()}`, { signal: controller.signal });
+      if (!response.ok) throw new Error(String(response.status));
+      const payload = (await response.json()) as { results?: GeocodeResult[] };
+      const resolved = payload.results?.[0];
+      if (resolved?.label) setQuery(resolved.label);
+      setStatus("idle");
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      // Nöqtə artıq seçilib; yalnız ünvan mətnini həll etmək alınmayıb.
+      console.error("[location-picker:reverse]", error);
+      setStatus("idle");
+    }
+  }
 
   async function search() {
     const trimmed = query.trim();
@@ -110,7 +142,8 @@ export function LocationPicker({
     setStatus("loading");
 
     try {
-      const response = await fetch(`/api/geocode?q=${encodeURIComponent(trimmed)}`, {
+      const params = new URLSearchParams({ q: trimmed, lang: language });
+      const response = await fetch(`/api/geocode?${params.toString()}`, {
         signal: controller.signal,
       });
       if (!response.ok) throw new Error(String(response.status));
@@ -133,7 +166,7 @@ export function LocationPicker({
     }
     setStatus("loading");
     navigator.geolocation.getCurrentPosition(
-      (position) => select(position.coords.latitude, position.coords.longitude),
+      (position) => void resolvePoint(position.coords.latitude, position.coords.longitude),
       () => setStatus("denied"),
       { enableHighAccuracy: true, timeout: 10_000 },
     );
@@ -194,7 +227,7 @@ export function LocationPicker({
               <li key={`${result.latitude},${result.longitude}`}>
                 <button
                   type="button"
-                  onClick={() => select(result.latitude, result.longitude)}
+                  onClick={() => select(result.latitude, result.longitude, result.label)}
                   className="flex w-full items-start gap-2 rounded-xs px-3 py-2 text-left text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink"
                 >
                   <MapPin className="mt-0.5 size-4 shrink-0 text-gold-deep" aria-hidden="true" />
@@ -208,6 +241,17 @@ export function LocationPicker({
         {status === "empty" && <p className="text-xs text-ink-muted">{labels.noResults}</p>}
         {status === "error" && <p className="text-xs font-medium text-danger">{labels.searchError}</p>}
         {status === "denied" && <p className="text-xs font-medium text-danger">{labels.locationDenied}</p>}
+        <p className="text-xs text-ink-muted">
+          {labels.providerAttribution}{" "}
+          <a
+            href="https://www.geoapify.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-line-strong underline-offset-2 hover:text-gold-deep"
+          >
+            Geoapify
+          </a>
+        </p>
       </div>
 
       <LeafletMap
@@ -215,7 +259,7 @@ export function LocationPicker({
         labels={labels.map}
         className="h-72 sm:h-80"
         selectable
-        onSelect={select}
+        onSelect={(nextLatitude, nextLongitude) => void resolvePoint(nextLatitude, nextLongitude)}
         center={hasPoint ? [parsedLatitude, parsedLongitude] : undefined}
         zoom={hasPoint ? 16 : 12}
       />
