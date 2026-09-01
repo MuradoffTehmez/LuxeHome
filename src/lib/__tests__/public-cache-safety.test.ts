@@ -2,7 +2,11 @@
 
 import { describe, expect, it } from "vitest";
 
-import { SESSION_DEPENDENT_PUBLIC_ROUTES, isCacheablePublicRoute } from "../public-cache-policy";
+import {
+  NEVER_CACHED_PREFIXES,
+  SESSION_DEPENDENT_PUBLIC_ROUTES,
+  isCacheablePublicRoute,
+} from "../public-cache-policy";
 
 /**
  * Keşlənə bilən ictimai səhifə heç vaxt sessiyadan asılı olmamalıdır.
@@ -53,12 +57,34 @@ describe("ictimai keş təhlükəsizliyi", () => {
     }
   });
 
+  it("`(account)` qrupundakı hər marşrut bypass siyahısı ilə örtülür", () => {
+    // Fayl ağacından üst səviyyə seqmentlər: `.../(account)/kabinet/...` → `/kabinet`
+    const accountSegments = new Set(
+      Object.keys(allModules)
+        .filter((path) => path.includes("/(account)/"))
+        .map((path) => "/" + path.split("/(account)/")[1].split("/")[0])
+        .filter((segment) => !segment.endsWith(".tsx")),
+    );
+
+    expect(accountSegments.size).toBeGreaterThan(0);
+    for (const segment of accountSegments) {
+      expect(
+        NEVER_CACHED_PREFIXES.includes(segment as (typeof NEVER_CACHED_PREFIXES)[number]),
+        `${segment} bypass siyahısında yoxdur`,
+      ).toBe(true);
+    }
+  });
+
   it("auth, kabinet, admin və API yolları keşdən kənardır", () => {
     for (const route of [
       "/az/daxil-ol",
       "/az/qeydiyyat",
       "/az/kabinet",
       "/az/kabinet/favoritler",
+      "/az/hesab/parolu-unutdum",
+      "/az/hesab/parolu-yenile",
+      "/az/hesab/e-poct-tesdiqi",
+      "/az/favoritler",
       "/giris",
       "/admin",
       "/admin/emlaklar",

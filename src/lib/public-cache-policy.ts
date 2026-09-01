@@ -19,16 +19,23 @@ export const SESSION_DEPENDENT_PUBLIC_ROUTES = [
   "/mene-emlak-tap",
 ] as const;
 
-/** Heç bir halda keşlənməyən ön şəkilçilər — auth, kabinet, panel və API. */
-const NEVER_CACHED_PREFIXES = [
+/**
+ * Heç bir halda keşlənməyən ön şəkilçilər — auth, kabinet, panel və API.
+ *
+ * `(account)` qrupundakı hər üst səviyyə seqment burada olmalıdır; testi bunu
+ * fayl ağacından yenidən hesablayır. `/hesab` altında parol bərpası və e-poçt
+ * təsdiqi var, ona görə tək-tək deyil, bütöv ağac bağlanır.
+ */
+export const NEVER_CACHED_PREFIXES = [
   "/admin",
   "/api",
   "/giris",
   "/daxil-ol",
   "/qeydiyyat",
   "/kabinet",
-  "/parolu-unutdum",
-  "/parolu-yenile",
+  "/hesab",
+  // Sessiyanı serverdə oxumur, amma istifadəçiyə məxsus səthdir və robots-dan
+  // kənarlaşdırılıb — paylaşılan keşdə yeri yoxdur.
   "/favoritler",
 ] as const;
 
