@@ -37,7 +37,7 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 | Dil | İctimai sayt, kabinet **və admin panel** AZ + EN + RU dillərindədir. Panel dili `User.locale`-dan gəlir (`/admin` locale prefiksi daşımır). |
 | Lead bildirişi | **Telegram bot.** Yeni müraciət gələndə sistem bot vasitəsilə bildiriş göndərəcək. |
 | Spam qoruma | Same-origin + honeypot + IP rate limit + Cloudflare Turnstile tətbiq olunub. |
-| Test / CI / analitika | Vitest və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. Browser E2E hələ yoxdur. |
+| Test / CI / analitika | Vitest və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. **2 sentyabr 2026-dan CI həm staging, həm production-a yayım edir və hər mühitin D1 miqrasiyalarını deploy-dan əvvəl tətbiq edir.** Browser E2E hələ yoxdur. |
 | Real Estate Knowledge Hub | D1 əsaslı bələdçi, hüquqi FAQ, lüğət, kalkulyator və admin CMS hazırdır. Mənbə hüquqi araşdırma DRAFT idxal edilir; yayımdan əvvəl hüquqşünas baxışı tələb olunur. |
 
 ---

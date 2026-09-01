@@ -9,7 +9,7 @@ on:
 
 concurrency:
   # Eyni branch üzrə köhnə run-lar ləğv olunur. `main` istisnadır: yarımçıq kəsilən
-  # production deploy R2 keşini natamam qoya bilər, ona görə orada yeni run növbəyə durur.
+  # deploy R2 keşini natamam qoya bilər, ona görə orada yeni run növbəyə durur.
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
@@ -17,6 +17,17 @@ concurrency:
 permissions:
   contents: read
 
+# Yayım axını (yalnız `main`-ə push):
+#
+#   quality → deploy-staging → deploy-production
+#
+# Hər deploy job-u əvvəlcə **öz mühitinin D1 miqrasiyalarını tətbiq edir**, sonra
+# bundle qurur və worker-i yayımlayır. Bu sıra məcburidir: yeni kod çox vaxt yeni
+# sütun gözləyir, əvvəlcə worker yayımlansa sxem gəlincəyə qədər sorğular çökür və
+# xəta `try/catch` içində səssizcə udulur.
+#
+# Staging production-dan əvvəl gedir — miqrasiya və ya yayım orada sınarsa
+# production heç toxunulmur.
 jobs:
   quality:
     name: Quality gate
@@ -57,13 +68,14 @@ jobs:
       - name: Production build
         run: npm run build
 
-  production-validation:
-    name: Production validation
+  deploy-staging:
+    name: Deploy to staging
     needs: quality
-    # Yalnız `main`-ə push zamanı: PR və manual dispatch production resurslarına toxunmur.
+    # Yalnız `main`-ə push zamanı: PR və manual dispatch canlı resurslara toxunmur.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
+    environment: staging
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -86,7 +98,8 @@ jobs:
 
       # Secret-ə düşən artıq boşluq/sətir sonu wrangler-i "Invalid account ID" ilə saxlayır,
       # ona görə dəyərlər təmizlənir, formatı yoxlanılır və sonrakı step-lərə maskalanmış
-      # şəkildə ötürülür. Job səviyyəsində env yazılmır ki, GITHUB_ENV ilə ziddiyyət olmasın.
+      # şəkildə ötürülür. Blok hər deploy job-unda təkrarlanır: `GITHUB_ENV` job-lar
+      # arasında ötürülmür.
       - name: Verify Cloudflare credentials
         shell: bash
         env:
@@ -120,16 +133,33 @@ jobs:
           } >> "${GITHUB_ENV}"
           echo "Cloudflare credentials are present."
 
-      # Miqrasiyanın repoda olması onun tətbiq edildiyi demək deyil — kod cədvəl gözləyib
-      # bazada tapmayanda xəta çox vaxt səssizcə udulur. Deploy-dan əvvəl vəziyyət yoxlanılır.
-      - name: Check production D1 migration status
-        run: npx wrangler d1 migrations list DB --remote
+      # Miqrasiya bundle-dan əvvəl gəlir. `apply` uğursuz olsa job dayanır və
+      # yayım heç başlamır — sxemi köhnə qalan worker yayımlamaqdansa deploy-u
+      # dayandırmaq daha az zərərlidir.
+      - name: Apply staging D1 migrations
+        run: npx wrangler d1 migrations apply DB --remote --env staging
 
-  deploy:
-    name: Deploy to Cloudflare Workers
-    needs: [quality, production-validation]
-    # `needs` skip olunanda bu job da skip olunur; şərt yenə açıq yazılır ki, deploy
-    # yalnız `main`-ə push zamanı işləsin və PR heç vaxt production-a çıxmasın.
+      - name: Log staging D1 migration status
+        run: npx wrangler d1 migrations list DB --remote --env staging
+
+      # `SITE_URL` statik səhifələrin içinə build vaxtı yazılır, ona görə staging və
+      # production üçün bundle ayrı-ayrı qurulur — bir build-i iki mühitə yaymaq
+      # canonical URL-ləri və Open Graph linklərini yanlış edərdi. `IS_STAGING` isə
+      # robots/SEO qatını və nümunə məzmun defoltunu idarə edir
+      # (`src/lib/demo-content.ts`). Analitika ID-si staging-ə qəsdən verilmir.
+      - name: Build OpenNext worker bundle (staging)
+        env:
+          SITE_URL: https://luxehomeestate-staging.amiyevbahadur.workers.dev
+          IS_STAGING: "true"
+        run: npx opennextjs-cloudflare build
+
+      - name: Deploy to staging worker
+        run: npx wrangler deploy --env staging
+
+  deploy-production:
+    name: Deploy to production
+    # Staging əvvəl gedir: miqrasiya və ya yayım orada sınarsa production toxunulmur.
+    needs: [quality, deploy-staging]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -154,7 +184,6 @@ jobs:
           npm --version
           npm ci
 
-      # Eyni normallaşdırma deploy-da da lazımdır: GITHUB_ENV job-lar arasında ötürülmür.
       - name: Verify Cloudflare credentials
         shell: bash
         env:
@@ -166,8 +195,6 @@ jobs:
           : "${RAW_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID secret is not configured}"
           API_TOKEN="$(printf '%s' "${RAW_API_TOKEN}" | tr -d '[:space:]')"
           ACCOUNT_ID="$(printf '%s' "${RAW_ACCOUNT_ID}" | tr -d '[:space:]')"
-          # Dəyər maskalandığı üçün log-da görünmür; diaqnostika kimi yalnız uzunluq və
-          # qaydaya uymayan simvolların sayı yazılır (terminal paste işarələri, dırnaq, `=`).
           check_format() {
             local label="$1" value="$2" expected="$3"
             if [[ "${value}" =~ ^[A-Za-z0-9_-]+$ ]]; then
@@ -188,10 +215,15 @@ jobs:
           } >> "${GITHUB_ENV}"
           echo "Cloudflare credentials are present."
 
-      # `wrangler.jsonc` → `main: .open-next/worker.js`. Bundle olmadan deploy mümkün deyil,
-      # ona görə package.json-dakı `deploy` skriptinin build mərhələsi eyni dəyişənlərlə
-      # təkrarlanır (statik səhifələr bu dəyərləri build vaxtı içinə alır).
-      - name: Build OpenNext worker bundle
+      # Eyni sıra production üçün də qüvvədədir: əvvəlcə sxem, sonra kod.
+      - name: Apply production D1 migrations
+        run: npx wrangler d1 migrations apply DB --remote
+
+      # Tətbiqdən sonrakı vəziyyət run-un tarixçəsində qalsın deyə loglanır.
+      - name: Log production D1 migration status
+        run: npx wrangler d1 migrations list DB --remote
+
+      - name: Build OpenNext worker bundle (production)
         env:
           SITE_URL: https://luxehomeestate.az
           IS_STAGING: "false"
@@ -201,5 +233,5 @@ jobs:
       # Bu repoda `wrangler deploy` OpenNext layihəsini tanıyır və `opennextjs-cloudflare
       # deploy`-a ötürür (ISR keşinin R2-yə yüklənməsi + worker yayımı).
       # `--env=""` production konfiqurasiyasını açıq seçir ki, səhvən `env.staging` getməsin.
-      - name: Deploy to Cloudflare Workers
+      - name: Deploy to production worker
         run: npx wrangler deploy --env=""

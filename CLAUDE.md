@@ -66,10 +66,13 @@ build-i saxlayır (`fix(build): agent rəy action-larını async et`).
 Yayımdan əvvəl `npm run preview` ilə workerd runtime-ında yoxlamaq tövsiyə olunur, çünki bəzi
 problemlər yalnız orada üzə çıxır.
 
-**Miqrasiyanın repoda olması onun tətbiq edildiyi demək deyil.** Yayımdan əvvəl
-`npx wrangler d1 migrations list DB --remote` (və `--env staging`) ilə hər iki mühitin
-vəziyyəti yoxlanmalıdır — kod cədvəl gözləyib bazada tapmayanda xəta çox vaxt `try/catch`
-içində səssizcə udulur.
+**Miqrasiyalar CI tərəfindən tətbiq olunur.** `main`-ə push zamanı hər deploy job-u
+öz mühitinin miqrasiyalarını **bundle-dan əvvəl** tətbiq edir (`d1 migrations apply`),
+sonra worker-i yayımlayır. Sıra məcburidir: əvvəlcə worker getsə, sxem gəlincəyə qədər
+sorğular çökür və xəta çox vaxt `try/catch` içində səssizcə udulur.
+
+Lokal və ya təcili yayımda eyni sıra əl ilə saxlanmalıdır — əvvəlcə
+`npm run db:migrate:remote` (və ya `:staging`), sonra `npm run deploy`.
 
 ## Arxitektura
 
@@ -360,8 +363,11 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   Keçid geribildirimi `(site)/template.tsx` və `NavigationProgress` ilə, Suspense sərhədi
   yaratmadan verilir. Admin/kabinet kimi 404 semantikası tələb etməyən ağaclarda skeleton var.
 - GitHub Actions CI `test + typecheck + lint + build` qapılarını hər PR və `main` push-unda
-  işlədir. Cloudflare secret-ləri qoyularsa `main` push-unda remote D1 miqrasiya vəziyyəti də
-  yoxlanılır. Avtomatlaşdırılmış browser E2E hələ yoxdur.
+  işlədir. `main` push-unda yayım axını: **quality → deploy-staging → deploy-production**.
+  Hər deploy job-u əvvəlcə öz mühitinin D1 miqrasiyalarını tətbiq edir, sonra bundle qurub
+  worker-i yayımlayır. Staging production-dan əvvəl gedir — orada sınarsa production
+  toxunulmur. Bundle hər mühit üçün ayrıca qurulur, çünki `SITE_URL` statik səhifələrin
+  içinə build vaxtı yazılır. Avtomatlaşdırılmış browser E2E hələ yoxdur.
 
 ## Diqqət tələb edən məqamlar
 
