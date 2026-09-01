@@ -5,7 +5,6 @@ export {
   LOCALES,
   DEFAULT_LOCALE,
   LOCALE_LABELS,
-  LOCALE_COOKIE,
   MESSAGE_NAMESPACES,
   type Locale,
   type MessageNamespace,

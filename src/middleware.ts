@@ -5,8 +5,7 @@ import { routing } from "@/i18n/routing";
 import { isStaging } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
 import { canonicalAdminPath, localeFromPathname, pathnameWithoutLocale } from "@/i18n/path-locale";
-import { LOCALE_COOKIE } from "@/i18n/config";
-import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
+import { DEFAULT_LOCALE } from "@/lib/constants";
 import {
   SESSION_COOKIE,
   SESSION_SUBJECT,
@@ -155,12 +154,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL("/__baglidir", request.url));
   }
 
-  const preferred = request.cookies.get(LOCALE_COOKIE)?.value;
-  const preferredLocale = Object.values(LOCALES).includes(preferred as Locale)
-    ? (preferred as Locale)
-    : DEFAULT_LOCALE;
+  // Dil yalnız URL prefiksindən oxunur. Prefikssiz ünvanlar (`/admin/...`)
+  // default dilə düşür — əvvəl bunu `NEXT_LOCALE` cookie-si həll edirdi, amma
+  // həmin cookie hər ictimai cavaba `Set-Cookie` əlavə edib keşi bağlayırdı.
   const session = await readSignedSession(request.cookies.get(SESSION_COOKIE)?.value);
-  const redirectPath = signedSessionRedirect(pathname, search, session, preferredLocale);
+  const redirectPath = signedSessionRedirect(pathname, search, session, DEFAULT_LOCALE);
   if (redirectPath) return NextResponse.redirect(new URL(redirectPath, request.url));
 
   // Layout cari marşrutu bilməlidir: müvəqqəti parolla gələn istifadəçi hesab

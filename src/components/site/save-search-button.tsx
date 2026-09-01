@@ -14,7 +14,7 @@ import type { PropertyFilters } from "@/lib/queries";
 import { createSavedSearch } from "@/app/[locale]/(account)/kabinet/axtarislarim/actions";
 import { trackEvent } from "@/lib/client-analytics";
 
-type SavableFilters = Omit<PropertyFilters, "sort" | "page" | "pageSize">;
+export type SavableFilters = Omit<PropertyFilters, "sort" | "page" | "pageSize">;
 
 /**
  * `/emlaklar` axtarış nəticələrində göstərilən "Axtarışı saxla" düyməsi.

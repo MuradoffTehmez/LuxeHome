@@ -1,89 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { Bell, LayoutDashboard, LogIn, UserRound } from "lucide-react";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { useSessionState } from "./use-session-state";
 
 /**
  * Naviqasiyadakı hesab bölməsi.
  *
- * Vəziyyət `/api/hesab/menu`-dan brauzer tərəfdə alınır: sessiyanı layout-da
- * oxumaq bütün ictimai səhifələri dinamik edərdi.
- *
- * **Keşləmə niyə lazımdır.** Əvvəl effektin asılılığında `pathname` var idi və
- * hər naviqasiyada yenidən sorğu gedirdi. Hər sorğu isə D1-də sessiya oxuması,
- * `touchSession()` **yazması** və oxunmamış bildiriş sayı deməkdir — yəni səhifə
- * keçidinin üstünə üç əlavə D1 gedişi. Üstəlik cavab gələnə qədər komponent
- * `null` qaytarırdı, ona görə hesab bölməsi hər keçiddə yox olub geri qayıdır
- * və naviqasiyada gözlə görünən sıçrayış yaradırdı.
- *
- * İndi vəziyyət modul səviyyəsində keşlənir: keçiddə dərhal köhnə dəyər
- * göstərilir, köhnəlibsə arxa fonda yenilənir. Giriş/çıxış axını keşi açıq
- * şəkildə sıfırlayır, ona görə menyu orada dərhal uyğunlaşır.
+ * Sessiya vəziyyəti `useSessionState()`-dən gəlir — həmin hook `/api/hesab/menu`
+ * cavabını modul səviyyəsində keşləyir və eyni səhifədəki digər istifadəçiyə
+ * bağlı komponentlərlə (məsələn «axtarışı saxla» düyməsi) bölüşür.
  */
-
-type MenuState =
-  | { status: "loading" }
-  | { status: "anonymous" }
-  | { status: "signed-in"; name: string; isStaff: boolean; unreadNotifications: number };
-
-type MenuPayload = {
-  signedIn: boolean;
-  name?: string;
-  isStaff?: boolean;
-  unreadNotifications?: number;
-};
-
-/** Keş nə qədər «təzə» sayılır — bu müddət ərzində sorğu ümumiyyətlə getmir. */
-const FRESH_MS = 60_000;
-
-/**
- * Modul səviyyəli keş — eyni səhifədəki desktop və mobil menyu da onu bölüşür,
- * ona görə iki nüsxə iki sorğu atmır.
- */
-let cache: { state: MenuState; at: number } | null = null;
-let inFlight: Promise<MenuState> | null = null;
-
-/** Giriş/qeydiyyat/kabinet marşrutlarında sessiya vəziyyəti dəyişmiş ola bilər. */
-function isAuthBoundary(path: string): boolean {
-  return (
-    path.includes("/daxil-ol") ||
-    path.includes("/qeydiyyat") ||
-    path.includes("/kabinet") ||
-    path.includes("/giris")
-  );
-}
-
-async function fetchMenuState(fallbackName: string): Promise<MenuState> {
-  // Eyni anda iki komponent çağırsa, sorğu bir dəfə gedir
-  if (inFlight) return inFlight;
-
-  inFlight = (async () => {
-    try {
-      const response = await fetch("/api/hesab/menu", { cache: "no-store" });
-      if (!response.ok) throw new Error("menu");
-      const data = (await response.json()) as MenuPayload;
-      return data.signedIn
-        ? ({
-            status: "signed-in",
-            name: data.name ?? fallbackName,
-            isStaff: data.isStaff === true,
-            unreadNotifications: data.unreadNotifications ?? 0,
-          } as const)
-        : ({ status: "anonymous" } as const);
-    } catch {
-      // Şəbəkə xətasında ziyarətçi qonaq kimi göstərilir — menyu sınmır
-      return { status: "anonymous" } as const;
-    } finally {
-      inFlight = null;
-    }
-  })();
-
-  return inFlight;
-}
 
 export function AccountMenu({
   isOverlay = false,
@@ -92,33 +22,8 @@ export function AccountMenu({
   isOverlay?: boolean;
   variant?: "desktop" | "mobile";
 }) {
-  // Keşdə dəyər varsa ilk render-də dərhal göstərilir — «yox olub qayıtma» olmur
-  const [state, setState] = useState<MenuState>(() => cache?.state ?? { status: "loading" });
-  const pathname = usePathname();
   const t = useTranslations("auth");
-
-  useEffect(() => {
-    let active = true;
-    const fallbackName = t("myAccount");
-
-    // Auth sərhədində keş etibarsızdır: istifadəçi indicə girmiş və ya çıxmış ola bilər
-    const stale =
-      !cache || Date.now() - cache.at > FRESH_MS || isAuthBoundary(pathname);
-
-    if (!stale) {
-      setState(cache!.state);
-      return;
-    }
-
-    void fetchMenuState(fallbackName).then((next) => {
-      cache = { state: next, at: Date.now() };
-      if (active) setState(next);
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [pathname, t]);
+  const state = useSessionState(t("myAccount"));
 
   if (state.status === "loading") return null;
 

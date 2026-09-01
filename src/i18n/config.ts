@@ -30,5 +30,3 @@ export const MESSAGE_NAMESPACES = [
 
 export type MessageNamespace = (typeof MESSAGE_NAMESPACES)[number];
 
-/** `next-intl` middleware-in dil seçimini saxladığı cookie adı. */
-export const LOCALE_COOKIE = "NEXT_LOCALE";
