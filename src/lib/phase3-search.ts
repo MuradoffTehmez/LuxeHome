@@ -109,7 +109,7 @@ export async function searchPropertiesWithAi(rawQuery: string) {
   const candidates = await prisma.property.findMany({
     where: {
       AND: [
-        publicPropertyWhere(),
+        await publicPropertyWhere(),
         criteria.listingType ? { listingType: criteria.listingType } : {},
         criteria.maxPrice !== undefined ? { price: { lte: criteria.maxPrice * 1.15 } } : {},
         criteria.minPrice !== undefined ? { price: { gte: criteria.minPrice * 0.85 } } : {},

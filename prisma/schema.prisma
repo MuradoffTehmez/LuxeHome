@@ -132,6 +132,8 @@ model Agency {
   website     String?
   isVerified  Boolean   @default(false)
   verifiedAt  DateTime?
+  /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
+  isDemo      Boolean   @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -143,6 +145,7 @@ model Agency {
   testimonials  Testimonial[]
 
   @@index([isVerified])
+  @@index([isDemo])
 }
 
 /// Agentlik işçisi. Sahibin (Agency.userId) özü bura yazılmır — yalnız dəvət
@@ -396,17 +399,17 @@ model Property {
   /// Nümunə/demo qeydi — real məlumatla əvəzlənəndə false olur.
   isDemo             Boolean   @default(false)
 
-  viewCount   Int       @default(0)
-  publishedAt DateTime?
+  viewCount          Int       @default(0)
+  publishedAt        DateTime?
   /// SOLD/RENTED/ARCHIVED vəziyyətinə ilk keçid; retention siyasəti bu real tarixdən hesablanır.
-  closedAt    DateTime?
+  closedAt           DateTime?
   /// Keçmiş elanın indeksdə saxlanıla biləcəyi son tarix. Null olduqda qlobal SEO siyasəti işləyir.
-  retentionUntil DateTime?
+  retentionUntil     DateTime?
   /// Duplikat aşkarlanması üçün normallaşdırılmış ünvan+təsvir+əsas atribut fingerprint-i.
   contentFingerprint String?
-  deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  deletedAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   metaTitle       String?
   metaDescription String?
@@ -603,23 +606,23 @@ model BlogCategory {
 }
 
 model BlogPost {
-  id         String  @id @default(cuid())
-  title      String
-  slug       String  @unique
-  excerpt    String
-  content    String
-  coverUrl   String?
-  coverAlt   String  @default("")
-  categoryId String?
-  authorId   String?
-  reviewerName String?
-  reviewedAt DateTime?
-  reviewAfter DateTime?
+  id                 String    @id @default(cuid())
+  title              String
+  slug               String    @unique
+  excerpt            String
+  content            String
+  coverUrl           String?
+  coverAlt           String    @default("")
+  categoryId         String?
+  authorId           String?
+  reviewerName       String?
+  reviewedAt         DateTime?
+  reviewAfter        DateTime?
   /// JSON massivləri: mövzu etiketləri, mənbələr və əlaqəli entity ID-ləri.
-  tags String?
-  references String?
+  tags               String?
+  references         String?
   relatedPropertyIds String?
-  relatedPostIds String?
+  relatedPostIds     String?
 
   /// DRAFT | PUBLISHED | ARCHIVED
   status      String    @default("DRAFT")
@@ -680,13 +683,13 @@ model Lead {
   /// Organic/paid/direct atribusiyası `source` domen sahəsindən qəsdən ayrıdır.
   acquisitionSource String?
   acquisitionMedium String?
-  landingPage String?
-  referrer String?
-  utmSource String?
-  utmMedium String?
-  utmCampaign String?
-  utmTerm String?
-  utmContent String?
+  landingPage       String?
+  referrer          String?
+  utmSource         String?
+  utmMedium         String?
+  utmCampaign       String?
+  utmTerm           String?
+  utmContent        String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -861,6 +864,8 @@ model AgentProfile {
   areas           String   @default("[]")
   isVerified      Boolean  @default(false)
   isPublic        Boolean  @default(false)
+  /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
+  isDemo          Boolean  @default(false)
   soldCount       Int      @default(0)
   rentedCount     Int      @default(0)
   responseMinutes Int?
@@ -876,6 +881,7 @@ model AgentProfile {
 
   @@index([agencyId, isPublic])
   @@index([isVerified, isPublic])
+  @@index([isDemo])
 }
 
 /// Agent rəyi yalnız APPROVED statusunda ictimai görünür.
@@ -1031,19 +1037,19 @@ model AiContentDraft {
 // ---------------------------------------------------------------------------
 
 model Media {
-  id           String  @id @default(cuid())
-  url          String  @unique
-  thumbUrl     String?
-  originalName String
-  mimeType     String
-  size         Int
-  width        Int?
-  height       Int?
-  alt          String  @default("")
-  caption      String?
-  checksum     String?
+  id               String  @id @default(cuid())
+  url              String  @unique
+  thumbUrl         String?
+  originalName     String
+  mimeType         String
+  size             Int
+  width            Int?
+  height           Int?
+  alt              String  @default("")
+  caption          String?
+  checksum         String?
   watermarkApplied Boolean @default(false)
-  uploaderId   String?
+  uploaderId       String?
 
   createdAt DateTime @default(now())
 
@@ -1224,6 +1230,9 @@ model Partner {
 
   sortOrder Int @default(0)
 
+  /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
+  isDemo Boolean @default(false)
+
   seoTitle       String?
   seoDescription String?
   /// Vergüllə ayrılmış açar sözlər — `buildMetadata({ keywords })`-ə verilir.
@@ -1266,6 +1275,7 @@ model Partner {
   @@index([deletedAt])
   @@index([status, showPublicly, deletedAt])
   @@index([sortOrder])
+  @@index([isDemo])
 }
 
 /// Elan ↔ tərəfdaş. Çox-çoxa: bir elanda developer, satış tərəfdaşı və broker
@@ -1353,9 +1363,9 @@ model AgencyPartner {
 /// köhnəlməyən təlimat məzmunudur. İki axını bir cədvəldə birləşdirmək SEO baxımından
 /// da səhv olardı — bələdçi `Article` deyil, `HowTo`/`FAQPage` siqnalı verir.
 model KnowledgeCategory {
-  id   String @id @default(cuid())
-  slug String @unique
-  name String
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
   /// Azərbaycan diakritiklərindən asılı olmayan axtarış indeksi (`normalizeSearchText`).
   searchName  String  @default("")
   description String?
@@ -1375,14 +1385,14 @@ model KnowledgeCategory {
 
 /// Bilik Mərkəzi bələdçisi — addım-addım təlimat və izah məzmunu.
 model KnowledgeArticle {
-  id      String @id @default(cuid())
-  slug    String @unique
-  title   String
+  id         String @id @default(cuid())
+  slug       String @unique
+  title      String
   /// Registrsiz/diakritiksiz axtarış üçün normallaşdırılmış başlıq + xülasə.
   searchText String @default("")
-  excerpt String
+  excerpt    String
   /// `sanitizeRichText()`-dən keçmiş HTML. Bazadakı dəyər həmişə təhlükəsizdir.
-  content String
+  content    String
 
   categoryId String?
   /// BUYER | SELLER | RENTER | LANDLORD | INVESTOR — kimə ünvanlanıb.
@@ -1393,10 +1403,10 @@ model KnowledgeArticle {
   status     String  @default("DRAFT")
 
   /// CURRENT | PROPOSAL | MIXED — qüvvədə olan norma ilə təşəbbüsü ayırır.
-  legalStatus    String   @default("CURRENT")
+  legalStatus     String    @default("CURRENT")
   /// GREEN | YELLOW | RED | LEGAL_REVIEW — məqalənin universal risk siqnalı.
-  riskLevel      String   @default("YELLOW")
-  jurisdiction   String   @default("Azərbaycan Respublikası")
+  riskLevel       String    @default("YELLOW")
+  jurisdiction    String    @default("Azərbaycan Respublikası")
   /// Hüquqşünasın məzmunu son dəfə qüvvədə olan aktlarla yoxladığı tarix.
   legalReviewedAt DateTime?
   /// JSON sətir massivləri: D1 native array saxlamır.
@@ -1404,15 +1414,15 @@ model KnowledgeArticle {
   sourceUrls      String?
 
   /// Sənəddə müəyyən edilən vahid hüquqi bloklar; HTML yazı anında sanitizasiya olunur.
-  legalBasis       String?
+  legalBasis        String?
   requiredDocuments String?
-  procedure        String?
-  duration         String?
-  costs            String?
-  risks            String?
-  checklist        String?
-  template         String?
-  courtPosition    String?
+  procedure         String?
+  duration          String?
+  costs             String?
+  risks             String?
+  checklist         String?
+  template          String?
+  courtPosition     String?
 
   readMinutes Int     @default(1)
   isFeatured  Boolean @default(false)
@@ -1423,14 +1433,14 @@ model KnowledgeArticle {
   coverUrl String?
   coverAlt String  @default("")
 
-  authorId String?
-  reviewerName String?
-  reviewedAt DateTime?
-  reviewAfter DateTime?
+  authorId           String?
+  reviewerName       String?
+  reviewedAt         DateTime?
+  reviewAfter        DateTime?
   /// JSON massivləri: mövzu etiketləri və əlaqəli content/entity ID-ləri.
-  tags String?
+  tags               String?
   relatedPropertyIds String?
-  relatedArticleIds String?
+  relatedArticleIds  String?
 
   metaTitle       String?
   metaDescription String?
@@ -1464,15 +1474,15 @@ model KnowledgeArticle {
 
 /// İstənilən public entity üçün locale-səviyyəli metadata override-i.
 model SeoMetadata {
-  id            String  @id @default(cuid())
+  id            String   @id @default(cuid())
   entityType    String
   entityId      String
-  locale        String  @default("az")
+  locale        String   @default("az")
   title         String?
   description   String?
   canonical     String?
-  robotsIndex   Boolean @default(true)
-  robotsFollow  Boolean @default(true)
+  robotsIndex   Boolean  @default(true)
+  robotsFollow  Boolean  @default(true)
   ogTitle       String?
   ogDescription String?
   ogImage       String?
@@ -1486,27 +1496,27 @@ model SeoMetadata {
 
 /// Nəzarətli programmatic SEO səhifəsi; limitsiz filter URL-lərini əvəz edir.
 model SeoLandingPage {
-  id             String   @id @default(cuid())
-  locale         String   @default("az")
-  slug           String
-  name           String
-  title          String
-  h1             String
-  description    String
-  introContent   String
-  bottomContent  String?
-  filtersJson    String
-  faqJson        String   @default("[]")
-  relatedPathsJson String @default("[]")
-  indexable      Boolean  @default(false)
-  indexEmpty     Boolean  @default(false)
-  minInventory   Int      @default(5)
-  canonical      String?
-  status         String   @default("DRAFT")
-  publishedAt    DateTime?
-  updatedBy      String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id               String    @id @default(cuid())
+  locale           String    @default("az")
+  slug             String
+  name             String
+  title            String
+  h1               String
+  description      String
+  introContent     String
+  bottomContent    String?
+  filtersJson      String
+  faqJson          String    @default("[]")
+  relatedPathsJson String    @default("[]")
+  indexable        Boolean   @default(false)
+  indexEmpty       Boolean   @default(false)
+  minInventory     Int       @default(5)
+  canonical        String?
+  status           String    @default("DRAFT")
+  publishedAt      DateTime?
+  updatedBy        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@unique([locale, slug])
   @@index([status, indexable, locale])
@@ -1514,18 +1524,18 @@ model SeoLandingPage {
 
 /// Keyword intent/cluster və target URL xəritəsi; rank API-dən asılı deyil.
 model SeoKeyword {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   keyword         String
-  locale          String   @default("az")
+  locale          String    @default("az")
   intent          String
   cluster         String
   targetUrl       String
-  priority        Int      @default(3)
+  priority        Int       @default(3)
   searchVolume    Int?
   currentPosition Float?
   measuredAt      DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@unique([keyword, locale])
   @@index([cluster, priority])
@@ -1609,11 +1619,11 @@ model SeoAlert {
 /// Ayrıca model saxlanılır, çünki termin səhifəsi `DefinedTerm` struktur datası verir
 /// və uzun bələdçidən fərqli olaraq bir abzaslıq cavab üçün optimallaşdırılır.
 model KnowledgeTerm {
-  id   String @id @default(cuid())
-  slug String @unique
-  term String
+  id              String  @id @default(cuid())
+  slug            String  @unique
+  term            String
   /// Normallaşdırılmış termin — registrsiz axtarış üçün.
-  searchName String @default("")
+  searchName      String  @default("")
   /// Bir cümləlik tərif — kart və snippet üçün.
   shortDefinition String
   /// Genişləndirilmiş izah (sanitizasiya olunmuş HTML). Boş buraxıla bilər.

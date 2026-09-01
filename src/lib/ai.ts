@@ -71,23 +71,75 @@ function extractText(payload: unknown): string {
 }
 
 /**
- * Model çıxışından JSON obyekti çıxarır.
+ * Mətndən balanslı JSON blokunu çıxarır.
  *
- * Model bəzən JSON-u ``` bloku içində və ya izahat mətni ilə birlikdə qaytarır.
- * Əvvəlcə təmizlənmiş sətir sınanır, alınmasa ilk `{…}` blokuna düşülür — belə
- * hallarda istifadəçiyə «AI cavab vermədi» demək əvəzinə nəticəni xilas etmək
- * daha faydalıdır.
+ * Sadəcə ilk `{` ilə son `}` arasını götürmək kifayət etmir: model bəzən JSON-dan
+ * sonra izahat cümləsi yazır, bəzən isə iki ayrı blok qaytarır — belə halda həmin
+ * kəsik sintaksis xətası verir. Burada mötərizələr sayılır və **ilk tam bağlanan**
+ * blok qaytarılır. Sətir literalları nəzərə alınır ki, mətn daxilindəki mötərizə
+ * balansı pozmasın.
+ */
+function extractJsonBlock(text: string): string | null {
+  for (let index = 0; index < text.length; index += 1) {
+    const opening = text[index];
+    if (opening !== "{" && opening !== "[") continue;
+
+    const closing = opening === "{" ? "}" : "]";
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+
+    for (let cursor = index; cursor < text.length; cursor += 1) {
+      const char = text[cursor];
+
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (char === "\\") escaped = true;
+        else if (char === '"') inString = false;
+        continue;
+      }
+
+      if (char === '"') inString = true;
+      else if (char === opening) depth += 1;
+      else if (char === closing) {
+        depth -= 1;
+        if (depth === 0) return text.slice(index, cursor + 1);
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Model çıxışından JSON çıxarır.
+ *
+ * Model təlimata baxmayaraq cavabı ``` bloku içində, izahat mətni ilə və ya
+ * massiv kimi qaytara bilir. Üç mərhələ sınanır: təmizlənmiş sətrin özü →
+ * markdown blokunun içi → mətnə səpələnmiş ilk balanslı JSON bloku. Yalnız
+ * üçü də alınmadıqda xəta atılır.
  */
 export function parseAiJson<T>(value: string): T {
-  const clean = value.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  try {
-    return JSON.parse(clean) as T;
-  } catch {
-    const start = clean.indexOf("{");
-    const end = clean.lastIndexOf("}");
-    if (start === -1 || end <= start) throw new Error("AI cavabında JSON tapılmadı.");
-    return JSON.parse(clean.slice(start, end + 1)) as T;
+  const trimmed = value.trim();
+
+  const candidates: string[] = [trimmed];
+
+  // ```json … ``` bloku — açılış/bağlanış sətrin ortasında da ola bilər.
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced?.[1]) candidates.push(fenced[1].trim());
+
+  const block = extractJsonBlock(trimmed);
+  if (block) candidates.push(block);
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    try {
+      return JSON.parse(candidate) as T;
+    } catch {
+      // növbəti namizəd
+    }
   }
+
+  throw new Error("AI cavabında JSON tapılmadı.");
 }
 
 /**
@@ -104,36 +156,70 @@ export async function runAiText(input: {
 }): Promise<AiResult> {
   const ai = await aiBinding();
   const configuredModel = textModel();
-  const payload: Record<string, unknown> = {
-    messages: [
-      { role: "system", content: input.instructions },
-      { role: "user", content: input.prompt },
-    ],
+
+  const messages: Array<Record<string, unknown>> = [
+    { role: "system", content: input.instructions },
+    { role: "user", content: input.prompt },
+  ];
+
+  // Sxem həm də mətnlə təkrarlanır: JSON mode dəstəklənməyən modeldə yeganə
+  // istiqamətləndirici budur, dəstəklənəndə isə nəticəyə zərər vermir.
+  if (input.jsonSchema) {
+    messages.push({
+      role: "system",
+      content:
+        "Yalnız bu JSON sxeminə uyğun tək bir JSON obyekti qaytar. " +
+        `Markdown, kod bloku və izahat yazma. Sxem: ${JSON.stringify(input.jsonSchema)}`,
+    });
+  }
+
+  const basePayload: Record<string, unknown> = {
+    messages,
     max_tokens: input.maxTokens ?? 1600,
     temperature: 0.3,
   };
-  // `guided_json` bütün Workers AI Llama variantlarında dəstəklənmir və
-  // production-da 400 qaytarırdı. Sxem prompta verilir, yekun sərhəd isə
-  // çağıran tərəfdə parse + Zod/allow-list yoxlamasıdır.
-  if (input.jsonSchema) {
-    payload.messages = [
-      ...(payload.messages as Array<Record<string, unknown>>),
-      { role: "system", content: `Yekun cavab bu JSON sxeminə uyğun olmalıdır: ${JSON.stringify(input.jsonSchema)}` },
-    ];
-  }
+
+  /**
+   * Cəhd sırası.
+   *
+   * Workers AI JSON mode-u (`response_format`) modelin çıxışını sxemə məcbur edir
+   * və sərbəst mətni sonradan parse etməkdən qat-qat etibarlıdır. Lakin kataloqdakı
+   * hər model onu dəstəkləmir — dəstəkləməyən model 400 qaytarır. Ona görə hər model
+   * üçün əvvəlcə JSON mode, sonra sxemsiz sadə çağırış sınanır.
+   *
+   * (Əvvəlki kod `guided_json` işlədirdi; o, vLLM-ə xas parametrdir və Workers AI
+   * binding-ində 400 verirdi. `response_format` OpenAI-uyğun rəsmi yoldur.)
+   */
+  const payloads: Record<string, unknown>[] = input.jsonSchema
+    ? [
+        {
+          ...basePayload,
+          response_format: { type: "json_schema", json_schema: input.jsonSchema },
+        },
+        basePayload,
+      ]
+    : [basePayload];
 
   const models = [configuredModel, ...FALLBACK_TEXT_MODELS.filter((item) => item !== configuredModel)];
   let lastError: unknown;
+
   for (const model of models) {
-    try {
-      const text = extractText(await ai.run(model, payload));
-      if (!text) throw new Error("AI boş cavab qaytardı.");
-      return { text, model };
-    } catch (error) {
-      lastError = error;
-      console.error("[workers-ai] mətn modeli xətası", { model, error: error instanceof Error ? error.message : String(error) });
+    for (const [attempt, payload] of payloads.entries()) {
+      try {
+        const text = extractText(await ai.run(model, payload));
+        if (!text) throw new Error("AI boş cavab qaytardı.");
+        return { text, model };
+      } catch (error) {
+        lastError = error;
+        console.error("[workers-ai] mətn modeli xətası", {
+          model,
+          jsonMode: attempt === 0 && Boolean(input.jsonSchema),
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
     }
   }
+
   throw new Error(`Workers AI cavab vermədi: ${lastError instanceof Error ? lastError.message : "naməlum xəta"}`);
 }
 

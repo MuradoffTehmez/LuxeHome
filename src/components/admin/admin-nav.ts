@@ -126,6 +126,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "security", href: "/admin/security" },
           { labelKey: "audit", href: "/admin/audit" },
           { labelKey: "settings", href: "/admin/parametrler" },
+          { labelKey: "demoContent", href: "/admin/demo-mezmun" },
         ],
       },
       { labelKey: "profile", href: "/admin/hesabim", icon: "UserCog" },

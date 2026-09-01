@@ -18,6 +18,7 @@ import {
   type Locale,
   type SortOption,
 } from "@/lib/constants";
+import { demoWhere } from "@/lib/demo-content";
 import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
 import type { DigestStore } from "@/lib/saved-search-digest";
 import { normalizeSearchText } from "@/lib/search-normalization";
@@ -139,8 +140,31 @@ export type PropertyFilters = {
   installmentOnly?: boolean;
 };
 
-/** İctimai səhifələr üçün baza şərt — silinmiş və qaralama əmlaklar görünmür. */
-export function publicPropertyWhere(): Prisma.PropertyWhereInput {
+/**
+ * İctimai səhifələr üçün baza şərt — silinmiş və qaralama əmlaklar görünmür.
+ *
+ * Funksiya `demoWhere()`-i gözlədiyi üçün `async`-dir: nümunə məzmunun görünüb
+ * görünməməsi paneldəki açardan asılıdır və sorğu başına bir dəfə oxunur.
+ * Bunu sinxron saxlayıb şərti çağıran tərəfə buraxmaq təhlükəli olardı —
+ * bir yerdə unudulsa, demo rejimi saytın yalnız bir hissəsində işləyərdi.
+ */
+export async function publicPropertyWhere(): Promise<Prisma.PropertyWhereInput> {
+  return {
+    deletedAt: null,
+    ...(await demoWhere()),
+    status: { in: PUBLIC_PROPERTY_STATUSES },
+  };
+}
+
+/**
+ * Sitemap və SEO auditi üçün baza şərt.
+ *
+ * `publicPropertyWhere()`-dən fərqi: nümunə məzmun **heç vaxt** daxil edilmir.
+ * Demo rejimi test və təqdimat üçündür; nümunə URL-lərin sitemap-a düşməsi və
+ * axtarış sistemləri tərəfindən indeksləşdirilməsi rejim sonradan söndürüləndə
+ * qırıq linklər və dəyərsiz indeks qeydləri qoyardı.
+ */
+export function indexablePropertyWhere(): Prisma.PropertyWhereInput {
   return {
     deletedAt: null,
     isDemo: false,
@@ -166,8 +190,10 @@ function andWhere(
 }
 
 /** Yalnız oxuma — filtr birləşmə məntiqi unit testlərlə örtülsün deyə ixrac olunur. */
-export function buildPropertyWhere(filters: PropertyFilters): Prisma.PropertyWhereInput {
-  const where: Prisma.PropertyWhereInput = publicPropertyWhere();
+export async function buildPropertyWhere(
+  filters: PropertyFilters,
+): Promise<Prisma.PropertyWhereInput> {
+  const where: Prisma.PropertyWhereInput = await publicPropertyWhere();
 
   if (filters.statuses?.length) where.status = { in: filters.statuses };
   if (filters.listingType) where.listingType = filters.listingType;
@@ -289,7 +315,7 @@ function buildPropertyOrderBy(
 export async function getProperties(filters: PropertyFilters = {}) {
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = filters.pageSize ?? PAGE_SIZE;
-  const where = buildPropertyWhere(filters);
+  const where = await buildPropertyWhere(filters);
 
   if (filters.sort === "featured") {
     const now = new Date();
@@ -383,7 +409,7 @@ export const PROPERTY_MAP_LIMIT = 200;
  */
 export async function getPropertiesForMap(filters: PropertyFilters = {}) {
   const where: Prisma.PropertyWhereInput = {
-    AND: [buildPropertyWhere(filters), { latitude: { not: null } }, { longitude: { not: null } }],
+    AND: [await buildPropertyWhere(filters), { latitude: { not: null } }, { longitude: { not: null } }],
   };
 
   const [items, total] = await Promise.all([
@@ -402,7 +428,7 @@ export async function getPropertiesForMap(filters: PropertyFilters = {}) {
 export async function getFeaturedProperties(take = 6) {
   return prisma.property.findMany({
     where: {
-      ...publicPropertyWhere(),
+      ...(await publicPropertyWhere()),
       isFeatured: true,
       OR: [{ featuredUntil: null }, { featuredUntil: { gte: new Date() } }],
     },
@@ -414,7 +440,7 @@ export async function getFeaturedProperties(take = 6) {
 
 export async function getPropertyBySlug(slug: string) {
   return prisma.property.findFirst({
-    where: { ...publicPropertyWhere(), slug },
+    where: { ...(await publicPropertyWhere()), slug },
     include: {
       type: true,
       city: true,
@@ -442,7 +468,7 @@ export async function getSimilarProperties(
 ) {
   return prisma.property.findMany({
     where: {
-      ...publicPropertyWhere(),
+      ...(await publicPropertyWhere()),
       id: { not: property.id },
       listingType: property.listingType,
       OR: [{ cityId: property.cityId }, { typeId: property.typeId }],
@@ -456,7 +482,7 @@ export async function getSimilarProperties(
 export async function getPropertiesByIds(ids: string[]) {
   if (ids.length === 0) return [];
   return prisma.property.findMany({
-    where: { ...publicPropertyWhere(), id: { in: ids } },
+    where: { ...(await publicPropertyWhere()), id: { in: ids } },
     select: propertyCardSelect,
   });
 }
@@ -483,7 +509,7 @@ export type ComparePropertyData = Prisma.PropertyGetPayload<{
 export async function getPropertiesForCompare(ids: string[]) {
   if (ids.length === 0) return [];
   return prisma.property.findMany({
-    where: { ...publicPropertyWhere(), id: { in: ids } },
+    where: { ...(await publicPropertyWhere()), id: { in: ids } },
     select: compareSelect,
   });
 }
@@ -529,7 +555,7 @@ export async function getFilterOptions() {
 export async function getPropertyTypeCounts() {
   const grouped = await prisma.property.groupBy({
     by: ["typeId"],
-    where: publicPropertyWhere(),
+    where: await publicPropertyWhere(),
     _count: { _all: true },
   });
   return new Map(grouped.map((row) => [row.typeId, row._count._all]));
@@ -543,7 +569,7 @@ export async function getPropertyTypesWithCounts() {
       _count: {
         select: {
           properties: {
-            where: publicPropertyWhere(),
+            where: await publicPropertyWhere(),
           },
         },
       },
@@ -560,7 +586,7 @@ export async function getProjects(filters: { status?: string; type?: string } = 
   return prisma.project.findMany({
     where: {
       deletedAt: null,
-      isDemo: false,
+      ...(await demoWhere()),
       isActive: true,
       ...(filters.status ? { status: filters.status } : {}),
       ...(filters.type ? { projectType: filters.type } : {}),
@@ -572,12 +598,12 @@ export async function getProjects(filters: { status?: string; type?: string } = 
 
 export async function getProjectBySlug(slug: string) {
   return prisma.project.findFirst({
-    where: { slug, deletedAt: null, isDemo: false, isActive: true },
+    where: { slug, deletedAt: null, ...(await demoWhere()), isActive: true },
     include: {
       city: true,
       images: { orderBy: { order: "asc" } },
       properties: {
-        where: publicPropertyWhere(),
+        where: await publicPropertyWhere(),
         select: propertyCardSelect,
         take: 6,
       },
@@ -591,7 +617,7 @@ export async function getProjectBySlug(slug: string) {
 
 export async function getAgencies() {
   const agencies = await prisma.agency.findMany({
-    where: { isVerified: true, user: { isActive: true } },
+    where: { isVerified: true, ...(await demoWhere()), user: { isActive: true } },
     select: {
       id: true,
       name: true,
@@ -602,7 +628,7 @@ export async function getAgencies() {
       user: {
         select: {
           _count: {
-            select: { properties: { where: publicPropertyWhere() } },
+            select: { properties: { where: await publicPropertyWhere() } },
           },
         },
       },
@@ -700,12 +726,12 @@ export async function getAdminAgencies() {
 
 export async function getAgencyBySlug(slug: string) {
   const agency = await prisma.agency.findFirst({
-    where: { slug, isVerified: true, user: { isActive: true } },
+    where: { slug, isVerified: true, ...(await demoWhere()), user: { isActive: true } },
   });
   if (!agency) return null;
 
   const properties = await prisma.property.findMany({
-    where: { ...publicPropertyWhere(), authorId: agency.userId },
+    where: { ...(await publicPropertyWhere()), authorId: agency.userId },
     select: propertyCardSelect,
     orderBy: { publishedAt: "desc" },
   });
@@ -889,7 +915,7 @@ export async function getPosts(
 
   const where: Prisma.BlogPostWhereInput = {
     deletedAt: null,
-    isDemo: false,
+    ...(await demoWhere()),
     status: POST_STATUSES.PUBLISHED,
     ...(filters.categorySlug ? { category: { slug: filters.categorySlug } } : {}),
     ...(filters.search
@@ -924,7 +950,7 @@ export async function getPosts(
 
 export async function getPostBySlug(slug: string) {
   return prisma.blogPost.findFirst({
-    where: { slug, deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
+    where: { slug, deletedAt: null, ...(await demoWhere()), status: POST_STATUSES.PUBLISHED },
     include: {
       category: true,
       author: { select: { name: true } },
@@ -936,7 +962,7 @@ export async function getRelatedPosts(postId: string, categoryId: string | null,
   return prisma.blogPost.findMany({
     where: {
       deletedAt: null,
-      isDemo: false,
+      ...(await demoWhere()),
       status: POST_STATUSES.PUBLISHED,
       id: { not: postId },
       ...(categoryId ? { categoryId } : {}),
@@ -953,7 +979,9 @@ export async function getBlogCategories() {
     include: {
       _count: {
         select: {
-          posts: { where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED } },
+          posts: {
+            where: { deletedAt: null, ...(await demoWhere()), status: POST_STATUSES.PUBLISHED },
+          },
         },
       },
     },
@@ -968,7 +996,7 @@ export async function getSitemapEntries() {
   const [properties, projects, services, posts, agencies, agents, partners, seoLandings, dbLandings, districts, metros] = await Promise.all([
     prisma.property.findMany({
       where: {
-        ...publicPropertyWhere(),
+        ...indexablePropertyWhere(),
         OR: [
           { status: { in: [PROPERTY_STATUSES.PUBLISHED, PROPERTY_STATUSES.RESERVED] } },
           { status: { in: [PROPERTY_STATUSES.SOLD, PROPERTY_STATUSES.RENTED] }, retentionUntil: { gte: new Date() } },
@@ -978,6 +1006,7 @@ export async function getSitemapEntries() {
       },
       select: { id: true, slug: true, updatedAt: true, status: true, noIndex: true, canonicalUrl: true, retentionUntil: true },
     }),
+    // Nümunə məzmun sitemap-a heç vaxt düşmür — `indexablePropertyWhere()`-dəki səbəb.
     prisma.project.findMany({
       where: { deletedAt: null, isDemo: false, isActive: true, noIndex: false, canonicalUrl: null },
       select: { id: true, slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
@@ -997,11 +1026,11 @@ export async function getSitemapEntries() {
       select: { id: true, slug: true, updatedAt: true, noIndex: true, canonicalUrl: true },
     }),
     prisma.agency.findMany({
-      where: { isVerified: true, user: { isActive: true } },
+      where: { isVerified: true, isDemo: false, user: { isActive: true } },
       select: { slug: true, updatedAt: true },
     }),
     prisma.agentProfile.findMany({
-      where: { isPublic: true, isVerified: true },
+      where: { isPublic: true, isVerified: true, isDemo: false },
       select: { slug: true, updatedAt: true },
     }),
     getSitemapPartners(),
@@ -1088,10 +1117,15 @@ export async function getTaxonomyLandingProperties(
 async function getIndexableSeoLandingEntries() {
   const rows = await Promise.all(
     SEO_LANDINGS.map(async (landing) => {
-      const where = buildPropertyWhere({
-        ...landing.filters,
-        statuses: INDEXABLE_LISTING_STATUSES,
-      });
+      // `isDemo` geri məcbur edilir: landing-in indeksləşməyə dəyər inventarı
+      // olub-olmadığı qərarı nümunə elanlarla şişirdilməməlidir.
+      const where = {
+        ...(await buildPropertyWhere({
+          ...landing.filters,
+          statuses: INDEXABLE_LISTING_STATUSES,
+        })),
+        isDemo: false,
+      };
       const aggregate = await prisma.property.aggregate({
         where,
         _count: { _all: true },
@@ -1106,7 +1140,10 @@ async function getIndexableSeoLandingEntries() {
 }
 
 export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
-  const baseWhere = buildPropertyWhere({ statuses: INDEXABLE_LISTING_STATUSES });
+  const baseWhere = {
+    ...(await buildPropertyWhere({ statuses: INDEXABLE_LISTING_STATUSES })),
+    isDemo: false,
+  };
   const grouped: Array<{
     locationId: string | null;
     count: number;
@@ -1238,7 +1275,7 @@ export async function getLeadStatusBreakdown() {
 export async function getSeoAuditItems() {
   const [properties, posts, projects, services] = await Promise.all([
     prisma.property.findMany({
-      where: publicPropertyWhere(),
+      where: indexablePropertyWhere(),
       select: {
         id: true,
         title: true,
@@ -2128,7 +2165,7 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
 
   async matchesFilters(filters, propertyId) {
     const match = await prisma.property.findFirst({
-      where: { ...buildPropertyWhere(filters), id: propertyId },
+      where: { ...(await buildPropertyWhere(filters)), id: propertyId },
       select: { id: true },
     });
     return match !== null;
@@ -2264,7 +2301,7 @@ export const savedSearchDigestStore: DigestStore = {
         savedSearchId,
         notifiedAt: null,
         // Elan bu arada silinib və ya qaralamaya qaytarılıbsa məktuba düşməməlidir
-        property: publicPropertyWhere(),
+        property: await publicPropertyWhere(),
       },
       orderBy: { createdAt: "desc" },
       take: limit,
@@ -2298,7 +2335,7 @@ export const savedSearchDigestStore: DigestStore = {
 
   async countPendingMatches(savedSearchId) {
     return prisma.savedSearchMatch.count({
-      where: { savedSearchId, notifiedAt: null, property: publicPropertyWhere() },
+      where: { savedSearchId, notifiedAt: null, property: await publicPropertyWhere() },
     });
   },
 
@@ -2410,9 +2447,24 @@ export async function getAdminEmailOverview() {
  * bilər, amma müddəti bitmiş müqavilə həmin an görünməməlidir. `null` (müddətsiz)
  * və gələcək tarix keçir; keçmiş tarix süzülür.
  */
-function publicPartnerWhere(now: Date = new Date()): Prisma.PartnerWhereInput {
+async function publicPartnerWhere(now: Date = new Date()): Promise<Prisma.PartnerWhereInput> {
   return {
     deletedAt: null,
+    ...(await demoWhere()),
+    status: { in: PUBLIC_PARTNER_STATUSES },
+    showPublicly: true,
+    OR: [{ partnershipEndDate: null }, { partnershipEndDate: { gte: startOfToday(now) } }],
+  };
+}
+
+/**
+ * Sitemap üçün tərəfdaş şərti — nümunə tərəfdaşlar heç vaxt daxil edilmir.
+ * Səbəb `indexablePropertyWhere()`-dəki ilə eynidir.
+ */
+function indexablePartnerWhere(now: Date = new Date()): Prisma.PartnerWhereInput {
+  return {
+    deletedAt: null,
+    isDemo: false,
     status: { in: PUBLIC_PARTNER_STATUSES },
     showPublicly: true,
     OR: [{ partnershipEndDate: null }, { partnershipEndDate: { gte: startOfToday(now) } }],
@@ -2497,7 +2549,7 @@ export async function getPublicPartners(
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = filters.pageSize ?? PARTNER_PAGE_SIZE;
   const where: Prisma.PartnerWhereInput = {
-    ...publicPartnerWhere(),
+    ...(await publicPartnerWhere()),
     ...(filters.types?.length ? { partnershipType: { in: filters.types } } : {}),
   };
 
@@ -2519,7 +2571,7 @@ export async function getPublicPartners(
 export async function getPublicPartnerTypeCounts(): Promise<Record<string, number>> {
   const rows = await prisma.partner.groupBy({
     by: ["partnershipType"],
-    where: publicPartnerWhere(),
+    where: await publicPartnerWhere(),
     _count: { _all: true },
   });
 
@@ -2529,7 +2581,7 @@ export async function getPublicPartnerTypeCounts(): Promise<Record<string, numbe
 /** Ana səhifədə göstərilən tərəfdaşlar — hamısı deyil, yalnız işarələnmişlər. */
 export async function getHomepagePartners(take = 6) {
   return prisma.partner.findMany({
-    where: { ...publicPartnerWhere(), showOnHomepage: true },
+    where: { ...(await publicPartnerWhere()), showOnHomepage: true },
     select: partnerCardSelect,
     orderBy: PARTNER_ORDER,
     take,
@@ -2546,7 +2598,7 @@ export async function getHomepagePartners(take = 6) {
  */
 export async function getPartnerBySlug(slug: string) {
   const partner = await prisma.partner.findFirst({
-    where: { ...publicPartnerWhere(), slug },
+    where: { ...(await publicPartnerWhere()), slug },
     select: partnerDetailSelect,
   });
 
@@ -2554,7 +2606,7 @@ export async function getPartnerBySlug(slug: string) {
 
   const [propertyLinks, projectLinks, agencyLinks] = await Promise.all([
     prisma.propertyPartner.findMany({
-      where: { partnerId: partner.id, isPublic: true, property: publicPropertyWhere() },
+      where: { partnerId: partner.id, isPublic: true, property: await publicPropertyWhere() },
       select: { role: true, property: { select: propertyCardSelect } },
       orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
       take: 6,
@@ -2563,7 +2615,7 @@ export async function getPartnerBySlug(slug: string) {
       where: {
         partnerId: partner.id,
         isPublic: true,
-        project: { deletedAt: null, isDemo: false, isActive: true },
+        project: { deletedAt: null, ...(await demoWhere()), isActive: true },
       },
       select: { role: true, project: { select: projectCardSelect } },
       orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
@@ -2600,7 +2652,7 @@ export async function getPartnerBySlug(slug: string) {
  */
 export async function getPropertyPartners(propertyId: string) {
   return prisma.propertyPartner.findMany({
-    where: { propertyId, isPublic: true, partner: publicPartnerWhere() },
+    where: { propertyId, isPublic: true, partner: await publicPartnerWhere() },
     select: { role: true, isPrimary: true, sourceUrl: true, partner: { select: partnerCardSelect } },
     orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
   });
@@ -2610,7 +2662,7 @@ export type PropertyPartnerLink = Awaited<ReturnType<typeof getPropertyPartners>
 
 export async function getProjectPartners(projectId: string) {
   return prisma.projectPartner.findMany({
-    where: { projectId, isPublic: true, partner: publicPartnerWhere() },
+    where: { projectId, isPublic: true, partner: await publicPartnerWhere() },
     select: { role: true, isPrimary: true, partner: { select: partnerCardSelect } },
     orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }],
   });
@@ -2618,10 +2670,10 @@ export async function getProjectPartners(projectId: string) {
 
 export type ProjectPartnerLink = Awaited<ReturnType<typeof getProjectPartners>>[number];
 
-/** Sitemap: yalnız ictimai görünən tərəfdaşlar. */
+/** Sitemap: yalnız ictimai görünən, nümunə olmayan tərəfdaşlar. */
 export async function getSitemapPartners() {
   return prisma.partner.findMany({
-    where: publicPartnerWhere(),
+    where: indexablePartnerWhere(),
     select: { slug: true, updatedAt: true },
   });
 }

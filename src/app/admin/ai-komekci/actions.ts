@@ -29,6 +29,28 @@ const DESCRIPTION_SCHEMA = {
 /** Bir çağırışda analiz edilən maksimum şəkil — xərci və icra vaxtını məhdudlaşdırır. */
 const MAX_ANALYZED_IMAGES = 6;
 
+/**
+ * Model çıxışını təsvir qaralamasına çevirir.
+ *
+ * Sxem prompta verilir və JSON mode ilə məcbur edilir, lakin kiçik modellər bəzən
+ * yenə də sərbəst mətn qaytarır. Belə halda cavabı atmaq mənasızdır: mətn faktiki
+ * olaraq istənilən təsvirdir və onsuz da qaralama kimi saxlanılır — redaktor
+ * dərc etməzdən əvvəl onu nəzərdən keçirir. Ona görə JSON alınmayanda mətnin
+ * özü təsvir sayılır.
+ */
+function toDescriptionOutput(text: string): DescriptionOutput {
+  try {
+    const parsed = parseAiJson<DescriptionOutput>(text);
+    if (parsed.description?.trim()) return parsed;
+  } catch {
+    // aşağıdakı mətn variantına düşülür
+  }
+
+  // Kod bloku qalıqları təmizlənir — mətn birbaşa redaktora göstərilir.
+  const plain = text.replace(/```(?:json)?/gi, "").trim();
+  return { description: plain };
+}
+
 async function guard() {
   try {
     return await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE);
@@ -58,20 +80,47 @@ export async function testAiProvider(): Promise<ActionState> {
   }
 }
 
+/** Vision modelinə göndərilən şəklin yuxarı həddi — böyük fayl sorğunu uzadır. */
+const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
+
 /**
- * Elan şəklini R2-dən bayt massivi kimi oxuyur.
+ * Elan şəklini bayt massivi kimi oxuyur.
  *
- * `image.url` `/media/<açar>` formatındadır. Şəkli ictimai URL üzərindən çəkmək
- * əvəzinə birbaşa binding-dən oxumaq həm bir şəbəkə gedişini aradan qaldırır,
- * həm də hələ dərc edilməmiş elanın şəkli üçün də işləyir.
+ * Paneldən yüklənən şəkillərin URL-i `/media/<açar>` formatındadır və birbaşa R2
+ * binding-indən oxunur: bu, bir şəbəkə gedişini aradan qaldırır və hələ dərc
+ * edilməmiş elanın şəkli üçün də işləyir.
+ *
+ * Bazadakı hər şəkil isə R2-də olmur — stok və nümunə elanlar xarici URL daşıyır
+ * (`images.unsplash.com`), R2 custom domeni də mütləq URL verir. Əvvəllər belə
+ * şəkillər sadəcə `null` qaytarırdı və foto məsləhətçisi «heç bir şəkil analiz
+ * edilə bilmədi» deyirdi. İndi mütləq `https:` URL-lər çəkilir.
+ *
+ * `http:` və digər sxemlər qəsdən qəbul edilmir, ölçü isə həm başlıqla, həm də
+ * faktiki bayt sayı ilə yoxlanılır.
  */
 async function readImageBytes(url: string): Promise<Uint8Array | null> {
-  const key = url.startsWith("/media/") ? url.slice("/media/".length) : null;
-  if (!key) return null;
-  const bucket = getCloudflareContext().env.MEDIA;
-  const object = await bucket?.get(key);
-  if (!object) return null;
-  return new Uint8Array(await object.arrayBuffer());
+  if (url.startsWith("/media/")) {
+    const bucket = getCloudflareContext().env.MEDIA;
+    const object = await bucket?.get(url.slice("/media/".length));
+    if (!object) return null;
+    return new Uint8Array(await object.arrayBuffer());
+  }
+
+  if (!url.startsWith("https://")) return null;
+
+  const response = await fetch(url, { headers: { accept: "image/*" } });
+  if (!response.ok) return null;
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.startsWith("image/")) return null;
+
+  const declaredLength = Number(response.headers.get("content-length") ?? 0);
+  if (declaredLength > MAX_IMAGE_BYTES) return null;
+
+  const buffer = await response.arrayBuffer();
+  if (buffer.byteLength === 0 || buffer.byteLength > MAX_IMAGE_BYTES) return null;
+
+  return new Uint8Array(buffer);
 }
 
 export async function generatePropertyDescription(
@@ -119,7 +168,7 @@ export async function generatePropertyDescription(
       jsonSchema: DESCRIPTION_SCHEMA,
     });
 
-    const output = parseAiJson<DescriptionOutput>(response.text);
+    const output = toDescriptionOutput(response.text);
     if (!output.description?.trim()) return failure("AI cavabında təsvir yoxdur.");
 
     const draft = await prisma.aiContentDraft.create({
@@ -164,9 +213,14 @@ export async function analyzePropertyPhotos(
     // Vision modeli bir çağırışda bir şəkil qəbul edir, ona görə şəkillər bir-bir gedir.
     const results: Array<{ id: string; score: number; issues: string[] }> = [];
     let model = "";
+    let unreadable = 0;
     for (const image of property.images) {
       const bytes = await readImageBytes(image.url);
-      if (!bytes) continue;
+      if (!bytes) {
+        unreadable += 1;
+        console.error(`[ai] «${image.id}» şəkli oxunmadı: ${image.url}`);
+        continue;
+      }
       try {
         const response = await runAiVision({
           instructions: AI_SYSTEM_PROMPTS.photoAdvisor,
@@ -186,7 +240,13 @@ export async function analyzePropertyPhotos(
       }
     }
 
-    if (results.length === 0) return failure("Heç bir şəkil analiz edilə bilmədi.");
+    if (results.length === 0) {
+      return failure(
+        unreadable === property.images.length
+          ? "Şəkillər oxunmadı — fayl mənbəyi əlçatan deyil."
+          : "Heç bir şəkil analiz edilə bilmədi. AI modeli cavab vermədi.",
+      );
+    }
 
     for (const result of results) {
       await prisma.propertyImage.update({

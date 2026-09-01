@@ -4,7 +4,12 @@ import { describe, expect, it, vi } from "vitest";
 // toxunur; klient isə Proxy arxasında D1 binding-i axtarır. Bu testin sorğu icrasına
 // ehtiyacı yoxdur — yalnız qurulan `where` obyektinin formasını yoxlayır.
 vi.mock("@/lib/prisma", () => ({
-  prisma: { property: { fields: { totalFloors: "__field:totalFloors__" } } },
+  prisma: {
+    property: { fields: { totalFloors: "__field:totalFloors__" } },
+    // `demoWhere()` paneldəki demo açarını oxuyur. Bu testdə rejim bağlıdır,
+    // yəni baza şərti həmişə `isDemo: false` daşımalıdır.
+    setting: { findUnique: async () => null },
+  },
 }));
 
 import { buildPropertyWhere } from "../queries";
@@ -19,7 +24,7 @@ import { buildPropertyWhere } from "../queries";
  */
 
 /** `where.AND`-i həmişə massiv kimi oxuyur. */
-function andConditions(where: ReturnType<typeof buildPropertyWhere>): unknown[] {
+function andConditions(where: Awaited<ReturnType<typeof buildPropertyWhere>>): unknown[] {
   if (Array.isArray(where.AND)) return where.AND;
   return where.AND ? [where.AND] : [];
 }
@@ -33,8 +38,8 @@ function hasFeature(conditions: unknown[], slug: string): boolean {
 }
 
 describe("buildPropertyWhere — baza şərti", () => {
-  it("hər sorğuya ictimai görünürlük şərtini əlavə edir", () => {
-    const where = buildPropertyWhere({});
+  it("hər sorğuya ictimai görünürlük şərtini əlavə edir", async () => {
+    const where = await buildPropertyWhere({});
 
     expect(where.deletedAt).toBeNull();
     expect(where.isDemo).toBe(false);
@@ -43,8 +48,8 @@ describe("buildPropertyWhere — baza şərti", () => {
 });
 
 describe("buildPropertyWhere — müstəqil filtrlərin birləşməsi", () => {
-  it("xüsusiyyət filtri «son mərtəbə olmasın» şərtini silmir", () => {
-    const where = buildPropertyWhere({
+  it("xüsusiyyət filtri «son mərtəbə olmasın» şərtini silmir", async () => {
+    const where = await buildPropertyWhere({
       excludeLastFloor: true,
       featureSlugs: ["hovuz"],
     });
@@ -57,8 +62,8 @@ describe("buildPropertyWhere — müstəqil filtrlərin birləşməsi", () => {
     );
   });
 
-  it("hər xüsusiyyət ayrıca AND şərti kimi əlavə olunur", () => {
-    const where = buildPropertyWhere({ featureSlugs: ["hovuz", "qaraj", "lift"] });
+  it("hər xüsusiyyət ayrıca AND şərti kimi əlavə olunur", async () => {
+    const where = await buildPropertyWhere({ featureSlugs: ["hovuz", "qaraj", "lift"] });
     const conditions = andConditions(where);
 
     expect(conditions).toHaveLength(3);
@@ -67,8 +72,8 @@ describe("buildPropertyWhere — müstəqil filtrlərin birləşməsi", () => {
     }
   });
 
-  it("mətn axtarışı xüsusiyyət filtri ilə birlikdə qalır", () => {
-    const where = buildPropertyWhere({
+  it("mətn axtarışı xüsusiyyət filtri ilə birlikdə qalır", async () => {
+    const where = await buildPropertyWhere({
       featureSlugs: ["hovuz"],
       search: "Yasamal",
     });
@@ -78,8 +83,8 @@ describe("buildPropertyWhere — müstəqil filtrlərin birləşməsi", () => {
     expect(conditions.some((condition) => JSON.stringify(condition).includes("Yasamal"))).toBe(true);
   });
 
-  it("üç OR/AND filtri eyni anda verildikdə hamısı qorunur", () => {
-    const where = buildPropertyWhere({
+  it("üç OR/AND filtri eyni anda verildikdə hamısı qorunur", async () => {
+    const where = await buildPropertyWhere({
       excludeLastFloor: true,
       featureSlugs: ["qaraj"],
       search: "villa",
@@ -91,21 +96,21 @@ describe("buildPropertyWhere — müstəqil filtrlərin birləşməsi", () => {
     expect(serialized).toContain("villa");
   });
 
-  it("birinci mərtəbə istisnası mərtəbə aralığını pozmur", () => {
-    const where = buildPropertyWhere({ minFloor: 2, maxFloor: 9, excludeFirstFloor: true });
+  it("birinci mərtəbə istisnası mərtəbə aralığını pozmur", async () => {
+    const where = await buildPropertyWhere({ minFloor: 2, maxFloor: 9, excludeFirstFloor: true });
 
     expect(where.floor).toEqual({ gte: 2, lte: 9, gt: 1 });
   });
 });
 
 describe("buildPropertyWhere — filtr olmayan hallar", () => {
-  it("boş xüsusiyyət siyahısı AND yaratmır", () => {
-    const where = buildPropertyWhere({ featureSlugs: [] });
+  it("boş xüsusiyyət siyahısı AND yaratmır", async () => {
+    const where = await buildPropertyWhere({ featureSlugs: [] });
     expect(where.AND).toBeUndefined();
   });
 
-  it("boşluqdan ibarət axtarış sözü şərt yaratmır", () => {
-    const where = buildPropertyWhere({ search: "   " });
+  it("boşluqdan ibarət axtarış sözü şərt yaratmır", async () => {
+    const where = await buildPropertyWhere({ search: "   " });
     expect(where.AND).toBeUndefined();
   });
 });

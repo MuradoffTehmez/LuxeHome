@@ -69,11 +69,40 @@ düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` q�
 |---|---|
 | Kabinet moderasiyası | Kabinet elanına koordinat əlavə olundu, lakin moderator baxışında xəritə önizləməsi yoxdur. |
 | Browser axınları | Avtomatlaşdırılmış Playwright/E2E yoxdur; production smoke testi manualdır. |
-| Phase 3 / AI | Semantik axtarış, Match Score, chatbot və map draw search yazılmayıb (PRD bölmə 180). Panel tərəfdə yalnız AI təsvir generatoru və foto məsləhətçisi var. |
+| Phase 3 / AI | Semantik axtarış, Match Score, chatbot və map draw search yazılmayıb (PRD bölmə 180). Panel tərəfdə yalnız AI təsvir generatoru və foto məsləhətçisi var. Hər ikisi 1 sentyabr 2026-da düzəldildi (Workers AI JSON mode + xarici şəkil URL-ləri); production-a yayım gözləyir. |
 | Finance / statik CMS | Knowledge Hub üçün domen CMS-i hazırdır; paket, ödəniş və ümumi statik səhifə redaktoru hələ yoxdur (Admin PRD). |
 
 Azərbaycan hərfləri ilə registrsiz axtarış 28 avqustda `searchText` / `searchName`
 sütunları və `normalizeSearchText()` ilə həll olunub.
+
+---
+
+## 5c. Nümunə (demo) məzmun rejimi — 1 sentyabr 2026
+
+Test və müştəri təqdimatı üçün saytı dolu göstərən məzmun dəsti qurulub.
+
+**Həcm:** 15 əmlak kateqoriyasının hər biri üçün 20 elan (cəmi 300), 12 yaşayış
+kompleksi, 6 agentlik, 12 agent, 12 tərəfdaş, 20 bloq yazısı. Elan mətnləri reklam
+üslubundadır; hər təsvirin sonunda nümunə bildirişi var və slug-lar `demo-` prefikslidir.
+
+**İdarəetmə:** `/admin/demo-mezmun` səhifəsindəki açar (`demo.content_enabled`).
+Rejim bağlı olanda nümunə qeydlər saytda görünmür, real məzmun isə hər iki halda görünür.
+
+**Qəbul edilmiş qərarlar:**
+
+- Görünürlük **yalnız sorğu şərtindədir** — `isDemo` bayrağı heç vaxt dəyişmir.
+  Toplu status yeniləməsi D1-də tranzaksiya olmadığı üçün yarımçıq qala bilərdi və
+  nümunə qeydi real qeyddən ayırd etmək imkanını itirərdi.
+- `publicPropertyWhere()` və `publicPartnerWhere()` **async edildi**. Şərti hər çağırış
+  yerinə əl ilə əlavə etmək variantı rədd edildi: bir yerdə unudulsa, rejim saytın
+  yalnız bir hissəsində işləyərdi.
+- Sitemap və SEO auditi ayrıca `indexable*Where()` funksiyalarından keçir və nümunə
+  məzmunu **heç vaxt** daxil etmir. Səbəb: rejim söndürüləndən sonra indeksdə qırıq
+  URL-lər qalardı.
+- Nümunə agentliklər sahib istifadəçi tələb edir; onlar `.test` domenində və
+  `passwordHash = 'disabled'` ilə yaradılır — giriş mümkün deyil.
+
+**Production-da rejim söndürülü qalmalıdır.** Miqrasiya `0027_demo_content_flags.sql`.
 
 ---
 

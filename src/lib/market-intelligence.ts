@@ -38,7 +38,7 @@ export async function getMarketReport(slug: string): Promise<MarketReport | null
   const district = slug === "baki" ? null : await prisma.location.findFirst({ where: { slug, kind: "DISTRICT", neighborhoodProfile: { isNot: null } }, include: { neighborhoodProfile: true } });
   if (slug !== "baki" && !district?.neighborhoodProfile) return null;
   const properties = await prisma.property.findMany({
-    where: { ...publicPropertyWhere(), ...(district ? { districtId: district.id } : {}) },
+    where: { ...(await publicPropertyWhere()), ...(district ? { districtId: district.id } : {}) },
     select: { price: true, area: true, typeId: true, type: { select: { name: true } } },
     orderBy: { updatedAt: "desc" },
     take: 5000,

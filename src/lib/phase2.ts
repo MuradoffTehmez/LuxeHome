@@ -1,14 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { demoWhere } from "@/lib/demo-content";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
 
 /** İctimai agent kataloqu — qaralama və gizli profillər heç vaxt sızmır. */
 export async function getPublicAgents() {
   return prisma.agentProfile.findMany({
-    where: { isPublic: true },
+    where: { isPublic: true, ...(await demoWhere()) },
     include: {
       agency: { select: { name: true, slug: true } },
       reviews: { where: { status: "APPROVED" }, select: { rating: true } },
-      _count: { select: { properties: { where: publicPropertyWhere() } } },
+      _count: { select: { properties: { where: await publicPropertyWhere() } } },
     },
     orderBy: [{ isVerified: "desc" }, { soldCount: "desc" }, { name: "asc" }],
   });
@@ -16,11 +17,11 @@ export async function getPublicAgents() {
 
 export async function getPublicAgentBySlug(slug: string) {
   return prisma.agentProfile.findFirst({
-    where: { slug, isPublic: true },
+    where: { slug, isPublic: true, ...(await demoWhere()) },
     include: {
       agency: { select: { name: true, slug: true, logoUrl: true } },
       properties: {
-        where: publicPropertyWhere(),
+        where: await publicPropertyWhere(),
         select: propertyCardSelect,
         orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
       },
@@ -55,7 +56,7 @@ export async function getPersonalizedRecommendations(userId: string, take = 12) 
   }
 
   const favorites = await prisma.favorite.findMany({
-    where: { userId, property: publicPropertyWhere() },
+    where: { userId, property: await publicPropertyWhere() },
     select: {
       propertyId: true,
       property: { select: { typeId: true, cityId: true, listingType: true } },
@@ -82,7 +83,7 @@ export async function getPersonalizedRecommendations(userId: string, take = 12) 
   const items = await prisma.property.findMany({
     where: {
       AND: [
-        publicPropertyWhere(),
+        await publicPropertyWhere(),
         affinity,
         favoriteIds.length > 0 ? { id: { notIn: favoriteIds } } : {},
       ],

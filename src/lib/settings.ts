@@ -29,6 +29,12 @@ export const SETTING_KEYS = {
    */
   CONTACT_LATITUDE: "site.contact_latitude",
   CONTACT_LONGITUDE: "site.contact_longitude",
+  /**
+   * `"1"` — nümunə (demo) məzmun ictimai saytda göstərilir. Yalnız test və
+   * təqdimat rejimidir; production-da söndürülü qalmalıdır. Şərtin sorğulara
+   * necə tətbiq olunduğu `src/lib/demo-content.ts`-dədir.
+   */
+  DEMO_CONTENT_ENABLED: "demo.content_enabled",
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];

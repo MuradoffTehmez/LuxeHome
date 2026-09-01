@@ -76,7 +76,8 @@
       "security": "Security",
       "audit": "Audit log",
       "profile": "My account",
-      "settings": "Settings"
+      "settings": "Settings",
+      "demoContent": "Demo content"
     }
   },
   "actions": {
@@ -2092,6 +2093,33 @@
       "sorguSayi": "{p0} queries",
       "idareOlunanUrl": "{p0} managed URLs",
       "sonYenilenmeAuditQeydleri": "Last updated: {p0}. Audit records"
+    },
+    "demoContent": {
+      "title": "Demo content",
+      "description": "Show or hide sample listings, projects, agencies and blog posts used for testing and demos.",
+      "toggleTitle": "Public visibility",
+      "toggleDescription": "The mode affects sample records only; real content is shown either way.",
+      "statusOn": "Enabled — visible on the site",
+      "statusOff": "Disabled — hidden from the site",
+      "turnOn": "Enable demo content",
+      "turnOff": "Disable demo content",
+      "noContentHint": "There are no sample records in the database. Load the content with the command below first.",
+      "statProperties": "Sample listings",
+      "statPropertiesHint": "across {p0} categories",
+      "statProjects": "Residential complexes",
+      "statAgencies": "Agencies",
+      "statAgents": "Agents",
+      "statPartners": "Partners",
+      "statPosts": "Blog posts",
+      "byCategoryTitle": "Breakdown by category",
+      "byCategoryDescription": "How many sample listings each property type holds.",
+      "howTitle": "How it works",
+      "howVisibility": "Records are not deleted — only the public query condition changes. Turning the mode off hides sample content immediately.",
+      "howSeo": "Sample pages never enter the sitemap and are not exposed to search engines, even while the mode is on.",
+      "howCommands": "Terminal commands",
+      "cmdBuild": "Regenerates the sample SQL file.",
+      "cmdLoad": "Loads the sample content into the local database.",
+      "cmdClean": "Deletes every sample record from the database."
     }
   }
 }

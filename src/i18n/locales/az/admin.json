@@ -76,7 +76,8 @@
       "security": "Təhlükəsizlik",
       "audit": "Audit jurnalı",
       "profile": "Hesabım",
-      "settings": "Parametrlər"
+      "settings": "Parametrlər",
+      "demoContent": "Nümunə məzmun"
     }
   },
   "actions": {
@@ -2092,6 +2093,33 @@
       "sorguSayi": "{p0} sorğu",
       "idareOlunanUrl": "{p0} idarə olunan URL",
       "sonYenilenmeAuditQeydleri": "Son yenilənmə: {p0}. Audit qeydləri"
+    },
+    "demoContent": {
+      "title": "Nümunə məzmun",
+      "description": "Test və təqdimat üçün nümunə elan, layihə, agentlik və bloq qeydlərini saytda göstərin və ya gizlədin.",
+      "toggleTitle": "İctimai görünürlük",
+      "toggleDescription": "Rejim yalnız nümunə qeydlərə təsir edir; real məzmun hər iki halda göstərilir.",
+      "statusOn": "Aktivdir — saytda görünür",
+      "statusOff": "Söndürülüb — saytda görünmür",
+      "turnOn": "Nümunə məzmunu aktiv et",
+      "turnOff": "Nümunə məzmunu söndür",
+      "noContentHint": "Bazada nümunə qeyd yoxdur. Əvvəlcə aşağıdakı əmrlə məzmunu yükləyin.",
+      "statProperties": "Nümunə elan",
+      "statPropertiesHint": "{p0} kateqoriya üzrə",
+      "statProjects": "Yaşayış kompleksi",
+      "statAgencies": "Agentlik",
+      "statAgents": "Agent",
+      "statPartners": "Tərəfdaş",
+      "statPosts": "Bloq yazısı",
+      "byCategoryTitle": "Kateqoriya üzrə bölgü",
+      "byCategoryDescription": "Hər əmlak növündə neçə nümunə elan olduğunu göstərir.",
+      "howTitle": "Necə işləyir",
+      "howVisibility": "Qeydlər bazadan silinmir — yalnız ictimai sorğu şərti dəyişir. Söndürüləndə nümunə məzmun dərhal gizlənir.",
+      "howSeo": "Nümunə səhifələr sitemap-a düşmür və axtarış sistemlərinə verilmir, rejim açıq olsa belə.",
+      "howCommands": "Terminal əmrləri",
+      "cmdBuild": "Nümunə SQL faylını yenidən yaradır.",
+      "cmdLoad": "Nümunə məzmunu lokal bazaya yükləyir.",
+      "cmdClean": "Bütün nümunə qeydləri bazadan silir."
     }
   }
 }

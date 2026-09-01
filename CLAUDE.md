@@ -293,10 +293,41 @@ Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur 
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
 
-### Demo kontent qoruması
+### Nümunə (demo) məzmun
 
-`Property`, `Project`, `BlogPost` modellərində geriyə uyğunluq üçün `isDemo` boolean sahəsi var.
-İctimai sorğular yalnız `isDemo: false` qeydlərini qaytarır; seed ictimai məzmun yaratmır.
+`Property`, `Project`, `BlogPost`, `Agency`, `AgentProfile` və `Partner` modellərində
+`isDemo` boolean sahəsi var. Seed ictimai məzmun yaratmır.
+
+Görünürlük **paneldən idarə olunur** — `/admin/demo-mezmun` səhifəsindəki açar
+`demo.content_enabled` parametrini yazır. Məntiq `src/lib/demo-content.ts`-dədir:
+
+- `demoWhere()` — rejim bağlı olanda `{ isDemo: false }`, açıq olanda `{}` qaytarır.
+  Hər ictimai sorğu bu şərti spread edir.
+- `isDemoContentEnabled()` — `cache()` ilə sorğu başına bir dəfə oxunur.
+- **Qeydlərin `isDemo` bayrağı heç vaxt dəyişmir.** Görünürlük yalnız sorğu şərtindədir;
+  toplu status yeniləməsi D1-də tranzaksiya olmadığı üçün yarımçıq qala bilərdi.
+
+Buna görə `publicPropertyWhere()`, `buildPropertyWhere()` və `publicPartnerWhere()`
+**async-dir**. Şərti çağıran tərəfə buraxmaq təhlükəli olardı: bir yerdə unudulsa,
+rejim saytın yalnız bir hissəsində işləyərdi.
+
+`indexablePropertyWhere()` və `indexablePartnerWhere()` isə sinxrondur və **həmişə**
+`isDemo: false` daşıyır. Sitemap, SEO auditi və landing indeksləşdirmə qərarı bunları
+işlədir: rejim təqdimat üçün açıldıqda nümunə URL-lərin indeksləşməsi, rejim
+söndürüləndən sonra qırıq indeks qeydləri qoyardı.
+
+Məzmun dəsti — 15 kateqoriyanın hər biri üçün 20 elan, 12 yaşayış kompleksi,
+6 agentlik, 12 agent, 12 tərəfdaş, 20 bloq yazısı:
+
+```bash
+npm run db:demo:build    # prisma/demo-content-data.ts → prisma/demo-content.sql
+npm run db:demo:local    # SQL-i lokal D1-ə tətbiq edir (:staging / :remote də var)
+npm run db:clean-demo:local  # bütün isDemo qeydlərini silir və açarı söndürür
+```
+
+`prisma/demo-content.sql` generasiya olunur — əl ilə redaktə edilməməlidir. Xarici
+açarlar ID ilə deyil, `(SELECT id FROM ... WHERE slug = ...)` alt-sorğusu ilə bağlanır,
+ona görə eyni fayl hər üç mühitdə işləyir.
 
 ## Cari vəziyyət və bilinən boşluqlar
 
