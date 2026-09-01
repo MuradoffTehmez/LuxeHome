@@ -34,7 +34,7 @@ export function AdminListCard({
   className,
 }: AdminListCardProps) {
   return (
-    <article className={cn("min-w-0 rounded-md border border-line bg-paper p-4 shadow-sm", className)}>
+    <article className={cn("min-w-0 rounded-lg border border-line bg-paper p-4 shadow-xs", className)}>
       <header className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="font-medium text-ink [overflow-wrap:anywhere]">{title}</div>

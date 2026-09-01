@@ -27,7 +27,7 @@ export async function AdminPageHeader({
     <div className="mb-6 flex flex-col gap-4 sm:mb-8">
       {breadcrumbs.length > 0 && (
         <nav aria-label={t("components.breadcrumb.label")}>
-          <ol className="flex flex-wrap items-center gap-1 text-xs text-ink-muted">
+          <ol className="flex flex-wrap items-center gap-1.5 text-xs text-ink-muted">
             {breadcrumbs.map((crumb, index) => (
               <li key={`${crumb.label}-${index}`} className="flex items-center gap-1">
                 {index > 0 && (
@@ -51,7 +51,7 @@ export async function AdminPageHeader({
 
       <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-col gap-1.5">
-          <h1 className="font-display text-2xl text-ink sm:text-3xl">{title}</h1>
+          <h1 className="text-2xl font-semibold tracking-[-0.025em] text-ink sm:text-[2rem]">{title}</h1>
           {description && (
             <p className="max-w-2xl text-sm text-ink-soft">{description}</p>
           )}
@@ -83,12 +83,12 @@ export function AdminCard({
 }) {
   return (
     <section
-      className={cn("overflow-hidden rounded-md border border-line bg-paper", className)}
+      className={cn("overflow-hidden rounded-lg border border-line bg-paper shadow-xs", className)}
     >
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
           <div className="flex flex-col gap-0.5">
-            {title && <h2 className="font-display text-lg text-ink">{title}</h2>}
+            {title && <h2 className="text-base font-semibold tracking-[-0.01em] text-ink">{title}</h2>}
             {description && <p className="text-sm text-ink-muted">{description}</p>}
           </div>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
@@ -133,13 +133,13 @@ export function StatCard({
           <Icon className="size-4.5" aria-hidden="true" />
         </span>
       </div>
-      <p className="tabular mt-3 font-display text-3xl text-ink">{value}</p>
+      <p className="tabular mt-3 text-3xl font-semibold tracking-[-0.03em] text-ink">{value}</p>
       {hint && <p className="mt-1 text-xs text-ink-muted">{hint}</p>}
     </>
   );
 
   const className =
-    "block rounded-md border border-line bg-paper p-5 transition-all duration-300 ease-out-soft";
+    "block rounded-lg border border-line bg-paper p-5 shadow-xs transition-all duration-300 ease-out-soft";
 
   if (href) {
     return (
@@ -171,7 +171,7 @@ export function AdminTable({
       <table className="w-full min-w-3xl border-collapse text-sm">
         {caption && <caption className="sr-only">{caption}</caption>}
         <thead>
-          <tr className="border-b border-line">
+          <tr className="border-b border-line bg-beige/45">
             {headers.map((header) => (
               <th
                 key={header.label}
@@ -193,7 +193,7 @@ export function AdminTable({
 }
 
 export function AdminTableRow({ children }: { children: React.ReactNode }) {
-  return <tr className="transition-colors duration-150 hover:bg-beige/50">{children}</tr>;
+  return <tr className="transition-colors duration-150 hover:bg-beige/45">{children}</tr>;
 }
 
 export function AdminTableCell({

@@ -43,7 +43,7 @@ export function AdminFilterBar({
   const shared = { action, searchName, searchValue, searchPlaceholder, selects, hidden, hasFilters };
 
   return (
-    <div className={cn("border-b border-line bg-paper-light", className)}>
+    <div className={cn("border-b border-line bg-beige/25", className)}>
       <div className="flex min-h-14 items-center justify-between gap-3 p-3 lg:hidden">
         <div className="min-w-0">
           <p className="text-sm font-medium text-ink">{t("components.filterBar.title")}</p>
@@ -54,7 +54,7 @@ export function AdminFilterBar({
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={open}
-          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xs border border-line-strong px-4 text-sm font-medium text-ink"
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md border border-line-strong bg-paper px-4 text-sm font-medium text-ink shadow-xs"
         >
           <ListFilter className="size-4" aria-hidden="true" />
           {t("components.filterBar.button")}{hasFilters ? <span className="size-2 rounded-full bg-gold" aria-label={t("components.filterBar.activeFilter")} /> : null}
@@ -104,7 +104,7 @@ function FilterForm({
           defaultValue={searchValue}
           placeholder={searchPlaceholder}
           aria-label={searchPlaceholder}
-          className="min-h-11 w-full rounded-xs border border-line bg-paper pr-3 pl-9 text-base text-ink transition-colors placeholder:text-ink-muted focus:border-gold lg:text-sm"
+          className="min-h-11 w-full rounded-md border border-line bg-paper pr-3 pl-9 text-base text-ink shadow-xs transition-colors placeholder:text-ink-muted focus:border-gold lg:text-sm"
         />
       </div>
       <div className={cn("flex gap-2", mobile ? "flex-col" : "flex-wrap items-center")}>
@@ -115,12 +115,12 @@ function FilterForm({
             aria-label={select.label}
             defaultValue={select.value ?? ""}
             onChange={() => formRef.current?.requestSubmit()}
-            className="min-h-11 cursor-pointer rounded-xs border border-line bg-paper px-3 text-base text-ink transition-colors focus:border-gold lg:text-xs"
+            className="min-h-11 cursor-pointer rounded-md border border-line bg-paper px-3 text-base text-ink shadow-xs transition-colors focus:border-gold lg:text-xs"
           >
             {select.options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
         ))}
-        <button type="submit" className="min-h-11 cursor-pointer rounded-xs border border-line-strong bg-gold px-4 text-sm font-medium text-ink transition-colors hover:bg-gold-soft">
+        <button type="submit" className="min-h-11 cursor-pointer rounded-md border border-line-strong bg-gold px-4 text-sm font-medium text-ink shadow-xs transition-colors hover:bg-gold-soft">
           {t("actions.apply")}
         </button>
         {hasFilters ? (

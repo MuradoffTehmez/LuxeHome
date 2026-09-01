@@ -172,10 +172,10 @@ export function FormSection({
   const Tag = asFieldset ? "fieldset" : "section";
 
   return (
-    <Tag id={id} className={cn("min-w-0 scroll-mt-32 rounded-md border border-line bg-paper", className)}>
+    <Tag id={id} className={cn("min-w-0 scroll-mt-32 rounded-lg border border-line bg-paper shadow-xs", className)}>
       {asFieldset ? <legend className="sr-only">{title}</legend> : null}
       <header className="border-b border-line px-4 py-4 sm:px-5">
-        <h2 className="font-display text-lg text-ink">{title}</h2>
+        <h2 className="text-base font-semibold tracking-[-0.01em] text-ink">{title}</h2>
         {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
       </header>
       <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">{children}</div>
