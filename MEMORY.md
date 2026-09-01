@@ -102,7 +102,18 @@ Rejim bağlı olanda nümunə qeydlər saytda görünmür, real məzmun isə hə
 - Nümunə agentliklər sahib istifadəçi tələb edir; onlar `.test` domenində və
   `passwordHash = 'disabled'` ilə yaradılır — giriş mümkün deyil.
 
-**Production-da rejim söndürülü qalmalıdır.** Miqrasiya `0027_demo_content_flags.sql`.
+**Nümunə məzmun yalnız staging bazasındadır** (2 sentyabr 2026 qərarı). Production-a
+bir dəfə yüklənib dərhal geri silindi; orada yalnız `isDemo` sütunları qalır.
+
+Açar heç yazılmayıbsa mühit defoltu işləyir: staging-də açıq (`IS_STAGING=true`),
+production-da bağlı. Paneldəki açar defoltdan üstündür. Səbəb: staging test və
+təqdimat mühitidir (robots-da tam `Disallow: /`), orada nümunə məzmunu görmək üçün
+əlavə addım tələb etmək mənasızdır; production-da isə səhvən görünməsi ciddi xətadır.
+
+Miqrasiya `0027_demo_content_flags.sql` — hər iki mühitdə tətbiq olunub. Eyni yayımda
+`0025_serp_ecosystem` (staging) və `0026_normalize_theme_preference` (hər ikisi) də
+tətbiq edildi; onlar əvvəldən gözləyirdi. **Staging bazası o vaxta qədər tamamilə boş
+idi** — `db:seed:staging` + `db:taxonomy:staging` ilk dəfə orada işlədildi.
 
 ---
 

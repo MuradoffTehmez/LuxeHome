@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { runtimeEnv } from "@/lib/runtime-env";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
 
 /**
@@ -25,9 +26,20 @@ export const DEMO_CONTENT_ENABLED_VALUE = "1";
  *
  * `cache()` React-in request scope-udur: eyni sorğuda onlarla ictimai `where`
  * qurulur, hamısı bu dəyəri paylaşır və D1-ə yalnız bir `Setting` oxuması gedir.
+ *
+ * **Mühit defoltu.** Açar heç yazılmayıbsa rejim staging-də açıq, production-da
+ * bağlı sayılır: staging test və təqdimat mühitidir (`robots.txt`-də tam
+ * `Disallow: /`, custom domen yoxdur), ona görə orada nümunə məzmunu görmək üçün
+ * paneldən əlavə addım tələb etmək mənasızdır. Production-da isə defolt həmişə
+ * bağlıdır — nümunə elanların səhvən müştəriyə görünməsi ciddi xətadır.
+ *
+ * Paneldəki açar hər iki mühitdə defoltdan **üstündür**: bazada `"0"` yazılıbsa
+ * staging-də də söndürülü qalır.
  */
 export const isDemoContentEnabled = cache(async (): Promise<boolean> => {
-  return (await getSetting(SETTING_KEYS.DEMO_CONTENT_ENABLED)) === DEMO_CONTENT_ENABLED_VALUE;
+  const stored = await getSetting(SETTING_KEYS.DEMO_CONTENT_ENABLED);
+  if (stored !== null) return stored === DEMO_CONTENT_ENABLED_VALUE;
+  return runtimeEnv("IS_STAGING") === "true";
 });
 
 /**

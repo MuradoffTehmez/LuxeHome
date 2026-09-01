@@ -303,7 +303,10 @@ Görünürlük **paneldən idarə olunur** — `/admin/demo-mezmun` səhifəsind
 
 - `demoWhere()` — rejim bağlı olanda `{ isDemo: false }`, açıq olanda `{}` qaytarır.
   Hər ictimai sorğu bu şərti spread edir.
-- `isDemoContentEnabled()` — `cache()` ilə sorğu başına bir dəfə oxunur.
+- `isDemoContentEnabled()` — `cache()` ilə sorğu başına bir dəfə oxunur. Açar heç
+  yazılmayıbsa mühit defoltu işləyir: **staging-də açıq, production-da bağlı**
+  (`IS_STAGING`). Paneldəki açar defoltdan üstündür — bazada `"0"` varsa staging-də
+  də söndürülü qalır.
 - **Qeydlərin `isDemo` bayrağı heç vaxt dəyişmir.** Görünürlük yalnız sorğu şərtindədir;
   toplu status yeniləməsi D1-də tranzaksiya olmadığı üçün yarımçıq qala bilərdi.
 
@@ -327,7 +330,11 @@ npm run db:clean-demo:local  # bütün isDemo qeydlərini silir və açarı sön
 
 `prisma/demo-content.sql` generasiya olunur — əl ilə redaktə edilməməlidir. Xarici
 açarlar ID ilə deyil, `(SELECT id FROM ... WHERE slug = ...)` alt-sorğusu ilə bağlanır,
-ona görə eyni fayl hər üç mühitdə işləyir.
+ona görə eyni fayl hər üç mühitdə işləyir. Faylı tətbiq etməzdən əvvəl həmin bazada
+taksonomiya olmalıdır (`db:seed:*` + `db:taxonomy:*`), əks halda FK xətası verir.
+
+**Nümunə məzmun yalnız staging-dədir.** Production bazasına yüklənmir; orada rejim
+həm də defolt bağlıdır. Bu, 2 sentyabr 2026-da qəbul edilmiş qərardır.
 
 ## Cari vəziyyət və bilinən boşluqlar
 

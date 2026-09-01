@@ -16,6 +16,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  */
 
 const settingValue = vi.hoisted(() => ({ current: null as string | null }));
+const stagingFlag = vi.hoisted(() => ({ current: undefined as string | undefined }));
+
+// `runtimeEnv` Cloudflare kontekstinə toxunur; testdə yalnız dəyər lazımdır.
+vi.mock("@/lib/runtime-env", () => ({
+  runtimeEnv: (name: string) => (name === "IS_STAGING" ? stagingFlag.current : undefined),
+  hasRuntimeEnv: (name: string) => Boolean(name === "IS_STAGING" && stagingFlag.current),
+}));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -35,8 +42,9 @@ import { indexablePropertyWhere, publicPropertyWhere } from "../queries";
  * testdə çağırış nəticəsi keşlənir. Hər test öz dəyərini görsün deyə modul
  * qeydiyyatı sıfırlanır.
  */
-async function withSetting(value: string | null) {
+async function withSetting(value: string | null, isStaging?: string) {
   settingValue.current = value;
+  stagingFlag.current = isStaging;
   vi.resetModules();
   const demo = await import("../demo-content");
   const queries = await import("../queries");
@@ -45,6 +53,7 @@ async function withSetting(value: string | null) {
 
 beforeEach(() => {
   settingValue.current = null;
+  stagingFlag.current = undefined;
   vi.resetModules();
 });
 
@@ -71,6 +80,34 @@ describe("demoWhere — rejim açıq", () => {
     const { demo } = await withSetting("1");
     expect(await demo.demoWhere()).toEqual({});
     expect(await demo.isDemoContentEnabled()).toBe(true);
+  });
+});
+
+describe("mühit defoltu — açar heç yazılmayıb", () => {
+  it("staging-də rejim açıq gəlir", async () => {
+    const { demo } = await withSetting(null, "true");
+    expect(await demo.isDemoContentEnabled()).toBe(true);
+    expect(await demo.demoWhere()).toEqual({});
+  });
+
+  it("production-da rejim bağlı qalır", async () => {
+    const { demo } = await withSetting(null, undefined);
+    expect(await demo.isDemoContentEnabled()).toBe(false);
+    expect(await demo.demoWhere()).toEqual({ isDemo: false });
+  });
+});
+
+describe("paneldəki açar mühit defoltundan üstündür", () => {
+  it("staging-də «0» yazılıbsa rejim bağlıdır", async () => {
+    const { demo } = await withSetting("0", "true");
+    expect(await demo.isDemoContentEnabled()).toBe(false);
+    expect(await demo.demoWhere()).toEqual({ isDemo: false });
+  });
+
+  it("production-da «1» yazılıbsa rejim açıqdır", async () => {
+    const { demo } = await withSetting("1", undefined);
+    expect(await demo.isDemoContentEnabled()).toBe(true);
+    expect(await demo.demoWhere()).toEqual({});
   });
 });
 
