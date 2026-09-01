@@ -102,7 +102,11 @@
     "publishedAt": "Dərc tarixi",
     "views": "Baxış",
     "metroNearby": "Metro",
-    "addressLabel": "Ünvan"
+    "addressLabel": "Ünvan",
+    "videoTour": "Video tur",
+    "openVideo": "Videonu yeni pəncərədə aç",
+    "mortgageTitle": "İpoteka hesablaması",
+    "mortgageDescription": "Bu elanın qiyməti ilə təxmini aylıq ödəniş. Nəticə məlumat xarakterlidir, bank təklifi deyil."
   },
   "map": {
     "region": "{title} xəritədə",

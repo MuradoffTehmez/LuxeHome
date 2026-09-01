@@ -102,7 +102,11 @@
     "publishedAt": "Published",
     "views": "Views",
     "metroNearby": "Metro",
-    "addressLabel": "Address"
+    "addressLabel": "Address",
+    "videoTour": "Video tour",
+    "openVideo": "Open the video in a new window",
+    "mortgageTitle": "Mortgage estimate",
+    "mortgageDescription": "An approximate monthly payment based on this listing's price. Indicative only — not a bank offer."
   },
   "map": {
     "region": "{title} on the map",

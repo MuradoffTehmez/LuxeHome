@@ -11,6 +11,7 @@ import {
   SESSION_SUBJECT,
   TOKEN_ISSUER,
 } from "@/lib/auth/cookie-names";
+import { accessConfig, verifyAccessJwt } from "@/lib/auth/cloudflare-access";
 import {
   isUsableSignedSession,
   signedSessionRedirect,
@@ -158,6 +159,23 @@ export async function middleware(request: NextRequest) {
 
   if ((isAdminRoute || isStaffLoginRoute) && process.env.ADMIN_ENABLED !== "true") {
     return NextResponse.rewrite(new URL("/__baglidir", request.url));
+  }
+
+  // Cloudflare Access (Zero Trust) qapısı — sessiya yoxlamasından **əvvəl**.
+  // Konfiqurasiya natamam olduqda `accessConfig()` `null` qaytarır və panel mövcud
+  // sessiya müdafiəsi ilə işləməyə davam edir; qapı yalnız açıq şəkildə
+  // `ACCESS_ENFORCED="true"` ediləndə bağlanır.
+  if (isAdminRoute || isStaffLoginRoute) {
+    const access = accessConfig(process.env);
+    if (access) {
+      const verified = await verifyAccessJwt(
+        request.headers.get("cf-access-jwt-assertion"),
+        access,
+      );
+      if (!verified) {
+        return new NextResponse("Forbidden", { status: 403 });
+      }
+    }
   }
 
   // Dil yalnız URL prefiksindən oxunur. Prefikssiz ünvanlar (`/admin/...`)

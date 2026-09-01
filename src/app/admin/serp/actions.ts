@@ -18,7 +18,7 @@ import { failure, invalid, success, unexpected, type ActionState } from "@/lib/a
 import { recordAudit } from "@/lib/admin/audit";
 import * as form from "@/lib/admin/form";
 import { getSeoAuditItems } from "@/lib/queries";
-import { findRedirectChain, normalizePublicPath } from "@/lib/serp";
+import { findRedirectChain, normalizePublicPath, parseJsonObject } from "@/lib/serp";
 
 const ROOT = "/admin/serp";
 const locale = z.enum(Object.values(LOCALES) as [string, ...string[]]);
@@ -67,6 +67,8 @@ export async function saveGlobalSeoSettings(_state: ActionState, data: FormData)
 export async function saveLocalSeoSettings(_state: ActionState, data: FormData): Promise<ActionState> {
   const user = await actor(PERMISSIONS.SEO_SETTINGS_MANAGE);
   if (!user) return failure("Local SEO parametrlərini dəyişmək səlahiyyətiniz yoxdur.");
+  const existingRow = await prisma.setting.findUnique({ where: { key: SEO_SETTING_KEYS.LOCAL }, select: { value: true } });
+  const existingLocal = parseJsonObject<{ latitude?: number | null; longitude?: number | null }>(existingRow?.value, {});
   const parsed = z.object({
     businessName: z.string().trim().min(2).max(160), legalName: z.string().trim().min(2).max(160),
     address: z.string().trim().min(5).max(300), latitude: z.number().min(-90).max(90).nullable(), longitude: z.number().min(-180).max(180).nullable(),
@@ -74,7 +76,11 @@ export async function saveLocalSeoSettings(_state: ActionState, data: FormData):
     googleMapsUrl: optional(), googleBusinessProfileUrl: optional(), socialProfiles: z.array(z.string()),
   }).safeParse({
     businessName: form.text(data, "businessName"), legalName: form.text(data, "legalName"), address: form.text(data, "address"),
-    latitude: form.number(data, "latitude"), longitude: form.number(data, "longitude"), phone: form.text(data, "phone"), email: form.text(data, "email"),
+    // Koordinat bu formada deyil — ofis nöqtəsi `Parametrlər → Ofisin xəritədəki
+    // yeri` bölməsindən idarə olunur. Mövcud dəyər JSON-da olduğu kimi qorunur ki,
+    // Local SEO formasının saxlanması onu səssizcə silməsin.
+    latitude: existingLocal.latitude ?? null, longitude: existingLocal.longitude ?? null,
+    phone: form.text(data, "phone"), email: form.text(data, "email"),
     openingHours: form.text(data, "openingHours").split("\n").map((v) => v.trim()).filter(Boolean),
     serviceAreas: form.text(data, "serviceAreas").split("\n").map((v) => v.trim()).filter(Boolean),
     googleMapsUrl: form.optionalText(data, "googleMapsUrl"), googleBusinessProfileUrl: form.optionalText(data, "googleBusinessProfileUrl"),

@@ -1672,7 +1672,8 @@
       "buYolSiyahidanCixarilacaq": "The path is removed from the list. Create a redirect if you want to keep it.",
       "301Daimi": "301 — Permanent",
       "302Muveqqeti": "302 — Temporary",
-      "deaktiv": "Inactive"
+      "deaktiv": "Inactive",
+      "koordinatParametrlerde": "The office map point is set under Settings → Office location on the map and flows into the structured data (JSON-LD `geo`) from there."
     },
     "ops": {
       "trafikAnalitikasi": "Traffic analytics",

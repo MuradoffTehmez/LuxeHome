@@ -53,8 +53,15 @@ export default async function SeoSettingsPage() {
         <AdminInput name="businessName" label={t("pages.serp.biznesAdi")} defaultValue={local.businessName} required />
         <AdminInput name="legalName" label={t("pages.serp.huquqiAd")} defaultValue={local.legalName} required />
         <FullWidth><AdminTextarea name="address" label={t("pages.serp.tamUnvan")} defaultValue={local.address} rows={2} required /></FullWidth>
-        <AdminInput name="latitude" label={t("pages.serp.enlik")} type="number" step="any" defaultValue={local.latitude ?? ""} />
-        <AdminInput name="longitude" label={t("pages.serp.uzunluq")} type="number" step="any" defaultValue={local.longitude ?? ""} />
+        {/* Koordinat burada redaktə olunmur: ofis nöqtəsi «Parametrlər → Ofisin
+            xəritədəki yeri» bölməsində xəritədən seçilir və struktur dataya
+            oradan düşür. İki forma eyni faktı saxlasaydı, hansının doğru
+            olduğu bilinməzdi. */}
+        <FullWidth>
+          <p className="rounded-xs border border-line bg-paper-light p-3 text-sm text-ink-soft">
+            {t("pages.serp.koordinatParametrlerde")}
+          </p>
+        </FullWidth>
         <AdminInput name="phone" label={t("pages.serp.telefon")} defaultValue={local.phone} required />
         <AdminInput name="email" label={t("pages.serp.ePoct")} type="email" defaultValue={local.email} required />
         <FullWidth><AdminTextarea name="openingHours" label={t("pages.serp.isSaatlariSetirSetir")} defaultValue={local.openingHours.join("\n")} rows={4} /></FullWidth>

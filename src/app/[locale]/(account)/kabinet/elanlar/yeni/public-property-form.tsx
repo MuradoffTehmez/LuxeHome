@@ -11,6 +11,7 @@ import {
   FullWidth,
 } from "@/components/admin/form-fields";
 import { ImageDropzone, type DropzoneImage } from "@/components/admin/image-dropzone";
+import { LocationPicker } from "@/components/map/location-picker";
 import type { ActionState } from "@/lib/admin/action-state";
 import {
   BUILDING_TYPES,
@@ -42,6 +43,8 @@ export type PublicPropertyFormInitial = {
   cityId: string;
   districtId: string | null;
   address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   rooms: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
@@ -177,6 +180,44 @@ export function PublicPropertyForm({
             maxLength={240}
             hint={t("addressHint")}
             defaultValue={initial?.address ?? ""}
+          />
+        </FullWidth>
+      </FormSection>
+
+      {/* Koordinat sxemdə və server sxemində onsuz da var idi (`publicPropertySchema`
+          `latitude`/`longitude`-u omit etmir) — sadəcə formada sahə yox idi, ona görə
+          istifadəçinin öz elanı heç vaxt xəritədə görünmürdü. */}
+      <FormSection asFieldset title={t("mapPoint")} description={t("mapPointDescription")}>
+        <FullWidth>
+          <LocationPicker
+            defaultLatitude={initial?.latitude ?? null}
+            defaultLongitude={initial?.longitude ?? null}
+            initialQuery={initial?.address ?? ""}
+            language={locale}
+            labels={{
+              latitude: t("latitude"),
+              longitude: t("longitude"),
+              searchLabel: t("mapSearch"),
+              searchPlaceholder: t("mapSearchPlaceholder"),
+              searchAction: t("mapSearchAction"),
+              searching: t("mapSearching"),
+              noResults: t("mapNoResults"),
+              searchError: t("mapSearchError"),
+              useMyLocation: t("mapUseMyLocation"),
+              locationDenied: t("mapLocationDenied"),
+              clear: t("mapClear"),
+              hint: t("mapHint"),
+              providerAttribution: t("mapProviderAttribution"),
+              map: {
+                region: t("mapRegion"),
+                zoomIn: t("mapZoomIn"),
+                zoomOut: t("mapZoomOut"),
+                expand: t("mapExpand"),
+                collapse: t("mapCollapse"),
+                recenter: t("mapRecenter"),
+                scrollHint: t("mapScrollHint"),
+              },
+            }}
           />
         </FullWidth>
       </FormSection>

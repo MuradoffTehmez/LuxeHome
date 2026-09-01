@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 30 avqust 2026.
+Son yenilənmə: 1 sentyabr 2026.
 
 ---
 
@@ -34,7 +34,7 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 | Admin panel | Auth və əsas CRUD hazırdır; növbəti böyük boşluqlar Finance/CMS və panel UI-ının çoxdilliliyidir. |
 | Verilənlər bazası + hosting | **Qərar verilib (20 avqust 2026): tam Cloudflare.** Workers (OpenNext), D1, R2, Images. Supabase və PostgreSQL layihədən çıxarılıb. |
 | Media yükləmə | **Cloudflare R2 + Images** — admin və kabinet upload route-ları, WebP/thumbnail və magic-byte yoxlaması işləyir. |
-| Dil | İctimai sayt və kabinet **AZ + EN + RU** dillərindədir; admin panel UI-ı hələ yalnız AZ-dır. |
+| Dil | İctimai sayt, kabinet **və admin panel** AZ + EN + RU dillərindədir. Panel dili `User.locale`-dan gəlir (`/admin` locale prefiksi daşımır). |
 | Lead bildirişi | **Telegram bot.** Yeni müraciət gələndə sistem bot vasitəsilə bildiriş göndərəcək. |
 | Spam qoruma | Same-origin + honeypot + IP rate limit + Cloudflare Turnstile tətbiq olunub. |
 | Test / CI / analitika | Vitest və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. Browser E2E hələ yoxdur. |
@@ -67,7 +67,7 @@ düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` q�
 
 | Yer | Problem |
 |---|---|
-| `src/app/admin/**` | Paneldə `User.locale` seçimi olsa da UI mətnləri tərcümə qatına bağlanmayıb. |
+| Kabinet moderasiyası | Kabinet elanına koordinat əlavə olundu, lakin moderator baxışında xəritə önizləməsi yoxdur. |
 | Browser axınları | Avtomatlaşdırılmış Playwright/E2E yoxdur; production smoke testi manualdır. |
 | Phase 3 / AI | Semantik axtarış, Match Score, chatbot və map draw search yazılmayıb (PRD bölmə 180). Panel tərəfdə yalnız AI təsvir generatoru və foto məsləhətçisi var. |
 | Finance / statik CMS | Knowledge Hub üçün domen CMS-i hazırdır; paket, ödəniş və ümumi statik səhifə redaktoru hələ yoxdur (Admin PRD). |
@@ -125,7 +125,7 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [x] Admin CRUD: əmlak, layihə, xidmət, bloq, lead, media, istifadəçi, parametr və tərəfdaşlar.
 - [x] Dashboard səhifəsi real D1 statistikalarını göstərir.
 - [x] Media yükləmə: admin və kabinet R2 upload route-ları, `Media` yazması və `ImageDropzone`.
-- [ ] Telegram bot inteqrasiyası — yeni lead bildirişi.
+- [ ] Telegram bot inteqrasiyası — yeni lead bildirişi. **Hələ yazılmayıb**: kodda `TELEGRAM` izi yoxdur.
 - [x] Contact/auth form spam qoruması: origin + honeypot + rate limit + Turnstile.
 - [x] `prisma/remove-demo-content.sql` və lokal/remote təmizləmə scriptləri əlavə edildi.
 - [x] Azərbaycanca axtarış üçün normallaşdırılmış `searchText` / `searchName` sütunları.
@@ -134,7 +134,7 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [x] `[locale]` routing, middleware və locale cookie-si.
 - [x] İctimai kontent üçün tərcümə sahələri/cədvəlləri və admin tərcümə modulu.
 - [x] İctimai sayt və kabinet mətnləri `next-intl` kataloqlarına çıxarılıb.
-- [ ] Admin panel UI mətnlərini tərcümə qatına qoşmaq.
+- [x] Admin panel UI mətnləri tərcümə qatına qoşuldu (`src/i18n/admin.ts`, `getAdminT()`).
 
 ### Keyfiyyət
 - [x] Xüsusiyyət filtri (`featureSlugs`) — çoxseçimli komponent, hovuz/qaraj/lift və s.
@@ -144,11 +144,59 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [x] GA/GTM consent qapısı və Web Vitals/brauzer xəta monitorinqi.
 
 ### Kontent
-- [ ] `siteConfig.geo` — ofisin dəqiq koordinatları şirkətdən alınmalıdır (hazırkı dəyər təxminidir).
-- [ ] `siteConfig.workingHours` — real iş qrafiki təsdiqlənməlidir.
+- [x] Ofis koordinatı — `Parametrlər → Ofisin xəritədəki yeri` bölməsindən xəritədən seçilir
+      (`site.contact_latitude` / `site.contact_longitude`). Kodda təxmini defolt qəsdən yoxdur.
+- [ ] İş saatları — `SERP → Local SEO` formasında doldurulur və JSON-LD `openingHours`-a düşür,
+      lakin real qrafik hələ şirkət tərəfindən təsdiqlənməyib (sahə boşdur).
 - [x] Təsdiqlənməmiş statistika və demo məzmun saytdan çıxarıldı.
 - [ ] Unsplash stok şəkilləri şirkətin öz foto arxivi ilə əvəzlənməlidir
       (`next.config.ts`-dəki `remotePatterns` qaydası sonra silinə bilər).
+
+---
+
+## 6b. Xəritə, geokodlaşdırma və Zero Trust — 1 sentyabr 2026
+
+### Xəritə qatı
+
+Bütün xəritələr `src/components/map/leaflet-map.tsx` üzərindən gedir: elan detalı,
+layihə detalı, «Əlaqə» səhifəsi, `/emlaklar?gorunus=xerite` nəticə xəritəsi və
+panelin koordinat seçicisi.
+
+| Qərar | Səbəb |
+|---|---|
+| Tile provayderi **Geoapify** | CARTO açarsız basemap istifadəsini dayandırıb — tile-ların üstünə «API KEY REQUIRED» yazısı basılır. OSM standart tile-ları isə POI ilə doludur və OSMF siyasəti kommersiya yükünü məhdudlaşdırır. |
+| Tile-lar **proxy** üzərindən (`/api/map-tiles/...`) | Tile `<img>` ilə yüklənir; birbaşa istifadə `GEOAPIFY_API_KEY`-i hər ziyarətçiyə göstərərdi. Proxy həm də panel CSP-sini (`img-src 'self'`) toxunulmaz saxlayır. |
+| Ehtiyat mənbə | Dörd tile ardıcıl uğursuz olarsa xəritə açarsız `tile.openstreetmap.org`-a keçir — kvota bitəndə xəritə boz düzbucaqlıya çevrilməməlidir. |
+| Geokodlaşdırma `/api/geocode` | Geoapify açarı serverdə qalır; sessiya, same-origin və sürət limiti tətbiq olunur. |
+
+**Bilinən tələ (bir dəfə baş verib):** proxy-dəki `y` şablonu `\d{1,3}` idi, ona görə
+9-dan yuxarı zoom-da bütün tile-lar 404 alırdı və xəritə tam boş görünürdü. Şablon
+zoom 20-yə uyğun `\d{1,7}`-dir; dəyişdirilməməlidir.
+
+Secret: `npx wrangler secret put GEOAPIFY_API_KEY` (staging üçün `--env staging`).
+Açar `https://myprojects.geoapify.com` üzərindən alınır.
+
+### Cloudflare Access (Zero Trust)
+
+`src/lib/auth/cloudflare-access.ts` + `middleware.ts` `/admin` və `/giris` üçün
+Access token-ini **imza səviyyəsində** yoxlayır. Qapı defolt **bağlıdır**:
+`ACCESS_ENFORCED="true"` yalnız Cloudflare tərəfdə Access tətbiqi qurulub
+yoxlanandan sonra qoyulmalıdır, əks halda panel heç kimə açılmır.
+
+Tələb olunan `vars`: `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN` (`<team>.cloudflareaccess.com`),
+`ACCESS_AUD` (Application Audience tag).
+
+**`/api/*` yollarına Access qoyulmamalıdır** — kabinet, geokod və tile proxy-si sınar.
+
+### Bu sessiyada bağlanan «panel doldurur, sayt göstərmir» boşluqları
+
+| Boşluq | Nə edildi |
+|---|---|
+| `Property.videoUrl` | Admin və kabinet formasında doldurulurdu, ictimai səhifədə heç yerdə göstərilmirdi. `PropertyVideo` YouTube/Vimeo-nu embed edir (nocookie), naməlum ünvanı keçid kimi verir. |
+| `seo.local` (NAP) | Koordinat, iş saatları, xidmət bölgələri və sosial profillər D1-ə yazılırdı, `organizationSchema()` isə yalnız `siteConfig`-dən oxuyurdu. `src/lib/local-business.ts` tək oxu nöqtəsidir; JSON-LD indi `geo`, `openingHours`, `areaServed`, `hasMap` daşıyır. |
+| Ofis koordinatının duplikatı | Eyni fakt həm `seo.local`, həm `site.contact_*` açarlarında idi. Redaktə tək yerdədir (`Parametrlər`), SERP forması yalnız istiqamətləndirici qeyd göstərir. |
+| Kabinet elanında koordinat | `publicPropertySchema` `latitude`/`longitude`-u onsuz da qəbul edirdi, formada sahə yox idi — istifadəçinin elanı heç vaxt xəritədə görünmürdü. `LocationPicker` əlavə olundu (sxem dəyişmədi, miqrasiya lazım olmadı). |
+| İpoteka kalkulyatoru | `MortgageCalculator` `defaultPrice`/`compact` proplarını dəstəkləyirdi, amma yalnız `/kalkulyator` səhifəsində istifadə olunurdu. İndi satılıq elan detalında qiymətlə əvvəlcədən doldurulur. |
 
 ---
 

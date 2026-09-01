@@ -1672,7 +1672,8 @@
       "buYolSiyahidanCixarilacaq": "Bu yol siyahıdan çıxarılacaq. Yönləndirmə yaratmaq istəyirsinizsə, əvvəlcə yuxarıdakı formu doldurun.",
       "301Daimi": "301 — Daimi",
       "302Muveqqeti": "302 — Müvəqqəti",
-      "deaktiv": "Deaktiv"
+      "deaktiv": "Deaktiv",
+      "koordinatParametrlerde": "Ofisin xəritədəki nöqtəsi «Parametrlər → Ofisin xəritədəki yeri» bölməsində seçilir və struktur dataya (JSON-LD `geo`) oradan düşür."
     },
     "ops": {
       "trafikAnalitikasi": "Trafik analitikası",

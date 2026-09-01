@@ -38,6 +38,8 @@ import { PropertyActionToolbar } from "@/components/site/property-action-toolbar
 import { propertyQrSvg } from "@/lib/property-qr";
 import { PlaceMap } from "@/components/map/place-map";
 import { PropertyKeyFacts } from "@/components/site/property-key-facts";
+import { PropertyVideo } from "@/components/site/property-video";
+import { MortgageCalculator } from "@/components/site/mortgage-calculator";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { RecentlyViewedTracker } from "@/components/site/recently-viewed-tracker";
@@ -470,6 +472,31 @@ export default async function PropertyDetailPage({ params }: Props) {
                     ))}
                   </ul>
                 </div>
+              )}
+
+              {/* İpoteka hesablaması — yalnız satılıq elanlarda mənalıdır.
+                  Komponent `defaultPrice`/`compact` proplarını onsuz da dəstəkləyirdi,
+                  sadəcə elan səhifəsinə heç vaxt bağlanmamışdı. */}
+              {isSale && !isClosed && (
+                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                  <div className="mb-5 flex flex-col gap-1">
+                    <h2 className="font-display text-xl text-ink">{content("mortgageTitle")}</h2>
+                    <p className="text-sm text-ink-soft">{content("mortgageDescription")}</p>
+                  </div>
+                  <MortgageCalculator
+                    compact
+                    defaultPrice={property.price}
+                    currency={property.currency}
+                  />
+                </section>
+              )}
+
+              {property.videoUrl && (
+                <PropertyVideo
+                  url={property.videoUrl}
+                  heading={content("videoTour")}
+                  openLabel={content("openVideo")}
+                />
               )}
 
               {/* Xəritədə yerləşmə */}

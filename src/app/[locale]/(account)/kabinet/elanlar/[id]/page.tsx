@@ -46,6 +46,8 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
         cityId: true,
         districtId: true,
         address: true,
+        latitude: true,
+        longitude: true,
         rooms: true,
         bedrooms: true,
         bathrooms: true,
