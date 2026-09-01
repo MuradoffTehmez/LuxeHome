@@ -62,7 +62,7 @@ const BUILDING_KEYS = { NEW: "new", OLD: "old" } as const;
 const FEATURE_GROUP_KEYS = { GENERAL: "general", UTILITY: "utility", INDOOR: "indoor", OUTDOOR: "outdoor", SECURITY: "security", PAYMENT: "payment" } as const;
 
 const CONTROL =
-  "min-h-12 w-full rounded-xs border border-line-strong bg-paper px-3 text-base text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold sm:text-sm";
+  "min-h-12 min-w-0 w-full rounded-xs border border-line-strong bg-paper px-3 text-base text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold sm:text-sm";
 const SELECT_CLASS = cn(CONTROL, "cursor-pointer appearance-none pr-9");
 const INPUT_CLASS = cn(CONTROL, "placeholder:text-ink-muted");
 const LABEL_CLASS = "text-xs font-medium tracking-wide text-ink-soft";
@@ -131,9 +131,9 @@ function RangeField({
   maxLabel: string;
 }) {
   return (
-    <fieldset className="flex flex-col gap-1.5">
+    <fieldset className="flex min-w-0 flex-col gap-1.5">
       <legend className={LABEL_CLASS}>{legend}</legend>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
         <input
           name={minName}
           type="number"
@@ -277,7 +277,7 @@ export function PropertyFilterFields({
         placeholder={t("all")}
         defaultValue={initial.tip}
         options={types}
-        className={mode === "compact" ? "lg:col-span-2" : undefined}
+        className={mode === "compact" ? "hidden md:flex lg:col-span-2" : undefined}
       />
       <SelectField
         id={`${id}-city`}
@@ -287,7 +287,7 @@ export function PropertyFilterFields({
         defaultValue={initial.seher}
         options={cities}
         onChange={setCitySlug}
-        className={mode === "compact" ? "lg:col-span-3" : undefined}
+        className={mode === "compact" ? "hidden md:flex lg:col-span-3" : undefined}
       />
 
       {mode === "full" ? (

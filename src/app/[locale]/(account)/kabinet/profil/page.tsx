@@ -5,6 +5,7 @@ import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
+import { ThemeSelector } from "@/components/site/theme-selector";
 import { AccountDataForm, PasswordForm, ProfileForm } from "./profile-forms";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -61,6 +62,14 @@ export default async function CabinetProfilePage() {
               : null
           }
         />
+      </section>
+
+      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+        <h2 className="font-display text-lg text-ink">{t("appearanceSection")}</h2>
+        <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">
+          {t("appearanceDescription")}
+        </p>
+        <ThemeSelector className="max-w-md" />
       </section>
 
       <section className="rounded-md border border-line bg-paper p-4 sm:p-6">

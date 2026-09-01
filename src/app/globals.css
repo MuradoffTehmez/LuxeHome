@@ -100,6 +100,7 @@
    Dark Mode Override
    -------------------------------------------------------------------------- */
 .dark {
+  color-scheme: dark;
   /* --- Rənglər: səth (qara və göy tonları) --- */
   --color-ivory: #17202b;
   --color-paper: #202c39;
@@ -150,6 +151,7 @@
   --z-base: 0;
   --z-sticky: 20;
   --z-header: 40;
+  --z-dropdown: 50;
   --z-drawer: 60;
   --z-modal: 80;
   --z-toast: 100;
@@ -176,6 +178,8 @@ html {
 }
 
 body {
+  max-width: 100%;
+  overflow-x: clip;
   background-color: var(--surface-page);
   color: var(--text-primary);
   font-family: var(--font-sans);
@@ -185,6 +189,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
   /* Mobil tap gecikməsini azaldır */
   touch-action: manipulation;
+}
+
+main,
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+main {
+  min-width: 0;
 }
 
 h1,
@@ -319,6 +334,15 @@ p {
   }
 }
 
+@keyframes luxe-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes luxe-scale-in {
   from {
     opacity: 0;
@@ -330,12 +354,32 @@ p {
   }
 }
 
+@keyframes luxe-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
 @keyframes luxe-slide-up {
   from {
     transform: translateY(100%);
   }
   to {
     transform: translateY(0);
+  }
+}
+
+@keyframes luxe-slide-down {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
   }
 }
 
@@ -357,20 +401,53 @@ p {
   }
 }
 
+@keyframes luxe-slide-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes luxe-slide-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .animate-fade-in {
-  animation: luxe-fade-in 200ms var(--ease-out-soft);
+  animation: luxe-fade-in 200ms var(--ease-out-soft) both;
+}
+.animate-fade-out {
+  animation: luxe-fade-out 180ms var(--ease-in-out-soft) both;
 }
 .animate-scale-in {
-  animation: luxe-scale-in 220ms var(--ease-out-soft);
+  animation: luxe-scale-in 220ms var(--ease-out-soft) both;
+}
+.animate-scale-out {
+  animation: luxe-scale-out 180ms var(--ease-in-out-soft) both;
 }
 .animate-slide-up {
-  animation: luxe-slide-up 260ms var(--ease-out-soft);
+  animation: luxe-slide-up 260ms var(--ease-out-soft) both;
+}
+.animate-slide-down {
+  animation: luxe-slide-down 180ms var(--ease-in-out-soft) both;
 }
 .animate-slide-right {
-  animation: luxe-slide-right 240ms var(--ease-out-soft);
+  animation: luxe-slide-right 240ms var(--ease-out-soft) both;
 }
 .animate-slide-left {
-  animation: luxe-slide-left 240ms var(--ease-out-soft);
+  animation: luxe-slide-left 240ms var(--ease-out-soft) both;
+}
+.animate-slide-out-left {
+  animation: luxe-slide-out-left 180ms var(--ease-in-out-soft) both;
+}
+.animate-slide-out-right {
+  animation: luxe-slide-out-right 180ms var(--ease-in-out-soft) both;
 }
 
 /* --------------------------------------------------------------------------

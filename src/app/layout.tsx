@@ -91,7 +91,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   // Zoom bloklanmır — əlçatanlıq tələbi.
   maximumScale: 5,
-  themeColor: "#16191d",
+  // İlk giriş həmişə açıq temadır; cihazın rəng rejimi avtomatik tətbiq edilmir.
+  themeColor: "#f7f3ec",
 };
 
 import { ThemeProvider } from "@/components/theme-provider";

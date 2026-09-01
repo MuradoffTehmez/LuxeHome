@@ -9,8 +9,8 @@
   "theme": {
     "light": "Light",
     "dark": "Dark",
-    "system": "System",
-    "toggle": "Theme: {theme}. Click to change."
+    "activate": "Activate the {theme} theme",
+    "choose": "Theme selection"
   },
   "locale": {
     "az": "Azərbaycan",

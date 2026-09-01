@@ -19,9 +19,9 @@ export function ThemeSync({ preference }: { preference: string }) {
     if (typeof window === "undefined") return;
     if (window.localStorage.getItem(SYNCED_KEY)) return;
     window.localStorage.setItem(SYNCED_KEY, "1");
-    if (preference === "light" || preference === "dark" || preference === "system") {
-      setTheme(preference);
-    }
+    // Köhnə `system` qeydləri də daxil olmaqla bütün naməlum dəyərlər light-a
+    // miqrasiya olunur. Sayt cihaz mövzusunu avtomatik oxumur.
+    setTheme(preference === "dark" ? "dark" : "light");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

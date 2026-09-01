@@ -176,6 +176,8 @@
     "title": "Profil",
     "description": "E-poçt dəyişdirilmir — dəyişiklik üçün bizimlə əlaqə saxlayın ({email}).",
     "accountInfo": "Hesab məlumatları",
+    "appearanceSection": "Görünüş",
+    "appearanceDescription": "Sayt ilk dəfə açıq temada açılır. İstədiyiniz zaman tünd temaya keçə bilərsiniz.",
     "passwordSection": "Parol",
     "name": "Ad Soyad",
     "phone": "Telefon",

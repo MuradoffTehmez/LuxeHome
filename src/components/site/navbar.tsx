@@ -13,6 +13,7 @@ import { Overlay } from "@/components/ui/overlay";
 import { AccountMenu } from "./account-menu";
 import { Logo } from "./logo";
 import { LocaleSwitcher } from "./locale-switcher";
+import { ThemeSelector } from "./theme-selector";
 import { ThemeToggle } from "./theme-toggle";
 
 /** `siteConfig.navigation`-dakı href → tərcümə açarı. Kompakt (xl-dən aşağı) etiket
@@ -35,6 +36,7 @@ const NAV_KEYS: Record<string, "home" | "properties" | "projects" | "agencies" |
  * sətrdədir — locale uzunluğu onun görünməsinə təsir etmir.
  */
 const OVERFLOW_HREFS = new Set(["/", "/terefdaslar"]);
+const MOBILE_PRIMARY_HREFS = new Set(["/", "/emlaklar", "/layiheler", "/agentlikler", "/xidmetler"]);
 export const desktopNavigationGroups = {
   primary: navigation.filter((item) => !OVERFLOW_HREFS.has(item.href)),
   overflow: navigation.filter((item) => OVERFLOW_HREFS.has(item.href)),
@@ -262,10 +264,10 @@ export function Navbar({
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-1 min-[1440px]:ml-0 min-[1440px]:gap-1.5">
-          <ThemeToggle isOverlay={isOverlay} />
-          {showLocaleSwitcher && (
-            <LocaleSwitcher isOverlay={isOverlay} />
-          )}
+          <div className="hidden items-center gap-1 min-[1440px]:flex">
+            <ThemeToggle isOverlay={isOverlay} />
+            {showLocaleSwitcher ? <LocaleSwitcher isOverlay={isOverlay} /> : null}
+          </div>
 
           <Link
             href="/favoritler"
@@ -320,11 +322,38 @@ export function Navbar({
         onClose={() => setMenuOpen(false)}
         title={t("menu")}
         placement="right"
-        className="w-[min(26rem,92vw)]"
+        className="w-[min(24rem,94vw)]"
       >
-        <nav aria-label={t("mobileNavigation")}>
-          <ul className="flex flex-col">
-            {navigation.map((item) => {
+        <section aria-labelledby="mobile-main-actions">
+          <p id="mobile-main-actions" className="editorial-kicker mb-3 text-ink-muted">
+            {t("mainActions")}
+          </p>
+          <div className="grid gap-2.5">
+            <Link
+              href="/emlaklar"
+              onClick={() => setMenuOpen(false)}
+              className={buttonClassName("primary", "lg", true)}
+            >
+              <Search className="size-4" aria-hidden="true" />
+              {t("searchProperties")}
+            </Link>
+            <Link
+              href="/kabinet/elanlar/yeni"
+              onClick={() => setMenuOpen(false)}
+              className={buttonClassName("outline", "lg", true)}
+            >
+              <Plus className="size-4" aria-hidden="true" />
+              {t("listProperty")}
+            </Link>
+          </div>
+        </section>
+
+        <nav aria-label={t("mobileNavigation")} className="mt-7 border-t border-line pt-6">
+          <p className="editorial-kicker mb-3 text-ink-muted">{t("explore")}</p>
+          <ul className="overflow-hidden rounded-md border border-line bg-paper">
+            {[...navigation]
+              .sort((a, b) => Number(MOBILE_PRIMARY_HREFS.has(b.href)) - Number(MOBILE_PRIMARY_HREFS.has(a.href)))
+              .map((item) => {
               const active = isNavigationItemActive(pathname, item.href);
 
               return (
@@ -334,8 +363,8 @@ export function Navbar({
                     onClick={() => setMenuOpen(false)}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex min-h-14 items-center justify-between rounded-xs text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
-                      active ? "text-gold-deep" : "text-ink",
+                      "flex min-h-12 items-center justify-between px-3.5 text-[0.9375rem] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold",
+                      active ? "bg-gold/10 text-gold-deep" : "text-ink hover:bg-beige/60",
                     )}
                   >
                     {NAV_KEYS[item.href] ? t(NAV_KEYS[item.href]) : item.label}
@@ -347,25 +376,27 @@ export function Navbar({
           </ul>
         </nav>
 
-        <div className="mt-7 border-t border-line pt-6">
+        <section aria-labelledby="mobile-preferences" className="mt-7 border-t border-line pt-6">
+          <p id="mobile-preferences" className="editorial-kicker mb-4 text-ink-muted">
+            {t("preferences")}
+          </p>
+          <div className="space-y-5">
+            {showLocaleSwitcher ? (
+              <div>
+                <p className="mb-2 text-xs font-semibold text-ink-soft">{t("language")}</p>
+                <LocaleSwitcher variant="mobile" onSelect={() => setMenuOpen(false)} />
+              </div>
+            ) : null}
+            <div>
+              <p className="mb-2 text-xs font-semibold text-ink-soft">{t("appearance")}</p>
+              <ThemeSelector />
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-7 border-t border-line pt-6" aria-label={t("quickLinks")}>
           <p className="editorial-kicker mb-4 text-ink-muted">{t("quickLinks")}</p>
-          <div className="flex flex-col gap-3">
-            <Link
-              href="/kabinet/elanlar/yeni"
-              onClick={() => setMenuOpen(false)}
-              className={buttonClassName("primary", "lg", true)}
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              {t("listProperty")}
-            </Link>
-            <Link
-              href="/emlaklar"
-              onClick={() => setMenuOpen(false)}
-              className={buttonClassName("primary", "lg", true)}
-            >
-              <Search className="size-4" aria-hidden="true" />
-              {t("searchProperties")}
-            </Link>
+          <div className="flex flex-col gap-2.5">
             <AccountMenu variant="mobile" />
             <Link
               href="/favoritler"
@@ -383,7 +414,7 @@ export function Navbar({
               {siteConfig.phone}
             </a>
           </div>
-        </div>
+        </section>
       </Overlay>
     </header>
   );

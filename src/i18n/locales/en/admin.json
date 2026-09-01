@@ -406,7 +406,6 @@
     "theme": "Appearance",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "themeSystem": "Device setting",
     "themeHint": "New users start on the light theme; you can change it at any time.",
     "avatar": "Profile picture"
   },

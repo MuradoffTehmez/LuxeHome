@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getOptionalUser } from "@/lib/auth/guard";
 
-const VALID_THEMES = new Set(["light", "dark", "system"]);
+const VALID_THEMES = new Set(["light", "dark"]);
 
 /**
  * Mövzu seçimini profil üzrə saxlayır ki, başqa cihazda ilk girişdə eyni görünüş

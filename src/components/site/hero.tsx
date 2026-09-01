@@ -17,7 +17,7 @@ type HeroProps = {
 /** Başlığın şkalası bütün dillərdə eynidir; yalnız oxunaqlı sətir eni locale-a uyğunlaşır. */
 export function heroTitleClassName(locale: Locale): string {
   return cn(
-    "animate-slide-up mt-6 font-display text-[clamp(2.65rem,5.4vw,5.5rem)] leading-[0.96] tracking-[-0.04em] text-balance text-white [overflow-wrap:normal] [word-break:normal]",
+    "animate-slide-up mt-6 font-display text-[clamp(2.35rem,11vw,3.4rem)] leading-[0.98] tracking-[-0.035em] text-balance text-white sm:text-[clamp(3rem,7vw,4.5rem)] sm:leading-[0.96] lg:text-[clamp(3.8rem,5.4vw,5.5rem)] lg:tracking-[-0.04em] [overflow-wrap:normal] [word-break:normal]",
     locale === "ru" ? "max-w-[20ch]" : "max-w-[18ch]",
   );
 }
@@ -79,7 +79,7 @@ export async function Hero({ types, cities }: HeroProps) {
 
             <Link
               href="/elaqe"
-              className={buttonClassName("onDark", "lg", false, "border-white/30 text-white hover:text-gold-soft")}
+              className={buttonClassName("onDark", "lg", false, "hidden border-white/30 text-white hover:text-gold-soft sm:inline-flex")}
             >
               {t("contactUs")}
             </Link>

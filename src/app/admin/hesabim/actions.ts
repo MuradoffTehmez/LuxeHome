@@ -26,7 +26,7 @@ const profileSchema = z.object({
   name: z.string().trim().min(2, "Ad ən azı 2 simvol olmalıdır.").max(120),
   phone: z.string().trim().max(30).nullable(),
   locale: z.enum(["az", "en", "ru"]),
-  themePreference: z.enum(["light", "dark", "system"]),
+  themePreference: z.enum(["light", "dark"]),
 });
 
 export async function saveProfile(_previous: ActionState, formData: FormData): Promise<ActionState> {

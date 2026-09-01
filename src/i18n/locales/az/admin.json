@@ -406,8 +406,7 @@
     "theme": "Görünüş",
     "themeLight": "Açıq",
     "themeDark": "Tünd",
-    "themeSystem": "Cihaz ayarı",
-    "themeHint": "Sistem yeni istifadəçilər üçün açıq tema ilə başlayır; istədiyiniz vaxt dəyişə bilərsiniz.",
+    "themeHint": "Yeni istifadəçilər açıq tema ilə başlayır; istədiyiniz vaxt tünd temaya keçə bilərsiniz.",
     "avatar": "Profil şəkli"
   },
   "components": {

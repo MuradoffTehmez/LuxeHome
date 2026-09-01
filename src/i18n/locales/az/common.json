@@ -9,8 +9,8 @@
   "theme": {
     "light": "Açıq",
     "dark": "Tünd",
-    "system": "Sistem",
-    "toggle": "Mövzu: {theme}. Dəyişmək üçün klikləyin."
+    "activate": "{theme} temanı aktivləşdir",
+    "choose": "Tema seçimi"
   },
   "locale": {
     "az": "Azərbaycan",

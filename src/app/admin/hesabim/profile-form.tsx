@@ -30,10 +30,9 @@ export function ProfileForm({ initial }: { initial: { name: string; phone: strin
           options={localeOptions}
           hint={t("profile.languageHint")}
         />
-        <AdminSelect name="themePreference" label={t("profile.theme")} defaultValue={initial.themePreference} options={[
+        <AdminSelect name="themePreference" label={t("profile.theme")} defaultValue={initial.themePreference === "dark" ? "dark" : "light"} options={[
           { value: "light", label: t("profile.themeLight") },
           { value: "dark", label: t("profile.themeDark") },
-          { value: "system", label: t("profile.themeSystem") },
         ]} hint={t("profile.themeHint")} />
         <FullWidth>
           <ImageDropzone name="avatar" label={t("profile.avatar")} folder="umumi" mode="single" initial={initial.avatarUrl ? [{ url: initial.avatarUrl, alt: "", isCover: true }] : []} />

@@ -46,7 +46,7 @@ export function SearchPanel({
   return (
     <div
       className={cn(
-        "rounded-sm border p-4 backdrop-blur-md sm:p-5",
+        "rounded-sm border p-3 backdrop-blur-md sm:p-5",
         isPage
           ? "hidden border-line bg-paper shadow-sm lg:block"
           : "border-white/20 bg-paper/94 shadow-editorial",

@@ -176,6 +176,8 @@
     "title": "Profile",
     "description": "Email cannot be changed here — contact us to request a change ({email}).",
     "accountInfo": "Account information",
+    "appearanceSection": "Appearance",
+    "appearanceDescription": "The site opens in the light theme by default. You can switch to the dark theme at any time.",
     "passwordSection": "Password",
     "name": "Full name",
     "phone": "Phone",

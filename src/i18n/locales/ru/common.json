@@ -9,8 +9,8 @@
   "theme": {
     "light": "Светлая",
     "dark": "Тёмная",
-    "system": "Системная",
-    "toggle": "Тема: {theme}. Нажмите, чтобы изменить."
+    "activate": "Включить тему «{theme}»",
+    "choose": "Выбор темы"
   },
   "locale": {
     "az": "Azərbaycan",

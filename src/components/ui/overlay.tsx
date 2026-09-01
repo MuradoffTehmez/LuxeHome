@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -32,12 +32,27 @@ const WRAPPER_CLASSES: Record<OverlayPlacement, string> = {
 };
 
 const PANEL_CLASSES: Record<OverlayPlacement, string> = {
-  center: "max-h-[92dvh] w-full max-w-xl animate-scale-in rounded-md",
-  bottom:
-    "max-h-dvh w-full animate-slide-up rounded-t-lg pb-[var(--safe-bottom)]",
-  left: "h-dvh w-[min(24rem,90vw)] animate-slide-right",
-  right: "h-dvh w-[min(24rem,90vw)] animate-slide-left",
+  center: "max-h-[92dvh] w-full max-w-xl rounded-md",
+  bottom: "max-h-dvh w-full rounded-t-lg pb-[var(--safe-bottom)]",
+  left: "h-dvh w-[min(24rem,90vw)]",
+  right: "h-dvh w-[min(24rem,90vw)]",
 };
+
+const PANEL_ENTER_CLASSES: Record<OverlayPlacement, string> = {
+  center: "animate-scale-in",
+  bottom: "animate-slide-up",
+  left: "animate-slide-right",
+  right: "animate-slide-left",
+};
+
+const PANEL_EXIT_CLASSES: Record<OverlayPlacement, string> = {
+  center: "animate-scale-out",
+  bottom: "animate-slide-down",
+  left: "animate-slide-out-left",
+  right: "animate-slide-out-right",
+};
+
+const EXIT_DURATION_MS = 180;
 
 /**
  * Modal, sheet və drawer-lər üçün ortaq əlçatan təbəqə.
@@ -56,6 +71,8 @@ export function Overlay({
   const t = useTranslations("common.ui");
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const [rendered, setRendered] = useState(open);
+  const [closing, setClosing] = useState(false);
   const generatedId = useId();
   const titleId = `${generatedId}-title`;
   const descriptionId = `${generatedId}-description`;
@@ -115,16 +132,35 @@ export function Overlay({
     };
   }, [handleKeyDown, open]);
 
-  if (!open) return null;
+  useEffect(() => {
+    if (open) {
+      setRendered(true);
+      setClosing(false);
+      return;
+    }
+
+    if (!rendered) return;
+    setClosing(true);
+    const timer = window.setTimeout(() => {
+      setRendered(false);
+      setClosing(false);
+    }, EXIT_DURATION_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [open, rendered]);
+
+  if (!rendered) return null;
 
   const dialog = (
     <div
       className={cn(
         "fixed inset-0 z-[var(--z-modal)] flex overflow-hidden",
+        closing && "pointer-events-none",
         WRAPPER_CLASSES[placement],
       )}
       role="dialog"
       aria-modal="true"
+      aria-hidden={closing || undefined}
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
     >
@@ -133,7 +169,10 @@ export function Overlay({
         tabIndex={-1}
         aria-hidden="true"
         onClick={onClose}
-        className="animate-fade-in absolute inset-0 cursor-default bg-charcoal/60 backdrop-blur-[2px]"
+        className={cn(
+          "absolute inset-0 cursor-default bg-charcoal/60 backdrop-blur-[2px]",
+          closing ? "animate-fade-out" : "animate-fade-in",
+        )}
       />
 
       <div
@@ -142,6 +181,7 @@ export function Overlay({
         className={cn(
           "relative flex min-h-0 flex-col bg-paper shadow-lg outline-none",
           PANEL_CLASSES[placement],
+          closing ? PANEL_EXIT_CLASSES[placement] : PANEL_ENTER_CLASSES[placement],
           className,
         )}
       >
