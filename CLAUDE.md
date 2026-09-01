@@ -367,7 +367,11 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   Hər deploy job-u əvvəlcə öz mühitinin D1 miqrasiyalarını tətbiq edir, sonra bundle qurub
   worker-i yayımlayır. Staging production-dan əvvəl gedir — orada sınarsa production
   toxunulmur. Bundle hər mühit üçün ayrıca qurulur, çünki `SITE_URL` statik səhifələrin
-  içinə build vaxtı yazılır. Avtomatlaşdırılmış browser E2E hələ yoxdur.
+  içinə build vaxtı yazılır.
+- **Browser E2E qurulub** (Playwright, `e2e/`): 190+ test — smoke, filtrlər, detal axını,
+  favoritlər, məzmun, i18n, API, SEO, təhlükəsizlik, performans, əlçatanlıq (axe-core) və
+  mobil. CI-də staging yayımından sonra işləyir və uğursuz olarsa production yayımını
+  saxlayır. Testlər `next dev`-ə deyil, canlı workerd mühitinə qarşı qurulub.
 
 ## Diqqət tələb edən məqamlar
 

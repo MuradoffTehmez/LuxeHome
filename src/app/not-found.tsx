@@ -3,11 +3,14 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/container";
 import { ButtonLink } from "@/components/ui/button";
+import { localizePath } from "@/i18n/path-locale";
+import type { Locale } from "@/i18n/config";
 
 export default function NotFound() {
-  const locale = useLocale();
+  // `useLocale()` `string` qaytarır; marşrutlaşdırma yalnız dəstəklənən dilləri
+  // buraya buraxdığı üçün dar tipə gətirmək təhlükəsizdir.
+  const locale = useLocale() as Locale;
   const t = useTranslations("common.notFound");
-  const prefix = locale === "az" ? "" : `/${locale}`;
   return (
     <main className="flex min-h-[70vh] items-center bg-ivory text-ink">
       <Container>
@@ -20,8 +23,8 @@ export default function NotFound() {
             {t("description")}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <ButtonLink href={`${prefix}/`}>{t("home")}</ButtonLink>
-            <ButtonLink href={`${prefix}/emlaklar`} variant="outline">
+            <ButtonLink href={localizePath("/", locale)}>{t("home")}</ButtonLink>
+            <ButtonLink href={localizePath("/emlaklar", locale)} variant="outline">
               {t("properties")}
             </ButtonLink>
           </div>

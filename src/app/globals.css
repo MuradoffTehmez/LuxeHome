@@ -22,7 +22,7 @@
   /* --- Rənglər: mətn (WCAG AA yoxlanılıb) --- */
   --color-ink: #14181c; /* ivory üzərində 15.9:1 */
   --color-ink-soft: #454c54; /* ivory üzərində 8.4:1 */
-  --color-ink-muted: #6a7178; /* ivory üzərində 4.7:1 */
+  --color-ink-muted: #666d74; /* ivory üzərində 4.74:1, paper üzərində 5.24:1 — WCAG AA */
   --color-ink-invert: #f7f4ef; /* navy üzərində 15.2:1 */
   --color-ink-invert-soft: #b9c0c9; /* navy üzərində 8.7:1 */
 

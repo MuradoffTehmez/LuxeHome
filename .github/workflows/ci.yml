@@ -19,7 +19,7 @@ permissions:
 
 # Yayım axını (yalnız `main`-ə push):
 #
-#   quality → deploy-staging → deploy-production
+#   quality → deploy-staging → e2e-staging → deploy-production
 #
 # Hər deploy job-u əvvəlcə **öz mühitinin D1 miqrasiyalarını tətbiq edir**, sonra
 # bundle qurur və worker-i yayımlayır. Bu sıra məcburidir: yeni kod çox vaxt yeni
@@ -27,7 +27,8 @@ permissions:
 # xəta `try/catch` içində səssizcə udulur.
 #
 # Staging production-dan əvvəl gedir — miqrasiya və ya yayım orada sınarsa
-# production heç toxunulmur.
+# production heç toxunulmur. Browser E2E dəsti canlı staging-ə qarşı işləyir və
+# uğursuz olduğu halda production yayımını saxlayır.
 jobs:
   quality:
     name: Quality gate
@@ -156,10 +157,57 @@ jobs:
       - name: Deploy to staging worker
         run: npx wrangler deploy --env staging
 
+  e2e-staging:
+    name: Browser E2E (staging)
+    needs: deploy-staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          NPM_VERSION="$(node -p "require('./package.json').packageManager.split('@').pop()")"
+          echo "packageManager: npm@${NPM_VERSION}"
+          npm install -g "npm@${NPM_VERSION}"
+          npm --version
+          npm ci
+
+      # Yalnız chromium quraşdırılır: mobil layihə də eyni brauzeri Pixel 7
+      # viewport-u ilə işlədir, ona görə firefox/webkit yükləməyə ehtiyac yoxdur.
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      # Testlər canlı staging worker-inə qarşı işləyir: nümunə məzmun orada
+      # açıqdır (300+ elan), runtime isə production ilə eynidir.
+      - name: Run E2E suite
+        env:
+          E2E_BASE_URL: https://luxehomeestate-staging.amiyevbahadur.workers.dev
+        run: npm run e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
   deploy-production:
     name: Deploy to production
-    # Staging əvvəl gedir: miqrasiya və ya yayım orada sınarsa production toxunulmur.
-    needs: [quality, deploy-staging]
+    # Staging əvvəl gedir və E2E orada keçməlidir: miqrasiya, yayım və ya browser
+    # axını sınarsa production toxunulmur.
+    needs: [quality, deploy-staging, e2e-staging]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30

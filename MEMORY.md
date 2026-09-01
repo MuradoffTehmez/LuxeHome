@@ -246,7 +246,12 @@ Tələb olunan `vars`: `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN` (`<team>.cloudfla
 - 88 Vitest faylı, 369 test; 30 avqust tam icrasında hamısı keçib.
 - 53 Prisma modeli, 25 D1 miqrasiya faylı və 382 commit.
 - GitHub Actions hər PR və `main` push-unda test, typecheck, lint və build işlədir.
-- Avtomatlaşdırılmış browser E2E yoxdur.
+- **Browser E2E qurulub — 2 sentyabr 2026** (Playwright, `e2e/`, 190+ test).
+  Testlər canlı mühitə qarşı işləyir; `next dev` hədəf kimi yararsızdır (Prisma wasm
+  engine orada yüklənmir, hər D1 səhifəsi 500 verir). CI axını:
+  `quality → deploy-staging → e2e-staging → deploy-production` — E2E sınarsa production
+  yayımı baş vermir. Dəst iki real baq tapdı: `not-found.tsx` AZ üçün locale prefiksi
+  vermirdi və `--color-ink-muted` ivory fonunda 4.47:1 idi (WCAG AA 4.5:1 tələb edir).
 - `.env` düzgün şəkildə `.gitignore`-dadır; yalnız `.env.example` izlənir.
 
 
