@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
-import { ACCOUNT_TYPES, MAX_AGENCY_EMPLOYEES, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_STATUSES, MAX_AGENCY_EMPLOYEES, type Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencyEmployees, getAgencyForOwner } from "@/lib/queries";
 import { InviteEmployeeForm, RemoveEmployeeButton } from "./team-forms";
@@ -45,7 +45,7 @@ export default async function CabinetTeamPage() {
         <>
           <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
             <h2 className="mb-5 font-display text-lg text-ink">{t("newInvite")}</h2>
-            <InviteEmployeeForm disabled={employees.filter((e) => e.status !== "REJECTED").length >= MAX_AGENCY_EMPLOYEES} />
+            <InviteEmployeeForm disabled={employees.filter((e) => e.status !== AGENCY_EMPLOYEE_STATUSES.REJECTED).length >= MAX_AGENCY_EMPLOYEES} />
           </section>
 
           <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
@@ -59,7 +59,7 @@ export default async function CabinetTeamPage() {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-ink">{employee.user.name}</p>
                       <p className="truncate text-xs text-ink-muted">
-                        {employee.user.email} · {t(`status.${employee.status === "APPROVED" ? "approved" : employee.status === "REJECTED" ? "rejected" : "pending"}`)}
+                        {employee.user.email} · {t(`status.${employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "approved" : employee.status === AGENCY_EMPLOYEE_STATUSES.REJECTED ? "rejected" : "pending"}`)}
                       </p>
                     </div>
                     <RemoveEmployeeButton id={employee.id} name={employee.user.name} />

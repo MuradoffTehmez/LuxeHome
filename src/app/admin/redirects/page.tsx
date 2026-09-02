@@ -33,7 +33,7 @@ export default async function AdminRedirectsPage() {
         <div className="flex min-w-0 flex-col gap-6">
           <AdminCard
             title={t("pages.serp.aktivYonlendirmeler")}
-            description={`${redirects.length} qeyd`}
+            description={t("pages.misc.qeydSayi", { count: redirects.length })}
             bodyClassName="p-0"
           >
             <ul>

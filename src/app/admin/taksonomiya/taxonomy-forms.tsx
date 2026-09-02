@@ -84,7 +84,7 @@ export function PropertyTypeRow({
             type="submit"
             className="inline-flex min-h-11 items-center rounded-xs px-3 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
           >
-            {isActive ? "Deaktiv et" : t("pages.misc.aktivlesdir")}
+            {isActive ? t("pages.misc.deaktivEt") : t("pages.misc.aktivlesdir")}
           </button>
         </form>
         <ConfirmAction

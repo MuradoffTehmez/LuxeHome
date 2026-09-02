@@ -6,7 +6,7 @@ import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { PERMISSIONS, type ReviewStatus } from "@/lib/constants";
+import { PERMISSIONS, REVIEW_STATUSES, type ReviewStatus } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { AgentForm, type AgentFormValues } from "../agent-form";
@@ -100,7 +100,7 @@ export default async function EditAgentPage({ params }: { params: Promise<{ id: 
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-ink">{review.customerName}</p>
                   <span className="flex items-center gap-1 text-sm text-gold-deep"><Star className="size-4 fill-current" /> {review.rating}</span>
-                  <Badge tone={review.status === "APPROVED" ? "success" : review.status === "PENDING" ? "warning" : "neutral"}>
+                  <Badge tone={review.status === REVIEW_STATUSES.APPROVED ? "success" : review.status === REVIEW_STATUSES.PENDING ? "warning" : "neutral"}>
                     {t(`labels.reviewStatus.${review.status as ReviewStatus}`) ?? review.status}
                   </Badge>
                 </div>

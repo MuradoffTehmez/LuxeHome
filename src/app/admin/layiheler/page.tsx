@@ -150,7 +150,7 @@ export default async function AdminProjectsPage({
               variant="outline"
               size="sm"
             >
-              {deleted ? t("pages.misc.aktivLayiheler") : "Zibil qutusu"}
+              {deleted ? t("pages.misc.aktivLayiheler") : t("pages.misc.zibilQutusu")}
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />

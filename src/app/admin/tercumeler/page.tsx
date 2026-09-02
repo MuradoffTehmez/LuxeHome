@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { PERMISSIONS, type TranslationStatus } from "@/lib/constants";
+import { PERMISSIONS, TRANSLATION_STATUSES, type TranslationStatus } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { AdminCard, AdminPageHeader, AdminTable, AdminTableCell, AdminTableRow } from "@/components/admin/admin-ui";
 import { Badge } from "@/components/ui/badge";
@@ -59,7 +59,7 @@ export default async function AdminTranslationsPage({ searchParams }: { searchPa
                 <AdminTableRow key={item.id}>
                   <AdminTableCell className="max-w-72"><p className="truncate font-medium">{item.title || sourceNames.get(`${item.entityType}:${item.entityId}`) || entityLabels(t)[item.entityType]}</p><p className="mt-1 text-xs text-ink-muted">{sourceNames.get(`${item.entityType}:${item.entityId}`) || t("pages.common.silinmisMenbe", { p0: entityLabels(t)[item.entityType] })}</p></AdminTableCell>
                   <AdminTableCell className="uppercase">{item.locale}</AdminTableCell>
-                  <AdminTableCell><Badge tone={item.status === "PUBLISHED" ? "success" : item.status === "READY" ? "warning" : "neutral"}>{t(`labels.translationStatus.${item.status as TranslationStatus}`) ?? item.status}</Badge></AdminTableCell>
+                  <AdminTableCell><Badge tone={item.status === TRANSLATION_STATUSES.PUBLISHED ? "success" : item.status === TRANSLATION_STATUSES.READY ? "warning" : "neutral"}>{t(`labels.translationStatus.${item.status as TranslationStatus}`) ?? item.status}</Badge></AdminTableCell>
                   <AdminTableCell align="right"><div className="flex justify-end"><Link href={`/admin/tercumeler?id=${item.id}`} aria-label={t("pages.translations.tercumeniRedakteEt")} className="grid size-11 place-items-center rounded-xs text-ink-muted hover:bg-beige hover:text-ink"><Pencil className="size-4" /></Link><ConfirmAction action={deleteTranslation} id={item.id} label={t("pages.translations.tercumeniSil")} title={t("pages.translations.tercumeniSilmek")} description={t("pages.translations.buDilVersiyasiSilinecek")}><Trash2 className="size-4" /></ConfirmAction></div></AdminTableCell>
                 </AdminTableRow>
               ))}

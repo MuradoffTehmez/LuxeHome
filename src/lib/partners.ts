@@ -37,6 +37,16 @@ export type PartnerVisibilityInput = {
 const DAY_MS = 24 * 60 * 60 * 1000;
 const BAKU_UTC_OFFSET_MS = 4 * 60 * 60 * 1000;
 
+/** Bakı təqvimində cari günün D1-də saxlanan UTC midnight qarşılığı. */
+export function startOfBakuToday(now: Date = new Date()): Date {
+  const bakuNow = new Date(now.getTime() + BAKU_UTC_OFFSET_MS);
+  return new Date(Date.UTC(
+    bakuNow.getUTCFullYear(),
+    bakuNow.getUTCMonth(),
+    bakuNow.getUTCDate(),
+  ));
+}
+
 function toTime(value: Date | string | null | undefined): number | null {
   if (value == null) return null;
   const time = value instanceof Date ? value.getTime() : new Date(value).getTime();
@@ -61,12 +71,7 @@ export function isPartnershipExpired(
     endDate.getUTCMonth(),
     endDate.getUTCDate(),
   );
-  const bakuNow = new Date(now.getTime() + BAKU_UTC_OFFSET_MS);
-  const todayInBaku = Date.UTC(
-    bakuNow.getUTCFullYear(),
-    bakuNow.getUTCMonth(),
-    bakuNow.getUTCDate(),
-  );
+  const todayInBaku = startOfBakuToday(now).getTime();
   return todayInBaku > endDay;
 }
 
@@ -136,12 +141,7 @@ export function daysUntilPartnershipEnd(
     endDate.getUTCMonth(),
     endDate.getUTCDate(),
   );
-  const bakuNow = new Date(now.getTime() + BAKU_UTC_OFFSET_MS);
-  const todayInBaku = Date.UTC(
-    bakuNow.getUTCFullYear(),
-    bakuNow.getUTCMonth(),
-    bakuNow.getUTCDate(),
-  );
+  const todayInBaku = startOfBakuToday(now).getTime();
   return Math.round((endDay - todayInBaku) / DAY_MS);
 }
 

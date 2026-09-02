@@ -83,8 +83,8 @@ export default async function AdminSecurityPage() {
       <div className="flex flex-col gap-6">
         <AdminCard title={t("pages.security.botMudafiesi")} description={t("pages.security.cloudflareTurnstileServerTerefli")}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="max-w-2xl text-sm text-ink-soft">Admin və istifadəçi girişi, qeydiyyat, parol bərpası və müraciət formaları qorunur. Token hər əməliyyat növünə ayrıca bağlanır.</p>
-            <Badge tone={turnstileReady ? "success" : "danger"}>{turnstileReady ? "Aktiv" : t("pages.misc.konfiqurasiyaTamamlanmayib")}</Badge>
+            <p className="max-w-2xl text-sm text-ink-soft">{t("pages.security.botMudafiesiTesviri")}</p>
+            <Badge tone={turnstileReady ? "success" : "danger"}>{turnstileReady ? t("pages.misc.aktiv") : t("pages.misc.konfiqurasiyaTamamlanmayib")}</Badge>
           </div>
         </AdminCard>
         {lockedUsers.length > 0 && (
@@ -102,7 +102,7 @@ export default async function AdminSecurityPage() {
                       {user.name}
                     </p>
                     <p className="mt-0.5 truncate text-xs text-ink-muted">
-                      {user.email} · {user.failedAttempts} uğursuz cəhd · {formatDateTime(user.lockedUntil!)}-a qədər
+                      {t("pages.security.kilidMelumati", { email: user.email, count: user.failedAttempts, date: formatDateTime(user.lockedUntil!) })}
                     </p>
                   </div>
                   <ConfirmAction
@@ -123,7 +123,7 @@ export default async function AdminSecurityPage() {
           </AdminCard>
         )}
 
-        <AdminCard title={t("pages.security.aktivSessiyalar")} description={`${sessions.length} aktiv sessiya`} bodyClassName="p-4 lg:p-0">
+        <AdminCard title={t("pages.security.aktivSessiyalar")} description={t("pages.security.aktivSessiyaSayi", { count: sessions.length })} bodyClassName="p-4 lg:p-0">
           {sessions.length === 0 ? (
             <EmptyState title={t("pages.security.aktivSessiyaYoxdur")} />
           ) : (

@@ -3,6 +3,7 @@ import { timingSafeEqual } from "@/lib/auth/crypto";
 import { runSavedSearchDigest } from "@/lib/saved-search-digest";
 import { savedSearchDigestStore } from "@/lib/queries";
 import { runPhase2Maintenance } from "@/lib/phase2-maintenance";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
 
 /**
  * «Gündəlik» / «Həftəlik» saxlanmış axtarış digest-inin işə salma nöqtəsi.
@@ -52,6 +53,12 @@ export async function POST(request: Request) {
       runSavedSearchDigest(savedSearchDigestStore),
       runPhase2Maintenance(),
     ]);
+    if (maintenance.expiredPremium > 0 || maintenance.accountDeletions.completed > 0) {
+      revalidatePublicContent("property");
+    }
+    if (maintenance.expiredPartners > 0) {
+      revalidatePublicContent("partner");
+    }
     return NextResponse.json({ ...digest, maintenance }, {
       headers: { "Cache-Control": "no-store, max-age=0" },
     });

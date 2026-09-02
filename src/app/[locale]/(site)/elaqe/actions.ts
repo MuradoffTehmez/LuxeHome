@@ -10,6 +10,7 @@ import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
 import { z } from "zod";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { readLeadAttribution } from "@/lib/lead-attribution";
+import { LEAD_STATUSES } from "@/lib/constants";
 
 async function contactSchema() {
   let nameMin = "Ad ən azı 2 simvol olmalıdır";
@@ -122,7 +123,7 @@ export async function submitContactForm(
         subject: result.data.subject || null,
         message: result.data.message,
         source: "CONTACT",
-        status: "NEW",
+        status: LEAD_STATUSES.NEW,
         ...readLeadAttribution(formData),
       },
     });

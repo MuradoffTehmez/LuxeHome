@@ -32,7 +32,7 @@ export default async function SeoLandingsAdminPage({ searchParams }: Props) {
       <AdminForm action={saveSeoLanding} submitLabel={current ? t("pages.misc.landingIYenile") : "Landing yarat"} cancelHref={current ? "/admin/serp/landingler" : undefined}><FormSection title={t("pages.serp.landingMelumati")} description={t("pages.serp.filtersjsonPublicPropertyQuery")}>
         {current && <input type="hidden" name="id" value={current.id} />}
         <AdminSelect name="locale" label={t("pages.serp.dil")} options={localeOptions} defaultValue={current?.locale ?? "az"} />
-        <AdminSelect name="status" label={t("pages.serp.status")} options={statusOptions} defaultValue={current?.status ?? "DRAFT"} />
+        <AdminSelect name="status" label={t("pages.serp.status")} options={statusOptions} defaultValue={current?.status ?? SEO_LANDING_STATUSES.DRAFT} />
         <AdminInput name="name" label={t("pages.serp.sehifeAdi")} defaultValue={current?.name ?? ""} required />
         <AdminInput name="slug" label={t("pages.serp.slug")} defaultValue={current?.slug ?? ""} required />
         <FullWidth><AdminInput name="title" label={t("pages.serp.seoTitle")} defaultValue={current?.title ?? ""} required /></FullWidth>
