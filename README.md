@@ -22,7 +22,7 @@
 
 > [!NOTE]
 > Bu sənəd 2 sentyabr 2026 tarixli `main` auditi, tam keçən keyfiyyət qapısı
-> (102 test faylı / 474 test) və son uğurlu CI/deploy əsasında yenilənib. Dərin texniki
+> (104 test faylı / 480 test) və son uğurlu CI/deploy əsasında yenilənib. Dərin texniki
 > məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
 
 ## Layihə haqqında
@@ -380,7 +380,7 @@ npm test
 npm run build
 ```
 
-Cari qapı **102 Vitest faylındakı 474 testi** əhatə edir. Auth, sessiya, lokallaşdırma, SEO/SERP,
+Cari qapı **104 Vitest faylındakı 480 testi** əhatə edir. Auth, sessiya, lokallaşdırma, SEO/SERP,
 sitemap data mənbələri, saved-search, tərəfdaşlıq, axtarış normallaşdırması, Turnstile, admin
 responsive siyahıları, media rollback-i və public-content sərhədləri yoxlanır. GitHub Actions eyni
 dörd əmri hər PR və `main` push-unda işlədir. `main` push-u staging deploy və canlı Playwright
@@ -393,8 +393,8 @@ npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xət
 ## Cari məhdudiyyətlər və yol xəritəsi
 
 - İctimai hesab şəxsi data ixracı və self-service silinmə verir. D1 transaction dəstəkləmədiyi
-  üçün elanların arxivləşdirilməsi ilə istifadəçi qeydinin silinməsi iki ardıcıl əməliyyatdır;
-  ikinci addım uğursuz olarsa avtomatik reconciliation mexanizmi hələ yoxdur.
+  üçün silinmə davamlı marker və gündəlik idempotent retry ilə qorunur: hesab əvvəl deaktiv
+  edilir, əlaqəli təmizlik yarımçıq qalarsa maintenance işi onu avtomatik tamamlayır.
 - Admin panel dili `User.locale` ilə AZ/EN/RU arasında saxlanılır; yeni admin mətnləri hər üç
   kataloqda parity testi ilə qorunmalıdır.
 - Playwright E2E staging-də deployment qapısıdır. `npm run test:seo:routes` və `npm run
