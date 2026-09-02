@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 1 sentyabr 2026.
+Son yenilənmə: 2 sentyabr 2026.
 
 ---
 
@@ -31,13 +31,13 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 
 | Mövzu | Qərar |
 |---|---|
-| Admin panel | Auth və əsas CRUD hazırdır; növbəti böyük boşluqlar Finance/CMS və panel UI-ının çoxdilliliyidir. |
+| Admin panel | Auth, əsas CRUD və AZ/EN/RU panel UI-ı hazırdır; növbəti böyük boşluqlar Finance və ümumi statik səhifə CMS-idir. |
 | Verilənlər bazası + hosting | **Qərar verilib (20 avqust 2026): tam Cloudflare.** Workers (OpenNext), D1, R2, Images. Supabase və PostgreSQL layihədən çıxarılıb. |
 | Media yükləmə | **Cloudflare R2 + Images** — admin və kabinet upload route-ları, WebP/thumbnail və magic-byte yoxlaması işləyir. |
 | Dil | İctimai sayt, kabinet **və admin panel** AZ + EN + RU dillərindədir. Panel dili `User.locale`-dan gəlir (`/admin` locale prefiksi daşımır). |
 | Lead bildirişi | **Telegram bot.** Yeni müraciət gələndə sistem bot vasitəsilə bildiriş göndərəcək. |
 | Spam qoruma | Same-origin + honeypot + IP rate limit + Cloudflare Turnstile tətbiq olunub. |
-| Test / CI / analitika | Vitest və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. **2 sentyabr 2026-dan CI həm staging, həm production-a yayım edir və hər mühitin D1 miqrasiyalarını deploy-dan əvvəl tətbiq edir.** Browser E2E hələ yoxdur. |
+| Test / CI / analitika | Vitest, Playwright və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. **2 sentyabr 2026-dan CI staging deploy → canlı E2E → production deploy ardıcıllığını və hər mühit üçün əvvəlcədən D1 miqrasiyasını tətbiq edir.** |
 | Real Estate Knowledge Hub | D1 əsaslı bələdçi, hüquqi FAQ, lüğət, kalkulyator və admin CMS hazırdır. Mənbə hüquqi araşdırma DRAFT idxal edilir; yayımdan əvvəl hüquqşünas baxışı tələb olunur. |
 
 ---
@@ -68,9 +68,12 @@ düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` q�
 | Yer | Problem |
 |---|---|
 | Kabinet moderasiyası | Kabinet elanına koordinat əlavə olundu, lakin moderator baxışında xəritə önizləməsi yoxdur. |
-| Browser axınları | Avtomatlaşdırılmış Playwright/E2E yoxdur; production smoke testi manualdır. |
-| Phase 3 / AI | Semantik axtarış, Match Score, chatbot və map draw search yazılmayıb (PRD bölmə 180). Panel tərəfdə yalnız AI təsvir generatoru və foto məsləhətçisi var. Hər ikisi 1 sentyabr 2026-da düzəldildi (Workers AI JSON mode + xarici şəkil URL-ləri); production-a yayım gözləyir. |
+| Browser axınları | Playwright dəsti staging-də CI qapısıdır; production-a ayrıca post-deploy browser smoke hələ yoxdur. |
+| Phase 3 / AI | Public AI sorğu parser-i, deterministik fallback, Match Score və «Mənə əmlak tap» axını hazırdır. Cari “semantic” uyğunluq embedding/vector deyil, normallaşdırılmış mətn terminləri ilə leksik axtarışdır; chatbot və xəritədə sərbəst sahə çəkmə (map draw) yoxdur. Admin AI təsvir/foto köməkçisi Workers AI JSON mode ilə işləyir. |
 | Finance / statik CMS | Knowledge Hub üçün domen CMS-i hazırdır; paket, ödəniş və ümumi statik səhifə redaktoru hələ yoxdur (Admin PRD). |
+| Admin lokallaşdırması | AZ/EN/RU kataloqları və əsas panel UI-ı hazırdır, lakin audit SERP, security, e-poçt, hesab və trash/status mətnlərində qalan bir neçə hardcode AZ/EN sətri tapıb. Kataloq parity testi xam JSX mətnini tutmur. |
+| Backend → UI uyğunluğu | 151 Server Action ixracından üçü (`setPropertyStatus`, `togglePropertyFeatured`, `expireOverduePartners`) heç bir UI/cron tərəfindən çağırılmır; `/admin/seo` naviqasiyadan kənarda qalan köhnə paralel audit route-udur. `PropertyPriceHistory` yalnız bildiriş mənbəyidir, istifadəçiyə tarixçə qrafiki göstərilmir. |
+| D1 atomikliyi | Self-service hesab silinməsi əvvəl elanları arxivləyir, sonra istifadəçini silir. D1 transaction olmadığı üçün ikinci addım uğursuz olsa avtomatik reconciliation yoxdur. |
 
 Azərbaycan hərfləri ilə registrsiz axtarış 28 avqustda `searchText` / `searchName`
 sütunları və `normalizeSearchText()` ilə həll olunub.
@@ -240,11 +243,11 @@ Tələb olunan `vars`: `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN` (`<team>.cloudfla
 
 ---
 
-## 7. Layihənin texniki sağlamlığı (30 avqust 2026)
+## 7. Layihənin texniki sağlamlığı (2 sentyabr 2026)
 
-- Mənbə kodu: 51 900 sətir / 508 fayl (`src/` altında `.ts` + `.tsx`).
-- 88 Vitest faylı, 369 test; 30 avqust tam icrasında hamısı keçib.
-- 53 Prisma modeli, 25 D1 miqrasiya faylı və 382 commit.
+- Mənbə ağacı: 582 TypeScript/TSX faylı (`src/` altında).
+- 102 Vitest faylı, 474 test; 2 sentyabr tam lokal icrasında hamısı keçib.
+- 60 Prisma modeli, 28 D1 miqrasiya faylı və audit başlanğıcında 463 commit.
 - GitHub Actions hər PR və `main` push-unda test, typecheck, lint və build işlədir.
 - **Browser E2E qurulub — 2 sentyabr 2026** (Playwright, `e2e/`, 190+ test).
   Testlər canlı mühitə qarşı işləyir; `next dev` hədəf kimi yararsızdır (Prisma wasm
@@ -435,10 +438,10 @@ production build təmizdir.
 - B10 Azərbaycan axtarış normallaşdırması ilə, B12 korporativ göndərici fallback-i ilə bağlandı;
 - B13 istifadə olunmayan `SAVED_SEARCH_FREQUENCY_LABELS` ixracının silinməsi ilə bağlandı;
 - GitHub Actions CI əlavə edildi və public `loading.tsx` güzəşti sənədləşdirildi;
-- B9 (admin UI-ının AZ/EN/RU lokallaşdırılması) ayrıca böyük modul kimi açıqdır;
+- B9 (admin UI-ının AZ/EN/RU lokallaşdırılması) sonrakı işdə bağlandı;
 - P5 (`force-dynamic` public HTML render-i) ölçmə və arxitektura işi olaraq açıqdır;
-- avtomatlaşdırılmış browser E2E və Resend/Cloudflare kimi xarici sistemlərin canlı smoke
-  yoxlamaları repository daxilində tam əvəz edilə bilmir.
+- avtomatlaşdırılmış browser E2E staging-də quruldu; Resend/Cloudflare kimi xarici sistemlərin
+  production smoke yoxlamaları repository daxilində tam əvəz edilə bilmir.
 
 ---
 
@@ -482,3 +485,36 @@ yayımlanır.
   generator typecheck-dən keçir, lakin `prisma/knowledge-hub.sql` sağlam Node mühitində yaradılmalıdır.
 - Bu sessiyada Vitest 369/369 keçib. `next build` kod xətasına görə deyil, qeyri-interaktiv
   Cloudflare remote proxy üçün `CLOUDFLARE_API_TOKEN` olmadığına görə tamamlanmayıb.
+
+---
+
+## 15. GitHub governance və production workflow — 2 sentyabr 2026
+
+Repository işi artıq standart olaraq bu zəncirlə gedir:
+`Issue → Branch → Commit → Pull Request → CI → Review → Merge → Issue close`.
+Branch adı `<tip>/<issue-id>-<qisa-tesvir>`, commit mesajı Conventional Commits formatındadır;
+boş və ya süni contribution commit-ləri yaradılmır. Bu governance işinin özü də #19 issue-su və
+`chore/19-github-governance` branch-i ilə başladılıb.
+
+Repository daxilində əlavə və ya genişləndirilən qatlar:
+
+- strukturlaşdırılmış issue formaları və tam PR checklist-i;
+- mövcud Cloudflare ardıcıllığını qoruyan CI action SHA pinləri;
+- CodeQL, dependency review, Dependabot və PR path labeler workflow-ları;
+- CODEOWNERS və sahə/prioritet label taksonomiyası;
+- `CONTRIBUTING.md` və `docs/github-governance.md` authoritative qaydaları.
+
+Canlı GitHub yoxlamasında `main` üçün PR, strict `Quality gate`, conversation resolution,
+linear history, admin enforcement və force-push/silmə qadağası aktiv idi. Dependency graph,
+secret scanning və push protection da aktivdir. Governance PR-ı merge olunub yeni workflow-lar
+ən azı bir dəfə yaşıl işləyəndən sonra CodeQL və Dependency review required check edilməli;
+Dependabot alerts/security updates, private vulnerability reporting və full-SHA policy UI-dan
+aktivləşdirilməlidir. `staging` və `production` environment-lərinin deployment branch-i yalnız
+`main` ilə məhdudlaşdırılmalıdır.
+
+Hazırkı yayım continuous deployment-dır; package versiyası və iki köhnə tag canlı vəziyyəti
+etibarlı təmsil etmədiyi üçün `release.yml` qəsdən yaradılmayıb. Əvvəl version/changelog qaydası
+və cari baseline release razılaşdırılmalıdır.
+
+Lokal qəbul nəticəsi: YAML/workflow parse təmiz, `npm audit --audit-level=high` — 0 zəiflik,
+102/102 Vitest faylı və 474/474 test, typecheck, ESLint və Next.js production build uğurludur.

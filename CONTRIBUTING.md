@@ -33,6 +33,8 @@ flowchart LR
     F --> G[Review]
     G -->|Dəyişiklik lazımdır| D
     G -->|Təsdiqləndi| H[main-ə merge]
+    H --> I[Issue avtomatik bağlanır]
+    I --> J[Lazım olduqda SemVer release]
 ```
 
 1. Issue açın və rəhbərlərdən təsdiq/istiqamət gözləyin — xüsusilə böyük dəyişikliklər üçün.
@@ -78,42 +80,11 @@ Branch-dakı commit-lər `main`-də bir addım kimi görünür, tam tarixçə is
 
 ### Təcili hal
 
-Qoruma administratora da şamil olunur, yəni sınıq production üçün də yol pull request-dir.
-Doğrudan da yan keçmək lazımdırsa, qoruma şüurlu şəkildə söndürülür və dərhal geri
-qaytarılır:
-
-```bash
-gh api -X DELETE repos/MuradoffTehmez/LuxeHome/branches/main/protection
-```
-
-Bu əmr **bütün** qoruma konfiqurasiyasını silir, ona görə düzəlişdən dərhal sonra
-konfiqurasiya bərpa edilməlidir. Bərpa əmri tam şəkildə budur — yuxarıdakı cədvəlin
-maşın oxunaqlı qarşılığıdır:
-
-```bash
-gh api -X PUT repos/MuradoffTehmez/LuxeHome/branches/main/protection --input - <<'JSON'
-{
-  "required_status_checks": { "strict": true, "contexts": ["Quality gate"] },
-  "enforce_admins": true,
-  "required_pull_request_reviews": {
-    "required_approving_review_count": 0,
-    "dismiss_stale_reviews": true,
-    "require_last_push_approval": false
-  },
-  "restrictions": null,
-  "required_linear_history": true,
-  "allow_force_pushes": false,
-  "allow_deletions": false,
-  "required_conversation_resolution": true
-}
-JSON
-```
-
-Bərpanı yoxlamaq üçün:
-
-```bash
-gh api repos/MuradoffTehmez/LuxeHome/branches/main/protection -q .required_status_checks
-```
+Qoruma administratora da şamil olunur, yəni sınıq production üçün də standart yol kiçik
+hotfix/revert PR-ıdır. Qorumanı silmək bütün required check və bypass parametrlərini birdən
+itirə bildiyi üçün normal incident addımı sayılmır. GitHub qaydasında dəyişiklik məcburi olarsa,
+əvvəl cari konfiqurasiya ixrac edilir, dəyişiklik ayrıca incident qeydində əsaslandırılır və
+iş bitən kimi UI/API nəticəsi yenidən yoxlanılır.
 
 ## Merge-dən sonra: yayım
 
@@ -141,20 +112,35 @@ məqsəd daşıyır.
 
 | Prefiks | Təyinat |
 |---|---|
-| `feature/<qisa-tesvir>` | Yeni funksiya |
-| `fix/<qisa-tesvir>` | Nasazlıq düzəlişi |
-| `docs/<qisa-tesvir>` | Yalnız sənəd dəyişikliyi |
-| `refactor/<qisa-tesvir>` | Davranışı dəyişməyən kod yenidənqurması |
-| `test/<qisa-tesvir>` | Test əlavəsi/düzəlişi |
-| `chore/<qisa-tesvir>` | Asılılıq, konfiqurasiya, alət dəyişikliyi |
+| `feat/<issue-id>-<qisa-tesvir>` | Yeni funksiya |
+| `fix/<issue-id>-<qisa-tesvir>` | Nasazlıq düzəlişi |
+| `perf/<issue-id>-<qisa-tesvir>` | Performans işi |
+| `docs/<issue-id>-<qisa-tesvir>` | Yalnız sənəd dəyişikliyi |
+| `refactor/<issue-id>-<qisa-tesvir>` | Davranışı dəyişməyən kod yenidənqurması |
+| `test/<issue-id>-<qisa-tesvir>` | Test əlavəsi/düzəlişi |
+| `chore/<issue-id>-<qisa-tesvir>` | Asılılıq, konfiqurasiya, alət dəyişikliyi |
+| `security/<issue-id>-<qisa-tesvir>` | Məxfi olmayan təhlükəsizlik möhkəmləndirməsi |
 
-Nümunə: `fix/property-filter-crash`
+Nümunələr: `feat/184-ai-seo-suggestions`, `fix/205-image-upload`,
+`perf/211-listing-images`.
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feat/184-example
+
+git add .
+git commit -m "feat(example): implement feature"
+git push -u origin feat/184-example
+```
 
 ## Commit mesajları
 
 Format: `type(scope): qısa əmr cümləsi`
 
-Tiplər: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `style`, `build`, `ci`
+Tiplər: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `ci`, `chore`, `revert`.
+Commit-lər kiçik, məntiqli və atomic olmalıdır; bir-birindən asılı olmayan düzəlişləri eyni
+commit-ə yığmayın və contribution statistikasını artırmaq üçün boş commit yaratmayın.
 
 Breaking change `!` işarəsi və commit body-də `BREAKING CHANGE:` sətri ilə göstərilir:
 
@@ -231,6 +217,14 @@ Reviewer PR təsvirindən aşağıdakıları aydın görə bilməlidir:
 - UI dəyişikliyi varsa, əvvəl/sonra görüntü;
 - breaking change, migration və ya deployment addımı varmı;
 - rollback lazım olarsa necə ediləcək.
+
+Review zamanı correctness, regressiya, təhlükəsizlik, performans, type safety, D1/migration,
+xəta idarəsi, accessibility, mobil görünüş, SEO və maintainability ayrıca qiymətləndirilir.
+Code Owner tək maintainer olduğu müddətdə məcburi approval yoxdur; komanda böyüdükdə bu qayda
+aktivləşdirilir.
+
+GitHub UI-də saxlanılan branch protection, Actions, environment, Advanced Security, label və
+release parametrləri üçün [GitHub governance sənədinə](docs/github-governance.md) baxın.
 
 ## Tarixçə haqqında qeyd
 

@@ -21,7 +21,9 @@
 ---
 
 > [!NOTE]
-> Bu sənəd 31 avqust 2026 tarixli `main` auditi, tam keçən keyfiyyət qapısı (89 test faylı / 373 test) və production deploy əsasında yenilənib. Aktiv Worker versiyası `a88cf4ab-6a5e-4b84-a038-2a6c82f0ae92`-dir. Dərin texniki məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
+> Bu sənəd 2 sentyabr 2026 tarixli `main` auditi, tam keçən keyfiyyət qapısı
+> (102 test faylı / 474 test) və son uğurlu CI/deploy əsasında yenilənib. Dərin texniki
+> məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
 
 ## Layihə haqqında
 
@@ -378,11 +380,11 @@ npm test
 npm run build
 ```
 
-Cari qapı **89 Vitest faylındakı 373 testi** əhatə edir. Auth, sessiya, lokallaşdırma, SEO/SERP,
+Cari qapı **102 Vitest faylındakı 474 testi** əhatə edir. Auth, sessiya, lokallaşdırma, SEO/SERP,
 sitemap data mənbələri, saved-search, tərəfdaşlıq, axtarış normallaşdırması, Turnstile, admin
 responsive siyahıları, media rollback-i və public-content sərhədləri yoxlanır. GitHub Actions eyni
-dörd əmri hər PR və `main` push-unda işlədir; D1 integration və avtomatlaşdırılmış browser E2E hələ
-yoxdur, production browser smoke testi manual aparılır.
+dörd əmri hər PR və `main` push-unda işlədir. `main` push-u staging deploy və canlı Playwright
+E2E-dən keçmədən production-a yayımlanmır; production post-deploy smoke yoxlaması hələ manualdır.
 
 CI iş axını asılılıqları quraşdırmazdan əvvəl `package.json`-dakı `packageManager` dəyərini oxuyub
 eyni npm versiyasını qurur, Node versiyasını isə `.nvmrc`-dən götürür. Bu, lock faylı formatının
@@ -390,11 +392,14 @@ npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xət
 
 ## Cari məhdudiyyətlər və yol xəritəsi
 
-- İctimai hesab şəxsi data ixracını verir; hesabın self-service silinməsi hələ yoxdur.
-- Admin paneldə locale seçimi saxlanılır, lakin panel UI mətnləri hələ yalnız azərbaycancadır.
-- Avtomatlaşdırılmış browser E2E yoxdur; deploy və canlı smoke prosesi manualdır. `npm run
-  test:seo:routes` və `npm run test:seo:live` production SEO/SERP qəbul yoxlamasını avtomatlaşdırır,
-  lakin tam brauzer axını əhatə etmir.
+- İctimai hesab şəxsi data ixracı və self-service silinmə verir. D1 transaction dəstəkləmədiyi
+  üçün elanların arxivləşdirilməsi ilə istifadəçi qeydinin silinməsi iki ardıcıl əməliyyatdır;
+  ikinci addım uğursuz olarsa avtomatik reconciliation mexanizmi hələ yoxdur.
+- Admin panel dili `User.locale` ilə AZ/EN/RU arasında saxlanılır; yeni admin mətnləri hər üç
+  kataloqda parity testi ilə qorunmalıdır.
+- Playwright E2E staging-də deployment qapısıdır. `npm run test:seo:routes` və `npm run
+  test:seo:live` production SEO/SERP qəbul yoxlamasını avtomatlaşdırır; production üçün tam
+  post-deploy brauzer smoke hələ manualdır.
 - Avtomatlaşdırılmış D1 backup/restore drill hələ qurulmayıb.
 - Bilik Mərkəzinin idxal paketi DRAFT yaradır; hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilmir.
 - Korporativ e-poçt hadisələri yalnız `RESEND_WEBHOOK_SECRET` və Resend endpoint abunəliyi qurulduqdan sonra dolur; məzmun deyil, metadata saxlanılır.

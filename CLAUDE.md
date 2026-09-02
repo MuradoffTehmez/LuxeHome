@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Layihə haqqında
 
 Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 15 App Router,
-React 19, Tailwind CSS v4, Prisma v6. Saytın bütün istifadəçi mətnləri Azərbaycan dilindədir.
+React 19, Tailwind CSS v4, Prisma v6. İctimai sayt, kabinet və admin panel AZ/EN/RU dillərindədir;
+Azərbaycan dili defoltdur.
 
 **İnfrastruktur tam Cloudflare-dədir:** Workers (OpenNext adapteri), D1 (verilənlər bazası),
 R2 (media + ISR keşi), Images (şəkil optimizasiyası). Supabase və PostgreSQL layihədən çıxarılıb.
@@ -21,6 +22,7 @@ npm run build        # prisma generate + next build
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
 npm run test         # vitest (workerd runtime, auth qatının unit testləri)
+npm run e2e          # canlı/konfiqurasiya edilmiş workerd mühitinə qarşı Playwright
 
 npm run preview      # OpenNext bundle + lokal workerd (production ilə eyni runtime)
 npm run deploy:staging  # staging worker-ə yayım (luxehomeestate-staging)
@@ -78,11 +80,24 @@ sorğular çökür və xəta çox vaxt `try/catch` içində səssizcə udulur.
 Lokal və ya təcili yayımda eyni sıra əl ilə saxlanmalıdır — əvvəlcə
 `npm run db:migrate:remote` (və ya `:staging`), sonra `npm run deploy`.
 
+### GitHub development workflow
+
+Standart axın `Issue → Branch → Commit → Pull Request → CI → Review → Merge → Issue close`-dur.
+Birbaşa `main`-də işləmə. Branch adı `<tip>/<issue-id>-<qisa-tesvir>` formatındadır; icazəli
+prefikslər `feat`, `fix`, `perf`, `docs`, `refactor`, `test`, `chore`, `security`-dir.
+Commit-lər Conventional Commits formatında, kiçik və atomic olmalıdır. PR təsvirində
+`Closes #<issue-id>` yazılır.
+
+GitHub Actions üçüncü tərəf action-ları tam commit SHA ilə pin edir. CI/CD, CodeQL,
+dependency review, Dependabot, CODEOWNERS və labeler qaydaları `.github/` altındadır;
+GitHub UI parametrlərinin authoritative sənədi `docs/github-governance.md`-dir. Solo maintainer
+rejimində məcburi approval qoyulmur, çünki müəllif öz PR-ını təsdiqləyə bilmir.
+
 ## Arxitektura
 
 ### Route qrupu və marşrutlar
 
-Bütün ictimai səhifələr `src/app/(site)/` qrupundadır və `(site)/layout.tsx` Navbar + Footer
+Bütün ictimai səhifələr `src/app/[locale]/(site)/` qrupundadır və `(site)/layout.tsx` Navbar + Footer
 sarğısını verir. Marşrut adları azərbaycancadır və URL-in bir hissəsidir:
 `/emlaklar`, `/xidmetler`, `/layiheler`, `/haqqimizda`, `/blog`, `/elaqe`,
 `/bilik-merkezi`, `/lugat`, `/kalkulyator`, `/suallar`.
@@ -98,8 +113,10 @@ Query parametrləri də azərbaycancadır və `emlaklar/page.tsx`-də əl ilə m
 
 ### Data axını
 
-Səhifələr Server Component-dir və birbaşa `src/lib/queries.ts`-dən oxuyur — ayrıca API qatı yoxdur.
-Yazma əməliyyatları Server Action ilə gedir (`(site)/elaqe/actions.ts`, `(site)/favoritler/actions.ts`).
+Səhifələr Server Component-dir və əsasən `src/lib/queries.ts` və domen kitabxanalarından oxuyur.
+Public JSON API qatı əsas data oxu mənbəyi deyil; yazmalar public, kabinet və admin ağaclarındakı
+Server Action-larla gedir. Route Handler-lar media, webhook, cron, monitorinq, geocode, tile və
+hesab köməkçi endpoint-ləri üçündür.
 
 **D1 binding yalnız sorğu kontekstində əlçatandır.** Buna görə:
 
@@ -199,6 +216,10 @@ Panel öz yolunu işlədir:
   `NextIntlClientProvider` vasitəsilə gəlir.
 - **Etiket siyahılarını modul sabiti kimi saxlama.** `const SECTIONS = [{ label: t(...) }]`
   modul yüklənəndə hesablanır və `t`-ni görmür; onları `(t) => [...]` funksiyasına çevir.
+- Panel JSX-ində istifadəçiyə görünən AZ/EN mətnini xam string kimi yazma; say, status və
+  diaqnostika suffix-ləri də kataloqdan gəlməlidir. Kataloq parity testi yalnız üç JSON
+  kataloqunun açarlarını müqayisə edir, xam JSX mətnini tutmur. 2 sentyabr auditində qalan
+  legacy sətirlər `MEMORY.md` bölmə 5-də ayrıca borc kimi qeyd olunub.
 - `*_LABELS` sabitləri domen qatının mənbəyidir, panel isə `labels.*` kataloqundan oxuyur.
   İkisinin sinxronluğunu `admin-label-sync.test.ts` qoruyur — sabitə yeni dəyər əlavə
   edəndə kataloqu da yenilə.
@@ -245,8 +266,9 @@ propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
   Hər səhifə `export const metadata` və ya `generateMetadata` içindən bunu çağırır.
 - JSON-LD generatorları: `organizationSchema()` (root layout-da, `RealEstateAgent`),
   `propertySchema()`, `articleSchema()`, `serviceSchema()`, `breadcrumbSchema()`.
-- `siteUrl(path)` — `SITE_URL` üzərindən mütləq URL qurur. Dəyər runtime-da oxunur, ona görə
-  eyni build həm production, həm staging worker-inə yayımlana bilir.
+- `siteUrl(path)` — production-da sabit canonical hostu, staging/lokal mühitdə isə `SITE_URL`
+  dəyərini istifadə edir. Dəyər həm build, həm request vaxtında işlənə bildiyi üçün staging və
+  production bundle-ları ayrı qurulur.
 
 `app/sitemap.ts` `getSitemapEntries()`-i çağırır və `force-dynamic`-dir (D1-dən oxuyur).
 `app/robots.ts` `/admin`, `/giris` və `/favoritler` marşrutlarını indeksdən kənarlaşdırır.
@@ -367,7 +389,7 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   Keçid geribildirimi `(site)/template.tsx` və `NavigationProgress` ilə, Suspense sərhədi
   yaratmadan verilir. Admin/kabinet kimi 404 semantikası tələb etməyən ağaclarda skeleton var.
 - GitHub Actions CI `test + typecheck + lint + build` qapılarını hər PR və `main` push-unda
-  işlədir. `main` push-unda yayım axını: **quality → deploy-staging → deploy-production**.
+  işlədir. `main` push-unda yayım axını: **quality → deploy-staging → e2e-staging → deploy-production**.
   Hər deploy job-u əvvəlcə öz mühitinin D1 miqrasiyalarını tətbiq edir, sonra bundle qurub
   worker-i yayımlayır. Staging production-dan əvvəl gedir — orada sınarsa production
   toxunulmur. Bundle hər mühit üçün ayrıca qurulur, çünki `SITE_URL` statik səhifələrin
@@ -385,9 +407,9 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   taksonomiya yazma axınlarında bu normallaşdırılmış sahələri doldurmağı unutma.
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
-- `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər) və
-  `media.luxehomeestate.az` (R2 custom domain) mənbələrinə icazə verir. Yeni mənbə əlavə
-  edilərsə bu siyahı yenilənməlidir.
+- `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər),
+  `media.luxehomeestate.az` (R2 custom domain) və `treva.realestate` (rəsmi tərəfdaş media-sı)
+  mənbələrinə icazə verir. Yeni mənbə əlavə edilərsə bu siyahı yenilənməlidir.
 - `next/image` optimizasiyası Cloudflare `IMAGES` binding-i üzərindən gedir (`wrangler.jsonc`).
 - Gizli dəyərlər `.env`-də deyil, Cloudflare secret-lərindədir:
   `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`.
