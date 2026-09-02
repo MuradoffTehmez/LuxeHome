@@ -1,9 +1,36 @@
 name: ⚡ Performance Issue
 description: Yavaşlıq, gecikmə və ya resurs istehlakı problemi bildirin
 title: "[Performance]: "
-labels: ["bug"]
+labels: ["performance"]
 assignees: []
 body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritet
+      options:
+        - Critical — production əlçatmazdır və ya resurs limiti aşılır
+        - High — əsas axında ciddi gecikmə
+        - Medium — ölçülən, lakin workaround olan geriləmə
+        - Low — optimizasiya imkanı
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Təsirlənən sahə
+      multiple: true
+      options:
+        - Frontend render / bundle
+        - Şəkil / media
+        - Server Action / API
+        - Prisma / D1 sorğusu
+        - Cloudflare Worker / cache
+        - E2E / CI müddəti
+    validations:
+      required: true
+
   - type: input
     id: location
     attributes:
@@ -44,6 +71,22 @@ body:
       required: true
 
   - type: textarea
+    id: expected
+    attributes:
+      label: Gözlənilən nəticə / performans büdcəsi
+      description: Hədəf göstəricini və ya qəbul edilən həddi qeyd edin.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Qəbul meyarları
+      description: Eyni metodla ölçülə bilən tamamlanma şərtləri.
+    validations:
+      required: true
+
+  - type: textarea
     id: evidence
     attributes:
       label: Lighthouse / profiler / network trace
@@ -58,6 +101,14 @@ body:
     attributes:
       label: Regression məlumatı
       description: Əvvəllər sürətli idisə, nə vaxtdan yavaşladığını bilirsinizmi?
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Texniki qeydlər və əlavə kontekst
+      description: Profil nəticəsi, şübhəli sorğu/fayl və mümkün həll.
     validations:
       required: false
 

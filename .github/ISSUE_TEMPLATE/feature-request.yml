@@ -12,6 +12,34 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritet
+      options:
+        - High — əsas məhsul və ya biznes hədəfi
+        - Medium — planlaşdırılan yaxşılaşdırma
+        - Low — faydalı, lakin təxirə salına bilən
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Təsirlənən sahə
+      multiple: true
+      options:
+        - İctimai frontend
+        - Admin panel
+        - Kabinet / hesab
+        - Backend / API
+        - Verilənlər bazası
+        - SEO / content
+        - Accessibility
+        - CI/CD / developer experience
+    validations:
+      required: true
+
   - type: textarea
     id: proposal
     attributes:
@@ -57,6 +85,23 @@ body:
     attributes:
       label: Alternativlər
       description: Nəzərdən keçirdiyiniz başqa həll yolları varmı?
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Brauzer / cihaz
+      description: Təklif müəyyən platforma və ya viewport-la bağlıdırsa qeyd edin.
+      placeholder: "Bütün brauzerlər; mobil 360–430px"
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Texniki qeydlər
+      description: Məlumat modeli, migration, API, təhlükəsizlik və ya performans məhdudiyyəti.
     validations:
       required: false
 

@@ -17,12 +17,43 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritet / təsir
+      description: Problemin istifadəçi və biznes axınına təsirini seçin.
+      options:
+        - Critical — təhlükəsizlik, məlumat itkisi və ya production dayanması
+        - High — əsas axın işləmir, workaround yoxdur
+        - Medium — funksiya qismən işləyir və ya workaround var
+        - Low — məhdud təsirli kosmetik və ya kənar hal
+    validations:
+      required: true
+
   - type: input
     id: location
     attributes:
       label: Təsirlənən səhifə/komponent
       description: Məsələn `/emlaklar`, `SearchPanel`, admin `İstifadəçilər` səhifəsi.
       placeholder: "/emlaklar/[slug]"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Təsirlənən sahə
+      multiple: true
+      options:
+        - İctimai frontend
+        - Admin panel
+        - Kabinet / hesab
+        - Backend / Server Action
+        - API / webhook / cron
+        - Verilənlər bazası / migration
+        - SEO / indeksləmə
+        - Accessibility
+        - CI/CD / infrastruktur
     validations:
       required: true
 
@@ -53,13 +84,32 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Qəbul meyarları
+      description: Düzəliş hansı yoxlanıla bilən nəticələrdən sonra tamamlanmış sayılır?
+      placeholder: |
+        - [ ] Problem verilmiş addımlarla təkrarlanmır
+        - [ ] Əlaqəli regressiya testi əlavə olunub
+    validations:
+      required: true
+
   - type: input
     id: environment
     attributes:
-      label: Brauzer və əməliyyat sistemi
-      placeholder: "Chrome 128, Windows 11"
+      label: Mühit, brauzer və əməliyyat sistemi
+      placeholder: "Production, Chrome 128, Windows 11"
     validations:
       required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Cihaz / viewport
+      placeholder: "Desktop 1440px, iPhone 15 393px"
+    validations:
+      required: false
 
   - type: textarea
     id: regression
@@ -76,6 +126,21 @@ body:
       description: |
         ⚠️ Diqqət: parol, sessiya cookie-si, token və ya real müştəri məlumatı əlavə etməyin.
       render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Texniki qeydlər
+      description: Ehtimal olunan səbəb, əlaqəli fayl, sorğu və ya commit varsa qeyd edin.
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Əlavə kontekst
     validations:
       required: false
 

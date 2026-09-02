@@ -1,0 +1,95 @@
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/**/page.tsx"
+          - "src/app/**/layout.tsx"
+          - "src/app/**/loading.tsx"
+          - "src/app/**/error.tsx"
+          - "src/app/**/not-found.tsx"
+          - "src/components/**"
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/lib/**"
+          - "src/app/**/actions.ts"
+          - "src/app/**/route.ts"
+          - "src/middleware.ts"
+          - "workers/**"
+
+api:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/api/**"
+          - "src/app/media/**"
+          - "workers/**"
+
+admin:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/admin/**"
+          - "src/components/admin/**"
+          - "src/lib/admin/**"
+
+database:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "prisma/**"
+          - "migrations/**"
+          - "wrangler.jsonc"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "docs/**"
+          - "Wiki/**"
+
+github-actions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - ".github/dependabot.yml"
+          - ".github/labeler.yml"
+          - ".github/CODEOWNERS"
+
+testing:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/**/__tests__/**"
+          - "e2e/**"
+          - "vitest.config.mts"
+          - "playwright.config.ts"
+
+styles:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.css"
+          - "postcss.config.mjs"
+
+i18n:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/i18n/**"
+
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/lib/auth/**"
+          - "src/lib/admin/guard.ts"
+          - "src/lib/spam.ts"
+          - "src/middleware.ts"
+          - "src/app/api/security/**"
+          - "SECURITY.md"
+          - "public/_headers"
+
+seo:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/lib/seo*.ts"
+          - "src/lib/serp.ts"
+          - "src/app/admin/serp/**"
+          - "src/app/sitemap.ts"
+          - "src/app/sitemaps/**"
+          - "src/app/robots.ts"
+          - "src/app/llms.txt/**"

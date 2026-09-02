@@ -88,7 +88,10 @@ Hazırkı müdafiələrə aşağıdakılar daxildir:
 - admin route-larında CSP, `no-store`, clickjacking və referrer müdafiəsi;
 - staging mühitində `noindex` və production resurslarından ayrı D1/R2 namespace-ləri.
 
-Məlum təhlükəsizlik boşluqları və planlaşdırılan möhkəmləndirmələr README və Wiki-də açıq şəkildə qeyd olunur. Xüsusilə əlaqə formasının anti-spam qatı, e-poçt təsdiqi, parol bərpası, CI və browser E2E testləri hələ tamamlanmayıb.
+Məlum təhlükəsizlik boşluqları və planlaşdırılan möhkəmləndirmələr README və Wiki-də açıq şəkildə
+qeyd olunur. Əlaqə/auth anti-spam qatı, e-poçt təsdiqi, parol bərpası, CI və staging browser E2E
+qurulub; production post-deploy smoke, D1 backup/restore drill-i və xarici xidmətlərin əməliyyat
+monitorinqi inkişaf etdirilməli sahələr olaraq qalır.
 
 ## Açıqlama və təşəkkür
 
