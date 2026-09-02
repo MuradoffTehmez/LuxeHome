@@ -86,6 +86,35 @@ qaytarılır:
 gh api -X DELETE repos/MuradoffTehmez/LuxeHome/branches/main/protection
 ```
 
+Bu əmr **bütün** qoruma konfiqurasiyasını silir, ona görə düzəlişdən dərhal sonra
+konfiqurasiya bərpa edilməlidir. Bərpa əmri tam şəkildə budur — yuxarıdakı cədvəlin
+maşın oxunaqlı qarşılığıdır:
+
+```bash
+gh api -X PUT repos/MuradoffTehmez/LuxeHome/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": { "strict": true, "contexts": ["Quality gate"] },
+  "enforce_admins": true,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 0,
+    "dismiss_stale_reviews": true,
+    "require_last_push_approval": false
+  },
+  "restrictions": null,
+  "required_linear_history": true,
+  "allow_force_pushes": false,
+  "allow_deletions": false,
+  "required_conversation_resolution": true
+}
+JSON
+```
+
+Bərpanı yoxlamaq üçün:
+
+```bash
+gh api repos/MuradoffTehmez/LuxeHome/branches/main/protection -q .required_status_checks
+```
+
 ## Merge-dən sonra: yayım
 
 `main`-ə merge avtomatik yayım axınını işə salır:
@@ -137,15 +166,25 @@ BREAKING CHANGE: köhnə sessiya cookie-ləri etibarsızdır, bütün istifadə�
 
 ## Keyfiyyət qapısı
 
-Pull request açmazdan əvvəl bunların hamısı lokal olaraq keçməlidir:
+Pull request açmazdan əvvəl **dörd qapının** hamısı lokal olaraq keçməlidir
+(`CLAUDE.md`-dəki siyahı ilə eynidir):
 
 ```bash
-npm audit --audit-level=high
 npm run typecheck
 npm run lint
 npm test
 npm run build
 ```
+
+Asılılıq auditi bu dördlüyə daxil deyil — o, kod keyfiyyətini deyil, üçüncü tərəf
+paketlərini yoxlayır və CI-də `Quality gate` job-unun ayrıca addımı kimi işləyir:
+
+```bash
+npm audit --audit-level=high
+```
+
+`package.json` və ya `package-lock.json`-a toxunmusunuzsa, onu da lokalda işlədin.
+Yalnız kod dəyişikliyində nəticə dəyişmir.
 
 **`npm run build`-i buraxmayın.** Digər qapılar təmiz olsa da build sınıq qala bilər:
 Server Action qaydaları yalnız webpack mərhələsində yoxlanılır — `"use server"` faylındakı

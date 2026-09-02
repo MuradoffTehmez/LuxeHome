@@ -58,6 +58,10 @@ Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run lint` + `np
 dəyişiklikdən sonra dördü də işlədilməlidir. Testlər `@cloudflare/vitest-plugin` vasitəsilə
 workerd runtime-ında (domen qatı) və Node layihəsində (SSR komponentləri) işləyir.
 
+Bu dördlükdən **ayrı** olaraq CI `npm audit --audit-level=high` işlədir. O, kod keyfiyyətini
+deyil, asılılıqları yoxlayır, ona görə lokalda yalnız `package.json`/`package-lock.json`
+dəyişdikdə işlətmək lazımdır.
+
 **`npm run build`-i buraxma.** Digər üç qapı təmiz olsa da build sınıq qala bilər: Server
 Action qaydaları yalnız webpack mərhələsində yoxlanılır. `"use server"` faylındakı **hər
 ixrac** Server Action-dır və **`async` olmalıdır** — Promise qaytaran sinxron sarğı belə
