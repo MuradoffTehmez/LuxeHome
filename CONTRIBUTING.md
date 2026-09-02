@@ -45,6 +45,95 @@ flowchart LR
    `--force` ilə silməyin.
 8. Yalnız təsdiq və keyfiyyət qapısından keçdikdən sonra `main`-ə merge olunur.
 
+## `main` üzərindəki qorumalar
+
+2 sentyabr 2026-dan etibarən yuxarıdakı axın texniki olaraq məcburidir — `main`-ə birbaşa
+push bağlıdır.
+
+| Qayda | Dəyər |
+|---|---|
+| Birbaşa push | Bağlı — yalnız pull request |
+| Məcburi yoxlama | `Quality gate` |
+| Branch güncəl olmalı | Bəli |
+| Təsdiq (approval) sayı | 0 |
+| Linear history | Məcburi — merge commit qəbul edilmir |
+| Force push / branch silmə | Bağlı |
+| Administrator istisnası | Yoxdur — qayda repo sahibinə də şamil olunur |
+
+Təsdiq sayı sıfırdır, çünki GitHub öz pull request-ini təsdiqləməyə icazə vermir və tək
+işləyən adam üçün 1 təsdiq tələbi axını tamamilə bloklayardı. Komanda böyüdükdə bu dəyər
+artırılmalıdır.
+
+Solo işləyəndə də PR açılır. Səbəb review deyil, **diff-in bir yerdə görünməsidir**:
+birbaşa push-da dəyişikliyin bütövlükdə necə göründüyünü heç kim, o cümlədən müəllif,
+görmür.
+
+Linear history tələb olunduğu üçün merge **squash** ilə edilir:
+
+```bash
+gh pr merge --squash --delete-branch
+```
+
+Branch-dakı commit-lər `main`-də bir addım kimi görünür, tam tarixçə isə PR-də qalır.
+
+### Təcili hal
+
+Qoruma administratora da şamil olunur, yəni sınıq production üçün də yol pull request-dir.
+Doğrudan da yan keçmək lazımdırsa, qoruma şüurlu şəkildə söndürülür və dərhal geri
+qaytarılır:
+
+```bash
+gh api -X DELETE repos/MuradoffTehmez/LuxeHome/branches/main/protection
+```
+
+Bu əmr **bütün** qoruma konfiqurasiyasını silir, ona görə düzəlişdən dərhal sonra
+konfiqurasiya bərpa edilməlidir. Bərpa əmri tam şəkildə budur — yuxarıdakı cədvəlin
+maşın oxunaqlı qarşılığıdır:
+
+```bash
+gh api -X PUT repos/MuradoffTehmez/LuxeHome/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": { "strict": true, "contexts": ["Quality gate"] },
+  "enforce_admins": true,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 0,
+    "dismiss_stale_reviews": true,
+    "require_last_push_approval": false
+  },
+  "restrictions": null,
+  "required_linear_history": true,
+  "allow_force_pushes": false,
+  "allow_deletions": false,
+  "required_conversation_resolution": true
+}
+JSON
+```
+
+Bərpanı yoxlamaq üçün:
+
+```bash
+gh api repos/MuradoffTehmez/LuxeHome/branches/main/protection -q .required_status_checks
+```
+
+## Merge-dən sonra: yayım
+
+`main`-ə merge avtomatik yayım axınını işə salır:
+
+```text
+quality → deploy-staging → e2e-staging → deploy-production
+```
+
+Hər deploy job-u öz mühitinin D1 miqrasiyalarını **bundle-dan əvvəl** tətbiq edir. Sıra
+məcburidir: əvvəlcə worker yayımlansa, sxem gəlincəyə qədər sorğular çökür və xəta çox vaxt
+`try/catch` içində səssizcə udulur.
+
+Staging production-dan əvvəl gedir. Browser E2E dəsti (190+ test) canlı staging mühitinə
+qarşı işləyir və uğursuz olarsa production yayımını saxlayır.
+
+Bu, sənəd dəyişikliyinin də tam axından keçməsi deməkdir. Qəsdəndir: «bu dəyişiklik
+zərərsizdir» qərarını avtomatlaşdırmaq, nəyin zərərsiz olduğunu səhv qiymətləndirmək üçün
+ən qısa yoldur.
+
 ## Branch adlandırma
 
 Kiçik ingilis hərfləri, rəqəm və tire (`-`) istifadə edin. Bir branch bir issue və bir əsas
@@ -77,7 +166,8 @@ BREAKING CHANGE: köhnə sessiya cookie-ləri etibarsızdır, bütün istifadə�
 
 ## Keyfiyyət qapısı
 
-Pull request açmazdan əvvəl bunların hamısı lokal olaraq keçməlidir:
+Pull request açmazdan əvvəl **dörd qapının** hamısı lokal olaraq keçməlidir
+(`CLAUDE.md`-dəki siyahı ilə eynidir):
 
 ```bash
 npm run typecheck
@@ -85,6 +175,23 @@ npm run lint
 npm test
 npm run build
 ```
+
+Asılılıq auditi bu dördlüyə daxil deyil — o, kod keyfiyyətini deyil, üçüncü tərəf
+paketlərini yoxlayır və CI-də `Quality gate` job-unun ayrıca addımı kimi işləyir:
+
+```bash
+npm audit --audit-level=high
+```
+
+`package.json` və ya `package-lock.json`-a toxunmusunuzsa, onu da lokalda işlədin.
+Yalnız kod dəyişikliyində nəticə dəyişmir.
+
+**`npm run build`-i buraxmayın.** Digər qapılar təmiz olsa da build sınıq qala bilər:
+Server Action qaydaları yalnız webpack mərhələsində yoxlanılır — `"use server"` faylındakı
+hər ixrac Server Action-dır və `async` olmalıdır.
+
+Auth, sessiya və ya səlahiyyət qatına toxunursunuzsa, dəyişiklik testlə sabitlənməlidir.
+Bu qaydalar səssiz sınır: pozulanda nə build, nə də tip yoxlaması xəbər verir.
 
 D1 sxem dəyişikliyi varsa, əlavə olaraq:
 
@@ -124,5 +231,13 @@ Reviewer PR təsvirindən aşağıdakıları aydın görə bilməlidir:
 - UI dəyişikliyi varsa, əvvəl/sonra görüntü;
 - breaking change, migration və ya deployment addımı varmı;
 - rollback lazım olarsa necə ediləcək.
+
+## Tarixçə haqqında qeyd
+
+2 sentyabr 2026-ya qədərki commit-lər birbaşa `main`-ə gedib, ona görə onlara uyğun pull
+request yoxdur. Həmin dövrün işi geriyə dönük olaraq
+[`retrospective`](https://github.com/MuradoffTehmez/LuxeHome/issues?q=label%3Aretrospective)
+etiketli issue-larda (#6–#16) sənədləşdirilib — hər issue əhatəni və ona aid commit
+SHA-larını saxlayır.
 
 Töhfəniz üçün əvvəlcədən təşəkkür edirik.
