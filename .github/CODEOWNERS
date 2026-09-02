@@ -1,0 +1,29 @@
+# Repository hazırda bir maintainer tərəfindən idarə olunur. Komanda böyüdükdə
+# aşağıdakı sahələr ayrı şəxslər və ya GitHub team-ləri ilə əvəz edilməlidir.
+* @MuradoffTehmez
+
+# Frontend və ictimai məhsul səthləri
+/src/app/ @MuradoffTehmez
+/src/components/ @MuradoffTehmez
+/src/i18n/ @MuradoffTehmez
+
+# Backend, API və verilənlər bazası
+/src/lib/ @MuradoffTehmez
+/src/app/api/ @MuradoffTehmez
+/workers/ @MuradoffTehmez
+/prisma/ @MuradoffTehmez
+/migrations/ @MuradoffTehmez
+
+# Təhlükəsizlik və deployment baxımından həssas fayllar
+/src/lib/auth/ @MuradoffTehmez
+/src/lib/admin/guard.ts @MuradoffTehmez
+/src/middleware.ts @MuradoffTehmez
+/wrangler.jsonc @MuradoffTehmez
+/.github/workflows/ @MuradoffTehmez
+/.github/CODEOWNERS @MuradoffTehmez
+/SECURITY.md @MuradoffTehmez
+
+# Sənədləşmə
+/docs/ @MuradoffTehmez
+/Wiki/ @MuradoffTehmez
+/*.md @MuradoffTehmez

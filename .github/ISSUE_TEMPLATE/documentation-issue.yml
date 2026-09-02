@@ -4,6 +4,17 @@ title: "[Docs]: "
 labels: ["documentation"]
 assignees: []
 body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritet
+      options:
+        - High — yanlış məlumat təhlükəli və ya bloklayıcıdır
+        - Medium — əsas axında anlaşılmazlıq yaradır
+        - Low — redaksiya və ya rahatlıq yaxşılaşdırmasıdır
+    validations:
+      required: true
+
   - type: input
     id: location
     attributes:
@@ -15,14 +26,24 @@ body:
   - type: textarea
     id: issue
     attributes:
-      label: Yanlış və ya çatışmayan məlumat
+      label: Mövcud davranış / yanlış və ya çatışmayan məlumat
     validations:
       required: true
 
   - type: textarea
     id: proposal
     attributes:
-      label: Təklif olunan dəyişiklik
+      label: Gözlənilən məlumat / təklif olunan dəyişiklik
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Qəbul meyarları
+      placeholder: |
+        - [ ] Komanda nümunələri real package.json script-ləri ilə uyğundur
+        - [ ] Əlaqəli sənədlərdə ziddiyyət qalmır
     validations:
       required: true
 
@@ -43,6 +64,14 @@ body:
     attributes:
       label: Xarici istinadlar
       description: Əlaqəli sənəd, kod sətri və ya link.
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Texniki qeydlər və əlavə kontekst
+      description: Əlaqəli kod, versiya, screenshot və ya log varsa əlavə edin.
     validations:
       required: false
 

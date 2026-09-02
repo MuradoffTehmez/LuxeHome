@@ -1,9 +1,35 @@
 name: 📱 Mobile/Responsive Issue
 description: Mobil və ya planşet görünüşündə problem bildirin
 title: "[Mobile]: "
-labels: ["bug"]
+labels: ["bug", "mobile"]
 assignees: []
 body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritet
+      options:
+        - High — əsas mobil axın tamamlanmır
+        - Medium — istifadə mümkündür, amma ciddi UX problemi var
+        - Low — kosmetik və ya məhdud cihaz problemi
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Təsirlənən sahə
+      multiple: true
+      options:
+        - İctimai sayt
+        - Admin panel
+        - Kabinet / hesab
+        - Naviqasiya
+        - Forma / klaviatura
+        - Şəkil / qalereya / xəritə
+    validations:
+      required: true
+
   - type: input
     id: location
     attributes:
@@ -61,6 +87,14 @@ body:
       required: true
 
   - type: textarea
+    id: acceptance
+    attributes:
+      label: Qəbul meyarları
+      description: Hansı viewport və cihazlarda hansı nəticə alınmalıdır?
+    validations:
+      required: true
+
+  - type: textarea
     id: media
     attributes:
       label: Screenshot / video
@@ -74,6 +108,14 @@ body:
     attributes:
       label: Accessibility təsiri
       description: Toxunma hədəfi ölçüsü, kontrast, klaviatura/skrin-oxuyucu ilə əlaqəsi varmı?
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Texniki qeydlər və əlavə kontekst
+      description: Breakpoint, CSS qaydası, komponent və ya ehtimal olunan səbəb.
     validations:
       required: false
 

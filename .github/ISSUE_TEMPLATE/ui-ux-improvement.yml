@@ -1,9 +1,36 @@
 name: 🎨 UI/UX Improvement
 description: Dizayn və istifadəçi təcrübəsi ilə bağlı təklif bildirin
 title: "[UI/UX]: "
-labels: ["enhancement"]
+labels: ["enhancement", "ui", "ux"]
 assignees: []
 body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritet
+      options:
+        - High — əsas tapşırıq axınını bloklayır
+        - Medium — nəzərə çarpan istifadə çətinliyi yaradır
+        - Low — vizual və ya rahatlıq yaxşılaşdırmasıdır
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Təsirlənən sahə
+      multiple: true
+      options:
+        - İctimai sayt
+        - Admin panel
+        - Kabinet / hesab
+        - Dizayn sistemi
+        - Naviqasiya
+        - Forma
+        - Accessibility
+    validations:
+      required: true
+
   - type: input
     id: location
     attributes:
@@ -23,7 +50,15 @@ body:
   - type: textarea
     id: proposal
     attributes:
-      label: Təklif olunan yaxşılaşdırma
+      label: Gözlənilən davranış / təklif olunan yaxşılaşdırma
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Qəbul meyarları
+      description: Dəyişiklik hansı müşahidə edilən nəticələrdən sonra tamamlanmış sayılır?
     validations:
       required: true
 
@@ -54,6 +89,22 @@ body:
       label: Screenshot / vizual istinad
       description: |
         ⚠️ Diqqət: real müştəri məlumatı olan ekran görüntüsü əlavə etməyin.
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Brauzer / cihaz
+      placeholder: "Safari 18, iPhone 15; Chrome, 1440px"
+    validations:
+      required: false
+
+  - type: textarea
+    id: technical-notes
+    attributes:
+      label: Texniki qeydlər və əlavə kontekst
+      description: Token, komponent, route, benchmark və ya istinad dizaynı.
     validations:
       required: false
 
