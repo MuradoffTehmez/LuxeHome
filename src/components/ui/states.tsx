@@ -1,4 +1,4 @@
-import { AlertTriangle, Inbox, SearchX } from "lucide-react";
+import { AlertTriangle, Inbox } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
@@ -202,21 +202,6 @@ export function EmptyState({
         </Button>
       )}
     </div>
-  );
-}
-
-/** Filtrlərə uyğun əmlak tapılmadıqda göstərilir. */
-export function NoResultsState({ onReset }: { onReset?: () => void }) {
-  const t = useTranslations("common.ui");
-
-  return (
-    <EmptyState
-      icon={<SearchX className="size-6" aria-hidden="true" />}
-      title={t("noResultsTitle")}
-      description={t("noResultsDescription")}
-      onAction={onReset ? { label: t("resetFilters"), onClick: onReset } : undefined}
-      action={onReset ? undefined : { label: t("allProperties"), href: "/emlaklar" }}
-    />
   );
 }
 

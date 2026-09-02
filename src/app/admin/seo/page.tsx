@@ -70,7 +70,7 @@ export default async function AdminSeoPage({ searchParams }: Props) {
         ))}
       </div>
 
-      <AdminCard title={t("pages.serp.askarEdilmisProblemler")} description={`${issues.length} audit qeydi`} className="mt-6" bodyClassName="p-0">
+      <AdminCard title={t("pages.serp.askarEdilmisProblemler")} description={t("pages.misc.auditQeydSayi", { count: issues.length })} className="mt-6" bodyClassName="p-0">
         <div className="flex flex-wrap gap-2 border-b border-line p-4">
           <Link href="/admin/seo" className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${!selected ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>{t("pages.serp.hamisi")}</Link>
           {(["error", "warning", "info"] as const).map((severity) => (

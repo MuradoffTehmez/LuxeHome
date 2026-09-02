@@ -21,10 +21,6 @@ import { SecretPanel } from "./secret-panel";
 
 const FormStateContext = createContext<ActionState>(IDLE_STATE);
 
-export function useAdminFormState(): ActionState {
-  return useContext(FormStateContext);
-}
-
 export function useFieldError(name: string): string | undefined {
   return useContext(FormStateContext).fieldErrors?.[name];
 }

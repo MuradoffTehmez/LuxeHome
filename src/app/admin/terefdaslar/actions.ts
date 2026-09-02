@@ -24,7 +24,6 @@ import * as form from "@/lib/admin/form";
 import { hasPermission } from "@/lib/auth/permissions";
 import { partnerDomain } from "@/lib/partners";
 import { slugify } from "@/lib/utils";
-import { getExpiredActivePartners } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import type { AuthUser } from "@/lib/auth/types";
 
@@ -438,44 +437,6 @@ export async function togglePartnerVisibility(id: string): Promise<ActionState> 
     return success(showPublicly ? "Tərəfdaş silinmədən saytda göstərildi." : "Tərəfdaş saytdan gizlədildi; məlumatları saxlanıldı.");
   } catch (error) {
     return unexpected("tərəfdaş görünüşü dəyişmədi", error);
-  }
-}
-
-/** Cron-un sonradan eyni service məntiqini çağırması üçün toplu expiration əməliyyatı. */
-export async function expireOverduePartners(): Promise<ActionState> {
-  let user: AuthUser;
-  try {
-    user = await requireAdminAction(PERMISSIONS.PARTNER_PUBLISH);
-  } catch (error) {
-    if (error instanceof AdminGuardError) return failure(error.message);
-    throw error;
-  }
-
-  try {
-    const expired = await getExpiredActivePartners();
-    for (const partner of expired) {
-      await prisma.partner.update({
-        where: { id: partner.id },
-        data: {
-          status: PARTNER_STATUSES.EXPIRED,
-          showOnHomepage: false,
-          updatedById: user.id,
-        },
-      });
-      await recordAudit(user, "EXPIRE", "Partner", partner.id, partner.name, {
-        oldValue: { status: PARTNER_STATUSES.ACTIVE },
-        newValue: { status: PARTNER_STATUSES.EXPIRED },
-      });
-    }
-    revalidatePath(LIST_PATH);
-    revalidatePublicContent("partner");
-    return success(
-      expired.length > 0
-        ? `${expired.length} tərəfdaşın müddəti bitmiş kimi işarələndi.`
-        : "Müddəti bitmiş aktiv tərəfdaş tapılmadı.",
-    );
-  } catch (error) {
-    return unexpected("tərəfdaş müddətləri yoxlanmadı", error);
   }
 }
 

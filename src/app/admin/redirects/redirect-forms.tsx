@@ -70,7 +70,7 @@ export function RedirectRow({
             type="submit"
             className="rounded-xs px-2 py-1 text-xs font-medium text-ink-soft transition-colors hover:bg-beige hover:text-ink"
           >
-            {isActive ? "Deaktiv et" : t("pages.misc.aktivlesdir")}
+            {isActive ? t("pages.misc.deaktivEt") : t("pages.misc.aktivlesdir")}
           </button>
         </form>
         <ConfirmAction

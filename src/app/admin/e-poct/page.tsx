@@ -91,9 +91,9 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
         <div className="flex items-start gap-3 text-sm">
           {webhookConfigured ? <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" aria-hidden="true" /> : <Info className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden="true" />}
           <div>
-            <p className="font-medium text-ink">{webhookConfigured ? "Resend webhook secret-i aktivdir" : t("pages.misc.resendWebhookQurasdirilmasiTamamlanmalid")}</p>
+            <p className="font-medium text-ink">{webhookConfigured ? t("pages.misc.resendWebhookAktivdir") : t("pages.misc.resendWebhookQurasdirilmasiTamamlanmalid")}</p>
             <p className="mt-1 text-ink-soft">
-              {t("pages.ops.gonderisXidmeti")} <strong className="text-ink">{senderConfigured ? "aktiv" : t("pages.misc.konfiqurasiyaEdilmeyib")}</strong>. {webhookConfigured ? t("pages.misc.catdirilmaHadiseleriImzaYoxlanisindan") : <>{t("pages.ops.resendPanelinde")} <code>/api/webhooks/resend</code> {t("pages.ops.endpointIUcunHadiseleri")} <code>RESEND_WEBHOOK_SECRET</code> {t("pages.ops.kimiElaveEdin")}</>} Məktub məzmunu bu cədvəldə saxlanılmır.
+              {t("pages.ops.gonderisXidmeti")} <strong className="text-ink">{senderConfigured ? t("pages.misc.aktivLower") : t("pages.misc.konfiqurasiyaEdilmeyib")}</strong>. {webhookConfigured ? t("pages.misc.catdirilmaHadiseleriImzaYoxlanisindan") : <>{t("pages.ops.resendPanelinde")} <code>/api/webhooks/resend</code> {t("pages.ops.endpointIUcunHadiseleri")} <code>RESEND_WEBHOOK_SECRET</code> {t("pages.ops.kimiElaveEdin")}</>} {t("pages.ops.mektubMezmunuSaxlanilmir")}
             </p>
           </div>
         </div>

@@ -4,6 +4,8 @@ import type { LocalBusinessProfile } from "@/lib/local-business";
 import {
   DEFAULT_LOCALE,
   LOCALES,
+  PROPERTY_STATUSES,
+  TRANSLATION_STATUSES,
   type Locale,
 } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
@@ -178,7 +180,7 @@ export async function buildManagedMetadata(input: PageMetaInput): Promise<Metada
       const translatableTypes = new Set(["PROPERTY", "PROJECT", "SERVICE", "BLOG_POST", "KNOWLEDGE_ARTICLE"]);
       if (translatableTypes.has(input.managedEntity.type)) {
         const translations = await prisma.contentTranslation.findMany({
-          where: { entityType: input.managedEntity.type, entityId: input.managedEntity.id, status: "PUBLISHED" },
+          where: { entityType: input.managedEntity.type, entityId: input.managedEntity.id, status: TRANSLATION_STATUSES.PUBLISHED },
           select: { locale: true },
         });
         alternateLocales = [DEFAULT_LOCALE, ...translations.map((item) => item.locale as Locale)]
@@ -338,7 +340,7 @@ type PropertySchemaInput = {
 /** Əmlak elanı: listing + təsvir edilən obyekt + kommersiya təklifi. */
 export function propertySchema(property: PropertySchemaInput, locale: Locale = DEFAULT_LOCALE) {
   const availability =
-    property.status === "SOLD" || property.status === "RENTED"
+    property.status === PROPERTY_STATUSES.SOLD || property.status === PROPERTY_STATUSES.RENTED
       ? "https://schema.org/SoldOut"
       : property.status === "RESERVED"
         ? "https://schema.org/LimitedAvailability"

@@ -18,10 +18,10 @@ export default async function SerpOverviewPage() {
     prisma.notFoundHit.count(), prisma.seoSearchMetric.count(),
   ]);
   const metrics = [
-    ["Metadata override", metadataCount, "/admin/serp/metadata"], [t("pages.misc.landingSehife"), landingCount, "/admin/serp/landingler"],
-    ["Keyword", keywordCount, "/admin/serp/acar-sozler"], ["Semantic entity", entityCount, "/admin/serp/entities"],
-    [t("pages.misc.aciqAuditProblemi"), openIssues, "/admin/serp/audit"], ["Aktiv redirect", redirects, "/admin/redirects"],
-    ["404 URL", notFound, "/admin/redirects#not-found"], [t("pages.misc.searchConsoleSetri"), searchMetrics, "/admin/serp/search-console"],
+    [t("pages.serp.metadataOverride"), metadataCount, "/admin/serp/metadata"], [t("pages.misc.landingSehife"), landingCount, "/admin/serp/landingler"],
+    [t("pages.serp.keyword"), keywordCount, "/admin/serp/acar-sozler"], [t("pages.serp.semanticEntity"), entityCount, "/admin/serp/entities"],
+    [t("pages.misc.aciqAuditProblemi"), openIssues, "/admin/serp/audit"], [t("pages.misc.aktivRedirect"), redirects, "/admin/redirects"],
+    [t("pages.misc.url404"), notFound, "/admin/redirects#not-found"], [t("pages.misc.searchConsoleSetri"), searchMetrics, "/admin/serp/search-console"],
   ] as const;
   return <>
     <AdminPageHeader title={t("pages.serp.serpVeSeo")} description={t("pages.serp.indekslenmeEntityLandingMetadata")} breadcrumbs={[{ label: t("pages.serp.idarePaneli"), href: "/admin" }, { label: t("pages.serp.serpVeSeo") }]} />
@@ -29,4 +29,3 @@ export default async function SerpOverviewPage() {
     <AdminCard title={t("pages.serp.emeliyyatArdicilligi")} description={t("pages.serp.prdQebulQapisi")} className="mt-6"><ol className="grid gap-3 text-sm text-ink-soft md:grid-cols-3"><li className="rounded-xs border border-line p-4"><strong className="text-ink">{t("pages.serp.1Keyfiyyet")}</strong><p className="mt-1">{t("pages.serp.auditVePublishValidator")}</p></li><li className="rounded-xs border border-line p-4"><strong className="text-ink">{t("pages.serp.2Discovery")}</strong><p className="mt-1">{t("pages.serp.landingEntityVeInternal")}</p></li><li className="rounded-xs border border-line p-4"><strong className="text-ink">{t("pages.serp.3Olcme")}</strong><p className="mt-1">{t("pages.serp.gscAnalyticsVeConversion")}</p></li></ol></AdminCard>
   </>;
 }
-

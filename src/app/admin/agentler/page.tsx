@@ -8,7 +8,7 @@ import { AdminForm } from "@/components/admin/form-shell";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { PERMISSIONS } from "@/lib/constants";
+import { PERMISSIONS, REVIEW_STATUSES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { AgentForm, EMPTY_AGENT_FORM } from "./agent-form";
@@ -37,7 +37,7 @@ export default async function AdminAgentsPage() {
       include: { agency: { select: { name: true } }, _count: { select: { properties: true, reviews: true } } },
       orderBy: { name: "asc" },
     }),
-    prisma.agentReview.findMany({ where: { status: "PENDING" }, include: { agent: { select: { name: true } } }, orderBy: { createdAt: "asc" } }),
+    prisma.agentReview.findMany({ where: { status: REVIEW_STATUSES.PENDING }, include: { agent: { select: { name: true } } }, orderBy: { createdAt: "asc" } }),
     prisma.testimonial.findMany({ include: { agent: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 50 }),
     prisma.user.findMany({ where: { isActive: true, agentProfile: null }, select: { id: true, name: true, email: true }, orderBy: { name: "asc" } }),
     prisma.agency.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
@@ -114,7 +114,7 @@ export default async function AdminAgentsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-medium text-ink">{item.customerName}</p>
                 <span className="flex items-center gap-1 text-sm text-gold-deep"><Star className="size-4 fill-current" /> {item.rating}</span>
-                {item.status === "APPROVED" ? <Badge tone="success">{t("pages.agents.dercEdilib")}</Badge> : <Badge tone="warning">{t("pages.agents.gozleyir")}</Badge>}
+                {item.status === REVIEW_STATUSES.APPROVED ? <Badge tone="success">{t("pages.agents.dercEdilib")}</Badge> : <Badge tone="warning">{t("pages.agents.gozleyir")}</Badge>}
               </div>
               <p className="mt-1 max-w-3xl text-sm text-ink-soft">{item.review}</p>
               <p className="mt-1 text-xs text-ink-muted">{item.agent?.name ?? t("pages.misc.sirketReyi")} · {formatDateTime(item.createdAt)}</p>

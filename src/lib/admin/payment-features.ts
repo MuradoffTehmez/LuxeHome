@@ -48,12 +48,3 @@ export async function paymentFlagsFromFeatures(featureIds: string[]): Promise<Pa
     installmentAvailable: INSTALLMENT_SLUGS.some((slug) => slugs.has(slug)),
   };
 }
-
-/** Saf hissə — testdən keçirilə bilməsi üçün slug dəstindən bayraq hesablayır. */
-export function paymentFlagsFromSlugs(slugs: Iterable<string>): PaymentFlags {
-  const set = new Set(slugs);
-  return {
-    mortgageAvailable: MORTGAGE_SLUGS.some((slug) => set.has(slug)),
-    installmentAvailable: INSTALLMENT_SLUGS.some((slug) => set.has(slug)),
-  };
-}

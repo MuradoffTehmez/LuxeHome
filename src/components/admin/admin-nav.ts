@@ -104,6 +104,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "seoKeywords", href: "/admin/serp/acar-sozler" },
           { labelKey: "seoMonitoring", href: "/admin/serp/monitorinq" },
           { labelKey: "seoAudit", href: "/admin/serp/audit" },
+          { labelKey: "seoLiveAudit", href: "/admin/seo" },
           { labelKey: "seoSearchConsole", href: "/admin/serp/search-console" },
           { labelKey: "seoIndexing", href: "/admin/serp/indexing" },
           { labelKey: "seoLinks", href: "/admin/serp/links" },

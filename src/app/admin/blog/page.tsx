@@ -150,7 +150,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
               variant="outline"
               size="sm"
             >
-              {deleted ? t("pages.misc.aktivMeqaleler") : "Zibil qutusu"}
+              {deleted ? t("pages.misc.aktivMeqaleler") : t("pages.misc.zibilQutusu")}
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />

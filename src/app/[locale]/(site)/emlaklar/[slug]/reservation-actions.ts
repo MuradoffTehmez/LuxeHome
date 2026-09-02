@@ -5,7 +5,7 @@ import { z } from "zod";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { prisma } from "@/lib/prisma";
-import { NOTIFICATION_TYPES, RESERVATION_STATUSES, type Locale } from "@/lib/constants";
+import { NOTIFICATION_TYPES, PROPERTY_STATUSES, RESERVATION_STATUSES, type Locale } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
@@ -45,7 +45,7 @@ export async function createReservation(
         id: parsed.data.propertyId,
         reservationEnabled: true,
         deletedAt: null,
-        status: "PUBLISHED",
+        status: PROPERTY_STATUSES.PUBLISHED,
         isDemo: false,
       },
       select: {
