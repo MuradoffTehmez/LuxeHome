@@ -21,6 +21,7 @@ npm run dev          # development server (localhost:3000)
 npm run build        # prisma generate + next build
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
+npm run dead-code    # Knip: istifadə olunmayan fayl və asılılıqlar
 npm run test         # vitest (workerd runtime, auth qatının unit testləri)
 npm run e2e          # canlı/konfiqurasiya edilmiş workerd mühitinə qarşı Playwright
 
@@ -56,11 +57,11 @@ Real hesab `npm run auth:create-admin` ilə qurulur.
 Yeni miqrasiya: `npm run db:migrate:new -- --output migrations/000N_ad.sql`
 (`prisma migrate diff --from-local-d1` işlədir, ona görə əvvəlcə `npm run db:migrate:local`).
 
-Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run lint` + `npm run build` —
-dəyişiklikdən sonra dördü də işlədilməlidir. Testlər `@cloudflare/vitest-plugin` vasitəsilə
+Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run lint` + `npm run dead-code` +
+`npm run build` — dəyişiklikdən sonra beşi də işlədilməlidir. Testlər `@cloudflare/vitest-plugin` vasitəsilə
 workerd runtime-ında (domen qatı) və Node layihəsində (SSR komponentləri) işləyir.
 
-Bu dördlükdən **ayrı** olaraq CI `npm audit --audit-level=high` işlədir. O, kod keyfiyyətini
+Bu beşlikdən **ayrı** olaraq CI `npm audit --audit-level=high` işlədir. O, kod keyfiyyətini
 deyil, asılılıqları yoxlayır, ona görə lokalda yalnız `package.json`/`package-lock.json`
 dəyişdikdə işlətmək lazımdır.
 
@@ -127,6 +128,10 @@ hesab köməkçi endpoint-ləri üçündür.
 - D1-dən oxuyan hər səhifədə `export const dynamic = "force-dynamic"` var — binding build
   vaxtı olmadığı üçün statik prerender mümkün deyil.
 - **D1 transaction dəstəkləmir.** `$transaction` ayrı-ayrı sorğulara bölünür, atomarlıq yoxdur.
+- Self-service hesab silinməsi buna görə iki mərhələlidir: əvvəl `isActive = false` və
+  `deletionRequestedAt` eyni `User.update`-da yazılır, sonra elanlar arxivlənib hesab silinir.
+  İkinci mərhələ alınmasa `runPhase2Maintenance()` marker-li hesabı idempotent yenidən sınayır.
+  Bu marker-i və maintenance retry-sini yan keçən ayrıca silmə axını yazmaq olmaz.
 
 `queries.ts` mərkəzi qaydaları saxlayır:
 

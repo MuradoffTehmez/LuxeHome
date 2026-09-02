@@ -5,7 +5,8 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 ## Layihə haqqında
 
 Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 15 App Router,
-React 19, Tailwind CSS v4, Prisma v6. Saytın bütün istifadəçi mətnləri Azərbaycan dilindədir.
+React 19, Tailwind CSS v4, Prisma v6. İctimai sayt, kabinet və admin panel AZ/EN/RU dillərindədir;
+Azərbaycan dili defoltdur. İnfrastruktur Cloudflare Workers + D1 + R2 + Images üzərindədir.
 
 **Kod dilində konvensiya:** identifikatorlar (dəyişən, funksiya, tip adları) ingiliscədir,
 şərhlər və istifadəçiyə görünən sətirlər Azərbaycan dilindədir. Yeni kod da bu qaydaya uyğun yazılır.
@@ -17,6 +18,9 @@ npm run dev          # development server (localhost:3000)
 npm run build        # production build — lint + typecheck daxildir
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
+npm run test         # Vitest
+npm run dead-code    # Knip: istifadə olunmayan fayl/asılılıq
+npm run e2e          # Playwright, konfiqurasiya edilmiş staging/live runtime
 
 npm run db:migrate:local # D1 miqrasiyalarını lokal tətbiq edir
 npx tsx prisma/seed.ts  # admin/taksonomiya/xidmət başlanğıc məlumatları
@@ -24,8 +28,8 @@ npm run db:seed:build # lokal SQLite-dan D1 seed.sql yaradır
 npm run db:studio    # Prisma Studio
 ```
 
-Test infrastrukturu yoxdur. **Yeganə keyfiyyət qapısı `npm run typecheck` + `npm run build`-dır** —
-dəyişiklikdən sonra hər ikisi işlədilməlidir.
+Keyfiyyət qapısı `npm run test` + `npm run typecheck` + `npm run lint` + `npm run dead-code` +
+`npm run build`-dır — dəyişiklikdən sonra hamısı işlədilməlidir.
 
 Köhnə demo kontent `npm run db:clean-demo:local` və ya açıq production əməliyyatı kimi
 `npm run db:clean-demo:remote` ilə təmizlənir.
@@ -34,7 +38,7 @@ Köhnə demo kontent `npm run db:clean-demo:local` və ya açıq production əm�
 
 ### Route qrupu və marşrutlar
 
-Bütün ictimai səhifələr `src/app/(site)/` qrupundadır və `(site)/layout.tsx` Navbar + Footer
+Bütün ictimai səhifələr `src/app/[locale]/(site)/` qrupundadır və `(site)/layout.tsx` Navbar + Footer
 sarğısını verir. Marşrut adları azərbaycancadır və URL-in bir hissəsidir:
 `/emlaklar`, `/xidmetler`, `/layiheler`, `/haqqimizda`, `/blog`, `/elaqe`.
 
@@ -44,8 +48,9 @@ Query parametrləri də azərbaycancadır və `emlaklar/page.tsx`-də əl ilə m
 
 ### Data axını
 
-Səhifələr Server Component-dir və birbaşa `src/lib/queries.ts`-dən oxuyur — ayrıca API qatı yoxdur.
-Yazma əməliyyatları Server Action ilə gedir (hazırda yeganə nümunə: `(site)/elaqe/actions.ts`).
+Səhifələr Server Component-dir və əsasən `src/lib/queries.ts`/domen modullarından oxuyur.
+Yazma əməliyyatları public, kabinet və admin Server Action-ları ilə gedir; Route Handler-lar
+media, webhook, cron, monitorinq, geocode, tile və hesab köməkçi endpoint-ləri üçündür.
 
 `queries.ts` mərkəzi qaydaları saxlayır:
 
@@ -110,8 +115,8 @@ propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
   `propertySchema()`, `articleSchema()`, `serviceSchema()`, `breadcrumbSchema()`.
 - `siteUrl(path)` — `NEXT_PUBLIC_SITE_URL` üzərindən mütləq URL qurur.
 
-`getSitemapEntries()` (`queries.ts`) yazılıb, amma `app/sitemap.ts` mövcud olmadığı üçün
-hazırda çağırılmır.
+`getSitemapEntries()` (`queries.ts`) `app/sitemap.ts` və parçalanmış sitemap feed-ləri tərəfindən
+istifadə olunur.
 
 ### Şirkət məlumatları
 
@@ -132,23 +137,20 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
 
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
-- **Admin panel qismən hazırdır.** Auth, dashboard və real əmlak siyahısı mövcuddur;
-  əmlak CRUD və media yükləmə axını hələ tamamlanmayıb.
-- **Sınıq daxili linklər:** `/favoritler` (navbar-da 2 yerdə), `legalNavigation`-dakı 3 hüquqi
-  səhifə (footer). Hamısı 404 verir.
-- `not-found.tsx`, `error.tsx`, `loading.tsx`, `sitemap.ts`, `robots.ts` yoxdur.
-- Contact form-da rate limit / honeypot / captcha yoxdur.
-- `emlaklar/page.tsx` `queries.ts`-in dəstəklədiyi filtrlərin yalnız bir hissəsini ötürür
-  (mətn axtarışı, rayon, sahə, təmir, sənəd statusu, xüsusiyyətlər bağlanmayıb).
-- Test və CI yoxdur.
+- Admin CRUD, media, moderasiya, təhlükəsizlik, audit, SERP və üçdilli UI hazırdır.
+- Əsas public/kabinet marşrutları, hüquqi səhifələr, 404/error, sitemap və robots hazırdır.
+- Contact/auth formalarında same-origin, honeypot, rate limit və Turnstile qoruması var.
+- Açıq məhsul boşluqları: Finance/paket modulu, ümumi statik səhifə CMS-i, moderator xəritə
+  preview-u, production post-deploy browser smoke və embedding/vector semantik axtarış.
+- Self-service hesab silinməsi D1 üçün davamlı marker + maintenance retry ilə işləyir;
+  `deletionRequestedAt` invariantını yan keçən ayrıca silmə axını yaratma.
 
 ## Diqqət tələb edən məqamlar
 
-- **Verilənlər bazası provayderi hələ seçilməyib** (SQLite dev-dədir, production qərarı verilməyib).
-  Yeni sorğu yazarkən SQLite-a xas davranışa bel bağlama. Xüsusilə `contains` filtrləri SQLite-da
-  case-insensitive işləyir, PostgreSQL-də isə `mode: "insensitive"` tələb edir.
-- Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
-  yazma (istisna: `prisma/` altındakı standalone scriptlər).
+- Production bazası Cloudflare D1-dir. D1 transaction dəstəkləmir; çoxaddımlı yazıları
+  idempotent marker/retry və ya kompensasiya ilə dizayn et.
+- Prisma client `src/lib/prisma.ts`-də D1 binding-i üçün lazy Proxy və WASM client istifadə edir —
+  `new PrismaClient()` yazma (istisna: `prisma/` altındakı standalone lokal scriptlər).
 - `next.config.ts`-də `images.remotePatterns` yalnız `images.unsplash.com`-a icazə verir; stok
   şəkillər oradandır. Yeni xarici şəkil mənbəyi əlavə edilərsə bu siyahı yenilənməlidir.
 - `outputFileTracingRoot: import.meta.dirname` qəsdən qoyulub — yuxarı qovluqdakı lockfile-ın
