@@ -102,6 +102,12 @@
     "vitest": "^4.1.11",
     "wrangler": "^4.124.0"
   },
+  "//overrides": "Tranzitiv zəifliklər. Üçünün də düzəlişi yalnız yuxarı paketin (next, prisma) yeni buraxılışı ilə gələcək; o vaxta qədər versiya burada qaldırılır. Yuxarı paket yeniləndikdə bu blok yenidən qiymətləndirilməlidir.",
+  "overrides": {
+    "postcss": "^8.5.26",
+    "sharp": "$sharp",
+    "deepmerge-ts": "^8.0.2"
+  },
   "allowScripts": {
     "prisma@6.19.3": true,
     "@prisma/engines@6.19.3": true,

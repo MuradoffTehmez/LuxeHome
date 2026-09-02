@@ -61,7 +61,7 @@ export async function requireAdminAction(permission: Permission): Promise<AuthUs
 
 /** İctimai kabinet yazıları üçün CSRF, hesab növü və ayrıca sürət limiti qapısı. */
 export async function requirePublicAction(
-  scope: "media" | "property" | "review" | "reservation" | "preferences" | "push",
+  scope: "media" | "property" | "review" | "reservation" | "preferences" | "push" | "team",
   locale: Locale = DEFAULT_LOCALE,
 ): Promise<AuthUser> {
   await assertSameOrigin();

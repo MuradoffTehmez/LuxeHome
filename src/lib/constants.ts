@@ -783,6 +783,17 @@ export const AUTH_KINDS = {
 
 export type AuthKind = (typeof AUTH_KINDS)[keyof typeof AUTH_KINDS];
 
+/**
+ * Parol minimumları.
+ *
+ * Əməkdaş həddi ictimai hesabdan yüksəkdir və bu qəsdəndir: PBKDF2 iterasiya sayı
+ * Cloudflare Workers-in 100 000 həddi ilə məhduddur (`src/lib/auth/password.ts`),
+ * yəni oflayn sındırma müqaviməti tamamilə parolun uzunluğundan asılıdır. Panel
+ * hesabının dəyəri isə ziyarətçi hesabı ilə müqayisə olunmur.
+ */
+export const PUBLIC_PASSWORD_MIN = 10;
+export const STAFF_PASSWORD_MIN = 12;
+
 export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   STAFF: "Şirkət əməkdaşı",
   USER: "İstifadəçi",

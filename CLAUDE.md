@@ -151,7 +151,7 @@ Bütün auth kodu `src/lib/auth/` altındadır. Qatların bölgüsü qəsdəndir
 
 | Fayl | Məsuliyyət |
 |---|---|
-| `password.ts` | Web Crypto PBKDF2-SHA256, 210 000 iterasiya. Format iterasiya sayını daşıyır, `needsRehash()` köhnə hash-ı uğurlu girişdə səssizcə yeniləyir. |
+| `password.ts` | Web Crypto PBKDF2-SHA256, **100 000 iterasiya** — Workers runtime-ının yuxarı həddi; daha böyük dəyər `deriveBits()`-də `NotSupportedError` atır və düzgün parolu da rədd edir. Format iterasiya sayını daşıyır, `needsRehash()` köhnə hash-ı uğurlu girişdə səssizcə yeniləyir. Hədd OWASP tövsiyəsindən (600 000) aşağı olduğu üçün kompensasiya parol uzunluğundadır: `STAFF_PASSWORD_MIN = 12`, `PUBLIC_PASSWORD_MIN = 10`. |
 | `crypto.ts` | HKDF açar törəmə, AES-GCM şifrələmə, base64url, `timingSafeEqual`. |
 | `totp.ts` | TOTP yoxlaması, QR SVG (server tərəfdə çəkilir), ehtiyat kodlar. Sirr bazada AES-GCM ilə şifrəli saxlanılır. |
 | `cookies.ts` | `jose` ilə imzalanan iki cookie: sessiya (`lhe_session`) və ikinci mərhələ (`lhe_2fa`). |
@@ -278,7 +278,7 @@ resurslarına bağlanardı.
 | D1 | `luxehome-db` | `luxehome-db-staging` |
 | R2 media | `luxehome-media` | `luxehome-media-staging` |
 | R2 ISR keş | `luxehome-next-cache` | `luxehome-next-cache-staging` |
-| `ADMIN_ENABLED` | `"false"` | `"true"` |
+| `ADMIN_ENABLED` | `"true"` | `"true"` |
 | Ünvan | `luxehomeestate.az` | `luxehomeestate-staging.amiyevbahadur.workers.dev` |
 
 Staging custom domain almır və `robots.txt`-də tam `Disallow: /` verir — indeksləşməməlidir.

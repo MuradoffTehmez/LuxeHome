@@ -57,6 +57,12 @@ jobs:
           npm --version
           npm ci
 
+      # Yüksək və kritik zəifliklər build-i saxlayır. Aşağı/orta səviyyələr qəsdən
+      # buraxılır: tranzitiv asılılıqlarda onlar tez-tez görünür və hər dəfə yayımı
+      # dayandırsaydı, qapı çox keçmədən söndürülərdi.
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
       - name: Run unit tests
         run: npm run test
 

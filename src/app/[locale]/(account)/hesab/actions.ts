@@ -340,6 +340,12 @@ export async function resetPassword(
   });
   if (!parsed.success) return failure(t("actions.invalidForm"), toFieldErrors(parsed.error));
 
+  // Token 256 bit təsadüfidir, yəni brute-force real təhlükə deyil — limit burada
+  // sınağı ucuz saxlamamaq və bərpa axınını digər hesab formaları ilə eyni
+  // büdcəyə bağlamaq üçündür.
+  const ip = clientIp(await headers());
+  if (!(await checkLoginLimit(ip))) return failure(t("actions.rateLimited"));
+
   const userId = await consumePasswordResetToken(parsed.data.token);
   if (!userId) return failure(t("actions.resetTokenInvalid"));
   await prisma.user.update({

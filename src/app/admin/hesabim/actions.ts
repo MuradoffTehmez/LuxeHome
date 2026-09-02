@@ -12,6 +12,7 @@ import { recordAudit } from "@/lib/admin/audit";
 import { assertSameOrigin } from "@/lib/admin/guard";
 import { type ActionState, failure, invalid, success, successWithSecret, unexpected } from "@/lib/admin/action-state";
 import * as form from "@/lib/admin/form";
+import { STAFF_PASSWORD_MIN } from "@/lib/constants";
 
 /**
  * Hesab əməliyyatları.
@@ -89,7 +90,9 @@ export async function regenerateBackupCodes(
 const passwordSchema = z
   .object({
     current: z.string().min(1),
-    next: z.string().min(10, "Yeni parol ən azı 10 simvol olmalıdır."),
+    next: z
+      .string()
+      .min(STAFF_PASSWORD_MIN, `Yeni parol ən azı ${STAFF_PASSWORD_MIN} simvol olmalıdır.`),
     confirm: z.string(),
   })
   .refine((value) => value.next === value.confirm, {

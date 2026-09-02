@@ -86,6 +86,47 @@ const ADMIN_CSP = [
   "frame-src https://challenges.cloudflare.com",
 ].join("; ");
 
+/**
+ * İctimai səhifələr üçün siyasət.
+ *
+ * Panel siyasətindən qəsdən yumşaqdır — burada analitika, video embed və Turnstile
+ * işləməlidir — amma eyni üç təməli daşıyır: `base-uri`, `object-src` və
+ * `form-action`. Bu qat sanitizer-i əvəz etmir, onun gələcək bir səhvi üçün ikinci
+ * müdafiədir: məhz ictimai səhifələr redaktorun yazdığı HTML-i render edir.
+ *
+ * `frame-ancestors 'self'` paneldəki `'none'`-dan fərqlidir: ictimai səhifə öz
+ * daxilində (məsələn önbaxış freymində) göstərilə bilməlidir.
+ */
+const PUBLIC_CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  "form-action 'self'",
+  // `unsafe-inline` Next.js hidrasiya məlumatı üçün lazımdır — panel siyasətindəki
+  // ilə eyni səbəb. GTM sayt analitikasını yükləyir.
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az https://treva.realestate https://tile.openstreetmap.org https://www.googletagmanager.com https://www.google-analytics.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
+  // Turnstile widget-i, GTM `noscript` freymi və elan videoları (`property-video.tsx`)
+  "frame-src https://challenges.cloudflare.com https://www.googletagmanager.com https://www.youtube-nocookie.com https://player.vimeo.com",
+].join("; ");
+
+/**
+ * İctimai cavaba yalnız CSP əlavə edir.
+ *
+ * Qalan başlıqlar (`nosniff`, `X-Frame-Options`, `Referrer-Policy`,
+ * `Permissions-Policy`, HSTS) `next.config.ts`-dən gəlir. `Cache-Control` **qəsdən
+ * toxunulmur** — panel üçün `no-store` doğrudur, ictimai səhifədə isə ISR keşini
+ * söndürərdi.
+ */
+function hardenPublic(response: NextResponse): NextResponse {
+  response.headers.set("Content-Security-Policy", PUBLIC_CSP);
+  return response;
+}
+
 function harden(response: NextResponse): NextResponse {
   response.headers.set("Content-Security-Policy", ADMIN_CSP);
   response.headers.set("X-Frame-Options", "DENY");
@@ -150,7 +191,7 @@ export async function middleware(request: NextRequest) {
     const response = intlMiddleware(request);
     response.headers.set("Content-Language", localeFromPathname(pathname));
     if (isStaging()) response.headers.set("X-Robots-Tag", "noindex, nofollow");
-    return response;
+    return hardenPublic(response);
   }
 
   const routePath = pathnameWithoutLocale(pathname);

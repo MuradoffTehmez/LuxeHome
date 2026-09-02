@@ -61,7 +61,6 @@ next-env.d.ts
 # Alt qovluqdakı worker-lərin (workers/*) öz build artefaktları
 **/.wrangler/
 .dev.vars
-!.env.production
 
 # Loqo mənbəyi assets/brand/ altındadır
 /Luxe Home Estate Logo/

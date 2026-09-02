@@ -5,7 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_STATUSES, MAX_AGENCY_EMPLOYEES, type Locale } from "@/lib/constants";
-import { requireAccount } from "@/lib/auth/guard";
+import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { type ActionState, failure, success, toFieldErrors, unexpected } from "@/lib/admin/action-state";
 import * as form from "@/lib/admin/form";
@@ -23,16 +23,19 @@ async function requireAgencyOwner(
   locale: Locale,
   messages: { agencyOnly: string; agencyProfileRequired: string },
 ) {
-  const user = await requireAccount(locale);
+  // `requireAccount()` tək başına kifayət deyildi: mənbə yoxlaması və yazma sürət
+  // limiti yalnız `requirePublicAction()`-dadır və kabinetdəki bütün digər yazılar
+  // ondan keçir. Bu iki action istisna qalmamalıdır.
+  const user = await requirePublicAction("team", locale);
   if (user.accountType !== ACCOUNT_TYPES.AGENCY) {
-    throw new Error(messages.agencyOnly);
+    throw new AdminGuardError(messages.agencyOnly);
   }
   const agency = await prisma.agency.findUnique({
     where: { userId: user.id },
     select: { id: true, name: true },
   });
   if (!agency) {
-    throw new Error(messages.agencyProfileRequired);
+    throw new AdminGuardError(messages.agencyProfileRequired);
   }
   return { user, agency };
 }
@@ -48,7 +51,10 @@ export async function inviteAgencyEmployee(_prev: ActionState, formData: FormDat
   try {
     owner = await requireAgencyOwner(locale, messages);
   } catch (error) {
-    return failure(error instanceof Error ? error.message : t("actions.actionUnavailable"));
+    // Yalnız qapı xətası mesaja çevrilir. `redirect()` də istisna kimi atılır —
+    // onu udmaq sessiyası bitmiş istifadəçini giriş səhifəsinə buraxmazdı.
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
   }
 
   const inviteSchema = z.object({
@@ -119,7 +125,10 @@ export async function removeAgencyEmployee(id: string): Promise<ActionState> {
   try {
     owner = await requireAgencyOwner(locale, messages);
   } catch (error) {
-    return failure(error instanceof Error ? error.message : t("actions.actionUnavailable"));
+    // Yalnız qapı xətası mesaja çevrilir. `redirect()` də istisna kimi atılır —
+    // onu udmaq sessiyası bitmiş istifadəçini giriş səhifəsinə buraxmazdı.
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
   }
 
   try {

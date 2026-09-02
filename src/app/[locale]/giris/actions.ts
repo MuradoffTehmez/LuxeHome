@@ -42,6 +42,7 @@ import {
 } from "@/lib/auth/totp";
 import type { FormState } from "@/lib/auth/types";
 import { verifyStaffPassword } from "@/lib/auth/staff-login-policy";
+import { canStartStaffSession, twoFactorGateOutcome } from "@/lib/auth/two-factor-policy";
 import { sendEmail } from "@/lib/email";
 import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
@@ -95,11 +96,19 @@ async function startSession(
 
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
-    select: { email: true, role: true, accountType: true },
+    select: { email: true, role: true, accountType: true, totpEnabledAt: true },
   });
   const locale = await getLocale() as Locale;
   if (user.accountType !== ACCOUNT_TYPES.STAFF) {
     redirect(localizePath("/giris?yeniden=1", locale));
+  }
+
+  // Qurulum ara-cookie-si prosesin **başında** verilir. Yalnız onun mərhələsinə
+  // baxmaq kifayət deyil: parolu bilən tərəf qurulum ekranını atlayıb sessiya açan
+  // action-ı birbaşa çağıra bilərdi. Yoxlama burada dayanır ki, sessiya açan hər
+  // axın ondan keçsin.
+  if (!canStartStaffSession(user)) {
+    redirect(localizePath("/giris/2fa-qurulumu", locale));
   }
 
   const session = await createSession({
@@ -224,13 +233,33 @@ export async function verifyTwoFactor(_prev: FormState, formData: FormData): Pro
     return { error: t("actions.verificationExpired") };
   }
 
+  // Limit istifadəçi oxunmadan **əvvəl** xərclənir: sayğac D1-ə toxunmur və
+  // hədd aşılıbsa artıq sorğu atmağın mənası yoxdur.
+  const ip = clientIp(await headers());
+  const withinRateLimit = await checkLoginLimit(ip);
+
   const user = await prisma.user.findUnique({ where: { id: claims.uid } });
   if (!user?.totpSecret || !user.isActive) {
     return { error: t("actions.verificationExpired") };
   }
 
+  // `signIn()`-dəki eyni iki qapı. Onlarsız `registerFailure()` kilidi yazırdı,
+  // amma oxuyan olmadığı üçün kilid heç nəyi dayandırmırdı — parol mərhələsini
+  // keçmiş tərəf 6 rəqəmli kodu limitsiz sınaya bilirdi.
+  const gate = twoFactorGateOutcome({
+    withinRateLimit,
+    lockedUntil: user.lockedUntil,
+    now: new Date(),
+  });
+  if (gate === "RATE_LIMITED") {
+    await logRateLimited(user.email, ip);
+    return { error: t("actions.rateLimited") };
+  }
+  if (gate === "LOCKED") {
+    return { error: t("actions.locked") };
+  }
+
   const input = String(formData.get("code") ?? "");
-  const ip = clientIp(await headers());
 
   // Backup kodda hərf var, TOTP isə yalnız rəqəmdən ibarətdir
   if (/[A-Za-z]/.test(input)) {

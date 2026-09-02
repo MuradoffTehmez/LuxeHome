@@ -84,6 +84,17 @@ export async function testAiProvider(): Promise<ActionState> {
 const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
 
 /**
+ * Xarici şəkil oxumaq üçün icazəli hostlar — `next.config.ts`-dəki
+ * `images.remotePatterns` siyahısının eynisi. İki siyahı ayrılarsa, göstərilə
+ * bilməyən bir mənbə oxuna bilən qalar; dəyişiklik hər ikisinə tətbiq olunmalıdır.
+ */
+const AI_IMAGE_HOSTS = new Set([
+  "images.unsplash.com",
+  "media.luxehomeestate.az",
+  "treva.realestate",
+]);
+
+/**
  * Elan şəklini bayt massivi kimi oxuyur.
  *
  * Paneldən yüklənən şəkillərin URL-i `/media/<açar>` formatındadır və birbaşa R2
@@ -107,6 +118,17 @@ async function readImageBytes(url: string): Promise<Uint8Array | null> {
   }
 
   if (!url.startsWith("https://")) return null;
+
+  // Host ağ siyahısı `next.config.ts`-dəki `images.remotePatterns` ilə eynidir:
+  // şəkil hansı mənbədən göstərilə bilirsə, yalnız onu da oxuyuruq. Siyahısız
+  // funksiya ixtiyari ictimai ünvana sorğu atan bir vasitəyə çevrilirdi.
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+  if (!AI_IMAGE_HOSTS.has(host)) return null;
 
   const response = await fetch(url, { headers: { accept: "image/*" } });
   if (!response.ok) return null;

@@ -193,11 +193,14 @@ export async function putImage(file: File, folder: MediaFolder, seoName?: string
 
   const now = new Date();
   const generatedName = safeSeoName(seoName);
+  // SEO adı təsadüfi şəkilçi ilə tamamlanır. Ad tək başına açar olsaydı, eyni ay
+  // ərzində eyni adla ikinci yükləmə birincini səssizcə əvəz edərdi və `Media`
+  // cədvəlindəki iki sətir eyni obyektə işarə edərdi.
   const prefix = [
     folder,
     now.getUTCFullYear(),
     String(now.getUTCMonth() + 1).padStart(2, "0"),
-    generatedName || crypto.randomUUID(),
+    generatedName ? `${generatedName}-${crypto.randomUUID().slice(0, 8)}` : crypto.randomUUID(),
   ].join("/");
 
   const key = `${prefix}.${master.extension}`;
