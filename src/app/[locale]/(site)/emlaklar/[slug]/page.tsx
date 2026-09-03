@@ -18,6 +18,7 @@ import {
   LISTING_TYPES,
   AUTH_KINDS,
   PROPERTY_STATUS_TONE,
+  PROPERTY_STATUSES,
   TRANSLATION_ENTITY_TYPES,
   type PropertyStatus,
   type Locale,
@@ -88,7 +89,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 
   const image = property.images[0]?.url || null;
-  const isClosed = property.status === "SOLD" || property.status === "RENTED";
+  const isClosed = property.status === PROPERTY_STATUSES.SOLD || property.status === PROPERTY_STATUSES.RENTED;
   const retainedForIndex = isClosed && property.retentionUntil != null && property.retentionUntil.getTime() >= Date.now();
 
   const location = [property.district?.name, property.city.name]
@@ -149,7 +150,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const isSale = property.listingType === LISTING_TYPES.SALE;
   const status = property.status as PropertyStatus;
-  const isClosed = status === "SOLD" || status === "RENTED";
+  const isClosed = status === PROPERTY_STATUSES.SOLD || status === PROPERTY_STATUSES.RENTED;
   const isPremium = property.isFeatured && (
     property.featuredUntil == null || new Date(property.featuredUntil).getTime() > Date.now()
   );
@@ -257,7 +258,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <Badge tone={isSale ? "dark" : "gold"}>
                   {isSale ? content("sale") : content("rent")}
                 </Badge>
-                {status !== "PUBLISHED" && (
+                {status !== PROPERTY_STATUSES.PUBLISHED && (
                   <Badge tone={PROPERTY_STATUS_TONE[status]}>
                     {propertyText(`status.${STATUS_KEYS[status]}`)}
                   </Badge>

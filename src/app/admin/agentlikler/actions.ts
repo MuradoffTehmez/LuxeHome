@@ -117,17 +117,17 @@ export async function createAgencyProfile(
 }
 
 export async function approveAgencyEmployee(id: string): Promise<ActionState> {
-  return reviewAgencyEmployee(id, "APPROVED");
+  return reviewAgencyEmployee(id, AGENCY_EMPLOYEE_STATUSES.APPROVED);
 }
 
 export async function rejectAgencyEmployee(id: string): Promise<ActionState> {
-  return reviewAgencyEmployee(id, "REJECTED");
+  return reviewAgencyEmployee(id, AGENCY_EMPLOYEE_STATUSES.REJECTED);
 }
 
 /** Agentlik komandasına dəvət olunan əməkdaşı təsdiqləyir və ya rədd edir. */
 async function reviewAgencyEmployee(
   id: string,
-  decision: "APPROVED" | "REJECTED",
+  decision: typeof AGENCY_EMPLOYEE_STATUSES.APPROVED | typeof AGENCY_EMPLOYEE_STATUSES.REJECTED,
 ): Promise<ActionState> {
   let actor;
   try {
@@ -156,7 +156,7 @@ async function reviewAgencyEmployee(
       where: { id },
       data: {
         status: decision,
-        approvedAt: decision === "APPROVED" ? new Date() : null,
+        approvedAt: decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? new Date() : null,
       },
     });
 
@@ -165,10 +165,10 @@ async function reviewAgencyEmployee(
       "UPDATE",
       "Agency",
       employee.agency.id,
-      `${employee.user.email} — komanda dəvəti ${decision === "APPROVED" ? "təsdiqləndi" : "rədd edildi"}`,
+      `${employee.user.email} — komanda dəvəti ${decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "təsdiqləndi" : "rədd edildi"}`,
     );
     await recordDomainEvent(
-      decision === "APPROVED" ? "agency.employee_approved" : "agency.employee_rejected",
+      decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "agency.employee_approved" : "agency.employee_rejected",
       "AgencyEmployee",
       id,
       { agencyId: employee.agency.id, userEmail: employee.user.email },
@@ -177,7 +177,7 @@ async function reviewAgencyEmployee(
     revalidatePath(LIST_PATH);
     revalidatePath("/kabinet/komanda");
     return success(
-      decision === "APPROVED" ? "Əməkdaş təsdiqləndi." : "Dəvət rədd edildi.",
+      decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "Əməkdaş təsdiqləndi." : "Dəvət rədd edildi.",
     );
   } catch (error) {
     return unexpected("dəvət yenilənmədi", error);

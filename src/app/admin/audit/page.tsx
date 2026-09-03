@@ -13,7 +13,7 @@ import {
 import { formatDateTime } from "@/lib/utils";
 import { PERMISSIONS, ROLES } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { getAdminAuditLog } from "@/lib/queries";
+import { getAdminAuditLog, getAdminDomainEvents } from "@/lib/queries";
 import { AdminFilterBar } from "@/components/admin/admin-filter-bar";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { clearAuditLog } from "./actions";
@@ -45,7 +45,10 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
   const entity = typeof params.entity === "string" ? params.entity : "";
   const query = typeof params.q === "string" ? params.q : "";
 
-  const { entries, pageCount, total } = await getAdminAuditLog(page, 12, { entity, query });
+  const [{ entries, pageCount, total }, domainEvents] = await Promise.all([
+    getAdminAuditLog(page, 12, { entity, query }),
+    getAdminDomainEvents(),
+  ]);
 
   return (
     <>
@@ -145,6 +148,50 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
           className="mt-6"
         />
       )}
+
+      <AdminCard
+        title={t("pages.security.domenHadiseleri")}
+        description={t("pages.security.domenHadiseleriTesviri")}
+        className="mt-6"
+        bodyClassName="p-0"
+      >
+        {domainEvents.length === 0 ? (
+          <EmptyState title={t("pages.security.domenHadisesiYoxdur")} />
+        ) : (
+          <AdminTable
+            caption={t("pages.security.domenHadiseleri")}
+            headers={[
+              { label: t("pages.security.tarix") },
+              { label: t("pages.security.hadiseNovu") },
+              { label: t("pages.security.obyekt") },
+              { label: t("pages.security.melumat") },
+            ]}
+          >
+            {domainEvents.map((event) => (
+              <AdminTableRow key={event.id}>
+                <AdminTableCell className="text-xs text-ink-muted whitespace-nowrap">
+                  {formatDateTime(event.createdAt)}
+                </AdminTableCell>
+                <AdminTableCell>
+                  <span className="rounded-xs bg-beige px-2 py-1 text-xs font-medium text-ink-soft">
+                    {event.type}
+                  </span>
+                </AdminTableCell>
+                <AdminTableCell className="text-xs text-ink-muted">
+                  {event.entityType} · {event.entityId.slice(0, 12)}
+                </AdminTableCell>
+                <AdminTableCell className="max-w-lg text-xs text-ink-muted [overflow-wrap:anywhere]">
+                  {event.payload ? (
+                    <pre className="overflow-x-auto whitespace-pre-wrap">
+                      {JSON.stringify(auditValue(event.payload), null, 2)}
+                    </pre>
+                  ) : "—"}
+                </AdminTableCell>
+              </AdminTableRow>
+            ))}
+          </AdminTable>
+        )}
+      </AdminCard>
     </>
   );
 }

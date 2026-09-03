@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Locale } from "@/lib/constants";
+import { SEO_LANDING_STATUSES, type Locale } from "@/lib/constants";
 import type { PropertyFilters } from "@/lib/queries";
 import type { SeoLanding } from "@/lib/seo-landings";
 
@@ -9,7 +9,7 @@ function parseArray<T>(value: string, guard: (item: unknown) => item is T): T[] 
 }
 
 export async function getPublishedDbSeoLanding(slug: string, locale: Locale): Promise<{ landing: SeoLanding; policy: { indexable: boolean; indexEmpty: boolean; minInventory: number; canonical: string | null } } | null> {
-  const row = await prisma.seoLandingPage.findFirst({ where: { slug, locale, status: "PUBLISHED" } });
+  const row = await prisma.seoLandingPage.findFirst({ where: { slug, locale, status: SEO_LANDING_STATUSES.PUBLISHED } });
   if (!row) return null;
   let filters: PropertyFilters;
   try { const parsed: unknown = JSON.parse(row.filtersJson); if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null; filters = parsed as PropertyFilters; }
@@ -22,4 +22,3 @@ export async function getPublishedDbSeoLanding(slug: string, locale: Locale): Pr
     policy: { indexable: row.indexable, indexEmpty: row.indexEmpty, minInventory: row.minInventory, canonical: row.canonical },
   };
 }
-

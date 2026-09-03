@@ -14,7 +14,7 @@ export default async function AdminLoading() {
         ))}
       </div>
       <div className="mt-6"><TableSkeleton rows={6} /></div>
-      <span className="sr-only">İdarə paneli yüklənir…</span>
+      <span className="sr-only">{t("pages.misc.idarePaneliYuklenir")}</span>
     </div>
   );
 }

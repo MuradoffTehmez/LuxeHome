@@ -50,7 +50,6 @@ function cardImageSrc(
   if (preferFullSize) return image.url;
   return image.thumbUrl || image.url;
 }
-
 export function PropertyCard({
   property: sourceProperty,
   priority = false,
@@ -226,59 +225,6 @@ export function PropertyCard({
           <FavoriteButton propertyId={property.id} />
           <CompareButton propertyId={property.id} />
         </div>
-      </div>
-    </article>
-  );
-}
-
-/** Yan panel və oxşar əmlaklar üçün kompakt sətir. */
-export function PropertyRow({ property: sourceProperty }: { property: PropertyCardData }) {
-  const format = useFormatter();
-  const locale = useLocale() as Locale;
-  const localizedProperty = localizeKnownContent("property", sourceProperty, locale);
-  const property = {
-    ...localizedProperty,
-    city: localizeLocation(localizedProperty.city, locale),
-    district: localizedProperty.district ? localizeLocation(localizedProperty.district, locale) : null,
-  };
-  const image = property.images[0];
-  const location = [property.district?.name, property.city.name]
-    .filter(Boolean)
-    .join(", ");
-
-  return (
-    <article className="group relative flex gap-4">
-      <div className="relative size-24 shrink-0 overflow-hidden rounded-xs bg-beige">
-        {image ? (
-          <Image
-            src={cardImageSrc(image, false)}
-            alt={image.alt || property.title}
-            fill
-            unoptimized={isUnoptimizedImage(image.url)}
-            loading="lazy"
-            sizes="96px"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex size-full items-center justify-center text-ink-muted">
-            <Building2 className="size-5" aria-hidden="true" />
-          </div>
-        )}
-      </div>
-
-      <div className="flex min-w-0 flex-col justify-center gap-1">
-        <h3 className="truncate font-display text-base text-ink">
-          <Link
-            href={`/emlaklar/${property.slug}`}
-            className="after:absolute after:inset-0 after:content-[''] transition-colors duration-300 ease-out-soft hover:text-gold-deep"
-          >
-            {property.title}
-          </Link>
-        </h3>
-        {location && <p className="truncate text-xs text-ink-muted">{location}</p>}
-        <p className="tabular text-sm font-semibold text-ink">
-          {format.number(property.price, { maximumFractionDigits: 0 })} {property.currency === "AZN" ? "₼" : property.currency}
-        </p>
       </div>
     </article>
   );

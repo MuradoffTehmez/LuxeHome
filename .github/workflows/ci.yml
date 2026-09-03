@@ -74,6 +74,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Detect unused files and dependencies
+        run: npm run dead-code
+
       - name: Production build
         run: npm run build
 

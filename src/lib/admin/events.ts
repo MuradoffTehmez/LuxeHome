@@ -17,9 +17,11 @@ export type DomainEventType =
   | "agency.employee_removed"
   | "reservation.requested"
   | "reservation.status_changed"
-  | "lead.created";
+  | "lead.created"
+  | "partner.expired"
+  | "account.deletion_requested";
 
-export type DomainEventEntityType = "Property" | "Agency" | "AgencyEmployee" | "Lead" | "Reservation";
+export type DomainEventEntityType = "Property" | "Agency" | "AgencyEmployee" | "Lead" | "Reservation" | "Partner" | "User";
 
 export async function recordDomainEvent(
   type: DomainEventType,

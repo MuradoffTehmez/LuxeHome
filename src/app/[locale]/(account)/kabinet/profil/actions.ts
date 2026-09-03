@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { requireAccount, currentSessionId } from "@/lib/auth/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { revokeAllSessions } from "@/lib/auth/session";
@@ -16,6 +16,7 @@ import { clearSessionCookie } from "@/lib/auth/cookies";
 import { assertSameOrigin } from "@/lib/admin/guard";
 import { redirect } from "next/navigation";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { requestAccountDeletion } from "@/lib/account-deletion";
 
 /**
  * Kabinet profili.
@@ -167,11 +168,10 @@ export async function deleteAccount(_prev: ActionState, formData: FormData): Pro
   }
 
   try {
-    await prisma.property.updateMany({
-      where: { authorId: user.id, deletedAt: null },
-      data: { deletedAt: new Date(), status: PROPERTY_STATUSES.ARCHIVED },
-    });
-    await prisma.user.delete({ where: { id: user.id } });
+    // İlk atomik addım hesabı deaktiv edib durable marker yazır. Əlaqəli təmizlik
+    // yarımçıq qalsa gündəlik maintenance cron-u idempotent şəkildə davam etdirir.
+    await requestAccountDeletion(user.id);
+    await revokeAllSessions(user.id);
   } catch (error) {
     return unexpected("ictimai hesab silinmədi", error, t("actions.unexpected"));
   }

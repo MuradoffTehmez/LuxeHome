@@ -159,7 +159,7 @@ export default async function AdminPropertiesPage({
               variant="outline"
               size="sm"
             >
-              {deleted ? "Aktiv elanlar" : "Zibil qutusu"}
+              {deleted ? t("pages.misc.aktivElanlar") : t("pages.misc.zibilQutusu")}
             </ButtonLink>
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />

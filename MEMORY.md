@@ -37,7 +37,7 @@ Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
 | Dil | İctimai sayt, kabinet **və admin panel** AZ + EN + RU dillərindədir. Panel dili `User.locale`-dan gəlir (`/admin` locale prefiksi daşımır). |
 | Lead bildirişi | **Telegram bot.** Yeni müraciət gələndə sistem bot vasitəsilə bildiriş göndərəcək. |
 | Spam qoruma | Same-origin + honeypot + IP rate limit + Cloudflare Turnstile tətbiq olunub. |
-| Test / CI / analitika | Vitest, Playwright və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + build` qapısını avtomatlaşdırır. **2 sentyabr 2026-dan CI staging deploy → canlı E2E → production deploy ardıcıllığını və hər mühit üçün əvvəlcədən D1 miqrasiyasını tətbiq edir.** |
+| Test / CI / analitika | Vitest, Playwright və GA/GTM işləyir; GitHub Actions `test + typecheck + lint + dead-code + build` qapısını avtomatlaşdırır. **2 sentyabr 2026-dan CI staging deploy → canlı E2E → production deploy ardıcıllığını və hər mühit üçün əvvəlcədən D1 miqrasiyasını tətbiq edir.** |
 | Real Estate Knowledge Hub | D1 əsaslı bələdçi, hüquqi FAQ, lüğət, kalkulyator və admin CMS hazırdır. Mənbə hüquqi araşdırma DRAFT idxal edilir; yayımdan əvvəl hüquqşünas baxışı tələb olunur. |
 
 ---
@@ -71,9 +71,6 @@ düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` q�
 | Browser axınları | Playwright dəsti staging-də CI qapısıdır; production-a ayrıca post-deploy browser smoke hələ yoxdur. |
 | Phase 3 / AI | Public AI sorğu parser-i, deterministik fallback, Match Score və «Mənə əmlak tap» axını hazırdır. Cari “semantic” uyğunluq embedding/vector deyil, normallaşdırılmış mətn terminləri ilə leksik axtarışdır; chatbot və xəritədə sərbəst sahə çəkmə (map draw) yoxdur. Admin AI təsvir/foto köməkçisi Workers AI JSON mode ilə işləyir. |
 | Finance / statik CMS | Knowledge Hub üçün domen CMS-i hazırdır; paket, ödəniş və ümumi statik səhifə redaktoru hələ yoxdur (Admin PRD). |
-| Admin lokallaşdırması | AZ/EN/RU kataloqları və əsas panel UI-ı hazırdır, lakin audit SERP, security, e-poçt, hesab və trash/status mətnlərində qalan bir neçə hardcode AZ/EN sətri tapıb. Kataloq parity testi xam JSX mətnini tutmur. |
-| Backend → UI uyğunluğu | 151 Server Action ixracından üçü (`setPropertyStatus`, `togglePropertyFeatured`, `expireOverduePartners`) heç bir UI/cron tərəfindən çağırılmır; `/admin/seo` naviqasiyadan kənarda qalan köhnə paralel audit route-udur. `PropertyPriceHistory` yalnız bildiriş mənbəyidir, istifadəçiyə tarixçə qrafiki göstərilmir. |
-| D1 atomikliyi | Self-service hesab silinməsi əvvəl elanları arxivləyir, sonra istifadəçini silir. D1 transaction olmadığı üçün ikinci addım uğursuz olsa avtomatik reconciliation yoxdur. |
 
 Azərbaycan hərfləri ilə registrsiz axtarış 28 avqustda `searchText` / `searchName`
 sütunları və `normalizeSearchText()` ilə həll olunub.
@@ -246,7 +243,7 @@ Tələb olunan `vars`: `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN` (`<team>.cloudfla
 ## 7. Layihənin texniki sağlamlığı (2 sentyabr 2026)
 
 - Mənbə ağacı: 582 TypeScript/TSX faylı (`src/` altında).
-- 102 Vitest faylı, 474 test; 2 sentyabr tam lokal icrasında hamısı keçib.
+- 104 Vitest faylı, 480 test; 3 sentyabr tam lokal icrasında hamısı keçib.
 - 60 Prisma modeli, 28 D1 miqrasiya faylı və audit başlanğıcında 463 commit.
 - GitHub Actions hər PR və `main` push-unda test, typecheck, lint və build işlədir.
 - **Browser E2E qurulub — 2 sentyabr 2026** (Playwright, `e2e/`, 190+ test).
@@ -504,17 +501,24 @@ Repository daxilində əlavə və ya genişləndirilən qatlar:
 - CODEOWNERS və sahə/prioritet label taksonomiyası;
 - `CONTRIBUTING.md` və `docs/github-governance.md` authoritative qaydaları.
 
-Canlı GitHub yoxlamasında `main` üçün PR, strict `Quality gate`, conversation resolution,
-linear history, admin enforcement və force-push/silmə qadağası aktiv idi. Dependency graph,
-secret scanning və push protection da aktivdir. Governance PR-ı merge olunub yeni workflow-lar
-ən azı bir dəfə yaşıl işləyəndən sonra CodeQL və Dependency review required check edilməli;
-Dependabot alerts/security updates, private vulnerability reporting və full-SHA policy UI-dan
-aktivləşdirilməlidir. `staging` və `production` environment-lərinin deployment branch-i yalnız
-`main` ilə məhdudlaşdırılmalıdır.
+3 sentyabr 2026 canlı GitHub yoxlamasında `main` üçün PR, strict `Quality gate`,
+`Analyze (javascript-typescript)`, `Dependency review`, conversation resolution, linear history,
+admin enforcement və force-push/silmə qadağası aktivdir. Dependency graph, secret scanning,
+push protection, private vulnerability reporting, Dependabot alerts/malware/security/grouped
+updates və Actions full-SHA siyasəti də aktivdir. Merge modeli squash-only-dır; update-branch
+təklifi və head-branch auto-delete aktivdir. `staging` və `production` environment-ləri yalnız
+`main` branch-indən deploy qəbul edir.
 
 Hazırkı yayım continuous deployment-dır; package versiyası və iki köhnə tag canlı vəziyyəti
 etibarlı təmsil etmədiyi üçün `release.yml` qəsdən yaradılmayıb. Əvvəl version/changelog qaydası
 və cari baseline release razılaşdırılmalıdır.
 
+Audit tapıntıları eyni branch-də bağlanıb: D1-safe hesab silmə növbəsi (`0028`), tərəfdaş
+expiration maintenance-i, 180 günlük `DomainEvent` retention və audit görünüşü, admin qiymət
+tarixçəsi, `/admin/seo` naviqasiyası, tam admin UI lokallaşdırma source testi və Knip əsaslı
+ölü fayl/asılılıq qapısı əlavə olunub. Təsdiqlənmiş ölü Server Action, komponent, helper və
+əl e-poçt script-ləri silinib.
+
 Lokal qəbul nəticəsi: YAML/workflow parse təmiz, `npm audit --audit-level=high` — 0 zəiflik,
-102/102 Vitest faylı və 474/474 test, typecheck, ESLint və Next.js production build uğurludur.
+104/104 Vitest faylı və 480/480 test, `npm run dead-code`, typecheck, ESLint və Next.js
+production build uğurludur.

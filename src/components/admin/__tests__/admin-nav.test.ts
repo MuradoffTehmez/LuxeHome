@@ -19,7 +19,8 @@ describe("adminNav", () => {
 
   it("SERP və SEO-nun bütün alətlərini alt menyuda verir", () => {
     const serp = adminNav.flatMap((group) => group.items).find((item) => item.labelKey === "serp");
-    expect(serp?.children).toHaveLength(18);
+    expect(serp?.children).toHaveLength(19);
+    expect(serp?.children?.map((item) => item.href)).toContain("/admin/seo");
     expect(serp?.children?.map((item) => item.href)).toContain("/admin/serp/search-console");
     expect(serp?.children?.map((item) => item.href)).toContain("/admin/redirects#not-found");
   });

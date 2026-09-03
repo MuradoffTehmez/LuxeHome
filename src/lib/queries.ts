@@ -11,6 +11,9 @@ import {
   PAGE_SIZE,
   PARTNER_STATUSES,
   POST_STATUSES,
+  LEAD_STATUSES,
+  REVIEW_STATUSES,
+  SEO_LANDING_STATUSES,
   PUBLIC_PARTNER_STATUSES,
   PUBLIC_PROPERTY_STATUSES,
   PROPERTY_STATUSES,
@@ -23,6 +26,7 @@ import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
 import type { DigestStore } from "@/lib/saved-search-digest";
 import { normalizeSearchText } from "@/lib/search-normalization";
 import { localizePath } from "@/i18n/path-locale";
+import { startOfBakuToday } from "@/lib/partners";
 
 const LOCALE_VALUES = Object.values(LOCALES);
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
@@ -454,7 +458,7 @@ export async function getPropertyBySlug(slug: string) {
       assignedAgent: {
         include: {
           agency: { select: { name: true, slug: true } },
-          reviews: { where: { status: "APPROVED" }, orderBy: { createdAt: "desc" }, take: 5 },
+          reviews: { where: { status: REVIEW_STATUSES.APPROVED }, orderBy: { createdAt: "desc" }, take: 5 },
         },
       },
     },
@@ -841,6 +845,22 @@ export async function getAdminAuditLog(
   return { entries, total, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
+/** Panel — sistem səviyyəli domen hadisələri. Saxlama müddəti gündəlik işdə 180 gündür. */
+export async function getAdminDomainEvents(limit = 50) {
+  return prisma.domainEvent.findMany({
+    select: {
+      id: true,
+      type: true,
+      entityType: true,
+      entityId: true,
+      payload: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+}
+
 /** Panel — moderasiya növbəsi: kənar istifadəçilərin göndərdiyi təsdiq gözləyən elanlar. */
 export async function getModerationQueue() {
   return prisma.property.findMany({
@@ -1036,7 +1056,7 @@ export async function getSitemapEntries() {
     getSitemapPartners(),
     getIndexableSeoLandingEntries(),
     prisma.seoLandingPage.findMany({
-      where: { status: "PUBLISHED", indexable: true },
+      where: { status: SEO_LANDING_STATUSES.PUBLISHED, indexable: true },
       select: { locale: true, slug: true, filtersJson: true, indexable: true, indexEmpty: true, minInventory: true, introContent: true, updatedAt: true },
     }),
     getIndexableTaxonomyLandings("DISTRICT"),
@@ -1217,7 +1237,7 @@ export async function getDashboardStats() {
       where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.DRAFT },
     }),
     prisma.project.count({ where: { deletedAt: null, isDemo: false, status: "ONGOING" } }),
-    prisma.lead.count({ where: { status: "NEW" } }),
+    prisma.lead.count({ where: { status: LEAD_STATUSES.NEW } }),
     prisma.lead.count(),
     prisma.blogPost.count({
       where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
@@ -1545,6 +1565,7 @@ export async function getAdminPropertyById(id: string) {
     include: {
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { select: { featureId: true } },
+      priceHistory: { orderBy: { changedAt: "desc" }, take: 50 },
     },
   });
 }
@@ -2379,15 +2400,6 @@ export const savedSearchDigestStore: DigestStore = {
 // ---------------------------------------------------------------------------
 
 /** Müqavilə tarixləri gün dəqiqliyindədir — son gün bütöv sayılır. */
-function startOfToday(now: Date): Date {
-  // Müqavilə tarixləri Bakı təqvim günüdür. `Date` bazada UTC midnight kimi
-  // saxlanır, ona görə əvvəlcə cari anı UTC+4-ə çəkib həmin calendar date-i qururuq.
-  const bakuNow = new Date(now.getTime() + 4 * 60 * 60 * 1000);
-  return new Date(
-    Date.UTC(bakuNow.getUTCFullYear(), bakuNow.getUTCMonth(), bakuNow.getUTCDate()),
-  );
-}
-
 /** Panel — korporativ e-poçt göndəriş və qəbul metadatası. */
 export async function getAdminEmailActivities(
   page = 1,
@@ -2453,7 +2465,7 @@ async function publicPartnerWhere(now: Date = new Date()): Promise<Prisma.Partne
     ...(await demoWhere()),
     status: { in: PUBLIC_PARTNER_STATUSES },
     showPublicly: true,
-    OR: [{ partnershipEndDate: null }, { partnershipEndDate: { gte: startOfToday(now) } }],
+    OR: [{ partnershipEndDate: null }, { partnershipEndDate: { gte: startOfBakuToday(now) } }],
   };
 }
 
@@ -2467,7 +2479,7 @@ function indexablePartnerWhere(now: Date = new Date()): Prisma.PartnerWhereInput
     isDemo: false,
     status: { in: PUBLIC_PARTNER_STATUSES },
     showPublicly: true,
-    OR: [{ partnershipEndDate: null }, { partnershipEndDate: { gte: startOfToday(now) } }],
+    OR: [{ partnershipEndDate: null }, { partnershipEndDate: { gte: startOfBakuToday(now) } }],
   };
 }
 
@@ -2991,7 +3003,7 @@ export async function getExpiredActivePartners(now: Date = new Date()) {
     where: {
       deletedAt: null,
       status: PARTNER_STATUSES.ACTIVE,
-      partnershipEndDate: { not: null, lt: startOfToday(now) },
+      partnershipEndDate: { not: null, lt: startOfBakuToday(now) },
     },
     select: { id: true, name: true, status: true, partnershipEndDate: true, deletedAt: true },
   });
@@ -2999,7 +3011,7 @@ export async function getExpiredActivePartners(now: Date = new Date()) {
 
 /** Paneldə xəbərdarlıq üçün: müqaviləsi yaxınlaşan və ya bitmiş aktiv tərəfdaşlar. */
 export async function getPartnerExpiryAlerts(withinDays: number, now: Date = new Date()) {
-  const horizon = new Date(startOfToday(now).getTime() + withinDays * 24 * 60 * 60 * 1000);
+  const horizon = new Date(startOfBakuToday(now).getTime() + withinDays * 24 * 60 * 60 * 1000);
   return prisma.partner.findMany({
     where: {
       deletedAt: null,

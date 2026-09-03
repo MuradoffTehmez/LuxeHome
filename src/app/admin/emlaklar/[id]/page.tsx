@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Trash2 } from "lucide-react";
-import { AdminPageHeader } from "@/components/admin/admin-ui";
+import { ExternalLink, History, Trash2 } from "lucide-react";
+import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatPrice } from "@/lib/utils";
 import { getAdminPropertyById, getPropertyFormOptions } from "@/lib/queries";
 import { deleteProperty, updateProperty } from "../actions";
 import type { PropertyFormValues } from "../form-values";
@@ -137,6 +137,31 @@ export default async function EditPropertyPage({
           )
         }
       />
+
+      <AdminCard
+        title={t("pages.properties.qiymetTarixcesi")}
+        description={t("pages.properties.qiymetTarixcesiTesviri")}
+        className="mt-6"
+      >
+        {property.priceHistory.length === 0 ? (
+          <p className="text-sm text-ink-muted">{t("pages.properties.qiymetTarixcesiBosdur")}</p>
+        ) : (
+          <ol className="divide-y divide-line">
+            {property.priceHistory.map((entry) => (
+              <li key={entry.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 first:pt-0 last:pb-0">
+                <History className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
+                <span className="font-medium text-ink">
+                  {formatPrice(entry.oldPrice, entry.currency)} → {formatPrice(entry.newPrice, entry.currency)}
+                </span>
+                <span className="text-xs text-ink-muted">{formatDateTime(entry.changedAt)}</span>
+                <span className="ml-auto rounded-xs bg-beige px-2 py-1 text-xs text-ink-soft">
+                  {t("pages.properties.menbe")}: {entry.source}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </AdminCard>
     </>
   );
 }

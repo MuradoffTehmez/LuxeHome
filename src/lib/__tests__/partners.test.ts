@@ -10,6 +10,7 @@ import {
   partnerDomain,
   partnerLogoVariants,
   shouldMarkExpired,
+  startOfBakuToday,
 } from "@/lib/partners";
 
 const activePartner = {
@@ -40,6 +41,11 @@ describe("tərəfdaşlıq domen qaydaları", () => {
     expect(isPartnershipExpired(partner, new Date("2026-08-27T19:59:59.000Z"))).toBe(false);
     expect(isPartnershipExpired(partner, new Date("2026-08-27T20:00:01.000Z"))).toBe(true);
     expect(daysUntilPartnershipEnd(partner, new Date("2026-08-27T08:00:00.000Z"))).toBe(0);
+  });
+
+  it("Bakı gün sərhədini UTC+4 üzrə hesablayır", () => {
+    expect(startOfBakuToday(new Date("2026-09-02T19:59:59.000Z")).toISOString()).toBe("2026-09-02T00:00:00.000Z");
+    expect(startOfBakuToday(new Date("2026-09-02T20:00:00.000Z")).toISOString()).toBe("2026-09-03T00:00:00.000Z");
   });
 
   it("müddəti bitmiş ACTIVE tərəfdaşı publicdən çıxarır və expiration namizədi edir", () => {

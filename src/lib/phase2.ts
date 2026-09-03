@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { demoWhere } from "@/lib/demo-content";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
+import { REVIEW_STATUSES } from "@/lib/constants";
 
 /** İctimai agent kataloqu — qaralama və gizli profillər heç vaxt sızmır. */
 export async function getPublicAgents() {
@@ -8,7 +9,7 @@ export async function getPublicAgents() {
     where: { isPublic: true, ...(await demoWhere()) },
     include: {
       agency: { select: { name: true, slug: true } },
-      reviews: { where: { status: "APPROVED" }, select: { rating: true } },
+      reviews: { where: { status: REVIEW_STATUSES.APPROVED }, select: { rating: true } },
       _count: { select: { properties: { where: await publicPropertyWhere() } } },
     },
     orderBy: [{ isVerified: "desc" }, { soldCount: "desc" }, { name: "asc" }],
@@ -26,7 +27,7 @@ export async function getPublicAgentBySlug(slug: string) {
         orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
       },
       reviews: {
-        where: { status: "APPROVED" },
+        where: { status: REVIEW_STATUSES.APPROVED },
         orderBy: { createdAt: "desc" },
       },
     },
@@ -35,7 +36,7 @@ export async function getPublicAgentBySlug(slug: string) {
 
 export async function getApprovedTestimonials(take = 6) {
   return prisma.testimonial.findMany({
-    where: { status: "APPROVED" },
+    where: { status: REVIEW_STATUSES.APPROVED },
     include: {
       agent: { select: { name: true, slug: true } },
       agency: { select: { name: true, slug: true } },

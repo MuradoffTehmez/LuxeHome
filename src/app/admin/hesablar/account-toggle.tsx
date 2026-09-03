@@ -28,7 +28,7 @@ export function AccountToggle({
           ? t("pages.misc.hesabDerhalGirisiItirecek")
           : t("pages.misc.hesabYenidenGirisEde")
       }
-      confirmLabel={isActive ? "Deaktiv et" : t("pages.misc.aktivlesdir")}
+      confirmLabel={isActive ? t("pages.misc.deaktivEt") : t("pages.misc.aktivlesdir")}
       tone={isActive ? "danger" : "neutral"}
       className={className}
     >

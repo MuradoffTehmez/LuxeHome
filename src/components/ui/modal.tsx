@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Button } from "./button";
 import { Overlay } from "./overlay";
 
 type ModalProps = {
@@ -49,56 +48,5 @@ export function Modal({
     >
       {children}
     </Overlay>
-  );
-}
-
-type ConfirmModalProps = {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  description: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  loading?: boolean;
-  destructive?: boolean;
-};
-
-/** Geri qaytarıla bilməyən əməliyyatlar üçün təsdiq dialoqu. */
-export function ConfirmModal({
-  open,
-  onClose,
-  onConfirm,
-  title,
-  description,
-  confirmLabel = "Təsdiq et",
-  cancelLabel = "Ləğv et",
-  loading = false,
-  destructive = true,
-}: ConfirmModalProps) {
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={title}
-      size="sm"
-      footer={
-        <>
-          <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
-            {cancelLabel}
-          </Button>
-          <Button
-            type="button"
-            variant={destructive ? "danger" : "primary"}
-            onClick={onConfirm}
-            loading={loading}
-          >
-            {confirmLabel}
-          </Button>
-        </>
-      }
-    >
-      <p className="text-sm leading-relaxed text-ink-soft">{description}</p>
-    </Modal>
   );
 }
