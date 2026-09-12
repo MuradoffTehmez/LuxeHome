@@ -31,6 +31,8 @@ type MaintenanceStrings = {
   body: string;
   expectedLabel: string;
   countdownLabel: string;
+  /** Bir gündən uzun geri sayımda rəqəmin yanındakı qısaltma. */
+  dayShort: string;
   rights: string;
   ownership: string;
 };
@@ -53,6 +55,7 @@ const STRINGS: Record<Locale, MaintenanceStrings> = {
     body: `${siteConfig.name} platformasında planlaşdırılmış texniki və təkmilləşdirmə işləri aparılır. Xidmətlərimiz qısa müddət sonra yenidən əlçatan olacaq.`,
     expectedLabel: "Təxmini açılış",
     countdownLabel: "Təxmini açılışa qalıb",
+    dayShort: "gün",
     rights: "Bütün hüquqlar qorunur.",
     ownership: `${siteConfig.name} brendi ${siteConfig.owner.name}-a məxsusdur.`,
   },
@@ -63,6 +66,7 @@ const STRINGS: Record<Locale, MaintenanceStrings> = {
     body: `Planned maintenance and improvements are under way on the ${siteConfig.name} platform. Our services will be available again shortly.`,
     expectedLabel: "Expected back",
     countdownLabel: "Estimated time remaining",
+    dayShort: "d",
     rights: "All rights reserved.",
     ownership: `The ${siteConfig.name} brand belongs to ${siteConfig.owner.name}.`,
   },
@@ -73,6 +77,7 @@ const STRINGS: Record<Locale, MaintenanceStrings> = {
     body: `На платформе ${siteConfig.name} проводятся плановые технические работы и улучшения. Наши услуги снова станут доступны в ближайшее время.`,
     expectedLabel: "Ожидаемое время открытия",
     countdownLabel: "Примерно осталось",
+    dayShort: "дн.",
     rights: "Все права защищены.",
     ownership: `Бренд ${siteConfig.name} принадлежит ${siteConfig.owner.name}.`,
   },
@@ -234,7 +239,7 @@ function renderHtml(config: SystemModeConfig, locale: Locale, now: Date): string
   }
   .countdown {
     margin-top: 8px;
-    font-size: clamp(28px, 8vw, 40px);
+    font-size: clamp(24px, 6.5vw, 38px);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.04em;
@@ -280,7 +285,7 @@ function renderHtml(config: SystemModeConfig, locale: Locale, now: Date): string
     countdownTarget
       ? `<section class="panel" aria-live="off">
     <p class="panel-label">${escapeHtml(strings.countdownLabel)}</p>
-    <p class="countdown" id="countdown" data-target="${countdownTarget}">--:--:--</p>
+    <p class="countdown" id="countdown" data-target="${countdownTarget}" data-day="${escapeHtml(strings.dayShort)}">--:--:--</p>
   </section>`
       : expected
         ? `<section class="panel">
@@ -305,14 +310,20 @@ ${
   var el = document.getElementById("countdown");
   if (!el) return;
   var target = Number(el.getAttribute("data-target"));
+  var dayLabel = el.getAttribute("data-day") || "";
   function pad(value) { return value < 10 ? "0" + value : String(value); }
   function tick() {
     var left = Math.max(0, target - Date.now());
     var total = Math.floor(left / 1000);
-    el.textContent =
-      pad(Math.floor(total / 3600)) + ":" +
-      pad(Math.floor((total % 3600) / 60)) + ":" +
-      pad(total % 60);
+    /* Sutkadan uzun müddət gün kimi ayrılır: planlaşdırılmış iş bir neçə gün
+       çəkəndə "312:00:00" ziyarətçiyə heç nə demir. */
+    var days = Math.floor(total / 86400);
+    var rest = total % 86400;
+    var clock =
+      pad(Math.floor(rest / 3600)) + ":" +
+      pad(Math.floor((rest % 3600) / 60)) + ":" +
+      pad(rest % 60);
+    el.textContent = days > 0 ? days + " " + dayLabel + " " + clock : clock;
     if (left <= 0) clearInterval(timer);
   }
   tick();
