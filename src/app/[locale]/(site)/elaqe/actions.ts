@@ -11,6 +11,7 @@ import { z } from "zod";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { readLeadAttribution } from "@/lib/lead-attribution";
 import { LEAD_STATUSES } from "@/lib/constants";
+import { SYSTEM_READ_ONLY_MESSAGE, isSystemWriteBlocked } from "@/lib/system-mode";
 
 async function contactSchema() {
   let nameMin = "Ad ən azı 2 simvol olmalıdır";
@@ -84,6 +85,13 @@ export async function submitContactForm(
       return { success: false, error: await rejectionMessage("origin") };
     }
     throw error;
+  }
+
+  // Müraciət `Lead` sətri yaradır — `READ_ONLY` rejimində bu da yazmadır.
+  // Turnstile yoxlamasından **əvvəl** gəlir: bloklanmış sorğu üçün kənar
+  // doğrulama xidmətinə müraciət etməyin mənası yoxdur.
+  if (await isSystemWriteBlocked()) {
+    return { success: false, error: SYSTEM_READ_ONLY_MESSAGE };
   }
 
   const ip = clientIp(await headers());

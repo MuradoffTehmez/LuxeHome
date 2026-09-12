@@ -6,9 +6,11 @@ import {
   SameOriginError,
   assertSameOrigin as assertRequestSameOrigin,
 } from "@/lib/request-origin";
+import { SystemWriteBlockedError, assertSystemWritable } from "@/lib/system-mode";
+import { failure, type ActionState } from "@/lib/admin/action-state";
 import type { AuthUser } from "@/lib/auth/types";
-import type { Permission } from "@/lib/constants";
-import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
+import type { Permission, SystemMode } from "@/lib/constants";
+import { DEFAULT_LOCALE, ROLES, type Locale } from "@/lib/constants";
 
 /**
  * Paneldəki hər yazma əməliyyatının giriş qapısı.
@@ -26,6 +28,61 @@ import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
  */
 
 export class AdminGuardError extends Error {}
+
+/**
+ * Sistem rejiminin bağladığı yazma.
+ *
+ * `AdminGuardError`-dan törəyir ki, mövcud 40+ server action-ın
+ * `catch (error) { if (error instanceof AdminGuardError) ... }` bloku
+ * dəyişiklik olmadan düzgün mesajı göstərsin. `mode` sahəsi isə API
+ * route-larına 503 + strukturlaşdırılmış JSON qaytarmaq imkanı verir.
+ */
+export class SystemModeGuardError extends AdminGuardError {
+  constructor(
+    readonly mode: SystemMode,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+/**
+ * Rejim qapısı — yazma icazəsinin son şərti.
+ *
+ * `MAINTENANCE` və `READ_ONLY` rejimlərində məlumat dəyişdirən əməliyyat
+ * rədd edilir. Super admin istisnadır: əks halda rejimi söndürən action-ın
+ * özü də bloklanar və panel öz-özünü kilidləyərdi.
+ */
+export async function assertWritableMode(role?: string): Promise<void> {
+  try {
+    await assertSystemWritable({ isSuperAdmin: role === ROLES.SUPER_ADMIN });
+  } catch (error) {
+    if (error instanceof SystemWriteBlockedError) {
+      throw new SystemModeGuardError(error.mode, error.message);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Mərkəzi guard-lardan keçməyən action-lar üçün rejim qapısı.
+ *
+ * `requireAccount()`-u birbaşa çağıran kabinet action-ları və sessiya tələb
+ * etməyən ictimai formalar (əlaqə forması) bunu işlədir. Bloklanma halında
+ * hazır `ActionState` qaytarılır ki, hər çağırış yerində eyni `try/catch`
+ * bloku təkrarlanmasın.
+ *
+ * @returns Bloklanıbsa xəta vəziyyəti, əks halda `null`.
+ */
+export async function systemModeBlock(role?: string): Promise<ActionState | null> {
+  try {
+    await assertWritableMode(role);
+    return null;
+  } catch (error) {
+    if (error instanceof SystemModeGuardError) return failure(error.message);
+    throw error;
+  }
+}
 
 /**
  * Mənbə yoxlaması. Məntiq `@/lib/request-origin`-dədir — ictimai formalar onu
@@ -55,6 +112,7 @@ async function assertWriteLimit(userId: string, scope: string): Promise<void> {
 export async function requireAdminAction(permission: Permission): Promise<AuthUser> {
   await assertSameOrigin();
   const user = await requirePermission(permission);
+  await assertWritableMode(user.role);
   await assertWriteLimit(user.id, "admin");
   return user;
 }
@@ -68,6 +126,8 @@ export async function requirePublicAction(
   const user = scope === "media" || scope === "property"
     ? await requireLister(locale)
     : await requireAccount(locale);
+  // İctimai hesab heç vaxt super admin deyil — rejim bağlıdırsa yazma da bağlıdır.
+  await assertWritableMode(user.role);
   await assertWriteLimit(user.id, `public:${scope}`);
   return user;
 }

@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAccount } from "@/lib/auth/guard";
+import { systemModeBlock } from "@/lib/admin/guard";
 import { SAVED_SEARCH_FREQUENCIES, type Locale } from "@/lib/constants";
 import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
 import { type ActionState, failure, success, toFieldErrors, unexpected } from "@/lib/admin/action-state";
@@ -31,6 +32,9 @@ export async function createSavedSearch(_prev: ActionState, formData: FormData):
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Sistem `READ_ONLY`/`MAINTENANCE` rejimindədirsə yazma burada dayanır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
 
   const parsed = createSavedSearchSchema.safeParse({
     name: form.text(formData, "name"),
@@ -77,6 +81,9 @@ export async function updateSavedSearch(_prev: ActionState, formData: FormData):
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Sistem `READ_ONLY`/`MAINTENANCE` rejimindədirsə yazma burada dayanır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
 
   const parsed = updateSavedSearchSchema.safeParse({
     id: form.text(formData, "id"),
@@ -104,6 +111,9 @@ export async function toggleSavedSearchEnabled(id: string): Promise<ActionState>
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Sistem `READ_ONLY`/`MAINTENANCE` rejimindədirsə yazma burada dayanır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
 
   try {
     const existing = await ownedSavedSearch(user.id, id);
@@ -121,6 +131,9 @@ export async function deleteSavedSearch(id: string): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Sistem `READ_ONLY`/`MAINTENANCE` rejimindədirsə yazma burada dayanır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
 
   try {
     const existing = await ownedSavedSearch(user.id, id);

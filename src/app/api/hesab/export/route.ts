@@ -2,10 +2,15 @@ import { NextResponse } from "next/server";
 import { AUTH_KINDS } from "@/lib/constants";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { prisma } from "@/lib/prisma";
+import { isPublicApiBlocked, maintenanceApiResponse } from "@/lib/system-mode";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  // Texniki xidmət rejimində ictimai hesab API-si də bağlanır —
+  // middleware matcher-i `/api/*` yollarını əhatə etmir.
+  if (await isPublicApiBlocked()) return maintenanceApiResponse();
+
   const sessionUser = await getOptionalUser(AUTH_KINDS.PUBLIC);
   if (!sessionUser) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401 });
 

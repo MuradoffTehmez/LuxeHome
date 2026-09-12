@@ -17,6 +17,9 @@ import {
   signedSessionRedirect,
   type SignedSession,
 } from "@/lib/auth/session-routing";
+import { getSystemModeConfig, verifySuperAdminBypass } from "@/lib/system-mode";
+import { decideMaintenanceGate } from "@/lib/system-mode-policy";
+import { maintenanceResponse } from "@/lib/maintenance-response";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -31,7 +34,17 @@ const intlMiddleware = createIntlMiddleware(routing);
  * panelin varlığı kənara bildirilmir.
  */
 
-async function readSignedSession(token: string | undefined): Promise<SignedSession | null> {
+/**
+ * Cookie-dən oxunan iddia.
+ *
+ * `SignedSession`-a üç sahə əlavə olunur: `sid`/`uid` texniki xidmət
+ * bypass-ının D1 təsdiqi üçün, `role` isə bypass qərarı üçün lazımdır.
+ * Dəyərlər imzalıdır — saxtalaşdırıla bilməz — amma köhnə ola bilər,
+ * ona görə bypass verilməzdən əvvəl `verifySuperAdminBypass()` çağırılır.
+ */
+type MiddlewareSession = SignedSession & { sid: string; uid: string; role: string };
+
+async function readSignedSession(token: string | undefined): Promise<MiddlewareSession | null> {
   if (!token || !process.env.AUTH_SECRET) return null;
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.AUTH_SECRET), {
@@ -49,9 +62,15 @@ async function readSignedSession(token: string | undefined): Promise<SignedSessi
     ) {
       return null;
     }
-    const session: SignedSession = {
+    if (typeof payload.sid !== "string" || typeof payload.uid !== "string" || typeof payload.role !== "string") {
+      return null;
+    }
+    const session: MiddlewareSession = {
       accountType: accountType as SignedSession["accountType"],
       authKind: authKind as SignedSession["authKind"],
+      sid: payload.sid,
+      uid: payload.uid,
+      role: payload.role,
     };
     return isUsableSignedSession(session) ? session : null;
   } catch {
@@ -165,6 +184,55 @@ function isAccountFlowRoute(pathname: string): boolean {
   );
 }
 
+/**
+ * Texniki xidmət qapısı.
+ *
+ * Sorğunun **ən erkən** mərhələsidir: Next server-i, i18n middleware-i və
+ * hər hansı səhifə render-i bundan sonra gəlir, ona görə adi istifadəçi
+ * əsas UI-nin heç bir hissəsini görmür.
+ *
+ * Qərarın özü `system-mode-policy.ts`-dədir (saf funksiya, test edilir).
+ * Burada yalnız üç iş var: rejimi oxumaq, super admin iddiasını bazadan
+ * təsdiqləmək və 503 cavabını qurmaq.
+ *
+ * Sessiya bir dəfə oxunur və `sessionRef` vasitəsilə aşağıdakı marşrut
+ * qapılarına ötürülür — eyni JWT-ni iki dəfə yoxlamağa ehtiyac yoxdur.
+ */
+async function maintenanceGate(
+  request: NextRequest,
+  sessionRef: { value: MiddlewareSession | null | undefined },
+): Promise<Response | null> {
+  const config = await getSystemModeConfig();
+  const pathname = request.nextUrl.pathname;
+  const routePath = pathnameWithoutLocale(pathname);
+
+  // Rejim `NORMAL` və ya `READ_ONLY` olduqda qərar sessiya oxunmadan verilir.
+  let decision = decideMaintenanceGate({
+    mode: config.mode,
+    routePath,
+    superAdminBypass: config.superAdminBypass,
+    claims: null,
+  });
+  if (decision.action === "allow") return null;
+
+  sessionRef.value = await readSignedSession(request.cookies.get(SESSION_COOKIE)?.value);
+  decision = decideMaintenanceGate({
+    mode: config.mode,
+    routePath,
+    superAdminBypass: config.superAdminBypass,
+    claims: sessionRef.value,
+  });
+
+  if (decision.action === "allow") return null;
+
+  if (decision.action === "verify-bypass" && sessionRef.value) {
+    const verified = await verifySuperAdminBypass(sessionRef.value.sid, sessionRef.value);
+    if (verified.ok) return null;
+  }
+
+  return maintenanceResponse(config, localeFromPathname(pathname));
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const forwardedProtocol = request.headers.get("x-forwarded-proto");
@@ -177,6 +245,13 @@ export async function middleware(request: NextRequest) {
     isStaging: isStaging(),
   });
   if (canonicalRedirect) return NextResponse.redirect(canonicalRedirect, 308);
+
+  // Texniki xidmət qapısı kanonik host yönləndirməsindən **sonra**, qalan hər
+  // şeydən **əvvəl**: 503 cavabı kanonik ünvandan verilir, yəni `www.` variantı
+  // bağlı saytın ayrıca nüsxəsi kimi görünmür.
+  const sessionRef: { value: MiddlewareSession | null | undefined } = { value: undefined };
+  const maintenance = await maintenanceGate(request, sessionRef);
+  if (maintenance) return maintenance;
 
   // Next metadata route-u flat URL set qaytarır; PRD sitemap index tələb etdiyi üçün
   // public `/sitemap.xml` daxildə index route-na rewrite olunur.
@@ -222,7 +297,11 @@ export async function middleware(request: NextRequest) {
   // Dil yalnız URL prefiksindən oxunur. Prefikssiz ünvanlar (`/admin/...`)
   // default dilə düşür — əvvəl bunu `NEXT_LOCALE` cookie-si həll edirdi, amma
   // həmin cookie hər ictimai cavaba `Set-Cookie` əlavə edib keşi bağlayırdı.
-  const session = await readSignedSession(request.cookies.get(SESSION_COOKIE)?.value);
+  // Texniki xidmət qapısı sessiyanı artıq oxuyubsa təkrar JWT yoxlaması aparılmır.
+  const session =
+    sessionRef.value !== undefined
+      ? sessionRef.value
+      : await readSignedSession(request.cookies.get(SESSION_COOKIE)?.value);
   const redirectPath = signedSessionRedirect(pathname, search, session, DEFAULT_LOCALE);
   if (redirectPath) return NextResponse.redirect(new URL(redirectPath, request.url));
 

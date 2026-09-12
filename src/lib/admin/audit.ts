@@ -19,6 +19,8 @@ export type AuditAction =
   | "UNPUBLISH"
   | "VERIFY"
   | "STATUS_CHANGE"
+  /** Platformanın işləmə rejimi dəyişdi (NORMAL / MAINTENANCE / READ_ONLY). */
+  | "SYSTEM_MODE_CHANGE"
   | "RELATION_CHANGE"
   | "EXPIRE"
   | "UPLOAD"
@@ -40,6 +42,7 @@ export type AuditEntity =
   | "Partner"
   | "Redirect"
   | "Setting"
+  | "SystemMode"
   | "ContentTranslation"
   | "Reservation"
   | "AgentProfile"

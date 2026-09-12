@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { AUTH_KINDS, PUBLIC_PROPERTY_STATUSES } from "@/lib/constants";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { assertSameOrigin } from "@/lib/request-origin";
+import {
+  SYSTEM_READ_ONLY_MESSAGE,
+  isPublicApiBlocked,
+  isSystemWriteBlocked,
+  maintenanceApiResponse,
+  systemModeErrorResponse,
+} from "@/lib/system-mode";
+import { SYSTEM_MODES } from "@/lib/constants";
 import { sanitizeFavoriteIds } from "@/lib/favorite-sync";
 import { prisma } from "@/lib/prisma";
 
@@ -12,6 +20,10 @@ async function account() {
 }
 
 export async function GET() {
+  // Texniki xidmət rejimində ictimai API də bağlanır: middleware matcher-i
+  // `/api/*` yollarını görmür, ona görə yoxlama burada təkrarlanır.
+  if (await isPublicApiBlocked()) return maintenanceApiResponse();
+
   const user = await account();
   if (!user) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401 });
   const rows = await prisma.favorite.findMany({
@@ -27,6 +39,15 @@ export async function PUT(request: Request) {
     await assertSameOrigin();
   } catch {
     return NextResponse.json({ error: "Sorğunun mənbəyi qəbul edilmədi" }, { status: 403 });
+  }
+
+  // Favorit sinxronizasiyası `Favorite` sətirlərini yazır — `READ_ONLY`
+  // rejimində bloklanan tipik istifadəçi əməliyyatıdır.
+  if (await isSystemWriteBlocked()) {
+    return systemModeErrorResponse({
+      mode: SYSTEM_MODES.READ_ONLY,
+      message: SYSTEM_READ_ONLY_MESSAGE,
+    });
   }
   const user = await account();
   if (!user) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401 });
