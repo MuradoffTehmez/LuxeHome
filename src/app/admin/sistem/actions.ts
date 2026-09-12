@@ -69,9 +69,14 @@ export async function saveSystemMode(
 ): Promise<ActionState> {
   let user;
   try {
-    // `requireAdminAction()` mənbəni (CSRF), sessiyanı D1-dən, icazəni, sistem
-    // rejimini və sürət limitini bir yerdə yoxlayır.
-    user = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+    // `requireAdminAction()` mənbəni (CSRF), sessiyanı D1-dən, icazəni və
+    // sürət limitini yoxlayır.
+    //
+    // `skipSystemModeGate` bu action üçün **mütləqdir**: generic qapı
+    // `READ_ONLY`-də hər yazmanı bağlayır, bu action isə məhz rejimi
+    // dəyişən action-dır. Qapı tətbiq olunsaydı, `READ_ONLY`-dən `NORMAL`-a
+    // qayıtmaq mümkün olmazdı. Aşağıdakı `SUPER_ADMIN` yoxlaması yerindədir.
+    user = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE, { skipSystemModeGate: true });
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
@@ -100,62 +105,85 @@ export async function saveSystemMode(
   });
   if (!parsed.success) return invalid(parsed.error);
 
-  try {
-    const previous = await getSystemModeConfig();
-    const next: SystemModeConfig = {
-      mode: parsed.data.mode as SystemModeConfig["mode"],
-      title: localized(parsed.data.titleAz, parsed.data.titleEn, parsed.data.titleRu),
-      description: localized(
-        parsed.data.descriptionAz,
-        parsed.data.descriptionEn,
-        parsed.data.descriptionRu,
-      ),
-      expectedBackAt: toIso(parsed.data.expectedBackAt),
-      startAt: toIso(parsed.data.startAt),
-      endAt: toIso(parsed.data.endAt),
-      superAdminBypass: parsed.data.superAdminBypass,
-      showCountdown: parsed.data.showCountdown,
-      updatedAt: new Date().toISOString(),
-    };
+  const previous = await getSystemModeConfig();
 
+  // Obyektin qurulması saf çevirmədir — `toIso()` pozulmuş dəyəri `null` edir,
+  // istisna atmır. Ona görə `try` yalnız bazaya yazılışı əhatə edir.
+  const next: SystemModeConfig = {
+    mode: parsed.data.mode as SystemModeConfig["mode"],
+    title: localized(parsed.data.titleAz, parsed.data.titleEn, parsed.data.titleRu),
+    description: localized(
+      parsed.data.descriptionAz,
+      parsed.data.descriptionEn,
+      parsed.data.descriptionRu,
+    ),
+    expectedBackAt: toIso(parsed.data.expectedBackAt),
+    startAt: toIso(parsed.data.startAt),
+    endAt: toIso(parsed.data.endAt),
+    superAdminBypass: parsed.data.superAdminBypass,
+    showCountdown: parsed.data.showCountdown,
+    updatedAt: new Date().toISOString(),
+  };
+
+  try {
     // Tək JSON açarı — D1-də tranzaksiya yoxdur, bölünmüş açarlar yarımçıq
     // qalanda rejimi mətndən ayıra bilərdi.
     await setSettings({ [SETTING_KEYS.SYSTEM_MODE_CONFIG]: serializeSystemModeConfig(next) });
-    bustSystemModeCache();
+  } catch (error) {
+    // Yazılış özü alınmadı — rejim dəyişmədi, nəticə xətadır.
+    return unexpected("sistem rejimi yazılmadı", error);
+  }
 
-    // Audit jurnalı mövcud infrastrukturu işlədir — paralel sistem qurulmur.
-    if (previous.mode !== next.mode) {
-      await recordAudit(
-        user,
-        "SYSTEM_MODE_CHANGE",
-        "SystemMode",
-        SETTING_KEYS.SYSTEM_MODE_CONFIG,
-        `Sistem rejimi: ${previous.mode} → ${next.mode}`,
-        { oldValue: { mode: previous.mode }, newValue: { mode: next.mode } },
-      );
-    } else {
-      await recordAudit(
-        user,
-        "UPDATE",
-        "SystemMode",
-        SETTING_KEYS.SYSTEM_MODE_CONFIG,
-        "Texniki xidmət səhifəsinin parametrləri yeniləndi",
-      );
-    }
+  // ---------------------------------------------------------------------
+  // Buradan aşağısı **uğuru poza bilməz.**
+  //
+  // Parametr artıq yazılıb, yəni rejim qüvvədədir. Sonrakı addımın xətası
+  // istifadəçiyə «saxlanılmadı» kimi qaytarılsaydı, super admin texniki
+  // xidməti aktivləşdirib bunu bilməyə bilərdi — bypass söndürülü olsaydı
+  // bu, öz-özünü kənarda qoymaq demək idi. D1 tranzaksiya dəstəkləmədiyinə
+  // görə addımları geri qaytarmaq da mümkün deyil, ona görə hər biri ayrıca
+  // udulur və yalnız log-a düşür.
+  // ---------------------------------------------------------------------
 
+  bustSystemModeCache();
+
+  // Audit jurnalı mövcud infrastrukturu işlədir — paralel sistem qurulmur.
+  // `recordAudit()` özü uğursuzluğu udur, burada isə əlavə qat kimi qalır.
+  if (previous.mode !== next.mode) {
+    await recordAudit(
+      user,
+      "SYSTEM_MODE_CHANGE",
+      "SystemMode",
+      SETTING_KEYS.SYSTEM_MODE_CONFIG,
+      `Sistem rejimi: ${previous.mode} → ${next.mode}`,
+      { oldValue: { mode: previous.mode }, newValue: { mode: next.mode } },
+    );
+  } else {
+    await recordAudit(
+      user,
+      "UPDATE",
+      "SystemMode",
+      SETTING_KEYS.SYSTEM_MODE_CONFIG,
+      "Texniki xidmət səhifəsinin parametrləri yeniləndi",
+    );
+  }
+
+  try {
     revalidatePath("/admin/sistem");
     // Rejim ictimai səthin hamısına təsir edir.
     revalidatePath("/", "layout");
     for (const locale of Object.values(LOCALES)) {
       revalidatePath(`/${locale}`, "layout");
     }
-
-    return success(
-      previous.mode === next.mode
-        ? "Texniki xidmət parametrləri yadda saxlanıldı."
-        : `Sistem rejimi dəyişdirildi: ${next.mode}.`,
-    );
   } catch (error) {
-    return unexpected("sistem rejimi yazılmadı", error);
+    // Keş invalidasiyası alınmasa rejim yenə qüvvədədir: qapı hər sorğuda
+    // parametri oxuyur, ISR keşi isə ən geci 15 saniyəyə özü yenilənir.
+    console.error("[admin] sistem rejimi keşi invalidasiya edilmədi:", error);
   }
+
+  return success(
+    previous.mode === next.mode
+      ? "Texniki xidmət parametrləri yadda saxlanıldı."
+      : `Sistem rejimi dəyişdirildi: ${next.mode}.`,
+  );
 }

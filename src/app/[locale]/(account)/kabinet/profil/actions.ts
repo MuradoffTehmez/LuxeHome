@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { requireAccount, currentSessionId } from "@/lib/auth/guard";
+import { systemModeBlock } from "@/lib/admin/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { revokeAllSessions } from "@/lib/auth/session";
 import { uniqueSlug } from "@/lib/admin/slug";
@@ -29,6 +30,9 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Profil `User` və `Agency` sətirlərini yazır — `READ_ONLY` rejimində bağlıdır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
   const profileSchema = z.object({
     name: z.string().trim().min(2, t("actions.nameMin")).max(120, t("actions.invalidField")),
     phone: z.string().trim().min(7, t("actions.invalidPhone")).max(30, t("actions.invalidField")).nullable(),
@@ -100,6 +104,14 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
   }
 }
 
+/**
+ * Parol dəyişmə `READ_ONLY` rejimində də açıq qalır.
+ *
+ * Bu, məzmun redaktəsi deyil, təhlükəsizlik əməliyyatıdır: parolu sızmış
+ * istifadəçi onu texniki xidmət pəncərəsinin bitməsini gözləmədən dəyişə
+ * bilməlidir. `MAINTENANCE` rejimində kabinet səhifəsinə middleware onsuz da
+ * icazə vermir.
+ */
 export async function changePassword(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account");
@@ -151,6 +163,10 @@ export async function deleteAccount(_prev: ActionState, formData: FormData): Pro
   const t = await getTranslations("account");
   await assertSameOrigin();
   const user = await requireAccount(locale);
+  // Silinmə iki mərhələlidir və ikincisi `runPhase2Maintenance()` ilə təkrarlanır;
+  // rejim bağlı ikən başlanğıc vermək yarımçıq vəziyyəti uzadardı.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
   const parsed = z.object({
     password: z.string().min(1, t("actions.currentPasswordRequired")),
     confirmation: z.literal(t("profile.deletePhrase"), {

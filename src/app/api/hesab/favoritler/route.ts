@@ -3,12 +3,14 @@ import { AUTH_KINDS, PUBLIC_PROPERTY_STATUSES } from "@/lib/constants";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { assertSameOrigin } from "@/lib/request-origin";
 import {
+  SYSTEM_MAINTENANCE_MESSAGE,
   SYSTEM_READ_ONLY_MESSAGE,
+  getSystemMode,
   isPublicApiBlocked,
-  isSystemWriteBlocked,
   maintenanceApiResponse,
   systemModeErrorResponse,
 } from "@/lib/system-mode";
+import { isWriteBlocked } from "@/lib/system-mode-policy";
 import { SYSTEM_MODES } from "@/lib/constants";
 import { sanitizeFavoriteIds } from "@/lib/favorite-sync";
 import { prisma } from "@/lib/prisma";
@@ -41,12 +43,17 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Sorğunun mənbəyi qəbul edilmədi" }, { status: 403 });
   }
 
-  // Favorit sinxronizasiyası `Favorite` sətirlərini yazır — `READ_ONLY`
-  // rejimində bloklanan tipik istifadəçi əməliyyatıdır.
-  if (await isSystemWriteBlocked()) {
+  // Favorit sinxronizasiyası `Favorite` sətirlərini yazır — həm `READ_ONLY`,
+  // həm də `MAINTENANCE` rejimində bloklanır. Cavabdakı kod **həqiqi**
+  // rejimdən gəlməlidir: müştəri tərəf iki halı ayırd edir.
+  const mode = await getSystemMode();
+  if (isWriteBlocked(mode, false)) {
     return systemModeErrorResponse({
-      mode: SYSTEM_MODES.READ_ONLY,
-      message: SYSTEM_READ_ONLY_MESSAGE,
+      mode,
+      message:
+        mode === SYSTEM_MODES.MAINTENANCE
+          ? SYSTEM_MAINTENANCE_MESSAGE
+          : SYSTEM_READ_ONLY_MESSAGE,
     });
   }
   const user = await account();

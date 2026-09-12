@@ -109,10 +109,25 @@ async function assertWriteLimit(userId: string, scope: string): Promise<void> {
   }
 }
 
-export async function requireAdminAction(permission: Permission): Promise<AuthUser> {
+/**
+ * `requireAdminAction` seçimləri.
+ *
+ * `skipSystemModeGate` **yalnız** sistem rejimini dəyişən action üçündür.
+ * Generic qapı `READ_ONLY`-də hər yazmanı bağlayır (super admin daxil) — bu
+ * doğrudur, amma rejimi geri `NORMAL`-a qaytaran action-ın özünə tətbiq
+ * olunsaydı, çıxış yolu bağlanar və yeganə bərpa yolu bazaya əl ilə
+ * müdaxilə olardı. Qapını burada keçmək təhlükəsizdir, çünki həmin action
+ * ayrıca `SUPER_ADMIN` yoxlaması daşıyır.
+ */
+type AdminActionOptions = { skipSystemModeGate?: boolean };
+
+export async function requireAdminAction(
+  permission: Permission,
+  options?: AdminActionOptions,
+): Promise<AuthUser> {
   await assertSameOrigin();
   const user = await requirePermission(permission);
-  await assertWritableMode(user.role);
+  if (!options?.skipSystemModeGate) await assertWritableMode(user.role);
   await assertWriteLimit(user.id, "admin");
   return user;
 }

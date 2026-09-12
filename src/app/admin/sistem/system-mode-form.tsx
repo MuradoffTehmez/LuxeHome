@@ -53,6 +53,15 @@ export function SystemModeForm({ initial }: { initial: SystemModeFormValues }) {
   const formRef = useRef<HTMLFormElement>(null);
   const [mode, setMode] = useState<SystemMode>(initial.mode);
   const [confirming, setConfirming] = useState(false);
+  /**
+   * Təsdiqdən sonrakı proqramlı göndərişin bayrağı.
+   *
+   * `confirming` state-i istifadə edilə bilməz: `setConfirming(false)` yeni
+   * render planlaşdırır və `requestSubmit()` işə düşəndə `handleSubmit` artıq
+   * `confirming === false` görür — nəticədə forma yenidən dayandırılıb dialoq
+   * təkrar açılırdı. Ref render dövründən asılı deyil.
+   */
+  const confirmedRef = useRef(false);
 
   const modeHint: Record<SystemMode, string> = {
     NORMAL: t("pages.systemMode.modeNormalHint"),
@@ -67,17 +76,21 @@ export function SystemModeForm({ initial }: { initial: SystemModeFormValues }) {
   };
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    // Rejim dəyişmirsə forma birbaşa göndərilir.
-    if (mode === initial.mode || confirming) return;
+    // Rejim dəyişmirsə, yaxud dəyişiklik artıq təsdiqlənibsə forma birbaşa gedir.
+    if (mode === initial.mode || confirmedRef.current) {
+      confirmedRef.current = false;
+      return;
+    }
     event.preventDefault();
     setConfirming(true);
   }
 
   function confirmAndSubmit() {
+    confirmedRef.current = true;
     setConfirming(false);
     // `requestSubmit()` HTML validasiyasını və `action`-ı normal yolla işə salır;
     // `submit()` isə `onSubmit` handler-ini yan keçərdi.
-    queueMicrotask(() => formRef.current?.requestSubmit());
+    formRef.current?.requestSubmit();
   }
 
   return (
