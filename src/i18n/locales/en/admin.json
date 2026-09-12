@@ -78,7 +78,8 @@
       "audit": "Audit log",
       "profile": "My account",
       "settings": "Settings",
-      "demoContent": "Demo content"
+      "demoContent": "Demo content",
+      "systemMode": "System settings"
     }
   },
   "actions": {
@@ -393,6 +394,11 @@
       "DRAFT": "Draft",
       "READY": "Ready for review",
       "PUBLISHED": "Published"
+    },
+    "systemMode": {
+      "NORMAL": "Normal",
+      "MAINTENANCE": "Maintenance",
+      "READ_ONLY": "Read only"
     }
   },
   "profile": {
@@ -2158,6 +2164,44 @@
       "cmdBuild": "Regenerates the sample SQL file.",
       "cmdLoad": "Loads the sample content into the local database.",
       "cmdClean": "Deletes every sample record from the database."
+    },
+    "systemMode": {
+      "title": "Maintenance mode",
+      "description": "Control the platform operating mode. Only a Super Admin can change it.",
+      "breadcrumb": "System settings",
+      "statusTitle": "System status",
+      "statusDescription": "The current mode takes effect immediately across all public pages and write operations.",
+      "modeTitle": "Mode",
+      "modeNormalHint": "The site works normally.",
+      "modeMaintenanceHint": "Regular visitors see a 503 maintenance page across the whole site.",
+      "modeReadOnlyHint": "Pages stay readable, but every data-changing operation is blocked.",
+      "contentTitle": "Maintenance page content",
+      "contentDescription": "Fields left empty fall back to the built-in default text.",
+      "fieldTitle": "Heading",
+      "fieldDescription": "Description",
+      "fieldExpectedBackAt": "Expected back at",
+      "fieldStartAt": "Start time",
+      "fieldEndAt": "End time (countdown)",
+      "fieldBypass": "Super Admin bypass",
+      "fieldBypassHint": "When off, even a Super Admin sees the maintenance page.",
+      "fieldCountdown": "Show a countdown to visitors",
+      "fieldCountdownHint": "Shown only when an end time is set. The mode does not change on its own when the time runs out.",
+      "submit": "Save mode",
+      "confirmTitle": "Change the mode",
+      "confirmMaintenance": "Enabling Maintenance Mode makes the platform unreachable for regular users.",
+      "confirmReadOnly": "In Read Only mode content stays viewable, but data-changing operations are blocked.",
+      "confirmNormal": "The site will work in full normal mode again.",
+      "confirmAccept": "Confirm",
+      "confirmCancel": "Cancel",
+      "forcedTitle": "Environment override is active",
+      "forcedHint": "FORCE_MAINTENANCE is set and overrides the panel choice.",
+      "howTitle": "How it works",
+      "howGate": "The mode is checked at the earliest request stage — in middleware — so the main page never renders.",
+      "howBypass": "Bypass applies to a Super Admin session only and is verified against the database every time; there is no URL-parameter bypass.",
+      "howCache": "A change propagates to every Worker isolate within 15 seconds.",
+      "howAudit": "Every change is written to the audit log as SYSTEM_MODE_CHANGE.",
+      "saved": "System mode updated.",
+      "unchanged": "Nothing changed."
     }
   }
 }

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
+import { SYSTEM_MODE_SETTING_KEY } from "@/lib/system-mode";
 
 /**
  * Paneldən idarə olunan parametrlər.
@@ -35,6 +36,19 @@ export const SETTING_KEYS = {
    * necə tətbiq olunduğu `src/lib/demo-content.ts`-dədir.
    */
   DEMO_CONTENT_ENABLED: "demo.content_enabled",
+  /**
+   * Sistem rejimi (`NORMAL` | `MAINTENANCE` | `READ_ONLY`) və texniki xidmət
+   * səhifəsinin mətnləri — **tək JSON dəyər**.
+   *
+   * Sahələr qəsdən ayrı açarlara bölünmür: D1 tranzaksiya dəstəkləmir, ona görə
+   * `setSettings()` açarları bir-bir yazır. Bölünsəydi, yarımçıq qalan yazılış
+   * rejimi `MAINTENANCE` edib başlığı köhnə saxlaya bilərdi. Tək sətir isə
+   * atomar yenilənir.
+   *
+   * Oxuma yolu `src/lib/system-mode.ts`-dədir və Prisma-dan keçmir — middleware
+   * də həmin sətri oxuyur.
+   */
+  SYSTEM_MODE_CONFIG: SYSTEM_MODE_SETTING_KEY,
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];

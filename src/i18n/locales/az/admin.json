@@ -78,7 +78,8 @@
       "audit": "Audit jurnalı",
       "profile": "Hesabım",
       "settings": "Parametrlər",
-      "demoContent": "Nümunə məzmun"
+      "demoContent": "Nümunə məzmun",
+      "systemMode": "Sistem ayarları"
     }
   },
   "actions": {
@@ -393,6 +394,11 @@
       "DRAFT": "Qaralama",
       "READY": "Yoxlamaya hazır",
       "PUBLISHED": "Dərc edilib"
+    },
+    "systemMode": {
+      "NORMAL": "Normal",
+      "MAINTENANCE": "Texniki xidmət",
+      "READ_ONLY": "Yalnız baxış"
     }
   },
   "profile": {
@@ -2158,6 +2164,44 @@
       "cmdBuild": "Nümunə SQL faylını yenidən yaradır.",
       "cmdLoad": "Nümunə məzmunu lokal bazaya yükləyir.",
       "cmdClean": "Bütün nümunə qeydləri bazadan silir."
+    },
+    "systemMode": {
+      "title": "Texniki xidmət rejimi",
+      "description": "Platformanın işləmə rejimini idarə edin. Dəyişikliyi yalnız Super Admin edə bilər.",
+      "breadcrumb": "Sistem ayarları",
+      "statusTitle": "Sistem statusu",
+      "statusDescription": "Cari rejim bütün ictimai səhifələrə və yazma əməliyyatlarına dərhal təsir edir.",
+      "modeTitle": "Rejim",
+      "modeNormalHint": "Sayt tam normal işləyir.",
+      "modeMaintenanceHint": "Adi istifadəçilər bütün saytda 503 texniki xidmət səhifəsi görür.",
+      "modeReadOnlyHint": "Səhifələrə baxmaq olar, məlumat dəyişdirən əməliyyatlar bloklanır.",
+      "contentTitle": "Texniki xidmət səhifəsinin mətni",
+      "contentDescription": "Boş buraxılan sahələr üçün sistemin standart mətni göstərilir.",
+      "fieldTitle": "Başlıq",
+      "fieldDescription": "Açıqlama",
+      "fieldExpectedBackAt": "Təxmini açılış vaxtı",
+      "fieldStartAt": "Başlanma vaxtı",
+      "fieldEndAt": "Bitmə vaxtı (geri sayım)",
+      "fieldBypass": "Super Admin bypass",
+      "fieldBypassHint": "Söndürülsə, texniki xidmət səhifəsini Super Admin də görür.",
+      "fieldCountdown": "İstifadəçiyə geri sayım göstərilsin",
+      "fieldCountdownHint": "Yalnız bitmə vaxtı doldurulduqda göstərilir. Vaxt bitəndə rejim avtomatik dəyişmir.",
+      "submit": "Rejimi yadda saxla",
+      "confirmTitle": "Rejimi dəyişmək",
+      "confirmMaintenance": "Maintenance Mode aktiv edilərsə platforma adi istifadəçilər üçün əlçatmaz olacaq.",
+      "confirmReadOnly": "Read Only rejimində məlumatlara baxmaq mümkün olacaq, lakin məlumat dəyişdirən əməliyyatlar bloklanacaq.",
+      "confirmNormal": "Sayt yenidən tam normal rejimdə işləyəcək.",
+      "confirmAccept": "Təsdiq edirəm",
+      "confirmCancel": "İmtina",
+      "forcedTitle": "Mühit override-u aktivdir",
+      "forcedHint": "FORCE_MAINTENANCE dəyəri qüvvədədir və paneldəki seçimdən üstündür.",
+      "howTitle": "Necə işləyir",
+      "howGate": "Rejim sorğunun ən erkən mərhələsində — middleware-də — yoxlanılır, ona görə əsas səhifə heç render olunmur.",
+      "howBypass": "Bypass yalnız Super Admin sessiyası üçündür və hər dəfə bazadan təsdiqlənir; URL parametri ilə bypass yoxdur.",
+      "howCache": "Dəyişiklik bütün Worker izolyatlarına 15 saniyəyə qədər yayılır.",
+      "howAudit": "Hər dəyişiklik audit jurnalına SYSTEM_MODE_CHANGE kimi yazılır.",
+      "saved": "Sistem rejimi yeniləndi.",
+      "unchanged": "Dəyişiklik yoxdur."
     }
   }
 }

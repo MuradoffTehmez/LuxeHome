@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PERMISSIONS } from "@/lib/constants";
-import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { AdminGuardError, SystemModeGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { systemModeErrorResponse } from "@/lib/system-mode";
 import { recordAudit } from "@/lib/admin/audit";
 import { MEDIA_FOLDERS, putImage, type MediaFolder } from "@/lib/media/storage";
 
@@ -24,6 +25,9 @@ export async function POST(request: Request) {
   try {
     user = await requireAdminAction(PERMISSIONS.MEDIA_MANAGE);
   } catch (error) {
+    // Sistem rejimi bloku 503 + strukturlaşdırılmış kodla qaytarılır ki,
+    // müştəri tərəf onu icazə xətasından (403) ayırd edə bilsin.
+    if (error instanceof SystemModeGuardError) return systemModeErrorResponse(error);
     if (error instanceof AdminGuardError) {
       return NextResponse.json({ error: error.message }, { status: 403 });
     }

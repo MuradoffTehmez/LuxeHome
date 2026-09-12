@@ -1086,3 +1086,42 @@ export type PartnerFilterGroupSlug = PartnerFilterGroup["slug"];
 
 /** Yüklənə bilən ən böyük loqo ölçüsü — `MAX_UPLOAD_SIZE`-dan kiçikdir, loqo ağır olmamalıdır. */
 export const MAX_PARTNER_LOGO_SIZE = 2 * 1024 * 1024;
+
+// ---------------------------------------------------------------------------
+// SİSTEM REJİMİ (Maintenance Mode)
+// ---------------------------------------------------------------------------
+
+/**
+ * Platformanın işləmə rejimi.
+ *
+ * `NORMAL` — sayt tam işlək.
+ * `MAINTENANCE` — ictimai səthin hamısı 503 texniki xidmət səhifəsinə düşür;
+ *   yalnız `SUPER_ADMIN` və sistem üçün zəruri marşrutlar keçir.
+ * `READ_ONLY` — səhifələr normal göstərilir, məlumat dəyişdirən hər əməliyyat
+ *   (server action, API mutasiyası) rədd edilir.
+ *
+ * Dəyərlər `Setting` cədvəlində JSON içində saxlanılır — hansı yolla oxunduğu
+ * `src/lib/system-mode.ts`-dədir.
+ */
+export const SYSTEM_MODES = {
+  NORMAL: "NORMAL",
+  MAINTENANCE: "MAINTENANCE",
+  READ_ONLY: "READ_ONLY",
+} as const;
+
+export type SystemMode = (typeof SYSTEM_MODES)[keyof typeof SYSTEM_MODES];
+
+export const SYSTEM_MODE_LABELS: Record<SystemMode, string> = {
+  NORMAL: "Normal",
+  MAINTENANCE: "Texniki xidmət",
+  READ_ONLY: "Yalnız baxış",
+};
+
+export const SYSTEM_MODE_TONE: Record<
+  SystemMode,
+  "neutral" | "success" | "warning" | "danger" | "gold"
+> = {
+  NORMAL: "success",
+  MAINTENANCE: "danger",
+  READ_ONLY: "warning",
+};

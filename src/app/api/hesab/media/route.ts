@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
+import { AdminGuardError, SystemModeGuardError, requirePublicAction } from "@/lib/admin/guard";
+import { systemModeErrorResponse } from "@/lib/system-mode";
 import { createMediaRecordWithRollback } from "@/lib/media/upload-record";
 import { deleteImage, putImage } from "@/lib/media/storage";
 
@@ -18,6 +19,7 @@ export async function POST(request: Request) {
   try {
     user = await requirePublicAction("media");
   } catch (error) {
+    if (error instanceof SystemModeGuardError) return systemModeErrorResponse(error);
     if (error instanceof AdminGuardError) {
       return NextResponse.json({ error: error.message }, { status: 403 });
     }
