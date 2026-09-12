@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { requireAccount } from "@/lib/auth/guard";
+import { systemModeBlock } from "@/lib/admin/guard";
 import type { Locale } from "@/lib/constants";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
 import { localizePath } from "@/i18n/path-locale";
@@ -14,6 +15,9 @@ export async function markNotificationRead(id: string): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Sistem `READ_ONLY`/`MAINTENANCE` rejimindədirsə yazma burada dayanır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
 
   try {
     const existing = await prisma.notification.findFirst({ where: { id, userId: user.id }, select: { id: true } });
@@ -31,6 +35,9 @@ export async function markAllNotificationsRead(): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Sistem `READ_ONLY`/`MAINTENANCE` rejimindədirsə yazma burada dayanır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
 
   try {
     await prisma.notification.updateMany({
@@ -48,6 +55,9 @@ export async function deleteNotification(id: string): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account");
   const user = await requireAccount(locale);
+  // Sistem `READ_ONLY`/`MAINTENANCE` rejimindədirsə yazma burada dayanır.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
 
   try {
     const existing = await prisma.notification.findFirst({ where: { id, userId: user.id }, select: { id: true } });

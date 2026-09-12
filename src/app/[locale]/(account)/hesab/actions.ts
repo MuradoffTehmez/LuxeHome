@@ -24,6 +24,7 @@ import { hashPassword, needsRehash, verifyPassword } from "@/lib/auth/password";
 import { checkLoginLimit, clientIp, registerFailure, registerSuccess } from "@/lib/auth/rate-limit";
 import { createSession, revokeAllSessions, revokeSession } from "@/lib/auth/session";
 import { uniqueSlug } from "@/lib/admin/slug";
+import { systemModeBlock } from "@/lib/admin/guard";
 import {
   canUsePublicSignIn,
   publicSignInOutcome,
@@ -101,6 +102,15 @@ export async function registerAccount(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  // Qeydiyyat yeni `User` sətri yaradır, yəni yazma əməliyyatıdır.
+  //
+  // Bu fayldakı digər action-lar (giriş, çıxış, e-poçt təsdiqi, parol bərpası)
+  // **qəsdən** bloklanmır: onlar sessiya axınıdır və bağlandıqda artıq
+  // qeydiyyatdan keçmiş istifadəçi öz hesabından kənarda qalar. `MAINTENANCE`
+  // rejimində bu səhifələrə onsuz da middleware qapısı icazə vermir.
+  const blocked = await systemModeBlock();
+  if (blocked) return blocked;
+
   const t = await getTranslations("account");
   const passwordRule = z
     .string()

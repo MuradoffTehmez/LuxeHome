@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ACCOUNT_TYPES, LISTING_ACCOUNT_TYPES } from "@/lib/constants";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { getUnreadNotificationCount } from "@/lib/queries";
+import { isPublicApiBlocked, maintenanceApiResponse } from "@/lib/system-mode";
 
 /**
  * Naviqasiyadakı hesab bölməsi üçün sessiya vəziyyəti.
@@ -16,6 +17,10 @@ import { getUnreadNotificationCount } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  // Texniki xidmət rejimində ictimai hesab API-si də bağlanır —
+  // middleware matcher-i `/api/*` yollarını əhatə etmir.
+  if (await isPublicApiBlocked()) return maintenanceApiResponse();
+
   const user = await getOptionalUser();
   const isStaff = user?.accountType === ACCOUNT_TYPES.STAFF;
 
