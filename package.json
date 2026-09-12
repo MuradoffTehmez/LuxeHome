@@ -49,6 +49,7 @@
     "test:seo:routes": "node scripts/seo-route-status-smoke.mjs",
     "test:seo:live": "node scripts/serp-live-acceptance.mjs",
     "auth:create-admin": "tsx prisma/create-admin.ts",
+    "assets:maintenance-logo": "node scripts/build-maintenance-logo.mjs",
     "db:taxonomy:build": "tsx prisma/build-taxonomy-sql.ts",
     "db:taxonomy:local": "wrangler d1 execute luxehome-db --local --file=prisma/taxonomy.sql",
     "db:taxonomy:remote": "wrangler d1 execute luxehome-db --remote --file=prisma/taxonomy.sql",

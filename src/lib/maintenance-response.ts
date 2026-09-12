@@ -1,5 +1,6 @@
 import { DEFAULT_LOCALE, LOCALE_TAGS, type Locale } from "@/lib/constants";
 import { siteConfig } from "@/config/site";
+import { MAINTENANCE_LOGO_DATA_URI } from "@/lib/maintenance-logo";
 import {
   countdownTargetMs,
   localizedValue,
@@ -17,8 +18,9 @@ import {
  *   maintenance-ə keçmə»);
  * - status kodu tam nəzarətdədir. `NextResponse.rewrite()` rewrite edilən
  *   səhifənin statusunu (200) saxlayır və 503 vermək mümkün olmur;
- * - D1/R2 sorğusu, CSS bundle-ı, şəkil və şrift yüklənmir — səhifə tək
- *   cavabda tamamlanır, yəni sayt həqiqətən çətin vəziyyətdə olsa belə açılır.
+ * - D1/R2 sorğusu, CSS bundle-ı və şrift yüklənmir; loqo da data URI kimi
+ *   gömülüdür — səhifə tək cavabda tamamlanır, yəni sayt həqiqətən çətin
+ *   vəziyyətdə olsa belə açılır.
  *
  * Stil inline-dır: Tailwind sinifləri `_next/static/css/...` faylından gəlir,
  * onun adı isə build-dən buildə dəyişir və middleware onu bilmir.
@@ -170,6 +172,15 @@ function renderHtml(config: SystemModeConfig, locale: Locale, now: Date): string
     gap: 6px;
     margin-bottom: 28px;
   }
+  /* Loqo data URI kimi gəlir (bax: scripts/build-maintenance-logo.mjs) —
+     şəbəkədən heç nə yüklənmir. alt="" qəsdəndir: brend adı dərhal altında
+     mətn kimi var, ona görə şəkil ekran oxuyucusu üçün dekorativdir. */
+  .brand-mark {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 4px;
+    object-fit: contain;
+  }
   .brand-name {
     font-size: clamp(20px, 4.2vw, 26px);
     font-weight: 600;
@@ -271,6 +282,7 @@ function renderHtml(config: SystemModeConfig, locale: Locale, now: Date): string
 <body>
 <main role="main">
   <div class="brand">
+    <img class="brand-mark" src="${MAINTENANCE_LOGO_DATA_URI}" alt="" width="48" height="48">
     <span class="brand-name">${escapeHtml(siteConfig.name)}</span>
     <span class="brand-rule" aria-hidden="true"></span>
     <span class="brand-slogan">${escapeHtml(siteConfig.slogan)}</span>
@@ -377,7 +389,7 @@ export function maintenanceResponse(
       // Səhifə tam müstəqildir: kənar mənbə yükləmir, yalnız öz inline
       // stilini və geri sayım skriptini işlədir.
       "Content-Security-Policy":
-        "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
     },
   });
 }
