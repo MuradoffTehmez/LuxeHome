@@ -28,6 +28,9 @@
   "vars": {
     // İdarə paneli qapısı — prod admin istifadəyə açıqdır
     "ADMIN_ENABLED": "true",
+    // Sistem iş rejimi — texniki xidmət bağlıdır, normal iş rejimi aktivdir
+    "SYSTEM_MODE": "NORMAL",
+    "FORCE_MAINTENANCE": "false",
     // Dinamik səhifələrdə runtime-da oxunur; statik səhifələr üçün deploy skripti
     // eyni dəyəri build prosesinə də ötürür
     "SITE_URL": "https://luxehomeestate.az",
@@ -127,6 +130,8 @@
       "vars": {
         // Panel yalnız staging-də açıqdır
         "ADMIN_ENABLED": "true",
+        "SYSTEM_MODE": "NORMAL",
+        "FORCE_MAINTENANCE": "false",
         // robots.ts və seo.ts bunu görüb bütün səhifələri indeksdən çıxarır
         "IS_STAGING": "true",
         "SITE_URL": "https://luxehomeestate-staging.amiyevbahadur.workers.dev",
