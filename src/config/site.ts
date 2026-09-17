@@ -61,14 +61,23 @@ export const siteConfig = {
  * təmizlənmiş saxlanılır: onlar paylaşım anına bağlıdır, vaxtla etibarsızlaşır
  * və `sameAs` struktur datasında kanonik olmayan URL kimi görünür.
  *
+ * `scope` struktur datada kimin kimliyini sübut etdiyini göstərir — hamısı
+ * footer-də görünür, lakin `sameAs` sahələri fərqlidir:
+ *
+ * - `organization` — şirkətin öz profili, `organizationSchema().sameAs`-a düşür.
+ * - `owner` — şəxsi profil (`siteConfig.owner`). Təşkilatın `sameAs`-ına
+ *   salınsaydı, şirkətlə sahibin eyni subyekt olduğu iddia edilərdi; ona görə
+ *   `owner` Person qeydinə bağlanır.
+ * - `contact` — profil deyil, mesajlaşma/kataloq keçididir; `sameAs`-da yeri yoxdur.
+ *
  * Siyahının sırası footer-də göstərilmə sırasıdır.
  */
 export const socialProfiles = [
-  { key: "instagram", label: "Instagram", href: "https://www.instagram.com/luxe_home_estate" },
-  { key: "facebook", label: "Facebook", href: "https://www.facebook.com/share/14pAvDP57is/" },
-  { key: "tiktok", label: "TikTok", href: "https://www.tiktok.com/@luxe_home_estate" },
-  { key: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com/in/bahadur-amiyev-220458360" },
-  { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/c/267388138344634" },
+  { key: "instagram", label: "Instagram", scope: "organization", href: "https://www.instagram.com/luxe_home_estate" },
+  { key: "facebook", label: "Facebook", scope: "organization", href: "https://www.facebook.com/share/14pAvDP57is/" },
+  { key: "tiktok", label: "TikTok", scope: "organization", href: "https://www.tiktok.com/@luxe_home_estate" },
+  { key: "linkedin", label: "LinkedIn", scope: "owner", href: "https://www.linkedin.com/in/bahadur-amiyev-220458360" },
+  { key: "whatsapp", label: "WhatsApp", scope: "contact", href: "https://wa.me/c/267388138344634" },
 ] as const;
 
 export const PRODUCTION_SITE_URL = "https://luxehomeestate.az";

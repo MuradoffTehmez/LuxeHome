@@ -236,12 +236,16 @@ export function organizationSchema(profile?: LocalBusinessProfile | null) {
   const areaServed = profile?.serviceAreas.length
     ? { areaServed: profile.serviceAreas.map((name) => ({ "@type": "AdministrativeArea", name })) }
     : { areaServed: { "@type": "Country", name: "Azərbaycan" } };
-  // WhatsApp kataloqu `sameAs`-a salınmır: o, şirkətin profil səhifəsi deyil,
-  // mesajlaşma/kataloq keçididir və struktur datada eyniyyət sübutu sayılmır.
+  // Yalnız `scope: "organization"` profilləri şirkətin `sameAs`-ına düşür.
+  // Şəxsi profil (`owner`) aşağıda ayrıca Person qeydinə bağlanır, mesajlaşma
+  // keçidi (`contact`) isə kimlik sübutu olmadığı üçün heç birinə salınmır.
   const sameAs = [
-    ...socialProfiles.filter((item) => item.key !== "whatsapp").map((item) => item.href),
+    ...socialProfiles.filter((item) => item.scope === "organization").map((item) => item.href),
     ...(profile?.socialProfiles ?? []),
   ].filter((value, index, list) => value && list.indexOf(value) === index);
+  const ownerSameAs = socialProfiles
+    .filter((item) => item.scope === "owner")
+    .map((item) => item.href);
 
   return {
     "@context": "https://schema.org",
@@ -269,7 +273,11 @@ export function organizationSchema(profile?: LocalBusinessProfile | null) {
     ...openingHours,
     ...hasMap,
     // Sayt, brend və marka hüquqlarının sahibi
-    owner: { "@type": "Person", name: siteConfig.owner.name },
+    owner: {
+      "@type": "Person",
+      name: siteConfig.owner.name,
+      ...(ownerSameAs.length ? { sameAs: ownerSameAs } : {}),
+    },
     brand: {
       "@type": "Brand",
       name: siteConfig.name,
