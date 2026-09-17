@@ -147,7 +147,9 @@ function ContactDetails({ directionsLabel }: { directionsLabel: string }) {
         className="group flex min-h-11 items-center gap-3 rounded-xs transition-colors hover:text-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:min-h-0 lg:py-1"
       >
         <Phone className="size-4 shrink-0 text-gold-soft" aria-hidden="true" />
-        <span className="tabular text-base font-medium text-ink-invert transition-colors group-hover:text-gold-soft">
+        {/* `whitespace-nowrap`: nömrə boşluqlarla yazılır və 167px-lik «Əlaqə»
+            sütununda iki sətrə bölünürdü. */}
+        <span className="tabular whitespace-nowrap text-sm font-semibold text-ink-invert transition-colors group-hover:text-gold-soft">
           {siteConfig.phone}
         </span>
       </a>
