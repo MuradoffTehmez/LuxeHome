@@ -2,8 +2,8 @@
  * Brend ikonları.
  *
  * lucide-react brend loqolarını daşımır, buna görə Instagram, WhatsApp,
- * Facebook və Telegram ikonları rəsmi forma proporsiyalarına uyğun,
- * `currentColor` ilə rənglənən SVG kimi burada saxlanılır.
+ * Facebook, Telegram, LinkedIn və TikTok ikonları rəsmi forma proporsiyalarına
+ * uyğun, `currentColor` ilə rənglənən SVG kimi burada saxlanılır.
  * Ştrix qalınlığı (1.75) qalan ikon dəsti ilə eyni saxlanılıb.
  */
 
@@ -40,6 +40,22 @@ export function FacebookIcon({ className, ...props }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true" {...props}>
       <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.9h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z" />
+    </svg>
+  );
+}
+
+export function LinkedInIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true" {...props}>
+      <path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM2.4 21.5h5.16V9.75H2.4V21.5Zm7.4 0h5.16v-6.53c0-1.72.33-3.39 2.47-3.39 2.1 0 2.13 1.97 2.13 3.5v6.42H24v-7.45c0-4.02-.87-6.4-5.05-6.4-2.01 0-3.36 1.02-3.91 1.99h-.07V9.75H9.8V21.5Z" />
+    </svg>
+  );
+}
+
+export function TikTokIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true" {...props}>
+      <path d="M16.6 2h-3.1v13.6a2.6 2.6 0 1 1-2.6-2.6c.2 0 .4 0 .6.06v-3.14a5.9 5.9 0 0 0-.6-.03 5.72 5.72 0 1 0 5.72 5.72V8.9a7.1 7.1 0 0 0 4.1 1.31V7.07a4.05 4.05 0 0 1-2.9-1.24A4.07 4.07 0 0 1 16.6 2Z" />
     </svg>
   );
 }
