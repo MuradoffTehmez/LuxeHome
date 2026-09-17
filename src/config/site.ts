@@ -54,6 +54,23 @@ export const siteConfig = {
 
 } as const;
 
+/**
+ * Rəsmi sosial şəbəkə profilləri.
+ *
+ * Ünvanlar izləmə parametrlərindən (`utm_*`, `stkn`, `mibextid`, `_t`)
+ * təmizlənmiş saxlanılır: onlar paylaşım anına bağlıdır, vaxtla etibarsızlaşır
+ * və `sameAs` struktur datasında kanonik olmayan URL kimi görünür.
+ *
+ * Siyahının sırası footer-də göstərilmə sırasıdır.
+ */
+export const socialProfiles = [
+  { key: "instagram", label: "Instagram", href: "https://www.instagram.com/luxe_home_estate" },
+  { key: "facebook", label: "Facebook", href: "https://www.facebook.com/share/14pAvDP57is/" },
+  { key: "tiktok", label: "TikTok", href: "https://www.tiktok.com/@luxe_home_estate" },
+  { key: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com/in/bahadur-amiyev-220458360" },
+  { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/c/267388138344634" },
+] as const;
+
 export const PRODUCTION_SITE_URL = "https://luxehomeestate.az";
 
 export const navigation = [

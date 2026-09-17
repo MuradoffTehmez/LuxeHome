@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { isStaging, siteConfig, siteUrl } from "@/config/site";
+import { isStaging, siteConfig, siteUrl, socialProfiles } from "@/config/site";
 import type { LocalBusinessProfile } from "@/lib/local-business";
 import {
   DEFAULT_LOCALE,
@@ -236,8 +236,12 @@ export function organizationSchema(profile?: LocalBusinessProfile | null) {
   const areaServed = profile?.serviceAreas.length
     ? { areaServed: profile.serviceAreas.map((name) => ({ "@type": "AdministrativeArea", name })) }
     : { areaServed: { "@type": "Country", name: "Azərbaycan" } };
-  const sameAs = [siteConfig.instagramUrl, ...(profile?.socialProfiles ?? [])]
-    .filter((value, index, list) => value && list.indexOf(value) === index);
+  // WhatsApp kataloqu `sameAs`-a salınmır: o, şirkətin profil səhifəsi deyil,
+  // mesajlaşma/kataloq keçididir və struktur datada eyniyyət sübutu sayılmır.
+  const sameAs = [
+    ...socialProfiles.filter((item) => item.key !== "whatsapp").map((item) => item.href),
+    ...(profile?.socialProfiles ?? []),
+  ].filter((value, index, list) => value && list.indexOf(value) === index);
 
   return {
     "@context": "https://schema.org",

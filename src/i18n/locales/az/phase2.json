@@ -23,7 +23,8 @@
     "loginHint": "Rəy yazmaq üçün hesabınıza daxil olun.",
     "reviewSelf": "Öz agentliyinizin agenti haqqında rəy yaza bilməzsiniz.",
     "homeTitle": "Sizə kömək edəcək mütəxəssislər",
-    "homeAll": "Bütün agentlər"
+    "homeAll": "Bütün agentlər",
+    "emptyDescription": "Yeni agentlər təsdiqləndikcə burada görünəcək."
   },
   "reservation": {
     "title": "Əmlakı rezervasiya et",

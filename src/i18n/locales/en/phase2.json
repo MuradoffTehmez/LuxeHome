@@ -23,7 +23,8 @@
     "loginHint": "Sign in to leave a review.",
     "reviewSelf": "You cannot review an agent from your own agency.",
     "homeTitle": "The specialists who will help you",
-    "homeAll": "All agents"
+    "homeAll": "All agents",
+    "emptyDescription": "New agents will appear here as they are verified."
   },
   "reservation": {
     "title": "Reserve this property",

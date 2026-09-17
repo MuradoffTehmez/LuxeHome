@@ -27,7 +27,7 @@ export function AgencyCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col gap-4 rounded-sm border border-line bg-paper p-5 transition-colors duration-200 hover:border-gold sm:p-6",
+        "group relative flex h-full flex-col gap-4 rounded-sm border border-line bg-paper p-5 transition-colors duration-300 ease-out-soft hover:border-gold sm:p-6",
         className,
       )}
     >
@@ -47,11 +47,11 @@ export function AgencyCard({
           )}
         </div>
 
-        <div className="flex flex-col gap-0.5">
+        <div className="flex min-w-0 flex-col gap-1">
           <h3 className="font-display text-lg leading-snug text-ink">
             <Link
               href={`/agentlikler/${agency.slug}`}
-              className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center hover:text-gold-deep"
+              className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center transition-colors duration-300 ease-out-soft hover:text-gold-deep"
             >
               {agency.name}
             </Link>
@@ -62,22 +62,26 @@ export function AgencyCard({
         </div>
       </div>
 
-      <dl className="mt-auto flex flex-col gap-2 border-t border-line pt-4 text-sm text-ink-muted">
-        {agency.address && (
-          <div className="flex items-start gap-1.5">
-            <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            <dt className="sr-only">{t("address")}</dt>
-            <dd className="line-clamp-1">{agency.address}</dd>
-          </div>
-        )}
-        {agency.phone && (
-          <div className="flex items-center gap-1.5">
-            <Phone className="size-4 shrink-0" aria-hidden="true" />
-            <dt className="sr-only">{t("phone")}</dt>
-            <dd className="tabular">{agency.phone}</dd>
-          </div>
-        )}
-      </dl>
+      {/* Ünvan və telefon hər agentlikdə dolu olmur — ikisi də boşdursa
+          ayırıcı xətt asılı qalır, ona görə blok şərtlə render olunur. */}
+      {(agency.address || agency.phone) && (
+        <dl className="mt-auto flex flex-col gap-2 border-t border-line pt-4 text-sm text-ink-muted">
+          {agency.address && (
+            <div className="flex items-start gap-1.5">
+              <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <dt className="sr-only">{t("address")}</dt>
+              <dd className="line-clamp-1">{agency.address}</dd>
+            </div>
+          )}
+          {agency.phone && (
+            <div className="flex items-center gap-1.5">
+              <Phone className="size-4 shrink-0" aria-hidden="true" />
+              <dt className="sr-only">{t("phone")}</dt>
+              <dd className="tabular">{agency.phone}</dd>
+            </div>
+          )}
+        </dl>
+      )}
     </article>
   );
 }

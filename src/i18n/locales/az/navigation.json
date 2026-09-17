@@ -54,7 +54,9 @@
     "description": "Mənzil, villa, torpaq və kommersiya obyektləri üzrə peşəkar daşınmaz əmlak xidmətləri.",
     "ownership": "Sayt, «{brand}» brendi və markası {owner}-na məxsusdur.",
     "vat": "VÖEN: {value}",
-    "directions": "Yol göstər"
+    "directions": "Yol göstər",
+    "resources": "Resurslar",
+    "social": "Sosial şəbəkələr"
   },
   "agents": "Agentlər",
   "knowledgeHub": "Bilik Mərkəzi",
