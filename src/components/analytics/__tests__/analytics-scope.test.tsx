@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -30,6 +32,22 @@ describe("analitika əhatəsi", () => {
     expect(isAdminRoute("/az/emlaklar")).toBe(false);
     // Ad oxşarlığı panel sayılmamalıdır
     expect(isAdminRoute("/az/administrativ-rayonlar")).toBe(false);
+  });
+
+  /**
+   * `isAdminRoute` yalnız yeni işə salmanı dayandırır. İctimai səhifədən panelə
+   * client-side keçid olsaydı, sənəd ictimai CSP-si ilə qalar və orada artıq
+   * yüklənmiş GTM sökülmədən panel marşrutlarını izləməyə davam edərdi —
+   * ona görə keçid tam sənəd yükləməsi olmalıdır.
+   */
+  it("panelə keçidi tam sənəd yükləməsi kimi saxlayır", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/components/site/account-menu.tsx"),
+      "utf8",
+    );
+
+    expect(source).toContain('<a href="/admin"');
+    expect(source).not.toMatch(/<(NextLink|Link)\s[^>]*href="\/admin"/);
   });
 
   /**
