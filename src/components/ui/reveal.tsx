@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 type RevealProps = {
@@ -12,8 +9,9 @@ type RevealProps = {
 };
 
 /**
- * Scroll zamanı elementi yumşaq şəkildə göstərir (fade + 12px yuxarı).
- * `prefers-reduced-motion` aktivdirsə CSS animasiyanı ləğv edir.
+ * Kontenti client-side observer və React state olmadan render edir. Dəstəkləyən
+ * brauzerlərdə giriş effekti CSS view timeline ilə işləyir; digərlərində kontent
+ * dərhal görünür. Beləliklə çoxkartlı səhifələr onlarla hydration sərhədi yaratmır.
  */
 export function Reveal({
   children,
@@ -21,40 +19,9 @@ export function Reveal({
   className,
   as: Tag = "div",
 }: RevealProps) {
-  const ref = useRef<HTMLElement>(null);
-  const [ready, setReady] = useState(false);
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element || revealed) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setRevealed(true);
-            observer.disconnect();
-          }
-        }
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [revealed]);
-
   return (
     <Tag
-      ref={ref as React.Ref<never>}
       data-reveal=""
-      data-reveal-ready={ready ? "true" : "false"}
-      data-revealed={revealed ? "true" : "false"}
       style={{ "--reveal-delay": `${delay}ms` } as React.CSSProperties}
       className={cn(className)}
     >

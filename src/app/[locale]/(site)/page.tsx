@@ -91,16 +91,27 @@ const BLOG_LAYOUT = [
 export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   const resolvedLocale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
-  const t = await getTranslations({ locale: resolvedLocale, namespace: "home" });
-  const propertyT = await getTranslations({ locale: resolvedLocale, namespace: "property" });
-  const phase2T = await getTranslations({ locale: resolvedLocale, namespace: "phase2.testimonials" });
-  const wizardT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.wizard" });
-  const agentsT = await getTranslations({ locale: resolvedLocale, namespace: "phase2.agents" });
-  const aiSearchT = await getTranslations({ locale: resolvedLocale, namespace: "phase3.search" });
   const [
+    t,
+    propertyT,
+    phase2T,
+    wizardT,
+    agentsT,
+    aiSearchT,
+    listingSearchT,
     { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners },
     { testimonials, agents },
-  ] = await Promise.all([getCachedHomePageData(), getCachedHomeSocialProof()]);
+  ] = await Promise.all([
+    getTranslations({ locale: resolvedLocale, namespace: "home" }),
+    getTranslations({ locale: resolvedLocale, namespace: "property" }),
+    getTranslations({ locale: resolvedLocale, namespace: "phase2.testimonials" }),
+    getTranslations({ locale: resolvedLocale, namespace: "phase2.wizard" }),
+    getTranslations({ locale: resolvedLocale, namespace: "phase2.agents" }),
+    getTranslations({ locale: resolvedLocale, namespace: "phase3.search" }),
+    getTranslations({ locale: resolvedLocale, namespace: "listings.search" }),
+    getCachedHomePageData(),
+    getCachedHomeSocialProof(),
+  ]);
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 
@@ -126,7 +137,32 @@ export default async function HomePage({ params }: HomePageProps) {
 
   return (
     <>
-      <Hero types={typeOptions} cities={cityOptions} />
+      <Hero
+        types={typeOptions}
+        cities={cityOptions}
+        locale={resolvedLocale}
+        labels={{
+          imageAlt: t("hero.imageAlt"),
+          eyebrow: t("hero.eyebrow"),
+          title: t("hero.title"),
+          description: t("hero.description"),
+          viewProperties: t("hero.viewProperties"),
+          contactUs: t("hero.contactUs"),
+          call: t("hero.call"),
+          search: {
+            listingType: listingSearchT("listingType"),
+            sale: listingSearchT("sale"),
+            rent: listingSearchT("rent"),
+            query: listingSearchT("search"),
+            queryPlaceholder: listingSearchT("queryPlaceholder"),
+            propertyType: listingSearchT("propertyType"),
+            city: listingSearchT("city"),
+            all: listingSearchT("all"),
+            submit: listingSearchT("submit"),
+          },
+        }}
+      />
+      <div className="home-deferred-content">
       <Section tone="beige" spacing="cozy">
         <Container size="wide">
           <SectionHeader
@@ -137,6 +173,7 @@ export default async function HomePage({ params }: HomePageProps) {
           <div className="mt-8">
             <AiSearchForm
               initialQuery=""
+              locale={resolvedLocale}
               labels={{
                 placeholder: aiSearchT("placeholder"),
                 submit: aiSearchT("submit"),
@@ -603,6 +640,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </Container>
       </Section>
+      </div>
     </>
   );
 }

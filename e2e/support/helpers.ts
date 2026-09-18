@@ -194,16 +194,11 @@ export async function readFavorites(page: Page): Promise<string[]> {
 }
 
 /**
- * Səhifəni «oturdur»: bütün reveal elementlərini görünən hala gətirir.
+ * Səhifəni «oturdur»: deferred bölmələri render etdirir.
  *
- * `[data-reveal]` blokları `IntersectionObserver` ilə idarə olunur — viewport-a
- * girməyən element `opacity: 0` qalır. axe belə elementi fonla qarışmış rəngdə
- * ölçür və mövcud olmayan kontrast pozuntusu bildirir (məsələn qızıl `#aa8754`
- * fon `#bca077` kimi görünür).
- *
- * `reducedMotion: "reduce"` keçidi ləğv edir, lakin observer yenə də yalnız
- * viewport-a girən elementi işarələyir. Ona görə səhifə sona qədər sürüşdürülür,
- * qısa fasilə verilir və başa qaytarılır — bundan sonra bütün bloklar görünəndir.
+ * `reducedMotion: "reduce"` CSS reveal keçidini ləğv edir. Ana səhifənin
+ * `content-visibility: auto` bölmələri isə axe ölçməsindən əvvəl browser
+ * tərəfindən layout edilməlidir; sona qədər sürüşmək həmin işi deterministik edir.
  */
 export async function settlePage(page: Page): Promise<void> {
   await page.evaluate(async () => {
@@ -217,16 +212,7 @@ export async function settlePage(page: Page): Promise<void> {
     window.scrollTo(0, 0);
   });
 
-  // Observer-in son partiyanı işarələməsi üçün qısa pəncərə.
-  await page.waitForTimeout(600);
-
-  // Gizli qalan reveal bloku varsa, testi yanıltmamaq üçün açıq şəkildə açılır.
-  await page.evaluate(() => {
-    document.querySelectorAll("[data-reveal]").forEach((element) => {
-      element.setAttribute("data-revealed", "true");
-    });
-  });
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(300);
 }
 
 /**

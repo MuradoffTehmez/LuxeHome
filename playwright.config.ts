@@ -72,9 +72,9 @@ export default defineConfig({
     extraHTTPHeaders: { "user-agent": USER_AGENT },
 
     /**
-     * Reveal animasiyası söndürülür.
+     * CSS reveal animasiyası söndürülür.
      *
-     * `[data-reveal]` elementləri scroll zamanı `opacity: 0 → 1` keçidi edir.
+     * `[data-reveal]` elementləri CSS view timeline ilə `opacity: 0 → 1` keçidi edir.
      * Keçidin ortasında tutulan element yarı-şəffaf olur və axe onu fonla
      * qarışmış rəngdə ölçür — nəticədə mövcud olmayan kontrast pozuntuları
      * hesabata düşür (məsələn `#aa8754` qızıl fon `#bca077` kimi görünür).
