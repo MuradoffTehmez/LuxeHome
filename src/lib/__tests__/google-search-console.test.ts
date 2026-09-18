@@ -36,7 +36,8 @@ describe("Google Search Console credential-i", () => {
 
   it("property verilmədikdə domain property-ni istifadə edir", () => {
     expect(getSearchConsoleSiteUrl()).toBe(DEFAULT_GSC_SITE_URL);
-    process.env.GSC_SITE_URL = " sc-domain:example.az ";
+    (process.env as Record<string, string | undefined>).GSC_SITE_URL =
+      " sc-domain:example.az ";
     expect(getSearchConsoleSiteUrl()).toBe("sc-domain:example.az");
   });
 
