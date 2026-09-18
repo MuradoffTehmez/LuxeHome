@@ -5,6 +5,7 @@ import { canAttemptDeploymentReload, isStaleDeploymentError } from "../deploymen
 describe("deploy-dan sonra köhnə tabın bərpası", () => {
   it.each([
     'Server Action "abc123" was not found on the server.',
+    'Failed to find Server Action "abc123". This request might be from an older or newer deployment.',
     "Loading chunk 8450 failed.",
     "ChunkLoadError: Loading chunk 12 failed",
   ])("köhnə deploy xətasını tanıyır: %s", (message) => {

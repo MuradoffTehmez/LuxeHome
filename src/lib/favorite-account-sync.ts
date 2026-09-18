@@ -28,7 +28,7 @@ export function createFavoriteAccountSync(fetcher: Fetcher = fetch) {
   async function read(local: string[]): Promise<string[] | null> {
     if (readPromise) return readPromise;
 
-    readPromise = (async () => {
+    const pendingRead = (async () => {
       try {
         const response = await fetcher("/api/hesab/favoritler", {
           credentials: "same-origin",
@@ -46,12 +46,19 @@ export function createFavoriteAccountSync(fetcher: Fetcher = fetch) {
       } catch {
         // Müvəqqəti şəbəkə xətası növbəti mount-da yenidən yoxlanıla bilsin.
         signedIn = null;
-        readPromise = null;
         return null;
       }
     })();
 
-    return readPromise;
+    readPromise = pendingRead;
+    try {
+      return await pendingRead;
+    } finally {
+      // Promise yalnız eyni anda mount olunan kartları birləşdirir. Nəticəni modul
+      // ömrü boyu saxlamaq hesab dəyişəndə əvvəlki istifadəçinin favoritlərini
+      // yeni hesaba yaza bilərdi; növbəti mount cari sessiyanı yenidən oxumalıdır.
+      if (readPromise === pendingRead) readPromise = null;
+    }
   }
 
   return { read, persist };

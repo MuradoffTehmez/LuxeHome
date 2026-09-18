@@ -4,7 +4,7 @@ const RELOAD_GUARD_MS = 60_000;
 /** Yeni deploy-dan sonra açıq qalan tabın köhnə asset/action identifikatorlarını tanıyır. */
 export function isStaleDeploymentError(value: unknown): boolean {
   const message = value instanceof Error ? value.message : String(value ?? "");
-  return /(?:Server Action .+ was not found|Loading chunk .+ failed|ChunkLoadError)/i.test(message);
+  return /(?:Server Action .+ was not found|Failed to find Server Action .+|Loading chunk .+ failed|ChunkLoadError)/i.test(message);
 }
 
 /** Davamlı server xətasında sonsuz reload dövrəsinin qarşısını alır. */

@@ -47,5 +47,23 @@ describe("favorit hesab sinxronu", () => {
       body: JSON.stringify({ ids: ["property-1", "property-2"] }),
     });
   });
+
+  it("növbəti mount-da sessiyanı yenidən oxuyur", async () => {
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(Response.json({ ids: ["account-a"], signedIn: true }))
+      .mockResolvedValueOnce(Response.json({ ids: ["account-a"] }))
+      .mockResolvedValueOnce(Response.json({ ids: ["account-b"], signedIn: true }))
+      .mockResolvedValueOnce(Response.json({ ids: ["account-b"] }));
+    const sync = createFavoriteAccountSync(fetcher);
+
+    await expect(sync.read([])).resolves.toEqual(["account-a"]);
+    await expect(sync.read([])).resolves.toEqual(["account-b"]);
+
+    expect(fetcher).toHaveBeenCalledTimes(4);
+    expect(fetcher.mock.calls[2]?.[1]).toMatchObject({
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+  });
 });
 
