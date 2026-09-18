@@ -48,6 +48,7 @@ describe("əmlak detal discovery və conversion əməliyyatları", () => {
 
     expect(html).toContain('aria-label="Əmlak əməliyyatları"');
     expect(html).toContain('aria-label="Favoritlərə əlavə et"');
+    expect(html).toMatch(/<button[^>]*disabled=""[^>]*aria-label="Favoritlərə əlavə et"/);
     expect(html).toContain('aria-label="Müqayisəyə əlavə et"');
     expect(html).toContain('aria-label="Elanı paylaş"');
     expect(html).toContain('aria-label="QR kod"');
