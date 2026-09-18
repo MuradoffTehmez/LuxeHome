@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { isStaging, siteConfig, siteUrl } from "@/config/site";
+import { isStaging, siteConfig, siteUrl, socialProfiles } from "@/config/site";
 import type { LocalBusinessProfile } from "@/lib/local-business";
 import {
   DEFAULT_LOCALE,
@@ -236,8 +236,16 @@ export function organizationSchema(profile?: LocalBusinessProfile | null) {
   const areaServed = profile?.serviceAreas.length
     ? { areaServed: profile.serviceAreas.map((name) => ({ "@type": "AdministrativeArea", name })) }
     : { areaServed: { "@type": "Country", name: "Azərbaycan" } };
-  const sameAs = [siteConfig.instagramUrl, ...(profile?.socialProfiles ?? [])]
-    .filter((value, index, list) => value && list.indexOf(value) === index);
+  // Yalnız `scope: "organization"` profilləri şirkətin `sameAs`-ına düşür.
+  // Şəxsi profil (`owner`) aşağıda ayrıca Person qeydinə bağlanır, mesajlaşma
+  // keçidi (`contact`) isə kimlik sübutu olmadığı üçün heç birinə salınmır.
+  const sameAs = [
+    ...socialProfiles.filter((item) => item.scope === "organization").map((item) => item.href),
+    ...(profile?.socialProfiles ?? []),
+  ].filter((value, index, list) => value && list.indexOf(value) === index);
+  const ownerSameAs = socialProfiles
+    .filter((item) => item.scope === "owner")
+    .map((item) => item.href);
 
   return {
     "@context": "https://schema.org",
@@ -265,7 +273,11 @@ export function organizationSchema(profile?: LocalBusinessProfile | null) {
     ...openingHours,
     ...hasMap,
     // Sayt, brend və marka hüquqlarının sahibi
-    owner: { "@type": "Person", name: siteConfig.owner.name },
+    owner: {
+      "@type": "Person",
+      name: siteConfig.owner.name,
+      ...(ownerSameAs.length ? { sameAs: ownerSameAs } : {}),
+    },
     brand: {
       "@type": "Brand",
       name: siteConfig.name,

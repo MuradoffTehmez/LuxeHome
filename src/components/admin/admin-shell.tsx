@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown, ExternalLink, LogOut, Menu } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
-import { cn } from "@/lib/utils";
+import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { localizePath } from "@/i18n/path-locale";
 import type { Locale } from "@/lib/constants";
 import { siteConfig } from "@/config/site";
@@ -98,7 +98,16 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
             <div className="hidden h-8 w-px bg-line sm:block" aria-hidden="true" />
             <div className="flex min-w-0 items-center gap-3 pl-1">
               {user.avatarUrl ? (
-                <Image src={user.avatarUrl} alt="" width={72} height={72} className="size-9 shrink-0 rounded-full object-cover" />
+                // Avatar R2-dən `/media/...` ünvanı ilə gəlir; `next/image`
+                // optimizatoru bu yolu 404 qaytarır, ona görə qoruma məcburidir.
+                <Image
+                  src={user.avatarUrl}
+                  alt=""
+                  width={72}
+                  height={72}
+                  unoptimized={isUnoptimizedImage(user.avatarUrl)}
+                  className="size-9 shrink-0 rounded-full object-cover"
+                />
               ) : (
                 <div aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-charcoal text-sm font-semibold text-ink-invert">
                   {initials(user.name)}

@@ -71,4 +71,24 @@ describe("SEO audit evaluator", () => {
       orphanPages: 0,
     });
   });
+
+  it("xidmət səhifəsinin görünən maddələrini nazik kontent hesabına daxil edir", () => {
+    const result = evaluateSeoAudit([
+      {
+        ...base,
+        kind: "service",
+        id: "service-with-bullets",
+        slug: "icare-xidmeti",
+        description: "Peşəkar xidmət haqqında dolğun giriş mətni. ".repeat(6),
+        supplementalContent: [
+          "Uyğun əmlak variantlarının seçilməsi",
+          "Baxışların təşkili və danışıqlar",
+          "Sənədlərin yoxlanılması və müqavilə dəstəyi",
+          "Proses boyunca fərdi müştəri müşayiəti",
+        ],
+      },
+    ]);
+
+    expect(result.issues.map((issue) => issue.code)).not.toContain("thin_content");
+  });
 });

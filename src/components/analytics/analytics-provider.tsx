@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   ANALYTICS_CONSENT_COOKIE,
@@ -21,17 +22,30 @@ function writeConsent(value: Exclude<Consent, null>) {
   document.cookie = `${ANALYTICS_CONSENT_COOKIE}=${value}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
 }
 
+/**
+ * Provider kök layout-dadır, yəni `/admin` da onun altındadır. Panel isə marketinq
+ * analitikasının yeri deyil: `ADMIN_CSP` `googletagmanager.com`-a icazə vermir
+ * (skript və `ns.html` freymi konsolda bloklanırdı) və əməkdaşın panel daxilindəki
+ * hərəkətini izləmək razılıq banneri ilə birlikdə oraya heç düşməməlidir.
+ */
+export function isAdminRoute(pathname: string | null): boolean {
+  return pathname === "/admin" || (pathname?.startsWith("/admin/") ?? false);
+}
+
 export function AnalyticsProvider() {
   const t = useTranslations("common.analytics");
+  const pathname = usePathname();
+  const onAdmin = isAdminRoute(pathname);
   const [consent, setConsent] = useState<Consent>(null);
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
   const measurementId = gtmId || gaId;
-  const configured = process.env.NODE_ENV === "production" && Boolean(measurementId);
+  const configured = process.env.NODE_ENV === "production" && Boolean(measurementId) && !onAdmin;
 
   useEffect(() => setConsent(readConsent()), []);
 
   useEffect(() => {
+    if (onAdmin) return;
     if (!analyticsRuntimeEnabled({ production: process.env.NODE_ENV === "production", measurementId, consent: consent === "granted" })) return;
     window.dataLayer = window.dataLayer ?? [];
     if (gtmId) {
@@ -50,7 +64,7 @@ export function AnalyticsProvider() {
       ? `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(id)}`
       : `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
     document.head.appendChild(script);
-  }, [consent, gaId, gtmId, measurementId]);
+  }, [consent, gaId, gtmId, measurementId, onAdmin]);
 
   if (!configured) return null;
 

@@ -33,10 +33,11 @@ export function FavoriteButton({
       <button
         type="button"
         onClick={handleToggle}
+        disabled={!ready}
         aria-pressed={ready ? isFavorite : undefined}
         className={cn(
           "inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-xs border px-4 text-sm font-medium",
-          "transition-colors duration-200",
+          "transition-colors duration-200 disabled:cursor-wait disabled:opacity-60",
           isFavorite
             ? "border-gold bg-gold/10 text-gold-deep"
             : "border-line-strong text-ink hover:border-gold hover:text-gold-deep",
@@ -55,6 +56,7 @@ export function FavoriteButton({
   return (
     <button
       type="button"
+      disabled={!ready}
       onClick={(event) => {
         // Kart tam link olduğu üçün naviqasiyanın qarşısı alınır
         event.preventDefault();
@@ -67,7 +69,7 @@ export function FavoriteButton({
       className={cn(
         // size-11 = 44px — minimum toxunma hədəfi (Apple HIG / WCAG 2.5.5)
         "inline-flex size-11 cursor-pointer items-center justify-center rounded-full",
-        "bg-charcoal/45 text-white backdrop-blur-sm transition-colors duration-200",
+        "bg-charcoal/45 text-white backdrop-blur-sm transition-colors duration-200 disabled:cursor-wait disabled:opacity-60",
         "hover:bg-charcoal/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
         isFavorite && "text-gold-soft",
         className,

@@ -296,6 +296,9 @@ async function main() {
         "Əməliyyat sonrası dəstək",
       ]),
       imageUrl: imageUrl(stockPhotos.keys, 1400),
+      metaTitle: "Alqı-Satqı — Luxe Home Estate",
+      metaDescription:
+        "Bakıda daşınmaz əmlak alqı-satqısı: qiymətləndirmə, sənəd yoxlanışı, danışıqlar və notarial rəsmiləşdirmə üzrə peşəkar müşayiət.",
     },
     {
       title: "İcarə",
@@ -312,6 +315,9 @@ async function main() {
         "İcarə müddətində əlaqələndirmə",
       ]),
       imageUrl: imageUrl(stockPhotos.apartmentLiving, 1400),
+      metaTitle: "Bakıda Əmlak İcarəsi — Luxe Home Estate",
+      metaDescription:
+        "Bakıda mənzil, villa, ofis və kommersiya obyektlərinin qısa və uzunmüddətli icarəsi üzrə seçim, baxış və müqavilə dəstəyi.",
     },
     {
       title: "İpoteka",
@@ -328,6 +334,9 @@ async function main() {
         "Rəsmiləşdirmə mərhələsində müşayiət",
       ]),
       imageUrl: imageUrl(stockPhotos.mortgage, 1400),
+      metaTitle: "İpoteka — Luxe Home Estate",
+      metaDescription:
+        "İpoteka ilə mənzil alışı üçün uyğun əmlak seçimi, sənədlərin hazırlanması, qiymətləndirmə və bank tələbləri üzrə peşəkar dəstək.",
     },
     {
       title: "Daxili Kredit",
@@ -343,6 +352,9 @@ async function main() {
         "Rəsmi müqavilə ilə rəsmiləşdirmə",
       ]),
       imageUrl: imageUrl(stockPhotos.marketNews, 1400),
+      metaTitle: "Daxili Kredit — Luxe Home Estate",
+      metaDescription:
+        "Seçilmiş əmlaklar üçün fərdi ilkin ödəniş və mərhələli ödəniş qrafiki ilə şirkətdaxili kredit imkanları və müqavilə dəstəyi.",
     },
     {
       title: "Təmir-Tikinti",
@@ -359,6 +371,9 @@ async function main() {
         "İşin mərhələli təhvili",
       ]),
       imageUrl: imageUrl(stockPhotos.renovation, 1400),
+      metaTitle: "Təmir-Tikinti — Luxe Home Estate",
+      metaDescription:
+        "Bakıda mənzil və kommersiya obyektləri üçün kosmetik və əsaslı təmir, tikinti, daxili dizayn, smeta və mərhələli təhvil xidmətləri.",
     },
     {
       title: "Reklam",
@@ -375,6 +390,9 @@ async function main() {
         "Nəticələr üzrə hesabat",
       ]),
       imageUrl: imageUrl(stockPhotos.cityPanorama, 1400),
+      metaTitle: "Reklam — Luxe Home Estate",
+      metaDescription:
+        "Əmlak elanının hazırlanması, peşəkar təqdimatı, sosial media yayımı və hədəflənmiş rəqəmsal reklam kampaniyaları üzrə xidmət.",
     },
     {
       title: "Çəkiliş",
@@ -391,18 +409,98 @@ async function main() {
         "Sosial media üçün format hazırlığı",
       ]),
       imageUrl: imageUrl(stockPhotos.villaLiving, 1400),
+      metaTitle: "Çəkiliş — Luxe Home Estate",
+      metaDescription:
+        "Əmlaklar üçün peşəkar interyer və eksteryer fotoçəkilişi, video təqdimat, dron çəkilişi, 360° panorama və şəkil emalı.",
+    },
+    {
+      title: "Əmlakın Qiymətləndirilməsi",
+      slug: "qiymetlendirme",
+      icon: "Calculator",
+      shortDescription: "Daşınmaz əmlakın bazar dəyərinin peşəkar şəkildə müəyyən edilməsi.",
+      description:
+        "Daşınmaz əmlakın real bazar dəyərini satış, icarə və investisiya məqsədləri üçün peşəkar şəkildə müəyyən edirik. Qiymətləndirmə zamanı yerləşmə, sahə, təmir vəziyyəti, sənədlər, binanın xüsusiyyətləri və oxşar bazar təklifləri müqayisə olunur. Nəticələr müştəriyə əsaslandırılmış qiymət aralığı və praktik tövsiyələrlə təqdim edilir. Bu yanaşma əmlakı düzgün qiymətlə bazara çıxarmağa və riskli qərarlardan yayınmağa kömək edir.",
+      bullets: JSON.stringify([
+        "Oxşar bazar təkliflərinin müqayisəsi",
+        "Yerləşmə və texniki vəziyyətin təhlili",
+        "Sənəd və təyinat amillərinin nəzərə alınması",
+        "Əsaslandırılmış qiymət aralığı",
+        "Satış və investisiya üzrə praktik tövsiyələr",
+      ]),
+      imageUrl: imageUrl(stockPhotos.mortgage, 1400),
+      metaTitle: "Əmlak Qiymətləndirilməsi — Luxe Home Estate",
+      metaDescription:
+        "Bakıda daşınmaz əmlakın satış, icarə və investisiya məqsədləri üçün bazar dəyərinin peşəkar təhlili və qiymətləndirilməsi.",
+    },
+    {
+      title: "Konsultasiya",
+      slug: "konsultasiya",
+      icon: "MessageCircle",
+      shortDescription: "Daşınmaz əmlak alqı-satqısı, hüquqi məsələlər və bazar trendləri üzrə fərdi məsləhət xidməti.",
+      description:
+        "Daşınmaz əmlakın alınması, satılması, icarəsi və investisiya məqsədilə seçilməsi üzrə fərdi konsultasiya təqdim edirik. Mütəxəssislərimiz bazar vəziyyətini, qiymət dinamikasını, sənəd risklərini və mümkün alternativləri izah edir. Görüş zamanı müştərinin məqsədi, büdcəsi və vaxt planı dəqiqləşdirilir, sonra atılacaq addımlar üzrə aydın yol xəritəsi hazırlanır. Qərarınızı faktlara əsaslanan və riskləri nəzərə alan yanaşma ilə verməyinizə kömək edirik.",
+      bullets: JSON.stringify([
+        "Alqı-satqı və icarə strategiyası",
+        "Bazar və qiymət dinamikasının izahı",
+        "Sənəd və əməliyyat risklərinin təhlili",
+        "Alternativ əmlak variantlarının müqayisəsi",
+        "Fərdi addım planının hazırlanması",
+      ]),
+      imageUrl: imageUrl(stockPhotos.officeBuilding, 1400),
+      metaTitle: "Konsultasiya — Luxe Home Estate",
+      metaDescription:
+        "Daşınmaz əmlak alqı-satqısı, sənədlər, bazar vəziyyəti və investisiya qərarları üzrə fərdi ekspert konsultasiyası.",
+    },
+    {
+      title: "A-frame Evlər",
+      slug: "a-frame-evler-xidmeti",
+      icon: "Triangle",
+      shortDescription: "A-frame tipli evlərin layihələndirilməsi, tikintisi və satışına dair tam xidmət paketi.",
+      description:
+        "A-frame tipli evlərin ideyadan təhvilə qədər layihələndirilməsi və tikintisi üzrə kompleks xidmət təqdim edirik. Torpaq sahəsinin xüsusiyyətləri, evin ölçüsü, plan həlli, material seçimi, istilik izolyasiyası və kommunikasiya ehtiyacları birlikdə qiymətləndirilir. Layihə mərhələli iş qrafiki və razılaşdırılmış smeta əsasında idarə olunur. Məqsədimiz müasir dizaynı, enerji səmərəliliyini və rahat yaşayış standartlarını birləşdirən funksional A-frame ev yaratmaqdır.",
+      bullets: JSON.stringify([
+        "Torpaq sahəsi və ehtiyacların ilkin təhlili",
+        "Memarlıq və planlaşdırma həlli",
+        "Material və enerji səmərəliliyi seçimi",
+        "Mərhələli tikinti və keyfiyyət nəzarəti",
+        "Hazır evin təhvili və satış dəstəyi",
+      ]),
+      imageUrl: imageUrl(stockPhotos.houseFacade, 1400),
+      metaTitle: "A-frame Evlər — Luxe Home Estate",
+      metaDescription:
+        "A-frame evlərin layihələndirilməsi, tikintisi və satışı: planlama, material seçimi, enerji səmərəliliyi və mərhələli icra dəstəyi.",
+    },
+    {
+      title: "Havalandırma Sistemi",
+      slug: "havalandirma-sistemi",
+      icon: "Wind",
+      shortDescription: "Yaşayış və ofis məkanları üçün peşəkar havalandırma sistemlərinin quraşdırılması və texniki xidməti.",
+      description:
+        "Yaşayış, ofis və kommersiya məkanları üçün havalandırma sistemlərinin layihələndirilməsi, quraşdırılması və texniki xidmətini təşkil edirik. Məkanın sahəsi, istifadə təyinatı, hava dövriyyəsi ehtiyacı və enerji sərfiyyatı təhlil olunur. Uyğun avadanlıq və kanal sistemi seçildikdən sonra montaj, sazlama və yoxlama aparılır. Dövri texniki baxış və filtr xidməti sistemin səmərəli işləməsinə, təmiz havanın və rahat temperaturun qorunmasına kömək edir.",
+      bullets: JSON.stringify([
+        "Məkan və hava dövriyyəsi ehtiyacının təhlili",
+        "Sistem layihəsi və avadanlıq seçimi",
+        "Kanal və avadanlıqların quraşdırılması",
+        "Sazlama, balanslaşdırma və işəsalma yoxlaması",
+        "Dövri texniki baxış və filtr xidməti",
+      ]),
+      imageUrl: imageUrl(stockPhotos.villaLiving, 1400),
+      metaTitle: "Havalandırma Sistemləri — Luxe Home Estate",
+      metaDescription:
+        "Yaşayış və ofis məkanları üçün havalandırma sistemlərinin layihələndirilməsi, quraşdırılması, sazlanması və texniki xidməti.",
     },
   ];
 
   for (const [index, service] of serviceData.entries()) {
     await prisma.service.upsert({
       where: { slug: service.slug },
-      update: {},
+      update: {
+        ...service,
+        order: index,
+      },
       create: {
         ...service,
         order: index,
-        metaTitle: `${service.title} — Luxe Home Estate`,
-        metaDescription: service.shortDescription,
       },
     });
   }

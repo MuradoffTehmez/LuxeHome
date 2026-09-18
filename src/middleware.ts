@@ -94,14 +94,14 @@ const ADMIN_CSP = [
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline'",
   // Xəritə tile-ları `/api/map-tiles/...` proxy-si üzərindən gəlir. `tile.openstreetmap.org`
   // yalnız proxy cavab verməyəndə işə düşən ehtiyat mənbədir (`FALLBACK_TILES`) —
   // xəritə boş qalmasın deyə. Marker ikonu inline SVG-dir.
   "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az https://tile.openstreetmap.org",
   "font-src 'self' data:",
-  "connect-src 'self' https://challenges.cloudflare.com",
+  "connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com",
   "frame-src https://challenges.cloudflare.com",
 ].join("; ");
 
@@ -124,11 +124,11 @@ const PUBLIC_CSP = [
   "form-action 'self'",
   // `unsafe-inline` Next.js hidrasiya məlumatı üçün lazımdır — panel siyasətindəki
   // ilə eyni səbəb. GTM sayt analitikasını yükləyir.
-  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://www.google-analytics.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az https://treva.realestate https://tile.openstreetmap.org https://www.googletagmanager.com https://www.google-analytics.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com https://www.googletagmanager.com https://www.google-analytics.com",
   // Turnstile widget-i, GTM `noscript` freymi və elan videoları (`property-video.tsx`)
   "frame-src https://challenges.cloudflare.com https://www.googletagmanager.com https://www.youtube-nocookie.com https://player.vimeo.com",
 ].join("; ");

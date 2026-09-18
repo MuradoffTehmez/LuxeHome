@@ -1,7 +1,7 @@
 /**
  * Cloudflare GraphQL Analytics API-dən zona trafik statistikası.
  *
- * `CLOUDFLARE_ANALYTICS_TOKEN` (secret, sorğulanan resurs üçün Analytics:Read
+ * `CLOUDFLARE_ANALYTICS_TOKEN` (secret, sorğulanan zona üçün Zone → Analytics Read
  * səlahiyyəti ilə) və `CF_ZONE_ID` (vars, sirr deyil) lazımdır. Hər ikisi Workers-də yalnız
  * sorğu kontekstində dolur, ona görə oxuma ilk istifadə anında baş verir.
  */
@@ -36,8 +36,9 @@ type GraphQlResponse = {
 };
 
 const PERMISSION_REASON =
-  "Cloudflare tokeninin bu zona üçün «Analytics: Read» icazəsi yoxdur. " +
-  "CLOUDFLARE_ANALYTICS_TOKEN secret-ini uyğun icazəli tokenlə yeniləyin.";
+  "Cloudflare tokeninin bu zona üçün «Zone → Analytics Read» icazəsi yoxdur. " +
+  "«Account Analytics Read» kifayət etmir; CLOUDFLARE_ANALYTICS_TOKEN secret-ini " +
+  "yalnız bu zonaya məhdudlaşdırılmış tokenlə yeniləyin.";
 
 /**
  * Provider-in daxili actor/token identifikatorunu panelə çıxarmadan operatora
@@ -105,6 +106,14 @@ export async function getSearchAnalytics(daysBack = 14): Promise<SearchAnalytics
   }
 
   if (!response.ok) {
+    // Panel mətni qəsdən sanitasiya olunur (aşağıdakı `analyticsFailureReason`),
+    // ona görə səbəbin özü yalnız server loquna düşür. Onsuz operator tokenin
+    // həqiqətən icazəsiz olduğunu, yoxsa sorğunun başqa səbəbdən sınmasını
+    // ayırd edə bilmir — `npx wrangler tail` ilə görünür.
+    console.error("[analytics] Cloudflare GraphQL sorğusu uğursuz:", {
+      status: response.status,
+      body: (await response.text().catch(() => "")).slice(0, 500),
+    });
     return { available: false, reason: analyticsFailureReason(response.status) };
   }
 
@@ -115,10 +124,9 @@ export async function getSearchAnalytics(daysBack = 14): Promise<SearchAnalytics
     return { available: false, reason: analyticsFailureReason() };
   }
   if (json.errors?.length) {
-    return {
-      available: false,
-      reason: analyticsFailureReason(undefined, json.errors.map((error) => error.message)),
-    };
+    const messages = json.errors.map((error) => error.message);
+    console.error("[analytics] Cloudflare GraphQL xətası:", messages);
+    return { available: false, reason: analyticsFailureReason(undefined, messages) };
   }
 
   const groups = json.data?.viewer?.zones?.[0]?.httpRequests1dGroups ?? [];

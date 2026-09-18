@@ -8,6 +8,7 @@ import { getLocalBusinessProfile } from "@/lib/local-business";
 import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { WebVitalsReporter } from "@/components/analytics/web-vitals-reporter";
+import { DeploymentRecovery } from "@/components/deployment-recovery";
 import "./globals.css";
 
 /**
@@ -117,6 +118,7 @@ export default async function RootLayout({
         <script {...jsonLd(websiteSchema())} />
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
+            <DeploymentRecovery />
             {children}
             <AnalyticsProvider />
             <WebVitalsReporter />
