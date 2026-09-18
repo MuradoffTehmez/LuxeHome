@@ -1510,6 +1510,10 @@
       "tesdiqlenmisSearchConsoleProperty": "Отправляет URL индекса карты сайта в подтверждённый ресурс Search Console.",
       "sitemapUrl": "URL карты сайта",
       "oauthToken": "OAuth-токен",
+      "gscCredential": "Тип учётных данных",
+      "gscServiceAccount": "Сервисный аккаунт (автообновление)",
+      "gscOAuthRefresh": "OAuth refresh token (автообновление)",
+      "gscTemporaryAccessToken": "Временный access token",
       "property": "Ресурс",
       "hazirliq": "Готовность",
       "seoLandingPageEngine": "Движок SEO-лендингов",
@@ -2201,7 +2205,20 @@
       "howCache": "Изменение расходится по всем изолятам Worker в течение 15 секунд.",
       "howAudit": "Каждое изменение записывается в журнал аудита как SYSTEM_MODE_CHANGE.",
       "saved": "Системный режим обновлён.",
-      "unchanged": "Изменений нет."
+      "unchanged": "Изменений нет.",
+      "integrationHealthTitle": "Состояние интеграций",
+      "integrationHealthDescription": "Проверка готовности внешних сервисов без отображения значений секретов.",
+      "integrationReady": "Готово",
+      "integrationOptionalMissing": "Необязательно, отсутствует",
+      "integrationRequiredMissing": "Обязательно, отсутствует",
+      "integrationSearchConsole": "Google Search Console",
+      "integrationCloudflareAnalytics": "Аналитика Cloudflare",
+      "integrationEmail": "Отправка почты",
+      "integrationEmailWebhook": "Webhook Resend",
+      "integrationGeocoding": "Адреса и карты",
+      "integrationTurnstile": "Защита Turnstile",
+      "integrationSavedSearchCron": "Cron сохранённых поисков",
+      "integrationPush": "Push-уведомления"
     }
   }
 }

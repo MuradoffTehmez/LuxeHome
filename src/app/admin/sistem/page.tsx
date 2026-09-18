@@ -12,7 +12,19 @@ import {
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getSystemModeConfig } from "@/lib/system-mode";
+import { getIntegrationHealth, type IntegrationHealthId } from "@/lib/integration-health";
 import { SystemModeForm, type SystemModeFormValues } from "./system-mode-form";
+
+const INTEGRATION_LABEL_KEYS = {
+  searchConsole: "pages.systemMode.integrationSearchConsole",
+  cloudflareAnalytics: "pages.systemMode.integrationCloudflareAnalytics",
+  email: "pages.systemMode.integrationEmail",
+  emailWebhook: "pages.systemMode.integrationEmailWebhook",
+  geocoding: "pages.systemMode.integrationGeocoding",
+  turnstile: "pages.systemMode.integrationTurnstile",
+  savedSearchCron: "pages.systemMode.integrationSavedSearchCron",
+  push: "pages.systemMode.integrationPush",
+} as const satisfies Record<IntegrationHealthId, string>;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getAdminI18n();
@@ -40,6 +52,7 @@ export default async function AdminSystemModePage() {
   await requireAdminRead(PERMISSIONS.SETTINGS_MANAGE);
 
   const config = await getSystemModeConfig();
+  const integrations = getIntegrationHealth();
 
   const initial: SystemModeFormValues = {
     mode: config.mode,
@@ -105,6 +118,35 @@ export default async function AdminSystemModePage() {
               </span>
             </p>
           ) : null}
+        </AdminCard>
+
+        <AdminCard
+          title={t("pages.systemMode.integrationHealthTitle")}
+          description={t("pages.systemMode.integrationHealthDescription")}
+        >
+          <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {integrations.map((item) => (
+              <li key={item.id} className="rounded-xs border border-line bg-beige/40 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-sm font-medium text-ink">
+                    {t(INTEGRATION_LABEL_KEYS[item.id])}
+                  </span>
+                  <Badge tone={item.ready ? "success" : item.optional ? "warning" : "danger"}>
+                    {item.ready
+                      ? t("pages.systemMode.integrationReady")
+                      : item.optional
+                        ? t("pages.systemMode.integrationOptionalMissing")
+                        : t("pages.systemMode.integrationRequiredMissing")}
+                  </Badge>
+                </div>
+                {item.missing.length > 0 ? (
+                  <code className="mt-2 block break-words text-[11px] leading-relaxed text-ink-muted">
+                    {item.missing.join(", ")}
+                  </code>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </AdminCard>
 
         <div className="grid min-w-0 gap-6 xl:grid-cols-[1.25fr_1fr]">

@@ -19,6 +19,11 @@ import { recordAudit } from "@/lib/admin/audit";
 import * as form from "@/lib/admin/form";
 import { getSeoAuditItems } from "@/lib/queries";
 import { findRedirectChain, normalizePublicPath, parseJsonObject } from "@/lib/serp";
+import {
+  getSearchConsoleAccessToken,
+  getSearchConsoleSiteUrl,
+  SearchConsoleConfigurationError,
+} from "@/lib/google-search-console";
 
 const ROOT = "/admin/serp";
 const locale = z.enum(Object.values(LOCALES) as [string, ...string[]]);
@@ -207,12 +212,11 @@ export async function importSearchMetric(_state: ActionState, data: FormData): P
 
 export async function syncSearchConsole(_state: ActionState, data: FormData): Promise<ActionState> {
   const user = await actor(PERMISSIONS.SEO_EDIT); if (!user) return failure("Search Console sync səlahiyyətiniz yoxdur.");
-  const token = process.env.GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN;
-  const site = process.env.GSC_SITE_URL || "sc-domain:luxehomeestate.az";
-  if (!token) return failure("GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN secret-i konfiqurasiya edilməyib.");
   const endDate = form.text(data, "endDate") || new Date(Date.now() - 3 * 86_400_000).toISOString().slice(0, 10);
   const startDate = form.text(data, "startDate") || new Date(Date.parse(endDate) - 27 * 86_400_000).toISOString().slice(0, 10);
   try {
+    const token = await getSearchConsoleAccessToken();
+    const site = getSearchConsoleSiteUrl();
     const response = await fetch(`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(site)}/searchAnalytics/query`, {
       method: "POST",
       headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
@@ -230,21 +234,26 @@ export async function syncSearchConsole(_state: ActionState, data: FormData): Pr
     }
     await recordAudit(user, "UPDATE", "SeoSearchMetric", null, `GSC sync ${startDate}–${endDate}: ${imported} sətir`);
     refresh(`${ROOT}/search-console`); return success(`Search Console sinxronlaşdırıldı: ${imported} sətir.`);
-  } catch (error) { return unexpected("Search Console sinxronlaşdırılmadı", error); }
+  } catch (error) {
+    if (error instanceof SearchConsoleConfigurationError) return failure(error.message);
+    return unexpected("Search Console sinxronlaşdırılmadı", error);
+  }
 }
 
 export async function submitSitemapToSearchConsole(_state: ActionState, data: FormData): Promise<ActionState> {
   const user = await actor(PERMISSIONS.SEO_PUBLISH); if (!user) return failure("Sitemap göndərmək səlahiyyətiniz yoxdur.");
-  const token = process.env.GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN;
-  const site = process.env.GSC_SITE_URL || "sc-domain:luxehomeestate.az";
   const sitemap = form.text(data, "sitemap");
-  if (!token) return failure("GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN secret-i konfiqurasiya edilməyib.");
   try {
+    const token = await getSearchConsoleAccessToken();
+    const site = getSearchConsoleSiteUrl();
     const response = await fetch(`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(site)}/sitemaps/${encodeURIComponent(sitemap)}`, { method: "PUT", headers: { authorization: `Bearer ${token}` } });
     if (!response.ok) return failure(`Search Console sitemap API ${response.status}: ${(await response.text()).slice(0, 300)}`);
     await recordAudit(user, "PUBLISH", "Setting", SEO_SETTING_KEYS.SEARCH_CONSOLE, `Sitemap göndərildi: ${sitemap}`);
     return success("Sitemap Google Search Console-a göndərildi.");
-  } catch (error) { return unexpected("sitemap göndərilmədi", error); }
+  } catch (error) {
+    if (error instanceof SearchConsoleConfigurationError) return failure(error.message);
+    return unexpected("sitemap göndərilmədi", error);
+  }
 }
 
 export async function resolveSeoAlert(id: string): Promise<ActionState> {
