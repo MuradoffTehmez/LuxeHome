@@ -105,6 +105,14 @@ export async function getSearchAnalytics(daysBack = 14): Promise<SearchAnalytics
   }
 
   if (!response.ok) {
+    // Panel mətni qəsdən sanitasiya olunur (aşağıdakı `analyticsFailureReason`),
+    // ona görə səbəbin özü yalnız server loquna düşür. Onsuz operator tokenin
+    // həqiqətən icazəsiz olduğunu, yoxsa sorğunun başqa səbəbdən sınmasını
+    // ayırd edə bilmir — `npx wrangler tail` ilə görünür.
+    console.error("[analytics] Cloudflare GraphQL sorğusu uğursuz:", {
+      status: response.status,
+      body: (await response.text().catch(() => "")).slice(0, 500),
+    });
     return { available: false, reason: analyticsFailureReason(response.status) };
   }
 
@@ -115,10 +123,9 @@ export async function getSearchAnalytics(daysBack = 14): Promise<SearchAnalytics
     return { available: false, reason: analyticsFailureReason() };
   }
   if (json.errors?.length) {
-    return {
-      available: false,
-      reason: analyticsFailureReason(undefined, json.errors.map((error) => error.message)),
-    };
+    const messages = json.errors.map((error) => error.message);
+    console.error("[analytics] Cloudflare GraphQL xətası:", messages);
+    return { available: false, reason: analyticsFailureReason(undefined, messages) };
   }
 
   const groups = json.data?.viewer?.zones?.[0]?.httpRequests1dGroups ?? [];
