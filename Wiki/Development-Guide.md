@@ -84,7 +84,7 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `RESEND_FROM_EMAIL` | Göndərən |
 | `NOTIFICATION_EMAIL` | Lead bildiriş alıcısı |
 | `CRON_SECRET` | Saved-search digest endpoint Bearer açarı |
-| `CLOUDFLARE_ANALYTICS_TOKEN` | Admin trafik analitikası üçün `Analytics:Read` token-i |
+| `CLOUDFLARE_ANALYTICS_TOKEN` | Admin trafik analitikası üçün, konkret zonaya məhdud `Zone` → `Analytics Read` token-i (`Account Analytics Read` deyil) |
 | `ADMIN_ENABLED` | Staff route feature flag-i |
 
 `IS_STAGING` əsasən Wrangler staging vars daxilində təyin olunur.

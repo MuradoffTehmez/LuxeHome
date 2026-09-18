@@ -1,7 +1,7 @@
 /**
  * Cloudflare GraphQL Analytics API-dən zona trafik statistikası.
  *
- * `CLOUDFLARE_ANALYTICS_TOKEN` (secret, sorğulanan resurs üçün Analytics:Read
+ * `CLOUDFLARE_ANALYTICS_TOKEN` (secret, sorğulanan zona üçün Zone → Analytics Read
  * səlahiyyəti ilə) və `CF_ZONE_ID` (vars, sirr deyil) lazımdır. Hər ikisi Workers-də yalnız
  * sorğu kontekstində dolur, ona görə oxuma ilk istifadə anında baş verir.
  */
@@ -36,8 +36,9 @@ type GraphQlResponse = {
 };
 
 const PERMISSION_REASON =
-  "Cloudflare tokeninin bu zona üçün «Analytics: Read» icazəsi yoxdur. " +
-  "CLOUDFLARE_ANALYTICS_TOKEN secret-ini uyğun icazəli tokenlə yeniləyin.";
+  "Cloudflare tokeninin bu zona üçün «Zone → Analytics Read» icazəsi yoxdur. " +
+  "«Account Analytics Read» kifayət etmir; CLOUDFLARE_ANALYTICS_TOKEN secret-ini " +
+  "yalnız bu zonaya məhdudlaşdırılmış tokenlə yeniləyin.";
 
 /**
  * Provider-in daxili actor/token identifikatorunu panelə çıxarmadan operatora
