@@ -256,6 +256,10 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `RESEND_WEBHOOK_SECRET` | Resend/Svix webhook imzasının doğrulanması | Korporativ e-poçt jurnalı üçün |
 | `CRON_SECRET` | Saved-search digest endpoint Bearer sirri | Digest cron üçün |
 | `CLOUDFLARE_ANALYTICS_TOKEN` | Cloudflare GraphQL analitika sorğusu (`Zone` → `Analytics Read`; `Account Analytics Read` deyil) | Admin analitika üçün |
+| `GSC_SITE_URL` | Search Console property-si (`sc-domain:luxehomeestate.az`) | Admin GSC üçün |
+| `GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON` | Google service account JSON key; access token runtime-da avtomatik alınır | Admin GSC üçün tövsiyə olunur |
+| `GOOGLE_SEARCH_CONSOLE_CLIENT_ID`, `GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET`, `GOOGLE_SEARCH_CONSOLE_REFRESH_TOKEN` | Service account əvəzinə OAuth refresh credential dəsti | Admin GSC üçün alternativ |
+| `GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN` | Qısaömürlü legacy token | Yalnız diaqnostika üçün |
 
 Cloudflare secret nümunələri:
 
@@ -268,8 +272,14 @@ npx wrangler secret put NOTIFICATION_EMAIL
 npx wrangler secret put RESEND_WEBHOOK_SECRET
 npx wrangler secret put CRON_SECRET
 npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN
+npx wrangler secret put GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON
 npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc
 ```
+
+Search Console service account e-poçtu `sc-domain:luxehomeestate.az` property-sinə
+Owner və ya Full user kimi əlavə olunmalıdır. JSON key heç vaxt repozitoriyaya,
+`.env`-ə və terminal tarixçəsinə yazılmır; dəyər birbaşa `wrangler secret put`
+prompt-una verilir.
 
 ## npm əmrləri
 

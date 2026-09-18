@@ -34,6 +34,8 @@
     // Dinamik səhifələrdə runtime-da oxunur; statik səhifələr üçün deploy skripti
     // eyni dəyəri build prosesinə də ötürür
     "SITE_URL": "https://luxehomeestate.az",
+    // Search Console domain property-si sirr deyil; credential Worker secret-dir
+    "GSC_SITE_URL": "sc-domain:luxehomeestate.az",
     // Public açardır; gizli açar `TURNSTILE_SECRET` Worker secret-i kimi saxlanılır
     "TURNSTILE_SITE_KEY": "0x4AAAAAAEfhXUNNmS0Ka_DO",
     // Siteverify cavabındakı hostname yalnız bu production frontend-lərdən biri olmalıdır
@@ -135,6 +137,7 @@
         // robots.ts və seo.ts bunu görüb bütün səhifələri indeksdən çıxarır
         "IS_STAGING": "true",
         "SITE_URL": "https://luxehomeestate-staging.amiyevbahadur.workers.dev",
+        "GSC_SITE_URL": "sc-domain:luxehomeestate.az",
         // Public site key sirr deyil. Staging Turnstile secret-i ayrıca Worker secret-i kimi saxlanılır.
         "TURNSTILE_SITE_KEY": "0x4AAAAAAEfhXUNNmS0Ka_DO",
         "TURNSTILE_HOSTNAMES": "luxehomeestate-staging.amiyevbahadur.workers.dev",
