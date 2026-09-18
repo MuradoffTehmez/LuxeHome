@@ -37,7 +37,7 @@ describe("analitika əhatəsi", () => {
    * enum-una düşmür və `/api/monitoring/vitals` hər yüklənişdə 400 qaytarırdı.
    */
   it("yalnız Core Web Vitals ölçülərini göndərir", () => {
-    const sendBeacon = vi.fn(() => true);
+    const sendBeacon = vi.fn<(url: string, body?: BodyInit) => boolean>(() => true);
     vi.stubGlobal("navigator", { sendBeacon });
     vi.stubGlobal("window", { location: { pathname: "/az" } });
 
