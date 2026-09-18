@@ -46,4 +46,22 @@ describe("inteqrasiya sağlamlığı", () => {
 
     expect(turnstile).toMatchObject({ ready: true, missing: [] });
   });
+
+  it("e-poçt ünvanlarının tətbiq fallback-larını hazır hesab edir", () => {
+    process.env.RESEND_API_KEY = "resend-key";
+    const email = getIntegrationHealth().find((item) => item.id === "email");
+
+    expect(email).toMatchObject({ ready: true, missing: [] });
+  });
+
+  it("webhook üçün Resend API açarını da tələb edir", () => {
+    process.env.RESEND_WEBHOOK_SECRET = "webhook-secret";
+    const webhook = getIntegrationHealth().find((item) => item.id === "emailWebhook");
+
+    expect(webhook).toMatchObject({
+      ready: false,
+      optional: true,
+      missing: ["RESEND_API_KEY"],
+    });
+  });
 });

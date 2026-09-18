@@ -47,8 +47,10 @@ export function getIntegrationHealth(): IntegrationHealthItem[] {
       credentialMode: searchConsole.mode,
     },
     envHealth("cloudflareAnalytics", ["CLOUDFLARE_ANALYTICS_TOKEN", "CF_ZONE_ID"]),
-    envHealth("email", ["RESEND_API_KEY", "RESEND_FROM_EMAIL", "NOTIFICATION_EMAIL"]),
-    envHealth("emailWebhook", ["RESEND_WEBHOOK_SECRET"], true),
+    // Göndərən və bildiriş ünvanları tətbiq daxilində təhlükəsiz fallback-lara malikdir.
+    envHealth("email", ["RESEND_API_KEY"]),
+    // Webhook imzasını yoxlamaq üçün həm Resend klienti, həm də webhook sirri lazımdır.
+    envHealth("emailWebhook", ["RESEND_API_KEY", "RESEND_WEBHOOK_SECRET"], true),
     envHealth("geocoding", ["GEOAPIFY_API_KEY"]),
     {
       id: "turnstile",
