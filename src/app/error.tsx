@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/container";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { attemptDeploymentReload } from "@/lib/deployment-recovery";
 
 /**
  * Gözlənilməz server/klient xətası üçün ehtiyat ekran.
@@ -20,6 +21,7 @@ export default function GlobalError({
   const t = useTranslations("common.globalError");
   const prefix = locale === "az" ? "" : `/${locale}`;
   useEffect(() => {
+    if (attemptDeploymentReload(error)) return;
     console.error("Səhifə xətası:", error);
     void fetch("/api/monitoring/error", {
       method: "POST",

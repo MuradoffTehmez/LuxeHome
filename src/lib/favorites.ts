@@ -1,10 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { mergeFavoriteIds, sanitizeFavoriteIds } from "@/lib/favorite-sync";
+import { sanitizeFavoriteIds } from "@/lib/favorite-sync";
+import { createFavoriteAccountSync } from "@/lib/favorite-account-sync";
 
 const STORAGE_KEY = "luxehomeestate:favorites";
 const CHANGE_EVENT = "luxehomeestate:favorites-changed";
+
+const accountFavorites = createFavoriteAccountSync();
 
 /**
  * Favoritlər qeydiyyatsız istifadəçilər üçün localStorage-də saxlanılır.
@@ -20,30 +23,6 @@ function read(): string[] {
   } catch {
     return [];
   }
-}
-
-async function readAccountFavorites(local: string[]): Promise<string[] | null> {
-  try {
-    const response = await fetch("/api/hesab/favoritler", { credentials: "same-origin", cache: "no-store" });
-    if (response.status === 401) return null;
-    if (!response.ok) throw new Error("Favorit sinxronu alınmadı");
-    const payload = await response.json() as { ids?: unknown };
-    const merged = mergeFavoriteIds(local, sanitizeFavoriteIds(payload.ids));
-    await persistAccountFavorites(merged);
-    return merged;
-  } catch {
-    return null;
-  }
-}
-
-async function persistAccountFavorites(ids: string[]): Promise<void> {
-  const response = await fetch("/api/hesab/favoritler", {
-    method: "PUT",
-    credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok && response.status !== 401) throw new Error("Favoritlər saxlanılmadı");
 }
 
 function write(ids: string[]) {
@@ -64,7 +43,7 @@ export function useFavorites() {
   useEffect(() => {
     const local = read();
     setIds(local);
-    void readAccountFavorites(local).then((synced) => {
+    void accountFavorites.read(local).then((synced) => {
       if (synced) {
         write(synced);
         setIds(synced);
@@ -88,14 +67,14 @@ export function useFavorites() {
       : [...current, id];
     write(next);
     setIds(next);
-    void persistAccountFavorites(next).catch(() => undefined);
+    void accountFavorites.persist(next).catch(() => undefined);
     return next.includes(id);
   }, []);
 
   const clear = useCallback(() => {
     write([]);
     setIds([]);
-    void persistAccountFavorites([]).catch(() => undefined);
+    void accountFavorites.persist([]).catch(() => undefined);
   }, []);
 
   return { ids, ready, toggle, clear, count: ids.length };

@@ -69,6 +69,7 @@ export function propertyCardLinks(page: Page, locale: Locale = "az"): Locator {
 /** «300 nəticə» sətrindən rəqəmi çıxarır. Sətir tapılmasa `null`. */
 export async function readResultCount(page: Page): Promise<number | null> {
   const text = await page.locator("body").innerText();
+  if (/Nəticə tapılmadı|No results found|Ничего не найдено/i.test(text)) return 0;
   const match = text.match(/(\d[\d\s]*)\s*(?:nəticə|result|результат)/i);
   if (!match) return null;
   return Number(match[1].replace(/\s/g, ""));
@@ -119,16 +120,14 @@ export async function jsonLdBlocks(page: Page): Promise<Array<Record<string, unk
 /**
  * Konsol xətalarını toplayır.
  *
- * Şəkil 404-ləri və üçüncü tərəf skript xəbərdarlıqları süzülür: onlar real
- * tətbiq xətası deyil və testi səbəbsiz qırmamalıdır.
+ * Heç bir browser xətası gizlədilmir. CSP, 4xx/5xx resurs cavabları, üçüncü tərəf
+ * inteqrasiya xətaları və şəbəkə problemləri də regressiyadır və testdə görünməlidir.
  */
 export function collectConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on("console", (message) => {
     if (message.type() !== "error") return;
-    const text = message.text();
-    if (/favicon|net::ERR_|Failed to load resource|googletagmanager|gtag/i.test(text)) return;
-    errors.push(text);
+    errors.push(message.text());
   });
   page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   return errors;
