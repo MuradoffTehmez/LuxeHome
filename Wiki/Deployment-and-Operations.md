@@ -72,7 +72,9 @@ Qaydalar:
 - Resend credential sızma şübhəsində dərhal revoke edilməlidir.
 - `CRON_SECRET` əsas Worker və ayrıca cron Worker-də eyni mühit üçün eyni olmalıdır;
 - production və staging `CRON_SECRET` dəyərləri bir-birindən fərqli olmalıdır;
-- `CLOUDFLARE_ANALYTICS_TOKEN` yalnız `Analytics:Read` icazəsi ilə məhdudlaşdırılmalıdır.
+- `CLOUDFLARE_ANALYTICS_TOKEN` konkret `luxehomeestate.az` zonası üçün yalnız
+  `Zone` → `Analytics Read` icazəsi ilə məhdudlaşdırılmalıdır;
+  hesab səviyyəli `Account Analytics Read` bu GraphQL sorğusu üçün kifayət etmir.
 
 ## OpenNext konfiqurasiyası
 

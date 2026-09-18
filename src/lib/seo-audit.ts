@@ -7,6 +7,8 @@ export type SeoAuditContent = {
   title: string;
   slug: string;
   description: string;
+  /** Səhifədə description-dan əlavə görünən mətnlər (məsələn, xidmət maddələri). */
+  supplementalContent?: string[];
   metaTitle?: string | null;
   metaDescription?: string | null;
   noIndex: boolean;
@@ -35,7 +37,7 @@ const THIN_WORD_LIMIT: Record<SeoContentKind, number> = {
   property: 35,
   post: 150,
   project: 80,
-  service: 80,
+  service: 50,
 };
 
 function countWords(value: string) {
@@ -93,7 +95,8 @@ export function evaluateSeoAudit(contents: SeoAuditContent[]) {
     else if (metaDescription.length < 70) add(content, "meta_description_short", "warning", "Meta təsvir 70 simvoldan qısadır.");
     else if (metaDescription.length > 160) add(content, "meta_description_long", "warning", "Meta təsvir 160 simvoldan uzundur.");
 
-    if (countWords(content.description) < THIN_WORD_LIMIT[content.kind]) {
+    const visibleContent = [content.description, ...(content.supplementalContent ?? [])].join(" ");
+    if (countWords(visibleContent) < THIN_WORD_LIMIT[content.kind]) {
       add(content, "thin_content", "warning", "Səhifənin görünən mətni kifayət qədər əhatəli deyil.");
     }
     if (!content.imageUrl) add(content, "cover_missing", "warning", "Üz qabığı şəkli yoxdur.");

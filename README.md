@@ -255,7 +255,7 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `NOTIFICATION_EMAIL` | Müraciət bildirişinin alıcısı | E-poçt bildirişi üçün |
 | `RESEND_WEBHOOK_SECRET` | Resend/Svix webhook imzasının doğrulanması | Korporativ e-poçt jurnalı üçün |
 | `CRON_SECRET` | Saved-search digest endpoint Bearer sirri | Digest cron üçün |
-| `CLOUDFLARE_ANALYTICS_TOKEN` | Cloudflare GraphQL analitika sorğusu (`Analytics:Read`) | Admin analitika üçün |
+| `CLOUDFLARE_ANALYTICS_TOKEN` | Cloudflare GraphQL analitika sorğusu (`Zone` → `Analytics Read`; `Account Analytics Read` deyil) | Admin analitika üçün |
 
 Cloudflare secret nümunələri:
 

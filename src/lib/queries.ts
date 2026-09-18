@@ -32,6 +32,7 @@ const LOCALE_VALUES = Object.values(LOCALES);
 import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo-landings";
 import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
 import { landingCanBeIndexed } from "@/lib/serp";
+import { parseJsonArray } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // SEÇİM (SELECT) TƏRİFLƏRİ — kart və detal görünüşləri üçün
@@ -1362,6 +1363,7 @@ export async function getSeoAuditItems() {
         metaDescription: true,
         noIndex: true,
         imageUrl: true,
+        bullets: true,
       },
       orderBy: { order: "asc" },
       take: 200,
@@ -1428,6 +1430,7 @@ export async function getSeoAuditItems() {
       title: item.title,
       slug: item.slug,
       description: item.description,
+      supplementalContent: parseJsonArray<string>(item.bullets),
       metaTitle: item.metaTitle,
       metaDescription: item.metaDescription,
       noIndex: item.noIndex,
