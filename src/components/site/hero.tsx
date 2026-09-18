@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { LISTING_TYPES, type Locale } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { localizePath } from "@/i18n/path-locale";
+import { TrackedPropertySearchForm } from "./tracked-property-search-form";
 
 export type HeroTypeOption = { value: string; label: string };
 export type HeroCityOption = { value: string; label: string };
@@ -55,9 +56,10 @@ function HeroSearchForm({
 }: Pick<HeroProps, "types" | "cities" | "locale"> & { labels: HeroLabels["search"] }) {
   return (
     <div className="rounded-sm border border-white/20 bg-paper/94 p-3 shadow-editorial backdrop-blur-md sm:p-5">
-      <form
+      <TrackedPropertySearchForm
         action={localizePath("/emlaklar", locale)}
         method="get"
+        placement="hero"
         className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-4"
       >
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12 lg:items-end">
@@ -133,7 +135,7 @@ function HeroSearchForm({
           <Search className="size-4" aria-hidden="true" />
           {labels.submit}
         </button>
-      </form>
+      </TrackedPropertySearchForm>
     </div>
   );
 }

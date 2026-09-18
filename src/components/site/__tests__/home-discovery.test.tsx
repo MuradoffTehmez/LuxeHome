@@ -62,6 +62,7 @@ describe("ana səhifə discovery təcrübəsi", () => {
     expect(html).toContain('name="axtaris"');
     expect(html).toContain('name="tip"');
     expect(html).toContain('name="seher"');
+    expect(html).toContain('data-analytics-placement="hero"');
   });
 
   it("AI axtarışını locale-agah native GET formu kimi saxlayır", () => {
