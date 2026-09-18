@@ -19,7 +19,6 @@ test.describe("Qorunan API route-ları", () => {
   const guarded = [
     "/api/admin/media",
     "/api/hesab/export",
-    "/api/hesab/favoritler",
     "/api/hesab/media",
     "/api/cron/saved-search-digest",
   ];
@@ -45,6 +44,15 @@ test.describe("Qorunan API route-ları", () => {
     expect(body).toMatch(/"signedIn"\s*:\s*false/);
     expect(body, "anonim cavabda e-poçt var").not.toMatch(/@[a-z0-9.-]+\.[a-z]{2,}/i);
     expect(body, "anonim cavabda ad sahəsi var").not.toMatch(/"(name|email|role|userId)"/);
+  });
+
+  test("«/api/hesab/favoritler» anonimə şəxsi məlumat və 401 qaytarmır", async ({ page }) => {
+    expect(await statusOf(page, "/api/hesab/favoritler")).toBe(200);
+
+    const body = await page.evaluate(() => document.body?.innerText ?? "");
+    expect(body).toMatch(/"signedIn"\s*:\s*false/);
+    expect(body).toMatch(/"ids"\s*:\s*\[\s*\]/);
+    expect(body, "anonim cavabda şəxsi məlumat var").not.toMatch(/"(name|email|role|userId)"/);
   });
 
   test("webhook imzasız POST-u rədd edir", async ({ request, baseURL }) => {

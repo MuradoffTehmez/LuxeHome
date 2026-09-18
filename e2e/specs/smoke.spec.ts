@@ -19,7 +19,9 @@ import {
 test.describe("İctimai marşrutlar — AZ", () => {
   for (const route of PUBLIC_ROUTES) {
     test(`«/az${route || ""}» açılır`, async ({ page }) => {
+      const errors = collectConsoleErrors(page);
       await expectPageOk(page, `/az${route}`);
+      expect(errors, `konsol xətaları: ${errors.join(" | ")}`).toHaveLength(0);
     });
   }
 });
@@ -27,9 +29,11 @@ test.describe("İctimai marşrutlar — AZ", () => {
 test.describe("Locale prefiksi", () => {
   for (const locale of LOCALES) {
     test(`«/${locale}» ana səhifəsi açılır`, async ({ page }) => {
+      const errors = collectConsoleErrors(page);
       await expectPageOk(page, `/${locale}`);
       // `<html lang>` locale ilə uyğun olmalıdır — SEO və ekran oxuyucu üçün.
       await expect(page.locator("html")).toHaveAttribute("lang", locale);
+      expect(errors, `konsol xətaları: ${errors.join(" | ")}`).toHaveLength(0);
     });
   }
 
@@ -56,20 +60,5 @@ test.describe("Texniki marşrutlar", () => {
 
   test("llms.txt cavab verir", async ({ page }) => {
     expect([200, 404]).toContain(await statusOf(page, "/llms.txt"));
-  });
-});
-
-test.describe("Konsol sağlamlığı", () => {
-  test("ana səhifə JS xətası vermir", async ({ page }) => {
-    const errors = collectConsoleErrors(page);
-    await expectPageOk(page, "/az");
-    // Hidratasiya xətaları burada üzə çıxır — server və client render fərqi.
-    expect(errors, `konsol xətaları: ${errors.join(" | ")}`).toHaveLength(0);
-  });
-
-  test("kataloq JS xətası vermir", async ({ page }) => {
-    const errors = collectConsoleErrors(page);
-    await expectPageOk(page, "/az/emlaklar");
-    expect(errors, `konsol xətaları: ${errors.join(" | ")}`).toHaveLength(0);
   });
 });

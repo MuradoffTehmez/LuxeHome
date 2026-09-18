@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { MESSAGE_NAMESPACES } from "../config";
-import { ADMIN_MESSAGE_NAMESPACES } from "../admin";
+import { ADMIN_MESSAGE_NAMESPACES, loadAdminMessages } from "../admin";
 
 const locales = ["az", "en", "ru"] as const;
 const requiredNamespaces = [
@@ -29,7 +29,8 @@ const requiredNamespaces = [
  * Panel kataloqları ictimai siyahıda deyil (hər ictimai sorğuda yüklənməsinlər),
  * amma dil paritetinə eyni sərtliklə tabedirlər.
  */
-const requiredAdminNamespaces = ["admin"] as const;
+const requiredAdminNamespaces = ["admin", "common"] as const;
+const adminOnlyNamespaces = ["admin"] as const;
 
 const catalogModules = import.meta.glob("../locales/*/*.json", {
   eager: true,
@@ -57,8 +58,13 @@ describe("i18n message catalogs", () => {
     expect(ADMIN_MESSAGE_NAMESPACES).toEqual(requiredAdminNamespaces);
   });
 
+  it.each(locales)("loads common.ui into the %s admin provider", async (locale) => {
+    const messages = await loadAdminMessages(locale);
+    expect(messages.common.ui).toBeTypeOf("object");
+  });
+
   it("keeps admin namespaces out of the public request config", () => {
-    for (const namespace of requiredAdminNamespaces) {
+    for (const namespace of adminOnlyNamespaces) {
       expect(MESSAGE_NAMESPACES).not.toContain(namespace);
     }
   });

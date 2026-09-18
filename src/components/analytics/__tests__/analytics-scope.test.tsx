@@ -50,6 +50,19 @@ describe("analitika əhatəsi", () => {
     expect(source).not.toMatch(/<(NextLink|Link)\s[^>]*href="\/admin"/);
   });
 
+  it("Cloudflare Web Analytics beacon-una public və admin CSP-də icazə verir", () => {
+    const middleware = readFileSync(join(process.cwd(), "src/middleware.ts"), "utf8");
+    const policies = [...middleware.matchAll(/const (?:ADMIN|PUBLIC)_CSP = \[([\s\S]*?)\]\.join/g)];
+
+    expect(policies).toHaveLength(2);
+    for (const [, policy] of policies) {
+      expect(policy).toContain("script-src");
+      expect(policy).toContain("https://static.cloudflareinsights.com");
+      expect(policy).toContain("connect-src");
+      expect(policy).toContain("https://cloudflareinsights.com");
+    }
+  });
+
   /**
    * `useReportWebVitals` Next.js-in öz ölçülərini də verir; onların adı server
    * enum-una düşmür və `/api/monitoring/vitals` hər yüklənişdə 400 qaytarırdı.
