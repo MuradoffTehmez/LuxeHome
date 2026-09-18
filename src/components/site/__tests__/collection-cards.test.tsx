@@ -6,7 +6,7 @@ import { PostCard } from "../post-card";
 import { ProjectCard } from "../project-card";
 
 describe("public kolleksiya kartları", () => {
-  it("agentlik, layihə və bloq kartının əsas linkini 44 px hədəf edir", () => {
+  it("agentlik, layihə və bloq kartının əsas linkini 44 px hədəf edir", async () => {
     const agencyHtml = renderToStaticMarkup(
       <AgencyCard
         agency={{
@@ -21,8 +21,8 @@ describe("public kolleksiya kartları", () => {
       />,
     );
     const projectHtml = renderToStaticMarkup(
-      <ProjectCard
-        project={{
+      await ProjectCard({
+        project: {
           id: "project-1",
           name: "Sahil Residence",
           slug: "sahil-residence",
@@ -32,12 +32,12 @@ describe("public kolleksiya kartları", () => {
           year: 2027,
           coverUrl: null,
           city: { name: "Bakı" },
-        } as ProjectCardData}
-      />,
+        } as ProjectCardData,
+      }),
     );
     const postHtml = renderToStaticMarkup(
-      <PostCard
-        post={{
+      await PostCard({
+        post: {
           id: "post-1",
           title: "Əmlak seçimi",
           slug: "emlak-secimi",
@@ -47,8 +47,8 @@ describe("public kolleksiya kartları", () => {
           readMinutes: 4,
           publishedAt: new Date("2026-08-20T10:00:00Z"),
           category: { name: "Bələdçi", slug: "beledci" },
-        } as PostCardData}
-      />,
+        } as PostCardData,
+      }),
     );
 
     expect(agencyHtml).toMatch(/<a[^>]*class="[^"]*min-h-11[^"]*"[^>]*href="\/agentlikler\//);

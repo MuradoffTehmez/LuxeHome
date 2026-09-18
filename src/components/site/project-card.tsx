@@ -1,7 +1,5 @@
-"use client";
-
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Building2, CalendarDays, MapPin } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
@@ -20,7 +18,7 @@ const STATUS_TONE: Record<ProjectStatus, "gold" | "success" | "neutral"> = {
 const STATUS_KEY: Record<ProjectStatus, "planned" | "ongoing" | "completed"> = { PLANNED: "planned", ONGOING: "ongoing", COMPLETED: "completed" };
 const TYPE_KEY: Record<ProjectType, "residential" | "commercial" | "villa" | "mixed"> = { RESIDENTIAL: "residential", COMMERCIAL: "commercial", VILLA: "villa", MIXED: "mixed" };
 
-export function ProjectCard({
+export async function ProjectCard({
   project,
   priority = false,
   className,
@@ -29,7 +27,7 @@ export function ProjectCard({
   priority?: boolean;
   className?: string;
 }) {
-  const t = useTranslations("property");
+  const t = await getTranslations("property");
   const status = project.status as ProjectStatus;
   const type = project.projectType as ProjectType;
 

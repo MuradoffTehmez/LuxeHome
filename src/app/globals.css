@@ -263,24 +263,39 @@ p {
 }
 
 /* --------------------------------------------------------------------------
-   Reveal animasiyası — scroll zamanı yumşaq görünmə
-   IntersectionObserver `data-revealed` atributunu əlavə edir.
+   Reveal animasiyası — CSS-only scroll timeline
+   Dəstək olmayan brauzerdə kontent dərhal görünür.
    -------------------------------------------------------------------------- */
 [data-reveal] {
-  transition:
-    opacity 500ms var(--ease-out-soft),
-    transform 500ms var(--ease-out-soft);
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
-[data-reveal][data-reveal-ready="true"][data-revealed="false"] {
-  opacity: 0;
-  transform: translateY(18px);
-}
-
-[data-reveal][data-revealed="true"] {
   opacity: 1;
   transform: none;
+}
+
+@supports (animation-timeline: view()) {
+  [data-reveal] {
+    animation: reveal-in 500ms var(--ease-out-soft) both;
+    animation-delay: var(--reveal-delay, 0ms);
+    animation-timeline: view();
+    animation-range: entry 0% entry 28%;
+  }
+
+  @keyframes reveal-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@supports (content-visibility: auto) {
+  .home-deferred-content > section {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 50rem;
+  }
 }
 
 /* --------------------------------------------------------------------------
