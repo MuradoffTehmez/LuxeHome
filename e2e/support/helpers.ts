@@ -127,7 +127,9 @@ export function collectConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on("console", (message) => {
     if (message.type() !== "error") return;
-    errors.push(message.text());
+    const location = message.location();
+    const source = location.url ? ` [${location.url}]` : "";
+    errors.push(`${message.text()}${source}`);
   });
   page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   return errors;
