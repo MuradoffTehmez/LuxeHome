@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@cloudflare/vitest-plugin": "^1.1.7",
+    "@cloudflare/vitest-plugin": "^1.1.13",
     "@eslint/eslintrc": "^3",
     "@opennextjs/cloudflare": "^1.20.6",
     "@playwright/test": "^1.63.0",
@@ -102,7 +102,7 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5",
-    "vitest": "^5.0.0",
+    "vitest": "^4.1.11",
     "wrangler": "^4.124.0"
   },
   "//overrides": "Tranzitiv zəifliklər. Düzəlişi yalnız yuxarı paketin (next, prisma, eslint, knip) yeni buraxılışı ilə gələcək; o vaxta qədər versiya burada qaldırılır. Yuxarı paket yeniləndikdə bu blok yenidən qiymətləndirilməlidir. js-yaml yalnız dev alətlərindədir (eslintrc, knip) və production bundle-a düşmür, amma CI audit qapısı bütün asılılıqları yoxlayır.",
