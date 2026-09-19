@@ -34,6 +34,7 @@ vi.mock("next-intl", async (importOriginal) => {
 
 vi.mock("next-intl/server", async () => {
   const actual = await vi.importActual<typeof import("next-intl")>("next-intl");
+  const formatter = actual.createFormatter({ locale: "az-AZ", timeZone: "Asia/Baku" });
   return {
     getTranslations: async (input?: string | { locale?: string; namespace?: string }) => {
       const namespace = typeof input === "string" ? input : input?.namespace;
@@ -45,6 +46,7 @@ vi.mock("next-intl/server", async () => {
     },
     getLocale: async () => "az",
     getMessages: async () => messages,
+    getFormatter: async () => formatter,
   };
 });
 

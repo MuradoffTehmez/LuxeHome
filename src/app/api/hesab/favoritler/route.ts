@@ -27,13 +27,24 @@ export async function GET() {
   if (await isPublicApiBlocked()) return maintenanceApiResponse();
 
   const user = await account();
-  if (!user) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401 });
+  // Favoritlər qeydiyyatsız istifadəçidə localStorage-də işləyir. GET sorğusu
+  // yalnız giriş vəziyyətini bildirir və şəxsi məlumat qaytarmır; beləliklə hər
+  // kart anonim istifadəçi üçün ayrıca 401 konsol xətası yaratmır.
+  if (!user) {
+    return NextResponse.json(
+      { ids: [], signedIn: false },
+      { headers: { "Cache-Control": "private, no-store" } },
+    );
+  }
   const rows = await prisma.favorite.findMany({
     where: { userId: user.id },
     select: { propertyId: true },
     orderBy: { createdAt: "asc" },
   });
-  return NextResponse.json({ ids: rows.map((row) => row.propertyId) }, { headers: { "Cache-Control": "private, no-store" } });
+  return NextResponse.json(
+    { ids: rows.map((row) => row.propertyId), signedIn: true },
+    { headers: { "Cache-Control": "private, no-store" } },
+  );
 }
 
 export async function PUT(request: Request) {

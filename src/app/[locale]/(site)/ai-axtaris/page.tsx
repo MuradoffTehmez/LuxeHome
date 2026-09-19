@@ -23,7 +23,7 @@ export default async function AiSearchPage({ params, searchParams }: Props) {
   const t = await getTranslations({ locale, namespace: "phase3.search" });
   const result = q ? await searchPropertiesWithAi(q) : null;
   return <>
-    <Section tone="beige" spacing="cozy"><Container><SectionHeader as="h1" overline={t("overline")} title={t("title")} description={t("description")} /><div className="mt-8"><AiSearchForm initialQuery={q} labels={{ placeholder: t("placeholder"), submit: t("submit"), example: t("example") }} /></div></Container></Section>
+    <Section tone="beige" spacing="cozy"><Container><SectionHeader as="h1" overline={t("overline")} title={t("title")} description={t("description")} /><div className="mt-8"><AiSearchForm initialQuery={q} locale={locale as Locale} labels={{ placeholder: t("placeholder"), submit: t("submit"), example: t("example") }} /></div></Container></Section>
     {result && <Section tone="ivory" spacing="cozy"><Container>
       <div className="mb-7 flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-display text-2xl text-ink">{t("results", { count: result.items.length })}</h2><p className="mt-1 text-sm text-ink-muted">{t("realOnly")}</p></div><Badge tone="info">{result.model === "deterministic-fallback" ? t("fallback") : t("aiParsed")}</Badge></div>
       {result.clarification && <p className="mb-6 rounded-sm border border-gold/40 bg-gold/10 p-4 text-sm text-ink">{result.clarification}</p>}

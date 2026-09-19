@@ -22,22 +22,96 @@ export async function AgentCard({
     ? agent.reviews.reduce((sum, review) => sum + review.rating, 0) / agent.reviews.length
     : null;
 
-  return <article className="h-full rounded-md border border-line bg-paper p-5 shadow-sm">
-    <div className="flex items-start gap-4">
-      <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige">
-        {agent.avatarUrl ? <Image src={agent.avatarUrl} alt="" fill sizes="64px" unoptimized={isUnoptimizedImage(agent.avatarUrl)} className="object-cover" /> : <UserRound className="size-7 text-ink-muted" aria-hidden="true" />}
-      </div>
-      <div className="min-w-0">
-        <Heading className="font-display text-xl text-ink"><Link href={`/agentler/${agent.slug}`} className="hover:text-gold-deep">{agent.name}</Link></Heading>
-        {agent.agency && <p className="text-sm text-ink-muted"><Link href={`/agentlikler/${agent.agency.slug}`} className="hover:text-gold-deep">{agent.agency.name}</Link></p>}
-        <div className="mt-2 flex flex-wrap gap-2">
-          {agent.isVerified && <Badge tone="gold">{t("verified")}</Badge>}
-          {rating != null && <Badge tone="neutral"><Star className="mr-1 size-3.5 fill-gold text-gold-deep" aria-hidden="true" />{rating.toFixed(1)}</Badge>}
+  // Yeni agentdə `soldCount`/`rentedCount` sıfırdır. «0 satış · 0 icarə»
+  // yazmaq kartı boş göstərir, ona görə sətir yalnız real nəticə olanda çıxır.
+  const hasDeals = agent.soldCount > 0 || agent.rentedCount > 0;
+  const summary = agent.specialization || agent.roleTitle || null;
+
+  return (
+    <article className="group relative flex h-full flex-col gap-4 rounded-sm border border-line bg-paper p-5 transition-colors duration-300 ease-out-soft hover:border-gold sm:p-6">
+      <div className="flex items-start gap-4">
+        <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige">
+          {agent.avatarUrl ? (
+            <Image
+              src={agent.avatarUrl}
+              alt=""
+              fill
+              sizes="64px"
+              unoptimized={isUnoptimizedImage(agent.avatarUrl)}
+              className="object-cover"
+            />
+          ) : (
+            <UserRound className="size-7 text-ink-muted" aria-hidden="true" />
+          )}
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-1">
+          <Heading className="font-display text-xl leading-snug text-ink">
+            {/* Bütün kart klikləndikdə agent səhifəsinə keçir. */}
+            <Link
+              href={`/agentler/${agent.slug}`}
+              className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center transition-colors duration-300 ease-out-soft hover:text-gold-deep"
+            >
+              {agent.name}
+            </Link>
+          </Heading>
+
+          {agent.agency && (
+            // Overlay linkin altında qalmasın deyə z-10.
+            <p className="relative z-10 w-fit text-sm text-ink-muted">
+              <Link
+                href={`/agentlikler/${agent.agency.slug}`}
+                className="transition-colors hover:text-gold-deep"
+              >
+                {agent.agency.name}
+              </Link>
+            </p>
+          )}
+
+          {(agent.isVerified || rating != null) && (
+            <div className="mt-1 flex flex-wrap gap-2">
+              {agent.isVerified && <Badge tone="gold">{t("verified")}</Badge>}
+              {rating != null && (
+                <Badge tone="neutral">
+                  <Star className="mr-1 size-3.5 fill-gold text-gold-deep" aria-hidden="true" />
+                  {rating.toFixed(1)}
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
       </div>
-    </div>
-    <p className="mt-4 text-sm text-ink-soft">{agent.specialization || agent.roleTitle || t("about")}</p>
-    <p className="mt-3 text-xs text-ink-muted">{t("soldRented", { sold: agent.soldCount, rented: agent.rentedCount })} · {agent._count.properties} {t("listings").toLocaleLowerCase()}</p>
-    {agent.responseMinutes != null && <p className="mt-1 text-xs text-ink-muted">{t("responseTime", { count: agent.responseMinutes })}</p>}
-  </article>;
+
+      {summary && (
+        <p className="text-xs font-medium tracking-wide text-gold-deep uppercase">{summary}</p>
+      )}
+
+      {agent.experienceYears != null && (
+        <p className="line-clamp-2 text-sm text-ink-soft">
+          {t("experience", { count: agent.experienceYears })}
+        </p>
+      )}
+
+      <div className="mt-auto flex flex-col gap-2 border-t border-line pt-4">
+        <dl className="flex items-baseline justify-between gap-4 text-sm">
+          <dt className="text-ink-muted">{t("listings")}</dt>
+          <dd className="tabular font-display text-lg leading-none text-ink">
+            {agent._count.properties}
+          </dd>
+        </dl>
+
+        {hasDeals && (
+          <p className="text-xs text-ink-muted">
+            {t("soldRented", { sold: agent.soldCount, rented: agent.rentedCount })}
+          </p>
+        )}
+
+        {agent.responseMinutes != null && (
+          <p className="text-xs text-ink-muted">
+            {t("responseTime", { count: agent.responseMinutes })}
+          </p>
+        )}
+      </div>
+    </article>
+  );
 }

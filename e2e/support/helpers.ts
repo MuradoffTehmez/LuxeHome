@@ -69,6 +69,7 @@ export function propertyCardLinks(page: Page, locale: Locale = "az"): Locator {
 /** «300 nəticə» sətrindən rəqəmi çıxarır. Sətir tapılmasa `null`. */
 export async function readResultCount(page: Page): Promise<number | null> {
   const text = await page.locator("body").innerText();
+  if (/Nəticə tapılmadı|No results found|Ничего не найдено/i.test(text)) return 0;
   const match = text.match(/(\d[\d\s]*)\s*(?:nəticə|result|результат)/i);
   if (!match) return null;
   return Number(match[1].replace(/\s/g, ""));
@@ -119,16 +120,14 @@ export async function jsonLdBlocks(page: Page): Promise<Array<Record<string, unk
 /**
  * Konsol xətalarını toplayır.
  *
- * Şəkil 404-ləri və üçüncü tərəf skript xəbərdarlıqları süzülür: onlar real
- * tətbiq xətası deyil və testi səbəbsiz qırmamalıdır.
+ * Heç bir browser xətası gizlədilmir. CSP, 4xx/5xx resurs cavabları, üçüncü tərəf
+ * inteqrasiya xətaları və şəbəkə problemləri də regressiyadır və testdə görünməlidir.
  */
 export function collectConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on("console", (message) => {
     if (message.type() !== "error") return;
-    const text = message.text();
-    if (/favicon|net::ERR_|Failed to load resource|googletagmanager|gtag/i.test(text)) return;
-    errors.push(text);
+    errors.push(message.text());
   });
   page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   return errors;
@@ -194,16 +193,11 @@ export async function readFavorites(page: Page): Promise<string[]> {
 }
 
 /**
- * Səhifəni «oturdur»: bütün reveal elementlərini görünən hala gətirir.
+ * Səhifəni «oturdur»: deferred bölmələri render etdirir.
  *
- * `[data-reveal]` blokları `IntersectionObserver` ilə idarə olunur — viewport-a
- * girməyən element `opacity: 0` qalır. axe belə elementi fonla qarışmış rəngdə
- * ölçür və mövcud olmayan kontrast pozuntusu bildirir (məsələn qızıl `#aa8754`
- * fon `#bca077` kimi görünür).
- *
- * `reducedMotion: "reduce"` keçidi ləğv edir, lakin observer yenə də yalnız
- * viewport-a girən elementi işarələyir. Ona görə səhifə sona qədər sürüşdürülür,
- * qısa fasilə verilir və başa qaytarılır — bundan sonra bütün bloklar görünəndir.
+ * `reducedMotion: "reduce"` CSS reveal keçidini ləğv edir. Ana səhifənin
+ * `content-visibility: auto` bölmələri isə axe ölçməsindən əvvəl browser
+ * tərəfindən layout edilməlidir; sona qədər sürüşmək həmin işi deterministik edir.
  */
 export async function settlePage(page: Page): Promise<void> {
   await page.evaluate(async () => {
@@ -217,16 +211,7 @@ export async function settlePage(page: Page): Promise<void> {
     window.scrollTo(0, 0);
   });
 
-  // Observer-in son partiyanı işarələməsi üçün qısa pəncərə.
-  await page.waitForTimeout(600);
-
-  // Gizli qalan reveal bloku varsa, testi yanıltmamaq üçün açıq şəkildə açılır.
-  await page.evaluate(() => {
-    document.querySelectorAll("[data-reveal]").forEach((element) => {
-      element.setAttribute("data-revealed", "true");
-    });
-  });
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(300);
 }
 
 /**

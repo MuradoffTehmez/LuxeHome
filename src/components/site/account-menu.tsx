@@ -1,6 +1,5 @@
 "use client";
 
-import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { Bell, LayoutDashboard, LogIn, UserRound } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -70,10 +69,16 @@ export function AccountMenu({
   );
 
   if (state.isStaff) {
+    // Panelə keçid qəsdən tam sənəd yükləməsidir (`<a>`, `NextLink` deyil).
+    // Client-side keçiddə sənəd ictimai CSP-si ilə qalır və ictimai səhifədə
+    // artıq yüklənmiş GTM sökülmür — History Change trigger-i panel
+    // marşrutlarını da izləməyə davam edərdi. Tam yükləmə middleware-in
+    // `ADMIN_CSP`-sini tətbiq edir və izləyicini sənədlə birlikdə atır.
     return (
-      <NextLink href="/admin" aria-label={t("adminPanel")} className={linkClass}>
+      // eslint-disable-next-line @next/next/no-html-link-for-pages -- tam sənəd yükləməsi qəsdlidir (yuxarıdakı şərhə bax)
+      <a href="/admin" aria-label={t("adminPanel")} className={linkClass}>
         {contents}
-      </NextLink>
+      </a>
     );
   }
 

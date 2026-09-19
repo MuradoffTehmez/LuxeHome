@@ -9,7 +9,8 @@ describe("Cloudflare analitika xəta mətnləri", () => {
 
     const reason = analyticsFailureReason(undefined, [providerMessage]);
 
-    expect(reason).toContain("Analytics: Read");
+    expect(reason).toContain("Zone → Analytics Read");
+    expect(reason).toContain("Account Analytics Read");
     expect(reason).toContain("CLOUDFLARE_ANALYTICS_TOKEN");
     expect(reason).not.toContain("secret-id");
     expect(reason).not.toContain("secret-zone");

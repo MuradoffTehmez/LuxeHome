@@ -1,14 +1,12 @@
-"use client";
-
 import Image from "next/image";
-import { useFormatter, useTranslations } from "next-intl";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Clock, Newspaper } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { PostCardData } from "@/lib/queries";
 
-export function PostCard({
+export async function PostCard({
   post,
   priority = false,
   className,
@@ -19,8 +17,10 @@ export function PostCard({
   className?: string;
   variant?: "standard" | "featured";
 }) {
-  const t = useTranslations("property");
-  const format = useFormatter();
+  const [t, format] = await Promise.all([
+    getTranslations("property"),
+    getFormatter(),
+  ]);
   return (
     <article
       className={cn(

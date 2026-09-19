@@ -48,6 +48,7 @@ npx wrangler secret put NOTIFICATION_EMAIL
 npx wrangler secret put RESEND_WEBHOOK_SECRET
 npx wrangler secret put CRON_SECRET
 npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN
+npx wrangler secret put GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON
 npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc
 ```
 
@@ -61,6 +62,7 @@ npx wrangler secret put NOTIFICATION_EMAIL --env staging
 npx wrangler secret put RESEND_WEBHOOK_SECRET --env staging
 npx wrangler secret put CRON_SECRET --env staging
 npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN --env staging
+npx wrangler secret put GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON --env staging
 npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc --env staging
 ```
 
@@ -72,7 +74,13 @@ Qaydalar:
 - Resend credential sızma şübhəsində dərhal revoke edilməlidir.
 - `CRON_SECRET` əsas Worker və ayrıca cron Worker-də eyni mühit üçün eyni olmalıdır;
 - production və staging `CRON_SECRET` dəyərləri bir-birindən fərqli olmalıdır;
-- `CLOUDFLARE_ANALYTICS_TOKEN` yalnız `Analytics:Read` icazəsi ilə məhdudlaşdırılmalıdır.
+- `CLOUDFLARE_ANALYTICS_TOKEN` konkret `luxehomeestate.az` zonası üçün yalnız
+  `Zone` → `Analytics Read` icazəsi ilə məhdudlaşdırılmalıdır;
+  hesab səviyyəli `Account Analytics Read` bu GraphQL sorğusu üçün kifayət etmir.
+- `GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON` JSON key-ni bütöv saxlayır;
+  service account `sc-domain:luxehomeestate.az` property-sinə Owner və ya Full
+  user kimi əlavə edilməlidir. Qısaömürlü access token daimi secret kimi istifadə
+  edilməməlidir.
 
 ## OpenNext konfiqurasiyası
 

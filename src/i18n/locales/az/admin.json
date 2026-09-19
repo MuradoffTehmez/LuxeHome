@@ -1510,6 +1510,10 @@
       "tesdiqlenmisSearchConsoleProperty": "Təsdiqlənmiş Search Console property-yə sitemap index URL-i göndərilir.",
       "sitemapUrl": "Sitemap URL",
       "oauthToken": "OAuth token",
+      "gscCredential": "Credential növü",
+      "gscServiceAccount": "Service account (avtomatik yenilənir)",
+      "gscOAuthRefresh": "OAuth refresh token (avtomatik yenilənir)",
+      "gscTemporaryAccessToken": "Müvəqqəti access token",
       "property": "Property",
       "hazirliq": "Hazırlıq",
       "seoLandingPageEngine": "SEO landing page engine",
@@ -2201,7 +2205,20 @@
       "howCache": "Dəyişiklik bütün Worker izolyatlarına 15 saniyəyə qədər yayılır.",
       "howAudit": "Hər dəyişiklik audit jurnalına SYSTEM_MODE_CHANGE kimi yazılır.",
       "saved": "Sistem rejimi yeniləndi.",
-      "unchanged": "Dəyişiklik yoxdur."
+      "unchanged": "Dəyişiklik yoxdur.",
+      "integrationHealthTitle": "İnteqrasiya sağlamlığı",
+      "integrationHealthDescription": "Secret dəyərləri göstərilmədən xarici xidmətlərin runtime hazırlığı yoxlanılır.",
+      "integrationReady": "Hazırdır",
+      "integrationOptionalMissing": "Opsional çatışmır",
+      "integrationRequiredMissing": "Məcburi çatışmır",
+      "integrationSearchConsole": "Google Search Console",
+      "integrationCloudflareAnalytics": "Cloudflare analitikası",
+      "integrationEmail": "E-poçt göndərişi",
+      "integrationEmailWebhook": "Resend webhook",
+      "integrationGeocoding": "Ünvan və xəritə",
+      "integrationTurnstile": "Turnstile bot müdafiəsi",
+      "integrationSavedSearchCron": "Saxlanmış axtarış cron-u",
+      "integrationPush": "Push bildirişləri"
     }
   }
 }

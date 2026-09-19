@@ -1510,6 +1510,10 @@
       "tesdiqlenmisSearchConsoleProperty": "Sends the sitemap index URL to the verified Search Console property.",
       "sitemapUrl": "Sitemap URL",
       "oauthToken": "OAuth token",
+      "gscCredential": "Credential type",
+      "gscServiceAccount": "Service account (auto-refreshing)",
+      "gscOAuthRefresh": "OAuth refresh token (auto-refreshing)",
+      "gscTemporaryAccessToken": "Temporary access token",
       "property": "Property",
       "hazirliq": "Readiness",
       "seoLandingPageEngine": "SEO landing page engine",
@@ -2201,7 +2205,20 @@
       "howCache": "A change propagates to every Worker isolate within 15 seconds.",
       "howAudit": "Every change is written to the audit log as SYSTEM_MODE_CHANGE.",
       "saved": "System mode updated.",
-      "unchanged": "Nothing changed."
+      "unchanged": "Nothing changed.",
+      "integrationHealthTitle": "Integration health",
+      "integrationHealthDescription": "Runtime readiness of external services without revealing secret values.",
+      "integrationReady": "Ready",
+      "integrationOptionalMissing": "Optional missing",
+      "integrationRequiredMissing": "Required missing",
+      "integrationSearchConsole": "Google Search Console",
+      "integrationCloudflareAnalytics": "Cloudflare analytics",
+      "integrationEmail": "Email delivery",
+      "integrationEmailWebhook": "Resend webhook",
+      "integrationGeocoding": "Address and maps",
+      "integrationTurnstile": "Turnstile bot protection",
+      "integrationSavedSearchCron": "Saved-search cron",
+      "integrationPush": "Push notifications"
     }
   }
 }

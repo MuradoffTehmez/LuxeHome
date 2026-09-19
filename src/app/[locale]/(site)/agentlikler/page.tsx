@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/lib/constants";
 import { getTranslations } from "next-intl/server";
+import { Building2, UserRound } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
@@ -50,6 +51,7 @@ export default async function AgenciesPage({ params }: PageProps) {
             </div>
           ) : (
             <EmptyState
+              icon={<Building2 className="size-6" aria-hidden="true" />}
               title={t("emptyTitle")}
               description={t("emptyDescription")}
             />
@@ -58,8 +60,31 @@ export default async function AgenciesPage({ params }: PageProps) {
       </Section>
       <Section tone="beige" spacing="cozy">
         <Container>
-          <SectionHeader title={agentsT("title")} description={agentsT("description")} action={{ label: agentsT("title"), href: "/agentler" }} />
-          {agents.length > 0 ? <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">{agents.map((agent) => <Reveal key={agent.id}><AgentCard agent={agent} /></Reveal>)}</div> : <div className="mt-8"><EmptyState title={agentsT("notFound")} description={agentsT("description")} /></div>}
+          {/* Əməl düyməsinin etiketi başlıqdan fərqlidir — eyni olsa, bölmədə
+              «Agentlər … Agentlər» təkrarı yaranır. */}
+          <SectionHeader
+            title={agentsT("title")}
+            description={agentsT("description")}
+            action={{ label: agentsT("homeAll"), href: "/agentler" }}
+          />
+
+          {agents.length > 0 ? (
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {agents.map((agent, index) => (
+                <Reveal key={agent.id} delay={index * 60}>
+                  <AgentCard agent={agent} />
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-10">
+              <EmptyState
+                icon={<UserRound className="size-6" aria-hidden="true" />}
+                title={agentsT("notFound")}
+                description={agentsT("emptyDescription")}
+              />
+            </div>
+          )}
         </Container>
       </Section>
     </>
