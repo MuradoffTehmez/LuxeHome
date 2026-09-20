@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/layiheler/${project.slug}`,
     image: project.images[0]?.url,
     noIndex: project.noIndex,
-    canonicalPath: project.canonicalUrl,
+    canonicalPath: project.canonicalUrl || undefined,
     ogTitle: project.ogTitle,
     ogDescription: project.ogDescription,
     ogImage: project.ogImage,
