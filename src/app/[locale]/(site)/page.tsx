@@ -16,6 +16,7 @@ import {
   Star,
   Users,
 } from "lucide-react";
+import { LOCATION_KINDS } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -119,14 +120,25 @@ export default async function HomePage({ params }: HomePageProps) {
     value: type.slug,
     label: localizeKnownContent("propertyType", type, resolvedLocale).name,
   }));
-  // Rayon seçimi şəhərdən asılı olduğu üçün alt siyahı da ötürülür
+  // Rayon seçimi şəhərdən asılı olduğu üçün alt siyahı da ötürülür. Bakıda
+  // qəsəbələr inzibati rayonun altındadır, ona görə iki səviyyə birləşdirilir.
   const cityOptions = filterOptions.cities.map((city) => ({
     value: city.slug,
     label: localizeLocation(city, resolvedLocale).name,
-    districts: city.children.map((district) => ({
-      value: district.slug,
-      label: localizeLocation(district, resolvedLocale).name,
-    })),
+    districts: city.children.flatMap((child) => {
+      const label = localizeLocation(child, resolvedLocale).name;
+      const self = { value: child.slug, label, kind: child.kind };
+      if (child.kind !== LOCATION_KINDS.DISTRICT) return [self];
+      return [
+        self,
+        ...child.children.map((grandchild) => ({
+          value: grandchild.slug,
+          label: localizeLocation(grandchild, resolvedLocale).name,
+          kind: grandchild.kind,
+          group: label,
+        })),
+      ];
+    }),
   }));
   const categoryItems = localizedPropertyTypes.map((type) => ({
     href: `/emlaklar?tip=${type.slug}`,

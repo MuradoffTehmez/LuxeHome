@@ -25,7 +25,7 @@ import {
   buildPropertySearchHref,
   parsePropertySearchParams,
 } from "@/lib/property-search";
-import { SORT_OPTIONS, type Locale } from "@/lib/constants";
+import { LOCATION_KINDS, SORT_OPTIONS, type Locale } from "@/lib/constants";
 import { cn, formatPrice } from "@/lib/utils";
 import { localizePath } from "@/i18n/path-locale";
 import { Link } from "@/i18n/navigation";
@@ -185,13 +185,26 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     value: type.slug,
     label: localizeKnownContent("propertyType", type, locale as Locale).name,
   }));
+  // Rayon açılışı iki səviyyəni birləşdirir: Bakıda inzibati rayon, onun
+  // altında isə qəsəbə/massiv gəlir. Qruplaşdırma `group` sahəsi ilə verilir ki,
+  // «Maştağa» hansı rayona aid olduğu görünsün.
   const cityOptions = filterOptions.cities.map((city) => ({
     value: city.slug,
     label: localizeLocation(city, locale as Locale).name,
-    districts: city.children.map((district) => ({
-      value: district.slug,
-      label: localizeLocation(district, locale as Locale).name,
-    })),
+    districts: city.children.flatMap((child) => {
+      const label = localizeLocation(child, locale as Locale).name;
+      const self = { value: child.slug, label, kind: child.kind };
+      if (child.kind !== LOCATION_KINDS.DISTRICT) return [self];
+      return [
+        self,
+        ...child.children.map((grandchild) => ({
+          value: grandchild.slug,
+          label: localizeLocation(grandchild, locale as Locale).name,
+          kind: grandchild.kind,
+          group: label,
+        })),
+      ];
+    }),
   }));
   const metroOptions = filterOptions.metros.map((metro) => ({
     value: metro.slug,

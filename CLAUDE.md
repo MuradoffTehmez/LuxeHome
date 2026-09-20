@@ -31,6 +31,7 @@ npm run deploy       # OpenNext bundle + Cloudflare Workers-ə yayım (productio
 npm run cf-typegen   # wrangler.jsonc-dən CloudflareEnv tiplərini yenidən yaradır
 
 npm run auth:create-admin  # ilk SUPER_ADMIN üçün INSERT ifadəsi çap edir
+npm run db:locations:build    # rəsmi inzibati-ərazi JSON-undan locations-data.ts yaradır
 npm run db:knowledge:build    # hüquqi mənbə sənədindən DRAFT Knowledge Hub SQL yaradır
 npm run db:knowledge:local    # yaradılmış Knowledge Hub SQL-i lokal D1-ə tətbiq edir
 npm run db:knowledge:staging  # eyni SQL-i staging D1-ə tətbiq edir
@@ -252,6 +253,56 @@ Layout primitivləri: `Container` (max-width + padding) və `Section`.
 `Section` şaquli boşluğu **`spacing` propu ilə** verilir (`default` | `cozy` | `compact` | `none`).
 Boşluğu `className="py-10 sm:py-12"` ilə əvəzləmə — bazadakı `lg:` sinfi qüvvədə qalır və
 override desktopda səssizcə işləmir. Tam əl ilə idarə lazımdırsa `spacing="none"` ver.
+
+### Yerləşmə ağacı (şəhər / rayon / qəsəbə / kənd)
+
+Mənbə **Azərbaycanın rəsmi inzibati-ərazi bölgüsüdür**: «İnzibati Ərazi Bölgüsü Təsnifatı, 2024»
+(Dövlət Statistika Komitəsi kollegiyasının 16.02.2024 tarixli 2/2 nömrəli qərarı, Milli Məclisin
+Aparatı ilə razılaşdırılıb) — <https://e-qanun.az/framework/57325>.
+
+Data axını **generasiyalıdır**, `locations-data.ts` əl ilə redaktə edilmir:
+
+```
+prisma/az-admin-divisions.json   # rəsmi sənəddən çıxarılmış snapshot
+  → npm run db:locations:build   # scripts/build-locations-data.py
+prisma/locations-data.ts         # generasiya olunur
+  → npm run db:taxonomy:build
+prisma/taxonomy.sql              # db:taxonomy:local / :staging / :remote
+```
+
+`Location.kind` səviyyələri (`src/lib/constants.ts` → `LOCATION_KINDS`):
+
+| kind | Məna | Say |
+|---|---|---|
+| `CITY` | 11 respublika tabeli şəhər **və** 64 rayon — istifadəçinin birinci seçimi | 75 |
+| `DISTRICT` | **Yalnız şəhərdaxili** inzibati rayon: Bakının 12, Gəncənin 2 rayonu | 14 |
+| `SETTLEMENT` | Rəsmi qəsəbə və rayon tabeli şəhər (Xırdalan, Xudat, Horadiz, Liman) | 274 |
+| `VILLAGE` | Kənd | 265 |
+| `NEIGHBORHOOD` | Yaşayış massivi/mikrorayon — **rəsmi inzibati vahid deyil** | 23 |
+| `METRO` | Bakı metrosunun stansiyası; valideyni Bakıdır | 26 |
+
+Qaydalar:
+
+- **Rayon `CITY` səviyyəsindədir, `DISTRICT` deyil.** Quba ilə Bakı axtarışda eyni açılan
+  siyahıdan seçilir; `DISTRICT` yalnız şəhərin daxilindəki rayon deməkdir.
+- **Xırdalan, Novxanı, Masazır, Görədil Abşeron rayonunun altındadır** — nə Bakının rayonu,
+  nə ayrıca şəhər. 2026 auditinə qədər belə idi və `migrations/0031` onu düzəldir.
+- Rəsmi təsnifatda **Nərimanov, Nəsimi və Yasamal rayonlarında qəsəbə yoxdur.** Orada işlənən
+  adlar (mikrorayonlar, Yeni Yasamal) `NEIGHBORHOOD`-dur və rəsmi qəsəbə siyahısına qarışmır.
+- Slug valideynin slug-ı ilə prefikslənir (`quba-xinaliq`, `abseron-xirdalan`); Bakı ağacında
+  konvensiya ilk seed-dən `baki-<ad>`-dır və dəyişdirilmir. Generator təkrar slug tapanda
+  **dayanır** — səssizcə atmaq valideyn əlaqəsini korlayardı.
+- Şəhər/rayonla eyniadlı qəsəbə ayrıca qeyd yaratmır: «Binəqədi qəsəbəsi» Binəqədi rayonunun
+  mərkəzidir və seçim siyahısında iki dəfə görünməməlidir.
+- Kənd siyahısı **seçmədir**: rəsmi 4 244 kənddən Bakıya yaxın rayonlarda tam, turizm və bağ
+  bölgələrində bazarda tanınanlar. Tam siyahı açılan menyunu yararsız edərdi.
+- Filtr açılışında seçilə bilən səviyyələr `LOCATION_CHILD_KINDS`-dədir. **`METRO` oraya
+  salınmamalıdır** — metro Bakının uşağıdır, amma öz filtr sahəsi var; süzülməsə rayon
+  açılışında 26 stansiya görünür.
+- `/rayon/<slug>` landing-i `DISTRICT`-lə yanaşı qəsəbə, kənd və massivi də açır: hamısı
+  `Property.districtId`-də saxlanılır.
+
+Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 
 ### Əmlak filtrləri
 

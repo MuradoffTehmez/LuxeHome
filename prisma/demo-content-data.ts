@@ -71,9 +71,12 @@ export const PLACES: Array<{ city: string; district: string | null; name: string
   { city: "baki", district: "baki-xezer", name: "Xəzər" },
   { city: "baki", district: "baki-suraxani", name: "Suraxanı" },
   { city: "baki", district: "baki-qaradag", name: "Qaradağ" },
-  { city: "baki", district: "baki-novxani", name: "Novxanı" },
+  { city: "baki", district: "baki-mastaga", name: "Maştağa" },
   { city: "sumqayit", district: null, name: "Sumqayıt" },
-  { city: "xirdalan", district: null, name: "Xırdalan" },
+  // Xırdalan və Novxanı Abşeron rayonunun yaşayış məntəqələridir; rəsmi
+  // təsnifatda Bakının rayonu və ya ayrıca şəhər deyil.
+  { city: "abseron", district: "abseron-xirdalan", name: "Xırdalan" },
+  { city: "abseron", district: "abseron-novxani", name: "Novxanı" },
   { city: "qebele", district: null, name: "Qəbələ" },
   { city: "gence", district: null, name: "Gəncə" },
 ];

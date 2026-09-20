@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { requireAdminRead } from "@/lib/admin/guard";
 import {
+  LOCATION_CHILD_KINDS,
   NEARBY_PLACE_CATEGORY_LABELS,
   PERMISSIONS,
   PREMIUM_DURATIONS_DAYS,
@@ -51,7 +52,7 @@ export default async function PublicFeaturesAdminPage() {
       orderBy: { title: "asc" },
     }),
     prisma.location.findMany({
-      where: { kind: { in: ["DISTRICT", "SETTLEMENT"] } },
+      where: { kind: { in: LOCATION_CHILD_KINDS } },
       select: { id: true, name: true, parent: { select: { name: true } } },
       orderBy: { name: "asc" },
     }),

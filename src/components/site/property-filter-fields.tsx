@@ -12,10 +12,23 @@ import {
   RENOVATIONS,
 } from "@/lib/constants";
 
+/**
+ * Rayon açılışının bir sətri.
+ *
+ * `group` verilibsə, sətir həmin başlıq altında `<optgroup>`-a yığılır —
+ * Bakının qəsəbələri aid olduqları inzibati rayonun altında görünür.
+ */
+export type DistrictOption = {
+  value: string;
+  label: string;
+  kind?: string;
+  group?: string;
+};
+
 export type CityOption = {
   value: string;
   label: string;
-  districts?: { value: string; label: string }[];
+  districts?: DistrictOption[];
 };
 
 export type TypeOption = { value: string; label: string };
@@ -82,10 +95,19 @@ function SelectField({
   label: string;
   defaultValue?: string;
   placeholder: string;
-  options: readonly { value: string; label: string }[];
+  options: readonly { value: string; label: string; group?: string }[];
   onChange?: (value: string) => void;
   className?: string;
 }) {
+  // Ardıcıl eyni `group` dəyərləri bir `<optgroup>`-a yığılır. Sıra serverdən
+  // gəldiyi kimi saxlanılır — rayon, sonra onun qəsəbələri.
+  const groups: { group?: string; items: { value: string; label: string }[] }[] = [];
+  for (const option of options) {
+    const last = groups[groups.length - 1];
+    if (last && last.group === option.group) last.items.push(option);
+    else groups.push({ group: option.group, items: [option] });
+  }
+
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
       <label htmlFor={id} className={LABEL_CLASS}>{label}</label>
@@ -98,9 +120,19 @@ function SelectField({
           className={SELECT_CLASS}
         >
           <option value="">{placeholder}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
+          {groups.map((entry, index) =>
+            entry.group ? (
+              <optgroup key={`${entry.group}-${index}`} label={entry.group}>
+                {entry.items.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </optgroup>
+            ) : (
+              entry.items.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))
+            ),
+          )}
         </select>
         <ChevronDown
           className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-ink-muted"

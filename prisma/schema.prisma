@@ -290,9 +290,16 @@ model PropertyType {
   properties  Property[]
 }
 
-/// Yerləşmə ağacı. Bakı bazarında yer dörd paralel açarla göstərilir və istifadəçi
-/// hər hansı biri ilə axtarır: rayon, metro, qəsəbə/mikrorayon, nişangah.
-/// kind = "CITY" | "DISTRICT" | "METRO" | "SETTLEMENT" | "LANDMARK"
+/// Yerləşmə ağacı — Azərbaycanın rəsmi inzibati-ərazi bölgüsü.
+/// Mənbə və quruluş izahı: `prisma/locations-data.ts`.
+///
+/// kind = "CITY" | "DISTRICT" | "SETTLEMENT" | "VILLAGE" | "NEIGHBORHOOD" | "METRO" | "LANDMARK"
+/// - CITY         — 11 respublika tabeli şəhər və 64 rayon (istifadəçinin birinci seçimi)
+/// - DISTRICT     — yalnız şəhərdaxili inzibati rayon: Bakının 12, Gəncənin 2 rayonu
+/// - SETTLEMENT   — rəsmi qəsəbə və rayon tabeli şəhər
+/// - VILLAGE      — kənd
+/// - NEIGHBORHOOD — yaşayış massivi/mikrorayon; rəsmi inzibati vahid deyil
+/// - METRO        — Bakı metrosunun stansiyası; valideyni Bakıdır
 model Location {
   id         String  @id @default(cuid())
   name       String
