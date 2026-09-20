@@ -422,6 +422,8 @@ INSERT OR IGNORE INTO "Location" ("id","name","slug","kind","parentId","order") 
 UPDATE "Location" SET "name"='Şağan', "kind"='SETTLEMENT', "order"=60, "parentId"=(SELECT "id" FROM "Location" WHERE "slug"='baki-xezer') WHERE "slug"='baki-sagan';
 INSERT OR IGNORE INTO "Location" ("id","name","slug","kind","parentId","order") VALUES ('loc_baki-suvelan','Şüvəlan','baki-suvelan','SETTLEMENT',(SELECT "id" FROM "Location" WHERE "slug"='baki-xezer'),70);
 UPDATE "Location" SET "name"='Şüvəlan', "kind"='SETTLEMENT', "order"=70, "parentId"=(SELECT "id" FROM "Location" WHERE "slug"='baki-xezer') WHERE "slug"='baki-suvelan';
+INSERT OR IGNORE INTO "Location" ("id","name","slug","kind","parentId","order") VALUES ('loc_baki-dubendi','Dübəndi','baki-dubendi','NEIGHBORHOOD',(SELECT "id" FROM "Location" WHERE "slug"='baki-xezer'),80);
+UPDATE "Location" SET "name"='Dübəndi', "kind"='NEIGHBORHOOD', "order"=80, "parentId"=(SELECT "id" FROM "Location" WHERE "slug"='baki-xezer') WHERE "slug"='baki-dubendi';
 INSERT OR IGNORE INTO "Location" ("id","name","slug","kind","parentId","order") VALUES ('loc_baki-xetai','Xətai','baki-xetai','DISTRICT',(SELECT "id" FROM "Location" WHERE "slug"='baki'),90);
 UPDATE "Location" SET "name"='Xətai', "kind"='DISTRICT', "order"=90, "parentId"=(SELECT "id" FROM "Location" WHERE "slug"='baki') WHERE "slug"='baki-xetai';
 INSERT OR IGNORE INTO "Location" ("id","name","slug","kind","parentId","order") VALUES ('loc_baki-ehmedli','Əhmədli','baki-ehmedli','SETTLEMENT',(SELECT "id" FROM "Location" WHERE "slug"='baki-xetai'),0);

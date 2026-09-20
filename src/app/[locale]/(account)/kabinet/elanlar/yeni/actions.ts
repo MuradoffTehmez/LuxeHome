@@ -84,8 +84,13 @@ export async function createPublicProperty(
     {
       findType: (id) =>
         prisma.propertyType.findUnique({ where: { id }, select: { isActive: true } }),
+      // `parent.parentId` Bakı qəsəbələri üçün şəhəri verir — onlar rayonun
+      // uşağıdır, ona görə tək səviyyəli yoxlama onları səhvən rədd edərdi.
       findLocation: (id) =>
-        prisma.location.findUnique({ where: { id }, select: { kind: true, parentId: true } }),
+        prisma.location.findUnique({
+          where: { id },
+          select: { kind: true, parentId: true, parent: { select: { parentId: true } } },
+        }),
       countFeatures: (ids) => prisma.feature.count({ where: { id: { in: ids } } }),
     },
     parsed.data,

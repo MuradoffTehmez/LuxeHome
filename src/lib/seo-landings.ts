@@ -1,5 +1,5 @@
 import type { PropertyFilters } from "@/lib/queries";
-import type { Locale } from "@/lib/constants";
+import { LOCATION_KINDS, type Locale } from "@/lib/constants";
 import { localizeLocation } from "@/i18n/dynamic-content";
 
 export const MIN_INDEXABLE_LISTINGS = 3;
@@ -290,8 +290,54 @@ export function propertyFiltersToLandingPath(filters: PropertyFilters): string |
 type TaxonomyLocation = {
   name: string;
   slug: string;
+  /**
+   * `/rayon/<slug>` marşrutu inzibati rayonla yanaşı qəsəbə, kənd və massivi də
+   * açır. Etiket buna görə `kind`-dən qurulur — «Maştağa rayonunda» yazmaq
+   * yanlış olardı.
+   */
+  kind?: string | null;
   parent: { name: string } | null;
 };
+
+/** Yer adına uyğun azərbaycanca yerlik hal etiketi. */
+function placeLabelAz(location: TaxonomyLocation, isDistrict: boolean): string {
+  if (!isDistrict) return `${location.name} metrosu yaxınlığında`;
+  switch (location.kind) {
+    case LOCATION_KINDS.SETTLEMENT:
+      return `${location.name} qəsəbəsində`;
+    case LOCATION_KINDS.VILLAGE:
+      return `${location.name} kəndində`;
+    case LOCATION_KINDS.NEIGHBORHOOD:
+      return `${location.name} massivində`;
+    default:
+      return `${location.name} rayonunda`;
+  }
+}
+
+/** Eyni məntiq ingilis və rus dilləri üçün. */
+function placeLabelForeign(
+  location: TaxonomyLocation,
+  place: string,
+  isDistrict: boolean,
+  locale: "en" | "ru",
+): string {
+  if (!isDistrict) {
+    return locale === "en" ? `near ${place} metro` : `у метро ${place}`;
+  }
+  const en: Record<string, string> = {
+    SETTLEMENT: `in ${place} settlement`,
+    VILLAGE: `in ${place} village`,
+    NEIGHBORHOOD: `in ${place} neighbourhood`,
+  };
+  const ru: Record<string, string> = {
+    SETTLEMENT: `в посёлке ${place}`,
+    VILLAGE: `в селе ${place}`,
+    NEIGHBORHOOD: `в массиве ${place}`,
+  };
+  const kind = location.kind ?? "";
+  if (locale === "en") return en[kind] ?? `in ${place} district`;
+  return ru[kind] ?? `в районе ${place}`;
+}
 
 /**
  * Rayon və metro səhifələrini eyni keyfiyyət kontraktı ilə qurur. Mətn yalnız
@@ -307,26 +353,25 @@ export function buildTaxonomyLandingDescriptor(
     const isDistrict = kind === "DISTRICT";
     const prefix = isDistrict ? "rayon" : "metro";
     const place = localizeLocation(location, locale).name;
-    const heading = locale === "en"
-      ? `${isDistrict ? `Property in ${place} district` : `Property near ${place} metro`}`
-      : `${isDistrict ? `Недвижимость в районе ${place}` : `Недвижимость у метро ${place}`}`;
+    const where = placeLabelForeign(location, place, isDistrict, locale);
+    const heading = locale === "en" ? `Property ${where}` : `Недвижимость ${where}`;
     return {
       slug: location.slug,
       path: `/${prefix}/${location.slug}`,
       title: heading,
       description: locale === "en"
-        ? `Compare active properties for sale and rent ${isDistrict ? `in ${place} district` : `near ${place} metro`} by price, area, rooms and property type.`
-        : `Сравнивайте активные предложения о продаже и аренде ${isDistrict ? `в районе ${place}` : `у метро ${place}`} по цене, площади, комнатам и типу недвижимости.`,
+        ? `Compare active properties for sale and rent ${where} by price, area, rooms and property type.`
+        : `Сравнивайте активные предложения о продаже и аренде ${where} по цене, площади, комнатам и типу недвижимости.`,
       h1: heading,
-      overline: locale === "en" ? (isDistrict ? "Search by district" : "Search near metro") : (isDistrict ? "Поиск по району" : "Поиск у метро"),
+      overline: locale === "en" ? (isDistrict ? "Search by area" : "Search near metro") : (isDistrict ? "Поиск по территории" : "Поиск у метро"),
       filters: isDistrict ? { districtSlug: location.slug } : { metroSlug: location.slug },
       content: locale === "en"
         ? [
-            `This page groups current public Luxe Home Estate listings ${isDistrict ? `in ${place} district` : `near ${place} metro`}. Available property types depend on the active portfolio, and listing cards show only information entered for each property.`,
+            `This page groups current public Luxe Home Estate listings ${where}. Available property types depend on the active portfolio, and listing cards show only information entered for each property.`,
             "Compare the exact location, daily transport needs, building or plot condition, documents and payment terms before making a decision. Confirm any missing details with the responsible person and arrange an in-person viewing.",
           ]
         : [
-            `На этой странице собраны актуальные публичные объявления Luxe Home Estate ${isDistrict ? `в районе ${place}` : `у метро ${place}`}. Доступные типы недвижимости зависят от текущего портфеля, а карточки показывают только сведения, указанные для конкретного объекта.`,
+            `На этой странице собраны актуальные публичные объявления Luxe Home Estate ${where}. Доступные типы недвижимости зависят от текущего портфеля, а карточки показывают только сведения, указанные для конкретного объекта.`,
             "До принятия решения сравните точное расположение, ежедневные маршруты, состояние здания или участка, документы и условия оплаты. Уточните недостающие сведения у ответственного лица и договоритесь о личном просмотре.",
           ],
       faq: locale === "en"
@@ -343,7 +388,7 @@ export function buildTaxonomyLandingDescriptor(
   }
   const isDistrict = kind === "DISTRICT";
   const prefix = isDistrict ? "rayon" : "metro";
-  const placeLabel = isDistrict ? `${location.name} rayonunda` : `${location.name} metrosu yaxınlığında`;
+  const placeLabel = placeLabelAz(location, isDistrict);
   const areaContext = location.parent?.name ? `${location.parent.name} şəhərinin ${location.name} ərazisi` : location.name;
 
   return {
@@ -352,7 +397,7 @@ export function buildTaxonomyLandingDescriptor(
     title: `${placeLabel} daşınmaz əmlak elanları`,
     description: `${placeLabel} satılan və kirayə mənzil, ev, ofis və obyektləri qiymət, sahə, otaq və əmlak növünə görə müqayisə edin.`,
     h1: `${placeLabel} daşınmaz əmlaklar`,
-    overline: isDistrict ? "Rayon üzrə seçim" : "Metro yaxınlığında seçim",
+    overline: isDistrict ? "Ərazi üzrə seçim" : "Metro yaxınlığında seçim",
     filters: isDistrict ? { districtSlug: location.slug } : { metroSlug: location.slug },
     content: content(
       `${areaContext} üzrə əmlak axtarışı yaşayış, investisiya və ya biznes məqsədinə uyğun meyarların əvvəlcədən müəyyənləşdirilməsi ilə daha səmərəli olur. Bu səhifə yalnız cari bazada ${placeLabel.toLocaleLowerCase("az-AZ")} qeyd edilmiş, ictimai statusda olan real elanları bir siyahıda göstərir. Mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyekti kimi fərqli əmlak növləri mövcud portfeldən asılı olaraq nəticələrə daxil ola bilər. Kartlarda qiymət, sahə, otaq və ünvan göstəriciləri yalnız elan üçün daxil edilmiş həddə görünür və həmin məlumatlar seçimləri müqayisə etmək üçün ilkin əsas yaradır.`,

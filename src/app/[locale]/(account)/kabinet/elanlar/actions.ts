@@ -55,7 +55,13 @@ async function validateRelations(input: Parameters<typeof validatePublicProperty
   return validatePublicPropertyRelations(
     {
       findType: (id) => prisma.propertyType.findUnique({ where: { id }, select: { isActive: true } }),
-      findLocation: (id) => prisma.location.findUnique({ where: { id }, select: { kind: true, parentId: true } }),
+      // `parent.parentId` Bakı qəsəbələri üçün şəhəri verir — onlar rayonun
+      // uşağıdır, ona görə tək səviyyəli yoxlama onları səhvən rədd edərdi.
+      findLocation: (id) =>
+        prisma.location.findUnique({
+          where: { id },
+          select: { kind: true, parentId: true, parent: { select: { parentId: true } } },
+        }),
       countFeatures: (ids) => prisma.feature.count({ where: { id: { in: ids } } }),
     },
     input,

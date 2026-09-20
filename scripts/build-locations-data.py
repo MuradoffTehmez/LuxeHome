@@ -85,6 +85,9 @@ BAKU_NEIGHBORHOODS = {
     "Səbail": ["Bayıl", "İçərişəhər", "Şıxov"],
     "Suraxanı": ["Bahar", "Yeni Günəşli"],
     "Xətai": ["Ağ şəhər", "Qara şəhər"],
+    # Dübəndi rəsmi təsnifatda ayrıca yaşayış məntəqəsi deyil (Bakıda kənd
+    # yoxdur), amma bağ evi elanlarında işlənir və köhnə ağacda qeyd vardı.
+    "Xəzər": ["Dübəndi"],
     "Yasamal": ["Yeni Yasamal"],
 }
 
@@ -310,10 +313,14 @@ def main():
     with io.open(OUT, "w", encoding="utf-8", newline="\n") as handle:
         handle.write("\n".join(lines) + "\n")
 
-    towns = sum(len(set(data[k]["c"]) | set(data[k]["t"])) for k in data)
-    villages = sum(len(data[k]["v"]) for k in data)
-    print("prisma/locations-data.ts yazıldı — %d şəhər, %d rayon, %d qəsəbə, %d kənd."
-          % (len(CITY_TIER), len(regions), towns, villages))
+    # Sayılar yazılan fayldan hesablanır — şəhər/rayonla eyniadlı qeydlər
+    # atıldığı üçün JSON-dakı xam say daha böyükdür.
+    written = io.open(OUT, encoding="utf-8").read()
+    towns = written.count('s("')
+    villages = written.count('v("')
+    hoods = written.count('n("')
+    print("prisma/locations-data.ts yazıldı — %d şəhər, %d rayon, %d qəsəbə, "
+          "%d kənd, %d massiv." % (len(CITY_TIER), len(regions), towns, villages, hoods))
 
 
 if __name__ == "__main__":

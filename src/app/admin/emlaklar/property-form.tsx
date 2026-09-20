@@ -83,8 +83,10 @@ export function PropertyForm({
   const [rooms, setRooms] = useState(initial.rooms);
   const [uploadReference] = useState(() => initial.id ? `LHE${initial.id.slice(-8)}` : `LHE${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`);
 
-  // Rayon siyahısı seçilmiş şəhərdən asılıdır — kaskad ictimai axtarışdakı ilə eynidir
-  const districts = options.districts.filter((district) => district.parentId === cityId);
+  // Rayon siyahısı seçilmiş şəhərdən asılıdır — kaskad ictimai axtarışdakı ilə
+  // eynidir. `cityId` ağacdan hesablanır (`getPropertyFormOptions`), ona görə
+  // Bakının qəsəbələri — rayonun uşağı olsalar da — burada görünür.
+  const districts = options.districts.filter((district) => district.cityId === cityId);
   const metros = options.metros.filter((metro) => metro.parentId === cityId);
 
   const featureGroups = options.features.reduce<Record<string, typeof options.features>>(
@@ -215,7 +217,11 @@ export function PropertyForm({
           value={districtId}
           onChange={(event) => setDistrictId(event.target.value)}
           placeholder={t("pages.properties.secilmeyib")}
-          options={districts.map((district) => ({ value: district.id, label: district.name }))}
+          options={districts.map((district) => ({
+            value: district.id,
+            label: district.name,
+            group: district.group,
+          }))}
         />
 
         <AdminSelect

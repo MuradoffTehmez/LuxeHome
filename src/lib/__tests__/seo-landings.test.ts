@@ -78,6 +78,44 @@ describe("taxonomy landing descriptor", () => {
     expect(words).toBeLessThanOrEqual(500);
   });
 
+  it("qəsəbə, kənd və massivi öz adı ilə çağırır", () => {
+    // `/rayon/<slug>` inzibati rayonla yanaşı bu səviyyələri də açır —
+    // «Maştağa rayonunda» yazmaq yanlış olardı.
+    const cases = [
+      { kind: "SETTLEMENT", name: "Maştağa", expect: "Maştağa qəsəbəsində" },
+      { kind: "VILLAGE", name: "Novxanı", expect: "Novxanı kəndində" },
+      { kind: "NEIGHBORHOOD", name: "Günəşli", expect: "Günəşli massivində" },
+      { kind: "DISTRICT", name: "Nərimanov", expect: "Nərimanov rayonunda" },
+    ];
+    for (const item of cases) {
+      const landing = buildTaxonomyLandingDescriptor("DISTRICT", {
+        name: item.name,
+        slug: "slug",
+        kind: item.kind,
+        parent: { name: "Bakı" },
+      });
+      expect(landing.title, item.kind).toContain(item.expect);
+      expect(landing.h1, item.kind).toContain(item.expect);
+    }
+  });
+
+  it("qəsəbə etiketi ingilis və rus dillərində də uyğunlaşır", () => {
+    const en = buildTaxonomyLandingDescriptor(
+      "DISTRICT",
+      { name: "Maştağa", slug: "baki-mastaga", kind: "SETTLEMENT", parent: { name: "Bakı" } },
+      "en",
+    );
+    expect(en.h1).toContain("settlement");
+    expect(en.h1).not.toContain("district");
+
+    const ru = buildTaxonomyLandingDescriptor(
+      "DISTRICT",
+      { name: "Novxanı", slug: "abseron-novxani", kind: "VILLAGE", parent: { name: "Abşeron" } },
+      "ru",
+    );
+    expect(ru.h1).toContain("в селе");
+  });
+
   it("metro üçün metro filtrindən istifadə edir", () => {
     expect(
       buildTaxonomyLandingDescriptor("METRO", {

@@ -140,7 +140,30 @@ export function Textarea({ label, error, hint, className, id, ...props }: Textar
 
 // ---------------------------------------------------------------------------
 
-export type SelectOption = { value: string; label: string };
+export type SelectOption = {
+  value: string;
+  label: string;
+  /** Verilibsə, variant bu başlıqlı `<optgroup>`-a yığılır. */
+  group?: string | null;
+};
+
+/**
+ * Ardıcıl eyni `group` dəyərli variantları bir `<optgroup>`-a yığır.
+ *
+ * Yerləşmə açılışında qəsəbə, kənd və massiv aid olduqları inzibati rayonun
+ * başlığı altında göstərilir — düz siyahıda «Maştağa»nın hansı rayonda olduğu
+ * bilinmir. Sıra serverdən gəldiyi kimi qalır.
+ */
+function groupOptions(options: readonly SelectOption[]) {
+  const groups: { group: string | null; items: SelectOption[] }[] = [];
+  for (const option of options) {
+    const group = option.group ?? null;
+    const last = groups[groups.length - 1];
+    if (last && last.group === group) last.items.push(option);
+    else groups.push({ group, items: [option] });
+  }
+  return groups;
+}
 
 type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "className"> & {
   label: string;
@@ -186,11 +209,23 @@ export function Select({
           {...props}
         >
           {placeholder && <option value="">{placeholder}</option>}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {groupOptions(options).map((entry, index) =>
+            entry.group ? (
+              <optgroup key={`${entry.group}-${index}`} label={entry.group}>
+                {entry.items.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+            ) : (
+              entry.items.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))
+            ),
+          )}
         </select>
         <ChevronDown
           className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-ink-muted"

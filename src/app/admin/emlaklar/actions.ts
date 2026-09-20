@@ -15,6 +15,7 @@ import {
   readPropertyForm,
 } from "@/lib/admin/property-input";
 import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
+import { locationBelongsToCity } from "@/lib/accounts/property-submission";
 import { uniqueSlug } from "@/lib/admin/slug";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
@@ -49,7 +50,12 @@ async function validateRelations(input: PropertyInput): Promise<Record<string, s
     prisma.propertyType.findUnique({ where: { id: input.typeId }, select: { id: true } }),
     prisma.location.findUnique({ where: { id: input.cityId }, select: { id: true } }),
     input.districtId
-      ? prisma.location.findUnique({ where: { id: input.districtId }, select: { parentId: true } })
+      ? prisma.location.findUnique({
+          where: { id: input.districtId },
+          // `parent.parentId` Bakı qəsəbələri üçün şəhəri verir — onlar rayonun
+          // uşağıdır, tək səviyyəli yoxlama Maştağanı səhvən rədd edərdi.
+          select: { kind: true, parentId: true, parent: { select: { parentId: true } } },
+        })
       : null,
     input.projectId
       ? prisma.project.findUnique({ where: { id: input.projectId }, select: { id: true } })
@@ -59,7 +65,7 @@ async function validateRelations(input: PropertyInput): Promise<Record<string, s
   if (!type) errors.typeId = "Əmlak növü seçilməyib";
   if (!city) errors.cityId = "Şəhər seçilməyib";
   if (input.districtId && !district) errors.districtId = "Rayon tapılmadı";
-  if (district && district.parentId !== input.cityId) {
+  if (district && !locationBelongsToCity(district, input.cityId)) {
     errors.districtId = "Seçilmiş rayon bu şəhərə aid deyil";
   }
   if (input.projectId && !project) errors.projectId = "Layihə tapılmadı";

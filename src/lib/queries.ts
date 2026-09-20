@@ -1193,7 +1193,7 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
     count: number;
     updatedAt?: Date;
   }> =
-    kind === "DISTRICT"
+    kind === LOCATION_KINDS.DISTRICT
       ? (
           await prisma.property.groupBy({
             by: ["districtId"],
@@ -1223,7 +1223,14 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
   if (ids.length === 0) return [];
 
   const locations = await prisma.location.findMany({
-    where: { id: { in: ids }, kind },
+    // `districtId` yalnız inzibati rayonu deyil, qəsəbə, kənd və massivi də
+    // saxlayır — `getTaxonomyLandingProperties()` ilə eyni səviyyə dəsti
+    // işlədilməlidir, əks halda Maştağa və Novxanı kimi yerlərin `/rayon/`
+    // səhifəsi açıq olsa da sitemap-a düşməzdi.
+    where: {
+      id: { in: ids },
+      ...(kind === LOCATION_KINDS.DISTRICT ? { kind: { in: LOCATION_CHILD_KINDS } } : { kind }),
+    },
     select: { id: true, name: true, slug: true },
   });
   const counts = new Map(
@@ -1611,7 +1618,17 @@ export async function getPropertyFormOptions() {
     }),
     prisma.location.findMany({
       where: { kind: { in: LOCATION_CHILD_KINDS } },
-      select: { id: true, name: true, slug: true, kind: true, parentId: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        kind: true,
+        parentId: true,
+        // Bakının qəsəbələri şəhərin deyil, inzibati rayonun uşağıdır. Forma
+        // seçimi şəhər üzrə süzüldüyü üçün kök şəhər ayrıca lazımdır —
+        // yoxsa Maştağa heç bir şəhərdə görünmür.
+        parent: { select: { id: true, name: true, parentId: true, kind: true } },
+      },
       orderBy: { name: "asc" },
     }),
     prisma.location.findMany({
@@ -1635,7 +1652,28 @@ export async function getPropertyFormOptions() {
     }),
   ]);
 
-  return { types, cities, districts, metros, features, projects, agents };
+  return {
+    types,
+    cities,
+    // `cityId` ağacdan hesablanır: rayon üçün öz valideyni, qəsəbə/kənd/massiv
+    // üçün isə babası. `group` açılışda optgroup başlığıdır.
+    districts: districts.map((district) => {
+      const parentIsDistrict = district.parent?.kind === LOCATION_KINDS.DISTRICT;
+      return {
+        id: district.id,
+        name: district.name,
+        slug: district.slug,
+        kind: district.kind,
+        parentId: district.parentId,
+        cityId: parentIsDistrict ? district.parent?.parentId ?? null : district.parentId,
+        group: parentIsDistrict ? district.parent?.name ?? null : null,
+      };
+    }),
+    metros,
+    features,
+    projects,
+    agents,
+  };
 }
 
 export type PropertyFormOptions = Awaited<ReturnType<typeof getPropertyFormOptions>>;

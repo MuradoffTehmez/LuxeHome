@@ -175,6 +175,7 @@ export const BAKU_DISTRICTS: UrbanDistrict[] = [
       s("Zirə"),
       s("Şağan"),
       s("Şüvəlan"),
+      n("Dübəndi"),
     ],
   },
   {

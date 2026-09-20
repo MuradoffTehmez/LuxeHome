@@ -276,9 +276,9 @@ prisma/taxonomy.sql              # db:taxonomy:local / :staging / :remote
 |---|---|---|
 | `CITY` | 11 respublika tabeli şəhər **və** 64 rayon — istifadəçinin birinci seçimi | 75 |
 | `DISTRICT` | **Yalnız şəhərdaxili** inzibati rayon: Bakının 12, Gəncənin 2 rayonu | 14 |
-| `SETTLEMENT` | Rəsmi qəsəbə və rayon tabeli şəhər (Xırdalan, Xudat, Horadiz, Liman) | 274 |
+| `SETTLEMENT` | Rəsmi qəsəbə və rayon tabeli şəhər (Xırdalan, Xudat, Horadiz, Liman) | 266 |
 | `VILLAGE` | Kənd | 265 |
-| `NEIGHBORHOOD` | Yaşayış massivi/mikrorayon — **rəsmi inzibati vahid deyil** | 23 |
+| `NEIGHBORHOOD` | Yaşayış massivi/mikrorayon — **rəsmi inzibati vahid deyil** | 24 |
 | `METRO` | Bakı metrosunun stansiyası; valideyni Bakıdır | 26 |
 
 Qaydalar:
@@ -300,7 +300,13 @@ Qaydalar:
   salınmamalıdır** — metro Bakının uşağıdır, amma öz filtr sahəsi var; süzülməsə rayon
   açılışında 26 stansiya görünür.
 - `/rayon/<slug>` landing-i `DISTRICT`-lə yanaşı qəsəbə, kənd və massivi də açır: hamısı
-  `Property.districtId`-də saxlanılır.
+  `Property.districtId`-də saxlanılır. Səhifə etiketi `kind`-dən qurulur
+  (`placeLabelAz()`) — «Maştağa rayonunda» yazmaq yanlış olardı. Sitemap üzrə
+  `getIndexableTaxonomyLandings("DISTRICT")` də eyni səviyyə dəstini işlədir.
+- **Ağac iki dərinlikdədir.** Rayon şəhərin uşağı, Bakı və Gəncədə qəsəbə isə rayonun
+  uşağıdır. Şəhərə aidlik yoxlaması buna görə `locationBelongsToCity()` üzərindən gedir —
+  yalnız `parentId`-yə baxmaq Maştağanı səhvən rədd edir. Forma açılışlarında `cityId`
+  `getPropertyFormOptions()`-da hesablanır.
 
 Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 
