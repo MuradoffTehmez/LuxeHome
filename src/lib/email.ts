@@ -5,6 +5,7 @@ import { localizePath } from "@/i18n/path-locale";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import { recordEmailActivity } from "@/lib/email-activity";
 import { runtimeEnv } from "@/lib/runtime-env";
+import { emailHref, escapeHtml, telHref } from "@/lib/email-html";
 
 /**
  * E-poçt mətnləri.
@@ -236,6 +237,19 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
 
   const subject = `🔔 Yeni Müraciət: ${payload.name} — ${payload.subject || "Luxe Home Estate"}`;
 
+  // Şablona yalnız kodlanmış dəyərlər düşür: müraciəti anonim ziyarətçi doldurur,
+  // məktub isə əməkdaşın qutusunda brend məktubu kimi açılır.
+  const safe = {
+    name: escapeHtml(payload.name),
+    phone: escapeHtml(payload.phone),
+    phoneHref: emailHref(`tel:${telHref(payload.phone)}`),
+    email: payload.email ? escapeHtml(payload.email) : "",
+    emailHref: payload.email ? emailHref(`mailto:${payload.email}`) : "#",
+    subject: escapeHtml(payload.subject || "Sayt üzərindən əlaqə müraciəti daxil oldu"),
+    message: escapeHtml(payload.message),
+    propertyTitle: payload.propertyTitle ? escapeHtml(payload.propertyTitle) : "",
+  };
+
   const html = `
 <!DOCTYPE html>
 <html lang="az" dir="ltr">
@@ -245,7 +259,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
   <meta name="x-apple-disable-message-reformatting">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
-  <title>${subject}</title>
+  <title>${escapeHtml(subject)}</title>
   <style>
     body {
       margin: 0;
@@ -349,7 +363,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                 color:#171717;
                 font-weight:normal;
               ">
-                ${payload.name}
+                ${safe.name}
               </div>
 
               <div style="height:10px; line-height:10px;">&nbsp;</div>
@@ -360,7 +374,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                 line-height:22px;
                 color:#777777;
               ">
-                ${payload.subject || "Sayt üzərindən əlaqə müraciəti daxil oldu"}
+                ${safe.subject}
               </div>
             </td>
           </tr>
@@ -378,7 +392,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                           Müştəri:
                         </td>
                         <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717; font-weight:bold;">
-                          ${payload.name}
+                          ${safe.name}
                         </td>
                       </tr>
 
@@ -387,7 +401,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                           Telefon:
                         </td>
                         <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717; font-weight:bold;">
-                          <a href="tel:${payload.phone}" style="color:#171717;">${payload.phone}</a>
+                          <a href="${safe.phoneHref}" style="color:#171717;">${safe.phone}</a>
                         </td>
                       </tr>
 
@@ -399,7 +413,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                           E-poçt:
                         </td>
                         <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717;">
-                          <a href="mailto:${payload.email}" style="color:#171717; text-decoration:underline;">${payload.email}</a>
+                          <a href="${safe.emailHref}" style="color:#171717; text-decoration:underline;">${safe.email}</a>
                         </td>
                       </tr>`
                           : ""
@@ -413,7 +427,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                           Əmlak / Layihə:
                         </td>
                         <td style="padding:8px 0; border-bottom:1px solid #ede9e1; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#171717; font-weight:bold;">
-                          ${payload.propertyTitle}
+                          ${safe.propertyTitle}
                         </td>
                       </tr>`
                           : ""
@@ -454,7 +468,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                       line-height:22px;
                       color:#2b2b2b;
                       white-space:pre-wrap;
-                    ">${payload.message}</div>
+                    ">${safe.message}</div>
 
                   </td>
                 </tr>
@@ -468,7 +482,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
               <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" style="padding:4px;">
-                    <a href="tel:${payload.phone}" class="action-btn" style="
+                    <a href="${safe.phoneHref}" class="action-btn" style="
                       display:inline-block;
                       background-color:#171717;
                       color:#ffffff;
@@ -633,6 +647,11 @@ export async function sendSavedSearchMatchEmail(
   const copy = emailCopy(locale);
   const propertyUrl = siteUrl(localizePath(`/emlaklar/${property.slug}`, copy.locale));
   const subject = `🏠 ${copy.matchSubject(searchName)}`;
+  // Axtarış adını istifadəçi, elan başlığını isə elan sahibi yazır — hər ikisi
+  // başqa bir hesabın qutusuna gedir, ona görə şablona kodlanmış düşür.
+  const safeSearchName = escapeHtml(searchName);
+  const safeTitle = escapeHtml(property.title);
+  const safeUrl = emailHref(propertyUrl);
 
   const html = `
 <!DOCTYPE html>
@@ -641,7 +660,7 @@ export async function sendSavedSearchMatchEmail(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="x-apple-disable-message-reformatting">
-  <title>${subject}</title>
+  <title>${escapeHtml(subject)}</title>
   <style>
     body { margin: 0; padding: 0; background-color: #f3f1ed; font-family: Arial, Helvetica, sans-serif; }
     table { border-spacing: 0; border-collapse: collapse; }
@@ -671,11 +690,11 @@ export async function sendSavedSearchMatchEmail(
           <tr>
             <td align="center" class="mobile-padding" style="padding:36px 40px 28px 40px;">
               <div style="font-family:Arial, Helvetica, sans-serif; font-size:11px; letter-spacing:3px; color:#B89B5E; text-transform:uppercase; font-weight:bold;">
-                ${copy.eyebrow} — «${searchName}»
+                ${copy.eyebrow} — «${safeSearchName}»
               </div>
               <div style="height:12px; line-height:12px;">&nbsp;</div>
               <div style="font-family:Georgia, 'Times New Roman', serif; font-size:26px; line-height:34px; color:#171717;">
-                ${property.title}
+                ${safeTitle}
               </div>
               <div style="height:10px; line-height:10px;">&nbsp;</div>
               <div style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:22px; color:#777777;">
@@ -685,7 +704,7 @@ export async function sendSavedSearchMatchEmail(
               <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" style="background-color:#171717; border-radius:2px;">
-                    <a href="${propertyUrl}" style="display:inline-block; padding:14px 28px; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1.5px; color:#ffffff; text-transform:uppercase; font-weight:600;">
+                    <a href="${safeUrl}" style="display:inline-block; padding:14px 28px; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1.5px; color:#ffffff; text-transform:uppercase; font-weight:600;">
                       ${copy.viewListing}
                     </a>
                   </td>
@@ -701,7 +720,7 @@ export async function sendSavedSearchMatchEmail(
               </div>
               <div style="height:10px; line-height:10px;">&nbsp;</div>
               <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#8f8f8f;">
-                ${copy.matchFooter(searchName)}
+                ${escapeHtml(copy.matchFooter(searchName))}
               </div>
             </td>
           </tr>
@@ -732,21 +751,6 @@ export type SavedSearchDigestProperty = {
 };
 
 /**
- * HTML-ə qoyulan istifadəçi mətni.
- *
- * Elan başlığı və axtarış adı istifadəçidən gəlir; e-poçt klientləri HTML-i
- * icra etməsə də, məktub veb-önbaxışda (Gmail, Outlook Web) render olunur və
- * markup sınmamalıdır.
- */
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-/**
  * «Gündəlik» / «Həftəlik» tezliyi üçün toplu bildiriş.
  *
  * Bir məktubda bir saxlanmış axtarışın bütün yeni nəticələri gedir — hər elan
@@ -773,7 +777,7 @@ export async function sendSavedSearchDigestEmail(input: {
       const url = siteUrl(localizePath(`/emlaklar/${property.slug}`, copy.locale));
       const price = `${property.price.toLocaleString("az-AZ")} ${escapeHtml(property.currency)}`;
       const thumb = property.imageUrl
-        ? `<td width="96" style="padding:0 16px 0 0;"><img src="${siteUrl(property.imageUrl)}" width="96" height="72" alt="" style="display:block; width:96px; height:72px; object-fit:cover; border:0;"></td>`
+        ? `<td width="96" style="padding:0 16px 0 0;"><img src="${emailHref(siteUrl(property.imageUrl))}" width="96" height="72" alt="" style="display:block; width:96px; height:72px; object-fit:cover; border:0;"></td>`
         : "";
 
       return `
@@ -783,7 +787,7 @@ export async function sendSavedSearchDigestEmail(input: {
                 <tr>
                   ${thumb}
                   <td valign="middle">
-                    <a href="${url}" style="font-family:Georgia, 'Times New Roman', serif; font-size:17px; line-height:24px; color:#171717;">
+                    <a href="${emailHref(url)}" style="font-family:Georgia, 'Times New Roman', serif; font-size:17px; line-height:24px; color:#171717;">
                       ${escapeHtml(property.title)}
                     </a>
                     <div style="height:6px; line-height:6px;">&nbsp;</div>
@@ -862,7 +866,7 @@ ${moreRow}
               <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" style="background-color:#171717; border-radius:2px;">
-                    <a href="${listUrl}" style="display:inline-block; padding:14px 28px; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1.5px; color:#ffffff; text-transform:uppercase; font-weight:600;">
+                    <a href="${emailHref(listUrl)}" style="display:inline-block; padding:14px 28px; font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:1.5px; color:#ffffff; text-transform:uppercase; font-weight:600;">
                       ${copy.viewAll}
                     </a>
                   </td>

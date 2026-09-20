@@ -14,6 +14,7 @@ import {
   type ReservationStatus,
 } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/email-html";
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/push";
 
@@ -98,7 +99,9 @@ export async function updateReservationStatus(
       await sendEmail({
         to: reservation.email,
         subject: `${reservation.property.title} — ${RESERVATION_STATUS_LABELS[nextStatus]}`,
-        html: `<p>${title}</p><p>${reservation.property.title}</p>${parsed.data.note ? `<p>${parsed.data.note}</p>` : ""}`,
+        // Elan başlığı və moderator qeydi müştərinin qutusunda göstərilir —
+        // hər ikisi HTML-ə kodlanmış düşməlidir.
+        html: `<p>${escapeHtml(title)}</p><p>${escapeHtml(reservation.property.title)}</p>${parsed.data.note ? `<p>${escapeHtml(parsed.data.note)}</p>` : ""}`,
       });
     }
     if (preference?.reservationPush) {
