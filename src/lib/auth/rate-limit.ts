@@ -58,6 +58,22 @@ export async function checkMonitoringLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/**
+ * İctimai AI axtarışı üçün limit — `true` = inference-ə icazə var.
+ *
+ * Digər limitlərdən fərqi: aşıldıqda sorğu rədd edilmir, sadəcə deterministik
+ * parser-ə düşür. `/ai-axtaris` anonim və keşsiz səhifədir, hər çağırış isə
+ * Workers AI neyronu xərcləyir (model uğursuz olarsa `runAiText()` bir neçə
+ * modeli ardıcıl sınayır, yəni bir sorğu bir neçə inference-ə çevrilə bilir).
+ */
+export async function checkAiSearchLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.AI_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `ai-search:${ip}` });
+  return success;
+}
+
 export function isAccountLocked(lockedUntil: Date | null): boolean {
   return isLockActive(lockedUntil, new Date());
 }

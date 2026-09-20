@@ -18,22 +18,27 @@ async function contactSchema() {
   let phoneMin = "Telefon nömrəsi düzgün deyil";
   let emailInvalid = "E-poçt ünvanı düzgün deyil";
   let messageMin = "Mesaj ən azı 10 simvol olmalıdır";
+  let tooLong = "Mətn çox uzundur";
   try {
     const t = await getTranslations("validation");
     nameMin = t("nameMin");
     phoneMin = t("phoneMin");
     emailInvalid = t("emailInvalid");
     messageMin = t("messageMin");
+    tooLong = t("tooLong");
   } catch {
     // Request kontekstindən kənarda (məs. unit testlər) standart azərbaycanca mesajlar istifadə olunur
   }
 
+  // Yuxarı hədlər həm `Lead` sətrinin, həm də bildiriş məktubunun ölçüsünü
+  // bağlayır: sahələr kodlanmış şəkildə HTML şablona düşür və kodlama uzunluğu
+  // altı dəfəyə qədər artıra bilir. Hədsiz mətn D1-i və Resend limitini yeyərdi.
   return z.object({
-    name: z.string().min(2, nameMin),
-    phone: z.string().min(7, phoneMin),
-    email: z.string().email(emailInvalid).optional().or(z.literal("")),
-    subject: z.string().optional().or(z.literal("")),
-    message: z.string().min(10, messageMin),
+    name: z.string().min(2, nameMin).max(120, tooLong),
+    phone: z.string().min(7, phoneMin).max(40, tooLong),
+    email: z.string().max(200, tooLong).email(emailInvalid).optional().or(z.literal("")),
+    subject: z.string().max(200, tooLong).optional().or(z.literal("")),
+    message: z.string().min(10, messageMin).max(4_000, tooLong),
   });
 }
 

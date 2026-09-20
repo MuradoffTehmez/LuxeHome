@@ -5,6 +5,7 @@ import { sendEmail } from "@/lib/email";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { sendPushToUser } from "@/lib/push";
+import { emailHref, escapeHtml } from "@/lib/email-html";
 
 type PriceChangeInput = {
   propertyId: string;
@@ -109,7 +110,9 @@ export async function recordPropertyPriceChange(input: PriceChangeInput): Promis
       await sendEmail({
         to: user.email,
         subject: copy.subject(history.property.title),
-        html: `<p>${content}</p><p><a href="${propertyUrl}">${copy.link}</a></p>`,
+        // `content` elanın başlığını daşıyır — onu elan sahibi yazır, məktub isə
+        // elanı favoritə salmış **başqa** istifadəçiyə gedir.
+        html: `<p>${escapeHtml(content)}</p><p><a href="${emailHref(propertyUrl)}">${copy.link}</a></p>`,
       });
     }
 

@@ -44,6 +44,7 @@ import type { FormState } from "@/lib/auth/types";
 import { verifyStaffPassword } from "@/lib/auth/staff-login-policy";
 import { canStartStaffSession, twoFactorGateOutcome } from "@/lib/auth/two-factor-policy";
 import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/email-html";
 import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
@@ -191,9 +192,11 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
         to: user.email,
         subject: t("actions.lockedEmailSubject"),
         html:
-          `<p>${t("actions.lockedEmailIntro")}</p>` +
-          `<p>${t("actions.lockedEmailAdvice")}</p>` +
-          `<p>${t("actions.lockedEmailIp")}: <strong>${ip}</strong></p>`,
+          `<p>${escapeHtml(t("actions.lockedEmailIntro"))}</p>` +
+          `<p>${escapeHtml(t("actions.lockedEmailAdvice"))}</p>` +
+          // IP dəyəri `x-forwarded-for` başlığından gələ bilir — yəni müraciəti
+          // edən tərəf onu seçir. Məktub isə hesab sahibinə gedir.
+          `<p>${escapeHtml(t("actions.lockedEmailIp"))}: <strong>${escapeHtml(ip)}</strong></p>`,
       });
     }
     return { error: t("actions.genericCredentials") };

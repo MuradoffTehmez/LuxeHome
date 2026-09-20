@@ -1,5 +1,7 @@
+import { headers } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { checkAiSearchLimit, clientIp } from "@/lib/auth/rate-limit";
 import { parseAiJson, runAiText } from "@/lib/ai";
 import { AI_SYSTEM_PROMPTS } from "@/lib/ai-prompts";
 import { normalizeSearchText } from "@/lib/search-normalization";
@@ -39,7 +41,29 @@ function compact<T extends Record<string, unknown>>(value: T): T {
   return Object.fromEntries(Object.entries(value).filter(([, item]) => item !== undefined && item !== "")) as T;
 }
 
-/** Workers AI olmadıqda axtarışı işlək saxlayan, qəsdən konservativ parser. */
+/**
+ * Sorğudan çıxarılan rəqəmi sxem diapazonuna salır.
+ *
+ * `criteriaSchema` yuxarı hədlər qoyur (otaq ≤ 20, sahə ≤ 100 000, qiymət ≤ 1e9).
+ * Sorğudakı rəqəm həmin həddi aşanda `parse()` istisna atırdı — «50 otaq» və ya
+ * «min 200000 m2» kimi adi yazılış fallback-i sındırırdı. İndi dəyər yuxarı həddə
+ * sıxılır; aşağı həddən kiçik və ya rəqəm olmayan dəyər isə tamamilə atılır,
+ * çünki onu yuxarı çəkmək istifadəçinin demədiyi meyar uydurmaq olardı.
+ */
+function withinRange(value: number | undefined, min: number, max: number): number | undefined {
+  if (value === undefined || !Number.isFinite(value) || value < min) return undefined;
+  return Math.min(value, max);
+}
+
+/**
+ * Workers AI olmadıqda axtarışı işlək saxlayan, qəsdən konservativ parser.
+ *
+ * **İstisna atmamalıdır.** Həm model xətasının, həm də kvota limitinin düşdüyü
+ * yoldur; burada atılan istisna `parseQuery()`-dən keçib səhifə xətasına çevrilir,
+ * yəni «zərif deqradasiya» əvəzinə istifadəçi 500 görür. Dəyərlər əvvəlcə sxem
+ * diapazonuna salınır, sonra `safeParse()` son qoruyucu kimi işləyir: gözlənilməz
+ * hal boş meyar dəstinə düşür, sorğu isə yenə cavab verir.
+ */
 export function parseSearchFallback(query: string): AiSearchCriteria {
   const normalized = normalizeSearchText(query);
   const price = normalized.match(/([\d][\d\s.,]*)\s*(?:azn|manat|₼)/i)
@@ -47,21 +71,69 @@ export function parseSearchFallback(query: string): AiSearchCriteria {
   const room = normalized.match(/(\d{1,2})\s*(?:otaq|room|komnat)/i);
   const area = normalized.match(/(?:minimum|min|en azi|ən az)\s*(\d+)\s*(?:m2|m²|kv)/i);
   const numericPrice = price ? Number(price[1].replace(/[\s,.]/g, "")) : undefined;
-  return criteriaSchema.parse(compact({
+  const criteria = criteriaSchema.safeParse(compact({
     listingType: /kiraye|icar[eə]|rent|arenda/.test(normalized) ? "RENT" : /sat[iı][sş]|buy|sale/.test(normalized) ? "SALE" : undefined,
-    maxPrice: numericPrice && numericPrice > 0 ? numericPrice : undefined,
-    rooms: room ? Number(room[1]) : undefined,
-    minArea: area ? Number(area[1]) : undefined,
+    maxPrice: withinRange(numericPrice, 1, 1_000_000_000),
+    rooms: withinRange(room ? Number(room[1]) : undefined, 1, 20),
+    minArea: withinRange(area ? Number(area[1]) : undefined, 1, 100_000),
     featureSlugs: [
       /parking|qaraj|parkinq/.test(normalized) ? "parking" : "",
       /hovuz|pool|basseyn/.test(normalized) ? "hovuz" : "",
       /deniz|dəniz|sea|more/.test(normalized) ? "denize-yaxin" : "",
     ].filter(Boolean),
-    semanticTerms: normalized.split(/\s+/).filter((term) => term.length > 3).slice(0, 8),
+    // Tək söz 80 simvoldan uzun ola bilər (məs. yapışmış URL) — sxem onu da rədd edirdi.
+    semanticTerms: normalized
+      .split(/\s+/)
+      .filter((term) => term.length > 3)
+      .slice(0, 8)
+      .map((term) => term.slice(0, 80)),
   }));
+
+  // Son qoruyucu literal-dır, `criteriaSchema.parse({})` deyil: sxem gələcəkdə
+  // məcburi sahə qazansa, parse-a qayıtmaq eyni istisnanı geri gətirərdi.
+  return criteria.success ? criteria.data : { featureSlugs: [], semanticTerms: [] };
+}
+
+/**
+ * Kvota qapısı — model çağırışından **əvvəl**.
+ *
+ * Səhifə anonimdir və `force-dynamic`-dir, yəni hər `?q=` dəyəri yeni inference
+ * deməkdir. Limit aşılanda sorğu xəta vermir, deterministik parser-ə düşür:
+ * axtarış işləməyə davam edir, provayder büdcəsi isə qorunur.
+ *
+ * İki xəta halı qəsdən fərqli həll olunur:
+ *
+ * - **Sorğu konteksti yoxdur** (`headers()` atır — build, unit test): limit tətbiq
+ *   edilmir, çünki sayılacaq sorğu da yoxdur. Layihənin qalan limitləri ilə eyni.
+ * - **Limiter özü atır** (binding nasazlığı, konfiqurasiya xətası): deterministik
+ *   parser-ə düşürük. Burada fail-open etmək müdafiəni məhz sorğuların sayıla
+ *   bilmədiyi anda söndürərdi — yəni kvota ən çox risk altında olanda.
+ *
+ * Binding-in **yoxluğu** xəta deyil: `checkAiSearchLimit()` onu lokal `next dev`
+ * halı kimi qəbul edib `true` qaytarır.
+ */
+async function aiBudgetAvailable(): Promise<boolean> {
+  let ip: string;
+  try {
+    ip = clientIp(await headers());
+  } catch {
+    return true;
+  }
+
+  try {
+    return await checkAiSearchLimit(ip);
+  } catch (error) {
+    console.error("[ai-search] sürət limiti yoxlanmadı:", error);
+    return false;
+  }
 }
 
 async function parseQuery(query: string): Promise<{ criteria: AiSearchCriteria; model: string }> {
+  // Taksonomiya sorğuları yalnız model çağırılacaqsa lazımdır.
+  if (!(await aiBudgetAvailable())) {
+    return { criteria: parseSearchFallback(query), model: "deterministic-fallback" };
+  }
+
   const [types, locations, features] = await Promise.all([
     prisma.propertyType.findMany({ where: { isActive: true }, select: { slug: true, name: true } }),
     prisma.location.findMany({ select: { slug: true, name: true, kind: true } }),

@@ -4,6 +4,7 @@ import { runSavedSearchDigest } from "@/lib/saved-search-digest";
 import { savedSearchDigestStore } from "@/lib/queries";
 import { runPhase2Maintenance } from "@/lib/phase2-maintenance";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { runtimeEnv } from "@/lib/runtime-env";
 
 /**
  * «Gündəlik» / «Həftəlik» saxlanmış axtarış digest-inin işə salma nöqtəsi.
@@ -30,7 +31,10 @@ export const dynamic = "force-dynamic";
 
 /** `Authorization: Bearer <secret>` başlığını yoxlayır. */
 function isAuthorized(request: Request): boolean {
-  const expected = process.env.CRON_SECRET;
+  // Secret həm `process.env` proyeksiyasından, həm də Cloudflare binding-indən
+  // oxunur: yalnız birincisinə güvənsək, proyeksiya işləməyən runtime yolunda
+  // marşrut səssizcə 404-ə düşər və cron heç vaxt işləməzdi.
+  const expected = runtimeEnv("CRON_SECRET");
   // Sirr təyin edilməyibsə marşrut bağlıdır — «boş sirr = hamıya açıq» olmamalıdır
   if (!expected) return false;
 

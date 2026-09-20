@@ -7,6 +7,7 @@ import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { prisma } from "@/lib/prisma";
 import { NOTIFICATION_TYPES, PROPERTY_STATUSES, RESERVATION_STATUSES, type Locale } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
+import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { sendPushToUser } from "@/lib/push";
@@ -141,7 +142,7 @@ export async function createReservation(
       await sendEmail({
         to: user.email,
         subject: `${property.title} — ${t("success")}`,
-        html: `<p>${t("success")}</p><p><a href="${propertyUrl}">${property.title}</a></p>`,
+        html: `<p>${escapeHtml(t("success"))}</p><p><a href="${emailHref(propertyUrl)}">${escapeHtml(property.title)}</a></p>`,
       });
     }
     return success(t("success"));

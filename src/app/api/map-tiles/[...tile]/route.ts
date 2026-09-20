@@ -18,6 +18,13 @@ import { runtimeEnv } from "@/lib/runtime-env";
  *
  * Sorğular Cloudflare Cache API-də saxlanılır və brauzerə uzunmüddətli
  * `Cache-Control` verilir — eyni tile provayderə bir dəfə gedir.
+ *
+ * **Kvota müdafiəsi.** `Referer` müştəri tərəfin seçdiyi başlıqdır və onun
+ * olmaması qəbul edilir (aşağıya bax), ona görə tək başına icazə sübutu deyil:
+ * başlıqsız sorğu ilə koordinatları sıralayan istənilən klient hər dəfə yeni
+ * keş açarı yaradıb Geoapify kvotamızı xərcləyə bilərdi. İkinci qat — IP üzrə
+ * sürət limiti — məhz **keşdə olmayan** tile-lara tətbiq olunur: adi ziyarətçi
+ * eyni bölgəni gəzdiyi üçün keşdən qayıdır və sayğaca toxunmur.
  */
 
 export const dynamic = "force-dynamic";
@@ -80,6 +87,32 @@ function isForeignReferer(request: Request): boolean {
   }
 }
 
+/**
+ * Keş boş çıxanda tətbiq olunan IP limiti.
+ *
+ * `src/lib/auth/rate-limit.ts`-dəki köməkçilər burada işlədilmir: o modul Prisma
+ * klientini idxal edir və tile marşrutu üçün D1-ə heç bir ehtiyac yoxdur.
+ *
+ * Binding olmayan mühitdə (lokal `next dev`) limit tətbiq edilmir — layihənin
+ * qalan limitləri ilə eyni davranış.
+ */
+async function withinTileLimit(request: Request): Promise<boolean> {
+  let limiter: { limit: (options: { key: string }) => Promise<{ success: boolean }> } | undefined;
+  try {
+    limiter = getCloudflareContext().env.TILE_LIMIT;
+  } catch {
+    return true;
+  }
+  if (!limiter) return true;
+
+  const ip =
+    request.headers.get("cf-connecting-ip") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
+  const { success } = await limiter.limit({ key: `tile:${ip}` });
+  return success;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ tile: string[] }> },
@@ -117,6 +150,15 @@ async function proxy(request: Request, upstream: string): Promise<Response> {
 
   const cached = await cache?.match(cacheKey);
   if (cached) return cached;
+
+  // Limit yalnız buradan sonra: keşdən qayıdan tile provayderə getmir və
+  // normal xəritə gəzintisini ləngitməməlidir.
+  if (!(await withinTileLimit(request))) {
+    return new Response("Too many requests", {
+      status: 429,
+      headers: { "Retry-After": "60", "Cache-Control": "no-store" },
+    });
+  }
 
   let upstreamResponse: Response;
   try {
