@@ -1,5 +1,7 @@
+import { headers } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { checkAiSearchLimit, clientIp } from "@/lib/auth/rate-limit";
 import { parseAiJson, runAiText } from "@/lib/ai";
 import { AI_SYSTEM_PROMPTS } from "@/lib/ai-prompts";
 import { normalizeSearchText } from "@/lib/search-normalization";
@@ -61,7 +63,30 @@ export function parseSearchFallback(query: string): AiSearchCriteria {
   }));
 }
 
+/**
+ * Kvota qapısı — model çağırışından **əvvəl**.
+ *
+ * Səhifə anonimdir və `force-dynamic`-dir, yəni hər `?q=` dəyəri yeni inference
+ * deməkdir. Limit aşılanda sorğu xəta vermir, deterministik parser-ə düşür:
+ * axtarış işləməyə davam edir, provayder büdcəsi isə qorunur.
+ *
+ * Sorğu kontekstindən kənarda (`headers()` mövcud deyil) limit tətbiq edilmir —
+ * layihənin qalan limitləri ilə eyni davranış.
+ */
+async function aiBudgetAvailable(): Promise<boolean> {
+  try {
+    return await checkAiSearchLimit(clientIp(await headers()));
+  } catch {
+    return true;
+  }
+}
+
 async function parseQuery(query: string): Promise<{ criteria: AiSearchCriteria; model: string }> {
+  // Taksonomiya sorğuları yalnız model çağırılacaqsa lazımdır.
+  if (!(await aiBudgetAvailable())) {
+    return { criteria: parseSearchFallback(query), model: "deterministic-fallback" };
+  }
+
   const [types, locations, features] = await Promise.all([
     prisma.propertyType.findMany({ where: { isActive: true }, select: { slug: true, name: true } }),
     prisma.location.findMany({ select: { slug: true, name: true, kind: true } }),
