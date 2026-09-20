@@ -77,14 +77,39 @@ export function decryptTotpSecret(payload: string): Promise<string> {
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 /**
+ * Əlifbadan qərəzsiz simvol seçimi (rədd nümunəsi).
+ *
+ * Əvvəl `byte % CODE_ALPHABET.length` yazılırdı. Cari əlifba üçün bu, təsadüfən
+ * qərəzsizdir — 256 ÷ 32 = 8, yəni hər simvol eyni sayda bayta düşür. Lakin
+ * düzgünlük əlifbanın uzunluğuna **gizli bağlılıq** yaradırdı: əlifba oxunaqlılıq
+ * üçün redaktə olunan sətirdir (`0/O` və `1/I` onsuz da çıxarılıb) və bir simvol
+ * əlavə edilsə paylanma səssizcə əyilərdi.
+ *
+ * Diapazondan kənar bayt sadəcə atılır — modulo işlədilmir, ona görə seçim
+ * əlifbanın istənilən uzunluğu üçün qərəzsiz qalır. Baytlar bloklarla çəkilir ki,
+ * hər simvol üçün ayrıca `getRandomValues()` çağırışı olmasın.
+ */
+function randomCodeChars(length: number): string {
+  let code = "";
+  while (code.length < length) {
+    const bytes = crypto.getRandomValues(new Uint8Array(length * 8));
+    for (const byte of bytes) {
+      if (byte >= CODE_ALPHABET.length) continue;
+      code += CODE_ALPHABET[byte];
+      if (code.length === length) break;
+    }
+  }
+  return code;
+}
+
+/**
  * 10 birdəfəlik kod. Hər kod 8 simvoldur və 32 simvollu əlifbadan gəlir — 40 bit
  * entropiya. Bu, lüğət hücumuna məruz qalmadığı üçün SHA-256 hash kifayətdir.
  */
 export function generateBackupCodes(): string[] {
   const codes = new Set<string>();
   while (codes.size < BACKUP_CODE_COUNT) {
-    const bytes = crypto.getRandomValues(new Uint8Array(8));
-    const raw = [...bytes].map((byte) => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join("");
+    const raw = randomCodeChars(8);
     codes.add(`${raw.slice(0, 4)}-${raw.slice(4)}`);
   }
   return [...codes];
