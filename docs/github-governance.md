@@ -90,6 +90,22 @@ təsnif olunur; fork PR-larında read-only token səbəbindən label maintainer 
   şəxs olduqda production approval qapısı əlavə olunmalıdır;
 - secret dəyərlərini issue, PR, workflow log-u və sənədə yazma.
 
+**Settings → Secrets and variables → Actions → Variables** (repository variables):
+
+| Dəyişən | Təyinat |
+|---|---|
+| `PRODUCTION_VAPID_PUBLIC_KEY` | Web Push açıq açarı — production build-inə ötürülür |
+| `STAGING_VAPID_PUBLIC_KEY` | Eyni, staging üçün (ayrı açar cütü) |
+
+Bunlar **secret deyil**: `NEXT_PUBLIC_*` dəyəri onsuz da brauzer paketinə yazılır.
+Variable seçilməsinin səbəbi gizlilik deyil, **cütlük**: açıq açar Cloudflare-dəki
+`VAPID_PRIVATE_KEY` secret-i ilə uyğun gəlməlidir. Bir yarısını koda hardcode edib
+digərini secret store-da saxlamaq açarlar rotasiya olunanda onların səssizcə
+uyğunsuzlaşmasına yol açardı — push isə uyğunsuzluqda xəta vermir, sadəcə çatmır.
+
+Dəyişən boş olduqda build keçir və push söndürülü qalır (`src/lib/push.ts` →
+`configure()`), ona görə staging üçün konfiqurasiya etmək **opsionaldır**.
+
 ## Advanced Security
 
 **Settings → Advanced Security**:

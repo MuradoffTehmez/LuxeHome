@@ -38,6 +38,13 @@ function envHealth(
 /** Secret dəyərlərini qaytarmadan production inteqrasiyalarının hazırlığını göstərir. */
 export function getIntegrationHealth(): IntegrationHealthItem[] {
   const searchConsole = getSearchConsoleCredentialStatus();
+  // `NEXT_PUBLIC_*` dəyərləri Next.js tərəfindən build vaxtı yalnız literal
+  // `process.env.NEXT_PUBLIC_...` oxunuşlarına yazılır. `runtimeEnv(name)`-dəki
+  // dinamik indeks həmin əvəzləməni görmür və açar Worker binding-i olmadığı üçün
+  // düzgün qurulmuş push inteqrasiyasını yanlış olaraq «çatışmır» göstərərdi.
+  const hasVapidPublicKey = Boolean(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim());
+  const hasVapidPrivateKey = hasRuntimeEnv("VAPID_PRIVATE_KEY");
+  const hasVapidSubject = hasRuntimeEnv("VAPID_SUBJECT");
   return [
     {
       id: "searchConsole",
@@ -68,10 +75,15 @@ export function getIntegrationHealth(): IntegrationHealthItem[] {
       ],
     },
     envHealth("savedSearchCron", ["CRON_SECRET"]),
-    envHealth(
-      "push",
-      ["NEXT_PUBLIC_VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT"],
-      true,
-    ),
+    {
+      id: "push",
+      ready: hasVapidPublicKey && hasVapidPrivateKey && hasVapidSubject,
+      optional: true,
+      missing: [
+        ...(!hasVapidPublicKey ? ["NEXT_PUBLIC_VAPID_PUBLIC_KEY"] : []),
+        ...(!hasVapidPrivateKey ? ["VAPID_PRIVATE_KEY"] : []),
+        ...(!hasVapidSubject ? ["VAPID_SUBJECT"] : []),
+      ],
+    },
   ];
 }

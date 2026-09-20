@@ -161,10 +161,17 @@ jobs:
       # canonical URL-ləri və Open Graph linklərini yanlış edərdi. `IS_STAGING` isə
       # robots/SEO qatını və nümunə məzmun defoltunu idarə edir
       # (`src/lib/demo-content.ts`). Analitika ID-si staging-ə qəsdən verilmir.
+      # Web Push-un **açıq** VAPID açarı. Secret deyil — brauzer paketinin içinə
+      # yazılır və saytı açan hər kəs onu görür. Buna baxmayaraq repository
+      # variable-dadır, hardcode deyil: açar `VAPID_PRIVATE_KEY` secret-i ilə **cüt**
+      # işləyir, cütün bir yarısını koda, digərini secret store-a qoymaq rotasiyada
+      # onların səssizcə uyğunsuzlaşmasına yol açardı. Dəyər boş olarsa build keçir,
+      # push isə sadəcə söndürülü qalır (`src/lib/push.ts` → `configure()`).
       - name: Build OpenNext worker bundle (staging)
         env:
           SITE_URL: https://luxehomeestate-staging.amiyevbahadur.workers.dev
           IS_STAGING: "true"
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ vars.STAGING_VAPID_PUBLIC_KEY }}
         run: npx opennextjs-cloudflare build
 
       - name: Deploy to staging worker
@@ -288,11 +295,13 @@ jobs:
       - name: Log production D1 migration status
         run: npx wrangler d1 migrations list DB --remote
 
+      # `NEXT_PUBLIC_VAPID_PUBLIC_KEY` üçün izah staging build addımındadır.
       - name: Build OpenNext worker bundle (production)
         env:
           SITE_URL: https://luxehomeestate.az
           IS_STAGING: "false"
           NEXT_PUBLIC_GTM_ID: GTM-MMV4VC9L
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ vars.PRODUCTION_VAPID_PUBLIC_KEY }}
         run: npx opennextjs-cloudflare build
 
       # Bu repoda `wrangler deploy` OpenNext layihəsini tanıyır və `opennextjs-cloudflare
