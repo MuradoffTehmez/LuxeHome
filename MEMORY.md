@@ -522,3 +522,49 @@ tarixçəsi, `/admin/seo` naviqasiyası, tam admin UI lokallaşdırma source tes
 Lokal qəbul nəticəsi: YAML/workflow parse təmiz, `npm audit --audit-level=high` — 0 zəiflik,
 104/104 Vitest faylı və 480/480 test, `npm run dead-code`, typecheck, ESLint və Next.js
 production build uğurludur.
+
+---
+
+## 16. Təhlükəsizlik auditinin bağlanması — 20 sentyabr 2026
+
+Kənar offline mənbə auditi (revizyon `ace8bb7`) iki «medium» tapıntı qeyd etmişdi; hər ikisi
+bağlanıb, üstəlik eyni siniflərdən daha üç problem tapılıb və düzəldilib.
+
+**A1 — E-poçt şablonlarına HTML injeksiyası (audit tapıntısı 1).** Anonim əlaqə forması və
+elan/axtarış adları kodlanmadan brend məktublarına düşürdü. Ortaq kodlama sərhədi
+`src/lib/email-html.ts`-dir (`escapeHtml`, `escapeOptional`, `emailHref`, `telHref`);
+`email.ts`-dəki yerli `escapeHtml` ora köçdü. Bütün məktub sinkləri — lead bildirişi,
+saxlanmış axtarış «dərhal» və digest, qiymət endirimi, rezervasiya (panel + kabinet),
+hesab kilidi, e-poçt təsdiqi və parol bərpası — indi həmin köməkçilərdən keçir. `href`
+dəyərləri sxem ağ siyahısından (`http(s)`, `mailto`, `tel`, saytdaxili yol) keçir və
+qəbul edilməyən ünvan `#`-ə düşür.
+
+**A2 — Xəritə tile kvotasının drenajı (audit tapıntısı 2).** `Referer` müştəri başlığıdır və
+onun olmaması qəbul edilir, ona görə tək başına icazə sübutu deyildi. `TILE_LIMIT` binding-i
+əlavə olundu və limit **yalnız keş boş çıxanda** tətbiq olunur: keşdən qayıdan tile provayderə
+getmir, yəni adi ziyarətçi sayğaca toxunmur. Limit aşılanda 429 + `Retry-After` qayıdır.
+
+**A3 — İctimai AI axtarışının kvotası (audit tapmadı).** `/ai-axtaris?q=` anonim, keşsiz və
+`force-dynamic` səhifədir; hər sorğu Workers AI inference-i xərcləyirdi, `runAiText()` isə
+uğursuzluqda bir neçə modeli ardıcıl sınayır — yəni bir sorğu bir neçə inference. `AI_LIMIT`
+binding-i əlavə edildi. Limit aşılanda səhifə xəta vermir, deterministik parser-ə düşür.
+
+**A4 — Əlaqə formasının hədsiz sahələri.** `name`/`phone`/`email`/`subject`/`message` üçün
+yuxarı hədd yox idi; sahələr həm `Lead` sətrinə, həm də HTML məktuba düşür. Zod hədləri
+(120/40/200/200/4000) və formada `maxLength` əlavə olundu; `validation.tooLong` açarı
+üç kataloqa da yazıldı.
+
+**A5 — Push abunəliyinin ünvanı.** `endpoint` müştəridən gəlir və server sonradan məhz ora
+POST atır. Artıq yalnız `https` sxemi və 800 simvol həddi qəbul edilir, açarlar isə base64url
+formasına uyğun olmalıdır. (`global_fetch_strictly_public` daxili şəbəkəni onsuz da bağlayır —
+bu, onun üstündəki ikinci qatdır.)
+
+**Əlavə düzəliş.** Cron marşrutu `process.env.CRON_SECRET`-i birbaşa oxuyurdu; proyeksiya
+işləməyən runtime yolunda marşrut səssizcə 404-ə düşərdi. İndi `runtimeEnv("CRON_SECRET")`
+işlədilir.
+
+**Rədd edilən tapıntı.** Auditin Web Push SSRF namizədi rədd edilib: `global_fetch_strictly_public`
+compat bayrağı daxili/link-local ünvanları bağlayır və cavab gövdəsi heç yerə açılmır.
+
+Qəbul: `npm run test` (567 test), `typecheck`, `lint`, `dead-code` və `build` — beşi də təmiz.
+`wrangler.jsonc` dəyişdiyi üçün `npm run cf-typegen` yenidən işlədilib.
