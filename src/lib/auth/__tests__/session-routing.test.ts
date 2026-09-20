@@ -44,4 +44,65 @@ describe("imzalı sessiya marşrutları", () => {
       }),
     ).toBe("/en/kabinet");
   });
+
+  /**
+   * Marşrut təsnifatının bütövlüyü.
+   *
+   * CodeQL bu funksiyadakı `if (isAdminRoute)` şərtini `js/user-controlled-bypass`
+   * kimi işarələyir, çünki şərti URL — yəni istifadəçinin seçdiyi dəyər — idarə edir.
+   * Router-də bu qaçılmazdır; real sual budur ki, panel yolunun hansısa yazılışı
+   * təsnifatdan **kənarda** qalıb qapını yan keçə bilirmi. Aşağıdakı matris həmin
+   * invariantı bağlayır.
+   *
+   * Qapı onsuz da yeganə müdafiə deyil: `admin/layout.tsx` və hər server action
+   * sessiyanı D1-dən oxuyur (CLAUDE.md, «Qoruma iki həlqəlidir»).
+   */
+  describe("panel yolunun təsnifatı", () => {
+    const adminPaths = ["/admin", "/admin/", "/admin/emlaklar", "/admin/emlaklar/yeni"];
+    // Locale prefiksli variant middleware-də `canonicalAdminPath()` ilə 308 alır;
+    // buraya düşsə belə locale soyulduğu üçün yenə qapıdan keçməlidir.
+    const localePrefixed = ["/az/admin", "/en/admin/emlaklar", "/ru/admin/audit"];
+
+    for (const pathname of [...adminPaths, ...localePrefixed]) {
+      it(`sessiyasız keçid vermir: ${pathname}`, () => {
+        expect(signedSessionRedirect(pathname, "", null)).not.toBeNull();
+      });
+
+      // Yönləndirmə marşrutun öz dilində qalır (`/en/admin/...` → `/en/kabinet`).
+      it(`ictimai sessiyaya keçid vermir: ${pathname}`, () => {
+        expect(
+          signedSessionRedirect(pathname, "", {
+            accountType: ACCOUNT_TYPES.USER,
+            authKind: AUTH_KINDS.PUBLIC,
+          }),
+        ).toMatch(/^\/(az|en|ru)\/kabinet$/);
+      });
+
+      it(`ikinci mərhələsi bitməmiş staff sessiyasına keçid vermir: ${pathname}`, () => {
+        expect(
+          signedSessionRedirect(pathname, "", {
+            accountType: ACCOUNT_TYPES.STAFF,
+            authKind: AUTH_KINDS.PUBLIC,
+          }),
+        ).not.toBeNull();
+      });
+    }
+
+    it("panel olmayan, adı oxşar yolu səhvən qapıya salmır", () => {
+      for (const pathname of ["/administrator", "/adminx", "/az/administrator"]) {
+        expect(signedSessionRedirect(pathname, "", null)).toBeNull();
+      }
+    });
+
+    it("tam 2FA-lı staff sessiyasını panelə buraxır", () => {
+      for (const pathname of adminPaths) {
+        expect(
+          signedSessionRedirect(pathname, "", {
+            accountType: ACCOUNT_TYPES.STAFF,
+            authKind: AUTH_KINDS.STAFF_2FA,
+          }),
+        ).toBeNull();
+      }
+    });
+  });
 });
