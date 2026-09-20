@@ -83,6 +83,32 @@ describe("backup kodlar", () => {
     }
   });
 
+  /**
+   * Seçim qərəzsiz olmalıdır — bir simvolun digərindən daha tez-tez düşməsi
+   * ehtimal sahəsini daraldır. Əvvəlki `byte % 32` yalnız əlifba uzunluğu 256-nı
+   * bölən ədəd olduğu üçün işləyirdi; bu test həmin gizli şərtdən asılı deyil.
+   */
+  it("əlifbanın bütün simvolları təxminən eyni tezlikdə düşür", () => {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const counts = new Map<string, number>(alphabet.split("").map((char) => [char, 0]));
+
+    // 400 çağırış × 10 kod × 8 simvol = 32 000 nümunə, simvol başına ~1000.
+    for (let round = 0; round < 400; round += 1) {
+      for (const code of generateBackupCodes()) {
+        for (const char of code.replace("-", "")) {
+          counts.set(char, (counts.get(char) ?? 0) + 1);
+        }
+      }
+    }
+
+    const total = [...counts.values()].reduce((sum, value) => sum + value, 0);
+    const expected = total / alphabet.length;
+    for (const [char, count] of counts) {
+      expect(count, `${char} tezliyi`).toBeGreaterThan(expected * 0.8);
+      expect(count, `${char} tezliyi`).toBeLessThan(expected * 1.2);
+    }
+  });
+
   it("normalizasiya boşluq, defis və registr fərqini udur", () => {
     expect(normalizeBackupCode(" ab3d-9f2k ")).toBe("AB3D9F2K");
     expect(normalizeBackupCode("AB3D9F2K")).toBe("AB3D9F2K");
