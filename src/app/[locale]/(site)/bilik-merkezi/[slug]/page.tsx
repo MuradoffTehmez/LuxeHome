@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     image: article.coverUrl || undefined,
     type: "article",
     noIndex: article.noIndex,
-    canonicalPath: article.canonicalUrl,
+    canonicalPath: article.canonicalUrl || undefined,
     ogTitle: article.ogTitle,
     ogDescription: article.ogDescription,
     ogImage: article.ogImage,

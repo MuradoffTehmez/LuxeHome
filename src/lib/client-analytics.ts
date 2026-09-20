@@ -67,13 +67,30 @@ export function hasAnalyticsConsent(cookieValue?: string) {
 
 declare global {
   interface Window {
-    dataLayer?: Array<Record<string, unknown>>;
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+    pendingAnalyticsEvents?: Array<{ event: AnalyticsEvent; payload: AnalyticsPayload }>;
+  }
+}
+
+/**
+ * GA4 səhifə baxışına filtr, axtarış və təsdiq tokenləri daxil olmamalıdır.
+ * Marşrut ölçülür, query/hash isə yalnız domen və path saxlanılaraq atılır.
+ */
+export function sanitizeAnalyticsPageLocation(value: string): string {
+  try {
+    const url = new URL(value);
+    return `${url.origin}${url.pathname}`;
+  } catch {
+    return value.split(/[?#]/, 1)[0];
   }
 }
 
 export function trackEvent(event: AnalyticsEvent, payload: Record<string, unknown> = {}) {
   if (typeof window === "undefined") return;
-  const measurementId = process.env.NEXT_PUBLIC_GTM_ID || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
+  const measurementId = gaId || gtmId;
   if (!analyticsRuntimeEnabled({
     production: process.env.NODE_ENV === "production",
     measurementId,
@@ -81,6 +98,17 @@ export function trackEvent(event: AnalyticsEvent, payload: Record<string, unknow
   })) return;
   const clean = sanitizeAnalyticsPayload(event, payload);
   if (!clean) return;
+
+  if (gaId) {
+    if (window.gtag) {
+      window.gtag("event", event, clean);
+    } else {
+      window.pendingAnalyticsEvents = window.pendingAnalyticsEvents ?? [];
+      window.pendingAnalyticsEvents.push({ event, payload: clean });
+    }
+    return;
+  }
+
   window.dataLayer = window.dataLayer ?? [];
   window.dataLayer.push({ event, ...clean });
 }

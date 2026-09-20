@@ -7,6 +7,7 @@ import {
   ANALYTICS_CONSENT_COOKIE,
   analyticsRuntimeEnabled,
   hasAnalyticsConsent,
+  sanitizeAnalyticsPageLocation,
 } from "@/lib/client-analytics";
 
 type Consent = "granted" | "denied" | null;
@@ -39,7 +40,7 @@ export function AnalyticsProvider() {
   const [consent, setConsent] = useState<Consent>(null);
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID?.trim();
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
-  const measurementId = gtmId || gaId;
+  const measurementId = gaId || gtmId;
   const configured = process.env.NODE_ENV === "production" && Boolean(measurementId) && !onAdmin;
 
   useEffect(() => setConsent(readConsent()), []);
@@ -48,27 +49,36 @@ export function AnalyticsProvider() {
     if (onAdmin) return;
     if (!analyticsRuntimeEnabled({ production: process.env.NODE_ENV === "production", measurementId, consent: consent === "granted" })) return;
     window.dataLayer = window.dataLayer ?? [];
-    if (gtmId) {
+    const id = gaId || gtmId!;
+    const scriptId = gaId ? "luxe-ga" : "luxe-gtm";
+    const scriptExists = Boolean(document.getElementById(scriptId));
+    if (gaId) {
+      window.gtag = window.gtag ?? ((...args: unknown[]) => window.dataLayer!.push(args));
+      if (!scriptExists) window.gtag("js", new Date());
+      window.gtag("config", gaId, {
+        anonymize_ip: true,
+        page_location: sanitizeAnalyticsPageLocation(window.location.href),
+      });
+      for (const pending of window.pendingAnalyticsEvents ?? []) {
+        window.gtag("event", pending.event, pending.payload);
+      }
+      window.pendingAnalyticsEvents = [];
+    } else if (gtmId && !scriptExists) {
       window.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
-    } else if (gaId) {
-      window.dataLayer.push({ event: "js", timestamp: Date.now() });
-      window.dataLayer.push({ event: "config", measurement_id: gaId, anonymize_ip: true });
     }
-    const id = gtmId || gaId!;
-    const scriptId = gtmId ? "luxe-gtm" : "luxe-ga";
-    if (document.getElementById(scriptId)) return;
+    if (scriptExists) return;
     const script = document.createElement("script");
     script.id = scriptId;
     script.async = true;
-    script.src = gtmId
-      ? `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(id)}`
-      : `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+    script.src = gaId
+      ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`
+      : `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(id)}`;
     document.head.appendChild(script);
-  }, [consent, gaId, gtmId, measurementId, onAdmin]);
+  }, [consent, gaId, gtmId, measurementId, onAdmin, pathname]);
 
   if (!configured) return null;
 
-  if (consent === "granted" && gtmId) {
+  if (consent === "granted" && gtmId && !gaId) {
     return (
       <iframe
         src={`https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(gtmId)}`}

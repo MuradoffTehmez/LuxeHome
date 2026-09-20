@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/xidmetler/${service.slug}`,
     image: service.imageUrl || undefined,
     noIndex: service.noIndex,
-    canonicalPath: service.canonicalUrl,
+    canonicalPath: service.canonicalUrl || undefined,
     ogTitle: service.ogTitle,
     ogDescription: service.ogDescription,
     ogImage: service.ogImage,
