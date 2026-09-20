@@ -78,7 +78,10 @@ export function PublicPropertyForm({
   const propertyT = useTranslations("property");
   const [listingType, setListingType] = useState<string>(initial?.listingType ?? LISTING_TYPES.SALE);
   const [cityId, setCityId] = useState(initial?.cityId ?? options.cities[0]?.id ?? "");
-  const districts = options.districts.filter((district) => district.parentId === cityId);
+  // Rayon siyahısı seçilmiş şəhərdən asılıdır — kaskad ictimai axtarışdakı ilə
+  // eynidir. `cityId` ağacdan hesablanır (`getPropertyFormOptions`), ona görə
+  // Bakının qəsəbələri — rayonun uşağı olsalar da — burada görünür.
+  const districts = options.districts.filter((district) => district.cityId === cityId);
   const featureGroups = options.features.reduce<Record<string, typeof options.features>>(
     (groups, feature) => {
       (groups[feature.group] ??= []).push(feature);
@@ -171,7 +174,11 @@ export function PublicPropertyForm({
           label={t("district")}
           placeholder={t("notSelected")}
           defaultValue={initial?.districtId ?? ""}
-          options={districts.map((district) => ({ value: district.id, label: district.name }))}
+          options={districts.map((district) => ({
+            value: district.id,
+            label: district.name,
+            group: district.group,
+          }))}
         />
         <FullWidth>
           <AdminInput

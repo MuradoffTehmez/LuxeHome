@@ -55,6 +55,19 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          /**
+           * Repo fayllarını (miqrasiya, generasiya olunan SQL) oxuyan testlər.
+           * workerd sandbox-ında `node:fs` layihə qovluğunu görmür, ona görə
+           * onlar ayrıca Node layihəsindədir.
+           */
+          name: "repo-node",
+          environment: "node",
+          include: ["prisma/**/*.test.ts", "scripts/**/*.test.ts"],
+        },
+      },
+      {
+        extends: true,
+        test: {
           name: "ui-node",
           environment: "node",
           include: ["src/components/**/*.test.{ts,tsx}"],

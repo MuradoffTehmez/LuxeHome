@@ -1,4 +1,9 @@
-import { LOCATION_KINDS, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES } from "@/lib/constants";
+import {
+  LOCATION_CHILD_KINDS,
+  LOCATION_KINDS,
+  MAX_PROPERTY_IMAGES,
+  PROPERTY_STATUSES,
+} from "@/lib/constants";
 import { readPropertyForm } from "@/lib/admin/property-input";
 import { propertyFieldsSchema } from "@/lib/admin/schemas";
 
@@ -139,17 +144,42 @@ export function hasAllowedPropertyImageCount(count: number): boolean {
   return count <= MAX_PROPERTY_IMAGES;
 }
 
-const PUBLIC_DISTRICT_KINDS = [
-  LOCATION_KINDS.DISTRICT,
-  LOCATION_KINDS.SETTLEMENT,
+/**
+ * «Rayon/qəsəbə» sahəsində seçilə bilən səviyyələr.
+ *
+ * `METRO` tarixən burada idi, çünki köhnə formada metro da eyni sahədən
+ * seçilirdi; indi onun öz sahəsi var, amma köhnə elanlar hələ metro ID-si
+ * daşıya bilər, ona görə saxlanılır.
+ */
+const PUBLIC_DISTRICT_KINDS: readonly string[] = [
+  ...LOCATION_CHILD_KINDS,
   LOCATION_KINDS.METRO,
-] as const;
+];
+
+type PublicLocationRow = {
+  kind: string;
+  parentId: string | null;
+  /** Valideynin valideyni — Bakı qəsəbələri üçün şəhər bu səviyyədədir. */
+  parent?: { parentId: string | null } | null;
+};
 
 type PublicPropertyRelationStore = {
   findType(id: string): Promise<{ isActive: boolean } | null>;
-  findLocation(id: string): Promise<{ kind: string; parentId: string | null } | null>;
+  findLocation(id: string): Promise<PublicLocationRow | null>;
   countFeatures(ids: string[]): Promise<number>;
 };
+
+/**
+ * Yerləşmə qeydinin verilmiş şəhərə aid olub-olmadığını yoxlayır.
+ *
+ * Ağac iki dərinlikdədir: rayon birbaşa şəhərin uşağıdır, qəsəbə/kənd/massiv
+ * isə Bakı və Gəncədə rayonun uşağı, qalan yerlərdə şəhərin uşağıdır. Yalnız
+ * birinci səviyyəyə baxmaq Maştağa kimi qeydləri səhvən rədd edərdi.
+ */
+export function locationBelongsToCity(location: PublicLocationRow, cityId: string): boolean {
+  if (location.parentId === cityId) return true;
+  return location.parent?.parentId === cityId;
+}
 
 /** İctimai forma üçün saxtalaşdırılmış və passiv taksonomiya ID-lərini rədd edir. */
 export async function validatePublicPropertyRelations(
@@ -167,10 +197,10 @@ export async function validatePublicPropertyRelations(
   if (!type?.isActive) errors.typeId = "Əmlak növü seçilməyib";
   if (!city || city.kind !== LOCATION_KINDS.CITY) errors.cityId = "Şəhər seçilməyib";
   if (input.districtId && !district) errors.districtId = "Rayon tapılmadı";
-  if (district && !PUBLIC_DISTRICT_KINDS.includes(district.kind as never)) {
+  if (district && !PUBLIC_DISTRICT_KINDS.includes(district.kind)) {
     errors.districtId = "Seçilmiş rayon düzgün deyil";
   }
-  if (district && district.parentId !== input.cityId) {
+  if (district && !locationBelongsToCity(district, input.cityId)) {
     errors.districtId = "Seçilmiş rayon bu şəhərə aid deyil";
   }
   if (featureCount !== input.featureIds.length) {

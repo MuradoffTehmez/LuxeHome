@@ -12,6 +12,8 @@ import {
   PARTNER_STATUSES,
   POST_STATUSES,
   LEAD_STATUSES,
+  LOCATION_CHILD_KINDS,
+  LOCATION_KINDS,
   REVIEW_STATUSES,
   SEO_LANDING_STATUSES,
   PUBLIC_PARTNER_STATUSES,
@@ -531,19 +533,33 @@ export async function getFilterOptions() {
       select: { name: true, slug: true, imageUrl: true, description: true, icon: true },
     }),
     prisma.location.findMany({
-      where: { kind: "CITY" },
+      where: { kind: LOCATION_KINDS.CITY },
       orderBy: { order: "asc" },
       select: {
         name: true,
         slug: true,
         children: {
-          orderBy: { order: "asc" },
-          select: { name: true, slug: true },
+          // Metro stansiyaları da Bakının uşağıdır, lakin ayrıca filtr sahəsidir —
+          // burada süzülməsəydi «rayon» açılışında 26 stansiya görünərdi.
+          where: { kind: { in: LOCATION_CHILD_KINDS } },
+          orderBy: [{ kind: "asc" }, { order: "asc" }],
+          select: {
+            name: true,
+            slug: true,
+            kind: true,
+            // Bakının qəsəbələri rayonun altındadır, yəni üçüncü səviyyədədir.
+            // Onlar gətirilməsəydi «Maştağa» filtrdə heç vaxt seçilə bilməzdi.
+            children: {
+              where: { kind: { in: LOCATION_CHILD_KINDS } },
+              orderBy: { order: "asc" },
+              select: { name: true, slug: true, kind: true },
+            },
+          },
         },
       },
     }),
     prisma.location.findMany({
-      where: { kind: "METRO" },
+      where: { kind: LOCATION_KINDS.METRO },
       orderBy: { order: "asc" },
       select: { name: true, slug: true },
     }),
@@ -1111,8 +1127,15 @@ export async function getTaxonomyLandingProperties(
   slug: string,
   page = 1,
 ) {
+  // `/rayon/<slug>` yalnız inzibati rayonu deyil, qəsəbə, kənd və massivi də
+  // açır — «Maştağa» üçün ayrıca marşrut yaratmaq əvəzinə eyni səhifə işlədilir.
+  // `districtId` bu səviyyələrin hamısını saxlayır.
+  const where =
+    kind === LOCATION_KINDS.DISTRICT
+      ? { slug, kind: { in: LOCATION_CHILD_KINDS } }
+      : { slug, kind };
   const location = await prisma.location.findFirst({
-    where: { slug, kind },
+    where,
     select: {
       id: true,
       name: true,
@@ -1127,7 +1150,7 @@ export async function getTaxonomyLandingProperties(
   if (!location) return null;
 
   const result = await getProperties({
-    ...(kind === "DISTRICT" ? { districtSlug: slug } : { metroSlug: slug }),
+    ...(kind === LOCATION_KINDS.DISTRICT ? { districtSlug: slug } : { metroSlug: slug }),
     statuses: INDEXABLE_LISTING_STATUSES,
     page,
     pageSize: 12,
@@ -1170,7 +1193,7 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
     count: number;
     updatedAt?: Date;
   }> =
-    kind === "DISTRICT"
+    kind === LOCATION_KINDS.DISTRICT
       ? (
           await prisma.property.groupBy({
             by: ["districtId"],
@@ -1200,7 +1223,14 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
   if (ids.length === 0) return [];
 
   const locations = await prisma.location.findMany({
-    where: { id: { in: ids }, kind },
+    // `districtId` yalnız inzibati rayonu deyil, qəsəbə, kənd və massivi də
+    // saxlayır — `getTaxonomyLandingProperties()` ilə eyni səviyyə dəsti
+    // işlədilməlidir, əks halda Maştağa və Novxanı kimi yerlərin `/rayon/`
+    // səhifəsi açıq olsa da sitemap-a düşməzdi.
+    where: {
+      id: { in: ids },
+      ...(kind === LOCATION_KINDS.DISTRICT ? { kind: { in: LOCATION_CHILD_KINDS } } : { kind }),
+    },
     select: { id: true, name: true, slug: true },
   });
   const counts = new Map(
@@ -1582,17 +1612,27 @@ export async function getPropertyFormOptions() {
       orderBy: { order: "asc" },
     }),
     prisma.location.findMany({
-      where: { kind: "CITY" },
+      where: { kind: LOCATION_KINDS.CITY },
       select: { id: true, name: true, slug: true },
       orderBy: { order: "asc" },
     }),
     prisma.location.findMany({
-      where: { kind: { in: ["DISTRICT", "SETTLEMENT"] } },
-      select: { id: true, name: true, slug: true, kind: true, parentId: true },
+      where: { kind: { in: LOCATION_CHILD_KINDS } },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        kind: true,
+        parentId: true,
+        // Bakının qəsəbələri şəhərin deyil, inzibati rayonun uşağıdır. Forma
+        // seçimi şəhər üzrə süzüldüyü üçün kök şəhər ayrıca lazımdır —
+        // yoxsa Maştağa heç bir şəhərdə görünmür.
+        parent: { select: { id: true, name: true, parentId: true, kind: true } },
+      },
       orderBy: { name: "asc" },
     }),
     prisma.location.findMany({
-      where: { kind: "METRO" },
+      where: { kind: LOCATION_KINDS.METRO },
       select: { id: true, name: true, slug: true, parentId: true },
       orderBy: { name: "asc" },
     }),
@@ -1612,7 +1652,28 @@ export async function getPropertyFormOptions() {
     }),
   ]);
 
-  return { types, cities, districts, metros, features, projects, agents };
+  return {
+    types,
+    cities,
+    // `cityId` ağacdan hesablanır: rayon üçün öz valideyni, qəsəbə/kənd/massiv
+    // üçün isə babası. `group` açılışda optgroup başlığıdır.
+    districts: districts.map((district) => {
+      const parentIsDistrict = district.parent?.kind === LOCATION_KINDS.DISTRICT;
+      return {
+        id: district.id,
+        name: district.name,
+        slug: district.slug,
+        kind: district.kind,
+        parentId: district.parentId,
+        cityId: parentIsDistrict ? district.parent?.parentId ?? null : district.parentId,
+        group: parentIsDistrict ? district.parent?.name ?? null : null,
+      };
+    }),
+    metros,
+    features,
+    projects,
+    agents,
+  };
 }
 
 export type PropertyFormOptions = Awaited<ReturnType<typeof getPropertyFormOptions>>;
@@ -1835,7 +1896,7 @@ export async function getAdminProjectById(id: string) {
 /** Layihə formasında yalnız şəhər siyahısı lazımdır. */
 export async function getCityOptions() {
   return prisma.location.findMany({
-    where: { kind: "CITY" },
+    where: { kind: LOCATION_KINDS.CITY },
     select: { id: true, name: true },
     orderBy: { order: "asc" },
   });

@@ -1,3 +1,4 @@
+import { LOCATION_CHILD_KINDS } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { publicPropertyWhere } from "@/lib/queries";
 
@@ -35,7 +36,7 @@ function distribution(properties: Array<{ typeId: string; type: { name: string }
 }
 
 export async function getMarketReport(slug: string): Promise<MarketReport | null> {
-  const district = slug === "baki" ? null : await prisma.location.findFirst({ where: { slug, kind: "DISTRICT", neighborhoodProfile: { isNot: null } }, include: { neighborhoodProfile: true } });
+  const district = slug === "baki" ? null : await prisma.location.findFirst({ where: { slug, kind: { in: LOCATION_CHILD_KINDS }, neighborhoodProfile: { isNot: null } }, include: { neighborhoodProfile: true } });
   if (slug !== "baki" && !district?.neighborhoodProfile) return null;
   const properties = await prisma.property.findMany({
     where: { ...(await publicPropertyWhere()), ...(district ? { districtId: district.id } : {}) },

@@ -192,16 +192,42 @@ export const BUILDING_TYPE_LABELS: Record<BuildingType, string> = {
   OLD: "Köhnə tikili",
 };
 
-/** Yerləşmə ağacının səviyyələri — `Location.kind` sahəsinin icazə verilən dəyərləri. */
+/**
+ * Yerləşmə ağacının səviyyələri — `Location.kind` sahəsinin icazə verilən dəyərləri.
+ *
+ * Ağacın quruluşu və rəsmi mənbəsi `prisma/locations-data.ts`-də izah olunub.
+ * Qısaca: `CITY` istifadəçinin birinci seçimidir (11 respublika tabeli şəhər və
+ * 64 rayon), `DISTRICT` isə **yalnız şəhərdaxili** inzibati rayondur — Bakının
+ * 12, Gəncənin 2 rayonu. Rayonları `CITY` saymaq qəsdidir: axtarışda Quba ilə
+ * Bakı eyni açılan siyahıdan seçilir.
+ */
 export const LOCATION_KINDS = {
   CITY: "CITY",
   DISTRICT: "DISTRICT",
   METRO: "METRO",
   SETTLEMENT: "SETTLEMENT",
+  /** Rəsmi kənd. */
+  VILLAGE: "VILLAGE",
+  /** Yaşayış massivi və mikrorayon — rəsmi inzibati vahid deyil. */
+  NEIGHBORHOOD: "NEIGHBORHOOD",
   LANDMARK: "LANDMARK",
 } as const;
 
 export type LocationKind = (typeof LOCATION_KINDS)[keyof typeof LOCATION_KINDS];
+
+/**
+ * «Rayon/qəsəbə» filtrində seçilə bilən səviyyələr.
+ *
+ * `METRO` qəsdən kənardadır: metro Bakının uşağı olsa da, öz filtr sahəsi var.
+ * Bu siyahı olmasaydı «Bakı» seçiləndə rayon açılışında 26 metro stansiyası da
+ * görünərdi — 2026 auditində tapılan bug məhz bu idi.
+ */
+export const LOCATION_CHILD_KINDS: string[] = [
+  LOCATION_KINDS.DISTRICT,
+  LOCATION_KINDS.SETTLEMENT,
+  LOCATION_KINDS.VILLAGE,
+  LOCATION_KINDS.NEIGHBORHOOD,
+];
 
 /** Yer göstərilərkən ada əlavə olunan qısaltma: «Nəsimi m.», «Mərdəkan q.». */
 export const LOCATION_KIND_SUFFIX: Record<LocationKind, string> = {
@@ -209,6 +235,8 @@ export const LOCATION_KIND_SUFFIX: Record<LocationKind, string> = {
   DISTRICT: "r.",
   METRO: "m.",
   SETTLEMENT: "q.",
+  VILLAGE: "k.",
+  NEIGHBORHOOD: "",
   LANDMARK: "",
 };
 

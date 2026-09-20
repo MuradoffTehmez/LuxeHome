@@ -204,4 +204,53 @@ describe("ictimai elan göndərmə siyasəti", () => {
       districtId: "Seçilmiş rayon düzgün deyil",
     });
   });
+
+  it("Bakı qəsəbəsini qəbul edir — o, rayonun uşağıdır, şəhərin nəvəsidir", async () => {
+    // Maştağa Sabunçu rayonuna, Sabunçu isə Bakıya bağlıdır. Yalnız birinci
+    // səviyyəyə baxan yoxlama onu «bu şəhərə aid deyil» deyə rədd edirdi.
+    const errors = await validatePublicPropertyRelations(
+      {
+        findType: async () => ({ isActive: true }),
+        findLocation: async (id) =>
+          id === "baki"
+            ? { kind: "CITY", parentId: null }
+            : { kind: "SETTLEMENT", parentId: "baki-sabuncu", parent: { parentId: "baki" } },
+        countFeatures: async () => 0,
+      },
+      { typeId: "type", cityId: "baki", districtId: "baki-mastaga", featureIds: [] },
+    );
+    expect(errors).toBeNull();
+  });
+
+  it("kənd və massiv səviyyələrini qəbul edir", async () => {
+    for (const kind of ["VILLAGE", "NEIGHBORHOOD"]) {
+      const errors = await validatePublicPropertyRelations(
+        {
+          findType: async () => ({ isActive: true }),
+          findLocation: async (id) =>
+            id === "abseron"
+              ? { kind: "CITY", parentId: null }
+              : { kind, parentId: "abseron", parent: null },
+          countFeatures: async () => 0,
+        },
+        { typeId: "type", cityId: "abseron", districtId: "place", featureIds: [] },
+      );
+      expect(errors, `${kind} rədd edildi`).toBeNull();
+    }
+  });
+
+  it("başqa şəhərin qəsəbəsini rədd edir", async () => {
+    const errors = await validatePublicPropertyRelations(
+      {
+        findType: async () => ({ isActive: true }),
+        findLocation: async (id) =>
+          id === "gence"
+            ? { kind: "CITY", parentId: null }
+            : { kind: "SETTLEMENT", parentId: "baki-sabuncu", parent: { parentId: "baki" } },
+        countFeatures: async () => 0,
+      },
+      { typeId: "type", cityId: "gence", districtId: "baki-mastaga", featureIds: [] },
+    );
+    expect(errors).toMatchObject({ districtId: "Seçilmiş rayon bu şəhərə aid deyil" });
+  });
 });

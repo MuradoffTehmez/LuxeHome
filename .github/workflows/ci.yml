@@ -156,6 +156,15 @@ jobs:
       - name: Log staging D1 migration status
         run: npx wrangler d1 migrations list DB --remote --env staging
 
+      # Taksonomiya (əmlak növü, xüsusiyyət, yerləşmə ağacı) miqrasiyada deyil,
+      # `prisma/taxonomy.sql`-də saxlanılır: o, generasiya olunan **arzu olunan
+      # vəziyyətdir** və `INSERT OR IGNORE` + `UPDATE` cütü ilə idempotentdir.
+      # Miqrasiyadan sonra, bundle-dan əvvəl gəlir — yeni yerləşmə qeydləri
+      # worker yayımlanmamışdan əvvəl bazada olmalıdır, əks halda filtr açılışları
+      # boş gələr.
+      - name: Apply staging taxonomy (property types, features, locations)
+        run: npm run db:taxonomy:staging
+
       # `SITE_URL` statik səhifələrin içinə build vaxtı yazılır, ona görə staging və
       # production üçün bundle ayrı-ayrı qurulur — bir build-i iki mühitə yaymaq
       # canonical URL-ləri və Open Graph linklərini yanlış edərdi. `IS_STAGING` isə
@@ -294,6 +303,10 @@ jobs:
       # Tətbiqdən sonrakı vəziyyət run-un tarixçəsində qalsın deyə loglanır.
       - name: Log production D1 migration status
         run: npx wrangler d1 migrations list DB --remote
+
+      # İzah staging-dəki eyni addımdadır.
+      - name: Apply production taxonomy (property types, features, locations)
+        run: npm run db:taxonomy:remote
 
       # `NEXT_PUBLIC_VAPID_PUBLIC_KEY` üçün izah staging build addımındadır.
       - name: Build OpenNext worker bundle (production)

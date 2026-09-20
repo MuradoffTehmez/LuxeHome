@@ -15,7 +15,7 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { FEATURES, PROPERTY_TYPES } from "./taxonomy-data";
-import { BAKU, BAKU_DISTRICTS, CITIES, METRO_STATIONS, REGIONS } from "./locations-data";
+import { BAKU, METRO_STATIONS, PLACES } from "./locations-data";
 
 const AZ_TRANSLIT: Record<string, string> = {
   ə: "e", Ə: "e",
@@ -100,14 +100,26 @@ function parentRef(parentSlug: string): string {
   return `(SELECT "id" FROM "Location" WHERE "slug"=${quote(parentSlug)})`;
 }
 
+/**
+ * Yazılmış hər slug. Eyni slug iki dəfə yazılsaydı, ikinci `UPDATE` birincinin
+ * valideynini səssizcə dəyişərdi — məsələn iki fərqli rayonun «İstisu»su.
+ * Slug-lar valideyn prefiksi daşıdığı üçün bu normalda baş vermir; yenə də
+ * generator dayanır, çünki səhvi SQL tətbiq olunandan sonra tapmaq çətindir.
+ */
+const seenSlugs = new Set<string>();
+
 function locationRow(
   name: string,
   kind: string,
   order: number,
   parentSlug: string | null,
-  slugOverride?: string,
+  slug: string,
 ): void {
-  const slug = slugOverride ?? slugify(name);
+  if (seenSlugs.has(slug)) {
+    throw new Error(`Təkrar slug: ${slug} (${name}) — locations-data.ts-ə bax.`);
+  }
+  seenSlugs.add(slug);
+
   const id = `loc_${slug}`;
   const parent = parentSlug ? parentRef(parentSlug) : "NULL";
 
@@ -122,41 +134,40 @@ function locationRow(
   );
 }
 
-lines.push("-- Şəhərlər");
-CITIES.forEach((city, index) => locationRow(city, "CITY", index * 10, null));
-lines.push("");
-
-lines.push("-- Rayonlar (şəhərlərlə eyni pillədə seçilir)");
-REGIONS.forEach((region, index) => locationRow(region, "CITY", 1000 + index * 10, null));
-lines.push("");
-
 /**
- * Bakı daxilindəki yerlər üçün slug konvensiyası: `baki-<ad>`.
- *
- * Konvensiya ilk seed-dən qalır və dəyişdirilmir — bare slug (`yasamal`) yazılsaydı,
- * mövcud `baki-yasamal` sətri ilə yanaşı ikinci sətir yaranardı və seçim siyahısında
- * hər rayon iki dəfə görünərdi.
+ * Bakı daxilindəki yerlər üçün slug konvensiyası `baki-<ad>`-dır və ilk seed-dən
+ * qalır. Digər şəhər və rayonlarda da eyni qayda işləyir: `<şəhər>-<ad>`.
+ * Prefiks olmasaydı eyni adlı qəsəbələr toqquşardı — «İstisu» üç rayonda var.
  */
-const bakuSlug = slugify(BAKU);
-const bakuScoped = (name: string) => `${bakuSlug}-${slugify(name)}`;
+const scopedSlug = (parentSlug: string, name: string) => `${parentSlug}-${slugify(name)}`;
 
-lines.push("-- Bakının inzibati rayonları");
-BAKU_DISTRICTS.forEach((district, index) => {
-  locationRow(district.name, "DISTRICT", index * 10, bakuSlug, bakuScoped(district.name));
+const bakuSlug = slugify(BAKU);
+
+lines.push("-- Şəhərlər və rayonlar");
+PLACES.forEach((place, index) => {
+  // Şəhərlər əvvəl, rayonlar sonra sıralanır
+  const base = place.tier === "CITY" ? index * 10 : 1000 + index * 10;
+  locationRow(place.name, "CITY", base, null, slugify(place.name));
 });
 lines.push("");
 
-lines.push("-- Bakı qəsəbələri");
-const seenSettlements = new Set<string>();
-BAKU_DISTRICTS.forEach((district) => {
-  const districtSlug = bakuScoped(district.name);
-  district.settlements.forEach((settlement, index) => {
-    const slug = bakuScoped(settlement);
-    // Eyni qəsəbə adı iki rayonun siyahısında ola bilər (məsələn «8-ci kilometr») —
-    // yalnız birinci qeyd saxlanılır, əks halda slug toqquşardı
-    if (seenSettlements.has(slug)) return;
-    seenSettlements.add(slug);
-    locationRow(settlement, "SETTLEMENT", index * 10, districtSlug, slug);
+lines.push("-- Şəhərdaxili inzibati rayonlar, qəsəbə, kənd və massivlər");
+PLACES.forEach((place) => {
+  const topSlug = slugify(place.name);
+
+  place.districts?.forEach((district, districtIndex) => {
+    const districtSlug = scopedSlug(topSlug, district.name);
+    locationRow(district.name, "DISTRICT", districtIndex * 10, topSlug, districtSlug);
+
+    district.places.forEach((child, childIndex) => {
+      // Qəsəbənin slug-ı rayonun deyil, şəhərin prefiksini daşıyır: elanlar
+      // ilk seed-dən bəri `baki-<qəsəbə>` slug-ına bağlıdır.
+      locationRow(child.name, child.kind, childIndex * 10, districtSlug, scopedSlug(topSlug, child.name));
+    });
+  });
+
+  place.places?.forEach((child, childIndex) => {
+    locationRow(child.name, child.kind, childIndex * 10, topSlug, scopedSlug(topSlug, child.name));
   });
 });
 lines.push("");
