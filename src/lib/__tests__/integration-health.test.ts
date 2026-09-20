@@ -64,4 +64,27 @@ describe("inteqrasiya sağlamlığı", () => {
       missing: ["RESEND_API_KEY"],
     });
   });
+
+  it("push açıq açarını build-time literal, gizli dəyərləri runtime kimi oxuyur", () => {
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY = "public-key";
+    process.env.VAPID_PRIVATE_KEY = "private-key";
+    process.env.VAPID_SUBJECT = "mailto:info@luxehomeestate.az";
+
+    const push = getIntegrationHealth().find((item) => item.id === "push");
+
+    expect(push).toMatchObject({ ready: true, optional: true, missing: [] });
+  });
+
+  it("push açıq açarı build-də yoxdursa runtime secret-ləri hazır olsa da çatışmır", () => {
+    process.env.VAPID_PRIVATE_KEY = "private-key";
+    process.env.VAPID_SUBJECT = "mailto:info@luxehomeestate.az";
+
+    const push = getIntegrationHealth().find((item) => item.id === "push");
+
+    expect(push).toMatchObject({
+      ready: false,
+      optional: true,
+      missing: ["NEXT_PUBLIC_VAPID_PUBLIC_KEY"],
+    });
+  });
 });
