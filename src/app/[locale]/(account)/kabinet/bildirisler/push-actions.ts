@@ -8,6 +8,29 @@ import { prisma } from "@/lib/prisma";
 
 type BrowserSubscription = { endpoint: string; keys: { p256dh: string; auth: string } };
 
+/**
+ * Abunəlik ünvanının forma yoxlaması.
+ *
+ * `endpoint` müştəri tərəfdən gəlir və sonradan server `webpush` vasitəsilə məhz
+ * ora sorğu atır. Giriş etmiş istifadəçinin bizim worker-i ixtiyari ünvana POST
+ * atmağa yönləndirməsinin qarşısını almaq üçün yalnız `https` qəbul edilir.
+ * (`global_fetch_strictly_public` compat bayrağı daxili şəbəkəni onsuz da bağlayır —
+ * bu, onun üstündəki ikinci qatdır.)
+ */
+function isValidPushEndpoint(value: string): boolean {
+  if (value.length > 800) return false;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/** Brauzerin verdiyi açarlar base64url-dur — uzunluq həddi sətri bazada bağlayır. */
+function isValidPushKey(value: string): boolean {
+  return value.length > 0 && value.length <= 256 && /^[A-Za-z0-9_=-]+$/.test(value);
+}
+
 export async function savePushSubscription(subscription: BrowserSubscription): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account.notifications.push");
@@ -15,6 +38,13 @@ export async function savePushSubscription(subscription: BrowserSubscription): P
   try { user = await requirePublicAction("push", locale); }
   catch (error) { if (error instanceof AdminGuardError) return failure(error.message); throw error; }
   if (!subscription.endpoint || !subscription.keys?.p256dh || !subscription.keys?.auth) return failure(t("incomplete"));
+  if (
+    !isValidPushEndpoint(subscription.endpoint) ||
+    !isValidPushKey(subscription.keys.p256dh) ||
+    !isValidPushKey(subscription.keys.auth)
+  ) {
+    return failure(t("incomplete"));
+  }
   try {
     await prisma.pushSubscription.upsert({
       where: { endpoint: subscription.endpoint },
