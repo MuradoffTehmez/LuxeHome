@@ -77,6 +77,7 @@ export function ContactForm() {
           name="name"
           label={t("fullName")}
           placeholder={t("namePlaceholder")}
+          maxLength={120}
           required
           error={state.fieldErrors?.name}
         />
@@ -85,6 +86,7 @@ export function ContactForm() {
           label={t("phone")}
           type="tel"
           placeholder="+994 50 XXX XX XX"
+          maxLength={40}
           required
           error={state.fieldErrors?.phone}
         />
@@ -96,12 +98,14 @@ export function ContactForm() {
           label={t("email")}
           type="email"
           placeholder="name@example.com"
+          maxLength={200}
           error={state.fieldErrors?.email}
         />
         <Input
           name="subject"
           label={t("subject")}
           placeholder={t("subjectPlaceholder")}
+          maxLength={200}
           error={state.fieldErrors?.subject}
         />
       </div>
@@ -110,6 +114,7 @@ export function ContactForm() {
         name="message"
         label={t("message")}
         placeholder={t("messagePlaceholder")}
+        maxLength={4000}
         required
         rows={5}
         error={state.fieldErrors?.message}

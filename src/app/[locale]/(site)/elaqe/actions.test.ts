@@ -141,4 +141,26 @@ describe("əlaqə forması — spam qapısı", () => {
     expect(database.leadCreate).not.toHaveBeenCalled();
     expect(effects.sendEmail).not.toHaveBeenCalled();
   });
+
+  // Hədsiz uzun mətn həm `Lead` sətrini, həm də bildiriş məktubunu şişirdirdi.
+  it("hədləri aşan sahələri rədd edir", async () => {
+    const formData = validFormData();
+    formData.set("message", "ə".repeat(4_001));
+
+    const result = await submitContactForm({ success: false }, formData);
+
+    expect(result.success).toBe(false);
+    expect(result.fieldErrors?.message).toBeTruthy();
+    expect(database.leadCreate).not.toHaveBeenCalled();
+  });
+
+  it("hədd daxilindəki uzun mətni qəbul edir", async () => {
+    const formData = validFormData();
+    formData.set("message", "ə".repeat(4_000));
+
+    const result = await submitContactForm({ success: false }, formData);
+
+    expect(result.success).toBe(true);
+    expect(database.leadCreate).toHaveBeenCalledOnce();
+  });
 });
