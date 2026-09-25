@@ -96,3 +96,21 @@ export function createAdminTranslator(locale: Locale, messages: AdminMessages) {
  * `layout.tsx`-idir (məs. `admin/emlaklar/layout.tsx`) — o, seqmentə daxil olarkən
  * yenidən render olunur.
  */
+
+/**
+ * Panel xaricində — kabinetdə — işlədilən ortaq admin komponentlərinin
+ * (`ImageDropzone`, `form-shell`, `confirm-action`, `secret-panel`) oxuduğu bölmələr.
+ *
+ * `admin` namespace-i ictimai `MESSAGE_NAMESPACES`-ə salınmır, ona görə `(account)`
+ * ağacı bu alt-dəsti ayrıca alır; olmasaydı kabinet formasında `admin.actions.cancel`
+ * kimi xam açarlar görünürdü (#81). Yalnız bu iki bölmə göndərilir (~3 KB), tam
+ * kataloq (~78 KB) yox. Kabinetdə yeni admin komponenti istifadə olunarsa,
+ * `admin-shared-messages.test.ts` onun açarlarının burada olmasını tələb edir.
+ */
+export const ADMIN_SHARED_CLIENT_SECTIONS = ["actions", "components"] as const;
+
+export function pickSharedAdminMessages(catalog: AdminMessages["admin"]) {
+  return Object.fromEntries(
+    ADMIN_SHARED_CLIENT_SECTIONS.map((section) => [section, catalog[section]]),
+  ) as Pick<AdminMessages["admin"], (typeof ADMIN_SHARED_CLIENT_SECTIONS)[number]>;
+}
