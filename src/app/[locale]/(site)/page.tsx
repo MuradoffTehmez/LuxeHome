@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react";
 import { LOCATION_KINDS } from "@/lib/constants";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import { Badge } from "@/components/ui/badge";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -102,6 +103,7 @@ export default async function HomePage({ params }: HomePageProps) {
     listingSearchT,
     { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners },
     { testimonials, agents },
+    projectsEnabled,
   ] = await Promise.all([
     getTranslations({ locale: resolvedLocale, namespace: "home" }),
     getTranslations({ locale: resolvedLocale, namespace: "property" }),
@@ -112,6 +114,7 @@ export default async function HomePage({ params }: HomePageProps) {
     getTranslations({ locale: resolvedLocale, namespace: "listings.search" }),
     getCachedHomePageData(),
     getCachedHomeSocialProof(),
+    isProjectsSectionEnabled(),
   ]);
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
@@ -560,7 +563,8 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* ------------------------------------------------------------------ */}
       {/* LAYİHƏLƏR                                                          */}
       {/* ------------------------------------------------------------------ */}
-      {projects.length > 0 && (
+      {/* Bölmə paneldən bağlana bilər (`site.projects_enabled`) — #83. */}
+      {projectsEnabled && projects.length > 0 && (
         <Section tone="paper">
           <Container size="wide">
             <SectionHeader

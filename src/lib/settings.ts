@@ -37,6 +37,12 @@ export const SETTING_KEYS = {
    */
   DEMO_CONTENT_ENABLED: "demo.content_enabled",
   /**
+   * `"1"` — «Yaşayış kompleksləri» (`/layiheler`) bölməsi ictimai saytda görünür.
+   * Açar yoxdursa bölmə **gizlidir**: menyu, bloklar və sitemap-dan çıxarılır,
+   * marşrutlar 404 verir. Məntiq `src/lib/site-sections.ts`-dədir.
+   */
+  PROJECTS_SECTION_ENABLED: "site.projects_enabled",
+  /**
    * Sistem rejimi (`NORMAL` | `MAINTENANCE` | `READ_ONLY`) və texniki xidmət
    * səhifəsinin mətnləri — **tək JSON dəyər**.
    *

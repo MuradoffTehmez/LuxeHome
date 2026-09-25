@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { Locale } from "@/lib/constants";
 import { getTranslations } from "next-intl/server";
@@ -8,6 +9,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { ProjectCard } from "@/components/site/project-card";
 import { buildManagedMetadata } from "@/lib/seo";
 import { getProjects } from "@/lib/queries";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -18,12 +20,15 @@ type PageProps = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
+  // Bölmə paneldən bağlıdırsa marşrut mövcud deyil (#83).
+  if (!(await isProjectsSectionEnabled())) notFound();
   const t = await getTranslations({ locale, namespace: "listings.projectsPage" });
   return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/layiheler", locale: locale as Locale });
 }
 
 export default async function ProjectsPage({ params }: PageProps) {
   const { locale } = await params;
+  if (!(await isProjectsSectionEnabled())) notFound();
   const t = await getTranslations({ locale, namespace: "listings.projectsPage" });
   const projects = await getProjects();
 

@@ -93,10 +93,12 @@ describe("ana səhifə discovery təcrübəsi", () => {
       "/kiraye-emlaklar",
       "/bakida-satilan-menziller",
       "/villalar",
-      "/layiheler",
     ]) {
       expect(html).toContain(`href="${href}"`);
     }
+    // «Yaşayış kompleksləri» defolt olaraq paneldən bağlıdır (#83) — 404 verən
+    // səhifəyə keçid verilmir.
+    expect(html).not.toContain('href="/layiheler"');
   });
 
   it("kateqoriyaları mobil scroll-snap rail kimi əlçatan render edir", () => {

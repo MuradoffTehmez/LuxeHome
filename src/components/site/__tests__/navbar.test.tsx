@@ -87,4 +87,11 @@ describe("Navbar", () => {
     expect(fullNavigation).toContain("Əlaqə");
     expect(fullNavigation).not.toContain("Daha çox");
   });
+
+  it("paneldən bağlanmış bölməni desktop, full və mobil menyudan çıxarır (#83)", () => {
+    const html = renderToStaticMarkup(<Navbar hiddenPaths={["/layiheler"]} />);
+    expect(html).not.toContain('href="/layiheler"');
+    expect(html).not.toContain("Yaşayış kompleksləri");
+    expect(html).toContain('href="/emlaklar"');
+  });
 });

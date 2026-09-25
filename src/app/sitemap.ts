@@ -3,6 +3,7 @@ import { PRODUCTION_SITE_URL } from "@/config/site";
 import { LOCALES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
 import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib/public-cache";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
 
 // Sitemap D1-dən oxuyur — build zamanı deyil, sorğu anında qurulur.
 export const dynamic = "force-dynamic";
@@ -27,6 +28,8 @@ export type SitemapSource = {
   landings: Array<{ path: string; updatedAt?: Date }>;
   knowledge?: Array<{ path: string; updatedAt?: Date }>;
   dbLandings?: Array<{ path: string; locale: Locale; updatedAt: Date }>;
+  /** `false` — «Yaşayış kompleksləri» paneldən bağlıdır, `/layiheler*` sitemap-a düşmür (#83). */
+  projectsEnabled?: boolean;
 };
 
 function absoluteUrl(path: string): string {
@@ -48,10 +51,12 @@ function localizedEntries(
 }
 
 export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
+  const projectsEnabled = source.projectsEnabled !== false;
+  const projects = projectsEnabled ? source.projects : [];
   const staticEntries: MetadataRoute.Sitemap = [
     ...localizedEntries("/", { changeFrequency: "daily", priority: 1 }),
     ...localizedEntries("/emlaklar", { changeFrequency: "daily", priority: 0.9 }),
-    ...localizedEntries("/layiheler", { changeFrequency: "weekly", priority: 0.8 }),
+    ...(projectsEnabled ? localizedEntries("/layiheler", { changeFrequency: "weekly", priority: 0.8 }) : []),
     ...localizedEntries("/agentlikler", { changeFrequency: "weekly", priority: 0.7 }),
     ...localizedEntries("/terefdaslar", { changeFrequency: "weekly", priority: 0.6 }),
     ...localizedEntries("/xidmetler", { changeFrequency: "monthly", priority: 0.7 }),
@@ -83,7 +88,7 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
         changeFrequency: "weekly" as const,
         priority: 0.8,
       })),
-    ...source.projects.filter(isSelfCanonical).flatMap((item) => localizedEntries(`/layiheler/${item.slug}`, {
+    ...projects.filter(isSelfCanonical).flatMap((item) => localizedEntries(`/layiheler/${item.slug}`, {
       lastModified: item.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
@@ -135,9 +140,10 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [source, knowledge] = await Promise.all([
+  const [source, knowledge, projectsEnabled] = await Promise.all([
     getCachedSitemapEntries(),
     getCachedKnowledgeSitemapEntries(),
+    isProjectsSectionEnabled(),
   ]);
-  return buildSitemap({ ...source, knowledge });
+  return buildSitemap({ ...source, knowledge, projectsEnabled });
 }

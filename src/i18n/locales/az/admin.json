@@ -973,7 +973,19 @@
       "media": "Media",
       "faylAdiVeYa": "Fayl adı və ya alt mətn üzrə axtar…",
       "ofisKoordinati": "Ofisin xəritədəki yeri",
-      "ofisKoordinatiHint": "Koordinat təyin edildikdən sonra ofisin xəritəsi «Əlaqə» səhifəsində və footer-də görünür."
+      "ofisKoordinatiHint": "Koordinat təyin edildikdən sonra ofisin xəritəsi «Əlaqə» səhifəsində və footer-də görünür.",
+      "sections": {
+        "title": "Sayt bölmələri",
+        "description": "İctimai saytda hansı bölmələrin görünəcəyini idarə edin. Məlumat silinmir — gizli bölmə paneldə idarə olunmağa davam edir.",
+        "projectsLabel": "Yaşayış kompleksləri (Layihələr)",
+        "projectsHint": "Gizli olanda menyu, footer, ana səhifə bölməsi, elan və tərəfdaş səhifələrindəki layihə blokları və sitemap-dan çıxarılır; /layiheler səhifələri 404 qaytarır.",
+        "statusVisible": "Saytda görünür",
+        "statusHidden": "Saytda gizlidir",
+        "show": "Bölməni göstər",
+        "hide": "Bölməni gizlət",
+        "projectsShown": "Yaşayış kompleksləri bölməsi saytda göstərilir.",
+        "projectsHidden": "Yaşayış kompleksləri bölməsi saytdan gizlədildi."
+      }
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA ehtiyat kodları — bir dəfə göstərilir",

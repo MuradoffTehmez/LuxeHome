@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/site/navbar";
+import { getHiddenPublicPaths } from "@/lib/site-sections";
 import { Footer } from "@/components/site/footer";
 import { CompareBar } from "@/components/site/compare-bar";
 import { NavigationProgress } from "@/components/site/navigation-progress";
@@ -11,14 +12,14 @@ import { ToastProvider } from "@/components/ui/toast";
  * Header `fixed` olduğu üçün `<main>`-ə `pt-[--header-h]` əlavə olunur.
  * Ana səhifənin hero-su bu padding-i mənfi margin ilə neytrallaşdırır.
  */
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ToastProvider>
       <NavigationProgress />
       <div className="flex min-h-dvh flex-col">
-        <Navbar showLocaleSwitcher />
+        <Navbar showLocaleSwitcher hiddenPaths={await getHiddenPublicPaths()} />
         <main id="main" className="flex-1 pt-[var(--header-h)]">
           {children}
         </main>

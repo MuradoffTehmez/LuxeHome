@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
+import { getHiddenPublicPaths } from "@/lib/site-sections";
+import { withoutHiddenPaths } from "@/lib/site-section-paths";
 
 const discoveryLinks = [
   { href: "/satilan-emlaklar", key: "sale" },
@@ -15,6 +17,7 @@ const discoveryLinks = [
 /** Ana səhifədə axtarış niyyətini izah edən, crawl edilə bilən lokal giriş. */
 export async function HomeSeoIntro({ locale = DEFAULT_LOCALE }: { locale?: Locale }) {
   const t = await getTranslations({ locale, namespace: "home.intro" });
+  const links = withoutHiddenPaths(discoveryLinks, await getHiddenPublicPaths());
   return (
     <Section tone="paper" spacing="cozy" aria-labelledby="home-seo-intro-title">
       <Container size="wide">
@@ -33,7 +36,7 @@ export async function HomeSeoIntro({ locale = DEFAULT_LOCALE }: { locale?: Local
             <p>{t("paragraph1")}</p>
             <p>{t("paragraph2")}</p>
             <nav aria-label={t("navLabel")} className="flex flex-wrap gap-x-6 gap-y-3">
-              {discoveryLinks.map((item) => (
+              {links.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

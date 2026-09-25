@@ -973,7 +973,19 @@
       "media": "Media",
       "faylAdiVeYa": "Search by file name or alt text…",
       "ofisKoordinati": "Office location on the map",
-      "ofisKoordinatiHint": "Once the coordinates are set, the office map appears on the Contact page and in the footer."
+      "ofisKoordinatiHint": "Once the coordinates are set, the office map appears on the Contact page and in the footer.",
+      "sections": {
+        "title": "Site sections",
+        "description": "Control which sections appear on the public site. Data is not deleted — a hidden section can still be managed in the panel.",
+        "projectsLabel": "Residential complexes (Projects)",
+        "projectsHint": "When hidden, it is removed from the menu, footer, homepage section, project blocks on listing and partner pages, and the sitemap; /layiheler pages return 404.",
+        "statusVisible": "Visible on site",
+        "statusHidden": "Hidden on site",
+        "show": "Show section",
+        "hide": "Hide section",
+        "projectsShown": "The residential complexes section is now visible on the site.",
+        "projectsHidden": "The residential complexes section is now hidden from the site."
+      }
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA backup codes — shown once",

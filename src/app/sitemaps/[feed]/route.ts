@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { PROPERTY_STATUSES, TRANSLATION_ENTITY_TYPES, TRANSLATION_STATUSES, type Locale } from "@/lib/constants";
 import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib/public-cache";
 import { parseSitemapFeed, urlsetXml, type SitemapEntry } from "@/lib/sitemap-xml";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
+import { PROJECTS_SECTION_PATH } from "@/lib/site-section-paths";
 
 export const dynamic = "force-dynamic";
 const absolute = (path: string, locale: Locale) => new URL(localizePath(path, locale), `${PRODUCTION_SITE_URL}/`).toString();
@@ -18,7 +20,14 @@ async function translatedIds(entityType: string, ids: string[], locale: Locale) 
 export async function GET(_request: Request, { params }: { params: Promise<{ feed: string }> }) {
   const descriptor = parseSitemapFeed((await params).feed);
   if (!descriptor) return new Response("Sitemap tapılmadı", { status: 404 });
-  const [source, knowledge] = await Promise.all([getCachedSitemapEntries(), getCachedKnowledgeSitemapEntries()]);
+  const [cachedSource, knowledge, projectsEnabled] = await Promise.all([
+    getCachedSitemapEntries(),
+    getCachedKnowledgeSitemapEntries(),
+    isProjectsSectionEnabled(),
+  ]);
+  // «Yaşayış kompleksləri» paneldən bağlıdırsa (#83) 404 verən URL-lər sitemap-a düşmür.
+  const source = projectsEnabled ? cachedSource : { ...cachedSource, projects: [] };
+  const visibleStaticPaths = projectsEnabled ? staticPaths : staticPaths.filter((path) => path !== PROJECTS_SECTION_PATH);
   const { kind, locale, page } = descriptor;
   let entries: SitemapEntry[] = [];
   if (kind === "pages") {
@@ -27,7 +36,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ fee
       translatedIds(TRANSLATION_ENTITY_TYPES.SERVICE, source.services.flatMap((item) => item.id ? [item.id] : []), locale),
     ]);
     entries = [
-      ...staticPaths.map((path, index) => ({ url: absolute(path, locale), changeFrequency: index < 2 ? "daily" : "monthly", priority: index === 0 ? 1 : 0.6 })),
+      ...visibleStaticPaths.map((path, index) => ({ url: absolute(path, locale), changeFrequency: index < 2 ? "daily" : "monthly", priority: index === 0 ? 1 : 0.6 })),
       ...source.projects.filter((item) => locale === "az" || (item.id && projectTranslations.has(item.id))).map((item) => ({ url: absolute(`/layiheler/${item.slug}`, locale), lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.7 })),
       ...source.services.filter((item) => locale === "az" || (item.id && serviceTranslations.has(item.id))).map((item) => ({ url: absolute(`/xidmetler/${item.slug}`, locale), lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 })),
       ...source.partners.map((item) => ({ url: absolute(`/terefdaslar/${item.slug}`, locale), lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 })),
