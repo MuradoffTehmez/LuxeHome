@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { AdminGuardError, SystemModeGuardError, requirePublicAction } from "@/lib/admin/guard";
+import { AdminGuardError, RateLimitGuardError, SystemModeGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { systemModeErrorResponse } from "@/lib/system-mode";
 import { createMediaRecordWithRollback } from "@/lib/media/upload-record";
-import { deleteImage, putImage } from "@/lib/media/storage";
+import { deleteImage, putImage, uploadFailureStatus } from "@/lib/media/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,10 @@ export async function POST(request: Request) {
     user = await requirePublicAction("media");
   } catch (error) {
     if (error instanceof SystemModeGuardError) return systemModeErrorResponse(error);
+    // 429 — client növbəsi bunu keçici sayıb gözləyərək təkrar cəhd edir.
+    if (error instanceof RateLimitGuardError) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
     if (error instanceof AdminGuardError) {
       return NextResponse.json({ error: error.message }, { status: 403 });
     }
@@ -34,7 +38,7 @@ export async function POST(request: Request) {
 
   const result = await putImage(file, "emlaklar");
   if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
+    return NextResponse.json({ error: result.error }, { status: uploadFailureStatus(result.reason) });
   }
 
   let media;

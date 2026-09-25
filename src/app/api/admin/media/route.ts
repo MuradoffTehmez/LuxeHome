@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PERMISSIONS } from "@/lib/constants";
-import { AdminGuardError, SystemModeGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { AdminGuardError, RateLimitGuardError, SystemModeGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { systemModeErrorResponse } from "@/lib/system-mode";
 import { recordAudit } from "@/lib/admin/audit";
-import { MEDIA_FOLDERS, putImage, type MediaFolder } from "@/lib/media/storage";
+import { MEDIA_FOLDERS, putImage, uploadFailureStatus, type MediaFolder } from "@/lib/media/storage";
 
 /**
  * Şəkil yükləmə.
@@ -28,6 +28,10 @@ export async function POST(request: Request) {
     // Sistem rejimi bloku 503 + strukturlaşdırılmış kodla qaytarılır ki,
     // müştəri tərəf onu icazə xətasından (403) ayırd edə bilsin.
     if (error instanceof SystemModeGuardError) return systemModeErrorResponse(error);
+    // 429 — client növbəsi bunu keçici sayıb gözləyərək təkrar cəhd edir.
+    if (error instanceof RateLimitGuardError) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
     if (error instanceof AdminGuardError) {
       return NextResponse.json({ error: error.message }, { status: 403 });
     }
@@ -45,7 +49,7 @@ export async function POST(request: Request) {
 
   const result = await putImage(file, folder, String(formData.get("seoName") ?? ""));
   if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
+    return NextResponse.json({ error: result.error }, { status: uploadFailureStatus(result.reason) });
   }
 
   // Orijinal ad yalnız məlumat kimi saxlanılır — heç bir yolda istifadə edilmir

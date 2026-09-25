@@ -151,7 +151,19 @@ export type UploadResult =
       checksum: string;
       watermarkApplied: boolean;
     }
-  | { ok: false; error: string };
+  | { ok: false; error: string; reason: UploadFailureReason };
+
+export type UploadFailureReason = "empty" | "tooLarge" | "unsupported" | "storage";
+
+/**
+ * Uğursuz yükləmənin HTTP statusu. Client növbəsi statusa görə qərar verir:
+ * 413 və 400 qəti imtinadır, 503 isə keçicidir və təkrar cəhd olunur.
+ */
+export function uploadFailureStatus(reason: UploadFailureReason): 400 | 413 | 503 {
+  if (reason === "tooLarge") return 413;
+  if (reason === "storage") return 503;
+  return 400;
+}
 
 function safeSeoName(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -168,22 +180,23 @@ async function sha256(buffer: ArrayBuffer): Promise<string> {
 
 export async function putImage(file: File, folder: MediaFolder, seoName?: string | null): Promise<UploadResult> {
   const maxSize = folder === "terefdaslar-logo" ? MAX_PARTNER_LOGO_SIZE : MAX_UPLOAD_SIZE;
-  if (file.size === 0) return { ok: false, error: "Fayl boşdur." };
+  if (file.size === 0) return { ok: false, error: "Fayl boşdur.", reason: "empty" };
   if (file.size > maxSize) {
     return {
       ok: false,
       error: `Fayl ${Math.round(maxSize / 1024 / 1024)} MB-dan böyükdür.`,
+      reason: "tooLarge",
     };
   }
 
   const buffer = await file.arrayBuffer();
   const sourceType = sniffImageType(new Uint8Array(buffer.slice(0, 16)));
   if (!sourceType) {
-    return { ok: false, error: "Yalnız JPEG, PNG, WebP və AVIF şəkilləri qəbul edilir." };
+    return { ok: false, error: "Yalnız JPEG, PNG, WebP və AVIF şəkilləri qəbul edilir.", reason: "unsupported" };
   }
 
   const bucket = getCloudflareContext().env.MEDIA;
-  if (!bucket) return { ok: false, error: "Media anbarı əlçatan deyil." };
+  if (!bucket) return { ok: false, error: "Media anbarı əlçatan deyil.", reason: "storage" };
 
   const applyWatermark = folder === "emlaklar";
   const master = await toWebp(buffer, sourceType, MASTER_WIDTH, MASTER_QUALITY, applyWatermark);

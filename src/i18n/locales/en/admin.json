@@ -467,7 +467,7 @@
       "uploadFailed": "Upload failed",
       "count": "{count, plural, one {# image} other {# images}}",
       "prompt": "Drag images here, or click to choose them",
-      "formats": "JPG, PNG, WebP or AVIF — up to {size} MB per file",
+      "formats": "JPG, PNG, WebP or AVIF — large photos are resized automatically before upload (max {size} MB)",
       "cover": "Cover",
       "altLabel": "Image alt text",
       "altPlaceholder": "Alt text (SEO)",
@@ -480,7 +480,12 @@
       "remove": "Delete image",
       "removeFailed": "Remove the failed image from the list",
       "removeShort": "Remove",
-      "addMore": "Add more"
+      "addMore": "Add more",
+      "unsupported": "This format is not supported. Choose JPG, PNG, WebP or AVIF (iPhone: Settings → Camera → Formats → “Most Compatible”).",
+      "rateLimited": "Too many uploads in a short time. Please try again in a minute.",
+      "network": "Connection lost. Please try again.",
+      "serverBusy": "The server is busy right now. Please try again shortly.",
+      "retry": "Try again"
     },
     "locationPicker": {
       "latitude": "Latitude",

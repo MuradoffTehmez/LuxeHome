@@ -467,7 +467,7 @@
       "uploadFailed": "Yükləmə alınmadı",
       "count": "{count, plural, other {# şəkil}}",
       "prompt": "Şəkilləri bura sürüşdürün və ya seçmək üçün klikləyin",
-      "formats": "JPG, PNG, WebP və ya AVIF — hər fayl ən çoxu {size} MB",
+      "formats": "JPG, PNG, WebP və ya AVIF — böyük şəkillər yükləmədən əvvəl avtomatik kiçildilir (maks. {size} MB)",
       "cover": "Üz qabığı",
       "altLabel": "Şəklin alt mətni",
       "altPlaceholder": "Alt mətn (SEO)",
@@ -480,7 +480,12 @@
       "remove": "Şəkli sil",
       "removeFailed": "Uğursuz şəkli siyahıdan çıxar",
       "removeShort": "Çıxar",
-      "addMore": "Daha əlavə et"
+      "addMore": "Daha əlavə et",
+      "unsupported": "Bu format dəstəklənmir. JPG, PNG, WebP və ya AVIF seçin (iPhone: Ayarlar → Kamera → Formatlar → «Ən uyğun»).",
+      "rateLimited": "Qısa müddətdə çox yükləmə oldu. Bir dəqiqə sonra yenidən cəhd edin.",
+      "network": "Bağlantı kəsildi. Yenidən cəhd edin.",
+      "serverBusy": "Server hazırda məşğuldur. Bir az sonra yenidən cəhd edin.",
+      "retry": "Yenidən cəhd et"
     },
     "locationPicker": {
       "latitude": "Enlik (latitude)",
