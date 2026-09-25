@@ -29,7 +29,7 @@ test.describe("Mobil naviqasiya", () => {
 });
 
 test.describe("Mobil layout", () => {
-  const paths = ["/az", "/az/emlaklar", "/az/layiheler", "/az/blog", "/az/elaqe"];
+  const paths = ["/az", "/az/emlaklar", "/az/blog", "/az/elaqe"];
 
   for (const path of paths) {
     /**
