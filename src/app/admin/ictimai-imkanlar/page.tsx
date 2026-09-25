@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/states";
 import { requireAdminRead } from "@/lib/admin/guard";
 import {
   LOCATION_CHILD_KINDS,
+  LOCATION_KINDS,
   NEARBY_PLACE_CATEGORY_LABELS,
   PERMISSIONS,
   PREMIUM_DURATIONS_DAYS,
@@ -51,9 +52,11 @@ export default async function PublicFeaturesAdminPage() {
       select: { id: true, title: true },
       orderBy: { title: "asc" },
     }),
+    // Valideyn adı `parent` relation-u ilə deyil, ayrıca xəritədən gəlir:
+    // ~600 alt yer üzrə `id IN (…)` D1-in 100 parametr həddini aşır.
     prisma.location.findMany({
-      where: { kind: { in: LOCATION_CHILD_KINDS } },
-      select: { id: true, name: true, parent: { select: { name: true } } },
+      where: { kind: { in: [LOCATION_KINDS.CITY, ...LOCATION_CHILD_KINDS] } },
+      select: { id: true, name: true, kind: true, parentId: true },
       orderBy: { name: "asc" },
     }),
     prisma.nearbyPlace.findMany({
@@ -71,6 +74,14 @@ export default async function PublicFeaturesAdminPage() {
       orderBy: [{ featuredUntil: "asc" }],
     }),
   ]);
+
+  const locationNames = new Map(locations.map((location) => [location.id, location.name]));
+  const locationOptions = locations
+    .filter((location) => location.kind !== LOCATION_KINDS.CITY)
+    .map((location) => {
+      const parentName = location.parentId ? locationNames.get(location.parentId) : undefined;
+      return { id: location.id, label: `${parentName ? `${parentName} · ` : ""}${location.name}` };
+    });
 
   const profileValues: Record<string, Omit<NeighborhoodProfileValues, "locationId">> = Object.fromEntries(
     neighborhoodProfiles.map((profile) => [
@@ -180,10 +191,7 @@ export default async function PublicFeaturesAdminPage() {
 
       <AdminCard title={t("pages.amenities.rayonAnalitikasi")} description={t("pages.amenities.rayonSecilendeSaxlanmisGostericiler")} className="mt-6">
         <NeighborhoodEditor
-          locations={locations.map((location) => ({
-            id: location.id,
-            label: `${location.parent?.name ? `${location.parent.name} · ` : ""}${location.name}`,
-          }))}
+          locations={locationOptions}
           profiles={profileValues}
         />
       </AdminCard>
