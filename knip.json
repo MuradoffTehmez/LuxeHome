@@ -10,8 +10,5 @@
   "ignore": [
     "tmp/**",
     "archive-*/**"
-  ],
-  "ignoreDependencies": [
-    "eslint-config-next"
   ]
 }

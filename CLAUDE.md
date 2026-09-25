@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Layihə haqqında
 
-Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 15 App Router,
+Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 16 App Router (webpack),
 React 19, Tailwind CSS v4, Prisma v6. İctimai sayt, kabinet və admin panel AZ/EN/RU dillərindədir;
 Azərbaycan dili defoltdur.
 
@@ -65,6 +65,16 @@ workerd runtime-ında (domen qatı) və Node layihəsində (SSR komponentləri) 
 Bu beşlikdən **ayrı** olaraq CI `npm audit --audit-level=high` işlədir. O, kod keyfiyyətini
 deyil, asılılıqları yoxlayır, ona görə lokalda yalnız `package.json`/`package-lock.json`
 dəyişdikdə işlətmək lazımdır.
+
+**Bundler webpack-dır.** Next 16 defolt olaraq Turbopack işlədir, lakin `build` və `dev`
+skriptləri `--webpack` bayrağı ilə qəsdən webpack-da saxlanılır: Turbopack Prisma klientini
+hash-lı `@prisma/client-<hash>` symlink-i kimi xaricləşdirir, bu isə OpenNext/workerd bundle-ında
+`@prisma/client/wasm.js` idxal qaydası ilə yoxlanmayıb (Windows-da symlink `EPERM` ilə düşür).
+Turbopack-a keçid ayrıca, `npm run preview` + staging E2E ilə sınanmalıdır.
+
+`revalidateTag()` Next 16-da ikinci arqument tələb edir. `revalidatePublicContent()` Next 15
+davranışını (teq dərhal bitir) `{ expire: 0 }` ilə saxlayır — `"max"` stale-while-revalidate
+verir və redaktor dəyişikliyi gecikmə ilə görərdi.
 
 **`npm run build`-i buraxma.** Digər üç qapı təmiz olsa da build sınıq qala bilər: Server
 Action qaydaları yalnız webpack mərhələsində yoxlanılır. `"use server"` faylındakı **hər

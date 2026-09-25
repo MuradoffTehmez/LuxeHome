@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Layihə haqqında
 
-Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 15 App Router,
+Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 16 App Router (webpack),
 React 19, Tailwind CSS v4, Prisma v6. İctimai sayt, kabinet və admin panel AZ/EN/RU dillərindədir;
 Azərbaycan dili defoltdur. İnfrastruktur Cloudflare Workers + D1 + R2 + Images üzərindədir.
 
