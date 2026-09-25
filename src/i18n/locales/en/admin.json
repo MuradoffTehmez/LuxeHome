@@ -485,7 +485,8 @@
       "rateLimited": "Too many uploads in a short time. Please try again in a minute.",
       "network": "Connection lost. Please try again.",
       "serverBusy": "The server is busy right now. Please try again shortly.",
-      "retry": "Try again"
+      "retry": "Try again",
+      "limitReached": "Limit reached — up to {max} images. Remove one first."
     },
     "locationPicker": {
       "latitude": "Latitude",

@@ -114,7 +114,9 @@ export function ImageDropzone({
   // eyni paralellik limitinə tabedir.
   const limiterRef = useRef<ReturnType<typeof createUploadLimiter> | null>(null);
   // Uğursuz faylı «Yenidən cəhd et» ilə təkrar göndərmək üçün orijinal saxlanılır.
-  const filesRef = useRef(new Map<string, { file: File; sequence: number }>());
+  // `uploadId` fayl başına bir dəfə yaranır və təkrar cəhdlərdə dəyişmir — server
+  // onunla cavabı itmiş, amma saxlanmış yükləməni tanıyır (idempotentlik).
+  const filesRef = useRef(new Map<string, { file: File; sequence: number; uploadId: string }>());
 
   function markError(id: string, error: string) {
     setItems((current) =>
@@ -140,7 +142,8 @@ export function ImageDropzone({
   }
 
   async function upload(file: File, id: string, sequence: number) {
-    filesRef.current.set(id, { file, sequence });
+    const uploadId = filesRef.current.get(id)?.uploadId ?? crypto.randomUUID();
+    filesRef.current.set(id, { file, sequence, uploadId });
     limiterRef.current ??= createUploadLimiter();
 
     await limiterRef.current(async () => {
@@ -168,6 +171,7 @@ export function ImageDropzone({
         const body = new FormData();
         body.append("file", prepared);
         body.append("folder", folder);
+        body.append("uploadId", uploadId);
         if (seoNamePrefix) body.append("seoName", `${seoNamePrefix}-${String(sequence).padStart(2, "0")}`);
         return fetch(uploadUrl, { method: "POST", body });
       });
@@ -191,6 +195,13 @@ export function ImageDropzone({
   function retry(id: string) {
     const entry = filesRef.current.get(id);
     if (!entry) return;
+    // Uğursuz şəkil limitə sayılmır; istifadəçi onun yerinə başqasını əlavə edibsə,
+    // təkrar cəhd `maxFiles`-i aşar və forma bütövlükdə rədd olunar.
+    const active = items.filter((item) => item.status !== "error").length;
+    if (maxFiles !== undefined && active >= maxFiles) {
+      markError(id, t("components.dropzone.limitReached", { max: maxFiles }));
+      return;
+    }
     setItems((current) =>
       current.map((item) => (item.id === id ? { ...item, status: "uploading", error: undefined } : item)),
     );

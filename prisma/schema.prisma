@@ -1061,11 +1061,16 @@ model Media {
   checksum         String?
   watermarkApplied Boolean @default(false)
   uploaderId       String?
+  /// Client-in hər fayl üçün yaratdığı idempotentlik açarı. Cavab itib yükləmə
+  /// təkrar göndəriləndə server eyni sətri qaytarır — ikinci R2 obyekti və `Media`
+  /// sətri yaranmır (#79). Köhnə sətirlərdə boşdur.
+  clientUploadId   String?
 
   createdAt DateTime @default(now())
 
   uploader User? @relation("MediaUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
 
+  @@unique([uploaderId, clientUploadId])
   @@index([createdAt])
   @@index([checksum])
 }

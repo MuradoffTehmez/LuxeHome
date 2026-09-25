@@ -46,10 +46,12 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
           throw new Error(t("components.dropzone.unsupported"));
         }
 
+        const uploadId = crypto.randomUUID();
         const result = await uploadWithRetry(() => {
           const body = new FormData();
           body.append("file", prepared);
           body.append("folder", folder);
+          body.append("uploadId", uploadId);
           return fetch("/api/admin/media", { method: "POST", body });
         });
         if (!result.ok) {

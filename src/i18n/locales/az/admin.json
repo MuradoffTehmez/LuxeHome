@@ -485,7 +485,8 @@
       "rateLimited": "Qısa müddətdə çox yükləmə oldu. Bir dəqiqə sonra yenidən cəhd edin.",
       "network": "Bağlantı kəsildi. Yenidən cəhd edin.",
       "serverBusy": "Server hazırda məşğuldur. Bir az sonra yenidən cəhd edin.",
-      "retry": "Yenidən cəhd et"
+      "retry": "Yenidən cəhd et",
+      "limitReached": "Limit dolub — ən çoxu {max} şəkil. Əvvəlcə birini silin."
     },
     "locationPicker": {
       "latitude": "Enlik (latitude)",
