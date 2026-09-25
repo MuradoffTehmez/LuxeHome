@@ -24,6 +24,7 @@ import {
   type SortOption,
 } from "@/lib/constants";
 import { demoWhere } from "@/lib/demo-content";
+import { buildCityFilterTree, withCityAndGroup } from "@/lib/location-tree";
 import { parseSavedSearchFilters } from "@/lib/saved-search-filters";
 import type { DigestStore } from "@/lib/saved-search-digest";
 import { normalizeSearchText } from "@/lib/search-normalization";
@@ -526,7 +527,7 @@ export async function getPropertiesForCompare(ids: string[]) {
 // ---------------------------------------------------------------------------
 
 export async function getFilterOptions() {
-  const [types, cities, metros, features] = await Promise.all([
+  const [types, cities, childLocations, metros, features] = await Promise.all([
     prisma.propertyType.findMany({
       where: { isActive: true },
       orderBy: { order: "asc" },
@@ -535,28 +536,18 @@ export async function getFilterOptions() {
     prisma.location.findMany({
       where: { kind: LOCATION_KINDS.CITY },
       orderBy: { order: "asc" },
-      select: {
-        name: true,
-        slug: true,
-        children: {
-          // Metro stansiyaları da Bakının uşağıdır, lakin ayrıca filtr sahəsidir —
-          // burada süzülməsəydi «rayon» açılışında 26 stansiya görünərdi.
-          where: { kind: { in: LOCATION_CHILD_KINDS } },
-          orderBy: [{ kind: "asc" }, { order: "asc" }],
-          select: {
-            name: true,
-            slug: true,
-            kind: true,
-            // Bakının qəsəbələri rayonun altındadır, yəni üçüncü səviyyədədir.
-            // Onlar gətirilməsəydi «Maştağa» filtrdə heç vaxt seçilə bilməzdi.
-            children: {
-              where: { kind: { in: LOCATION_CHILD_KINDS } },
-              orderBy: { order: "asc" },
-              select: { name: true, slug: true, kind: true },
-            },
-          },
-        },
-      },
+      select: { id: true, name: true, slug: true },
+    }),
+    // Ağac nested `children` ilə deyil, düz siyahı ilə oxunur — D1-in 100
+    // parametr həddi səbəbindən (`location-tree.ts`). Metro stansiyaları da
+    // Bakının uşağıdır, lakin ayrıca filtr sahəsidir — burada süzülməsəydi
+    // «rayon» açılışında 26 stansiya görünərdi. Bakının qəsəbələri isə rayonun
+    // altındadır, yəni üçüncü səviyyədədir; onlar da eyni siyahıya düşür ki,
+    // «Maştağa» filtrdə seçilə bilsin.
+    prisma.location.findMany({
+      where: { kind: { in: LOCATION_CHILD_KINDS } },
+      orderBy: { order: "asc" },
+      select: { id: true, name: true, slug: true, kind: true, parentId: true },
     }),
     prisma.location.findMany({
       where: { kind: LOCATION_KINDS.METRO },
@@ -569,7 +560,7 @@ export async function getFilterOptions() {
     }),
   ]);
 
-  return { types, cities, metros, features };
+  return { types, cities: buildCityFilterTree(cities, childLocations), metros, features };
 }
 
 /** Kateqoriya kartlarında göstərilən əmlak sayları. */
@@ -1222,21 +1213,24 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
   const ids = eligible.map((row) => row.locationId).filter((id): id is string => Boolean(id));
   if (ids.length === 0) return [];
 
-  const locations = await prisma.location.findMany({
-    // `districtId` yalnız inzibati rayonu deyil, qəsəbə, kənd və massivi də
-    // saxlayır — `getTaxonomyLandingProperties()` ilə eyni səviyyə dəsti
-    // işlədilməlidir, əks halda Maştağa və Novxanı kimi yerlərin `/rayon/`
-    // səhifəsi açıq olsa da sitemap-a düşməzdi.
-    where: {
-      id: { in: ids },
-      ...(kind === LOCATION_KINDS.DISTRICT ? { kind: { in: LOCATION_CHILD_KINDS } } : { kind }),
-    },
-    select: { id: true, name: true, slug: true },
-  });
+  // `districtId` yalnız inzibati rayonu deyil, qəsəbə, kənd və massivi də
+  // saxlayır — `getTaxonomyLandingProperties()` ilə eyni səviyyə dəsti
+  // işlədilməlidir, əks halda Maştağa və Novxanı kimi yerlərin `/rayon/`
+  // səhifəsi açıq olsa da sitemap-a düşməzdi.
+  //
+  // `id IN (…)` şərti SQL-ə verilmir: `kind IN (…)` ilə birlikdə D1-in 100
+  // parametr həddini aşa bilərdi (`location-tree.ts`). Yer cədvəli kiçikdir,
+  // süzgəc JS-də aparılır.
   const counts = new Map(
     eligible.map((row) => [row.locationId, { count: row.count, updatedAt: row.updatedAt }]),
   );
-  return locations.map((location) => ({ ...location, ...counts.get(location.id)! }));
+  const locations = await prisma.location.findMany({
+    where: kind === LOCATION_KINDS.DISTRICT ? { kind: { in: LOCATION_CHILD_KINDS } } : { kind },
+    select: { id: true, name: true, slug: true },
+  });
+  return locations
+    .filter((location) => counts.has(location.id))
+    .map((location) => ({ ...location, ...counts.get(location.id)! }));
 }
 
 // ---------------------------------------------------------------------------
@@ -1618,17 +1612,9 @@ export async function getPropertyFormOptions() {
     }),
     prisma.location.findMany({
       where: { kind: { in: LOCATION_CHILD_KINDS } },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        kind: true,
-        parentId: true,
-        // Bakının qəsəbələri şəhərin deyil, inzibati rayonun uşağıdır. Forma
-        // seçimi şəhər üzrə süzüldüyü üçün kök şəhər ayrıca lazımdır —
-        // yoxsa Maştağa heç bir şəhərdə görünmür.
-        parent: { select: { id: true, name: true, parentId: true, kind: true } },
-      },
+      // `parent` relation-u burada seçilmir: ~600 sətir üzrə `id IN (…)` D1-in
+      // 100 parametr həddini aşır. Valideyn eyni siyahıdan tapılır.
+      select: { id: true, name: true, slug: true, kind: true, parentId: true },
       orderBy: { name: "asc" },
     }),
     prisma.location.findMany({
@@ -1655,20 +1641,10 @@ export async function getPropertyFormOptions() {
   return {
     types,
     cities,
-    // `cityId` ağacdan hesablanır: rayon üçün öz valideyni, qəsəbə/kənd/massiv
-    // üçün isə babası. `group` açılışda optgroup başlığıdır.
-    districts: districts.map((district) => {
-      const parentIsDistrict = district.parent?.kind === LOCATION_KINDS.DISTRICT;
-      return {
-        id: district.id,
-        name: district.name,
-        slug: district.slug,
-        kind: district.kind,
-        parentId: district.parentId,
-        cityId: parentIsDistrict ? district.parent?.parentId ?? null : district.parentId,
-        group: parentIsDistrict ? district.parent?.name ?? null : null,
-      };
-    }),
+    // Bakının qəsəbələri şəhərin deyil, inzibati rayonun uşağıdır. Forma
+    // seçimi şəhər üzrə süzüldüyü üçün kök şəhər (`cityId`) ayrıca hesablanır —
+    // yoxsa Maştağa heç bir şəhərdə görünmür. `group` optgroup başlığıdır.
+    districts: withCityAndGroup(districts),
     metros,
     features,
     projects,
