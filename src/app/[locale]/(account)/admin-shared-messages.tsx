@@ -1,22 +1,15 @@
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { loadAdminMessages, pickSharedAdminMessages, resolveAdminLocale } from "@/i18n/admin";
+import { ExtendedMessagesProvider } from "./extended-messages-provider";
 
 /**
- * Kabinet ağacına ictimai mesajlarla yanaşı ortaq admin komponentlərinin
- * mesajlarını da verir (#81). Dil URL-dəki locale-dir — kabinet ictimai saytın
- * bir hissəsidir, `User.locale` yalnız panel üçündür.
+ * Kabinet ağacına ortaq admin komponentlərinin mesajlarını verir (#81). Dil
+ * URL-dəki locale-dir — kabinet ictimai saytın bir hissəsidir, `User.locale`
+ * yalnız panel üçündür. Client-ə yalnız `admin` alt-dəsti (~3 KB) göndərilir.
  */
 export async function AdminSharedMessages({ children }: { children: React.ReactNode }) {
   const locale = resolveAdminLocale(await getLocale());
-  const [messages, adminMessages] = await Promise.all([getMessages(), loadAdminMessages(locale)]);
+  const { admin } = await loadAdminMessages(locale);
 
-  return (
-    <NextIntlClientProvider
-      locale={locale}
-      messages={{ ...messages, admin: pickSharedAdminMessages(adminMessages.admin) }}
-    >
-      {children}
-    </NextIntlClientProvider>
-  );
+  return <ExtendedMessagesProvider extra={{ admin: pickSharedAdminMessages(admin) }}>{children}</ExtendedMessagesProvider>;
 }
