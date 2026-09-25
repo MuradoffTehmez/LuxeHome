@@ -7,6 +7,8 @@ import { Loader2, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
 import { MAX_UPLOAD_SIZE } from "@/lib/constants";
+import { ImagePrepareError, isImageCandidate, prepareImageForUpload } from "@/components/admin/image-prepare";
+import { uploadWithRetry } from "@/components/admin/image-upload-queue";
 
 /**
  * Kitabxanaya birbaşa yükləmə.
@@ -24,28 +26,42 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
   const [pending, setPending] = useState(0);
 
   async function upload(files: FileList | null) {
-    const selected = Array.from(files ?? []).filter((file) => file.type.startsWith("image/"));
+    const selected = Array.from(files ?? []).filter(isImageCandidate);
     if (selected.length === 0) return;
 
     setPending((count) => count + selected.length);
     let uploaded = 0;
 
+    // Ardıcıl göndərilir — kitabxana yükləməsi arxa planda gedir, sürət deyil,
+    // etibarlılıq vacibdir. Böyük telefon şəkilləri əvvəlcə brauzerdə kiçildilir (#79).
     for (const file of selected) {
-      if (file.size > MAX_UPLOAD_SIZE) {
-        toast(t("pages.common.8MbDanBoyukdur", { p0: file.name }), "error");
-        setPending((count) => count - 1);
-        continue;
-      }
-
-      const body = new FormData();
-      body.append("file", file);
-      body.append("folder", folder);
-
       try {
-        const response = await fetch("/api/admin/media", { method: "POST", body });
-        if (!response.ok) {
-          const payload = (await response.json()) as { error?: string };
-          throw new Error(payload.error ?? t("pages.misc.yuklemeAlinmadi"));
+        let prepared: File;
+        try {
+          prepared = await prepareImageForUpload(file, MAX_UPLOAD_SIZE);
+        } catch (error) {
+          if (error instanceof ImagePrepareError && error.kind === "tooLarge") {
+            throw new Error(t("pages.common.8MbDanBoyukdur", { p0: file.name }));
+          }
+          throw new Error(t("components.dropzone.unsupported"));
+        }
+
+        const uploadId = crypto.randomUUID();
+        const result = await uploadWithRetry(() => {
+          const body = new FormData();
+          body.append("file", prepared);
+          body.append("folder", folder);
+          body.append("uploadId", uploadId);
+          return fetch("/api/admin/media", { method: "POST", body });
+        });
+        if (!result.ok) {
+          throw new Error(
+            result.kind === "rateLimited"
+              ? t("components.dropzone.rateLimited")
+              : result.kind === "server" || result.kind === "network"
+                ? t("components.dropzone.serverBusy")
+                : result.message ?? t("pages.misc.yuklemeAlinmadi"),
+          );
         }
         uploaded += 1;
       } catch (error) {

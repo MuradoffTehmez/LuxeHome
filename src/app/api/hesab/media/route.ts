@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { AdminGuardError, SystemModeGuardError, requirePublicAction } from "@/lib/admin/guard";
+import { AdminGuardError, RateLimitGuardError, SystemModeGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { systemModeErrorResponse } from "@/lib/system-mode";
-import { createMediaRecordWithRollback } from "@/lib/media/upload-record";
-import { deleteImage, putImage } from "@/lib/media/storage";
+import { createMediaRecordOnce, parseClientUploadId } from "@/lib/media/upload-record";
+import { deleteImage, putImage, uploadFailureStatus } from "@/lib/media/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,10 @@ export async function POST(request: Request) {
     user = await requirePublicAction("media");
   } catch (error) {
     if (error instanceof SystemModeGuardError) return systemModeErrorResponse(error);
+    // 429 — client növbəsi bunu keçici sayıb gözləyərək təkrar cəhd edir.
+    if (error instanceof RateLimitGuardError) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
     if (error instanceof AdminGuardError) {
       return NextResponse.json({ error: error.message }, { status: 403 });
     }
@@ -32,14 +36,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Fayl tapılmadı." }, { status: 400 });
   }
 
+  // Təkrar cəhd (cavab itəndə) eyni açarla gəlir — mövcud sətir qaytarılır (#79).
+  const clientUploadId = parseClientUploadId(formData.get("uploadId"));
+  const mediaSelect = { id: true, url: true, thumbUrl: true, originalName: true } as const;
+  const findExisting = () =>
+    clientUploadId
+      ? prisma.media.findUnique({
+          where: { uploaderId_clientUploadId: { uploaderId: user.id, clientUploadId } },
+          select: mediaSelect,
+        })
+      : Promise.resolve(null);
+  const existing = await findExisting();
+  if (existing) return NextResponse.json(existing, { status: 200 });
+
   const result = await putImage(file, "emlaklar");
   if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
+    return NextResponse.json({ error: result.error }, { status: uploadFailureStatus(result.reason) });
   }
 
   let media;
   try {
-    media = await createMediaRecordWithRollback(
+    media = await createMediaRecordOnce(
       {
         createRecord: () =>
           prisma.media.create({
@@ -52,9 +69,12 @@ export async function POST(request: Request) {
               width: result.width ?? null,
               height: result.height ?? null,
               uploaderId: user.id,
+              checksum: result.checksum,
+              clientUploadId,
             },
-            select: { id: true, url: true, thumbUrl: true, originalName: true },
+            select: mediaSelect,
           }),
+        findExisting,
         deleteImage,
         logCleanupFailure: (error) => console.error("[media] R2 rollback alınmadı:", error),
       },
