@@ -1,18 +1,25 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+// eslint-config-next 16 native flat config ixrac edir; `FlatCompat` sarğısı
+// onun plugin obyektini dövri JSON kimi seriallaşdırmağa çalışıb çökürdü.
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
   {
-    ignores: [
+    // eslint-config-next 16 ilə gələn `react-hooks` v7 React Compiler qaydalarını
+    // da açır. Layihə React Compiler işlətmir; `set-state-in-effect` hallarının
+    // çoxu hydration-dan sonra localStorage/tema oxuyan qəsdən pattern-dir,
+    // `purity` isə Server Component-də `Date.now()`-u tutur (orada render bir
+    // dəfədir). Next 15-dəki qayda dəsti ilə paritet saxlanılır; refaktor ayrıca
+    // issue-dadır.
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/purity": "off",
+    },
+  },
+  globalIgnores([
       "node_modules/**",
       ".next/**",
       "out/**",
@@ -31,8 +38,7 @@ const eslintConfig = [
       // yalnız lokal işdə görünürdü.
       "tmp/**",
       "archive-*/**",
-    ],
-  },
-];
+  ]),
+]);
 
 export default eslintConfig;

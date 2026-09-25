@@ -99,7 +99,7 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 
 | Qat | Texnologiya |
 |---|---|
-| Framework | Next.js 15.5.23, React 19.1, App Router |
+| Framework | Next.js 16.3 (webpack), React 19.3, App Router |
 | Dil | TypeScript 5, strict mode |
 | UI | Tailwind CSS v4, Lucide React, `next-themes`, Leaflet |
 | Verilənlər bazası | Cloudflare D1 / SQLite |
