@@ -119,7 +119,11 @@ export default async function SavedSearchesPage() {
   const cityLabels = new Map(
     filterOptions.cities.flatMap((city) => [
       [city.slug, localizeLocation(city, locale).name] as const,
-      ...city.children.map((district) => [district.slug, localizeLocation(district, locale).name] as const),
+      ...city.children.flatMap((district) => [
+        [district.slug, localizeLocation(district, locale).name] as const,
+        // Bakının qəsəbələri rayonun altındadır — etiket slug-a düşməsin.
+        ...district.children.map((place) => [place.slug, localizeLocation(place, locale).name] as const),
+      ]),
     ]),
   );
   const metroLabels = new Map(filterOptions.metros.map((metro) => [metro.slug, localizeLocation(metro, locale).name]));
