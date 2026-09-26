@@ -22,7 +22,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
     <>
       <div className="mb-6 flex min-w-0 items-center justify-between gap-4 rounded-xl border border-line bg-paper p-4 shadow-sm lg:hidden">
         <div className="min-w-0">
-          <p className="text-xs tracking-wide text-ink-muted uppercase">{accountLabel}</p>
+          <p className="text-xs font-semibold text-gold-deep">{accountLabel}</p>
           <p className="mt-1 truncate font-medium text-ink">{name}</p>
         </div>
         <button
@@ -31,14 +31,14 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen(true)}
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-xs border border-line-strong text-ink transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
         >
           <Menu className="size-5" aria-hidden="true" />
         </button>
       </div>
 
       <div className="grid min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
+        <aside className="hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block lg:self-start">
           <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} />
         </aside>
         <div className="min-w-0">{children}</div>
