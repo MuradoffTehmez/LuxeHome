@@ -18,7 +18,7 @@ keçəndən sonra squash merge edilir.
 
 - `main` üçün classic branch protection aktivdir;
 - pull request, güncəl branch, `Quality gate`, `Analyze (javascript-typescript)`,
-  `Dependency review`, conversation resolution və linear history məcburidir;
+  `Dependency review`, `Local stack E2E`, conversation resolution və linear history məcburidir;
 - qayda administratora da tətbiq olunur; force push və branch silinməsi bağlıdır;
 - GitHub Actions üçün default `GITHUB_TOKEN` read-only-dir və Actions PR yaratmaq/təsdiqləmək
   hüququ daşımır;
@@ -46,7 +46,9 @@ Required checks siyahısı:
 
 - `Quality gate`;
 - `Analyze (javascript-typescript)`;
-- `Dependency review`.
+- `Dependency review`;
+- `Local stack E2E` — PR-da OpenNext bundle lokal workerd-də real D1/R2 ilə qaldırılır
+  və bütün Playwright dəsti (auth ssenariləri daxil) işləyir (#87).
 
 `Label changed areas` təsnifat addımıdır, keyfiyyət qapısı deyil və required check
 edilməməlidir. Solo maintainer rejimində məcburi bir approval qoyulmur: GitHub müəllifin öz
