@@ -103,7 +103,9 @@ qradiyent/modal fonu üçün sabit `black/<opacity>` işlət.
   üstələyirdi, ona görə yeni komponent sinfini də oraya yaz.
 - Serif (Playfair) yalnız səhifə/bölmə başlıqlarındadır: qlobal qayda h3/h4-ü sans edir.
   Kiçik **h2** başlığa `font-sans` açıq yazılmalıdır, çünki h1/h2 qlobal olaraq serif-dir.
-  Admin paneldə h1/h2 `admin-surface` sinfi ilə sans-dır.
+  Başlıq bazası `@layer base`-dədir ki, utility sinifləri onu üstələyə bilsin — laysız
+  yazılsa `font-sans`/`leading-*` başlıqda səssizcə işləmir. Admin paneldə h1–h4
+  `admin-surface` ilə sans-dır; admin başlıqlarında `font-display` işlətmə (test qoruyur).
 - Tailwind v4 px vahidli arbitrary breakpoint-i (`min-[1360px]:`) rem əsaslı `sm:`/`lg:`-dən
   əvvəl sıralayır və o, səssizcə üstələnir — `min-[85rem]:` kimi rem işlət.
 

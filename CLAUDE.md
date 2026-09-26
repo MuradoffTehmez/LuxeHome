@@ -136,6 +136,9 @@ hesab köməkçi endpoint-ləri üçündür.
 **D1 binding yalnız sorğu kontekstində əlçatandır.** Buna görə:
 
 - `src/lib/prisma.ts` klienti Proxy arxasında lazy qurur (`getCloudflareContext().env.DB`).
+  **Klient sorğu başına yaradılır** (OpenNext `ctx`-i açarı ilə `WeakMap`). İzolyat boyu
+  paylaşılan klient yarımçıq kəsilmiş sorğuda ilişəndə sonrakı bütün sorğular workerd
+  tərəfindən «hung» kimi 500-ə çevrilirdi (#96) — modul səviyyəsində klient/promise saxlama.
   Modul səviyyəsində `new PrismaClient()` yazmaq olmaz — build zamanı çökür.
 - Prisma klienti `@prisma/client/wasm.js`-dən idxal olunur. Sadəcə `@prisma/client` yazılsa,
   esbuild `node` şərtini seçir və Workers-də mövcud olmayan binary engine-i yükləməyə çalışır.
@@ -275,7 +278,9 @@ qradiyent/modal fonu üçün sabit `black/<opacity>` işlət.
   üstələyirdi, ona görə yeni komponent sinfini də oraya yaz.
 - Serif (Playfair) yalnız səhifə/bölmə başlıqlarındadır: qlobal qayda h3/h4-ü sans edir.
   Kiçik **h2** başlığa `font-sans` açıq yazılmalıdır, çünki h1/h2 qlobal olaraq serif-dir.
-  Admin paneldə h1/h2 `admin-surface` sinfi ilə sans-dır.
+  Başlıq bazası `@layer base`-dədir ki, utility sinifləri onu üstələyə bilsin — laysız
+  yazılsa `font-sans`/`leading-*` başlıqda səssizcə işləmir. Admin paneldə h1–h4
+  `admin-surface` ilə sans-dır; admin başlıqlarında `font-display` işlətmə (test qoruyur).
 - Tailwind v4 px vahidli arbitrary breakpoint-i (`min-[1360px]:`) rem əsaslı `sm:`/`lg:`-dən
   əvvəl sıralayır və o, səssizcə üstələnir — `min-[85rem]:` kimi rem işlət.
 
