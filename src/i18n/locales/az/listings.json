@@ -63,7 +63,14 @@
     "noFilters": "Filtr seçilməyib — bütün elanlar göstərilir.",
     "emptyTitle": "Bu kriteriyalara uyğun əmlak tapılmadı",
     "emptyDescription": "Axtarış şərtlərini genişləndirin və ya filtrləri sıfırlayaraq yenidən cəhd edin.",
-    "viewAll": "Bütün əmlaklara bax"
+    "viewAll": "Bütün əmlaklara bax",
+    "removeFilter": "«{filter}» filtrini çıxarın",
+    "widenMax": "Maksimum qiyməti {price} ₼-ə qaldırın",
+    "suggestionsTitle": "Bu dəyişikliklərlə nəticə var:",
+    "suggestionCount": "{count, plural, other {# elan}}",
+    "assistTitle": "Sizin üçün biz axtaraq",
+    "assistDescription": "Hər elan saytda dərc olunmur. Kriteriyalarınızı yazın — mütəxəssisimiz bazadan və tərəfdaşlarımızdan uyğun variantları seçib sizə göndərsin.",
+    "assistCta": "Fərdi seçim istəyin"
   },
   "blogPage": {
     "metaTitle": "Daşınmaz əmlak bloqu",

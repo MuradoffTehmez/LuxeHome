@@ -12,7 +12,8 @@ export type IntegrationHealthId =
   | "geocoding"
   | "turnstile"
   | "savedSearchCron"
-  | "push";
+  | "push"
+  | "telegram";
 
 export type IntegrationHealthItem = {
   id: IntegrationHealthId;
@@ -75,6 +76,8 @@ export function getIntegrationHealth(): IntegrationHealthItem[] {
       ],
     },
     envHealth("savedSearchCron", ["CRON_SECRET"]),
+    // Lead bildirişi üçün ofis Telegram çatı (#103) — olmasa e-poçt bildirişi qalır.
+    envHealth("telegram", ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"], true),
     {
       id: "push",
       ready: hasVapidPublicKey && hasVapidPrivateKey && hasVapidSubject,

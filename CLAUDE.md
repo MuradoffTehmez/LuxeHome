@@ -364,12 +364,30 @@ Qaydalar:
 
 Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 
+### Toplu idxal və sayt şəkilləri
+
+- `/admin/emlaklar/idxal` CSV-dən elan yaradır (#103). Hər sətir `propertySchema`-dan keçir,
+  taksonomiya slug və ya adla (diakritiksiz) tapılır, elan **həmişə DRAFT** yaranır.
+  `commitPropertyImport` sətirləri `IMPORT_BATCH_SIZE` (10) partiya ilə işləyir — şəkillər
+  kənar linkdən yüklənib `putImage()` ilə R2-yə yazılır və Worker subrequest limitinə sığmalıdır.
+  Eyni başlıq + şəhər + qiymət «dublikat» sayılır, ona görə yarımçıq idxal təkrar işlədilə bilər.
+- Ana səhifənin hero/«Haqqımızda»/CTA fotoları `site.image_*` parametrlərindədir
+  (`Parametrlər → Saytın şəkilləri`, `getSiteImages()`). Yalnız `/media/...` qəbul olunur;
+  boşdursa stok foto göstərilir. Koda yeni sabit Unsplash linki yazma.
+- Ana səhifə vitrini `getHomeShowcaseProperties()`-dir: seçilmişlər, çatmayan yer son elanlarla.
+  Vitrində 3-dən az elan olanda sahib müraciəti bloku (`OwnerLeadBanner`) çıxır; boş kateqoriya
+  «0 elan» yazmır.
+
 ### Əmlak filtrləri
 
 URL query parametrləri filtr vəziyyətinin yeganə mənbəyidir. `SearchPanel` göndərdiyi adlarla
 `emlaklar/page.tsx` oxuduğu adlar **eyni olmalıdır**: `elan`, `axtaris`, `tip`, `seher`, `rayon`,
 `otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `siralama`, `sehife`.
 `elan` dəyəri `LISTING_TYPES` sabitindən gəlir (`SALE` / `RENT`) — azərbaycanca mətn deyil.
+
+Boş nəticədə `EmptySearchSuggestions` hər aktiv çipi çıxaranda neçə elan qaldığını göstərir
+(`search-relaxation.ts`; çip açarı → `PropertyFilters` sahəsi). Yeni filtr əlavə edəndə
+`CHIP_FIELDS`-ə də yaz, əks halda təklif siyahısında görünməz.
 
 `SearchPanel` cari vəziyyəti `useSearchParams` ilə deyil, server komponentindən gələn `initial`
 propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
@@ -385,6 +403,12 @@ propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
 - `siteUrl(path)` — production-da sabit canonical hostu, staging/lokal mühitdə isə `SITE_URL`
   dəyərini istifadə edir. Dəyər həm build, həm request vaxtında işlənə bildiyi üçün staging və
   production bundle-ları ayrı qurulur.
+
+**Elan paylaşım kartı** (`/api/og/property/[slug]?l=az`, #103): foto + qiymət + yer ilə
+1200×630 OG şəkli. Media WebP-dir, satori isə WebP-ni etibarlı oxumur — foto `IMAGES` ilə
+JPEG-ə çevrilib data URI kimi yerləşir, nəticə də JPEG-ə çevrilir (PNG ~800 KB olur,
+WhatsApp ~300 KB-dan böyük önizləməni göstərmir). OG şrifti (Geist) «₼» daşımır — valyuta
+kodu `formatOgPrice()` ilə yazılır. Marşrut `/api` altındadır ki, locale middleware-i keçməsin.
 
 `app/sitemap.ts` `getSitemapEntries()`-i çağırır və `force-dynamic`-dir (D1-dən oxuyur).
 `app/robots.ts` `/admin`, `/giris` və `/favoritler` marşrutlarını indeksdən kənarlaşdırır.
@@ -539,8 +563,12 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   mənbələrinə icazə verir. Yeni mənbə əlavə edilərsə bu siyahı yenilənməlidir.
 - `next/image` optimizasiyası Cloudflare `IMAGES` binding-i üzərindən gedir (`wrangler.jsonc`).
 - Gizli dəyərlər `.env`-də deyil, Cloudflare secret-lərindədir:
-  `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`.
-  Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
+  `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`,
+  `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
+- **Telegram lead bildirişi** (`src/lib/telegram.ts`, #103): əlaqə müraciəti və baxış
+  sorğusu ofis çatına gedir. Secret yoxdursa səssizcə buraxılır, `notifyLeadOnTelegram()`
+  heç vaxt atmır — müraciət artıq yazılıb, bildiriş xətası onu uğursuz göstərməməlidir.
+  Ziyarətçi mətni `escapeHtml()`-dən keçir (HTML `parse_mode`). Hazırlıq `/admin/sistem`-də görünür.
 - `process.env` Workers-də yalnız sorğu kontekstində doludur. Modul səviyyəsində oxunan
   konfiqurasiya boş qalır — `src/lib/email.ts`-dəki kimi lazy funksiya işlət.
 - `outputFileTracingRoot: import.meta.dirname` qəsdən qoyulub — yuxarı qovluqdakı lockfile-ın

@@ -3,6 +3,7 @@ import { ArrowRight, ChevronDown, Phone, Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
 import { buttonClassName } from "@/components/ui/button";
+import { isUnoptimizedImage } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { LISTING_TYPES, type Locale } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,8 @@ export type HeroLabels = {
 };
 
 type HeroProps = {
+  /** Fon şəkli — paneldən dəyişdirilir (`site.image_hero`). */
+  imageUrl: string;
   types: HeroTypeOption[];
   cities: HeroCityOption[];
   locale: Locale;
@@ -149,13 +152,14 @@ export function heroTitleClassName(locale: Locale): string {
 }
 
 /** Ana səhifənin hero bölməsi — LCP elementi burada yerləşir. */
-export function Hero({ types, cities, locale, labels }: HeroProps) {
+export function Hero({ imageUrl, types, cities, locale, labels }: HeroProps) {
   return (
     <section className="on-dark relative isolate -mt-[var(--header-h)]" data-locale={locale}>
       {/* Fon şəkli — hero başlığın altında fixed header-in arxasına uzanır */}
       <div className="absolute inset-0 -z-10">
         <Image
-          src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2048&q=75"
+          src={imageUrl}
+          unoptimized={isUnoptimizedImage(imageUrl)}
           alt={labels.imageAlt}
           fill
           priority

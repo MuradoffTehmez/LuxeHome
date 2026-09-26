@@ -11,6 +11,7 @@ import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { sendPushToUser } from "@/lib/push";
+import { notifyLeadOnTelegram } from "@/lib/telegram";
 
 const reservationSchema = z.object({
   propertyId: z.string().min(1),
@@ -132,6 +133,18 @@ export async function createReservation(
         await sendPushToUser(property.assignedAgent.userId, { title: "Yeni rezervasiya sorğusu", body: property.title, url: "/admin/rezervasiyalar", tag: `reservation-${reservation.id}` });
       }
     }
+
+    // Ofis çatına bildiriş — göndərilməsə də sorğu artıq yazılıb (#103).
+    await notifyLeadOnTelegram({
+      kind: "reservation",
+      id: reservation.id,
+      name: `${parsed.data.firstName} ${parsed.data.lastName}`.trim(),
+      phone: parsed.data.phone,
+      email: parsed.data.email,
+      message: parsed.data.message || null,
+      propertyTitle: property.title,
+      requestedFor: parsed.data.requestedFor,
+    });
 
     const requesterPreference = await prisma.notificationPreference.findUnique({
       where: { userId: user.id },

@@ -7,7 +7,8 @@ import { Container, Section } from "@/components/ui/container";
 import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
 import { ResponsiveToolbar } from "@/components/ui/responsive-toolbar";
 import { SectionHeader } from "@/components/ui/section-header";
-import { EmptyState } from "@/components/ui/states";
+import { EmptySearchSuggestions } from "@/components/site/empty-search-suggestions";
+import { MAX_RELAXATIONS, rankSuggestions, relaxFilters, widenedMaxPrice, type RelaxationSuggestion } from "@/lib/search-relaxation";
 import { Reveal } from "@/components/ui/reveal";
 import { PropertyCard } from "@/components/site/property-card";
 import { PropertyFilterSheet } from "@/components/site/property-filter-sheet";
@@ -19,7 +20,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { buildManagedMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { classifyPropertySearchParams } from "@/lib/seo-indexing";
 import { routing } from "@/i18n/routing";
-import { getCachedFilterOptions, getCachedProperties, getCachedPropertiesForMap } from "@/lib/public-cache";
+import { getCachedFilterOptions, getCachedProperties, getCachedPropertiesForMap, getCachedPropertyCount } from "@/lib/public-cache";
 import {
   buildActivePropertyFilters,
   buildPropertySearchHref,
@@ -252,7 +253,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
         return labels[raw.temir] ?? fallback;
       }
       if (key === "sened" && raw.sened) {
-        const labels: Record<string, string> = { TITLE_DEED: propertyT("document.titleDeed"), CONTRACT: propertyT("document.contract"), MUNICIPAL: propertyT("document.municipal"), DECREE: propertyT("document.decree"), POWER_OF_ATTORNEY: propertyT("document.powerOfAttorney"), COMMERCIAL_EXTRACT: propertyT("document.commercialExtract"), NONE: propertyT("document.none") };
+        const labels: Record<string, string> = { TITLE_DEED: propertyT("document.titleDeed"), CONTRACT: propertyT("document.contract"), MUNICIPAL: propertyT("document.municipal"), DECREE: propertyT("document.decree"), POWER_OF_ATTORNEY: propertyT("document.powerOfAttorney"), EXTRACT_COMMERCIAL: propertyT("document.commercialExtract"), NONE: propertyT("document.none") };
         return labels[raw.sened] ?? fallback;
       }
       if (key === "tikili" && raw.tikili) return raw.tikili === "NEW" ? propertyT("building.new") : propertyT("building.old");
@@ -267,6 +268,30 @@ export default async function PropertiesPage({ params: routeParams, searchParams
       return fallback;
     },
   });
+
+  // Boş nəticədə «filtri çıxar — N elan» təklifləri (#103). Sorğular yalnız boş
+  // səhifədə və ən çox MAX_RELAXATIONS dəfə işləyir.
+  let relaxations: RelaxationSuggestion[] = [];
+  if (!isMapView && total === 0) {
+    const candidates = activeFilters.filter((chip) => chip.key !== "siralama").slice(0, MAX_RELAXATIONS);
+    const counted = await Promise.all(
+      candidates.map(async (chip) => {
+        const relaxed = relaxFilters(filters, chip.key);
+        if (!relaxed) return null;
+        return { key: chip.key, label: t("propertiesPage.removeFilter", { filter: chip.label }), href: chip.href, count: await getCachedPropertyCount(relaxed) };
+      }),
+    );
+    if (filters.maxPrice) {
+      const widened = widenedMaxPrice(filters.maxPrice);
+      counted.push({
+        key: "max-widen",
+        label: t("propertiesPage.widenMax", { price: String(widened).replace(/\B(?=(\d{3})+(?!\d))/g, " ") }),
+        href: buildHref({ max: widened }),
+        count: await getCachedPropertyCount({ ...filters, maxPrice: widened, page: 1 }),
+      });
+    }
+    relaxations = rankSuggestions(counted.filter((item): item is RelaxationSuggestion => item !== null));
+  }
 
   const mapPoints = (mapResult?.items ?? [])
     .filter((item) => item.latitude != null && item.longitude != null)
@@ -438,10 +463,19 @@ export default async function PropertiesPage({ params: routeParams, searchParams
               />
             </>
           ) : (
-            <EmptyState
-              title={t("propertiesPage.emptyTitle")}
-              description={t("propertiesPage.emptyDescription")}
-              action={{ label: t("propertiesPage.viewAll"), href: "/emlaklar" }}
+            <EmptySearchSuggestions
+              suggestions={relaxations}
+              saveSearch={activeFilters.length > 0 ? <SaveSearchSlot filters={saveableFilters} /> : null}
+              labels={{
+                title: t("propertiesPage.emptyTitle"),
+                description: t("propertiesPage.emptyDescription"),
+                suggestionsTitle: t("propertiesPage.suggestionsTitle"),
+                suggestionCount: (count) => t("propertiesPage.suggestionCount", { count }),
+                assistTitle: t("propertiesPage.assistTitle"),
+                assistDescription: t("propertiesPage.assistDescription"),
+                assistCta: t("propertiesPage.assistCta"),
+                viewAll: t("propertiesPage.viewAll"),
+              }}
             />
           )}
           </div>

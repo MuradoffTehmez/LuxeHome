@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { BedDouble, Building2, Crown, Layers, Maximize, MapPin } from "lucide-react";
+import { BedDouble, Building2, Camera, Crown, Layers, Maximize, MapPin, Sparkles, TrendingDown } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
   LISTING_TYPES,
@@ -50,6 +50,32 @@ function cardImageSrc(
   if (preferFullSize) return image.url;
   return image.thumbUrl || image.url;
 }
+const DAY_MS = 24 * 60 * 60 * 1000;
+/** «Yeni» nişanı dərcdən sonra bu qədər gün görünür. */
+const NEW_BADGE_DAYS = 3;
+/** «Qiymət endi» nişanı son endirimdən sonra bu qədər gün görünür. */
+const PRICE_DROP_BADGE_DAYS = 30;
+
+type CardSignals = { isNew: boolean; dropPercent: number | null; photoCount: number };
+
+/**
+ * Kart siqnalları. Endirim yalnız son dəyişiklik azalmadırsa və cari qiymət ona
+ * bərabərdirsə göstərilir — sonradan qalxan qiymət köhnə «endi» nişanını daşımamalıdır.
+ */
+export function cardSignals(property: Pick<PropertyCardData, "publishedAt" | "price" | "priceHistory" | "_count">, now = Date.now()): CardSignals {
+  const published = property.publishedAt ? new Date(property.publishedAt).getTime() : null;
+  const isNew = published != null && now - published >= 0 && now - published < NEW_BADGE_DAYS * DAY_MS;
+  const last = property.priceHistory?.[0];
+  const dropPercent =
+    last &&
+    last.newPrice < last.oldPrice &&
+    last.newPrice === property.price &&
+    now - new Date(last.changedAt).getTime() < PRICE_DROP_BADGE_DAYS * DAY_MS
+      ? Math.max(1, Math.round(((last.oldPrice - last.newPrice) / last.oldPrice) * 100))
+      : null;
+  return { isNew, dropPercent, photoCount: property._count?.images ?? 0 };
+}
+
 export function PropertyCard({
   property: sourceProperty,
   priority = false,
@@ -73,6 +99,8 @@ export function PropertyCard({
   const isClosed =
     status === PROPERTY_STATUSES.SOLD || status === PROPERTY_STATUSES.RENTED;
   const isPremium = property.isFeatured && (!property.featuredUntil || new Date(property.featuredUntil).getTime() >= Date.now());
+
+  const signals = cardSignals(sourceProperty);
 
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
@@ -135,7 +163,21 @@ export function PropertyCard({
           {status === PROPERTY_STATUSES.RESERVED && (
             <Badge tone="warning">{t(`status.${STATUS_KEYS[status]}`)}</Badge>
           )}
+          {!isClosed && signals.dropPercent != null && (
+            <Badge tone="success"><TrendingDown className="size-3" aria-hidden="true" />{t("signals.priceDrop", { percent: signals.dropPercent })}</Badge>
+          )}
+          {!isClosed && signals.isNew && (
+            <Badge tone="info"><Sparkles className="size-3" aria-hidden="true" />{t("signals.new")}</Badge>
+          )}
         </div>
+
+        {signals.photoCount > 1 && (
+          <span className="on-image-chip pointer-events-none absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular">
+            <Camera className="size-3.5" aria-hidden="true" />
+            {signals.photoCount}
+            <span className="sr-only">{t("signals.photos", { count: signals.photoCount })}</span>
+          </span>
+        )}
 
         {/* z-10 düymələri kartın tam-səth linkindən yuxarı saxlayır. */}
         <div className="absolute top-2 right-2 z-10 flex gap-1.5">
@@ -153,7 +195,7 @@ export function PropertyCard({
             {number(property.price)} {currency}
             {period && (
               <span className="ml-1 text-sm font-normal text-ink-muted">
-                / {period}
+                {period}
               </span>
             )}
           </p>

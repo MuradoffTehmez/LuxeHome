@@ -5,9 +5,9 @@ import { MapPin, Phone, Mail } from "lucide-react";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
-import { InstagramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
+import { GoogleIcon, InstagramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
 import { buildManagedMetadata } from "@/lib/seo";
-import { siteConfig } from "@/config/site";
+import { googleBusinessProfileUrl, siteConfig } from "@/config/site";
 import { getOperationalSiteConfig } from "@/lib/settings";
 import { PlaceMap } from "@/components/map/place-map";
 import { ContactForm } from "./contact-form";
@@ -38,6 +38,7 @@ export default async function ContactPage({ params }: PageProps) {
     { icon: Mail, label: t("email"), value: operational.email, href: `mailto:${operational.email}` },
     { icon: MapPin, label: t("address"), value: operational.addressFull, href: undefined },
     { icon: InstagramIcon, label: "Instagram", value: `@${operational.instagram}`, href: operational.instagramUrl },
+    { icon: GoogleIcon, label: t("googleProfile"), value: t("googleProfileValue"), href: googleBusinessProfileUrl },
   ];
   return (
     <>

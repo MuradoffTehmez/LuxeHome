@@ -43,6 +43,14 @@ export const SETTING_KEYS = {
    */
   PROJECTS_SECTION_ENABLED: "site.projects_enabled",
   /**
+   * Saytın brend şəkilləri (#103) — hero, «Haqqımızda» bloku və son CTA. Boşdursa
+   * `SITE_IMAGE_DEFAULTS`-dakı stok foto göstərilir; şirkət öz fotolarını paneldən
+   * yükləyəndə kod dəyişmədən əvəzlənir.
+   */
+  SITE_IMAGE_HERO: "site.image_hero",
+  SITE_IMAGE_ABOUT: "site.image_about",
+  SITE_IMAGE_CTA: "site.image_cta",
+  /**
    * Sistem rejimi (`NORMAL` | `MAINTENANCE` | `READ_ONLY`) və texniki xidmət
    * səhifəsinin mətnləri — **tək JSON dəyər**.
    *
@@ -128,4 +136,33 @@ export async function setSettings(entries: Record<string, string>): Promise<void
       update: { value },
     });
   }
+}
+
+/** Stok fotolar — yalnız panel şəkli təyin olunmayanda göstərilir. */
+export const SITE_IMAGE_DEFAULTS = {
+  hero: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2048&q=75",
+  about: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80",
+  cta: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=2000&q=80",
+} as const;
+
+export type SiteImages = Record<keyof typeof SITE_IMAGE_DEFAULTS, string>;
+
+/** Yalnız öz media anbarımızdakı fayl qəbul edilir — parametrə kənar URL düşməsin. */
+function mediaUrl(value: string | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed && /^\/media\/[a-z0-9/_-]+\.(jpg|png|webp|avif)$/i.test(trimmed) ? trimmed : null;
+}
+
+export async function getSiteImages(): Promise<SiteImages> {
+  let settings: Record<string, string> = {};
+  try {
+    settings = await getAllSettings();
+  } catch {
+    // Parametr oxunmasa sayt stok fotolarla açılır.
+  }
+  return {
+    hero: mediaUrl(settings[SETTING_KEYS.SITE_IMAGE_HERO]) ?? SITE_IMAGE_DEFAULTS.hero,
+    about: mediaUrl(settings[SETTING_KEYS.SITE_IMAGE_ABOUT]) ?? SITE_IMAGE_DEFAULTS.about,
+    cta: mediaUrl(settings[SETTING_KEYS.SITE_IMAGE_CTA]) ?? SITE_IMAGE_DEFAULTS.cta,
+  };
 }

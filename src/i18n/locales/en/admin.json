@@ -993,7 +993,16 @@
         "projectsHidden": "The residential complexes section is now hidden from the site."
       },
       "legalInfoHint": "The legal name, tax ID, brand owner and navigation structure are protected in code. You can change the phone, email, address and social links in the form on the left.",
-      "secretsHint": "Secrets (Resend key, session secret) live in Cloudflare secrets and are never stored in the database."
+      "secretsHint": "Secrets (Resend key, session secret) live in Cloudflare secrets and are never stored in the database.",
+      "siteImages": {
+        "title": "Site images",
+        "description": "Main photos of the home page. Empty fields show a temporary stock photo — upload the company's own photos.",
+        "hero": "Home page hero photo and sign-in page",
+        "about": "“About us” block",
+        "cta": "Enquiry block at the end of the page",
+        "hint": "A landscape photo at least 1600 px wide is recommended.",
+        "save": "Save images"
+      }
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA backup codes — shown once",
@@ -2250,7 +2259,83 @@
       "integrationGeocoding": "Address and maps",
       "integrationTurnstile": "Turnstile bot protection",
       "integrationSavedSearchCron": "Saved-search cron",
+      "integrationTelegram": "Telegram lead alerts",
       "integrationPush": "Push notifications"
+    },
+    "propertyImport": {
+      "title": "Bulk CSV import",
+      "listButton": "CSV import",
+      "description": "Add listings from an Excel/CSV file at once. All are created as drafts — review and publish them.",
+      "step1": "1. Download the template",
+      "step1Help": "The template has one sample row. Fill it in Excel and save as “CSV UTF-8”; comma and semicolon separators are detected automatically.",
+      "downloadTemplate": "CSV template",
+      "columnsTitle": "Columns and accepted values",
+      "column": "Column",
+      "requiredLabel": "Required",
+      "columnHelp": "Value",
+      "yes": "Yes",
+      "step2": "2. Choose the file",
+      "step2Help": "Up to 500 rows. The file is checked first; nothing is written.",
+      "chooseFile": "Choose CSV file",
+      "checking": "Checking the file…",
+      "step3": "3. Check result",
+      "summary": "{total} rows: {valid} ready, {invalid} with errors",
+      "importButton": "{count, plural, one {Import # listing as draft} other {Import # listings as drafts}}",
+      "progress": "{done} / {total} rows processed",
+      "resultCreated": "{count, plural, one {# listing created} other {# listings created}}",
+      "resultDuplicates": "{count, plural, one {# duplicate skipped} other {# duplicates skipped}}",
+      "resultFailed": "{count, plural, one {# row failed} other {# rows failed}}",
+      "resultImagesFailed": "{count, plural, one {# image not downloaded} other {# images not downloaded}}",
+      "openDrafts": "Open drafts",
+      "line": "Row",
+      "titleColumn": "Title",
+      "images": "Images",
+      "state": "State",
+      "ready": "Ready",
+      "status": {
+        "created": "Created",
+        "duplicate": "Already exists",
+        "invalid": "Invalid",
+        "failed": "Could not be created"
+      },
+      "issues": {
+        "missingColumn": "Column “{field}” is missing",
+        "empty": "The file is empty",
+        "tooManyRows": "The file has more than {value} rows",
+        "invalidValue": "“{field}”: value “{value}” not recognised",
+        "invalidNumber": "“{field}”: “{value}” is not a number",
+        "notFound": "“{field}”: “{value}” not found",
+        "tooManyImages": "Too many images ({value})",
+        "invalidImageUrl": "Image link must start with https://: {value}",
+        "duplicate": "A listing with this title, city and price already exists",
+        "schema": "“{field}”"
+      },
+      "columns": {
+        "title": "Title (5–160 characters)",
+        "description": "Description (at least 20 characters)",
+        "listing_type": "SALE / RENT",
+        "price": "Price: 185000, 185 000 or 185,000",
+        "currency": "AZN (default), USD, EUR",
+        "price_period": "For rent: MONTH/DAY (monthly if empty)",
+        "type": "Property type slug or name (e.g. menziller)",
+        "city": "City/region name or slug (e.g. Bakı)",
+        "district": "District, settlement or neighbourhood inside the city",
+        "metro": "Metro station name",
+        "address": "Address",
+        "rooms": "Number of rooms",
+        "area": "Area, m²",
+        "land_area": "Land area, sot",
+        "floor": "Floor",
+        "total_floors": "Number of floors in the building",
+        "renovation": "Code (RENOVATED …) or label",
+        "document": "Code (TITLE_DEED …) or label",
+        "building_type": "NEW / OLD",
+        "latitude": "Latitude (e.g. 40.4093)",
+        "longitude": "Longitude (e.g. 49.8671)",
+        "video_url": "YouTube or video link",
+        "features": "Feature slugs or names separated by «|»",
+        "images": "https:// image links separated by «|» (max 12) — copied to R2"
+      }
     }
   },
   "server": {
@@ -2563,6 +2648,10 @@
       "minImages": "At least {count} images are required to publish.",
       "titleRoomsMismatch": "The {titleRooms} rooms stated in the title do not match the form value ({rooms}).",
       "strongDuplicate": "This listing is a strong duplicate of “{title}”. Update the existing record or decide on canonical/merge."
+    },
+    "propertyImport": {
+      "fileTooLarge": "The file is larger than 900 KB — split it into several parts.",
+      "invalidFile": "The file header row is invalid."
     }
   }
 }

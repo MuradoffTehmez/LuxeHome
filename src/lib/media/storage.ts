@@ -167,7 +167,8 @@ export function uploadFailureStatus(reason: UploadFailureReason): 400 | 413 | 50
 
 function safeSeoName(value: string | null | undefined): string | null {
   if (!value) return null;
-  const normalized = value.toLocaleLowerCase("az-AZ").normalize("NFKD")
+  // «ə» və «ı» NFKD ilə parçalanmır — əvvəlcə transliterasiya olunur, yoxsa itərdi.
+  const normalized = value.toLocaleLowerCase("az-AZ").replace(/ə/g, "e").replace(/ı/g, "i").normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9-]+/g, "-")
     .replace(/-{2,}/g, "-").replace(/^-|-$/g, "").slice(0, 150);
   return normalized || null;

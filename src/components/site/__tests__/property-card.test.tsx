@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ToastProvider } from "@/components/ui/toast";
 import { PropertyCardSkeleton } from "@/components/ui/states";
 import type { PropertyCardData } from "@/lib/queries";
-import { PropertyCard } from "../property-card";
+import { PropertyCard, cardSignals } from "../property-card";
 
 const property = {
   id: "property-1",
@@ -27,6 +27,8 @@ const property = {
   city: { name: "Bakı", slug: "baki" },
   district: { name: "Səbail", slug: "sebail" },
   images: [],
+  _count: { images: 0 },
+  priceHistory: [],
 } as PropertyCardData;
 
 describe("PropertyCard", () => {
@@ -117,5 +119,36 @@ describe("PropertyCard — şəkil çatdırılması", () => {
     );
 
     expect(html).toContain("master.webp");
+  });
+});
+
+describe("cardSignals", () => {
+  const now = new Date("2026-09-27T12:00:00Z").getTime();
+  const day = 24 * 60 * 60 * 1000;
+
+  it("3 gündən təzə elanı «Yeni» sayır, köhnəni saymır", () => {
+    expect(cardSignals({ ...property, publishedAt: new Date(now - day) }, now).isNew).toBe(true);
+    expect(cardSignals({ ...property, publishedAt: new Date(now - 4 * day) }, now).isNew).toBe(false);
+  });
+
+  it("endirimi yalnız son dəyişiklik azalmadırsa və cari qiymətə bərabərdirsə göstərir", () => {
+    const drop = { oldPrice: 400000, newPrice: 350000, changedAt: new Date(now - 2 * day) };
+    expect(cardSignals({ ...property, priceHistory: [drop] }, now).dropPercent).toBe(13);
+    // Sonradan qiymət yenə dəyişib — köhnə endirim göstərilmir.
+    expect(cardSignals({ ...property, price: 360000, priceHistory: [drop] }, now).dropPercent).toBeNull();
+    // Artım endirim deyil.
+    expect(cardSignals({ ...property, priceHistory: [{ ...drop, oldPrice: 300000 }] }, now).dropPercent).toBeNull();
+    // 30 gündən köhnə endirim.
+    expect(cardSignals({ ...property, priceHistory: [{ ...drop, changedAt: new Date(now - 31 * day) }] }, now).dropPercent).toBeNull();
+  });
+
+  it("foto sayını qaytarır və 1-dən çox olanda kartda göstərir", () => {
+    const html = renderToStaticMarkup(
+      <ToastProvider>
+        <PropertyCard property={{ ...property, _count: { images: 7 } }} />
+      </ToastProvider>,
+    );
+    expect(cardSignals({ ...property, _count: { images: 7 } }, now).photoCount).toBe(7);
+    expect(html).toContain(">7<");
   });
 });

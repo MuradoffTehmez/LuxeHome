@@ -198,6 +198,12 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
   şəkillər oradandır. Yeni xarici şəkil mənbəyi əlavə edilərsə bu siyahı yenilənməlidir.
 - `outputFileTracingRoot: import.meta.dirname` qəsdən qoyulub — yuxarı qovluqdakı lockfile-ın
   səhvən workspace kökü kimi seçilməsinin qarşısını alır. Silinməməlidir.
+- Yol xəritəsi 1-ci mərhələ (#103) modulları: Telegram lead bildirişi (`src/lib/telegram.ts`,
+  secret-lər `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`, heç vaxt atmır), elan OG kartı
+  (`/api/og/property/[slug]`, WebP → JPEG `IMAGES` ilə), CSV idxalı (`/admin/emlaklar/idxal`,
+  həmişə DRAFT, 10 sətirlik partiya), sayt şəkilləri (`site.image_*`, yalnız `/media/...`) və
+  boş axtarış təklifləri (`search-relaxation.ts` — yeni filtr `CHIP_FIELDS`-ə də yazılmalıdır).
+  Ətraflı qaydalar `CLAUDE.md`-dədir.
 
 ## Digər agent konfiqurasiyaları
 

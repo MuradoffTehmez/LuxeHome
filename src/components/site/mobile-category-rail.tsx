@@ -57,9 +57,11 @@ export function MobileCategoryRail({ items }: MobileCategoryRailProps) {
             <span className="relative mt-auto flex w-full items-end justify-between gap-3 p-5">
               <span>
                 <span className="block text-lg font-semibold text-white">{item.label}</span>
-                <span className="tabular mt-1 block text-sm text-white/75">
-                  {propertyT("listingCount", { count: item.count })}
-                </span>
+                {item.count > 0 ? (
+                  <span className="tabular mt-1 block text-sm text-white/75">
+                    {propertyT("listingCount", { count: item.count })}
+                  </span>
+                ) : null}
               </span>
               <ArrowUpRight className="size-5 shrink-0 text-gold-soft" aria-hidden="true" />
             </span>

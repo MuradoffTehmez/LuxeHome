@@ -993,7 +993,16 @@
         "projectsHidden": "Yaşayış kompleksləri bölməsi saytdan gizlədildi."
       },
       "legalInfoHint": "Hüquqi ad, VÖEN, brend sahibi və naviqasiya strukturu kodda qorunur. Telefon, e-poçt, ünvan və sosial əlaqələri isə soldakı formadan dəyişə bilərsiniz.",
-      "secretsHint": "Gizli dəyərlər (Resend açarı, sessiya sirri) Cloudflare secret-lərindədir və heç vaxt bazada saxlanılmır."
+      "secretsHint": "Gizli dəyərlər (Resend açarı, sessiya sirri) Cloudflare secret-lərindədir və heç vaxt bazada saxlanılmır.",
+      "siteImages": {
+        "title": "Saytın şəkilləri",
+        "description": "Ana səhifənin əsas fotoları. Boş qalan sahədə müvəqqəti stok foto göstərilir — şirkətin öz fotolarını yükləyin.",
+        "hero": "Ana səhifənin başlıq fotosu (hero) və giriş səhifəsi",
+        "about": "«Haqqımızda» bloku",
+        "cta": "Səhifənin sonundakı müraciət bloku",
+        "hint": "Üfüqi, ən azı 1600 px enində foto tövsiyə olunur.",
+        "save": "Şəkilləri saxla"
+      }
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA ehtiyat kodları — bir dəfə göstərilir",
@@ -2250,7 +2259,83 @@
       "integrationGeocoding": "Ünvan və xəritə",
       "integrationTurnstile": "Turnstile bot müdafiəsi",
       "integrationSavedSearchCron": "Saxlanmış axtarış cron-u",
+      "integrationTelegram": "Telegram lead bildirişi",
       "integrationPush": "Push bildirişləri"
+    },
+    "propertyImport": {
+      "title": "CSV ilə toplu idxal",
+      "listButton": "CSV idxal",
+      "description": "Elanları Excel/CSV faylından bir dəfəyə əlavə edin. Hamısı qaralama kimi yaranır — yoxlayıb dərc edirsiniz.",
+      "step1": "1. Şablonu yükləyin",
+      "step1Help": "Şablonda bir nümunə sətir var. Excel-də doldurub «CSV UTF-8» kimi saxlayın; vergül və nöqtəli vergül ayırıcısı avtomatik tanınır.",
+      "downloadTemplate": "CSV şablonu",
+      "columnsTitle": "Sütunlar və qəbul edilən dəyərlər",
+      "column": "Sütun",
+      "requiredLabel": "Məcburi",
+      "columnHelp": "Dəyər",
+      "yes": "Bəli",
+      "step2": "2. Faylı seçin",
+      "step2Help": "Ən çox 500 sətir. Əvvəlcə yoxlama aparılır, heç nə yazılmır.",
+      "chooseFile": "CSV faylı seç",
+      "checking": "Fayl yoxlanılır…",
+      "step3": "3. Yoxlama nəticəsi",
+      "summary": "{total} sətir: {valid} hazır, {invalid} xətalı",
+      "importButton": "{count, plural, other {# elanı qaralama kimi idxal et}}",
+      "progress": "{done} / {total} sətir işləndi",
+      "resultCreated": "{count, plural, other {# elan yaradıldı}}",
+      "resultDuplicates": "{count, plural, other {# dublikat buraxıldı}}",
+      "resultFailed": "{count, plural, other {# sətir alınmadı}}",
+      "resultImagesFailed": "{count, plural, other {# şəkil yüklənmədi}}",
+      "openDrafts": "Qaralamalara bax",
+      "line": "Sətir",
+      "titleColumn": "Başlıq",
+      "images": "Şəkil",
+      "state": "Vəziyyət",
+      "ready": "Hazırdır",
+      "status": {
+        "created": "Yaradıldı",
+        "duplicate": "Artıq mövcuddur",
+        "invalid": "Xətalı",
+        "failed": "Yaradıla bilmədi"
+      },
+      "issues": {
+        "missingColumn": "«{field}» sütunu yoxdur",
+        "empty": "Fayl boşdur",
+        "tooManyRows": "Faylda {value}-dən çox sətir var",
+        "invalidValue": "«{field}»: «{value}» dəyəri tanınmadı",
+        "invalidNumber": "«{field}»: «{value}» ədəd deyil",
+        "notFound": "«{field}»: «{value}» tapılmadı",
+        "tooManyImages": "Şəkil çoxdur ({value})",
+        "invalidImageUrl": "Şəkil linki https:// ilə başlamalıdır: {value}",
+        "duplicate": "Bu başlıq, şəhər və qiymətlə elan artıq var",
+        "schema": "«{field}»"
+      },
+      "columns": {
+        "title": "Başlıq (5–160 simvol)",
+        "description": "Təsvir (ən azı 20 simvol)",
+        "listing_type": "SALE / RENT və ya «satış», «kirayə»",
+        "price": "Qiymət: 185000, 185 000 və ya 185,000",
+        "currency": "AZN (defolt), USD, EUR",
+        "price_period": "Kirayə üçün: MONTH/DAY və ya «aylıq», «günlük» (boşdursa aylıq)",
+        "type": "Əmlak növünün slug-ı və ya adı (məs. menziller)",
+        "city": "Şəhər/rayon adı və ya slug-ı (məs. Bakı)",
+        "district": "Şəhər daxilində rayon, qəsəbə və ya massiv",
+        "metro": "Metro stansiyasının adı",
+        "address": "Ünvan",
+        "rooms": "Otaq sayı",
+        "area": "Sahə, m²",
+        "land_area": "Torpaq sahəsi, sot",
+        "floor": "Mərtəbə",
+        "total_floors": "Binanın mərtəbə sayı",
+        "renovation": "Kod (RENOVATED …) və ya ad («Əla təmirli»)",
+        "document": "Kod (TITLE_DEED …) və ya ad («Kupça (Çıxarış)»)",
+        "building_type": "NEW / OLD və ya «yeni», «köhnə»",
+        "latitude": "En dairəsi (məs. 40.4093)",
+        "longitude": "Uzunluq dairəsi (məs. 49.8671)",
+        "video_url": "YouTube və ya video linki",
+        "features": "Xüsusiyyət slug-ları və ya adları, «|» ilə ayrılır",
+        "images": "https:// şəkil linkləri, «|» ilə ayrılır (ən çox 12) — R2-yə köçürülür"
+      }
     }
   },
   "server": {
@@ -2563,6 +2648,10 @@
       "minImages": "Dərc üçün ən azı {count} şəkil lazımdır.",
       "titleRoomsMismatch": "Başlıqdakı {titleRooms} otaq məlumatı forma dəyəri ({rooms}) ilə uyğun deyil.",
       "strongDuplicate": "Bu elan «{title}» ilə güclü duplikatdır. Mövcud qeydi yeniləyin və ya canonical/merge qərarı verin."
+    },
+    "propertyImport": {
+      "fileTooLarge": "Fayl 900 KB-dan böyükdür — onu bir neçə hissəyə bölün.",
+      "invalidFile": "Faylın başlıq sətri düzgün deyil."
     }
   }
 }

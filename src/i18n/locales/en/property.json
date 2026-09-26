@@ -150,5 +150,11 @@
     "description": "The QR code carries this listing's address — download it for print materials, window displays and agent cards.",
     "downloadPng": "Download PNG",
     "downloadSvg": "Download SVG"
-  }
+  },
+  "signals": {
+    "new": "New",
+    "priceDrop": "Price cut −{percent}%",
+    "photos": "{count, plural, one {# photo} other {# photos}}"
+  },
+  "ogRooms": "{count, plural, one {# room} other {# rooms}}"
 }

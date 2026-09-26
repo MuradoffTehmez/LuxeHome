@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Eye, Pencil, Plus, RotateCcw, Star, Trash2 } from "lucide-react";
+import { Eye, FileUp, Pencil, Plus, RotateCcw, Star, Trash2 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
@@ -161,6 +161,12 @@ export default async function AdminPropertiesPage({
             >
               {deleted ? t("pages.misc.aktivElanlar") : t("pages.misc.zibilQutusu")}
             </ButtonLink>
+            {!deleted && (
+              <ButtonLink href={`${LIST_PATH}/idxal`} variant="outline" size="sm">
+                <FileUp className="size-4" aria-hidden="true" />
+                {t("pages.propertyImport.listButton")}
+              </ButtonLink>
+            )}
             <ButtonLink href={`${LIST_PATH}/yeni`} variant="primary" size="sm">
               <Plus className="size-4" aria-hidden="true" />
               {t("pages.properties.yeniElan")}

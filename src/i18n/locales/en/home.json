@@ -28,10 +28,7 @@
     "overline": "Portfolio",
     "title": "Featured properties",
     "description": "Properties selected by Luxe Home Estate.",
-    "all": "All properties",
-    "emptyTitle": "There are no featured properties right now",
-    "emptyDescription": "New properties will appear in this section as they are added.",
-    "emptyAction": "View all properties"
+    "all": "All properties"
   },
   "categories": {
     "overline": "Categories",
@@ -108,5 +105,13 @@
     "description": "Tell us what you need and we will select suitable options and contact you.",
     "send": "Send an enquiry",
     "view": "View properties"
+  },
+  "ownerLead": {
+    "overline": "For owners",
+    "title": "Want to sell or rent out your property?",
+    "description": "We handle valuation, professional photos, document checks and buyer viewings. Send a request and our specialist will contact you within one business day.",
+    "primary": "Send a request",
+    "whatsapp": "Message on WhatsApp",
+    "whatsappMessage": "Hello, I would like to sell/rent out my property with Luxe Home Estate."
   }
 }

@@ -23,5 +23,7 @@
   "messagePlaceholder": "Müraciətinizi yazın...",
   "successTitle": "Müraciətiniz göndərildi!",
   "successDescription": "Komandamız ən qısa zamanda sizinlə əlaqə saxlayacaq.",
-  "error": "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin."
+  "error": "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
+  "googleProfile": "Google-da rəylər",
+  "googleProfileValue": "Profilə baxın və rəy yazın"
 }

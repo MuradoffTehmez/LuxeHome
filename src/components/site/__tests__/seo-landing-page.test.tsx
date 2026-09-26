@@ -27,6 +27,8 @@ const property = {
   city: { name: "Bakı", slug: "baki" },
   district: { name: "Nərimanov", slug: "nerimanov" },
   images: [],
+  _count: { images: 0 },
+  priceHistory: [],
 } as PropertyCardData;
 
 describe("SEO landing template", () => {

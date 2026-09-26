@@ -150,5 +150,11 @@
     "description": "QR bu elanın ünvanını daşıyır — çap materialı, vitrin və agent kartı üçün yükləyin.",
     "downloadPng": "PNG yüklə",
     "downloadSvg": "SVG yüklə"
-  }
+  },
+  "signals": {
+    "new": "Yeni",
+    "priceDrop": "Qiymət endi −{percent}%",
+    "photos": "{count, plural, other {# şəkil}}"
+  },
+  "ogRooms": "{count} otaq"
 }

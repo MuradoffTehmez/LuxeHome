@@ -70,6 +70,13 @@ export const propertyCardSelect = {
     // açılmayıb), ona görə `url` verilsə kartda 2400 px-lik master şəkil yüklənir.
     select: { url: true, thumbUrl: true, alt: true, width: true, height: true },
   },
+  // Kart siqnalları (#103): foto sayı və son qiymət dəyişikliyi («Qiymət endi»).
+  _count: { select: { images: true } },
+  priceHistory: {
+    orderBy: { changedAt: "desc" },
+    take: 1,
+    select: { oldPrice: true, newPrice: true, changedAt: true },
+  },
 } satisfies Prisma.PropertySelect;
 
 export type PropertyCardData = Prisma.PropertyGetPayload<{
@@ -325,6 +332,11 @@ function buildPropertyOrderBy(
   }
 }
 
+/** Filtrə uyğun ictimai elan sayı — boş nəticədə «filtri yumşalt» təklifləri üçün (#103). */
+export async function countProperties(filters: PropertyFilters = {}) {
+  return prisma.property.count({ where: await buildPropertyWhere(filters) });
+}
+
 export async function getProperties(filters: PropertyFilters = {}) {
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = filters.pageSize ?? PAGE_SIZE;
@@ -438,7 +450,7 @@ export async function getPropertiesForMap(filters: PropertyFilters = {}) {
   return { items, total };
 }
 
-export async function getFeaturedProperties(take = 6) {
+async function getFeaturedProperties(take = 6) {
   return prisma.property.findMany({
     where: {
       ...(await publicPropertyWhere()),
@@ -449,6 +461,22 @@ export async function getFeaturedProperties(take = 6) {
     orderBy: [{ publishedAt: "desc" }],
     take,
   });
+}
+
+/**
+ * Ana səhifə vitrini: əvvəl aktiv premium (seçilmiş) elanlar, çatmayan yer isə ən son
+ * dərc olunanlarla doldurulur. Portfel kiçik olanda bölmə boş qalmasın deyə (#103).
+ */
+export async function getHomeShowcaseProperties(take = 6) {
+  const featured = await getFeaturedProperties(take);
+  if (featured.length >= take) return featured;
+  const latest = await prisma.property.findMany({
+    where: { ...(await publicPropertyWhere()), id: { notIn: featured.map((property) => property.id) } },
+    select: propertyCardSelect,
+    orderBy: [{ publishedAt: "desc" }],
+    take: take - featured.length,
+  });
+  return [...featured, ...latest];
 }
 
 export async function getPropertyBySlug(slug: string) {

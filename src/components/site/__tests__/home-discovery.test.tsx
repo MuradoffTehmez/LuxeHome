@@ -9,6 +9,7 @@ import { PostCard } from "../post-card";
 import { ProjectCard } from "../project-card";
 
 const heroProps = {
+  imageUrl: "/media/umumi/hero.webp",
   types: [],
   cities: [],
   locale: "az" as const,

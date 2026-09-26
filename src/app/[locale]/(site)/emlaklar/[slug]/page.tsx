@@ -89,7 +89,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     district: localizedProperty.district ? localizeLocation(localizedProperty.district, locale as Locale) : null,
   };
 
-  const image = property.images[0]?.url || null;
+  // Paylaşım kartı: foto + qiymət + yer (#103). Fotosuz elanda ümumi OG şəkli qalır.
+  const image = property.images[0]?.url
+    ? `/api/og/property/${encodeURIComponent(property.slug)}?l=${locale}`
+    : null;
   const isClosed = property.status === PROPERTY_STATUSES.SOLD || property.status === PROPERTY_STATUSES.RENTED;
   const retainedForIndex = isClosed && property.retentionUntil != null && property.retentionUntil.getTime() >= Date.now();
 
