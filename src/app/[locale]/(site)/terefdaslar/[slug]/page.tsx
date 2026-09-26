@@ -24,6 +24,7 @@ import {
   truncateAtWord,
 } from "@/lib/seo";
 import { getCachedPartnerBySlug } from "@/lib/public-cache";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import {
   localizePartnerContent,
   normalizePartnershipType,
@@ -78,12 +79,15 @@ export default async function PartnerDetailPage({ params }: Props) {
 
   if (!data) notFound();
 
-  const [t, navigationText] = await Promise.all([
+  const [t, navigationText, projectsEnabled] = await Promise.all([
     getTranslations({ locale, namespace: "partners" }),
     getTranslations({ locale, namespace: "navigation" }),
+    isProjectsSectionEnabled(),
   ]);
 
-  const { partner, properties, projects, agencies } = data;
+  const { partner, properties, agencies } = data;
+  // Bölmə paneldən bağlıdırsa layihə kartları və rolları göstərilmir (#83).
+  const projects = projectsEnabled ? data.projects : [];
   const { shortDescription, description, disclaimer } = localizePartnerContent(
     partner,
     resolvedLocale,

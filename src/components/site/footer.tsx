@@ -19,6 +19,8 @@ import {
   WhatsAppIcon,
 } from "./brand-icons";
 import { Logo } from "./logo";
+import { getHiddenPublicPaths } from "@/lib/site-sections";
+import { withoutHiddenPaths } from "@/lib/site-section-paths";
 
 /** `socialProfiles` açarını ikona bağlayır — sıra konfiqurasiyada saxlanılır. */
 const SOCIAL_ICONS = {
@@ -235,9 +237,11 @@ const LEGAL_KEY_BY_HREF = {
 
 export async function Footer() {
   const t = await getTranslations("navigation");
+  // Paneldən bağlanmış bölmələr (məs. «Yaşayış kompleksləri») footer-də də görünmür.
+  const hiddenPaths = await getHiddenPublicPaths();
   const year = new Date().getFullYear();
   const localize = (items: readonly { href: keyof typeof NAV_KEY_BY_HREF }[]) =>
-    items.map((item) => ({ href: item.href, label: t(NAV_KEY_BY_HREF[item.href]) }));
+    withoutHiddenPaths(items, hiddenPaths).map((item) => ({ href: item.href, label: t(NAV_KEY_BY_HREF[item.href]) }));
 
   // `navigation` və `supportNavigation` qəsdən ayrı sütunlardır: vahid siyahı
   // 14 sətirlik sütun yaradır və qonşu sütunlarla hündürlük fərqi footer-i

@@ -13,6 +13,7 @@ import { Gallery } from "@/components/site/gallery";
 import { PropertyCard } from "@/components/site/property-card";
 import { buildManagedMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getCachedProjectBySlug } from "@/lib/public-cache";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import { getProjectPartners } from "@/lib/queries";
 import { PartnerRelations } from "@/components/site/partner-relations";
 import { siteConfig, siteUrl } from "@/config/site";
@@ -37,6 +38,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
+  // Bölmə paneldən bağlıdırsa marşrut mövcud deyil (#83).
+  if (!(await isProjectsSectionEnabled())) notFound();
   const sourceProject = await getCachedProjectBySlug(slug);
 
   if (!sourceProject) notFound();
@@ -67,6 +70,8 @@ export default async function ProjectDetailPage({ params }: Props) {
     getTranslations({ locale, namespace: "listings.detail" }),
     getTranslations({ locale, namespace: "navigation" }),
   ]);
+  // Bölmə paneldən bağlıdırsa marşrut mövcud deyil (#83).
+  if (!(await isProjectsSectionEnabled())) notFound();
   const sourceProject = await getCachedProjectBySlug(slug);
 
   if (!sourceProject) notFound();

@@ -1,4 +1,5 @@
 import { isStaging, siteConfig, siteUrl } from "@/config/site";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
 
 /**
  * LLM axtarış/söhbət alətləri üçün sayt xülasəsi (Generative Engine Optimization).
@@ -7,12 +8,18 @@ import { isStaging, siteConfig, siteUrl } from "@/config/site";
  * saytı düzgün sitat gətirmək üçün bu faylı oxuya bilir. `robots.txt`-dən fərqli
  * olaraq icazə/qadağa deyil, kontekst təqdim edir.
  */
-export function GET() {
+export async function GET() {
   if (isStaging()) {
     return new Response("# Staging mühiti — indekslənməməlidir\n", {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
   }
+
+  // Bölmə paneldən bağlıdırsa (#83) sətir çıxarılır — 404 verən səhifəyə istinad olmasın.
+  const projectsLine = (await isProjectsSectionEnabled())
+    ? `
+- [Yaşayış kompleksləri](${siteUrl("/layiheler")}) — davam edən və tamamlanmış tikinti layihələri`
+    : "";
 
   const body = `# ${siteConfig.name}
 
@@ -23,8 +30,7 @@ həyət evi, torpaq, ofis və kommersiya obyektlərinin satışı və icarəsi �
 
 ## Əsas bölmələr
 
-- [Əmlaklar](${siteUrl("/emlaklar")}) — satış və icarə elanlarının tam siyahısı, filtrlə axtarış
-- [Yaşayış kompleksləri](${siteUrl("/layiheler")}) — davam edən və tamamlanmış tikinti layihələri
+- [Əmlaklar](${siteUrl("/emlaklar")}) — satış və icarə elanlarının tam siyahısı, filtrlə axtarış${projectsLine}
 - [Agentliklər](${siteUrl("/agentlikler")}) — təsdiqlənmiş tərəfdaş agentliklərin siyahısı
 - [Xidmətlər](${siteUrl("/xidmetler")}) — göstərilən daşınmaz əmlak xidmətləri
 - [Tez-tez verilən suallar](${siteUrl("/suallar")}) — alqı-satqı və icarə prosesi haqqında cavablar

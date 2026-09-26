@@ -17,7 +17,6 @@ import { settlePage, visit } from "../support/helpers";
 const AUDITED_PAGES = [
   { name: "Ana səhifə", path: "/az" },
   { name: "Kataloq", path: "/az/emlaklar" },
-  { name: "Layihələr", path: "/az/layiheler" },
   { name: "Bloq", path: "/az/blog" },
   { name: "Əlaqə", path: "/az/elaqe" },
   { name: "Kalkulyator", path: "/az/kalkulyator" },

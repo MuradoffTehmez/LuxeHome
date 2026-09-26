@@ -15,7 +15,8 @@ export type Locale = (typeof LOCALES)[number];
 export const PUBLIC_ROUTES = [
   "",
   "/emlaklar",
-  "/layiheler",
+  // `/layiheler` burada yoxdur: bölmə paneldən bağlana bilir və defolt gizlidir
+  // (#83) — onun davranışı `projects-section.spec.ts`-də ayrıca yoxlanır.
   "/xidmetler",
   "/haqqimizda",
   "/blog",

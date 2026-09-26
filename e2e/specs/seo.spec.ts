@@ -9,7 +9,7 @@ import { LOCALES, bodyOf, jsonLdBlocks, metaContent, visit } from "../support/he
  * yoxlayır, burada isə səhifənin faktiki `<head>`-i oxunur.
  */
 
-const INDEXABLE_PAGES = ["/az", "/az/emlaklar", "/az/layiheler", "/az/blog", "/az/haqqimizda"];
+const INDEXABLE_PAGES = ["/az", "/az/emlaklar", "/az/blog", "/az/haqqimizda"];
 
 test.describe("Metadata", () => {
   for (const path of INDEXABLE_PAGES) {

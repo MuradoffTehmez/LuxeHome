@@ -36,6 +36,25 @@ describe("sitemap assembler", () => {
     expect(urls).not.toContain("https://luxehomeestate.az/az/layiheler/dublikat-layihe");
   });
 
+  it("«Yaşayış kompleksləri» paneldən bağlıdırsa /layiheler URL-lərini çıxarır (#83)", () => {
+    const base = {
+      properties: [],
+      projects: [{ slug: "sahil", updatedAt, noIndex: false, canonicalUrl: null }],
+      services: [],
+      posts: [],
+      agencies: [],
+      partners: [],
+      landings: [],
+    };
+    const hidden = buildSitemap({ ...base, projectsEnabled: false }).map((entry) => entry.url);
+    expect(hidden.some((url) => url.includes("/layiheler"))).toBe(false);
+
+    // Açar göndərilməyibsə (köhnə çağırışlar) davranış dəyişmir.
+    const visible = buildSitemap(base).map((entry) => entry.url);
+    expect(visible).toContain("https://luxehomeestate.az/az/layiheler");
+    expect(visible).toContain("https://luxehomeestate.az/az/layiheler/sahil");
+  });
+
   it("agentlik, FAQ və hüquqi hub-ları absolute HTTPS URL kimi elan edir", () => {
     const sitemap = buildSitemap({
       properties: [],

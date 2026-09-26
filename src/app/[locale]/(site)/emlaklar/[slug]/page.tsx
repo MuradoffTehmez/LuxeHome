@@ -14,6 +14,7 @@ import {
   Star,
 } from "lucide-react";
 import { formatPrice, toIsoDateTime } from "@/lib/utils";
+import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import {
   LISTING_TYPES,
   AUTH_KINDS,
@@ -162,9 +163,10 @@ export default async function PropertyDetailPage({ params }: Props) {
     .filter(Boolean)
     .join(", ");
 
-  const [similarProperties, partnerLinks] = await Promise.all([
+  const [similarProperties, partnerLinks, projectsEnabled] = await Promise.all([
     getSimilarProperties(property, 4),
     getPropertyPartners(property.id),
+    isProjectsSectionEnabled(),
   ]);
   const reservationUser = property.reservationEnabled && !isClosed
     ? await getOptionalUser(AUTH_KINDS.PUBLIC)
@@ -521,8 +523,8 @@ export default async function PropertyDetailPage({ params }: Props) {
                 placement="property_detail"
               />
 
-              {/* Layihəyə bağlantı */}
-              {property.project && (
+              {/* Layihəyə bağlantı — bölmə paneldən bağlıdırsa göstərilmir (#83) */}
+              {projectsEnabled && property.project && (
                 <div className="rounded-md border border-line bg-paper p-5 sm:p-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-col gap-1">

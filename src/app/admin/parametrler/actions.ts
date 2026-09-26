@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { PERMISSIONS } from "@/lib/constants";
+import { LOCALES, PERMISSIONS } from "@/lib/constants";
+import { getAdminT } from "@/lib/admin-i18n";
+import { PROJECTS_SECTION_ENABLED_VALUE } from "@/lib/site-sections";
 import { SETTING_KEYS, setSettings } from "@/lib/settings";
 import { type ActionState, failure, invalid, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
@@ -81,5 +83,49 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
     return success("Parametrlər yadda saxlanıldı.");
   } catch (error) {
     return unexpected("parametrlər saxlanılmadı", error);
+  }
+}
+
+/**
+ * «Yaşayış kompleksləri» bölməsini ictimai saytda açıb-bağlayır (#83).
+ *
+ * Yalnız `site.projects_enabled` parametri yazılır — layihə qeydləri toxunulmur və
+ * paneldə idarə davam edir. Görünürlük render vaxtı `isProjectsSectionEnabled()`
+ * ilə həll olunur, ona görə keşlənmiş data deyil, layout-lar yenilənir.
+ */
+export async function toggleProjectsSection(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  let user;
+  try {
+    user = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const t = await getAdminT();
+  const enabled = form.boolean(formData, "enabled");
+
+  try {
+    await setSettings({
+      [SETTING_KEYS.PROJECTS_SECTION_ENABLED]: enabled ? PROJECTS_SECTION_ENABLED_VALUE : "0",
+    });
+    await recordAudit(
+      user,
+      "UPDATE",
+      "Setting",
+      SETTING_KEYS.PROJECTS_SECTION_ENABLED,
+      enabled ? "Yaşayış kompleksləri bölməsi açıldı" : "Yaşayış kompleksləri bölməsi gizlədildi",
+    );
+
+    // Menyu, footer, ana səhifə, detal blokları və sitemap — hamısı layout ağacındadır.
+    revalidatePath("/admin/parametrler");
+    revalidatePath("/", "layout");
+    for (const locale of Object.values(LOCALES)) {
+      revalidatePath(`/${locale}`, "layout");
+    }
+
+    return success(enabled ? t("pages.settings.sections.projectsShown") : t("pages.settings.sections.projectsHidden"));
+  } catch (error) {
+    return unexpected("bölmə görünürlüyü dəyişdirilmədi", error);
   }
 }

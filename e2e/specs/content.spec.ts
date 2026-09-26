@@ -16,7 +16,6 @@ type ListingSurface = {
 };
 
 const SURFACES: ListingSurface[] = [
-  { name: "Layihələr", listPath: "/az/layiheler", detailPrefix: "/az/layiheler/" },
   { name: "Bloq", listPath: "/az/blog", detailPrefix: "/az/blog/" },
   { name: "Xidmətlər", listPath: "/az/xidmetler", detailPrefix: "/az/xidmetler/" },
   { name: "Bilik mərkəzi", listPath: "/az/bilik-merkezi", detailPrefix: "/az/bilik-merkezi/" },

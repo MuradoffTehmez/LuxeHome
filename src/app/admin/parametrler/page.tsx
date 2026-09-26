@@ -7,6 +7,8 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { SETTING_KEYS, getAllSettings } from "@/lib/settings";
 import { siteConfig } from "@/config/site";
 import { SettingsForm } from "./settings-form";
+import { ProjectsSectionForm } from "./projects-section-form";
+import { PROJECTS_SECTION_ENABLED_VALUE } from "@/lib/site-sections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -73,6 +75,22 @@ export default async function AdminSettingsPage() {
           </div>
         </AdminCard>
       </div>
+
+      <AdminCard
+        title={t("pages.settings.sections.title")}
+        description={t("pages.settings.sections.description")}
+        className="mt-6 min-w-0"
+      >
+        <div className="flex min-w-0 flex-col gap-3">
+          <div>
+            <p className="text-sm font-medium text-ink">{t("pages.settings.sections.projectsLabel")}</p>
+            <p className="mt-1 text-sm text-ink-soft">{t("pages.settings.sections.projectsHint")}</p>
+          </div>
+          <ProjectsSectionForm
+            enabled={settings[SETTING_KEYS.PROJECTS_SECTION_ENABLED] === PROJECTS_SECTION_ENABLED_VALUE}
+          />
+        </div>
+      </AdminCard>
     </>
   );
 }

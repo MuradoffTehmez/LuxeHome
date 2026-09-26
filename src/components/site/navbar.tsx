@@ -6,6 +6,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { ChevronDown, Heart, Menu, Phone, Plus, Search } from "lucide-react";
 import { navigation, siteConfig } from "@/config/site";
 import { isNavigationItemActive } from "@/lib/ui/navigation";
+import { withoutHiddenPaths } from "@/lib/site-section-paths";
 import { cn } from "@/lib/utils";
 import { IconButton, buttonClassName } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -50,10 +51,18 @@ export const desktopNavigationGroups = {
  */
 export function Navbar({
   showLocaleSwitcher = false,
+  hiddenPaths = [],
 }: {
   showLocaleSwitcher?: boolean;
+  /** Paneldən bağlanmış bölmələr (məs. `/layiheler`) — layout serverdə oxuyub ötürür. */
+  hiddenPaths?: readonly string[];
 }) {
   const t = useTranslations("navigation");
+  const visibleNavigation = withoutHiddenPaths(navigation, hiddenPaths);
+  const visibleGroups = {
+    primary: withoutHiddenPaths(desktopNavigationGroups.primary, hiddenPaths),
+    overflow: withoutHiddenPaths(desktopNavigationGroups.overflow, hiddenPaths),
+  };
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -138,7 +147,7 @@ export function Navbar({
           data-navigation-mode="compact"
         >
           <ul className="flex min-w-0 items-center gap-1">
-            {desktopNavigationGroups.primary.map((item) => {
+            {visibleGroups.primary.map((item) => {
               const active = isNavigationItemActive(pathname, item.href);
 
               return (
@@ -197,7 +206,7 @@ export function Navbar({
                   id="desktop-navigation-overflow"
                   className="absolute top-[calc(100%+0.5rem)] right-0 min-w-52 rounded-sm border border-line bg-paper p-2 shadow-editorial"
                 >
-                  {desktopNavigationGroups.overflow.map((item) => {
+                  {visibleGroups.overflow.map((item) => {
                     const active = isNavigationItemActive(pathname, item.href);
                     return (
                       <li key={item.href}>
@@ -228,7 +237,7 @@ export function Navbar({
           data-navigation-mode="full"
         >
           <ul className="flex min-w-0 items-center gap-0 min-[2200px]:gap-1">
-            {navigation.map((item) => {
+            {visibleNavigation.map((item) => {
               const active = isNavigationItemActive(pathname, item.href);
 
               return (
@@ -351,7 +360,7 @@ export function Navbar({
         <nav aria-label={t("mobileNavigation")} className="mt-7 border-t border-line pt-6">
           <p className="editorial-kicker mb-3 text-ink-muted">{t("explore")}</p>
           <ul className="overflow-hidden rounded-md border border-line bg-paper">
-            {[...navigation]
+            {[...visibleNavigation]
               .sort((a, b) => Number(MOBILE_PRIMARY_HREFS.has(b.href)) - Number(MOBILE_PRIMARY_HREFS.has(a.href)))
               .map((item) => {
               const active = isNavigationItemActive(pathname, item.href);
