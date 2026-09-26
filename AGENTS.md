@@ -89,6 +89,24 @@ Dark rejim üçün mətn və sərhəd tokenləri ayrıca təyin olunub (`--color
 `--color-ink-muted`, `--color-line`, `--color-line-strong`). Bunlar açıq rejimdəki dəyərlərlə
 eyni saxlanılmamalıdır — əks halda tünd fonda kontrast WCAG həddindən aşağı düşür.
 
+**Foto üzərində `charcoal`/`navy` tokenini işlətmə.** Tünd rejimdə bu tokenlər açığa dönür:
+`bg-charcoal/55` düymə və ya `from-charcoal/90` qradiyent şəkil üzərində ağ mətni oxunmaz edirdi.
+Foto üzərindəki çip/düymə üçün `on-image-chip` sinfi (və ya `Badge tone="overlay"`),
+qradiyent/modal fonu üçün sabit `black/<opacity>` işlət.
+
+2026 yenilənməsi (#91–#94) konvensiyaları:
+
+- Radius şkalası `globals.css`-dədir (xs 6 · sm 10 · md 12 · lg 16 · xl 20 · 2xl 28 px).
+  Düymə və input `rounded-sm`, kart `rounded-lg`/`rounded-xl`, badge və çip `rounded-full`.
+- İctimai kart səthi üçün `card-surface` sinfi (hover-də qalxma + kölgə). O və
+  `on-image-chip` `@layer components` içindədir — laysız qayda Tailwind utility-lərini
+  üstələyirdi, ona görə yeni komponent sinfini də oraya yaz.
+- Serif (Playfair) yalnız səhifə/bölmə başlıqlarındadır: qlobal qayda h3/h4-ü sans edir.
+  Kiçik **h2** başlığa `font-sans` açıq yazılmalıdır, çünki h1/h2 qlobal olaraq serif-dir.
+  Admin paneldə h1/h2 `admin-surface` sinfi ilə sans-dır.
+- Tailwind v4 px vahidli arbitrary breakpoint-i (`min-[1360px]:`) rem əsaslı `sm:`/`lg:`-dən
+  əvvəl sıralayır və o, səssizcə üstələnir — `min-[85rem]:` kimi rem işlət.
+
 Layout primitivləri: `Container` (max-width + padding) və `Section`.
 
 `Section` şaquli boşluğu **`spacing` propu ilə** verilir (`default` | `cozy` | `compact` | `none`).
