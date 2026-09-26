@@ -5,7 +5,8 @@
     "prisma/seed.ts",
     "public/push-sw.js",
     "scripts/prepare-logo.mjs",
-    "workers/saved-search-cron/src/index.ts"
+    "workers/saved-search-cron/src/index.ts",
+    "scripts/e2e/local-stack-fixtures.ts"
   ],
   "ignore": [
     "tmp/**",

@@ -96,7 +96,18 @@ export default defineConfig({
 
   projects: [
     {
+      /**
+       * Lokal stack-də admin bir dəfə 2FA ilə daxil olur və sessiya paylaşılır (#87):
+       * TOTP təkrar qoruması eyni 30 saniyəlik addımda ikinci girişi rədd edir.
+       * Fixture-lar yoxdursa (staging run) boş vəziyyət yazılır, auth testləri atlanır.
+       */
+      name: "auth-setup",
+      testMatch: ["**/auth.setup.ts"],
+      use: { ...devices["Desktop Chrome"], userAgent: USER_AGENT },
+    },
+    {
       name: "chromium",
+      dependencies: ["auth-setup"],
       use: { ...devices["Desktop Chrome"], userAgent: USER_AGENT },
       // Mobil spec dar ekrana xas davranışı yoxlayır (çekmece, bottom-sheet,
       // toxunma hədəfi) — desktop viewport-da mənasızdır və yalançı uğursuzluq verir.

@@ -24,6 +24,9 @@ npm run lint         # eslint
 npm run dead-code    # Knip: istifadə olunmayan fayl və asılılıqlar
 npm run test         # vitest (workerd runtime, auth qatının unit testləri)
 npm run e2e          # canlı/konfiqurasiya edilmiş workerd mühitinə qarşı Playwright
+npm run e2e:local:build    # lokal stack üçün OpenNext bundle (IS_STAGING=true, localhost)
+npm run e2e:local:prepare  # .wrangler/e2e-state-də təzə D1 + test hesabları (AUTH_SECRET, E2E_ADMIN_TOTP_SECRET)
+npm run e2e:local:serve    # lokal workerd :8787; sonra E2E_BASE_URL=http://localhost:8787 npm run e2e
 
 npm run preview      # OpenNext bundle + lokal workerd (production ilə eyni runtime)
 npm run deploy:staging  # staging worker-ə yayım (luxehomeestate-staging)
@@ -466,6 +469,11 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   worker-i yayımlayır. Staging production-dan əvvəl gedir — orada sınarsa production
   toxunulmur. Bundle hər mühit üçün ayrıca qurulur, çünki `SITE_URL` statik səhifələrin
   içinə build vaxtı yazılır.
+- **PR-da `Local stack E2E` məcburi yoxlamadır** (#87): bundle lokal workerd-də real D1/R2
+  ilə qaldırılır, bütün Playwright dəsti + auth ssenariləri (admin 2FA doğrulaması, toplu
+  şəkil yükləmə, kabinet forması, layihələr açarı) işləyir. Giriş formaları Turnstile ilə
+  qorunur və test bypass-ı **qəsdən yoxdur** — admin stage cookie ilə TOTP addımından real
+  keçir, elan sahibi fixture sessiyası ilə daxil olur (`scripts/e2e/`, `e2e/support/auth.ts`).
 - **Browser E2E qurulub** (Playwright, `e2e/`): 190+ test — smoke, filtrlər, detal axını,
   favoritlər, məzmun, i18n, API, SEO, təhlükəsizlik, performans, əlçatanlıq (axe-core) və
   mobil. CI-də staging yayımından sonra işləyir və uğursuz olarsa production yayımını
