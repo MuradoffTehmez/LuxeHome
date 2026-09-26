@@ -1,7 +1,7 @@
 import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
 import { LOCATION_KINDS, PROPERTY_STATUSES } from "@/lib/constants";
-import { getProperties } from "@/lib/queries";
+import { getIndexableTaxonomyLandings, getProperties } from "@/lib/queries";
 
 /**
  * Kataloq sorğularının real D1 üzərində integration testləri (#85).
@@ -95,7 +95,6 @@ describe("rayon landing-lərinin sitemap uyğunluğu", () => {
     await DB.prepare(`UPDATE "Property" SET "districtId" = 'test-mastaga' WHERE "id" IN ('p-0', 'p-3', 'p-6')`).run();
     await DB.prepare(`UPDATE "Property" SET "updatedAt" = '2030-01-01T00:00:00.000Z' WHERE "id" = 'p-1'`).run();
 
-    const { getIndexableTaxonomyLandings } = await import("@/lib/queries");
     const landings = await getIndexableTaxonomyLandings("DISTRICT");
     const bySlug = new Map(landings.map((landing) => [landing.slug, landing]));
 

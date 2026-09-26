@@ -1,7 +1,9 @@
 import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
 import { LOCATION_CHILD_KINDS, LOCATION_KINDS } from "@/lib/constants";
+import { getPublishedContentTranslations } from "@/lib/content-translation";
 import { prisma } from "@/lib/prisma";
+import { getFilterOptions, getPropertyFormOptions } from "@/lib/queries";
 
 /**
  * Real D1 üzərində 100 bound-parametr həddinin reqressiya testləri (#74, #85).
@@ -70,7 +72,6 @@ describe("D1 100 bound-parametr həddi", () => {
 
 describe("yerləşmə ağacı sorğuları (#74)", () => {
   it("getFilterOptions() bütün ağacı D1 həddini aşmadan qaytarır", async () => {
-    const { getFilterOptions } = await import("@/lib/queries");
     const { cities } = await getFilterOptions();
     // 0031 miqrasiyası da öz yerlərini yaradır — gözlənilən say bazadan oxunur.
     const expected = await countLocations();
@@ -89,7 +90,6 @@ describe("yerləşmə ağacı sorğuları (#74)", () => {
   });
 
   it("getPropertyFormOptions() qəsəbə üçün kök şəhəri və qrupu hesablayır", async () => {
-    const { getPropertyFormOptions } = await import("@/lib/queries");
     const { districts } = await getPropertyFormOptions();
     const settlement = districts.find((item) => item.slug === "yer-0");
     expect(settlement).toMatchObject({ cityId: "city-0", group: "Rayon 0" });
@@ -113,7 +113,6 @@ describe("tərcümə sorğuları (#85)", () => {
   });
 
   it("getPublishedContentTranslations() 250 qeydi hissələrə bölüb düzgün süzür", async () => {
-    const { getPublishedContentTranslations } = await import("@/lib/content-translation");
     const ids = Array.from({ length: ENTITY_COUNT }, (_, index) => `entity-${index}`);
     const translations = await getPublishedContentTranslations("PROPERTY", ids, "en");
 

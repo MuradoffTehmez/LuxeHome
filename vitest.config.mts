@@ -76,6 +76,10 @@ export default defineConfig({
         test: {
           name: "integration",
           include: ["src/**/*.integration.test.ts"],
+          // Real D1 sorğuları və 700 sətirlik fixture-lar tam dəst paralel işləyəndə
+          // (xüsusən CI runner-də) defolt 5 saniyəni aşa bilir.
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
           setupFiles: ["./src/test/setup-d1.ts"],
         },
       },
