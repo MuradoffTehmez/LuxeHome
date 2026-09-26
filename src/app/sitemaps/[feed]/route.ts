@@ -1,6 +1,7 @@
 import { PRODUCTION_SITE_URL } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { prisma } from "@/lib/prisma";
+import { findManyInChunks } from "@/lib/d1-chunks";
 import { PROPERTY_STATUSES, TRANSLATION_ENTITY_TYPES, TRANSLATION_STATUSES, type Locale } from "@/lib/constants";
 import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib/public-cache";
 import { parseSitemapFeed, urlsetXml, type SitemapEntry } from "@/lib/sitemap-xml";
@@ -13,7 +14,10 @@ const staticPaths = ["/", "/emlaklar", "/layiheler", "/agentler", "/agentlikler"
 
 async function translatedIds(entityType: string, ids: string[], locale: Locale) {
   if (locale === "az") return new Set(ids);
-  const rows = await prisma.contentTranslation.findMany({ where: { entityType, entityId: { in: ids }, locale, status: TRANSLATION_STATUSES.PUBLISHED }, select: { entityId: true } });
+  // IN siyahısından əlavə 3 parametr — D1 100-parametr həddi üçün hissələrə bölünür (#85).
+  const rows = await findManyInChunks(ids, 3, (chunk) =>
+    prisma.contentTranslation.findMany({ where: { entityType, entityId: { in: chunk }, locale, status: TRANSLATION_STATUSES.PUBLISHED }, select: { entityId: true } }),
+  );
   return new Set(rows.map((row) => row.entityId));
 }
 

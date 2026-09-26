@@ -154,14 +154,14 @@ async function parseQuery(query: string): Promise<{ criteria: AiSearchCriteria; 
 
 function scoreProperty(property: {
   listingType: string; price: number; rooms: number | null; area: number | null;
-  type: { slug: string }; city: { slug: string }; district: { slug: string } | null;
+  type: { slug: string }; city: { slug: string }; district: { slug: string; parent?: { slug: string } | null } | null;
   features: Array<{ feature: { slug: string } }>;
 }, criteria: AiSearchCriteria) {
   const checks: Array<{ active: boolean; matched: boolean; reason: string }> = [
     { active: Boolean(criteria.listingType), matched: property.listingType === criteria.listingType, reason: "Elan növü uyğundur" },
     { active: Boolean(criteria.typeSlug), matched: property.type.slug === criteria.typeSlug, reason: "Əmlak növü uyğundur" },
     { active: Boolean(criteria.citySlug), matched: property.city.slug === criteria.citySlug, reason: "Şəhər uyğundur" },
-    { active: Boolean(criteria.districtSlug), matched: property.district?.slug === criteria.districtSlug, reason: "Rayon uyğundur" },
+    { active: Boolean(criteria.districtSlug), matched: property.district?.slug === criteria.districtSlug || property.district?.parent?.slug === criteria.districtSlug, reason: "Rayon uyğundur" },
     { active: criteria.maxPrice !== undefined, matched: criteria.maxPrice === undefined || property.price <= criteria.maxPrice, reason: "Büdcəyə uyğundur" },
     { active: criteria.minPrice !== undefined, matched: criteria.minPrice === undefined || property.price >= criteria.minPrice, reason: "Minimum qiymət meyarına uyğundur" },
     { active: criteria.rooms !== undefined, matched: criteria.rooms === undefined || property.rooms === criteria.rooms, reason: "Otaq sayı uyğundur" },
@@ -190,7 +190,12 @@ export async function searchPropertiesWithAi(rawQuery: string) {
         terms.length ? { OR: terms.flatMap((term) => [{ searchText: { contains: term } }, { description: { contains: term } }]) } : {},
       ],
     },
-    select: { ...propertyCardSelect, features: { select: { feature: { select: { slug: true } } } } },
+    select: {
+      ...propertyCardSelect,
+      // Qəsəbədəki elan rayon meyarına da uyğun sayılır (#85) — kataloq filtri ilə eyni.
+      district: { select: { name: true, slug: true, parent: { select: { slug: true } } } },
+      features: { select: { feature: { select: { slug: true } } } },
+    },
     orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
     take: 36,
   });
