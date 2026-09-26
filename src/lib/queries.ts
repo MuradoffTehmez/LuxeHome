@@ -1214,9 +1214,7 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
           count: row._count._all,
           updatedAt: row._max.updatedAt ?? undefined,
         }));
-  const eligible = grouped.filter((row) => row.count >= MIN_INDEXABLE_LISTINGS);
-  const ids = eligible.map((row) => row.locationId).filter((id): id is string => Boolean(id));
-  if (ids.length === 0) return [];
+  if (!grouped.some((row) => row.locationId)) return [];
 
   // `districtId` yalnız inzibati rayonu deyil, qəsəbə, kənd və massivi də
   // saxlayır — `getTaxonomyLandingProperties()` ilə eyni səviyyə dəsti
@@ -1226,16 +1224,35 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
   // `id IN (…)` şərti SQL-ə verilmir: `kind IN (…)` ilə birlikdə D1-in 100
   // parametr həddini aşa bilərdi (`location-tree.ts`). Yer cədvəli kiçikdir,
   // süzgəc JS-də aparılır.
-  const counts = new Map(
-    eligible.map((row) => [row.locationId, { count: row.count, updatedAt: row.updatedAt }]),
-  );
   const locations = await prisma.location.findMany({
     where: kind === LOCATION_KINDS.DISTRICT ? { kind: { in: LOCATION_CHILD_KINDS } } : { kind },
-    select: { id: true, name: true, slug: true },
+    select: { id: true, name: true, slug: true, kind: true, parentId: true },
   });
-  return locations
-    .filter((location) => counts.has(location.id))
-    .map((location) => ({ ...location, ...counts.get(location.id)! }));
+  const byId = new Map(locations.map((location) => [location.id, location]));
+
+  // İnzibati rayonun landing-i onun qəsəbələrindəki elanları da göstərir
+  // (`buildPropertyWhere`), ona görə say və son yenilənmə valideynə toplanır —
+  // yoxsa birbaşa 3-dən az elanı olan, qəsəbələrində isə çox elanı olan rayon
+  // sitemap-a düşməzdi, `lastModified` isə qəsəbə dəyişikliklərini görməzdi (#85).
+  const totals = new Map<string, { count: number; updatedAt?: Date }>();
+  const add = (id: string, count: number, updatedAt?: Date) => {
+    const current = totals.get(id);
+    const latest = current?.updatedAt && updatedAt && current.updatedAt > updatedAt ? current.updatedAt : updatedAt ?? current?.updatedAt;
+    totals.set(id, { count: (current?.count ?? 0) + count, updatedAt: latest });
+  };
+  for (const row of grouped) {
+    if (!row.locationId) continue;
+    add(row.locationId, row.count, row.updatedAt);
+    const parentId = byId.get(row.locationId)?.parentId;
+    if (kind === LOCATION_KINDS.DISTRICT && parentId && byId.get(parentId)?.kind === LOCATION_KINDS.DISTRICT) {
+      add(parentId, row.count, row.updatedAt);
+    }
+  }
+
+  return locations.flatMap(({ id, name, slug }) => {
+    const total = totals.get(id);
+    return total && total.count >= MIN_INDEXABLE_LISTINGS ? [{ id, name, slug, ...total }] : [];
+  });
 }
 
 // ---------------------------------------------------------------------------
