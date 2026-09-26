@@ -216,27 +216,41 @@ main {
   min-width: 0;
 }
 
-h1,
-h2,
-h3,
-h4 {
-  font-family: var(--font-display);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-}
+/* Başlıq bazası `@layer base`-dədir: laysız qayda Tailwind utility-lərini
+   spesifiklikdən asılı olmayaraq üstələyirdi və `font-sans`/`font-display`
+   sinifləri başlıqda səssizcə işləmirdi (#95 rəyi). */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
 
-/* Serif yalnız səhifə və bölmə başlıqlarında qalır. Kart və siyahı başlıqları
-   (h3/h4) sans-dır: kiçik ölçüdə Playfair-in nazik ştrixləri oxunaqlığı
-   azaldır və interfeysi köhnə göstərir (#91). Ayrıca `font-display` sinfi
-   verilən başlıq yenə serif olur. */
-h3,
-h4 {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.3;
+  /* Serif yalnız səhifə və bölmə başlıqlarında qalır. Kart və siyahı başlıqları
+     (h3/h4) sans-dır: kiçik ölçüdə Playfair-in nazik ştrixləri oxunaqlığı
+     azaldır və interfeysi köhnə göstərir (#91). Ayrıca `font-display` sinfi
+     verilən başlıq yenə serif olur. */
+  h3,
+  h4 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  /* Admin panel — iş interfeysi. Paneldə serif başlıq yoxdur: sıx cədvəl və
+     forma səhifələrində Playfair oxunaqlığı azaldır. Başlıqlarda `font-display`
+     sinfi işlədilmir (admin-i18n kimi mənbə testi qoruyur). */
+  .admin-surface :is(h1, h2, h3, h4) {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
 }
 
 p {
@@ -382,18 +396,6 @@ p {
   a.on-image-chip:hover {
     background-color: rgb(20 24 28 / 0.82);
   }
-}
-
-/* --------------------------------------------------------------------------
-   Admin panel — iş interfeysi
-   Paneldə serif başlıq yoxdur: sıx cədvəl və forma səhifələrində Playfair
-   oxunaqlığı azaldır. İctimai saytın h1/h2 serif qaydası burada ləğv olunur;
-   `font-display` sinfi açıq verilərsə yenə tətbiq olunur.
-   -------------------------------------------------------------------------- */
-.admin-surface :is(h1, h2):not(.font-display) {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  letter-spacing: -0.02em;
 }
 
 /* --------------------------------------------------------------------------

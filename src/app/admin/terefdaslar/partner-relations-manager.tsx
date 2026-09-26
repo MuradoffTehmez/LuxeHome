@@ -182,9 +182,9 @@ function RelationList({
 }) {
   const t = useTranslations("admin");
   return (
-    <section className="overflow-hidden rounded-md border border-line bg-paper">
+    <section className="overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
       <header className="border-b border-line px-4 py-3 sm:px-5">
-        <h3 className="font-display text-base text-ink">{title}</h3>
+        <h3 className="font-semibold text-base text-ink">{title}</h3>
       </header>
       {items.length === 0 ? (
         <p className="p-4 text-sm text-ink-muted sm:p-5">{t("pages.partners.elaqeYoxdur")}</p>

@@ -62,7 +62,7 @@ export default async function AdminSeoPage({ searchParams }: Props) {
         {(Object.keys(metricLabels(t)) as Array<keyof ReturnType<typeof metricLabels>>).map((key) => (
           <div key={key} className="rounded-xl border border-line bg-paper p-4 shadow-xs">
             <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">{metricLabels(t)[key]}</p>
-            <p className="tabular mt-2 font-display text-3xl text-ink">{metrics[key]}</p>
+            <p className="tabular mt-2 font-semibold text-3xl text-ink">{metrics[key]}</p>
             {!["missingAlt", "thinContent", "orphanPages"].includes(key) && (
               <p className="mt-1 text-xs text-ink-muted">{t("pages.misc.cemiSehifeden", { p0: metrics.total })}</p>
             )}
