@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { PropertyCard } from "@/components/site/property-card";
 import { Container, Section } from "@/components/ui/container";
@@ -35,7 +35,7 @@ export function SeoLandingPage({
 
   return (
     <>
-      <div className="border-b border-line bg-beige py-8 sm:py-10">
+      <div className="border-b border-line bg-[linear-gradient(180deg,var(--color-paper)_0%,var(--surface-page)_100%)] py-10 sm:py-14">
         <Container>
           <Breadcrumbs
             locale={locale}
@@ -45,25 +45,25 @@ export function SeoLandingPage({
               { label: landing.h1 },
             ]}
           />
-          <p className="editorial-kicker mt-6 text-gold-deep">{landing.overline}</p>
-          <h1 className="mt-3 max-w-4xl font-display text-4xl leading-tight text-ink sm:text-5xl lg:text-6xl">
+          <p className="editorial-kicker mt-6 flex items-center gap-3 text-gold-deep"><span aria-hidden="true" className="h-px w-8 bg-gold/60" />{landing.overline}</p>
+          <h1 className="mt-4 max-w-4xl font-display text-4xl leading-[1.1] tracking-[-0.025em] text-ink sm:text-5xl lg:text-[3.5rem]">
             {landing.h1}
           </h1>
-          <p className="mt-5 text-base text-ink-soft">{content("activeListings", { count: total })}</p>
+          <p className="mt-5 inline-flex min-h-9 items-center rounded-full border border-line bg-paper px-4 text-sm font-medium text-ink-soft shadow-xs">{content("activeListings", { count: total })}</p>
         </Container>
       </div>
 
       <Section tone="ivory" spacing="cozy">
         <Container>
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
-            <div className="flex flex-col gap-5 text-base leading-relaxed text-ink-soft">
+            <div className="flex max-w-[72ch] flex-col gap-5 text-base leading-relaxed text-ink-soft">
               {landing.content.map((paragraph) => (
                 <p key={paragraph.slice(0, 48)}>{paragraph}</p>
               ))}
             </div>
-            <aside className="border-l border-line pl-6">
-              <h2 className="font-display text-xl text-ink">{t("related")}</h2>
-              <ul className="mt-4 flex flex-col gap-1">
+            <aside className="self-start rounded-xl border border-line bg-paper p-5 shadow-xs lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
+              <h2 className="font-sans text-base font-semibold text-ink">{t("related")}</h2>
+              <ul className="mt-3 flex flex-col divide-y divide-line">
                 {landing.relatedPaths.map((path) => {
                   const related = findSeoLanding(path.slice(1));
                   const localizedRelated = related ? localizeSeoLanding(related, locale) : null;
@@ -71,10 +71,10 @@ export function SeoLandingPage({
                     <li key={path}>
                       <Link
                         href={path}
-                        className="flex min-h-11 items-center justify-between gap-3 text-sm text-ink-soft transition-colors hover:text-gold-deep"
+                        className="group/related flex min-h-11 items-center justify-between gap-3 text-sm text-ink-soft transition-colors hover:text-gold-deep"
                       >
                         {localizedRelated?.h1 ?? path.replaceAll("-", " ").slice(1)}
-                        <ArrowRight className="size-3.5 shrink-0" aria-hidden="true" />
+                        <ArrowRight className="size-3.5 shrink-0 text-gold-deep transition-transform duration-200 group-hover/related:translate-x-0.5" aria-hidden="true" />
                       </Link>
                     </li>
                   );
@@ -124,13 +124,16 @@ export function SeoLandingPage({
           <h2 id="landing-faq-title" className="font-display text-3xl text-ink">
             {nav("faq")}
           </h2>
-          <div className="mt-7 divide-y divide-line border-y border-line">
+          <div className="mt-7 flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
             {landing.faq.map((item) => (
-              <details key={item.question} className="group py-5">
-                <summary className="cursor-pointer list-none pr-6 font-medium text-ink marker:hidden">
-                  {item.question}
+              <details key={item.question} className="group px-4 transition-colors open:bg-ivory/50 sm:px-6">
+                <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 text-[0.9375rem] font-semibold text-ink [&::-webkit-details-marker]:hidden">
+                  <span className="min-w-0">{item.question}</span>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-beige text-ink-soft transition-colors group-open:bg-gold/15 group-open:text-gold-deep">
+                    <ChevronDown className="size-4 transition-transform duration-200 group-open:rotate-180" aria-hidden="true" />
+                  </span>
                 </summary>
-                <p className="mt-3 leading-relaxed text-ink-soft">{item.answer}</p>
+                <p className="pb-4 leading-relaxed text-ink-soft">{item.answer}</p>
               </details>
             ))}
           </div>

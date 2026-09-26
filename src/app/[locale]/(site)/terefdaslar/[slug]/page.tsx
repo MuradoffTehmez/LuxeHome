@@ -157,7 +157,7 @@ export default async function PartnerDetailPage({ params }: Props) {
           { label: t("navLabel"), href: "/terefdaslar" },
           { label: partner.name },
         ]}
-        actions={<PartnerLogo partner={partner} size="lg" priority />}
+        media={<div className="rounded-xl border border-line bg-paper p-4 shadow-xs"><PartnerLogo partner={partner} size="lg" priority /></div>}
       />
 
       <Section tone="ivory" spacing="compact" className="border-b border-line">

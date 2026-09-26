@@ -110,8 +110,8 @@ export default async function ServiceDetailPage({ params }: Props) {
           { label: navigation("services"), href: "/xidmetler" },
           { label: service.title },
         ]}
-        actions={
-          <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-charcoal text-gold-soft shadow-sm lg:size-20">
+        media={
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-gold/12 text-gold-deep lg:size-20">
             <ServiceIcon name={service.icon} className="size-8 lg:size-10" />
           </div>
         }

@@ -74,8 +74,8 @@ export default async function AgencyDetailPage({ params }: Props) {
           { label: navigation("agencies"), href: "/agentlikler" },
           { label: agency.name },
         ]}
-        actions={
-            <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-beige sm:size-24">
+        media={
+            <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-paper shadow-sm sm:size-24">
               {agency.logoUrl ? (
                 <Image
                   src={agency.logoUrl}
@@ -94,21 +94,21 @@ export default async function AgencyDetailPage({ params }: Props) {
 
       <Section tone="ivory" spacing="compact" className="border-b border-line">
         <Container>
-          <div className="rounded-xl border border-line bg-paper p-4 shadow-sm sm:p-5">
-            <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="flex flex-col gap-4 rounded-xl border border-line bg-paper p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge tone="gold">{t("verifiedAgency")}</Badge>
               <Badge tone="neutral">{t("activeListingCount", { count: properties.length })}</Badge>
             </div>
               <div className="flex min-w-0 flex-col gap-1 text-sm text-ink-soft sm:flex-row sm:flex-wrap sm:gap-x-6">
                 {agency.phone && (
                   <TrackedAnchor event="agency_contact" payload={{ agency_id: agency.id, method: "phone" }} href={`tel:${agency.phone}`} className="flex min-h-11 min-w-0 items-center gap-2 rounded-xs hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
-                    <Phone className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                    <Phone className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
                     <span className="[overflow-wrap:anywhere]">{agency.phone}</span>
                   </TrackedAnchor>
                 )}
                 {agency.address && (
                   <span className="flex min-h-11 min-w-0 items-center gap-2">
-                    <MapPin className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                    <MapPin className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
                     <span className="[overflow-wrap:anywhere]">{agency.address}</span>
                   </span>
                 )}
@@ -119,7 +119,7 @@ export default async function AgencyDetailPage({ params }: Props) {
                     rel="noopener noreferrer"
                     className="flex min-h-11 min-w-0 items-center gap-2 rounded-xs hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                   >
-                    <Globe className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+                    <Globe className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
                     <span className="break-all">{agency.website}</span>
                   </a>
                 )}
@@ -131,7 +131,7 @@ export default async function AgencyDetailPage({ params }: Props) {
       <Section tone="paper" spacing="cozy">
         <Container>
           <div className="mb-8 flex flex-col gap-2">
-            <h2 className="font-display text-2xl text-ink sm:text-3xl">{t("agencyListings")}</h2>
+            <h2 className="font-display text-3xl tracking-[-0.02em] text-ink sm:text-4xl">{t("agencyListings")}</h2>
             <p className="text-sm text-ink-soft">
               {t("agencyListingsDescription", { name: agency.name })}
             </p>

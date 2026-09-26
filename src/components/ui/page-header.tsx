@@ -10,6 +10,8 @@ export type PageHeaderProps = {
   description?: string;
   breadcrumbs?: { label: string; href?: string }[];
   actions?: React.ReactNode;
+  /** Başlığın solunda göstərilən loqo/avatar (agentlik, tərəfdaş, agent profili). */
+  media?: React.ReactNode;
   compact?: boolean;
   contained?: boolean;
 };
@@ -21,6 +23,7 @@ export function PageHeader({
   description,
   breadcrumbs,
   actions,
+  media,
   compact = false,
   contained = false,
 }: PageHeaderProps) {
@@ -58,7 +61,9 @@ export function PageHeader({
       ) : null}
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0 max-w-3xl">
+        <div className={cn("min-w-0 max-w-3xl", media && "flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6")}>
+          {media ? <div className="shrink-0">{media}</div> : null}
+          <div className="min-w-0">
           {eyebrow ? (
             <p className="editorial-kicker mb-4 flex items-center gap-3 text-gold-deep">
               <span aria-hidden="true" className="h-px w-8 bg-gold/60" />
@@ -78,6 +83,7 @@ export function PageHeader({
               {description}
             </p>
           ) : null}
+          </div>
         </div>
 
         {actions ? (
