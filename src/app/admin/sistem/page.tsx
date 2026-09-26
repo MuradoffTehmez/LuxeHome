@@ -124,7 +124,7 @@ export default async function AdminSystemModePage() {
           title={t("pages.systemMode.integrationHealthTitle")}
           description={t("pages.systemMode.integrationHealthDescription")}
         >
-          <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
             {integrations.map((item) => (
               <li key={item.id} className="rounded-sm border border-line bg-beige/40 p-3">
                 <div className="flex items-start justify-between gap-2">
@@ -149,7 +149,7 @@ export default async function AdminSystemModePage() {
           </ul>
         </AdminCard>
 
-        <div className="grid min-w-0 gap-6 xl:grid-cols-[1.25fr_1fr]">
+        <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[1.25fr_1fr]">
           <AdminCard
             title={t("pages.systemMode.contentTitle")}
             description={t("pages.systemMode.contentDescription")}

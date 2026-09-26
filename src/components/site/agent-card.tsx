@@ -28,9 +28,9 @@ export async function AgentCard({
   const summary = agent.specialization || agent.roleTitle || null;
 
   return (
-    <article className="group relative flex h-full flex-col gap-4 rounded-xl border border-line bg-paper p-5 transition-colors duration-300 ease-out-soft hover:border-gold sm:p-6">
+    <article className="card-surface group relative flex h-full flex-col gap-4 p-5 sm:p-6">
       <div className="flex items-start gap-4">
-        <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige">
+        <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige ring-2 ring-gold/30 ring-offset-2 ring-offset-paper">
           {agent.avatarUrl ? (
             <Image
               src={agent.avatarUrl}
@@ -46,11 +46,11 @@ export async function AgentCard({
         </div>
 
         <div className="flex min-w-0 flex-col gap-1">
-          <Heading className="font-display text-xl leading-snug text-ink">
+          <Heading className="font-sans text-lg leading-snug font-semibold tracking-[-0.015em] text-ink">
             {/* Bütün kart klikləndikdə agent səhifəsinə keçir. */}
             <Link
               href={`/agentler/${agent.slug}`}
-              className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center transition-colors duration-300 ease-out-soft hover:text-gold-deep"
+              className="after:absolute after:inset-0 after:rounded-lg after:content-[''] inline-flex min-h-11 items-center transition-colors duration-300 ease-out-soft hover:text-gold-deep"
             >
               {agent.name}
             </Link>
@@ -83,7 +83,7 @@ export async function AgentCard({
       </div>
 
       {summary && (
-        <p className="text-xs font-medium tracking-wide text-gold-deep uppercase">{summary}</p>
+        <p className="text-xs font-semibold tracking-[0.08em] text-gold-deep uppercase">{summary}</p>
       )}
 
       {agent.experienceYears != null && (
@@ -95,7 +95,7 @@ export async function AgentCard({
       <div className="mt-auto flex flex-col gap-2 border-t border-line pt-4">
         <dl className="flex items-baseline justify-between gap-4 text-sm">
           <dt className="text-ink-muted">{t("listings")}</dt>
-          <dd className="tabular font-display text-lg leading-none text-ink">
+          <dd className="tabular text-lg leading-none font-semibold text-ink">
             {agent._count.properties}
           </dd>
         </dl>

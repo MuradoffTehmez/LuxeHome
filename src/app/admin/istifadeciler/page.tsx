@@ -49,7 +49,7 @@ export default async function AdminUsersPage() {
         breadcrumbs={[{ label: t("pages.users.idarePaneli"), href: "/admin" }, { label: t("pages.users.istifadeciler") }]}
       />
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label={t("pages.users.aktivHesab")} value={activeUsers.length} hint={t("pages.common.umumiHesab", { p0: users.length })} icon={UserCheck} tone="success" />
         <StatCard label={t("pages.users.2faQurulmayib")} value={withoutTwoFactor} hint={t("pages.users.aktivHesablarda")} icon={ShieldAlert} tone={withoutTwoFactor > 0 ? "warning" : "success"} />
         <StatCard label={t("pages.users.parolDeyismelidir")} value={mustChangePassword} hint={t("pages.users.ilkGirisGozlenilir")} icon={KeyRound} tone={mustChangePassword > 0 ? "warning" : "success"} />
@@ -154,7 +154,7 @@ export default async function AdminUsersPage() {
         />
       </AdminCard>
 
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[1fr_1.1fr]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[1fr_1.1fr]">
         <CreateUserForm />
 
         <AdminCard

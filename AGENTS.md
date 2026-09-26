@@ -109,6 +109,24 @@ qradiyent/modal fonu üçün sabit `black/<opacity>` işlət.
 - Tailwind v4 px vahidli arbitrary breakpoint-i (`min-[1360px]:`) rem əsaslı `sm:`/`lg:`-dən
   əvvəl sıralayır və o, səssizcə üstələnir — `min-[85rem]:` kimi rem işlət.
 
+**Responsive qaydalar** (#101 auditi, 49 səhifə × 18 viewport):
+
+- Yalnız breakpoint-də sütun verən grid-ə baza `grid-cols-1` yaz (`grid grid-cols-1 lg:grid-cols-…`).
+  Baza olmadan mobil sütun `auto` olur və uşaqdakı üfüqi scroller (qalereya miniatürləri)
+  onu min-content enə qədər böyüdüb səhifəni daşdırır.
+- `overflow-x-auto` konteyneri `relative` olmalıdır: içindəki `sr-only` (absolute) element
+  əks halda kəsilmədən qaçır və sənədi üfüqi daşdırır (admin cədvəli 1024px-də +264px).
+- Safe area işləkdir (`viewportFit: "cover"`): fixed/sticky zolaq `--safe-bottom`,
+  kənar boşluq `--safe-left/right` işlədir; `Container` bunu özü edir. Kənardan-kənara
+  yeni fixed səth (drawer, toast, banner, tam ekran xəritə) də `max(boşluq, --safe-*)` almalıdır.
+- Toxunma cihazında input/select/textarea ≥16px-dir (`globals.css`, `pointer: coarse`) —
+  iOS fokusda zoom etməsin. Desktop üçün `sm:text-sm` yazmaq təhlükəsizdir.
+- Turnstile konteyner eni 300px-dən az olanda `compact` ölçüyə keçir və `ResizeObserver`
+  ilə fırlanma/split-screen-də yenidən render olunur; kök `overflow-hidden` saxlanmalıdır —
+  əks halda 300px-lik widget öz konteynerini genişləndirir və keçid heç vaxt baş vermir.
+- Interaktiv element mobil ekranda ≥44px; mətn linkini böyütmək lazımdırsa layout-u
+  dəyişməyən `after:absolute after:-inset-y-3` toxunma sahəsi işlət.
+
 Layout primitivləri: `Container` (max-width + padding) və `Section`.
 
 `Section` şaquli boşluğu **`spacing` propu ilə** verilir (`default` | `cozy` | `compact` | `none`).

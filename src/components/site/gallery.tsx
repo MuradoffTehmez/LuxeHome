@@ -118,7 +118,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
 
   const current = images[index];
   const arrowClassName =
-    "pointer-events-auto inline-flex size-10 items-center justify-center rounded-full on-image-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
+    "pointer-events-auto inline-flex size-11 items-center justify-center rounded-full on-image-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
@@ -174,7 +174,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
         <button
           type="button"
           onClick={() => openAt(index)}
-          className="absolute right-3 bottom-3 inline-flex min-h-9 items-center gap-2 on-image-chip rounded-full px-3.5 text-xs font-semibold"
+          className="absolute right-3 bottom-3 inline-flex min-h-11 items-center gap-2 on-image-chip rounded-full px-3.5 text-xs font-semibold"
         >
           <Expand className="size-4" aria-hidden="true" />
           {t("showAll", { count: total })}

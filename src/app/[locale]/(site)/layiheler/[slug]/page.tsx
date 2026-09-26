@@ -167,36 +167,36 @@ export default async function ProjectDetailPage({ params }: Props) {
               )}
 
               {/* Sürətli parametrlər */}
-              <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {project.deliveryDate && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <Calendar className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium uppercase text-ink-muted">{t("deliveryDate")}</span>
+                  <div className="flex flex-col items-center gap-1.5 rounded-xl border border-line bg-paper p-4 text-center shadow-xs">
+                    <Calendar className="size-5 text-gold-deep" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-ink-muted">{t("deliveryDate")}</span>
                     <span className="tabular font-medium text-ink">
                       {new Intl.DateTimeFormat(dateLocale, { month: "long", year: "numeric" }).format(new Date(project.deliveryDate))}
                     </span>
                   </div>
                 )}
                 {project.startDate && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <Calendar className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium uppercase text-ink-muted">{t("startDate")}</span>
+                  <div className="flex flex-col items-center gap-1.5 rounded-xl border border-line bg-paper p-4 text-center shadow-xs">
+                    <Calendar className="size-5 text-gold-deep" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-ink-muted">{t("startDate")}</span>
                     <span className="tabular font-medium text-ink">
                       {new Intl.DateTimeFormat(dateLocale, { month: "long", year: "numeric" }).format(new Date(project.startDate))}
                     </span>
                   </div>
                 )}
                 {project.year && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <CheckCircle2 className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium uppercase text-ink-muted">{t("constructionYear")}</span>
+                  <div className="flex flex-col items-center gap-1.5 rounded-xl border border-line bg-paper p-4 text-center shadow-xs">
+                    <CheckCircle2 className="size-5 text-gold-deep" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-ink-muted">{t("constructionYear")}</span>
                     <span className="tabular font-medium text-ink">{project.year}</span>
                   </div>
                 )}
                 {project.properties && project.properties.length > 0 && (
-                  <div className="flex flex-col items-center gap-1.5 bg-paper p-4 text-center">
-                    <Building2 className="size-5 text-ink-muted" aria-hidden="true" />
-                    <span className="text-xs font-medium uppercase text-ink-muted">{t("propertyCount")}</span>
+                  <div className="flex flex-col items-center gap-1.5 rounded-xl border border-line bg-paper p-4 text-center shadow-xs">
+                    <Building2 className="size-5 text-gold-deep" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-ink-muted">{t("propertyCount")}</span>
                     <span className="tabular font-medium text-ink">{t("offerCount", { count: project.properties.length })}</span>
                   </div>
                 )}

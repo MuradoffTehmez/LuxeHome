@@ -60,9 +60,9 @@ function HeroSearchForm({
         action={localizePath("/emlaklar", locale)}
         method="get"
         placement="hero"
-        className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-4"
+        className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-4"
       >
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12 lg:items-end">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12 lg:items-end">
           <fieldset className="flex flex-col gap-1.5 lg:col-span-3">
             <legend className="text-xs font-medium tracking-wide text-ink-soft">
               {labels.listingType}
@@ -173,7 +173,7 @@ export function Hero({ types, cities, locale, labels }: HeroProps) {
 
       <Container
         size="wide"
-        className="grid min-h-[34rem] min-w-0 gap-7 pt-[calc(var(--header-h)+3rem)] pb-6 sm:min-h-[40rem] sm:gap-8 sm:pt-[calc(var(--header-h)+4rem)] lg:min-h-[min(54rem,100dvh)] lg:grid-cols-12 lg:grid-rows-[minmax(0,1fr)_auto] lg:gap-x-10 lg:gap-y-8 lg:pt-[calc(var(--header-h)+4rem)] lg:pb-10"
+        className="grid grid-cols-1 min-h-[34rem] min-w-0 gap-7 pt-[calc(var(--header-h)+3rem)] pb-6 sm:min-h-[40rem] sm:gap-8 sm:pt-[calc(var(--header-h)+4rem)] lg:min-h-[min(54rem,100dvh)] lg:grid-cols-12 lg:grid-rows-[minmax(0,1fr)_auto] lg:gap-x-10 lg:gap-y-8 lg:pt-[calc(var(--header-h)+4rem)] lg:pb-10"
       >
         <div className="min-w-0 self-end lg:col-span-9">
           <p className="editorial-kicker animate-fade-in flex items-center gap-3 text-gold-soft">

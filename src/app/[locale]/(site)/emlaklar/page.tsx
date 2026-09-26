@@ -89,15 +89,15 @@ function ViewToggle({
   compact?: boolean;
 }) {
   const base = cn(
-    "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-[7px] text-sm font-medium transition-colors",
-    compact ? "w-9" : "px-3",
+    "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[7px] text-sm font-medium transition-colors",
+    compact ? "w-11" : "px-3",
   );
   // Seqment nəzarəti: aktiv düymə açıq «kart» kimi qalxır.
   const active = "bg-paper text-ink shadow-sm";
   const idle = "text-ink-soft hover:text-ink";
 
   return (
-    <div className="inline-flex shrink-0 gap-1 rounded-sm border border-line bg-beige/60 p-1">
+    <div className="inline-flex shrink-0 gap-0.5 rounded-sm border border-line bg-beige/60 p-0.5">
       <Link
         href={listHref}
         aria-current={!isMapView}
@@ -354,7 +354,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
           <div className="min-w-0">
           <ResponsiveToolbar
             mobile={
-              <div className="-mx-4 flex min-h-14 items-center justify-between gap-2 px-2 sm:-mx-6 sm:px-4">
+              <div className="-mx-4 flex min-h-14 flex-wrap items-center justify-between gap-2 px-2 py-1.5 sm:-mx-6 sm:px-4">
                 <PropertyFilterSheet
                   types={typeOptions}
                   cities={cityOptions}
@@ -364,7 +364,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                   resultCount={total}
                   activeCount={activeFilters.length}
                 />
-                <div className="flex min-w-0 shrink items-center gap-2">
+                <div className="ml-auto flex min-w-0 shrink items-center gap-2">
                   <ViewToggle
                     compact
                     isMapView={isMapView}

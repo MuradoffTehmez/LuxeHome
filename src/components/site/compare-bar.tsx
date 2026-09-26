@@ -31,9 +31,11 @@ export function CompareBar() {
       className={cn(
         "fixed inset-x-0 z-[var(--z-sticky)] border-t border-line-strong bg-ivory/95 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-sm",
         getCompareBarPositionClass(pathname),
+        // Ekranın ən altında olanda (detal səhifəsindən başqa) home indicator-u örtməsin.
+        !/^\/emlaklar\/[^/]+\/?$/.test(pathname) && "pb-[var(--safe-bottom)]",
       )}
     >
-      <div className="mx-auto flex min-h-14 w-full max-w-360 flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6 lg:px-10">
+      <div className="mx-auto flex min-h-14 w-full max-w-360 flex-wrap items-center justify-between gap-2 pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))] py-2 sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] lg:px-10">
         <span className="inline-flex items-center gap-2 text-sm font-medium text-ink">
           <GitCompareArrows className="size-4 text-gold-deep" aria-hidden="true" />
           {t("selected", { count })}

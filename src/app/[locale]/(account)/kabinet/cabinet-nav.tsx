@@ -58,7 +58,7 @@ function SignOutButton() {
     <button
       type="submit"
       disabled={pending}
-      className="inline-flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-xs px-3 text-sm font-medium text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger disabled:opacity-50"
+      className="inline-flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-md px-3 text-sm font-medium text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger disabled:opacity-50"
     >
       <LogOut className="size-4" aria-hidden="true" />
       {pending ? t("signingOut") : t("signOut")}
@@ -81,7 +81,7 @@ export function CabinetNav({
   return (
     <nav aria-label={t("menu")} className="flex flex-col gap-4">
       <div className={cn("rounded-xl border border-line bg-paper p-4 shadow-xs", variant === "mobile" && "bg-beige/45")}>
-        <p className="text-xs tracking-wide text-ink-muted uppercase">{accountLabel}</p>
+        <p className="text-xs font-semibold text-gold-deep">{accountLabel}</p>
         <p className="mt-1 truncate font-medium text-ink">{name}</p>
       </div>
 
@@ -96,13 +96,13 @@ export function CabinetNav({
                 onClick={onNavigate}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex min-h-11 w-full items-center gap-2 rounded-xs px-3 text-sm transition-colors",
+                  "group/nav inline-flex min-h-11 w-full items-center gap-2.5 rounded-md border px-3 text-sm transition-colors",
                   active
-                    ? "bg-beige font-medium text-ink"
-                    : "text-ink-soft hover:bg-beige/60 hover:text-ink",
+                    ? "border-line bg-paper font-semibold text-ink shadow-xs"
+                    : "border-transparent text-ink-soft hover:bg-beige/60 hover:text-ink",
                 )}
               >
-                <Icon className="size-4 shrink-0" aria-hidden="true" />
+                <Icon className={cn("size-4 shrink-0", active ? "text-gold-deep" : "text-ink-muted group-hover/nav:text-ink")} aria-hidden="true" />
                 {t(LABEL_KEYS[item.id])}
               </Link>
             </li>

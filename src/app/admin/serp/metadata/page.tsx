@@ -23,7 +23,7 @@ export default async function MetadataPage() {
   const localeOptions = Object.values(LOCALES).map((value) => ({ value, label: value.toUpperCase() }));
   return <>
     <AdminPageHeader title={t("pages.serp.pageSeoEditor")} description={t("pages.serp.avtomatikMetadataNiYalniz")} breadcrumbs={[{ label: t("pages.serp.serpVeSeo"), href: "/admin/serp" }, { label: "Metadata" }]} />
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
       <AdminForm action={saveSeoMetadata} submitLabel={t("pages.serp.metadataOverrideSaxla")}><FormSection title={t("pages.serp.metadataOverride")} description={t("pages.serp.entityIdRoutePath")}>
         <AdminSelect name="entityType" label={t("pages.serp.entityTipi")} options={entityOptions} defaultValue="PAGE" />
         <AdminSelect name="locale" label={t("pages.serp.dil")} options={localeOptions} defaultValue="az" />

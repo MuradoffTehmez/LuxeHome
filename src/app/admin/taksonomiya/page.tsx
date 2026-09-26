@@ -49,7 +49,7 @@ export default async function AdminTaxonomyPage() {
 
       <FormJumpNav items={taxonomySections(t)} />
 
-      <div className="grid min-w-0 gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-6">
           <section id="emlak-novleri" className="scroll-mt-32">
             <AdminCard title={t("pages.taxonomy.emlakNovleri")} description={t("pages.common.nov", { p0: types.length })} bodyClassName="p-0">

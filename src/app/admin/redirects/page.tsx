@@ -29,7 +29,7 @@ export default async function AdminRedirectsPage() {
         breadcrumbs={[{ label: t("pages.serp.idarePaneli"), href: "/admin" }, { label: t("pages.serp.yonlendirmeler") }]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="flex min-w-0 flex-col gap-6">
           <AdminCard
             title={t("pages.serp.aktivYonlendirmeler")}

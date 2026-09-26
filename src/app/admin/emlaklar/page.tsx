@@ -243,7 +243,7 @@ export default async function AdminPropertiesPage({
                     {property.isFeatured ? (
                       <Star className="mt-1 size-3.5 shrink-0 fill-current text-gold" aria-label={t("pages.properties.tovsiyeOlunan")} />
                     ) : null}
-                    <Link href={`${LIST_PATH}/${property.id}`} className="transition-colors hover:text-gold-deep">
+                    <Link href={`${LIST_PATH}/${property.id}`} className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] transition-colors hover:text-gold-deep">
                       {property.title}
                     </Link>
                   </span>

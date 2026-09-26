@@ -19,7 +19,7 @@ export function PublicDetailLayout({
   return (
     <div
       className={cn(
-        "grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14",
+        "grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14",
         className,
       )}
     >

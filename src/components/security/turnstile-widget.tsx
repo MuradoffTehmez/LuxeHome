@@ -11,6 +11,7 @@ type TurnstileApi = {
       sitekey: string;
       action: string;
       appearance: "always";
+      size: "normal" | "compact";
       callback: (token: string) => void;
       "expired-callback": () => void;
       "error-callback": () => void;
@@ -65,6 +66,19 @@ export function TurnstileWidget({
   const initialResetRef = useRef(true);
   const [siteKey, setSiteKey] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
+  // `normal` widget sabit 300px-dir. Konteyner bu həddi keçəndə (fırlanma, split-screen)
+  // widget uyğun ölçüdə yenidən render olunur — yoxsa üfüqi daşma geri qayıdırdı.
+  const [size, setSize] = useState<"normal" | "compact" | null>(null);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+    const measure = () => setSize(element.clientWidth < 300 ? "compact" : "normal");
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -83,7 +97,7 @@ export function TurnstileWidget({
   }, []);
 
   useEffect(() => {
-    if (!siteKey || !containerRef.current) return;
+    if (!siteKey || !size || !containerRef.current) return;
     let active = true;
     loadTurnstileScript()
       .then(() => {
@@ -92,6 +106,9 @@ export function TurnstileWidget({
           sitekey: siteKey,
           action,
           appearance: "always",
+          // Dar konteynerdə rəsmi `compact` (150px) ölçüsü — 320px ekranda 300px-lik
+          // `normal` widget forma kartına sığmır və səhifəni üfüqi daşdırırdı.
+          size,
           "response-field": true,
           "response-field-name": TURNSTILE_RESPONSE_FIELD,
           callback: () => setFailed(false),
@@ -109,7 +126,7 @@ export function TurnstileWidget({
         widgetIdRef.current = null;
       }
     };
-  }, [action, siteKey]);
+  }, [action, siteKey, size]);
 
   useEffect(() => {
     if (initialResetRef.current) {
@@ -125,8 +142,11 @@ export function TurnstileWidget({
     // `aria-label` yalnız rolu olan elementdə keçərlidir; role-suz `div`-də
     // axe onu «aria-prohibited-attr» kimi işarələyir (WCAG 4.1.2). Widget
     // qrup kimi elan olunur ki, etiket ekran oxuyucuya çatsın.
-    <div className="min-h-[65px]" role="group" aria-label="Təhlükəsizlik yoxlaması">
-      <div ref={containerRef} />
+    // `overflow-hidden`: widget-in 300px min-content eni valideyn kartı böyütməsin —
+    // əks halda konteyner heç vaxt 300px-dən daralmır və ResizeObserver `compact`-a
+    // keçməyi görmürdü (ölçü dəyişəndə forma yenə daşırdı).
+    <div className="min-h-[65px] w-full min-w-0 overflow-hidden" role="group" aria-label="Təhlükəsizlik yoxlaması">
+      <div ref={containerRef} className="w-full" />
       {failed && (
         <p role="alert" className="mt-2 text-sm text-danger">
           Təhlükəsizlik yoxlaması yüklənmədi. Səhifəni yeniləyib yenidən cəhd edin.

@@ -24,7 +24,7 @@ export function KnowledgeCard({
   const t = useTranslations("knowledge");
 
   return (
-    <article className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-paper transition-colors duration-200 hover:border-gold-line shadow-xs">
+    <article className="card-surface group relative flex h-full min-w-0 flex-col overflow-hidden">
       <div className="relative aspect-16/9 w-full overflow-hidden bg-beige">
         {article.coverUrl ? (
           <Image
@@ -54,7 +54,7 @@ export function KnowledgeCard({
         <h3 className="text-lg leading-snug text-ink">
           <Link
             href={`/bilik-merkezi/${article.slug}`}
-            className="rounded-xs after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            className="rounded-xs after:absolute after:inset-0 after:rounded-lg transition-colors hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
             {article.title}
           </Link>

@@ -161,6 +161,9 @@
   --text-primary: var(--color-ink);
   --text-secondary: var(--color-ink-soft);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Landscape iPhone-da notch tərəfi — Container gutter-i bununla max() olunur. */
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 
   --z-base: 0;
   --z-sticky: 20;
@@ -187,6 +190,8 @@ html {
   scroll-behavior: smooth;
   /* Fixed header-in altında qalmasın deyə anchor offset */
   scroll-padding-top: calc(var(--header-h) + 1.5rem);
+  /* Mobil sticky əməl paneli (≈5rem) fokuslanan sahəni örtməsin. */
+  scroll-padding-bottom: calc(6rem + var(--safe-bottom));
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -203,6 +208,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   /* Mobil tap gecikməsini azaldır */
   touch-action: manipulation;
+  /* Sığmayan uzun söz (URL, e-poçt, ID, uzun RU/AZ birləşmələri) sətirdə qırılır —
+     yalnız sığmayanda işləyir, adi mətnə təsir etmir. */
+  overflow-wrap: break-word;
 }
 
 main,
@@ -260,6 +268,21 @@ p {
 /* Rəqəmlər cədvəl və qiymətlərdə sıçramasın */
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Toxunma cihazında form şrifti
+   iOS Safari 16px-dən kiçik şriftli sahəyə fokusda səhifəni zoom edir və
+   layout sürüşür. Komponentlər desktop üçün `sm:text-sm`/`lg:text-xs` işlədir;
+   landscape telefon (≥640px) və iPad həmin breakpoint-ə düşürdü. Qayda qəsdən
+   laysızdır — utility siniflərini yalnız toxunma cihazında üstələyir.
+   -------------------------------------------------------------------------- */
+@media (pointer: coarse) {
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]),
+  select,
+  textarea {
+    font-size: max(16px, 1rem);
+  }
 }
 
 /* --------------------------------------------------------------------------

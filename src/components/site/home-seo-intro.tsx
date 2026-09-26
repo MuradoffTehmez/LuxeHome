@@ -21,7 +21,7 @@ export async function HomeSeoIntro({ locale = DEFAULT_LOCALE }: { locale?: Local
   return (
     <Section tone="paper" spacing="cozy" aria-labelledby="home-seo-intro-title">
       <Container size="wide">
-        <div className="grid gap-7 border-y border-line py-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:py-10">
+        <div className="grid grid-cols-1 gap-7 border-y border-line py-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:py-10">
           <div>
             <p className="editorial-kicker text-gold-deep">{t("eyebrow")}</p>
             <h2

@@ -266,7 +266,7 @@ export function PropertyFilterFields({
   return (
     <div
       className={cn(
-        "grid gap-4",
+        "grid grid-cols-1 gap-4",
         mode === "compact"
           ? "md:grid-cols-2 lg:grid-cols-12 lg:items-end"
           : stacked
@@ -455,7 +455,7 @@ export function PropertyFilterFields({
             <div className="flex flex-col gap-5 border-t border-line px-4 pt-4 pb-3">
               <fieldset>
                 <legend className={LABEL_CLASS}>{t("extra")}</legend>
-                <div className={cn("mt-1 grid", !stacked && "sm:grid-cols-2 lg:grid-cols-3")}>
+                <div className={cn("mt-1 grid grid-cols-1", !stacked && "sm:grid-cols-2 lg:grid-cols-3")}>
                   <CheckboxField name="ilk_mertebe_yox" label={t("notFirstFloor")} defaultChecked={initial.ilk_mertebe_yox === "1"} />
                   <CheckboxField name="son_mertebe_yox" label={t("notLastFloor")} defaultChecked={initial.son_mertebe_yox === "1"} />
                   <CheckboxField name="sekilli" label={t("withPhotos")} defaultChecked={initial.sekilli === "1"} />
@@ -467,7 +467,7 @@ export function PropertyFilterFields({
                   <legend className={LABEL_CLASS}>
                     {FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS] ? propertyT(`featureGroup.${FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS]}`) : group}
                   </legend>
-                  <div className={cn("mt-1 grid", stacked ? "grid-cols-2 gap-x-3" : "sm:grid-cols-2 lg:grid-cols-3")}>
+                  <div className={cn("mt-1 grid", stacked ? "grid-cols-2 gap-x-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3")}>
                     {items.map((feature) => (
                       <CheckboxField
                         key={feature.value}

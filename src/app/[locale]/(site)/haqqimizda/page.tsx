@@ -54,7 +54,7 @@ export default async function AboutPage({ params }: PageProps) {
       {/* Şirkət haqqında — şəkil + mətn */}
       <Section tone="ivory">
         <Container>
-          <div className="grid min-w-0 items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="grid grid-cols-1 min-w-0 items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <Reveal><BusinessTrustPanel /></Reveal>
 
             <div className="flex min-w-0 flex-col gap-6">
@@ -90,7 +90,7 @@ export default async function AboutPage({ params }: PageProps) {
             align="center"
           />
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.key} delay={index * 50}>
                 <div className="flex h-full min-w-0 flex-col gap-4 rounded-xl border border-line bg-ivory p-5 sm:p-6 shadow-xs">

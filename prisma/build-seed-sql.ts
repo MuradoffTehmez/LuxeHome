@@ -70,6 +70,8 @@ function literal(value: unknown): string {
 
 const ISO_DATE_COLUMNS: Readonly<Record<string, ReadonlySet<string>>> = {
   Service: new Set(["createdAt", "updatedAt"]),
+  // Epoch rəqəmi Prisma D1-də oxunmur və /admin/terefdaslar-ı çökdürürdü (#99).
+  Partner: new Set(["createdAt", "updatedAt", "verifiedAt", "officialSince", "partnershipEndDate", "contractStartDate", "contractEndDate"]),
   Setting: new Set(["updatedAt"]),
 };
 

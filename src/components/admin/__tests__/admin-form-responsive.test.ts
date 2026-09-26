@@ -17,7 +17,7 @@ describe("admin formalarının responsive və validasiya müqaviləsi", () => {
   it("sticky submit safe-area və mobil tək sütun grid-ini saxlayır", () => {
     const formShell = source("src/components/admin/form-shell.tsx");
     expect(formShell).toContain("var(--safe-bottom)");
-    expect(formShell).toContain("grid gap-4 p-4 sm:grid-cols-2 sm:p-5");
+    expect(formShell).toContain("grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-5");
   });
 
   it("hesab kartları dar ekranda az padding və qırılan uzun mətn istifadə edir", () => {

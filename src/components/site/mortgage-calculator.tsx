@@ -119,7 +119,7 @@ export function MortgageCalculator({
           {compact ? t("onProperty") : t("mortgageTitle")}
         </h2>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <NumberField
             id={`${baseId}-price`}
             label={t("price")}
@@ -186,7 +186,7 @@ export function MortgageCalculator({
             {t("affordabilityTitle")}
           </h2>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <NumberField
               id={`${baseId}-income`}
               label={t("monthlyIncome")}

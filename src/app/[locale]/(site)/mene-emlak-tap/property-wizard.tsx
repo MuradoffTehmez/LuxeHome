@@ -29,7 +29,7 @@ export function PropertyWizard({ types, cities }: { types: Option[]; cities: Cit
 
   return (
     <form action={submit} className="rounded-xl border border-line bg-paper p-5 sm:p-7 shadow-xs">
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         <label className="text-sm text-ink-soft">1. {t("saleRent")}<select name="elan" className={fieldClass}><option value="">{t("any")}</option><option value={LISTING_TYPES.SALE}>{propertyT("listingType.sale")}</option><option value={LISTING_TYPES.RENT}>{propertyT("listingType.rent")}</option></select></label>
         <label className="text-sm text-ink-soft">2. {t("propertyType")}<select name="tip" className={fieldClass}><option value="">{t("any")}</option>{types.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
         <label className="text-sm text-ink-soft">3. {t("city")}<select name="seher" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass}><option value="">{t("any")}</option>{cities.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>

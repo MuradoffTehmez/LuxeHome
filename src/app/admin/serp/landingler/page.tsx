@@ -28,7 +28,7 @@ export default async function SeoLandingsAdminPage({ searchParams }: Props) {
   const statusOptions = Object.values(SEO_LANDING_STATUSES).map((value) => ({ value, label: value }));
   return <>
     <AdminPageHeader title={t("pages.serp.seoLandingPageEngine")} description={t("pages.serp.yalnizRealIntentUnikal")} breadcrumbs={[{ label: t("pages.serp.serpVeSeo"), href: "/admin/serp" }, { label: t("pages.serp.landingler") }]} />
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_460px]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_460px]">
       <AdminForm action={saveSeoLanding} submitLabel={current ? t("pages.misc.landingIYenile") : "Landing yarat"} cancelHref={current ? "/admin/serp/landingler" : undefined}><FormSection title={t("pages.serp.landingMelumati")} description={t("pages.serp.filtersjsonPublicPropertyQuery")}>
         {current && <input type="hidden" name="id" value={current.id} />}
         <AdminSelect name="locale" label={t("pages.serp.dil")} options={localeOptions} defaultValue={current?.locale ?? "az"} />

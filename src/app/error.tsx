@@ -40,7 +40,7 @@ export default function GlobalError({
     <main className="flex min-h-[70vh] items-center bg-ivory text-ink">
       <Container>
         <div className="mx-auto max-w-xl py-20 text-center">
-          <h1 className="font-serif text-3xl text-ink sm:text-4xl">
+          <h1 className="font-display text-3xl text-ink sm:text-4xl">
             {t("title")}
           </h1>
           <p className="mt-4 text-ink-soft">

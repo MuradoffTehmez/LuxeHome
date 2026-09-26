@@ -40,7 +40,7 @@ export default async function PartnerDetailLoading() {
 
       <Section tone="paper" spacing="cozy">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
             <div>
               <Skeleton className="h-8 w-64" />
               <Skeleton className="mt-5 h-4 w-full" />

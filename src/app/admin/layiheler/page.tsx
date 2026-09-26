@@ -210,7 +210,7 @@ export default async function AdminProjectsPage({
             renderCard={(project) => (
               <AdminListCard
                 title={
-                  <Link href={`${LIST_PATH}/${project.id}`} className="transition-colors hover:text-gold-deep">
+                  <Link href={`${LIST_PATH}/${project.id}`} className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] transition-colors hover:text-gold-deep">
                     {project.name}
                   </Link>
                 }

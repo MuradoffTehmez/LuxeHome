@@ -21,7 +21,9 @@ describe("SortSelect", () => {
     );
 
     expect(html).toContain("min-h-11");
-    expect(html).toContain("max-w-36");
+    expect(html).toContain("max-w-40");
+    // Dar ekranda seçim mətni «Сна…» kimi kəsilməsin (responsive audit).
+    expect(html).toContain("min-w-[7.5rem]");
     expect(html).toMatch(/<label[^>]*class="[^"]*sr-only[^"]*"/);
   });
 });

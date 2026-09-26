@@ -40,7 +40,7 @@ export function ProjectPartnersManager({ projectId, links, options }: { projectI
         <h2 className="font-semibold text-lg text-ink">{t("pages.projects.layiheninTerefdaslari")}</h2>
         <p className="mt-1 text-sm text-ink-muted">{t("pages.projects.developerSatisTerefdasiBroker")}</p>
       </header>
-      <form action={addAction} className="grid gap-4 border-b border-line p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
+      <form action={addAction} className="grid grid-cols-1 gap-4 border-b border-line p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
         <input type="hidden" name="entityType" value="project" />
         <input type="hidden" name="entityId" value={projectId} />
         <label className="text-sm text-ink-soft">{t("pages.projects.terefdas")}

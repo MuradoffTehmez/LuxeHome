@@ -74,7 +74,7 @@ export function SeoFields({
         <p className="text-xs text-ink-muted">{t("components.seo.metaDescriptionHint")}</p>
       </div>
 
-      <div className="sm:col-span-2 grid gap-4 lg:grid-cols-2">
+      <div className="sm:col-span-2 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Preview label={t("components.seo.desktopPreview")} title={previewTitle} description={previewDescription} pathname={pathname} />
         <Preview label={t("components.seo.mobilePreview")} title={previewTitle} description={previewDescription} pathname={pathname} mobile />
       </div>

@@ -77,7 +77,7 @@ function FooterLinkList({
   items: readonly { label: string; href: string }[];
 }) {
   return (
-    <ul className="grid gap-y-0.5 sm:grid-cols-2 lg:grid-cols-1">
+    <ul className="grid grid-cols-1 gap-y-0.5 sm:grid-cols-2 lg:grid-cols-1">
       {items.map((item) => (
         <li key={item.href}>
           <Link href={item.href} className={FOOTER_LINK}>
@@ -100,7 +100,7 @@ function PropertyLinks({
 }) {
   return (
     <div className="flex flex-col gap-5">
-      <ul className="grid gap-y-0.5 sm:grid-cols-2 lg:grid-cols-1">
+      <ul className="grid grid-cols-1 gap-y-0.5 sm:grid-cols-2 lg:grid-cols-1">
         {propertyItems.map((item) => (
           <li key={item.href}>
             <Link href={item.href} className={FOOTER_LINK}>
@@ -275,7 +275,7 @@ export async function Footer() {
           aşağıda beş sütun üçün yer qalmır, ona görə brend orada bütün sətri
           tutur və keçid sütunları altındakı sətirdə dördə bölünür.
         */}
-        <div className="grid gap-x-8 lg:grid-cols-4 xl:grid-cols-[340px_repeat(4,minmax(0,1fr))] xl:gap-x-12">
+        <div className="grid grid-cols-1 gap-x-8 lg:grid-cols-4 xl:grid-cols-[340px_repeat(4,minmax(0,1fr))] xl:gap-x-12">
           <div className="flex flex-col gap-5 pb-8 lg:col-span-4 lg:mb-14 lg:pb-0 xl:col-span-1 xl:mb-0">
             <Logo tone="dark" />
             <p className="max-w-xs text-sm leading-7 text-ink-invert-soft">

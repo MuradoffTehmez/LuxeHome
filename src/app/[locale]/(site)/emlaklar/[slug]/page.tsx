@@ -308,7 +308,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             slug={property.slug}
           />
 
-          <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
+          <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
             {/* Sol tərəf: Qalereya və Əsas məlumatlar */}
             <div className="flex flex-col gap-10">
               {/* Qalereya */}
@@ -356,7 +356,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     <Navigation className="size-5 text-gold-deep" aria-hidden="true" />
                     {commonContent("phase2.nearby")}
                   </h2>
-                  <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {property.nearbyPlaces.map((place) => (
                       <li key={place.id} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs">
                         <p className="text-xs font-semibold tracking-wide text-gold-deep uppercase">
@@ -396,7 +396,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     ].filter((item): item is [string, string] => Boolean(item));
                     return <>
                       {description ? <p className="mt-3 leading-relaxed text-ink-soft">{description}</p> : null}
-                      {metrics.length > 0 ? <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
+                      {metrics.length > 0 ? <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
                       {(profile.dataSource || profile.measuredAt) ? <p className="mt-4 text-xs text-ink-muted">{profile.dataSource ? `${neighborhoodText("source")}: ${profile.dataSource}` : ""}{profile.dataSource && profile.measuredAt ? " · " : ""}{profile.measuredAt ? `${neighborhoodText("measuredAt")}: ${new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(profile.measuredAt)}` : ""}</p> : null}
                     </>;
                   })()}

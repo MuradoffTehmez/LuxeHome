@@ -58,7 +58,7 @@ export default async function AdminSeoPage({ searchParams }: Props) {
         breadcrumbs={[{ label: t("pages.serp.idarePaneli"), href: "/admin" }, { label: t("pages.serp.seoAuditi") }]}
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {(Object.keys(metricLabels(t)) as Array<keyof ReturnType<typeof metricLabels>>).map((key) => (
           <div key={key} className="rounded-xl border border-line bg-paper p-4 shadow-xs">
             <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">{metricLabels(t)[key]}</p>
@@ -87,7 +87,7 @@ export default async function AdminSeoPage({ searchParams }: Props) {
         ) : (
           <ul className="divide-y divide-line">
             {visibleIssues.map((issue, index) => (
-              <li key={`${issue.contentId}-${issue.code}-${index}`} className="grid min-w-0 gap-3 px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-5">
+              <li key={`${issue.contentId}-${issue.code}-${index}`} className="grid grid-cols-1 min-w-0 gap-3 px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-5">
                 {issue.severity === "error" ? <AlertCircle className="size-5 text-danger" aria-hidden="true" /> : issue.severity === "warning" ? <AlertTriangle className="size-5 text-warning" aria-hidden="true" /> : <CheckCircle2 className="size-5 text-info" aria-hidden="true" />}
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-ink-muted">{kindLabels(t)[issue.kind]} · {severityLabels(t)[issue.severity]}</p>

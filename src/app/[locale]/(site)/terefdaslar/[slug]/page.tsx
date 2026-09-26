@@ -157,7 +157,7 @@ export default async function PartnerDetailPage({ params }: Props) {
           { label: t("navLabel"), href: "/terefdaslar" },
           { label: partner.name },
         ]}
-        actions={<PartnerLogo partner={partner} size="lg" priority />}
+        media={<div className="rounded-xl border border-line bg-paper p-4 shadow-xs"><PartnerLogo partner={partner} size="lg" priority /></div>}
       />
 
       <Section tone="ivory" spacing="compact" className="border-b border-line">
@@ -225,7 +225,7 @@ export default async function PartnerDetailPage({ params }: Props) {
       {description || roles.length > 0 ? (
         <Section tone="paper" spacing="cozy">
           <Container>
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
               {description ? (
                 <div className="flex flex-col gap-4">
                   <h2 className="font-display text-2xl text-ink sm:text-3xl">
@@ -273,7 +273,7 @@ export default async function PartnerDetailPage({ params }: Props) {
             <h2 className="mb-8 font-display text-2xl text-ink sm:text-3xl">
               {t("detail.relatedProjects")}
             </h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {projects.map((link) => (
                 <ProjectCard key={link.project.id} project={link.project} />
               ))}
@@ -316,7 +316,7 @@ export default async function PartnerDetailPage({ params }: Props) {
             <h2 className="mb-8 font-display text-2xl text-ink sm:text-3xl">
               {t("detail.relatedAgencies")}
             </h2>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {agencies.map((link) => (
                 <li key={link.agency.id}>
                   <Link

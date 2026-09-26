@@ -13,7 +13,8 @@ const SIZES = {
 
 /**
  * Səhifə boyu eyni yan boşluqları təmin edir.
- * Gutter breakpoint-lərə görə artır (mobil 20px → desktop 40px).
+ * Gutter breakpoint-lərə görə artır (mobil 20px → desktop 40px) və safe area-dan
+ * kiçik olmur.
  */
 export function Container({
   size = "default",
@@ -23,7 +24,16 @@ export function Container({
 }: ContainerProps) {
   return (
     <Tag
-      className={cn("mx-auto w-full px-5 sm:px-6 lg:px-10", SIZES[size], className)}
+      className={cn(
+        "mx-auto w-full",
+        // Gutter safe area ilə max() olunur: landscape iPhone-da məzmun notch
+        // altına düşmür, fon isə kənardan-kənara qalır (viewportFit: cover).
+        "pr-[max(1.25rem,var(--safe-right))] pl-[max(1.25rem,var(--safe-left))]",
+        "sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))]",
+        "lg:pr-[max(2.5rem,var(--safe-right))] lg:pl-[max(2.5rem,var(--safe-left))]",
+        SIZES[size],
+        className,
+      )}
       {...props}
     />
   );

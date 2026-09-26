@@ -74,7 +74,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
       </Overlay>
 
       <div className="flex min-h-dvh flex-col lg:pl-[292px]">
-        <header className="sticky top-0 z-[var(--z-header)] flex min-h-[72px] items-center gap-3 border-b border-line bg-paper/90 px-4 shadow-xs backdrop-blur-xl sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-[var(--z-header)] flex min-h-[72px] items-center gap-3 border-b border-line bg-paper/90 pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))] sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] lg:px-8 shadow-xs backdrop-blur-xl">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -91,7 +91,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:ml-0">
-            <Link href={localizePath("/", locale)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink">
+            <Link href={localizePath("/", locale)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink">
               <ExternalLink className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">{t("shell.openSite")}</span>
             </Link>
@@ -121,7 +121,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
           </div>
         </header>
 
-        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <main className="min-w-0 flex-1 pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))] sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] lg:px-8 py-6 pb-[calc(1.5rem+var(--safe-bottom))] sm:py-8">
           <div className="mx-auto w-full max-w-[1600px]">{children}</div>
         </main>
       </div>

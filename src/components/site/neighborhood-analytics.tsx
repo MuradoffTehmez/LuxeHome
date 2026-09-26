@@ -76,11 +76,11 @@ export function NeighborhoodAnalytics({
         {description && <p className="mt-5 max-w-3xl leading-relaxed text-ink-soft">{description}</p>}
 
         {metrics.length > 0 && (
-          <dl className="mt-7 grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+          <dl className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {metrics.map(([label, value]) => (
-              <div key={label} className="flex flex-col gap-1 bg-paper px-5 py-4">
-                <dt className="text-xs tracking-wide text-ink-muted uppercase">{label}</dt>
-                <dd className="font-display text-xl text-ink">{value}</dd>
+              <div key={label} className="flex flex-col gap-1 rounded-xl border border-line bg-paper px-5 py-4 shadow-xs">
+                <dt className="text-xs font-semibold text-ink-muted">{label}</dt>
+                <dd className="tabular text-xl font-semibold tracking-[-0.02em] text-ink">{value}</dd>
               </div>
             ))}
           </dl>

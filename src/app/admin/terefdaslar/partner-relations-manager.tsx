@@ -41,7 +41,7 @@ export function PartnerRelationsManager({
 
   return (
     <div className="flex flex-col gap-6">
-      <form action={addAction} className="grid gap-4 rounded-xl border border-line bg-paper p-4 sm:grid-cols-2 sm:p-5 shadow-xs">
+      <form action={addAction} className="grid grid-cols-1 gap-4 rounded-xl border border-line bg-paper p-4 sm:grid-cols-2 sm:p-5 shadow-xs">
         <input type="hidden" name="partnerId" value={partnerId} />
         <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
           {t("pages.partners.elaqeNovu")}

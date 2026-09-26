@@ -178,7 +178,7 @@ export function FormSection({
         <h2 className="text-base font-semibold tracking-[-0.01em] text-ink">{title}</h2>
         {description && <p className="mt-0.5 text-sm text-ink-muted">{description}</p>}
       </header>
-      <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">{children}</div>
+      <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-5">{children}</div>
     </Tag>
   );
 }

@@ -185,7 +185,7 @@ export function Overlay({
           className,
         )}
       >
-        <header className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
+        <header className="flex shrink-0 items-start justify-between gap-4 border-b border-line pr-[max(1.25rem,var(--safe-right))] pl-[max(1.25rem,var(--safe-left))] sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] py-4">
           <div className="min-w-0 flex-1">
             <h2 id={titleId} className="font-display text-xl text-ink">
               {title}
@@ -201,12 +201,12 @@ export function Overlay({
           </IconButton>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-[max(1.25rem,var(--safe-right))] pl-[max(1.25rem,var(--safe-left))] sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] pt-5 pb-[calc(1.25rem+var(--safe-bottom))]">
           {children}
         </div>
 
         {footer ? (
-          <footer className="flex shrink-0 flex-wrap justify-end gap-3 border-t border-line px-5 py-4 sm:px-6">
+          <footer className="flex shrink-0 flex-wrap justify-end gap-3 border-t border-line pr-[max(1.25rem,var(--safe-right))] pl-[max(1.25rem,var(--safe-left))] sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] py-4">
             {footer}
           </footer>
         ) : null}

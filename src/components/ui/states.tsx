@@ -114,7 +114,7 @@ export function DetailSkeleton() {
       </header>
       <Section tone="ivory" spacing="cozy">
         <Container>
-          <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
+          <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
             <div className="flex min-w-0 flex-col gap-6">
               <Skeleton className="aspect-16/9 w-full rounded-md" />
               <Skeleton className="h-8 w-3/4" />
@@ -134,7 +134,7 @@ export function DetailSkeleton() {
 
 export function TableSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="flex flex-col gap-px overflow-hidden rounded-md border border-line bg-line">
+    <div className="flex flex-col gap-px overflow-hidden rounded-xl border border-line bg-line">
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="flex items-center gap-4 bg-paper px-4 py-4">
           <Skeleton className="size-12 shrink-0 rounded-xs" />

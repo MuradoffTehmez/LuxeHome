@@ -36,7 +36,7 @@ export async function AdminPageHeader({
                 {crumb.href ? (
                   <Link
                     href={crumb.href}
-                    className="underline-offset-4 transition-colors hover:text-ink hover:underline"
+                    className="relative underline-offset-4 transition-colors after:absolute after:inset-x-0 after:-inset-y-3.5 after:content-[''] hover:text-ink hover:underline"
                   >
                     {crumb.label}
                   </Link>
@@ -167,7 +167,9 @@ export function AdminTable({
 }) {
   return (
     // Dar ekranda cədvəl öz içində sürüşür — səhifə üfüqi sürüşmür
-    <div className="overflow-x-auto">
+    // `relative` vacibdir: başlıqdakı `sr-only` (position: absolute) əks halda scroll
+    // konteynerindən qaçıb sənədi üfüqi daşdırırdı (1024px-də +264px).
+    <div className="relative overflow-x-auto">
       <table className="w-full min-w-3xl border-collapse text-sm">
         {caption && <caption className="sr-only">{caption}</caption>}
         <thead>

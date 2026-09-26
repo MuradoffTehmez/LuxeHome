@@ -28,7 +28,7 @@ export default async function AgentsPage({ params }: { params: Promise<{ locale:
           {agents.length === 0 ? (
             <EmptyState title={t("notFound")} description={t("description")} />
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {agents.map((agent) => <AgentCard key={agent.id} agent={agent} headingLevel="h2" />)}
             </div>
           )}

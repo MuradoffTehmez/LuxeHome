@@ -373,7 +373,7 @@ export function PropertyForm({
                   <legend className="mb-1 text-xs font-semibold tracking-wide text-ink-muted uppercase">
                     {t(`labels.featureGroup.${group as FeatureGroup}`) ?? group}
                   </legend>
-                  <div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
                     {features.map((feature) => (
                       <AdminCheckbox
                         key={feature.id}

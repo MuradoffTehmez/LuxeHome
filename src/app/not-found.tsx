@@ -15,8 +15,8 @@ export default function NotFound() {
     <main className="flex min-h-[70vh] items-center bg-ivory text-ink">
       <Container>
         <div className="mx-auto max-w-xl py-20 text-center">
-          <p className="font-serif text-6xl text-gold sm:text-7xl">404</p>
-          <h1 className="mt-6 font-serif text-3xl text-ink sm:text-4xl">
+          <p className="font-display text-6xl text-gold sm:text-7xl">404</p>
+          <h1 className="mt-6 font-display text-3xl text-ink sm:text-4xl">
             {t("title")}
           </h1>
           <p className="mt-4 text-ink-soft">

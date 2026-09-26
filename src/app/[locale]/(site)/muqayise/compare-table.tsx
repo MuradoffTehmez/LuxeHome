@@ -224,7 +224,7 @@ export function ComparePresentation({
         </article>
       </div>
 
-      <div className="hidden overflow-x-auto rounded-sm border border-line lg:block">
+      <div className="relative hidden overflow-x-auto rounded-xl border border-line lg:block">
         <table className="w-full min-w-160 border-collapse text-sm">
           <thead>
             <tr className="border-b border-line bg-beige">

@@ -359,13 +359,20 @@ export function LeafletMap({
         className="size-full min-h-40"
       />
 
-      <div className="pointer-events-none absolute top-3 right-3 z-[500] flex flex-col gap-2">
+      <div
+        className={cn(
+          "pointer-events-none absolute z-[500] flex flex-col gap-2",
+          // Tam ekranda xəritə kənardan-kənaradır: landscape iPhone-da düymələr
+          // notch/status zolağının altına düşməsin (viewportFit: cover).
+          fullscreen ? "top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,var(--safe-right))]" : "top-3 right-3",
+        )}
+      >
         <button
           type="button"
           onClick={recenter}
           aria-label={labels.recenter}
           title={labels.recenter}
-          className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
+          className="pointer-events-auto inline-flex size-11 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
         >
           <Crosshair className="size-4" aria-hidden="true" />
         </button>
@@ -376,7 +383,7 @@ export function LeafletMap({
             aria-label={fullscreen ? labels.collapse : labels.expand}
             title={fullscreen ? labels.collapse : labels.expand}
             aria-pressed={fullscreen}
-            className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
+            className="pointer-events-auto inline-flex size-11 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
           >
             {fullscreen ? <Minimize2 className="size-4" aria-hidden="true" /> : <Expand className="size-4" aria-hidden="true" />}
           </button>

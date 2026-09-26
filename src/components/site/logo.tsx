@@ -37,7 +37,7 @@ export function Logo({
     <Link
       href="/"
       aria-label={t("logoHome", { brand: siteConfig.name })}
-      className={cn("group inline-flex shrink-0 items-center gap-2 sm:gap-3", className)}
+      className={cn("group inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 sm:gap-3", className)}
     >
       {!markless && (
         <Image

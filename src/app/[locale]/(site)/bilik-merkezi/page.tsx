@@ -268,7 +268,7 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
       {/* Lüğət və hesablayıcı keçidləri */}
       <Section tone="paper" spacing="compact" className="border-t border-line">
         <Container>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Link
               href="/lugat"
               className="group flex min-w-0 items-start gap-4 rounded-xl border border-line bg-ivory p-6 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold shadow-xs"

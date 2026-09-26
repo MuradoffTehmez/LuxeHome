@@ -65,7 +65,7 @@ export default async function AdminMediaPage({
             {q ? t("pages.misc.buAxtarisaUygunFayl") : t("pages.misc.heleFaylYuklenmeyib")}
           </p>
         ) : (
-          <ul className="grid gap-4 p-4 min-[480px]:grid-cols-2 lg:grid-cols-3 lg:p-5 xl:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-4 p-4 min-[480px]:grid-cols-2 lg:grid-cols-3 lg:p-5 xl:grid-cols-4">
             {rows.map((media) => (
               <MediaCard
                 key={media.id}

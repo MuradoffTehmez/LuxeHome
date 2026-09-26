@@ -115,7 +115,7 @@ export default async function AdminDashboardPage() {
       )}
 
       {/* --- Sayğaclar --- */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label={t("dashboard.stats.activeProperties")}
           value={stats.activeProperties}
@@ -149,7 +149,7 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_1fr]">
         {/* --- Son müraciətlər --- */}
         <AdminCard
           title={t("dashboard.recentLeads.title")}
@@ -278,7 +278,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* --- Analitika --- */}
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_1fr]">
         <AdminCard title={t("dashboard.topViewed.title")} description={t("dashboard.topViewed.description")} bodyClassName="p-0">
           <ul className="divide-y divide-line">
             {topViewed.length === 0 && (
@@ -336,7 +336,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* --- Sürətli keçidlər --- */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: t("dashboard.quickActions.newProperty"), href: "/admin/emlaklar/yeni", icon: Building2 },
           { label: t("dashboard.quickActions.newProject"), href: "/admin/layiheler/yeni", icon: Blocks },

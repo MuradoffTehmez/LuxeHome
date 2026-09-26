@@ -69,7 +69,7 @@ export default async function AgenciesPage({ params }: PageProps) {
           />
 
           {agents.length > 0 ? (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {agents.map((agent, index) => (
                 <Reveal key={agent.id} delay={index * 60}>
                   <AgentCard agent={agent} />
