@@ -54,7 +54,7 @@ export function PropertyResultsMap({
 
   if (markers.length === 0) {
     return (
-      <div className="flex min-h-64 items-center justify-center rounded-md border border-line bg-paper p-8 text-center text-sm text-ink-muted">
+      <div className="flex min-h-64 items-center justify-center rounded-xl border border-line bg-paper p-8 text-center text-sm text-ink-muted">
         {t("mapEmpty")}
       </div>
     );

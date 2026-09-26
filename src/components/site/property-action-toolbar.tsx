@@ -40,7 +40,7 @@ export function PropertyActionToolbar({
     <>
       <nav
         aria-label={t("propertyActions")}
-        className="grid grid-cols-4 divide-x divide-line border-y border-line bg-paper sm:ml-auto sm:max-w-md"
+        className="grid grid-cols-4 divide-x divide-line overflow-hidden rounded-full border border-line bg-paper shadow-xs sm:ml-auto sm:max-w-md"
       >
         <div className="flex min-h-14 items-center justify-center">
           <FavoriteButton propertyId={propertyId} className={iconButtonClass} />

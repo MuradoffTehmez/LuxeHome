@@ -89,14 +89,15 @@ function ViewToggle({
   compact?: boolean;
 }) {
   const base = cn(
-    "inline-flex min-h-11 items-center justify-center gap-1.5 text-sm font-medium transition-colors",
-    compact ? "w-11" : "px-3",
+    "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-[7px] text-sm font-medium transition-colors",
+    compact ? "w-9" : "px-3",
   );
-  const active = "bg-ink text-ink-invert";
-  const idle = "text-ink-soft hover:text-gold-deep";
+  // Seqment nəzarəti: aktiv düymə açıq «kart» kimi qalxır.
+  const active = "bg-paper text-ink shadow-sm";
+  const idle = "text-ink-soft hover:text-ink";
 
   return (
-    <div className="inline-flex shrink-0 overflow-hidden rounded-xs border border-line">
+    <div className="inline-flex shrink-0 gap-1 rounded-sm border border-line bg-beige/60 p-1">
       <Link
         href={listHref}
         aria-current={!isMapView}
@@ -110,7 +111,7 @@ function ViewToggle({
         href={mapHref}
         aria-current={isMapView}
         title={compact ? mapLabel : undefined}
-        className={cn(base, "border-l border-line", isMapView ? active : idle)}
+        className={cn(base, isMapView ? active : idle)}
       >
         <MapIcon className="size-4 shrink-0" aria-hidden="true" />
         <span className={compact ? "sr-only" : undefined}>{mapLabel}</span>
@@ -323,16 +324,6 @@ export default async function PropertiesPage({ params: routeParams, searchParams
             title={listingLabel ? t("propertiesPage.typedTitle", { type: listingLabel }) : t("propertiesPage.allTitle")}
             description={t("results", { count: total })}
           />
-          <div className="mt-8">
-            <SearchPanel
-              types={typeOptions}
-              cities={cityOptions}
-              metros={metroOptions}
-              features={featureOptions}
-              variant="page"
-              initial={initialSearch}
-            />
-          </div>
         </Container>
       </Section>
 
@@ -341,9 +332,26 @@ export default async function PropertiesPage({ params: routeParams, searchParams
       <Section
         tone="ivory"
         spacing="none"
-        className="pt-8 pb-16 sm:pt-10 sm:pb-20 lg:pt-12 lg:pb-24"
+        className="pt-8 pb-16 sm:pt-10 sm:pb-20 lg:pt-10 lg:pb-24"
       >
-        <Container>
+        <Container size="wide">
+          {/* Desktop: filtrlər solda sticky sidebar-dadır. Əvvəl tam panel
+              nəticələrin üstündə idi və onları bir ekrandan çox aşağı itələyirdi. */}
+          <div className="lg:grid lg:grid-cols-[19rem_minmax(0,1fr)] lg:items-start lg:gap-8 xl:gap-10">
+          <aside className="hidden lg:block lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
+            <div className="max-h-[calc(100dvh-var(--header-h)-3rem)] overflow-y-auto overscroll-contain rounded-xl">
+              <SearchPanel
+                types={typeOptions}
+                cities={cityOptions}
+                metros={metroOptions}
+                features={featureOptions}
+                variant="page"
+                initial={initialSearch}
+              />
+            </div>
+          </aside>
+
+          <div className="min-w-0">
           <ResponsiveToolbar
             mobile={
               <div className="-mx-4 flex min-h-14 items-center justify-between gap-2 px-2 sm:-mx-6 sm:px-4">
@@ -370,7 +378,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
               </div>
             }
             desktop={
-              <div className="mb-8 flex items-start justify-between gap-6 border-b border-line pb-6">
+              <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-line bg-paper px-4 py-3 shadow-xs">
                 {activeFilters.length > 0 ? (
                   <ActiveFilterChips items={activeFilters} resetHref="/emlaklar" />
                 ) : (
@@ -378,7 +386,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                     {t("propertiesPage.noFilters")}
                   </p>
                 )}
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="ml-auto flex shrink-0 items-center gap-3">
                   <ViewToggle
                     isMapView={isMapView}
                     listHref={buildPropertySearchHref(searchState, { gorunus: null })}
@@ -414,7 +422,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
             />
           ) : items.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 min-[85rem]:grid-cols-3">
                 {items.map((property, index) => (
                   <Reveal key={property.id} delay={index * 40}>
                     <PropertyCard property={property} priority={index === 0} />
@@ -436,6 +444,8 @@ export default async function PropertiesPage({ params: routeParams, searchParams
               action={{ label: t("propertiesPage.viewAll"), href: "/emlaklar" }}
             />
           )}
+          </div>
+          </div>
         </Container>
       </Section>
     </>

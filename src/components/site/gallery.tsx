@@ -107,7 +107,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
     return (
       <div
         className={cn(
-          "flex aspect-16/9 items-center justify-center rounded-md bg-beige text-ink-muted",
+          "flex aspect-16/9 items-center justify-center rounded-xl bg-beige text-ink-muted",
           className,
         )}
       >
@@ -118,11 +118,11 @@ export function Gallery({ images, title, className }: GalleryProps) {
 
   const current = images[index];
   const arrowClassName =
-    "pointer-events-auto inline-flex size-10 items-center justify-center rounded-full bg-charcoal/55 text-white backdrop-blur-sm transition-colors hover:bg-charcoal/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
+    "pointer-events-auto inline-flex size-10 items-center justify-center rounded-full on-image-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <div className="relative overflow-hidden rounded-md bg-beige">
+      <div className="relative overflow-hidden rounded-xl bg-beige">
         <div
           ref={railRef}
           onScroll={handleRailScroll}
@@ -166,7 +166,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
 
         <p
           aria-live="polite"
-          className="tabular pointer-events-none absolute bottom-3 left-3 rounded-xs bg-charcoal/65 px-2.5 py-1 text-xs text-white backdrop-blur-sm"
+          className="tabular pointer-events-none absolute bottom-3 left-3 on-image-chip rounded-full px-2.5 py-1 text-xs"
         >
           {index + 1} / {total}
         </p>
@@ -174,7 +174,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
         <button
           type="button"
           onClick={() => openAt(index)}
-          className="absolute right-3 bottom-3 inline-flex min-h-9 items-center gap-2 rounded-xs bg-charcoal/65 px-3 text-xs font-medium text-white backdrop-blur-sm transition-colors hover:bg-charcoal/85"
+          className="absolute right-3 bottom-3 inline-flex min-h-9 items-center gap-2 on-image-chip rounded-full px-3.5 text-xs font-semibold"
         >
           <Expand className="size-4" aria-hidden="true" />
           {t("showAll", { count: total })}
@@ -196,7 +196,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
               aria-label={t("thumbnail", { index: imageIndex + 1 })}
               aria-current={imageIndex === index}
               className={cn(
-                "relative aspect-4/3 w-20 shrink-0 overflow-hidden rounded-xs bg-beige transition-opacity sm:w-24",
+                "relative aspect-4/3 w-20 shrink-0 overflow-hidden rounded-md bg-beige transition-opacity sm:w-24",
                 imageIndex === index
                   ? "ring-2 ring-gold ring-offset-1 ring-offset-ivory"
                   : "opacity-65 hover:opacity-100",

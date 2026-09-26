@@ -53,7 +53,7 @@ export function SortSelect({ value, hrefs, compact = false, className }: SortSel
             router.push(href);
           }}
           className={cn(
-            "min-h-11 w-full cursor-pointer appearance-none rounded-xs border border-line-strong bg-paper pr-9 pl-3 text-sm text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold",
+            "min-h-11 w-full cursor-pointer appearance-none rounded-sm border border-line-strong bg-paper pr-9 pl-3 text-sm text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold",
             compact && "max-w-36",
           )}
         >

@@ -170,7 +170,7 @@ export function Overlay({
         aria-hidden="true"
         onClick={onClose}
         className={cn(
-          "absolute inset-0 cursor-default bg-charcoal/60 backdrop-blur-[2px]",
+          "absolute inset-0 cursor-default bg-black/55 backdrop-blur-[2px]",
           closing ? "animate-fade-out" : "animate-fade-in",
         )}
       />

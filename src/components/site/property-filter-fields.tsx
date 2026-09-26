@@ -67,6 +67,11 @@ export type PropertyFilterFieldsProps = {
   features: FeatureOption[];
   initial: SearchPanelInitial;
   mode: "compact" | "full";
+  /**
+   * `stack` — tək sütun (desktop sidebar); `grid` — çoxsütunlu (mobil sheet).
+   * Yalnız `full` rejimində nəzərə alınır.
+   */
+  layout?: "grid" | "stack";
 };
 
 const RENOVATION_KEYS = { COSMETIC: "cosmetic", RENOVATED: "renovated", DESIGNER: "designer", UNRENOVATED: "unrenovated", NEW_BUILDING: "newBuilding" } as const;
@@ -75,10 +80,10 @@ const BUILDING_KEYS = { NEW: "new", OLD: "old" } as const;
 const FEATURE_GROUP_KEYS = { GENERAL: "general", UTILITY: "utility", INDOOR: "indoor", OUTDOOR: "outdoor", SECURITY: "security", PAYMENT: "payment" } as const;
 
 const CONTROL =
-  "min-h-12 min-w-0 w-full rounded-xs border border-line-strong bg-paper px-3 text-base text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold sm:text-sm";
+  "min-h-12 min-w-0 w-full rounded-sm border border-line-strong bg-paper px-3 text-base text-ink transition-[border-color,box-shadow] duration-200 hover:border-ink-muted focus:border-gold focus:shadow-[0_0_0_4px_rgb(170_135_84/0.16)] sm:text-sm";
 const SELECT_CLASS = cn(CONTROL, "cursor-pointer appearance-none pr-9");
 const INPUT_CLASS = cn(CONTROL, "placeholder:text-ink-muted");
-const LABEL_CLASS = "text-xs font-medium tracking-wide text-ink-soft";
+const LABEL_CLASS = "text-xs font-semibold text-ink-soft";
 
 function SelectField({
   id,
@@ -227,7 +232,9 @@ export function PropertyFilterFields({
   features,
   initial,
   mode,
+  layout = "grid",
 }: PropertyFilterFieldsProps) {
+  const stacked = mode === "full" && layout === "stack";
   const t = useTranslations("listings.search");
   const propertyT = useTranslations("property");
   const id = useId();
@@ -257,14 +264,23 @@ export function PropertyFilterFields({
   }, [features]);
 
   return (
-    <div className={cn("grid gap-4", mode === "compact" ? "md:grid-cols-2 lg:grid-cols-12 lg:items-end" : "sm:grid-cols-2 lg:grid-cols-3")}>
+    <div
+      className={cn(
+        "grid gap-4",
+        mode === "compact"
+          ? "md:grid-cols-2 lg:grid-cols-12 lg:items-end"
+          : stacked
+            ? "grid-cols-1"
+            : "sm:grid-cols-2 lg:grid-cols-3",
+      )}
+    >
       {initial.siralama && initial.siralama !== "newest" ? (
         <input type="hidden" name="siralama" value={initial.siralama} />
       ) : null}
 
       <fieldset className={cn("flex flex-col gap-1.5", mode === "compact" && "lg:col-span-3")}>
         <legend className={LABEL_CLASS}>{t("listingType")}</legend>
-        <div className="grid min-h-12 grid-cols-2 rounded-xs border border-line-strong bg-paper p-1">
+        <div className="grid min-h-12 grid-cols-2 rounded-sm border border-line-strong bg-beige/60 p-1">
           {[
             { value: LISTING_TYPES.SALE, label: t("sale") },
             { value: LISTING_TYPES.RENT, label: t("rent") },
@@ -278,7 +294,7 @@ export function PropertyFilterFields({
                 onChange={() => setListingType(option.value)}
                 className="peer sr-only"
               />
-              <span className="flex min-h-11 items-center justify-center rounded-xs px-3 text-sm font-medium text-ink-soft transition-colors peer-checked:bg-charcoal peer-checked:text-ink-invert peer-focus-visible:ring-2 peer-focus-visible:ring-gold">
+              <span className="flex min-h-11 items-center justify-center rounded-[7px] px-3 text-sm font-semibold text-ink-soft transition-colors peer-checked:bg-charcoal peer-checked:text-ink-invert peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-gold">
                 {option.label}
               </span>
             </label>
@@ -413,33 +429,59 @@ export function PropertyFilterFields({
             maxLabel={t("maximum", { unit: t("floor") })}
           />
 
-          <fieldset className="sm:col-span-2 lg:col-span-3">
-            <legend className={LABEL_CLASS}>{t("extra")}</legend>
-            <div className="mt-1 grid sm:grid-cols-2 lg:grid-cols-3">
-              <CheckboxField name="ilk_mertebe_yox" label={t("notFirstFloor")} defaultChecked={initial.ilk_mertebe_yox === "1"} />
-              <CheckboxField name="son_mertebe_yox" label={t("notLastFloor")} defaultChecked={initial.son_mertebe_yox === "1"} />
-              <CheckboxField name="sekilli" label={t("withPhotos")} defaultChecked={initial.sekilli === "1"} />
-            </div>
-          </fieldset>
+          {/* Əlavə filtrlər və ~40 xüsusiyyət checkbox-u açılan bölmədədir: açıq
+              siyahı nəticələri bir ekrandan çox aşağı itələyirdi. Seçim varsa
+              bölmə açıq gəlir ki, aktiv filtr gizli qalmasın. */}
+          <details
+            open={
+              selectedFeatures.size > 0
+              || initial.ilk_mertebe_yox === "1"
+              || initial.son_mertebe_yox === "1"
+              || initial.sekilli === "1"
+              || undefined
+            }
+            className={cn(
+              "group/more rounded-md border border-line bg-ivory/60",
+              !stacked && "sm:col-span-2 lg:col-span-3",
+            )}
+          >
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-ink [&::-webkit-details-marker]:hidden">
+              {t("moreFilters")}
+              <ChevronDown
+                className="size-4 shrink-0 text-ink-muted transition-transform duration-200 group-open/more:rotate-180"
+                aria-hidden="true"
+              />
+            </summary>
+            <div className="flex flex-col gap-5 border-t border-line px-4 pt-4 pb-3">
+              <fieldset>
+                <legend className={LABEL_CLASS}>{t("extra")}</legend>
+                <div className={cn("mt-1 grid", !stacked && "sm:grid-cols-2 lg:grid-cols-3")}>
+                  <CheckboxField name="ilk_mertebe_yox" label={t("notFirstFloor")} defaultChecked={initial.ilk_mertebe_yox === "1"} />
+                  <CheckboxField name="son_mertebe_yox" label={t("notLastFloor")} defaultChecked={initial.son_mertebe_yox === "1"} />
+                  <CheckboxField name="sekilli" label={t("withPhotos")} defaultChecked={initial.sekilli === "1"} />
+                </div>
+              </fieldset>
 
-          {featureGroups.map(([group, items]) => (
-            <fieldset key={group} className="sm:col-span-2 lg:col-span-3">
-              <legend className={LABEL_CLASS}>
-                {FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS] ? propertyT(`featureGroup.${FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS]}`) : group}
-              </legend>
-              <div className="mt-1 grid sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((feature) => (
-                  <CheckboxField
-                    key={feature.value}
-                    name="xususiyyet"
-                    value={feature.value}
-                    label={feature.label}
-                    defaultChecked={selectedFeatures.has(feature.value)}
-                  />
-                ))}
-              </div>
-            </fieldset>
-          ))}
+              {featureGroups.map(([group, items]) => (
+                <fieldset key={group}>
+                  <legend className={LABEL_CLASS}>
+                    {FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS] ? propertyT(`featureGroup.${FEATURE_GROUP_KEYS[group as keyof typeof FEATURE_GROUP_KEYS]}`) : group}
+                  </legend>
+                  <div className={cn("mt-1 grid", stacked ? "grid-cols-2 gap-x-3" : "sm:grid-cols-2 lg:grid-cols-3")}>
+                    {items.map((feature) => (
+                      <CheckboxField
+                        key={feature.value}
+                        name="xususiyyet"
+                        value={feature.value}
+                        label={feature.label}
+                        defaultChecked={selectedFeatures.has(feature.value)}
+                      />
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
+            </div>
+          </details>
         </>
       ) : null}
     </div>

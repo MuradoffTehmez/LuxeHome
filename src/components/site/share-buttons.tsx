@@ -17,7 +17,7 @@ export type ShareButtonsProps = {
 };
 
 const ITEM =
-  "inline-flex min-h-11 items-center gap-2 rounded-xs border border-line-strong px-3.5 " +
+  "inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong px-3.5 " +
   "text-sm text-ink-soft transition-colors duration-200 " +
   "hover:border-gold hover:text-gold-deep cursor-pointer";
 

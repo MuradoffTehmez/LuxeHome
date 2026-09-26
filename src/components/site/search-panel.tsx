@@ -46,10 +46,10 @@ export function SearchPanel({
   return (
     <div
       className={cn(
-        "rounded-sm border p-3 backdrop-blur-md sm:p-5",
+        "rounded-xl border p-3 sm:p-5",
         isPage
           ? "hidden border-line bg-paper shadow-sm lg:block"
-          : "border-white/20 bg-paper/94 shadow-editorial",
+          : "border-white/20 bg-paper/94 shadow-editorial backdrop-blur-md",
         className,
       )}
     >
@@ -68,22 +68,23 @@ export function SearchPanel({
           features={features}
           initial={initial}
           mode={isPage ? "full" : "compact"}
+          layout={isPage ? "stack" : "grid"}
         />
 
         <div className={cn(
-          "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end",
-          !isPage && "lg:block",
+          "flex gap-2",
+          isPage ? "flex-col-reverse" : "flex-col sm:flex-row sm:items-center sm:justify-end lg:block",
         )}>
           {isPage ? (
             <Link
               href="/emlaklar"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xs px-3 text-sm text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm px-3 text-sm text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
               <RotateCcw className="size-4" aria-hidden="true" />
               {t("reset")}
             </Link>
           ) : null}
-          <Button type="submit" size="md" className={cn("sm:min-w-40", !isPage && "w-full sm:w-auto lg:min-w-36")}>
+          <Button type="submit" size="md" className={cn(isPage ? "w-full" : "w-full sm:w-auto sm:min-w-40 lg:min-w-36")}>
             <Search className="size-4" aria-hidden="true" />
             {t("submit")}
           </Button>

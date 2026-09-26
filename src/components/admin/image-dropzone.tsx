@@ -352,7 +352,7 @@ export function ImageDropzone({
                   className={cn("object-cover", item.status !== "ready" && "opacity-50")}
                 />
                 {item.status === "uploading" && (
-                  <span className="absolute inset-0 grid place-items-center bg-charcoal/25">
+                  <span className="absolute inset-0 grid place-items-center bg-black/25">
                     <Loader2 className="size-6 animate-spin text-paper" aria-hidden="true" />
                   </span>
                 )}

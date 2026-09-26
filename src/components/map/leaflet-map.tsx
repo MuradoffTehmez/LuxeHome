@@ -383,7 +383,7 @@ export function LeafletMap({
         )}
       </div>
 
-      <p className="pointer-events-none absolute bottom-2 left-2 z-[500] hidden rounded-xs bg-charcoal/60 px-2 py-1 text-[0.6875rem] text-white sm:block">
+      <p className="pointer-events-none absolute bottom-2 left-2 z-[500] hidden on-image-chip rounded-full px-2.5 py-1 text-[0.6875rem] sm:block">
         {labels.scrollHint}
       </p>
     </div>

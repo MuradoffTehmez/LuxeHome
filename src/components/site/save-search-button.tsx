@@ -54,7 +54,7 @@ export function SaveSearchButton({ filters }: { filters: SavableFilters }) {
         <form action={formAction} className="flex flex-col gap-4" noValidate>
           <input type="hidden" name="filters" value={JSON.stringify(filters)} />
           {state.status === "error" && state.message && (
-            <p role="alert" className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
+            <p role="alert" className="rounded-md border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
               {state.message}
             </p>
           )}
