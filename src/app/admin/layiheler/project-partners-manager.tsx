@@ -9,6 +9,7 @@ import { PARTNER_RELATION_ROLE_LABELS, PARTNER_RELATION_ROLES } from "@/lib/cons
 import type { getAdminProjectPartnerLinks, getPartnerOptions } from "@/lib/queries";
 import { addPartnerRelation, removePartnerRelation } from "../terefdaslar/actions";
 import { useTranslations } from "next-intl";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 type Links = Awaited<ReturnType<typeof getAdminProjectPartnerLinks>>;
 type Options = Awaited<ReturnType<typeof getPartnerOptions>>;
@@ -27,8 +28,10 @@ function SubmitButton() {
 
 export function ProjectPartnersManager({ projectId, links, options }: { projectId: string; links: Links; options: Options }) {
   const t = useTranslations("admin");
-  const [addState, addAction] = useActionState(addPartnerRelation, IDLE_STATE);
-  const [removeState, removeAction] = useActionState(removePartnerRelation, IDLE_STATE);
+  const [addStateRaw, addAction] = useActionState(addPartnerRelation, IDLE_STATE);
+  const addState = useLocalizedActionState(addStateRaw);
+  const [removeStateRaw, removeAction] = useActionState(removePartnerRelation, IDLE_STATE);
+  const removeState = useLocalizedActionState(removeStateRaw);
   const linkedIds = new Set(links.map((link) => link.partnerId));
 
   return (

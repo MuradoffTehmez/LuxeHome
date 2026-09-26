@@ -69,6 +69,18 @@ describe("admin i18n source audit", () => {
     expect(findings).toEqual([]);
   });
 
+  it("action nəticəsini göstərən hər admin komponenti markeri tərcümə edir (#89)", () => {
+    const findings = roots
+      .flatMap(sourceFiles)
+      .filter((file) => file.endsWith(".tsx"))
+      .filter((file) => {
+        const source = readFileSync(file, "utf8");
+        return source.includes("useActionState(") && !/useLocalizedActionState|useServerMessage/.test(source);
+      })
+      .map((file) => file.replace(process.cwd(), ""));
+    expect(findings).toEqual([]);
+  });
+
   it("admin server action-ları istifadəçiyə xam AZ mətni deyil, tərcümə markeri qaytarır (#89)", () => {
     const userFacing =
       /(?:\b(?:success|successWithSecret|failure|permissionError|AdminGuardError)\(\s*|errors(?:\.\w+|\[[^\]]+\])\s*=\s*)(["'`])[^"'`]*[ƏəİıÖöÜüĞğŞşÇç]/g;
