@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ImagePlus,
   Loader2,
+  RotateCcw,
   Star,
   Trash2,
   UploadCloud,
@@ -18,6 +19,8 @@ import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 import { useFieldError } from "./form-shell";
 import { DEFAULT_IMAGE_UPLOAD_URL } from "./image-dropzone-config";
+import { ImagePrepareError, isImageCandidate, prepareImageForUpload } from "./image-prepare";
+import { createUploadLimiter, uploadWithRetry, type UploadFailureKind } from "./image-upload-queue";
 
 /**
  * Şəkil yükləmə sahəsi.
@@ -28,6 +31,11 @@ import { DEFAULT_IMAGE_UPLOAD_URL } from "./image-dropzone-config";
  *
  * Forma dəyəri gizli input-larda JSON kimi gedir — sıra, alt mətn və üz qabığı
  * seçimi bir sahədə saxlanılır və server tərəfdə bir yerdə oxunur.
+ *
+ * Toplu yükləmə (#79): fayllar brauzerdə 2400 px-ə kiçildilir (`image-prepare.ts`)
+ * və paylaşılan növbə ilə eyni anda ən çox iki-iki göndərilir, keçici xətada
+ * təkrar cəhd olunur (`image-upload-queue.ts`). Əvvəl hamısı paralel gedirdi və
+ * Worker-in yaddaş limitinə dəyirdi.
  */
 
 export type DropzoneImage = {
@@ -40,6 +48,8 @@ type Item = DropzoneImage & {
   id: string;
   status: "ready" | "uploading" | "error";
   error?: string;
+  /** Orijinal fayl yaddaşdadır — «Yenidən cəhd et» göstərilir. */
+  retryable?: boolean;
 };
 
 type ImageDropzoneProps = {
@@ -100,61 +110,108 @@ export function ImageDropzone({
     ),
   );
 
-  async function upload(file: File, id: string, sequence: number) {
-    if (file.size > maxFileSize) {
-      setItems((current) =>
-        current.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                status: "error",
-                error: t("components.dropzone.tooLarge", { size: Math.round(maxFileSize / 1024 / 1024) }),
-              }
-            : item,
-        ),
-      );
-      return;
+  // Komponent boyu bir növbə: yükləmə davam edərkən əlavə olunan fayllar da
+  // eyni paralellik limitinə tabedir.
+  const limiterRef = useRef<ReturnType<typeof createUploadLimiter> | null>(null);
+  // Uğursuz faylı «Yenidən cəhd et» ilə təkrar göndərmək üçün orijinal saxlanılır.
+  // `uploadId` fayl başına bir dəfə yaranır və təkrar cəhdlərdə dəyişmir — server
+  // onunla cavabı itmiş, amma saxlanmış yükləməni tanıyır (idempotentlik).
+  const filesRef = useRef(new Map<string, { file: File; sequence: number; uploadId: string }>());
+
+  function markError(id: string, error: string) {
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id ? { ...item, status: "error", error, retryable: filesRef.current.has(id) } : item,
+      ),
+    );
+  }
+
+  function failureMessage(kind: UploadFailureKind, message?: string): string {
+    switch (kind) {
+      case "rateLimited":
+        return t("components.dropzone.rateLimited");
+      case "tooLarge":
+        return t("components.dropzone.tooLarge", { size: Math.round(maxFileSize / 1024 / 1024) });
+      case "network":
+        return t("components.dropzone.network");
+      case "server":
+        return t("components.dropzone.serverBusy");
+      default:
+        return message ?? t("components.dropzone.uploadFailed");
     }
+  }
 
-    const body = new FormData();
-    body.append("file", file);
-    body.append("folder", folder);
-    if (seoNamePrefix) body.append("seoName", `${seoNamePrefix}-${String(sequence).padStart(2, "0")}`);
+  async function upload(file: File, id: string, sequence: number) {
+    const uploadId = filesRef.current.get(id)?.uploadId ?? crypto.randomUUID();
+    filesRef.current.set(id, { file, sequence, uploadId });
+    limiterRef.current ??= createUploadLimiter();
 
-    try {
-      const response = await fetch(uploadUrl, { method: "POST", body });
-      const payload = (await response.json()) as { url?: string; error?: string };
-
-      if (!response.ok || !payload.url) {
-        throw new Error(payload.error ?? t("components.dropzone.uploadFailed"));
+    await limiterRef.current(async () => {
+      let prepared: File;
+      try {
+        prepared = await prepareImageForUpload(file, maxFileSize);
+      } catch (error) {
+        const kind = error instanceof ImagePrepareError ? error.kind : "unsupported";
+        markError(
+          id,
+          kind === "tooLarge"
+            ? t("components.dropzone.tooLarge", { size: Math.round(maxFileSize / 1024 / 1024) })
+            : t("components.dropzone.unsupported"),
+        );
+        return;
       }
 
+      if (prepared.size > maxFileSize) {
+        markError(id, t("components.dropzone.tooLarge", { size: Math.round(maxFileSize / 1024 / 1024) }));
+        return;
+      }
+
+      const result = await uploadWithRetry(() => {
+        // Hər cəhd üçün yeni gövdə — `fetch` göndərilmiş gövdəni təkrar oxumur.
+        const body = new FormData();
+        body.append("file", prepared);
+        body.append("folder", folder);
+        body.append("uploadId", uploadId);
+        if (seoNamePrefix) body.append("seoName", `${seoNamePrefix}-${String(sequence).padStart(2, "0")}`);
+        return fetch(uploadUrl, { method: "POST", body });
+      });
+
+      if (!result.ok) {
+        markError(id, failureMessage(result.kind, result.message));
+        return;
+      }
+
+      filesRef.current.delete(id);
       setItems((current) =>
         withCover(
           current.map((item) =>
-            item.id === id ? { ...item, url: payload.url!, status: "ready" } : item,
+            item.id === id ? { ...item, url: result.url, status: "ready", error: undefined } : item,
           ),
         ),
       );
-    } catch (error) {
-      setItems((current) =>
-        current.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                status: "error",
-                error: error instanceof Error ? error.message : t("components.dropzone.uploadFailed"),
-              }
-            : item,
-        ),
-      );
+    });
+  }
+
+  function retry(id: string) {
+    const entry = filesRef.current.get(id);
+    if (!entry) return;
+    // Uğursuz şəkil limitə sayılmır; istifadəçi onun yerinə başqasını əlavə edibsə,
+    // təkrar cəhd `maxFiles`-i aşar və forma bütövlükdə rədd olunar.
+    const active = items.filter((item) => item.status !== "error").length;
+    if (maxFiles !== undefined && active >= maxFiles) {
+      markError(id, t("components.dropzone.limitReached", { max: maxFiles }));
+      return;
     }
+    setItems((current) =>
+      current.map((item) => (item.id === id ? { ...item, status: "uploading", error: undefined } : item)),
+    );
+    void upload(entry.file, id, entry.sequence);
   }
 
   function addFiles(files: FileList | null) {
     if (!files?.length) return;
 
-    const selected = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    const selected = Array.from(files).filter(isImageCandidate);
     const currentCount = items.filter((item) => item.status !== "error").length;
     const available = maxFiles === undefined ? selected.length : Math.max(0, maxFiles - currentCount);
     const limited = mode === "single" ? selected.slice(0, 1) : selected.slice(0, available);
@@ -173,6 +230,7 @@ export function ImageDropzone({
   }
 
   function remove(id: string) {
+    filesRef.current.delete(id);
     setItems((current) => withCover(current.filter((item) => item.id !== id)));
   }
 
@@ -387,7 +445,18 @@ export function ImageDropzone({
               )}
 
               {item.status === "error" && (
-                <div className="flex justify-end bg-paper px-2 py-1.5">
+                <div className="flex justify-end gap-0.5 bg-paper px-2 py-1.5">
+                  {item.retryable && (
+                    <button
+                      type="button"
+                      onClick={() => retry(item.id)}
+                      aria-label={t("components.dropzone.retry")}
+                      title={t("components.dropzone.retry")}
+                      className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-beige hover:text-gold-deep"
+                    >
+                      <RotateCcw className="size-4" aria-hidden="true" />
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => remove(item.id)}

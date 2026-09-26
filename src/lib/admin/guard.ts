@@ -98,6 +98,16 @@ export async function assertSameOrigin(): Promise<void> {
   }
 }
 
+/**
+ * Yazma sürət limiti aşılıb.
+ *
+ * `AdminGuardError`-dan törəyir ki, mövcud action-ların `catch` bloku dəyişmədən
+ * işləsin; route handler-lər isə onu 403 əvəzinə 429 ilə qaytarır — client
+ * (məsələn, şəkil yükləmə növbəsi) keçici limiti icazə xətasından ayırd edib
+ * təkrar cəhd edə bilir.
+ */
+export class RateLimitGuardError extends AdminGuardError {}
+
 async function assertWriteLimit(userId: string, scope: string): Promise<void> {
   // Lokal `next dev` mühitində binding olmaya bilər — limit orada tətbiq edilmir
   const limiter = getCloudflareContext().env.ADMIN_LIMIT;
@@ -105,7 +115,7 @@ async function assertWriteLimit(userId: string, scope: string): Promise<void> {
 
   const { success } = await limiter.limit({ key: `${scope}:${userId}` });
   if (!success) {
-    throw new AdminGuardError("Çox sayda əməliyyat oldu. Bir dəqiqə gözləyin.");
+    throw new RateLimitGuardError("Çox sayda əməliyyat oldu. Bir dəqiqə gözləyin.");
   }
 }
 
