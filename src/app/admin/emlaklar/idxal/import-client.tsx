@@ -134,7 +134,7 @@ export function PropertyImportClient() {
     }
   }
 
-  const created = results.filter((row) => row.status === "created");
+  const created = results.filter((row) => row.status === "created" || row.status === "resumed");
   const duplicates = results.filter((row) => row.status === "duplicate").length;
   const failed = results.filter((row) => row.status === "failed" || row.status === "invalid").length;
   const imagesFailed = created.reduce((sum, row) => sum + (row.imagesFailed ?? 0), 0);
@@ -263,7 +263,7 @@ export function PropertyImportClient() {
                       <td className="px-3 py-3 tabular text-ink-soft">{row.imageCount}</td>
                       <td className="px-5 py-3">
                         {result ? (
-                          <span className={result.status === "created" ? "text-success" : result.status === "duplicate" ? "text-ink-muted" : "text-danger"}>
+                          <span className={result.status === "created" || result.status === "resumed" ? "text-success" : result.status === "duplicate" ? "text-ink-muted" : "text-danger"}>
                             {t(`pages.propertyImport.status.${result.status}` as Parameters<typeof t>[0])}
                           </span>
                         ) : row.errors.length === 0 ? (

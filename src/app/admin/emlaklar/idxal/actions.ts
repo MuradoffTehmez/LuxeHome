@@ -11,12 +11,14 @@ import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
 import { parseCsv } from "@/lib/admin/csv";
 import {
   IMPORT_BATCH_SIZE,
+  importRowKey,
   mapImportRows,
   type ImportIssue,
   type ImportLookups,
   type ImportRow,
 } from "@/lib/admin/property-import";
 import { putImage } from "@/lib/media/storage";
+import { readLimited } from "@/lib/read-limited";
 import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 import { propertyRetentionDays } from "@/lib/property-publish-validation";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
@@ -51,7 +53,7 @@ export type ImportPreviewResult =
 
 export type ImportCommitRow = {
   line: number;
-  status: "created" | "duplicate" | "invalid" | "failed";
+  status: "created" | "resumed" | "duplicate" | "invalid" | "failed";
   propertyId?: string;
   imagesSaved?: number;
   imagesFailed?: number;
@@ -93,14 +95,34 @@ function readTable(csv: string): string[][] | null {
   return parseCsv(csv);
 }
 
-/** Eyni başlıq + şəhər + qiymətlə silinməmiş elan — təkrar idxalın qarşısını alır. */
-async function isDuplicate(row: ImportRow): Promise<boolean> {
-  if (!row.input) return false;
-  const existing = await prisma.property.findFirst({
+type ExistingState =
+  | { kind: "complete" }
+  | { kind: "incomplete"; id: string };
+
+/**
+ * Sətrin bazadakı vəziyyəti.
+ *
+ * - Eyni `importKey` və `importCompletedAt` dolu → tam idxal olunub, dublikat.
+ * - Eyni `importKey`, marker boş, hələ qaralama → yarımçıq idxal, **davam etdirilir**.
+ *   Redaktor qaralamanı artıq dərc edibsə toxunulmur (dublikat sayılır).
+ * - Açar yoxdur, amma eyni başlıq + şəhər + qiymətlə elan var (əl ilə yaradılıb) → dublikat.
+ */
+async function existingState(row: ImportRow, key: string | null): Promise<ExistingState | null> {
+  if (!row.input || !key) return null;
+  const imported = await prisma.property.findFirst({
+    where: { deletedAt: null, importKey: key },
+    select: { id: true, status: true, importCompletedAt: true },
+  });
+  if (imported) {
+    return imported.importCompletedAt || imported.status !== PROPERTY_STATUSES.DRAFT
+      ? { kind: "complete" }
+      : { kind: "incomplete", id: imported.id };
+  }
+  const manual = await prisma.property.findFirst({
     where: { deletedAt: null, title: row.input.title, cityId: row.input.cityId, price: row.input.price },
     select: { id: true },
   });
-  return existing !== null;
+  return manual ? { kind: "complete" } : null;
 }
 
 export async function previewPropertyImport(csv: string): Promise<ImportPreviewResult> {
@@ -114,7 +136,8 @@ export async function previewPropertyImport(csv: string): Promise<ImportPreviewR
   const rows: ImportPreviewRow[] = [];
   for (const row of parsed.rows) {
     const errors = [...row.errors];
-    if (row.input && (await isDuplicate(row))) errors.push({ code: "duplicate" });
+    const state = await existingState(row, await importRowKey(row));
+    if (state?.kind === "complete") errors.push({ code: "duplicate" });
     rows.push({ line: row.line, title: row.title, imageCount: row.images.length, errors });
   }
   return { ok: true, headerErrors: parsed.headerErrors, rows };
@@ -127,7 +150,10 @@ async function importImage(url: string, title: string, uploaderId: string): Prom
     if (!response.ok) return null;
     const declared = Number(response.headers.get("content-length") ?? 0);
     if (declared > MAX_UPLOAD_SIZE) return null;
-    const bytes = await response.arrayBuffer();
+    // Başlıq olmaya və ya yalan ola bilər — limit axın oxunarkən tətbiq olunur ki,
+    // böyük fayl Worker yaddaşını doldurmasın.
+    const bytes = await readLimited(response, MAX_UPLOAD_SIZE);
+    if (!bytes) return null;
     const name = new URL(url).pathname.split("/").pop() || "image";
     // Tip və ölçü yoxlaması (magic byte) `putImage` içindədir — cavab başlığına güvənilmir.
     const result = await putImage(new File([bytes], name.slice(0, 120)), "emlaklar", title);
@@ -174,45 +200,61 @@ export async function commitPropertyImport(csv: string, lines: number[]): Promis
       continue;
     }
     try {
-      if (await isDuplicate(row)) {
+      const input = row.input;
+      const key = await importRowKey(row);
+      const state = await existingState(row, key);
+      if (state?.kind === "complete") {
         results.push({ line: row.line, status: "duplicate" });
         continue;
       }
-      const input = row.input;
-      const slug = await uniqueSlug(input.title, (candidate) =>
-        prisma.property.findUnique({ where: { slug: candidate }, select: { id: true } }),
-      );
-      const property = await prisma.property.create({
-        data: {
-          ...propertyData(input, await paymentFlagsFromFeatures(input.featureIds)),
-          slug,
-          authorId: user.id,
-          isDemo: false,
-          ...propertyLifecycleData(PROPERTY_STATUSES.DRAFT, { publishedAt: null }, retentionDays),
-        },
-        select: { id: true },
-      });
+      const resumed = state?.kind === "incomplete";
 
+      const propertyId = resumed
+        ? state.id
+        : (await prisma.property.create({
+            data: {
+              ...propertyData(input, await paymentFlagsFromFeatures(input.featureIds)),
+              slug: await uniqueSlug(input.title, (candidate) =>
+                prisma.property.findUnique({ where: { slug: candidate }, select: { id: true } }),
+              ),
+              authorId: user.id,
+              isDemo: false,
+              importKey: key,
+              ...propertyLifecycleData(PROPERTY_STATUSES.DRAFT, { publishedAt: null }, retentionDays),
+            },
+            select: { id: true },
+          })).id;
+
+      // Davam etdirmədə əvvəlki cəhdin yarımçıq qalereyası atılır və yenidən qurulur —
+      // hansı şəklin yazılıb-yazılmadığını təxmin etməkdən etibarlıdır. Media kitabxanası
+      // sətirləri qalır (başqa elanda da işlənə bilər).
+      if (resumed) await prisma.propertyImage.deleteMany({ where: { propertyId } });
+      const linked = resumed
+        ? new Set((await prisma.propertyFeature.findMany({ where: { propertyId }, select: { featureId: true } })).map((item) => item.featureId))
+        : new Set<string>();
       for (const featureId of input.featureIds) {
-        await prisma.propertyFeature.create({ data: { propertyId: property.id, featureId } }).catch(() => undefined);
+        if (linked.has(featureId)) continue;
+        await prisma.propertyFeature.create({ data: { propertyId, featureId } });
       }
 
-      // D1-də tranzaksiya yoxdur: elan əvvəl yaranır, şəkil alınmasa qaralama şəkilsiz qalır.
+      // Tək şəklin yüklənməməsi (kənar server, format) sətri dayandırmır — say hesabatda görünür.
       let saved = 0;
       for (const url of row.images) {
         const stored = await importImage(url, input.title, user.id);
         if (!stored) continue;
         await prisma.propertyImage.create({
-          data: { propertyId: property.id, url: stored, alt: input.title, order: saved, isCover: saved === 0 },
+          data: { propertyId, url: stored, alt: input.title, order: saved, isCover: saved === 0 },
         });
         saved += 1;
       }
 
-      await recordAudit(user, "CREATE", "Property", property.id, `CSV: ${input.title}`);
+      // Marker ən sonda yazılır: bundan əvvəlki istənilən xəta sətri «yarımçıq» saxlayır.
+      await prisma.property.update({ where: { id: propertyId }, data: { importCompletedAt: new Date() } });
+      await recordAudit(user, resumed ? "UPDATE" : "CREATE", "Property", propertyId, `CSV: ${input.title}`);
       results.push({
         line: row.line,
-        status: "created",
-        propertyId: property.id,
+        status: resumed ? "resumed" : "created",
+        propertyId,
         imagesSaved: saved,
         imagesFailed: row.images.length - saved,
       });
@@ -222,7 +264,7 @@ export async function commitPropertyImport(csv: string, lines: number[]): Promis
     }
   }
 
-  if (results.some((row) => row.status === "created")) {
+  if (results.some((row) => row.status === "created" || row.status === "resumed")) {
     revalidatePath("/admin/emlaklar");
     // Qaralama ictimai sayta düşmür, amma say keşləri (kateqoriya sayları) təzələnir.
     revalidatePublicContent("property");

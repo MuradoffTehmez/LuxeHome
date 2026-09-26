@@ -370,7 +370,11 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   taksonomiya slug və ya adla (diakritiksiz) tapılır, elan **həmişə DRAFT** yaranır.
   `commitPropertyImport` sətirləri `IMPORT_BATCH_SIZE` (10) partiya ilə işləyir — şəkillər
   kənar linkdən yüklənib `putImage()` ilə R2-yə yazılır və Worker subrequest limitinə sığmalıdır.
-  Eyni başlıq + şəhər + qiymət «dublikat» sayılır, ona görə yarımçıq idxal təkrar işlədilə bilər.
+  Hər sətrin məzmun heşi `Property.importKey`-ə yazılır, bütün əlaqələr yazılandan sonra
+  `importCompletedAt` qoyulur (D1-də tranzaksiya yoxdur). Təkrar idxalda marker dolu və ya
+  dərc olunmuş qeyd «dublikat», marker boş qaralama isə **davam etdirilir** (qalereya yenidən
+  qurulur). Əl ilə yaradılmış eyni başlıq + şəhər + qiymətli elan da dublikatdır. Kənar şəkil
+  `readLimited()` ilə axın oxunarkən ölçü limitinə tabedir.
 - Ana səhifənin hero/«Haqqımızda»/CTA fotoları `site.image_*` parametrlərindədir
   (`Parametrlər → Saytın şəkilləri`, `getSiteImages()`). Yalnız `/media/...` qəbul olunur;
   boşdursa stok foto göstərilir. Koda yeni sabit Unsplash linki yazma.

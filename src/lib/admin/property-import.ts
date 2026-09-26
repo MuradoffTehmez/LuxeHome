@@ -99,7 +99,8 @@ export function parseImportNumber(raw: string): number | null {
       : value.replace(/,/g, "");
   } else if (hasComma) {
     value = /^\d{1,3}(,\d{3})+$/.test(value) ? value.replace(/,/g, "") : value.replace(",", ".");
-  } else if (hasDot && /^\d{1,3}(\.\d{3}){2,}$/.test(value)) {
+  } else if (hasDot && /^\d{1,3}(\.\d{3})+$/.test(value)) {
+    // Yerli yazılışda nöqtə minlik ayırıcısıdır: «185.000» = 185 000, 185 deyil.
     value = value.replace(/\./g, "");
   }
   const parsed = Number(value);
@@ -207,7 +208,9 @@ function mapRow(cells: string[], index: Map<ImportColumn, number>, lookups: Impo
 
   let metroId: string | null = null;
   if (cell("metro")) {
-    const metro = findBy(lookups.locations.filter((location) => location.kind === LOCATION_KINDS.METRO), cell("metro"));
+    // Metro yalnız seçilmiş şəhərin stansiyaları arasında axtarılır — başqa şəhərə Bakı metrosu yazılmasın.
+    const metros = lookups.locations.filter((location) => location.kind === LOCATION_KINDS.METRO && city && location.parentId === city.id);
+    const metro = findBy(metros, cell("metro"));
     if (metro) metroId = metro.id;
     else invalid("metro", "notFound");
   }
@@ -315,4 +318,16 @@ export function mapImportRows(table: string[][], lookups: ImportLookups): Import
   const { index, errors } = headerIndex(header);
   if (errors.length > 0) return { headerErrors: errors, rows: [] };
   return { headerErrors: [], rows: body.map((cells, position) => mapRow(cells, index, lookups, position + 2)) };
+}
+
+/**
+ * Sətrin sabit idxal açarı — məzmunun SHA-256 heşi. Eyni sətir təkrar yükləndikdə eyni
+ * açar alınır; başlıq, qiymət və ya şəkil dəyişibsə yeni sətir sayılır.
+ */
+export async function importRowKey(row: Pick<ImportRow, "input" | "images">): Promise<string | null> {
+  if (!row.input) return null;
+  const { title, description, listingType, price, currency, typeId, cityId, districtId, area, rooms, floor } = row.input;
+  const payload = JSON.stringify([title, description, listingType, price, currency, typeId, cityId, districtId, area, rooms, floor, row.images]);
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(payload));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }

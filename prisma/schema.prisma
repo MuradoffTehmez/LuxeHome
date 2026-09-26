@@ -416,6 +416,11 @@ model Property {
   closedAt           DateTime?
   /// Keçmiş elanın indeksdə saxlanıla biləcəyi son tarix. Null olduqda qlobal SEO siyasəti işləyir.
   retentionUntil     DateTime?
+  /// CSV idxalı (#103): sətir məzmununun SHA-256 heşi. Təkrar idxalda eyni sətri tanıyır.
+  importKey          String?
+  /// Bütün əlaqələr (xüsusiyyət, şəkil) yazılanda qoyulur. `null` + `importKey` = yarımçıq
+  /// idxal; təkrar cəhd onu dublikat saymır, davam etdirir (D1-də tranzaksiya yoxdur).
+  importCompletedAt  DateTime?
   /// Duplikat aşkarlanması üçün normallaşdırılmış ünvan+təsvir+əsas atribut fingerprint-i.
   contentFingerprint String?
   deletedAt          DateTime?
@@ -463,6 +468,7 @@ model Property {
   @@index([price])
   @@index([isFeatured])
   @@index([featuredUntil])
+  @@index([importKey])
   @@index([reservationEnabled, status])
   @@index([assignedAgentId])
   @@index([deletedAt])

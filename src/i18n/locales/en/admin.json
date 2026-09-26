@@ -2296,7 +2296,8 @@
         "created": "Created",
         "duplicate": "Already exists",
         "invalid": "Invalid",
-        "failed": "Could not be created"
+        "failed": "Could not be created",
+        "resumed": "Resumed"
       },
       "issues": {
         "missingColumn": "Column “{field}” is missing",

@@ -2296,7 +2296,8 @@
         "created": "Создано",
         "duplicate": "Уже существует",
         "invalid": "С ошибками",
-        "failed": "Не удалось создать"
+        "failed": "Не удалось создать",
+        "resumed": "Продолжено"
       },
       "issues": {
         "missingColumn": "Нет столбца «{field}»",

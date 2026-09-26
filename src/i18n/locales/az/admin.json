@@ -2296,7 +2296,8 @@
         "created": "Yaradıldı",
         "duplicate": "Artıq mövcuddur",
         "invalid": "Xətalı",
-        "failed": "Yaradıla bilmədi"
+        "failed": "Yaradıla bilmədi",
+        "resumed": "Davam etdirildi"
       },
       "issues": {
         "missingColumn": "«{field}» sütunu yoxdur",
