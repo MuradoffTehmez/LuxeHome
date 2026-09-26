@@ -14,6 +14,7 @@ import { recordDomainEvent } from "@/lib/admin/events";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/agentlikler";
 
@@ -37,7 +38,7 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
       where: { id },
       select: { id: true, userId: true, name: true, isVerified: true },
     });
-    if (!agency) return failure("Agentlik tapılmadı.");
+    if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
 
     const next = !agency.isVerified;
 
@@ -59,9 +60,9 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
 
     revalidatePath(LIST_PATH);
     revalidatePath("/agentlikler");
-    return success(next ? "Agentlik təsdiqləndi." : "Agentliyin təsdiqi ləğv edildi.");
+    return success(next ? msg("server.agentlikler.agentlikTesdiqlendi") : msg("server.agentlikler.agentliyinTesdiqiLegvEdildi"));
   } catch (error) {
-    return unexpected("agentlik yenilənmədi", error);
+    return unexpected("agentlik yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -81,8 +82,8 @@ export async function createAgencyProfile(
   const userId = form.text(formData, "userId");
   const name = form.text(formData, "name").trim();
   if (!userId || name.length < 2 || name.length > 160) {
-    return failure("Agentlik adı 2–160 simvol arasında olmalıdır.", {
-      name: "Düzgün agentlik adı yazın",
+    return failure(msg("server.agentlikler.agentlikAdi2160Simvol"), {
+      name: msg("server.agentlikler.duzgunAgentlikAdiYazin"),
     });
   }
 
@@ -91,8 +92,8 @@ export async function createAgencyProfile(
       where: { id: userId, accountType: "AGENCY" },
       select: { id: true, email: true, phone: true, agency: { select: { id: true } } },
     });
-    if (!account) return failure("Agentlik hesabı tapılmadı.");
-    if (account.agency) return failure("Bu hesabın agentlik profili artıq mövcuddur.");
+    if (!account) return failure(msg("server.agentlikler.agentlikHesabiTapilmadi"));
+    if (account.agency) return failure(msg("server.agentlikler.buHesabinAgentlikProfiliArtiq"));
 
     const slug = await uniqueSlug(name, (candidate) =>
       prisma.agency.findUnique({ where: { slug: candidate }, select: { id: true } }),
@@ -110,9 +111,9 @@ export async function createAgencyProfile(
 
     await recordAudit(actor, "CREATE", "Agency", agency.id, `${name} · ${account.email}`);
     revalidatePath(LIST_PATH);
-    return success("Agentlik profili yaradıldı. İndi onu yoxlayıb təsdiqləyə bilərsiniz.");
+    return success(msg("server.agentlikler.agentlikProfiliYaradildiIndiOnu"));
   } catch (error) {
-    return unexpected("agentlik profili yaradılmadı", error);
+    return unexpected("agentlik profili yaradılmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -147,9 +148,9 @@ async function reviewAgencyEmployee(
         user: { select: { name: true, email: true } },
       },
     });
-    if (!employee) return failure("Dəvət tapılmadı.");
+    if (!employee) return failure(msg("server.agentlikler.devetTapilmadi"));
     if (employee.status !== AGENCY_EMPLOYEE_STATUSES.PENDING) {
-      return failure("Bu dəvət artıq nəzərdən keçirilib.");
+      return failure(msg("server.agentlikler.buDevetArtiqNezerdenKecirilib"));
     }
 
     await prisma.agencyEmployee.update({
@@ -177,9 +178,9 @@ async function reviewAgencyEmployee(
     revalidatePath(LIST_PATH);
     revalidatePath("/kabinet/komanda");
     return success(
-      decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "Əməkdaş təsdiqləndi." : "Dəvət rədd edildi.",
+      decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? msg("server.agentlikler.emekdasTesdiqlendi") : msg("server.agentlikler.devetReddEdildi"),
     );
   } catch (error) {
-    return unexpected("dəvət yenilənmədi", error);
+    return unexpected("dəvət yenilənmədi", error, msg("server.common.unexpected"));
   }
 }

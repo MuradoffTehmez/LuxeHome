@@ -460,7 +460,8 @@
       "paragraph": "Paragraph",
       "italic": "Italic",
       "link": "Link",
-      "quote": "Quote"
+      "quote": "Quote",
+      "undo": "Undo"
     },
     "dropzone": {
       "tooLarge": "The file is larger than {size} MB",
@@ -486,7 +487,9 @@
       "network": "Connection lost. Please try again.",
       "serverBusy": "The server is busy right now. Please try again shortly.",
       "retry": "Try again",
-      "limitReached": "Limit reached — up to {max} images. Remove one first."
+      "limitReached": "Limit reached — up to {max} images. Remove one first.",
+      "moveLastShort": "To end",
+      "deleteShort": "Delete"
     },
     "locationPicker": {
       "latitude": "Latitude",
@@ -649,7 +652,8 @@
       "ePoct": "Email",
       "whatsapp": "WhatsApp",
       "whatsappDaYaz": "Message on WhatsApp",
-      "elaqeliElan": "Related listing"
+      "elaqeliElan": "Related listing",
+      "statusLabel": "Status of {name}'s inquiry"
     },
     "moderation": {
       "elaniTesdiqlemek": "Approve the listing",
@@ -740,7 +744,8 @@
       "deyisiklikleriSaxla": "Save changes",
       "layiheniSil": "Delete development",
       "layiheninRedaktesi": "Edit development",
-      "redakte": "Edit"
+      "redakte": "Edit",
+      "addPartner": "Add partner"
     },
     "blog": {
       "ad": "Name",
@@ -890,7 +895,8 @@
       "elan": "Listings",
       "favorit": "Favourites",
       "heleIctimaiHesabYoxdur": "No public accounts yet.",
-      "bloklanib": "Blocked"
+      "bloklanib": "Blocked",
+      "openSessions": "{count, plural, one {# active session} other {# active sessions}}"
     },
     "security": {
       "tehlukesizlik": "Security",
@@ -985,7 +991,9 @@
         "hide": "Hide section",
         "projectsShown": "The residential complexes section is now visible on the site.",
         "projectsHidden": "The residential complexes section is now hidden from the site."
-      }
+      },
+      "legalInfoHint": "The legal name, tax ID, brand owner and navigation structure are protected in code. You can change the phone, email, address and social links in the form on the left.",
+      "secretsHint": "Secrets (Resend key, session secret) live in Cloudflare secrets and are never stored in the database."
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA backup codes — shown once",
@@ -1004,7 +1012,9 @@
       "yeniParol": "New password",
       "enAzi10Simvol": "At least 10 characters. A random password from a password manager is recommended.",
       "yeniParolunTekrari": "Repeat the new password",
-      "sizeMuveqqetiParolVerilib": "You were given a temporary password. Change it before continuing to the panel."
+      "sizeMuveqqetiParolVerilib": "You were given a temporary password. Change it before continuing to the panel.",
+      "generateNewCodes": "Generate new codes",
+      "changePassword": "Change password"
     },
     "knowledge": {
       "beledci": "Guide",
@@ -1306,7 +1316,9 @@
       "birQeydUcunMuxtelif": "A single record can hold several partners in different roles.",
       "terefdasiRedakteEt": "Edit partner",
       "saytdaBax": "View on site",
-      "auditJurnalinda": "in the audit log"
+      "auditJurnalinda": "in the audit log",
+      "addRelation": "Add relation",
+      "auditStoredSuffix": "are stored."
     },
     "agents": {
       "profil": "Profile",
@@ -1453,7 +1465,8 @@
       "piyadaDeqiqe": "On foot (minutes)",
       "muddetiBitib": "Expired",
       "premium": "Premium",
-      "saytdaBax": "View on site"
+      "saytdaBax": "View on site",
+      "durationDays": "{days, plural, one {# day} other {# days}}"
     },
     "serp": {
       "keywordClusterManagement": "Keyword cluster management",
@@ -1715,7 +1728,8 @@
       "301Daimi": "301 — Permanent",
       "302Muveqqeti": "302 — Temporary",
       "deaktiv": "Inactive",
-      "koordinatParametrlerde": "The office map point is set under Settings → Office location on the map and flows into the structured data (JSON-LD `geo`) from there."
+      "koordinatParametrlerde": "The office map point is set under Settings → Office location on the map and flows into the structured data (JSON-LD `geo`) from there.",
+      "hitCount": "{count, plural, one {# hit} other {# hits}}"
     },
     "ops": {
       "trafikAnalitikasi": "Traffic analytics",
@@ -2237,6 +2251,318 @@
       "integrationTurnstile": "Turnstile bot protection",
       "integrationSavedSearchCron": "Saved-search cron",
       "integrationPush": "Push notifications"
+    }
+  },
+  "server": {
+    "common": {
+      "formInvalid": "The form has errors. Check the highlighted fields.",
+      "unexpected": "The action could not be completed. Please try again shortly."
+    },
+    "guard": {
+      "rateLimited": "Too many actions. Please wait a minute.",
+      "crossOrigin": "The request failed the security check. Refresh the page and try again."
+    },
+    "agentler": {
+      "duzgunUrlAdiYaradilmadi": "A valid URL slug could not be generated.",
+      "agentTapilmadi": "Agent not found.",
+      "agentProfiliYenilendi": "Agent profile updated.",
+      "agentProfiliYaradildi": "Agent profile created.",
+      "agentProfiliSaxlanilaBilmediUrl": "The agent profile could not be saved. The URL slug and linked account must be unique.",
+      "buAgenteElanTeyinEdilib": "{p0} listings are assigned to this agent. Reassign them to another agent first.",
+      "reyTesdiqlendi": "Review approved.",
+      "reyReddEdildi": "Review rejected.",
+      "agentIctimaiKataloqdanGizledildi": "Agent hidden from the public directory.",
+      "agentIctimaiKataloqdaDercEdildi": "Agent published in the public directory.",
+      "musteriReyiDercEdildi": "Client review published.",
+      "reyTapilmadi": "Review not found.",
+      "musteriReyiSilindi": "Client review deleted."
+    },
+    "agentlikler": {
+      "agentlikTapilmadi": "Agency not found.",
+      "agentlikTesdiqlendi": "Agency approved.",
+      "agentliyinTesdiqiLegvEdildi": "Agency approval revoked.",
+      "agentlikAdi2160Simvol": "The agency name must be 2–160 characters long.",
+      "duzgunAgentlikAdiYazin": "Enter a valid agency name",
+      "agentlikHesabiTapilmadi": "Agency account not found.",
+      "buHesabinAgentlikProfiliArtiq": "This account already has an agency profile.",
+      "agentlikProfiliYaradildiIndiOnu": "Agency profile created. You can now review and approve it.",
+      "devetTapilmadi": "Invitation not found.",
+      "buDevetArtiqNezerdenKecirilib": "This invitation has already been reviewed.",
+      "emekdasTesdiqlendi": "Team member approved.",
+      "devetReddEdildi": "Invitation rejected."
+    },
+    "aiKomekci": {
+      "workersAiCavabVerdiAmma": "Workers AI responded, but the reply did not match the health-check schema.",
+      "workersAiIsleyir": "Workers AI is working: {p0}",
+      "elanSecin": "Select a listing.",
+      "elanTapilmadi": "Listing not found.",
+      "aiCavabindaTesvirYoxdur": "The AI response contains no description.",
+      "aiTesvirQaralamasiYaradildiDerc": "AI description draft created. Review it before publishing.",
+      "elaninAnalizEdilecekSekliYoxdur": "The listing has no images to analyze.",
+      "sekillerOxunmadiFaylMenbeyiElcatan": "Images could not be read — the file source is unavailable.",
+      "hecBirSekilAnalizEdile": "No image could be analyzed. The AI model did not respond.",
+      "sekilAnalizEdildi": "{p0} images analyzed.",
+      "qaralamaTapilmadiVeYaArtiq": "Draft not found or already processed.",
+      "qaralamadaTesvirYoxdur": "The draft contains no description.",
+      "qaralamaElanaTetbiqEdildi": "Draft applied to the listing.",
+      "qaralamaReddEdildi": "Draft rejected."
+    },
+    "audit": {
+      "auditJurnaliniYalnizSuperAdmin": "Only a Super Admin can reset the audit log.",
+      "auditQeydiSifirlandi": "{p0} audit entries were cleared."
+    },
+    "bilikMerkezi": {
+      "beledciTapilmadi": "Guide not found.",
+      "beledciTapilmadiVeYaSilinib": "Guide not found or already deleted.",
+      "beledciYenilendi": "Guide updated.",
+      "beledciSilindi": "Guide deleted.",
+      "kateqoriyaYenilendi": "Category updated.",
+      "kateqoriyaYaradildi": "Category created.",
+      "kateqoriyaTapilmadi": "Category not found.",
+      "terminYenilendi": "Term updated.",
+      "terminElaveOlundu": "Term added.",
+      "terminTapilmadi": "Term not found.",
+      "sualYenilendi": "Question updated.",
+      "sualElaveOlundu": "Question added.",
+      "sualTapilmadi": "Question not found."
+    },
+    "blog": {
+      "meqaleTapilmadi": "Article not found.",
+      "meqaleTapilmadiVeYaSilinib": "Article not found or already deleted.",
+      "meqaleYenilendi": "Article updated.",
+      "meqaleSilindi": "Article deleted.",
+      "meqaleBerpaEdildi": "Article restored.",
+      "kateqoriyaYenilendi": "Category updated.",
+      "kateqoriyaYaradildi": "Category created.",
+      "kateqoriyasiSilindi": "Category “{p0}” deleted."
+    },
+    "demoMezmun": {
+      "numuneMezmunAktivlesdirildiSaytdaGorunur": "Sample content enabled — it is now visible on the site.",
+      "numuneMezmunSondurulduSaytdaYalniz": "Sample content disabled — only real records remain on the site."
+    },
+    "emlaklar": {
+      "emlakNovuSecilmeyib": "Property type is not selected",
+      "seherSecilmeyib": "City is not selected",
+      "rayonTapilmadi": "District not found",
+      "secilmisRayonBuSehereAid": "The selected district does not belong to this city",
+      "layiheTapilmadi": "Project not found",
+      "secilmisTaksonomiyaDeyerleriDuzgunDeyil": "The selected taxonomy values are invalid.",
+      "elanDercTelebleriniOdemir": "The listing does not meet the publishing requirements.",
+      "elanTapilmadi": "Listing not found.",
+      "elanTapilmadiVeYaSilinib": "Listing not found or already deleted.",
+      "elanYenilendi": "Listing updated.",
+      "elanBerpaEdildi": "Listing restored.",
+      "hecBirElanSecilmeyib": "No listings selected.",
+      "namelumEmeliyyat": "Unknown action.",
+      "hecBirElanYenilenmedi": "No listings were updated.",
+      "elanYenilendiQalanlariUgursuzOldu": "{p0}/{p1} listings updated; the rest failed.",
+      "elanYenilendi2": "{p0} listings updated."
+    },
+    "hesabim": {
+      "adEnAzi2Simvol": "The name must be at least 2 characters long.",
+      "profilMelumatlariYenilendi": "Profile details updated.",
+      "cariParoluYazin": "Enter your current password.",
+      "cariParolTelebOlunur": "Current password is required",
+      "cariParolYanlisdir": "The current password is incorrect.",
+      "cariParolYanlisdir2": "The current password is incorrect",
+      "yeniEhtiyatKodlariYaradildiOnlari": "New backup codes generated. Store them somewhere safe now.",
+      "yeniParolEnAziSimvol": "The new password must be at least {p0} characters long.",
+      "yeniParolTekrariUygunGelmir": "The new password confirmation does not match.",
+      "yeniParolKohnesindenFerqliOlmalidir": "The new password must differ from the old one.",
+      "parolDeyisdirildiVeDigerCihazlardaki": "Password changed and sessions on other devices were signed out."
+    },
+    "hesablar": {
+      "hesabTapilmadi": "Account not found.",
+      "hesabAktivlesdirildi": "Account activated.",
+      "hesabTesdiqlendi": "Account approved.",
+      "hesabTesdiqiLegvEdildi": "Account approval revoked."
+    },
+    "ictimaiImkanlar": {
+      "yaxinObyektElaveEdildi": "Nearby place added.",
+      "rayonAnalitikasiYaddaSaxlanildi": "District analytics saved.",
+      "elanGunPremiumEdildi": "Listing promoted to premium for {p0} days.",
+      "yaxinObyektTapilmadi": "Nearby place not found.",
+      "yaxinObyektSilindi": "Nearby place deleted.",
+      "rayonAnalitikasiTapilmadi": "District analytics not found.",
+      "rayonAnalitikasiSilindi": "District analytics deleted.",
+      "premiumStatusDayandirildi": "Premium status stopped."
+    },
+    "istifadeciler": {
+      "buEPoctArtiqIstifade": "This email is already in use.",
+      "ePoctArtiqQeydiyyatdadir": "Email is already registered",
+      "hesabiYaradildi": "Account “{p0}” created.",
+      "istifadeciTapilmadi": "User not found.",
+      "ozRolunuzuDeyiseVeYa": "You cannot change your own role or deactivate your own account.",
+      "sistemdeEnAziBirAktiv": "At least one active Super Admin must remain in the system.",
+      "istifadeciYenilendi": "User updated.",
+      "ucunParolSifirlandi": "Password reset for “{p0}”.",
+      "n2faSifirlandiIstifadeciNovbetiGirisde": "2FA reset. The user will set it up again at the next sign-in.",
+      "butunSessiyalarBaglandi": "All sessions signed out.",
+      "ozHesabiniziSileBilmezsiniz": "You cannot delete your own account.",
+      "istifadeciSilindi": "User deleted."
+    },
+    "layiheler": {
+      "layiheTapilmadi": "Project not found.",
+      "layiheTapilmadiVeYaSilinib": "Project not found or already deleted.",
+      "layiheYenilendi": "Project updated.",
+      "layiheSilindi": "Project deleted.",
+      "layiheBerpaEdildi": "Project restored."
+    },
+    "media": {
+      "faylTapilmadi": "File not found.",
+      "altMetnYenilendi": "Alt text updated."
+    },
+    "moderation": {
+      "elanTapilmadiVeYaArtiq": "Listing not found or already reviewed.",
+      "elanDercTelebleriniOdemir": "The listing does not meet the publishing requirements.",
+      "elanTesdiqlendiVeDercOlundu": "Listing approved and published.",
+      "elanTapilmadi": "Listing not found.",
+      "elanReddEdildiVeQaralamaya": "Listing rejected and returned to draft."
+    },
+    "muracietler": {
+      "muracietTapilmadi": "Inquiry not found.",
+      "secilmisEmekdasTapilmadi": "The selected team member was not found.",
+      "emekdasAktivDeyil": "Team member is not active",
+      "muracietYenilendi": "Inquiry updated.",
+      "muracietSilindi": "Inquiry deleted.",
+      "statusDeyeriDuzgunDeyil": "Invalid status value.",
+      "statusYenilendi": "Status updated."
+    },
+    "parametrler": {
+      "ePoctUnvaniDuzgunDeyil": "Invalid email address",
+      "qeyd500SimvoldanUzunOla": "The note cannot be longer than 500 characters",
+      "korporativEPoctDuzgunDeyil": "Invalid corporate email",
+      "parametrlerYaddaSaxlanildi": "Settings saved.",
+      "enlikAraligi": "Latitude must be between -90 and 90",
+      "uzunluqAraligi": "Longitude must be between -180 and 180"
+    },
+    "redirects": {
+      "kohneVeYeniUnvanEyni": "The old and new addresses cannot be the same.",
+      "ferqliUnvanSecin": "Choose a different address",
+      "buUnvanUcunArtiqYonlendirme": "A redirect already exists for this address.",
+      "artiqMovcuddur": "Already exists",
+      "redirectChainLoopYaranaBiler": "This may create a redirect chain or loop: {p0}. Redirect directly to the final canonical address.",
+      "yonlendirmeElaveEdildi": "Redirect added.",
+      "yonlendirmeTapilmadi": "Redirect not found.",
+      "yonlendirmeYenilendi": "Redirect updated.",
+      "yonlendirmeSilindi": "Redirect deleted."
+    },
+    "rezervasiyalar": {
+      "rezervasiyaTapilmadi": "Reservation not found.",
+      "statusArtiqSecilenDeyerdedir": "The status already has the selected value.",
+      "rezervasiyaStatusuYenilendi": "Reservation status updated."
+    },
+    "security": {
+      "sessiyaTapilmadi": "Session not found.",
+      "sessiyaBaglandi": "Session signed out.",
+      "istifadeciTapilmadi": "User not found.",
+      "hesabinKilidiAcildi": "Account unlocked."
+    },
+    "serp": {
+      "slugKicikLatinHerfleriIle": "The slug must use lowercase Latin letters",
+      "seoParametrleriniDeyismekSelahiyyetinizYoxdur": "You do not have permission to change SEO settings.",
+      "qlobalSeoParametrleriSaxlanildi": "Global SEO settings saved.",
+      "localSeoParametrleriniDeyismekSelahiyyetiniz": "You do not have permission to change local SEO settings.",
+      "localSeoParametrleriSaxlanildi": "Local SEO settings saved.",
+      "robotsSiyasetiniDeyismekSelahiyyetinizYoxdur": "You do not have permission to change the robots policy.",
+      "productionSaytiniButovlukdeBloklayanDisallow": "A “Disallow: /” rule that blocks the entire production site cannot be saved.",
+      "robotsSiyasetiSaxlanildi": "Robots policy saved.",
+      "seoMetadataRedakteSelahiyyetinizYoxdur": "You do not have permission to edit SEO metadata.",
+      "metadataOverrideSaxlanildi": "Metadata override saved.",
+      "seoMetadataSilmekSelahiyyetinizYoxdur": "You do not have permission to delete SEO metadata.",
+      "seoLandingDercEtmekSelahiyyetiniz": "You do not have permission to publish SEO landing pages.",
+      "seoLandingSehifesiSaxlanildi": "SEO landing page saved.",
+      "landingSilmekSelahiyyetinizYoxdur": "You do not have permission to delete landing pages.",
+      "keywordRedakteSelahiyyetinizYoxdur": "You do not have permission to edit keywords.",
+      "keywordSaxlanildi": "Keyword saved.",
+      "keywordSilmekSelahiyyetinizYoxdur": "You do not have permission to delete keywords.",
+      "entitySchemaRedakteSelahiyyetinizYoxdur": "You do not have permission to edit entities/schema.",
+      "entityProfiliSaxlanildi": "Entity profile saved.",
+      "entitySilmekSelahiyyetinizYoxdur": "You do not have permission to delete entities.",
+      "seoAuditSelahiyyetinizYoxdur": "You do not have permission to run SEO audits.",
+      "kritikSeoAuditProblemiTapildi": "{p0} critical SEO audit issues found.",
+      "auditTamamlandiCariProblem": "Audit completed: {p0} current issues.",
+      "auditQeydiHellEtmekSelahiyyetiniz": "You do not have permission to resolve audit entries.",
+      "auditQeydiHellEdildi": "Audit entry resolved.",
+      "searchConsoleMelumatiIdxalEtmek": "You do not have permission to import Search Console data.",
+      "searchConsoleMetrikasiIdxalEdildi": "Search Console metrics imported.",
+      "searchConsoleSyncSelahiyyetinizYoxdur": "You do not have permission to sync Search Console.",
+      "searchConsoleSinxronlasdirildiSetir": "Search Console synced: {p0} rows.",
+      "sitemapGondermekSelahiyyetinizYoxdur": "You do not have permission to submit sitemaps.",
+      "sitemapGoogleSearchConsoleA": "Sitemap submitted to Google Search Console.",
+      "xeberdarligiHellEtmekSelahiyyetinizYoxdur": "You do not have permission to resolve alerts.",
+      "xeberdarliqHellEdildi": "Alert resolved.",
+      "jsonMassivDuzgunDeyil": "Invalid JSON array",
+      "filterJsonDuzgunDeyil": "Invalid filter JSON",
+      "jsonDuzgunDeyil": "Invalid JSON"
+    },
+    "sistem": {
+      "buEmeliyyatYalnizSuperAdmin": "This action is available to Super Admins only.",
+      "texnikiXidmetParametrleriYaddaSaxlanildi": "Maintenance settings saved.",
+      "sistemRejimiDeyisdirildi": "System mode changed: {p0}."
+    },
+    "taksonomiya": {
+      "emlakNovuElaveEdildi": "Property type “{p0}” added.",
+      "emlakNovuTapilmadi": "Property type not found.",
+      "emlakNovuYenilendi": "Property type updated.",
+      "buNovdeEmlakVarEvvelce": "This type has {p0} properties — move them to another type first.",
+      "emlakNovuSilindi": "Property type deleted.",
+      "xususiyyetiElaveEdildi": "Feature “{p0}” added.",
+      "xususiyyetTapilmadi": "Feature not found.",
+      "buXususiyyetEmlakaBaglidirEvvelce": "This feature is linked to {p0} properties — remove it from them first.",
+      "xususiyyetSilindi": "Feature deleted."
+    },
+    "tercumeler": {
+      "mezmunSecin": "Select content",
+      "basliqEnAzi2Simvol": "The title must be at least 2 characters long",
+      "secilmisMezmunTapilmadi": "The selected content was not found.",
+      "tercumeYaddaSaxlanildi": "Translation saved.",
+      "tercumeSilindi": "Translation deleted."
+    },
+    "terefdaslar": {
+      "buSlugIleTerefdasArtiq": "A partner with this slug already exists",
+      "buSaytDomeniBasqaTerefdasda": "This website domain is used by another partner",
+      "buHuquqiAdlaTerefdasArtiq": "A partner with this legal name already exists",
+      "eyniTerefdasaBenzeyenQeydArtiq": "A record resembling this partner already exists.",
+      "terefdasTapilmadi": "Partner not found.",
+      "terefdasTapilmadiVeYaSilinib": "Partner not found or already deleted.",
+      "terefdasYenilendi": "Partner updated.",
+      "terefdasSilindiQeydAuditVe": "Partner deleted. The record is kept for audit and relations.",
+      "terefdasArxivStatusundaBerpaEdildi": "Partner restored with archived status.",
+      "saytdaGostermekUcunTerefdasinStatusu": "To show the partner on the site, its status must be “Active” first.",
+      "terefdasSilinmedenSaytdaGosterildi": "Partner shown on the site without deletion.",
+      "terefdasSaytdanGizledildiMelumatlariSaxlanildi": "Partner hidden from the site; its data is kept.",
+      "elaqelendirilecekQeydSecilmeyib": "No record selected to link.",
+      "elanTapilmadi": "Listing not found.",
+      "layiheTapilmadi": "Project not found.",
+      "agentlikTapilmadi": "Agency not found.",
+      "elaqeElaveEdildi": "Relation added.",
+      "elaqeElaveEdilmediEyniRol": "The relation was not added. The same role may already exist.",
+      "elaqeTapilmadi": "Relation not found.",
+      "elaqeSilindi": "Relation deleted.",
+      "tesdiqIcazesiYoxdur": "You do not have permission to approve partners.",
+      "yayimIcazesiYoxdur": "You do not have permission to change a partner's publishing status."
+    },
+    "xidmetler": {
+      "ikonSecimiDuzgunDeyil": "Invalid icon selection.",
+      "siyahidanBirIkonSecin": "Choose an icon from the list",
+      "redakteEdilenXidmetTapilmadiSiyahini": "The service being edited was not found. Refresh the list.",
+      "xidmetYenilendi": "Service updated.",
+      "xidmetSilindi": "Service deleted."
+    },
+    "publish": {
+      "titleRequired": "A title is required.",
+      "descriptionRequired": "A description is required.",
+      "pricePositive": "The price must be greater than zero.",
+      "currencyNotAllowed": "The currency is not in the allowed list.",
+      "typeRequired": "A property type must be selected.",
+      "cityRequired": "A city must be selected.",
+      "roomsPositive": "To publish, the room count must be greater than zero.",
+      "areaPositive": "To publish, the area or land area must be greater than zero.",
+      "floorAboveTotal": "The floor cannot exceed the total number of floors.",
+      "minImages": "At least {count} images are required to publish.",
+      "titleRoomsMismatch": "The {titleRooms} rooms stated in the title do not match the form value ({rooms}).",
+      "strongDuplicate": "This listing is a strong duplicate of “{title}”. Update the existing record or decide on canonical/merge."
     }
   }
 }

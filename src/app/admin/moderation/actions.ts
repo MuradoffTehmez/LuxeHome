@@ -17,6 +17,7 @@ import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { propertyRetentionDays, validateStoredPropertyForPublication } from "@/lib/property-publish-validation";
 import { propertyLifecycleData } from "@/lib/admin/property-input";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/moderation";
 
@@ -34,11 +35,11 @@ export async function approveModerationProperty(id: string): Promise<ActionState
       where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
       select: { title: true, slug: true, publishedAt: true, closedAt: true },
     });
-    if (!property) return failure("Elan tapılmadı və ya artıq nəzərdən keçirilib.");
+    if (!property) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
 
     const publication = await validateStoredPropertyForPublication(id);
     if (Object.keys(publication.errors).length > 0) {
-      return failure("Elan dərc tələblərini ödəmir.", publication.errors);
+      return failure(msg("server.moderation.elanDercTelebleriniOdemir"), publication.errors);
     }
 
     await prisma.property.update({
@@ -59,9 +60,9 @@ export async function approveModerationProperty(id: string): Promise<ActionState
     revalidatePath("/emlaklar");
     revalidatePath(`/emlaklar/${property.slug}`);
     revalidatePublicContent("property", property.slug);
-    return success("Elan təsdiqləndi və dərc olundu.");
+    return success(msg("server.moderation.elanTesdiqlendiVeDercOlundu"));
   } catch (error) {
-    return unexpected("elan təsdiqlənmədi", error);
+    return unexpected("elan təsdiqlənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -76,14 +77,14 @@ export async function rejectModerationProperty(_prev: ActionState, formData: For
 
   const id = form.text(formData, "id");
   const reason = form.optionalText(formData, "reason");
-  if (!id) return failure("Elan tapılmadı.");
+  if (!id) return failure(msg("server.moderation.elanTapilmadi"));
 
   try {
     const property = await prisma.property.findFirst({
       where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
       select: { title: true },
     });
-    if (!property) return failure("Elan tapılmadı və ya artıq nəzərdən keçirilib.");
+    if (!property) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
 
     await prisma.property.update({
       where: { id },
@@ -98,8 +99,8 @@ export async function rejectModerationProperty(_prev: ActionState, formData: For
     });
 
     revalidatePath(LIST_PATH);
-    return success("Elan rədd edildi və qaralamaya qaytarıldı.");
+    return success(msg("server.moderation.elanReddEdildiVeQaralamaya"));
   } catch (error) {
-    return unexpected("elan rədd edilmədi", error);
+    return unexpected("elan rədd edilmədi", error, msg("server.common.unexpected"));
   }
 }

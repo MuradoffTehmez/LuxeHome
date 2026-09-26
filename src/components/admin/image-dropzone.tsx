@@ -21,6 +21,7 @@ import { useFieldError } from "./form-shell";
 import { DEFAULT_IMAGE_UPLOAD_URL } from "./image-dropzone-config";
 import { ImagePrepareError, isImageCandidate, prepareImageForUpload } from "./image-prepare";
 import { createUploadLimiter, uploadWithRetry, type UploadFailureKind } from "./image-upload-queue";
+import { useServerMessage } from "./use-server-message";
 
 /**
  * Şəkil yükləmə sahəsi.
@@ -100,6 +101,7 @@ export function ImageDropzone({
   const fieldError = useFieldError(name);
   const [dragActive, setDragActive] = useState(false);
   const t = useTranslations("admin");
+  const translateMessage = useServerMessage();
   const [items, setItems] = useState<Item[]>(() =>
     withCover(
       initial.map((image, index) => ({
@@ -137,7 +139,7 @@ export function ImageDropzone({
       case "server":
         return t("components.dropzone.serverBusy");
       default:
-        return message ?? t("components.dropzone.uploadFailed");
+        return translateMessage(message) ?? t("components.dropzone.uploadFailed");
     }
   }
 
@@ -408,7 +410,7 @@ export function ImageDropzone({
                           onClick={() => move(item.id, 1)}
                           disabled={index === items.length - 1}
                           aria-label={t("components.dropzone.moveLast")}
-                          title="Sona"
+                          title={t("components.dropzone.moveLastShort")}
                           className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-beige hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                         >
                           <ChevronRight className="size-4" aria-hidden="true" />
@@ -434,7 +436,7 @@ export function ImageDropzone({
                         type="button"
                         onClick={() => remove(item.id)}
                         aria-label={t("components.dropzone.remove")}
-                        title="Sil"
+                        title={t("components.dropzone.deleteShort")}
                         className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors hover:bg-danger-bg hover:text-danger"
                       >
                         <Trash2 className="size-4" aria-hidden="true" />

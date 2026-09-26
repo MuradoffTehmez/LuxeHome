@@ -15,6 +15,7 @@ import { uniqueSlug } from "@/lib/admin/slug";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Bloq idarəsi.
@@ -51,7 +52,7 @@ export async function createPost(_prev: ActionState, formData: FormData): Promis
     ogDescription: form.optionalText(formData, "ogDescription"),
     ogImage: form.optionalText(formData, "ogImage"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   let postId: string;
 
@@ -91,7 +92,7 @@ export async function createPost(_prev: ActionState, formData: FormData): Promis
 
     await recordAudit(user, "CREATE", "BlogPost", postId, parsed.data.title);
   } catch (error) {
-    return unexpected("məqalə yaradıla bilmədi", error);
+    return unexpected("məqalə yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 
   revalidatePath(LIST_PATH);
@@ -109,7 +110,7 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("Məqalə tapılmadı.");
+  if (!id) return failure(msg("server.blog.meqaleTapilmadi"));
 
   const parsed = postSchema.safeParse({
     title: form.text(formData, "title"),
@@ -127,14 +128,14 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
     ogDescription: form.optionalText(formData, "ogDescription"),
     ogImage: form.optionalText(formData, "ogImage"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const existing = await prisma.blogPost.findFirst({
       where: { id, deletedAt: null },
       select: { publishedAt: true, slug: true },
     });
-    if (!existing) return failure("Məqalə tapılmadı və ya silinib.");
+    if (!existing) return failure(msg("server.blog.meqaleTapilmadiVeYaSilinib"));
 
     const content = await sanitizeRichText(parsed.data.content);
     const cover = parseSingleImage(formData, "cover");
@@ -177,9 +178,9 @@ export async function updatePost(_prev: ActionState, formData: FormData): Promis
     revalidatePath(LIST_PATH);
     revalidatePath(`/blog/${slug}`);
     revalidatePublicContent("post", slug);
-    return success("Məqalə yeniləndi.");
+    return success(msg("server.blog.meqaleYenilendi"));
   } catch (error) {
-    return unexpected("məqalə yenilənmədi", error);
+    return unexpected("məqalə yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -203,9 +204,9 @@ export async function deletePost(id: string): Promise<ActionState> {
     revalidatePath(LIST_PATH);
     revalidatePath(`/blog/${post.slug}`);
     revalidatePublicContent("post", post.slug);
-    return success("Məqalə silindi.");
+    return success(msg("server.blog.meqaleSilindi"));
   } catch (error) {
-    return unexpected("məqalə silinmədi", error);
+    return unexpected("məqalə silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -228,9 +229,9 @@ export async function restorePost(id: string): Promise<ActionState> {
     await recordAudit(user, "RESTORE", "BlogPost", id, post.title);
     revalidatePath(LIST_PATH);
     revalidatePublicContent("post");
-    return success("Məqalə bərpa edildi.");
+    return success(msg("server.blog.meqaleBerpaEdildi"));
   } catch (error) {
-    return unexpected("məqalə bərpa edilmədi", error);
+    return unexpected("məqalə bərpa edilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -257,7 +258,7 @@ export async function saveBlogCategory(
     description: form.optionalText(formData, "description"),
     order: form.integer(formData, "order") ?? 0,
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const slug = await uniqueSlug(
@@ -279,9 +280,9 @@ export async function saveBlogCategory(
 
     revalidatePath("/admin/blog/kateqoriyalar");
     revalidatePath("/blog");
-    return success(id ? "Kateqoriya yeniləndi." : "Kateqoriya yaradıldı.");
+    return success(id ? msg("server.blog.kateqoriyaYenilendi") : msg("server.blog.kateqoriyaYaradildi"));
   } catch (error) {
-    return unexpected("kateqoriya saxlanılmadı", error);
+    return unexpected("kateqoriya saxlanılmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -309,8 +310,8 @@ export async function deleteBlogCategory(id: string): Promise<ActionState> {
     await recordAudit(user, "DELETE", "BlogCategory", id, category.name);
     revalidatePath("/admin/blog/kateqoriyalar");
     revalidatePath("/blog");
-    return success(`«${truncate(category.name, 40)}» kateqoriyası silindi.`);
+    return success(msg("server.blog.kateqoriyasiSilindi", { p0: String(truncate(category.name, 40)) }));
   } catch (error) {
-    return unexpected("kateqoriya silinmədi", error);
+    return unexpected("kateqoriya silinmədi", error, msg("server.common.unexpected"));
   }
 }

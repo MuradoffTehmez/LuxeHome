@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { msg } from "@/lib/admin/server-message";
 
 const database = vi.hoisted(() => ({
   userFindMany: vi.fn(),
@@ -75,7 +76,7 @@ describe("panel istifadəçi idarəsinin STAFF sərhədi", () => {
 
     const result = await resetUserPassword("public-user");
 
-    expect(result).toMatchObject({ status: "error", message: "İstifadəçi tapılmadı." });
+    expect(result).toMatchObject({ status: "error", message: msg("server.istifadeciler.istifadeciTapilmadi") });
     expect(database.userUpdate).not.toHaveBeenCalled();
     expect(effects.revokeAllSessions).not.toHaveBeenCalled();
     expect(effects.recordAudit).not.toHaveBeenCalled();
@@ -103,7 +104,7 @@ describe("panel istifadəçi idarəsinin STAFF sərhədi", () => {
 
     expect(result).toMatchObject({
       status: "error",
-      message: "Sistemdə ən azı bir aktiv Super Admin qalmalıdır.",
+      message: msg("server.istifadeciler.sistemdeEnAziBirAktiv"),
     });
     expect(database.userUpdate).not.toHaveBeenCalled();
   });

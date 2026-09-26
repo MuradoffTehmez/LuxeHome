@@ -115,7 +115,7 @@ export default async function PublicFeaturesAdminPage() {
         <AdminCard title={t("pages.amenities.premiumElan")} description={t("pages.amenities.yalnizUygunNeticelerDaxilinde")}>
           <AdminForm action={activatePremiumListing} submitLabel={t("pages.amenities.premiumAktivEt")} className="gap-4">
             <label className="text-sm text-ink-soft">{t("pages.amenities.elan")}<select className={inputClass} name="propertyId" required><option value="">{t("pages.amenities.secin")}</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
-            <label className="text-sm text-ink-soft">{t("pages.amenities.muddet")}<select className={inputClass} name="durationDays">{PREMIUM_DURATIONS_DAYS.map((days) => <option key={days} value={days}>{days} gün</option>)}</select></label>
+            <label className="text-sm text-ink-soft">{t("pages.amenities.muddet")}<select className={inputClass} name="durationDays">{PREMIUM_DURATIONS_DAYS.map((days) => <option key={days} value={days}>{t("pages.amenities.durationDays", { days })}</option>)}</select></label>
           </AdminForm>
         </AdminCard>
 

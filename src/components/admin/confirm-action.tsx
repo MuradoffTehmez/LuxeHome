@@ -10,6 +10,7 @@ import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
 import type { ActionState } from "@/lib/admin/action-state";
 import { SecretPanel } from "./secret-panel";
+import { useServerMessage } from "./use-server-message";
 
 type ConfirmActionProps = {
   /** Təsdiqdən sonra çağırılan server action. */
@@ -54,6 +55,7 @@ export function ConfirmAction({
   const [secret, setSecret] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const { toast } = useToast();
+  const translateMessage = useServerMessage();
   const router = useRouter();
 
   function close() {
@@ -64,7 +66,7 @@ export function ConfirmAction({
   function run() {
     startTransition(async () => {
       const result = await action(id);
-      if (result.message) toast(result.message, result.status === "success" ? "success" : "error");
+      if (result.message) toast(translateMessage(result.message) ?? result.message, result.status === "success" ? "success" : "error");
       if (result.status !== "success") return;
 
       if (result.secret) {

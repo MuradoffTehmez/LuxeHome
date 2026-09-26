@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { RESERVATION_STATUS_LABELS, type ReservationStatus } from "@/lib/constants";
 import { updateReservationStatus } from "./actions";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 function Submit() {
   const t = useTranslations("admin");
@@ -21,7 +22,8 @@ function Submit() {
 
 export function ReservationStatusForm({ id, status }: { id: string; status: ReservationStatus }) {
   const t = useTranslations("admin");
-  const [state, action] = useActionState(updateReservationStatus, IDLE_STATE);
+  const [rawState, action] = useActionState(updateReservationStatus, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
   const { toast } = useToast();
   useEffect(() => {
     if (state.message) toast(state.message, state.status === "success" ? "success" : "error");

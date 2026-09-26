@@ -17,6 +17,7 @@ import { featureCreateSchema, propertyTypeCreateSchema } from "@/lib/admin/schem
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { normalizeSearchText } from "@/lib/search-normalization";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/taksonomiya";
 
@@ -30,7 +31,7 @@ export async function createPropertyType(_prev: ActionState, formData: FormData)
   }
 
   const parsed = propertyTypeCreateSchema.safeParse({ name: form.text(formData, "name") });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const slug = await uniqueSlug(parsed.data.name, (candidate) =>
@@ -46,9 +47,9 @@ export async function createPropertyType(_prev: ActionState, formData: FormData)
     await recordAudit(actor, "CREATE", "Property", type.id, `Əmlak növü: ${parsed.data.name}`);
     revalidatePath(LIST_PATH);
     revalidatePublicContent("taxonomy");
-    return success(`«${parsed.data.name}» əmlak növü əlavə edildi.`);
+    return success(msg("server.taksonomiya.emlakNovuElaveEdildi", { p0: String(parsed.data.name) }));
   } catch (error) {
-    return unexpected("əmlak növü yaradıla bilmədi", error);
+    return unexpected("əmlak növü yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -63,14 +64,14 @@ export async function togglePropertyTypeActive(id: string): Promise<ActionState>
 
   try {
     const type = await prisma.propertyType.findUnique({ where: { id }, select: { name: true, isActive: true } });
-    if (!type) return failure("Əmlak növü tapılmadı.");
+    if (!type) return failure(msg("server.taksonomiya.emlakNovuTapilmadi"));
 
     await prisma.propertyType.update({ where: { id }, data: { isActive: !type.isActive } });
     await recordAudit(actor, "UPDATE", "Property", id, `${type.name} — ${type.isActive ? "deaktiv edildi" : "aktivləşdirildi"}`);
     revalidatePath(LIST_PATH);
-    return success("Əmlak növü yeniləndi.");
+    return success(msg("server.taksonomiya.emlakNovuYenilendi"));
   } catch (error) {
-    return unexpected("əmlak növü yenilənmədi", error);
+    return unexpected("əmlak növü yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -88,17 +89,17 @@ export async function deletePropertyType(id: string): Promise<ActionState> {
       where: { id },
       select: { name: true, _count: { select: { properties: true } } },
     });
-    if (!type) return failure("Əmlak növü tapılmadı.");
+    if (!type) return failure(msg("server.taksonomiya.emlakNovuTapilmadi"));
     if (type._count.properties > 0) {
-      return failure(`Bu növdə ${type._count.properties} əmlak var — əvvəlcə onları başqa növə köçürün.`);
+      return failure(msg("server.taksonomiya.buNovdeEmlakVarEvvelce", { p0: String(type._count.properties) }));
     }
 
     await prisma.propertyType.delete({ where: { id } });
     await recordAudit(actor, "DELETE", "Property", id, `Əmlak növü silindi: ${type.name}`);
     revalidatePath(LIST_PATH);
-    return success("Əmlak növü silindi.");
+    return success(msg("server.taksonomiya.emlakNovuSilindi"));
   } catch (error) {
-    return unexpected("əmlak növü silinmədi", error);
+    return unexpected("əmlak növü silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -115,7 +116,7 @@ export async function createFeature(_prev: ActionState, formData: FormData): Pro
     name: form.text(formData, "name"),
     group: form.text(formData, "group"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const slug = await uniqueSlug(parsed.data.name, (candidate) =>
@@ -139,9 +140,9 @@ export async function createFeature(_prev: ActionState, formData: FormData): Pro
 
     await recordAudit(actor, "CREATE", "Property", feature.id, `Xüsusiyyət: ${parsed.data.name}`);
     revalidatePath(LIST_PATH);
-    return success(`«${parsed.data.name}» xüsusiyyəti əlavə edildi.`);
+    return success(msg("server.taksonomiya.xususiyyetiElaveEdildi", { p0: String(parsed.data.name) }));
   } catch (error) {
-    return unexpected("xüsusiyyət yaradıla bilmədi", error);
+    return unexpected("xüsusiyyət yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -159,16 +160,16 @@ export async function deleteFeature(id: string): Promise<ActionState> {
       where: { id },
       select: { name: true, _count: { select: { properties: true } } },
     });
-    if (!feature) return failure("Xüsusiyyət tapılmadı.");
+    if (!feature) return failure(msg("server.taksonomiya.xususiyyetTapilmadi"));
     if (feature._count.properties > 0) {
-      return failure(`Bu xüsusiyyət ${feature._count.properties} əmlaka bağlıdır — əvvəlcə onlardan çıxarın.`);
+      return failure(msg("server.taksonomiya.buXususiyyetEmlakaBaglidirEvvelce", { p0: String(feature._count.properties) }));
     }
 
     await prisma.feature.delete({ where: { id } });
     await recordAudit(actor, "DELETE", "Property", id, `Xüsusiyyət silindi: ${feature.name}`);
     revalidatePath(LIST_PATH);
-    return success("Xüsusiyyət silindi.");
+    return success(msg("server.taksonomiya.xususiyyetSilindi"));
   } catch (error) {
-    return unexpected("xüsusiyyət silinmədi", error);
+    return unexpected("xüsusiyyət silinmədi", error, msg("server.common.unexpected"));
   }
 }

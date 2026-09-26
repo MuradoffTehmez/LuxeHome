@@ -6,6 +6,7 @@ import { PERMISSIONS, ROLES } from "@/lib/constants";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { msg } from "@/lib/admin/server-message";
 
 /** Audit jurnalını yalnız Super Admin sıfırlaya bilər; sıfırlama faktının özü saxlanılır. */
 export async function clearAuditLog(id: string): Promise<ActionState> {
@@ -19,15 +20,15 @@ export async function clearAuditLog(id: string): Promise<ActionState> {
   }
 
   if (actor.role !== ROLES.SUPER_ADMIN) {
-    return failure("Audit jurnalını yalnız Super Admin sıfırlaya bilər.");
+    return failure(msg("server.audit.auditJurnaliniYalnizSuperAdmin"));
   }
 
   try {
     const result = await prisma.auditLog.deleteMany();
     await recordAudit(actor, "RESET", "AuditLog", null, `${result.count} audit qeydi sıfırlandı`);
     revalidatePath("/admin/audit");
-    return success(`${result.count} audit qeydi sıfırlandı.`);
+    return success(msg("server.audit.auditQeydiSifirlandi", { p0: String(result.count) }));
   } catch (error) {
-    return unexpected("audit jurnalı sıfırlanmadı", error);
+    return unexpected("audit jurnalı sıfırlanmadı", error, msg("server.common.unexpected"));
   }
 }

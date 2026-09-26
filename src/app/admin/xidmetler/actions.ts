@@ -14,6 +14,7 @@ import { uniqueSlug } from "@/lib/admin/slug";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Xidmət CRUD-u.
@@ -56,10 +57,10 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
 
   const id = form.text(formData, "id");
   const parsed = serviceSchema.safeParse(readForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   if (!SERVICE_ICON_NAMES.includes(parsed.data.icon)) {
-    return failure("İkon seçimi düzgün deyil.", { icon: "Siyahıdan bir ikon seçin" });
+    return failure(msg("server.xidmetler.ikonSecimiDuzgunDeyil"), { icon: msg("server.xidmetler.siyahidanBirIkonSecin") });
   }
 
   let serviceId = id;
@@ -68,7 +69,7 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
     const existing = id
       ? await prisma.service.findUnique({ where: { id }, select: { slug: true } })
       : null;
-    if (id && !existing) return failure("Redaktə edilən xidmət tapılmadı. Siyahını yeniləyin.");
+    if (id && !existing) return failure(msg("server.xidmetler.redakteEdilenXidmetTapilmadiSiyahini"));
 
     const slug = await uniqueSlug(
       parsed.data.slug || parsed.data.title,
@@ -108,14 +109,14 @@ export async function saveService(_prev: ActionState, formData: FormData): Promi
         revalidatePublicContent("service", existing.slug);
       }
       revalidatePublicContent("service", slug);
-      return success("Xidmət yeniləndi.");
+      return success(msg("server.xidmetler.xidmetYenilendi"));
     }
 
     const created = await prisma.service.create({ data, select: { id: true } });
     serviceId = created.id;
     await recordAudit(user, "CREATE", "Service", serviceId, parsed.data.title);
   } catch (error) {
-    return unexpected("xidmət saxlanılmadı", error);
+    return unexpected("xidmət saxlanılmadı", error, msg("server.common.unexpected"));
   }
 
   revalidatePath(LIST_PATH);
@@ -148,8 +149,8 @@ export async function deleteService(id: string): Promise<ActionState> {
     revalidatePath(LIST_PATH);
     revalidatePath(`/xidmetler/${service.slug}`);
     revalidatePublicContent("service", service.slug);
-    return success("Xidmət silindi.");
+    return success(msg("server.xidmetler.xidmetSilindi"));
   } catch (error) {
-    return unexpected("xidmət silinmədi", error);
+    return unexpected("xidmət silinmədi", error, msg("server.common.unexpected"));
   }
 }

@@ -7,6 +7,7 @@ import {
   validatePublishableProperty,
   type PublishableProperty,
 } from "@/lib/serp";
+import { msg } from "@/lib/admin/server-message";
 
 type ImageInput = { url: string; alt?: string | null };
 
@@ -77,7 +78,7 @@ export async function validatePropertyForPublication(
     return score >= 6;
   });
   if (duplicate) {
-    errors.title = `Bu elan «${duplicate.title}» ilə güclü duplikatdır. Mövcud qeydi yeniləyin və ya canonical/merge qərarı verin.`;
+    errors.title = msg("server.publish.strongDuplicate", { title: duplicate.title });
   }
   return { errors, fingerprint };
 }

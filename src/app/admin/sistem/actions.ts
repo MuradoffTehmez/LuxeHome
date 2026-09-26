@@ -17,6 +17,7 @@ import { type ActionState, failure, invalid, success, unexpected } from "@/lib/a
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Sistem rejiminin yazılması.
@@ -86,7 +87,7 @@ export async function saveSystemMode(
   // `SUPER_ADMIN`-dədir, amma matris gələcəkdə genişlənə bilər; rejim isə bütün
   // platformanı bağlayan əməliyyatdır və şərti burada açıq saxlamaq lazımdır.
   if (user.role !== ROLES.SUPER_ADMIN) {
-    return failure("Bu əməliyyat yalnız Super Admin üçündür.");
+    return failure(msg("server.sistem.buEmeliyyatYalnizSuperAdmin"));
   }
 
   const parsed = systemModeSchema.safeParse({
@@ -103,7 +104,7 @@ export async function saveSystemMode(
     superAdminBypass: form.boolean(formData, "superAdminBypass"),
     showCountdown: form.boolean(formData, "showCountdown"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   const previous = await getSystemModeConfig();
 
@@ -131,7 +132,7 @@ export async function saveSystemMode(
     await setSettings({ [SETTING_KEYS.SYSTEM_MODE_CONFIG]: serializeSystemModeConfig(next) });
   } catch (error) {
     // Yazılış özü alınmadı — rejim dəyişmədi, nəticə xətadır.
-    return unexpected("sistem rejimi yazılmadı", error);
+    return unexpected("sistem rejimi yazılmadı", error, msg("server.common.unexpected"));
   }
 
   // ---------------------------------------------------------------------
@@ -183,7 +184,7 @@ export async function saveSystemMode(
 
   return success(
     previous.mode === next.mode
-      ? "Texniki xidmət parametrləri yadda saxlanıldı."
-      : `Sistem rejimi dəyişdirildi: ${next.mode}.`,
+      ? msg("server.sistem.texnikiXidmetParametrleriYaddaSaxlanildi")
+      : msg("server.sistem.sistemRejimiDeyisdirildi", { p0: String(next.mode) }),
   );
 }

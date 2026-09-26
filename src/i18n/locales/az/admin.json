@@ -460,7 +460,8 @@
       "paragraph": "Abzas",
       "italic": "Kursiv",
       "link": "Link",
-      "quote": "Sitat"
+      "quote": "Sitat",
+      "undo": "Geri al"
     },
     "dropzone": {
       "tooLarge": "Fayl {size} MB-dan böyükdür",
@@ -486,7 +487,9 @@
       "network": "Bağlantı kəsildi. Yenidən cəhd edin.",
       "serverBusy": "Server hazırda məşğuldur. Bir az sonra yenidən cəhd edin.",
       "retry": "Yenidən cəhd et",
-      "limitReached": "Limit dolub — ən çoxu {max} şəkil. Əvvəlcə birini silin."
+      "limitReached": "Limit dolub — ən çoxu {max} şəkil. Əvvəlcə birini silin.",
+      "moveLastShort": "Sona",
+      "deleteShort": "Sil"
     },
     "locationPicker": {
       "latitude": "Enlik (latitude)",
@@ -649,7 +652,8 @@
       "ePoct": "E-poçt",
       "whatsapp": "WhatsApp",
       "whatsappDaYaz": "WhatsApp-da yaz",
-      "elaqeliElan": "Əlaqəli elan"
+      "elaqeliElan": "Əlaqəli elan",
+      "statusLabel": "{name} müraciətinin statusu"
     },
     "moderation": {
       "elaniTesdiqlemek": "Elanı təsdiqləmək",
@@ -740,7 +744,8 @@
       "deyisiklikleriSaxla": "Dəyişiklikləri saxla",
       "layiheniSil": "Layihəni sil",
       "layiheninRedaktesi": "Layihənin redaktəsi",
-      "redakte": "Redaktə"
+      "redakte": "Redaktə",
+      "addPartner": "Tərəfdaş əlavə et"
     },
     "blog": {
       "ad": "Ad",
@@ -890,7 +895,8 @@
       "elan": "Elan",
       "favorit": "Favorit",
       "heleIctimaiHesabYoxdur": "Hələ ictimai hesab yoxdur.",
-      "bloklanib": "Bloklanıb"
+      "bloklanib": "Bloklanıb",
+      "openSessions": "{count, plural, other {# açıq sessiya}}"
     },
     "security": {
       "tehlukesizlik": "Təhlükəsizlik",
@@ -985,7 +991,9 @@
         "hide": "Bölməni gizlət",
         "projectsShown": "Yaşayış kompleksləri bölməsi saytda göstərilir.",
         "projectsHidden": "Yaşayış kompleksləri bölməsi saytdan gizlədildi."
-      }
+      },
+      "legalInfoHint": "Hüquqi ad, VÖEN, brend sahibi və naviqasiya strukturu kodda qorunur. Telefon, e-poçt, ünvan və sosial əlaqələri isə soldakı formadan dəyişə bilərsiniz.",
+      "secretsHint": "Gizli dəyərlər (Resend açarı, sessiya sirri) Cloudflare secret-lərindədir və heç vaxt bazada saxlanılmır."
     },
     "account": {
       "2faEhtiyatKodlariBir": "2FA ehtiyat kodları — bir dəfə göstərilir",
@@ -1004,7 +1012,9 @@
       "yeniParol": "Yeni parol",
       "enAzi10Simvol": "Ən azı 10 simvol. Parol menecerinin yaratdığı təsadüfi parol tövsiyə olunur.",
       "yeniParolunTekrari": "Yeni parolun təkrarı",
-      "sizeMuveqqetiParolVerilib": "Sizə müvəqqəti parol verilib. Panelə keçməzdən əvvəl onu dəyişməlisiniz."
+      "sizeMuveqqetiParolVerilib": "Sizə müvəqqəti parol verilib. Panelə keçməzdən əvvəl onu dəyişməlisiniz.",
+      "generateNewCodes": "Yeni kodlar yarat",
+      "changePassword": "Parolu dəyiş"
     },
     "knowledge": {
       "beledci": "Bələdçi",
@@ -1306,7 +1316,9 @@
       "birQeydUcunMuxtelif": "Bir qeyd üçün müxtəlif rollarda birdən çox tərəfdaş saxlanıla bilər.",
       "terefdasiRedakteEt": "Tərəfdaşı redaktə et",
       "saytdaBax": "Saytda bax",
-      "auditJurnalinda": "audit jurnalında"
+      "auditJurnalinda": "audit jurnalında",
+      "addRelation": "Əlaqə əlavə et",
+      "auditStoredSuffix": "saxlanılır."
     },
     "agents": {
       "profil": "Profil",
@@ -1453,7 +1465,8 @@
       "piyadaDeqiqe": "Piyada (dəqiqə)",
       "muddetiBitib": "Müddəti bitib",
       "premium": "Premium",
-      "saytdaBax": "Saytda bax"
+      "saytdaBax": "Saytda bax",
+      "durationDays": "{days, plural, other {# gün}}"
     },
     "serp": {
       "keywordClusterManagement": "Keyword cluster management",
@@ -1715,7 +1728,8 @@
       "301Daimi": "301 — Daimi",
       "302Muveqqeti": "302 — Müvəqqəti",
       "deaktiv": "Deaktiv",
-      "koordinatParametrlerde": "Ofisin xəritədəki nöqtəsi «Parametrlər → Ofisin xəritədəki yeri» bölməsində seçilir və struktur dataya (JSON-LD `geo`) oradan düşür."
+      "koordinatParametrlerde": "Ofisin xəritədəki nöqtəsi «Parametrlər → Ofisin xəritədəki yeri» bölməsində seçilir və struktur dataya (JSON-LD `geo`) oradan düşür.",
+      "hitCount": "{count, plural, other {# baxış}}"
     },
     "ops": {
       "trafikAnalitikasi": "Trafik analitikası",
@@ -2237,6 +2251,318 @@
       "integrationTurnstile": "Turnstile bot müdafiəsi",
       "integrationSavedSearchCron": "Saxlanmış axtarış cron-u",
       "integrationPush": "Push bildirişləri"
+    }
+  },
+  "server": {
+    "common": {
+      "formInvalid": "Formada xətalar var. Qeyd olunan sahələri yoxlayın.",
+      "unexpected": "Əməliyyat tamamlanmadı. Bir az sonra yenidən cəhd edin."
+    },
+    "guard": {
+      "rateLimited": "Çox sayda əməliyyat oldu. Bir dəqiqə gözləyin.",
+      "crossOrigin": "Sorğu təhlükəsizlik yoxlamasından keçmədi. Səhifəni yeniləyib yenidən cəhd edin."
+    },
+    "agentler": {
+      "duzgunUrlAdiYaradilmadi": "Düzgün URL adı yaradılmadı.",
+      "agentTapilmadi": "Agent tapılmadı.",
+      "agentProfiliYenilendi": "Agent profili yeniləndi.",
+      "agentProfiliYaradildi": "Agent profili yaradıldı.",
+      "agentProfiliSaxlanilaBilmediUrl": "Agent profili saxlanıla bilmədi. URL adı və bağlı hesab təkrarsız olmalıdır.",
+      "buAgenteElanTeyinEdilib": "Bu agentə {p0} elan təyin edilib. Əvvəlcə elanları başqa agentə keçirin.",
+      "reyTesdiqlendi": "Rəy təsdiqləndi.",
+      "reyReddEdildi": "Rəy rədd edildi.",
+      "agentIctimaiKataloqdanGizledildi": "Agent ictimai kataloqdan gizlədildi.",
+      "agentIctimaiKataloqdaDercEdildi": "Agent ictimai kataloqda dərc edildi.",
+      "musteriReyiDercEdildi": "Müştəri rəyi dərc edildi.",
+      "reyTapilmadi": "Rəy tapılmadı.",
+      "musteriReyiSilindi": "Müştəri rəyi silindi."
+    },
+    "agentlikler": {
+      "agentlikTapilmadi": "Agentlik tapılmadı.",
+      "agentlikTesdiqlendi": "Agentlik təsdiqləndi.",
+      "agentliyinTesdiqiLegvEdildi": "Agentliyin təsdiqi ləğv edildi.",
+      "agentlikAdi2160Simvol": "Agentlik adı 2–160 simvol arasında olmalıdır.",
+      "duzgunAgentlikAdiYazin": "Düzgün agentlik adı yazın",
+      "agentlikHesabiTapilmadi": "Agentlik hesabı tapılmadı.",
+      "buHesabinAgentlikProfiliArtiq": "Bu hesabın agentlik profili artıq mövcuddur.",
+      "agentlikProfiliYaradildiIndiOnu": "Agentlik profili yaradıldı. İndi onu yoxlayıb təsdiqləyə bilərsiniz.",
+      "devetTapilmadi": "Dəvət tapılmadı.",
+      "buDevetArtiqNezerdenKecirilib": "Bu dəvət artıq nəzərdən keçirilib.",
+      "emekdasTesdiqlendi": "Əməkdaş təsdiqləndi.",
+      "devetReddEdildi": "Dəvət rədd edildi."
+    },
+    "aiKomekci": {
+      "workersAiCavabVerdiAmma": "Workers AI cavab verdi, amma sağlıq sxeminə uyğun olmadı.",
+      "workersAiIsleyir": "Workers AI işləyir: {p0}",
+      "elanSecin": "Elan seçin.",
+      "elanTapilmadi": "Elan tapılmadı.",
+      "aiCavabindaTesvirYoxdur": "AI cavabında təsvir yoxdur.",
+      "aiTesvirQaralamasiYaradildiDerc": "AI təsvir qaralaması yaradıldı. Dərc etməzdən əvvəl yoxlayın.",
+      "elaninAnalizEdilecekSekliYoxdur": "Elanın analiz ediləcək şəkli yoxdur.",
+      "sekillerOxunmadiFaylMenbeyiElcatan": "Şəkillər oxunmadı — fayl mənbəyi əlçatan deyil.",
+      "hecBirSekilAnalizEdile": "Heç bir şəkil analiz edilə bilmədi. AI modeli cavab vermədi.",
+      "sekilAnalizEdildi": "{p0} şəkil analiz edildi.",
+      "qaralamaTapilmadiVeYaArtiq": "Qaralama tapılmadı və ya artıq işlənib.",
+      "qaralamadaTesvirYoxdur": "Qaralamada təsvir yoxdur.",
+      "qaralamaElanaTetbiqEdildi": "Qaralama elana tətbiq edildi.",
+      "qaralamaReddEdildi": "Qaralama rədd edildi."
+    },
+    "audit": {
+      "auditJurnaliniYalnizSuperAdmin": "Audit jurnalını yalnız Super Admin sıfırlaya bilər.",
+      "auditQeydiSifirlandi": "{p0} audit qeydi sıfırlandı."
+    },
+    "bilikMerkezi": {
+      "beledciTapilmadi": "Bələdçi tapılmadı.",
+      "beledciTapilmadiVeYaSilinib": "Bələdçi tapılmadı və ya silinib.",
+      "beledciYenilendi": "Bələdçi yeniləndi.",
+      "beledciSilindi": "Bələdçi silindi.",
+      "kateqoriyaYenilendi": "Kateqoriya yeniləndi.",
+      "kateqoriyaYaradildi": "Kateqoriya yaradıldı.",
+      "kateqoriyaTapilmadi": "Kateqoriya tapılmadı.",
+      "terminYenilendi": "Termin yeniləndi.",
+      "terminElaveOlundu": "Termin əlavə olundu.",
+      "terminTapilmadi": "Termin tapılmadı.",
+      "sualYenilendi": "Sual yeniləndi.",
+      "sualElaveOlundu": "Sual əlavə olundu.",
+      "sualTapilmadi": "Sual tapılmadı."
+    },
+    "blog": {
+      "meqaleTapilmadi": "Məqalə tapılmadı.",
+      "meqaleTapilmadiVeYaSilinib": "Məqalə tapılmadı və ya silinib.",
+      "meqaleYenilendi": "Məqalə yeniləndi.",
+      "meqaleSilindi": "Məqalə silindi.",
+      "meqaleBerpaEdildi": "Məqalə bərpa edildi.",
+      "kateqoriyaYenilendi": "Kateqoriya yeniləndi.",
+      "kateqoriyaYaradildi": "Kateqoriya yaradıldı.",
+      "kateqoriyasiSilindi": "«{p0}» kateqoriyası silindi."
+    },
+    "demoMezmun": {
+      "numuneMezmunAktivlesdirildiSaytdaGorunur": "Nümunə məzmun aktivləşdirildi — saytda görünür.",
+      "numuneMezmunSondurulduSaytdaYalniz": "Nümunə məzmun söndürüldü — saytda yalnız real qeydlər qalır."
+    },
+    "emlaklar": {
+      "emlakNovuSecilmeyib": "Əmlak növü seçilməyib",
+      "seherSecilmeyib": "Şəhər seçilməyib",
+      "rayonTapilmadi": "Rayon tapılmadı",
+      "secilmisRayonBuSehereAid": "Seçilmiş rayon bu şəhərə aid deyil",
+      "layiheTapilmadi": "Layihə tapılmadı",
+      "secilmisTaksonomiyaDeyerleriDuzgunDeyil": "Seçilmiş taksonomiya dəyərləri düzgün deyil.",
+      "elanDercTelebleriniOdemir": "Elan dərc tələblərini ödəmir.",
+      "elanTapilmadi": "Elan tapılmadı.",
+      "elanTapilmadiVeYaSilinib": "Elan tapılmadı və ya silinib.",
+      "elanYenilendi": "Elan yeniləndi.",
+      "elanBerpaEdildi": "Elan bərpa edildi.",
+      "hecBirElanSecilmeyib": "Heç bir elan seçilməyib.",
+      "namelumEmeliyyat": "Naməlum əməliyyat.",
+      "hecBirElanYenilenmedi": "Heç bir elan yenilənmədi.",
+      "elanYenilendiQalanlariUgursuzOldu": "{p0}/{p1} elan yeniləndi, qalanları uğursuz oldu.",
+      "elanYenilendi2": "{p0} elan yeniləndi."
+    },
+    "hesabim": {
+      "adEnAzi2Simvol": "Ad ən azı 2 simvol olmalıdır.",
+      "profilMelumatlariYenilendi": "Profil məlumatları yeniləndi.",
+      "cariParoluYazin": "Cari parolu yazın.",
+      "cariParolTelebOlunur": "Cari parol tələb olunur",
+      "cariParolYanlisdir": "Cari parol yanlışdır.",
+      "cariParolYanlisdir2": "Cari parol yanlışdır",
+      "yeniEhtiyatKodlariYaradildiOnlari": "Yeni ehtiyat kodları yaradıldı. Onları indi təhlükəsiz yerdə saxlayın.",
+      "yeniParolEnAziSimvol": "Yeni parol ən azı {p0} simvol olmalıdır.",
+      "yeniParolTekrariUygunGelmir": "Yeni parol təkrarı uyğun gəlmir.",
+      "yeniParolKohnesindenFerqliOlmalidir": "Yeni parol köhnəsindən fərqli olmalıdır.",
+      "parolDeyisdirildiVeDigerCihazlardaki": "Parol dəyişdirildi və digər cihazlardakı sessiyalar bağlandı."
+    },
+    "hesablar": {
+      "hesabTapilmadi": "Hesab tapılmadı.",
+      "hesabAktivlesdirildi": "Hesab aktivləşdirildi.",
+      "hesabTesdiqlendi": "Hesab təsdiqləndi.",
+      "hesabTesdiqiLegvEdildi": "Hesab təsdiqi ləğv edildi."
+    },
+    "ictimaiImkanlar": {
+      "yaxinObyektElaveEdildi": "Yaxın obyekt əlavə edildi.",
+      "rayonAnalitikasiYaddaSaxlanildi": "Rayon analitikası yadda saxlanıldı.",
+      "elanGunPremiumEdildi": "Elan {p0} gün premium edildi.",
+      "yaxinObyektTapilmadi": "Yaxın obyekt tapılmadı.",
+      "yaxinObyektSilindi": "Yaxın obyekt silindi.",
+      "rayonAnalitikasiTapilmadi": "Rayon analitikası tapılmadı.",
+      "rayonAnalitikasiSilindi": "Rayon analitikası silindi.",
+      "premiumStatusDayandirildi": "Premium status dayandırıldı."
+    },
+    "istifadeciler": {
+      "buEPoctArtiqIstifade": "Bu e-poçt artıq istifadə olunur.",
+      "ePoctArtiqQeydiyyatdadir": "E-poçt artıq qeydiyyatdadır",
+      "hesabiYaradildi": "«{p0}» hesabı yaradıldı.",
+      "istifadeciTapilmadi": "İstifadəçi tapılmadı.",
+      "ozRolunuzuDeyiseVeYa": "Öz rolunuzu dəyişə və ya hesabınızı deaktiv edə bilməzsiniz.",
+      "sistemdeEnAziBirAktiv": "Sistemdə ən azı bir aktiv Super Admin qalmalıdır.",
+      "istifadeciYenilendi": "İstifadəçi yeniləndi.",
+      "ucunParolSifirlandi": "«{p0}» üçün parol sıfırlandı.",
+      "n2faSifirlandiIstifadeciNovbetiGirisde": "2FA sıfırlandı. İstifadəçi növbəti girişdə yenidən quracaq.",
+      "butunSessiyalarBaglandi": "Bütün sessiyalar bağlandı.",
+      "ozHesabiniziSileBilmezsiniz": "Öz hesabınızı silə bilməzsiniz.",
+      "istifadeciSilindi": "İstifadəçi silindi."
+    },
+    "layiheler": {
+      "layiheTapilmadi": "Layihə tapılmadı.",
+      "layiheTapilmadiVeYaSilinib": "Layihə tapılmadı və ya silinib.",
+      "layiheYenilendi": "Layihə yeniləndi.",
+      "layiheSilindi": "Layihə silindi.",
+      "layiheBerpaEdildi": "Layihə bərpa edildi."
+    },
+    "media": {
+      "faylTapilmadi": "Fayl tapılmadı.",
+      "altMetnYenilendi": "Alt mətn yeniləndi."
+    },
+    "moderation": {
+      "elanTapilmadiVeYaArtiq": "Elan tapılmadı və ya artıq nəzərdən keçirilib.",
+      "elanDercTelebleriniOdemir": "Elan dərc tələblərini ödəmir.",
+      "elanTesdiqlendiVeDercOlundu": "Elan təsdiqləndi və dərc olundu.",
+      "elanTapilmadi": "Elan tapılmadı.",
+      "elanReddEdildiVeQaralamaya": "Elan rədd edildi və qaralamaya qaytarıldı."
+    },
+    "muracietler": {
+      "muracietTapilmadi": "Müraciət tapılmadı.",
+      "secilmisEmekdasTapilmadi": "Seçilmiş əməkdaş tapılmadı.",
+      "emekdasAktivDeyil": "Əməkdaş aktiv deyil",
+      "muracietYenilendi": "Müraciət yeniləndi.",
+      "muracietSilindi": "Müraciət silindi.",
+      "statusDeyeriDuzgunDeyil": "Status dəyəri düzgün deyil.",
+      "statusYenilendi": "Status yeniləndi."
+    },
+    "parametrler": {
+      "ePoctUnvaniDuzgunDeyil": "E-poçt ünvanı düzgün deyil",
+      "qeyd500SimvoldanUzunOla": "Qeyd 500 simvoldan uzun ola bilməz",
+      "korporativEPoctDuzgunDeyil": "Korporativ e-poçt düzgün deyil",
+      "parametrlerYaddaSaxlanildi": "Parametrlər yadda saxlanıldı.",
+      "enlikAraligi": "Enlik -90 ilə 90 arasında olmalıdır",
+      "uzunluqAraligi": "Uzunluq -180 ilə 180 arasında olmalıdır"
+    },
+    "redirects": {
+      "kohneVeYeniUnvanEyni": "Köhnə və yeni ünvan eyni ola bilməz.",
+      "ferqliUnvanSecin": "Fərqli ünvan seçin",
+      "buUnvanUcunArtiqYonlendirme": "Bu ünvan üçün artıq yönləndirmə var.",
+      "artiqMovcuddur": "Artıq mövcuddur",
+      "redirectChainLoopYaranaBiler": "Redirect chain/loop yarana bilər: {p0}. Son canonical ünvana birbaşa yönləndirin.",
+      "yonlendirmeElaveEdildi": "Yönləndirmə əlavə edildi.",
+      "yonlendirmeTapilmadi": "Yönləndirmə tapılmadı.",
+      "yonlendirmeYenilendi": "Yönləndirmə yeniləndi.",
+      "yonlendirmeSilindi": "Yönləndirmə silindi."
+    },
+    "rezervasiyalar": {
+      "rezervasiyaTapilmadi": "Rezervasiya tapılmadı.",
+      "statusArtiqSecilenDeyerdedir": "Status artıq seçilən dəyərdədir.",
+      "rezervasiyaStatusuYenilendi": "Rezervasiya statusu yeniləndi."
+    },
+    "security": {
+      "sessiyaTapilmadi": "Sessiya tapılmadı.",
+      "sessiyaBaglandi": "Sessiya bağlandı.",
+      "istifadeciTapilmadi": "İstifadəçi tapılmadı.",
+      "hesabinKilidiAcildi": "Hesabın kilidi açıldı."
+    },
+    "serp": {
+      "slugKicikLatinHerfleriIle": "Slug kiçik latın hərfləri ilə yazılmalıdır",
+      "seoParametrleriniDeyismekSelahiyyetinizYoxdur": "SEO parametrlərini dəyişmək səlahiyyətiniz yoxdur.",
+      "qlobalSeoParametrleriSaxlanildi": "Qlobal SEO parametrləri saxlanıldı.",
+      "localSeoParametrleriniDeyismekSelahiyyetiniz": "Local SEO parametrlərini dəyişmək səlahiyyətiniz yoxdur.",
+      "localSeoParametrleriSaxlanildi": "Local SEO parametrləri saxlanıldı.",
+      "robotsSiyasetiniDeyismekSelahiyyetinizYoxdur": "Robots siyasətini dəyişmək səlahiyyətiniz yoxdur.",
+      "productionSaytiniButovlukdeBloklayanDisallow": "Production saytını bütövlükdə bloklayan Disallow: / saxlanıla bilməz.",
+      "robotsSiyasetiSaxlanildi": "Robots siyasəti saxlanıldı.",
+      "seoMetadataRedakteSelahiyyetinizYoxdur": "SEO metadata redaktə səlahiyyətiniz yoxdur.",
+      "metadataOverrideSaxlanildi": "Metadata override saxlanıldı.",
+      "seoMetadataSilmekSelahiyyetinizYoxdur": "SEO metadata silmək səlahiyyətiniz yoxdur.",
+      "seoLandingDercEtmekSelahiyyetiniz": "SEO landing dərc etmək səlahiyyətiniz yoxdur.",
+      "seoLandingSehifesiSaxlanildi": "SEO landing səhifəsi saxlanıldı.",
+      "landingSilmekSelahiyyetinizYoxdur": "Landing silmək səlahiyyətiniz yoxdur.",
+      "keywordRedakteSelahiyyetinizYoxdur": "Keyword redaktə səlahiyyətiniz yoxdur.",
+      "keywordSaxlanildi": "Keyword saxlanıldı.",
+      "keywordSilmekSelahiyyetinizYoxdur": "Keyword silmək səlahiyyətiniz yoxdur.",
+      "entitySchemaRedakteSelahiyyetinizYoxdur": "Entity/schema redaktə səlahiyyətiniz yoxdur.",
+      "entityProfiliSaxlanildi": "Entity profili saxlanıldı.",
+      "entitySilmekSelahiyyetinizYoxdur": "Entity silmək səlahiyyətiniz yoxdur.",
+      "seoAuditSelahiyyetinizYoxdur": "SEO audit səlahiyyətiniz yoxdur.",
+      "kritikSeoAuditProblemiTapildi": "{p0} kritik SEO audit problemi tapıldı.",
+      "auditTamamlandiCariProblem": "Audit tamamlandı: {p0} cari problem.",
+      "auditQeydiHellEtmekSelahiyyetiniz": "Audit qeydi həll etmək səlahiyyətiniz yoxdur.",
+      "auditQeydiHellEdildi": "Audit qeydi həll edildi.",
+      "searchConsoleMelumatiIdxalEtmek": "Search Console məlumatı idxal etmək səlahiyyətiniz yoxdur.",
+      "searchConsoleMetrikasiIdxalEdildi": "Search Console metrikası idxal edildi.",
+      "searchConsoleSyncSelahiyyetinizYoxdur": "Search Console sync səlahiyyətiniz yoxdur.",
+      "searchConsoleSinxronlasdirildiSetir": "Search Console sinxronlaşdırıldı: {p0} sətir.",
+      "sitemapGondermekSelahiyyetinizYoxdur": "Sitemap göndərmək səlahiyyətiniz yoxdur.",
+      "sitemapGoogleSearchConsoleA": "Sitemap Google Search Console-a göndərildi.",
+      "xeberdarligiHellEtmekSelahiyyetinizYoxdur": "Xəbərdarlığı həll etmək səlahiyyətiniz yoxdur.",
+      "xeberdarliqHellEdildi": "Xəbərdarlıq həll edildi.",
+      "jsonMassivDuzgunDeyil": "JSON massiv düzgün deyil",
+      "filterJsonDuzgunDeyil": "Filter JSON düzgün deyil",
+      "jsonDuzgunDeyil": "JSON düzgün deyil"
+    },
+    "sistem": {
+      "buEmeliyyatYalnizSuperAdmin": "Bu əməliyyat yalnız Super Admin üçündür.",
+      "texnikiXidmetParametrleriYaddaSaxlanildi": "Texniki xidmət parametrləri yadda saxlanıldı.",
+      "sistemRejimiDeyisdirildi": "Sistem rejimi dəyişdirildi: {p0}."
+    },
+    "taksonomiya": {
+      "emlakNovuElaveEdildi": "«{p0}» əmlak növü əlavə edildi.",
+      "emlakNovuTapilmadi": "Əmlak növü tapılmadı.",
+      "emlakNovuYenilendi": "Əmlak növü yeniləndi.",
+      "buNovdeEmlakVarEvvelce": "Bu növdə {p0} əmlak var — əvvəlcə onları başqa növə köçürün.",
+      "emlakNovuSilindi": "Əmlak növü silindi.",
+      "xususiyyetiElaveEdildi": "«{p0}» xüsusiyyəti əlavə edildi.",
+      "xususiyyetTapilmadi": "Xüsusiyyət tapılmadı.",
+      "buXususiyyetEmlakaBaglidirEvvelce": "Bu xüsusiyyət {p0} əmlaka bağlıdır — əvvəlcə onlardan çıxarın.",
+      "xususiyyetSilindi": "Xüsusiyyət silindi."
+    },
+    "tercumeler": {
+      "mezmunSecin": "Məzmun seçin",
+      "basliqEnAzi2Simvol": "Başlıq ən azı 2 simvol olmalıdır",
+      "secilmisMezmunTapilmadi": "Seçilmiş məzmun tapılmadı.",
+      "tercumeYaddaSaxlanildi": "Tərcümə yadda saxlanıldı.",
+      "tercumeSilindi": "Tərcümə silindi."
+    },
+    "terefdaslar": {
+      "buSlugIleTerefdasArtiq": "Bu slug ilə tərəfdaş artıq mövcuddur",
+      "buSaytDomeniBasqaTerefdasda": "Bu sayt domeni başqa tərəfdaşda istifadə olunur",
+      "buHuquqiAdlaTerefdasArtiq": "Bu hüquqi adla tərəfdaş artıq mövcuddur",
+      "eyniTerefdasaBenzeyenQeydArtiq": "Eyni tərəfdaşa bənzəyən qeyd artıq mövcuddur.",
+      "terefdasTapilmadi": "Tərəfdaş tapılmadı.",
+      "terefdasTapilmadiVeYaSilinib": "Tərəfdaş tapılmadı və ya silinib.",
+      "terefdasYenilendi": "Tərəfdaş yeniləndi.",
+      "terefdasSilindiQeydAuditVe": "Tərəfdaş silindi. Qeyd audit və əlaqələr üçün saxlanıldı.",
+      "terefdasArxivStatusundaBerpaEdildi": "Tərəfdaş arxiv statusunda bərpa edildi.",
+      "saytdaGostermekUcunTerefdasinStatusu": "Saytda göstərmək üçün tərəfdaşın statusu əvvəlcə «Aktiv» olmalıdır.",
+      "terefdasSilinmedenSaytdaGosterildi": "Tərəfdaş silinmədən saytda göstərildi.",
+      "terefdasSaytdanGizledildiMelumatlariSaxlanildi": "Tərəfdaş saytdan gizlədildi; məlumatları saxlanıldı.",
+      "elaqelendirilecekQeydSecilmeyib": "Əlaqələndiriləcək qeyd seçilməyib.",
+      "elanTapilmadi": "Elan tapılmadı.",
+      "layiheTapilmadi": "Layihə tapılmadı.",
+      "agentlikTapilmadi": "Agentlik tapılmadı.",
+      "elaqeElaveEdildi": "Əlaqə əlavə edildi.",
+      "elaqeElaveEdilmediEyniRol": "Əlaqə əlavə edilmədi. Eyni rol artıq mövcud ola bilər.",
+      "elaqeTapilmadi": "Əlaqə tapılmadı.",
+      "elaqeSilindi": "Əlaqə silindi.",
+      "tesdiqIcazesiYoxdur": "Tərəfdaşı təsdiqləmək üçün icazəniz yoxdur.",
+      "yayimIcazesiYoxdur": "Tərəfdaşın yayımlanma vəziyyətini dəyişmək üçün icazəniz yoxdur."
+    },
+    "xidmetler": {
+      "ikonSecimiDuzgunDeyil": "İkon seçimi düzgün deyil.",
+      "siyahidanBirIkonSecin": "Siyahıdan bir ikon seçin",
+      "redakteEdilenXidmetTapilmadiSiyahini": "Redaktə edilən xidmət tapılmadı. Siyahını yeniləyin.",
+      "xidmetYenilendi": "Xidmət yeniləndi.",
+      "xidmetSilindi": "Xidmət silindi."
+    },
+    "publish": {
+      "titleRequired": "Başlıq yazılmalıdır.",
+      "descriptionRequired": "Təsvir yazılmalıdır.",
+      "pricePositive": "Qiymət sıfırdan böyük olmalıdır.",
+      "currencyNotAllowed": "Valyuta icazəli siyahıda deyil.",
+      "typeRequired": "Əmlak növü seçilməlidir.",
+      "cityRequired": "Şəhər seçilməlidir.",
+      "roomsPositive": "Dərc üçün otaq sayı sıfırdan böyük olmalıdır.",
+      "areaPositive": "Dərc üçün sahə və ya torpaq sahəsi sıfırdan böyük olmalıdır.",
+      "floorAboveTotal": "Mərtəbə ümumi mərtəbə sayından böyük ola bilməz.",
+      "minImages": "Dərc üçün ən azı {count} şəkil lazımdır.",
+      "titleRoomsMismatch": "Başlıqdakı {titleRooms} otaq məlumatı forma dəyəri ({rooms}) ilə uyğun deyil.",
+      "strongDuplicate": "Bu elan «{title}» ilə güclü duplikatdır. Mövcud qeydi yeniləyin və ya canonical/merge qərarı verin."
     }
   }
 }

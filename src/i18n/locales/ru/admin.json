@@ -460,7 +460,8 @@
       "paragraph": "Абзац",
       "italic": "Курсив",
       "link": "Ссылка",
-      "quote": "Цитата"
+      "quote": "Цитата",
+      "undo": "Отменить"
     },
     "dropzone": {
       "tooLarge": "Файл больше {size} МБ",
@@ -486,7 +487,9 @@
       "network": "Соединение прервано. Попробуйте ещё раз.",
       "serverBusy": "Сервер сейчас занят. Повторите попытку чуть позже.",
       "retry": "Повторить",
-      "limitReached": "Лимит исчерпан — не более {max} фото. Сначала удалите одно."
+      "limitReached": "Лимит исчерпан — не более {max} фото. Сначала удалите одно.",
+      "moveLastShort": "В конец",
+      "deleteShort": "Удалить"
     },
     "locationPicker": {
       "latitude": "Широта (latitude)",
@@ -649,7 +652,8 @@
       "ePoct": "Эл. почта",
       "whatsapp": "WhatsApp",
       "whatsappDaYaz": "Написать в WhatsApp",
-      "elaqeliElan": "Связанное объявление"
+      "elaqeliElan": "Связанное объявление",
+      "statusLabel": "Статус заявки: {name}"
     },
     "moderation": {
       "elaniTesdiqlemek": "Одобрить объявление",
@@ -740,7 +744,8 @@
       "deyisiklikleriSaxla": "Сохранить изменения",
       "layiheniSil": "Удалить комплекс",
       "layiheninRedaktesi": "Редактирование комплекса",
-      "redakte": "Редактирование"
+      "redakte": "Редактирование",
+      "addPartner": "Добавить партнёра"
     },
     "blog": {
       "ad": "Название",
@@ -890,7 +895,8 @@
       "elan": "Объявления",
       "favorit": "Избранное",
       "heleIctimaiHesabYoxdur": "Публичных аккаунтов пока нет.",
-      "bloklanib": "Заблокирован"
+      "bloklanib": "Заблокирован",
+      "openSessions": "{count, plural, one {# активный сеанс} few {# активных сеанса} many {# активных сеансов} other {# активного сеанса}}"
     },
     "security": {
       "tehlukesizlik": "Безопасность",
@@ -985,7 +991,9 @@
         "hide": "Скрыть раздел",
         "projectsShown": "Раздел «Жилые комплексы» теперь виден на сайте.",
         "projectsHidden": "Раздел «Жилые комплексы» скрыт с сайта."
-      }
+      },
+      "legalInfoHint": "Юридическое название, ИНН, владелец бренда и структура навигации защищены в коде. Телефон, e-mail, адрес и соцсети можно изменить в форме слева.",
+      "secretsHint": "Секреты (ключ Resend, секрет сеанса) хранятся в секретах Cloudflare и никогда не сохраняются в базе."
     },
     "account": {
       "2faEhtiyatKodlariBir": "Резервные коды 2FA — показываются один раз",
@@ -1004,7 +1012,9 @@
       "yeniParol": "Новый пароль",
       "enAzi10Simvol": "Не менее 10 символов. Рекомендуется случайный пароль из менеджера паролей.",
       "yeniParolunTekrari": "Повтор нового пароля",
-      "sizeMuveqqetiParolVerilib": "Вам выдан временный пароль. Смените его перед переходом в панель."
+      "sizeMuveqqetiParolVerilib": "Вам выдан временный пароль. Смените его перед переходом в панель.",
+      "generateNewCodes": "Создать новые коды",
+      "changePassword": "Изменить пароль"
     },
     "knowledge": {
       "beledci": "Руководство",
@@ -1306,7 +1316,9 @@
       "birQeydUcunMuxtelif": "К одной записи можно привязать несколько партнёров в разных ролях.",
       "terefdasiRedakteEt": "Редактировать партнёра",
       "saytdaBax": "Открыть на сайте",
-      "auditJurnalinda": "в журнале аудита"
+      "auditJurnalinda": "в журнале аудита",
+      "addRelation": "Добавить связь",
+      "auditStoredSuffix": "хранятся."
     },
     "agents": {
       "profil": "Профиль",
@@ -1453,7 +1465,8 @@
       "piyadaDeqiqe": "Пешком (минуты)",
       "muddetiBitib": "Истёк",
       "premium": "Премиум",
-      "saytdaBax": "Открыть на сайте"
+      "saytdaBax": "Открыть на сайте",
+      "durationDays": "{days, plural, one {# день} few {# дня} many {# дней} other {# дня}}"
     },
     "serp": {
       "keywordClusterManagement": "Управление кластерами ключевых слов",
@@ -1715,7 +1728,8 @@
       "301Daimi": "301 — Постоянная",
       "302Muveqqeti": "302 — Временная",
       "deaktiv": "Неактивна",
-      "koordinatParametrlerde": "Точка офиса на карте задаётся в разделе «Параметры → Расположение офиса на карте» и оттуда попадает в структурированные данные (JSON-LD `geo`)."
+      "koordinatParametrlerde": "Точка офиса на карте задаётся в разделе «Параметры → Расположение офиса на карте» и оттуда попадает в структурированные данные (JSON-LD `geo`).",
+      "hitCount": "{count, plural, one {# переход} few {# перехода} many {# переходов} other {# перехода}}"
     },
     "ops": {
       "trafikAnalitikasi": "Аналитика трафика",
@@ -2237,6 +2251,318 @@
       "integrationTurnstile": "Защита Turnstile",
       "integrationSavedSearchCron": "Cron сохранённых поисков",
       "integrationPush": "Push-уведомления"
+    }
+  },
+  "server": {
+    "common": {
+      "formInvalid": "В форме есть ошибки. Проверьте отмеченные поля.",
+      "unexpected": "Операция не выполнена. Повторите попытку чуть позже."
+    },
+    "guard": {
+      "rateLimited": "Слишком много операций. Подождите минуту.",
+      "crossOrigin": "Запрос не прошёл проверку безопасности. Обновите страницу и повторите попытку."
+    },
+    "agentler": {
+      "duzgunUrlAdiYaradilmadi": "Не удалось сформировать корректный URL-адрес.",
+      "agentTapilmadi": "Агент не найден.",
+      "agentProfiliYenilendi": "Профиль агента обновлён.",
+      "agentProfiliYaradildi": "Профиль агента создан.",
+      "agentProfiliSaxlanilaBilmediUrl": "Не удалось сохранить профиль агента. URL-адрес и связанный аккаунт должны быть уникальными.",
+      "buAgenteElanTeyinEdilib": "За этим агентом закреплено объявлений: {p0}. Сначала передайте их другому агенту.",
+      "reyTesdiqlendi": "Отзыв одобрен.",
+      "reyReddEdildi": "Отзыв отклонён.",
+      "agentIctimaiKataloqdanGizledildi": "Агент скрыт из публичного каталога.",
+      "agentIctimaiKataloqdaDercEdildi": "Агент опубликован в публичном каталоге.",
+      "musteriReyiDercEdildi": "Отзыв клиента опубликован.",
+      "reyTapilmadi": "Отзыв не найден.",
+      "musteriReyiSilindi": "Отзыв клиента удалён."
+    },
+    "agentlikler": {
+      "agentlikTapilmadi": "Агентство не найдено.",
+      "agentlikTesdiqlendi": "Агентство одобрено.",
+      "agentliyinTesdiqiLegvEdildi": "Одобрение агентства отменено.",
+      "agentlikAdi2160Simvol": "Название агентства должно содержать от 2 до 160 символов.",
+      "duzgunAgentlikAdiYazin": "Введите корректное название агентства",
+      "agentlikHesabiTapilmadi": "Аккаунт агентства не найден.",
+      "buHesabinAgentlikProfiliArtiq": "У этого аккаунта уже есть профиль агентства.",
+      "agentlikProfiliYaradildiIndiOnu": "Профиль агентства создан. Теперь его можно проверить и одобрить.",
+      "devetTapilmadi": "Приглашение не найдено.",
+      "buDevetArtiqNezerdenKecirilib": "Это приглашение уже рассмотрено.",
+      "emekdasTesdiqlendi": "Сотрудник одобрен.",
+      "devetReddEdildi": "Приглашение отклонено."
+    },
+    "aiKomekci": {
+      "workersAiCavabVerdiAmma": "Workers AI ответил, но ответ не соответствует схеме проверки.",
+      "workersAiIsleyir": "Workers AI работает: {p0}",
+      "elanSecin": "Выберите объявление.",
+      "elanTapilmadi": "Объявление не найдено.",
+      "aiCavabindaTesvirYoxdur": "В ответе AI нет описания.",
+      "aiTesvirQaralamasiYaradildiDerc": "Черновик AI-описания создан. Проверьте его перед публикацией.",
+      "elaninAnalizEdilecekSekliYoxdur": "У объявления нет изображений для анализа.",
+      "sekillerOxunmadiFaylMenbeyiElcatan": "Не удалось прочитать изображения — источник файлов недоступен.",
+      "hecBirSekilAnalizEdile": "Не удалось проанализировать ни одного изображения. Модель AI не ответила.",
+      "sekilAnalizEdildi": "Проанализировано изображений: {p0}.",
+      "qaralamaTapilmadiVeYaArtiq": "Черновик не найден или уже обработан.",
+      "qaralamadaTesvirYoxdur": "В черновике нет описания.",
+      "qaralamaElanaTetbiqEdildi": "Черновик применён к объявлению.",
+      "qaralamaReddEdildi": "Черновик отклонён."
+    },
+    "audit": {
+      "auditJurnaliniYalnizSuperAdmin": "Сбросить журнал аудита может только супер-администратор.",
+      "auditQeydiSifirlandi": "Записей аудита удалено: {p0}."
+    },
+    "bilikMerkezi": {
+      "beledciTapilmadi": "Руководство не найдено.",
+      "beledciTapilmadiVeYaSilinib": "Руководство не найдено или уже удалено.",
+      "beledciYenilendi": "Руководство обновлено.",
+      "beledciSilindi": "Руководство удалено.",
+      "kateqoriyaYenilendi": "Категория обновлена.",
+      "kateqoriyaYaradildi": "Категория создана.",
+      "kateqoriyaTapilmadi": "Категория не найдена.",
+      "terminYenilendi": "Термин обновлён.",
+      "terminElaveOlundu": "Термин добавлен.",
+      "terminTapilmadi": "Термин не найден.",
+      "sualYenilendi": "Вопрос обновлён.",
+      "sualElaveOlundu": "Вопрос добавлен.",
+      "sualTapilmadi": "Вопрос не найден."
+    },
+    "blog": {
+      "meqaleTapilmadi": "Статья не найдена.",
+      "meqaleTapilmadiVeYaSilinib": "Статья не найдена или уже удалена.",
+      "meqaleYenilendi": "Статья обновлена.",
+      "meqaleSilindi": "Статья удалена.",
+      "meqaleBerpaEdildi": "Статья восстановлена.",
+      "kateqoriyaYenilendi": "Категория обновлена.",
+      "kateqoriyaYaradildi": "Категория создана.",
+      "kateqoriyasiSilindi": "Категория «{p0}» удалена."
+    },
+    "demoMezmun": {
+      "numuneMezmunAktivlesdirildiSaytdaGorunur": "Демо-контент включён — теперь он виден на сайте.",
+      "numuneMezmunSondurulduSaytdaYalniz": "Демо-контент отключён — на сайте остаются только реальные записи."
+    },
+    "emlaklar": {
+      "emlakNovuSecilmeyib": "Тип недвижимости не выбран",
+      "seherSecilmeyib": "Город не выбран",
+      "rayonTapilmadi": "Район не найден",
+      "secilmisRayonBuSehereAid": "Выбранный район не относится к этому городу",
+      "layiheTapilmadi": "Проект не найден",
+      "secilmisTaksonomiyaDeyerleriDuzgunDeyil": "Выбранные значения таксономии некорректны.",
+      "elanDercTelebleriniOdemir": "Объявление не соответствует требованиям к публикации.",
+      "elanTapilmadi": "Объявление не найдено.",
+      "elanTapilmadiVeYaSilinib": "Объявление не найдено или уже удалено.",
+      "elanYenilendi": "Объявление обновлено.",
+      "elanBerpaEdildi": "Объявление восстановлено.",
+      "hecBirElanSecilmeyib": "Не выбрано ни одного объявления.",
+      "namelumEmeliyyat": "Неизвестная операция.",
+      "hecBirElanYenilenmedi": "Ни одно объявление не обновлено.",
+      "elanYenilendiQalanlariUgursuzOldu": "Обновлено объявлений: {p0} из {p1}, остальные — с ошибкой.",
+      "elanYenilendi2": "Обновлено объявлений: {p0}."
+    },
+    "hesabim": {
+      "adEnAzi2Simvol": "Имя должно содержать не менее 2 символов.",
+      "profilMelumatlariYenilendi": "Данные профиля обновлены.",
+      "cariParoluYazin": "Введите текущий пароль.",
+      "cariParolTelebOlunur": "Требуется текущий пароль",
+      "cariParolYanlisdir": "Текущий пароль неверен.",
+      "cariParolYanlisdir2": "Текущий пароль неверен",
+      "yeniEhtiyatKodlariYaradildiOnlari": "Созданы новые резервные коды. Сохраните их в надёжном месте.",
+      "yeniParolEnAziSimvol": "Новый пароль должен содержать не менее {p0} символов.",
+      "yeniParolTekrariUygunGelmir": "Подтверждение нового пароля не совпадает.",
+      "yeniParolKohnesindenFerqliOlmalidir": "Новый пароль должен отличаться от старого.",
+      "parolDeyisdirildiVeDigerCihazlardaki": "Пароль изменён, сеансы на других устройствах завершены."
+    },
+    "hesablar": {
+      "hesabTapilmadi": "Аккаунт не найден.",
+      "hesabAktivlesdirildi": "Аккаунт активирован.",
+      "hesabTesdiqlendi": "Аккаунт одобрен.",
+      "hesabTesdiqiLegvEdildi": "Одобрение аккаунта отменено."
+    },
+    "ictimaiImkanlar": {
+      "yaxinObyektElaveEdildi": "Объект поблизости добавлен.",
+      "rayonAnalitikasiYaddaSaxlanildi": "Аналитика района сохранена.",
+      "elanGunPremiumEdildi": "Объявление переведено в премиум на {p0} дн.",
+      "yaxinObyektTapilmadi": "Объект поблизости не найден.",
+      "yaxinObyektSilindi": "Объект поблизости удалён.",
+      "rayonAnalitikasiTapilmadi": "Аналитика района не найдена.",
+      "rayonAnalitikasiSilindi": "Аналитика района удалена.",
+      "premiumStatusDayandirildi": "Премиум-статус отключён."
+    },
+    "istifadeciler": {
+      "buEPoctArtiqIstifade": "Этот e-mail уже используется.",
+      "ePoctArtiqQeydiyyatdadir": "E-mail уже зарегистрирован",
+      "hesabiYaradildi": "Аккаунт «{p0}» создан.",
+      "istifadeciTapilmadi": "Пользователь не найден.",
+      "ozRolunuzuDeyiseVeYa": "Нельзя изменить собственную роль или деактивировать свой аккаунт.",
+      "sistemdeEnAziBirAktiv": "В системе должен оставаться хотя бы один активный супер-администратор.",
+      "istifadeciYenilendi": "Пользователь обновлён.",
+      "ucunParolSifirlandi": "Пароль для «{p0}» сброшен.",
+      "n2faSifirlandiIstifadeciNovbetiGirisde": "2FA сброшена. Пользователь настроит её заново при следующем входе.",
+      "butunSessiyalarBaglandi": "Все сеансы завершены.",
+      "ozHesabiniziSileBilmezsiniz": "Нельзя удалить собственный аккаунт.",
+      "istifadeciSilindi": "Пользователь удалён."
+    },
+    "layiheler": {
+      "layiheTapilmadi": "Проект не найден.",
+      "layiheTapilmadiVeYaSilinib": "Проект не найден или уже удалён.",
+      "layiheYenilendi": "Проект обновлён.",
+      "layiheSilindi": "Проект удалён.",
+      "layiheBerpaEdildi": "Проект восстановлен."
+    },
+    "media": {
+      "faylTapilmadi": "Файл не найден.",
+      "altMetnYenilendi": "Alt-текст обновлён."
+    },
+    "moderation": {
+      "elanTapilmadiVeYaArtiq": "Объявление не найдено или уже рассмотрено.",
+      "elanDercTelebleriniOdemir": "Объявление не соответствует требованиям к публикации.",
+      "elanTesdiqlendiVeDercOlundu": "Объявление одобрено и опубликовано.",
+      "elanTapilmadi": "Объявление не найдено.",
+      "elanReddEdildiVeQaralamaya": "Объявление отклонено и возвращено в черновики."
+    },
+    "muracietler": {
+      "muracietTapilmadi": "Заявка не найдена.",
+      "secilmisEmekdasTapilmadi": "Выбранный сотрудник не найден.",
+      "emekdasAktivDeyil": "Сотрудник неактивен",
+      "muracietYenilendi": "Заявка обновлена.",
+      "muracietSilindi": "Заявка удалена.",
+      "statusDeyeriDuzgunDeyil": "Некорректное значение статуса.",
+      "statusYenilendi": "Статус обновлён."
+    },
+    "parametrler": {
+      "ePoctUnvaniDuzgunDeyil": "Некорректный адрес e-mail",
+      "qeyd500SimvoldanUzunOla": "Примечание не может быть длиннее 500 символов",
+      "korporativEPoctDuzgunDeyil": "Некорректный корпоративный e-mail",
+      "parametrlerYaddaSaxlanildi": "Настройки сохранены.",
+      "enlikAraligi": "Широта должна быть от -90 до 90",
+      "uzunluqAraligi": "Долгота должна быть от -180 до 180"
+    },
+    "redirects": {
+      "kohneVeYeniUnvanEyni": "Старый и новый адреса не могут совпадать.",
+      "ferqliUnvanSecin": "Выберите другой адрес",
+      "buUnvanUcunArtiqYonlendirme": "Для этого адреса уже есть перенаправление.",
+      "artiqMovcuddur": "Уже существует",
+      "redirectChainLoopYaranaBiler": "Возможна цепочка или петля перенаправлений: {p0}. Перенаправляйте сразу на конечный канонический адрес.",
+      "yonlendirmeElaveEdildi": "Перенаправление добавлено.",
+      "yonlendirmeTapilmadi": "Перенаправление не найдено.",
+      "yonlendirmeYenilendi": "Перенаправление обновлено.",
+      "yonlendirmeSilindi": "Перенаправление удалено."
+    },
+    "rezervasiyalar": {
+      "rezervasiyaTapilmadi": "Бронирование не найдено.",
+      "statusArtiqSecilenDeyerdedir": "Статус уже имеет выбранное значение.",
+      "rezervasiyaStatusuYenilendi": "Статус бронирования обновлён."
+    },
+    "security": {
+      "sessiyaTapilmadi": "Сеанс не найден.",
+      "sessiyaBaglandi": "Сеанс завершён.",
+      "istifadeciTapilmadi": "Пользователь не найден.",
+      "hesabinKilidiAcildi": "Аккаунт разблокирован."
+    },
+    "serp": {
+      "slugKicikLatinHerfleriIle": "Slug должен состоять из строчных латинских букв",
+      "seoParametrleriniDeyismekSelahiyyetinizYoxdur": "У вас нет прав на изменение настроек SEO.",
+      "qlobalSeoParametrleriSaxlanildi": "Глобальные настройки SEO сохранены.",
+      "localSeoParametrleriniDeyismekSelahiyyetiniz": "У вас нет прав на изменение настроек локального SEO.",
+      "localSeoParametrleriSaxlanildi": "Настройки локального SEO сохранены.",
+      "robotsSiyasetiniDeyismekSelahiyyetinizYoxdur": "У вас нет прав на изменение политики robots.",
+      "productionSaytiniButovlukdeBloklayanDisallow": "Нельзя сохранить правило «Disallow: /», блокирующее весь рабочий сайт.",
+      "robotsSiyasetiSaxlanildi": "Политика robots сохранена.",
+      "seoMetadataRedakteSelahiyyetinizYoxdur": "У вас нет прав на редактирование SEO-метаданных.",
+      "metadataOverrideSaxlanildi": "Переопределение метаданных сохранено.",
+      "seoMetadataSilmekSelahiyyetinizYoxdur": "У вас нет прав на удаление SEO-метаданных.",
+      "seoLandingDercEtmekSelahiyyetiniz": "У вас нет прав на публикацию SEO-лендингов.",
+      "seoLandingSehifesiSaxlanildi": "SEO-лендинг сохранён.",
+      "landingSilmekSelahiyyetinizYoxdur": "У вас нет прав на удаление лендингов.",
+      "keywordRedakteSelahiyyetinizYoxdur": "У вас нет прав на редактирование ключевых слов.",
+      "keywordSaxlanildi": "Ключевое слово сохранено.",
+      "keywordSilmekSelahiyyetinizYoxdur": "У вас нет прав на удаление ключевых слов.",
+      "entitySchemaRedakteSelahiyyetinizYoxdur": "У вас нет прав на редактирование сущностей/schema.",
+      "entityProfiliSaxlanildi": "Профиль сущности сохранён.",
+      "entitySilmekSelahiyyetinizYoxdur": "У вас нет прав на удаление сущностей.",
+      "seoAuditSelahiyyetinizYoxdur": "У вас нет прав на проведение SEO-аудита.",
+      "kritikSeoAuditProblemiTapildi": "Найдено критических проблем SEO-аудита: {p0}.",
+      "auditTamamlandiCariProblem": "Аудит завершён: текущих проблем — {p0}.",
+      "auditQeydiHellEtmekSelahiyyetiniz": "У вас нет прав на закрытие записей аудита.",
+      "auditQeydiHellEdildi": "Запись аудита закрыта.",
+      "searchConsoleMelumatiIdxalEtmek": "У вас нет прав на импорт данных Search Console.",
+      "searchConsoleMetrikasiIdxalEdildi": "Метрики Search Console импортированы.",
+      "searchConsoleSyncSelahiyyetinizYoxdur": "У вас нет прав на синхронизацию Search Console.",
+      "searchConsoleSinxronlasdirildiSetir": "Search Console синхронизирован: строк — {p0}.",
+      "sitemapGondermekSelahiyyetinizYoxdur": "У вас нет прав на отправку sitemap.",
+      "sitemapGoogleSearchConsoleA": "Sitemap отправлен в Google Search Console.",
+      "xeberdarligiHellEtmekSelahiyyetinizYoxdur": "У вас нет прав на закрытие предупреждений.",
+      "xeberdarliqHellEdildi": "Предупреждение закрыто.",
+      "jsonMassivDuzgunDeyil": "Некорректный JSON-массив",
+      "filterJsonDuzgunDeyil": "Некорректный JSON фильтра",
+      "jsonDuzgunDeyil": "Некорректный JSON"
+    },
+    "sistem": {
+      "buEmeliyyatYalnizSuperAdmin": "Это действие доступно только супер-администратору.",
+      "texnikiXidmetParametrleriYaddaSaxlanildi": "Настройки технического обслуживания сохранены.",
+      "sistemRejimiDeyisdirildi": "Режим системы изменён: {p0}."
+    },
+    "taksonomiya": {
+      "emlakNovuElaveEdildi": "Тип недвижимости «{p0}» добавлен.",
+      "emlakNovuTapilmadi": "Тип недвижимости не найден.",
+      "emlakNovuYenilendi": "Тип недвижимости обновлён.",
+      "buNovdeEmlakVarEvvelce": "У этого типа есть объекты недвижимости: {p0}. Сначала перенесите их в другой тип.",
+      "emlakNovuSilindi": "Тип недвижимости удалён.",
+      "xususiyyetiElaveEdildi": "Характеристика «{p0}» добавлена.",
+      "xususiyyetTapilmadi": "Характеристика не найдена.",
+      "buXususiyyetEmlakaBaglidirEvvelce": "Эта характеристика привязана к объектам: {p0}. Сначала уберите её у них.",
+      "xususiyyetSilindi": "Характеристика удалена."
+    },
+    "tercumeler": {
+      "mezmunSecin": "Выберите контент",
+      "basliqEnAzi2Simvol": "Заголовок должен содержать не менее 2 символов",
+      "secilmisMezmunTapilmadi": "Выбранный контент не найден.",
+      "tercumeYaddaSaxlanildi": "Перевод сохранён.",
+      "tercumeSilindi": "Перевод удалён."
+    },
+    "terefdaslar": {
+      "buSlugIleTerefdasArtiq": "Партнёр с таким slug уже существует",
+      "buSaytDomeniBasqaTerefdasda": "Этот домен сайта используется другим партнёром",
+      "buHuquqiAdlaTerefdasArtiq": "Партнёр с таким юридическим названием уже существует",
+      "eyniTerefdasaBenzeyenQeydArtiq": "Запись, похожая на этого партнёра, уже существует.",
+      "terefdasTapilmadi": "Партнёр не найден.",
+      "terefdasTapilmadiVeYaSilinib": "Партнёр не найден или уже удалён.",
+      "terefdasYenilendi": "Партнёр обновлён.",
+      "terefdasSilindiQeydAuditVe": "Партнёр удалён. Запись сохранена для аудита и связей.",
+      "terefdasArxivStatusundaBerpaEdildi": "Партнёр восстановлен в архивном статусе.",
+      "saytdaGostermekUcunTerefdasinStatusu": "Чтобы показать партнёра на сайте, сначала установите статус «Активный».",
+      "terefdasSilinmedenSaytdaGosterildi": "Партнёр показан на сайте без удаления.",
+      "terefdasSaytdanGizledildiMelumatlariSaxlanildi": "Партнёр скрыт с сайта; данные сохранены.",
+      "elaqelendirilecekQeydSecilmeyib": "Не выбрана запись для связи.",
+      "elanTapilmadi": "Объявление не найдено.",
+      "layiheTapilmadi": "Проект не найден.",
+      "agentlikTapilmadi": "Агентство не найдено.",
+      "elaqeElaveEdildi": "Связь добавлена.",
+      "elaqeElaveEdilmediEyniRol": "Связь не добавлена. Такая роль, возможно, уже существует.",
+      "elaqeTapilmadi": "Связь не найдена.",
+      "elaqeSilindi": "Связь удалена.",
+      "tesdiqIcazesiYoxdur": "У вас нет прав на одобрение партнёров.",
+      "yayimIcazesiYoxdur": "У вас нет прав на изменение статуса публикации партнёра."
+    },
+    "xidmetler": {
+      "ikonSecimiDuzgunDeyil": "Некорректный выбор иконки.",
+      "siyahidanBirIkonSecin": "Выберите иконку из списка",
+      "redakteEdilenXidmetTapilmadiSiyahini": "Редактируемая услуга не найдена. Обновите список.",
+      "xidmetYenilendi": "Услуга обновлена.",
+      "xidmetSilindi": "Услуга удалена."
+    },
+    "publish": {
+      "titleRequired": "Необходимо указать заголовок.",
+      "descriptionRequired": "Необходимо указать описание.",
+      "pricePositive": "Цена должна быть больше нуля.",
+      "currencyNotAllowed": "Валюта не входит в разрешённый список.",
+      "typeRequired": "Необходимо выбрать тип недвижимости.",
+      "cityRequired": "Необходимо выбрать город.",
+      "roomsPositive": "Для публикации количество комнат должно быть больше нуля.",
+      "areaPositive": "Для публикации площадь или площадь участка должна быть больше нуля.",
+      "floorAboveTotal": "Этаж не может быть больше общего количества этажей.",
+      "minImages": "Для публикации нужно не менее {count} фото.",
+      "titleRoomsMismatch": "Количество комнат в заголовке ({titleRooms}) не совпадает со значением в форме ({rooms}).",
+      "strongDuplicate": "Это объявление — явный дубликат «{title}». Обновите существующую запись или примите решение о canonical/объединении."
     }
   }
 }

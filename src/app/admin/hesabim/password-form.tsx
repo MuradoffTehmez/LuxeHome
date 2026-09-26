@@ -6,6 +6,7 @@ import { KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { changePassword, type AccountState } from "./actions";
+import { useServerMessage } from "@/components/admin/use-server-message";
 
 const CONTROL =
   "min-h-12 w-full rounded-xs border border-line-strong bg-paper px-4 py-3 text-base text-ink " +
@@ -13,6 +14,7 @@ const CONTROL =
 
 export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
   const t = useTranslations("admin");
+  const translateMessage = useServerMessage();
   const [state, formAction, pending] = useActionState<AccountState, FormData>(changePassword, {});
 
   return (
@@ -68,7 +70,7 @@ export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
           role="alert"
           className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
         >
-          {state.error}
+          {translateMessage(state.error)}
         </p>
       )}
 
@@ -77,13 +79,13 @@ export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
           role="status"
           className="rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
         >
-          {state.success}
+          {translateMessage(state.success)}
         </p>
       )}
 
       <Button type="submit" size="lg" loading={pending}>
         {!pending && <KeyRound className="size-4.5" aria-hidden="true" />}
-        Parolu dəyiş
+        {t("pages.account.changePassword")}
       </Button>
     </form>
   );

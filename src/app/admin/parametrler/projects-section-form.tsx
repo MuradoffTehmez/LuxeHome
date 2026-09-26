@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { AlertTriangle, Check, Loader2 } from "lucide-react";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { toggleProjectsSection } from "./actions";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 /**
  * «Yaşayış kompleksləri» bölməsinin açarı (#83).
@@ -13,7 +14,8 @@ import { toggleProjectsSection } from "./actions";
  */
 export function ProjectsSectionForm({ enabled }: { enabled: boolean }) {
   const t = useTranslations("admin");
-  const [state, formAction, pending] = useActionState(toggleProjectsSection, IDLE_STATE);
+  const [rawState, formAction, pending] = useActionState(toggleProjectsSection, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">

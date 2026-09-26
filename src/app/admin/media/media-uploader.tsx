@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/toast";
 import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 import { ImagePrepareError, isImageCandidate, prepareImageForUpload } from "@/components/admin/image-prepare";
 import { uploadWithRetry } from "@/components/admin/image-upload-queue";
+import { useServerMessage } from "@/components/admin/use-server-message";
 
 /**
  * Kitabxanaya birbaşa yükləmə.
@@ -22,6 +23,7 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const translateMessage = useServerMessage();
   const [dragActive, setDragActive] = useState(false);
   const [pending, setPending] = useState(0);
 
@@ -60,7 +62,7 @@ export function MediaUploader({ folder = "umumi" }: { folder?: string }) {
               ? t("components.dropzone.rateLimited")
               : result.kind === "server" || result.kind === "network"
                 ? t("components.dropzone.serverBusy")
-                : result.message ?? t("pages.misc.yuklemeAlinmadi"),
+                : translateMessage(result.message) ?? t("pages.misc.yuklemeAlinmadi"),
           );
         }
         uploaded += 1;

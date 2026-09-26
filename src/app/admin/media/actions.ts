@@ -8,6 +8,7 @@ import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { deleteImage } from "@/lib/media/storage";
 import * as form from "@/lib/admin/form";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/media";
 
@@ -21,7 +22,7 @@ export async function updateMediaAlt(_prev: ActionState, formData: FormData): Pr
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("Fayl tapılmadı.");
+  if (!id) return failure(msg("server.media.faylTapilmadi"));
 
   const alt = form.text(formData, "alt").slice(0, 160);
 
@@ -34,9 +35,9 @@ export async function updateMediaAlt(_prev: ActionState, formData: FormData): Pr
 
     await recordAudit(user, "UPDATE", "Media", id, media.originalName);
     revalidatePath(LIST_PATH);
-    return success("Alt mətn yeniləndi.");
+    return success(msg("server.media.altMetnYenilendi"));
   } catch (error) {
-    return unexpected("alt mətn yenilənmədi", error);
+    return unexpected("alt mətn yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -72,6 +73,6 @@ export async function deleteMedia(id: string): Promise<ActionState> {
     revalidatePath(LIST_PATH);
     return success("Fayl silindi.");
   } catch (error) {
-    return unexpected("fayl silinmədi", error);
+    return unexpected("fayl silinmədi", error, msg("server.common.unexpected"));
   }
 }

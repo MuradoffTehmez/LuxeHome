@@ -22,6 +22,7 @@ import * as form from "@/lib/admin/form";
 import { normalizeSearchText } from "@/lib/search-normalization";
 import { knowledgeSearchText, termInitial } from "@/lib/knowledge";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Bilik Mərkəzinin idarəsi.
@@ -124,7 +125,7 @@ export async function createKnowledgeArticle(
   }
 
   const parsed = knowledgeArticleSchema.safeParse(readArticleForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   let articleId: string;
   try {
@@ -166,7 +167,7 @@ export async function createKnowledgeArticle(
     articleId = article.id;
     await recordAudit(user, "CREATE", "KnowledgeArticle", articleId, parsed.data.title);
   } catch (error) {
-    return unexpected("bələdçi yaradıla bilmədi", error);
+    return unexpected("bələdçi yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 
   revalidatePath(LIST_PATH);
@@ -187,17 +188,17 @@ export async function updateKnowledgeArticle(
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("Bələdçi tapılmadı.");
+  if (!id) return failure(msg("server.bilikMerkezi.beledciTapilmadi"));
 
   const parsed = knowledgeArticleSchema.safeParse(readArticleForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const existing = await prisma.knowledgeArticle.findFirst({
       where: { id, deletedAt: null },
       select: { id: true, publishedAt: true, coverUrl: true, slug: true },
     });
-    if (!existing) return failure("Bələdçi tapılmadı və ya silinib.");
+    if (!existing) return failure(msg("server.bilikMerkezi.beledciTapilmadiVeYaSilinib"));
 
     const content = await sanitizeRichText(parsed.data.content);
     const cover = parseSingleImage(formData, "cover");
@@ -247,9 +248,9 @@ export async function updateKnowledgeArticle(
     revalidatePath(`${LIST_PATH}/${id}`);
     revalidatePublicContent("knowledge", slug);
     if (existing.slug !== slug) revalidatePublicContent("knowledge", existing.slug);
-    return success("Bələdçi yeniləndi.");
+    return success(msg("server.bilikMerkezi.beledciYenilendi"));
   } catch (error) {
-    return unexpected("bələdçi yenilənmədi", error);
+    return unexpected("bələdçi yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -267,7 +268,7 @@ export async function deleteKnowledgeArticle(id: string): Promise<ActionState> {
       where: { id, deletedAt: null },
       select: { id: true, title: true, slug: true },
     });
-    if (!article) return failure("Bələdçi tapılmadı.");
+    if (!article) return failure(msg("server.bilikMerkezi.beledciTapilmadi"));
 
     // Soft-delete: ictimai sorğular `deletedAt: null` şərtindən keçir, ona görə
     // qeyd dərhal saytdan çıxır, lakin audit izi və keçmiş link qorunur.
@@ -276,9 +277,9 @@ export async function deleteKnowledgeArticle(id: string): Promise<ActionState> {
 
     revalidatePath(LIST_PATH);
     revalidatePublicContent("knowledge", article.slug);
-    return success("Bələdçi silindi.");
+    return success(msg("server.bilikMerkezi.beledciSilindi"));
   } catch (error) {
-    return unexpected("bələdçi silinmədi", error);
+    return unexpected("bələdçi silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -307,7 +308,7 @@ export async function saveKnowledgeCategory(
     order: form.integer(formData, "order") ?? 0,
     isActive: form.boolean(formData, "isActive"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const slug = await uniqueSlug(
@@ -340,9 +341,9 @@ export async function saveKnowledgeCategory(
     );
     revalidatePath(CATEGORIES_PATH);
     revalidatePublicContent("knowledge");
-    return success(id ? "Kateqoriya yeniləndi." : "Kateqoriya yaradıldı.");
+    return success(id ? msg("server.bilikMerkezi.kateqoriyaYenilendi") : msg("server.bilikMerkezi.kateqoriyaYaradildi"));
   } catch (error) {
-    return unexpected("kateqoriya yadda saxlanmadı", error);
+    return unexpected("kateqoriya yadda saxlanmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -360,7 +361,7 @@ export async function deleteKnowledgeCategory(id: string): Promise<ActionState> 
       where: { id },
       select: { id: true, name: true },
     });
-    if (!category) return failure("Kateqoriya tapılmadı.");
+    if (!category) return failure(msg("server.bilikMerkezi.kateqoriyaTapilmadi"));
 
     // Bələdçi və terminlər silinmir — `onDelete: SetNull` ilə kateqoriyasız qalır.
     await prisma.knowledgeCategory.delete({ where: { id } });
@@ -370,7 +371,7 @@ export async function deleteKnowledgeCategory(id: string): Promise<ActionState> 
     revalidatePublicContent("knowledge");
     return success("Kateqoriya silindi.");
   } catch (error) {
-    return unexpected("kateqoriya silinmədi", error);
+    return unexpected("kateqoriya silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -401,7 +402,7 @@ export async function saveKnowledgeTerm(
     order: form.integer(formData, "order") ?? 0,
     relatedSlugs: form.lines(formData, "relatedSlugs"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const slug = await uniqueSlug(
@@ -433,9 +434,9 @@ export async function saveKnowledgeTerm(
     await recordAudit(user, id ? "UPDATE" : "CREATE", "KnowledgeTerm", saved.id, parsed.data.term);
     revalidatePath(TERMS_PATH);
     revalidatePublicContent("knowledge");
-    return success(id ? "Termin yeniləndi." : "Termin əlavə olundu.");
+    return success(id ? msg("server.bilikMerkezi.terminYenilendi") : msg("server.bilikMerkezi.terminElaveOlundu"));
   } catch (error) {
-    return unexpected("termin yadda saxlanmadı", error);
+    return unexpected("termin yadda saxlanmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -453,7 +454,7 @@ export async function deleteKnowledgeTerm(id: string): Promise<ActionState> {
       where: { id },
       select: { id: true, term: true },
     });
-    if (!term) return failure("Termin tapılmadı.");
+    if (!term) return failure(msg("server.bilikMerkezi.terminTapilmadi"));
 
     await prisma.knowledgeTerm.delete({ where: { id } });
     await recordAudit(user, "DELETE", "KnowledgeTerm", id, term.term);
@@ -462,7 +463,7 @@ export async function deleteKnowledgeTerm(id: string): Promise<ActionState> {
     revalidatePublicContent("knowledge");
     return success("Termin silindi.");
   } catch (error) {
-    return unexpected("termin silinmədi", error);
+    return unexpected("termin silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -487,7 +488,7 @@ export async function saveFaqEntry(_prev: ActionState, formData: FormData): Prom
     status: form.text(formData, "status"),
     order: form.integer(formData, "order") ?? 0,
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const data = {
@@ -505,9 +506,9 @@ export async function saveFaqEntry(_prev: ActionState, formData: FormData): Prom
     await recordAudit(user, id ? "UPDATE" : "CREATE", "KnowledgeFaq", saved.id, parsed.data.question);
     revalidatePath(FAQ_PATH);
     revalidatePublicContent("knowledge");
-    return success(id ? "Sual yeniləndi." : "Sual əlavə olundu.");
+    return success(id ? msg("server.bilikMerkezi.sualYenilendi") : msg("server.bilikMerkezi.sualElaveOlundu"));
   } catch (error) {
-    return unexpected("sual yadda saxlanmadı", error);
+    return unexpected("sual yadda saxlanmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -525,7 +526,7 @@ export async function deleteFaqEntry(id: string): Promise<ActionState> {
       where: { id },
       select: { id: true, question: true },
     });
-    if (!entry) return failure("Sual tapılmadı.");
+    if (!entry) return failure(msg("server.bilikMerkezi.sualTapilmadi"));
 
     await prisma.knowledgeFaq.delete({ where: { id } });
     await recordAudit(user, "DELETE", "KnowledgeFaq", id, entry.question);
@@ -534,6 +535,6 @@ export async function deleteFaqEntry(id: string): Promise<ActionState> {
     revalidatePublicContent("knowledge");
     return success("Sual silindi.");
   } catch (error) {
-    return unexpected("sual silinmədi", error);
+    return unexpected("sual silinmədi", error, msg("server.common.unexpected"));
   }
 }

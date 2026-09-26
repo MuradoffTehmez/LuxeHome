@@ -12,6 +12,7 @@ import {
 } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/hesablar";
 
@@ -33,7 +34,7 @@ export async function togglePublicAccountActive(id: string): Promise<ActionState
       },
       select: { id: true, email: true, isActive: true },
     });
-    if (!account) return failure("Hesab tapılmadı.");
+    if (!account) return failure(msg("server.hesablar.hesabTapilmadi"));
 
     const nextActive = !account.isActive;
     await prisma.user.update({ where: { id }, data: { isActive: nextActive } });
@@ -41,9 +42,9 @@ export async function togglePublicAccountActive(id: string): Promise<ActionState
 
     await recordAudit(actor, "UPDATE", "User", id, `${account.email} — ${nextActive ? "aktivləşdirildi" : "deaktiv edildi"}`);
     revalidatePath(LIST_PATH);
-    return success(nextActive ? "Hesab aktivləşdirildi." : "Hesab deaktiv edildi.");
+    return success(nextActive ? msg("server.hesablar.hesabAktivlesdirildi") : "Hesab deaktiv edildi.");
   } catch (error) {
-    return unexpected("hesab yenilənmədi", error);
+    return unexpected("hesab yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -65,7 +66,7 @@ export async function togglePublicAccountApproval(id: string): Promise<ActionSta
       },
       select: { id: true, email: true, approvedAt: true },
     });
-    if (!account) return failure("Hesab tapılmadı.");
+    if (!account) return failure(msg("server.hesablar.hesabTapilmadi"));
 
     const approvedAt = account.approvedAt ? null : new Date();
     await prisma.user.update({ where: { id }, data: { approvedAt } });
@@ -79,8 +80,8 @@ export async function togglePublicAccountApproval(id: string): Promise<ActionSta
     );
     revalidatePath(LIST_PATH);
     revalidatePath("/admin/agentlikler");
-    return success(approvedAt ? "Hesab təsdiqləndi." : "Hesab təsdiqi ləğv edildi.");
+    return success(approvedAt ? msg("server.hesablar.hesabTesdiqlendi") : msg("server.hesablar.hesabTesdiqiLegvEdildi"));
   } catch (error) {
-    return unexpected("hesab təsdiqi yenilənmədi", error);
+    return unexpected("hesab təsdiqi yenilənmədi", error, msg("server.common.unexpected"));
   }
 }

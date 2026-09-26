@@ -21,6 +21,11 @@ function withoutComments(source: string): string {
     .replace(/^\s*\/\/.*$/gm, "");
 }
 
+/** String literal-larının içini boşaldır — JSX mətn axtarışı yalnız xam mətni görsün. */
+function withoutStrings(source: string): string {
+  return source.replace(/"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`/g, '""');
+}
+
 describe("admin i18n source audit", () => {
   it("üçdilli admin UI-da görünən Azərbaycan/Rus JSX literalı saxlamır", () => {
     const findings: string[] = [];
@@ -47,6 +52,33 @@ describe("admin i18n source audit", () => {
       forbidden.test(withoutComments(readFileSync(file, "utf8"))),
     );
 
+    expect(findings).toEqual([]);
+  });
+
+  it("çoxsətirli və ifadədən sonrakı JSX mətni də tərcüməsiz qalmır (#89)", () => {
+    // Əvvəlki yoxlama yalnız təksətirli `>mətn<` tuturdu; ikondan sonra ayrıca
+    // sətirdə yazılmış düymə mətni (`{ikon} Əlaqə əlavə et </button>`) ondan keçirdi.
+    const textNode = /[>}]([^<>{}]*[ƏəİıÖöÜüĞğŞşÇç][^<>{}]*)</g;
+    const findings: string[] = [];
+    for (const file of roots.flatMap(sourceFiles).filter((path) => path.endsWith(".tsx"))) {
+      const source = withoutStrings(withoutComments(readFileSync(file, "utf8")));
+      for (const match of source.matchAll(textNode)) {
+        findings.push(`${file.replace(process.cwd(), "")}: ${match[1].trim().slice(0, 80)}`);
+      }
+    }
+    expect(findings).toEqual([]);
+  });
+
+  it("admin server action-ları istifadəçiyə xam AZ mətni deyil, tərcümə markeri qaytarır (#89)", () => {
+    const userFacing =
+      /(?:\b(?:success|successWithSecret|failure|permissionError|AdminGuardError)\(\s*|errors(?:\.\w+|\[[^\]]+\])\s*=\s*)(["'`])[^"'`]*[ƏəİıÖöÜüĞğŞşÇç]/g;
+    const findings: string[] = [];
+    for (const file of roots.flatMap(sourceFiles).filter((path) => path.endsWith("actions.ts"))) {
+      const source = withoutComments(readFileSync(file, "utf8"));
+      for (const match of source.matchAll(userFacing)) {
+        findings.push(`${file.replace(process.cwd(), "")}: ${match[0].slice(0, 90)}`);
+      }
+    }
     expect(findings).toEqual([]);
   });
 });

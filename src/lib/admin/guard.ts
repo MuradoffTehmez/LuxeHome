@@ -11,6 +11,7 @@ import { failure, type ActionState } from "@/lib/admin/action-state";
 import type { AuthUser } from "@/lib/auth/types";
 import type { Permission, SystemMode } from "@/lib/constants";
 import { DEFAULT_LOCALE, ROLES, type Locale } from "@/lib/constants";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Paneldəki hər yazma əməliyyatının giriş qapısı.
@@ -135,10 +136,23 @@ export async function requireAdminAction(
   permission: Permission,
   options?: AdminActionOptions,
 ): Promise<AuthUser> {
-  await assertSameOrigin();
+  // Panel mesajları istifadəçinin panel dilində göstərilir (#89): guard xətaları
+  // burada tərcümə markeri ilə yenidən atılır. `assertSameOrigin`/`assertWriteLimit`
+  // ictimai kabinetlə ortaqdır, ona görə orijinal mətnlər orada dəyişmir.
+  try {
+    await assertSameOrigin();
+  } catch (error) {
+    if (error instanceof AdminGuardError) throw new AdminGuardError(msg("server.guard.crossOrigin"));
+    throw error;
+  }
   const user = await requirePermission(permission);
   if (!options?.skipSystemModeGate) await assertWritableMode(user.role);
-  await assertWriteLimit(user.id, "admin");
+  try {
+    await assertWriteLimit(user.id, "admin");
+  } catch (error) {
+    if (error instanceof RateLimitGuardError) throw new RateLimitGuardError(msg("server.guard.rateLimited"));
+    throw error;
+  }
   return user;
 }
 

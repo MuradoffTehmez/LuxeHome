@@ -13,6 +13,7 @@ import { assertSameOrigin } from "@/lib/admin/guard";
 import { type ActionState, failure, invalid, success, successWithSecret, unexpected } from "@/lib/admin/action-state";
 import * as form from "@/lib/admin/form";
 import { STAFF_PASSWORD_MIN } from "@/lib/constants";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Hesab əməliyyatları.
@@ -24,7 +25,7 @@ import { STAFF_PASSWORD_MIN } from "@/lib/constants";
 export type AccountState = { error?: string; success?: string };
 
 const profileSchema = z.object({
-  name: z.string().trim().min(2, "Ad ən azı 2 simvol olmalıdır.").max(120),
+  name: z.string().trim().min(2, msg("server.hesabim.adEnAzi2Simvol")).max(120),
   phone: z.string().trim().max(30).nullable(),
   locale: z.enum(["az", "en", "ru"]),
   themePreference: z.enum(["light", "dark"]),
@@ -39,7 +40,7 @@ export async function saveProfile(_previous: ActionState, formData: FormData): P
     locale: form.text(formData, "locale"),
     themePreference: form.text(formData, "themePreference"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const image = parseSingleImage(formData, "avatar");
@@ -50,9 +51,9 @@ export async function saveProfile(_previous: ActionState, formData: FormData): P
     await recordAudit(user, "UPDATE", "User", user.id, "Şəxsi profil yeniləndi");
     revalidatePath("/admin", "layout");
     revalidatePath("/admin/hesabim");
-    return success("Profil məlumatları yeniləndi.");
+    return success(msg("server.hesabim.profilMelumatlariYenilendi"));
   } catch (error) {
-    return unexpected("profil yenilənmədi", error);
+    return unexpected("profil yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -63,14 +64,14 @@ export async function regenerateBackupCodes(
   await assertSameOrigin();
   const user = await requireStaff();
   const currentPassword = form.text(formData, "currentPassword");
-  if (!currentPassword) return failure("Cari parolu yazın.", { currentPassword: "Cari parol tələb olunur" });
+  if (!currentPassword) return failure(msg("server.hesabim.cariParoluYazin"), { currentPassword: msg("server.hesabim.cariParolTelebOlunur") });
 
   const record = await prisma.user.findUniqueOrThrow({
     where: { id: user.id },
     select: { passwordHash: true },
   });
   if (!(await verifyPassword(currentPassword, record.passwordHash))) {
-    return failure("Cari parol yanlışdır.", { currentPassword: "Cari parol yanlışdır" });
+    return failure(msg("server.hesabim.cariParolYanlisdir"), { currentPassword: msg("server.hesabim.cariParolYanlisdir2") });
   }
 
   try {
@@ -81,9 +82,9 @@ export async function regenerateBackupCodes(
     }
     await recordAudit(user, "UPDATE", "User", user.id, "2FA ehtiyat kodları yeniləndi");
     revalidatePath("/admin/hesabim");
-    return successWithSecret("Yeni ehtiyat kodları yaradıldı. Onları indi təhlükəsiz yerdə saxlayın.", codes.join("\n"));
+    return successWithSecret(msg("server.hesabim.yeniEhtiyatKodlariYaradildiOnlari"), codes.join("\n"));
   } catch (error) {
-    return unexpected("ehtiyat kodları yenilənmədi", error);
+    return unexpected("ehtiyat kodları yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -92,14 +93,14 @@ const passwordSchema = z
     current: z.string().min(1),
     next: z
       .string()
-      .min(STAFF_PASSWORD_MIN, `Yeni parol ən azı ${STAFF_PASSWORD_MIN} simvol olmalıdır.`),
+      .min(STAFF_PASSWORD_MIN, msg("server.hesabim.yeniParolEnAziSimvol", { p0: String(STAFF_PASSWORD_MIN) })),
     confirm: z.string(),
   })
   .refine((value) => value.next === value.confirm, {
-    message: "Yeni parol təkrarı uyğun gəlmir.",
+    message: msg("server.hesabim.yeniParolTekrariUygunGelmir"),
   })
   .refine((value) => value.next !== value.current, {
-    message: "Yeni parol köhnəsindən fərqli olmalıdır.",
+    message: msg("server.hesabim.yeniParolKohnesindenFerqliOlmalidir"),
   });
 
 export async function changePassword(
@@ -114,7 +115,7 @@ export async function changePassword(
     confirm: formData.get("confirm"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Məlumatlar düzgün deyil." };
+    return { error: parsed.error.issues[0]?.message ?? msg("server.common.formInvalid") };
   }
 
   const record = await prisma.user.findUniqueOrThrow({
@@ -122,7 +123,7 @@ export async function changePassword(
     select: { passwordHash: true },
   });
   if (!(await verifyPassword(parsed.data.current, record.passwordHash))) {
-    return { error: "Cari parol yanlışdır." };
+    return { error: msg("server.hesabim.cariParolYanlisdir") };
   }
 
   await prisma.user.update({
@@ -138,7 +139,7 @@ export async function changePassword(
   await revokeAllSessions(user.id, (await currentSessionId()) ?? undefined);
 
   revalidatePath("/admin/hesabim");
-  return { success: "Parol dəyişdirildi və digər cihazlardakı sessiyalar bağlandı." };
+  return { success: msg("server.hesabim.parolDeyisdirildiVeDigerCihazlardaki") };
 }
 
 export async function revokeOne(formData: FormData): Promise<void> {
