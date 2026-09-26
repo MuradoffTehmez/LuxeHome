@@ -28,6 +28,9 @@ const child = spawn(
   [
     "opennextjs-cloudflare", "preview", "--",
     "--port", PORT,
+    // Remote binding-lər (Workers AI) söndürülür: CI-də Cloudflare token-i yoxdur və
+    // testlər canlı resurslara getməməlidir. AI çağırışları deterministik fallback-ə düşür.
+    "--local",
     "--persist-to", STATE_DIR,
     "--var", "IS_STAGING:true",
     "--var", `AUTH_SECRET:${env.AUTH_SECRET}`,

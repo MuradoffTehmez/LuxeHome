@@ -8,6 +8,7 @@ import {
   STAGE_SUBJECT,
   TOKEN_ISSUER,
 } from "../../src/lib/auth/cookie-names";
+import type { AuthStage } from "../../src/lib/auth/types";
 import { E2E_FIXTURES } from "./fixtures";
 
 /**
@@ -42,7 +43,8 @@ function cookieFor(context: BrowserContext, name: string, value: string, baseURL
 
 /** Admin: stage cookie → `/giris/dogrulama` → TOTP kodu → `/admin`. */
 export async function signInAsAdmin(page: Page, baseURL: string): Promise<void> {
-  const token = await new SignJWT({ uid: E2E_FIXTURES.admin.id, stage: "totp", next: "/admin" })
+  const stage: AuthStage = "totp";
+  const token = await new SignJWT({ uid: E2E_FIXTURES.admin.id, stage, next: "/admin" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuer(TOKEN_ISSUER)
     .setSubject(STAGE_SUBJECT)
@@ -70,9 +72,9 @@ export async function signInAsLister(context: BrowserContext, baseURL: string): 
   const token = await new SignJWT({
     sid: lister.sessionId,
     uid: lister.id,
-    role: "EDITOR",
-    accountType: "OWNER",
-    authKind: "PUBLIC",
+    role: lister.role,
+    accountType: lister.accountType,
+    authKind: lister.authKind,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuer(TOKEN_ISSUER)

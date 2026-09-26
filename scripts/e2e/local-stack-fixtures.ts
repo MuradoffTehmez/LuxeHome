@@ -46,16 +46,16 @@ async function main() {
     [
       user({
         id: admin.id, name: "E2E Admin", email: admin.email, passwordHash: "disabled",
-        role: "SUPER_ADMIN", accountType: "STAFF", isActive: 1, mustChangePassword: 0, failedAttempts: 0,
+        role: admin.role, accountType: admin.accountType, isActive: 1, mustChangePassword: 0, failedAttempts: 0,
         locale: admin.locale, totpSecret: encrypted, totpEnabledAt: now, createdAt: now, updatedAt: now,
       }),
       user({
         id: lister.id, name: "E2E Elan Sahibi", email: lister.email, passwordHash: "disabled",
-        role: "EDITOR", accountType: "OWNER", isActive: 1, mustChangePassword: 0, failedAttempts: 0,
+        role: lister.role, accountType: lister.accountType, isActive: 1, mustChangePassword: 0, failedAttempts: 0,
         locale: "az", emailVerifiedAt: now, approvedAt: now, createdAt: now, updatedAt: now,
       }),
       `INSERT INTO "Session" ("id", "userId", "createdAt", "expiresAt", "lastSeenAt", "authKind") VALUES (${[
-        lister.sessionId, lister.id, now, inWeek, now, "PUBLIC",
+        lister.sessionId, lister.id, now, inWeek, now, lister.authKind,
       ].map(sql).join(", ")});`,
     ].join("\n"),
   );
