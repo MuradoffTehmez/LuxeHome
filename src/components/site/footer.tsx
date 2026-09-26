@@ -13,6 +13,7 @@ import {
 } from "@/config/site";
 import {
   FacebookIcon,
+  GoogleIcon,
   InstagramIcon,
   LinkedInIcon,
   TikTokIcon,
@@ -29,6 +30,7 @@ const SOCIAL_ICONS = {
   tiktok: TikTokIcon,
   linkedin: LinkedInIcon,
   whatsapp: WhatsAppIcon,
+  google: GoogleIcon,
 } as const;
 
 /**

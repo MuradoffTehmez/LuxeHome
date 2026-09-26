@@ -24,6 +24,7 @@ const INTEGRATION_LABEL_KEYS = {
   turnstile: "pages.systemMode.integrationTurnstile",
   savedSearchCron: "pages.systemMode.integrationSavedSearchCron",
   push: "pages.systemMode.integrationPush",
+  telegram: "pages.systemMode.integrationTelegram",
 } as const satisfies Record<IntegrationHealthId, string>;
 
 export async function generateMetadata(): Promise<Metadata> {

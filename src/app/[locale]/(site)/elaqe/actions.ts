@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { sendLeadNotificationEmail } from "@/lib/email";
+import { notifyLeadOnTelegram } from "@/lib/telegram";
 import { SameOriginError, assertSameOrigin } from "@/lib/request-origin";
 import { checkContactLimit, clientIp } from "@/lib/auth/rate-limit";
 import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
@@ -154,6 +155,18 @@ export async function submitContactForm(
     } catch (emailErr) {
       console.error("E-poçt bildirişi göndərilərkən xəta:", emailErr);
     }
+
+    // Telegram öz xətasını udur (`notifyLeadOnTelegram` heç vaxt atmır).
+    await notifyLeadOnTelegram({
+      kind: "lead",
+      id: lead.id,
+      name: lead.name,
+      phone: lead.phone,
+      email: lead.email,
+      subject: lead.subject,
+      message: lead.message,
+      source: lead.source,
+    });
 
     return { success: true };
   } catch {

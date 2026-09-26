@@ -28,10 +28,7 @@
     "overline": "Portfel",
     "title": "Seçilmiş əmlaklar",
     "description": "Luxe Home Estate tərəfindən seçilmiş daşınmaz əmlaklar.",
-    "all": "Bütün əmlaklar",
-    "emptyTitle": "Hazırda seçilmiş əmlak yoxdur",
-    "emptyDescription": "Yeni əmlaklar əlavə edildikcə bu bölmədə göstəriləcək.",
-    "emptyAction": "Bütün əmlaklara bax"
+    "all": "Bütün əmlaklar"
   },
   "categories": {
     "overline": "Kateqoriyalar",
@@ -108,5 +105,13 @@
     "description": "Tələbinizi bizə bildirin — uyğun variantları seçib sizinlə əlaqə saxlayaq.",
     "send": "Müraciət göndər",
     "view": "Əmlaklara bax"
+  },
+  "ownerLead": {
+    "overline": "Sahiblər üçün",
+    "title": "Əmlakınızı satmaq və ya kirayə vermək istəyirsiniz?",
+    "description": "Qiymətləndirmə, peşəkar foto, sənəd yoxlaması və alıcı ilə görüşləri biz təşkil edirik. Müraciət edin, mütəxəssisimiz 1 iş günü ərzində sizinlə əlaqə saxlasın.",
+    "primary": "Müraciət göndər",
+    "whatsapp": "WhatsApp-da yazın",
+    "whatsappMessage": "Salam, əmlakımı Luxe Home Estate vasitəsilə satmaq/kirayə vermək istəyirəm."
   }
 }

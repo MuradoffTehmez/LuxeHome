@@ -165,7 +165,8 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [x] Admin CRUD: əmlak, layihə, xidmət, bloq, lead, media, istifadəçi, parametr və tərəfdaşlar.
 - [x] Dashboard səhifəsi real D1 statistikalarını göstərir.
 - [x] Media yükləmə: admin və kabinet R2 upload route-ları, `Media` yazması və `ImageDropzone`.
-- [ ] Telegram bot inteqrasiyası — yeni lead bildirişi. **Hələ yazılmayıb**: kodda `TELEGRAM` izi yoxdur.
+- [x] Telegram bot inteqrasiyası — kod hazırdır (#103, `src/lib/telegram.ts`). **Qalan iş:** bot
+      yaradılıb `TELEGRAM_BOT_TOKEN` və `TELEGRAM_CHAT_ID` secret-ləri production/staging-ə yazılmalıdır.
 - [x] Contact/auth form spam qoruması: origin + honeypot + rate limit + Turnstile.
 - [x] `prisma/remove-demo-content.sql` və lokal/remote təmizləmə scriptləri əlavə edildi.
 - [x] Azərbaycanca axtarış üçün normallaşdırılmış `searchText` / `searchName` sütunları.
@@ -189,7 +190,8 @@ Bütün lint warning-ləri təmizləndi: `npm run typecheck`, `npx eslint .` və
 - [ ] İş saatları — `SERP → Local SEO` formasında doldurulur və JSON-LD `openingHours`-a düşür,
       lakin real qrafik hələ şirkət tərəfindən təsdiqlənməyib (sahə boşdur).
 - [x] Təsdiqlənməmiş statistika və demo məzmun saytdan çıxarıldı.
-- [ ] Unsplash stok şəkilləri şirkətin öz foto arxivi ilə əvəzlənməlidir
+- [ ] Unsplash stok şəkilləri şirkətin öz foto arxivi ilə əvəzlənməlidir — #103-dən sonra kod
+      dəyişmədən `Parametrlər → Saytın şəkilləri` bölməsindən yüklənir; qalan iş şirkətin fotolarıdır.
       (`next.config.ts`-dəki `remotePatterns` qaydası sonra silinə bilər).
 
 ---

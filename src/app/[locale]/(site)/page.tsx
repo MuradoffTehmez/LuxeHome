@@ -18,11 +18,11 @@ import {
 } from "lucide-react";
 import { LOCATION_KINDS } from "@/lib/constants";
 import { isProjectsSectionEnabled } from "@/lib/site-sections";
+import { getSiteImages } from "@/lib/settings";
 import { Badge } from "@/components/ui/badge";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
 import { buttonClassName } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Hero } from "@/components/site/hero";
 import { AiSearchForm } from "@/components/site/ai-search-form";
@@ -34,6 +34,7 @@ import { ProjectCard } from "@/components/site/project-card";
 import { ServiceIcon } from "@/components/site/service-icon";
 import { PostCard } from "@/components/site/post-card";
 import { FeaturedPartnership } from "@/components/site/featured-partnership";
+import { OwnerLeadBanner } from "@/components/site/owner-lead-banner";
 import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { buildManagedMetadata } from "@/lib/seo";
@@ -90,6 +91,7 @@ export default async function HomePage({ params }: HomePageProps) {
     { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners },
     { testimonials, agents },
     projectsEnabled,
+    siteImages,
   ] = await Promise.all([
     getTranslations({ locale: resolvedLocale, namespace: "home" }),
     getTranslations({ locale: resolvedLocale, namespace: "property" }),
@@ -101,6 +103,7 @@ export default async function HomePage({ params }: HomePageProps) {
     getCachedHomePageData(),
     getCachedHomeSocialProof(),
     isProjectsSectionEnabled(),
+    getSiteImages(),
   ]);
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
@@ -139,6 +142,7 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <>
       <Hero
+        imageUrl={siteImages.hero}
         types={typeOptions}
         cities={cityOptions}
         locale={resolvedLocale}
@@ -164,6 +168,177 @@ export default async function HomePage({ params }: HomePageProps) {
         }}
       />
       <div className="home-deferred-content">
+
+      {/* ------------------------------------------------------------------ */}
+      {/* SEÇİLMİŞ ƏMLAKLAR — portfel boşdursa sahib müraciəti bloku (#103)  */}
+      {/* ------------------------------------------------------------------ */}
+      {featured.length > 0 ? (
+        <Section tone="ivory">
+          <Container size="wide">
+            <SectionHeader
+              overline={t("featured.overline")}
+              title={t("featured.title")}
+              description={t("featured.description")}
+              action={{ label: t("featured.all"), href: "/emlaklar" }}
+            />
+
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((property, index) => (
+                <Reveal key={property.id} delay={index * 60}>
+                  <PropertyCard property={property} />
+                </Reveal>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      ) : null}
+
+      {featured.length < 3 ? (
+        <OwnerLeadBanner
+          labels={{
+            overline: t("ownerLead.overline"),
+            title: t("ownerLead.title"),
+            description: t("ownerLead.description"),
+            primary: t("ownerLead.primary"),
+            whatsapp: t("ownerLead.whatsapp"),
+            whatsappMessage: t("ownerLead.whatsappMessage"),
+          }}
+        />
+      ) : null}
+
+
+      {/* ------------------------------------------------------------------ */}
+      {/* KATEQORİYALAR                                                      */}
+      {/* ------------------------------------------------------------------ */}
+      <Section tone="paper">
+        <Container size="wide">
+          <SectionHeader
+            overline={t("categories.overline")}
+            title={t("categories.title")}
+            description={t("categories.description")}
+          />
+
+          <MobileCategoryRail items={categoryItems} />
+
+          <div className="mt-10 hidden gap-4 lg:grid lg:grid-cols-4 xl:grid-cols-5">
+            {categoryItems.map((item, index) => (
+              <Reveal key={item.href} delay={(index % 5) * 40}>
+                <Link
+                  href={item.href}
+                  className="group relative flex aspect-4/3 overflow-hidden rounded-lg border border-line bg-beige shadow-xs transition-shadow duration-300 hover:shadow-lg"
+                >
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt=""
+                      fill
+                      unoptimized={isUnoptimizedImage(item.imageUrl)}
+                      loading="lazy"
+                      sizes="(max-width: 1279px) 25vw, 20vw"
+                      className="image-lift object-cover"
+                    />
+                  ) : null}
+
+                  {/* Sabit tünd qradiyent — `charcoal` tokeni tünd rejimdə açığa dönür. */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent"
+                  />
+
+                  <div className="relative mt-auto flex w-full items-end justify-between gap-3 p-4">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base text-white">{item.label}</h3>
+                      {/* Boş kateqoriyada «0 elan» yazılmır — portfel boş görünməsin (#103). */}
+                      {item.count > 0 ? (
+                        <p className="tabular mt-0.5 text-xs text-white/80">
+                          {propertyT("listingCount", { count: item.count })}
+                        </p>
+                      ) : null}
+                    </div>
+                    <span className="on-image-chip grid size-8 shrink-0 place-items-center rounded-full transition-transform duration-300 group-hover:-translate-y-0.5">
+                      <ArrowUpRight className="size-4" aria-hidden="true" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+
+      {/* ------------------------------------------------------------------ */}
+      {/* ƏMLAK TAPMA KÖMƏKÇİSİ                                              */}
+      {/* ------------------------------------------------------------------ */}
+      <Section tone="ivory" spacing="compact">
+        <Container size="wide">
+          <div className="on-dark relative isolate grid grid-cols-1 items-center gap-8 overflow-hidden rounded-2xl bg-navy px-6 py-10 sm:px-10 sm:py-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-14 lg:py-14">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_88%_12%,rgb(196_165_117/0.28),transparent_42%),radial-gradient(circle_at_0%_100%,rgb(196_165_117/0.12),transparent_40%)]"
+            />
+            <div className="min-w-0">
+              <p className="editorial-kicker text-gold-soft">{wizardT("eyebrow")}</p>
+              <h2 className="mt-3 max-w-2xl font-display text-[clamp(1.875rem,3vw,2.75rem)] leading-[1.1] tracking-[-0.025em] text-ivory">
+                {wizardT("title")}
+              </h2>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-ivory/75">
+                {wizardT("description")}
+              </p>
+              <p className="mt-3 flex items-center gap-2 text-sm text-ivory/65">
+                <Sparkles className="size-4 shrink-0 text-gold-soft" aria-hidden="true" />
+                {wizardT("homeNote")}
+              </p>
+            </div>
+            <Link href="/mene-emlak-tap" className={buttonClassName("primary", "lg")}>
+              {wizardT("homeCta")}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </Container>
+      </Section>
+
+
+      {/* ------------------------------------------------------------------ */}
+      {/* XİDMƏTLƏR                                                          */}
+      {/* ------------------------------------------------------------------ */}
+      <Section tone="navy">
+        <Container size="wide">
+          <SectionHeader
+            overline={t("services.overline")}
+            title={t("services.title")}
+            description={t("services.description")}
+            tone="dark"
+            action={{ label: t("services.all"), href: "/xidmetler" }}
+          />
+
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {localizedServices.slice(0, HOME_SERVICE_LIMIT).map((service, index) => (
+              <Reveal key={service.id} delay={index * 50}>
+                <Link
+                  href={`/xidmetler/${service.slug}`}
+                  className="group flex h-full flex-col gap-4 rounded-lg border border-line-dark bg-navy-soft p-6 transition-[border-color,transform] duration-300 ease-out-soft hover:-translate-y-0.5 hover:border-gold-soft/60 sm:p-7"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="grid size-12 place-items-center rounded-md bg-gold/15 text-gold-soft">
+                      <ServiceIcon name={service.icon} className="size-6" />
+                    </span>
+                    <ArrowUpRight
+                      className="size-5 text-ink-invert-soft transition-[color,transform] duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-gold-soft"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <h3 className="text-lg text-ink-invert">{service.title}</h3>
+                  <p className="line-clamp-3 text-sm leading-relaxed text-ink-invert-soft">
+                    {service.shortDescription}
+                  </p>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
       <Section tone="beige" spacing="cozy">
         <Container size="wide">
           <SectionHeader
@@ -184,39 +359,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </Container>
       </Section>
-      <HomeSeoIntro locale={resolvedLocale} />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* SEÇİLMİŞ ƏMLAKLAR                                                  */}
-      {/* ------------------------------------------------------------------ */}
-      <Section tone="ivory">
-        <Container size="wide">
-          <SectionHeader
-            overline={t("featured.overline")}
-            title={t("featured.title")}
-            description={t("featured.description")}
-            action={{ label: t("featured.all"), href: "/emlaklar" }}
-          />
-
-          <div className="mt-10">
-            {featured.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {featured.map((property, index) => (
-                  <Reveal key={property.id} delay={index * 60}>
-                    <PropertyCard property={property} />
-                  </Reveal>
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                title={t("featured.emptyTitle")}
-                description={t("featured.emptyDescription")}
-                action={{ label: t("featured.emptyAction"), href: "/emlaklar" }}
-              />
-            )}
-          </div>
-        </Container>
-      </Section>
 
       {testimonials.length > 0 && (
         <Section tone="ivory">
@@ -247,6 +390,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </Container>
         </Section>
       )}
+
 
       {/* ------------------------------------------------------------------ */}
       {/* AGENTLƏR — PRD bölmə 5.5                                           */}
@@ -313,132 +457,6 @@ export default async function HomePage({ params }: HomePageProps) {
         </Section>
       )}
 
-      {/* ------------------------------------------------------------------ */}
-      {/* ƏMLAK TAPMA KÖMƏKÇİSİ                                              */}
-      {/* ------------------------------------------------------------------ */}
-      <Section tone="ivory" spacing="compact">
-        <Container size="wide">
-          <div className="on-dark relative isolate grid grid-cols-1 items-center gap-8 overflow-hidden rounded-2xl bg-navy px-6 py-10 sm:px-10 sm:py-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-14 lg:py-14">
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_88%_12%,rgb(196_165_117/0.28),transparent_42%),radial-gradient(circle_at_0%_100%,rgb(196_165_117/0.12),transparent_40%)]"
-            />
-            <div className="min-w-0">
-              <p className="editorial-kicker text-gold-soft">{wizardT("eyebrow")}</p>
-              <h2 className="mt-3 max-w-2xl font-display text-[clamp(1.875rem,3vw,2.75rem)] leading-[1.1] tracking-[-0.025em] text-ivory">
-                {wizardT("title")}
-              </h2>
-              <p className="mt-4 max-w-xl text-base leading-relaxed text-ivory/75">
-                {wizardT("description")}
-              </p>
-              <p className="mt-3 flex items-center gap-2 text-sm text-ivory/65">
-                <Sparkles className="size-4 shrink-0 text-gold-soft" aria-hidden="true" />
-                {wizardT("homeNote")}
-              </p>
-            </div>
-            <Link href="/mene-emlak-tap" className={buttonClassName("primary", "lg")}>
-              {wizardT("homeCta")}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* KATEQORİYALAR                                                      */}
-      {/* ------------------------------------------------------------------ */}
-      <Section tone="paper">
-        <Container size="wide">
-          <SectionHeader
-            overline={t("categories.overline")}
-            title={t("categories.title")}
-            description={t("categories.description")}
-          />
-
-          <MobileCategoryRail items={categoryItems} />
-
-          <div className="mt-10 hidden gap-4 lg:grid lg:grid-cols-4 xl:grid-cols-5">
-            {categoryItems.map((item, index) => (
-              <Reveal key={item.href} delay={(index % 5) * 40}>
-                <Link
-                  href={item.href}
-                  className="group relative flex aspect-4/3 overflow-hidden rounded-lg border border-line bg-beige shadow-xs transition-shadow duration-300 hover:shadow-lg"
-                >
-                  {item.imageUrl ? (
-                    <Image
-                      src={item.imageUrl}
-                      alt=""
-                      fill
-                      unoptimized={isUnoptimizedImage(item.imageUrl)}
-                      loading="lazy"
-                      sizes="(max-width: 1279px) 25vw, 20vw"
-                      className="image-lift object-cover"
-                    />
-                  ) : null}
-
-                  {/* Sabit tünd qradiyent — `charcoal` tokeni tünd rejimdə açığa dönür. */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent"
-                  />
-
-                  <div className="relative mt-auto flex w-full items-end justify-between gap-3 p-4">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-base text-white">{item.label}</h3>
-                      <p className="tabular mt-0.5 text-xs text-white/80">
-                        {propertyT("listingCount", { count: item.count })}
-                      </p>
-                    </div>
-                    <span className="on-image-chip grid size-8 shrink-0 place-items-center rounded-full transition-transform duration-300 group-hover:-translate-y-0.5">
-                      <ArrowUpRight className="size-4" aria-hidden="true" />
-                    </span>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
-        </Container>
-      </Section>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* XİDMƏTLƏR                                                          */}
-      {/* ------------------------------------------------------------------ */}
-      <Section tone="navy">
-        <Container size="wide">
-          <SectionHeader
-            overline={t("services.overline")}
-            title={t("services.title")}
-            description={t("services.description")}
-            tone="dark"
-            action={{ label: t("services.all"), href: "/xidmetler" }}
-          />
-
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {localizedServices.slice(0, HOME_SERVICE_LIMIT).map((service, index) => (
-              <Reveal key={service.id} delay={index * 50}>
-                <Link
-                  href={`/xidmetler/${service.slug}`}
-                  className="group flex h-full flex-col gap-4 rounded-lg border border-line-dark bg-navy-soft p-6 transition-[border-color,transform] duration-300 ease-out-soft hover:-translate-y-0.5 hover:border-gold-soft/60 sm:p-7"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <span className="grid size-12 place-items-center rounded-md bg-gold/15 text-gold-soft">
-                      <ServiceIcon name={service.icon} className="size-6" />
-                    </span>
-                    <ArrowUpRight
-                      className="size-5 text-ink-invert-soft transition-[color,transform] duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-gold-soft"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <h3 className="text-lg text-ink-invert">{service.title}</h3>
-                  <p className="line-clamp-3 text-sm leading-relaxed text-ink-invert-soft">
-                    {service.shortDescription}
-                  </p>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
-        </Container>
-      </Section>
 
       {/* ------------------------------------------------------------------ */}
       {/* HAQQIMIZDA                                                         */}
@@ -449,7 +467,8 @@ export default async function HomePage({ params }: HomePageProps) {
             <Reveal className="relative lg:col-span-7 lg:col-start-1 lg:row-start-1">
               <div className="relative aspect-4/5 overflow-hidden rounded-xl sm:aspect-4/3 lg:aspect-4/5">
                 <Image
-                  src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
+                  src={siteImages.about}
+                  unoptimized={isUnoptimizedImage(siteImages.about)}
                   alt={t("about.imageAlt")}
                   fill
                   loading="lazy"
@@ -491,6 +510,7 @@ export default async function HomePage({ params }: HomePageProps) {
         </Container>
       </Section>
 
+
       {/* ------------------------------------------------------------------ */}
       {/* NİYƏ LUXE HOME ESTATE                                               */}
       {/* ------------------------------------------------------------------ */}
@@ -521,6 +541,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
         </Container>
       </Section>
+
 
       {/* ------------------------------------------------------------------ */}
       {/* RƏSMİ TƏRƏFDAŞLAR                                                  */}
@@ -588,6 +609,9 @@ export default async function HomePage({ params }: HomePageProps) {
         </Section>
       )}
 
+      <HomeSeoIntro locale={resolvedLocale} />
+
+
       {/* ------------------------------------------------------------------ */}
       {/* CTA                                                                */}
       {/* ------------------------------------------------------------------ */}
@@ -596,7 +620,8 @@ export default async function HomePage({ params }: HomePageProps) {
           <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-line shadow-md lg:grid-cols-12">
             <div className="relative aspect-4/3 overflow-hidden lg:col-span-7 lg:aspect-auto lg:min-h-[30rem]">
               <Image
-                src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=2000&q=80"
+                src={siteImages.cta}
+                unoptimized={isUnoptimizedImage(siteImages.cta)}
                 alt=""
                 fill
                 loading="lazy"

@@ -34,6 +34,8 @@ const cardProperty = {
   city: { name: "Bakı", slug: "baki" },
   district: { name: "Səbail", slug: "sebail" },
   images: [],
+  _count: { images: 0 },
+  priceHistory: [],
 } as PropertyCardData;
 
 const compareProperty = {

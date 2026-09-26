@@ -8,6 +8,7 @@ import { SETTING_KEYS, getAllSettings } from "@/lib/settings";
 import { siteConfig } from "@/config/site";
 import { SettingsForm } from "./settings-form";
 import { ProjectsSectionForm } from "./projects-section-form";
+import { SiteImagesForm } from "./site-images-form";
 import { PROJECTS_SECTION_ENABLED_VALUE } from "@/lib/site-sections";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -84,6 +85,18 @@ export default async function AdminSettingsPage() {
             enabled={settings[SETTING_KEYS.PROJECTS_SECTION_ENABLED] === PROJECTS_SECTION_ENABLED_VALUE}
           />
         </div>
+      </AdminCard>
+
+      <AdminCard
+        title={t("pages.settings.siteImages.title")}
+        description={t("pages.settings.siteImages.description")}
+        className="mt-6 min-w-0"
+      >
+        <SiteImagesForm
+          hero={settings[SETTING_KEYS.SITE_IMAGE_HERO] ?? ""}
+          about={settings[SETTING_KEYS.SITE_IMAGE_ABOUT] ?? ""}
+          cta={settings[SETTING_KEYS.SITE_IMAGE_CTA] ?? ""}
+        />
       </AdminCard>
     </>
   );

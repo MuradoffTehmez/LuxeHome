@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
+import { getSiteImages } from "@/lib/settings";
+import { isUnoptimizedImage } from "@/lib/utils";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { siteConfig } from "@/config/site";
@@ -22,7 +24,7 @@ export default async function LoginPage({
   searchParams: Promise<{ davam?: string }>;
 }) {
   const { davam } = await searchParams;
-  const t = await getTranslations("auth.staffLogin");
+  const [t, siteImages] = await Promise.all([getTranslations("auth.staffLogin"), getSiteImages()]);
 
   return (
     <AuthShell
@@ -33,7 +35,8 @@ export default async function LoginPage({
       aside={
         <div className="on-dark relative min-h-[34rem] overflow-hidden rounded-md">
           <Image
-            src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80"
+            src={siteImages.hero}
+            unoptimized={isUnoptimizedImage(siteImages.hero)}
             alt=""
             fill
             sizes="50vw"

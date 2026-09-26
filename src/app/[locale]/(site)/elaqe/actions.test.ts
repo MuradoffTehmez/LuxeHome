@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const database = vi.hoisted(() => ({ leadCreate: vi.fn() }));
-const effects = vi.hoisted(() => ({ sendEmail: vi.fn() }));
+const effects = vi.hoisted(() => ({ sendEmail: vi.fn(), telegram: vi.fn() }));
 const guard = vi.hoisted(() => ({
   requestHeaders: new Headers(),
   contactLimitOk: true,
@@ -12,6 +12,9 @@ vi.mock("@/lib/prisma", () => ({
 }));
 vi.mock("@/lib/email", () => ({
   sendLeadNotificationEmail: effects.sendEmail,
+}));
+vi.mock("@/lib/telegram", () => ({
+  notifyLeadOnTelegram: effects.telegram,
 }));
 // `next/headers` yalnız sorğu kontekstində işləyir; unit testdə başlıqlar əl ilə verilir
 vi.mock("next/headers", () => ({
@@ -57,6 +60,7 @@ describe("əlaqə forması", () => {
     expect(result).toEqual({ success: true });
     expect(database.leadCreate).toHaveBeenCalledOnce();
     expect(effects.sendEmail).toHaveBeenCalledOnce();
+    expect(effects.telegram).toHaveBeenCalledWith(expect.objectContaining({ kind: "lead", phone: "+994501234567" }));
   });
 
   it("saxlama xətasında istifadəçiyə təhlükəsiz ümumi mesaj qaytarır", async () => {

@@ -54,6 +54,9 @@ export const siteConfig = {
 
 } as const;
 
+/** Google Business Profile (Axtarış və Xəritələrdəki biznes kartı, rəylər). */
+export const googleBusinessProfileUrl = "https://www.google.com/search?kgmid=/g/11nv70p7tx";
+
 /**
  * Rəsmi sosial şəbəkə profilləri.
  *
@@ -76,6 +79,8 @@ export const socialProfiles = [
   { key: "instagram", label: "Instagram", scope: "organization", href: "https://www.instagram.com/luxe_home_estate" },
   { key: "facebook", label: "Facebook", scope: "organization", href: "https://www.facebook.com/share/14pAvDP57is/" },
   { key: "tiktok", label: "TikTok", scope: "organization", href: "https://www.tiktok.com/@luxe_home_estate" },
+  // Google Business Profile — bilik qrafı ID-li kanonik ünvan (share.google qısa linkinin hədəfi).
+  { key: "google", label: "Google", scope: "organization", href: googleBusinessProfileUrl },
   { key: "linkedin", label: "LinkedIn", scope: "owner", href: "https://www.linkedin.com/in/bahadur-amiyev-220458360" },
   { key: "whatsapp", label: "WhatsApp", scope: "contact", href: "https://wa.me/c/267388138344634" },
 ] as const;

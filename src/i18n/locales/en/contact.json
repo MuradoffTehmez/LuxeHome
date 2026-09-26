@@ -23,5 +23,7 @@
   "messagePlaceholder": "Write your enquiry...",
   "successTitle": "Your enquiry has been sent!",
   "successDescription": "Our team will contact you as soon as possible.",
-  "error": "Something went wrong while sending your enquiry. Please try again shortly."
+  "error": "Something went wrong while sending your enquiry. Please try again shortly.",
+  "googleProfile": "Reviews on Google",
+  "googleProfileValue": "See our profile and leave a review"
 }

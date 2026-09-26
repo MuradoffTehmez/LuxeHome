@@ -63,7 +63,14 @@
     "noFilters": "No filters selected — showing all listings.",
     "emptyTitle": "No properties match these criteria",
     "emptyDescription": "Broaden your search or reset the filters and try again.",
-    "viewAll": "View all properties"
+    "viewAll": "View all properties",
+    "removeFilter": "Remove the “{filter}” filter",
+    "widenMax": "Raise the maximum price to {price} ₼",
+    "suggestionsTitle": "These changes return results:",
+    "suggestionCount": "{count, plural, one {# listing} other {# listings}}",
+    "assistTitle": "Let us search for you",
+    "assistDescription": "Not every listing is published on the site. Share your criteria and our specialist will shortlist suitable options from our database and partners.",
+    "assistCta": "Request a personal selection"
   },
   "blogPage": {
     "metaTitle": "Real estate blog",

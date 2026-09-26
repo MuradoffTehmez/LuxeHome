@@ -10,6 +10,7 @@ import { type ActionState, failure, invalid, success, unexpected } from "@/lib/a
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
+import { parseSingleImage } from "@/lib/admin/images";
 import { msg } from "@/lib/admin/server-message";
 
 /** Boş sətri saxlayan, dolu dəyəri isə diapazona görə yoxlayan koordinat sahəsi. */
@@ -128,5 +129,34 @@ export async function toggleProjectsSection(_prev: ActionState, formData: FormDa
     return success(enabled ? t("pages.settings.sections.projectsShown") : t("pages.settings.sections.projectsHidden"));
   } catch (error) {
     return unexpected("bölmə görünürlüyü dəyişdirilmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+/**
+ * Saytın brend şəkilləri (#103). Sahə boş göndərilərsə parametr silinir və stok
+ * foto qayıdır. Yalnız öz media anbarımızdakı `/media/...` ünvanları qəbul olunur.
+ */
+export async function saveSiteImages(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  let user;
+  try {
+    user = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  try {
+    await setSettings({
+      [SETTING_KEYS.SITE_IMAGE_HERO]: parseSingleImage(formData, "heroImage")?.url ?? "",
+      [SETTING_KEYS.SITE_IMAGE_ABOUT]: parseSingleImage(formData, "aboutImage")?.url ?? "",
+      [SETTING_KEYS.SITE_IMAGE_CTA]: parseSingleImage(formData, "ctaImage")?.url ?? "",
+    });
+    await recordAudit(user, "UPDATE", "Setting", null, "Saytın şəkilləri");
+    revalidatePath("/admin/parametrler");
+    revalidatePath("/", "layout");
+    for (const locale of Object.values(LOCALES)) revalidatePath(`/${locale}`, "layout");
+    return success(msg("server.parametrler.parametrlerYaddaSaxlanildi"));
+  } catch (error) {
+    return unexpected("sayt şəkilləri saxlanılmadı", error, msg("server.common.unexpected"));
   }
 }

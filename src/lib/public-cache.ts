@@ -2,7 +2,8 @@ import { unstable_cache } from "next/cache";
 import { PUBLIC_CACHE_TAGS } from "@/lib/cache-tags";
 import {
   getBlogCategories,
-  getFeaturedProperties,
+  getHomeShowcaseProperties,
+  countProperties,
   getFilterOptions,
   getPostBySlug,
   getPosts,
@@ -37,6 +38,12 @@ const FIVE_MINUTES = 300;
 export const getCachedProperties = unstable_cache(
   async (filters: PropertyFilters) => getProperties(filters),
   ["public-property-list-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedPropertyCount = unstable_cache(
+  async (filters: PropertyFilters) => countProperties(filters),
+  ["public-property-count-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 
@@ -94,7 +101,7 @@ export const getCachedHomePageData = unstable_cache(
   async () => {
     const [featured, propertyTypes, services, projects, posts, filterOptions, categories, partners] =
       await Promise.all([
-        getFeaturedProperties(6),
+        getHomeShowcaseProperties(6),
         getPropertyTypesWithCounts(),
         getServices(),
         getProjects(),
@@ -105,7 +112,7 @@ export const getCachedHomePageData = unstable_cache(
       ]);
     return { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners };
   },
-  ["public-home-discovery-v1"],
+  ["public-home-discovery-v2"],
   {
     tags: [
       PUBLIC_CACHE_TAGS.home,

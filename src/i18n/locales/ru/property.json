@@ -150,5 +150,11 @@
     "description": "QR-код содержит адрес этого объявления — скачайте его для печатных материалов, витрины и визитки агента.",
     "downloadPng": "Скачать PNG",
     "downloadSvg": "Скачать SVG"
-  }
+  },
+  "signals": {
+    "new": "Новое",
+    "priceDrop": "Цена снижена −{percent}%",
+    "photos": "{count, plural, one {# фото} few {# фото} many {# фото} other {# фото}}"
+  },
+  "ogRooms": "{count, plural, one {# комната} few {# комнаты} many {# комнат} other {# комнаты}}"
 }
