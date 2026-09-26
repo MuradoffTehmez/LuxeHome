@@ -98,8 +98,10 @@ const ADMIN_CSP = [
   "style-src 'self' 'unsafe-inline'",
   // Xəritə tile-ları `/api/map-tiles/...` proxy-si üzərindən gəlir. `tile.openstreetmap.org`
   // yalnız proxy cavab verməyəndə işə düşən ehtiyat mənbədir (`FALLBACK_TILES`) —
-  // xəritə boş qalmasın deyə. Marker ikonu inline SVG-dir.
-  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az https://tile.openstreetmap.org",
+  // xəritə boş qalmasın deyə. Marker ikonu inline SVG-dir. `treva.realestate` rəsmi
+  // tərəfdaşın SVG loqosudur: SVG optimizasiyadan keçmir və birbaşa hostdan yüklənir,
+  // ictimai CSP-də olub paneldə olmadığı üçün tərəfdaş siyahısında loqo bloklanırdı.
+  "img-src 'self' data: blob: https://images.unsplash.com https://media.luxehomeestate.az https://treva.realestate https://tile.openstreetmap.org",
   "font-src 'self' data:",
   "connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com",
   "frame-src https://challenges.cloudflare.com",

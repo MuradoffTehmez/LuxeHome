@@ -180,8 +180,8 @@ INSERT INTO "Partner" ("id", "name", "slug", "shortDescription", "shortDescripti
   'TREVA Real Estate — Bakıda developer, broker və alıcıları birləşdirən daşınmaz əmlak satış platforması. Xidmətlər və əlaqə məlumatları.',
   'TREVA Real Estate, TREVA, daşınmaz əmlak, Bakı daşınmaz əmlak, əmlak satış platforması, developer, broker, investisiya',
   'https://treva.realestate/images/treva-hero-bg.jpg',
-  1787850000000,
-  1787850000000
+  '2026-08-27T17:00:00.000Z',
+  '2026-08-27T17:00:00.000Z'
 )
 ON CONFLICT("id") DO UPDATE SET
   "name" = excluded."name",
