@@ -151,6 +151,7 @@ jobs:
       - name: Run E2E suite (public + auth)
         env:
           E2E_BASE_URL: http://localhost:8787
+          E2E_LOCAL_STACK: "1"
         run: npm run e2e
 
       - name: Upload Playwright report

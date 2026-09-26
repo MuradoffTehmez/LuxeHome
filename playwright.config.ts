@@ -27,6 +27,12 @@ const baseURL = (
 const isCI = Boolean(process.env.CI);
 
 /**
+ * Lokal stack (#87): workerd, lokal D1 (300+ demo elan) və brauzerlər eyni 2 vCPU-lu
+ * CI runner-də işləyir — paralellik azaldılır, gözləmə vaxtları genişlənir.
+ */
+const isLocalStack = process.env.E2E_LOCAL_STACK === "1";
+
+/**
  * Cloudflare bot qoruması standart avtomatlaşdırma User-Agent-lərinə 403 verir.
  * Real Chrome sətri göndərilir — test brauzeri onsuz da Chromium-dur, ona görə
  * bu, davranışı saxtalaşdırmır, yalnız bot filtrindən keçirir.
@@ -40,13 +46,13 @@ export default defineConfig({
   testMatch: "**/*.spec.ts",
 
   // Workers cold start + D1 sorğusu bəzən yavaş olur; lokal preview isə sürətlidir.
-  timeout: 60_000,
-  expect: { timeout: 15_000 },
+  timeout: isLocalStack ? 120_000 : 60_000,
+  expect: { timeout: isLocalStack ? 30_000 : 15_000 },
 
   fullyParallel: true,
   // Uzaq mühitə qarşı işləyəndə paralellik məhdudlaşır: 300 elanlıq kataloq
   // sorğusu D1-ə düşür və eyni anda onlarla sorğu rate limitə dəyə bilər.
-  workers: isCI ? 4 : 6,
+  workers: isLocalStack && isCI ? 2 : isCI ? 4 : 6,
 
   // Şəbəkə səbəbli tək-tük uğursuzluq real reqressiya deyil; lokalda təkrar yoxdur
   // ki, sınıq test dərhal görünsün.
@@ -90,8 +96,8 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: isCI ? "on-first-retry" : "off",
-    navigationTimeout: 45_000,
-    actionTimeout: 15_000,
+    navigationTimeout: isLocalStack ? 90_000 : 45_000,
+    actionTimeout: isLocalStack ? 30_000 : 15_000,
   },
 
   projects: [

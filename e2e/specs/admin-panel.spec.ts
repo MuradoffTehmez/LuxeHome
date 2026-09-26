@@ -23,13 +23,15 @@ test.describe("Admin panel", () => {
   }
 
   test("elan formasında 8 böyük şəkil toplu yüklənir (#79)", async ({ page }) => {
+    // Brauzerdə kiçiltmə + server tərəfdə Images çevirməsi yavaş runner-də uzun çəkir.
+    test.setTimeout(240_000);
     await page.goto("/admin/emlaklar/yeni");
     await expect(page).toHaveURL(/\/admin\/emlaklar\/yeni/);
     const files = await makeJpegFiles(page, 8);
     await page.locator('input[type="file"][multiple]').first().setInputFiles(files);
 
     // Hər hazır şəkil formaya gizli `images` sahəsi kimi düşür.
-    await expect(page.locator('input[type="hidden"][name="images"]')).toHaveCount(8, { timeout: 90_000 });
+    await expect(page.locator('input[type="hidden"][name="images"]')).toHaveCount(8, { timeout: 200_000 });
     await expect(page.locator("body")).not.toContainText("Unexpected token");
     await expectNoRawMessageKeys(page);
 
