@@ -19,7 +19,7 @@ permissions:
 
 # Yayım axını (yalnız `main`-ə push):
 #
-#   quality → deploy-staging → e2e-staging → deploy-production
+#   quality + e2e-local → deploy-staging → e2e-staging → deploy-production
 #
 # Hər deploy job-u əvvəlcə **öz mühitinin D1 miqrasiyalarını tətbiq edir**, sonra
 # bundle qurur və worker-i yayımlayır. Bu sıra məcburidir: yeni kod çox vaxt yeni
@@ -80,9 +80,93 @@ jobs:
       - name: Production build
         run: npm run build
 
+  e2e-local:
+    name: Local stack E2E
+    # Hər PR-da işləyir və branch protection-da məcburidir (#87): OpenNext bundle
+    # lokal workerd-də (production ilə eyni runtime) real D1/R2 ilə qaldırılır.
+    # #68 bütün qapılardan keçib yalnız `main`-dən sonra staging-də düşmüşdü —
+    # D1 həddi kimi runtime xətaları indi merge-dən əvvəl tutulur. Staging-ə və
+    # canlı resurslara toxunmur; test hesabları hər run-da təsadüfi sirrlərlə
+    # yaradılır.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          NPM_VERSION="$(node -p "require('./package.json').packageManager.split('@').pop()")"
+          echo "packageManager: npm@${NPM_VERSION}"
+          npm install -g "npm@${NPM_VERSION}"
+          npm --version
+          npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      # Staging rejimi (`IS_STAGING=true`): nümunə məzmun görünür, canonical host
+      # yönləndirməsi söndürülüdür — `localhost`-da işləmək üçün lazımdır.
+      - name: Build OpenNext worker bundle (local stack)
+        run: npm run e2e:local:build
+
+      # Sirrlər hər run üçün yaradılır və loglarda maskalanır. Onlar yalnız bu
+      # runner-dəki müvəqqəti lokal bazaya aiddir.
+      - name: Generate ephemeral test secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH_SECRET="$(openssl rand -hex 32)"
+          TOTP_SECRET="$(node -e "const O=require('otpauth');console.log(new O.Secret({size:20}).base32)")"
+          echo "::add-mask::${AUTH_SECRET}"
+          echo "::add-mask::${TOTP_SECRET}"
+          echo "AUTH_SECRET=${AUTH_SECRET}" >> "$GITHUB_ENV"
+          echo "E2E_ADMIN_TOTP_SECRET=${TOTP_SECRET}" >> "$GITHUB_ENV"
+
+      - name: Prepare local D1 (migrations, seed, taxonomy, demo, fixtures)
+        run: npm run e2e:local:prepare
+
+      - name: Start local worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup npm run e2e:local:serve > local-stack.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            if curl -sf -o /dev/null http://localhost:8787/robots.txt; then exit 0; fi
+            sleep 2
+          done
+          cat local-stack.log
+          exit 1
+
+      - name: Run E2E suite (public + auth)
+        env:
+          E2E_BASE_URL: http://localhost:8787
+          E2E_LOCAL_STACK: "1"
+        run: npm run e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report-local
+          path: |
+            playwright-report/
+            local-stack.log
+          retention-days: 14
+
   deploy-staging:
     name: Deploy to staging
-    needs: quality
+    needs: [quality, e2e-local]
     # Yalnız `main`-ə push zamanı: PR və manual dispatch canlı resurslara toxunmur.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest

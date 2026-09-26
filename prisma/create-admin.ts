@@ -60,9 +60,10 @@ async function main() {
 
   const id = `usr_${Buffer.from(crypto.getRandomValues(new Uint8Array(12))).toString("hex")}`;
   const hash = await hashPassword(password);
-  // Prisma D1-də DateTime epoch millisaniyə kimi saxlanılır (bax: prisma/seed.sql).
-  // ISO sətri yazılsa, sətir oxunarkən çevrilmə pozulur.
-  const now = Date.now();
+  // Prisma D1-də DateTime ISO mətn kimi saxlanılır (bax: prisma/seed.sql). Epoch
+  // rəqəmi yazılsa SQLite onu hər mətndən kiçik sayır və `createdAt`/`updatedAt`
+  // üzrə müqayisələr (məs. `lt: now`) səhv nəticə verir.
+  const now = `'${new Date().toISOString()}'`;
 
   // `mustChangePassword = 1` — ilk girişdə parol dəyişdirilməlidir.
   // 2FA hələ qurulmayıb; ilk giriş istifadəçini qurulum ekranına aparır.

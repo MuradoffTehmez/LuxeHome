@@ -154,8 +154,11 @@ test.describe("robots və sitemap", () => {
 });
 
 test.describe("İndeksləşmə siqnalları", () => {
-  test("ictimai səhifə noindex daşımır", async ({ page, baseURL }) => {
-    const isStaging = baseURL!.includes("staging");
+  test("ictimai səhifə noindex daşımır", async ({ page, request }) => {
+    // Staging rejimi URL-dən deyil, saytın öz siqnalından oxunur: lokal stack də
+    // `IS_STAGING=true` ilə `localhost`-da işləyir (#87) və tam `Disallow: /` verir.
+    const robotsTxt = await (await request.get("/robots.txt")).text();
+    const isStaging = /^Disallow:\s*\/\s*$/m.test(robotsTxt);
     await visit(page, "/az/emlaklar");
 
     const robots = await metaContent(page, 'meta[name="robots"]');
