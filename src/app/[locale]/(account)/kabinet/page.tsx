@@ -54,7 +54,7 @@ export default async function CabinetPage() {
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <article className="rounded-md border border-line bg-paper p-5">
+            <article className="rounded-xl border border-line bg-paper p-5 shadow-xs">
               <ClipboardList className="size-5 text-gold-deep" aria-hidden="true" />
               <p className="mt-5 text-sm text-ink-soft">{t("yourListings")}</p>
               <p className="mt-1 font-display text-3xl text-ink">{summary.propertyCount}</p>
@@ -76,7 +76,7 @@ export default async function CabinetPage() {
             </article>
 
             {user.accountType === ACCOUNT_TYPES.AGENCY && (
-              <article className="rounded-md border border-line bg-paper p-5">
+              <article className="rounded-xl border border-line bg-paper p-5 shadow-xs">
                 <Building2 className="size-5 text-gold-deep" aria-hidden="true" />
                 <p className="mt-5 text-sm text-ink-soft">{t("agencyProfile")}</p>
                 <p className="mt-1 font-display text-xl text-ink">

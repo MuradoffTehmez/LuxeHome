@@ -319,7 +319,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* Təsvir */}
               <div className="flex flex-col gap-4">
-                <h2 className="text-lg font-semibold text-ink">{commonContent("description")}</h2>
+                <h2 className="font-sans text-lg font-semibold text-ink">{commonContent("description")}</h2>
                 <div className="flex max-w-[72ch] flex-col gap-4 text-base leading-relaxed text-ink-soft">
                   {property.description.split('\n').map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
@@ -329,7 +329,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {property.priceHistory.length > 0 && (
                 <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
-                  <h2 className="flex items-center gap-2 text-lg font-semibold text-ink">
+                  <h2 className="flex items-center gap-2 font-sans text-lg font-semibold text-ink">
                     <History className="size-5 text-gold-deep" aria-hidden="true" />
                     {commonContent("phase2.priceHistory")}
                   </h2>
@@ -352,13 +352,13 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {property.nearbyPlaces.length > 0 && (
                 <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
-                  <h2 className="flex items-center gap-2 text-lg font-semibold text-ink">
+                  <h2 className="flex items-center gap-2 font-sans text-lg font-semibold text-ink">
                     <Navigation className="size-5 text-gold-deep" aria-hidden="true" />
                     {commonContent("phase2.nearby")}
                   </h2>
                   <ul className="mt-4 grid gap-3 sm:grid-cols-2">
                     {property.nearbyPlaces.map((place) => (
-                      <li key={place.id} className="rounded-md border border-line bg-ivory p-3.5">
+                      <li key={place.id} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs">
                         <p className="text-xs font-semibold tracking-wide text-gold-deep uppercase">
                           {commonContent(`phase2.nearbyCategories.${NEARBY_KEYS[place.category] ?? "park"}`)}
                         </p>
@@ -381,7 +381,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {property.district?.neighborhoodProfile && (
                 <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
-                  <h2 className="text-lg font-semibold text-ink">{property.district.name} — {neighborhoodText("title")}</h2>
+                  <h2 className="font-sans text-lg font-semibold text-ink">{property.district.name} — {neighborhoodText("title")}</h2>
                   {(() => {
                     const profile = property.district.neighborhoodProfile;
                     const description = locale === "en" ? profile.descriptionEn : locale === "ru" ? profile.descriptionRu : profile.description;
@@ -396,7 +396,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     ].filter((item): item is [string, string] => Boolean(item));
                     return <>
                       {description ? <p className="mt-3 leading-relaxed text-ink-soft">{description}</p> : null}
-                      {metrics.length > 0 ? <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-md border border-line bg-ivory p-3.5"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
+                      {metrics.length > 0 ? <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
                       {(profile.dataSource || profile.measuredAt) ? <p className="mt-4 text-xs text-ink-muted">{profile.dataSource ? `${neighborhoodText("source")}: ${profile.dataSource}` : ""}{profile.dataSource && profile.measuredAt ? " · " : ""}{profile.measuredAt ? `${neighborhoodText("measuredAt")}: ${new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(profile.measuredAt)}` : ""}</p> : null}
                     </>;
                   })()}
@@ -446,7 +446,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {relatedLandingLinks.length > 0 && (
                 <nav aria-label={content("relatedSearchesAria")} className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
-                  <h2 className="text-lg font-semibold text-ink">{content("relatedSearches")}</h2>
+                  <h2 className="font-sans text-lg font-semibold text-ink">{content("relatedSearches")}</h2>
                   <ul className="mt-3 flex flex-wrap gap-2">
                     {relatedLandingLinks.map((item) => (
                       <li key={item.href}>
@@ -465,7 +465,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Əlavə Xüsusiyyətlər (əgər varsa) */}
               {property.features.length > 0 && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="text-lg font-semibold text-ink">{commonContent("features")}</h2>
+                  <h2 className="font-sans text-lg font-semibold text-ink">{commonContent("features")}</h2>
                   <ul className="flex flex-wrap gap-2">
                     {property.features.map(({ feature }) => (
                       <li key={feature.id} className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3.5 py-2 text-sm text-ink-soft">
@@ -483,7 +483,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {isSale && !isClosed && (
                 <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
                   <div className="mb-5 flex flex-col gap-1">
-                    <h2 className="text-lg font-semibold text-ink">{content("mortgageTitle")}</h2>
+                    <h2 className="font-sans text-lg font-semibold text-ink">{content("mortgageTitle")}</h2>
                     <p className="text-sm text-ink-soft">{content("mortgageDescription")}</p>
                   </div>
                   <MortgageCalculator
@@ -505,7 +505,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Xəritədə yerləşmə */}
               {property.latitude != null && property.longitude != null && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="text-lg font-semibold text-ink">{content("onMap")}</h2>
+                  <h2 className="font-sans text-lg font-semibold text-ink">{content("onMap")}</h2>
                   <PlaceMap
                     latitude={property.latitude}
                     longitude={property.longitude}

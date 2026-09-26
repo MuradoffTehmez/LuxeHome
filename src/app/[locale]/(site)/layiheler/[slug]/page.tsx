@@ -227,9 +227,9 @@ export default async function ProjectDetailPage({ params }: Props) {
             </div>
             }
             aside={
-              <div className="rounded-md border border-line bg-paper p-5 shadow-sm sm:p-6">
+              <div className="rounded-xl border border-line bg-paper p-5 shadow-sm sm:p-6">
                 <div className="mb-6 flex flex-col gap-2">
-                  <h3 className="font-display text-xl text-ink">{t("projectEnquiry")}</h3>
+                  <h3 className="text-xl text-ink">{t("projectEnquiry")}</h3>
                   <p className="text-sm text-ink-soft">
                     {t("projectEnquiryDescription")}
                   </p>

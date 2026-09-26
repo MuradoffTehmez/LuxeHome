@@ -131,7 +131,7 @@ export function NotificationList({ items }: { items: NotificationListItem[] }) {
           </Button>
         </div>
       )}
-      <ul className="divide-y divide-line overflow-hidden rounded-md border border-line bg-paper">
+      <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
         {items.map((item) => (
           <NotificationRow key={item.id} item={item} />
         ))}

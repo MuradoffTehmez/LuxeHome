@@ -23,7 +23,7 @@ export function AuthShell({
   return (
     <main className={cn(standalone ? "min-h-dvh" : "min-h-[calc(100dvh-var(--header-h))]", "bg-beige")}>
       <Container className={cn("grid items-center gap-10 py-8 lg:py-16", aside && "lg:grid-cols-2", standalone ? "min-h-dvh" : "min-h-[calc(100dvh-var(--header-h))]")}>
-        <section className="mx-auto w-full max-w-lg rounded-md border border-line bg-paper p-5 shadow-sm sm:p-8">
+        <section className="mx-auto w-full max-w-lg rounded-xl border border-line bg-paper p-5 shadow-sm sm:p-8">
           {standalone ? (
             <div className="mb-5 flex justify-end">
               <LocaleSwitcher />

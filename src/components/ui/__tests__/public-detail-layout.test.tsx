@@ -15,6 +15,6 @@ describe("PublicDetailLayout", () => {
     expect(html).toContain("min-w-0");
     expect(html).toContain("lg:grid-cols-[minmax(0,1fr)_380px]");
     expect(html).toContain("lg:sticky");
-    expect(html).toContain("lg:top-28");
+    expect(html).toContain("lg:top-[calc(var(--header-h)+1.5rem)]");
   });
 });

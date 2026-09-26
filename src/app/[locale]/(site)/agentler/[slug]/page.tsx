@@ -77,7 +77,7 @@ export default async function AgentPage({ params }: Props) {
       <Section tone="ivory" spacing="compact">
         <Container>
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            <div className="rounded-md border border-line bg-paper p-5 sm:p-6">
+            <div className="rounded-xl border border-line bg-paper p-5 sm:p-6 shadow-xs">
               <h2 className="font-display text-xl text-ink">{t("about")}</h2>
               {agent.bio && <p className="mt-3 whitespace-pre-line text-ink-soft">{agent.bio}</p>}
               <div className="mt-4 flex flex-wrap gap-2">
@@ -88,7 +88,7 @@ export default async function AgentPage({ params }: Props) {
                 {rating != null && <Badge tone="gold"><Star className="mr-1 size-3.5 fill-current" aria-hidden="true" />{rating.toFixed(1)} ({agent.reviews.length})</Badge>}
               </div>
             </div>
-            <aside className="rounded-md border border-line bg-paper p-5">
+            <aside className="rounded-xl border border-line bg-paper p-5 shadow-xs">
               <div className="flex flex-col gap-2 text-sm">
                 {agent.phone && <TrackedAnchor event="agent_contact" payload={{ content_id: agent.id, method: "phone" }} href={`tel:${agent.phone}`} className="flex min-h-11 items-center gap-2 text-ink hover:text-gold-deep"><Phone className="size-4" aria-hidden="true" />{agent.phone}</TrackedAnchor>}
                 {agent.whatsapp && <TrackedAnchor event="agent_contact" payload={{ content_id: agent.id, method: "whatsapp" }} href={`https://wa.me/${agent.whatsapp.replace(/\D/g, "")}`} className="flex min-h-11 items-center gap-2 text-ink hover:text-gold-deep"><MessageCircle className="size-4" aria-hidden="true" />WhatsApp</TrackedAnchor>}
@@ -111,7 +111,7 @@ export default async function AgentPage({ params }: Props) {
           <div className="grid gap-8 lg:grid-cols-2">
             <section>
               <h2 className="font-display text-2xl text-ink">{t("reviews")}</h2>
-              {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <li key={review.id} className="rounded-md border border-line bg-paper p-4"><p className="flex items-center gap-1 text-gold-deep">{Array.from({ length: review.rating }, (_, index) => <Star key={index} className="size-4 fill-current" aria-hidden="true" />)}</p><p className="mt-2 text-ink-soft">{review.comment}</p><p className="mt-2 text-xs text-ink-muted">{review.customerName}</p></li>)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}
+              {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <li key={review.id} className="rounded-xl border border-line bg-paper p-4 shadow-xs"><p className="flex items-center gap-1 text-gold-deep">{Array.from({ length: review.rating }, (_, index) => <Star key={index} className="size-4 fill-current" aria-hidden="true" />)}</p><p className="mt-2 text-ink-soft">{review.comment}</p><p className="mt-2 text-xs text-ink-muted">{review.customerName}</p></li>)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}
             </section>
             <AgentReviewForm agentId={agent.id} labels={{ title: t("reviewTitle"), rating: t("rating"), comment: t("comment"), serviceType: t("serviceType"), submit: t("submitReview") }} />
           </div>

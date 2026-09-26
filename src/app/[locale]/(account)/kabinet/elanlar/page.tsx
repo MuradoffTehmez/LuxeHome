@@ -84,7 +84,7 @@ export default async function CabinetPropertiesPage({
   function renderPropertyCard(property: CabinetProperty) {
     const status = propertyStatus(property);
     return (
-      <article className="min-w-0 rounded-md border border-line bg-paper p-4 shadow-sm">
+      <article className="min-w-0 rounded-xl border border-line bg-paper p-4 shadow-sm">
         <div className="flex min-w-0 items-start gap-3">
           <PropertyThumbnail property={property} />
           <div className="min-w-0 flex-1">
@@ -111,7 +111,7 @@ export default async function CabinetPropertiesPage({
 
   function renderPropertyList(items: readonly CabinetProperty[]) {
     return (
-      <ul className="divide-y divide-line overflow-hidden rounded-md border border-line bg-paper">
+      <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
         {items.map((property) => {
           const status = propertyStatus(property);
           return (

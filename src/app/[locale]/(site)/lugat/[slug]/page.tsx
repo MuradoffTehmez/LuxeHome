@@ -102,7 +102,7 @@ export default async function GlossaryTermPage({ params }: Props) {
             </article>
           ) : null}
 
-          <p className="mt-8 flex items-start gap-3 rounded-md border border-line bg-paper p-4 text-sm text-ink-soft">
+          <p className="mt-8 flex items-start gap-3 rounded-xl border border-line bg-paper p-4 text-sm text-ink-soft shadow-xs">
             <Info className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
             <span>{t("article.disclaimer")}</span>
           </p>

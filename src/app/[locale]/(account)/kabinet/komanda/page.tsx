@@ -43,12 +43,12 @@ export default async function CabinetTeamPage() {
         />
       ) : (
         <>
-          <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+          <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
             <h2 className="mb-5 font-display text-lg text-ink">{t("newInvite")}</h2>
             <InviteEmployeeForm disabled={employees.filter((e) => e.status !== AGENCY_EMPLOYEE_STATUSES.REJECTED).length >= MAX_AGENCY_EMPLOYEES} />
           </section>
 
-          <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+          <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
             <h2 className="mb-5 font-display text-lg text-ink">{t("employees")}</h2>
             {employees.length === 0 ? (
               <p className="text-sm text-ink-muted">{t("empty")}</p>

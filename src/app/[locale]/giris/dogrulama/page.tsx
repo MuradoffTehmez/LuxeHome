@@ -31,7 +31,7 @@ export default async function VerifyPage() {
       title={t("title")}
       description={t("description")}
       aside={
-        <div className="mx-auto max-w-md rounded-md border border-line bg-paper/70 p-8">
+        <div className="mx-auto max-w-md rounded-xl border border-line bg-paper/70 p-8 shadow-xs">
           <ShieldCheck className="size-10 text-gold-deep" aria-hidden="true" />
           <h2 className="mt-5 font-display text-3xl text-ink">{t("asideTitle")}</h2>
           <p className="mt-3 text-sm leading-6 text-ink-soft">

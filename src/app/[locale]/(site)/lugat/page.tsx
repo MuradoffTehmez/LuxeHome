@@ -97,7 +97,7 @@ export default async function GlossaryPage({ params, searchParams }: Props) {
             role="search"
             className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center"
           >
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-xs border border-line-strong bg-paper px-3 focus-within:border-gold">
+            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-sm border border-line-strong bg-paper px-3 focus-within:border-gold">
               <Search className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
               <span className="sr-only">{t("glossary.searchLabel")}</span>
               <input

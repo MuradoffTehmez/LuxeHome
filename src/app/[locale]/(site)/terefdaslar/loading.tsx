@@ -33,7 +33,7 @@ export default async function PartnersLoading() {
 
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }, (_, index) => (
-              <div key={index} className="rounded-md border border-line bg-paper p-5 sm:p-6">
+              <div key={index} className="rounded-xl border border-line bg-paper p-5 sm:p-6 shadow-xs">
                 <Skeleton className="h-11 w-40" />
                 <Skeleton className="mt-4 h-6 w-3/5" />
                 <Skeleton className="mt-3 h-6 w-32" />

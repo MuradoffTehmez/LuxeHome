@@ -122,22 +122,25 @@ export default async function BlogPostPage({ params }: Props) {
       />
 
       <Section tone="ivory" spacing="compact">
+        {/* Qapaq mətn sütunundan genişdir — dar sütunda 16:9 şəkil 1440px ekranda
+            kiçik «marka» kimi görünürdü. */}
+        {post.coverUrl && (
+          <Container className="mb-10 sm:mb-14">
+            <div className="relative aspect-16/9 w-full overflow-hidden rounded-2xl bg-beige shadow-md lg:aspect-[21/9]">
+              <Image
+                src={post.coverUrl}
+                alt={post.coverAlt || post.title}
+                fill
+                unoptimized={isUnoptimizedImage(post.coverUrl)}
+                priority
+                className="object-cover"
+                sizes="(max-width: 1279px) calc(100vw - 2.5rem), 1200px"
+              />
+            </div>
+          </Container>
+        )}
         <Container size="narrow">
           <div className="min-w-0">
-            {/* Cover */}
-            {post.coverUrl && (
-              <div className="relative mb-10 aspect-16/9 w-full overflow-hidden rounded-md bg-beige shadow-sm">
-                <Image
-                  src={post.coverUrl}
-                  alt={post.coverAlt || post.title}
-                  fill
-                  unoptimized={isUnoptimizedImage(post.coverUrl)}
-                  priority
-                  className="object-cover"
-                  sizes="(max-width: 767px) calc(100vw - 2.5rem), 720px"
-                />
-              </div>
-            )}
 
             {/* Content */}
             <article className="prose-luxe min-w-0 max-w-[68ch] text-base [overflow-wrap:anywhere] sm:text-lg">
@@ -145,8 +148,8 @@ export default async function BlogPostPage({ params }: Props) {
             </article>
 
             {/* Share */}
-            <div className="mt-12 flex flex-col gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-display text-lg text-ink">{content("articleShare")}</span>
+            <div className="mt-12 flex flex-col gap-4 rounded-xl border border-line bg-paper p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between sm:p-6">
+              <span className="text-base font-semibold text-ink">{content("articleShare")}</span>
               <ShareButtons title={post.title} path={`/blog/${post.slug}`} />
             </div>
           </div>

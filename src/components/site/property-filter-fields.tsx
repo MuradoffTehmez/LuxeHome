@@ -441,7 +441,7 @@ export function PropertyFilterFields({
               || undefined
             }
             className={cn(
-              "group/more rounded-md border border-line bg-ivory/60",
+              "group/more rounded-xl border border-line bg-ivory/60 shadow-xs",
               !stacked && "sm:col-span-2 lg:col-span-3",
             )}
           >
