@@ -25,8 +25,8 @@ export function Skeleton({
 /** Əmlak kartının yüklənmə vəziyyəti — real kartla eyni ölçüdə, CLS yaratmır. */
 export function PropertyCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-md border border-line bg-paper">
-      <Skeleton className="aspect-4/3 w-full rounded-none sm:aspect-[16/11]" />
+    <div className="overflow-hidden rounded-lg border border-line bg-paper">
+      <Skeleton className="aspect-4/3 w-full rounded-none" />
       <div className="flex flex-col gap-3 p-5">
         <Skeleton className="h-6 w-2/5" />
         <Skeleton className="h-5 w-4/5" />
@@ -53,7 +53,7 @@ export function PropertyGridSkeleton({ count = 6 }: { count?: number }) {
 
 export function ArticleCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-md border border-line bg-paper">
+    <div className="overflow-hidden rounded-lg border border-line bg-paper">
       <Skeleton className="aspect-16/10 w-full rounded-none" />
       <div className="flex flex-col gap-3 p-5">
         <Skeleton className="h-4 w-24" />
@@ -171,7 +171,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-4 rounded-md border border-dashed border-line-strong",
+        "flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-line-strong",
         "bg-paper px-6 py-16 text-center",
         className,
       )}
@@ -234,7 +234,7 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "flex flex-col items-center justify-center gap-4 rounded-md border border-danger/25",
+        "flex flex-col items-center justify-center gap-4 rounded-xl border border-danger/25",
         "bg-danger-bg/50 px-6 py-14 text-center",
         className,
       )}

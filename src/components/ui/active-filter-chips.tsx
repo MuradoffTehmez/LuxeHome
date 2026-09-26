@@ -32,7 +32,7 @@ export function ActiveFilterChips({
             <Link
               href={item.href}
               aria-label={t("removeFilter", { label: item.label })}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xs border border-line-strong bg-paper px-3 text-sm font-medium text-ink-soft transition-colors hover:border-gold hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong bg-paper px-3.5 text-sm font-medium text-ink-soft transition-colors hover:border-gold hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             >
               <span>{item.label}</span>
               <X className="size-3.5" aria-hidden="true" />

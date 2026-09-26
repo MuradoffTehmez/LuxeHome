@@ -76,7 +76,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={item.id}
             className={cn(
               "animate-fade-in pointer-events-auto flex w-full max-w-sm items-start gap-3",
-              "rounded-xs border px-4 py-3 text-sm font-medium shadow-md",
+              "rounded-md border px-4 py-3 text-sm font-medium shadow-md",
               TONES[item.tone].className,
             )}
           >

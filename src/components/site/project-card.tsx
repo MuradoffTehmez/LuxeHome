@@ -34,11 +34,11 @@ export async function ProjectCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col",
+        "card-surface group relative flex h-full flex-col overflow-hidden",
         className,
       )}
     >
-      <div className="relative aspect-16/11 overflow-hidden rounded-sm bg-beige">
+      <div className="relative aspect-16/11 overflow-hidden bg-beige">
         {project.coverUrl ? (
           <Image
             src={project.coverUrl}
@@ -58,7 +58,7 @@ export async function ProjectCard({
 
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"
         />
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
@@ -66,16 +66,16 @@ export async function ProjectCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 pt-5">
+      <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex flex-col gap-1.5">
           <p className="text-xs font-medium tracking-wide text-gold-deep uppercase">
             {t(`projectType.${TYPE_KEY[type]}`)}
           </p>
 
-          <h3 className="font-display text-xl leading-snug text-ink">
+          <h3 className="text-lg leading-snug text-ink">
             <Link
               href={`/layiheler/${project.slug}`}
-              className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center hover:text-gold-deep"
+              className="after:absolute after:inset-0 after:rounded-lg after:content-[''] inline-flex min-h-11 items-center transition-colors duration-300 hover:text-gold-deep"
             >
               {project.name}
             </Link>
@@ -88,7 +88,7 @@ export async function ProjectCard({
           </p>
         )}
 
-        <dl className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-4 text-sm text-ink-muted">
+        <dl className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-3.5 text-sm text-ink-muted">
           {project.city?.name && (
             <div className="flex items-center gap-1.5">
               <MapPin className="size-4 shrink-0" aria-hidden="true" />

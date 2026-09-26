@@ -31,6 +31,7 @@ import { MobileCategoryRail } from "@/components/site/mobile-category-rail";
 import { PropertyCard } from "@/components/site/property-card";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { ProjectCard } from "@/components/site/project-card";
+import { ServiceIcon } from "@/components/site/service-icon";
 import { PostCard } from "@/components/site/post-card";
 import { FeaturedPartnership } from "@/components/site/featured-partnership";
 import { siteConfig } from "@/config/site";
@@ -66,23 +67,8 @@ const WHY_ITEMS = [
   { icon: ShieldCheck, key: "documents" }, { icon: Handshake, key: "complete" },
 ] as const;
 
-const PROPERTY_LAYOUT = [
-  "lg:col-span-7 lg:row-span-2",
-  "lg:col-span-5",
-  "lg:col-span-5",
-  "lg:col-span-4",
-  "lg:col-span-4",
-  "lg:col-span-4",
-];
-
-const CATEGORY_LAYOUT = [
-  "col-span-2 row-span-2 lg:col-span-7",
-  "lg:col-span-5",
-  "lg:col-span-5",
-  "lg:col-span-4",
-  "lg:col-span-4",
-  "lg:col-span-4",
-];
+/** Ana səhifədə xidmətlərin ilk hissəsi göstərilir; tam siyahı `/xidmetler`-dədir. */
+const HOME_SERVICE_LIMIT = 6;
 
 const BLOG_LAYOUT = [
   "lg:col-span-7 lg:row-span-2",
@@ -214,17 +200,10 @@ export default async function HomePage({ params }: HomePageProps) {
 
           <div className="mt-10">
             {featured.length > 0 ? (
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-12 lg:auto-rows-fr">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {featured.map((property, index) => (
-                  <Reveal
-                    key={property.id}
-                    delay={index * 60}
-                    className={PROPERTY_LAYOUT[index] ?? "lg:col-span-4"}
-                  >
-                    <PropertyCard
-                      property={property}
-                      variant={index === 0 ? "featured" : "standard"}
-                    />
+                  <Reveal key={property.id} delay={index * 60}>
+                    <PropertyCard property={property} />
                   </Reveal>
                 ))}
               </div>
@@ -251,8 +230,8 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {testimonials.map((testimonial, index) => (
                 <Reveal key={testimonial.id} delay={index * 50}>
-                  <blockquote className="flex h-full flex-col rounded-md border border-line bg-paper p-6">
-                    <Quote className="size-7 text-gold-deep" aria-hidden="true" />
+                  <blockquote className="flex h-full flex-col rounded-lg border border-line bg-paper p-6 shadow-xs sm:p-7">
+                    <Quote className="size-8 fill-gold/15 text-gold-deep" aria-hidden="true" />
                     <p className="mt-5 flex-1 text-base leading-relaxed text-ink-soft">“{testimonial.review}”</p>
                     <footer className="mt-6 border-t border-line pt-4">
                       <div className="flex gap-0.5 text-gold-deep" aria-label={`${testimonial.rating}/5`}>
@@ -289,9 +268,9 @@ export default async function HomePage({ params }: HomePageProps) {
                   : null;
                 return (
                   <Reveal key={agent.id} delay={index * 60}>
-                    <article className="flex h-full flex-col rounded-md border border-line bg-ivory p-6">
+                    <article className="card-surface relative flex h-full flex-col bg-ivory p-6">
                       <div className="flex items-start gap-4">
-                        <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige">
+                        <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige ring-2 ring-gold/30 ring-offset-2 ring-offset-ivory">
                           {agent.avatarUrl ? (
                             <Image src={agent.avatarUrl} alt="" fill sizes="64px" unoptimized={isUnoptimizedImage(agent.avatarUrl)} className="object-cover" />
                           ) : (
@@ -299,8 +278,13 @@ export default async function HomePage({ params }: HomePageProps) {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-display text-xl text-ink">
-                            <Link href={`/agentler/${agent.slug}`} className="hover:text-gold-deep">{agent.name}</Link>
+                          <h3 className="text-lg text-ink">
+                            <Link
+                              href={`/agentler/${agent.slug}`}
+                              className="after:absolute after:inset-0 after:rounded-lg after:content-[''] hover:text-gold-deep"
+                            >
+                              {agent.name}
+                            </Link>
                           </h3>
                           {agent.agency && <p className="text-sm text-ink-muted">{agent.agency.name}</p>}
                           <div className="mt-2 flex flex-wrap gap-2">
@@ -332,23 +316,27 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* ------------------------------------------------------------------ */}
       {/* ƏMLAK TAPMA KÖMƏKÇİSİ                                              */}
       {/* ------------------------------------------------------------------ */}
-      <Section tone="navy">
+      <Section tone="ivory" spacing="compact">
         <Container size="wide">
-          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="on-dark relative isolate grid items-center gap-8 overflow-hidden rounded-2xl bg-navy px-6 py-10 sm:px-10 sm:py-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-14 lg:py-14">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_88%_12%,rgb(196_165_117/0.28),transparent_42%),radial-gradient(circle_at_0%_100%,rgb(196_165_117/0.12),transparent_40%)]"
+            />
             <div className="min-w-0">
-              <p className="editorial-kicker text-gold">{wizardT("eyebrow")}</p>
-              <h2 className="mt-3 max-w-2xl font-display text-[clamp(2rem,3.4vw,3.25rem)] leading-[1.05] tracking-[-0.03em] text-ivory">
+              <p className="editorial-kicker text-gold-soft">{wizardT("eyebrow")}</p>
+              <h2 className="mt-3 max-w-2xl font-display text-[clamp(1.875rem,3vw,2.75rem)] leading-[1.1] tracking-[-0.025em] text-ivory">
                 {wizardT("title")}
               </h2>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-ivory/75">
                 {wizardT("description")}
               </p>
-              <p className="mt-3 flex items-center gap-2 text-sm text-ivory/60">
-                <Sparkles className="size-4 shrink-0 text-gold" aria-hidden="true" />
+              <p className="mt-3 flex items-center gap-2 text-sm text-ivory/65">
+                <Sparkles className="size-4 shrink-0 text-gold-soft" aria-hidden="true" />
                 {wizardT("homeNote")}
               </p>
             </div>
-            <Link href="/mene-emlak-tap" className={buttonClassName("onDark", "lg")}>
+            <Link href="/mene-emlak-tap" className={buttonClassName("primary", "lg")}>
               {wizardT("homeCta")}
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
@@ -369,49 +357,41 @@ export default async function HomePage({ params }: HomePageProps) {
 
           <MobileCategoryRail items={categoryItems} />
 
-          <div className="mt-10 hidden auto-rows-[17rem] grid-cols-12 gap-3 lg:grid">
+          <div className="mt-10 hidden gap-4 lg:grid lg:grid-cols-4 xl:grid-cols-5">
             {categoryItems.map((item, index) => (
-              <Reveal
-                key={item.href}
-                delay={index * 50}
-                className={CATEGORY_LAYOUT[index] ?? "lg:col-span-4"}
-              >
+              <Reveal key={item.href} delay={(index % 5) * 40}>
                 <Link
                   href={item.href}
-                  className="group relative flex size-full min-h-40 overflow-hidden rounded-sm"
+                  className="group relative flex aspect-4/3 overflow-hidden rounded-lg border border-line bg-beige shadow-xs transition-shadow duration-300 hover:shadow-lg"
                 >
                   {item.imageUrl ? (
                     <Image
                       src={item.imageUrl}
-                      alt={item.label}
+                      alt=""
                       fill
                       unoptimized={isUnoptimizedImage(item.imageUrl)}
                       loading="lazy"
-                      sizes="(max-width: 1024px) 50vw, 25vw"
+                      sizes="(max-width: 1279px) 25vw, 20vw"
                       className="image-lift object-cover"
                     />
-                  ) : (
-                    <div className="size-full bg-beige" />
-                  )}
+                  ) : null}
 
+                  {/* Sabit tünd qradiyent — `charcoal` tokeni tünd rejimdə açığa dönür. */}
                   <div
                     aria-hidden="true"
-                    className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-charcoal/90 via-charcoal/38 to-transparent transition-opacity duration-300 group-hover:opacity-95"
+                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent"
                   />
 
-                  <div className="relative mt-auto flex w-full items-end justify-between gap-3 p-5">
-                    <div>
-                      <h3 className="font-display text-lg text-white sm:text-xl">
-                        {item.label}
-                      </h3>
-                      <p className="tabular mt-1 text-sm text-white/75">
+                  <div className="relative mt-auto flex w-full items-end justify-between gap-3 p-4">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base text-white">{item.label}</h3>
+                      <p className="tabular mt-0.5 text-xs text-white/80">
                         {propertyT("listingCount", { count: item.count })}
                       </p>
                     </div>
-                    <ArrowUpRight
-                      className="size-5 shrink-0 text-gold-soft transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      aria-hidden="true"
-                    />
+                    <span className="on-image-chip grid size-8 shrink-0 place-items-center rounded-full transition-transform duration-300 group-hover:-translate-y-0.5">
+                      <ArrowUpRight className="size-4" aria-hidden="true" />
+                    </span>
                   </div>
                 </Link>
               </Reveal>
@@ -425,40 +405,37 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* ------------------------------------------------------------------ */}
       <Section tone="navy">
         <Container size="wide">
-          <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
-            <SectionHeader
-              overline={t("services.overline")}
-              title={t("services.title")}
-              description={t("services.description")}
-              tone="dark"
-              action={{ label: t("services.all"), href: "/xidmetler" }}
-              className="self-start lg:sticky lg:top-32"
-            />
+          <SectionHeader
+            overline={t("services.overline")}
+            title={t("services.title")}
+            description={t("services.description")}
+            tone="dark"
+            action={{ label: t("services.all"), href: "/xidmetler" }}
+          />
 
-            <div className="border-t border-line-dark">
-              {localizedServices.map((service, index) => (
-                <Reveal key={service.id} delay={index * 40}>
-                  <Link
-                    href={`/xidmetler/${service.slug}`}
-                    className="group grid min-h-32 grid-cols-[2.5rem_1fr_auto] items-start gap-4 border-b border-line-dark py-6 transition-colors duration-300 hover:text-gold-soft sm:grid-cols-[3rem_0.7fr_1fr_auto] sm:items-center"
-                  >
-                    <span className="tabular editorial-kicker pt-1 text-gold-soft sm:pt-0">
-                      {String(index + 1).padStart(2, "0")}
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {localizedServices.slice(0, HOME_SERVICE_LIMIT).map((service, index) => (
+              <Reveal key={service.id} delay={index * 50}>
+                <Link
+                  href={`/xidmetler/${service.slug}`}
+                  className="group flex h-full flex-col gap-4 rounded-lg border border-line-dark bg-navy-soft p-6 transition-[border-color,transform] duration-300 ease-out-soft hover:-translate-y-0.5 hover:border-gold-soft/60 sm:p-7"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="grid size-12 place-items-center rounded-md bg-gold/15 text-gold-soft">
+                      <ServiceIcon name={service.icon} className="size-6" />
                     </span>
-                    <h3 className="font-display text-xl text-ink-invert sm:text-2xl">
-                      {service.title}
-                    </h3>
-                    <p className="col-start-2 text-sm leading-relaxed text-ink-invert-soft sm:col-start-auto">
-                      {service.shortDescription}
-                    </p>
-                    <ArrowRight
-                      className="mt-1 size-4 text-gold-soft transition-transform duration-300 group-hover:translate-x-1 sm:mt-0"
+                    <ArrowUpRight
+                      className="size-5 text-ink-invert-soft transition-[color,transform] duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-gold-soft"
                       aria-hidden="true"
                     />
-                  </Link>
-                </Reveal>
-              ))}
-            </div>
+                  </div>
+                  <h3 className="text-lg text-ink-invert">{service.title}</h3>
+                  <p className="line-clamp-3 text-sm leading-relaxed text-ink-invert-soft">
+                    {service.shortDescription}
+                  </p>
+                </Link>
+              </Reveal>
+            ))}
           </div>
         </Container>
       </Section>
@@ -470,7 +447,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <Container size="wide">
           <div className="grid items-center gap-0 lg:grid-cols-12">
             <Reveal className="relative lg:col-span-7 lg:col-start-1 lg:row-start-1">
-              <div className="relative aspect-4/5 overflow-hidden rounded-md sm:aspect-4/3 lg:aspect-4/5">
+              <div className="relative aspect-4/5 overflow-hidden rounded-xl sm:aspect-4/3 lg:aspect-4/5">
                 <Image
                   src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80"
                   alt={t("about.imageAlt")}
@@ -484,11 +461,11 @@ export default async function HomePage({ params }: HomePageProps) {
               {/* İncə qızılı çərçivə detalı */}
               <div
                 aria-hidden="true"
-                className="absolute -right-3 -bottom-3 hidden size-32 border-r border-b border-gold lg:block"
+                className="absolute -right-3 -bottom-3 hidden size-32 rounded-br-xl border-r border-b border-gold lg:block"
               />
             </Reveal>
 
-            <div className="relative z-10 mt-[-2rem] mx-4 flex flex-col gap-6 bg-paper p-7 shadow-editorial sm:mx-10 sm:p-10 lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mx-0 lg:mt-0 lg:-ml-20 lg:p-12">
+            <div className="relative z-10 mt-[-2rem] mx-4 flex flex-col gap-6 rounded-xl border border-line bg-paper p-7 shadow-editorial sm:mx-10 sm:p-10 lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:mx-0 lg:mt-0 lg:-ml-20 lg:p-12">
               <SectionHeader
                 overline={t("about.overline")}
                 title={t("about.title")}
@@ -526,20 +503,15 @@ export default async function HomePage({ params }: HomePageProps) {
             align="center"
           />
 
-          <div className="mt-12 grid gap-x-10 sm:grid-cols-2">
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.key} delay={index * 50}>
-                <div className="grid h-full grid-cols-[auto_1fr] gap-x-5 gap-y-3 border-t border-line-strong py-6 sm:py-8">
-                  <span className="flex size-9 items-center justify-center text-gold-deep">
-                    <item.icon className="size-5" aria-hidden="true" />
+                <div className="flex h-full flex-col gap-4 rounded-lg border border-line bg-paper p-6 shadow-xs sm:p-7">
+                  <span className="grid size-12 place-items-center rounded-md bg-gold/12 text-gold-deep">
+                    <item.icon className="size-6" aria-hidden="true" />
                   </span>
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="font-display text-xl text-ink">{t(`why.items.${item.key}.title`)}</h3>
-                    <span className="tabular editorial-kicker text-ink-muted">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <p className="col-start-2 text-sm leading-relaxed text-ink-soft">
+                  <h3 className="text-lg text-ink">{t(`why.items.${item.key}.title`)}</h3>
+                  <p className="text-sm leading-relaxed text-ink-soft">
                     {t(`why.items.${item.key}.description`)}
                   </p>
                 </div>
@@ -621,8 +593,8 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* ------------------------------------------------------------------ */}
       <Section tone="beige" spacing="none" className="overflow-hidden">
         <Container size="wide" className="py-14 sm:py-18 lg:py-24">
-          <div className="grid lg:grid-cols-12">
-            <div className="relative aspect-4/3 overflow-hidden lg:col-span-7 lg:aspect-auto lg:min-h-[34rem]">
+          <div className="grid overflow-hidden rounded-2xl border border-line shadow-md lg:grid-cols-12">
+            <div className="relative aspect-4/3 overflow-hidden lg:col-span-7 lg:aspect-auto lg:min-h-[30rem]">
               <Image
                 src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=2000&q=80"
                 alt=""
@@ -633,9 +605,9 @@ export default async function HomePage({ params }: HomePageProps) {
               />
             </div>
 
-            <div className="flex flex-col justify-center gap-6 bg-ivory p-7 sm:p-10 lg:col-span-5 lg:p-14">
+            <div className="flex flex-col justify-center gap-6 bg-paper p-7 sm:p-10 lg:col-span-5 lg:p-14">
               <p className="editorial-kicker text-gold-deep">{t("cta.overline")}</p>
-              <h2 className="max-w-xl font-display text-[clamp(2.4rem,4vw,4.5rem)] leading-[0.98] tracking-[-0.04em] text-ink">
+              <h2 className="max-w-xl font-display text-[clamp(2rem,3.2vw,3.25rem)] leading-[1.08] tracking-[-0.025em] text-ink">
                 {t("cta.title")}
               </h2>
 

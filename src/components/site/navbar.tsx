@@ -156,25 +156,17 @@ export function Navbar({
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2.5 text-sm font-medium transition-colors duration-300",
+                      "relative inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-3.5 text-sm font-medium transition-colors duration-200",
                       isOverlay
                         ? active
-                          ? "text-gold-soft"
-                          : "text-white hover:text-gold-soft"
+                          ? "bg-white/14 text-white"
+                          : "text-white/90 hover:bg-white/10 hover:text-white"
                         : active
-                          ? "text-gold-deep"
-                          : "text-ink-soft hover:text-ink",
+                          ? "bg-beige text-ink"
+                          : "text-ink-soft hover:bg-beige/70 hover:text-ink",
                     )}
                   >
                     {NAV_KEYS[item.href] ? t(NAV_KEYS[item.href]) : item.label}
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "absolute inset-x-2 bottom-1.5 h-px origin-left transition-transform duration-300 ease-out-soft",
-                        isOverlay ? "bg-gold-soft" : "bg-gold-deep",
-                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
-                      )}
-                    />
                   </Link>
                 </li>
               );
@@ -188,10 +180,10 @@ export function Navbar({
                 aria-controls="desktop-navigation-overflow"
                 onClick={() => setOverflowOpen((open) => !open)}
                 className={cn(
-                  "inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-xs px-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                  "inline-flex min-h-10 items-center gap-1 whitespace-nowrap rounded-full px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
                   isOverlay
-                    ? "text-white hover:text-gold-soft"
-                    : "text-ink-soft hover:text-ink",
+                    ? "text-white/90 hover:bg-white/10 hover:text-white"
+                    : "text-ink-soft hover:bg-beige/70 hover:text-ink",
                 )}
               >
                 {t("more")}
@@ -204,7 +196,7 @@ export function Navbar({
               {overflowOpen ? (
                 <ul
                   id="desktop-navigation-overflow"
-                  className="absolute top-[calc(100%+0.5rem)] right-0 min-w-52 rounded-sm border border-line bg-paper p-2 shadow-editorial"
+                  className="animate-scale-in absolute top-[calc(100%+0.5rem)] right-0 min-w-52 origin-top-right rounded-lg border border-line bg-paper p-1.5 shadow-lg"
                 >
                   {visibleGroups.overflow.map((item) => {
                     const active = isNavigationItemActive(pathname, item.href);
@@ -215,7 +207,7 @@ export function Navbar({
                           aria-current={active ? "page" : undefined}
                           onClick={() => setOverflowOpen(false)}
                           className={cn(
-                            "flex min-h-11 items-center rounded-xs px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                            "flex min-h-11 items-center rounded-sm px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
                             active ? "bg-beige text-gold-deep" : "text-ink hover:bg-beige/60",
                           )}
                         >
@@ -246,25 +238,17 @@ export function Navbar({
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative inline-flex min-h-11 items-center whitespace-nowrap rounded-xs px-2 text-[0.8125rem] font-medium transition-colors duration-300 min-[2200px]:px-2.5 min-[2200px]:text-sm",
+                      "relative inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-3 text-[0.8125rem] font-medium transition-colors duration-200 min-[2200px]:px-3.5 min-[2200px]:text-sm",
                       isOverlay
                         ? active
-                          ? "text-gold-soft"
-                          : "text-white hover:text-gold-soft"
+                          ? "bg-white/14 text-white"
+                          : "text-white/90 hover:bg-white/10 hover:text-white"
                         : active
-                          ? "text-gold-deep"
-                          : "text-ink-soft hover:text-ink",
+                          ? "bg-beige text-ink"
+                          : "text-ink-soft hover:bg-beige/70 hover:text-ink",
                     )}
                   >
                     {NAV_KEYS[item.href] ? t(NAV_KEYS[item.href]) : item.label}
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "absolute inset-x-2 bottom-1.5 h-px origin-left transition-transform duration-300 ease-out-soft",
-                        isOverlay ? "bg-gold-soft" : "bg-gold-deep",
-                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
-                      )}
-                    />
                   </Link>
                 </li>
               );
@@ -359,7 +343,7 @@ export function Navbar({
 
         <nav aria-label={t("mobileNavigation")} className="mt-7 border-t border-line pt-6">
           <p className="editorial-kicker mb-3 text-ink-muted">{t("explore")}</p>
-          <ul className="overflow-hidden rounded-md border border-line bg-paper">
+          <ul className="overflow-hidden rounded-lg border border-line bg-paper">
             {[...visibleNavigation]
               .sort((a, b) => Number(MOBILE_PRIMARY_HREFS.has(b.href)) - Number(MOBILE_PRIMARY_HREFS.has(a.href)))
               .map((item) => {

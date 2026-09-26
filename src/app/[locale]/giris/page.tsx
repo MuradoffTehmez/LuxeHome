@@ -39,7 +39,7 @@ export default async function LoginPage({
             sizes="50vw"
             className="object-cover"
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/60 to-charcoal/35" />
+          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/25" />
           <div className="relative flex min-h-[34rem] flex-col justify-end p-10 xl:p-14">
             <p className="max-w-md font-display text-3xl leading-tight text-white xl:text-4xl">
               {t("asideTitle")}

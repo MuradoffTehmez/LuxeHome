@@ -30,7 +30,7 @@ export function MobileCategoryRail({ items }: MobileCategoryRailProps) {
         <li key={item.href} className="w-[78vw] max-w-xs shrink-0 snap-start">
           <Link
             href={item.href}
-            className="group relative flex aspect-4/3 min-h-44 overflow-hidden rounded-sm border border-line bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+            className="group relative flex aspect-4/3 min-h-44 overflow-hidden rounded-lg border border-line bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
           >
             {item.imageUrl ? (
               <Image
@@ -48,13 +48,15 @@ export function MobileCategoryRail({ items }: MobileCategoryRailProps) {
               </span>
             )}
 
+            {/* Sabit tünd qradiyent: `charcoal` tokeni tünd rejimdə açığa dönür və
+                ağ mətn foto üzərində oxunmaz olurdu. */}
             <span
               aria-hidden="true"
-              className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/25 to-transparent"
+              className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
             />
             <span className="relative mt-auto flex w-full items-end justify-between gap-3 p-5">
               <span>
-                <span className="block font-display text-2xl text-white">{item.label}</span>
+                <span className="block text-lg font-semibold text-white">{item.label}</span>
                 <span className="tabular mt-1 block text-sm text-white/75">
                   {propertyT("listingCount", { count: item.count })}
                 </span>

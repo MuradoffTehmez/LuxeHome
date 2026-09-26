@@ -32,8 +32,8 @@ const WRAPPER_CLASSES: Record<OverlayPlacement, string> = {
 };
 
 const PANEL_CLASSES: Record<OverlayPlacement, string> = {
-  center: "max-h-[92dvh] w-full max-w-xl rounded-md",
-  bottom: "max-h-dvh w-full rounded-t-lg pb-[var(--safe-bottom)]",
+  center: "max-h-[92dvh] w-full max-w-xl rounded-xl",
+  bottom: "max-h-dvh w-full rounded-t-xl pb-[var(--safe-bottom)]",
   left: "h-dvh w-[min(24rem,90vw)]",
   right: "h-dvh w-[min(24rem,90vw)]",
 };

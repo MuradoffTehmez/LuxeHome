@@ -70,8 +70,8 @@ export function CompareButton({
       aria-pressed={ready ? isComparing : undefined}
       className={cn(
         "inline-flex size-11 cursor-pointer items-center justify-center rounded-full",
-        "bg-charcoal/45 text-white backdrop-blur-sm transition-colors duration-200",
-        "hover:bg-charcoal/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+        "on-image-chip disabled:cursor-wait disabled:opacity-60",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
         isComparing && "text-gold-soft",
         className,
       )}
