@@ -12,6 +12,7 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { approveModerationProperty, rejectModerationProperty } from "./actions";
 import { useTranslations } from "next-intl";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 export function ApprovePropertyButton({ id, title }: { id: string; title: string }) {
   const t = useTranslations("admin");
@@ -34,7 +35,8 @@ export function ApprovePropertyButton({ id, title }: { id: string; title: string
 export function RejectPropertyButton({ id, title }: { id: string; title: string }) {
   const t = useTranslations("admin");
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(rejectModerationProperty, IDLE_STATE);
+  const [rawState, formAction, pending] = useActionState(rejectModerationProperty, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
   const { toast } = useToast();
   const router = useRouter();
 

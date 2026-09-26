@@ -9,6 +9,7 @@ import { PARTNER_RELATION_ROLE_LABELS, PARTNER_RELATION_ROLES } from "@/lib/cons
 import type { getAdminPartnerRelations, getPartnerRelationOptions } from "@/lib/queries";
 import { addPartnerRelation, removePartnerRelation } from "./actions";
 import { useTranslations } from "next-intl";
+import { useServerMessage } from "@/components/admin/use-server-message";
 
 type Relations = Awaited<ReturnType<typeof getAdminPartnerRelations>>;
 type Options = Awaited<ReturnType<typeof getPartnerRelationOptions>>;
@@ -143,6 +144,7 @@ export function PartnerRelationsManager({
 
 function SubmitRelationButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations("admin");
   return (
     <button
       type="submit"
@@ -150,16 +152,17 @@ function SubmitRelationButton() {
       className="inline-flex min-h-11 items-center gap-2 rounded-xs bg-gold px-4 text-sm font-medium text-on-gold disabled:opacity-50"
     >
       {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Plus className="size-4" aria-hidden="true" />}
-      Əlaqə əlavə et
+      {t("pages.partners.addRelation")}
     </button>
   );
 }
 
 function ActionMessage({ state }: { state: typeof IDLE_STATE & { message?: string } }) {
+  const translate = useServerMessage();
   if (!state.message) return null;
   return (
     <p role={state.status === "error" ? "alert" : "status"} className={state.status === "error" ? "text-sm text-danger" : "text-sm text-success"}>
-      {state.message}
+      {translate(state.message)}
     </p>
   );
 }

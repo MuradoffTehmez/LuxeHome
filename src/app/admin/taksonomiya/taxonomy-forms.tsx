@@ -15,6 +15,7 @@ import {
   deletePropertyType,
   togglePropertyTypeActive,
 } from "./actions";
+import { useServerMessage } from "@/components/admin/use-server-message";
 
 /** Qrup adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
 const featureGroupOptions = (t: ReturnType<typeof useTranslations<"admin">>) =>
@@ -65,6 +66,7 @@ export function PropertyTypeRow({
 }) {
   const t = useTranslations("admin");
   const { toast } = useToast();
+  const translateMessage = useServerMessage();
 
   return (
     <li className="flex min-w-0 flex-col items-stretch gap-2 border-b border-line px-4 py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
@@ -77,7 +79,7 @@ export function PropertyTypeRow({
         <form
           action={async () => {
             const result = await togglePropertyTypeActive(id);
-            toast(result.message ?? "", result.status === "success" ? "success" : "error");
+            toast(translateMessage(result.message) ?? "", result.status === "success" ? "success" : "error");
           }}
         >
           <button

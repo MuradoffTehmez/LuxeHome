@@ -36,10 +36,17 @@ export function failure(message: string, fieldErrors?: Record<string, string>): 
   return { status: "error", message, fieldErrors };
 }
 
-export function invalid(error: ZodError): ActionState {
+/**
+ * `message` admin action-larında tərcümə markeridir (`msg("server.common.formInvalid")`,
+ * #89); ictimai action-lar defolt mətnlə qalır.
+ */
+export function invalid(
+  error: ZodError,
+  message = "Formada xətalar var. Qeyd olunan sahələri yoxlayın.",
+): ActionState {
   return {
     status: "error",
-    message: "Formada xətalar var. Qeyd olunan sahələri yoxlayın.",
+    message,
     fieldErrors: toFieldErrors(error),
   };
 }

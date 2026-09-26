@@ -146,8 +146,8 @@ export function ContentEditor({
             <button
               type="button"
               onClick={() => document.execCommand("undo")}
-              title="Geri al"
-              aria-label="Geri al"
+              title={t("components.editor.undo")}
+              aria-label={t("components.editor.undo")}
               className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-soft transition-colors duration-200 hover:bg-beige hover:text-ink"
             >
               <Undo2 className="size-4" aria-hidden="true" />

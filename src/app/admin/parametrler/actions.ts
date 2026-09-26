@@ -10,6 +10,7 @@ import { type ActionState, failure, invalid, success, unexpected } from "@/lib/a
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
+import { msg } from "@/lib/admin/server-message";
 
 /** Boş sətri saxlayan, dolu dəyəri isə diapazona görə yoxlayan koordinat sahəsi. */
 function coordinate(min: number, max: number, message: string) {
@@ -24,18 +25,18 @@ const settingsSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .pipe(z.email("E-poçt ünvanı düzgün deyil"))
+    .pipe(z.email(msg("server.parametrler.ePoctUnvaniDuzgunDeyil")))
     .or(z.literal("")),
   notifyEnabled: z.boolean(),
-  announcement: z.string().trim().max(500, "Qeyd 500 simvoldan uzun ola bilməz"),
+  announcement: z.string().trim().max(500, msg("server.parametrler.qeyd500SimvoldanUzunOla")),
   contactPhone: z.string().trim().max(30),
-  contactEmail: z.string().trim().toLowerCase().pipe(z.email("Korporativ e-poçt düzgün deyil")).or(z.literal("")),
+  contactEmail: z.string().trim().toLowerCase().pipe(z.email(msg("server.parametrler.korporativEPoctDuzgunDeyil"))).or(z.literal("")),
   contactAddress: z.string().trim().max(300),
   contactInstagram: z.string().trim().max(100),
   contactWhatsapp: z.string().trim().max(30),
   // Boş sətir icazəlidir: koordinat təyin edilməyibsə xəritə sadəcə göstərilmir.
-  contactLatitude: coordinate(-90, 90, "Enlik -90 ilə 90 arasında olmalıdır"),
-  contactLongitude: coordinate(-180, 180, "Uzunluq -180 ilə 180 arasında olmalıdır"),
+  contactLatitude: coordinate(-90, 90, msg("server.parametrler.enlikAraligi")),
+  contactLongitude: coordinate(-180, 180, msg("server.parametrler.uzunluqAraligi")),
 });
 
 export async function saveSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -59,7 +60,7 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
     contactLatitude: form.text(formData, "contactLatitude"),
     contactLongitude: form.text(formData, "contactLongitude"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     await setSettings({
@@ -80,9 +81,9 @@ export async function saveSettings(_prev: ActionState, formData: FormData): Prom
     revalidatePath("/admin");
     revalidatePath("/", "layout");
     for (const locale of ["az", "en", "ru"]) revalidatePath(`/${locale}/elaqe`);
-    return success("Parametrlər yadda saxlanıldı.");
+    return success(msg("server.parametrler.parametrlerYaddaSaxlanildi"));
   } catch (error) {
-    return unexpected("parametrlər saxlanılmadı", error);
+    return unexpected("parametrlər saxlanılmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -126,6 +127,6 @@ export async function toggleProjectsSection(_prev: ActionState, formData: FormDa
 
     return success(enabled ? t("pages.settings.sections.projectsShown") : t("pages.settings.sections.projectsHidden"));
   } catch (error) {
-    return unexpected("bölmə görünürlüyü dəyişdirilmədi", error);
+    return unexpected("bölmə görünürlüyü dəyişdirilmədi", error, msg("server.common.unexpected"));
   }
 }

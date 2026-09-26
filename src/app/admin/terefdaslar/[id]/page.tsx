@@ -150,7 +150,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
         <Link href={`/admin/audit?entity=Partner&q=${partner.id}`} className="underline hover:text-ink">
           {t("pages.partners.auditJurnalinda")}
         </Link>{" "}
-        saxlanılır.
+        {t("pages.partners.auditStoredSuffix")}
       </p>
     </>
   );

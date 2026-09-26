@@ -11,6 +11,7 @@ import { parseAiJson, runAiText, runAiVision } from "@/lib/ai";
 import { AI_SYSTEM_PROMPTS } from "@/lib/ai-prompts";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { msg } from "@/lib/admin/server-message";
 
 type DescriptionOutput = { title?: string; description: string; highlights?: string[] };
 type PhotoIssue = { score: number; issues: string[] };
@@ -72,9 +73,9 @@ export async function testAiProvider(): Promise<ActionState> {
       maxTokens: 40,
     });
     const parsed = parseAiJson<{ ok?: boolean }>(response.text);
-    if (parsed.ok !== true) return failure("Workers AI cavab verdi, amma sağlıq sxeminə uyğun olmadı.");
+    if (parsed.ok !== true) return failure(msg("server.aiKomekci.workersAiCavabVerdiAmma"));
     await recordAudit(actor, "TEST", "AiProvider", null, `Workers AI sağlıq yoxlaması: ${response.model}`);
-    return success(`Workers AI işləyir: ${response.model}`);
+    return success(msg("server.aiKomekci.workersAiIsleyir", { p0: String(response.model) }));
   } catch (error) {
     return unexpected("Workers AI işləmir", error, error instanceof Error ? error.message : undefined);
   }
@@ -154,14 +155,14 @@ export async function generatePropertyDescription(
 
   const propertyId = form.text(formData, "propertyId");
   const locale = form.text(formData, "locale") || "az";
-  if (!propertyId) return failure("Elan seçin.");
+  if (!propertyId) return failure(msg("server.aiKomekci.elanSecin"));
 
   try {
     const property = await prisma.property.findUnique({
       where: { id: propertyId },
       include: { type: true, city: true, district: true, features: { include: { feature: true } } },
     });
-    if (!property) return failure("Elan tapılmadı.");
+    if (!property) return failure(msg("server.aiKomekci.elanTapilmadi"));
 
     const facts = {
       currentTitle: property.title,
@@ -191,7 +192,7 @@ export async function generatePropertyDescription(
     });
 
     const output = toDescriptionOutput(response.text);
-    if (!output.description?.trim()) return failure("AI cavabında təsvir yoxdur.");
+    if (!output.description?.trim()) return failure(msg("server.aiKomekci.aiCavabindaTesvirYoxdur"));
 
     const draft = await prisma.aiContentDraft.create({
       data: {
@@ -206,7 +207,7 @@ export async function generatePropertyDescription(
     });
     await recordAudit(actor, "CREATE", "Property", propertyId, `AI mətn qaralaması: ${draft.id}`);
     revalidatePath("/admin/ai-komekci");
-    return success("AI təsvir qaralaması yaradıldı. Dərc etməzdən əvvəl yoxlayın.");
+    return success(msg("server.aiKomekci.aiTesvirQaralamasiYaradildiDerc"));
   } catch (error) {
     return unexpected("AI təsvir yaradılmadı", error, error instanceof Error ? error.message : undefined);
   }
@@ -220,7 +221,7 @@ export async function analyzePropertyPhotos(
   if ("status" in actor) return actor;
 
   const propertyId = form.text(formData, "propertyId");
-  if (!propertyId) return failure("Elan seçin.");
+  if (!propertyId) return failure(msg("server.aiKomekci.elanSecin"));
 
   try {
     const property = await prisma.property.findUnique({
@@ -230,7 +231,7 @@ export async function analyzePropertyPhotos(
         images: { orderBy: { order: "asc" }, take: MAX_ANALYZED_IMAGES, select: { id: true, url: true } },
       },
     });
-    if (!property || property.images.length === 0) return failure("Elanın analiz ediləcək şəkli yoxdur.");
+    if (!property || property.images.length === 0) return failure(msg("server.aiKomekci.elaninAnalizEdilecekSekliYoxdur"));
 
     // Vision modeli bir çağırışda bir şəkil qəbul edir, ona görə şəkillər bir-bir gedir.
     const results: Array<{ id: string; score: number; issues: string[] }> = [];
@@ -265,8 +266,8 @@ export async function analyzePropertyPhotos(
     if (results.length === 0) {
       return failure(
         unreadable === property.images.length
-          ? "Şəkillər oxunmadı — fayl mənbəyi əlçatan deyil."
-          : "Heç bir şəkil analiz edilə bilmədi. AI modeli cavab vermədi.",
+          ? msg("server.aiKomekci.sekillerOxunmadiFaylMenbeyiElcatan")
+          : msg("server.aiKomekci.hecBirSekilAnalizEdile"),
       );
     }
 
@@ -293,7 +294,7 @@ export async function analyzePropertyPhotos(
     });
     await recordAudit(actor, "UPDATE", "Property", propertyId, "AI foto keyfiyyəti analizi");
     revalidatePath("/admin/ai-komekci");
-    return success(`${results.length} şəkil analiz edildi.`);
+    return success(msg("server.aiKomekci.sekilAnalizEdildi", { p0: String(results.length) }));
   } catch (error) {
     return unexpected("AI foto analizi tamamlanmadı", error, error instanceof Error ? error.message : undefined);
   }
@@ -307,10 +308,10 @@ export async function applyDescriptionDraft(id: string): Promise<ActionState> {
     const draft = await prisma.aiContentDraft.findFirst({
       where: { id, status: AI_CONTENT_DRAFT_STATUSES.DRAFT, propertyId: { not: null } },
     });
-    if (!draft?.propertyId) return failure("Qaralama tapılmadı və ya artıq işlənib.");
+    if (!draft?.propertyId) return failure(msg("server.aiKomekci.qaralamaTapilmadiVeYaArtiq"));
 
     const output = parseAiJson<DescriptionOutput>(draft.outputJson);
-    if (!output.description?.trim()) return failure("Qaralamada təsvir yoxdur.");
+    if (!output.description?.trim()) return failure(msg("server.aiKomekci.qaralamadaTesvirYoxdur"));
 
     const property = await prisma.property.update({
       where: { id: draft.propertyId },
@@ -327,9 +328,9 @@ export async function applyDescriptionDraft(id: string): Promise<ActionState> {
     await recordAudit(actor, "UPDATE", "Property", draft.propertyId, `AI qaralaması insan təsdiqi ilə tətbiq edildi: ${id}`);
     revalidatePath("/admin/ai-komekci");
     revalidatePublicContent("property", property.slug);
-    return success("Qaralama elana tətbiq edildi.");
+    return success(msg("server.aiKomekci.qaralamaElanaTetbiqEdildi"));
   } catch (error) {
-    return unexpected("AI qaralaması tətbiq edilmədi", error);
+    return unexpected("AI qaralaması tətbiq edilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -342,7 +343,7 @@ export async function discardDescriptionDraft(id: string): Promise<ActionState> 
       where: { id, status: AI_CONTENT_DRAFT_STATUSES.DRAFT },
       select: { id: true },
     });
-    if (!draft) return failure("Qaralama tapılmadı və ya artıq işlənib.");
+    if (!draft) return failure(msg("server.aiKomekci.qaralamaTapilmadiVeYaArtiq"));
 
     await prisma.aiContentDraft.update({
       where: { id },
@@ -350,8 +351,8 @@ export async function discardDescriptionDraft(id: string): Promise<ActionState> 
     });
     await recordAudit(actor, "UPDATE", "Property", null, `AI qaralaması rədd edildi: ${id}`);
     revalidatePath("/admin/ai-komekci");
-    return success("Qaralama rədd edildi.");
+    return success(msg("server.aiKomekci.qaralamaReddEdildi"));
   } catch (error) {
-    return unexpected("AI qaralaması rədd edilmədi", error);
+    return unexpected("AI qaralaması rədd edilmədi", error, msg("server.common.unexpected"));
   }
 }

@@ -12,6 +12,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { slugify } from "@/lib/utils";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
+import { msg } from "@/lib/admin/server-message";
 
 const agentSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -75,10 +76,10 @@ export async function saveAgentProfile(_previous: ActionState, formData: FormDat
 
   const id = form.text(formData, "id");
   const parsed = readAgentForm(formData);
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   const slug = slugify(parsed.data.slug || parsed.data.name);
-  if (!slug) return failure("Düzgün URL adı yaradılmadı.");
+  if (!slug) return failure(msg("server.agentler.duzgunUrlAdiYaradilmadi"));
 
   const avatar = parseSingleImage(formData, "avatar");
   const data = {
@@ -106,7 +107,7 @@ export async function saveAgentProfile(_previous: ActionState, formData: FormDat
   try {
     if (id) {
       const previous = await prisma.agentProfile.findUnique({ where: { id }, select: { slug: true } });
-      if (!previous) return failure("Agent tapılmadı.");
+      if (!previous) return failure(msg("server.agentler.agentTapilmadi"));
       await prisma.agentProfile.update({ where: { id }, data });
       await ensureSlugRedirect("/agentler", previous.slug, slug, actor);
       await recordAudit(actor, "UPDATE", "AgentProfile", id, parsed.data.name);
@@ -116,16 +117,16 @@ export async function saveAgentProfile(_previous: ActionState, formData: FormDat
       if (previous.slug !== slug) revalidatePublicContent("agent", slug);
       // Agent kartı əmlak detalında da göstərilir və orada keşli sorğudan gəlir.
       revalidatePublicContent("property");
-      return success("Agent profili yeniləndi.");
+      return success(msg("server.agentler.agentProfiliYenilendi"));
     }
 
     const agent = await prisma.agentProfile.create({ data });
     await recordAudit(actor, "CREATE", "AgentProfile", agent.id, parsed.data.name);
     revalidatePath("/admin/agentler");
     revalidatePublicContent("agent", slug);
-    return success("Agent profili yaradıldı.");
+    return success(msg("server.agentler.agentProfiliYaradildi"));
   } catch (error) {
-    return unexpected("agent profili saxlanılmadı", error, "Agent profili saxlanıla bilmədi. URL adı və bağlı hesab təkrarsız olmalıdır.");
+    return unexpected("agent profili saxlanılmadı", error, msg("server.agentler.agentProfiliSaxlanilaBilmediUrl"));
   }
 }
 
@@ -149,9 +150,9 @@ export async function deleteAgentProfile(id: string): Promise<ActionState> {
       where: { id },
       select: { name: true, slug: true, _count: { select: { properties: true } } },
     });
-    if (!agent) return failure("Agent tapılmadı.");
+    if (!agent) return failure(msg("server.agentler.agentTapilmadi"));
     if (agent._count.properties > 0) {
-      return failure(`Bu agentə ${agent._count.properties} elan təyin edilib. Əvvəlcə elanları başqa agentə keçirin.`);
+      return failure(msg("server.agentler.buAgenteElanTeyinEdilib", { p0: String(agent._count.properties) }));
     }
 
     await prisma.agentProfile.delete({ where: { id } });
@@ -161,7 +162,7 @@ export async function deleteAgentProfile(id: string): Promise<ActionState> {
     revalidatePublicContent("property");
     return success("Agent profili silindi.");
   } catch (error) {
-    return unexpected("agent profili silinmədi", error);
+    return unexpected("agent profili silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -183,9 +184,9 @@ async function moderateReview(id: string, status: string): Promise<ActionState> 
     revalidatePath("/admin/agentler");
     revalidatePublicContent("agent", review.agent.slug);
     revalidatePublicContent("property");
-    return success(status === REVIEW_STATUSES.APPROVED ? "Rəy təsdiqləndi." : "Rəy rədd edildi.");
+    return success(status === REVIEW_STATUSES.APPROVED ? msg("server.agentler.reyTesdiqlendi") : msg("server.agentler.reyReddEdildi"));
   } catch (error) {
-    return unexpected("agent rəyi moderasiya edilmədi", error);
+    return unexpected("agent rəyi moderasiya edilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -209,15 +210,15 @@ export async function toggleAgentVisibility(id: string): Promise<ActionState> {
   }
   try {
     const current = await prisma.agentProfile.findUnique({ where: { id }, select: { name: true, slug: true, isPublic: true } });
-    if (!current) return failure("Agent tapılmadı.");
+    if (!current) return failure(msg("server.agentler.agentTapilmadi"));
     await prisma.agentProfile.update({ where: { id }, data: { isPublic: !current.isPublic } });
     await recordAudit(actor, "UPDATE", "AgentProfile", id, `${current.name} — ${current.isPublic ? "gizlədildi" : "dərc edildi"}`);
     revalidatePath("/admin/agentler");
     revalidatePublicContent("agent", current.slug);
     revalidatePublicContent("property");
-    return success(current.isPublic ? "Agent ictimai kataloqdan gizlədildi." : "Agent ictimai kataloqda dərc edildi.");
+    return success(current.isPublic ? msg("server.agentler.agentIctimaiKataloqdanGizledildi") : msg("server.agentler.agentIctimaiKataloqdaDercEdildi"));
   } catch (error) {
-    return unexpected("agent görünürlüğü dəyişmədi", error);
+    return unexpected("agent görünürlüğü dəyişmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -244,7 +245,7 @@ export async function createTestimonial(_previous: ActionState, formData: FormDa
     serviceType: form.text(formData, "serviceType"),
     agentId: form.text(formData, "agentId"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
   try {
     const item = await prisma.testimonial.create({
       data: {
@@ -258,9 +259,9 @@ export async function createTestimonial(_previous: ActionState, formData: FormDa
     await recordAudit(actor, "CREATE", "Testimonial", item.id, parsed.data.customerName);
     revalidatePath("/admin/agentler");
     revalidatePublicContent("property");
-    return success("Müştəri rəyi dərc edildi.");
+    return success(msg("server.agentler.musteriReyiDercEdildi"));
   } catch (error) {
-    return unexpected("testimonial yaradılmadı", error);
+    return unexpected("testimonial yaradılmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -274,13 +275,13 @@ export async function deleteTestimonial(id: string): Promise<ActionState> {
   }
   try {
     const item = await prisma.testimonial.findUnique({ where: { id }, select: { customerName: true } });
-    if (!item) return failure("Rəy tapılmadı.");
+    if (!item) return failure(msg("server.agentler.reyTapilmadi"));
     await prisma.testimonial.delete({ where: { id } });
     await recordAudit(actor, "DELETE", "Testimonial", id, item.customerName);
     revalidatePath("/admin/agentler");
     revalidatePublicContent("property");
-    return success("Müştəri rəyi silindi.");
+    return success(msg("server.agentler.musteriReyiSilindi"));
   } catch (error) {
-    return unexpected("müştəri rəyi silinmədi", error);
+    return unexpected("müştəri rəyi silinmədi", error, msg("server.common.unexpected"));
   }
 }

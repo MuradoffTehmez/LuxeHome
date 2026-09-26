@@ -13,6 +13,7 @@ import { uniqueSlug } from "@/lib/admin/slug";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Layihə CRUD-u.
@@ -133,7 +134,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
   }
 
   const parsed = projectSchema.safeParse(readForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   const images = parseImages(formData, "images");
   let projectId: string;
@@ -154,7 +155,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
     await replaceImages(projectId, images);
     await recordAudit(user, "CREATE", "Project", projectId, parsed.data.name);
   } catch (error) {
-    return unexpected("layihə yaradıla bilmədi", error);
+    return unexpected("layihə yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 
   revalidatePath(LIST_PATH);
@@ -172,17 +173,17 @@ export async function updateProject(_prev: ActionState, formData: FormData): Pro
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("Layihə tapılmadı.");
+  if (!id) return failure(msg("server.layiheler.layiheTapilmadi"));
 
   const parsed = projectSchema.safeParse(readForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const existing = await prisma.project.findFirst({
       where: { id, deletedAt: null },
       select: { id: true, slug: true },
     });
-    if (!existing) return failure("Layihə tapılmadı və ya silinib.");
+    if (!existing) return failure(msg("server.layiheler.layiheTapilmadiVeYaSilinib"));
 
     const images = parseImages(formData, "images");
     const cover = images.find((image) => image.isCover) ?? images[0] ?? null;
@@ -205,9 +206,9 @@ export async function updateProject(_prev: ActionState, formData: FormData): Pro
     revalidatePath(LIST_PATH);
     revalidatePath(`/layiheler/${slug}`);
     revalidatePublicContent("project", slug);
-    return success("Layihə yeniləndi.");
+    return success(msg("server.layiheler.layiheYenilendi"));
   } catch (error) {
-    return unexpected("layihə yenilənmədi", error);
+    return unexpected("layihə yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -231,9 +232,9 @@ export async function deleteProject(id: string): Promise<ActionState> {
     revalidatePath(LIST_PATH);
     revalidatePath(`/layiheler/${project.slug}`);
     revalidatePublicContent("project", project.slug);
-    return success("Layihə silindi.");
+    return success(msg("server.layiheler.layiheSilindi"));
   } catch (error) {
-    return unexpected("layihə silinmədi", error);
+    return unexpected("layihə silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -256,8 +257,8 @@ export async function restoreProject(id: string): Promise<ActionState> {
     await recordAudit(user, "RESTORE", "Project", id, project.name);
     revalidatePath(LIST_PATH);
     revalidatePublicContent("project");
-    return success("Layihə bərpa edildi.");
+    return success(msg("server.layiheler.layiheBerpaEdildi"));
   } catch (error) {
-    return unexpected("layihə bərpa edilmədi", error);
+    return unexpected("layihə bərpa edilmədi", error, msg("server.common.unexpected"));
   }
 }

@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { bulkUpdateProperties } from "./actions";
 import { useTranslations } from "next-intl";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 /**
  * Siyahını bütöv əhatə edən forma.
@@ -23,7 +24,8 @@ export function BulkActionsForm({
   children: React.ReactNode;
 }) {
   const t = useTranslations("admin");
-  const [state, formAction] = useActionState(bulkUpdateProperties, IDLE_STATE);
+  const [rawState, formAction] = useActionState(bulkUpdateProperties, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 

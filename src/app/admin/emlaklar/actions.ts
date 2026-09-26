@@ -27,6 +27,7 @@ import {
   validatePropertyForPublication,
   validateStoredPropertyForPublication,
 } from "@/lib/property-publish-validation";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Əmlak CRUD-u.
@@ -62,13 +63,13 @@ async function validateRelations(input: PropertyInput): Promise<Record<string, s
       : null,
   ]);
 
-  if (!type) errors.typeId = "Əmlak növü seçilməyib";
-  if (!city) errors.cityId = "Şəhər seçilməyib";
-  if (input.districtId && !district) errors.districtId = "Rayon tapılmadı";
+  if (!type) errors.typeId = msg("server.emlaklar.emlakNovuSecilmeyib");
+  if (!city) errors.cityId = msg("server.emlaklar.seherSecilmeyib");
+  if (input.districtId && !district) errors.districtId = msg("server.emlaklar.rayonTapilmadi");
   if (district && !locationBelongsToCity(district, input.cityId)) {
-    errors.districtId = "Seçilmiş rayon bu şəhərə aid deyil";
+    errors.districtId = msg("server.emlaklar.secilmisRayonBuSehereAid");
   }
-  if (input.projectId && !project) errors.projectId = "Layihə tapılmadı";
+  if (input.projectId && !project) errors.projectId = msg("server.emlaklar.layiheTapilmadi");
 
   return Object.keys(errors).length > 0 ? errors : null;
 }
@@ -122,18 +123,18 @@ export async function createProperty(
   }
 
   const parsed = propertySchema.safeParse(readPropertyForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   const relationErrors = await validateRelations(parsed.data);
   if (relationErrors) {
-    return failure("Seçilmiş taksonomiya dəyərləri düzgün deyil.", relationErrors);
+    return failure(msg("server.emlaklar.secilmisTaksonomiyaDeyerleriDuzgunDeyil"), relationErrors);
   }
 
   const images = parseImages(formData, "images");
   if (parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
     const publication = await validatePropertyForPublication(parsed.data, images);
     if (Object.keys(publication.errors).length > 0) {
-      return failure("Elan dərc tələblərini ödəmir.", publication.errors);
+      return failure(msg("server.emlaklar.elanDercTelebleriniOdemir"), publication.errors);
     }
   }
   let propertyId: string;
@@ -164,7 +165,7 @@ export async function createProperty(
       await notifyMatchingSavedSearches(propertyId);
     }
   } catch (error) {
-    return unexpected("əmlak yaradıla bilmədi", error);
+    return unexpected("əmlak yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 
   revalidatePath(LIST_PATH);
@@ -185,14 +186,14 @@ export async function updateProperty(
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("Elan tapılmadı.");
+  if (!id) return failure(msg("server.emlaklar.elanTapilmadi"));
 
   const parsed = propertySchema.safeParse(readPropertyForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   const relationErrors = await validateRelations(parsed.data);
   if (relationErrors) {
-    return failure("Seçilmiş taksonomiya dəyərləri düzgün deyil.", relationErrors);
+    return failure(msg("server.emlaklar.secilmisTaksonomiyaDeyerleriDuzgunDeyil"), relationErrors);
   }
 
   try {
@@ -201,7 +202,7 @@ export async function updateProperty(
       where: { id, deletedAt: null },
       select: { id: true, slug: true, publishedAt: true, closedAt: true, status: true, price: true, currency: true },
     });
-    if (!existing) return failure("Elan tapılmadı və ya silinib.");
+    if (!existing) return failure(msg("server.emlaklar.elanTapilmadiVeYaSilinib"));
 
     const slug = await uniqueSlug(
       parsed.data.slug || parsed.data.title,
@@ -212,7 +213,7 @@ export async function updateProperty(
     if (parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
       const publication = await validatePropertyForPublication(parsed.data, images, id);
       if (Object.keys(publication.errors).length > 0) {
-        return failure("Elan dərc tələblərini ödəmir.", publication.errors);
+        return failure(msg("server.emlaklar.elanDercTelebleriniOdemir"), publication.errors);
       }
     }
     const lifecycle = propertyLifecycleData(parsed.data.status, existing, await propertyRetentionDays());
@@ -244,9 +245,9 @@ export async function updateProperty(
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${slug}`);
     revalidatePublicContent("property", slug);
-    return success("Elan yeniləndi.");
+    return success(msg("server.emlaklar.elanYenilendi"));
   } catch (error) {
-    return unexpected("əmlak yenilənmədi", error);
+    return unexpected("əmlak yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -274,7 +275,7 @@ export async function deleteProperty(id: string): Promise<ActionState> {
     revalidatePublicContent("property", property.slug);
     return success("Elan silindi.");
   } catch (error) {
-    return unexpected("əmlak silinmədi", error);
+    return unexpected("əmlak silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -297,9 +298,9 @@ export async function restoreProperty(id: string): Promise<ActionState> {
     await recordAudit(user, "RESTORE", "Property", id, property.title);
     revalidatePath(LIST_PATH);
     revalidatePublicContent("property");
-    return success("Elan bərpa edildi.");
+    return success(msg("server.emlaklar.elanBerpaEdildi"));
   } catch (error) {
-    return unexpected("əmlak bərpa edilmədi", error);
+    return unexpected("əmlak bərpa edilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -322,10 +323,10 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
   }
 
   const ids = form.uniqueList(formData, "ids");
-  if (ids.length === 0) return failure("Heç bir elan seçilməyib.");
+  if (ids.length === 0) return failure(msg("server.emlaklar.hecBirElanSecilmeyib"));
 
   const intent = form.text(formData, "intent") as BulkIntent;
-  if (!BULK_INTENTS.includes(intent)) return failure("Naməlum əməliyyat.");
+  if (!BULK_INTENTS.includes(intent)) return failure(msg("server.emlaklar.namelumEmeliyyat"));
 
   // Yalnız ilk dəfə dərc olunanlar (əvvəllər `publishedAt` boş olan) saxlanmış axtarış
   // bildirişinə səbəb olur — artıq dərc edilmiş elanın statusu təkrar "publish" ilə
@@ -378,7 +379,7 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
   revalidatePath(LIST_PATH);
   revalidatePublicContent("property");
 
-  if (done === 0) return failure("Heç bir elan yenilənmədi.");
-  if (done < ids.length) return failure(`${done}/${ids.length} elan yeniləndi, qalanları uğursuz oldu.`);
-  return success(`${done} elan yeniləndi.`);
+  if (done === 0) return failure(msg("server.emlaklar.hecBirElanYenilenmedi"));
+  if (done < ids.length) return failure(msg("server.emlaklar.elanYenilendiQalanlariUgursuzOldu", { p0: String(done), p1: String(ids.length) }));
+  return success(msg("server.emlaklar.elanYenilendi2", { p0: String(done) }));
 }

@@ -9,6 +9,7 @@ import { Checkbox, Input, Textarea } from "@/components/ui/field";
 import { SYSTEM_MODES, type SystemMode } from "@/lib/constants";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { saveSystemMode } from "./actions";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 /**
  * Sistem rejimi forması.
@@ -49,7 +50,8 @@ const MODE_DOT: Record<SystemMode, string> = {
 
 export function SystemModeForm({ initial }: { initial: SystemModeFormValues }) {
   const t = useTranslations("admin");
-  const [state, formAction, pending] = useActionState(saveSystemMode, IDLE_STATE);
+  const [rawState, formAction, pending] = useActionState(saveSystemMode, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
   const formRef = useRef<HTMLFormElement>(null);
   const [mode, setMode] = useState<SystemMode>(initial.mode);
   const [confirming, setConfirming] = useState(false);

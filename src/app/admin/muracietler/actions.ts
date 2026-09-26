@@ -8,6 +8,7 @@ import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { leadUpdateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * Müraciətlərin idarəsi.
@@ -29,14 +30,14 @@ export async function updateLead(_prev: ActionState, formData: FormData): Promis
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("Müraciət tapılmadı.");
+  if (!id) return failure(msg("server.muracietler.muracietTapilmadi"));
 
   const parsed = leadUpdateSchema.safeParse({
     status: form.text(formData, "status"),
     adminNote: form.optionalText(formData, "adminNote"),
     assigneeId: form.optionalText(formData, "assigneeId"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     if (parsed.data.assigneeId) {
@@ -45,7 +46,7 @@ export async function updateLead(_prev: ActionState, formData: FormData): Promis
         select: { id: true },
       });
       if (!assignee) {
-        return failure("Seçilmiş əməkdaş tapılmadı.", { assigneeId: "Əməkdaş aktiv deyil" });
+        return failure(msg("server.muracietler.secilmisEmekdasTapilmadi"), { assigneeId: msg("server.muracietler.emekdasAktivDeyil") });
       }
     }
 
@@ -58,9 +59,9 @@ export async function updateLead(_prev: ActionState, formData: FormData): Promis
     await recordAudit(user, "UPDATE", "Lead", id, `${lead.name} → ${lead.status}`);
     revalidatePath(LIST_PATH);
     revalidatePath(`${LIST_PATH}/${id}`);
-    return success("Müraciət yeniləndi.");
+    return success(msg("server.muracietler.muracietYenilendi"));
   } catch (error) {
-    return unexpected("müraciət yenilənmədi", error);
+    return unexpected("müraciət yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -87,9 +88,9 @@ export async function deleteLead(id: string): Promise<ActionState> {
 
     await recordAudit(user, "DELETE", "Lead", id, `${lead.name} · ${lead.phone}`);
     revalidatePath(LIST_PATH);
-    return success("Müraciət silindi.");
+    return success(msg("server.muracietler.muracietSilindi"));
   } catch (error) {
-    return unexpected("müraciət silinmədi", error);
+    return unexpected("müraciət silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -104,7 +105,7 @@ export async function setLeadStatus(id: string, status: string): Promise<ActionS
   }
 
   const parsed = leadUpdateSchema.pick({ status: true }).safeParse({ status });
-  if (!parsed.success) return failure("Status dəyəri düzgün deyil.");
+  if (!parsed.success) return failure(msg("server.muracietler.statusDeyeriDuzgunDeyil"));
 
   try {
     const lead = await prisma.lead.update({
@@ -115,8 +116,8 @@ export async function setLeadStatus(id: string, status: string): Promise<ActionS
 
     await recordAudit(user, "UPDATE", "Lead", id, `${lead.name} → ${status}`);
     revalidatePath(LIST_PATH);
-    return success("Status yeniləndi.");
+    return success(msg("server.muracietler.statusYenilendi"));
   } catch (error) {
-    return unexpected("status dəyişmədi", error);
+    return unexpected("status dəyişmədi", error, msg("server.common.unexpected"));
   }
 }

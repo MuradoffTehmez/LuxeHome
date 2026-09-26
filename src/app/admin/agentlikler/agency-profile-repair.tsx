@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { createAgencyProfile } from "./actions";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 export function AgencyProfileRepair({ userId, defaultName }: { userId: string; defaultName: string }) {
   const t = useTranslations("admin");
-  const [state, action, pending] = useActionState(createAgencyProfile, IDLE_STATE);
+  const [rawState, action, pending] = useActionState(createAgencyProfile, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
   const { toast } = useToast();
   const router = useRouter();
 

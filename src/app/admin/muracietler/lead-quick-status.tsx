@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/toast";
 import { LEAD_STATUS_TONE, LEAD_STATUSES, type LeadStatus } from "@/lib/constants";
 import { setLeadStatus } from "./actions";
 import { useTranslations } from "next-intl";
+import { useServerMessage } from "@/components/admin/use-server-message";
 
 /**
  * Status tonuna uyğun nöqtə rəngi.
@@ -28,6 +29,7 @@ export function LeadQuickStatus({ id, status, name }: { id: string; status: Lead
   const [value, setValue] = useState<LeadStatus>(status);
   const [pending, startTransition] = useTransition();
   const { toast } = useToast();
+  const translateMessage = useServerMessage();
   const router = useRouter();
 
   function change(next: LeadStatus) {
@@ -36,14 +38,14 @@ export function LeadQuickStatus({ id, status, name }: { id: string; status: Lead
     startTransition(async () => {
       const result = await setLeadStatus(id, next);
       if (result.status !== "success") setValue(previous);
-      if (result.message) toast(result.message, result.status === "success" ? "success" : "error");
+      if (result.message) toast(translateMessage(result.message) ?? result.message, result.status === "success" ? "success" : "error");
       if (result.status === "success") router.refresh();
     });
   }
 
   return (
     <label className="sr-only">
-      {name} müraciətinin statusu
+      {t("pages.leads.statusLabel", { name })}
       <span className="not-sr-only inline-flex items-center gap-2">
         <span
           aria-hidden="true"

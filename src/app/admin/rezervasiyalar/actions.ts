@@ -17,6 +17,7 @@ import { sendEmail } from "@/lib/email";
 import { escapeHtml } from "@/lib/email-html";
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/push";
+import { msg } from "@/lib/admin/server-message";
 
 const allowedStatuses = Object.values(RESERVATION_STATUSES);
 const statusSchema = z.object({
@@ -38,7 +39,7 @@ export async function updateReservationStatus(
   }
 
   const parsed = statusSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const reservation = await prisma.reservation.findUnique({
@@ -57,8 +58,8 @@ export async function updateReservationStatus(
         property: { select: { title: true } },
       },
     });
-    if (!reservation) return failure("Rezervasiya tapılmadı.");
-    if (reservation.status === parsed.data.status) return success("Status artıq seçilən dəyərdədir.");
+    if (!reservation) return failure(msg("server.rezervasiyalar.rezervasiyaTapilmadi"));
+    if (reservation.status === parsed.data.status) return success(msg("server.rezervasiyalar.statusArtiqSecilenDeyerdedir"));
 
     const nextStatus = parsed.data.status as ReservationStatus;
     await prisma.reservation.update({
@@ -110,8 +111,8 @@ export async function updateReservationStatus(
 
     revalidatePath("/admin/rezervasiyalar");
     revalidatePath("/kabinet/rezervasiyalar");
-    return success("Rezervasiya statusu yeniləndi.");
+    return success(msg("server.rezervasiyalar.rezervasiyaStatusuYenilendi"));
   } catch (error) {
-    return unexpected("rezervasiya statusu yenilənmədi", error);
+    return unexpected("rezervasiya statusu yenilənmədi", error, msg("server.common.unexpected"));
   }
 }

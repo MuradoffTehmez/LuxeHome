@@ -86,7 +86,7 @@ export default async function AdminUsersPage() {
                   <div>
                     <dt className="text-xs text-ink-muted">{t("pages.users.sonGiris")}</dt>
                     <dd className="mt-1 text-ink">{user.lastLoginAt ? formatRelative(user.lastLoginAt) : t("pages.misc.hecVaxt")}</dd>
-                    <dd className="mt-1 text-xs text-ink-muted">{user._count.sessions} açıq sessiya</dd>
+                    <dd className="mt-1 text-xs text-ink-muted">{t("pages.users.openSessions", { count: user._count.sessions })}</dd>
                   </div>
                 </dl>
                 <div className="mt-4 border-t border-line pt-4">
@@ -139,7 +139,7 @@ export default async function AdminUsersPage() {
                     </AdminTableCell>
                     <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">
                       {user.lastLoginAt ? formatRelative(user.lastLoginAt) : t("pages.misc.hecVaxt")}
-                      <p className="mt-0.5">{user._count.sessions} açıq sessiya</p>
+                      <p className="mt-0.5">{t("pages.users.openSessions", { count: user._count.sessions })}</p>
                     </AdminTableCell>
                     <AdminTableCell align="right">
                       <div className="flex justify-end">

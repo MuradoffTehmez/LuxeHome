@@ -13,14 +13,15 @@ import { type ActionState, failure, invalid, success, unexpected } from "@/lib/a
 import { recordAudit } from "@/lib/admin/audit";
 import * as form from "@/lib/admin/form";
 import { sanitizeRichText } from "@/lib/admin/html";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/tercumeler";
 const schema = z.object({
   id: z.string().optional(),
-  entity: z.string().regex(/^(PROPERTY|PROJECT|SERVICE|BLOG_POST|KNOWLEDGE_ARTICLE|KNOWLEDGE_TERM|KNOWLEDGE_FAQ):[^:]+$/, "Məzmun seçin"),
+  entity: z.string().regex(/^(PROPERTY|PROJECT|SERVICE|BLOG_POST|KNOWLEDGE_ARTICLE|KNOWLEDGE_TERM|KNOWLEDGE_FAQ):[^:]+$/, msg("server.tercumeler.mezmunSecin")),
   locale: z.enum(["en", "ru"]),
   status: z.enum(Object.values(TRANSLATION_STATUSES) as [string, ...string[]]),
-  title: z.string().trim().min(2, "Başlıq ən azı 2 simvol olmalıdır").max(240),
+  title: z.string().trim().min(2, msg("server.tercumeler.basliqEnAzi2Simvol")).max(240),
   summary: z.string().trim().max(1_000).nullable(),
   content: z.string().trim().max(100_000).nullable(),
   metaTitle: z.string().trim().max(70).nullable(),
@@ -57,9 +58,9 @@ export async function saveTranslation(_prev: ActionState, formData: FormData): P
     metaTitle: form.optionalText(formData, "metaTitle"),
     metaDescription: form.optionalText(formData, "metaDescription"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
   const [entityType, entityId] = parsed.data.entity.split(":", 2);
-  if (!(await entityExists(entityType, entityId))) return failure("Seçilmiş məzmun tapılmadı.");
+  if (!(await entityExists(entityType, entityId))) return failure(msg("server.tercumeler.secilmisMezmunTapilmadi"));
 
   try {
     const data = {
@@ -85,9 +86,9 @@ export async function saveTranslation(_prev: ActionState, formData: FormData): P
     await recordAudit(user, parsed.data.id ? "UPDATE" : "CREATE", "ContentTranslation", saved.id, `${entityType} · ${parsed.data.locale}`);
     revalidatePath(LIST_PATH);
     revalidatePath("/", "layout");
-    return success("Tərcümə yadda saxlanıldı.");
+    return success(msg("server.tercumeler.tercumeYaddaSaxlanildi"));
   } catch (error) {
-    return unexpected("tərcümə saxlanılmadı", error);
+    return unexpected("tərcümə saxlanılmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -104,8 +105,8 @@ export async function deleteTranslation(id: string): Promise<ActionState> {
     await recordAudit(user, "DELETE", "ContentTranslation", id, `${deleted.entityType} · ${deleted.locale}`);
     revalidatePath(LIST_PATH);
     revalidatePath("/", "layout");
-    return success("Tərcümə silindi.");
+    return success(msg("server.tercumeler.tercumeSilindi"));
   } catch (error) {
-    return unexpected("tərcümə silinmədi", error);
+    return unexpected("tərcümə silinmədi", error, msg("server.common.unexpected"));
   }
 }

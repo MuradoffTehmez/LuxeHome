@@ -9,6 +9,7 @@ import { type ActionState, failure, invalid, success, unexpected } from "@/lib/a
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
+import { msg } from "@/lib/admin/server-message";
 
 const demoSchema = z.object({ enabled: z.boolean() });
 
@@ -32,7 +33,7 @@ export async function toggleDemoContent(
   }
 
   const parsed = demoSchema.safeParse({ enabled: form.boolean(formData, "enabled") });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     await setSettings({
@@ -56,10 +57,10 @@ export async function toggleDemoContent(
 
     return success(
       parsed.data.enabled
-        ? "Nümunə məzmun aktivləşdirildi — saytda görünür."
-        : "Nümunə məzmun söndürüldü — saytda yalnız real qeydlər qalır.",
+        ? msg("server.demoMezmun.numuneMezmunAktivlesdirildiSaytdaGorunur")
+        : msg("server.demoMezmun.numuneMezmunSondurulduSaytdaYalniz"),
     );
   } catch (error) {
-    return unexpected("nümunə məzmun rejimi dəyişdirilmədi", error);
+    return unexpected("nümunə məzmun rejimi dəyişdirilmədi", error, msg("server.common.unexpected"));
   }
 }

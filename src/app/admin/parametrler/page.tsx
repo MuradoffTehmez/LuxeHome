@@ -49,10 +49,7 @@ export default async function AdminSettingsPage() {
           <div className="flex min-w-0 flex-col gap-4 text-sm text-ink-soft">
             <p className="flex items-start gap-2.5">
               <Info className="mt-0.5 size-4 shrink-0 text-ink-muted" aria-hidden="true" />
-              <span>
-                Hüquqi ad, VÖEN, brend sahibi və naviqasiya strukturu kodda qorunur. Telefon,
-                e-poçt, ünvan və sosial əlaqələri isə soldakı formadan dəyişə bilərsiniz.
-              </span>
+              <span>{t("pages.settings.legalInfoHint")}</span>
             </p>
 
             <dl className="grid gap-2">
@@ -68,10 +65,7 @@ export default async function AdminSettingsPage() {
               ))}
             </dl>
 
-            <p className="text-xs text-ink-muted">
-              Gizli dəyərlər (Resend açarı, sessiya sirri) Cloudflare secret-lərindədir və heç vaxt
-              bazada saxlanılmır.
-            </p>
+            <p className="text-xs text-ink-muted">{t("pages.settings.secretsHint")}</p>
           </div>
         </AdminCard>
       </div>

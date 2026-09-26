@@ -17,6 +17,7 @@ import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { userCreateSchema, userUpdateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
+import { msg } from "@/lib/admin/server-message";
 
 /**
  * İstifadəçi idarəsi.
@@ -82,7 +83,7 @@ export async function createUser(_prev: ActionState, formData: FormData): Promis
     email: form.text(formData, "email"),
     role: form.text(formData, "role"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const existing = await prisma.user.findUnique({
@@ -90,7 +91,7 @@ export async function createUser(_prev: ActionState, formData: FormData): Promis
       select: { id: true },
     });
     if (existing) {
-      return failure("Bu e-poçt artıq istifadə olunur.", { email: "E-poçt artıq qeydiyyatdadır" });
+      return failure(msg("server.istifadeciler.buEPoctArtiqIstifade"), { email: msg("server.istifadeciler.ePoctArtiqQeydiyyatdadir") });
     }
 
     const password = temporaryPassword();
@@ -114,9 +115,9 @@ export async function createUser(_prev: ActionState, formData: FormData): Promis
     revalidatePath(LIST_PATH);
 
     // Parol yalnız bu bir dəfə göstərilir — bazada yalnız hash saxlanılır
-    return successWithSecret(`«${parsed.data.email}» hesabı yaradıldı.`, password);
+    return successWithSecret(msg("server.istifadeciler.hesabiYaradildi", { p0: String(parsed.data.email) }), password);
   } catch (error) {
-    return unexpected("istifadəçi yaradıla bilmədi", error);
+    return unexpected("istifadəçi yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -130,28 +131,28 @@ export async function updateUser(_prev: ActionState, formData: FormData): Promis
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("İstifadəçi tapılmadı.");
+  if (!id) return failure(msg("server.istifadeciler.istifadeciTapilmadi"));
 
   const parsed = userUpdateSchema.safeParse({
     name: form.text(formData, "name"),
     role: form.text(formData, "role"),
     isActive: form.boolean(formData, "isActive"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const target = await findStaffTarget(id);
-    if (!target) return failure("İstifadəçi tapılmadı.");
+    if (!target) return failure(msg("server.istifadeciler.istifadeciTapilmadi"));
 
     if (id === actor.id && (parsed.data.role !== target.role || !parsed.data.isActive)) {
-      return failure("Öz rolunuzu dəyişə və ya hesabınızı deaktiv edə bilməzsiniz.");
+      return failure(msg("server.istifadeciler.ozRolunuzuDeyiseVeYa"));
     }
 
     const losingSuperAdmin =
       (parsed.data.role !== ROLES.SUPER_ADMIN || !parsed.data.isActive) &&
       (await isLastSuperAdmin(id));
     if (losingSuperAdmin) {
-      return failure("Sistemdə ən azı bir aktiv Super Admin qalmalıdır.");
+      return failure(msg("server.istifadeciler.sistemdeEnAziBirAktiv"));
     }
 
     await prisma.user.update({
@@ -171,9 +172,9 @@ export async function updateUser(_prev: ActionState, formData: FormData): Promis
     );
 
     revalidatePath(LIST_PATH);
-    return success("İstifadəçi yeniləndi.");
+    return success(msg("server.istifadeciler.istifadeciYenilendi"));
   } catch (error) {
-    return unexpected("istifadəçi yenilənmədi", error);
+    return unexpected("istifadəçi yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -188,7 +189,7 @@ export async function resetUserPassword(id: string): Promise<ActionState> {
 
   try {
     const target = await findStaffTarget(id);
-    if (!target) return failure("İstifadəçi tapılmadı.");
+    if (!target) return failure(msg("server.istifadeciler.istifadeciTapilmadi"));
 
     const password = temporaryPassword();
 
@@ -208,9 +209,9 @@ export async function resetUserPassword(id: string): Promise<ActionState> {
     await recordAudit(actor, "UPDATE", "User", id, `${user.email} — parol sıfırlandı`);
 
     revalidatePath(LIST_PATH);
-    return successWithSecret(`«${user.email}» üçün parol sıfırlandı.`, password);
+    return successWithSecret(msg("server.istifadeciler.ucunParolSifirlandi", { p0: String(user.email) }), password);
   } catch (error) {
-    return unexpected("parol sıfırlanmadı", error);
+    return unexpected("parol sıfırlanmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -231,7 +232,7 @@ export async function resetUserTwoFactor(id: string): Promise<ActionState> {
 
   try {
     const target = await findStaffTarget(id);
-    if (!target) return failure("İstifadəçi tapılmadı.");
+    if (!target) return failure(msg("server.istifadeciler.istifadeciTapilmadi"));
 
     const user = await prisma.user.update({
       where: { id, accountType: ACCOUNT_TYPES.STAFF },
@@ -244,9 +245,9 @@ export async function resetUserTwoFactor(id: string): Promise<ActionState> {
     await recordAudit(actor, "UPDATE", "User", id, `${user.email} — 2FA sıfırlandı`);
 
     revalidatePath(LIST_PATH);
-    return success("2FA sıfırlandı. İstifadəçi növbəti girişdə yenidən quracaq.");
+    return success(msg("server.istifadeciler.n2faSifirlandiIstifadeciNovbetiGirisde"));
   } catch (error) {
-    return unexpected("2FA sıfırlanmadı", error);
+    return unexpected("2FA sıfırlanmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -261,15 +262,15 @@ export async function revokeUserSessions(id: string): Promise<ActionState> {
 
   try {
     const user = await findStaffTarget(id);
-    if (!user) return failure("İstifadəçi tapılmadı.");
+    if (!user) return failure(msg("server.istifadeciler.istifadeciTapilmadi"));
 
     await revokeAllSessions(id);
     await recordAudit(actor, "SESSION_REVOKE", "User", id, user.email);
 
     revalidatePath(LIST_PATH);
-    return success("Bütün sessiyalar bağlandı.");
+    return success(msg("server.istifadeciler.butunSessiyalarBaglandi"));
   } catch (error) {
-    return unexpected("sessiyalar bağlanmadı", error);
+    return unexpected("sessiyalar bağlanmadı", error, msg("server.common.unexpected"));
   }
 }
 
@@ -284,12 +285,12 @@ export async function deleteUser(id: string): Promise<ActionState> {
 
   try {
     const target = await findStaffTarget(id);
-    if (!target) return failure("İstifadəçi tapılmadı.");
+    if (!target) return failure(msg("server.istifadeciler.istifadeciTapilmadi"));
 
-    if (id === actor.id) return failure("Öz hesabınızı silə bilməzsiniz.");
+    if (id === actor.id) return failure(msg("server.istifadeciler.ozHesabiniziSileBilmezsiniz"));
 
     if (await isLastSuperAdmin(id)) {
-      return failure("Sistemdə ən azı bir aktiv Super Admin qalmalıdır.");
+      return failure(msg("server.istifadeciler.sistemdeEnAziBirAktiv"));
     }
 
     // Elan və məqalələr silinmir: sxemdə müəllif əlaqəsi `onDelete: SetNull`-dur
@@ -300,8 +301,8 @@ export async function deleteUser(id: string): Promise<ActionState> {
 
     await recordAudit(actor, "DELETE", "User", id, user.email);
     revalidatePath(LIST_PATH);
-    return success("İstifadəçi silindi.");
+    return success(msg("server.istifadeciler.istifadeciSilindi"));
   } catch (error) {
-    return unexpected("istifadəçi silinmədi", error);
+    return unexpected("istifadəçi silinmədi", error, msg("server.common.unexpected"));
   }
 }

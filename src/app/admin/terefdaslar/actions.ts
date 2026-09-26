@@ -26,6 +26,7 @@ import { partnerDomain } from "@/lib/partners";
 import { slugify } from "@/lib/utils";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import type { AuthUser } from "@/lib/auth/types";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/terefdaslar";
 
@@ -133,10 +134,10 @@ async function duplicateErrors(input: PartnerInput, excludeId?: string) {
 
   const errors: Record<string, string> = {};
   if (candidates.some((candidate) => candidate.slug === desiredSlug)) {
-    errors.slug = "Bu slug ilə tərəfdaş artıq mövcuddur";
+    errors.slug = msg("server.terefdaslar.buSlugIleTerefdasArtiq");
   }
   if (domain && candidates.some((candidate) => partnerDomain(candidate.websiteUrl) === domain)) {
-    errors.websiteUrl = "Bu sayt domeni başqa tərəfdaşda istifadə olunur";
+    errors.websiteUrl = msg("server.terefdaslar.buSaytDomeniBasqaTerefdasda");
   }
   if (
     legalName &&
@@ -144,7 +145,7 @@ async function duplicateErrors(input: PartnerInput, excludeId?: string) {
       (candidate) => candidate.legalName?.trim().toLocaleLowerCase("az") === legalName,
     )
   ) {
-    errors.legalName = "Bu hüquqi adla tərəfdaş artıq mövcuddur";
+    errors.legalName = msg("server.terefdaslar.buHuquqiAdlaTerefdasArtiq");
   }
 
   return { slug: desiredSlug || "terefdas", errors };
@@ -164,7 +165,7 @@ function assertSensitivePermissions(
     (previous && previous.verified !== input.verified)
   ) {
     if (!can(user, PERMISSIONS.PARTNER_VERIFY)) {
-      return permissionError("Tərəfdaşı təsdiqləmək üçün icazəniz yoxdur.");
+      return permissionError(msg("server.terefdaslar.tesdiqIcazesiYoxdur"));
     }
   }
 
@@ -172,7 +173,7 @@ function assertSensitivePermissions(
     ? previous.status !== input.status || previous.showPublicly !== input.showPublicly
     : input.status === PARTNER_STATUSES.ACTIVE || input.showPublicly;
   if (publishChanged && !can(user, PERMISSIONS.PARTNER_PUBLISH)) {
-    return permissionError("Tərəfdaşın yayımlanma vəziyyətini dəyişmək üçün icazəniz yoxdur.");
+    return permissionError(msg("server.terefdaslar.yayimIcazesiYoxdur"));
   }
 
   return null;
@@ -191,19 +192,19 @@ export async function createPartner(
   }
 
   const parsed = partnerSchema.safeParse(readPartnerForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
   const sensitiveError = assertSensitivePermissions(user, parsed.data);
   if (sensitiveError) return sensitiveError;
 
   const duplicate = await duplicateErrors(parsed.data);
   if (Object.keys(duplicate.errors).length > 0) {
-    return failure("Eyni tərəfdaşa bənzəyən qeyd artıq mövcuddur.", duplicate.errors);
+    return failure(msg("server.terefdaslar.eyniTerefdasaBenzeyenQeydArtiq"), duplicate.errors);
   }
 
   let contract: PartnerContractInput | null = null;
   if (can(user, PERMISSIONS.PARTNER_CONTRACT_MANAGE)) {
     const parsedContract = partnerContractSchema.safeParse(readContractForm(formData));
-    if (!parsedContract.success) return invalid(parsedContract.error);
+    if (!parsedContract.success) return invalid(parsedContract.error, msg("server.common.formInvalid"));
     contract = parsedContract.data;
   }
 
@@ -227,7 +228,7 @@ export async function createPartner(
       newValue: publicSnapshot({ ...parsed.data, slug: duplicate.slug }),
     });
   } catch (error) {
-    return unexpected("tərəfdaş yaradıla bilmədi", error);
+    return unexpected("tərəfdaş yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 
   revalidatePath(LIST_PATH);
@@ -248,10 +249,10 @@ export async function updatePartner(
   }
 
   const id = form.text(formData, "id");
-  if (!id) return failure("Tərəfdaş tapılmadı.");
+  if (!id) return failure(msg("server.terefdaslar.terefdasTapilmadi"));
 
   const parsed = partnerSchema.safeParse(readPartnerForm(formData));
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const existing = await prisma.partner.findFirst({
@@ -272,21 +273,21 @@ export async function updatePartner(
         sortOrder: true,
       },
     });
-    if (!existing) return failure("Tərəfdaş tapılmadı və ya silinib.");
+    if (!existing) return failure(msg("server.terefdaslar.terefdasTapilmadiVeYaSilinib"));
 
     const sensitiveError = assertSensitivePermissions(user, parsed.data, existing);
     if (sensitiveError) return sensitiveError;
 
     const duplicate = await duplicateErrors(parsed.data, id);
     if (Object.keys(duplicate.errors).length > 0) {
-      return failure("Eyni tərəfdaşa bənzəyən qeyd artıq mövcuddur.", duplicate.errors);
+      return failure(msg("server.terefdaslar.eyniTerefdasaBenzeyenQeydArtiq"), duplicate.errors);
     }
 
     const data = await sanitizePartnerData(parsed.data, formData);
     const contractResult = can(user, PERMISSIONS.PARTNER_CONTRACT_MANAGE)
       ? partnerContractSchema.safeParse(readContractForm(formData))
       : null;
-    if (contractResult && !contractResult.success) return invalid(contractResult.error);
+    if (contractResult && !contractResult.success) return invalid(contractResult.error, msg("server.common.formInvalid"));
 
     await prisma.partner.update({
       where: { id },
@@ -344,9 +345,9 @@ export async function updatePartner(
     revalidatePath(`${LIST_PATH}/${id}`);
     revalidatePublicContent("partner", existing.slug);
     revalidatePublicContent("partner", duplicate.slug);
-    return success("Tərəfdaş yeniləndi.");
+    return success(msg("server.terefdaslar.terefdasYenilendi"));
   } catch (error) {
-    return unexpected("tərəfdaş yenilənmədi", error);
+    return unexpected("tərəfdaş yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -373,9 +374,9 @@ export async function deletePartner(id: string): Promise<ActionState> {
     await recordAudit(user, "DELETE", "Partner", id, partner.name);
     revalidatePath(LIST_PATH);
     revalidatePublicContent("partner", partner.slug);
-    return success("Tərəfdaş silindi. Qeyd audit və əlaqələr üçün saxlanıldı.");
+    return success(msg("server.terefdaslar.terefdasSilindiQeydAuditVe"));
   } catch (error) {
-    return unexpected("tərəfdaş silinmədi", error);
+    return unexpected("tərəfdaş silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -396,9 +397,9 @@ export async function restorePartner(id: string): Promise<ActionState> {
     });
     await recordAudit(user, "RESTORE", "Partner", id, partner.name);
     revalidatePath(LIST_PATH);
-    return success("Tərəfdaş arxiv statusunda bərpa edildi.");
+    return success(msg("server.terefdaslar.terefdasArxivStatusundaBerpaEdildi"));
   } catch (error) {
-    return unexpected("tərəfdaş bərpa edilmədi", error);
+    return unexpected("tərəfdaş bərpa edilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -417,9 +418,9 @@ export async function togglePartnerVisibility(id: string): Promise<ActionState> 
       where: { id, deletedAt: null },
       select: { id: true, name: true, slug: true, status: true, showPublicly: true },
     });
-    if (!partner) return failure("Tərəfdaş tapılmadı.");
+    if (!partner) return failure(msg("server.terefdaslar.terefdasTapilmadi"));
     if (!partner.showPublicly && partner.status !== PARTNER_STATUSES.ACTIVE) {
-      return failure("Saytda göstərmək üçün tərəfdaşın statusu əvvəlcə «Aktiv» olmalıdır.");
+      return failure(msg("server.terefdaslar.saytdaGostermekUcunTerefdasinStatusu"));
     }
 
     const showPublicly = !partner.showPublicly;
@@ -434,9 +435,9 @@ export async function togglePartnerVisibility(id: string): Promise<ActionState> 
     await recordAudit(user, showPublicly ? "PUBLISH" : "UNPUBLISH", "Partner", id, partner.name);
     revalidatePath(LIST_PATH);
     revalidatePublicContent("partner", partner.slug);
-    return success(showPublicly ? "Tərəfdaş silinmədən saytda göstərildi." : "Tərəfdaş saytdan gizlədildi; məlumatları saxlanıldı.");
+    return success(showPublicly ? msg("server.terefdaslar.terefdasSilinmedenSaytdaGosterildi") : msg("server.terefdaslar.terefdasSaytdanGizledildiMelumatlariSaxlanildi"));
   } catch (error) {
-    return unexpected("tərəfdaş görünüşü dəyişmədi", error);
+    return unexpected("tərəfdaş görünüşü dəyişmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -460,7 +461,7 @@ export async function addPartnerRelation(
 
   const entity = relationEntity(form.text(formData, "entityType"));
   const entityId = form.text(formData, "entityId");
-  if (!entity || !entityId) return failure("Əlaqələndiriləcək qeyd seçilməyib.");
+  if (!entity || !entityId) return failure(msg("server.terefdaslar.elaqelendirilecekQeydSecilmeyib"));
 
   const parsed = partnerRelationSchema.safeParse({
     partnerId: form.text(formData, "partnerId"),
@@ -469,21 +470,21 @@ export async function addPartnerRelation(
     isPublic: form.boolean(formData, "isPublic"),
     isPrimary: form.boolean(formData, "isPrimary"),
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   try {
     const partner = await prisma.partner.findFirst({
       where: { id: parsed.data.partnerId, deletedAt: null },
       select: { id: true, name: true, slug: true },
     });
-    if (!partner) return failure("Tərəfdaş tapılmadı.");
+    if (!partner) return failure(msg("server.terefdaslar.terefdasTapilmadi"));
 
     if (entity === "property") {
       const property = await prisma.property.findFirst({
         where: { id: entityId, deletedAt: null },
         select: { id: true, slug: true },
       });
-      if (!property) return failure("Elan tapılmadı.");
+      if (!property) return failure(msg("server.terefdaslar.elanTapilmadi"));
       if (parsed.data.isPrimary) {
         await prisma.propertyPartner.updateMany({
           where: { propertyId: entityId },
@@ -499,7 +500,7 @@ export async function addPartnerRelation(
         where: { id: entityId, deletedAt: null },
         select: { id: true, slug: true },
       });
-      if (!project) return failure("Layihə tapılmadı.");
+      if (!project) return failure(msg("server.terefdaslar.layiheTapilmadi"));
       if (parsed.data.isPrimary) {
         await prisma.projectPartner.updateMany({
           where: { projectId: entityId },
@@ -523,7 +524,7 @@ export async function addPartnerRelation(
         where: { id: entityId },
         select: { id: true, slug: true },
       });
-      if (!agency) return failure("Agentlik tapılmadı.");
+      if (!agency) return failure(msg("server.terefdaslar.agentlikTapilmadi"));
       await prisma.agencyPartner.create({
         data: {
           agencyId: entityId,
@@ -540,12 +541,12 @@ export async function addPartnerRelation(
     });
     revalidatePath(`${LIST_PATH}/${partner.id}`);
     revalidatePublicContent("partner", partner.slug);
-    return success("Əlaqə əlavə edildi.");
+    return success(msg("server.terefdaslar.elaqeElaveEdildi"));
   } catch (error) {
     return unexpected(
       "tərəfdaş əlaqəsi əlavə edilmədi",
       error,
-      "Əlaqə əlavə edilmədi. Eyni rol artıq mövcud ola bilər.",
+      msg("server.terefdaslar.elaqeElaveEdilmediEyniRol"),
     );
   }
 }
@@ -566,7 +567,7 @@ export async function removePartnerRelation(
   const entity = relationEntity(form.text(formData, "entityType"));
   const relationId = form.text(formData, "relationId");
   const partnerId = form.text(formData, "partnerId");
-  if (!entity || !relationId || !partnerId) return failure("Əlaqə tapılmadı.");
+  if (!entity || !relationId || !partnerId) return failure(msg("server.terefdaslar.elaqeTapilmadi"));
 
   try {
     if (entity === "property") {
@@ -592,8 +593,8 @@ export async function removePartnerRelation(
     revalidatePath(`${LIST_PATH}/${partnerId}`);
     if (relatedProjectId) revalidatePath(`/admin/layiheler/${relatedProjectId}`);
     if (partner) revalidatePublicContent("partner", partner.slug);
-    return success("Əlaqə silindi.");
+    return success(msg("server.terefdaslar.elaqeSilindi"));
   } catch (error) {
-    return unexpected("tərəfdaş əlaqəsi silinmədi", error);
+    return unexpected("tərəfdaş əlaqəsi silinmədi", error, msg("server.common.unexpected"));
   }
 }

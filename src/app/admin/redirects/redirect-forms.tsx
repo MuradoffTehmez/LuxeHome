@@ -56,7 +56,7 @@ export function RedirectRow({
         </div>
         <div className="flex items-center gap-2 text-xs text-ink-muted">
           <Badge tone="neutral">{statusCode}</Badge>
-          <span className="tabular">{hitCount} baxış</span>
+          <span className="tabular">{t("pages.serp.hitCount", { count: hitCount })}</span>
           {!isActive && <Badge tone="neutral">{t("pages.serp.deaktiv")}</Badge>}
         </div>
       </div>

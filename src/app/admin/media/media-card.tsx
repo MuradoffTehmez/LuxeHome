@@ -9,6 +9,7 @@ import { SubmitButton } from "@/components/admin/form-shell";
 import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { deleteMedia, updateMediaAlt } from "./actions";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 type MediaItem = {
   id: string;
@@ -38,7 +39,8 @@ function formatSize(bytes: number): string {
  */
 export function MediaCard({ item }: { item: MediaItem }) {
   const t = useTranslations("admin");
-  const [state, formAction] = useActionState(updateMediaAlt, IDLE_STATE);
+  const [rawState, formAction] = useActionState(updateMediaAlt, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 

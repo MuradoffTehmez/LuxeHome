@@ -1,4 +1,5 @@
 import { CURRENCIES, SEO_AUDIT_SEVERITIES, type Locale } from "@/lib/constants";
+import { msg } from "@/lib/admin/server-message";
 
 export const DEFAULT_MIN_INDEXABLE_INVENTORY = 5;
 export const DEFAULT_MIN_PROPERTY_IMAGES = 1;
@@ -93,31 +94,35 @@ export function roomCountFromTitle(title: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
+/**
+ * Xətalar tərcümə markeri kimi qaytarılır (`msg()`, #89) — yalnız admin elan və
+ * moderasiya action-ları işlədir, panel onları istifadəçinin dilində göstərir.
+ */
 export function validatePublishableProperty(
   property: PublishableProperty,
   images: Array<{ url: string; alt?: string | null }>,
   minImages = DEFAULT_MIN_PROPERTY_IMAGES,
 ): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!property.title.trim()) errors.title = "Başlıq yazılmalıdır.";
-  if (!property.description.trim()) errors.description = "Təsvir yazılmalıdır.";
-  if (!(property.price > 0)) errors.price = "Qiymət sıfırdan böyük olmalıdır.";
+  if (!property.title.trim()) errors.title = msg("server.publish.titleRequired");
+  if (!property.description.trim()) errors.description = msg("server.publish.descriptionRequired");
+  if (!(property.price > 0)) errors.price = msg("server.publish.pricePositive");
   if (!Object.values(CURRENCIES).includes(property.currency as never)) {
-    errors.currency = "Valyuta icazəli siyahıda deyil.";
+    errors.currency = msg("server.publish.currencyNotAllowed");
   }
-  if (!property.typeId) errors.typeId = "Əmlak növü seçilməlidir.";
-  if (!property.cityId) errors.cityId = "Şəhər seçilməlidir.";
-  if (!(property.rooms != null && property.rooms > 0)) errors.rooms = "Dərc üçün otaq sayı sıfırdan böyük olmalıdır.";
+  if (!property.typeId) errors.typeId = msg("server.publish.typeRequired");
+  if (!property.cityId) errors.cityId = msg("server.publish.cityRequired");
+  if (!(property.rooms != null && property.rooms > 0)) errors.rooms = msg("server.publish.roomsPositive");
   if (!((property.area != null && property.area > 0) || (property.landArea != null && property.landArea > 0))) {
-    errors.area = "Dərc üçün sahə və ya torpaq sahəsi sıfırdan böyük olmalıdır.";
+    errors.area = msg("server.publish.areaPositive");
   }
   if (property.floor != null && property.totalFloors != null && property.floor > property.totalFloors) {
-    errors.floor = "Mərtəbə ümumi mərtəbə sayından böyük ola bilməz.";
+    errors.floor = msg("server.publish.floorAboveTotal");
   }
-  if (images.length < minImages) errors.images = `Dərc üçün ən azı ${minImages} şəkil lazımdır.`;
+  if (images.length < minImages) errors.images = msg("server.publish.minImages", { count: minImages });
   const titleRooms = roomCountFromTitle(property.title);
   if (titleRooms != null && property.rooms != null && titleRooms !== property.rooms) {
-    errors.title = `Başlıqdakı ${titleRooms} otaq məlumatı forma dəyəri (${property.rooms}) ilə uyğun deyil.`;
+    errors.title = msg("server.publish.titleRoomsMismatch", { titleRooms, rooms: property.rooms });
   }
   return errors;
 }

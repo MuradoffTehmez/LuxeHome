@@ -9,6 +9,7 @@ import { PARTNER_RELATION_ROLE_LABELS, PARTNER_RELATION_ROLES } from "@/lib/cons
 import type { getAdminProjectPartnerLinks, getPartnerOptions } from "@/lib/queries";
 import { addPartnerRelation, removePartnerRelation } from "../terefdaslar/actions";
 import { useTranslations } from "next-intl";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 type Links = Awaited<ReturnType<typeof getAdminProjectPartnerLinks>>;
 type Options = Awaited<ReturnType<typeof getPartnerOptions>>;
@@ -16,18 +17,21 @@ const fieldClass = "min-h-11 w-full rounded-xs border border-line-strong bg-pape
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations("admin");
   return (
     <button type="submit" disabled={pending} className="inline-flex min-h-11 items-center gap-2 rounded-xs bg-gold px-4 text-sm font-medium text-on-gold disabled:opacity-50">
       {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Plus className="size-4" aria-hidden="true" />}
-      Tərəfdaş əlavə et
+      {t("pages.projects.addPartner")}
     </button>
   );
 }
 
 export function ProjectPartnersManager({ projectId, links, options }: { projectId: string; links: Links; options: Options }) {
   const t = useTranslations("admin");
-  const [addState, addAction] = useActionState(addPartnerRelation, IDLE_STATE);
-  const [removeState, removeAction] = useActionState(removePartnerRelation, IDLE_STATE);
+  const [addStateRaw, addAction] = useActionState(addPartnerRelation, IDLE_STATE);
+  const addState = useLocalizedActionState(addStateRaw);
+  const [removeStateRaw, removeAction] = useActionState(removePartnerRelation, IDLE_STATE);
+  const removeState = useLocalizedActionState(removeStateRaw);
   const linkedIds = new Set(links.map((link) => link.partnerId));
 
   return (

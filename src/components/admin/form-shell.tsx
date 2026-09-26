@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
 import { SecretPanel } from "./secret-panel";
+import { useLocalizedActionState } from "./use-server-message";
 
 /**
  * Admin formalarının ümumi çərçivəsi.
@@ -44,7 +45,10 @@ export function AdminForm({
   className,
 }: AdminFormProps) {
   const t = useTranslations("admin");
-  const [state, formAction] = useActionState(action, IDLE_STATE);
+  const [rawState, formAction] = useActionState(action, IDLE_STATE);
+  // Server mesajları (`msg()` markerləri, #89) panel dilində göstərilir — sahə
+  // xətaları da daxil olmaqla, kontekstə artıq tərcümə olunmuş state verilir.
+  const state = useLocalizedActionState(rawState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);

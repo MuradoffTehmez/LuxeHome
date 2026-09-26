@@ -18,6 +18,7 @@ import {
   revokeUserSessions,
   updateUser,
 } from "./actions";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 /** Rol adları dilə bağlıdır, ona görə modul sabiti kimi saxlanmır. */
 const roleOptions = (t: ReturnType<typeof useTranslations<"admin">>) =>
@@ -66,7 +67,8 @@ export function UserRow({
   mobile?: boolean;
 }) {
   const t = useTranslations("admin");
-  const [state, formAction] = useActionState(updateUser, IDLE_STATE);
+  const [rawState, formAction] = useActionState(updateUser, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
   const { toast } = useToast();
 
   useEffect(() => {

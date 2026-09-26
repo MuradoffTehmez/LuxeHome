@@ -15,6 +15,7 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { redirectCreateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
 import { findRedirectChain } from "@/lib/serp";
+import { msg } from "@/lib/admin/server-message";
 
 const LIST_PATH = "/admin/redirects";
 
@@ -32,10 +33,10 @@ export async function createRedirect(_prev: ActionState, formData: FormData): Pr
     toPath: form.text(formData, "toPath"),
     statusCode: form.integer(formData, "statusCode") ?? 301,
   });
-  if (!parsed.success) return invalid(parsed.error);
+  if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
 
   if (parsed.data.fromPath === parsed.data.toPath) {
-    return failure("Köhnə və yeni ünvan eyni ola bilməz.", { toPath: "Fərqli ünvan seçin" });
+    return failure(msg("server.redirects.kohneVeYeniUnvanEyni"), { toPath: msg("server.redirects.ferqliUnvanSecin") });
   }
 
   try {
@@ -44,7 +45,7 @@ export async function createRedirect(_prev: ActionState, formData: FormData): Pr
       select: { id: true },
     });
     if (existing) {
-      return failure("Bu ünvan üçün artıq yönləndirmə var.", { fromPath: "Artıq mövcuddur" });
+      return failure(msg("server.redirects.buUnvanUcunArtiqYonlendirme"), { fromPath: msg("server.redirects.artiqMovcuddur") });
     }
     const activeRules = await prisma.redirect.findMany({
       where: { isActive: true },
@@ -52,7 +53,7 @@ export async function createRedirect(_prev: ActionState, formData: FormData): Pr
     });
     const chain = findRedirectChain(parsed.data.fromPath, parsed.data.toPath, activeRules);
     if (chain) {
-      return failure(`Redirect chain/loop yarana bilər: ${chain.join(" → ")}. Son canonical ünvana birbaşa yönləndirin.`);
+      return failure(msg("server.redirects.redirectChainLoopYaranaBiler", { p0: String(chain.join(" → ")) }));
     }
 
     const redirect = await prisma.redirect.create({
@@ -71,9 +72,9 @@ export async function createRedirect(_prev: ActionState, formData: FormData): Pr
       `${parsed.data.fromPath} → ${parsed.data.toPath}`,
     );
     revalidatePath(LIST_PATH);
-    return success("Yönləndirmə əlavə edildi.");
+    return success(msg("server.redirects.yonlendirmeElaveEdildi"));
   } catch (error) {
-    return unexpected("yönləndirmə yaradıla bilmədi", error);
+    return unexpected("yönləndirmə yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -91,7 +92,7 @@ export async function toggleRedirectActive(id: string): Promise<ActionState> {
       where: { id },
       select: { fromPath: true, isActive: true },
     });
-    if (!redirect) return failure("Yönləndirmə tapılmadı.");
+    if (!redirect) return failure(msg("server.redirects.yonlendirmeTapilmadi"));
 
     await prisma.redirect.update({ where: { id }, data: { isActive: !redirect.isActive } });
     await recordAudit(
@@ -102,9 +103,9 @@ export async function toggleRedirectActive(id: string): Promise<ActionState> {
       `${redirect.fromPath} — ${redirect.isActive ? "deaktiv edildi" : "aktivləşdirildi"}`,
     );
     revalidatePath(LIST_PATH);
-    return success("Yönləndirmə yeniləndi.");
+    return success(msg("server.redirects.yonlendirmeYenilendi"));
   } catch (error) {
-    return unexpected("yönləndirmə yenilənmədi", error);
+    return unexpected("yönləndirmə yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -121,9 +122,9 @@ export async function deleteRedirect(id: string): Promise<ActionState> {
     const redirect = await prisma.redirect.delete({ where: { id }, select: { fromPath: true } });
     await recordAudit(actor, "DELETE", "Redirect", id, redirect.fromPath);
     revalidatePath(LIST_PATH);
-    return success("Yönləndirmə silindi.");
+    return success(msg("server.redirects.yonlendirmeSilindi"));
   } catch (error) {
-    return unexpected("yönləndirmə silinmədi", error);
+    return unexpected("yönləndirmə silinmədi", error, msg("server.common.unexpected"));
   }
 }
 
@@ -143,6 +144,6 @@ export async function dismissNotFoundHit(id: string): Promise<ActionState> {
     revalidatePath(LIST_PATH);
     return success("404 qeydi silindi.");
   } catch (error) {
-    return unexpected("404 qeydi silinmədi", error);
+    return unexpected("404 qeydi silinmədi", error, msg("server.common.unexpected"));
   }
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { AlertTriangle, Check, Loader2 } from "lucide-react";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { toggleDemoContent } from "./actions";
+import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
 /**
  * Nümunə məzmun açarı.
@@ -14,7 +15,8 @@ import { toggleDemoContent } from "./actions";
  */
 export function DemoToggleForm({ enabled, hasContent }: { enabled: boolean; hasContent: boolean }) {
   const t = useTranslations("admin");
-  const [state, formAction, pending] = useActionState(toggleDemoContent, IDLE_STATE);
+  const [rawState, formAction, pending] = useActionState(toggleDemoContent, IDLE_STATE);
+  const state = useLocalizedActionState(rawState);
 
   const nextEnabled = !enabled;
 
