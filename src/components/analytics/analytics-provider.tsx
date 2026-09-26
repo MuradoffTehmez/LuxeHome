@@ -93,7 +93,7 @@ export function AnalyticsProvider() {
 
   if (consent !== null) return null;
   return (
-    <aside role="dialog" aria-label={t("ariaLabel")} className="fixed inset-x-4 bottom-[calc(1rem+var(--safe-bottom))] z-[110] mx-auto max-w-2xl rounded-md border border-line-strong bg-paper p-4 shadow-lg sm:p-5">
+    <aside role="dialog" aria-label={t("ariaLabel")} className="fixed right-[max(1rem,var(--safe-right))] bottom-[calc(1rem+var(--safe-bottom))] left-[max(1rem,var(--safe-left))] z-[110] mx-auto max-w-2xl rounded-md border border-line-strong bg-paper p-4 shadow-lg sm:p-5">
       <p className="font-medium text-ink">{t("title")}</p>
       <p className="mt-1 text-sm leading-6 text-ink-soft">{t("description")}</p>
       <div className="mt-4 flex flex-wrap gap-2">

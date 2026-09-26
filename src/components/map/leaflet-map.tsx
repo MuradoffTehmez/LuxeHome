@@ -359,7 +359,14 @@ export function LeafletMap({
         className="size-full min-h-40"
       />
 
-      <div className="pointer-events-none absolute top-3 right-3 z-[500] flex flex-col gap-2">
+      <div
+        className={cn(
+          "pointer-events-none absolute z-[500] flex flex-col gap-2",
+          // Tam ekranda xəritə kənardan-kənaradır: landscape iPhone-da düymələr
+          // notch/status zolağının altına düşməsin (viewportFit: cover).
+          fullscreen ? "top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,var(--safe-right))]" : "top-3 right-3",
+        )}
+      >
         <button
           type="button"
           onClick={recenter}
