@@ -6,7 +6,7 @@
  * almır, tərtibatçının `.dev.vars` faylına isə toxunmaq istəmirik. Sirr hər run
  * üçün təsadüfi yaradılır və yalnız lokal test bazası üçündür.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 
 const STATE_DIR = process.env.E2E_STATE_DIR ?? ".wrangler/e2e-state";
@@ -23,15 +23,51 @@ if (!env.AUTH_SECRET) {
   process.exit(1);
 }
 
+/**
+ * Workers AI binding-i həmişə remote-dur: wrangler onun üçün `--local` rejimində də
+ * remote proxy açmağa çalışır və CI-də Cloudflare token-i olmadığından düşür. Test
+ * worker-i üçün həmin binding-siz müvəqqəti konfiqurasiya yazılır (kök qovluqda —
+ * nisbi yollar dəyişməsin); AI çağırışları deterministik fallback-ə düşür.
+ */
+const E2E_CONFIG = "wrangler.e2e.jsonc";
+
+/** JSONC → JSON: şərhlər və sondakı vergüllər atılır, string-lər (URL-dəki `//`) qalır. */
+function parseJsonc(text) {
+  let out = "";
+  let i = 0;
+  while (i < text.length) {
+    const char = text[i];
+    if (char === '"') {
+      let j = i + 1;
+      while (j < text.length && text[j] !== '"') j += text[j] === "\\" ? 2 : 1;
+      out += text.slice(i, j + 1);
+      i = j + 1;
+    } else if (text.startsWith("//", i)) {
+      const end = text.indexOf("\n", i);
+      i = end < 0 ? text.length : end;
+    } else if (text.startsWith("/*", i)) {
+      const end = text.indexOf("*/", i);
+      i = end < 0 ? text.length : end + 2;
+    } else {
+      out += char;
+      i += 1;
+    }
+  }
+  return JSON.parse(out.replace(/,(\s*[}\]])/g, "$1"));
+}
+
+const config = parseJsonc(readFileSync("wrangler.jsonc", "utf8"));
+delete config.ai;
+writeFileSync(E2E_CONFIG, JSON.stringify(config, null, 2));
+
 const child = spawn(
   "npx",
   [
-    "opennextjs-cloudflare", "preview", "--",
+    "opennextjs-cloudflare", "preview", "--config", E2E_CONFIG, "--",
     "--port", PORT,
-    // Remote binding-lər (Workers AI) söndürülür: CI-də Cloudflare token-i yoxdur və
-    // testlər canlı resurslara getməməlidir. AI çağırışları deterministik fallback-ə düşür.
-    "--local",
     "--persist-to", STATE_DIR,
+    // Remote binding-lər söndürülür: testlər canlı resurslara getməməlidir.
+    "--local",
     "--var", "IS_STAGING:true",
     "--var", `AUTH_SECRET:${env.AUTH_SECRET}`,
   ],
