@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { edgeCacheKey, edgeCacheTtl, isEdgeCacheableRequest, isStorableResponse, toCachedCopy } from "@/lib/edge-html-cache";
+import { edgeCacheKey, edgeCacheTtl, isEdgeCacheableRequest, isModeCacheable, isStorableResponse, toCachedCopy } from "@/lib/edge-html-cache";
 
 const request = (path: string, init: RequestInit = {}) => new Request(`https://luxehomeestate.az${path}`, init);
 
@@ -42,5 +42,23 @@ describe("kənar HTML keşi", () => {
     const copy = toCachedCopy(new Response("x", { headers: { "content-type": "text/html", "set-cookie": "NEXT_LOCALE=az" } }), 60);
     expect(copy.headers.get("set-cookie")).toBeNull();
     expect(copy.headers.get("cache-control")).toBe("public, max-age=60");
+  });
+
+  it("baxış sayan bloq və bilik detal səhifələrini keşləmir, siyahıları keşləyir", () => {
+    expect(isEdgeCacheableRequest(request("/az/blog/menzil-alarken"))).toBe(false);
+    expect(isEdgeCacheableRequest(request("/ru/bilik-merkezi/kupca"))).toBe(false);
+    expect(isEdgeCacheableRequest(request("/az/blog"))).toBe(true);
+    expect(isEdgeCacheableRequest(request("/az/bilik-merkezi/suallar"))).toBe(true);
+    expect(isEdgeCacheableRequest(request("/az/bilik-merkezi/kateqoriya/huquq"))).toBe(true);
+  });
+
+  it("keş yalnız adi rejimdə, planlaşdırılmış pəncərə olmadan işləyir", () => {
+    expect(isModeCacheable(null, undefined)).toBe(true);
+    expect(isModeCacheable(JSON.stringify({ mode: "NORMAL" }), undefined)).toBe(true);
+    expect(isModeCacheable(JSON.stringify({ mode: "MAINTENANCE" }), undefined)).toBe(false);
+    expect(isModeCacheable(JSON.stringify({ mode: "READ_ONLY" }), undefined)).toBe(false);
+    expect(isModeCacheable(JSON.stringify({ mode: "NORMAL", startAt: "2026-10-01T00:00:00Z" }), undefined)).toBe(false);
+    expect(isModeCacheable(JSON.stringify({ mode: "NORMAL" }), "true")).toBe(false);
+    expect(isModeCacheable("{pozulmuş", undefined)).toBe(false);
   });
 });

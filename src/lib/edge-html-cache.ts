@@ -20,6 +20,15 @@ const BYPASS_COOKIES = ["lhe_session", "lhe_2fa", "__prerender_bypass", "__next_
 const VARY_HEADERS = ["rsc", "next-router-state-tree", "next-router-prefetch", "next-router-segment-prefetch", "next-url"];
 const LOCALE_PATH = /^\/(az|en|ru)(\/|$)/;
 
+/**
+ * Render zamanı yan təsiri olan marşrutlar — baxış sayğacı (`recordView`) server
+ * komponentindədir; keşdən verilən cavab onu işə salmazdı və sayğac donardı.
+ * (`/emlaklar/[slug]` sessiyadan asılı olduğu üçün onsuz da keşlənmir.)
+ */
+const SIDE_EFFECT_ROUTES = [/^\/(az|en|ru)\/blog\/[^/]+\/?$/, /^\/(az|en|ru)\/bilik-merkezi\/[^/]+\/?$/];
+/** `bilik-merkezi/kateqoriya/...` və `bilik-merkezi/suallar` detal deyil — sayğac yoxdur. */
+const SIDE_EFFECT_EXCEPTIONS = [/^\/(az|en|ru)\/bilik-merkezi\/(kateqoriya|suallar)\/?/];
+
 export const EDGE_CACHE_HEADER = "x-edge-cache";
 
 /** `EDGE_HTML_CACHE_TTL` (saniyə); staging-də və ya dəyər yoxdursa `0` (söndürülü). */
@@ -41,6 +50,9 @@ export function isEdgeCacheableRequest(request: Request): boolean {
   if (!LOCALE_PATH.test(url.pathname)) return false;
   if (hasCookie(request.headers.get("cookie"), BYPASS_COOKIES)) return false;
   if (request.headers.has("authorization")) return false;
+  const sideEffect = SIDE_EFFECT_ROUTES.some((pattern) => pattern.test(url.pathname))
+    && !SIDE_EFFECT_EXCEPTIONS.some((pattern) => pattern.test(url.pathname));
+  if (sideEffect) return false;
   return isCacheablePublicRoute(url.pathname);
 }
 
@@ -64,4 +76,43 @@ export function toCachedCopy(response: Response, ttl: number): Response {
   headers.delete("set-cookie");
   headers.set("cache-control", `public, max-age=${ttl}`);
   return new Response(response.body, { status: response.status, headers });
+}
+
+/** `system-mode.ts`-dəki açarla eyni — worker OpenNext kontekstindən kənardadır, ona görə təkrarlanır. */
+export const SYSTEM_MODE_SETTING_KEY = "system.mode_config";
+const MODE_SNAPSHOT_MS = 15_000;
+let modeSnapshot: { allowed: boolean; expiresAt: number } | null = null;
+
+/**
+ * Keşdən cavab vermək yalnız sayt adi rejimdədirsə təhlükəsizdir. Texniki xidmət açılanda
+ * keşlənmiş səhifə `maintenanceGate()`-dən yan keçməməlidir — ona görə rejim oxunur
+ * (middleware kimi 15 s izolyat snapshot-u ilə). Planlaşdırılmış pəncərə varsa və ya rejim
+ * oxunmursa keş işlədilmir: şübhəli halda sorğu OpenNext-ə gedir və qərarı middleware verir.
+ */
+export function isModeCacheable(raw: string | null | undefined, forceMaintenance: string | undefined): boolean {
+  if (forceMaintenance === "true") return false;
+  if (!raw?.trim()) return true;
+  try {
+    const config = JSON.parse(raw) as { mode?: unknown; startAt?: unknown; endAt?: unknown };
+    return (config.mode ?? "NORMAL") === "NORMAL" && !config.startAt && !config.endAt;
+  } catch {
+    return false;
+  }
+}
+
+export async function systemModeAllowsCache(env: { DB?: D1Database; FORCE_MAINTENANCE?: string }): Promise<boolean> {
+  if (env.FORCE_MAINTENANCE === "true") return false;
+  const now = Date.now();
+  if (modeSnapshot && modeSnapshot.expiresAt > now) return modeSnapshot.allowed;
+  let allowed = false;
+  try {
+    const row = env.DB
+      ? await env.DB.prepare('SELECT "value" FROM "Setting" WHERE "key" = ?1').bind(SYSTEM_MODE_SETTING_KEY).first<{ value: string }>()
+      : null;
+    allowed = env.DB ? isModeCacheable(row?.value ?? null, env.FORCE_MAINTENANCE) : false;
+  } catch {
+    allowed = false;
+  }
+  modeSnapshot = { allowed, expiresAt: now + MODE_SNAPSHOT_MS };
+  return allowed;
 }

@@ -54,7 +54,10 @@ export type BenchmarkKey = {
   pricePeriod: string | null;
 };
 
-async function comparablePerSqm(key: BenchmarkKey, scope: "district" | "city"): Promise<number[]> {
+type Sample = { id: string; perSqm: number };
+type BenchmarkSamples = { district: Sample[]; city: Sample[]; profilePerSqm: number | null };
+
+async function comparableSamples(key: BenchmarkKey, scope: "district" | "city"): Promise<Sample[]> {
   const rows = await prisma.property.findMany({
     where: {
       ...(await publicPropertyWhere()),
@@ -66,48 +69,55 @@ async function comparablePerSqm(key: BenchmarkKey, scope: "district" | "city"): 
       price: { gt: 0 },
       ...(scope === "district" ? { districtId: key.districtId } : { cityId: key.cityId }),
     },
-    select: { price: true, area: true },
+    select: { id: true, price: true, area: true },
     orderBy: { publishedAt: "desc" },
     take: MAX_SAMPLE,
   });
-  return rows.map((row) => row.price / (row.area as number));
+  return rows.map((row) => ({ id: row.id, perSqm: row.price / (row.area as number) }));
 }
 
-async function computeBenchmark(key: BenchmarkKey): Promise<PriceBenchmark | null> {
-  if (key.districtId) {
-    const district = await comparablePerSqm(key, "district");
-    if (district.length >= MIN_COMPARABLES) {
-      return { pricePerSqm: medianOf(district)!, sampleSize: district.length, scope: "district" };
-    }
+async function loadSamples(key: BenchmarkKey): Promise<BenchmarkSamples> {
+  const [district, city, profile] = await Promise.all([
+    key.districtId ? comparableSamples(key, "district") : Promise.resolve([]),
+    comparableSamples(key, "city"),
+    key.listingType === LISTING_TYPES.SALE && key.currency === "AZN" && key.districtId
+      ? prisma.neighborhoodProfile.findUnique({ where: { locationId: key.districtId }, select: { averagePricePerSqm: true } })
+      : Promise.resolve(null),
+  ]);
+  const profilePerSqm = profile?.averagePricePerSqm && profile.averagePricePerSqm > 0 ? profile.averagePricePerSqm : null;
+  return { district, city, profilePerSqm };
+}
+
+/**
+ * Nümunələrdən müqayisə bazası. Qiymətləndirilən elan **öz** müqayisəsinə daxil edilmir —
+ * əks halda kiçik nümunədə median elanın öz qiymətinə çəkilir və nəticə «bazara uyğun»a
+ * sürüşür. Çıxarıldıqdan sonra nümunə hədd altına düşərsə növbəti səviyyəyə keçilir.
+ */
+export function benchmarkFromSamples(samples: BenchmarkSamples, excludeId?: string): PriceBenchmark | null {
+  const usable = (list: Sample[]) => list.filter((sample) => sample.id !== excludeId).map((sample) => sample.perSqm);
+  const district = usable(samples.district);
+  if (district.length >= MIN_COMPARABLES) {
+    return { pricePerSqm: medianOf(district)!, sampleSize: district.length, scope: "district" };
   }
-  const city = await comparablePerSqm(key, "city");
+  const city = usable(samples.city);
   if (city.length >= MIN_COMPARABLES) {
     return { pricePerSqm: medianOf(city)!, sampleSize: city.length, scope: "city" };
   }
-  if (key.listingType === LISTING_TYPES.SALE && key.currency === "AZN" && key.districtId) {
-    const profile = await prisma.neighborhoodProfile.findUnique({
-      where: { locationId: key.districtId },
-      select: { averagePricePerSqm: true },
-    });
-    if (profile?.averagePricePerSqm && profile.averagePricePerSqm > 0) {
-      return { pricePerSqm: profile.averagePricePerSqm, sampleSize: 0, scope: "profile" };
-    }
-  }
-  return null;
+  return samples.profilePerSqm ? { pricePerSqm: samples.profilePerSqm, sampleSize: 0, scope: "profile" } : null;
 }
 
-/** Açar üzrə keşlənir — siyahı səhifəsində eyni rayon/növ üçün sorğu təkrarlanmır. */
-const getCachedBenchmark = unstable_cache(
-  async (key: BenchmarkKey) => computeBenchmark(key),
-  ["price-benchmark-v1"],
+/** Nümunələr açar üzrə keşlənir — siyahı səhifəsində eyni rayon/növ üçün sorğu təkrarlanmır. */
+const getCachedSamples = unstable_cache(
+  async (key: BenchmarkKey) => loadSamples(key),
+  ["price-benchmark-samples-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: 3600 },
 );
 
-type AssessableProperty = BenchmarkKey & { price: number; area: number | null };
+type AssessableProperty = BenchmarkKey & { id?: string; price: number; area: number | null };
 
 export async function assessPropertyPrice(property: AssessableProperty): Promise<PriceAssessment | null> {
   if (!property.area || property.area <= 0 || property.price <= 0) return null;
-  const benchmark = await getCachedBenchmark({
+  const samples = await getCachedSamples({
     listingType: property.listingType,
     typeId: property.typeId,
     cityId: property.cityId,
@@ -115,6 +125,7 @@ export async function assessPropertyPrice(property: AssessableProperty): Promise
     currency: property.currency,
     pricePeriod: property.pricePeriod,
   });
+  const benchmark = benchmarkFromSamples(samples, property.id);
   return benchmark ? classifyPrice(property.price / property.area, benchmark) : null;
 }
 
@@ -153,7 +164,7 @@ export function roundEstimate(value: number, listingType: string): number {
 export async function estimateValue(key: BenchmarkKey & { area: number }): Promise<ValueEstimate | null> {
   if (!(key.area > 0)) return null;
   const { area, ...benchmarkKey } = key;
-  const benchmark = await getCachedBenchmark(benchmarkKey);
+  const benchmark = benchmarkFromSamples(await getCachedSamples(benchmarkKey));
   if (!benchmark) return null;
   const mid = benchmark.pricePerSqm * area;
   return {

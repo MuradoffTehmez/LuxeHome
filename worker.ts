@@ -11,6 +11,7 @@ import {
   edgeCacheTtl,
   isEdgeCacheableRequest,
   isStorableResponse,
+  systemModeAllowsCache,
   toCachedCopy,
 } from "./src/lib/edge-html-cache";
 
@@ -19,12 +20,13 @@ import {
 // @ts-ignore
 export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-next/worker.js";
 
-type Env = { EDGE_HTML_CACHE_TTL?: string; IS_STAGING?: string };
+type Env = { EDGE_HTML_CACHE_TTL?: string; IS_STAGING?: string; FORCE_MAINTENANCE?: string; DB?: D1Database };
 
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const ttl = edgeCacheTtl(env);
-    if (ttl === 0 || !isEdgeCacheableRequest(request)) {
+    // Texniki xidmət rejimində keş həm oxunmur, həm yazılmır — middleware qapısı işləsin.
+    if (ttl === 0 || !isEdgeCacheableRequest(request) || !(await systemModeAllowsCache(env))) {
       return openNext.fetch(request, env, ctx);
     }
 
