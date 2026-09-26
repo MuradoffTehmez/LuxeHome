@@ -1,6 +1,7 @@
 import type { ContentTranslation } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { findManyInChunks } from "@/lib/d1-chunks";
 import {
   DEFAULT_LOCALE,
   TRANSLATION_ENTITY_TYPES,
@@ -36,14 +37,17 @@ export async function getPublishedContentTranslations(
 ): Promise<Map<string, ContentTranslation>> {
   if (locale === DEFAULT_LOCALE || entityIds.length === 0) return new Map();
 
-  const rows = await prisma.contentTranslation.findMany({
-    where: {
-      entityType,
-      locale,
-      status: TRANSLATION_STATUSES.PUBLISHED,
-      entityId: { in: [...entityIds] },
-    },
-  });
+  // `entityType`, `locale`, `status` — IN siyahısından əlavə 3 parametr (#85).
+  const rows = await findManyInChunks(entityIds, 3, (chunk) =>
+    prisma.contentTranslation.findMany({
+      where: {
+        entityType,
+        locale,
+        status: TRANSLATION_STATUSES.PUBLISHED,
+        entityId: { in: chunk },
+      },
+    }),
+  );
 
   return new Map(rows.map((row) => [row.entityId, row]));
 }

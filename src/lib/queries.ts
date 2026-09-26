@@ -207,7 +207,12 @@ export async function buildPropertyWhere(
   if (filters.listingType) where.listingType = filters.listingType;
   if (filters.typeSlug) where.type = { slug: filters.typeSlug };
   if (filters.citySlug) where.city = { slug: filters.citySlug };
-  if (filters.districtSlug) where.district = { slug: filters.districtSlug };
+  // Bakının qəsəbə/massivləri inzibati rayonun uşağıdır (#68): «Sabunçu» seçiləndə
+  // Maştağa və Bilgəhdəki elanlar da nəticəyə düşməlidir. Qəsəbə seçiləndə isə
+  // yalnız onun özü uyğun gəlir — onun uşağı yoxdur.
+  if (filters.districtSlug) {
+    where.district = { OR: [{ slug: filters.districtSlug }, { parent: { slug: filters.districtSlug } }] };
+  }
   if (filters.metroSlug) where.metro = { slug: filters.metroSlug };
   if (filters.renovation) where.renovation = filters.renovation;
   if (filters.documentStatus) where.documentStatus = filters.documentStatus;

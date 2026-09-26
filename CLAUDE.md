@@ -477,6 +477,12 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   yazılmamalıdır. Azərbaycanca registrsiz axtarış `src/lib/search-normalization.ts` və
   `Property.searchText` / taksonomiya `searchName` sütunları ilə həll olunur. Əmlak və
   taksonomiya yazma axınlarında bu normallaşdırılmış sahələri doldurmağı unutma.
+- **D1 bir sorğuda ən çox 100 bound parametr qəbul edir.** Prisma `IN (…)` siyahısını
+  98-lik hissələrə bölür, amma `where`-dəki digər şərtləri saymır; nested `children`/`parent`
+  relation yüklənməsi də `IN (…)` yaradır. Böyük cədvəldə (yerləşmə ağacı ~700 sətir)
+  nested relation əvəzinə düz sorğu + JS-də ağac (`location-tree.ts`), uzun id siyahısında
+  `findManyInChunks()` (`d1-chunks.ts`) işlət. Lokal SQLite bunu tutmur — sorğu formasını
+  dəyişəndə `*.integration.test.ts` (real miniflare D1, `npm run test`-ə daxildir) yaz (#74, #85).
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
 - `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər),

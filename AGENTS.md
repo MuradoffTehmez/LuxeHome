@@ -149,6 +149,11 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
 
 - Production bazası Cloudflare D1-dir. D1 transaction dəstəkləmir; çoxaddımlı yazıları
   idempotent marker/retry və ya kompensasiya ilə dizayn et.
+- **D1 bir sorğuda ən çox 100 bound parametr qəbul edir.** Prisma `IN (…)` siyahısını
+  98-lik hissələrə bölür, amma `where`-dəki digər şərtləri saymır; nested `children`/`parent`
+  relation yüklənməsi də `IN (…)` yaradır. Böyük cədvəldə nested relation əvəzinə düz sorğu +
+  JS-də ağac (`location-tree.ts`), uzun id siyahısında `findManyInChunks()` (`d1-chunks.ts`)
+  işlət və `*.integration.test.ts` (real miniflare D1) yaz (#74, #85).
 - Prisma client `src/lib/prisma.ts`-də D1 binding-i üçün lazy Proxy və WASM client istifadə edir —
   `new PrismaClient()` yazma (istisna: `prisma/` altındakı standalone lokal scriptlər).
 - `next.config.ts`-də `images.remotePatterns` yalnız `images.unsplash.com`-a icazə verir; stok

@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { cloudflareTest } from "@cloudflare/vitest-plugin";
+import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -49,7 +49,34 @@ export default defineConfig({
         test: {
           name: "workerd",
           include: ["src/**/*.test.{ts,tsx}"],
-          exclude: ["src/components/**/*.test.{ts,tsx}"],
+          exclude: ["src/components/**/*.test.{ts,tsx}", "src/**/*.integration.test.ts"],
+        },
+      },
+      {
+        extends: true,
+        /**
+         * Real D1-ə qarşı integration testləri (#85).
+         *
+         * Saf funksiya testləri Prisma sorğularının D1-dəki davranışını görmür:
+         * 100 bound-parametr həddi yalnız workerd D1-də tətbiq olunur və #68 məhz
+         * bu boşluqdan keçib production-u bloklamışdı. Burada hər test faylı
+         * `migrations/` tətbiq olunmuş təzə miniflare D1 alır və sorğular
+         * `@/lib/prisma` üzərindən, production-dakı kimi işləyir.
+         */
+        plugins: [
+          cloudflareTest(async () => ({
+            miniflare: {
+              compatibilityDate: "2026-08-20",
+              compatibilityFlags: ["nodejs_compat"],
+              d1Databases: ["DB"],
+              bindings: { TEST_MIGRATIONS: await readD1Migrations(fileURLToPath(new URL("./migrations", import.meta.url))) },
+            },
+          })),
+        ],
+        test: {
+          name: "integration",
+          include: ["src/**/*.integration.test.ts"],
+          setupFiles: ["./src/test/setup-d1.ts"],
         },
       },
       {
