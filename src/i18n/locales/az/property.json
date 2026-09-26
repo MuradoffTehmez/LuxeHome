@@ -156,5 +156,15 @@
     "priceDrop": "Qiymət endi −{percent}%",
     "photos": "{count, plural, other {# şəkil}}"
   },
-  "ogRooms": "{count} otaq"
+  "ogRooms": "{count} otaq",
+  "priceInsight": {
+    "title": "Bazar müqayisəsi",
+    "below": "Oxşar elanların medianından {percent}% aşağı",
+    "above": "Oxşar elanların medianından {percent}% yuxarı",
+    "fair": "Bazar qiymətinə uyğundur",
+    "basis": "{place} üzrə oxşar {count} elanın m² medianı: {price}.",
+    "basisProfile": "{place} üzrə rayon profilində orta m² qiyməti: {price}.",
+    "disclaimer": "Göstərici saytdakı aktiv elanlar əsasında avtomatik hesablanır və rəsmi qiymətləndirmə deyil.",
+    "cardBelow": "Sərfəli qiymət"
+  }
 }

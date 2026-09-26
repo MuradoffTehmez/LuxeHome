@@ -1,4 +1,4 @@
-import { LOCALES } from "@/lib/constants";
+import { LOCALES } from "./constants";
 
 /**
  * İctimai HTML keşinin təhlükəsizlik siyasəti.

@@ -13,7 +13,16 @@ import { AttributionFields } from "@/components/analytics/attribution-fields";
 
 const initialState: ContactFormState = { success: false };
 
-export function ContactForm() {
+type ContactFormProps = {
+  /** `OWNER` — satıcı səhifəsindən gələn müraciət (#105). */
+  source?: "CONTACT" | "OWNER";
+  defaultSubject?: string;
+  defaultMessage?: string;
+  /** Analitika hadisəsindəki yerləşmə adı. */
+  placement?: string;
+};
+
+export function ContactForm({ source = "CONTACT", defaultSubject, defaultMessage, placement = "contact_form" }: ContactFormProps = {}) {
   const t = useTranslations("contact");
   const [state, formAction, isPending] = useActionState(
     submitContactForm,
@@ -22,9 +31,9 @@ export function ContactForm() {
   useEffect(() => {
     if (state.success) {
       trackEvent("contact_submit", { status: "success" });
-      trackEvent("form_submit", { status: "success", placement: "contact_form" });
+      trackEvent("form_submit", { status: "success", placement });
     }
-  }, [state.success]);
+  }, [state.success, placement]);
 
   if (state.success) {
     return (
@@ -45,6 +54,7 @@ export function ContactForm() {
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <AttributionFields />
+      <input type="hidden" name="source" value={source} />
       {/*
         Honeypot — ziyarətçi görmür, bot doldurur. Ekrandan kənara çıxarılır,
         `display: none` işlədilmir: botların bir hissəsi məhz həmin xassəyə görə
@@ -105,6 +115,7 @@ export function ContactForm() {
           name="subject"
           label={t("subject")}
           placeholder={t("subjectPlaceholder")}
+          defaultValue={defaultSubject}
           maxLength={200}
           error={state.fieldErrors?.subject}
         />
@@ -114,6 +125,7 @@ export function ContactForm() {
         name="message"
         label={t("message")}
         placeholder={t("messagePlaceholder")}
+        defaultValue={defaultMessage}
         maxLength={4000}
         required
         rows={5}

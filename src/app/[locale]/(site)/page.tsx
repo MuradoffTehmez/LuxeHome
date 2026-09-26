@@ -19,6 +19,7 @@ import {
 import { LOCATION_KINDS } from "@/lib/constants";
 import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import { getSiteImages } from "@/lib/settings";
+import { assessPriceBands } from "@/lib/price-benchmark";
 import { Badge } from "@/components/ui/badge";
 import { Container, Section } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -105,6 +106,7 @@ export default async function HomePage({ params }: HomePageProps) {
     isProjectsSectionEnabled(),
     getSiteImages(),
   ]);
+  const priceBands = await assessPriceBands(featured);
   const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 
@@ -185,7 +187,7 @@ export default async function HomePage({ params }: HomePageProps) {
             <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((property, index) => (
                 <Reveal key={property.id} delay={index * 60}>
-                  <PropertyCard property={property} />
+                  <PropertyCard property={property} priceBand={priceBands[property.id]} />
                 </Reveal>
               ))}
             </div>

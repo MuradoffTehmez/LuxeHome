@@ -8,6 +8,7 @@ import { ActiveFilterChips } from "@/components/ui/active-filter-chips";
 import { ResponsiveToolbar } from "@/components/ui/responsive-toolbar";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EmptySearchSuggestions } from "@/components/site/empty-search-suggestions";
+import { assessPriceBands } from "@/lib/price-benchmark";
 import { MAX_RELAXATIONS, rankSuggestions, relaxFilters, widenedMaxPrice, type RelaxationSuggestion } from "@/lib/search-relaxation";
 import { Reveal } from "@/components/ui/reveal";
 import { PropertyCard } from "@/components/site/property-card";
@@ -293,6 +294,9 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     relaxations = rankSuggestions(counted.filter((item): item is RelaxationSuggestion => item !== null));
   }
 
+  // Kartda «sərfəli qiymət» nişanı (#105) — müqayisə açar üzrə keşlənir.
+  const priceBands = isMapView ? {} : await assessPriceBands(items);
+
   const mapPoints = (mapResult?.items ?? [])
     .filter((item) => item.latitude != null && item.longitude != null)
     .map((item) => ({
@@ -450,7 +454,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 min-[85rem]:grid-cols-3">
                 {items.map((property, index) => (
                   <Reveal key={property.id} delay={index * 40}>
-                    <PropertyCard property={property} priority={index === 0} />
+                    <PropertyCard property={property} priority={index === 0} priceBand={priceBands[property.id]} />
                   </Reveal>
                 ))}
               </div>

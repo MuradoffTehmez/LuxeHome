@@ -63,6 +63,18 @@ describe("əlaqə forması", () => {
     expect(effects.telegram).toHaveBeenCalledWith(expect.objectContaining({ kind: "lead", phone: "+994501234567" }));
   });
 
+  it("mənbəni allowlist ilə yazır: OWNER qəbul olunur, naməlum dəyər CONTACT olur", async () => {
+    const owner = validFormData();
+    owner.set("source", "OWNER");
+    await submitContactForm({ success: false }, owner);
+    expect(database.leadCreate.mock.calls[0][0].data.source).toBe("OWNER");
+
+    const forged = validFormData();
+    forged.set("source", "ADMIN");
+    await submitContactForm({ success: false }, forged);
+    expect(database.leadCreate.mock.calls[1][0].data.source).toBe("CONTACT");
+  });
+
   it("saxlama xətasında istifadəçiyə təhlükəsiz ümumi mesaj qaytarır", async () => {
     database.leadCreate.mockRejectedValue(new Error("database unavailable"));
 

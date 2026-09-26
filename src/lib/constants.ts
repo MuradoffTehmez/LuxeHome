@@ -456,6 +456,8 @@ export const LEAD_SOURCES = {
   CONTACT: "CONTACT",
   SERVICE: "SERVICE",
   PROJECT: "PROJECT",
+  /** Satmaq/kirayə vermək istəyən sahib — `/emlakimi-sat` və qiymətləndirmə aləti (#105). */
+  OWNER: "OWNER",
 } as const;
 
 export type LeadSource = (typeof LEAD_SOURCES)[keyof typeof LEAD_SOURCES];
@@ -465,6 +467,7 @@ export const LEAD_SOURCE_LABELS: Record<LeadSource, string> = {
   CONTACT: "Əlaqə səhifəsi",
   SERVICE: "Xidmət səhifəsi",
   PROJECT: "Layihə səhifəsi",
+  OWNER: "Sahib müraciəti",
 };
 
 // ---------------------------------------------------------------------------

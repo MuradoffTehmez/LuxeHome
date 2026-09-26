@@ -73,6 +73,8 @@ export const adminNav: AdminNavGroup[] = [
         badgeKey: "newLeads",
         children: [
           { labelKey: "leads", href: "/admin/muracietler" },
+          { labelKey: "leadBoard", href: "/admin/muracietler/lovhe" },
+          { labelKey: "funnel", href: "/admin/huni" },
           { labelKey: "reservations", href: "/admin/rezervasiyalar" },
           { labelKey: "email", href: "/admin/e-poct" },
           { labelKey: "agencies", href: "/admin/agentlikler" },

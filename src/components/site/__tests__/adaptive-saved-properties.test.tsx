@@ -35,6 +35,9 @@ const cardProperty = {
   district: { name: "Səbail", slug: "sebail" },
   images: [],
   _count: { images: 0 },
+  typeId: "type-1",
+  cityId: "city-1",
+  districtId: null,
   priceHistory: [],
 } as PropertyCardData;
 

@@ -40,6 +40,8 @@ import { PropertyActionToolbar } from "@/components/site/property-action-toolbar
 import { propertyQrSvg } from "@/lib/property-qr";
 import { PlaceMap } from "@/components/map/place-map";
 import { PropertyKeyFacts } from "@/components/site/property-key-facts";
+import { PriceInsight } from "@/components/site/price-insight";
+import { assessPriceBands, assessPropertyPrice } from "@/lib/price-benchmark";
 import { PropertyVideo } from "@/components/site/property-video";
 import { MortgageCalculator } from "@/components/site/mortgage-calculator";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
@@ -166,11 +168,18 @@ export default async function PropertyDetailPage({ params }: Props) {
     .filter(Boolean)
     .join(", ");
 
-  const [similarProperties, partnerLinks, projectsEnabled] = await Promise.all([
+  const [similarProperties, partnerLinks, projectsEnabled, priceAssessment, insightText] = await Promise.all([
     getSimilarProperties(property, 4),
     getPropertyPartners(property.id),
     isProjectsSectionEnabled(),
+    isClosed ? Promise.resolve(null) : assessPropertyPrice(property),
+    getTranslations({ locale, namespace: "property.priceInsight" }),
   ]);
+  const similarBands = await assessPriceBands(similarProperties);
+  const benchmarkPlace = priceAssessment?.scope === "city" ? property.city.name : property.district?.name ?? property.city.name;
+  const benchmarkPrice = priceAssessment
+    ? `${formatPrice(Math.round(priceAssessment.pricePerSqm), property.currency)}/m²`
+    : "";
   const reservationUser = property.reservationEnabled && !isClosed
     ? await getOptionalUser(AUTH_KINDS.PUBLIC)
     : null;
@@ -296,7 +305,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <span className="tabular text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
                   {formatPrice(property.price, property.currency)}
                 </span>
-                {period && <span className="text-sm text-ink-soft">/ {period}</span>}
+                {period && <span className="text-sm text-ink-soft">{period}</span>}
               </p>
             </div>
           </div>
@@ -319,6 +328,22 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* Əsas göstəricilər */}
               <PropertyKeyFacts locale={locale as Locale} property={property} />
+
+              {priceAssessment ? (
+                <PriceInsight
+                  assessment={priceAssessment}
+                  labels={{
+                    title: insightText("title"),
+                    verdict: priceAssessment.band === "fair"
+                      ? insightText("fair")
+                      : insightText(priceAssessment.band, { percent: Math.abs(priceAssessment.diffPercent) }),
+                    basis: priceAssessment.scope === "profile"
+                      ? insightText("basisProfile", { place: benchmarkPlace, price: benchmarkPrice })
+                      : insightText("basis", { place: benchmarkPlace, count: priceAssessment.sampleSize, price: benchmarkPrice }),
+                    disclaimer: insightText("disclaimer"),
+                  }}
+                />
+              ) : null}
 
               {/* Təsvir */}
               <div className="flex flex-col gap-4">
@@ -606,7 +631,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {similarProperties.map((prop) => (
-                <PropertyCard key={prop.id} property={prop} />
+                <PropertyCard key={prop.id} property={prop} priceBand={similarBands[prop.id]} />
               ))}
             </div>
           </Container>

@@ -116,8 +116,37 @@ export async function setLeadStatus(id: string, status: string): Promise<ActionS
 
     await recordAudit(user, "UPDATE", "Lead", id, `${lead.name} → ${status}`);
     revalidatePath(LIST_PATH);
+    revalidatePath(`${LIST_PATH}/lovhe`);
     return success(msg("server.muracietler.statusYenilendi"));
   } catch (error) {
     return unexpected("status dəyişmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+/**
+ * Lövhədən «mənə təyin et» (#105). Artıq başqasına təyin edilmiş müraciət üzərinə
+ * yazılmır — iki operatorun eyni anda götürməsi səssizcə birini silməsin.
+ */
+export async function assignLeadToMe(id: string): Promise<ActionState> {
+  let user;
+  try {
+    user = await requireAdminAction(PERMISSIONS.LEAD_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  try {
+    const { count } = await prisma.lead.updateMany({
+      where: { id, assigneeId: null },
+      data: { assigneeId: user.id },
+    });
+    if (count === 0) return failure(msg("server.muracietler.alreadyAssigned"));
+    await recordAudit(user, "UPDATE", "Lead", id, `→ ${user.email}`);
+    revalidatePath(LIST_PATH);
+    revalidatePath(`${LIST_PATH}/lovhe`);
+    return success(msg("server.muracietler.assignedToYou"));
+  } catch (error) {
+    return unexpected("müraciət təyin edilmədi", error, msg("server.common.unexpected"));
   }
 }

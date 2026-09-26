@@ -126,6 +126,7 @@ export const listingLinks = [
  * Əsas naviqasiyada olmayan yardımçı kontent səhifələri.
  */
 export const supportNavigation = [
+  { label: "Əmlakınızı satın", href: "/emlakimi-sat" },
   { label: "Haqqımızda", href: "/haqqimizda" },
   { label: "Bilik Mərkəzi", href: "/bilik-merkezi" },
   { label: "Əmlak lüğəti", href: "/lugat" },

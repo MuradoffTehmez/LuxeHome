@@ -204,6 +204,10 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
   həmişə DRAFT, 10 sətirlik partiya), sayt şəkilləri (`site.image_*`, yalnız `/media/...`) və
   boş axtarış təklifləri (`search-relaxation.ts` — yeni filtr `CHIP_FIELDS`-ə də yazılmalıdır).
   Ətraflı qaydalar `CLAUDE.md`-dədir.
+- 2-ci mərhələ (#105): `worker.ts` OpenNext-i sarıb anonim ictimai HTML-i 60 s kənarda keşləyir
+  (staging/lokal E2E-də söndürülü) — server tərəfdə sessiya oxuyan yeni ictimai marşrut
+  `SESSION_DEPENDENT_PUBLIC_ROUTES`-a yazılmalıdır. Qiymət göstəricisi median + ən azı 5 nümunə,
+  `/emlakimi-sat` (lead mənbəyi `OWNER`), müraciət lövhəsi və konversiya hunisi.
 
 ## Digər agent konfiqurasiyaları
 

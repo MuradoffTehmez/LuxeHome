@@ -45,6 +45,21 @@ export function AnalyticsProvider() {
 
   useEffect(() => setConsent(readConsent()), []);
 
+  // Cloudflare Web Analytics (#105) — cookie işlətmir və fərdi məlumat toplamır, ona görə
+  // razılıq gözləmir: GA-dan imtina edən ziyarətçi də ümumi trafik statistikasına düşür.
+  // Beacon SPA keçidlərini özü izləyir; panel marşrutlarında işə salınmır.
+  const cfBeaconToken = process.env.NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN?.trim();
+  useEffect(() => {
+    if (onAdmin || process.env.NODE_ENV !== "production" || !cfBeaconToken) return;
+    if (document.getElementById("luxe-cf-beacon")) return;
+    const script = document.createElement("script");
+    script.id = "luxe-cf-beacon";
+    script.defer = true;
+    script.src = "https://static.cloudflareinsights.com/beacon.min.js";
+    script.dataset.cfBeacon = JSON.stringify({ token: cfBeaconToken });
+    document.head.appendChild(script);
+  }, [cfBeaconToken, onAdmin]);
+
   useEffect(() => {
     if (onAdmin) return;
     if (!analyticsRuntimeEnabled({ production: process.env.NODE_ENV === "production", measurementId, consent: consent === "granted" })) return;

@@ -11,7 +11,7 @@ import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
 import { z } from "zod";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { readLeadAttribution } from "@/lib/lead-attribution";
-import { LEAD_STATUSES } from "@/lib/constants";
+import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
 import { SYSTEM_READ_ONLY_MESSAGE, isSystemWriteBlocked } from "@/lib/system-mode";
 
 async function contactSchema() {
@@ -136,7 +136,8 @@ export async function submitContactForm(
         email: result.data.email || null,
         subject: result.data.subject || null,
         message: result.data.message,
-        source: "CONTACT",
+        // Forma yalnız iki mənbə daşıya bilər — client-in göndərdiyi dəyər allowlist-dən keçir.
+        source: formData.get("source") === LEAD_SOURCES.OWNER ? LEAD_SOURCES.OWNER : LEAD_SOURCES.CONTACT,
         status: LEAD_STATUSES.NEW,
         ...readLeadAttribution(formData),
       },

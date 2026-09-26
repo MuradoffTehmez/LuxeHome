@@ -156,5 +156,15 @@
     "priceDrop": "Price cut −{percent}%",
     "photos": "{count, plural, one {# photo} other {# photos}}"
   },
-  "ogRooms": "{count, plural, one {# room} other {# rooms}}"
+  "ogRooms": "{count, plural, one {# room} other {# rooms}}",
+  "priceInsight": {
+    "title": "Market comparison",
+    "below": "{percent}% below the median of similar listings",
+    "above": "{percent}% above the median of similar listings",
+    "fair": "In line with the market",
+    "basis": "Median price per m² of {count} similar listings in {place}: {price}.",
+    "basisProfile": "Average price per m² in the {place} district profile: {price}.",
+    "disclaimer": "Calculated automatically from active listings on the site; not an official valuation.",
+    "cardBelow": "Good price"
+  }
 }
