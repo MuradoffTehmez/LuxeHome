@@ -93,6 +93,13 @@ export const viewport: Viewport = {
   initialScale: 1,
   // Zoom bloklanmır — əlçatanlıq tələbi.
   maximumScale: 5,
+  // `cover` olmadan iOS `env(safe-area-inset-*)` dəyərlərini həmişə 0 qaytarır və
+  // `--safe-bottom`/`--safe-left` tokenləri işləmirdi. Kənar boşluqlar Container və
+  // fixed zolaqlarda safe area ilə birləşdirilib, ona görə məzmun notch altına düşmür.
+  viewportFit: "cover",
+  // Klaviatura açılanda layout viewport kiçilir: sticky göndər düymələri və fokuslanan
+  // sahə klaviaturanın altında qalmır (Android Chrome; iOS öz davranışını saxlayır).
+  interactiveWidget: "resizes-content",
   // İlk giriş həmişə açıq temadır; cihazın rəng rejimi avtomatik tətbiq edilmir.
   themeColor: "#f7f3ec",
 };

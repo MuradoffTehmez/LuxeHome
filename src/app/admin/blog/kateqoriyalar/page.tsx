@@ -65,7 +65,7 @@ export default async function BlogCategoriesPage({
         ]}
       />
 
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[1.2fr_1fr]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[1.2fr_1fr]">
         <AdminCard bodyClassName="p-4 lg:p-0">
           <AdminResponsiveList
             ariaLabel={t("pages.blog.bloqKateqoriyalari")}

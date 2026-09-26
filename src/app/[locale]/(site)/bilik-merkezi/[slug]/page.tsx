@@ -200,7 +200,7 @@ export default async function KnowledgeArticlePage({ params }: Props) {
                 <Scale className="mt-0.5 size-5 shrink-0 text-gold-deep" aria-hidden="true" />
                 <div className="min-w-0 flex-1">
                   <h2 className="font-display text-xl text-ink">{t("article.legalStatusPanel")}</h2>
-                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                  <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                     <div><dt className="text-ink-muted">{t("article.normStatus")}</dt><dd className="font-medium text-ink">{t(`article.legalStatus.${LEGAL_STATUS_KEYS[article.legalStatus as LegalContentStatus]}`)}</dd></div>
                     <div><dt className="text-ink-muted">{t("article.riskLevel")}</dt><dd className="font-medium text-ink">{t(`article.riskLevels.${RISK_LEVEL_KEYS[article.riskLevel as KnowledgeRiskLevel]}`)}</dd></div>
                     <div><dt className="text-ink-muted">{t("article.jurisdiction")}</dt><dd className="font-medium text-ink">{article.jurisdiction}</dd></div>

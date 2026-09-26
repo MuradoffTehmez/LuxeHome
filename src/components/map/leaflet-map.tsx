@@ -365,7 +365,7 @@ export function LeafletMap({
           onClick={recenter}
           aria-label={labels.recenter}
           title={labels.recenter}
-          className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
+          className="pointer-events-auto inline-flex size-11 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
         >
           <Crosshair className="size-4" aria-hidden="true" />
         </button>
@@ -376,7 +376,7 @@ export function LeafletMap({
             aria-label={fullscreen ? labels.collapse : labels.expand}
             title={fullscreen ? labels.collapse : labels.expand}
             aria-pressed={fullscreen}
-            className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
+            className="pointer-events-auto inline-flex size-11 items-center justify-center rounded-xs border border-line bg-paper text-ink-soft shadow-sm transition-colors hover:border-gold hover:text-gold-deep"
           >
             {fullscreen ? <Minimize2 className="size-4" aria-hidden="true" /> : <Expand className="size-4" aria-hidden="true" />}
           </button>

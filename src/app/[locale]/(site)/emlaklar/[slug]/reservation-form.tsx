@@ -27,7 +27,7 @@ export function ReservationForm({
       <input type="hidden" name="propertyId" value={propertyId} />
       <h2 className="font-display text-xl text-ink">{labels.title}</h2>
       <p className="mt-1 text-sm text-ink-muted">{labels.description}</p>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm text-ink">{labels.firstName}<input name="firstName" required minLength={2} maxLength={80} defaultValue={firstName} className="min-h-11 rounded-sm border border-line-strong bg-paper px-3" /></label>
         <label className="flex flex-col gap-1.5 text-sm text-ink">{labels.lastName}<input name="lastName" required minLength={2} maxLength={80} defaultValue={lastNameParts.join(" ")} className="min-h-11 rounded-sm border border-line-strong bg-paper px-3" /></label>
         <label className="flex flex-col gap-1.5 text-sm text-ink">{labels.phone}<input name="phone" type="tel" required defaultValue={initial?.phone ?? ""} className="min-h-11 rounded-sm border border-line-strong bg-paper px-3" /></label>

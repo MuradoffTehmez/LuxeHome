@@ -17,7 +17,7 @@ export default async function EntityAdminPage() {
   const t = await getAdminT();
   const entries = await prisma.entityProfile.findMany({ orderBy: [{ entityType: "asc" }, { name: "asc" }] });
   return <><AdminPageHeader title={t("pages.serp.entityManagement")} description={t("pages.serp.organizationOfficeAgentVe")} breadcrumbs={[{ label: t("pages.serp.serpVeSeo"), href: "/admin/serp" }, { label: t("pages.serp.entityLer") }]} />
-  <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_460px]"><AdminForm action={saveEntityProfile} submitLabel={t("pages.serp.entitySaxla")}><FormSection title={t("pages.serp.semanticEntity")}>
+  <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_460px]"><AdminForm action={saveEntityProfile} submitLabel={t("pages.serp.entitySaxla")}><FormSection title={t("pages.serp.semanticEntity")}>
     <AdminInput name="entityType" label={t("pages.serp.entityTipi")} placeholder={t("pages.serp.organizationOfficeAgent")} required /><AdminSelect name="locale" label={t("pages.serp.dil")} defaultValue="az" options={Object.values(LOCALES).map((value) => ({ value, label: value.toUpperCase() }))} />
     <AdminInput name="entityId" label={t("pages.serp.bagliDbId")} /><AdminInput name="slug" label={t("pages.serp.slug")} required /><AdminInput name="name" label={t("pages.serp.ad")} required /><AdminInput name="legalName" label={t("pages.serp.huquqiAd")} />
     <AdminInput name="schemaType" label={t("pages.serp.schemaOrgTipi")} placeholder={t("pages.serp.organization")} required /><AdminCheckbox name="isPublic" label={t("pages.serp.publicEntity")} />

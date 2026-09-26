@@ -54,7 +54,7 @@ export default async function AdminAgentsPage() {
         breadcrumbs={[{ label: t("pages.agents.idarePaneli"), href: "/admin" }, { label: t("pages.agents.agentlerVeReyler") }]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <AdminCard title={t("pages.agents.yeniAgentProfili")} bodyClassName="p-0">
           <div className="p-4 sm:p-5">
             <AgentForm initial={EMPTY_AGENT_FORM} users={userOptions} agencies={agencyOptions} />
@@ -64,7 +64,7 @@ export default async function AdminAgentsPage() {
         <AdminCard title={t("pages.agents.yeniMusteriReyi")} description={t("pages.agents.adminTerefindenElaveEdilen")}>
           <AdminForm action={createTestimonial} submitLabel={t("pages.agents.reyiDercEt")} className="gap-4">
             <label className="text-sm text-ink-soft">{t("pages.agents.musterininAdi")}<input className={`${inputClass} mt-1`} name="customerName" required /></label>
-            <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-ink-soft">{t("pages.agents.qiymet")}<select className={`${inputClass} mt-1`} name="rating" defaultValue="5">{[5,4,3,2,1].map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label className="text-sm text-ink-soft">{t("pages.agents.xidmetNovu")}<input className={`${inputClass} mt-1`} name="serviceType" /></label></div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"><label className="text-sm text-ink-soft">{t("pages.agents.qiymet")}<select className={`${inputClass} mt-1`} name="rating" defaultValue="5">{[5,4,3,2,1].map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label className="text-sm text-ink-soft">{t("pages.agents.xidmetNovu")}<input className={`${inputClass} mt-1`} name="serviceType" /></label></div>
             <label className="text-sm text-ink-soft">{t("pages.agents.agent")}<select className={`${inputClass} mt-1`} name="agentId"><option value="">{t("pages.agents.sirketReyi")}</option>{agents.map((agent) => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label>
             <label className="text-sm text-ink-soft">{t("pages.agents.rey")}<textarea className={`${inputClass} mt-1 min-h-32 py-2`} name="review" required /></label>
           </AdminForm>

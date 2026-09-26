@@ -84,7 +84,7 @@ export default async function AgentPage({ params }: Props) {
               )}
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {agent.agency && (
-                  <Link href={`/agentlikler/${agent.agency.slug}`} className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line bg-paper px-3.5 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep">
+                  <Link href={`/agentlikler/${agent.agency.slug}`} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-paper px-4 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep">
                     <Building2 className="size-4 text-gold-deep" aria-hidden="true" />
                     {agent.agency.name}
                   </Link>
@@ -139,13 +139,13 @@ export default async function AgentPage({ params }: Props) {
       <Section tone="paper" spacing="cozy">
         <Container>
           <h2 className="font-display text-3xl tracking-[-0.02em] text-ink">{t("listings")}</h2>
-          {agent.properties.length ? <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">{agent.properties.map((property) => <PropertyCard key={property.id} property={property} />)}</div> : <div className="mt-6"><EmptyState title={t("noListings")} /></div>}
+          {agent.properties.length ? <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">{agent.properties.map((property) => <PropertyCard key={property.id} property={property} />)}</div> : <div className="mt-6"><EmptyState title={t("noListings")} /></div>}
         </Container>
       </Section>
 
       <Section tone="ivory" spacing="cozy">
         <Container>
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <section>
               <h2 className="font-display text-3xl tracking-[-0.02em] text-ink">{t("reviews")}</h2>
               {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <li key={review.id} className="rounded-xl border border-line bg-paper p-4 shadow-xs"><p className="flex items-center gap-1 text-gold-deep">{Array.from({ length: review.rating }, (_, index) => <Star key={index} className="size-4 fill-current" aria-hidden="true" />)}</p><p className="mt-2 text-ink-soft">{review.comment}</p><p className="mt-2 text-xs text-ink-muted">{review.customerName}</p></li>)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}

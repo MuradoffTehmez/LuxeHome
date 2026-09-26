@@ -24,7 +24,7 @@ export function AgentReviewForm({
     <form action={action} className="rounded-xl border border-line bg-paper p-5 sm:p-6 shadow-xs">
       <input type="hidden" name="agentId" value={agentId} />
       <h2 className="font-display text-xl text-ink">{labels.title}</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm text-ink">
           {labels.rating}
           <select name="rating" required defaultValue="5" className="min-h-11 rounded-sm border border-line-strong bg-paper px-3">

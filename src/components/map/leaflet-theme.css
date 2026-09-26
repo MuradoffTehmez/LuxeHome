@@ -21,6 +21,14 @@
   border-color: var(--color-line);
 }
 
+/* Toxunma ekranında zoom düymələri 44px — Leaflet defoltu 30px idi. */
+.lhe-map .leaflet-touch .leaflet-bar a,
+.lhe-map.leaflet-touch .leaflet-bar a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+}
+
 .lhe-map .leaflet-bar a:hover,
 .lhe-map .leaflet-bar a:focus-visible {
   background: var(--color-beige);

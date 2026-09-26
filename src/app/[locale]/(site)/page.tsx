@@ -227,7 +227,7 @@ export default async function HomePage({ params }: HomePageProps) {
               description={phase2T("description")}
               align="center"
             />
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {testimonials.map((testimonial, index) => (
                 <Reveal key={testimonial.id} delay={index * 50}>
                   <blockquote className="flex h-full flex-col rounded-lg border border-line bg-paper p-6 shadow-xs sm:p-7">
@@ -261,7 +261,7 @@ export default async function HomePage({ params }: HomePageProps) {
               action={{ label: agentsT("homeAll"), href: "/agentler" }}
             />
 
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {agents.map((agent, index) => {
                 const rating = agent.reviews.length
                   ? agent.reviews.reduce((sum, review) => sum + review.rating, 0) / agent.reviews.length
@@ -318,7 +318,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* ------------------------------------------------------------------ */}
       <Section tone="ivory" spacing="compact">
         <Container size="wide">
-          <div className="on-dark relative isolate grid items-center gap-8 overflow-hidden rounded-2xl bg-navy px-6 py-10 sm:px-10 sm:py-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-14 lg:py-14">
+          <div className="on-dark relative isolate grid grid-cols-1 items-center gap-8 overflow-hidden rounded-2xl bg-navy px-6 py-10 sm:px-10 sm:py-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:px-14 lg:py-14">
             <div
               aria-hidden="true"
               className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_88%_12%,rgb(196_165_117/0.28),transparent_42%),radial-gradient(circle_at_0%_100%,rgb(196_165_117/0.12),transparent_40%)]"
@@ -413,7 +413,7 @@ export default async function HomePage({ params }: HomePageProps) {
             action={{ label: t("services.all"), href: "/xidmetler" }}
           />
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {localizedServices.slice(0, HOME_SERVICE_LIMIT).map((service, index) => (
               <Reveal key={service.id} delay={index * 50}>
                 <Link
@@ -445,7 +445,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* ------------------------------------------------------------------ */}
       <Section tone="ivory">
         <Container size="wide">
-          <div className="grid items-center gap-0 lg:grid-cols-12">
+          <div className="grid grid-cols-1 items-center gap-0 lg:grid-cols-12">
             <Reveal className="relative lg:col-span-7 lg:col-start-1 lg:row-start-1">
               <div className="relative aspect-4/5 overflow-hidden rounded-xl sm:aspect-4/3 lg:aspect-4/5">
                 <Image
@@ -503,7 +503,7 @@ export default async function HomePage({ params }: HomePageProps) {
             align="center"
           />
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.key} delay={index * 50}>
                 <div className="flex h-full flex-col gap-4 rounded-lg border border-line bg-paper p-6 shadow-xs sm:p-7">
@@ -546,7 +546,7 @@ export default async function HomePage({ params }: HomePageProps) {
               action={{ label: t("projects.all"), href: "/layiheler" }}
             />
 
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {projects.slice(0, 3).map((project, index) => (
                 <Reveal key={project.id} delay={index * 60}>
                   <ProjectCard project={project} />
@@ -570,7 +570,7 @@ export default async function HomePage({ params }: HomePageProps) {
               action={{ label: t("blog.all"), href: "/blog" }}
             />
 
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-12 lg:auto-rows-fr">
+            <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-12 lg:auto-rows-fr">
               {posts.items.map((post, index) => (
                 <Reveal
                   key={post.id}
@@ -593,7 +593,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* ------------------------------------------------------------------ */}
       <Section tone="beige" spacing="none" className="overflow-hidden">
         <Container size="wide" className="py-14 sm:py-18 lg:py-24">
-          <div className="grid overflow-hidden rounded-2xl border border-line shadow-md lg:grid-cols-12">
+          <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-line shadow-md lg:grid-cols-12">
             <div className="relative aspect-4/3 overflow-hidden lg:col-span-7 lg:aspect-auto lg:min-h-[30rem]">
               <Image
                 src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=2000&q=80"

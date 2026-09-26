@@ -46,7 +46,7 @@ export function LoginForm({ next }: { next?: string }) {
         error={state.fieldErrors?.email}
       />
 
-      <Link href="/hesab/parolu-unutdum" className="-mt-2 self-end text-sm text-gold-deep underline-offset-4 hover:underline">
+      <Link href="/hesab/parolu-unutdum" className="-mt-2 inline-flex min-h-11 items-center self-end text-sm text-gold-deep underline-offset-4 hover:underline">
         {t("accountSecurity.forgotLink")}
       </Link>
 

@@ -81,7 +81,7 @@ export function NotificationPreferences({ values }: { values: NotificationPrefer
             {t("quietHours.title")}
           </p>
           <p className="mt-0.5 text-sm text-ink-muted">{t("quietHours.description")}</p>
-          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               name="quietHoursStart"
               type="time"

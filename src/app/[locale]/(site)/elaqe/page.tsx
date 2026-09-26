@@ -55,7 +55,7 @@ export default async function ContactPage({ params }: PageProps) {
       {/* Əsas məzmun — əlaqə + forma */}
       <Section tone="ivory" spacing="cozy">
         <Container>
-          <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)] lg:gap-12">
+          <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)] lg:gap-12">
             {/* Mobil ekranda əsas əməl olan forma birinci göstərilir. */}
             <div className="min-w-0 rounded-xl border border-line bg-paper p-5 shadow-md sm:p-8 lg:p-10">
               <h2 className="mb-6 font-display text-2xl text-ink">

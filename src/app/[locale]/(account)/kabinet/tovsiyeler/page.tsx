@@ -34,7 +34,7 @@ export default async function RecommendationsPage() {
       </div>
       <div className="mt-8">
         {result.items.length === 0 ? <EmptyState title={result.disabled ? t("disabled") : t("empty")} action={{ label: t("wizard"), href: "/mene-emlak-tap" }} /> : (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{result.items.map((property) => <PropertyCard key={property.id} property={property} />)}</div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">{result.items.map((property) => <PropertyCard key={property.id} property={property} />)}</div>
         )}
       </div>
     </div>

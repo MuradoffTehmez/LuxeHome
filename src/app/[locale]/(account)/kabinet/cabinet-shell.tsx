@@ -37,7 +37,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
         </button>
       </div>
 
-      <div className="grid min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block lg:self-start">
           <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} />
         </aside>

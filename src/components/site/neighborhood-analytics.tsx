@@ -76,7 +76,7 @@ export function NeighborhoodAnalytics({
         {description && <p className="mt-5 max-w-3xl leading-relaxed text-ink-soft">{description}</p>}
 
         {metrics.length > 0 && (
-          <dl className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {metrics.map(([label, value]) => (
               <div key={label} className="flex flex-col gap-1 rounded-xl border border-line bg-paper px-5 py-4 shadow-xs">
                 <dt className="text-xs font-semibold text-ink-muted">{label}</dt>

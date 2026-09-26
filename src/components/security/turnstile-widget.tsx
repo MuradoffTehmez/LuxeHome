@@ -11,6 +11,7 @@ type TurnstileApi = {
       sitekey: string;
       action: string;
       appearance: "always";
+      size: "normal" | "compact";
       callback: (token: string) => void;
       "expired-callback": () => void;
       "error-callback": () => void;
@@ -92,6 +93,9 @@ export function TurnstileWidget({
           sitekey: siteKey,
           action,
           appearance: "always",
+          // `normal` widget sabit 300px-dir: 320px ekranda forma kartına sığmır və
+          // səhifəni üfüqi daşdırırdı. Dar konteynerdə rəsmi `compact` (150px) ölçüsü.
+          size: containerRef.current.clientWidth < 300 ? "compact" : "normal",
           "response-field": true,
           "response-field-name": TURNSTILE_RESPONSE_FIELD,
           callback: () => setFailed(false),
@@ -125,8 +129,8 @@ export function TurnstileWidget({
     // `aria-label` yalnız rolu olan elementdə keçərlidir; role-suz `div`-də
     // axe onu «aria-prohibited-attr» kimi işarələyir (WCAG 4.1.2). Widget
     // qrup kimi elan olunur ki, etiket ekran oxuyucuya çatsın.
-    <div className="min-h-[65px]" role="group" aria-label="Təhlükəsizlik yoxlaması">
-      <div ref={containerRef} />
+    <div className="min-h-[65px] min-w-0" role="group" aria-label="Təhlükəsizlik yoxlaması">
+      <div ref={containerRef} className="w-full" />
       {failed && (
         <p role="alert" className="mt-2 text-sm text-danger">
           Təhlükəsizlik yoxlaması yüklənmədi. Səhifəni yeniləyib yenidən cəhd edin.

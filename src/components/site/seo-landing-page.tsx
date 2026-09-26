@@ -55,7 +55,7 @@ export function SeoLandingPage({
 
       <Section tone="ivory" spacing="cozy">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
             <div className="flex max-w-[72ch] flex-col gap-5 text-base leading-relaxed text-ink-soft">
               {landing.content.map((paragraph) => (
                 <p key={paragraph.slice(0, 48)}>{paragraph}</p>

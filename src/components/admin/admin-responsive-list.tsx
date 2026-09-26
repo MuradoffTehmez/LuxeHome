@@ -35,7 +35,9 @@ export function AdminListCard({
 }: AdminListCardProps) {
   return (
     <article className={cn("min-w-0 rounded-xl border border-line bg-paper p-4 shadow-xs", className)}>
-      <header className="flex min-w-0 items-start justify-between gap-3">
+      {/* 25rem-dən dar kartda status başlığın altına düşür — yanında qalanda başlıq
+          hər sətirdə bir söz olan dar sütuna sıxılırdı. */}
+      <header className="flex min-w-0 flex-col gap-2 min-[25rem]:flex-row min-[25rem]:items-start min-[25rem]:justify-between min-[25rem]:gap-3">
         <div className="min-w-0 flex-1">
           <div className="font-medium text-ink [overflow-wrap:anywhere]">{title}</div>
           {meta ? <div className="mt-1 text-xs text-ink-muted [overflow-wrap:anywhere]">{meta}</div> : null}

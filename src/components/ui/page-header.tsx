@@ -44,7 +44,7 @@ export function PageHeader({
                   {item.href && !isCurrent ? (
                     <Link
                       href={item.href}
-                      className="rounded-xs transition-colors hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                      className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] rounded-xs transition-colors hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                     >
                       {item.label}
                     </Link>

@@ -31,7 +31,7 @@ export default async function KnowledgeCategoriesPage({ searchParams }: { search
   return (
     <>
       <AdminPageHeader title={t("pages.knowledge.bilikMovzulari")} description={t("pages.knowledge.beledciVeTerminleriMovzu")} breadcrumbs={[{ label: t("pages.knowledge.idarePaneli"), href: "/admin" }, { label: t("pages.knowledge.bilikMerkezi"), href: "/admin/bilik-merkezi" }, { label: t("pages.knowledge.movzular") }]} />
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.2fr_1fr]">
         <AdminCard bodyClassName="p-0">
           <AdminTable caption={t("pages.knowledge.bilikMovzulari")} headers={[{ label: t("pages.knowledge.movzu") }, { label: t("pages.knowledge.kontent") }, { label: t("pages.knowledge.status") }, { label: t("pages.knowledge.emeliyyatlar"), srOnly: true, className: "text-right" }]}>
             {categories.map((category) => (

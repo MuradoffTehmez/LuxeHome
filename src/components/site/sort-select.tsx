@@ -41,7 +41,7 @@ export function SortSelect({ value, hrefs, compact = false, className }: SortSel
       >
         {t("sort")}
       </label>
-      <div className={cn("relative", compact && "min-w-0 max-w-36")}>
+      <div className={cn("relative", compact && "min-w-[7.5rem] max-w-40")}>
         <select
           id={id}
           value={value}
@@ -54,7 +54,7 @@ export function SortSelect({ value, hrefs, compact = false, className }: SortSel
           }}
           className={cn(
             "min-h-11 w-full cursor-pointer appearance-none rounded-sm border border-line-strong bg-paper pr-9 pl-3 text-sm text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold",
-            compact && "max-w-36",
+            compact && "max-w-40",
           )}
         >
           {[

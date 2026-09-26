@@ -207,7 +207,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             renderCard={(post) => (
               <AdminListCard
                 title={
-                  <Link href={`${LIST_PATH}/${post.id}`} className="transition-colors hover:text-gold-deep">
+                  <Link href={`${LIST_PATH}/${post.id}`} className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] transition-colors hover:text-gold-deep">
                     {post.title}
                   </Link>
                 }

@@ -33,7 +33,7 @@ export default async function SeoSettingsPage() {
   const localeOptions = Object.values(LOCALES).map((value) => ({ value, label: value.toUpperCase() }));
   return <>
     <AdminPageHeader title={t("pages.serp.qlobalVeLocalSeo")} description={t("pages.serp.canonicalHostMetadataDefault")} breadcrumbs={[{ label: t("pages.serp.serpVeSeo"), href: "/admin/serp" }, { label: t("pages.serp.parametrler") }]} />
-    <div className="grid gap-6 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <AdminForm action={saveGlobalSeoSettings} submitLabel={t("pages.serp.qlobalParametrleriSaxla")}><FormSection title={t("pages.serp.qlobalSeo")} description={t("pages.serp.butunPublicSehifelerinFallback")}>
         <AdminInput name="siteName" label={t("pages.serp.saytAdi")} defaultValue={global.siteName} required />
         <AdminInput name="titleTemplate" label={t("pages.serp.titleTemplate")} defaultValue={global.titleTemplate} required />

@@ -51,7 +51,7 @@ export default async function AdminDemoContentPage() {
           <DemoToggleForm enabled={enabled} hasContent={total > 0} />
         </AdminCard>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <StatCard
             label={t("pages.demoContent.statProperties")}
             value={stats.properties}
@@ -91,7 +91,7 @@ export default async function AdminDemoContentPage() {
           />
         </div>
 
-        <div className="grid min-w-0 gap-6 xl:grid-cols-[1.2fr_1fr]">
+        <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[1.2fr_1fr]">
           <AdminCard
             title={t("pages.demoContent.byCategoryTitle")}
             description={t("pages.demoContent.byCategoryDescription")}

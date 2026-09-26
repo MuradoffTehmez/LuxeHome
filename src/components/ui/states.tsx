@@ -114,7 +114,7 @@ export function DetailSkeleton() {
       </header>
       <Section tone="ivory" spacing="cozy">
         <Container>
-          <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
+          <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-14">
             <div className="flex min-w-0 flex-col gap-6">
               <Skeleton className="aspect-16/9 w-full rounded-md" />
               <Skeleton className="h-8 w-3/4" />

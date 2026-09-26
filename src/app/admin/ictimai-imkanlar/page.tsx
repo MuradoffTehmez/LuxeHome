@@ -111,7 +111,7 @@ export default async function PublicFeaturesAdminPage() {
         breadcrumbs={[{ label: t("pages.amenities.idarePaneli"), href: "/admin" }, { label: t("pages.amenities.ictimaiImkanlar") }]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <AdminCard title={t("pages.amenities.premiumElan")} description={t("pages.amenities.yalnizUygunNeticelerDaxilinde")}>
           <AdminForm action={activatePremiumListing} submitLabel={t("pages.amenities.premiumAktivEt")} className="gap-4">
             <label className="text-sm text-ink-soft">{t("pages.amenities.elan")}<select className={inputClass} name="propertyId" required><option value="">{t("pages.amenities.secin")}</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
@@ -124,7 +124,7 @@ export default async function PublicFeaturesAdminPage() {
             <label className="text-sm text-ink-soft">{t("pages.amenities.elan")}<select className={inputClass} name="propertyId" required><option value="">{t("pages.amenities.secin")}</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
             <label className="text-sm text-ink-soft">{t("pages.amenities.kateqoriya")}<select className={inputClass} name="category">{Object.entries(NEARBY_PLACE_CATEGORY_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
             <label className="text-sm text-ink-soft">{t("pages.amenities.ad")}<input className={inputClass} name="name" required /></label>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="text-sm text-ink-soft">{t("pages.amenities.mesafeMetr")}<input className={inputClass} name="distanceMeters" type="number" min="0" /></label>
               <label className="text-sm text-ink-soft">{t("pages.amenities.piyadaDeqiqe")}<input className={inputClass} name="walkingMinutes" type="number" min="0" /></label>
             </div>

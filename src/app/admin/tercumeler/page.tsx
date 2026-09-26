@@ -48,7 +48,7 @@ export default async function AdminTranslationsPage({ searchParams }: { searchPa
   return (
     <>
       <AdminPageHeader title={t("pages.translations.strukturlasdirilmisTercumeler")} description={t("pages.translations.azMenbeKontentininEn")} breadcrumbs={[{ label: t("pages.translations.idarePaneli"), href: "/admin" }, { label: t("pages.translations.tercumeler") }]} />
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,0.8fr)]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,0.8fr)]">
         <AdminCard title={current ? t("pages.misc.tercumeniRedakteEt") : t("pages.misc.yeniTercume")}>
           <TranslationForm key={current?.id ?? "new"} entities={entities} initial={current} />
         </AdminCard>

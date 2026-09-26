@@ -80,7 +80,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
     <>
       <AdminPageHeader title={t("pages.ops.korporativEPoct")} description={t("pages.common.mektubUzreGonderisCatdirilma", { p0: total })} breadcrumbs={[{ label: t("pages.ops.idarePaneli"), href: "/admin" }, { label: t("pages.ops.korporativEPoct") }]} />
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label={t("pages.ops.butunFealiyyet")} value={overview.total} hint={t("pages.ops.mezmunDeyilYalnizMetadata")} icon={Mail} />
         <StatCard label={t("pages.ops.gonderilen")} value={overview.outbound} hint={t("pages.common.catdirilmaTesdiqi", { p0: overview.delivered })} icon={Send} tone="gold" />
         <StatCard label={t("pages.ops.daxilOlan")} value={overview.inbound} hint={t("pages.ops.webhookIleQeydeAlinir")} icon={Inbox} tone="success" />

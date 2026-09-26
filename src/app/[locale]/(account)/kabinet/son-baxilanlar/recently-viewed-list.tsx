@@ -58,7 +58,7 @@ export function RecentlyViewedList() {
         <p className="text-sm text-ink-muted">{t("count", { count: properties.length })}</p>
         <ConfirmClearButton title={t("clearTitle")} description={t("clearDescription")} onConfirm={clear} />
       </div>
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {properties.map((property) => (
           <PropertyCard key={property.id} property={property} />
         ))}

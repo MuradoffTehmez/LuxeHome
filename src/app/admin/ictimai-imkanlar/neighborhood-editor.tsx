@@ -96,7 +96,7 @@ export function NeighborhoodEditor({
       </label>
 
       <div key={locationId || "empty"} className="flex flex-col gap-4">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {numberFields(t).map(([name, label]) => (
             <label key={name} className="text-sm text-ink-soft">
               {label}
@@ -104,12 +104,12 @@ export function NeighborhoodEditor({
             </label>
           ))}
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <label className="text-sm text-ink-soft">{t("pages.amenities.azTesvir")}<textarea className={`${inputClass} min-h-28 py-2`} name="description" defaultValue={values.description} /></label>
           <label className="text-sm text-ink-soft">{t("pages.amenities.enTesvir")}<textarea className={`${inputClass} min-h-28 py-2`} name="descriptionEn" defaultValue={values.descriptionEn} /></label>
           <label className="text-sm text-ink-soft">{t("pages.amenities.ruTesvir")}<textarea className={`${inputClass} min-h-28 py-2`} name="descriptionRu" defaultValue={values.descriptionRu} /></label>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="text-sm text-ink-soft">{t("pages.amenities.menbe")}<input className={inputClass} name="dataSource" defaultValue={values.dataSource} /></label>
           <label className="text-sm text-ink-soft">{t("pages.amenities.melumatTarixi")}<input className={inputClass} name="measuredAt" type="date" defaultValue={values.measuredAt} /></label>
         </div>

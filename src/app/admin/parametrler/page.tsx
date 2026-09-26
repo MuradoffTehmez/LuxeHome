@@ -29,7 +29,7 @@ export default async function AdminSettingsPage() {
         breadcrumbs={[{ label: t("pages.settings.idarePaneli"), href: "/admin" }, { label: t("pages.settings.parametrler") }]}
       />
 
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[1.1fr_1fr]">
+      <div className="grid grid-cols-1 min-w-0 gap-6 xl:grid-cols-[1.1fr_1fr]">
         <SettingsForm
           notificationEmail={settings[SETTING_KEYS.LEAD_NOTIFICATION_EMAIL] ?? ""}
           // Açar heç yazılmayıbsa, bildiriş aktiv sayılır

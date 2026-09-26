@@ -52,7 +52,7 @@ export default async function AdminReservationsPage() {
             {reservations.map((reservation) => {
               const status = reservation.status as ReservationStatus;
               return (
-                <li key={reservation.id} className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                <li key={reservation.id} className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <Link href={`/admin/emlaklar/${reservation.propertyId}`} className="font-medium text-ink hover:text-gold-deep">{reservation.property.title}</Link>

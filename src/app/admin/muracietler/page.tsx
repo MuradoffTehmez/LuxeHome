@@ -150,7 +150,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
             renderCard={(lead) => (
               <AdminListCard
                 title={
-                  <Link href={`${LIST_PATH}/${lead.id}`} className="transition-colors hover:text-gold-deep">
+                  <Link href={`${LIST_PATH}/${lead.id}`} className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] transition-colors hover:text-gold-deep">
                     {lead.name}
                   </Link>
                 }
