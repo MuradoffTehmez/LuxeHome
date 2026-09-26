@@ -183,7 +183,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
       />
 
       <nav aria-label={t("pages.partners.terefdasStatuslari")} className="mb-5 flex gap-2 overflow-x-auto pb-1">
-        <Link href={LIST_PATH} className="inline-flex min-h-11 shrink-0 items-center rounded-xs border border-line px-4 text-sm text-ink">
+        <Link href={LIST_PATH} className="inline-flex min-h-11 shrink-0 items-center rounded-sm border border-line px-4 text-sm text-ink">
           {t("pages.partners.hamisi")} <span className="ml-2 text-ink-muted">{Object.values(counts).reduce((sum, value) => sum + value, 0)}</span>
         </Link>
         {[
@@ -192,7 +192,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           PARTNER_STATUSES.EXPIRED,
           PARTNER_STATUSES.ARCHIVED,
         ].map((status) => (
-          <Link key={status} href={`${LIST_PATH}?status=${status}`} className="inline-flex min-h-11 shrink-0 items-center rounded-xs border border-line px-4 text-sm text-ink">
+          <Link key={status} href={`${LIST_PATH}?status=${status}`} className="inline-flex min-h-11 shrink-0 items-center rounded-sm border border-line px-4 text-sm text-ink">
             {t(`labels.partnerStatus.${status}`)} <span className="ml-2 text-ink-muted">{counts[status] ?? 0}</span>
           </Link>
         ))}
@@ -267,7 +267,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
                   <AdminTableRow key={partner.id}>
                     <AdminTableCell>
                       <div className="flex min-w-44 items-center gap-3">
-                        <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-xs border border-line bg-ivory text-xs font-semibold text-ink">
+                        <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-sm border border-line bg-ivory text-xs font-semibold text-ink">
                           {partner.logoUrl ?? partner.logoLight ?? partner.logoDark ? <Image src={(partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string} alt="" fill sizes="44px" unoptimized={isUnoptimizedImage((partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string)} className={!partner.logoUrl && !partner.logoLight ? "object-contain bg-navy p-1" : "object-contain p-1"} /> : partner.name.slice(0, 2).toUpperCase()}
                         </span>
                         <div><p className="font-medium text-ink">{partner.name}</p><p className="text-xs text-ink-muted">/{partner.slug}</p></div>

@@ -32,12 +32,12 @@ export function ReservationStatusForm({ id, status }: { id: string; status: Rese
   return (
     <form action={action} className="flex flex-wrap items-center justify-end gap-2">
       <input type="hidden" name="id" value={id} />
-      <select name="status" defaultValue={status} className="min-h-11 rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink">
+      <select name="status" defaultValue={status} className="min-h-11 rounded-sm border border-line-strong bg-paper px-3 text-sm text-ink">
         {(Object.entries(RESERVATION_STATUS_LABELS) as [ReservationStatus, string][]).map(([value, label]) => (
           <option key={value} value={value}>{label}</option>
         ))}
       </select>
-      <input name="note" maxLength={500} placeholder={t("pages.ops.qeydIsteyeBagli")} className="min-h-11 min-w-48 rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink" />
+      <input name="note" maxLength={500} placeholder={t("pages.ops.qeydIsteyeBagli")} className="min-h-11 min-w-48 rounded-sm border border-line-strong bg-paper px-3 text-sm text-ink" />
       <Submit />
     </form>
   );

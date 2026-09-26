@@ -65,7 +65,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
             href={localizePath(`/xidmetler/${service.slug}`, locale)}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
           >
             <ExternalLink className="size-4" aria-hidden="true" />
             {t("pages.services.saytdaBax")}

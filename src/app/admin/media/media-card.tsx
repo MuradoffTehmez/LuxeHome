@@ -98,7 +98,7 @@ export function MediaCard({ item }: { item: MediaItem }) {
             defaultValue={item.alt}
             placeholder={t("pages.settings.altMetnSeo")}
             maxLength={160}
-            className="min-h-11 w-full rounded-xs border border-line px-3 text-base text-ink placeholder:text-ink-muted focus:border-gold sm:text-sm"
+            className="min-h-11 w-full rounded-sm border border-line px-3 text-base text-ink placeholder:text-ink-muted focus:border-gold sm:text-sm"
           />
 
           <div className="flex items-center justify-between gap-1">

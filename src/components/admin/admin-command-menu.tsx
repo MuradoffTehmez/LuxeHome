@@ -82,7 +82,7 @@ export function AdminCommandMenu() {
       >
         <Search className="size-4.5 shrink-0" aria-hidden="true" />
         <span className="hidden min-w-0 flex-1 truncate text-left md:block">{t("shell.searchPlaceholder")}</span>
-        <kbd className="hidden rounded-xs border border-line bg-beige px-1.5 py-0.5 text-[11px] font-medium text-ink-muted lg:inline-flex">
+        <kbd className="hidden rounded-sm border border-line bg-beige px-1.5 py-0.5 text-[11px] font-medium text-ink-muted lg:inline-flex">
           Ctrl K
         </kbd>
       </button>

@@ -75,7 +75,7 @@ export default async function AdminKnowledgePage({
           <Link
             key={page.href}
             href={page.href}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
+            className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
           >
             <page.icon className="size-4" aria-hidden="true" />
             {page.label}

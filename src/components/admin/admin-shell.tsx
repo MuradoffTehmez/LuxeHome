@@ -52,7 +52,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
   }, [pathname]);
 
   return (
-    <div className="min-h-dvh bg-ivory">
+    <div className="admin-surface min-h-dvh bg-ivory">
       <aside className="dark-surface fixed inset-y-0 left-0 z-[var(--z-sticky)] hidden w-[292px] flex-col border-r border-white/10 bg-[#101a28] text-white shadow-lg lg:flex">
         <SidebarContent pathname={pathname} user={user} counters={counters} tone="dark" />
       </aside>
@@ -81,7 +81,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
             aria-label={t("shell.openMenu")}
             aria-haspopup="dialog"
             aria-expanded={drawerOpen}
-            className="inline-flex size-11 cursor-pointer items-center justify-center rounded-xs text-ink transition-colors hover:bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:hidden"
+            className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-ink transition-colors hover:bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold lg:hidden"
           >
             <Menu className="size-5" aria-hidden="true" />
           </button>
@@ -91,7 +91,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:ml-0">
-            <Link href={localizePath("/", locale)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xs px-3 text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink">
+            <Link href={localizePath("/", locale)} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm text-ink-soft transition-colors hover:bg-beige hover:text-ink">
               <ExternalLink className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">{t("shell.openSite")}</span>
             </Link>
@@ -206,7 +206,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
                           aria-expanded={expanded}
                           aria-controls={submenuId}
                           aria-label={t(expanded ? "shell.collapseSection" : "shell.expandSection", { section: t(`nav.items.${item.labelKey}`) })}
-                          className={cn("mr-1 grid size-9 shrink-0 cursor-pointer place-items-center rounded-xs focus-visible:outline-none", dark ? "hover:bg-white/10" : "hover:bg-black/5")}
+                          className={cn("mr-1 grid size-9 shrink-0 cursor-pointer place-items-center rounded-md focus-visible:outline-none", dark ? "hover:bg-white/10" : "hover:bg-black/5")}
                         >
                           <ChevronDown className={cn("size-4 transition-transform duration-200", expanded && "rotate-180")} aria-hidden="true" />
                         </button>
@@ -252,7 +252,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
           <p className={cn("truncate text-xs", dark ? "text-white/50" : "text-ink-muted")}>{user.email}</p>
         </div>
         <form action={signOut}>
-          <button type="submit" className={cn("flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-xs px-3 text-sm transition-colors", dark ? "text-white/75 hover:bg-white/8 hover:text-white" : "text-ink-soft hover:bg-danger-bg hover:text-danger")}>
+          <button type="submit" className={cn("flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-md px-3 text-sm transition-colors", dark ? "text-white/75 hover:bg-white/8 hover:text-white" : "text-ink-soft hover:bg-danger-bg hover:text-danger")}>
             <LogOut className="size-4.5 shrink-0" aria-hidden="true" />
             {t("shell.signOut")}
           </button>

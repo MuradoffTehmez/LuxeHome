@@ -337,7 +337,7 @@ export function ImageDropzone({
             <li
               key={item.id}
               className={cn(
-                "relative overflow-hidden rounded-xs border bg-beige",
+                "relative overflow-hidden rounded-sm border bg-beige",
                 item.status === "error" ? "border-danger" : "border-line",
               )}
             >
@@ -383,7 +383,7 @@ export function ImageDropzone({
                     onChange={(event) => setAlt(item.id, event.target.value)}
                     placeholder={t("components.dropzone.altPlaceholder")}
                     maxLength={160}
-                    className="min-h-11 w-full rounded-xs border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
+                    className="min-h-11 w-full rounded-sm border border-line px-2 text-xs text-ink placeholder:text-ink-muted focus:border-gold"
                   />
                   {!item.alt.trim() && (
                     <p className="flex items-start gap-1 text-[11px] leading-4 text-warning">
@@ -478,7 +478,7 @@ export function ImageDropzone({
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="flex min-h-11 aspect-4/3 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xs border-2 border-dashed border-line-strong text-ink-muted transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                className="flex min-h-11 aspect-4/3 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-sm border-2 border-dashed border-line-strong text-ink-muted transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
               >
                 <ImagePlus className="size-6" aria-hidden="true" />
                 <span className="text-xs font-medium">{t("components.dropzone.addMore")}</span>

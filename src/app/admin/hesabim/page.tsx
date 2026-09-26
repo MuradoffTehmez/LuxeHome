@@ -64,7 +64,7 @@ export default async function AccountPage({
         </p>
       </header>
 
-      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
+      <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
         <ProfileForm initial={{
           name: profile.name,
           phone: profile.phone ?? "",
@@ -74,27 +74,27 @@ export default async function AccountPage({
         }} />
       </section>
 
-      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
+      <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
         <h2 className="font-display text-lg text-ink">{t("pages.account.paroluDeyis")}</h2>
         <div className="mt-4 max-w-md">
           <PasswordForm mustChange={parol === "deyis" || user.mustChangePassword} />
         </div>
       </section>
 
-      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
+      <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
         <h2 className="font-display text-lg text-ink">{t("pages.account.ikiMerheleliDogrulama")}</h2>
         <p className="mt-2 text-sm text-ink-soft">
           {t("pages.account.aktivdirIslenmemisEhtiyatKod")} <strong className="text-ink">{remainingCodes}</strong>
         </p>
         {remainingCodes < 3 && (
-          <p className="mt-3 rounded-xs border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
+          <p className="mt-3 rounded-sm border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
             {t("pages.account.ehtiyatKodlarinizAzalibCari")}
           </p>
         )}
         <BackupCodesForm />
       </section>
 
-      <section className="min-w-0 rounded-xs border border-line bg-paper p-4 sm:p-6">
+      <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-lg text-ink">{t("pages.account.aktivSessiyalar")}</h2>
           {otherSessions.length > 0 && (

@@ -385,6 +385,18 @@ p {
 }
 
 /* --------------------------------------------------------------------------
+   Admin panel — iş interfeysi
+   Paneldə serif başlıq yoxdur: sıx cədvəl və forma səhifələrində Playfair
+   oxunaqlığı azaldır. İctimai saytın h1/h2 serif qaydası burada ləğv olunur;
+   `font-display` sinfi açıq verilərsə yenə tətbiq olunur.
+   -------------------------------------------------------------------------- */
+.admin-surface :is(h1, h2):not(.font-display) {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------------------
    Skeleton shimmer
    -------------------------------------------------------------------------- */
 @keyframes luxe-shimmer {

@@ -33,7 +33,7 @@ export function AgencyProfileRepair({ userId, defaultName }: { userId: string; d
           required
           minLength={2}
           maxLength={160}
-          className="mt-1 min-h-11 w-full rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink outline-none transition-colors focus:border-gold"
+          className="mt-1 min-h-11 w-full rounded-sm border border-line-strong bg-paper px-3 text-sm text-ink outline-none transition-colors focus:border-gold"
         />
       </label>
       <Button type="submit" size="sm" loading={pending} className="min-h-11 shrink-0">

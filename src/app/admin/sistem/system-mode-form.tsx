@@ -109,7 +109,7 @@ export function SystemModeForm({ initial }: { initial: SystemModeFormValues }) {
         {state.status === "error" && state.message ? (
           <div
             role="alert"
-            className="flex items-start gap-2.5 rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
+            className="flex items-start gap-2.5 rounded-sm border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
           >
             <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
             <span>{state.message}</span>
@@ -119,7 +119,7 @@ export function SystemModeForm({ initial }: { initial: SystemModeFormValues }) {
         {state.status === "success" && state.message ? (
           <div
             role="status"
-            className="flex items-start gap-2.5 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
+            className="flex items-start gap-2.5 rounded-sm border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
           >
             <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
             <span>{state.message}</span>
