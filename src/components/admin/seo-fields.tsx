@@ -28,7 +28,7 @@ function Preview({
   mobile?: boolean;
 }) {
   return (
-    <div className={`rounded-md border border-line bg-paper p-4 ${mobile ? "max-w-sm" : "w-full"}`}>
+    <div className={`rounded-xl border border-line bg-paper p-4 shadow-xs ${mobile ? "max-w-sm" : "w-full"}`}>
       <p className="mb-3 text-xs font-semibold tracking-wide text-ink-muted uppercase">{label}</p>
       <p className="truncate text-xs text-success">luxehomeestate.az{pathname}</p>
       <p className={`mt-1 font-medium text-info ${mobile ? "text-lg" : "text-xl"}`}>{title}</p>
@@ -61,7 +61,7 @@ export function SeoFields({
           <label htmlFor={titleId} className="text-sm font-medium text-ink">{t("components.seo.metaTitle")}</label>
           <span className={`tabular text-xs ${title.length > 60 ? "text-danger" : "text-ink-muted"}`}>{title.length} / 60</span>
         </div>
-        <input id={titleId} name={titleName} value={title} onChange={(event) => setTitle(event.target.value)} maxLength={70} className="min-h-11 w-full rounded-xs border border-line bg-paper px-3 text-sm text-ink focus:border-gold focus:outline-none" />
+        <input id={titleId} name={titleName} value={title} onChange={(event) => setTitle(event.target.value)} maxLength={70} className="min-h-11 w-full rounded-sm border border-line bg-paper px-3 text-sm text-ink focus:border-gold focus:outline-none" />
         <p className="text-xs text-ink-muted">{t("components.seo.metaTitleHint")}</p>
       </div>
 
@@ -70,7 +70,7 @@ export function SeoFields({
           <label htmlFor={descriptionId} className="text-sm font-medium text-ink">{t("components.seo.metaDescription")}</label>
           <span className={`tabular text-xs ${description.length > 160 ? "text-danger" : "text-ink-muted"}`}>{description.length} / 160</span>
         </div>
-        <textarea id={descriptionId} name={descriptionName} value={description} onChange={(event) => setDescription(event.target.value)} maxLength={180} rows={4} className="w-full rounded-xs border border-line bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
+        <textarea id={descriptionId} name={descriptionName} value={description} onChange={(event) => setDescription(event.target.value)} maxLength={180} rows={4} className="w-full rounded-sm border border-line bg-paper px-3 py-2.5 text-sm text-ink focus:border-gold focus:outline-none" />
         <p className="text-xs text-ink-muted">{t("components.seo.metaDescriptionHint")}</p>
       </div>
 

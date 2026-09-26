@@ -94,7 +94,7 @@ export default async function AgencyDetailPage({ params }: Props) {
 
       <Section tone="ivory" spacing="compact" className="border-b border-line">
         <Container>
-          <div className="rounded-md border border-line bg-paper p-4 shadow-sm sm:p-5">
+          <div className="rounded-xl border border-line bg-paper p-4 shadow-sm sm:p-5">
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <Badge tone="gold">{t("verifiedAgency")}</Badge>
               <Badge tone="neutral">{t("activeListingCount", { count: properties.length })}</Badge>

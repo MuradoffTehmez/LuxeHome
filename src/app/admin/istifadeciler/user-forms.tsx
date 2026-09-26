@@ -94,7 +94,7 @@ export function UserRow({
           defaultValue={name}
           maxLength={120}
           className={cn(
-            "min-h-11 rounded-xs border border-line bg-paper px-3 text-ink transition-colors focus:border-gold",
+            "min-h-11 rounded-sm border border-line bg-paper px-3 text-ink transition-colors focus:border-gold",
             mobile ? "w-full text-base sm:text-sm" : "w-40 text-xs",
           )}
         />
@@ -108,7 +108,7 @@ export function UserRow({
           defaultValue={role}
           disabled={isSelf}
           className={cn(
-            "min-h-11 cursor-pointer rounded-xs border border-line bg-paper px-3 text-ink transition-colors focus:border-gold disabled:cursor-not-allowed disabled:bg-beige",
+            "min-h-11 cursor-pointer rounded-sm border border-line bg-paper px-3 text-ink transition-colors focus:border-gold disabled:cursor-not-allowed disabled:bg-beige",
             mobile ? "w-full text-base sm:text-sm" : "text-xs",
           )}
         >

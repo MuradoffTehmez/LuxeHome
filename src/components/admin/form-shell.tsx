@@ -74,7 +74,7 @@ export function AdminForm({
           <div
             ref={errorRef}
             role="alert"
-            className="flex items-start gap-2.5 rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
+            className="flex items-start gap-2.5 rounded-sm border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
             <span>{state.message}</span>
@@ -85,7 +85,7 @@ export function AdminForm({
         {state.status === "success" && state.message && (
           <div
             role="status"
-            className="flex items-start gap-2.5 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
+            className="flex items-start gap-2.5 rounded-sm border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
           >
             <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
             <span>{state.message}</span>
@@ -102,7 +102,7 @@ export function AdminForm({
           {cancelHref && (
             <Link
               href={cancelHref}
-              className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
+              className="inline-flex min-h-11 items-center rounded-sm border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
             >
               {t("actions.cancel")}
             </Link>
@@ -136,7 +136,7 @@ export function SubmitButton({
       disabled={pending}
       aria-busy={pending || undefined}
       className={cn(
-        "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xs border border-transparent bg-gold px-5 text-sm font-medium text-on-gold",
+        "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-sm border border-transparent bg-gold px-5 text-sm font-medium text-on-gold",
         "transition-colors duration-300 ease-out-soft hover:bg-gold-soft",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",
@@ -197,7 +197,7 @@ export function FormJumpNav({ items }: { items: readonly { id: string; label: st
           <a
             key={item.id}
             href={`#${item.id}`}
-            className="inline-flex min-h-11 shrink-0 items-center rounded-xs border border-line bg-paper px-3 text-xs font-medium text-ink-soft transition-colors hover:border-gold hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-sm border border-line bg-paper px-3 text-xs font-medium text-ink-soft transition-colors hover:border-gold hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
             {item.label}
           </a>

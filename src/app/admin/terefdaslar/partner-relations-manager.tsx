@@ -41,7 +41,7 @@ export function PartnerRelationsManager({
 
   return (
     <div className="flex flex-col gap-6">
-      <form action={addAction} className="grid gap-4 rounded-md border border-line bg-paper p-4 sm:grid-cols-2 sm:p-5">
+      <form action={addAction} className="grid gap-4 rounded-xl border border-line bg-paper p-4 sm:grid-cols-2 sm:p-5 shadow-xs">
         <input type="hidden" name="partnerId" value={partnerId} />
         <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
           {t("pages.partners.elaqeNovu")}
@@ -182,9 +182,9 @@ function RelationList({
 }) {
   const t = useTranslations("admin");
   return (
-    <section className="overflow-hidden rounded-md border border-line bg-paper">
+    <section className="overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
       <header className="border-b border-line px-4 py-3 sm:px-5">
-        <h3 className="font-display text-base text-ink">{title}</h3>
+        <h3 className="font-semibold text-base text-ink">{title}</h3>
       </header>
       {items.length === 0 ? (
         <p className="p-4 text-sm text-ink-muted sm:p-5">{t("pages.partners.elaqeYoxdur")}</p>

@@ -119,7 +119,7 @@ export function ContentEditor({
 
       <div
         className={cn(
-          "overflow-hidden rounded-xs border bg-paper focus-within:border-gold",
+          "overflow-hidden rounded-sm border bg-paper focus-within:border-gold",
           error ? "border-danger" : "border-line-strong",
         )}
       >

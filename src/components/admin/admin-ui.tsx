@@ -83,7 +83,7 @@ export function AdminCard({
 }) {
   return (
     <section
-      className={cn("overflow-hidden rounded-lg border border-line bg-paper shadow-xs", className)}
+      className={cn("overflow-hidden rounded-xl border border-line bg-paper shadow-xs", className)}
     >
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
@@ -129,7 +129,7 @@ export function StatCard({
     <>
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm text-ink-soft">{label}</p>
-        <span className={cn("grid size-9 shrink-0 place-items-center rounded-xs", TONES[tone])}>
+        <span className={cn("grid size-9 shrink-0 place-items-center rounded-md", TONES[tone])}>
           <Icon className="size-4.5" aria-hidden="true" />
         </span>
       </div>
@@ -139,7 +139,7 @@ export function StatCard({
   );
 
   const className =
-    "block rounded-lg border border-line bg-paper p-5 shadow-xs transition-all duration-300 ease-out-soft";
+    "block rounded-xl border border-line bg-paper p-5 shadow-xs transition-all duration-300 ease-out-soft";
 
   if (href) {
     return (

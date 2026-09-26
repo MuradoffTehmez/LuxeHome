@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { buttonClassName } from "./button";
 
@@ -59,7 +60,7 @@ export function SectionHeader({
 
         <Heading
           className={cn(
-            "max-w-3xl font-display text-[clamp(2.25rem,4vw,4.5rem)] leading-[0.98] tracking-[-0.035em]",
+            "max-w-3xl font-display text-[clamp(2rem,3.2vw,3.25rem)] leading-[1.08] tracking-[-0.025em]",
             isDark ? "text-ink-invert" : "text-ink",
           )}
         >
@@ -69,7 +70,7 @@ export function SectionHeader({
         {description && (
           <p
             className={cn(
-              "text-base leading-relaxed",
+              "max-w-[60ch] text-base leading-relaxed sm:text-lg",
               isDark ? "text-ink-invert-soft" : "text-ink-soft",
             )}
           >
@@ -81,14 +82,13 @@ export function SectionHeader({
       {action && (
         <Link
           href={action.href}
-          className={buttonClassName("ghost", "sm", false, cn(
-            "group/action shrink-0 border-b px-0",
-            isDark
-              ? "border-white/30 text-ink-invert hover:border-gold-soft hover:bg-transparent hover:text-gold-soft"
-              : "border-line-strong text-ink hover:border-gold-deep hover:bg-transparent hover:text-gold-deep",
-          ))}
+          className={buttonClassName(isDark ? "onDark" : "outline", "sm", false, "group/action shrink-0 self-start sm:self-end")}
         >
           {action.label}
+          <ArrowRight
+            className="size-4 transition-transform duration-300 group-hover/action:translate-x-0.5"
+            aria-hidden="true"
+          />
         </Link>
       )}
     </div>

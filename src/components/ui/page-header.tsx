@@ -60,14 +60,15 @@ export function PageHeader({
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0 max-w-3xl">
           {eyebrow ? (
-            <p className="mb-3 text-xs font-semibold tracking-[0.16em] text-gold-deep uppercase">
+            <p className="editorial-kicker mb-4 flex items-center gap-3 text-gold-deep">
+              <span aria-hidden="true" className="h-px w-8 bg-gold/60" />
               {eyebrow}
             </p>
           ) : null}
           <h1
             className={cn(
               "text-balance font-display leading-[1.08] tracking-[-0.025em] text-ink",
-              compact ? "text-3xl sm:text-4xl" : "text-4xl sm:text-5xl lg:text-6xl",
+              compact ? "text-3xl sm:text-4xl" : "text-4xl sm:text-5xl lg:text-[3.5rem]",
             )}
           >
             {title}
@@ -97,7 +98,7 @@ export function PageHeader({
         "text-[var(--text-primary)]",
         contained
           ? "bg-transparent py-0"
-          : "border-b border-line bg-[var(--surface-page)]",
+          : "relative overflow-hidden border-b border-line bg-[linear-gradient(180deg,var(--color-paper)_0%,var(--surface-page)_100%)]",
         !contained && (compact ? "py-7 sm:py-9" : "py-10 sm:py-14 lg:py-16"),
       )}
     >

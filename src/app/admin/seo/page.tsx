@@ -60,9 +60,9 @@ export default async function AdminSeoPage({ searchParams }: Props) {
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {(Object.keys(metricLabels(t)) as Array<keyof ReturnType<typeof metricLabels>>).map((key) => (
-          <div key={key} className="rounded-md border border-line bg-paper p-4">
+          <div key={key} className="rounded-xl border border-line bg-paper p-4 shadow-xs">
             <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">{metricLabels(t)[key]}</p>
-            <p className="tabular mt-2 font-display text-3xl text-ink">{metrics[key]}</p>
+            <p className="tabular mt-2 font-semibold text-3xl text-ink">{metrics[key]}</p>
             {!["missingAlt", "thinContent", "orphanPages"].includes(key) && (
               <p className="mt-1 text-xs text-ink-muted">{t("pages.misc.cemiSehifeden", { p0: metrics.total })}</p>
             )}
@@ -72,9 +72,9 @@ export default async function AdminSeoPage({ searchParams }: Props) {
 
       <AdminCard title={t("pages.serp.askarEdilmisProblemler")} description={t("pages.misc.auditQeydSayi", { count: issues.length })} className="mt-6" bodyClassName="p-0">
         <div className="flex flex-wrap gap-2 border-b border-line p-4">
-          <Link href="/admin/seo" className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${!selected ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>{t("pages.serp.hamisi")}</Link>
+          <Link href="/admin/seo" className={`inline-flex min-h-11 items-center rounded-sm border px-3 text-sm ${!selected ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>{t("pages.serp.hamisi")}</Link>
           {(["error", "warning", "info"] as const).map((severity) => (
-            <Link key={severity} href={`/admin/seo?severity=${severity}`} className={`inline-flex min-h-11 items-center rounded-xs border px-3 text-sm ${selected === severity ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>
+            <Link key={severity} href={`/admin/seo?severity=${severity}`} className={`inline-flex min-h-11 items-center rounded-sm border px-3 text-sm ${selected === severity ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft"}`}>
               {severityLabels(t)[severity]}
             </Link>
           ))}
@@ -95,8 +95,8 @@ export default async function AdminSeoPage({ searchParams }: Props) {
                   <p className="mt-1 text-sm text-ink-soft">{issue.message}</p>
                 </div>
                 <div className="flex gap-2 sm:justify-end">
-                  <Link href={issue.adminPath} className="inline-flex min-h-11 items-center rounded-xs border border-line px-3 text-sm text-ink-soft hover:border-gold hover:text-gold-deep">{t("pages.serp.duzelt")}</Link>
-                  <a href={issue.publicPath} target="_blank" rel="noreferrer" aria-label={t("pages.serp.ictimaiSehifeniAc")} className="grid size-11 place-items-center rounded-xs border border-line text-ink-soft hover:border-gold hover:text-gold-deep"><ExternalLink className="size-4" aria-hidden="true" /></a>
+                  <Link href={issue.adminPath} className="inline-flex min-h-11 items-center rounded-sm border border-line px-3 text-sm text-ink-soft hover:border-gold hover:text-gold-deep">{t("pages.serp.duzelt")}</Link>
+                  <a href={issue.publicPath} target="_blank" rel="noreferrer" aria-label={t("pages.serp.ictimaiSehifeniAc")} className="grid size-11 place-items-center rounded-sm border border-line text-ink-soft hover:border-gold hover:text-gold-deep"><ExternalLink className="size-4" aria-hidden="true" /></a>
                 </div>
               </li>
             ))}

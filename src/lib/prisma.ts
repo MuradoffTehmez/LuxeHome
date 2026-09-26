@@ -9,17 +9,31 @@ import { PrismaClient } from "@prisma/client/wasm.js";
 /**
  * Prisma klienti Cloudflare D1 binding (`env.DB`) üzərindən işləyir.
  *
- * Workers mühitində bağlantı hovuzu yoxdur — binding hər izolyatda sabit qalır,
- * ona görə klient bir dəfə yaradılıb izolyat boyu təkrar istifadə olunur.
+ * **Klient sorğu başına yaradılır**, izolyat boyu paylaşılmır. Workers-də bir
+ * sorğunun yaratdığı promise başqa sorğudan gözlənilə bilməz: paylaşılan
+ * klientin daxili növbəsi yarımçıq kəsilmiş sorğuda (brauzer səhifəni bağlayır,
+ * Next prefetch-i ləğv edir) ilişəndə sonrakı bütün sorğular onu gözləyir,
+ * workerd onları «Worker's code had hung» ilə 500-ə çevirir və izolyat bir daha
+ * düzəlmir. Lokal stack E2E-də (#95) 6-cı dəqiqədən sonra bütün səhifələr belə
+ * düşürdü. Prisma-nın Workers nümunəsi də klienti sorğu daxilində qurur.
+ *
+ * Açar OpenNext-in hər sorğu üçün verdiyi `ctx` (ExecutionContext) obyektidir:
+ * eyni sorğunun fon işləri (`waitUntil`, `unstable_cache` revalidasiyası) eyni
+ * klienti görür, sorğu bitəndə isə `WeakMap` qeydi zibil toplayıcıya qalır.
  * Binding yalnız sorğu kontekstində əlçatandır, buna görə klient ilk istifadədə
  * (lazy) qurulur; modul yüklənərkən deyil.
  */
-let client: PrismaClient | undefined;
+const requestClients = new WeakMap<object, PrismaClient>();
+
+/** Sorğu konteksti olmayan hallar (skript, test) üçün tək klient. */
+let contextlessClient: PrismaClient | undefined;
+
+function createClient(db: D1Database): PrismaClient {
+  return new PrismaClient({ adapter: new PrismaD1(db) });
+}
 
 function getClient(): PrismaClient {
-  if (client) return client;
-
-  const { env } = getCloudflareContext();
+  const { env, ctx } = getCloudflareContext();
   const db = (env as CloudflareEnv).DB;
 
   if (!db) {
@@ -28,7 +42,16 @@ function getClient(): PrismaClient {
     );
   }
 
-  client = new PrismaClient({ adapter: new PrismaD1(db) });
+  if (!ctx) {
+    contextlessClient ??= createClient(db);
+    return contextlessClient;
+  }
+
+  let client = requestClients.get(ctx);
+  if (!client) {
+    client = createClient(db);
+    requestClients.set(ctx, client);
+  }
   return client;
 }
 
@@ -38,7 +61,8 @@ function getClient(): PrismaClient {
  */
 export const prisma = new Proxy({} as PrismaClient, {
   get(_target, prop, receiver) {
-    const value = Reflect.get(getClient(), prop, receiver);
-    return typeof value === "function" ? value.bind(getClient()) : value;
+    const client = getClient();
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
   },
 });

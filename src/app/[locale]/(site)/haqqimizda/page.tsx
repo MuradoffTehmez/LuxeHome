@@ -93,11 +93,11 @@ export default async function AboutPage({ params }: PageProps) {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {WHY_ITEMS.map((item, index) => (
               <Reveal key={item.key} delay={index * 50}>
-                <div className="flex h-full min-w-0 flex-col gap-4 rounded-md border border-line bg-ivory p-5 sm:p-6">
+                <div className="flex h-full min-w-0 flex-col gap-4 rounded-xl border border-line bg-ivory p-5 sm:p-6 shadow-xs">
                   <span className="flex size-11 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
                     <item.icon className="size-5" aria-hidden="true" />
                   </span>
-                  <h3 className="font-display text-lg text-ink">{t(`why.items.${item.key}.title`)}</h3>
+                  <h3 className="text-lg text-ink">{t(`why.items.${item.key}.title`)}</h3>
                   <p className="text-sm leading-relaxed text-ink-soft">
                     {t(`why.items.${item.key}.description`)}
                   </p>

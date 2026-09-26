@@ -57,7 +57,7 @@ export function BulkActionsForm({
           <input
             type="checkbox"
             onChange={toggleAll}
-            className="size-4 rounded-xs border-line-strong accent-gold"
+            className="size-4 rounded-sm border-line-strong accent-gold"
           />
           {t("pages.properties.hamisiniSec")}
         </label>
@@ -122,7 +122,7 @@ export function RowCheckbox({ id }: { id: string }) {
       value={id}
       aria-label={t("pages.properties.sec")}
       onClick={(event) => event.stopPropagation()}
-      className="size-4 shrink-0 rounded-xs border-line-strong accent-gold"
+      className="size-4 shrink-0 rounded-sm border-line-strong accent-gold"
     />
   );
 }

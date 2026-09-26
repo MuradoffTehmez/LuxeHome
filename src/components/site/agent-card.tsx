@@ -28,7 +28,7 @@ export async function AgentCard({
   const summary = agent.specialization || agent.roleTitle || null;
 
   return (
-    <article className="group relative flex h-full flex-col gap-4 rounded-sm border border-line bg-paper p-5 transition-colors duration-300 ease-out-soft hover:border-gold sm:p-6">
+    <article className="group relative flex h-full flex-col gap-4 rounded-xl border border-line bg-paper p-5 transition-colors duration-300 ease-out-soft hover:border-gold sm:p-6">
       <div className="flex items-start gap-4">
         <div className="relative grid size-16 shrink-0 place-items-center overflow-hidden rounded-full bg-beige">
           {agent.avatarUrl ? (

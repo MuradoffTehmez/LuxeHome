@@ -55,7 +55,7 @@ export function LeadQuickStatus({ id, status, name }: { id: string; status: Lead
         value={value}
         onChange={(event) => change(event.target.value as LeadStatus)}
         disabled={pending}
-        className="not-sr-only min-h-11 max-w-44 cursor-pointer rounded-xs border border-line-strong bg-paper px-2.5 text-sm text-ink outline-none transition-colors focus:border-gold disabled:cursor-wait disabled:opacity-60"
+        className="not-sr-only min-h-11 max-w-44 cursor-pointer rounded-sm border border-line-strong bg-paper px-2.5 text-sm text-ink outline-none transition-colors focus:border-gold disabled:cursor-wait disabled:opacity-60"
         aria-label={t("pages.common.muracietininStatusu", { p0: name })}
       >
         {Object.values(LEAD_STATUSES).map((item) => (

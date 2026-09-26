@@ -30,7 +30,7 @@ const property = {
 } as PropertyCardData;
 
 describe("PropertyCard", () => {
-  it("mobil məlumat iyerarxiyasında əməl düymələrini xüsusiyyətlərdən sonra saxlayır", () => {
+  it("etiket və əməl düymələrini şəklin üzərində, qiyməti ondan sonra verir", () => {
     const html = renderToStaticMarkup(
       <ToastProvider>
         <PropertyCard property={property} />
@@ -47,11 +47,11 @@ describe("PropertyCard", () => {
 
     expect(mediaIndex).toBeGreaterThanOrEqual(0);
     expect(badgeIndex).toBeGreaterThan(mediaIndex);
-    expect(priceIndex).toBeGreaterThan(badgeIndex);
+    expect(actionIndex).toBeGreaterThan(badgeIndex);
+    expect(priceIndex).toBeGreaterThan(actionIndex);
     expect(titleIndex).toBeGreaterThan(priceIndex);
     expect(locationIndex).toBeGreaterThan(titleIndex);
     expect(factsIndex).toBeGreaterThan(locationIndex);
-    expect(actionIndex).toBeGreaterThan(factsIndex);
   });
 
   it("kart və skeleton üçün eyni responsiv media nisbətini saxlayır", () => {
@@ -62,9 +62,8 @@ describe("PropertyCard", () => {
     );
     const skeletonHtml = renderToStaticMarkup(<PropertyCardSkeleton />);
 
-    expect(cardHtml).toContain("aspect-4/3 sm:aspect-[16/11]");
+    expect(cardHtml).toContain("aspect-4/3");
     expect(skeletonHtml).toContain("aspect-4/3");
-    expect(skeletonHtml).toContain("sm:aspect-[16/11]");
   });
 });
 

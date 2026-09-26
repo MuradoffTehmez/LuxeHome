@@ -13,7 +13,7 @@ function Submit() {
   const { pending } = useFormStatus();
   const t = useTranslations("admin");
   return (
-    <button type="submit" disabled={pending} className="inline-flex min-h-11 cursor-pointer items-center gap-2 self-start rounded-xs border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold disabled:opacity-50">
+    <button type="submit" disabled={pending} className="inline-flex min-h-11 cursor-pointer items-center gap-2 self-start rounded-sm border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold disabled:opacity-50">
       {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <KeyRound className="size-4" aria-hidden="true" />}
       {t("pages.account.generateNewCodes")}
     </button>
@@ -30,7 +30,7 @@ export function BackupCodesForm() {
       {state.secret ? <SecretPanel secret={state.secret} title={t("pages.account.2faEhtiyatKodlariBir")} note={t("pages.account.herKodYalnizBir")} /> : null}
       <label className="text-sm text-ink-soft">
         {t("pages.account.tehlukesizlikUcunCariParol")}
-        <input name="currentPassword" type="password" autoComplete="current-password" required aria-invalid={Boolean(state.fieldErrors?.currentPassword) || undefined} className="mt-1 block min-h-11 w-full rounded-xs border border-line-strong bg-paper px-3 text-ink outline-none focus:border-gold" />
+        <input name="currentPassword" type="password" autoComplete="current-password" required aria-invalid={Boolean(state.fieldErrors?.currentPassword) || undefined} className="mt-1 block min-h-11 w-full rounded-sm border border-line-strong bg-paper px-3 text-ink outline-none focus:border-gold" />
       </label>
       <Submit />
     </form>

@@ -129,7 +129,7 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
             role="search"
             className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center"
           >
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-xs border border-line-strong bg-paper px-3 focus-within:border-gold">
+            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-sm border border-line-strong bg-paper px-3 focus-within:border-gold">
               <Search className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
               <span className="sr-only">{t("hub.searchLabel")}</span>
               <input
@@ -192,7 +192,7 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
                 <li key={category.id} className="min-w-0">
                   <Link
                     href={`/bilik-merkezi/kateqoriya/${category.slug}`}
-                    className="group flex h-full min-w-0 flex-col gap-2 rounded-md border border-line bg-ivory p-5 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                    className="group flex h-full min-w-0 flex-col gap-2 rounded-xl border border-line bg-ivory p-5 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold shadow-xs"
                   >
                     <span className="flex items-center gap-2 font-display text-lg text-ink">
                       <Library className="size-4 shrink-0 text-gold" aria-hidden="true" />
@@ -271,7 +271,7 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
           <div className="grid gap-4 sm:grid-cols-2">
             <Link
               href="/lugat"
-              className="group flex min-w-0 items-start gap-4 rounded-md border border-line bg-ivory p-6 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              className="group flex min-w-0 items-start gap-4 rounded-xl border border-line bg-ivory p-6 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold shadow-xs"
             >
               <BookOpen className="size-6 shrink-0 text-gold" aria-hidden="true" />
               <span className="min-w-0">
@@ -281,7 +281,7 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
             </Link>
             <Link
               href="/kalkulyator"
-              className="group flex min-w-0 items-start gap-4 rounded-md border border-line bg-ivory p-6 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              className="group flex min-w-0 items-start gap-4 rounded-xl border border-line bg-ivory p-6 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold shadow-xs"
             >
               <Calculator className="size-6 shrink-0 text-gold" aria-hidden="true" />
               <span className="min-w-0">

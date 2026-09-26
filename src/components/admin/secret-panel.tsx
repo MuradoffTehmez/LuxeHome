@@ -41,7 +41,7 @@ export function SecretPanel({
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 rounded-xs border border-gold/50 bg-gold/10 px-4 py-3",
+        "flex flex-col gap-2 rounded-sm border border-gold/50 bg-gold/10 px-4 py-3",
         className,
       )}
     >
@@ -51,13 +51,13 @@ export function SecretPanel({
       </p>
 
       <div className="flex flex-wrap items-center gap-2">
-        <code className="tabular flex-1 whitespace-pre-wrap rounded-xs border border-line bg-paper px-3 py-2 font-mono text-base tracking-wider text-ink select-all">
+        <code className="tabular flex-1 whitespace-pre-wrap rounded-sm border border-line bg-paper px-3 py-2 font-mono text-base tracking-wider text-ink select-all">
           {secret}
         </code>
         <button
           type="button"
           onClick={copy}
-          className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xs border border-line-strong px-3 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
+          className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-sm border border-line-strong px-3 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
         >
           {copied ? (
             <Check className="size-4 text-success" aria-hidden="true" />

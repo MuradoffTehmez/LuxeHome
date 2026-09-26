@@ -9,7 +9,7 @@ import { isUnoptimizedImage } from "@/lib/utils";
 export function BusinessTrustPanel({ imageUrl, imageAlt }: { imageUrl?: string | null; imageAlt?: string }) {
   const t = useTranslations("content.trust");
   return (
-    <aside aria-label={t("aria")} className="overflow-hidden rounded-md border border-line bg-paper">
+    <aside aria-label={t("aria")} className="overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
       {imageUrl && (
         <div className="relative aspect-16/9">
           <Image src={imageUrl} alt={imageAlt || t("officeAlt", { brand: siteConfig.name })} fill unoptimized={isUnoptimizedImage(imageUrl)} sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover" />

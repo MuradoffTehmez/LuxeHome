@@ -113,7 +113,7 @@ export function MortgageCalculator({
     <div className={compact ? "" : "grid gap-6 lg:grid-cols-2"}>
       <section
         aria-labelledby={`${baseId}-mortgage`}
-        className="min-w-0 rounded-md border border-line bg-paper p-5 sm:p-6"
+        className="min-w-0 rounded-xl border border-line bg-paper p-5 sm:p-6 shadow-xs"
       >
         <h2 id={`${baseId}-mortgage`} className="font-display text-xl text-ink">
           {compact ? t("onProperty") : t("mortgageTitle")}
@@ -153,7 +153,7 @@ export function MortgageCalculator({
         </div>
 
         {result ? (
-          <dl className="mt-6 rounded-xs border border-line bg-ivory px-4 py-2">
+          <dl className="mt-6 rounded-md border border-line bg-ivory px-4 py-2">
             <ResultRow
               label={t("monthlyPayment")}
               value={formatPrice(result.monthlyPayment, currency)}
@@ -180,7 +180,7 @@ export function MortgageCalculator({
       {!compact && (
         <section
           aria-labelledby={`${baseId}-budget`}
-          className="min-w-0 rounded-md border border-line bg-paper p-5 sm:p-6"
+          className="min-w-0 rounded-xl border border-line bg-paper p-5 sm:p-6 shadow-xs"
         >
           <h2 id={`${baseId}-budget`} className="font-display text-xl text-ink">
             {t("affordabilityTitle")}
@@ -208,7 +208,7 @@ export function MortgageCalculator({
           <p className="mt-3 text-xs text-ink-muted">{t("budgetHint")}</p>
 
           {budget ? (
-            <dl className="mt-6 rounded-xs border border-line bg-ivory px-4 py-2">
+            <dl className="mt-6 rounded-md border border-line bg-ivory px-4 py-2">
               <ResultRow
                 label={t("budgetRange")}
                 value={`${formatPrice(budget.minPrice, currency)} – ${formatPrice(budget.maxPrice, currency)}`}

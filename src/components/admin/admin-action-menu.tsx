@@ -43,7 +43,7 @@ export function AdminActionMenu({ label, children }: AdminActionMenuProps) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex size-11 items-center justify-center rounded-xs border border-line-strong text-ink-soft transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+        className="inline-flex size-11 items-center justify-center rounded-sm border border-line-strong text-ink-soft transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
       >
         <MoreHorizontal className="size-5" aria-hidden="true" />
       </button>
@@ -52,7 +52,7 @@ export function AdminActionMenu({ label, children }: AdminActionMenuProps) {
         <div
           role="menu"
           aria-label={label}
-          className="absolute right-0 bottom-full z-[var(--z-dropdown)] mb-2 min-w-48 overflow-hidden rounded-xs border border-line bg-paper p-1.5 shadow-lg"
+          className="absolute right-0 bottom-full z-[var(--z-dropdown)] mb-2 min-w-48 overflow-hidden rounded-sm border border-line bg-paper p-1.5 shadow-lg"
           onClick={(event) => {
             if ((event.target as HTMLElement).closest("a")) setOpen(false);
           }}

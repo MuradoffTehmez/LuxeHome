@@ -80,7 +80,7 @@ export function CabinetNav({
 
   return (
     <nav aria-label={t("menu")} className="flex flex-col gap-4">
-      <div className={cn("rounded-md border border-line bg-paper p-4", variant === "mobile" && "bg-beige/45")}>
+      <div className={cn("rounded-xl border border-line bg-paper p-4 shadow-xs", variant === "mobile" && "bg-beige/45")}>
         <p className="text-xs tracking-wide text-ink-muted uppercase">{accountLabel}</p>
         <p className="mt-1 truncate font-medium text-ink">{name}</p>
       </div>

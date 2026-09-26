@@ -45,7 +45,7 @@ export default async function CabinetProfilePage() {
         description={t("description", { email: profile.email })}
       />
 
-      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+      <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
         <h2 className="mb-5 font-display text-lg text-ink">{t("accountInfo")}</h2>
         <ProfileForm
           name={profile.name}
@@ -64,7 +64,7 @@ export default async function CabinetProfilePage() {
         />
       </section>
 
-      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+      <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
         <h2 className="font-display text-lg text-ink">{t("appearanceSection")}</h2>
         <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">
           {t("appearanceDescription")}
@@ -72,12 +72,12 @@ export default async function CabinetProfilePage() {
         <ThemeSelector className="max-w-md" />
       </section>
 
-      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+      <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
         <h2 className="mb-5 font-display text-lg text-ink">{t("dataSection")}</h2>
         <AccountDataForm />
       </section>
 
-      <section className="rounded-md border border-line bg-paper p-4 sm:p-6">
+      <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
         <h2 className="mb-5 font-display text-lg text-ink">{t("passwordSection")}</h2>
         <PasswordForm />
       </section>

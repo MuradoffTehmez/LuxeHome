@@ -30,11 +30,11 @@ export async function PartnerCard({
   const location = [partner.city, partner.country].filter(Boolean).join(", ");
 
   return (
-    <article className="group relative flex h-full flex-col gap-4 rounded-md border border-line bg-paper p-5 transition-[border-color,box-shadow] duration-300 hover:border-gold-line hover:shadow-editorial sm:p-6">
+    <article className="group relative flex h-full flex-col gap-4 rounded-xl border border-line bg-paper p-5 transition-[border-color,box-shadow] duration-300 hover:border-gold-line hover:shadow-editorial sm:p-6">
       <PartnerLogo partner={partner} size="md" />
 
       <div className="flex min-w-0 flex-col gap-2">
-        <h3 className="font-display text-xl text-ink">
+        <h3 className="text-xl text-ink">
           <PartnerProfileLink
             href={`/terefdaslar/${partner.slug}`}
             partnerId={partner.id}

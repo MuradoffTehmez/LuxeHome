@@ -55,7 +55,7 @@ export function NotificationPreferences({ values }: { values: NotificationPrefer
   const [state, formAction, pending] = useActionState(saveNotificationPreferences, IDLE_STATE);
 
   return (
-    <section className="mb-6 rounded-md border border-line bg-paper p-4 sm:p-5">
+    <section className="mb-6 rounded-xl border border-line bg-paper p-4 sm:p-5 shadow-xs">
       <h2 className="font-medium text-ink">{t("title")}</h2>
       <p className="mt-0.5 text-sm text-ink-muted">{t("description")}</p>
 

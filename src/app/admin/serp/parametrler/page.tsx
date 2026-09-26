@@ -58,7 +58,7 @@ export default async function SeoSettingsPage() {
             oradan düşür. İki forma eyni faktı saxlasaydı, hansının doğru
             olduğu bilinməzdi. */}
         <FullWidth>
-          <p className="rounded-xs border border-line bg-paper-light p-3 text-sm text-ink-soft">
+          <p className="rounded-sm border border-line bg-ivory p-3 text-sm text-ink-soft">
             {t("pages.serp.koordinatParametrlerde")}
           </p>
         </FullWidth>

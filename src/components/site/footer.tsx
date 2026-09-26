@@ -116,7 +116,7 @@ function PropertyLinks({
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="inline-flex min-h-9 items-center rounded-xs border border-line-dark px-3 text-xs font-medium text-ink-invert-soft transition-colors hover:border-gold-soft hover:text-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                className="inline-flex min-h-9 items-center rounded-full border border-line-dark px-3.5 text-xs font-medium text-ink-invert-soft transition-colors hover:border-gold-soft hover:text-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
               >
                 {item.label}
               </Link>
@@ -209,7 +209,7 @@ function SocialLink({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="inline-flex size-11 items-center justify-center rounded-xs border border-line-dark text-ink-invert-soft transition-colors hover:border-gold-soft hover:text-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+      className="inline-flex size-11 items-center justify-center rounded-full border border-line-dark text-ink-invert-soft transition-colors hover:border-gold-soft hover:text-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
     >
       {children}
     </a>

@@ -111,7 +111,7 @@ export function LocaleSwitcher({
       {open ? (
         <ul
           id="locale-switcher-menu"
-          className="absolute top-[calc(100%+0.5rem)] right-0 z-[var(--z-dropdown)] min-w-56 rounded-md border border-line bg-paper p-2 shadow-editorial"
+          className="absolute top-[calc(100%+0.5rem)] right-0 z-[var(--z-dropdown)] min-w-56 rounded-xl border border-line bg-paper p-2 shadow-editorial"
         >
           {routing.locales.map((code) => (
             <li key={code}>

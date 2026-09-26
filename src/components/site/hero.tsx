@@ -41,7 +41,7 @@ type HeroProps = {
 };
 
 const CONTROL_CLASS =
-  "min-h-12 min-w-0 w-full rounded-xs border border-line-strong bg-paper px-3 text-base text-ink transition-colors duration-200 hover:border-ink-muted focus:border-gold sm:text-sm";
+  "min-h-12 min-w-0 w-full rounded-sm border border-line-strong bg-paper px-3 text-base text-ink transition-[border-color,box-shadow] duration-200 hover:border-ink-muted focus:border-gold focus:shadow-[0_0_0_4px_rgb(170_135_84/0.16)] sm:text-sm";
 
 /**
  * Hero axtarışı yalnız native GET formudur. Client state və bütün geniş filtr
@@ -55,7 +55,7 @@ function HeroSearchForm({
   labels,
 }: Pick<HeroProps, "types" | "cities" | "locale"> & { labels: HeroLabels["search"] }) {
   return (
-    <div className="rounded-sm border border-white/20 bg-paper/94 p-3 shadow-editorial backdrop-blur-md sm:p-5">
+    <div className="rounded-xl border border-white/25 bg-paper/95 p-3 shadow-editorial backdrop-blur-md sm:p-5">
       <TrackedPropertySearchForm
         action={localizePath("/emlaklar", locale)}
         method="get"
@@ -67,7 +67,7 @@ function HeroSearchForm({
             <legend className="text-xs font-medium tracking-wide text-ink-soft">
               {labels.listingType}
             </legend>
-            <div className="grid min-h-12 grid-cols-2 rounded-xs border border-line-strong bg-paper p-1">
+            <div className="grid min-h-12 grid-cols-2 rounded-sm border border-line-strong bg-beige/60 p-1">
               {[
                 { value: LISTING_TYPES.SALE, label: labels.sale },
                 { value: LISTING_TYPES.RENT, label: labels.rent },
@@ -80,7 +80,7 @@ function HeroSearchForm({
                     defaultChecked={index === 0}
                     className="peer sr-only"
                   />
-                  <span className="flex min-h-11 items-center justify-center rounded-xs px-3 text-sm font-medium text-ink-soft transition-colors peer-checked:bg-charcoal peer-checked:text-ink-invert peer-focus-visible:ring-2 peer-focus-visible:ring-gold">
+                  <span className="flex min-h-11 items-center justify-center rounded-[7px] px-3 text-sm font-semibold text-ink-soft transition-colors peer-checked:bg-charcoal peer-checked:text-ink-invert peer-checked:shadow-sm peer-focus-visible:ring-2 peer-focus-visible:ring-gold">
                     {option.label}
                   </span>
                 </label>
@@ -143,7 +143,7 @@ function HeroSearchForm({
 /** Başlığın şkalası bütün dillərdə eynidir; yalnız oxunaqlı sətir eni locale-a uyğunlaşır. */
 export function heroTitleClassName(locale: Locale): string {
   return cn(
-    "animate-slide-up mt-6 font-display text-[clamp(2.35rem,11vw,3.4rem)] leading-[0.98] tracking-[-0.035em] text-balance text-white sm:text-[clamp(3rem,7vw,4.5rem)] sm:leading-[0.96] lg:text-[clamp(3.8rem,5.4vw,5.5rem)] lg:tracking-[-0.04em] [overflow-wrap:normal] [word-break:normal]",
+    "animate-slide-up mt-6 font-display text-[clamp(2.35rem,11vw,3.4rem)] leading-[1.05] tracking-[-0.035em] text-balance text-white sm:text-[clamp(3rem,7vw,4.5rem)] sm:leading-[1.04] lg:text-[clamp(3.8rem,5.4vw,5.5rem)] lg:tracking-[-0.04em] [overflow-wrap:normal] [word-break:normal]",
     locale === "ru" ? "max-w-[20ch]" : "max-w-[18ch]",
   );
 }

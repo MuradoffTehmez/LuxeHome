@@ -15,16 +15,16 @@ type Size = "sm" | "md" | "lg";
 const VARIANTS: Record<Variant, string> = {
   // Champagne gold — səhifədə yalnız bir əsas CTA
   primary:
-    "bg-gold text-on-gold hover:bg-gold-soft active:bg-gold-deep active:text-paper border border-transparent",
+    "bg-gold text-on-gold shadow-xs hover:bg-gold-soft hover:shadow-md active:bg-gold-deep active:text-paper border border-transparent",
   secondary:
     "bg-charcoal text-ink-invert hover:bg-charcoal-soft border border-transparent",
   outline:
-    "bg-transparent text-ink border border-line-strong hover:border-gold hover:text-gold-deep",
-  ghost: "bg-transparent text-ink-soft hover:text-ink border border-transparent",
+    "bg-paper/60 text-ink border border-line-strong hover:border-gold hover:bg-paper hover:text-gold-deep",
+  ghost: "bg-transparent text-ink-soft hover:bg-beige/70 hover:text-ink border border-transparent",
   dark: "bg-navy text-ink-invert hover:bg-navy-soft border border-transparent",
   // Tünd fon üzərində ikincili düymə
   onDark:
-    "bg-transparent text-ink-invert border border-white/28 hover:border-gold-soft hover:text-gold-soft",
+    "bg-white/8 text-ink-invert border border-white/28 backdrop-blur-sm hover:border-gold-soft hover:bg-white/12 hover:text-gold-soft",
   danger: "bg-danger text-paper hover:opacity-90 border border-transparent",
 };
 
@@ -36,8 +36,8 @@ const SIZES: Record<Size, string> = {
 };
 
 const BASE =
-  "inline-flex items-center justify-center rounded-xs font-medium tracking-wide whitespace-nowrap " +
-  "transition-[color,background-color,border-color,transform] duration-300 ease-out-soft active:translate-y-px " +
+  "inline-flex items-center justify-center rounded-sm font-semibold whitespace-nowrap " +
+  "transition-[color,background-color,border-color,box-shadow,transform] duration-300 ease-out-soft active:translate-y-px " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 " +
   "disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed";
 
@@ -153,7 +153,7 @@ export function IconButton({
       className={cn(
         BASE,
         VARIANTS[variant],
-        "size-11 shrink-0 rounded-xs p-0",
+        "size-11 shrink-0 rounded-full p-0",
         className,
       )}
       {...props}

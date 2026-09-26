@@ -41,7 +41,7 @@ export function Modal({
       placement="bottom"
       footer={footer}
       className={cn(
-        "sm:m-auto sm:max-h-[92dvh] sm:rounded-md sm:pb-0",
+        "sm:m-auto sm:max-h-[92dvh] sm:rounded-xl sm:pb-0",
         SIZES[size],
         className,
       )}

@@ -86,19 +86,13 @@ export function PropertyCard({
 
   return (
     <article
-      className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-sm border border-line bg-paper",
-        "transition-colors duration-300 ease-out-soft hover:border-line-strong",
-        className,
-      )}
+      className={cn("card-surface group relative flex h-full flex-col overflow-hidden", className)}
     >
       {/* --- Şəkil --- */}
       <div
         className={cn(
           "relative overflow-hidden bg-beige",
-          variant === "featured"
-            ? "aspect-16/10 lg:min-h-[34rem]"
-            : "aspect-4/3 sm:aspect-[16/11]",
+          variant === "featured" ? "aspect-16/10" : "aspect-4/3",
         )}
       >
         {image ? (
@@ -126,13 +120,11 @@ export function PropertyCard({
           </div>
         )}
 
-      </div>
-
-      {/* --- Məzmun --- */}
-      <div className={cn("flex flex-1 flex-col gap-4 p-5", variant === "featured" && "sm:p-7")}>
-        <div className="flex flex-wrap gap-2">
-          {isPremium && <Badge tone="gold"><Crown className="mr-1 size-3" aria-hidden="true" />{contentT("premium")}</Badge>}
-          <Badge tone={isSale ? "dark" : "gold"}>
+        {/* Status etiketləri şəklin üzərindədir — kartın mətn hissəsi qısalır və
+            siyahıda bütün kartların qiymət sətri eyni hündürlükdə başlayır. */}
+        <div className="pointer-events-none absolute top-3 left-3 flex max-w-[calc(100%-7.5rem)] flex-wrap gap-1.5">
+          {isPremium && <Badge tone="gold"><Crown className="size-3" aria-hidden="true" />{contentT("premium")}</Badge>}
+          <Badge tone="overlay">
             {isSale ? t("listingType.sale") : t("listingType.rent")}
           </Badge>
           {isClosed && (
@@ -145,26 +137,42 @@ export function PropertyCard({
           )}
         </div>
 
-        <p className="tabular font-display text-2xl leading-none tracking-[-0.02em] text-ink">
-          {number(property.price)} {currency}
-          {period && (
-            <span className="ml-1 font-sans text-xs font-normal text-ink-muted">
-              / {period}
-            </span>
-          )}
-        </p>
+        {/* z-10 düymələri kartın tam-səth linkindən yuxarı saxlayır. */}
+        <div className="absolute top-2 right-2 z-10 flex gap-1.5">
+          <FavoriteButton propertyId={property.id} />
+          <CompareButton propertyId={property.id} />
+        </div>
+      </div>
+
+      {/* --- Məzmun --- */}
+      <div className={cn("flex flex-1 flex-col gap-3 p-5", variant === "featured" && "sm:p-6")}>
+        {/* Dar sütunda (4 sütunlu «oxşar elanlar») uzun növ adı qiyməti bölməsin
+            deyə sətir sarınır: qiymət həmişə tam qalır, etiket alt sətrə keçir. */}
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <p className="tabular whitespace-nowrap text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-ink">
+            {number(property.price)} {currency}
+            {period && (
+              <span className="ml-1 text-sm font-normal text-ink-muted">
+                / {period}
+              </span>
+            )}
+          </p>
+          <p className="text-[0.6875rem] font-semibold tracking-[0.08em] text-gold-deep uppercase">
+            {property.type.name}
+          </p>
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <h3
             className={cn(
-              "font-display leading-snug text-ink",
-              variant === "featured" ? "text-2xl sm:text-3xl" : "text-lg",
+              "line-clamp-2 leading-snug text-ink",
+              variant === "featured" ? "text-lg sm:text-xl" : "text-base",
             )}
           >
             {/* Bütün kart klikləndikdə detala keçir; overlay link fokus sırasını pozmur */}
             <Link
               href={`/emlaklar/${property.slug}`}
-              className="after:absolute after:inset-0 after:content-[''] transition-colors duration-300 ease-out-soft hover:text-gold-deep"
+              className="after:absolute after:inset-0 after:rounded-lg after:content-[''] transition-colors duration-300 ease-out-soft hover:text-gold-deep"
             >
               {property.title}
             </Link>
@@ -173,20 +181,16 @@ export function PropertyCard({
           {location && (
             <p className="flex items-center gap-1.5 text-sm text-ink-muted">
               <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
-              {location}
+              <span className="truncate">{location}</span>
             </p>
           )}
         </div>
 
-        <p className="text-xs font-medium tracking-wide text-gold-deep uppercase">
-          {property.type.name}
-        </p>
-
         {/* Xüsusiyyət sətri */}
-        <dl className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-4 text-sm text-ink-soft">
+        <dl className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-3.5 text-sm text-ink-soft">
           {property.rooms != null && (
             <div className="flex items-center gap-1.5">
-              <BedDouble className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+              <BedDouble className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
               <dt className="sr-only">{t("rooms", { count: property.rooms })}</dt>
               <dd className="tabular">{t("rooms", { count: property.rooms })}</dd>
             </div>
@@ -194,7 +198,7 @@ export function PropertyCard({
 
           {property.area != null && (
             <div className="flex items-center gap-1.5">
-              <Maximize className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+              <Maximize className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
               <dt className="sr-only">{t("area", { value: property.area })}</dt>
               <dd className="tabular">{t("area", { value: property.area })}</dd>
             </div>
@@ -202,7 +206,7 @@ export function PropertyCard({
 
           {property.landArea != null && property.area == null && (
             <div className="flex items-center gap-1.5">
-              <Maximize className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+              <Maximize className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
               <dt className="sr-only">{t("landArea")}</dt>
               <dd className="tabular">{t("landUnit", { value: property.landArea })}</dd>
             </div>
@@ -210,7 +214,7 @@ export function PropertyCard({
 
           {property.floor != null && property.totalFloors != null && (
             <div className="flex items-center gap-1.5">
-              <Layers className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
+              <Layers className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
               <dt className="sr-only">{t("floor")}</dt>
               <dd className="tabular">
                 {property.floor}/{property.totalFloors}
@@ -218,13 +222,6 @@ export function PropertyCard({
             </div>
           )}
         </dl>
-
-        {/* Mobil məlumat axınında əməl düymələri xüsusiyyətlərdən sonra gəlir.
-            z-10 onları kartın tam-səth linkindən yuxarı saxlayır. */}
-        <div className="relative z-10 flex items-center justify-end gap-2 border-t border-line pt-3">
-          <FavoriteButton propertyId={property.id} />
-          <CompareButton propertyId={property.id} />
-        </div>
       </div>
     </article>
   );

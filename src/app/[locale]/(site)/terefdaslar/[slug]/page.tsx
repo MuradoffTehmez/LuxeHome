@@ -162,7 +162,7 @@ export default async function PartnerDetailPage({ params }: Props) {
 
       <Section tone="ivory" spacing="compact" className="border-b border-line">
         <Container>
-          <div className="flex flex-col gap-4 rounded-md border border-line bg-paper p-5 shadow-sm sm:p-6">
+          <div className="flex flex-col gap-4 rounded-xl border border-line bg-paper p-5 shadow-sm sm:p-6">
             <PartnerBadges partner={partner} locale={resolvedLocale} />
 
             <div className="flex min-w-0 flex-col gap-1 text-sm text-ink-soft sm:flex-row sm:flex-wrap sm:gap-x-6">
@@ -246,7 +246,7 @@ export default async function PartnerDetailPage({ params }: Props) {
               )}
 
               {roles.length > 0 ? (
-                <aside className="flex h-fit flex-col gap-4 rounded-md border border-line bg-ivory p-5">
+                <aside className="flex h-fit flex-col gap-4 rounded-xl border border-line bg-ivory p-5 shadow-xs">
                   <h2 className="font-display text-lg text-ink">{t("detail.directions")}</h2>
                   <ul className="flex flex-wrap gap-2">
                     {roles.map((role) => (
@@ -321,7 +321,7 @@ export default async function PartnerDetailPage({ params }: Props) {
                 <li key={link.agency.id}>
                   <Link
                     href={`/agentlikler/${link.agency.slug}`}
-                    className="flex min-h-20 items-center gap-4 rounded-md border border-line bg-paper p-4 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                    className="flex min-h-20 items-center gap-4 rounded-xl border border-line bg-paper p-4 transition-colors hover:border-gold-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold shadow-xs"
                   >
                     <span className="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-beige">
                       {link.agency.logoUrl ? (

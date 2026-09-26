@@ -94,7 +94,7 @@ async function SinglePartnerShowcase({
 
   return (
     <Reveal>
-      <div className="relative overflow-hidden rounded-md border border-line bg-ivory px-5 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
+      <div className="relative overflow-hidden rounded-xl border border-line bg-ivory px-5 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
         {/* İncə qızılı kənar detalı — brendin editorial dilinə uyğun, glow yoxdur */}
         <div
           aria-hidden="true"
@@ -189,9 +189,11 @@ function Divider() {
 /** 5+ tərəfdaş: kart əvəzinə sıx loqo şəbəkəsi. */
 function PartnerLogoWall({ partners }: { partners: PartnerCardData[] }) {
   return (
-    <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-3 lg:grid-cols-4">
+    // Ayrı kartlar: əvvəlki `gap-px` + `bg-line` şəbəkəsi tərəfdaş sayı sütun
+    // sayına bölünməyəndə sonda boş fon xanası qoyurdu.
+    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
       {partners.map((partner) => (
-        <li key={partner.id} className="bg-paper">
+        <li key={partner.id} className="overflow-hidden rounded-lg border border-line bg-paper shadow-xs transition-shadow duration-300 hover:shadow-md">
           <PartnerProfileLink
             href={`/terefdaslar/${partner.slug}`}
             partnerId={partner.id}

@@ -24,14 +24,14 @@ export async function PostCard({
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-sm border border-line bg-paper transition-colors duration-300 hover:border-line-strong",
+        "card-surface group relative flex h-full flex-col overflow-hidden",
         className,
       )}
     >
       <div
         className={cn(
           "relative overflow-hidden bg-beige",
-          variant === "featured" ? "aspect-16/10 lg:min-h-[30rem]" : "aspect-16/10",
+          variant === "featured" ? "aspect-16/10 lg:aspect-auto lg:min-h-[22rem] lg:flex-1" : "aspect-16/10",
         )}
       >
         {post.coverUrl ? (
@@ -56,20 +56,20 @@ export async function PostCard({
         )}
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          {post.category && <Badge tone="dark">{post.category.name}</Badge>}
+          {post.category && <Badge tone="overlay">{post.category.name}</Badge>}
         </div>
       </div>
 
       <div className={cn("flex flex-1 flex-col gap-3 p-5", variant === "featured" && "sm:p-7")}>
         <h3
           className={cn(
-            "font-display leading-snug text-ink",
-            variant === "featured" ? "text-2xl sm:text-3xl" : "text-lg",
+            "leading-snug text-ink",
+            variant === "featured" ? "font-display text-2xl font-medium sm:text-[1.75rem]" : "text-lg",
           )}
         >
           <Link
             href={`/blog/${post.slug}`}
-            className="after:absolute after:inset-0 after:content-[''] inline-flex min-h-11 items-center hover:text-gold-deep"
+            className="after:absolute after:inset-0 after:rounded-lg after:content-[''] line-clamp-3 min-h-11 transition-colors duration-300 hover:text-gold-deep"
           >
             {post.title}
           </Link>
@@ -79,7 +79,7 @@ export async function PostCard({
           {post.excerpt}
         </p>
 
-        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-4 text-xs text-ink-muted">
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-3.5 text-xs text-ink-muted">
           {post.publishedAt && (
             <time dateTime={new Date(post.publishedAt).toISOString()}>
               {format.dateTime(new Date(post.publishedAt), { day: "numeric", month: "long", year: "numeric" })}

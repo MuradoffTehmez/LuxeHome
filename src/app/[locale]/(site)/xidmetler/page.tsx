@@ -42,19 +42,19 @@ export default async function ServicesPage({ params }: PageProps) {
       />
 
       {/* Xidmət kartları */}
-      <Section tone="ivory">
+      <Section tone="ivory" spacing="cozy">
         <Container>
           {services.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {services.map((service, index) => (
                 <Reveal key={service.id} delay={index * 50}>
-                  <div className="group flex h-full flex-col gap-5 rounded-md border border-line bg-paper p-5 transition-shadow duration-300 hover:shadow-md sm:p-7">
-                    <span className="flex size-12 items-center justify-center rounded-xs bg-charcoal text-gold-soft">
-                      <ServiceIcon name={service.icon} className="size-5" />
+                  <div className="card-surface group relative flex h-full flex-col gap-5 p-6 sm:p-7">
+                    <span className="flex size-12 items-center justify-center rounded-md bg-gold/12 text-gold-deep">
+                      <ServiceIcon name={service.icon} className="size-6" />
                     </span>
 
                     <div className="flex flex-col gap-2">
-                      <h2 className="font-display text-xl text-ink">
+                      <h2 className="font-sans text-lg font-semibold tracking-[-0.015em] text-ink">
                         {service.title}
                       </h2>
                       <p className="text-sm leading-relaxed text-ink-soft">
@@ -65,7 +65,7 @@ export default async function ServicesPage({ params }: PageProps) {
                     <div className="mt-auto pt-4 border-t border-line">
                       <Link
                         href={`/xidmetler/${service.slug}`}
-                        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-gold-deep transition-colors hover:text-gold"
+                        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-gold-deep transition-colors after:absolute after:inset-0 after:rounded-lg after:content-[''] hover:text-ink"
                       >
                         {t("more")}
                         <ArrowRight
@@ -88,8 +88,8 @@ export default async function ServicesPage({ params }: PageProps) {
       </Section>
 
       {/* CTA */}
-      <Section tone="beige">
-        <Container className="flex flex-col items-center gap-6 text-center">
+      <Section tone="ivory" spacing="compact">
+        <Container className="flex flex-col items-center gap-6 rounded-2xl border border-line bg-beige px-6 py-12 text-center sm:py-16">
           <h2 className="max-w-xl font-display text-3xl text-ink sm:text-4xl">
             {t("ctaTitle")}
           </h2>

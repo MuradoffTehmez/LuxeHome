@@ -24,7 +24,7 @@ export default async function PartnerDetailLoading() {
 
       <Section tone="ivory" spacing="compact" className="border-b border-line">
         <Container>
-          <div className="rounded-md border border-line bg-paper p-5 sm:p-6">
+          <div className="rounded-xl border border-line bg-paper p-5 sm:p-6 shadow-xs">
             <div className="flex flex-wrap gap-2">
               <Skeleton className="h-7 w-36" />
               <Skeleton className="h-7 w-28" />

@@ -36,7 +36,7 @@ export function EnrollForm() {
           autoFocus
           required
           placeholder="123456"
-          className="min-h-12 w-full rounded-xs border border-line-strong bg-paper px-4 py-3 text-center text-lg tracking-[0.4em] text-ink transition-colors duration-200 placeholder:tracking-normal placeholder:text-ink-muted hover:border-ink-muted focus:border-gold"
+          className="min-h-12 w-full rounded-sm border border-line-strong bg-paper px-4 py-3 text-center text-lg tracking-[0.4em] text-ink transition-colors duration-200 placeholder:tracking-normal placeholder:text-ink-muted hover:border-ink-muted focus:border-gold"
         />
       </Field>
 

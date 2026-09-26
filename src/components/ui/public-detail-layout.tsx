@@ -24,7 +24,7 @@ export function PublicDetailLayout({
       )}
     >
       <div className={cn("min-w-0", mainClassName)}>{main}</div>
-      <aside className={cn("min-w-0 lg:sticky lg:top-28 lg:self-start", asideClassName)}>
+      <aside className={cn("min-w-0 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:self-start", asideClassName)}>
         {aside}
       </aside>
     </div>

@@ -52,7 +52,7 @@ export function PushPreferences() {
   }
 
   return (
-    <section className="mb-6 flex flex-col gap-4 rounded-md border border-line bg-paper p-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="mb-6 flex flex-col gap-4 rounded-xl border border-line bg-paper p-4 sm:flex-row sm:items-center sm:justify-between shadow-xs">
       <div className="flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-full bg-gold/15 text-gold-deep"><BellRing className="size-5" /></span><div><h2 className="font-medium text-ink">{t("title")}</h2><p className="mt-0.5 text-sm text-ink-muted">{t("description")}</p></div></div>
       <Button type="button" variant={enabled ? "outline" : "primary"} size="sm" onClick={toggle} loading={pending} disabled={!supported}>{!supported ? t("unsupported") : enabled ? t("disable") : t("enable")}</Button>
     </section>

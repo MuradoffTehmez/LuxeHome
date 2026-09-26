@@ -67,7 +67,7 @@ export default async function ReservationsPage() {
               const status = reservation.status as ReservationStatus;
               const cancellable = status === RESERVATION_STATUSES.REQUESTED || status === RESERVATION_STATUSES.PENDING;
               return (
-                <li key={reservation.id} className="rounded-md border border-line bg-paper p-4 sm:p-5">
+                <li key={reservation.id} className="rounded-xl border border-line bg-paper p-4 sm:p-5 shadow-xs">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <Link href={`/emlaklar/${reservation.property.slug}`} className="font-display text-lg text-ink hover:text-gold-deep">

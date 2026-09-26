@@ -37,7 +37,7 @@ export function ProjectPartnersManager({ projectId, links, options }: { projectI
   return (
     <section className="mt-8 overflow-hidden rounded-md border border-line bg-paper">
       <header className="border-b border-line px-4 py-4 sm:px-6">
-        <h2 className="font-display text-lg text-ink">{t("pages.projects.layiheninTerefdaslari")}</h2>
+        <h2 className="font-semibold text-lg text-ink">{t("pages.projects.layiheninTerefdaslari")}</h2>
         <p className="mt-1 text-sm text-ink-muted">{t("pages.projects.developerSatisTerefdasiBroker")}</p>
       </header>
       <form action={addAction} className="grid gap-4 border-b border-line p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">

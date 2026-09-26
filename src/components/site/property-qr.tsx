@@ -7,7 +7,7 @@ import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
 const DOWNLOAD =
-  "inline-flex min-h-11 items-center gap-2 rounded-xs border border-line-strong px-3.5 " +
+  "inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong px-3.5 " +
   "text-sm text-ink-soft transition-colors duration-200 " +
   "hover:border-gold hover:text-gold-deep cursor-pointer disabled:opacity-60";
 
@@ -105,7 +105,7 @@ export function PropertyQr({
       <Modal open={open} onClose={() => setOpen(false)} title={t("label")} description={t("description")} size="sm">
         <div className="flex flex-col items-center gap-5">
           <div
-            className="w-56 max-w-full rounded-xs border border-line bg-white p-3 [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
+            className="w-56 max-w-full rounded-lg border border-line bg-white p-3 [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
             // QR mənbəyi server tərəfdə `qrcode-svg` ilə çəkilir; istifadəçi girişi
             // yalnız elanın öz slug-udur, ona görə HTML kimi yerləşdirmək təhlükəsizdir.
             dangerouslySetInnerHTML={{ __html: svg }}

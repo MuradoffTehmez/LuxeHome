@@ -109,7 +109,7 @@ export default async function AdminSystemModePage() {
           </div>
 
           {config.mode !== SYSTEM_MODES.NORMAL ? (
-            <p className="mt-4 flex items-start gap-2.5 rounded-xs border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">
+            <p className="mt-4 flex items-start gap-2.5 rounded-sm border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
               <span>
                 {config.mode === SYSTEM_MODES.MAINTENANCE
@@ -126,7 +126,7 @@ export default async function AdminSystemModePage() {
         >
           <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {integrations.map((item) => (
-              <li key={item.id} className="rounded-xs border border-line bg-beige/40 p-3">
+              <li key={item.id} className="rounded-sm border border-line bg-beige/40 p-3">
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-sm font-medium text-ink">
                     {t(INTEGRATION_LABEL_KEYS[item.id])}

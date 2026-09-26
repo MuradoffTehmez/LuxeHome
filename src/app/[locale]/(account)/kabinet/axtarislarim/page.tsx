@@ -147,7 +147,7 @@ export default async function SavedSearchesPage() {
     const filters = JSON.parse(item.filters) as PropertyFilters;
     const summary = summarizeFilters(filters, summaryLabels);
     return (
-      <article className="min-w-0 rounded-md border border-line bg-paper p-4 shadow-sm">
+      <article className="min-w-0 rounded-xl border border-line bg-paper p-4 shadow-sm">
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h2 className="font-medium text-ink [overflow-wrap:anywhere]">{item.name}</h2>

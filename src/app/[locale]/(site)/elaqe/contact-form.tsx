@@ -32,7 +32,7 @@ export function ContactForm() {
         <span className="flex size-14 items-center justify-center rounded-full bg-success-bg text-success">
           <CheckCircle2 className="size-7" aria-hidden="true" />
         </span>
-        <h3 className="font-display text-xl text-ink">
+        <h3 className="text-xl text-ink">
           {t("successTitle")}
         </h3>
         <p className="max-w-sm text-sm text-ink-soft">

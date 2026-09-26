@@ -265,7 +265,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     {propertyText(`status.${STATUS_KEYS[status]}`)}
                   </Badge>
                 )}
-                <Badge tone="neutral" className="bg-paper border-line">
+                <Badge tone="neutral">
                   {property.type.name}
                 </Badge>
                 {isPremium && (
@@ -276,7 +276,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 )}
               </div>
               
-              <h1 className="font-display text-2xl leading-tight text-ink sm:text-3xl lg:text-4xl">
+              <h1 className="font-display text-3xl leading-[1.12] tracking-[-0.02em] text-ink sm:text-4xl lg:text-[2.75rem]">
                 {property.title}
               </h1>
 
@@ -290,7 +290,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
             <div className="flex flex-col gap-2 sm:items-end">
               <p className="flex items-baseline gap-1 text-ink">
-                <span className="tabular font-display text-3xl font-semibold sm:text-4xl">
+                <span className="tabular text-3xl font-semibold tracking-[-0.02em] sm:text-4xl">
                   {formatPrice(property.price, property.currency)}
                 </span>
                 {period && <span className="text-sm text-ink-soft">/ {period}</span>}
@@ -308,7 +308,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             slug={property.slug}
           />
 
-          <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-14">
+          <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
             {/* Sol tərəf: Qalereya və Əsas məlumatlar */}
             <div className="flex flex-col gap-10">
               {/* Qalereya */}
@@ -319,8 +319,8 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* Təsvir */}
               <div className="flex flex-col gap-4">
-                <h2 className="font-display text-xl text-ink">{commonContent("description")}</h2>
-                <div className="prose prose-ink max-w-none text-base leading-relaxed text-ink-soft">
+                <h2 className="font-sans text-lg font-semibold text-ink">{commonContent("description")}</h2>
+                <div className="flex max-w-[72ch] flex-col gap-4 text-base leading-relaxed text-ink-soft">
                   {property.description.split('\n').map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
                   ))}
@@ -328,8 +328,8 @@ export default async function PropertyDetailPage({ params }: Props) {
               </div>
 
               {property.priceHistory.length > 0 && (
-                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
-                  <h2 className="flex items-center gap-2 font-display text-xl text-ink">
+                <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
+                  <h2 className="flex items-center gap-2 font-sans text-lg font-semibold text-ink">
                     <History className="size-5 text-gold-deep" aria-hidden="true" />
                     {commonContent("phase2.priceHistory")}
                   </h2>
@@ -351,14 +351,14 @@ export default async function PropertyDetailPage({ params }: Props) {
               )}
 
               {property.nearbyPlaces.length > 0 && (
-                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
-                  <h2 className="flex items-center gap-2 font-display text-xl text-ink">
+                <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
+                  <h2 className="flex items-center gap-2 font-sans text-lg font-semibold text-ink">
                     <Navigation className="size-5 text-gold-deep" aria-hidden="true" />
                     {commonContent("phase2.nearby")}
                   </h2>
                   <ul className="mt-4 grid gap-3 sm:grid-cols-2">
                     {property.nearbyPlaces.map((place) => (
-                      <li key={place.id} className="rounded-xs border border-line bg-paper-light p-3">
+                      <li key={place.id} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs">
                         <p className="text-xs font-semibold tracking-wide text-gold-deep uppercase">
                           {commonContent(`phase2.nearbyCategories.${NEARBY_KEYS[place.category] ?? "park"}`)}
                         </p>
@@ -380,8 +380,8 @@ export default async function PropertyDetailPage({ params }: Props) {
               )}
 
               {property.district?.neighborhoodProfile && (
-                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
-                  <h2 className="font-display text-xl text-ink">{property.district.name} — {neighborhoodText("title")}</h2>
+                <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
+                  <h2 className="font-sans text-lg font-semibold text-ink">{property.district.name} — {neighborhoodText("title")}</h2>
                   {(() => {
                     const profile = property.district.neighborhoodProfile;
                     const description = locale === "en" ? profile.descriptionEn : locale === "ru" ? profile.descriptionRu : profile.description;
@@ -396,7 +396,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     ].filter((item): item is [string, string] => Boolean(item));
                     return <>
                       {description ? <p className="mt-3 leading-relaxed text-ink-soft">{description}</p> : null}
-                      {metrics.length > 0 ? <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-xs border border-line bg-paper-light p-3"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
+                      {metrics.length > 0 ? <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
                       {(profile.dataSource || profile.measuredAt) ? <p className="mt-4 text-xs text-ink-muted">{profile.dataSource ? `${neighborhoodText("source")}: ${profile.dataSource}` : ""}{profile.dataSource && profile.measuredAt ? " · " : ""}{profile.measuredAt ? `${neighborhoodText("measuredAt")}: ${new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(profile.measuredAt)}` : ""}</p> : null}
                     </>;
                   })()}
@@ -404,11 +404,11 @@ export default async function PropertyDetailPage({ params }: Props) {
               )}
 
               {property.assignedAgent && (
-                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <p className="text-xs font-semibold tracking-wide text-gold-deep uppercase">{commonContent("phase2.responsibleAgent")}</p>
-                      <h2 className="mt-1 font-display text-xl text-ink">{property.assignedAgent.name}</h2>
+                      <h2 className="mt-1 text-lg font-semibold text-ink">{property.assignedAgent.name}</h2>
                       {property.assignedAgent.agency && <p className="text-sm text-ink-muted">{property.assignedAgent.agency.name}</p>}
                     </div>
                     {property.assignedAgent.reviews.length > 0 && (
@@ -445,14 +445,14 @@ export default async function PropertyDetailPage({ params }: Props) {
               )}
 
               {relatedLandingLinks.length > 0 && (
-                <nav aria-label={content("relatedSearchesAria")} className="border-y border-line py-5">
-                  <h2 className="font-display text-xl text-ink">{content("relatedSearches")}</h2>
+                <nav aria-label={content("relatedSearchesAria")} className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
+                  <h2 className="font-sans text-lg font-semibold text-ink">{content("relatedSearches")}</h2>
                   <ul className="mt-3 flex flex-wrap gap-2">
                     {relatedLandingLinks.map((item) => (
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          className="inline-flex min-h-11 items-center rounded-xs border border-line px-3 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
+                          className="inline-flex min-h-11 items-center rounded-full border border-line bg-paper px-4 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
                         >
                           {item.label}
                         </Link>
@@ -465,11 +465,11 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Əlavə Xüsusiyyətlər (əgər varsa) */}
               {property.features.length > 0 && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="font-display text-xl text-ink">{commonContent("features")}</h2>
-                  <ul className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                  <h2 className="font-sans text-lg font-semibold text-ink">{commonContent("features")}</h2>
+                  <ul className="flex flex-wrap gap-2">
                     {property.features.map(({ feature }) => (
-                      <li key={feature.id} className="flex items-center gap-2 text-sm text-ink-soft">
-                        <CheckCircle2 className="size-4 text-gold" aria-hidden="true" />
+                      <li key={feature.id} className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3.5 py-2 text-sm text-ink-soft">
+                        <CheckCircle2 className="size-4 text-gold-deep" aria-hidden="true" />
                         {feature.name}
                       </li>
                     ))}
@@ -481,9 +481,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                   Komponent `defaultPrice`/`compact` proplarını onsuz da dəstəkləyirdi,
                   sadəcə elan səhifəsinə heç vaxt bağlanmamışdı. */}
               {isSale && !isClosed && (
-                <section className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                <section className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
                   <div className="mb-5 flex flex-col gap-1">
-                    <h2 className="font-display text-xl text-ink">{content("mortgageTitle")}</h2>
+                    <h2 className="font-sans text-lg font-semibold text-ink">{content("mortgageTitle")}</h2>
                     <p className="text-sm text-ink-soft">{content("mortgageDescription")}</p>
                   </div>
                   <MortgageCalculator
@@ -505,7 +505,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Xəritədə yerləşmə */}
               {property.latitude != null && property.longitude != null && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="font-display text-xl text-ink">{content("onMap")}</h2>
+                  <h2 className="font-sans text-lg font-semibold text-ink">{content("onMap")}</h2>
                   <PlaceMap
                     latitude={property.latitude}
                     longitude={property.longitude}
@@ -525,11 +525,11 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* Layihəyə bağlantı — bölmə paneldən bağlıdırsa göstərilmir (#83) */}
               {projectsEnabled && property.project && (
-                <div className="rounded-md border border-line bg-paper p-5 sm:p-6">
+                <div className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-col gap-1">
                       <span className="text-xs font-medium uppercase tracking-wide text-ink-muted">{content("project")}</span>
-                      <h3 className="font-display text-lg text-ink">{property.project.name}</h3>
+                      <h3 className="text-lg text-ink">{property.project.name}</h3>
                     </div>
                     <Link href={`/layiheler/${property.project.slug}`} className={buttonClassName("outline", "sm")}>
                       {content("viewProject")} <ArrowRight className="ml-2 size-4" />
@@ -542,9 +542,9 @@ export default async function PropertyDetailPage({ params }: Props) {
             {/* Sağ tərəf: Əlaqə və Oxşar */}
             <div className="flex flex-col gap-8">
               {/* Əlaqə Forması */}
-              <div className="rounded-md border border-line bg-paper p-5 sm:p-6 lg:sticky lg:top-28 lg:shadow-sm">
+              <div className="rounded-xl border border-line bg-paper p-5 shadow-md sm:p-7 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
                 <div className="mb-6 flex flex-col gap-2">
-                  <h3 className="font-display text-xl text-ink">
+                  <h3 className="font-display text-2xl text-ink">
                     {isClosed ? content("closedTitle") : content("contactTitle")}
                   </h3>
                   <p className="text-sm text-ink-soft">
@@ -595,13 +595,13 @@ export default async function PropertyDetailPage({ params }: Props) {
       {/* Bənzər Əmlaklar */}
       {similarProperties.length > 0 && (
         <Section tone="paper" spacing="cozy">
-          <Container>
+          <Container size="wide">
             <div className="mb-8 flex flex-col gap-2">
-              <h2 className="font-display text-2xl text-ink sm:text-3xl">{commonContent("similarProperties")}</h2>
+              <h2 className="font-display text-3xl tracking-[-0.02em] text-ink sm:text-4xl">{commonContent("similarProperties")}</h2>
               <p className="text-sm text-ink-soft">{content("similarDescription")}</p>
             </div>
             
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {similarProperties.map((prop) => (
                 <PropertyCard key={prop.id} property={prop} />
               ))}

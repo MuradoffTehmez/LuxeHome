@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { buttonClassName } from "@/components/ui/button";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { FaqGroups } from "@/components/site/faq-groups";
@@ -57,12 +58,12 @@ export default async function FaqPage({ params }: PageProps) {
         <Container size="narrow">
           <FaqGroups groups={groups} />
 
-          <div className="mt-12 rounded-md border border-line bg-beige/40 p-6 text-center">
-            <p className="text-sm text-ink-soft">{copy.noAnswer}</p>
+          <div className="mt-12 rounded-2xl border border-line bg-beige p-8 text-center sm:p-10">
+            <p className="text-base text-ink-soft">{copy.noAnswer}</p>
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <Link
                 href="/elaqe"
-                className="inline-flex min-h-11 items-center rounded-xs bg-gold px-5 text-sm font-medium text-on-gold transition-colors hover:bg-gold-soft"
+                className={buttonClassName("primary", "sm")}
               >
                 {copy.contactForm}
               </Link>
@@ -70,13 +71,13 @@ export default async function FaqPage({ params }: PageProps) {
                 href={whatsappLink(copy.whatsappMessage)}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-5 text-sm font-medium text-ink transition-colors hover:border-gold hover:text-gold-deep"
+                className={buttonClassName("outline", "sm")}
               >
                 WhatsApp
               </a>
               <a
                 href={siteConfig.phoneHref}
-                className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-5 text-sm font-medium text-ink transition-colors hover:border-gold hover:text-gold-deep"
+                className={buttonClassName("outline", "sm")}
               >
                 {siteConfig.phone}
               </a>

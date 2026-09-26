@@ -29,7 +29,7 @@ function pageRange(page: number, total: number): (number | "gap")[] {
 }
 
 const ITEM =
-  "inline-flex size-11 items-center justify-center rounded-xs border text-sm " +
+  "inline-flex size-11 items-center justify-center rounded-full border text-sm " +
   "transition-colors duration-200";
 
 export function Pagination({ page, totalPages, buildHref, className }: PaginationProps) {

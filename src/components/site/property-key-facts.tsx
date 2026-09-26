@@ -182,7 +182,7 @@ export async function PropertyKeyFacts({
         {facts.map((fact) => (
           <div
             key={fact.key}
-            className="flex flex-col gap-1.5 rounded-xs border border-line bg-paper p-4"
+            className="flex flex-col gap-1.5 rounded-lg border border-line bg-paper p-4 shadow-xs"
           >
             <dt className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-ink-muted uppercase">
               <fact.icon className="size-4 shrink-0" aria-hidden="true" />
@@ -198,7 +198,7 @@ export async function PropertyKeyFacts({
           {badges.map((badge) => (
             <li
               key={badge.key}
-              className="inline-flex items-center gap-2 rounded-xs border border-success/30 bg-success-bg px-3 py-2 text-sm font-medium text-success"
+              className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-success-bg px-3 py-2 text-sm font-medium text-success"
             >
               <Landmark className="size-4" aria-hidden="true" />
               {badge.label} — {content("eligible")}

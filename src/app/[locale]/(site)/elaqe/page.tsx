@@ -53,31 +53,31 @@ export default async function ContactPage({ params }: PageProps) {
       />
 
       {/* Əsas məzmun — əlaqə + forma */}
-      <Section tone="ivory">
+      <Section tone="ivory" spacing="cozy">
         <Container>
           <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)] lg:gap-12">
             {/* Mobil ekranda əsas əməl olan forma birinci göstərilir. */}
-            <div className="min-w-0 rounded-md border border-line bg-paper p-5 shadow-sm sm:p-8">
+            <div className="min-w-0 rounded-xl border border-line bg-paper p-5 shadow-md sm:p-8 lg:p-10">
               <h2 className="mb-6 font-display text-2xl text-ink">
                 {t("sendEnquiry")}
               </h2>
               <ContactForm />
             </div>
 
-            <div className="flex min-w-0 flex-col gap-8 lg:pt-2">
+            <div className="flex min-w-0 flex-col gap-6 lg:pt-2">
               <h2 className="font-display text-2xl text-ink">
                 {t("contactDetails")}
               </h2>
 
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-3">
                 {contactItems.map((item, index) => (
                   <Reveal key={item.label} delay={index * 40}>
-                    <div className="flex min-w-0 items-start gap-4">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-xs bg-beige text-ink-muted">
+                    <div className="flex min-w-0 items-start gap-4 rounded-lg border border-line bg-paper px-4 py-3 shadow-xs">
+                      <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-md bg-gold/12 text-gold-deep">
                         <item.icon className="size-4" aria-hidden="true" />
                       </span>
                       <div className="flex min-w-0 flex-col gap-0.5">
-                        <span className="text-xs font-medium tracking-wide text-ink-muted uppercase">
+                        <span className="text-xs font-semibold text-ink-muted">
                           {item.label}
                         </span>
                         {item.href ? (
@@ -104,7 +104,7 @@ export default async function ContactPage({ params }: PageProps) {
                   bölməsində təyin edilir; boş olduqda blok göstərilmir. */}
               {operational.latitude != null && operational.longitude != null && (
                 <div className="flex min-w-0 flex-col gap-3">
-                  <h3 className="font-display text-lg text-ink">{mapText("officeTitle")}</h3>
+                  <h3 className="text-lg text-ink">{mapText("officeTitle")}</h3>
                   <PlaceMap
                     latitude={operational.latitude}
                     longitude={operational.longitude}

@@ -20,7 +20,7 @@ export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
   return (
     <form action={formAction} className="flex flex-col gap-5">
       {mustChange && !state.success && (
-        <p className="rounded-xs border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
+        <p className="rounded-sm border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
           {t("pages.account.sizeMuveqqetiParolVerilib")}
         </p>
       )}
@@ -68,7 +68,7 @@ export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
       {state.error && (
         <p
           role="alert"
-          className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
+          className="rounded-sm border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger"
         >
           {translateMessage(state.error)}
         </p>
@@ -77,7 +77,7 @@ export function PasswordForm({ mustChange = false }: { mustChange?: boolean }) {
       {state.success && (
         <p
           role="status"
-          className="rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
+          className="rounded-sm border border-success/30 bg-success-bg px-4 py-3 text-sm text-success"
         >
           {translateMessage(state.success)}
         </p>
