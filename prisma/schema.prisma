@@ -51,6 +51,9 @@ model User {
   calendarToken   String? @unique
   /// Google hesabının dəyişməz ID-si (`sub`, #109). E-poçt dəyişsə də bağlantı qalır.
   googleSub       String? @unique
+  /// SMS kodu ilə təsdiqlənmiş mobil nömrə, E.164 (#109) — telefonla girişin kimliyi.
+  /// Profildə nömrə dəyişəndə sıfırlanır; iki hesab eyni nömrəni təsdiqləyə bilmir.
+  verifiedPhone   String? @unique
   /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
   themePreference String @default("light")
 
@@ -221,6 +224,25 @@ model BackupCode {
 /// Əməkdaşın passkey-i (WebAuthn, #109) — girişin ikinci mərhələsində TOTP koduna
 /// fişinqə davamlı alternativ. TOTP məcburi qalır: passkey itəndə giriş yolu bağlanmır.
 /// Açar domenə bağlıdır (RP ID) — `luxehomeestate.az`-da yaradılan passkey workers.dev-də işləmir.
+/// Telefonla giriş və nömrə təsdiqi üçün birdəfəlik kod (#109). Kodun özü saxlanmır —
+/// yalnız HMAC-i; 5 dəqiqə və 5 cəhddən sonra etibarsızdır.
+model PhoneOtp {
+  id         String    @id @default(cuid())
+  /// E.164: +994XXXXXXXXX
+  phone      String
+  /// LOGIN | VERIFY
+  purpose    String
+  /// VERIFY üçün kodu istəyən hesab; LOGIN-də nömrə üzrə tapılan hesab.
+  userId     String?
+  codeHash   String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+}
+
 model Passkey {
   id           String    @id @default(cuid())
   userId       String

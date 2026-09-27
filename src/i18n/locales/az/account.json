@@ -237,7 +237,8 @@
     "deleteDescription": "Hesab, sessiyalar, favoritlər və şəxsi məlumatlar silinəcək; elanlar saytdan çıxarılacaq.",
     "deletePhrase": "HESABIMI SİL",
     "deleteConfirmation": "Təsdiq üçün «{phrase}» yazın",
-    "deleteButton": "Hesabı sil"
+    "deleteButton": "Hesabı sil",
+    "phoneSection": "Telefon nömrəsi ilə giriş"
   },
   "savedSearches": {
     "metaTitle": "Saxlanmış axtarışlarım",
@@ -387,5 +388,28 @@
       "duplicatePending": "Bu elan üçün eyni paket artıq sifariş olunub və ödəniş gözləyir.",
       "unavailable": "Əməliyyat tamamlanmadı. Bir az sonra yenidən cəhd edin."
     }
+  },
+  "phoneVerification": {
+    "description": "Təsdiqlənmiş nömrə ilə parol yazmadan, SMS kodu ilə daxil ola bilərsiniz.",
+    "phone": "Mobil nömrə",
+    "sendCode": "Təsdiq kodu göndər",
+    "changeAction": "Başqa nömrəni təsdiqlə",
+    "code": "SMS kodu",
+    "confirm": "Təsdiqlə",
+    "back": "Geri",
+    "codeSent": "{phone} nömrəsinə 6 rəqəmli kod göndərildi.",
+    "verifiedAs": "Təsdiqlənib: {phone}",
+    "remove": "Təsdiqi ləğv et",
+    "verified": "Nömrə təsdiqləndi. İndi telefonla daxil ola bilərsiniz.",
+    "removed": "Nömrə təsdiqi ləğv edildi.",
+    "taken": "Bu nömrə başqa hesabda təsdiqlənib.",
+    "unavailable": "Nömrə təsdiqi hazırda mümkün deyil.",
+    "securityCheck": "Təhlükəsizlik yoxlamasını tamamlayın.",
+    "invalidPhone": "Azərbaycan mobil nömrəsini yazın, məsələn +994 50 123 45 67.",
+    "cooldown": "Kod artıq göndərilib. Yenisini istəmək üçün bir dəqiqə gözləyin.",
+    "tooManyCodes": "Bu nömrəyə çox kod göndərilib. Bir saat sonra yenidən cəhd edin.",
+    "sendFailed": "SMS göndərilmədi. Bir az sonra yenidən cəhd edin.",
+    "invalidCode": "Kod yanlışdır.",
+    "expiredCode": "Kodun vaxtı bitib və ya cəhd limiti dolub. Yeni kod istəyin."
   }
 }

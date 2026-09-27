@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { ThemeSelector } from "@/components/site/theme-selector";
 import { AccountDataForm, PasswordForm, ProfileForm } from "./profile-forms";
+import { PhoneVerification } from "./phone-verification";
+import { isSmsConfigured } from "@/lib/sms";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -25,7 +27,7 @@ export default async function CabinetProfilePage() {
   const [profile, agency] = await Promise.all([
     prisma.user.findUniqueOrThrow({
       where: { id: user.id },
-      select: { name: true, phone: true, email: true },
+      select: { name: true, phone: true, email: true, verifiedPhone: true },
     }),
     isAgency
       ? prisma.agency.findUnique({
@@ -63,6 +65,13 @@ export default async function CabinetProfilePage() {
           }
         />
       </section>
+
+      {isSmsConfigured() ? (
+        <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+          <h2 className="mb-3 font-display text-lg text-ink">{t("phoneSection")}</h2>
+          <PhoneVerification verifiedPhone={profile.verifiedPhone} currentPhone={profile.phone ?? ""} />
+        </section>
+      ) : null}
 
       <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
         <h2 className="font-display text-lg text-ink">{t("appearanceSection")}</h2>

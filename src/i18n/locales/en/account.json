@@ -237,7 +237,8 @@
     "deleteDescription": "Your account, sessions, favorites and personal data will be deleted; listings will be removed from the site.",
     "deletePhrase": "DELETE MY ACCOUNT",
     "deleteConfirmation": "Type “{phrase}” to confirm",
-    "deleteButton": "Delete account"
+    "deleteButton": "Delete account",
+    "phoneSection": "Phone sign-in"
   },
   "savedSearches": {
     "metaTitle": "My saved searches",
@@ -387,5 +388,28 @@
       "duplicatePending": "This package has already been ordered for this listing and is awaiting payment.",
       "unavailable": "The action could not be completed. Please try again shortly."
     }
+  },
+  "phoneVerification": {
+    "description": "With a verified number you can sign in with an SMS code instead of a password.",
+    "phone": "Mobile number",
+    "sendCode": "Send verification code",
+    "changeAction": "Verify another number",
+    "code": "SMS code",
+    "confirm": "Verify",
+    "back": "Back",
+    "codeSent": "A 6-digit code was sent to {phone}.",
+    "verifiedAs": "Verified: {phone}",
+    "remove": "Remove verification",
+    "verified": "Number verified. You can now sign in by phone.",
+    "removed": "Number verification removed.",
+    "taken": "This number is verified on another account.",
+    "unavailable": "Number verification isn’t available right now.",
+    "securityCheck": "Please complete the security check.",
+    "invalidPhone": "Enter an Azerbaijani mobile number, e.g. +994 50 123 45 67.",
+    "cooldown": "A code was just sent. Wait a minute before requesting a new one.",
+    "tooManyCodes": "Too many codes were sent to this number. Try again in an hour.",
+    "sendFailed": "The SMS could not be sent. Please try again shortly.",
+    "invalidCode": "The code is incorrect.",
+    "expiredCode": "The code has expired or the attempt limit was reached. Request a new code."
   }
 }
