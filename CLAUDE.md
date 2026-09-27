@@ -462,6 +462,38 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - **Sessiya açma** `openPublicSession()` (`public-session.ts`) — parol, Google və telefon
   girişi eyni yoldan keçir; ictimai sessiya açan yeni axın da onu işlətməlidir.
 
+### Elan sehrbazı, iyerarxik ünvan, su nişanı, AI SEO və profillər (2026-09)
+
+- **Elan forması 8 addımlı sehrbazdır** (`components/admin/form-wizard.tsx`) — kabinet və admin
+  eyni komponenti işlədir. Bütün addımların sahələri DOM-da qalır (yalnız `hidden`), ona görə
+  forma son addımda hamısını göndərir. «Növbəti» cari addımı, «Göndər» bütün addımları brauzer
+  qaydaları ilə yoxlayır; server xətasında sehrbaz xətalı sahənin addımına keçir. Yeni elanda
+  qaralama `localStorage`-a yazılır (`lib/ui/form-wizard.ts`), bərpa formanı `key` ilə yenidən
+  qurur — idarə olunmayan sahələrə DOM üzərindən dəyər yazma (kaskad seçimlər sınır).
+- **Ünvan pillələri:** Region (kodda, `lib/regions.ts` — 14 iqtisadi rayon, Naxçıvan MR) →
+  şəhər/rayon → şəhər rayonu → qəsəbə → kənd → massiv → küçə → bina (`location-fields.tsx`).
+  Bazaya yenə **bir** yer yazılır — ən dərin seçim `districtId`; siyahıda olmayan massiv
+  `Property.neighborhoodName`, küçə/bina `street`/`building`-dədir və `address` onlardan qurulur
+  (CSV idxalında sərbəst qalır). Tam ünvan `formatFullAddress()` (`lib/location-path.ts`) ilə
+  göstərilir; kart `shortLocation()` işlədir («Əliabad qəsəbəsi, Naxçıvan»).
+- **Su nişanı** (`lib/media/watermark.ts`): ölçü və məsafə şəkil eninə nisbətdir. Təkrar yüklənən
+  nişanlı şəkil bayt izi (`Media.checksum`) və ya piksel korrelyasiyası ilə tanınır və ikinci
+  dəfə nişanlanmır. Production-da nişan çəkilə bilməsə yükləmə 503 ilə təkrar cəhdə qaytarılır;
+  `IS_STAGING` mühitində (lokal E2E) nişansız qəbul olunur. Elan şəkli **yalnız**
+  `/media/emlaklar/` qovluğundan qəbul olunur (`isListingMediaUrl`) — profil şəkli (`avatarlar`)
+  nişansızdır və elana qoşulmamalıdır.
+- **Avtomatik SEO və ALT** (`lib/listing-enrichment.ts`): elan yazan hər action
+  `queueListingEnrichment()` çağırır (`queuePropertyVectorSync` kimi — fon, xəta action-u
+  sındırmır). AI yoxdursa deterministik mətn yazılır (`lib/seo-copy.ts`). Redaktor SEO sahəsini
+  dəyişəndə `seoGeneratedAt = null` olur və generator yalnız boş sahələri doldurur. ALT cümləsi
+  faktlardan qurulur, AI yalnız fotodakı sahəni sabit siyahıdan seçir (`lib/image-alt.ts`).
+  CSV idxalı enrichment çağırmır (subrequest limiti) — elan paneldə saxlananda yaradılır.
+- **Hesab növləri:** USER, OWNER, AGENT, AGENCY, CORPORATE (+ STAFF). Siyahıları əl ilə yazma —
+  `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYPES`, `COMPANY_ACCOUNT_TYPES`, `accountTypeKey()`.
+  Doğum tarixi istəyə bağlıdır və yalnız 18 yaş yoxlaması üçündür (`accounts/profile-fields.ts`).
+- Qısa ünvanlar `/elan-yerlesdir`, `/elanlarim`, `/profilim` (`accounts/short-links.ts`) —
+  yenisini əlavə edəndə `NEVER_CACHED_PREFIXES`-ə də yaz.
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai

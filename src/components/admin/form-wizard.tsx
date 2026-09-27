@@ -130,11 +130,14 @@ export function FormWizard({
     [total],
   );
 
+  const mounted = useRef(false);
   useEffect(() => {
     onStepChange?.(steps[current]?.props.id ?? "", rootRef.current?.closest("form") ?? null);
     // Gizli paneldə qurulan xəritə (Leaflet) ölçüsünü görünəndə yenidən hesablasın.
     window.dispatchEvent(new Event("resize"));
-    rootRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    // İlk açılışda səhifə sürüşdürülmür — yalnız addım dəyişəndə sehrbazın başına qayıdılır.
+    if (mounted.current) rootRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    mounted.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnız addım dəyişəndə
   }, [current]);
 
