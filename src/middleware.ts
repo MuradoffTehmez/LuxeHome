@@ -5,7 +5,7 @@ import { routing } from "@/i18n/routing";
 import { isStaging } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
 import { canonicalAdminPath, localeFromPathname, pathnameWithoutLocale } from "@/i18n/path-locale";
-import { DEFAULT_LOCALE } from "@/lib/constants";
+import { DEFAULT_LOCALE, isAccountType } from "@/lib/constants";
 import {
   SESSION_COOKIE,
   SESSION_SUBJECT,
@@ -53,13 +53,7 @@ async function readSignedSession(token: string | undefined): Promise<MiddlewareS
     });
     const accountType = payload.accountType;
     const authKind = payload.authKind;
-    if (
-      accountType !== "STAFF" &&
-      accountType !== "USER" &&
-      accountType !== "OWNER" &&
-      accountType !== "AGENCY" ||
-      (authKind !== "STAFF_2FA" && authKind !== "PUBLIC")
-    ) {
+    if (!isAccountType(accountType) || (authKind !== "STAFF_2FA" && authKind !== "PUBLIC")) {
       return null;
     }
     if (typeof payload.sid !== "string" || typeof payload.uid !== "string" || typeof payload.role !== "string") {

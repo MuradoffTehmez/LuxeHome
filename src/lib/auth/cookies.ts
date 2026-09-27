@@ -11,7 +11,7 @@ import {
   WEBAUTHN_SUBJECT,
 } from "./cookie-names";
 import type { AuthStage } from "./types";
-import type { AccountType, AuthKind } from "@/lib/constants";
+import { isAccountType, type AccountType, type AuthKind } from "@/lib/constants";
 
 /**
  * Cookie qatı.
@@ -62,7 +62,7 @@ export async function verifySessionToken(token: string): Promise<SessionClaims |
       typeof sid !== "string" ||
       typeof uid !== "string" ||
       typeof role !== "string" ||
-      (accountType !== "STAFF" && accountType !== "USER" && accountType !== "OWNER" && accountType !== "AGENCY") ||
+      !isAccountType(accountType) ||
       (authKind !== "STAFF_2FA" && authKind !== "PUBLIC")
     ) {
       return null;

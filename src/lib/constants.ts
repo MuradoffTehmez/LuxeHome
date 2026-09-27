@@ -890,6 +890,16 @@ export const ACCOUNT_TYPES = {
 
 export type AccountType = (typeof ACCOUNT_TYPES)[keyof typeof ACCOUNT_TYPES];
 
+/**
+ * İmzalı sessiya cookie-sindəki `accountType`-ın yoxlanması — `cookies.ts` və
+ * `middleware.ts` eyni siyahıdan oxuyur. Əl ilə yazılmış siyahı yeni hesab növü
+ * (AGENT, CORPORATE) əlavə olunanda həmin istifadəçiləri girişdən dərhal sonra
+ * sessiyasız qoyurdu.
+ */
+export function isAccountType(value: unknown): value is AccountType {
+  return typeof value === "string" && (Object.values(ACCOUNT_TYPES) as string[]).includes(value);
+}
+
 /** Sessiyanın hansı giriş axınından yaradıldığını göstərir. */
 export const AUTH_KINDS = {
   STAFF_2FA: "STAFF_2FA",
