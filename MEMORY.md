@@ -590,10 +590,19 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   hissə-hissə kalkulyator, `/investisiya`, xəritədə sahə çəkmə, mənzil şahmatı, semantik axtarış
   (Vectorize indeksləri 27.09.2026-da yaradılıb). Yol boyu tapılan köhnə bug: xəritə görünüşü
   98-dən çox markerdə staging-də 500 verirdi (nested `take` əlaqəsi) — düzəldildi.
+- **4-cü mərhələ (#109):** elan müddəti (60 gün, xatırlatma, avtomatik arxiv), açıq qapı günləri,
+  rezervasiya təqvimi + ICS abunəsi, premium paketlər və ödəniş uçotu (provayder yoxdur —
+  qərar: ödəniş ofisdə/köçürmə ilə, paneldə qeyd), Bilik Mərkəzi AI məsləhətçisi (yalnız dərc
+  olunmuş məzmun, istinadla), admin passkey (TOTP-a alternativ), Google ilə və telefonla giriş
+  (secret-lər verilənə qədər söndürülü). Miqrasiyalar 0039–0045.
 
 **İstifadəçidən gözlənilən (koda aid deyil):**
 - `TELEGRAM_BOT_TOKEN` və `TELEGRAM_CHAT_ID` secret-ləri (bot @BotFather-də yaradılır).
 - Cloudflare Web Analytics sayt tokeni → GitHub repo dəyişəni `PRODUCTION_CF_WEB_ANALYTICS_TOKEN`.
+- Google ilə giriş: Google Cloud-da OAuth client (Web) → `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`;
+  icazəli yönləndirmə `https://luxehomeestate.az/api/auth/google/callback`.
+- Telefonla giriş: yerli SMS provayderi ilə müqavilə → `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`,
+  `SMS_SENDER`. Provayderin API forması fərqlidirsə `src/lib/sms.ts` uyğunlaşdırılır.
 - Şirkətin öz fotoları (`Parametrlər → Saytın şəkilləri`) və real elanlar (CSV idxalı).
 - Ünvan ziddiyyəti həll olunub (#110): sahibin təsdiqi ilə hər yerdə **Əliyar Əliyev 45a,
   Bakı AZ1005** (Google Business Profile ilə eyni). Köhnə «109A, AZ1033» işlədilməməlidir.
