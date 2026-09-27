@@ -534,6 +534,19 @@ export async function getPropertiesForMap(filters: PropertyFilters = {}) {
     AND: [await buildPropertyWhere(filters), { latitude: { not: null } }, { longitude: { not: null } }],
   };
 
+  // Poliqon: əvvəl dəqiq uyğun ID-lər (sıralı, namizəd həddi daxilində), sonra marker
+  // limiti — əks halda qutunun ilk 200 sətrindən kənarda qalan uyğun nöqtələr itirdi
+  // və `total` qutu sayını göstərirdi (#108 rəyi).
+  if (filters.polygon && filters.polygon.length >= 3) {
+    const ids = await polygonMatchIds({ ...filters, sort: filters.sort === "featured" ? undefined : filters.sort }, where);
+    const pageIds = ids.slice(0, PROPERTY_MAP_LIMIT);
+    const rows = await findManyInChunks(pageIds, 0, (chunk) =>
+      prisma.property.findMany({ where: { id: { in: chunk } }, select: propertyMapBaseSelect }));
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    const ordered = pageIds.map((id) => byId.get(id)).filter((row): row is (typeof rows)[number] => Boolean(row));
+    return { items: await withMapImages(ordered), total: ids.length };
+  }
+
   const [rows, total] = await Promise.all([
     prisma.property.findMany({
       where,
@@ -543,15 +556,7 @@ export async function getPropertiesForMap(filters: PropertyFilters = {}) {
     }),
     prisma.property.count({ where }),
   ]);
-  const found = await withMapImages(rows);
-
-  // Poliqon (#107): SQL sərhəd qutusunu süzüb, dəqiq sərhəd burada tətbiq olunur.
-  const polygon = filters.polygon;
-  if (polygon && polygon.length >= 3) {
-    const items = found.filter((item) => pointInPolygon([item.latitude as number, item.longitude as number], polygon));
-    return { items, total: found.length < PROPERTY_MAP_LIMIT ? items.length : total };
-  }
-  return { items: found, total };
+  return { items: await withMapImages(rows), total };
 }
 
 async function getFeaturedProperties(take = 6) {
@@ -2376,7 +2381,8 @@ function isPrismaKnownRequestErrorCode(error: unknown, code: string): boolean {
   );
 }
 
-const savedSearchMatchStore: SavedSearchMatchStore = {
+/** İxrac yalnız real D1 inteqrasiya testi üçündür (poliqon uyğunluğu, #108). */
+export const savedSearchMatchStore: SavedSearchMatchStore = {
   async findActiveSavedSearches() {
     return prisma.savedSearch.findMany({
       where: { enabled: true },
@@ -2402,9 +2408,16 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
   async matchesFilters(filters, propertyId) {
     const match = await prisma.property.findFirst({
       where: { ...(await buildPropertyWhere(filters)), id: propertyId },
-      select: { id: true },
+      select: { id: true, latitude: true, longitude: true },
     });
-    return match !== null;
+    if (!match) return false;
+    // SQL yalnız sərhəd qutusunu süzür — üçbucaq/konkav sahədə qutunun küncündəki elan
+    // saxta bildiriş yaratmasın deyə dəqiq sərhəd burada yoxlanır (#108 rəyi).
+    if (filters.polygon && filters.polygon.length >= 3) {
+      return match.latitude !== null && match.longitude !== null
+        && pointInPolygon([match.latitude, match.longitude], filters.polygon);
+    }
+    return true;
   },
 
   async recordMatch(savedSearchId, propertyId) {

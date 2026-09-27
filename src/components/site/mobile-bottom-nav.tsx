@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Heart, Home, Map, Search, UserRound } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -33,15 +34,9 @@ export function MobileBottomNav() {
   const t = useTranslations("navigation.bottom");
   const pathname = usePathname();
   const { ids, ready } = useFavorites();
-  // `?gorunus=` yalnız mount-dan sonra oxunur: render zamanı `window` oxumaq server
-  // HTML-i ilə uyğunsuzluq, `useSearchParams` isə statik səhifələrdə Suspense tələb edərdi.
+  // `?gorunus=` ayrıca, Suspense içindəki kiçik izləyicidən gəlir: panel özü SSR-da
+  // render olunur, yalnız aktiv bənd query dəyişəndə (siyahı ↔ xəritə) yenilənir.
   const [mapView, setMapView] = useState(false);
-  useEffect(() => {
-    const sync = () => setMapView(new URLSearchParams(window.location.search).get("gorunus") === "xerite");
-    sync();
-    window.addEventListener("popstate", sync);
-    return () => window.removeEventListener("popstate", sync);
-  }, [pathname]);
 
   if (isBottomNavHidden(pathname)) return null;
 
@@ -58,6 +53,9 @@ export function MobileBottomNav() {
       aria-label={t("label")}
       className="fixed inset-x-0 bottom-0 z-[calc(var(--z-sticky)+1)] border-t border-line bg-paper/95 pb-[var(--safe-bottom)] backdrop-blur-md lg:hidden"
     >
+      <Suspense fallback={null}>
+        <MapViewWatcher onChange={setMapView} />
+      </Suspense>
       <ul className="mx-auto grid h-16 max-w-xl grid-cols-5 pr-[var(--safe-right)] pl-[var(--safe-left)]">
         {ITEMS.map((item) => {
           const active = isActive(item);
@@ -86,4 +84,12 @@ export function MobileBottomNav() {
       </ul>
     </nav>
   );
+}
+
+/** `useSearchParams` client-side `pushState` keçidlərini də izləyir (popstate yalnız geri/irəlidir). */
+function MapViewWatcher({ onChange }: { onChange: (value: boolean) => void }) {
+  const params = useSearchParams();
+  const mapView = params.get("gorunus") === "xerite";
+  useEffect(() => onChange(mapView), [mapView, onChange]);
+  return null;
 }

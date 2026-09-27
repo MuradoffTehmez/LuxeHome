@@ -109,10 +109,14 @@ export async function syncPropertyVectors(ids: string[]): Promise<number | null>
     });
     const visibleIds = new Set(visible.map((item) => item.id));
     const hidden = chunk.filter((id) => !visibleIds.has(id));
-    if (hidden.length) await env.index.deleteByIds(hidden);
+    if (hidden.length) {
+      await env.index.deleteByIds(hidden);
+      await prisma.property.updateMany({ where: { id: { in: hidden } }, data: { vectorIndexedAt: null } });
+    }
     if (visible.length === 0) continue;
     const vectors = await embed(env.ai, visible.map(propertyEmbeddingText));
     await env.index.upsert(visible.map((item, index) => ({ id: item.id, values: vectors[index] })));
+    await prisma.property.updateMany({ where: { id: { in: [...visibleIds] } }, data: { vectorIndexedAt: new Date() } });
     upserted += visible.length;
   }
   return upserted;
@@ -148,9 +152,19 @@ export async function semanticPropertyMatches(query: string, topK = 48): Promise
   }
 }
 
-/** Bütün ictimai elanları yenidən indeksləyir (admin düyməsi). */
+/**
+ * Bütün ictimai elanları yenidən indeksləyir (admin düyməsi, gündəlik cron). Əvvəlcə
+ * indeksdə olduğu işarələnmiş, amma artıq ictimai olmayan elanlar da sinxronizasiyaya
+ * salınır — `updateMany` ilə dəyişən (məs. hesab silinməsi) elanların vektoru qalmasın.
+ */
 export async function reindexAllProperties(): Promise<number | null> {
   if (!bindings()) return null;
-  const rows = await prisma.property.findMany({ where: indexedWhere, select: { id: true }, orderBy: { id: "asc" } });
-  return syncPropertyVectors(rows.map((row) => row.id));
+  const [current, stale] = await Promise.all([
+    prisma.property.findMany({ where: indexedWhere, select: { id: true }, orderBy: { id: "asc" } }),
+    prisma.property.findMany({
+      where: { vectorIndexedAt: { not: null }, NOT: indexedWhere },
+      select: { id: true },
+    }),
+  ]);
+  return syncPropertyVectors([...stale.map((row) => row.id), ...current.map((row) => row.id)]);
 }

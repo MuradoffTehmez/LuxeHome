@@ -4,12 +4,12 @@ const env = vi.hoisted(() => ({
   AI: { run: vi.fn() },
   PROPERTY_VECTORS: { upsert: vi.fn(), deleteByIds: vi.fn(), query: vi.fn() },
 }));
-const db = vi.hoisted(() => ({ findMany: vi.fn() }));
+const db = vi.hoisted(() => ({ findMany: vi.fn(), updateMany: vi.fn() }));
 
 vi.mock("@opennextjs/cloudflare", () => ({ getCloudflareContext: () => ({ env, ctx: { waitUntil: vi.fn() } }) }));
-vi.mock("@/lib/prisma", () => ({ prisma: { property: { findMany: db.findMany } } }));
+vi.mock("@/lib/prisma", () => ({ prisma: { property: { findMany: db.findMany, updateMany: db.updateMany } } }));
 
-import { MIN_SIMILARITY, propertyEmbeddingText, semanticPropertyMatches, syncPropertyVectors } from "@/lib/semantic-search";
+import { MIN_SIMILARITY, propertyEmbeddingText, reindexAllProperties, semanticPropertyMatches, syncPropertyVectors } from "@/lib/semantic-search";
 
 const property = {
   id: "p1",
@@ -56,5 +56,16 @@ describe("semantik axtarış", () => {
 
     env.AI.run.mockRejectedValue(new Error("model down"));
     await expect(semanticPropertyMatches("test")).resolves.toBeNull();
+  });
+
+  it("tam indeksləmə artıq ictimai olmayan, amma indeksdə qalan elanın vektorunu silir", async () => {
+    db.findMany
+      .mockResolvedValueOnce([{ id: "p1" }]) // cari ictimai elanlar
+      .mockResolvedValueOnce([{ id: "p-archived" }]) // indeksdə işarəli, amma artıq gizli
+      .mockResolvedValueOnce([property]); // sinxronizasiya hissəsində görünənlər
+    env.AI.run.mockResolvedValue({ data: [[0.1, 0.2]] });
+    await expect(reindexAllProperties()).resolves.toBe(1);
+    expect(env.PROPERTY_VECTORS.deleteByIds).toHaveBeenCalledWith(["p-archived"]);
+    expect(db.updateMany).toHaveBeenCalledWith({ where: { id: { in: ["p-archived"] } }, data: { vectorIndexedAt: null } });
   });
 });

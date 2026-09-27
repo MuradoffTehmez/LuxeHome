@@ -423,6 +423,9 @@ model Property {
   /// Bütün əlaqələr (xüsusiyyət, şəkil) yazılanda qoyulur. `null` + `importKey` = yarımçıq
   /// idxal; təkrar cəhd onu dublikat saymır, davam etdirir (D1-də tranzaksiya yoxdur).
   importCompletedAt  DateTime?
+  /// Semantik indeksə yazılma vaxtı (#107). Tam yenidən indeksləmə bu işarəsi olub
+  /// artıq ictimai olmayan elanların vektorlarını silir.
+  vectorIndexedAt    DateTime?
   /// Duplikat aşkarlanması üçün normallaşdırılmış ünvan+təsvir+əsas atribut fingerprint-i.
   contentFingerprint String?
   deletedAt          DateTime?

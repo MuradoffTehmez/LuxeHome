@@ -1,7 +1,8 @@
 import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
 import { LOCATION_KINDS, PROPERTY_STATUSES } from "@/lib/constants";
-import { getPropertiesForMap, getSeoAuditItems } from "@/lib/queries";
+import { pointInPolygon, type LatLng } from "@/lib/geo-polygon";
+import { getPropertiesForMap, getSeoAuditItems, savedSearchMatchStore } from "@/lib/queries";
 
 /**
  * Xəritə görünüşü 98-dən çox markerlə (#107 zamanı tapıldı).
@@ -50,6 +51,27 @@ describe("böyük xəritə nəticəsi", () => {
     expect(items.length).toBeGreaterThan(0);
     expect(items.length).toBeLessThan(COUNT);
     expect(items.every((item) => (item.latitude as number) <= 40.355)).toBe(true);
+  });
+
+  it("üçbucaq sahədə limit dəqiq süzgəcdən sonra tətbiq olunur, say dəqiqdir", async () => {
+    // Sərhəd qutusu bütün 150 nöqtəni əhatə edir; hipotenuz (lat + lng = 90.1655) isə
+    // təxminən yarısını kəsir və heç bir test nöqtəsi düz sərhədin üzərinə düşmür.
+    const triangle: LatLng[] = [[40.34, 49.79], [40.34, 49.8255], [40.3755, 49.79]];
+    const expected = Array.from({ length: COUNT }, (_, index) => [40.35 + index / 10000, 49.8 + index / 10000] as LatLng)
+      .filter((point) => pointInPolygon(point, triangle)).length;
+    const { items, total } = await getPropertiesForMap({ citySlug: "map-baki", polygon: triangle });
+    expect(expected).toBeGreaterThan(50);
+    expect(expected).toBeLessThan(COUNT);
+    expect(total).toBe(expected);
+    expect(items).toHaveLength(expected);
+  });
+
+  it("saxlanmış axtarış sərhəd qutusunun küncündəki elanı uyğun saymır", async () => {
+    const triangle: LatLng[] = [[40.349, 49.799], [40.349, 49.9], [40.45, 49.9]];
+    // map-0 (40.35, 49.80) üçbucağın xaricindədir, amma qutunun içindədir.
+    expect(pointInPolygon([40.35, 49.8], triangle)).toBe(false);
+    await expect(savedSearchMatchStore.matchesFilters({ citySlug: "map-baki", polygon: triangle }, "map-0")).resolves.toBe(false);
+    await expect(savedSearchMatchStore.matchesFilters({ citySlug: "map-baki" }, "map-0")).resolves.toBe(true);
   });
 
   it("SEO auditi 150 elanla ilişmir və şəkilləri bağlayır", async () => {
