@@ -570,3 +570,25 @@ compat bayrağı daxili/link-local ünvanları bağlayır və cavab gövdəsi he
 
 Qəbul: `npm run test` (567 test), `typecheck`, `lint`, `dead-code` və `build` — beşi də təmiz.
 `wrangler.jsonc` dəyişdiyi üçün `npm run cf-typegen` yenidən işlədilib.
+
+---
+
+## 17. Yol xəritəsi — 27 sentyabr 2026
+
+Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölündü və istifadəçi
+«tövsiyə olunan sıra ilə tam yerinə yetir» dedi.
+
+- **1-ci mərhələ (#103 / PR #104, merge olunub):** boş bölmələrin gizlədilməsi və sahib
+  bloku, CSV idxalı (irəliləyiş markeri `importKey`/`importCompletedAt`, 0034), kart
+  siqnalları, Telegram lead bildirişi, PWA manifest, elan OG kartı, ana səhifə sırası,
+  boş axtarış təklifləri, sayt şəkilləri paneldən, Google Business Profile linki.
+- **2-ci mərhələ (#105):** qiymət göstəricisi, `/emlakimi-sat` + onlayn qiymətləndirmə,
+  müraciət lövhəsi, konversiya hunisi, kənar HTML keşi (`worker.ts`), bloq planı
+  (`docs/content/2026-bloq-plani.md`), Cloudflare Web Analytics dəstəyi.
+
+**İstifadəçidən gözlənilən (koda aid deyil):**
+- `TELEGRAM_BOT_TOKEN` və `TELEGRAM_CHAT_ID` secret-ləri (bot @BotFather-də yaradılır).
+- Cloudflare Web Analytics sayt tokeni → GitHub repo dəyişəni `PRODUCTION_CF_WEB_ANALYTICS_TOKEN`.
+- Şirkətin öz fotoları (`Parametrlər → Saytın şəkilləri`) və real elanlar (CSV idxalı).
+- Google Business Profile-dakı ünvan (Əliyar Əliyev **45a**) ilə saytdakı ünvan
+  (**109A**) fərqlidir — hansının düzgün olduğu şirkətlə təsdiqlənməlidir.

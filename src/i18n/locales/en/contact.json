@@ -25,5 +25,86 @@
   "successDescription": "Our team will contact you as soon as possible.",
   "error": "Something went wrong while sending your enquiry. Please try again shortly.",
   "googleProfile": "Reviews on Google",
-  "googleProfileValue": "See our profile and leave a review"
+  "googleProfileValue": "See our profile and leave a review",
+  "sell": {
+    "metaTitle": "Sell or rent out your property — instant online valuation",
+    "metaDescription": "Sell or let your apartment, house or commercial property in Baku with Luxe Home Estate. Get an instant estimate based on similar listings in your district.",
+    "eyebrow": "For owners",
+    "title": "Sell or rent out your property with us",
+    "description": "Check the estimated market price first, then leave the valuation, photos, document checks and viewings to us.",
+    "stepsOverline": "Process",
+    "stepsTitle": "Selling or letting in four steps",
+    "steps": {
+      "valuation": {
+        "title": "Valuation",
+        "description": "Together we set a realistic market price based on similar listings in the district and the property's condition."
+      },
+      "preparation": {
+        "title": "Preparation",
+        "description": "Professional photos and video, document checks and a well-written listing."
+      },
+      "marketing": {
+        "title": "Promotion",
+        "description": "The listing is published on our site, social media and partner channels and offered directly to matching buyers."
+      },
+      "deal": {
+        "title": "Viewings and deal",
+        "description": "We arrange viewings, lead negotiations and accompany you up to the notary stage."
+      }
+    },
+    "benefitsOverline": "What we do",
+    "benefitsTitle": "Work we take off the owner's hands",
+    "benefits": {
+      "pricing": {
+        "title": "The right price",
+        "description": "Overpricing keeps a listing unsold for months, underpricing costs you money — we rely on market data."
+      },
+      "photos": {
+        "title": "Professional visuals",
+        "description": "Quality photos, video and 360° shoots help a listing get more views."
+      },
+      "documents": {
+        "title": "Document check",
+        "description": "We check the title extract, technical passport and encumbrances upfront to avoid surprises at closing."
+      },
+      "reach": {
+        "title": "Wide audience",
+        "description": "Distribution via the site, social media, saved-search alerts and partner agencies."
+      },
+      "screening": {
+        "title": "Serious buyers",
+        "description": "We handle the calls and bring only interested, ready clients to viewings."
+      },
+      "negotiation": {
+        "title": "Negotiation",
+        "description": "We negotiate price and terms and protect your interests to the end."
+      }
+    },
+    "valuation": {
+      "title": "Value my property",
+      "listingType": "Goal",
+      "sale": "Sell",
+      "rent": "Rent out",
+      "propertyType": "Property type",
+      "city": "City / region",
+      "district": "District, settlement",
+      "anyDistrict": "Not selected",
+      "area": "Area, m²",
+      "submit": "Show estimated price",
+      "placeholder": "Enter the details — the site will instantly show an estimated price range based on similar listings.",
+      "resultKicker": "Estimated market price",
+      "perMonth": "/mo",
+      "basis": "Median price per m² of {count} similar listings: {perSqm}.",
+      "basisProfile": "Average price per m² in the district profile: {perSqm}.",
+      "disclaimer": "This is an automatic calculation based on active listings on the site. The exact price depends on renovation, floor, documents and view.",
+      "insufficient": "There are not enough listings of this type in this area for a reliable estimate. Send a request and our specialist will value it individually.",
+      "rateLimited": "Too many requests. Please try again in a minute.",
+      "invalid": "The request was not accepted. Refresh the page and try again.",
+      "preciseTitle": "Request a precise valuation",
+      "preciseDescription": "Our specialist will assess the property on site and contact you within one business day.",
+      "subject": "I want to sell / rent out my property",
+      "noEstimate": "not calculated",
+      "messageTemplate": "Goal: {listing}\nProperty type: {type}\nLocation: {place}\nArea: {area} m²\nSite estimate: {estimate}\n\nAdditional details: "
+    }
+  }
 }

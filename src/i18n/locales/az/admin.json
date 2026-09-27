@@ -79,7 +79,9 @@
       "profile": "Hesabım",
       "settings": "Parametrlər",
       "demoContent": "Nümunə məzmun",
-      "systemMode": "Sistem ayarları"
+      "systemMode": "Sistem ayarları",
+      "leadBoard": "Müraciət lövhəsi",
+      "funnel": "Konversiya hunisi"
     }
   },
   "actions": {
@@ -248,7 +250,8 @@
       "PROPERTY": "Əmlak səhifəsi",
       "CONTACT": "Əlaqə səhifəsi",
       "SERVICE": "Xidmət səhifəsi",
-      "PROJECT": "Layihə səhifəsi"
+      "PROJECT": "Layihə səhifəsi",
+      "OWNER": "Sahib müraciəti"
     },
     "leadStatus": {
       "NEW": "Yeni",
@@ -2337,6 +2340,52 @@
         "features": "Xüsusiyyət slug-ları və ya adları, «|» ilə ayrılır",
         "images": "https:// şəkil linkləri, «|» ilə ayrılır (ən çox 12) — R2-yə köçürülür"
       }
+    },
+    "leadBoard": {
+      "title": "Müraciət lövhəsi",
+      "description": "Müraciətlər iş mərhələsinə görə. Kartı sütuna sürüşdürün və ya statusu kartdakı menyudan dəyişin.",
+      "overdueSummary": "{count, plural, other {# müraciət 24 saatdan çoxdur cavabsızdır}}",
+      "emptyColumn": "Bu mərhələdə müraciət yoxdur",
+      "overdue": "24 saatdan çox cavabsız",
+      "stale": "3 gündür yenilənməyib",
+      "assignToMe": "Mənə təyin et",
+      "showMine": "Yalnız mənimkilər",
+      "showAll": "Hamısı",
+      "listView": "Siyahı",
+      "boardView": "Lövhə"
+    },
+    "funnel": {
+      "title": "Konversiya hunisi",
+      "description": "Son {days} gündə müraciətlərin mərhələləri, mənbələri və elanlar üzrə baxış → müraciət.",
+      "period": "Dövr",
+      "days": "{days} gün",
+      "leads": "Müraciət",
+      "waiting": "Cavab gözləyən",
+      "waitingHint": "«Yeni» statusunda",
+      "completedRate": "Tamamlanma",
+      "completedHint": "{count, plural, other {# müraciət tamamlanıb}}",
+      "reservations": "Baxış sorğusu",
+      "stagesTitle": "Müraciət mərhələləri",
+      "stagesHint": "Hər mərhələ özündən sonrakıları da daxil edir.",
+      "stage": {
+        "received": "Daxil olub",
+        "contacted": "Əlaqə saxlanılıb",
+        "inProgress": "İşdədir",
+        "completed": "Tamamlanıb"
+      },
+      "sourcesTitle": "Mənbələr",
+      "empty": "Bu dövrdə müraciət yoxdur",
+      "listingsTitle": "Elanlar üzrə baxış → müraciət",
+      "listingsHint": "Ən çox baxılan 20 dərc olunmuş elan. Baxış sayı elanın bütün ömrü üzrədir; favorit yalnız hesablı istifadəçiləri göstərir.",
+      "attentionSummary": "{count, plural, other {# elan çox baxılır, amma müraciət gətirmir — qiymət, foto və təsviri yoxlayın.}}",
+      "noListings": "Dərc olunmuş elan yoxdur",
+      "listing": "Elan",
+      "views": "Baxış",
+      "favorites": "Favorit",
+      "leadsColumn": "Müraciət",
+      "reservationsColumn": "Baxış sorğusu",
+      "leadRate": "Konversiya",
+      "attention": "Diqqət"
     }
   },
   "server": {
@@ -2512,7 +2561,9 @@
       "muracietYenilendi": "Müraciət yeniləndi.",
       "muracietSilindi": "Müraciət silindi.",
       "statusDeyeriDuzgunDeyil": "Status dəyəri düzgün deyil.",
-      "statusYenilendi": "Status yeniləndi."
+      "statusYenilendi": "Status yeniləndi.",
+      "alreadyAssigned": "Müraciət artıq başqa əməkdaşa təyin edilib.",
+      "assignedToYou": "Müraciət sizə təyin edildi."
     },
     "parametrler": {
       "ePoctUnvaniDuzgunDeyil": "E-poçt ünvanı düzgün deyil",

@@ -49,6 +49,15 @@ export async function checkContactLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/** «Evimi qiymətləndir» aləti (#105) — öz büdcəsi var, əlaqə formasının limitini yemir. */
+export async function checkValuationLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `valuation:${ip}` });
+  return success;
+}
+
 /** Brauzer monitorinq hadisələri üçün ayrıca, daha geniş büdcə. */
 export async function checkMonitoringLimit(ip: string): Promise<boolean> {
   const limiter = getCloudflareContext().env.MONITORING_LIMIT;

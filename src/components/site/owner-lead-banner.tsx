@@ -22,7 +22,7 @@ type OwnerLeadBannerProps = {
  * vəziyyət mesajının yerini tutur — ziyarətçiyə «heç nə yoxdur» demək əvəzinə
  * agentliyə inventar gətirən axını təklif edir (#103).
  */
-export function OwnerLeadBanner({ labels, href = "/elaqe" }: OwnerLeadBannerProps) {
+export function OwnerLeadBanner({ labels, href = "/emlakimi-sat" }: OwnerLeadBannerProps) {
   return (
     <Section tone="ivory" spacing="cozy">
       <Container size="wide">

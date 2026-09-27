@@ -382,6 +382,41 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   Vitrində 3-dən az elan olanda sahib müraciəti bloku (`OwnerLeadBanner`) çıxır; boş kateqoriya
   «0 elan» yazmır.
 
+### Satıcı axını, qiymət göstəricisi və CRM (#105)
+
+- **Qiymət göstəricisi** (`src/lib/price-benchmark.ts`): elanın m² qiyməti eyni rayon
+  (çatmasa şəhər) + növ + elan tipi + valyuta + dövrdəki elanların m² **medianı** ilə
+  müqayisə olunur; ən azı `MIN_COMPARABLES` (5) nümunə lazımdır, yoxsa göstərici çıxmır
+  (satışda son ehtiyat `NeighborhoodProfile.averagePricePerSqm`). ±10% «bazara uyğun».
+  Kartda yalnız «Sərfəli qiymət» (median-dan aşağı) göstərilir; tam müqayisə detaldadır.
+  Kart bu üçün `propertyCardSelect`-dəki `typeId/cityId/districtId`-dən istifadə edir.
+- **`/emlakimi-sat`**: satıcı səhifəsi + «Evimi qiymətləndir» (`estimateOwnerProperty`,
+  öz `VALUATION_LIMIT` limiti, lead yaratmır). Dəqiq qiymətləndirmə müraciəti əlaqə
+  formasından `source = OWNER` ilə gedir — forma mənbəni allowlist-dən keçirir
+  (`CONTACT` | `OWNER`), başqa dəyər `CONTACT` olur.
+- **Müraciət lövhəsi** `/admin/muracietler/lovhe`: status sütunları, sürüşdürmə + kartdakı
+  status menyusu (hover/drag olmadan da işləyir), SLA (`leadSla()`: yeni > 24 saat,
+  işdə > 3 gün yenilənməyib), «mənə təyin et» (`updateMany` + `assigneeId: null` şərti —
+  eyni anda götürmə səssizcə üzərinə yazmır).
+- **Konversiya hunisi** `/admin/huni`: dövr üzrə müraciət mərhələləri (kumulyativ), mənbə
+  bölgüsü və ən çox baxılan elanlar üzrə baxış → favorit → müraciət. `viewCount` kumulyativdir.
+
+### Kənar HTML keşi (#105)
+
+`wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai
+HTML-i Cloudflare Cache API-də `EDGE_HTML_CACHE_TTL` saniyə (production-da 60) saxlayır.
+Qaydalar `src/lib/edge-html-cache.ts`-dədir və `public-cache-policy.ts`-ə söykənir:
+sessiya/2FA/preview cookie-li sorğu, sessiya oxuyan marşrut, panel, auth və API keçir;
+açar RSC/router başlıqlarını daxil edir; `Set-Cookie` saxlanmır; `IS_STAGING` olan
+mühitdə (staging, lokal E2E) keş söndürülüdür. Nəticə: admin dəyişikliyi anonim
+ziyarətçiyə ən çox 60 saniyə gecikmə ilə çatır. **Yeni ictimai səhifə server tərəfdə
+sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunmalıdır** — əks halda
+bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test.ts` qoruyur).
+Durable Object sinifləri `worker.ts`-dən yenidən ixrac olunur — sarğını dəyişəndə saxla.
+
+Cloudflare Web Analytics beacon-u (cookie-siz, razılıq tələb etmir) `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN`
+build dəyişəni olanda ictimai səhifələrə əlavə olunur (`analytics-provider.tsx`).
+
 ### Əmlak filtrləri
 
 URL query parametrləri filtr vəziyyətinin yeganə mənbəyidir. `SearchPanel` göndərdiyi adlarla

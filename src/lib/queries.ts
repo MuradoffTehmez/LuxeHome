@@ -59,6 +59,10 @@ export const propertyCardSelect = {
   featuredUntil: true,
   publishedAt: true,
   createdAt: true,
+  // Qiymət göstəricisi (#105) müqayisə açarını bu ID-lərdən qurur.
+  typeId: true,
+  cityId: true,
+  districtId: true,
   type: { select: { name: true, slug: true } },
   city: { select: { name: true, slug: true } },
   district: { select: { name: true, slug: true } },

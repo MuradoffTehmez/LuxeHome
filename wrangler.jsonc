@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "luxehomeestate",
-  "main": ".open-next/worker.js",
+  // OpenNext worker-i `worker.ts` ilə sarınır — anonim ictimai HTML üçün kənar mikro-keş (#105).
+  "main": "worker.ts",
   "compatibility_date": "2026-08-20",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 
@@ -31,6 +32,9 @@
     // Sistem iş rejimi — texniki xidmət bağlıdır, normal iş rejimi aktivdir
     "SYSTEM_MODE": "NORMAL",
     "FORCE_MAINTENANCE": "false",
+    // Anonim ictimai HTML-in kənar keş müddəti, saniyə (`worker.ts`). «0» söndürür.
+    // Staging-də `IS_STAGING` olduğu üçün həmişə söndürülüdür.
+    "EDGE_HTML_CACHE_TTL": "60",
     // Dinamik səhifələrdə runtime-da oxunur; statik səhifələr üçün deploy skripti
     // eyni dəyəri build prosesinə də ötürür
     "SITE_URL": "https://luxehomeestate.az",
@@ -57,7 +61,9 @@
     // İctimai AI axtarışı — hər sorğu Workers AI inference-i (neyron) xərcləyir
     { "name": "AI_LIMIT", "namespace_id": "1006", "simple": { "limit": 12, "period": 60 } },
     // Paneldəki yazma əməliyyatları — oğurlanmış sessiya ilə kütləvi dəyişikliyi ləngidir
-    { "name": "ADMIN_LIMIT", "namespace_id": "1003", "simple": { "limit": 60, "period": 60 } }
+    { "name": "ADMIN_LIMIT", "namespace_id": "1003", "simple": { "limit": 60, "period": 60 } },
+    // «Evimi qiymətləndir» aləti (#105) — anonim, amma hər sorğu D1 müqayisəsi işlədir
+    { "name": "VALUATION_LIMIT", "namespace_id": "1007", "simple": { "limit": 20, "period": 60 } }
   ],
 
   // next/image optimizasiyası Cloudflare Images binding üzərindən işləyir
@@ -160,7 +166,8 @@
         { "name": "MONITORING_LIMIT", "namespace_id": "2004", "simple": { "limit": 60, "period": 60 } },
         { "name": "TILE_LIMIT", "namespace_id": "2005", "simple": { "limit": 240, "period": 60 } },
         { "name": "AI_LIMIT", "namespace_id": "2006", "simple": { "limit": 12, "period": 60 } },
-        { "name": "ADMIN_LIMIT", "namespace_id": "2003", "simple": { "limit": 60, "period": 60 } }
+        { "name": "ADMIN_LIMIT", "namespace_id": "2003", "simple": { "limit": 60, "period": 60 } },
+        { "name": "VALUATION_LIMIT", "namespace_id": "2007", "simple": { "limit": 20, "period": 60 } }
       ],
 
       "services": [

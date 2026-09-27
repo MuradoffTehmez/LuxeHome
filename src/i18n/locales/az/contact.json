@@ -25,5 +25,86 @@
   "successDescription": "Komandamız ən qısa zamanda sizinlə əlaqə saxlayacaq.",
   "error": "Müraciət göndərilərkən xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
   "googleProfile": "Google-da rəylər",
-  "googleProfileValue": "Profilə baxın və rəy yazın"
+  "googleProfileValue": "Profilə baxın və rəy yazın",
+  "sell": {
+    "metaTitle": "Əmlakınızı satın və ya kirayə verin — onlayn qiymətləndirmə",
+    "metaDescription": "Bakıda mənzil, ev və ya obyektinizi Luxe Home Estate ilə satın və ya kirayə verin. Rayon üzrə oxşar elanlara görə təxmini qiyməti dərhal öyrənin.",
+    "eyebrow": "Sahiblər üçün",
+    "title": "Əmlakınızı bizimlə satın və ya kirayə verin",
+    "description": "Əvvəlcə təxmini bazar qiymətini öyrənin, sonra qiymətləndirmə, foto, sənəd yoxlaması və alıcı ilə görüşləri bizə həvalə edin.",
+    "stepsOverline": "Proses",
+    "stepsTitle": "Dörd addımda satış və ya icarə",
+    "steps": {
+      "valuation": {
+        "title": "Qiymətləndirmə",
+        "description": "Rayondakı oxşar elanlar və əmlakın vəziyyətinə görə real bazar qiymətini birlikdə müəyyən edirik."
+      },
+      "preparation": {
+        "title": "Hazırlıq",
+        "description": "Peşəkar foto və video çəkiliş, sənədlərin yoxlanılması və elan mətninin hazırlanması."
+      },
+      "marketing": {
+        "title": "Təqdimat",
+        "description": "Elan saytımızda, sosial şəbəkələrdə və tərəfdaş kanallarda yayımlanır, uyğun alıcılara birbaşa təklif edilir."
+      },
+      "deal": {
+        "title": "Görüş və razılaşma",
+        "description": "Baxışları təşkil edir, danışıqları aparır və notarius mərhələsinə qədər prosesi müşayiət edirik."
+      }
+    },
+    "benefitsOverline": "Nə edirik",
+    "benefitsTitle": "Sahib olaraq sizin yerinizə görülən işlər",
+    "benefits": {
+      "pricing": {
+        "title": "Düzgün qiymət",
+        "description": "Çox yüksək qiymət elanı aylarla saxlayır, aşağı qiymət isə itki deməkdir — bazar məlumatına əsaslanırıq."
+      },
+      "photos": {
+        "title": "Peşəkar vizual",
+        "description": "Keyfiyyətli foto, video və 360° çəkiliş elanın daha çox baxış almasına kömək edir."
+      },
+      "documents": {
+        "title": "Sənəd yoxlaması",
+        "description": "Çıxarış, texniki pasport və yüklülük vəziyyətini əvvəlcədən yoxlayır, sövdələşmədə sürprizlərin qarşısını alırıq."
+      },
+      "reach": {
+        "title": "Geniş auditoriya",
+        "description": "Sayt, sosial şəbəkələr, saxlanmış axtarış bildirişləri və tərəfdaş agentliklər vasitəsilə yayım."
+      },
+      "screening": {
+        "title": "Ciddi alıcılar",
+        "description": "Zənglərə cavab veririk və baxışa yalnız maraqlı, hazır müştəriləri gətiririk."
+      },
+      "negotiation": {
+        "title": "Danışıqlar",
+        "description": "Qiymət və şərtlər üzrə danışıqları aparır, maraqlarınızı sonadək qoruyuruq."
+      }
+    },
+    "valuation": {
+      "title": "Evimi qiymətləndir",
+      "listingType": "Məqsəd",
+      "sale": "Satmaq",
+      "rent": "Kirayə vermək",
+      "propertyType": "Əmlak növü",
+      "city": "Şəhər / rayon",
+      "district": "Rayon, qəsəbə",
+      "anyDistrict": "Seçilməyib",
+      "area": "Sahə, m²",
+      "submit": "Təxmini qiyməti göstər",
+      "placeholder": "Parametrləri daxil edin — sayt oxşar elanlara görə təxmini qiymət aralığını dərhal göstərəcək.",
+      "resultKicker": "Təxmini bazar qiyməti",
+      "perMonth": "/ay",
+      "basis": "Oxşar {count} elanın m² medianı: {perSqm}.",
+      "basisProfile": "Rayon profilindəki orta m² qiyməti: {perSqm}.",
+      "disclaimer": "Bu, saytdakı aktiv elanlar əsasında avtomatik hesablamadır. Dəqiq qiymət təmir, mərtəbə, sənəd və mənzərədən asılıdır.",
+      "insufficient": "Bu bölgə və növ üzrə etibarlı hesablama üçün kifayət qədər elan yoxdur. Müraciət edin — mütəxəssisimiz fərdi qiymətləndirmə aparsın.",
+      "rateLimited": "Çox sayda sorğu göndərildi. Bir dəqiqə sonra yenidən cəhd edin.",
+      "invalid": "Məlumat qəbul edilmədi. Səhifəni yeniləyib yenidən cəhd edin.",
+      "preciseTitle": "Dəqiq qiymətləndirmə istəyin",
+      "preciseDescription": "Mütəxəssisimiz əmlakınızı yerində dəyərləndirib 1 iş günü ərzində sizinlə əlaqə saxlayacaq.",
+      "subject": "Əmlakımı satmaq / kirayə vermək istəyirəm",
+      "noEstimate": "hesablanmadı",
+      "messageTemplate": "Məqsəd: {listing}\nƏmlak növü: {type}\nYer: {place}\nSahə: {area} m²\nSaytdakı təxmini qiymət: {estimate}\n\nƏlavə məlumat: "
+    }
+  }
 }

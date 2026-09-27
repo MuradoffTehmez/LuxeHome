@@ -224,7 +224,7 @@ const NAV_KEY_BY_HREF = {
   "/elaqe": "contact", "/haqqimizda": "about", "/suallar": "faq",
   "/terefdaslar": "partners",
   "/bilik-merkezi": "knowledgeHub", "/lugat": "glossary", "/kalkulyator": "calculator",
-  "/bazar-analitikasi": "marketIntelligence",
+  "/bazar-analitikasi": "marketIntelligence", "/emlakimi-sat": "sellWithUs",
 } as const;
 
 const PROPERTY_KEY_BY_HREF = {

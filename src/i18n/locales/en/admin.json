@@ -79,7 +79,9 @@
       "profile": "My account",
       "settings": "Settings",
       "demoContent": "Demo content",
-      "systemMode": "System settings"
+      "systemMode": "System settings",
+      "leadBoard": "Lead board",
+      "funnel": "Conversion funnel"
     }
   },
   "actions": {
@@ -248,7 +250,8 @@
       "PROPERTY": "Property page",
       "CONTACT": "Contact page",
       "SERVICE": "Service page",
-      "PROJECT": "Development page"
+      "PROJECT": "Development page",
+      "OWNER": "Owner request"
     },
     "leadStatus": {
       "NEW": "New",
@@ -2337,6 +2340,52 @@
         "features": "Feature slugs or names separated by «|»",
         "images": "https:// image links separated by «|» (max 12) — copied to R2"
       }
+    },
+    "leadBoard": {
+      "title": "Lead board",
+      "description": "Leads by stage. Drag a card to a column or change its status from the card menu.",
+      "overdueSummary": "{count, plural, one {# lead has been waiting over 24 hours} other {# leads have been waiting over 24 hours}}",
+      "emptyColumn": "No leads at this stage",
+      "overdue": "Unanswered for 24h+",
+      "stale": "No update for 3 days",
+      "assignToMe": "Assign to me",
+      "showMine": "Only mine",
+      "showAll": "All",
+      "listView": "List",
+      "boardView": "Board"
+    },
+    "funnel": {
+      "title": "Conversion funnel",
+      "description": "Lead stages and sources for the last {days} days, and views → leads per listing.",
+      "period": "Period",
+      "days": "{days} days",
+      "leads": "Leads",
+      "waiting": "Awaiting reply",
+      "waitingHint": "In “New” status",
+      "completedRate": "Completion",
+      "completedHint": "{count, plural, one {# lead completed} other {# leads completed}}",
+      "reservations": "Viewing requests",
+      "stagesTitle": "Lead stages",
+      "stagesHint": "Each stage includes the ones after it.",
+      "stage": {
+        "received": "Received",
+        "contacted": "Contacted",
+        "inProgress": "In progress",
+        "completed": "Completed"
+      },
+      "sourcesTitle": "Sources",
+      "empty": "No leads in this period",
+      "listingsTitle": "Views → leads by listing",
+      "listingsHint": "Top 20 most viewed published listings. Views cover the listing's whole lifetime; favourites count signed-in users only.",
+      "attentionSummary": "{count, plural, one {# listing gets many views but no leads — check its price, photos and description.} other {# listings get many views but no leads — check their price, photos and description.}}",
+      "noListings": "No published listings",
+      "listing": "Listing",
+      "views": "Views",
+      "favorites": "Favourites",
+      "leadsColumn": "Leads",
+      "reservationsColumn": "Viewings",
+      "leadRate": "Conversion",
+      "attention": "Attention"
     }
   },
   "server": {
@@ -2512,7 +2561,9 @@
       "muracietYenilendi": "Inquiry updated.",
       "muracietSilindi": "Inquiry deleted.",
       "statusDeyeriDuzgunDeyil": "Invalid status value.",
-      "statusYenilendi": "Status updated."
+      "statusYenilendi": "Status updated.",
+      "alreadyAssigned": "The lead is already assigned to another team member.",
+      "assignedToYou": "The lead has been assigned to you."
     },
     "parametrler": {
       "ePoctUnvaniDuzgunDeyil": "Invalid email address",

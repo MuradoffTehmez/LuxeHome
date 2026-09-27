@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { BedDouble, Building2, Camera, Crown, Layers, Maximize, MapPin, Sparkles, TrendingDown } from "lucide-react";
+import { BadgePercent, BedDouble, Building2, Camera, Crown, Layers, Maximize, MapPin, Sparkles, TrendingDown } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
   LISTING_TYPES,
@@ -15,6 +15,7 @@ import {
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { Badge } from "@/components/ui/badge";
 import type { PropertyCardData } from "@/lib/queries";
+import type { PriceBand } from "@/lib/price-benchmark";
 import { FavoriteButton } from "./favorite-button";
 import { CompareButton } from "./compare-button";
 
@@ -24,6 +25,8 @@ type PropertyCardProps = {
   priority?: boolean;
   className?: string;
   variant?: "standard" | "featured";
+  /** Bazar müqayisəsi (#105) — kartda yalnız «sərfəli» (median-dan aşağı) göstərilir. */
+  priceBand?: PriceBand;
 };
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
@@ -81,6 +84,7 @@ export function PropertyCard({
   priority = false,
   className,
   variant = "standard",
+  priceBand,
 }: PropertyCardProps) {
   const t = useTranslations("property");
   const contentT = useTranslations("content.phase2");
@@ -203,6 +207,12 @@ export function PropertyCard({
             {property.type.name}
           </p>
         </div>
+        {priceBand === "below" && !isClosed ? (
+          <p className="-mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-success-bg px-2.5 py-0.5 text-xs font-semibold text-success">
+            <BadgePercent className="size-3.5" aria-hidden="true" />
+            {t("priceInsight.cardBelow")}
+          </p>
+        ) : null}
 
         <div className="flex flex-col gap-1.5">
           <h3

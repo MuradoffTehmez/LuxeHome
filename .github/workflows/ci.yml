@@ -399,6 +399,8 @@ jobs:
           IS_STAGING: "false"
           NEXT_PUBLIC_GA_MEASUREMENT_ID: G-54KSFRM17B
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ vars.PRODUCTION_VAPID_PUBLIC_KEY }}
+          # Cloudflare Web Analytics sayt tokeni (ictimai dəyər, sirr deyil) — boşdursa beacon yüklənmir.
+          NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN: ${{ vars.PRODUCTION_CF_WEB_ANALYTICS_TOKEN }}
         run: npx opennextjs-cloudflare build
 
       # Bu repoda `wrangler deploy` OpenNext layihəsini tanıyır və `opennextjs-cloudflare

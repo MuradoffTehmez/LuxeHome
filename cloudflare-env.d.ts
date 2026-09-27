@@ -12,6 +12,7 @@ interface __BaseEnv_CloudflareEnv {
 	TILE_LIMIT: RateLimit;
 	AI_LIMIT: RateLimit;
 	ADMIN_LIMIT: RateLimit;
+	VALUATION_LIMIT: RateLimit;
 	AI: Ai;
 	IMAGES: ImagesBinding;
 	ASSETS: Fetcher;
@@ -44,6 +45,7 @@ declare namespace Cloudflare {
 		TILE_LIMIT: RateLimit;
 		AI_LIMIT: RateLimit;
 		ADMIN_LIMIT: RateLimit;
+		VALUATION_LIMIT: RateLimit;
 		AI: Ai;
 		IMAGES: ImagesBinding;
 		ASSETS: Fetcher;

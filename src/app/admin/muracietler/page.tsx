@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Eye, Phone, Trash2 } from "lucide-react";
+import { Eye, KanbanSquare, Phone, Trash2 } from "lucide-react";
+import { ButtonLink } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import {
   AdminCard,
@@ -99,6 +100,12 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
         title={t("pages.leads.muracietler")}
         description={t("pages.common.umumilikdeMuracietTapildi", { p0: total })}
         breadcrumbs={[{ label: t("pages.leads.idarePaneli"), href: "/admin" }, { label: t("pages.leads.muracietler") }]}
+        actions={
+          <ButtonLink href={`${LIST_PATH}/lovhe`} variant="outline" size="sm">
+            <KanbanSquare className="size-4" aria-hidden="true" />
+            {t("pages.leadBoard.boardView")}
+          </ButtonLink>
+        }
       />
 
       <AdminCard bodyClassName="p-0">
