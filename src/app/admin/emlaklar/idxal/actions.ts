@@ -1,6 +1,7 @@
 "use server";
 
 import { isKnownWatermarkedChecksum } from "@/lib/media/known-watermark";
+import { enrichListing } from "@/lib/listing-enrichment";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { PERMISSIONS, PROPERTY_STATUSES } from "@/lib/constants";
@@ -253,6 +254,12 @@ export async function commitPropertyImport(csv: string, lines: number[]): Promis
 
       // Marker ən sonda yazılır: bundan əvvəlki istənilən xəta sətri «yarımçıq» saxlayır.
       await prisma.property.update({ where: { id: propertyId }, data: { importCompletedAt: new Date() } });
+      // SEO və boş ALT-lar faktlardan dərhal yazılır (AI-sız — toplu idxal Worker
+      // limitinə sığmalıdır). Xətası sətri uğursuz etmir: elan artıq tam yazılıb və
+      // paneldə saxlananda AI ilə yenidən zənginləşdirilir.
+      await enrichListing(propertyId, { useAi: false }).catch((error) => {
+        console.error("[idxal] SEO/ALT yazılmadı:", error instanceof Error ? error.message : error);
+      });
       await recordAudit(user, resumed ? "UPDATE" : "CREATE", "Property", propertyId, `CSV: ${input.title}`);
       results.push({
         line: row.line,

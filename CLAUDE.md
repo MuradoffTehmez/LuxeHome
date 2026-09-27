@@ -487,7 +487,8 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   sındırmır). AI yoxdursa deterministik mətn yazılır (`lib/seo-copy.ts`). Redaktor SEO sahəsini
   dəyişəndə `seoGeneratedAt = null` olur və generator yalnız boş sahələri doldurur. ALT cümləsi
   faktlardan qurulur, AI yalnız fotodakı sahəni sabit siyahıdan seçir (`lib/image-alt.ts`).
-  CSV idxalı enrichment çağırmır (subrequest limiti) — elan paneldə saxlananda yaradılır.
+  CSV idxalı `enrichListing(id, { useAi: false })` çağırır — AI-sız, faktlardan dərhal
+  (Worker limiti); AI versiyası elan paneldə saxlananda yaranır.
 - **Hesab növləri:** USER, OWNER, AGENT, AGENCY, CORPORATE (+ STAFF). Siyahıları əl ilə yazma —
   `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYPES`, `COMPANY_ACCOUNT_TYPES`, `accountTypeKey()`.
   Doğum tarixi istəyə bağlıdır və yalnız 18 yaş yoxlaması üçündür (`accounts/profile-fields.ts`).

@@ -145,7 +145,11 @@ function seoIsEmpty(property: EnrichmentProperty): boolean {
   ].some((value) => value?.trim());
 }
 
-async function enrichSeo(property: EnrichmentProperty, force: boolean): Promise<"generated" | "filled" | "skipped"> {
+async function enrichSeo(
+  property: EnrichmentProperty,
+  force: boolean,
+  useAi: boolean,
+): Promise<"generated" | "filled" | "skipped"> {
   const managedAutomatically = force || property.seoGeneratedAt !== null || seoIsEmpty(property);
   const missing = {
     metaTitle: !property.metaTitle?.trim(),
@@ -158,11 +162,14 @@ async function enrichSeo(property: EnrichmentProperty, force: boolean): Promise<
   if (!managedAutomatically && !Object.values(missing).some(Boolean)) return "skipped";
 
   const facts = listingSeoFacts(property);
-  const { copy } = await generateSeoCopy({
-    facts: { ...facts, description: facts.description.slice(0, 1500) },
-    fallback: fallbackListingSeo(facts),
-    context: "əmlak elanı",
-  });
+  const fallback = fallbackListingSeo(facts);
+  const { copy } = useAi
+    ? await generateSeoCopy({
+        facts: { ...facts, description: facts.description.slice(0, 1500) },
+        fallback,
+        context: "əmlak elanı",
+      })
+    : { copy: fallback };
   const values = {
     metaTitle: copy.metaTitle,
     metaDescription: copy.metaDescription,
@@ -216,7 +223,7 @@ async function classifyImage(url: string, facts: AltFacts): Promise<ReturnType<t
   }
 }
 
-async function enrichAlts(property: EnrichmentProperty, force: boolean): Promise<number> {
+async function enrichAlts(property: EnrichmentProperty, force: boolean, useAi: boolean): Promise<number> {
   const facts = altFacts(property);
   const targets = property.images.filter((image) => force || !image.alt.trim());
   if (targets.length === 0) return 0;
@@ -229,6 +236,7 @@ async function enrichAlts(property: EnrichmentProperty, force: boolean): Promise
     });
   }
 
+  if (!useAi) return targets.length;
   for (const image of targets.slice(0, MAX_AI_ALT_IMAGES)) {
     const room = await classifyImage(image.thumbUrl || image.url, facts);
     if (!room) continue;
@@ -242,16 +250,21 @@ async function enrichAlts(property: EnrichmentProperty, force: boolean): Promise
 
 export type EnrichmentResult = { seo: "generated" | "filled" | "skipped"; alts: number } | null;
 
-/** SEO və ALT-ı indi yaradır (admin düyməsi `force` ilə hamısını yeniləyir). */
+/**
+ * SEO və ALT-ı indi yaradır (admin düyməsi `force` ilə hamısını yeniləyir).
+ * `useAi: false` — yalnız faktlardan deterministik mətn: CSV idxalı kimi toplu
+ * axınlarda Workers AI çağırışları Worker limitlərinə sığmır.
+ */
 export async function enrichListing(
   propertyId: string,
-  options: { force?: boolean; seo?: boolean; alts?: boolean } = {},
+  options: { force?: boolean; useAi?: boolean } = {},
 ): Promise<EnrichmentResult> {
   const property = await loadProperty(propertyId);
   if (!property) return null;
   const force = options.force ?? false;
-  const seo = options.seo === false ? "skipped" : await enrichSeo(property, force);
-  const alts = options.alts === false ? 0 : await enrichAlts(property, force);
+  const useAi = options.useAi ?? true;
+  const seo = await enrichSeo(property, force, useAi);
+  const alts = await enrichAlts(property, force, useAi);
   return { seo, alts };
 }
 
