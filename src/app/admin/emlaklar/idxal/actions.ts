@@ -1,5 +1,6 @@
 "use server";
 
+import { isKnownWatermarkedChecksum } from "@/lib/media/known-watermark";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { PERMISSIONS, PROPERTY_STATUSES } from "@/lib/constants";
@@ -156,7 +157,9 @@ async function importImage(url: string, title: string, uploaderId: string): Prom
     if (!bytes) return null;
     const name = new URL(url).pathname.split("/").pop() || "image";
     // Tip və ölçü yoxlaması (magic byte) `putImage` içindədir — cavab başlığına güvənilmir.
-    const result = await putImage(new File([bytes], name.slice(0, 120)), "emlaklar", title);
+    const result = await putImage(new File([bytes], name.slice(0, 120)), "emlaklar", title, {
+      isKnownWatermarked: isKnownWatermarkedChecksum,
+    });
     if (!result.ok) return null;
     await prisma.media.create({
       data: {

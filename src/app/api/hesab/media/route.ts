@@ -4,6 +4,7 @@ import { AdminGuardError, RateLimitGuardError, SystemModeGuardError, requirePubl
 import { systemModeErrorResponse } from "@/lib/system-mode";
 import { createMediaRecordOnce, parseClientUploadId } from "@/lib/media/upload-record";
 import { deleteImage, putImage, uploadFailureStatus } from "@/lib/media/storage";
+import { isKnownWatermarkedChecksum } from "@/lib/media/known-watermark";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
   const existing = await findExisting();
   if (existing) return NextResponse.json(existing, { status: 200 });
 
-  const result = await putImage(file, "emlaklar");
+  const result = await putImage(file, "emlaklar", null, { isKnownWatermarked: isKnownWatermarkedChecksum });
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: uploadFailureStatus(result.reason) });
   }
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
               height: result.height ?? null,
               uploaderId: user.id,
               checksum: result.checksum,
+              watermarkApplied: result.watermarkApplied,
               clientUploadId,
             },
             select: mediaSelect,

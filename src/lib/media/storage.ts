@@ -4,6 +4,19 @@ import {
   MAX_PARTNER_LOGO_SIZE,
   MAX_UPLOAD_SIZE,
 } from "@/lib/constants";
+import { runtimeEnv } from "@/lib/runtime-env";
+import {
+  DETECTION_SIZE,
+  WATERMARK_OPACITY,
+  buildWatermarkTemplate,
+  controlBox,
+  isWatermarkDetected,
+  scaledDimensions,
+  watermarkBox,
+  watermarkScore,
+  type WatermarkBox,
+  type WatermarkTemplate,
+} from "@/lib/media/watermark";
 
 /**
  * R2-yə şəkil yükləmə qatı.
@@ -32,6 +45,9 @@ export const MEDIA_FOLDERS = [
 export type MediaFolder = (typeof MEDIA_FOLDERS)[number];
 
 type AllowedMime = (typeof ALLOWED_IMAGE_MIME_TYPES)[number];
+
+/** Su nişanı məcburi olan qovluqlar — ictimai elan şəkilləri. */
+const WATERMARKED_FOLDERS: ReadonlySet<MediaFolder> = new Set(["emlaklar"]);
 
 const EXTENSIONS: Record<AllowedMime, string> = {
   "image/jpeg": "jpg",
@@ -75,6 +91,8 @@ type Converted = {
   bytes: ArrayBuffer;
   contentType: string;
   extension: string;
+  /** Nişan bu çevirmədə həqiqətən çəkildi (loqo tapıldı, `draw` xətasız keçdi). */
+  watermarked: boolean;
 };
 
 /** Bir ArrayBuffer-dən təkrar oxuna bilən axın qurur. */
@@ -82,22 +100,39 @@ function streamOf(buffer: ArrayBuffer): ReadableStream {
   return new Response(buffer).body!;
 }
 
+type SourceSize = { width: number; height: number } | null;
+
+/** Loqo faylı — `public/logo-mark.webp`, Worker-in statik asset-lərindən oxunur. */
+const WATERMARK_ASSET = "https://assets.local/logo-mark.webp";
+
+async function watermarkAsset(): Promise<ReadableStream | null> {
+  const assets = getCloudflareContext().env.ASSETS;
+  if (!assets) return null;
+  const response = await assets.fetch(WATERMARK_ASSET);
+  return response.ok && response.body ? response.body : null;
+}
+
 /**
- * Şəkli WebP-ə çevirir və eni məhdudlaşdırır.
+ * Şəkli WebP-ə çevirir, eni məhdudlaşdırır və lazım olduqda su nişanını çəkir.
+ *
+ * Nişanın ölçüsü və kənardan məsafəsi çıxış eninə nisbətdir (`watermarkBox`) —
+ * master və kiçik nüsxə eyni nisbi nişanı daşıyır, bu da sonradan təkrar yüklənən
+ * surətdə nişanı tanımağa imkan verir.
  *
  * Binding olmayan mühitdə (lokal `next dev`) orijinal bayt dəsti qaytarılır ki,
- * axın hər halda işləsin.
+ * axın hər halda işləsin; `watermarked: false` qərarı çağıran tərəfə buraxır.
  */
 async function toWebp(
   buffer: ArrayBuffer,
   source: AllowedMime,
   width: number,
   quality: number,
-  watermark = false,
+  watermark: boolean,
+  sourceSize: SourceSize,
 ): Promise<Converted> {
-  const { IMAGES: images, ASSETS: assets } = getCloudflareContext().env;
+  const images = getCloudflareContext().env.IMAGES;
   if (!images) {
-    return { bytes: buffer, contentType: source, extension: EXTENSIONS[source] };
+    return { bytes: buffer, contentType: source, extension: EXTENSIONS[source], watermarked: false };
   }
 
   try {
@@ -105,11 +140,19 @@ async function toWebp(
       .input(streamOf(buffer))
       // `scale-down` kiçik şəkli böyütmür — yalnız böyükləri kiçildir
       .transform({ width, fit: "scale-down" });
-    if (watermark && assets) {
-      const watermarkResponse = await assets.fetch("https://assets.local/logo-mark.webp");
-      if (watermarkResponse.ok && watermarkResponse.body) {
-        const overlay = images.input(watermarkResponse.body).transform({ width: Math.min(160, Math.round(width * 0.12)), fit: "scale-down" });
-        transformer = transformer.draw(overlay, { bottom: 20, right: 20, opacity: 0.55 });
+    let watermarked = false;
+    if (watermark && sourceSize) {
+      const logo = await watermarkAsset();
+      if (logo) {
+        const output = scaledDimensions(sourceSize.width, sourceSize.height, width);
+        const box = watermarkBox(output.width, output.height);
+        const overlay = images.input(logo).transform({ width: box.size, height: box.size, fit: "contain" });
+        transformer = transformer.draw(overlay, {
+          bottom: box.margin,
+          right: box.margin,
+          opacity: WATERMARK_OPACITY,
+        });
+        watermarked = true;
       }
     }
     const result = await transformer.output({ format: "image/webp", quality });
@@ -118,11 +161,12 @@ async function toWebp(
       bytes: await result.response().arrayBuffer(),
       contentType: "image/webp",
       extension: "webp",
+      watermarked,
     };
   } catch (error) {
-    // Çevirmə alınmasa, elan şəkilsiz qalmasın deyə orijinal saxlanılır
+    // Çevirmə alınmasa orijinal qaytarılır; nişan tələb olunursa qərarı `putImage` verir.
     console.error("[media] WebP çevirməsi alınmadı:", error);
-    return { bytes: buffer, contentType: source, extension: EXTENSIONS[source] };
+    return { bytes: buffer, contentType: source, extension: EXTENSIONS[source], watermarked: false };
   }
 }
 
@@ -138,6 +182,79 @@ async function dimensions(buffer: ArrayBuffer): Promise<{ width?: number; height
   }
 }
 
+/**
+ * Şəklin bir qutusunu `DETECTION_SIZE²` RGBA baytlarına gətirir.
+ * Gözlənilən uzunluqda deyilsə `null` — aşkarlama «tapılmadı» sayılır.
+ */
+async function regionPixels(buffer: ArrayBuffer, box: WatermarkBox): Promise<Uint8Array | null> {
+  const images = getCloudflareContext().env.IMAGES;
+  if (!images) return null;
+  const result = await images
+    .input(streamOf(buffer))
+    .transform({ trim: { left: box.left, top: box.top, width: box.size, height: box.size } })
+    .transform({ width: DETECTION_SIZE, height: DETECTION_SIZE, fit: "squeeze" })
+    .output({ format: "rgba" });
+  const bytes = new Uint8Array(await result.response().arrayBuffer());
+  return bytes.length === DETECTION_SIZE * DETECTION_SIZE * 4 ? bytes : null;
+}
+
+/**
+ * Loqo şablonu izolyat boyu hesablanmış **dəyər** kimi saxlanılır (promise və ya
+ * I/O obyekti deyil — #96-dakı ilişən paylaşılan promise problemi burada yoxdur).
+ */
+let cachedTemplate: WatermarkTemplate | null = null;
+
+async function logoTemplate(): Promise<WatermarkTemplate | null> {
+  if (cachedTemplate) return cachedTemplate;
+  const images = getCloudflareContext().env.IMAGES;
+  const logo = await watermarkAsset();
+  if (!images || !logo) return null;
+  const result = await images
+    .input(logo)
+    .transform({ width: DETECTION_SIZE, height: DETECTION_SIZE, fit: "squeeze" })
+    .output({ format: "rgba" });
+  const bytes = new Uint8Array(await result.response().arrayBuffer());
+  if (bytes.length !== DETECTION_SIZE * DETECTION_SIZE * 4) return null;
+  cachedTemplate = buildWatermarkTemplate(bytes);
+  return cachedTemplate;
+}
+
+/**
+ * Yüklənən şəkildə artıq Luxe Home Estate nişanı varmı?
+ *
+ * Xəta və ya binding çatışmazlığı «yoxdur» deməkdir: ən pis halda nişan ikinci
+ * dəfə çəkilir, amma nişansız şəkil heç vaxt «nişanlı» sayılmır.
+ */
+async function detectExistingWatermark(buffer: ArrayBuffer, size: SourceSize): Promise<boolean> {
+  if (!size || size.width < 200 || size.height < 150) return false;
+  try {
+    const template = await logoTemplate();
+    if (!template) return false;
+    const [region, control] = await Promise.all([
+      regionPixels(buffer, watermarkBox(size.width, size.height)),
+      regionPixels(buffer, controlBox(size.width, size.height)),
+    ]);
+    if (!region || !control) return false;
+    return isWatermarkDetected(watermarkScore(region, template), watermarkScore(control, template));
+  } catch (error) {
+    console.error("[media] su nişanı aşkarlanmadı:", error);
+    return false;
+  }
+}
+
+/**
+ * Nişansız elan şəkli qəbul edilə bilərmi?
+ *
+ * Production-da yox: çevirmə və ya loqo alınmasa yükləmə keçici xəta (503) ilə
+ * qaytarılır və client növbəsi təkrar cəhd edir. Staging və lokal E2E (`IS_STAGING`)
+ * test mühitidir — orada Images binding-in lokal versiyası `draw()`-ı dəstəkləməyə
+ * bilər; şəkil qəbul olunur, `Media.watermarkApplied = false` isə «Media SEO»
+ * siyahısında görünür.
+ */
+function unwatermarkedAllowed(): boolean {
+  return runtimeEnv("IS_STAGING") === "true";
+}
+
 export type UploadResult =
   | {
       ok: true;
@@ -150,6 +267,8 @@ export type UploadResult =
       height?: number;
       checksum: string;
       watermarkApplied: boolean;
+      /** Şəkil artıq nişanlı gəlib — ikinci nişan çəkilməyib. */
+      watermarkDetected: boolean;
     }
   | { ok: false; error: string; reason: UploadFailureReason };
 
@@ -179,7 +298,21 @@ async function sha256(buffer: ArrayBuffer): Promise<string> {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export async function putImage(file: File, folder: MediaFolder, seoName?: string | null): Promise<UploadResult> {
+export type PutImageOptions = {
+  /**
+   * Bu SHA-256 izi sistemin öz nişanlı master faylına aiddirmi? (`Media.checksum`
+   * + `watermarkApplied`). Saytdan endirilib olduğu kimi yenidən yüklənən şəkil
+   * piksel analizinə getmədən tanınır.
+   */
+  isKnownWatermarked?: (checksum: string) => Promise<boolean>;
+};
+
+export async function putImage(
+  file: File,
+  folder: MediaFolder,
+  seoName?: string | null,
+  options: PutImageOptions = {},
+): Promise<UploadResult> {
   const maxSize = folder === "terefdaslar-logo" ? MAX_PARTNER_LOGO_SIZE : MAX_UPLOAD_SIZE;
   if (file.size === 0) return { ok: false, error: "Fayl boşdur.", reason: "empty" };
   if (file.size > maxSize) {
@@ -199,9 +332,33 @@ export async function putImage(file: File, folder: MediaFolder, seoName?: string
   const bucket = getCloudflareContext().env.MEDIA;
   if (!bucket) return { ok: false, error: "Media anbarı əlçatan deyil.", reason: "storage" };
 
-  const applyWatermark = folder === "emlaklar";
-  const master = await toWebp(buffer, sourceType, MASTER_WIDTH, MASTER_QUALITY, applyWatermark);
-  const thumb = await toWebp(buffer, sourceType, THUMB_WIDTH, THUMB_QUALITY, applyWatermark);
+  const watermarkRequired = WATERMARKED_FOLDERS.has(folder);
+  const sourceDimensions = await dimensions(buffer);
+  const sourceSize: SourceSize =
+    sourceDimensions.width && sourceDimensions.height
+      ? { width: sourceDimensions.width, height: sourceDimensions.height }
+      : null;
+
+  // Artıq nişanlı şəkil (əvvəl sistemdən endirilib təkrar yüklənən) ikinci dəfə
+  // nişanlanmır: əvvəlcə bayt izi, sonra piksel analizi yoxlanılır.
+  let watermarkDetected = false;
+  if (watermarkRequired) {
+    const inputChecksum = await sha256(buffer);
+    watermarkDetected =
+      (await options.isKnownWatermarked?.(inputChecksum).catch(() => false)) === true ||
+      (await detectExistingWatermark(buffer, sourceSize));
+  }
+  const drawWatermark = watermarkRequired && !watermarkDetected;
+
+  const master = await toWebp(buffer, sourceType, MASTER_WIDTH, MASTER_QUALITY, drawWatermark, sourceSize);
+  if (drawWatermark && !master.watermarked && !unwatermarkedAllowed()) {
+    return {
+      ok: false,
+      error: "Şəklə su nişanı tətbiq edilə bilmədi. Bir az sonra yenidən cəhd edin.",
+      reason: "storage",
+    };
+  }
+  const thumb = await toWebp(buffer, sourceType, THUMB_WIDTH, THUMB_QUALITY, drawWatermark && master.watermarked, sourceSize);
   const size = await dimensions(master.bytes);
   const checksum = await sha256(master.bytes);
 
@@ -240,7 +397,8 @@ export async function putImage(file: File, folder: MediaFolder, seoName?: string
     size: master.bytes.byteLength,
     ...size,
     checksum,
-    watermarkApplied: applyWatermark && master.contentType === "image/webp",
+    watermarkApplied: watermarkDetected || master.watermarked,
+    watermarkDetected,
   };
 }
 
