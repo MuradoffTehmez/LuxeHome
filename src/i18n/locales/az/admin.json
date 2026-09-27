@@ -182,9 +182,11 @@
   "labels": {
     "accountType": {
       "STAFF": "Şirkət əməkdaşı",
-      "USER": "İstifadəçi",
+      "USER": "Şəxsi istifadəçi",
       "OWNER": "Mülk sahibi",
-      "AGENCY": "Agentlik"
+      "AGENCY": "Agentlik",
+      "AGENT": "Agent (rieltor)",
+      "CORPORATE": "Korporativ hesab"
     },
     "agencyEmployeeRole": {
       "MANAGER": "Menecer",

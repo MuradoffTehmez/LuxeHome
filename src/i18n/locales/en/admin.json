@@ -182,9 +182,11 @@
   "labels": {
     "accountType": {
       "STAFF": "Company staff",
-      "USER": "User",
+      "USER": "Personal user",
       "OWNER": "Property owner",
-      "AGENCY": "Agency"
+      "AGENCY": "Agency",
+      "AGENT": "Agent (realtor)",
+      "CORPORATE": "Corporate account"
     },
     "agencyEmployeeRole": {
       "MANAGER": "Manager",

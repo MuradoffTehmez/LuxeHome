@@ -26,6 +26,7 @@ import {
   type SortOption,
   NEARBY_PLACE_CATEGORIES,
   NEAR_METRO_METERS,
+  PUBLIC_ACCOUNT_TYPES,
 } from "@/lib/constants";
 import { demoWhere } from "@/lib/demo-content";
 import { buildCityFilterTree, withCityAndGroup } from "@/lib/location-tree";
@@ -845,7 +846,7 @@ export async function getAdminTaxonomy() {
 /** Panel — ictimai qeydiyyatdan keçən hesablar (STAFF xaric). */
 export async function getAdminPublicAccounts() {
   return prisma.user.findMany({
-    where: { accountType: { in: [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY] } },
+    where: { accountType: { in: PUBLIC_ACCOUNT_TYPES } },
     select: {
       id: true,
       name: true,

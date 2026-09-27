@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, PERMISSIONS } from "@/lib/constants";
+import { PERMISSIONS, PUBLIC_ACCOUNT_TYPES } from "@/lib/constants";
 import { revokeAllSessions } from "@/lib/auth/session";
 import {
   type ActionState,
@@ -30,7 +30,7 @@ export async function togglePublicAccountActive(id: string): Promise<ActionState
     const account = await prisma.user.findFirst({
       where: {
         id,
-        accountType: { in: [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY] },
+        accountType: { in: PUBLIC_ACCOUNT_TYPES },
       },
       select: { id: true, email: true, isActive: true },
     });
@@ -62,7 +62,7 @@ export async function togglePublicAccountApproval(id: string): Promise<ActionSta
     const account = await prisma.user.findFirst({
       where: {
         id,
-        accountType: { in: [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY] },
+        accountType: { in: PUBLIC_ACCOUNT_TYPES },
       },
       select: { id: true, email: true, approvedAt: true },
     });

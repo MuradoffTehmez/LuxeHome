@@ -1,5 +1,6 @@
 "use server";
 
+import { composeName, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -85,18 +86,25 @@ export async function registerAccount(
     .max(200, t("actions.passwordLong"));
   const registerSchema = z
     .object({
-      name: z.string().trim().min(2, t("actions.nameMin")).max(120, t("actions.invalidField")),
+      firstName: z.string().trim().min(2, t("actions.firstNameRequired")).max(60, t("actions.invalidField")),
+      lastName: z.string().trim().min(2, t("actions.lastNameRequired")).max(60, t("actions.invalidField")),
       email: z.string().trim().toLowerCase().pipe(z.email(t("actions.invalidEmail"))),
       phone: z.string().trim().min(7, t("actions.invalidPhone")).max(30, t("actions.invalidField")).nullable(),
       password: passwordRule,
       accountType: z.enum(PUBLIC_ACCOUNT_TYPES as [AccountType, ...AccountType[]]),
-      agencyName: z.string().trim().max(160, t("actions.invalidField")).nullable(),
+      companyName: z.string().trim().max(160, t("actions.invalidField")).nullable(),
+      companyWebsite: z
+        .string()
+        .trim()
+        .url(t("actions.invalidUrl"))
+        .refine((value) => value.startsWith("https://"), t("actions.httpsUrl"))
+        .nullable(),
     })
     .refine(
-      (data) => data.accountType !== ACCOUNT_TYPES.AGENCY || (data.agencyName?.length ?? 0) >= 2,
-      { message: t("actions.agencyNameRequired"), path: ["agencyName"] },
+      (data) => !profileRequirements(data.accountType).company || (data.companyName?.length ?? 0) >= 2,
+      { message: t("actions.companyNameRequired"), path: ["companyName"] },
     )
-    .refine((data) => data.accountType === ACCOUNT_TYPES.USER || data.phone !== null, {
+    .refine((data) => !profileRequirements(data.accountType).phoneRequired || data.phone !== null, {
       message: t("actions.phoneRequired"),
       path: ["phone"],
     });
@@ -109,14 +117,30 @@ export async function registerAccount(
   }
 
   const parsed = registerSchema.safeParse({
-    name: form.text(formData, "name"),
+    firstName: form.text(formData, "firstName"),
+    lastName: form.text(formData, "lastName"),
     email: form.text(formData, "email"),
     phone: form.optionalText(formData, "phone"),
     password: form.text(formData, "password"),
     accountType: form.text(formData, "accountType"),
-    agencyName: form.optionalText(formData, "agencyName"),
+    // Köhnə forma `agencyName` göndərirdi — keşlənmiş səhifə də işləsin.
+    companyName: form.optionalText(formData, "companyName") ?? form.optionalText(formData, "agencyName"),
+    companyWebsite: form.optionalText(formData, "companyWebsite"),
   });
   if (!parsed.success) return failure(t("actions.invalidForm"), toFieldErrors(parsed.error));
+
+  // Doğum tarixi və VÖEN istəyə bağlıdır, amma doldurulubsa düzgün olmalıdır.
+  const birthDate = parseBirthDate(form.optionalText(formData, "birthDate"));
+  if (!birthDate.ok) {
+    return failure(t("actions.invalidForm"), {
+      birthDate: birthDate.reason === "underage" ? t("actions.underage") : t("actions.invalidBirthDate"),
+    });
+  }
+  const companyTaxId = normalizeTaxId(form.optionalText(formData, "companyTaxId"));
+  if (companyTaxId === false) {
+    return failure(t("actions.invalidForm"), { companyTaxId: t("actions.invalidTaxId") });
+  }
+  const requirements = profileRequirements(parsed.data.accountType);
 
   let userId: string;
 
@@ -154,17 +178,32 @@ export async function registerAccount(
             data: { ...input, slug, isVerified: false },
           });
         },
+        async createAgentProfile(input) {
+          const slug = await uniqueSlug(input.name, (candidate) =>
+            prisma.agentProfile.findUnique({ where: { slug: candidate }, select: { id: true } }),
+          );
+          // Profil admin təsdiqinə qədər ictimai deyil (`isPublic: false`).
+          await prisma.agentProfile.create({
+            data: { ...input, slug, isPublic: false, isVerified: false },
+          });
+        },
         async deleteUser(userId) {
           await prisma.user.delete({ where: { id: userId } });
         },
       },
       {
-        name: parsed.data.name,
+        name: composeName(parsed.data.firstName, parsed.data.lastName),
+        firstName: parsed.data.firstName,
+        lastName: parsed.data.lastName,
+        birthDate: birthDate.value,
         email: parsed.data.email,
         phone: parsed.data.phone,
         passwordHash: await hashPassword(parsed.data.password),
         accountType: parsed.data.accountType,
-        agencyName: parsed.data.agencyName,
+        agencyName: parsed.data.accountType === ACCOUNT_TYPES.AGENCY ? parsed.data.companyName : null,
+        companyName: requirements.company ? parsed.data.companyName : null,
+        companyTaxId: requirements.company ? companyTaxId : null,
+        companyWebsite: requirements.company ? parsed.data.companyWebsite : null,
       },
     );
 

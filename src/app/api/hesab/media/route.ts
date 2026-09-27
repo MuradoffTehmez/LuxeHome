@@ -50,7 +50,10 @@ export async function POST(request: Request) {
   const existing = await findExisting();
   if (existing) return NextResponse.json(existing, { status: 200 });
 
-  const result = await putImage(file, "emlaklar", null, { isKnownWatermarked: isKnownWatermarkedChecksum });
+  // Yalnız iki qovluq: elan şəkli (su nişanlı) və profil şəkli. Başqa dəyər
+  // elan şəkli sayılır — su nişanı heç vaxt client-in seçimi ilə söndürülmür.
+  const folder = formData.get("folder") === "avatarlar" ? "avatarlar" : "emlaklar";
+  const result = await putImage(file, folder, null, { isKnownWatermarked: isKnownWatermarkedChecksum });
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: uploadFailureStatus(result.reason) });
   }

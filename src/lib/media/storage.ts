@@ -41,6 +41,8 @@ export const MEDIA_FOLDERS = [
   "terefdaslar",
   "terefdaslar-logo",
   "umumi",
+  /** Kabinet profil şəkilləri — su nişanı çəkilmir, elana qoşula bilmir. */
+  "avatarlar",
 ] as const;
 export type MediaFolder = (typeof MEDIA_FOLDERS)[number];
 

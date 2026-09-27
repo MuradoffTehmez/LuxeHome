@@ -877,9 +877,15 @@ export const FEATURE_GROUP_LABELS: Record<FeatureGroup, string> = {
  */
 export const ACCOUNT_TYPES = {
   STAFF: "STAFF",
+  /** Şəxsi istifadəçi — axtarır, saxlayır, görüş təyin edir; elan yerləşdirmir. */
   USER: "USER",
+  /** Mülk sahibi — öz əmlakını satır/kirayə verir. */
   OWNER: "OWNER",
+  /** Fərdi agent (rieltor) — agentliyə bağlı olmaya da bilər; ictimai agent profili var. */
+  AGENT: "AGENT",
   AGENCY: "AGENCY",
+  /** Korporativ hesab — tikinti şirkəti, developer, bank və digər biznes hesabları. */
+  CORPORATE: "CORPORATE",
 } as const;
 
 export type AccountType = (typeof ACCOUNT_TYPES)[keyof typeof ACCOUNT_TYPES];
@@ -905,23 +911,50 @@ export const STAFF_PASSWORD_MIN = 12;
 
 export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
   STAFF: "Şirkət əməkdaşı",
-  USER: "İstifadəçi",
+  USER: "Şəxsi istifadəçi",
   OWNER: "Mülk sahibi",
+  AGENT: "Agent (rieltor)",
   AGENCY: "Agentlik",
+  CORPORATE: "Korporativ hesab",
 };
 
 /** Qeydiyyat formasında seçilə bilən növlər — `STAFF` yalnız paneldən yaradılır. */
 export const PUBLIC_ACCOUNT_TYPES: AccountType[] = [
   ACCOUNT_TYPES.USER,
   ACCOUNT_TYPES.OWNER,
+  ACCOUNT_TYPES.AGENT,
   ACCOUNT_TYPES.AGENCY,
+  ACCOUNT_TYPES.CORPORATE,
 ];
 
 /** Öz elanını yerləşdirə bilən hesab növləri. */
 export const LISTING_ACCOUNT_TYPES: AccountType[] = [
   ACCOUNT_TYPES.OWNER,
+  ACCOUNT_TYPES.AGENT,
   ACCOUNT_TYPES.AGENCY,
+  ACCOUNT_TYPES.CORPORATE,
 ];
+
+/** Şirkət məlumatı (ad, VÖEN, sayt) tələb olunan biznes hesabları. */
+export const COMPANY_ACCOUNT_TYPES: AccountType[] = [ACCOUNT_TYPES.AGENCY, ACCOUNT_TYPES.CORPORATE];
+
+/** Tərcümə kataloqundakı açar: `auth.accountTypes.<açar>`. */
+export function accountTypeKey(accountType: string): "user" | "owner" | "agent" | "agency" | "corporate" | "staff" {
+  switch (accountType) {
+    case ACCOUNT_TYPES.USER:
+      return "user";
+    case ACCOUNT_TYPES.OWNER:
+      return "owner";
+    case ACCOUNT_TYPES.AGENT:
+      return "agent";
+    case ACCOUNT_TYPES.AGENCY:
+      return "agency";
+    case ACCOUNT_TYPES.CORPORATE:
+      return "corporate";
+    default:
+      return "staff";
+  }
+}
 
 // ---------------------------------------------------------------------------
 // ÖDƏNİŞ VƏ SATIŞ ŞƏRTLƏRİ

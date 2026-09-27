@@ -10,6 +10,7 @@ import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
 import {
   hasAllowedPropertyImageCount,
   hasExclusiveMediaOwnership,
+  isListingMediaUrl,
   publicPropertySchema,
   readPublicPropertyForm,
   submissionPolicy,
@@ -119,7 +120,7 @@ export async function updatePublicProperty(
     where: { uploaderId: user.id, url: { in: images.map((image) => image.url) } },
     select: { url: true },
   });
-  const allowedUrls = [...media.map((item) => item.url), ...property.images.map((item) => item.url)];
+  const allowedUrls = [...media.map((item) => item.url).filter(isListingMediaUrl), ...property.images.map((item) => item.url)];
   if (!hasExclusiveMediaOwnership(images.map((image) => image.url), allowedUrls)) {
     return failure(t("actions.imageOwnership"));
   }

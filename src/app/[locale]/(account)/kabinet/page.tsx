@@ -6,7 +6,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { getCabinetSummary } from "@/lib/accounts/cabinet-summary";
 import { requireAccount } from "@/lib/auth/guard";
-import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
+import { accountTypeKey as accountTypeKeyOf, ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
@@ -37,7 +37,7 @@ export default async function CabinetPage() {
   const canList = user.accountType !== ACCOUNT_TYPES.USER;
   const t = await getTranslations("auth.cabinet");
   const accountT = await getTranslations("auth.accountTypes");
-  const accountTypeKey = user.accountType === ACCOUNT_TYPES.USER ? "user" : user.accountType === ACCOUNT_TYPES.OWNER ? "owner" : user.accountType === ACCOUNT_TYPES.AGENCY ? "agency" : "staff";
+  const accountTypeKey = accountTypeKeyOf(user.accountType);
 
   return (
     <div className="flex min-w-0 flex-col gap-8">

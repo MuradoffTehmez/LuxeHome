@@ -6,6 +6,7 @@ import { AlertCircle, CheckCircle2, Download, Trash2 } from "lucide-react";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/field";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
+import { ImageDropzone } from "@/components/admin/image-dropzone";
 import { changePassword, deleteAccount, updateProfile } from "./actions";
 
 /** Uğur və xəta mesajı — toast yerinə qalıcı sətir, çünki nəticə oxunmalıdır. */
@@ -30,68 +31,164 @@ function StateMessage({ state }: { state: ActionState }) {
   );
 }
 
-export function ProfileForm({
-  name,
-  phone,
-  isAgency,
-  agency,
-}: {
-  name: string;
+export type ProfileFormValues = {
+  firstName: string;
+  lastName: string;
   phone: string;
+  birthDate: string;
+  avatarUrl: string | null;
+  companyName: string;
+  companyTaxId: string;
+  companyWebsite: string;
+  position: string;
+  agencyDescription: string;
+  agencyAddress: string;
+  agentRoleTitle: string;
+  agentSpecialization: string;
+  agentExperience: string;
+  agentBio: string;
+};
+
+/**
+ * Profil forması — hesab növünə görə bölmələr: hamı üçün şəxsi məlumat və profil
+ * şəkli, agentlik/korporativ hesab üçün şirkət məlumatı, agent üçün ictimai agent
+ * profili. Hesab növü buradan dəyişmir (bax `actions.ts`).
+ */
+export function ProfileForm({
+  values,
+  isAgency,
+  requirements,
+}: {
+  values: ProfileFormValues;
   isAgency: boolean;
-  agency: { name: string; description: string; address: string; website: string } | null;
+  requirements: { phoneRequired: boolean; company: boolean; agent: boolean };
 }) {
   const t = useTranslations("account.profile");
   const [state, formAction, pending] = useActionState(updateProfile, IDLE_STATE);
+  const sectionTitle = "mb-1 text-xs font-semibold tracking-wide text-ink-muted uppercase";
 
   return (
-    <form action={formAction} className="flex flex-col gap-5" noValidate>
+    <form action={formAction} className="flex flex-col gap-6" noValidate>
       <StateMessage state={state} />
 
-      <Input name="name" label={t("name")} required defaultValue={name} maxLength={120} error={state.fieldErrors?.name} />
-      <Input
-        name="phone"
-        label={t("phone")}
-        type="tel"
-        defaultValue={phone}
-        placeholder="+994 XX XXX XX XX"
-        error={state.fieldErrors?.phone}
-      />
+      <fieldset className="flex flex-col gap-5">
+        <legend className={sectionTitle}>{t("personalSection")}</legend>
+        <ImageDropzone
+          name="avatar"
+          label={t("avatar")}
+          folder="avatarlar"
+          uploadUrl="/api/hesab/media"
+          maxFiles={1}
+          initial={values.avatarUrl ? [{ url: values.avatarUrl, alt: "", isCover: true }] : []}
+          hint={t("avatarHint")}
+        />
+        {state.fieldErrors?.avatar && <p className="text-sm text-danger">{state.fieldErrors.avatar}</p>}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <Input name="firstName" label={t("firstName")} required autoComplete="given-name" defaultValue={values.firstName} maxLength={60} error={state.fieldErrors?.firstName} />
+          <Input name="lastName" label={t("lastName")} required autoComplete="family-name" defaultValue={values.lastName} maxLength={60} error={state.fieldErrors?.lastName} />
+          <Input
+            name="phone"
+            label={t("phone")}
+            type="tel"
+            required={requirements.phoneRequired}
+            defaultValue={values.phone}
+            placeholder="+994 XX XXX XX XX"
+            error={state.fieldErrors?.phone}
+          />
+          <Input
+            name="birthDate"
+            label={t("birthDate")}
+            type="date"
+            defaultValue={values.birthDate}
+            hint={t("birthDateHint")}
+            error={state.fieldErrors?.birthDate}
+          />
+        </div>
+      </fieldset>
 
-      {isAgency && (
-        <>
+      {requirements.company && (
+        <fieldset className="flex flex-col gap-5 border-t border-line pt-6">
+          <legend className={sectionTitle}>{t("companySection")}</legend>
           <Input
-            name="agencyName"
-            label={t("agencyName")}
+            name="companyName"
+            label={isAgency ? t("agencyName") : t("companyName")}
             required
-            defaultValue={agency?.name ?? ""}
+            defaultValue={values.companyName}
             maxLength={160}
-            error={state.fieldErrors?.agencyName}
+            error={state.fieldErrors?.companyName}
           />
-          <Textarea
-            name="agencyDescription"
-            label={t("agencyDescription")}
-            rows={4}
-            maxLength={2000}
-            defaultValue={agency?.description ?? ""}
-            error={state.fieldErrors?.agencyDescription}
-          />
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <Input name="companyTaxId" label={t("companyTaxId")} inputMode="numeric" maxLength={14} defaultValue={values.companyTaxId} error={state.fieldErrors?.companyTaxId} />
+            <Input name="position" label={t("position")} defaultValue={values.position} maxLength={120} error={state.fieldErrors?.position} />
+          </div>
           <Input
-            name="agencyAddress"
-            label={t("address")}
-            defaultValue={agency?.address ?? ""}
-            maxLength={240}
-            error={state.fieldErrors?.agencyAddress}
-          />
-          <Input
-            name="agencyWebsite"
-            label={t("website")}
+            name="companyWebsite"
+            label={t("companyWebsite")}
             type="url"
             placeholder="https://"
-            defaultValue={agency?.website ?? ""}
-            error={state.fieldErrors?.agencyWebsite}
+            defaultValue={values.companyWebsite}
+            error={state.fieldErrors?.companyWebsite}
           />
-        </>
+          {isAgency && (
+            <>
+              <Textarea
+                name="agencyDescription"
+                label={t("agencyDescription")}
+                rows={4}
+                maxLength={2000}
+                defaultValue={values.agencyDescription}
+                error={state.fieldErrors?.agencyDescription}
+              />
+              <Input
+                name="agencyAddress"
+                label={t("address")}
+                defaultValue={values.agencyAddress}
+                maxLength={240}
+                error={state.fieldErrors?.agencyAddress}
+              />
+            </>
+          )}
+        </fieldset>
+      )}
+
+      {requirements.agent && (
+        <fieldset className="flex flex-col gap-5 border-t border-line pt-6">
+          <legend className={sectionTitle}>{t("agentSection")}</legend>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <Input
+              name="agentRoleTitle"
+              label={t("agentRoleTitle")}
+              placeholder={t("agentRoleTitlePlaceholder")}
+              defaultValue={values.agentRoleTitle}
+              maxLength={120}
+              error={state.fieldErrors?.agentRoleTitle}
+            />
+            <Input
+              name="agentExperience"
+              label={t("agentExperience")}
+              type="number"
+              min={0}
+              max={70}
+              defaultValue={values.agentExperience}
+              error={state.fieldErrors?.agentExperience}
+            />
+          </div>
+          <Input
+            name="agentSpecialization"
+            label={t("agentSpecialization")}
+            defaultValue={values.agentSpecialization}
+            maxLength={160}
+            error={state.fieldErrors?.agentSpecialization}
+          />
+          <Textarea
+            name="agentBio"
+            label={t("agentBio")}
+            rows={5}
+            maxLength={3000}
+            defaultValue={values.agentBio}
+            error={state.fieldErrors?.agentBio}
+          />
+        </fieldset>
       )}
 
       <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">

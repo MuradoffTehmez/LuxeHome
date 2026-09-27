@@ -7,6 +7,12 @@ export type PublicAccountInput = {
   passwordHash: string;
   accountType: AccountType;
   agencyName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  birthDate?: Date | null;
+  companyName?: string | null;
+  companyTaxId?: string | null;
+  companyWebsite?: string | null;
 };
 
 type PublicUserInput = Omit<PublicAccountInput, "agencyName">;
@@ -14,6 +20,8 @@ type PublicUserInput = Omit<PublicAccountInput, "agencyName">;
 export type PublicAccountStore = {
   createUser(input: PublicUserInput): Promise<{ id: string }>;
   createAgency(input: { userId: string; name: string; phone: string | null }): Promise<void>;
+  /** Agent hesabı üçün ictimai olmayan (admin təsdiqi gözləyən) agent profili. */
+  createAgentProfile?(input: { userId: string; name: string; phone: string | null; email: string }): Promise<void>;
   deleteUser(userId: string): Promise<void>;
 };
 
@@ -35,6 +43,14 @@ export async function createPublicAccount(
         userId: user.id,
         name: agencyName,
         phone: input.phone,
+      });
+    }
+    if (input.accountType === ACCOUNT_TYPES.AGENT && store.createAgentProfile) {
+      await store.createAgentProfile({
+        userId: user.id,
+        name: input.name,
+        phone: input.phone,
+        email: input.email,
       });
     }
     return user;

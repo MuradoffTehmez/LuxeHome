@@ -14,6 +14,7 @@ import {
   createPropertyWithRelations,
   hasAllowedPropertyImageCount,
   hasExclusiveMediaOwnership,
+  isListingMediaUrl,
   publicPropertySchema,
   readPublicPropertyForm,
   submissionPolicy,
@@ -38,7 +39,7 @@ async function ownsImages(userId: string, urls: string[]): Promise<boolean> {
   });
   return hasExclusiveMediaOwnership(
     urls,
-    owned.map((media) => media.url),
+    owned.map((media) => media.url).filter(isListingMediaUrl),
   );
 }
 
