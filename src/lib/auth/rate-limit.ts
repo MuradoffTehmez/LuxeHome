@@ -150,3 +150,15 @@ export async function checkKnowledgeAdvisorLimit(ip: string): Promise<boolean> {
   const { success } = await limiter.limit({ key: `ai-advisor:${ip}` });
   return success;
 }
+
+/**
+ * Paneldəki «AI ilə doldur» düymələri — əməkdaş üzrə limit. Aşılanda sorğu rədd
+ * edilmir, deterministik SEO mətni qaytarılır (inference xərclənmir).
+ */
+export async function checkAdminAiLimit(userId: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.AI_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `ai-admin:${userId}` });
+  return success;
+}

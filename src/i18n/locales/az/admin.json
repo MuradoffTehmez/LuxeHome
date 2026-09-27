@@ -462,7 +462,18 @@
       "metaDescription": "Meta təsvir",
       "metaDescriptionHint": "Tövsiyə olunan uzunluq: 70–160 simvol.",
       "desktopPreview": "Desktop önbaxış",
-      "mobilePreview": "Mobil önbaxış"
+      "mobilePreview": "Mobil önbaxış",
+      "aiFill": "AI ilə doldur",
+      "aiWorking": "Hazırlanır…",
+      "aiHint": "SEO başlığını yazın — meta təsvir, Open Graph, açar sözlər və sosial mətn süni intellektlə hazırlanacaq.",
+      "aiDone": "AI {count} sahəni doldurdu. Yoxlayıb yadda saxlayın.",
+      "aiFallback": "AI əlçatan olmadı — {count} sahə məzmundan avtomatik hazırlandı.",
+      "aiEmpty": "Əvvəlcə SEO başlığını və ya məzmunun başlığını yazın.",
+      "aiForbidden": "Bu əməliyyat üçün icazəniz yoxdur.",
+      "keywords": "Açar sözlər",
+      "socialText": "Sosial şəbəkə mətni",
+      "keywordsHint": "Vergüllə ayırın. Boş qalsa elan yadda saxlananda avtomatik yaradılır.",
+      "socialTextHint": "Paylaşım üçün hazır mətn. Boş qalsa avtomatik yaradılır."
     },
     "secret": {
       "title": "Müvəqqəti parol — bir dəfə göstərilir",
@@ -1952,7 +1963,11 @@
       "semanticDescription": "AI axtarışı elanları mənaca tapır (Workers AI + Vectorize). İndeks elan dəyişəndə və hər gün avtomatik yenilənir.",
       "semanticReindex": "Yenidən indekslə",
       "semanticReady": "Binding-lər qoşuludur. Düymə bütün ictimai elanları yenidən indeksləyir.",
-      "semanticMissing": "Bu mühitdə Vectorize binding-i yoxdur — axtarış leksik rejimdə işləyir."
+      "semanticMissing": "Bu mühitdə Vectorize binding-i yoxdur — axtarış leksik rejimdə işləyir.",
+      "seoAltTitle": "SEO və şəkil ALT mətnləri",
+      "seoAltDescription": "Elan yazılanda avtomatik yaradılır. Bu düymə seçilmiş elanın meta, Open Graph, açar söz, sosial mətn və bütün ALT-larını yenidən hazırlayır.",
+      "seoAltAction": "Yenidən yarat",
+      "seoAltNote": "Əl ilə yazılmış SEO sahələrinin də üzərinə yazılır."
     },
     "common": {
       "deqCavab": "{p0} dəq cavab",
@@ -2675,7 +2690,8 @@
       "qaralamaElanaTetbiqEdildi": "Qaralama elana tətbiq edildi.",
       "qaralamaReddEdildi": "Qaralama rədd edildi.",
       "semanticUnavailable": "Bu mühitdə semantik indeks qoşulmayıb.",
-      "semanticReindexed": "Semantik indeks yeniləndi: {count} elan."
+      "semanticReindexed": "Semantik indeks yeniləndi: {count} elan.",
+      "seoAltRegenerated": "SEO sahələri və {count} şəklin ALT mətni yeniləndi."
     },
     "audit": {
       "auditJurnaliniYalnizSuperAdmin": "Audit jurnalını yalnız Super Admin sıfırlaya bilər.",

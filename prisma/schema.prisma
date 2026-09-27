@@ -509,6 +509,13 @@ model Property {
   ogTitle         String?
   ogDescription   String?
   ogImage         String?
+  /// Vergüllə ayrılmış açar ifadələr — `<meta name="keywords">` və JSON-LD üçün.
+  metaKeywords    String?
+  /// Sosial şəbəkədə paylaşım üçün hazır mətn.
+  socialText      String?
+  /// SEO sahələri avtomatik (AI və ya deterministik) yaradılıbsa vaxtı. `null` —
+  /// sahələr redaktor tərəfindən yazılıb; o halda yalnız boş sahələr doldurulur.
+  seoGeneratedAt  DateTime?
 
   type            PropertyType  @relation(fields: [typeId], references: [id])
   city            Location      @relation("PropertyCity", fields: [cityId], references: [id])

@@ -476,7 +476,7 @@ function PropertyWizard({
           </FormSection>
 
           <FormSection id="seo" title="SEO" description={t("pages.properties.bosBuraxilsaBasliqVe")}>
-            <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || t("pages.misc.emlakElani")} fallbackDescription={initial.description || t("pages.misc.emlakHaqqindaMelumat")} pathname={`/emlaklar/${initial.slug || "yeni-elan"}`} />
+            <SeoFields aiKind="property" initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || t("pages.misc.emlakElani")} fallbackDescription={initial.description || t("pages.misc.emlakHaqqindaMelumat")} pathname={`/emlaklar/${initial.slug || "yeni-elan"}`} />
             <AdminInput
               name="canonicalUrl"
               label={t("pages.properties.canonicalUrl")}
@@ -510,6 +510,25 @@ function PropertyWizard({
               defaultValue={initial.ogImage}
               placeholder={t("pages.properties.bosBuraxilsaQalereyaninUz")}
             />
+            <FullWidth>
+              <AdminInput
+                name="metaKeywords"
+                label={t("components.seo.keywords")}
+                defaultValue={initial.metaKeywords}
+                maxLength={600}
+                hint={t("components.seo.keywordsHint")}
+              />
+            </FullWidth>
+            <FullWidth>
+              <AdminTextarea
+                name="socialText"
+                label={t("components.seo.socialText")}
+                defaultValue={initial.socialText}
+                maxLength={300}
+                rows={3}
+                hint={t("components.seo.socialTextHint")}
+              />
+            </FullWidth>
           </FormSection>
         </WizardStep>
 

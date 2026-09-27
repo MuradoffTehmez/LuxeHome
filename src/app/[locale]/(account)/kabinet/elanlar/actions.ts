@@ -21,6 +21,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { queueListingEnrichment } from "@/lib/listing-enrichment";
 import { publicationExpiryReset, renewedExpiry } from "@/lib/listing-expiry-policy";
 import { recordDomainEvent } from "@/lib/admin/events";
 
@@ -184,6 +185,7 @@ export async function updatePublicProperty(
   }
 
   queuePropertyVectorSync([id]);
+  queueListingEnrichment(id);
   revalidatePath(localizePath(LIST_PATH, locale));
   revalidatePath(localizePath(`${LIST_PATH}/${id}`, locale));
   revalidatePublicContent("property");

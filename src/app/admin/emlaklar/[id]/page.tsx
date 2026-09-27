@@ -93,6 +93,8 @@ export default async function EditPropertyPage({
     ogTitle: property.ogTitle ?? "",
     ogDescription: property.ogDescription ?? "",
     ogImage: property.ogImage ?? "",
+    metaKeywords: property.metaKeywords ?? "",
+    socialText: property.socialText ?? "",
     featureIds: property.features.map((feature) => feature.featureId),
     images: property.images.map((image) => ({
       url: image.url,

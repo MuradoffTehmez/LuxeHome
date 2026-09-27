@@ -58,6 +58,8 @@ export type PropertyFormValues = {
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
+  metaKeywords: string;
+  socialText: string;
   featureIds: string[];
   images: DropzoneImage[];
   floorPlans: DropzoneImage[];
@@ -106,6 +108,8 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   ogTitle: "",
   ogDescription: "",
   ogImage: "",
+  metaKeywords: "",
+  socialText: "",
   featureIds: [],
   images: [],
   floorPlans: [],

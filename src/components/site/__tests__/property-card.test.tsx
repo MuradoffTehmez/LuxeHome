@@ -47,7 +47,8 @@ describe("PropertyCard", () => {
     const badgeIndex = html.indexOf("Satılır");
     const priceIndex = html.indexOf("350.000");
     const titleIndex = html.indexOf("Dəniz mənzərəli mənzil");
-    const locationIndex = html.indexOf("Səbail, Bakı");
+    // Yer növ şəkilçisi ilə yazılır — tək «Səbail» hansı inzibati vahid olduğunu göstərmirdi.
+    const locationIndex = html.indexOf("Səbail rayonu, Bakı");
     const factsIndex = html.indexOf("3 otaq");
     const actionIndex = html.indexOf("Favoritlərə əlavə et");
 

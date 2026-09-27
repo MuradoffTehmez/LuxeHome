@@ -122,6 +122,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogTitle: property.ogTitle,
     ogDescription: property.ogDescription,
     ogImage: property.ogImage,
+    // Avtomatik (AI) və ya redaktorun yazdığı açar sözlər — yalnız doludursa.
+    keywords: property.metaKeywords
+      ? property.metaKeywords.split(",").map((item) => item.trim()).filter(Boolean).slice(0, 10)
+      : undefined,
     locale: locale as Locale,
     managedEntity: { type: TRANSLATION_ENTITY_TYPES.PROPERTY, id: sourceProperty.id },
   });

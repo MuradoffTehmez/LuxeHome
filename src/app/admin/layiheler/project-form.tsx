@@ -208,7 +208,7 @@ export function ProjectForm({
       </FormSection>
 
       <FormSection title="SEO">
-        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.name || t("pages.misc.yasayisLayihesi")} fallbackDescription={initial.summary || initial.description || t("pages.misc.layiheHaqqindaMelumat")} pathname={`/layiheler/${initial.slug || "yeni-layihe"}`} />
+        <SeoFields aiKind="project" initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.name || t("pages.misc.yasayisLayihesi")} fallbackDescription={initial.summary || initial.description || t("pages.misc.layiheHaqqindaMelumat")} pathname={`/layiheler/${initial.slug || "yeni-layihe"}`} />
         <AdminInput
           name="canonicalUrl"
           label={t("pages.projects.canonicalUrl")}
