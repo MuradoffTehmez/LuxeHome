@@ -129,6 +129,13 @@
     "listView": "List",
     "mapView": "Map",
     "mapEmpty": "None of the listings matching this filter has map coordinates.",
-    "markerCount": "{count, plural, other {# listings on the map}}"
+    "markerCount": "{count, plural, other {# listings on the map}}",
+    "drawToolbar": "Search area",
+    "drawStart": "Draw an area on the map",
+    "drawAgain": "Redraw the area",
+    "drawClear": "Remove the area",
+    "drawFinish": "Done",
+    "drawCancel": "Cancel",
+    "drawHint": "Tap the map to place the corners of the area ({count} points, at least 3)."
   }
 }

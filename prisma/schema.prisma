@@ -393,6 +393,8 @@ model Property {
   documentStatus String?
 
   videoUrl String?
+  /// 360° virtual tur (Kuula, Matterport, Momento360) — #107. Tanınmayan host embed olunmur.
+  virtualTourUrl String?
 
   /// NEW = yeni tikili, OLD = köhnə tikili. Yerli bazarda bu, əmlak növündən ayrı
   /// ikinci ölçüdür: qiymət, sənəd vəziyyəti və ipoteka uyğunluğu birbaşa ondan asılıdır.
@@ -421,6 +423,9 @@ model Property {
   /// Bütün əlaqələr (xüsusiyyət, şəkil) yazılanda qoyulur. `null` + `importKey` = yarımçıq
   /// idxal; təkrar cəhd onu dublikat saymır, davam etdirir (D1-də tranzaksiya yoxdur).
   importCompletedAt  DateTime?
+  /// Semantik indeksə yazılma vaxtı (#107). Tam yenidən indeksləmə bu işarəsi olub
+  /// artıq ictimai olmayan elanların vektorlarını silir.
+  vectorIndexedAt    DateTime?
   /// Duplikat aşkarlanması üçün normallaşdırılmış ünvan+təsvir+əsas atribut fingerprint-i.
   contentFingerprint String?
   deletedAt          DateTime?
@@ -453,6 +458,7 @@ model Property {
   savedSearchMatches SavedSearchMatch[]
   partners           PropertyPartner[]
   priceHistory       PropertyPriceHistory[]
+  floorPlans         PropertyFloorPlan[]
   reservations       Reservation[]
   nearbyPlaces       NearbyPlace[]
   aiContentDrafts    AiContentDraft[]
@@ -476,6 +482,21 @@ model Property {
   @@index([closedAt, retentionUntil])
   @@index([contentFingerprint])
   @@index([authorId])
+}
+
+/// Mərtəbə planı (#107). Qalereyadan ayrı saxlanılır: kart və qalereya sorğuları
+/// (`PropertyImage`) planı üz qabığı və ya foto kimi götürməməlidir.
+model PropertyFloorPlan {
+  id         String   @id @default(cuid())
+  propertyId String
+  url        String
+  title      String   @default("")
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, order])
 }
 
 model PropertyImage {
@@ -558,9 +579,33 @@ model Project {
   images     ProjectImage[]
   properties Property[]
   partners   ProjectPartner[]
+  units      ProjectUnit[]
 
   @@index([status])
   @@index([deletedAt])
+}
+
+/// Yeni tikilinin mənzil şahmatı (#107): blok → mərtəbə → mənzil. Status və qiymət
+/// satış ofisinin cari vəziyyətidir; elan (`Property`) yaradılması tələb olunmur.
+model ProjectUnit {
+  id         String   @id @default(cuid())
+  projectId  String
+  block      String
+  floor      Int
+  number     String
+  rooms      Int?
+  area       Float?
+  price      Float?
+  currency   String   @default("AZN")
+  /// AVAILABLE | RESERVED | SOLD — `PROJECT_UNIT_STATUSES`
+  status     String   @default("AVAILABLE")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, block, number])
+  @@index([projectId, block, floor])
 }
 
 model ProjectImage {

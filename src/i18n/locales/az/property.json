@@ -166,5 +166,15 @@
     "basisProfile": "{place} üzrə rayon profilində orta m² qiyməti: {price}.",
     "disclaimer": "Göstərici saytdakı aktiv elanlar əsasında avtomatik hesablanır və rəsmi qiymətləndirmə deyil.",
     "cardBelow": "Sərfəli qiymət"
-  }
+  },
+  "media": {
+    "floorPlans": "Mərtəbə planı",
+    "tour": "360° virtual tur",
+    "tourStart": "Turu başlat",
+    "tourNote": "Tur kənar platformadan yüklənir.",
+    "openTour": "Turu yeni pəncərədə aç"
+  },
+  "metroChip": "{name} · {minutes} dəq piyada",
+  "metroLine": "Metro {name} · {minutes} dəq piyada",
+  "metroOnly": "Metro {name}"
 }

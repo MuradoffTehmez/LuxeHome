@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export function getCompareBarPositionClass(pathname: string): string {
   return /^\/emlaklar\/[^/]+\/?$/.test(pathname)
     ? "bottom-[calc(5rem+var(--safe-bottom))] lg:bottom-0"
-    : "bottom-0";
+    : "bottom-[var(--bottom-nav-offset)]";
 }
 
 /**
@@ -32,7 +32,7 @@ export function CompareBar() {
         "fixed inset-x-0 z-[var(--z-sticky)] border-t border-line-strong bg-ivory/95 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-sm",
         getCompareBarPositionClass(pathname),
         // Ekranın ən altında olanda (detal səhifəsindən başqa) home indicator-u örtməsin.
-        !/^\/emlaklar\/[^/]+\/?$/.test(pathname) && "pb-[var(--safe-bottom)]",
+        !/^\/emlaklar\/[^/]+\/?$/.test(pathname) && "pb-[var(--bottom-safe-rest)]",
       )}
     >
       <div className="mx-auto flex min-h-14 w-full max-w-360 flex-wrap items-center justify-between gap-2 pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))] py-2 sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] lg:px-10">

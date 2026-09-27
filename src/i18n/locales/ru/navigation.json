@@ -63,5 +63,14 @@
   "glossary": "Словарь недвижимости",
   "calculator": "Ипотечный калькулятор",
   "marketIntelligence": "Аналитика рынка",
-  "sellWithUs": "Продать с нами"
+  "sellWithUs": "Продать с нами",
+  "bottom": {
+    "label": "Основная навигация",
+    "home": "Главная",
+    "search": "Поиск",
+    "map": "Карта",
+    "favorites": "Избранное",
+    "account": "Кабинет"
+  },
+  "investors": "Инвесторам"
 }

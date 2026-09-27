@@ -28,6 +28,7 @@ import {
   validateStoredPropertyForPublication,
 } from "@/lib/property-publish-validation";
 import { msg } from "@/lib/admin/server-message";
+import { queuePropertyVectorSync } from "@/lib/semantic-search";
 
 /**
  * Əmlak CRUD-u.
@@ -72,6 +73,14 @@ async function validateRelations(input: PropertyInput): Promise<Record<string, s
   if (input.projectId && !project) errors.projectId = msg("server.emlaklar.layiheTapilmadi");
 
   return Object.keys(errors).length > 0 ? errors : null;
+}
+
+/** Mərtəbə planlarını yenidən qurur (#107) — qalereyadan ayrı cədvəldir. */
+async function replaceFloorPlans(propertyId: string, plans: { url: string; alt: string }[]) {
+  await prisma.propertyFloorPlan.deleteMany({ where: { propertyId } });
+  for (const [order, plan] of plans.slice(0, 6).entries()) {
+    await prisma.propertyFloorPlan.create({ data: { propertyId, url: plan.url, title: plan.alt, order } });
+  }
 }
 
 /** Xüsusiyyət və şəkil sətirlərini yenidən qurur. */
@@ -159,6 +168,8 @@ export async function createProperty(
     propertyId = property.id;
 
     await replaceRelations(propertyId, parsed.data.featureIds, images);
+
+    await replaceFloorPlans(propertyId, parseImages(formData, "floorPlans"));
     await recordAudit(user, "CREATE", "Property", propertyId, parsed.data.title);
 
     if (parsed.data.status === PROPERTY_STATUSES.PUBLISHED) {
@@ -168,6 +179,7 @@ export async function createProperty(
     return unexpected("əmlak yaradıla bilmədi", error, msg("server.common.unexpected"));
   }
 
+  queuePropertyVectorSync([propertyId]);
   revalidatePath(LIST_PATH);
   revalidatePublicContent("property");
   redirect(`${LIST_PATH}/${propertyId}?yeni=1`);
@@ -235,6 +247,8 @@ export async function updateProperty(
     });
 
     await replaceRelations(id, parsed.data.featureIds, images);
+
+    await replaceFloorPlans(id, parseImages(formData, "floorPlans"));
     await ensureSlugRedirect("/emlaklar", existing.slug, slug, user);
     await recordAudit(user, "UPDATE", "Property", id, parsed.data.title);
 
@@ -242,6 +256,7 @@ export async function updateProperty(
       await notifyMatchingSavedSearches(id);
     }
 
+    queuePropertyVectorSync([id]);
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${slug}`);
     revalidatePublicContent("property", slug);
@@ -270,6 +285,7 @@ export async function deleteProperty(id: string): Promise<ActionState> {
     });
 
     await recordAudit(user, "DELETE", "Property", id, property.title);
+    queuePropertyVectorSync([id]);
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${property.slug}`);
     revalidatePublicContent("property", property.slug);
@@ -296,6 +312,7 @@ export async function restoreProperty(id: string): Promise<ActionState> {
     });
 
     await recordAudit(user, "RESTORE", "Property", id, property.title);
+    queuePropertyVectorSync([id]);
     revalidatePath(LIST_PATH);
     revalidatePublicContent("property");
     return success(msg("server.emlaklar.elanBerpaEdildi"));
@@ -376,6 +393,7 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
   }
 
   await recordAudit(user, "UPDATE", "Property", null, `Kütləvi ${intent}: ${done}/${ids.length} elan`);
+  queuePropertyVectorSync(ids);
   revalidatePath(LIST_PATH);
   revalidatePublicContent("property");
 

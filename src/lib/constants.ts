@@ -513,6 +513,21 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
 // PUBLIC PLATFORM — PHASE 2
 // ---------------------------------------------------------------------------
 
+/** Mənzil şahmatındakı mənzilin vəziyyəti (#107). */
+export const PROJECT_UNIT_STATUSES = {
+  AVAILABLE: "AVAILABLE",
+  RESERVED: "RESERVED",
+  SOLD: "SOLD",
+} as const;
+
+export type ProjectUnitStatus = (typeof PROJECT_UNIT_STATUSES)[keyof typeof PROJECT_UNIT_STATUSES];
+
+export const PROJECT_UNIT_STATUS_LABELS: Record<ProjectUnitStatus, string> = {
+  AVAILABLE: "Satışda",
+  RESERVED: "Rezerv",
+  SOLD: "Satılıb",
+};
+
 export const RESERVATION_STATUSES = {
   REQUESTED: "REQUESTED",
   PENDING: "PENDING",
@@ -566,6 +581,11 @@ export const NEARBY_PLACE_CATEGORIES = {
   PARK: "PARK",
   SHOPPING_CENTER: "SHOPPING_CENTER",
 } as const;
+
+/** «Metroya yaxın» filtri və kart çipi üçün hədd (#107): ~12 dəqiqəlik piyada yolu. */
+export const NEAR_METRO_METERS = 1000;
+/** Kartda metro çipi bu məsafədən uzaqda göstərilmir. */
+export const CARD_METRO_MAX_METERS = 1500;
 
 export type NearbyPlaceCategory =
   (typeof NEARBY_PLACE_CATEGORIES)[keyof typeof NEARBY_PLACE_CATEGORIES];

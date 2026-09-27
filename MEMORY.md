@@ -582,9 +582,14 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   bloku, CSV idxalı (irəliləyiş markeri `importKey`/`importCompletedAt`, 0034), kart
   siqnalları, Telegram lead bildirişi, PWA manifest, elan OG kartı, ana səhifə sırası,
   boş axtarış təklifləri, sayt şəkilləri paneldən, Google Business Profile linki.
-- **2-ci mərhələ (#105):** qiymət göstəricisi, `/emlakimi-sat` + onlayn qiymətləndirmə,
+- **2-ci mərhələ (#105 / PR #106, merge olunub):** qiymət göstəricisi, `/emlakimi-sat` + onlayn qiymətləndirmə,
   müraciət lövhəsi, konversiya hunisi, kənar HTML keşi (`worker.ts`), bloq planı
   (`docs/content/2026-bloq-plani.md`), Cloudflare Web Analytics dəstəyi.
+
+- **3-cü mərhələ (#107):** plan və 360° tur, mobil alt naviqasiya, metro məsafəsi və filtri,
+  hissə-hissə kalkulyator, `/investisiya`, xəritədə sahə çəkmə, mənzil şahmatı, semantik axtarış
+  (Vectorize indeksləri 27.09.2026-da yaradılıb). Yol boyu tapılan köhnə bug: xəritə görünüşü
+  98-dən çox markerdə staging-də 500 verirdi (nested `take` əlaqəsi) — düzəldildi.
 
 **İstifadəçidən gözlənilən (koda aid deyil):**
 - `TELEGRAM_BOT_TOKEN` və `TELEGRAM_CHAT_ID` secret-ləri (bot @BotFather-də yaradılır).

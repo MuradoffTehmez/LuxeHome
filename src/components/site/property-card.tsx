@@ -16,6 +16,7 @@ import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { Badge } from "@/components/ui/badge";
 import type { PropertyCardData } from "@/lib/queries";
 import type { PriceBand } from "@/lib/price-benchmark";
+import { CARD_METRO_MAX_METERS } from "@/lib/constants";
 import { FavoriteButton } from "./favorite-button";
 import { CompareButton } from "./compare-button";
 
@@ -105,6 +106,10 @@ export function PropertyCard({
   const isPremium = property.isFeatured && (!property.featuredUntil || new Date(property.featuredUntil).getTime() >= Date.now());
 
   const signals = cardSignals(sourceProperty);
+  const nearestMetro = sourceProperty.nearbyPlaces?.[0];
+  const metro = nearestMetro && nearestMetro.distanceMeters != null && nearestMetro.distanceMeters <= CARD_METRO_MAX_METERS
+    ? nearestMetro
+    : null;
 
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
@@ -236,6 +241,14 @@ export function PropertyCard({
               <span className="truncate">{location}</span>
             </p>
           )}
+          {metro ? (
+            <p className="flex items-center gap-1.5 text-xs text-ink-soft">
+              <span className="grid size-4 shrink-0 place-items-center rounded-full bg-danger text-[0.5625rem] font-bold text-white" aria-hidden="true">M</span>
+              <span className="truncate">
+                {t("metroChip", { name: metro.name, minutes: metro.walkingMinutes ?? Math.max(1, Math.round((metro.distanceMeters ?? 0) / 80)) })}
+              </span>
+            </p>
+          ) : null}
         </div>
 
         {/* Xüsusiyyət sətri */}

@@ -258,6 +258,7 @@ function mapRow(cells: string[], index: Map<ImportColumn, number>, lookups: Impo
     documentStatus: enumField("document", DOCUMENT_STATUS_LABELS),
     buildingType: enumField("building_type", BUILDING_TYPE_LABELS, BUILDING_ALIASES),
     videoUrl: cell("video_url") || null,
+    virtualTourUrl: null,
     isFeatured: false,
     featuredUntil: null,
     reservationEnabled: false,

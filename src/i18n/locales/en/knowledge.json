@@ -116,7 +116,22 @@
     "disclaimer": "Results are informational only and are not financial advice. Actual terms are set by the bank.",
     "onProperty": "Monthly payment for this property",
     "openCalculator": "Open calculator",
-    "closeCalculator": "Close calculator"
+    "closeCalculator": "Close calculator",
+    "installment": {
+      "title": "Instalment plan",
+      "description": "Developer financing: a down payment and equal monthly instalments.",
+      "price": "Price",
+      "months": "Term",
+      "monthsOption": "{count} months",
+      "downPayment": "Down payment",
+      "markup": "Mark-up",
+      "monthly": "Monthly payment",
+      "downPaymentAmount": "Down payment",
+      "markupAmount": "Mark-up amount",
+      "total": "Total amount",
+      "invalid": "Check the price and term.",
+      "disclaimer": "An estimate only. The actual schedule and mark-up are agreed with the developer."
+    }
   },
   "faq": {
     "categories": {

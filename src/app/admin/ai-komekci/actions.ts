@@ -12,6 +12,7 @@ import { AI_SYSTEM_PROMPTS } from "@/lib/ai-prompts";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
+import { queuePropertyVectorSync, reindexAllProperties } from "@/lib/semantic-search";
 
 type DescriptionOutput = { title?: string; description: string; highlights?: string[] };
 type PhotoIssue = { score: number; issues: string[] };
@@ -326,6 +327,7 @@ export async function applyDescriptionDraft(id: string): Promise<ActionState> {
       data: { status: AI_CONTENT_DRAFT_STATUSES.APPLIED, appliedAt: new Date() },
     });
     await recordAudit(actor, "UPDATE", "Property", draft.propertyId, `AI qaralaması insan təsdiqi ilə tətbiq edildi: ${id}`);
+    queuePropertyVectorSync([draft.propertyId]);
     revalidatePath("/admin/ai-komekci");
     revalidatePublicContent("property", property.slug);
     return success(msg("server.aiKomekci.qaralamaElanaTetbiqEdildi"));
@@ -354,5 +356,19 @@ export async function discardDescriptionDraft(id: string): Promise<ActionState> 
     return success(msg("server.aiKomekci.qaralamaReddEdildi"));
   } catch (error) {
     return unexpected("AI qaralaması rədd edilmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+/** Semantik axtarış indeksini bütün ictimai elanlar üçün yenidən qurur (#107). */
+export async function reindexSemanticSearch(): Promise<ActionState> {
+  const actor = await guard();
+  if ("status" in actor) return actor;
+  try {
+    const count = await reindexAllProperties();
+    if (count === null) return failure(msg("server.aiKomekci.semanticUnavailable"));
+    await recordAudit(actor, "UPDATE", "AiProvider", null, `Semantik indeks yeniləndi: ${count} elan`);
+    return success(msg("server.aiKomekci.semanticReindexed", { count }));
+  } catch (error) {
+    return unexpected("semantik indeks yenilənmədi", error, msg("server.common.unexpected"));
   }
 }

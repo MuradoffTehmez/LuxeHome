@@ -102,7 +102,9 @@
     "mapRecenter": "Отцентрировать карту",
     "mapScrollHint": "Кликните по карте, чтобы поставить точку",
     "mapRegion": "Карта выбора координат",
-    "mapProviderAttribution": "Поиск адреса и обратное геокодирование:"
+    "mapProviderAttribution": "Поиск адреса и обратное геокодирование:",
+    "virtualTour": "Виртуальный тур 360°",
+    "virtualTourHint": "Ссылка Kuula, Matterport или Momento360"
   },
   "team": {
     "metaTitle": "Команда",

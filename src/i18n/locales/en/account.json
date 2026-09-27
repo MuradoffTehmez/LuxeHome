@@ -102,7 +102,9 @@
     "mapRecenter": "Recentre the map",
     "mapScrollHint": "Click the map to set the point",
     "mapRegion": "Coordinate picker map",
-    "mapProviderAttribution": "Address search and reverse geocoding by:"
+    "mapProviderAttribution": "Address search and reverse geocoding by:",
+    "virtualTour": "360° virtual tour",
+    "virtualTourHint": "Kuula, Matterport or Momento360 link"
   },
   "team": {
     "metaTitle": "Team",

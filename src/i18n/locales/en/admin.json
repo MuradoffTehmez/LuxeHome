@@ -402,6 +402,11 @@
       "NORMAL": "Normal",
       "MAINTENANCE": "Maintenance",
       "READ_ONLY": "Read only"
+    },
+    "projectUnitStatus": {
+      "AVAILABLE": "Available",
+      "RESERVED": "Reserved",
+      "SOLD": "Sold"
     }
   },
   "profile": {
@@ -624,7 +629,11 @@
       "deyisiklikleriSaxla": "Save changes",
       "elaniSil": "Delete listing",
       "elaninRedaktesi": "Edit listing",
-      "redakte": "Edit"
+      "redakte": "Edit",
+      "virtualTour": "360° virtual tour",
+      "virtualTourHint": "Kuula, Matterport or Momento360 share link.",
+      "floorPlans": "Floor plan",
+      "floorPlansHint": "Image or scan of the plan, up to 6 files. Shown in a separate section, not in the gallery."
     },
     "leads": {
       "yenile": "Update",
@@ -1839,7 +1848,12 @@
       "rezervasiyaYoxdur": "No reservations",
       "ictimaiElanlardanGonderilenSorgular": "Requests sent from public listings will appear here.",
       "statusuYaddaSaxla": "Save status",
-      "qeydIsteyeBagli": "Note (optional)"
+      "qeydIsteyeBagli": "Note (optional)",
+      "semanticTitle": "Semantic search index",
+      "semanticDescription": "AI search finds listings by meaning (Workers AI + Vectorize). The index updates when listings change and daily.",
+      "semanticReindex": "Reindex",
+      "semanticReady": "Bindings are connected. The button reindexes all public listings.",
+      "semanticMissing": "No Vectorize binding in this environment — search runs in lexical mode."
     },
     "common": {
       "deqCavab": "{p0} min response",
@@ -2386,6 +2400,29 @@
       "reservationsColumn": "Viewings",
       "leadRate": "Conversion",
       "attention": "Attention"
+    },
+    "projectUnits": {
+      "title": "Unit chessboard",
+      "summary": "{name}: {total} units — {available} available, {reserved} reserved, {sold} sold.",
+      "generate": "Create units",
+      "generatorTitle": "Generator",
+      "generatorHint": "Creates a unit grid by blocks and floors. Existing block+number pairs are not overwritten — status and price are kept.",
+      "blocks": "Blocks",
+      "blocksHint": "Comma or new line: A, B, C",
+      "unitsPerFloor": "Units per floor",
+      "floorFrom": "From floor",
+      "floorTo": "To floor",
+      "rooms": "Rooms",
+      "area": "Area, m²",
+      "status": "Status",
+      "price": "Price",
+      "saveUnit": "Save unit {number}",
+      "empty": "No units yet",
+      "emptyHint": "Create blocks and floors with the generator above.",
+      "block": "Block {block}",
+      "floor": "Floor {floor}",
+      "deleteBlock": "Delete block {block}",
+      "deleteBlockHint": "All units of the block will be deleted. This cannot be undone."
     }
   },
   "server": {
@@ -2440,7 +2477,9 @@
       "qaralamaTapilmadiVeYaArtiq": "Draft not found or already processed.",
       "qaralamadaTesvirYoxdur": "The draft contains no description.",
       "qaralamaElanaTetbiqEdildi": "Draft applied to the listing.",
-      "qaralamaReddEdildi": "Draft rejected."
+      "qaralamaReddEdildi": "Draft rejected.",
+      "semanticUnavailable": "The semantic index is not connected in this environment.",
+      "semanticReindexed": "Semantic index updated: {count} listings."
     },
     "audit": {
       "auditJurnaliniYalnizSuperAdmin": "Only a Super Admin can reset the audit log.",
@@ -2704,6 +2743,13 @@
     "propertyImport": {
       "fileTooLarge": "The file is larger than 900 KB — split it into several parts.",
       "invalidFile": "The file header row is invalid."
+    },
+    "projectUnits": {
+      "tooMany": "Invalid parameters or more than 1,500 units.",
+      "projectNotFound": "Project not found.",
+      "generated": "{created} units created, {skipped} skipped as existing.",
+      "saved": "Unit saved.",
+      "blockDeleted": "{count} units deleted."
     }
   }
 }

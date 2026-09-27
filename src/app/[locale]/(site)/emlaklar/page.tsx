@@ -9,6 +9,7 @@ import { ResponsiveToolbar } from "@/components/ui/responsive-toolbar";
 import { SectionHeader } from "@/components/ui/section-header";
 import { EmptySearchSuggestions } from "@/components/site/empty-search-suggestions";
 import { assessPriceBands } from "@/lib/price-benchmark";
+import { parsePolygon } from "@/lib/geo-polygon";
 import { MAX_RELAXATIONS, rankSuggestions, relaxFilters, widenedMaxPrice, type RelaxationSuggestion } from "@/lib/search-relaxation";
 import { Reveal } from "@/components/ui/reveal";
 import { PropertyCard } from "@/components/site/property-card";
@@ -163,6 +164,8 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     excludeFirstFloor: searchState.excludeFirstFloor,
     excludeLastFloor: searchState.excludeLastFloor,
     withImagesOnly: searchState.withImagesOnly,
+    nearMetro: searchState.nearMetro,
+    polygon: parsePolygon(raw.sahe) ?? undefined,
     featureSlugs: searchState.featureSlugs,
     sort,
     page: searchState.page,
@@ -262,6 +265,8 @@ export default async function PropertiesPage({ params: routeParams, searchParams
       if (key === "ilk_mertebe_yox") return t("search.notFirstFloor");
       if (key === "son_mertebe_yox") return t("search.notLastFloor");
       if (key === "sekilli") return t("search.withPhotos");
+      if (key === "metro_yaxin") return t("search.nearMetro");
+      if (key === "sahe") return t("search.drawnArea");
       if (key === "siralama") {
         const labels: Record<string, string> = { newest: t("search.sortNewest"), price_asc: t("search.sortPriceAsc"), price_desc: t("search.sortPriceDesc"), area_desc: t("search.sortAreaDesc") };
         return labels[sort] ?? fallback;
@@ -327,6 +332,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     ilk_mertebe_yox: filters.excludeFirstFloor ? "1" : undefined,
     son_mertebe_yox: filters.excludeLastFloor ? "1" : undefined,
     sekilli: filters.withImagesOnly ? "1" : undefined,
+    metro_yaxin: filters.nearMetro ? "1" : undefined,
     xususiyyet: filters.featureSlugs,
     siralama: sort,
   };
@@ -448,6 +454,8 @@ export default async function PropertiesPage({ params: routeParams, searchParams
               hrefBase={localizePath("/emlaklar", locale as Locale)}
               shownCount={mapPoints.length}
               total={mapResult?.total ?? 0}
+              polygon={filters.polygon ?? null}
+              areaBaseHref={buildHref({ sahe: null })}
             />
           ) : items.length > 0 ? (
             <>

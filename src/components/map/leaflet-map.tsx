@@ -56,6 +56,13 @@ type LeafletMapProps = {
   onSelect?: (latitude: number, longitude: number) => void;
   /** Tam ekran düyməsi göstərilsin. */
   allowFullscreen?: boolean;
+  /**
+   * Xəritə üzərində sahə örtüyü (#107): `closed` — bitmiş poliqon, əks halda çəkilməkdə
+   * olan xətt və təpə nöqtələri. Koordinatlar `[lat, lng]`.
+   */
+  overlay?: { points: [number, number][]; closed: boolean };
+  /** Çəkmə rejimi: kursor dəyişir və marker popup-ları klikləri tutmur. */
+  drawing?: boolean;
 };
 
 /** Marker piktoqramı — kənar CDN-dən şəkil çəkilmir, ona görə CSP təmiz qalır. */
@@ -126,11 +133,14 @@ export function LeafletMap({
   selectable = false,
   onSelect,
   allowFullscreen = true,
+  overlay,
+  drawing = false,
 }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
   const tileRef = useRef<import("leaflet").TileLayer | null>(null);
   const markerLayerRef = useRef<import("leaflet").LayerGroup | null>(null);
+  const overlayLayerRef = useRef<import("leaflet").LayerGroup | null>(null);
   const leafletRef = useRef<typeof import("leaflet") | null>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const onSelectRef = useRef(onSelect);
@@ -181,6 +191,7 @@ export function LeafletMap({
       map.attributionControl.setPrefix(false);
 
       markerLayerRef.current = L.layerGroup().addTo(map);
+      overlayLayerRef.current = L.layerGroup().addTo(map);
 
       map.on("click", (event: import("leaflet").LeafletMouseEvent) => {
         onSelectRef.current?.(event.latlng.lat, event.latlng.lng);
@@ -215,6 +226,7 @@ export function LeafletMap({
       mapRef.current = null;
       tileRef.current = null;
       markerLayerRef.current = null;
+      overlayLayerRef.current = null;
       setReady(false);
     };
     // Yalnız mount/unmount: sonrakı dəyişikliklər ayrıca effektlərdə tətbiq olunur.
@@ -302,6 +314,34 @@ export function LeafletMap({
       map.setView([markers[0].latitude, markers[0].longitude], map.getZoom());
     }
   }, [ready, markers, fitToMarkers, selectable]);
+
+  // 3b) Sahə örtüyü (#107) — bitmiş poliqon və ya çəkilməkdə olan xətt.
+  useEffect(() => {
+    const L = leafletRef.current;
+    const layer = overlayLayerRef.current;
+    if (!ready || !L || !layer) return;
+    layer.clearLayers();
+    const points = overlay?.points ?? [];
+    if (points.length === 0) return;
+    const style = { color: "#a8844f", weight: 2, fillColor: "#c4a575", fillOpacity: 0.14 };
+    if (overlay?.closed && points.length >= 3) {
+      L.polygon(points, style).addTo(layer);
+      return;
+    }
+    if (points.length >= 2) L.polyline(points, { ...style, dashArray: "6 6" }).addTo(layer);
+    for (const point of points) {
+      L.circleMarker(point, { radius: 5, color: "#a8844f", weight: 2, fillColor: "#ffffff", fillOpacity: 1 }).addTo(layer);
+    }
+  }, [ready, overlay]);
+
+  // Çəkmə rejimində marker popup-u klikləri tutmasın və kursor dəqiq seçim göstərsin.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    map.getContainer().style.cursor = drawing ? "crosshair" : "";
+    if (drawing) map.closePopup();
+    map.doubleClickZoom[drawing ? "disable" : "enable"]();
+  }, [ready, drawing]);
 
   // 4) Ölçü dəyişəndə (tam ekran, sekme, responsiv grid) tile-lar yenidən hesablanır.
   useEffect(() => {

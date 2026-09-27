@@ -175,6 +175,8 @@
     "saveSearchFrequencyImmediate": "Immediately",
     "saveSearchFrequencyDaily": "Daily",
     "saveSearchFrequencyWeekly": "Weekly",
-    "saveSearchFrequencyOff": "Off"
+    "saveSearchFrequencyOff": "Off",
+    "nearMetro": "Within 1 km of a metro",
+    "drawnArea": "Area drawn on the map"
   }
 }

@@ -67,6 +67,8 @@ const PROPERTY_FILTER_KEYS = new Set([
   "ilk_mertebe_yox",
   "son_mertebe_yox",
   "sekilli",
+  "metro_yaxin",
+  "sahe",
   "xususiyyet",
 ]);
 

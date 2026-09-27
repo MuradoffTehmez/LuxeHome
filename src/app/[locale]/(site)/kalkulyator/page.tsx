@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { MortgageCalculator } from "@/components/site/mortgage-calculator";
+import { InstallmentCalculator } from "@/components/site/installment-calculator";
 import { breadcrumbSchema, buildManagedMetadata, jsonLd } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/lib/constants";
@@ -63,6 +64,9 @@ export default async function CalculatorPage({ params }: Props) {
       <Section tone="ivory" spacing="cozy">
         <Container>
           <MortgageCalculator />
+          <div className="mt-6">
+            <InstallmentCalculator />
+          </div>
         </Container>
       </Section>
     </>

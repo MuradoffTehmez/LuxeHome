@@ -22,6 +22,17 @@ describe("property search URL müqaviləsi", () => {
     expect(href).not.toContain("sehife=3");
   });
 
+  it("«metroya yaxın» bayrağını oxuyur, saxlayır və çipi ilə silir (#107)", () => {
+    const state = parsePropertySearchParams({ metro_yaxin: "1", tip: "villa" });
+    expect(state.nearMetro).toBe(true);
+    expect(buildPropertySearchHref(state)).toContain("metro_yaxin=1");
+
+    const chip = buildActivePropertyFilters(state).find((item) => item.key === "metro_yaxin");
+    expect(chip?.href).not.toContain("metro_yaxin");
+    expect(chip?.href).toContain("tip=villa");
+    expect(parsePropertySearchParams({ metro_yaxin: "0" }).nearMetro).toBe(false);
+  });
+
   it("yanlış sort və səhifə dəyərlərini təhlükəsiz default-a salır", () => {
     const state = parsePropertySearchParams({ siralama: "random", sehife: "-4" });
 

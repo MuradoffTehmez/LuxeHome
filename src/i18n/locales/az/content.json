@@ -129,6 +129,13 @@
     "listView": "Siyahı",
     "mapView": "Xəritə",
     "mapEmpty": "Bu filtrə uyğun elanların heç birində xəritə koordinatı göstərilməyib.",
-    "markerCount": "{count, plural, other {Xəritədə # elan}}"
+    "markerCount": "{count, plural, other {Xəritədə # elan}}",
+    "drawToolbar": "Axtarış sahəsi",
+    "drawStart": "Xəritədə sahə çək",
+    "drawAgain": "Sahəni yenidən çək",
+    "drawClear": "Sahəni sil",
+    "drawFinish": "Tamamla",
+    "drawCancel": "Ləğv et",
+    "drawHint": "Xəritəyə toxunaraq sahənin künclərini seçin ({count} nöqtə, ən az 3)."
   }
 }

@@ -107,6 +107,7 @@ export const propertyFieldsSchema = z.object({
     buildingType: enumOf(BUILDING_TYPES).nullable(),
 
     videoUrl: externalUrl,
+    virtualTourUrl: externalUrl,
     // `mortgageAvailable` / `installmentAvailable` burada yoxdur: dəyər `PAYMENT`
     // qrupundakı xüsusiyyət seçimindən törədilir (`admin/payment-features.ts`).
     isFeatured: z.boolean(),

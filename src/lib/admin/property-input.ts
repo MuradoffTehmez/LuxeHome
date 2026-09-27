@@ -48,6 +48,7 @@ export function readPropertyForm(formData: FormData): PropertyInput {
     buildingType: form.optionalText(formData, "buildingType"),
 
     videoUrl: form.optionalText(formData, "videoUrl"),
+    virtualTourUrl: form.optionalText(formData, "virtualTourUrl"),
     isFeatured: form.boolean(formData, "isFeatured"),
     featuredUntil: form.optionalText(formData, "featuredUntil"),
     reservationEnabled: form.boolean(formData, "reservationEnabled"),
@@ -103,6 +104,7 @@ export function propertyData(input: PropertyInput, payment: PaymentFlags) {
     documentStatus: input.documentStatus,
     buildingType: input.buildingType,
     videoUrl: input.videoUrl,
+    virtualTourUrl: input.virtualTourUrl,
     mortgageAvailable: payment.mortgageAvailable,
     installmentAvailable: payment.installmentAvailable,
     isFeatured: input.isFeatured,

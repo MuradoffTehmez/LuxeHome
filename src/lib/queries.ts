@@ -1,4 +1,6 @@
 import { Prisma } from "@prisma/client";
+import { boundingBox, pointInPolygon } from "@/lib/geo-polygon";
+import { findManyInChunks } from "@/lib/d1-chunks";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -22,6 +24,8 @@ import {
   SAVED_SEARCH_FREQUENCIES,
   type Locale,
   type SortOption,
+  NEARBY_PLACE_CATEGORIES,
+  NEAR_METRO_METERS,
 } from "@/lib/constants";
 import { demoWhere } from "@/lib/demo-content";
 import { buildCityFilterTree, withCityAndGroup } from "@/lib/location-tree";
@@ -73,6 +77,13 @@ export const propertyCardSelect = {
     // optimizasiyasından yan keçir (zona səviyyəsində Images transformations hələ
     // açılmayıb), ona görə `url` verilsə kartda 2400 px-lik master şəkil yüklənir.
     select: { url: true, thumbUrl: true, alt: true, width: true, height: true },
+  },
+  // Ən yaxın metro (#107) — kartda «M 28 May · 6 dəq» çipi.
+  nearbyPlaces: {
+    where: { category: NEARBY_PLACE_CATEGORIES.METRO },
+    orderBy: { distanceMeters: "asc" },
+    take: 1,
+    select: { name: true, distanceMeters: true, walkingMinutes: true },
   },
   // Kart siqnalları (#103): foto sayı və son qiymət dəyişikliyi («Qiymət endi»).
   _count: { select: { images: true } },
@@ -155,6 +166,10 @@ export type PropertyFilters = {
   excludeLastFloor?: boolean;
   /** Yalnız şəkli olan elanlar. */
   withImagesOnly?: boolean;
+  /** Ən yaxın metro `NEAR_METRO_METERS`-dən yaxındır (təsdiqlənmiş `NearbyPlace`, #107). */
+  nearMetro?: boolean;
+  /** Xəritədə çəkilmiş axtarış sahəsi, `[lat, lng]` nöqtələri (#107). */
+  polygon?: [number, number][];
   mortgageOnly?: boolean;
   installmentOnly?: boolean;
 };
@@ -280,6 +295,20 @@ export async function buildPropertyWhere(
     where.images = { some: {} };
   }
 
+  if (filters.polygon && filters.polygon.length >= 3) {
+    const box = boundingBox(filters.polygon);
+    andWhere(where, {
+      latitude: { gte: box.minLat, lte: box.maxLat },
+      longitude: { gte: box.minLng, lte: box.maxLng },
+    });
+  }
+
+  if (filters.nearMetro) {
+    andWhere(where, {
+      nearbyPlaces: { some: { category: NEARBY_PLACE_CATEGORIES.METRO, distanceMeters: { lte: NEAR_METRO_METERS } } },
+    });
+  }
+
   // Hər xüsusiyyət ayrıca AND şərtidir — «hovuz VƏ qaraj» seçimi ikisi də olan
   // elanları qaytarmalıdır, birini daşıyanı yox.
   if (filters.featureSlugs?.length) {
@@ -336,15 +365,53 @@ function buildPropertyOrderBy(
   }
 }
 
+/** Poliqon axtarışında sərhəd qutusundan götürülən namizəd sayının yuxarı həddi. */
+const POLYGON_CANDIDATE_LIMIT = 1000;
+
+/**
+ * Poliqon daxilindəki elan ID-ləri, seçilmiş sıralama ilə (#107). SQL yalnız sərhəd
+ * qutusunu süzür; dəqiq «nöqtə sahənin içindədir» yoxlaması burada aparılır, ona görə
+ * say və səhifələmə poliqona görə dəqiqdir (namizəd həddi daxilində).
+ */
+async function polygonMatchIds(filters: PropertyFilters, where: Prisma.PropertyWhereInput): Promise<string[]> {
+  const polygon = filters.polygon ?? [];
+  const candidates = await prisma.property.findMany({
+    where: { AND: [where, { latitude: { not: null } }, { longitude: { not: null } }] },
+    select: { id: true, latitude: true, longitude: true },
+    orderBy: buildPropertyOrderBy(filters.sort),
+    take: POLYGON_CANDIDATE_LIMIT,
+  });
+  return candidates
+    .filter((item) => pointInPolygon([item.latitude as number, item.longitude as number], polygon))
+    .map((item) => item.id);
+}
+
 /** Filtrə uyğun ictimai elan sayı — boş nəticədə «filtri yumşalt» təklifləri üçün (#103). */
 export async function countProperties(filters: PropertyFilters = {}) {
-  return prisma.property.count({ where: await buildPropertyWhere(filters) });
+  const where = await buildPropertyWhere(filters);
+  if (filters.polygon && filters.polygon.length >= 3) return (await polygonMatchIds(filters, where)).length;
+  return prisma.property.count({ where });
 }
 
 export async function getProperties(filters: PropertyFilters = {}) {
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = filters.pageSize ?? PAGE_SIZE;
   const where = await buildPropertyWhere(filters);
+
+  if (filters.polygon && filters.polygon.length >= 3) {
+    const ids = await polygonMatchIds(filters, where);
+    const pageIds = ids.slice((page - 1) * pageSize, page * pageSize);
+    const rows = pageIds.length
+      ? await prisma.property.findMany({ where: { id: { in: pageIds } }, select: propertyCardSelect })
+      : [];
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    return {
+      items: pageIds.map((id) => byId.get(id)).filter((row): row is (typeof rows)[number] => Boolean(row)),
+      total: ids.length,
+      page,
+      totalPages: Math.max(1, Math.ceil(ids.length / pageSize)),
+    };
+  }
 
   if (filters.sort === "featured") {
     const now = new Date();
@@ -425,6 +492,32 @@ export const propertyMapSelect = {
 
 export type PropertyMapData = Prisma.PropertyGetPayload<{ select: typeof propertyMapSelect }>;
 
+/**
+ * Xəritə elanları şəkil **əlaqəsi olmadan** oxunur, şəkillər ayrıca hissələrlə gəlir.
+ *
+ * `images: { take, orderBy }` əlaqəsi 98-dən çox valideyn üçün Prisma D1 sorğusunu
+ * ilişdirirdi — workerd onu «hung» kimi 500-ə çevirirdi və xəritə görünüşü (200 marker)
+ * staging-də açılmırdı. Şəkillər `findManyInChunks` ilə D1 parametr həddinə sığan
+ * hissələrlə oxunur və hər elana ilk (üz qabığı) şəkil JS-də bağlanır.
+ */
+const { images: _mapImages, ...propertyMapBaseSelect } = propertyMapSelect;
+void _mapImages;
+
+async function withMapImages<T extends { id: string }>(rows: T[]): Promise<(T & { images: { thumbUrl: string | null; url: string }[] })[]> {
+  const images = await findManyInChunks(rows.map((row) => row.id), 0, (chunk) =>
+    prisma.propertyImage.findMany({
+      where: { propertyId: { in: chunk } },
+      orderBy: [{ isCover: "desc" }, { order: "asc" }],
+      select: { propertyId: true, thumbUrl: true, url: true },
+    }),
+  );
+  const first = new Map<string, { thumbUrl: string | null; url: string }>();
+  for (const image of images) {
+    if (!first.has(image.propertyId)) first.set(image.propertyId, { thumbUrl: image.thumbUrl, url: image.url });
+  }
+  return rows.map((row) => ({ ...row, images: first.has(row.id) ? [first.get(row.id)!] : [] }));
+}
+
 /** Xəritə görünüşündə göstərilən ən çox elan sayı. */
 export const PROPERTY_MAP_LIMIT = 200;
 
@@ -441,17 +534,29 @@ export async function getPropertiesForMap(filters: PropertyFilters = {}) {
     AND: [await buildPropertyWhere(filters), { latitude: { not: null } }, { longitude: { not: null } }],
   };
 
-  const [items, total] = await Promise.all([
+  // Poliqon: əvvəl dəqiq uyğun ID-lər (sıralı, namizəd həddi daxilində), sonra marker
+  // limiti — əks halda qutunun ilk 200 sətrindən kənarda qalan uyğun nöqtələr itirdi
+  // və `total` qutu sayını göstərirdi (#108 rəyi).
+  if (filters.polygon && filters.polygon.length >= 3) {
+    const ids = await polygonMatchIds({ ...filters, sort: filters.sort === "featured" ? undefined : filters.sort }, where);
+    const pageIds = ids.slice(0, PROPERTY_MAP_LIMIT);
+    const rows = await findManyInChunks(pageIds, 0, (chunk) =>
+      prisma.property.findMany({ where: { id: { in: chunk } }, select: propertyMapBaseSelect }));
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    const ordered = pageIds.map((id) => byId.get(id)).filter((row): row is (typeof rows)[number] => Boolean(row));
+    return { items: await withMapImages(ordered), total: ids.length };
+  }
+
+  const [rows, total] = await Promise.all([
     prisma.property.findMany({
       where,
-      select: propertyMapSelect,
+      select: propertyMapBaseSelect,
       orderBy: buildPropertyOrderBy(filters.sort === "featured" ? undefined : filters.sort),
       take: PROPERTY_MAP_LIMIT,
     }),
     prisma.property.count({ where }),
   ]);
-
-  return { items, total };
+  return { items: await withMapImages(rows), total };
 }
 
 async function getFeaturedProperties(take = 6) {
@@ -495,6 +600,7 @@ export async function getPropertyBySlug(slug: string) {
       features: { include: { feature: true } },
       project: { select: { name: true, slug: true } },
       priceHistory: { orderBy: { changedAt: "desc" }, take: 20 },
+      floorPlans: { orderBy: { order: "asc" }, select: { id: true, url: true, title: true } },
       nearbyPlaces: { orderBy: [{ category: "asc" }, { distanceMeters: "asc" }] },
       assignedAgent: {
         include: {
@@ -655,6 +761,10 @@ export async function getProjectBySlug(slug: string) {
         where: await publicPropertyWhere(),
         select: propertyCardSelect,
         take: 6,
+      },
+      // Mənzil şahmatı (#107) — bir layihədə ən çox bir neçə yüz sətir.
+      units: {
+        select: { id: true, block: true, floor: true, number: true, rooms: true, area: true, price: true, currency: true, status: true },
       },
     },
   });
@@ -1386,7 +1496,8 @@ export async function getSeoAuditItems() {
         publishedAt: true,
         districtId: true,
         metroId: true,
-        images: { select: { url: true, alt: true }, orderBy: [{ isCover: "desc" }, { order: "asc" }], take: 1 },
+        // Şəkil əlaqəsi burada yüklənmir: 98-dən çox valideyndə `take` ilə əlaqə
+        // Prisma D1 sorğusunu ilişdirir — aşağıda hissələrlə oxunur.
       },
       orderBy: { publishedAt: "desc" },
       take: 200,
@@ -1425,7 +1536,6 @@ export async function getSeoAuditItems() {
         noIndex: true,
         coverUrl: true,
         cityId: true,
-        images: { select: { alt: true }, orderBy: { order: "asc" }, take: 1 },
       },
       orderBy: { updatedAt: "desc" },
       take: 200,
@@ -1448,6 +1558,21 @@ export async function getSeoAuditItems() {
     }),
   ]);
 
+  const [propertyImages, projectImages] = await Promise.all([
+    findManyInChunks(properties.map((item) => item.id), 0, (chunk) =>
+      prisma.propertyImage.findMany({
+        where: { propertyId: { in: chunk } },
+        orderBy: [{ isCover: "desc" }, { order: "asc" }],
+        select: { propertyId: true, url: true, alt: true },
+      })),
+    findManyInChunks(projects.map((item) => item.id), 0, (chunk) =>
+      prisma.projectImage.findMany({ where: { projectId: { in: chunk } }, orderBy: { order: "asc" }, select: { projectId: true, alt: true } })),
+  ]);
+  const firstPropertyImage = new Map<string, { url: string; alt: string }>();
+  for (const image of propertyImages) if (!firstPropertyImage.has(image.propertyId)) firstPropertyImage.set(image.propertyId, image);
+  const firstProjectImage = new Map<string, { alt: string }>();
+  for (const image of projectImages) if (!firstProjectImage.has(image.projectId)) firstProjectImage.set(image.projectId, image);
+
   const contents: SeoAuditContent[] = [
     ...properties.map((item) => ({
       kind: "property" as const,
@@ -1458,8 +1583,8 @@ export async function getSeoAuditItems() {
       metaTitle: item.metaTitle,
       metaDescription: item.metaDescription,
       noIndex: item.noIndex,
-      imageUrl: item.images[0]?.url,
-      imageAlt: item.images[0]?.alt,
+      imageUrl: firstPropertyImage.get(item.id)?.url,
+      imageAlt: firstPropertyImage.get(item.id)?.alt,
       hasLocation: Boolean(item.districtId || item.metroId),
       hasAuthor: true,
       hasPublishedAt: Boolean(item.publishedAt),
@@ -1494,7 +1619,7 @@ export async function getSeoAuditItems() {
       metaDescription: item.metaDescription,
       noIndex: item.noIndex,
       imageUrl: item.coverUrl,
-      imageAlt: item.images[0]?.alt,
+      imageAlt: firstProjectImage.get(item.id)?.alt,
       hasLocation: Boolean(item.cityId),
       hasAuthor: true,
       hasPublishedAt: true,
@@ -1647,6 +1772,7 @@ export async function getAdminPropertyById(id: string) {
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { select: { featureId: true } },
       priceHistory: { orderBy: { changedAt: "desc" }, take: 50 },
+      floorPlans: { orderBy: { order: "asc" } },
     },
   });
 }
@@ -2255,7 +2381,8 @@ function isPrismaKnownRequestErrorCode(error: unknown, code: string): boolean {
   );
 }
 
-const savedSearchMatchStore: SavedSearchMatchStore = {
+/** İxrac yalnız real D1 inteqrasiya testi üçündür (poliqon uyğunluğu, #108). */
+export const savedSearchMatchStore: SavedSearchMatchStore = {
   async findActiveSavedSearches() {
     return prisma.savedSearch.findMany({
       where: { enabled: true },
@@ -2281,9 +2408,16 @@ const savedSearchMatchStore: SavedSearchMatchStore = {
   async matchesFilters(filters, propertyId) {
     const match = await prisma.property.findFirst({
       where: { ...(await buildPropertyWhere(filters)), id: propertyId },
-      select: { id: true },
+      select: { id: true, latitude: true, longitude: true },
     });
-    return match !== null;
+    if (!match) return false;
+    // SQL yalnız sərhəd qutusunu süzür — üçbucaq/konkav sahədə qutunun küncündəki elan
+    // saxta bildiriş yaratmasın deyə dəqiq sərhəd burada yoxlanır (#108 rəyi).
+    if (filters.polygon && filters.polygon.length >= 3) {
+      return match.latitude !== null && match.longitude !== null
+        && pointInPolygon([match.latitude, match.longitude], filters.polygon);
+    }
+    return true;
   },
 
   async recordMatch(savedSearchId, propertyId) {

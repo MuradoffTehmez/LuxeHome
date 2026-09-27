@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { FAIR_BAND_PERCENT, benchmarkFromSamples, classifyPrice, medianOf, roundEstimate } from "@/lib/price-benchmark";
+import { FAIR_BAND_PERCENT, benchmarkFromSamples, classifyPrice, roundEstimate } from "@/lib/price-benchmark";
+import { medianOf } from "@/lib/stats";
 
 describe("qiymət müqayisəsi", () => {
   it("medianı tək və cüt nümunə üçün hesablayır, ifrat dəyərdən təsirlənmir", () => {

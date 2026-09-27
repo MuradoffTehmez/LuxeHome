@@ -401,6 +401,30 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - **Konversiya hunisi** `/admin/huni`: dövr üzrə müraciət mərhələləri (kumulyativ), mənbə
   bölgüsü və ən çox baxılan elanlar üzrə baxış → favorit → müraciət. `viewCount` kumulyativdir.
 
+### 3-cü mərhələ modulları (#107)
+
+- **Plan və tur:** `PropertyFloorPlan` (qalereyadan ayrı, kart/qalereya sorğularına düşmür) və
+  `Property.virtualTourUrl` — yalnız Kuula/Matterport/Momento360 embed olunur (`tourEmbedUrl`,
+  CSP `frame-src`), iframe kliklə yüklənir.
+- **Mobil alt naviqasiya** (`mobile-bottom-nav.tsx`): `lg`-dən kiçikdə, detal səhifəsindən başqa.
+  Görünəndə `--bottom-nav-offset` təyin olunur; alt kənara yapışan yeni sabit səth
+  `bottom-[calc(…+var(--bottom-nav-offset)+var(--bottom-safe-rest))]` işlətməlidir.
+- **Metro:** ən yaxın metro `NearbyPlace` (METRO) cədvəlindəndir — kartda çip (≤1,5 km),
+  detalda sətir, `?metro_yaxin=1` filtri (≤1 km). Stansiya koordinatı kodda saxlanmır.
+- **Xəritədə sahə** (`?sahe=lat,lng;…`, `geo-polygon.ts`): SQL sərhəd qutusunu süzür, dəqiq
+  yoxlama JS-də; siyahıda ən çox 1000 namizəd. Server komponentindən client-ə funksiya
+  ötürülmür — `areaBaseHref` sətri verilir.
+- **Mənzil şahmatı:** `ProjectUnit` (blok/mərtəbə/nömrə/status), admin
+  `/admin/layiheler/[id]/menziller` generatoru mövcud blok+nömrəni üzərinə yazmır.
+- **Kalkulyatorlar:** `calculateInstallment` (tikintiçi krediti) və investor
+  `calculateYield`/`computeDistrictYields` saf modullardadır (`mortgage.ts`,
+  `investment-math.ts`, `stats.ts`) — brauzer kalkulyatoru Prisma idxal edən fayla toxunmamalıdır.
+- **Semantik axtarış** (`semantic-search.ts`): Workers AI `bge-m3` + Vectorize
+  (`PROPERTY_VECTORS`, indekslər `luxehome-properties[-staging]`, 1024/cosine). Elan yazan
+  hər action `queuePropertyVectorSync()` çağırır (fon, xəta action-u sındırmır); gündəlik cron
+  tam yenidən indeksləyir. Binding yoxdursa (lokal E2E) axtarış leksik rejimə düşür.
+  Yeni elan yazma yolu əlavə edəndə sinxronizasiyanı da çağır.
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai
@@ -595,6 +619,11 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
   nested relation əvəzinə düz sorğu + JS-də ağac (`location-tree.ts`), uzun id siyahısında
   `findManyInChunks()` (`d1-chunks.ts`) işlət. Lokal SQLite bunu tutmur — sorğu formasını
   dəyişəndə `*.integration.test.ts` (real miniflare D1, `npm run test`-ə daxildir) yaz (#74, #85).
+- **`take`/`orderBy`-li nested əlaqə 98-dən çox valideyndə sorğunu ilişdirir** (xəta atmır,
+  workerd «hung» kimi 500 qaytarır). Xəritə görünüşü (200 marker) staging-də buna görə sınırdı
+  (#107). 12-24 kartlıq siyahıda `propertyCardSelect` təhlükəsizdir, amma 98-dən çox sətir
+  qaytaran sorğuda şəkil kimi əlaqələri əlaqəsiz oxu, sonra `findManyInChunks` ilə ayrıca
+  yüklə (`withMapImages()`, `getSeoAuditItems()`; test: `map-query.integration.test.ts`).
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
 - `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər),

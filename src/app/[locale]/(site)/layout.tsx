@@ -2,6 +2,7 @@ import { Navbar } from "@/components/site/navbar";
 import { getHiddenPublicPaths } from "@/lib/site-sections";
 import { Footer } from "@/components/site/footer";
 import { CompareBar } from "@/components/site/compare-bar";
+import { MobileBottomNav } from "@/components/site/mobile-bottom-nav";
 import { NavigationProgress } from "@/components/site/navigation-progress";
 import { ToastProvider } from "@/components/ui/toast";
 
@@ -18,13 +19,14 @@ export default async function SiteLayout({
   return (
     <ToastProvider>
       <NavigationProgress />
-      <div className="flex min-h-dvh flex-col">
+      <div className="flex min-h-dvh flex-col pb-[var(--bottom-nav-offset)]">
         <Navbar showLocaleSwitcher hiddenPaths={await getHiddenPublicPaths()} />
         <main id="main" className="flex-1 pt-[var(--header-h)]">
           {children}
         </main>
         <Footer />
         <CompareBar />
+        <MobileBottomNav />
       </div>
     </ToastProvider>
   );

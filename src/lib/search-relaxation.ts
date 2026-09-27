@@ -33,6 +33,8 @@ const CHIP_FIELDS: Record<string, FilterField[]> = {
   ilk_mertebe_yox: ["excludeFirstFloor"],
   son_mertebe_yox: ["excludeLastFloor"],
   sekilli: ["withImagesOnly"],
+  metro_yaxin: ["nearMetro"],
+  sahe: ["polygon"],
 };
 
 const FEATURE_PREFIX = "xususiyyet:";

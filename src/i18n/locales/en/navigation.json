@@ -63,5 +63,14 @@
   "glossary": "Real estate glossary",
   "calculator": "Mortgage calculator",
   "marketIntelligence": "Market intelligence",
-  "sellWithUs": "Sell with us"
+  "sellWithUs": "Sell with us",
+  "bottom": {
+    "label": "Main navigation",
+    "home": "Home",
+    "search": "Search",
+    "map": "Map",
+    "favorites": "Saved",
+    "account": "Account"
+  },
+  "investors": "For investors"
 }

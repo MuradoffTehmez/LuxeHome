@@ -6,6 +6,7 @@ import { parseAiJson, runAiText } from "@/lib/ai";
 import { AI_SYSTEM_PROMPTS } from "@/lib/ai-prompts";
 import { normalizeSearchText } from "@/lib/search-normalization";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
+import { semanticPropertyMatches } from "@/lib/semantic-search";
 
 const criteriaSchema = z.object({
   listingType: z.enum(["SALE", "RENT"]).optional(),
@@ -176,8 +177,11 @@ function scoreProperty(property: {
 export async function searchPropertiesWithAi(rawQuery: string) {
   const query = rawQuery.trim().slice(0, 500);
   if (query.length < 3) return { query, criteria: criteriaSchema.parse({}), model: "none", items: [], clarification: undefined };
-  const { criteria, model } = await parseQuery(query);
+  const [{ criteria, model }, semantic] = await Promise.all([parseQuery(query), semanticPropertyMatches(query)]);
   const terms = criteria.semanticTerms.map(normalizeSearchText).filter(Boolean);
+  // Semantik indeks nəticə veribsə namizədlər mənaca yaxın elanlardan seçilir (#107);
+  // yoxdursa (binding yoxdur, indeks boşdur) əvvəlki leksik termin axtarışı işləyir.
+  const semanticIds = semantic && semantic.size > 0 ? [...semantic.keys()] : null;
   const candidates = await prisma.property.findMany({
     where: {
       AND: [
@@ -187,7 +191,9 @@ export async function searchPropertiesWithAi(rawQuery: string) {
         criteria.minPrice !== undefined ? { price: { gte: criteria.minPrice * 0.85 } } : {},
         criteria.citySlug ? { city: { slug: criteria.citySlug } } : {},
         criteria.typeSlug ? { type: { slug: criteria.typeSlug } } : {},
-        terms.length ? { OR: terms.flatMap((term) => [{ searchText: { contains: term } }, { description: { contains: term } }]) } : {},
+        semanticIds
+          ? { id: { in: semanticIds } }
+          : terms.length ? { OR: terms.flatMap((term) => [{ searchText: { contains: term } }, { description: { contains: term } }]) } : {},
       ],
     },
     select: {
@@ -203,7 +209,10 @@ export async function searchPropertiesWithAi(rawQuery: string) {
     const match = scoreProperty(property, criteria);
     const card = { ...property };
     delete (card as Partial<typeof property>).features;
-    return { property: card, ...match };
+    const similarity = semantic?.get(property.id);
+    // Struktur uyğunluğu (büdcə, rayon…) əsasdır, mənaca yaxınlıq onu tamamlayır.
+    const score = similarity === undefined ? match.score : Math.round(match.score * 0.6 + similarity * 100 * 0.4);
+    return { property: card, ...match, score };
   }).sort((a, b) => b.score - a.score).slice(0, 12);
   return { query, criteria, model, items, clarification: criteria.clarification };
 }

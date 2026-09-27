@@ -164,6 +164,11 @@
   /* Landscape iPhone-da notch tərəfi — Container gutter-i bununla max() olunur. */
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+  /* Mobil alt naviqasiya (#107): görünəndə onun hündürlüyü, yoxsa 0. Alt kənara
+     yapışan başqa səthlər (müqayisə paneli, toast, cookie banneri) bununla qalxır;
+     `--bottom-safe-rest` isə panel home indicator-u artıq örtəndə təkrar boşluq qoymur. */
+  --bottom-nav-offset: 0px;
+  --bottom-safe-rest: var(--safe-bottom);
 
   --z-base: 0;
   --z-sticky: 20;
@@ -727,5 +732,13 @@ p {
 @media print {
   .no-print {
     display: none !important;
+  }
+}
+
+/* Alt naviqasiya yalnız `lg`-dən kiçik ekranda görünür (`mobile-bottom-nav.tsx`). */
+@media (width < 64rem) {
+  body:has([data-bottom-nav]) {
+    --bottom-nav-offset: calc(4rem + var(--safe-bottom));
+    --bottom-safe-rest: 0px;
   }
 }

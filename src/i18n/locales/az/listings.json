@@ -175,6 +175,8 @@
     "saveSearchFrequencyImmediate": "Dərhal",
     "saveSearchFrequencyDaily": "Gündəlik",
     "saveSearchFrequencyWeekly": "Həftəlik",
-    "saveSearchFrequencyOff": "Söndürülüb"
+    "saveSearchFrequencyOff": "Söndürülüb",
+    "nearMetro": "Metroya 1 km-dən yaxın",
+    "drawnArea": "Xəritədə seçilmiş sahə"
   }
 }

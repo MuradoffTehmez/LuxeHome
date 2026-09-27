@@ -56,6 +56,7 @@ export type PublicPropertyFormInitial = {
   documentStatus: string | null;
   buildingType: string | null;
   videoUrl: string | null;
+  virtualTourUrl?: string | null;
   featureIds: string[];
   images: DropzoneImage[];
 };
@@ -262,6 +263,7 @@ export function PublicPropertyForm({
           options={Object.values(BUILDING_TYPES).map((value) => ({ value, label: propertyT(`building.${value === "NEW" ? "new" : "old"}`) }))}
         />
         <AdminInput name="videoUrl" label={t("video")} type="url" hint={t("videoHint")} defaultValue={initial?.videoUrl ?? ""} />
+        <AdminInput name="virtualTourUrl" label={t("virtualTour")} type="url" hint={t("virtualTourHint")} defaultValue={initial?.virtualTourUrl ?? ""} />
         {/* İpoteka / taksit «Ödəniş şərtləri» xüsusiyyət qrupundan seçilir. */}
       </FormSection>
 

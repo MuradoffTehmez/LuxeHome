@@ -63,5 +63,14 @@
   "glossary": "Əmlak lüğəti",
   "calculator": "İpoteka kalkulyatoru",
   "marketIntelligence": "Bazar analitikası",
-  "sellWithUs": "Əmlakınızı satın"
+  "sellWithUs": "Əmlakınızı satın",
+  "bottom": {
+    "label": "Əsas naviqasiya",
+    "home": "Əsas",
+    "search": "Axtar",
+    "map": "Xəritə",
+    "favorites": "Seçilmiş",
+    "account": "Kabinet"
+  },
+  "investors": "İnvestorlar üçün"
 }

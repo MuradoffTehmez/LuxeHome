@@ -10,7 +10,7 @@ import { PROJECTS_SECTION_PATH } from "@/lib/site-section-paths";
 
 export const dynamic = "force-dynamic";
 const absolute = (path: string, locale: Locale) => new URL(localizePath(path, locale), `${PRODUCTION_SITE_URL}/`).toString();
-const staticPaths = ["/", "/emlaklar", "/layiheler", "/agentler", "/agentlikler", "/terefdaslar", "/xidmetler", "/haqqimizda", "/suallar", "/blog", "/bilik-merkezi", "/lugat", "/kalkulyator", "/emlakimi-sat", "/bazar-analitikasi", "/elaqe", "/mexfilik-siyaseti", "/istifade-sertleri", "/cookie-siyaseti"];
+const staticPaths = ["/", "/emlaklar", "/layiheler", "/agentler", "/agentlikler", "/terefdaslar", "/xidmetler", "/haqqimizda", "/suallar", "/blog", "/bilik-merkezi", "/lugat", "/kalkulyator", "/emlakimi-sat", "/investisiya", "/bazar-analitikasi", "/elaqe", "/mexfilik-siyaseti", "/istifade-sertleri", "/cookie-siyaseti"];
 
 async function translatedIds(entityType: string, ids: string[], locale: Locale) {
   if (locale === "az") return new Set(ids);

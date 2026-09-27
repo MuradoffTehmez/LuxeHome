@@ -102,7 +102,9 @@
     "mapRecenter": "Xəritəni mərkəzləşdir",
     "mapScrollHint": "Nöqtəni təyin etmək üçün xəritəyə klikləyin",
     "mapRegion": "Koordinat seçimi xəritəsi",
-    "mapProviderAttribution": "Ünvan axtarışı və əks geokod:"
+    "mapProviderAttribution": "Ünvan axtarışı və əks geokod:",
+    "virtualTour": "360° virtual tur",
+    "virtualTourHint": "Kuula, Matterport və ya Momento360 linki"
   },
   "team": {
     "metaTitle": "Komanda",

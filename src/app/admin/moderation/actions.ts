@@ -18,6 +18,7 @@ import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { propertyRetentionDays, validateStoredPropertyForPublication } from "@/lib/property-publish-validation";
 import { propertyLifecycleData } from "@/lib/admin/property-input";
 import { msg } from "@/lib/admin/server-message";
+import { queuePropertyVectorSync } from "@/lib/semantic-search";
 
 const LIST_PATH = "/admin/moderation";
 
@@ -54,6 +55,7 @@ export async function approveModerationProperty(id: string): Promise<ActionState
 
     await recordAudit(actor, "PUBLISH", "Property", id, `${property.title} — moderasiyadan təsdiqləndi`);
     await recordDomainEvent("property.published", "Property", id, { title: property.title });
+    queuePropertyVectorSync([id]);
     await notifyMatchingSavedSearches(id);
 
     revalidatePath(LIST_PATH);

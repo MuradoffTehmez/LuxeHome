@@ -2,7 +2,7 @@ import { getAdminT } from "@/lib/admin-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ExternalLink, LayoutGrid, Trash2 } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/admin-ui";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { PERMISSIONS } from "@/lib/constants";
@@ -95,6 +95,14 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
           { label: t("pages.projects.redakte") },
         ]}
         actions={
+          <>
+          <Link
+            href={`/admin/layiheler/${project.id}/menziller`}
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-line-strong px-4 text-sm text-ink transition-colors hover:border-gold hover:text-gold-deep"
+          >
+            <LayoutGrid className="size-4" aria-hidden="true" />
+            {t("pages.projectUnits.title")}
+          </Link>
           <Link
             href={localizePath(`/layiheler/${project.slug}`, locale)}
             target="_blank"
@@ -104,6 +112,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
             <ExternalLink className="size-4" aria-hidden="true" />
             {t("pages.projects.saytdaBax")}
           </Link>
+          </>
         }
       />
 
