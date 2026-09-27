@@ -13,6 +13,10 @@ export type DomainEventType =
   | "property.status_changed"
   | "property.expired"
   | "property.renewed"
+  | "package.ordered"
+  | "package.paid"
+  | "package.cancelled"
+  | "package.refunded"
   | "agency.employee_invited"
   | "agency.employee_approved"
   | "agency.employee_rejected"
@@ -23,7 +27,7 @@ export type DomainEventType =
   | "partner.expired"
   | "account.deletion_requested";
 
-export type DomainEventEntityType = "Property" | "Agency" | "AgencyEmployee" | "Lead" | "Reservation" | "Partner" | "User";
+export type DomainEventEntityType = "Property" | "Agency" | "AgencyEmployee" | "Lead" | "Reservation" | "Partner" | "User" | "PackageOrder";
 
 export async function recordDomainEvent(
   type: DomainEventType,

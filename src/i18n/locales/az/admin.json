@@ -82,7 +82,8 @@
       "systemMode": "Sistem ayarları",
       "leadBoard": "Müraciət lövhəsi",
       "funnel": "Konversiya hunisi",
-      "calendar": "Təqvim"
+      "calendar": "Təqvim",
+      "packages": "Paketlər və ödənişlər"
     }
   },
   "actions": {
@@ -295,7 +296,8 @@
       "RESERVATION_STATUS": "Rezervasiya statusu",
       "RECOMMENDATION": "Fərdi tövsiyə",
       "MEETING_REMINDER": "Görüş xatırlatması",
-      "LISTING_EXPIRY": "Elan müddəti"
+      "LISTING_EXPIRY": "Elan müddəti",
+      "PACKAGE": "Premium paket"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -409,6 +411,18 @@
       "AVAILABLE": "Satışda",
       "RESERVED": "Rezerv",
       "SOLD": "Satılıb"
+    },
+    "packageOrderStatus": {
+      "PENDING": "Ödəniş gözlənilir",
+      "PAID": "Ödənilib",
+      "CANCELLED": "Ləğv edilib",
+      "REFUNDED": "Geri qaytarılıb"
+    },
+    "paymentMethod": {
+      "CASH": "Nağd",
+      "BANK_TRANSFER": "Bank köçürməsi",
+      "CARD_TERMINAL": "POS terminal",
+      "OTHER": "Digər"
     }
   },
   "profile": {
@@ -2458,6 +2472,77 @@
       "next": "Növbəti ay",
       "empty": "Bu ayda hadisə yoxdur.",
       "subscribeHint": "Təqvimi telefonunuza və Google Təqvimə «Hesabım → Təqvim abunəsi» bölməsindən qoşun."
+    },
+    "packages": {
+      "title": "Paketlər və ödənişlər",
+      "description": "Premium paketlərin qiyməti, sifarişlər və ödəniş uçotu. Onlayn ödəniş yoxdur: ödəniş ofisdə, köçürmə və ya POS ilə alınır və burada qeydə alınır.",
+      "monthRevenue": "Bu ayın gəliri",
+      "monthPaidCount": "{count, plural, one {# ödəniş} other {# ödəniş}}",
+      "pendingOrders": "Ödəniş gözləyir",
+      "awaitingActivation": "Tətbiq gözləyir",
+      "awaitingActivationHint": "Ödənilib, elan hələ dərc olunmayıb",
+      "activePremium": "Aktiv premium elan",
+      "newOrder": "Yeni sifariş",
+      "newOrderHint": "Telefonla və ya ofisdə gələn sifarişi qeydə alın. Ödəniş alınıbsa premium dərhal tətbiq olunur.",
+      "noActivePackages": "Satışda paket yoxdur. Əvvəlcə sağdakı formadan paket əlavə edin.",
+      "createOrder": "Sifarişi yarat",
+      "package": "Paket",
+      "property": "Elan",
+      "choose": "Seçin",
+      "customerName": "Müştəri",
+      "customerPhone": "Telefon",
+      "note": "Qeyd",
+      "alreadyPaid": "Ödəniş artıq alınıb",
+      "method": "Ödəniş üsulu",
+      "reference": "Qəbz / köçürmə nömrəsi",
+      "referencePlaceholder": "Qəbz nömrəsi",
+      "packages": "Paketlər",
+      "packagesHint": "Qiymət dəyişikliyi yalnız yeni sifarişlərə təsir edir — keçmiş sifarişin məbləği saxlanılır.",
+      "inactive": "Satışda deyil",
+      "durationDays": "{days, plural, one {# gün} other {# gün}}",
+      "orderCount": "{count, plural, one {# sifariş} other {# sifariş}}",
+      "editLabel": "{name} paketini redaktə et",
+      "disable": "Satışdan çıxar",
+      "enable": "Satışa qaytar",
+      "disableTitle": "Paket satışdan çıxarılsın?",
+      "disableDescription": "Paket kabinetdə görünməyəcək. Mövcud sifarişlər və ödənişlər toxunulmaz qalır.",
+      "enableTitle": "Paket satışa qaytarılsın?",
+      "enableDescription": "Paket kabinetdə yenidən sifariş üçün görünəcək.",
+      "newPackage": "Yeni paket",
+      "editPackage": "Paketi redaktə et",
+      "savePackage": "Yadda saxla",
+      "addPackage": "Paket əlavə et",
+      "name": "Ad",
+      "namePlaceholder": "Məsələn: Premium 7 gün",
+      "price": "Qiymət (₼)",
+      "priceHint": "Məsələn: 9.90",
+      "duration": "Müddət (gün)",
+      "sortOrder": "Sıra",
+      "packageDescription": "Qısa təsvir",
+      "orders": "Sifarişlər",
+      "statusFilter": "Statusa görə süzgəc",
+      "all": "Hamısı",
+      "noOrders": "Sifariş yoxdur",
+      "noOrdersHint": "Kabinetdən və ya paneldən verilən paket sifarişləri burada görünəcək.",
+      "applied": "Tətbiq olunub",
+      "notApplied": "Tətbiq olunmayıb",
+      "sourceCabinet": "Kabinet",
+      "sourceAdmin": "Panel",
+      "propertyRemoved": "Elan silinib",
+      "createdAt": "Sifariş: {date}",
+      "paidAt": "Ödəniş: {date} ({method})",
+      "markPaid": "Ödənildi",
+      "cancel": "Ləğv et",
+      "cancelTitle": "Sifariş ləğv edilsin?",
+      "cancelDescription": "Sifariş «Ləğv edilib» statusuna keçəcək. Bu əməliyyat geri qaytarılmır.",
+      "activate": "Premiumu tətbiq et",
+      "activateTitle": "Premium tətbiq olunsun?",
+      "activateDescription": "Elan dərc olunubsa premium müddəti ödənilmiş paket qədər uzadılacaq.",
+      "refund": "Geri qaytar",
+      "refundTitle": "Ödəniş geri qaytarılsın?",
+      "refundDescription": "Sifariş «Geri qaytarılıb» kimi qeyd olunacaq. Pulun qaytarılmasını ayrıca həyata keçirin.",
+      "refundDescriptionApplied": "Sifariş «Geri qaytarılıb» kimi qeyd olunacaq və elanın premium müddətindən {days} gün çıxılacaq.",
+      "limitNotice": "Son {count} sifariş göstərilir. Köhnələri görmək üçün statusa görə süzün."
     }
   },
   "server": {
@@ -2792,6 +2877,23 @@
       "added": "Açıq qapı slotu əlavə olundu.",
       "deleted": "Slot silindi.",
       "invalidTime": "Başlama vaxtı gələcəkdə olmalıdır."
+    },
+    "packages": {
+      "packageCreated": "Paket əlavə edildi.",
+      "packageUpdated": "Paket yeniləndi.",
+      "packageDisabled": "Paket satışdan çıxarıldı.",
+      "packageEnabled": "Paket satışa qaytarıldı.",
+      "packageUnavailable": "Paket tapılmadı və ya satışda deyil.",
+      "propertyUnavailable": "Elan tapılmadı və ya dərc olunmayıb.",
+      "orderNotFound": "Sifariş tapılmadı.",
+      "invalidStatus": "Sifarişin cari statusunda bu əməliyyat mümkün deyil. Səhifəni yeniləyin.",
+      "methodRequired": "Ödəniş alınıbsa üsulu seçin.",
+      "orderCreated": "Sifariş yaradıldı və ödəniş gözləyir.",
+      "orderPaidActivated": "Ödəniş qeydə alındı, premium elana tətbiq olundu.",
+      "orderPaidPending": "Ödəniş qeydə alındı. Elan dərc olunmadığı üçün premium hələ tətbiq olunmayıb.",
+      "orderActivated": "Premium elana tətbiq olundu.",
+      "orderCancelled": "Sifariş ləğv edildi.",
+      "orderRefunded": "Geri qaytarma qeydə alındı."
     }
   }
 }

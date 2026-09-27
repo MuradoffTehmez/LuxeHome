@@ -51,6 +51,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "projects", href: "/admin/layiheler" },
           { labelKey: "taxonomy", href: "/admin/taksonomiya" },
           { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar" },
+          { labelKey: "packages", href: "/admin/paketler" },
         ],
       },
       {

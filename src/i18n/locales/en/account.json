@@ -33,7 +33,11 @@
     "renewed": "Listing renewed.",
     "renewUnavailable": "This listing cannot be renewed.",
     "expiresIn": "{days, plural, one {# day left} other {# days left}}",
-    "expired": "Expired — restore it"
+    "expired": "Expired — restore it",
+    "premium": "Premium",
+    "premiumUntil": "Premium · until {date}",
+    "promote": "Promote",
+    "promoteLabel": "Promote “{title}”"
   },
   "newProperty": {
     "metaTitle": "Submit a listing",
@@ -339,5 +343,47 @@
     "viewProperties": "Browse listings",
     "clearTitle": "Clear list",
     "clearDescription": "All recently viewed properties will be removed from this device."
+  },
+  "packages": {
+    "eyebrow": "Account",
+    "title": "Premium packages",
+    "description": "Feature your listing at the top of search results and on the home page.",
+    "listing": "Listing",
+    "chooseListing": "Select a listing",
+    "package": "Package",
+    "days": "{days, plural, one {# day} other {# days}}",
+    "submit": "Place order",
+    "choosePrompt": "Select a listing and a package.",
+    "requested": "Your order has been received. A manager will contact you about payment.",
+    "cancel": "Cancel",
+    "cancelled": "Order cancelled.",
+    "howTitle": "How it works",
+    "step1": "Choose a listing and a package and place your order.",
+    "step2": "A manager contacts you; payment is made at the office, by bank transfer or via POS terminal.",
+    "step3": "Premium activates as soon as payment is confirmed, and you get a notification.",
+    "fairRanking": "Premium listings are boosted only among matching results — they never appear in another city or category.",
+    "noPackagesTitle": "No packages on sale right now",
+    "noPackagesDescription": "Premium packages will be added soon. Contact us if you have questions.",
+    "noListingsTitle": "You have no published listings",
+    "noListingsDescription": "Premium can only be applied to a published listing. Come back once your listing is approved.",
+    "myListings": "Go to my listings",
+    "ordersTitle": "My orders",
+    "noOrders": "You have not ordered any packages yet.",
+    "listingRemoved": "Listing deleted",
+    "orderedAt": "Ordered on {date}",
+    "active": "Active",
+    "status": {
+      "pending": "Awaiting payment",
+      "paid": "Paid",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "errors": {
+      "packageUnavailable": "This package is no longer on sale.",
+      "propertyUnavailable": "Premium can only be applied to your own published listing.",
+      "tooManyPending": "You have too many orders awaiting payment. Complete or cancel them first.",
+      "duplicatePending": "This package has already been ordered for this listing and is awaiting payment.",
+      "unavailable": "The action could not be completed. Please try again shortly."
+    }
   }
 }

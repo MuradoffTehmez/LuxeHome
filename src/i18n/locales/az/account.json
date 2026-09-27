@@ -33,7 +33,11 @@
     "renewed": "Elan yeniləndi.",
     "renewUnavailable": "Bu elanı yeniləmək mümkün deyil.",
     "expiresIn": "{days, plural, other {# gün qalıb}}",
-    "expired": "Müddəti bitib — bərpa edin"
+    "expired": "Müddəti bitib — bərpa edin",
+    "premium": "Premium",
+    "premiumUntil": "Premium · {date} tarixinədək",
+    "promote": "Premium et",
+    "promoteLabel": "«{title}» elanını premium et"
   },
   "newProperty": {
     "metaTitle": "Elan göndər",
@@ -339,5 +343,47 @@
     "viewProperties": "Əmlaklara bax",
     "clearTitle": "Siyahını təmizlə",
     "clearDescription": "Son baxılan bütün əmlaklar bu cihazdan silinəcək."
+  },
+  "packages": {
+    "eyebrow": "Kabinet",
+    "title": "Premium paketlər",
+    "description": "Elanınızı axtarış nəticələrində və ana səhifədə önə çıxarın.",
+    "listing": "Elan",
+    "chooseListing": "Elanı seçin",
+    "package": "Paket",
+    "days": "{days, plural, one {# gün} other {# gün}}",
+    "submit": "Sifariş ver",
+    "choosePrompt": "Elanı və paketi seçin.",
+    "requested": "Sifarişiniz qəbul edildi. Menecer ödəniş üçün sizinlə əlaqə saxlayacaq.",
+    "cancel": "Ləğv et",
+    "cancelled": "Sifariş ləğv edildi.",
+    "howTitle": "Necə işləyir",
+    "step1": "Elanı və paketi seçib sifariş verin.",
+    "step2": "Menecer sizinlə əlaqə saxlayır; ödəniş ofisdə, bank köçürməsi və ya POS terminalı ilə edilir.",
+    "step3": "Ödəniş təsdiqlənən kimi premium aktivləşir və sizə bildiriş gəlir.",
+    "fairRanking": "Premium elan yalnız axtarışa uyğun nəticələr arasında önə çıxır — başqa şəhər və ya kateqoriyada göstərilmir.",
+    "noPackagesTitle": "Hazırda satışda paket yoxdur",
+    "noPackagesDescription": "Premium paketlər tezliklə əlavə olunacaq. Suallarınız üçün bizimlə əlaqə saxlayın.",
+    "noListingsTitle": "Dərc olunmuş elanınız yoxdur",
+    "noListingsDescription": "Premium yalnız dərc olunmuş elana tətbiq olunur. Elanınız təsdiqlənəndən sonra qayıdın.",
+    "myListings": "Elanlarıma keç",
+    "ordersTitle": "Sifarişlərim",
+    "noOrders": "Hələ paket sifariş etməmisiniz.",
+    "listingRemoved": "Elan silinib",
+    "orderedAt": "Sifariş tarixi: {date}",
+    "active": "Aktivdir",
+    "status": {
+      "pending": "Ödəniş gözlənilir",
+      "paid": "Ödənilib",
+      "cancelled": "Ləğv edilib",
+      "refunded": "Geri qaytarılıb"
+    },
+    "errors": {
+      "packageUnavailable": "Bu paket artıq satışda deyil.",
+      "propertyUnavailable": "Premium yalnız sizin dərc olunmuş elanınıza tətbiq oluna bilər.",
+      "tooManyPending": "Ödəniş gözləyən sifarişləriniz çoxdur. Əvvəlcə onları tamamlayın və ya ləğv edin.",
+      "duplicatePending": "Bu elan üçün eyni paket artıq sifariş olunub və ödəniş gözləyir.",
+      "unavailable": "Əməliyyat tamamlanmadı. Bir az sonra yenidən cəhd edin."
+    }
   }
 }
