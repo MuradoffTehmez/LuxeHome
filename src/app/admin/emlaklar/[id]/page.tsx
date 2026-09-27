@@ -147,6 +147,10 @@ export default async function EditPropertyPage({
               className="mr-auto"
             >
               <Trash2 className="size-4" aria-hidden="true" />
+            </ConfirmAction>
+          )
+        }
+      />
 
       {property.deletedAt ? null : (
         <OpenHouseManager
@@ -160,10 +164,6 @@ export default async function EditPropertyPage({
           }))}
         />
       )}
-            </ConfirmAction>
-          )
-        }
-      />
 
       <AdminCard
         title={t("pages.properties.qiymetTarixcesi")}
