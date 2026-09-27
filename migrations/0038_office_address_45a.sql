@@ -14,9 +14,33 @@ UPDATE "Setting"
        "updatedAt" = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
  WHERE "key" = 'contact.address' AND "value" LIKE '%109A%';
 
--- Ofisin xəritədəki yeri: dəyər yoxdursa yazılır, mövcud dəyərə toxunulmur.
-INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt")
-VALUES ('site.contact_latitude', '40.4076723677061', strftime('%Y-%m-%dT%H:%M:%fZ', 'now'));
+-- SERP → Local SEO formu `seo.local` JSON-unu oxuyur; orada köhnə ünvan qalıbsa
+-- form onu göstərib təkrar yadda saxlayardı. Yalnız `address` sahəsi dəyişir.
+UPDATE "Setting"
+   SET "value" = json_set("value", '$.address', 'Əliyar Əliyev 45a, Nərimanov rayonu, Bakı AZ1005, Azərbaycan'),
+       "updatedAt" = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+ WHERE "key" = 'seo.local'
+   AND json_valid("value") = 1
+   AND json_extract("value", '$.address') LIKE '%109A%';
 
-INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt")
-VALUES ('site.contact_longitude', '49.87432370341122', strftime('%Y-%m-%dT%H:%M:%fZ', 'now'));
+-- Ofisin xəritədəki yeri **cüt halında** yazılır: tam (hər ikisi dolu) cüt varsa
+-- toxunulmur, yoxsa hər iki açar birlikdə yazılır. Ayrı-ayrı `INSERT OR IGNORE`
+-- tək qalmış və ya boş açarla köhnə/yeni qarışıq cüt yarada bilərdi.
+-- Tək ifadədir: SQLite hədəf cədvəli oxuyan INSERT…SELECT-i əvvəlcə tam hesablayır,
+-- ona görə şərt hər iki sətir üçün eyni vəziyyətə baxır.
+INSERT INTO "Setting" ("key", "value", "updatedAt")
+SELECT "pair"."key", "pair"."value", strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+  FROM (
+    SELECT 'site.contact_latitude' AS "key", '40.4076723677061' AS "value"
+    UNION ALL
+    SELECT 'site.contact_longitude', '49.87432370341122'
+  ) AS "pair"
+ WHERE NOT EXISTS (
+   SELECT 1
+     FROM "Setting" AS "lat"
+     JOIN "Setting" AS "lng" ON "lng"."key" = 'site.contact_longitude'
+    WHERE "lat"."key" = 'site.contact_latitude'
+      AND trim("lat"."value") <> ''
+      AND trim("lng"."value") <> ''
+ )
+ON CONFLICT ("key") DO UPDATE SET "value" = excluded."value", "updatedAt" = excluded."updatedAt";
