@@ -25,7 +25,19 @@
       "sold": "Sold",
       "rented": "Rented",
       "archived": "Archived"
-    }
+    },
+    "renew": "Renew",
+    "renewTitle": "Renew the listing",
+    "renewDescription": "The listing will stay live for another {days} days.",
+    "renewLabel": "Renew “{title}”",
+    "renewed": "Listing renewed.",
+    "renewUnavailable": "This listing cannot be renewed.",
+    "expiresIn": "{days, plural, one {# day left} other {# days left}}",
+    "expired": "Expired — restore it",
+    "premium": "Premium",
+    "premiumUntil": "Premium · until {date}",
+    "promote": "Promote",
+    "promoteLabel": "Promote “{title}”"
   },
   "newProperty": {
     "metaTitle": "Submit a listing",
@@ -191,7 +203,9 @@
     "verificationSentGeneric": "If the account is not verified, a new link has been sent.",
     "passwordResetSentGeneric": "If a matching account exists, a password reset link has been sent.",
     "resetTokenInvalid": "The password reset link is invalid or has expired.",
-    "deleteConfirmationInvalid": "Enter the confirmation phrase exactly as shown."
+    "deleteConfirmationInvalid": "Enter the confirmation phrase exactly as shown.",
+    "passkeyUnavailable": "Passkey verification isn’t available right now. Enter your verification code.",
+    "passkeyFailed": "The passkey could not be verified. Try again or enter your code."
   },
   "profile": {
     "metaTitle": "Profile",
@@ -223,7 +237,8 @@
     "deleteDescription": "Your account, sessions, favorites and personal data will be deleted; listings will be removed from the site.",
     "deletePhrase": "DELETE MY ACCOUNT",
     "deleteConfirmation": "Type “{phrase}” to confirm",
-    "deleteButton": "Delete account"
+    "deleteButton": "Delete account",
+    "phoneSection": "Phone sign-in"
   },
   "savedSearches": {
     "metaTitle": "My saved searches",
@@ -331,5 +346,70 @@
     "viewProperties": "Browse listings",
     "clearTitle": "Clear list",
     "clearDescription": "All recently viewed properties will be removed from this device."
+  },
+  "packages": {
+    "eyebrow": "Account",
+    "title": "Premium packages",
+    "description": "Feature your listing at the top of search results and on the home page.",
+    "listing": "Listing",
+    "chooseListing": "Select a listing",
+    "package": "Package",
+    "days": "{days, plural, one {# day} other {# days}}",
+    "submit": "Place order",
+    "choosePrompt": "Select a listing and a package.",
+    "requested": "Your order has been received. A manager will contact you about payment.",
+    "cancel": "Cancel",
+    "cancelled": "Order cancelled.",
+    "howTitle": "How it works",
+    "step1": "Choose a listing and a package and place your order.",
+    "step2": "A manager contacts you; payment is made at the office, by bank transfer or via POS terminal.",
+    "step3": "Premium activates as soon as payment is confirmed, and you get a notification.",
+    "fairRanking": "Premium listings are boosted only among matching results — they never appear in another city or category.",
+    "noPackagesTitle": "No packages on sale right now",
+    "noPackagesDescription": "Premium packages will be added soon. Contact us if you have questions.",
+    "noListingsTitle": "You have no published listings",
+    "noListingsDescription": "Premium can only be applied to a published listing. Come back once your listing is approved.",
+    "myListings": "Go to my listings",
+    "ordersTitle": "My orders",
+    "noOrders": "You have not ordered any packages yet.",
+    "listingRemoved": "Listing deleted",
+    "orderedAt": "Ordered on {date}",
+    "active": "Active",
+    "status": {
+      "pending": "Awaiting payment",
+      "paid": "Paid",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "errors": {
+      "packageUnavailable": "This package is no longer on sale.",
+      "propertyUnavailable": "Premium can only be applied to your own published listing.",
+      "tooManyPending": "You have too many orders awaiting payment. Complete or cancel them first.",
+      "duplicatePending": "This package has already been ordered for this listing and is awaiting payment.",
+      "unavailable": "The action could not be completed. Please try again shortly."
+    }
+  },
+  "phoneVerification": {
+    "description": "With a verified number you can sign in with an SMS code instead of a password.",
+    "phone": "Mobile number",
+    "sendCode": "Send verification code",
+    "changeAction": "Verify another number",
+    "code": "SMS code",
+    "confirm": "Verify",
+    "back": "Back",
+    "codeSent": "A 6-digit code was sent to {phone}.",
+    "verifiedAs": "Verified: {phone}",
+    "remove": "Remove verification",
+    "verified": "Number verified. You can now sign in by phone.",
+    "removed": "Number verification removed.",
+    "taken": "This number is verified on another account.",
+    "unavailable": "Number verification isn’t available right now.",
+    "securityCheck": "Please complete the security check.",
+    "invalidPhone": "Enter an Azerbaijani mobile number, e.g. +994 50 123 45 67.",
+    "cooldown": "A code was just sent. Wait a minute before requesting a new one.",
+    "tooManyCodes": "Too many codes were sent to this number. Try again in an hour.",
+    "sendFailed": "The SMS could not be sent. Please try again shortly.",
+    "invalidCode": "The code is incorrect.",
+    "expiredCode": "The code has expired or the attempt limit was reached. Request a new code."
   }
 }

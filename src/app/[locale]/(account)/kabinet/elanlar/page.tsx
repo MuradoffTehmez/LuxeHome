@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarClock, Crown, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireLister } from "@/lib/auth/guard";
 import {
+  PROPERTY_STATUSES,
   PROPERTY_STATUS_TONE,
   type Locale,
   type PropertyStatus,
@@ -19,7 +20,8 @@ import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
 import { ConfirmAction } from "@/components/admin/confirm-action";
-import { deletePublicProperty } from "./actions";
+import { deletePublicProperty, renewPublicProperty } from "./actions";
+import { LISTING_LIFETIME_DAYS, expiryState } from "@/lib/listing-expiry-policy";
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
@@ -40,7 +42,7 @@ export default async function CabinetPropertiesPage({
   const locale = await getLocale() as Locale;
   const user = await requireLister(locale);
   const t = await getTranslations("account.listings");
-  const [properties, params] = await Promise.all([
+  const [properties, params, packageCount] = await Promise.all([
     prisma.property.findMany({
       where: { authorId: user.id, deletedAt: null },
       select: {
@@ -49,17 +51,73 @@ export default async function CabinetPropertiesPage({
         price: true,
         currency: true,
         status: true,
+        listingExpiresAt: true,
+        expiredAt: true,
+        isFeatured: true,
+        featuredUntil: true,
         images: { select: { url: true }, where: { isCover: true }, take: 1 },
       },
       orderBy: { createdAt: "desc" },
     }),
     searchParams,
+    prisma.listingPackage.count({ where: { isActive: true } }),
   ]);
 
   type CabinetProperty = (typeof properties)[number];
 
   function propertyStatus(property: CabinetProperty) {
     return property.status as PropertyStatus;
+  }
+
+  const now = Date.now();
+
+  /** Müddət göstəricisi və «Yenilə» düyməsi (#109) — müddəti olmayan elanda heç nə. */
+  function ExpiryControls({ property }: { property: CabinetProperty }) {
+    const expiry = expiryState(property, now);
+    if (!expiry) return null;
+    return (
+      <span className="inline-flex flex-wrap items-center gap-2">
+        <Badge tone={expiry.state === "active" ? "neutral" : "warning"}>
+          <CalendarClock className="size-3.5" aria-hidden="true" />
+          {expiry.state === "expired" ? t("expired") : t("expiresIn", { days: expiry.daysLeft })}
+        </Badge>
+        {expiry.state !== "active" ? (
+          <ConfirmAction
+            action={renewPublicProperty}
+            id={property.id}
+            title={t("renewTitle")}
+            description={t("renewDescription", { days: LISTING_LIFETIME_DAYS })}
+            confirmLabel={t("renew")}
+            label={t("renewLabel", { title: property.title })}
+            tone="neutral"
+          >
+            <RefreshCw className="size-4" aria-hidden="true" />
+          </ConfirmAction>
+        ) : null}
+      </span>
+    );
+  }
+
+  // Rəqəmli tarix dildən asılı deyil və dar ekranda nişanı qısa saxlayır.
+  const shortDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Baku" });
+
+  /** Premium göstəricisi (#109): aktivdirsə bitmə tarixi, yoxsa dərc olunmuş elanda paket keçidi. */
+  function PremiumControl({ property }: { property: CabinetProperty }) {
+    const active = property.isFeatured && (property.featuredUntil === null || property.featuredUntil.getTime() > now);
+    if (active) {
+      return (
+        <Badge tone="gold" className="whitespace-normal">
+          <Crown className="size-3.5 shrink-0" aria-hidden="true" />
+          {property.featuredUntil ? t("premiumUntil", { date: shortDate.format(property.featuredUntil) }) : t("premium")}
+        </Badge>
+      );
+    }
+    if (packageCount === 0 || property.status !== PROPERTY_STATUSES.PUBLISHED) return null;
+    return (
+      <ButtonLink href={localizePath(`/kabinet/paketler?elan=${property.id}`, locale)} variant="ghost" size="sm" aria-label={t("promoteLabel", { title: property.title })}>
+        <Crown className="size-4" aria-hidden="true" />{t("promote")}
+      </ButtonLink>
+    );
   }
 
   function PropertyThumbnail({ property }: { property: CabinetProperty }) {
@@ -92,6 +150,7 @@ export default async function CabinetPropertiesPage({
             <p className="mt-2 text-sm font-medium text-ink-soft tabular-nums">
               {formatPrice(property.price, property.currency)}
             </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /></div>
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
@@ -122,6 +181,7 @@ export default async function CabinetPropertiesPage({
                 <p className="mt-1 text-sm text-ink-soft tabular-nums">
                   {formatPrice(property.price, property.currency)}
                 </p>
+                <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /></div>
               </div>
               <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
                 {t(`status.${STATUS_KEYS[status]}`)}

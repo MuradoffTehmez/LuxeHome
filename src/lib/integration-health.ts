@@ -13,7 +13,9 @@ export type IntegrationHealthId =
   | "turnstile"
   | "savedSearchCron"
   | "push"
-  | "telegram";
+  | "telegram"
+  | "googleLogin"
+  | "phoneLogin";
 
 export type IntegrationHealthItem = {
   id: IntegrationHealthId;
@@ -78,6 +80,10 @@ export function getIntegrationHealth(): IntegrationHealthItem[] {
     envHealth("savedSearchCron", ["CRON_SECRET"]),
     // Lead bildirişi üçün ofis Telegram çatı (#103) — olmasa e-poçt bildirişi qalır.
     envHealth("telegram", ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"], true),
+    // İctimai hesab üçün Google ilə giriş (#109) — açarlar olmayanda düymə görünmür.
+    envHealth("googleLogin", ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"], true),
+    // Telefonla OTP girişi (#109) — SMS provayderi qurulana qədər söndürülüdür.
+    envHealth("phoneLogin", ["SMS_PROVIDER_URL", "SMS_PROVIDER_TOKEN"], true),
     {
       id: "push",
       ready: hasVapidPublicKey && hasVapidPrivateKey && hasVapidSubject,

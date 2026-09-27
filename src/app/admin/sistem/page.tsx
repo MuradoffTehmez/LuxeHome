@@ -25,6 +25,8 @@ const INTEGRATION_LABEL_KEYS = {
   savedSearchCron: "pages.systemMode.integrationSavedSearchCron",
   push: "pages.systemMode.integrationPush",
   telegram: "pages.systemMode.integrationTelegram",
+  googleLogin: "pages.systemMode.integrationGoogleLogin",
+  phoneLogin: "pages.systemMode.integrationPhoneLogin",
 } as const satisfies Record<IntegrationHealthId, string>;
 
 export async function generateMetadata(): Promise<Metadata> {

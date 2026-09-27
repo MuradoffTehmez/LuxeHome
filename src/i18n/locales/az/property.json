@@ -176,5 +176,26 @@
   },
   "metroChip": "{name} · {minutes} dəq piyada",
   "metroLine": "Metro {name} · {minutes} dəq piyada",
-  "metroOnly": "Metro {name}"
+  "metroOnly": "Metro {name}",
+  "openHouse": {
+    "title": "Açıq qapı günləri",
+    "description": "Elana ümumi baxış üçün vaxt seçin və qeydiyyatdan keçin — agentimiz sizi yerində qarşılayacaq.",
+    "open": "Yer var",
+    "seatsLeft": "{count, plural, other {# yer qalıb}}",
+    "full": "Yer qalmayıb",
+    "closed": "Qeydiyyat bağlanıb",
+    "pickSlot": "Qeydiyyat üçün yuxarıdan vaxt seçin.",
+    "name": "Ad, soyad",
+    "phone": "Telefon",
+    "email": "E-poçt",
+    "emailHint": "Yazsanız, bir gün əvvəl xatırlatma göndərərik.",
+    "register": "Qeydiyyatdan keç",
+    "registered": "Qeydiyyatınız qəbul olundu. Agentimiz sizinlə əlaqə saxlayacaq.",
+    "alreadyRegistered": "Bu telefonla artıq qeydiyyatdan keçmisiniz.",
+    "rejected": "Qeydiyyat qəbul edilmədi. Səhifəni yeniləyib yenidən cəhd edin.",
+    "rateLimited": "Çox sayda sorğu göndərildi. Bir dəqiqə gözləyin.",
+    "invalid": "Ad və telefonu yoxlayın.",
+    "unavailable": "Bu baxış artıq əlçatan deyil.",
+    "unexpected": "Xəta baş verdi. Bir az sonra yenidən cəhd edin."
+  }
 }

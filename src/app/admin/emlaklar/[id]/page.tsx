@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { OpenHouseManager } from "./open-house-manager";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, History, Trash2 } from "lucide-react";
@@ -14,6 +15,7 @@ import { PropertyForm } from "../property-form";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
+import { prisma } from "@/lib/prisma";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -34,9 +36,14 @@ export default async function EditPropertyPage({
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
 
   const { id } = await params;
-  const [property, options] = await Promise.all([
+  const [property, options, openHouses] = await Promise.all([
     getAdminPropertyById(id),
     getPropertyFormOptions(),
+    prisma.openHouse.findMany({
+      where: { propertyId: id, endsAt: { gt: new Date() } },
+      orderBy: { startsAt: "asc" },
+      select: { id: true, startsAt: true, endsAt: true, capacity: true, note: true, _count: { select: { registrations: true } } },
+    }),
   ]);
 
   if (!property) notFound();
@@ -135,6 +142,19 @@ export default async function EditPropertyPage({
               className="mr-auto"
             >
               <Trash2 className="size-4" aria-hidden="true" />
+
+      {property.deletedAt ? null : (
+        <OpenHouseManager
+          propertyId={property.id}
+          slots={openHouses.map((slot) => ({
+            id: slot.id,
+            label: `${formatDateTime(slot.startsAt)} – ${new Intl.DateTimeFormat("az-AZ", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku" }).format(slot.endsAt)}`,
+            capacity: slot.capacity,
+            registrations: slot._count.registrations,
+            note: slot.note,
+          }))}
+        />
+      )}
             </ConfirmAction>
           )
         }

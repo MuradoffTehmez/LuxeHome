@@ -47,6 +47,13 @@ model User {
 
   /// İstifadəçinin seçdiyi dil: az | en | ru. `src/lib/constants.ts`-dəki LOCALES-dən.
   locale          String @default("az")
+  /// Şəxsi təqvim abunəsinin (ICS) gizli açarı (#109). Yenidən yaradılanda köhnə link ölür.
+  calendarToken   String? @unique
+  /// Google hesabının dəyişməz ID-si (`sub`, #109). E-poçt dəyişsə də bağlantı qalır.
+  googleSub       String? @unique
+  /// SMS kodu ilə təsdiqlənmiş mobil nömrə, E.164 (#109) — telefonla girişin kimliyi.
+  /// Profildə nömrə dəyişəndə sıfırlanır; iki hesab eyni nömrəni təsdiqləyə bilmir.
+  verifiedPhone   String? @unique
   /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
   themePreference String @default("light")
 
@@ -63,9 +70,12 @@ model User {
   media      Media[]    @relation("MediaUploader")
   favorites  Favorite[]
   leadNotes  Lead[]     @relation("LeadAssignee")
+  packageOrders         PackageOrder[] @relation("PackageOrderCustomer")
+  packageOrdersRecorded PackageOrder[] @relation("PackageOrderRecorder")
 
   sessions                Session[]
   backupCodes             BackupCode[]
+  passkeys                Passkey[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
   agency                  Agency?
@@ -205,6 +215,51 @@ model BackupCode {
   userId   String
   codeHash String
   usedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Əməkdaşın passkey-i (WebAuthn, #109) — girişin ikinci mərhələsində TOTP koduna
+/// fişinqə davamlı alternativ. TOTP məcburi qalır: passkey itəndə giriş yolu bağlanmır.
+/// Açar domenə bağlıdır (RP ID) — `luxehomeestate.az`-da yaradılan passkey workers.dev-də işləmir.
+/// Telefonla giriş və nömrə təsdiqi üçün birdəfəlik kod (#109). Kodun özü saxlanmır —
+/// yalnız HMAC-i; 5 dəqiqə və 5 cəhddən sonra etibarsızdır.
+model PhoneOtp {
+  id         String    @id @default(cuid())
+  /// E.164: +994XXXXXXXXX
+  phone      String
+  /// LOGIN | VERIFY
+  purpose    String
+  /// VERIFY üçün kodu istəyən hesab; LOGIN-də nömrə üzrə tapılan hesab.
+  userId     String?
+  codeHash   String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+}
+
+model Passkey {
+  id           String    @id @default(cuid())
+  userId       String
+  /// base64url — autentifikatorun verdiyi kimlik.
+  credentialId String    @unique
+  /// base64url — COSE formatında açıq açar.
+  publicKey    String
+  /// İmza sayğacı: geri gedərsə açar klonlanmış sayılır və giriş rədd edilir.
+  counter      Int       @default(0)
+  /// JSON massivi: usb | nfc | ble | internal | hybrid.
+  transports   String?
+  /// singleDevice | multiDevice (sinxronlaşan passkey).
+  deviceType   String
+  backedUp     Boolean   @default(false)
+  name         String
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -418,6 +473,11 @@ model Property {
   closedAt           DateTime?
   /// Keçmiş elanın indeksdə saxlanıla biləcəyi son tarix. Null olduqda qlobal SEO siyasəti işləyir.
   retentionUntil     DateTime?
+  /// Sahib/agentlik elanının aktivlik müddəti (#109); STAFF elanlarında boşdur.
+  listingExpiresAt     DateTime?
+  expiryReminderSentAt DateTime?
+  /// Müddət bitdiyi üçün arxivlənib — sahib kabinetdən bir kliklə bərpa edə bilir.
+  expiredAt            DateTime?
   /// CSV idxalı (#103): sətir məzmununun SHA-256 heşi. Təkrar idxalda eyni sətri tanıyır.
   importKey          String?
   /// Bütün əlaqələr (xüsusiyyət, şəkil) yazılanda qoyulur. `null` + `importKey` = yarımçıq
@@ -459,6 +519,8 @@ model Property {
   partners           PropertyPartner[]
   priceHistory       PropertyPriceHistory[]
   floorPlans         PropertyFloorPlan[]
+  openHouses         OpenHouse[]
+  packageOrders      PackageOrder[]
   reservations       Reservation[]
   nearbyPlaces       NearbyPlace[]
   aiContentDrafts    AiContentDraft[]
@@ -475,6 +537,7 @@ model Property {
   @@index([isFeatured])
   @@index([featuredUntil])
   @@index([importKey])
+  @@index([status, listingExpiresAt])
   @@index([reservationEnabled, status])
   @@index([assignedAgentId])
   @@index([deletedAt])
@@ -497,6 +560,100 @@ model PropertyFloorPlan {
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId, order])
+}
+
+/// Açıq qapı günü (#109): elanın ümumi baxış pəncərəsi, qeydiyyatla.
+model OpenHouse {
+  id        String   @id @default(cuid())
+  propertyId String
+  startsAt  DateTime
+  endsAt    DateTime
+  /// Boşdursa məhdudiyyət yoxdur.
+  capacity  Int?
+  note      String?
+  createdAt DateTime @default(now())
+
+  property      Property                @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  registrations OpenHouseRegistration[]
+
+  @@index([propertyId, startsAt])
+}
+
+model OpenHouseRegistration {
+  id          String    @id @default(cuid())
+  openHouseId String
+  name        String
+  phone       String
+  email       String?
+  leadId      String?
+  reminderSentAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  openHouse OpenHouse @relation(fields: [openHouseId], references: [id], onDelete: Cascade)
+
+  @@unique([openHouseId, phone])
+}
+
+/// Premium yerləşdirmə paketi (#109): müddət və qiymət. Real ödəniş provayderi yoxdur —
+/// ödəniş ofisdə, bank köçürməsi və ya POS terminalı ilə alınır və paneldə əl ilə qeydə alınır.
+/// Məbləğlər qəpiklə (tam ədəd) saxlanılır: Float-da 9.90 kimi dəyərlər yuvarlaqlaşma xətası verir.
+model ListingPackage {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  durationDays Int
+  /// Qiymət qəpiklə (AZN × 100).
+  priceMinor   Int
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders PackageOrder[]
+
+  @@index([isActive, sortOrder])
+}
+
+/// Paket sifarişi və ödəniş uçotu (#109). Paketin adı, müddəti və qiyməti sifariş anında
+/// kopyalanır — paket sonradan dəyişəndə keçmiş ödənişlərin məbləği sürüşməməlidir.
+model PackageOrder {
+  id               String    @id @default(cuid())
+  packageId        String
+  packageName      String
+  durationDays     Int
+  amountMinor      Int
+  currency         String    @default("AZN")
+  /// Kabinetdən sifariş verən istifadəçi; paneldən daxil edilən sifarişdə boş ola bilər.
+  userId           String?
+  propertyId       String?
+  customerName     String
+  customerPhone    String?
+  /// PENDING | PAID | CANCELLED | REFUNDED — `src/lib/constants.ts` → PACKAGE_ORDER_STATUSES.
+  status           String    @default("PENDING")
+  /// CABINET | ADMIN — PACKAGE_ORDER_SOURCES.
+  source           String
+  /// CASH | BANK_TRANSFER | CARD_TERMINAL | OTHER — PAYMENT_METHODS.
+  paymentMethod    String?
+  paymentReference String?
+  note             String?
+  paidAt           DateTime?
+  /// Premium elana tətbiq olunan an. Ödəniş alınıb, amma elan dərc olunmayıbsa boş qalır.
+  activatedAt      DateTime?
+  cancelledAt      DateTime?
+  refundedAt       DateTime?
+  recordedById     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  package    ListingPackage @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  user       User?          @relation("PackageOrderCustomer", fields: [userId], references: [id], onDelete: SetNull)
+  property   Property?      @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  recordedBy User?          @relation("PackageOrderRecorder", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@index([propertyId])
+  @@index([paidAt])
 }
 
 model PropertyImage {

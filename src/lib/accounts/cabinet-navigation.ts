@@ -3,6 +3,7 @@ export type CabinetNavItem = {
     | "overview"
     | "listings"
     | "new-listing"
+    | "packages"
     | "team"
     | "saved-searches"
     | "notifications"
@@ -22,6 +23,7 @@ const BASE_ITEMS: readonly CabinetNavItem[] = [
 const LISTING_ITEMS: readonly CabinetNavItem[] = [
   { id: "listings", href: "/kabinet/elanlar", label: "Elanlarım" },
   { id: "new-listing", href: "/kabinet/elanlar/yeni", label: "Yeni elan" },
+  { id: "packages", href: "/kabinet/paketler", label: "Premium paketlər" },
 ];
 
 const TEAM_ITEM: CabinetNavItem = { id: "team", href: "/kabinet/komanda", label: "Komanda" };

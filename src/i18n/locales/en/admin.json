@@ -81,7 +81,9 @@
       "demoContent": "Demo content",
       "systemMode": "System settings",
       "leadBoard": "Lead board",
-      "funnel": "Conversion funnel"
+      "funnel": "Conversion funnel",
+      "calendar": "Calendar",
+      "packages": "Packages & payments"
     }
   },
   "actions": {
@@ -293,7 +295,9 @@
       "PRICE_DROP": "Price drop",
       "RESERVATION_STATUS": "Reservation status",
       "RECOMMENDATION": "Personal recommendation",
-      "MEETING_REMINDER": "Viewing reminder"
+      "MEETING_REMINDER": "Viewing reminder",
+      "LISTING_EXPIRY": "Listing expiry",
+      "PACKAGE": "Premium package"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -407,6 +411,18 @@
       "AVAILABLE": "Available",
       "RESERVED": "Reserved",
       "SOLD": "Sold"
+    },
+    "packageOrderStatus": {
+      "PENDING": "Awaiting payment",
+      "PAID": "Paid",
+      "CANCELLED": "Cancelled",
+      "REFUNDED": "Refunded"
+    },
+    "paymentMethod": {
+      "CASH": "Cash",
+      "BANK_TRANSFER": "Bank transfer",
+      "CARD_TERMINAL": "POS terminal",
+      "OTHER": "Other"
     }
   },
   "profile": {
@@ -1035,7 +1051,32 @@
       "yeniParolunTekrari": "Repeat the new password",
       "sizeMuveqqetiParolVerilib": "You were given a temporary password. Change it before continuing to the panel.",
       "generateNewCodes": "Generate new codes",
-      "changePassword": "Change password"
+      "changePassword": "Change password",
+      "calendarTitle": "Calendar subscription",
+      "calendarHint": "Show viewing reservations and open house days in your Google, Apple or Outlook calendar automatically. Add the link as “From URL”.",
+      "calendarUrl": "Calendar link",
+      "calendarCopy": "Copy",
+      "calendarCopied": "Copied",
+      "calendarGoogle": "Add to Google Calendar",
+      "calendarSecret": "The link works like a password — it carries client names and phones. Do not share it; rotate it if it leaks.",
+      "calendarRotate": "Rotate link",
+      "calendarRevoke": "Revoke",
+      "calendarCreate": "Create calendar link",
+      "passkeyTitle": "Passkeys",
+      "passkeyHint": "A passkey (fingerprint, Face ID or security key) can replace the 6-digit code at the second sign-in step and does not work on phishing sites. The authenticator app stays required — if you lose a passkey you can still sign in with a code.",
+      "passkeyAdded": "Added: {date}",
+      "passkeyLastUsed": "last used: {date}",
+      "passkeyNeverUsed": "not used yet",
+      "passkeySynced": "synced across devices",
+      "passkeyDeleteTitle": "Delete this passkey?",
+      "passkeyDeleteDescription": "You will no longer be able to sign in with “{name}”. Signing in with a verification code still works.",
+      "passkeyDelete": "Delete",
+      "passkeyDeleteLabel": "Delete passkey {name}",
+      "passkeyName": "Passkey name",
+      "passkeyNamePlaceholder": "e.g. work laptop",
+      "passkeyAdd": "Add passkey",
+      "passkeyCancelled": "No passkey was created — the action was cancelled or the device doesn’t support it.",
+      "passkeyUnsupported": "This browser doesn’t support passkeys."
     },
     "knowledge": {
       "beledci": "Guide",
@@ -2198,7 +2239,8 @@
       "ugursuz": "Failed",
       "sorguSayi": "{p0} queries",
       "idareOlunanUrl": "{p0} managed URLs",
-      "sonYenilenmeAuditQeydleri": "Last updated: {p0}. Audit records"
+      "sonYenilenmeAuditQeydleri": "Last updated: {p0}. Audit records",
+      "yanlisPasskey": "Failed passkey"
     },
     "demoContent": {
       "title": "Demo content",
@@ -2277,7 +2319,9 @@
       "integrationTurnstile": "Turnstile bot protection",
       "integrationSavedSearchCron": "Saved-search cron",
       "integrationTelegram": "Telegram lead alerts",
-      "integrationPush": "Push notifications"
+      "integrationPush": "Push notifications",
+      "integrationGoogleLogin": "Sign in with Google",
+      "integrationPhoneLogin": "Phone OTP sign-in (SMS)"
     },
     "propertyImport": {
       "title": "Bulk CSV import",
@@ -2423,6 +2467,100 @@
       "floor": "Floor {floor}",
       "deleteBlock": "Delete block {block}",
       "deleteBlockHint": "All units of the block will be deleted. This cannot be undone."
+    },
+    "openHouse": {
+      "title": "Open house days",
+      "description": "Group viewing windows for the listing. Registrations also land in the CRM as leads.",
+      "startsAt": "Starts at",
+      "durationMinutes": "Duration (minutes)",
+      "capacity": "Capacity",
+      "capacityHint": "Leave empty for no limit",
+      "note": "Note",
+      "add": "Add slot",
+      "empty": "No open house scheduled.",
+      "registrations": "{count, plural, one {# registration} other {# registrations}}",
+      "delete": "Delete slot",
+      "deleteHint": "The slot and its registrations will be deleted (leads remain in the CRM)."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "{count, plural, one {# event this month} other {# events this month}} — viewing reservations and open house days.",
+      "monthNav": "Month navigation",
+      "prev": "Previous month",
+      "next": "Next month",
+      "empty": "No events this month.",
+      "subscribeHint": "Connect this calendar to your phone and Google Calendar under “My account → Calendar subscription”."
+    },
+    "packages": {
+      "title": "Packages & payments",
+      "description": "Premium package pricing, orders and payment records. There is no online checkout: payment is taken at the office, by transfer or POS and recorded here.",
+      "monthRevenue": "Revenue this month",
+      "monthPaidCount": "{count, plural, one {# payment} other {# payments}}",
+      "pendingOrders": "Awaiting payment",
+      "awaitingActivation": "Awaiting activation",
+      "awaitingActivationHint": "Paid, listing not published yet",
+      "activePremium": "Active premium listings",
+      "newOrder": "New order",
+      "newOrderHint": "Record an order received by phone or at the office. If payment was taken, premium is applied immediately.",
+      "noActivePackages": "No packages on sale. Add a package with the form on the right first.",
+      "createOrder": "Create order",
+      "package": "Package",
+      "property": "Listing",
+      "choose": "Select",
+      "customerName": "Customer",
+      "customerPhone": "Phone",
+      "note": "Note",
+      "alreadyPaid": "Payment already received",
+      "method": "Payment method",
+      "reference": "Receipt / transfer number",
+      "referencePlaceholder": "Receipt number",
+      "packages": "Packages",
+      "packagesHint": "Price changes only affect new orders — past order amounts are preserved.",
+      "inactive": "Not on sale",
+      "durationDays": "{days, plural, one {# day} other {# days}}",
+      "orderCount": "{count, plural, one {# order} other {# orders}}",
+      "editLabel": "Edit package {name}",
+      "disable": "Take off sale",
+      "enable": "Put on sale",
+      "disableTitle": "Take this package off sale?",
+      "disableDescription": "The package will be hidden in the account area. Existing orders and payments stay untouched.",
+      "enableTitle": "Put this package back on sale?",
+      "enableDescription": "The package will be available to order in the account area again.",
+      "newPackage": "New package",
+      "editPackage": "Edit package",
+      "savePackage": "Save",
+      "addPackage": "Add package",
+      "name": "Name",
+      "namePlaceholder": "e.g. Premium 7 days",
+      "price": "Price (₼)",
+      "priceHint": "e.g. 9.90",
+      "duration": "Duration (days)",
+      "sortOrder": "Order",
+      "packageDescription": "Short description",
+      "orders": "Orders",
+      "statusFilter": "Filter by status",
+      "all": "All",
+      "noOrders": "No orders",
+      "noOrdersHint": "Package orders placed from the account area or the panel will appear here.",
+      "applied": "Applied",
+      "notApplied": "Not applied",
+      "sourceCabinet": "Account",
+      "sourceAdmin": "Panel",
+      "propertyRemoved": "Listing deleted",
+      "createdAt": "Ordered: {date}",
+      "paidAt": "Paid: {date} ({method})",
+      "markPaid": "Mark paid",
+      "cancel": "Cancel",
+      "cancelTitle": "Cancel this order?",
+      "cancelDescription": "The order will move to “Cancelled”. This cannot be undone.",
+      "activate": "Apply premium",
+      "activateTitle": "Apply premium?",
+      "activateDescription": "If the listing is published, its premium period will be extended by the paid package.",
+      "refund": "Refund",
+      "refundTitle": "Refund this payment?",
+      "refundDescription": "The order will be marked as “Refunded”. Return the money separately.",
+      "refundDescriptionApplied": "The order will be marked as “Refunded” and {days} days will be removed from the listing’s premium period.",
+      "limitNotice": "Showing the latest {count} orders. Filter by status to see older ones."
     }
   },
   "server": {
@@ -2543,7 +2681,16 @@
       "yeniParolEnAziSimvol": "The new password must be at least {p0} characters long.",
       "yeniParolTekrariUygunGelmir": "The new password confirmation does not match.",
       "yeniParolKohnesindenFerqliOlmalidir": "The new password must differ from the old one.",
-      "parolDeyisdirildiVeDigerCihazlardaki": "Password changed and sessions on other devices were signed out."
+      "parolDeyisdirildiVeDigerCihazlardaki": "Password changed and sessions on other devices were signed out.",
+      "calendarRotated": "Calendar link rotated. The old link no longer works.",
+      "calendarRevoked": "Calendar link revoked.",
+      "passkeyHost": "Passkeys can only be created on the site’s official address.",
+      "passkeyLimit": "You have reached the passkey limit. Delete an old one first.",
+      "passkeyExpired": "The request expired. Please try again.",
+      "passkeyFailed": "The passkey could not be verified. Please try again.",
+      "passkeyAdded": "Passkey added.",
+      "passkeyNotFound": "Passkey not found.",
+      "passkeyDeleted": "Passkey deleted."
     },
     "hesablar": {
       "hesabTapilmadi": "Account not found.",
@@ -2750,6 +2897,28 @@
       "generated": "{created} units created, {skipped} skipped as existing.",
       "saved": "Unit saved.",
       "blockDeleted": "{count} units deleted."
+    },
+    "openHouse": {
+      "added": "Open house slot added.",
+      "deleted": "Slot deleted.",
+      "invalidTime": "The start time must be in the future."
+    },
+    "packages": {
+      "packageCreated": "Package added.",
+      "packageUpdated": "Package updated.",
+      "packageDisabled": "Package taken off sale.",
+      "packageEnabled": "Package put back on sale.",
+      "packageUnavailable": "Package not found or not on sale.",
+      "propertyUnavailable": "Listing not found or not published.",
+      "orderNotFound": "Order not found.",
+      "invalidStatus": "This action is not possible in the order’s current status. Refresh the page.",
+      "methodRequired": "Select the payment method if payment was received.",
+      "orderCreated": "Order created and awaiting payment.",
+      "orderPaidActivated": "Payment recorded and premium applied to the listing.",
+      "orderPaidPending": "Payment recorded. Premium is not applied yet because the listing is not published.",
+      "orderActivated": "Premium applied to the listing.",
+      "orderCancelled": "Order cancelled.",
+      "orderRefunded": "Refund recorded."
     }
   }
 }

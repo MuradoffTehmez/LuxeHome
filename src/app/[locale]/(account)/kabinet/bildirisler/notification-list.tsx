@@ -27,6 +27,8 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
   RESERVATION_STATUS: CalendarClock,
   RECOMMENDATION: Sparkles,
   MEETING_REMINDER: CalendarClock,
+  LISTING_EXPIRY: CalendarClock,
+  PACKAGE: Sparkles,
 };
 
 function NotificationRow({ item }: { item: NotificationListItem }) {

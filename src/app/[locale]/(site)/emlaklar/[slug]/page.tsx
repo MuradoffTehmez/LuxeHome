@@ -45,6 +45,8 @@ import { PlaceMap } from "@/components/map/place-map";
 import { PropertyKeyFacts } from "@/components/site/property-key-facts";
 import { PriceInsight } from "@/components/site/price-insight";
 import { PropertyTour } from "@/components/site/property-tour";
+import { OpenHouseSection } from "@/components/site/open-house-section";
+import { getUpcomingOpenHouses } from "@/lib/open-house";
 import { assessPriceBands, assessPropertyPrice } from "@/lib/price-benchmark";
 import { PropertyVideo } from "@/components/site/property-video";
 import { MortgageCalculator } from "@/components/site/mortgage-calculator";
@@ -185,12 +187,13 @@ export default async function PropertyDetailPage({ params }: Props) {
       ? { name: property.metro.name, minutes: null }
       : null;
 
-  const [similarProperties, partnerLinks, projectsEnabled, priceAssessment, insightText] = await Promise.all([
+  const [similarProperties, partnerLinks, projectsEnabled, priceAssessment, insightText, openHouses] = await Promise.all([
     getSimilarProperties(property, 4),
     getPropertyPartners(property.id),
     isProjectsSectionEnabled(),
     isClosed ? Promise.resolve(null) : assessPropertyPrice(property),
     getTranslations({ locale, namespace: "property.priceInsight" }),
+    isClosed ? Promise.resolve([]) : getUpcomingOpenHouses(property.id),
   ]);
   const similarBands = await assessPriceBands(similarProperties);
   const benchmarkPlace = priceAssessment?.scope === "city" ? property.city.name : property.district?.name ?? property.city.name;
@@ -557,6 +560,20 @@ export default async function PropertyDetailPage({ params }: Props) {
                   url={property.videoUrl}
                   heading={content("videoTour")}
                   openLabel={content("openVideo")}
+                />
+              )}
+
+              {openHouses.length > 0 && (
+                <OpenHouseSection
+                  locale={locale}
+                  slots={openHouses.map((slot) => ({
+                    id: slot.id,
+                    startsAt: slot.startsAt.toISOString(),
+                    endsAt: slot.endsAt.toISOString(),
+                    capacity: slot.capacity,
+                    registered: slot.registered,
+                    note: slot.note,
+                  }))}
                 />
               )}
 

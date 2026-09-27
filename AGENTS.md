@@ -212,6 +212,10 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
   böyük sorğuda şəkilləri `findManyInChunks` ilə ayrıca yüklə. Semantik axtarış Vectorize
   (`PROPERTY_VECTORS`) ilə; elan yazan yeni action `queuePropertyVectorSync()` çağırmalıdır.
   Alt naviqasiya `--bottom-nav-offset` dəyişəni ilə digər sabit səthləri qaldırır.
+- 4-cü mərhələ (#109): elan müddəti, açıq qapı, təqvim + ICS, premium paketlər (ödəniş yalnız
+  uçotdur, provayder yoxdur; `billing:manage`), Bilik Mərkəzi AI məsləhətçisi (istinadsız cavab
+  göstərilmir), admin passkey (TOTP-a alternativ, onu əvəz etmir), Google və telefonla giriş
+  (secret-lər olmayanda tam söndürülü). İctimai sessiya yalnız `openPublicSession()` ilə açılır.
 
 ## Digər agent konfiqurasiyaları
 

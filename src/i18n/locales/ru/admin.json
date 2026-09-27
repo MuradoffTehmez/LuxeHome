@@ -81,7 +81,9 @@
       "demoContent": "Демоконтент",
       "systemMode": "Системные настройки",
       "leadBoard": "Доска заявок",
-      "funnel": "Воронка конверсии"
+      "funnel": "Воронка конверсии",
+      "calendar": "Календарь",
+      "packages": "Пакеты и оплаты"
     }
   },
   "actions": {
@@ -293,7 +295,9 @@
       "PRICE_DROP": "Снижение цены",
       "RESERVATION_STATUS": "Статус бронирования",
       "RECOMMENDATION": "Персональная рекомендация",
-      "MEETING_REMINDER": "Напоминание о просмотре"
+      "MEETING_REMINDER": "Напоминание о просмотре",
+      "LISTING_EXPIRY": "Срок объявления",
+      "PACKAGE": "Премиум-пакет"
     },
     "partnershipType": {
       "BROKER": "Брокер",
@@ -407,6 +411,18 @@
       "AVAILABLE": "В продаже",
       "RESERVED": "Бронь",
       "SOLD": "Продана"
+    },
+    "packageOrderStatus": {
+      "PENDING": "Ожидает оплаты",
+      "PAID": "Оплачен",
+      "CANCELLED": "Отменён",
+      "REFUNDED": "Возвращён"
+    },
+    "paymentMethod": {
+      "CASH": "Наличные",
+      "BANK_TRANSFER": "Банковский перевод",
+      "CARD_TERMINAL": "POS-терминал",
+      "OTHER": "Другое"
     }
   },
   "profile": {
@@ -1035,7 +1051,32 @@
       "yeniParolunTekrari": "Повтор нового пароля",
       "sizeMuveqqetiParolVerilib": "Вам выдан временный пароль. Смените его перед переходом в панель.",
       "generateNewCodes": "Создать новые коды",
-      "changePassword": "Изменить пароль"
+      "changePassword": "Изменить пароль",
+      "calendarTitle": "Подписка на календарь",
+      "calendarHint": "Бронирования показов и дни открытых дверей будут автоматически в вашем календаре Google, Apple или Outlook. Добавьте ссылку как «По URL».",
+      "calendarUrl": "Ссылка календаря",
+      "calendarCopy": "Копировать",
+      "calendarCopied": "Скопировано",
+      "calendarGoogle": "Добавить в Google Календарь",
+      "calendarSecret": "Ссылка работает как пароль — в ней имена и телефоны клиентов. Не делитесь ею; при утечке обновите.",
+      "calendarRotate": "Обновить ссылку",
+      "calendarRevoke": "Отозвать",
+      "calendarCreate": "Создать ссылку календаря",
+      "passkeyTitle": "Passkey",
+      "passkeyHint": "Passkey (отпечаток, Face ID или ключ безопасности) можно использовать на втором шаге входа вместо 6-значного кода; на фишинговых сайтах он не работает. Приложение-аутентификатор остаётся обязательным — при потере passkey вход по коду сохраняется.",
+      "passkeyAdded": "Добавлен: {date}",
+      "passkeyLastUsed": "последнее использование: {date}",
+      "passkeyNeverUsed": "ещё не использовался",
+      "passkeySynced": "синхронизируется между устройствами",
+      "passkeyDeleteTitle": "Удалить passkey?",
+      "passkeyDeleteDescription": "Входить с помощью «{name}» будет невозможно. Вход по коду подтверждения сохраняется.",
+      "passkeyDelete": "Удалить",
+      "passkeyDeleteLabel": "Удалить passkey {name}",
+      "passkeyName": "Название passkey",
+      "passkeyNamePlaceholder": "Например: рабочий ноутбук",
+      "passkeyAdd": "Добавить passkey",
+      "passkeyCancelled": "Passkey не создан — действие отменено или устройство не поддерживает его.",
+      "passkeyUnsupported": "Этот браузер не поддерживает passkey."
     },
     "knowledge": {
       "beledci": "Руководство",
@@ -2198,7 +2239,8 @@
       "ugursuz": "Неудачно",
       "sorguSayi": "запросов: {p0}",
       "idareOlunanUrl": "управляемых URL: {p0}",
-      "sonYenilenmeAuditQeydleri": "Последнее обновление: {p0}. Записи аудита"
+      "sonYenilenmeAuditQeydleri": "Последнее обновление: {p0}. Записи аудита",
+      "yanlisPasskey": "Неудачный вход по passkey"
     },
     "demoContent": {
       "title": "Демоконтент",
@@ -2277,7 +2319,9 @@
       "integrationTurnstile": "Защита Turnstile",
       "integrationSavedSearchCron": "Cron сохранённых поисков",
       "integrationTelegram": "Telegram-уведомления о заявках",
-      "integrationPush": "Push-уведомления"
+      "integrationPush": "Push-уведомления",
+      "integrationGoogleLogin": "Вход через Google",
+      "integrationPhoneLogin": "Вход по SMS-коду"
     },
     "propertyImport": {
       "title": "Массовый импорт CSV",
@@ -2423,6 +2467,100 @@
       "floor": "{floor} этаж",
       "deleteBlock": "Удалить блок {block}",
       "deleteBlockHint": "Все квартиры блока будут удалены. Действие необратимо."
+    },
+    "openHouse": {
+      "title": "Дни открытых дверей",
+      "description": "Окна общего показа объекта. Регистрации также попадают в CRM как заявки.",
+      "startsAt": "Начало",
+      "durationMinutes": "Длительность (мин)",
+      "capacity": "Вместимость",
+      "capacityHint": "Пусто — без ограничения",
+      "note": "Примечание",
+      "add": "Добавить слот",
+      "empty": "День открытых дверей не запланирован.",
+      "registrations": "{count, plural, one {# регистрация} few {# регистрации} many {# регистраций} other {# регистрации}}",
+      "delete": "Удалить слот",
+      "deleteHint": "Слот и его регистрации будут удалены (заявки останутся в CRM)."
+    },
+    "calendar": {
+      "title": "Календарь",
+      "description": "{count, plural, one {# событие в этом месяце} few {# события в этом месяце} many {# событий в этом месяце} other {# события в этом месяце}} — брони показов и дни открытых дверей.",
+      "monthNav": "Навигация по месяцам",
+      "prev": "Предыдущий месяц",
+      "next": "Следующий месяц",
+      "empty": "В этом месяце событий нет.",
+      "subscribeHint": "Подключите календарь к телефону и Google Календарю в разделе «Мой аккаунт → Подписка на календарь»."
+    },
+    "packages": {
+      "title": "Пакеты и оплаты",
+      "description": "Цены премиум-пакетов, заказы и учёт оплат. Онлайн-оплаты нет: оплата принимается в офисе, переводом или через POS и фиксируется здесь.",
+      "monthRevenue": "Выручка за месяц",
+      "monthPaidCount": "{count, plural, one {# оплата} few {# оплаты} many {# оплат} other {# оплаты}}",
+      "pendingOrders": "Ожидают оплаты",
+      "awaitingActivation": "Ожидают применения",
+      "awaitingActivationHint": "Оплачено, объявление ещё не опубликовано",
+      "activePremium": "Активные премиум-объявления",
+      "newOrder": "Новый заказ",
+      "newOrderHint": "Зафиксируйте заказ, полученный по телефону или в офисе. Если оплата получена, премиум применяется сразу.",
+      "noActivePackages": "Нет пакетов в продаже. Сначала добавьте пакет в форме справа.",
+      "createOrder": "Создать заказ",
+      "package": "Пакет",
+      "property": "Объявление",
+      "choose": "Выберите",
+      "customerName": "Клиент",
+      "customerPhone": "Телефон",
+      "note": "Заметка",
+      "alreadyPaid": "Оплата уже получена",
+      "method": "Способ оплаты",
+      "reference": "Номер чека / перевода",
+      "referencePlaceholder": "Номер чека",
+      "packages": "Пакеты",
+      "packagesHint": "Изменение цены влияет только на новые заказы — суммы прошлых заказов сохраняются.",
+      "inactive": "Не продаётся",
+      "durationDays": "{days, plural, one {# день} few {# дня} many {# дней} other {# дня}}",
+      "orderCount": "{count, plural, one {# заказ} few {# заказа} many {# заказов} other {# заказа}}",
+      "editLabel": "Редактировать пакет {name}",
+      "disable": "Снять с продажи",
+      "enable": "Вернуть в продажу",
+      "disableTitle": "Снять пакет с продажи?",
+      "disableDescription": "Пакет исчезнет из кабинета. Существующие заказы и оплаты не изменятся.",
+      "enableTitle": "Вернуть пакет в продажу?",
+      "enableDescription": "Пакет снова станет доступен для заказа в кабинете.",
+      "newPackage": "Новый пакет",
+      "editPackage": "Редактировать пакет",
+      "savePackage": "Сохранить",
+      "addPackage": "Добавить пакет",
+      "name": "Название",
+      "namePlaceholder": "Например: Премиум 7 дней",
+      "price": "Цена (₼)",
+      "priceHint": "Например: 9.90",
+      "duration": "Срок (дней)",
+      "sortOrder": "Порядок",
+      "packageDescription": "Краткое описание",
+      "orders": "Заказы",
+      "statusFilter": "Фильтр по статусу",
+      "all": "Все",
+      "noOrders": "Заказов нет",
+      "noOrdersHint": "Здесь появятся заказы пакетов из кабинета или панели.",
+      "applied": "Применён",
+      "notApplied": "Не применён",
+      "sourceCabinet": "Кабинет",
+      "sourceAdmin": "Панель",
+      "propertyRemoved": "Объявление удалено",
+      "createdAt": "Заказ: {date}",
+      "paidAt": "Оплата: {date} ({method})",
+      "markPaid": "Оплачено",
+      "cancel": "Отменить",
+      "cancelTitle": "Отменить заказ?",
+      "cancelDescription": "Заказ перейдёт в статус «Отменён». Действие необратимо.",
+      "activate": "Применить премиум",
+      "activateTitle": "Применить премиум?",
+      "activateDescription": "Если объявление опубликовано, срок премиума продлится на оплаченный пакет.",
+      "refund": "Возврат",
+      "refundTitle": "Оформить возврат?",
+      "refundDescription": "Заказ будет отмечен как «Возвращён». Верните деньги отдельно.",
+      "refundDescriptionApplied": "Заказ будет отмечен как «Возвращён», а из премиум-срока объявления будет вычтено {days} дн.",
+      "limitNotice": "Показаны последние {count} заказов. Для более старых используйте фильтр по статусу."
     }
   },
   "server": {
@@ -2543,7 +2681,16 @@
       "yeniParolEnAziSimvol": "Новый пароль должен содержать не менее {p0} символов.",
       "yeniParolTekrariUygunGelmir": "Подтверждение нового пароля не совпадает.",
       "yeniParolKohnesindenFerqliOlmalidir": "Новый пароль должен отличаться от старого.",
-      "parolDeyisdirildiVeDigerCihazlardaki": "Пароль изменён, сеансы на других устройствах завершены."
+      "parolDeyisdirildiVeDigerCihazlardaki": "Пароль изменён, сеансы на других устройствах завершены.",
+      "calendarRotated": "Ссылка обновлена. Старая больше не работает.",
+      "calendarRevoked": "Ссылка календаря отозвана.",
+      "passkeyHost": "Passkey можно создать только на официальном адресе сайта.",
+      "passkeyLimit": "Достигнут лимит passkey. Сначала удалите старый.",
+      "passkeyExpired": "Время операции истекло. Попробуйте снова.",
+      "passkeyFailed": "Passkey не подтверждён. Попробуйте снова.",
+      "passkeyAdded": "Passkey добавлен.",
+      "passkeyNotFound": "Passkey не найден.",
+      "passkeyDeleted": "Passkey удалён."
     },
     "hesablar": {
       "hesabTapilmadi": "Аккаунт не найден.",
@@ -2750,6 +2897,28 @@
       "generated": "Создано {created} квартир, {skipped} пропущено как существующие.",
       "saved": "Квартира сохранена.",
       "blockDeleted": "Удалено квартир: {count}."
+    },
+    "openHouse": {
+      "added": "Слот добавлен.",
+      "deleted": "Слот удалён.",
+      "invalidTime": "Время начала должно быть в будущем."
+    },
+    "packages": {
+      "packageCreated": "Пакет добавлен.",
+      "packageUpdated": "Пакет обновлён.",
+      "packageDisabled": "Пакет снят с продажи.",
+      "packageEnabled": "Пакет возвращён в продажу.",
+      "packageUnavailable": "Пакет не найден или не продаётся.",
+      "propertyUnavailable": "Объявление не найдено или не опубликовано.",
+      "orderNotFound": "Заказ не найден.",
+      "invalidStatus": "В текущем статусе заказа это действие невозможно. Обновите страницу.",
+      "methodRequired": "Выберите способ оплаты, если оплата получена.",
+      "orderCreated": "Заказ создан и ожидает оплаты.",
+      "orderPaidActivated": "Оплата зафиксирована, премиум применён к объявлению.",
+      "orderPaidPending": "Оплата зафиксирована. Премиум ещё не применён, так как объявление не опубликовано.",
+      "orderActivated": "Премиум применён к объявлению.",
+      "orderCancelled": "Заказ отменён.",
+      "orderRefunded": "Возврат зафиксирован."
     }
   }
 }

@@ -6,6 +6,10 @@ import { PasswordForm } from "./password-form";
 import { ProfileForm } from "./profile-form";
 import { BackupCodesForm } from "./backup-codes-form";
 import { revokeOne, revokeOtherSessions } from "./actions";
+import { CalendarSubscription } from "./calendar-subscription";
+import { PasskeyManager } from "./passkey-manager";
+import { formatDateTime } from "@/lib/utils";
+import { siteUrl } from "@/config/site";
 import { getAdminT } from "@/lib/admin-i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -43,13 +47,18 @@ export default async function AccountPage({
 }) {
   const t = await getAdminT();
   const [user, { parol }] = await Promise.all([requireStaff(), searchParams]);
-  const [sessions, activeSid, remainingCodes, profile] = await Promise.all([
+  const [sessions, activeSid, remainingCodes, profile, passkeys] = await Promise.all([
     listSessions(user.id),
     currentSessionId(),
     prisma.backupCode.count({ where: { userId: user.id, usedAt: null } }),
     prisma.user.findUniqueOrThrow({
       where: { id: user.id },
-      select: { name: true, phone: true, locale: true, themePreference: true, avatarUrl: true },
+      select: { name: true, phone: true, locale: true, themePreference: true, avatarUrl: true, calendarToken: true },
+    }),
+    prisma.passkey.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, name: true, createdAt: true, lastUsedAt: true, backedUp: true },
     }),
   ]);
 
@@ -75,6 +84,13 @@ export default async function AccountPage({
       </section>
 
       <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
+        <h2 className="font-semibold text-lg text-ink">{t("pages.account.calendarTitle")}</h2>
+        <div className="mt-4">
+          <CalendarSubscription url={profile.calendarToken ? siteUrl(`/api/calendar/${profile.calendarToken}`) : null} />
+        </div>
+      </section>
+
+      <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
         <h2 className="font-semibold text-lg text-ink">{t("pages.account.paroluDeyis")}</h2>
         <div className="mt-4 max-w-md">
           <PasswordForm mustChange={parol === "deyis" || user.mustChangePassword} />
@@ -92,6 +108,21 @@ export default async function AccountPage({
           </p>
         )}
         <BackupCodesForm />
+      </section>
+
+      <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
+        <h2 className="font-semibold text-lg text-ink">{t("pages.account.passkeyTitle")}</h2>
+        <div className="mt-4">
+          <PasskeyManager
+            passkeys={passkeys.map((passkey) => ({
+              id: passkey.id,
+              name: passkey.name,
+              createdAt: formatDateTime(passkey.createdAt),
+              lastUsedAt: passkey.lastUsedAt ? formatDateTime(passkey.lastUsedAt) : null,
+              synced: passkey.backedUp,
+            }))}
+          />
+        </div>
       </section>
 
       <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">

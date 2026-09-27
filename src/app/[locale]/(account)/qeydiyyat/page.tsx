@@ -6,6 +6,7 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
+import { GoogleSignIn } from "@/components/auth/google-sign-in";
 import { RegisterForm } from "./register-form";
 import { localizePath } from "@/i18n/path-locale";
 
@@ -57,7 +58,10 @@ export default async function RegisterPage({
         </div>
       }
     >
-      <RegisterForm next={next} />
+      <div className="flex flex-col gap-5">
+        <RegisterForm next={next} />
+        <GoogleSignIn next={next} />
+      </div>
     </AuthShell>
   );
 }

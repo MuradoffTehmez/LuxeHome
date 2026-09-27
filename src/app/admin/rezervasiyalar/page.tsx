@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { formatDateTime } from "@/lib/utils";
 import { ReservationStatusForm } from "./reservation-status-form";
 import { getAdminT } from "@/lib/admin-i18n";
+import { CalendarDays } from "lucide-react";
+import { ButtonLink } from "@/components/ui/button";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -45,6 +47,12 @@ export default async function AdminReservationsPage() {
         title={t("pages.ops.rezervasiyalar")}
         description={t("pages.ops.emlakBaxisiVeRezervasiya")}
         breadcrumbs={[{ label: t("pages.ops.idarePaneli"), href: "/admin" }, { label: t("pages.ops.rezervasiyalar") }]}
+        actions={
+          <ButtonLink href="/admin/rezervasiyalar/teqvim" variant="outline" size="sm">
+            <CalendarDays className="size-4" aria-hidden="true" />
+            {t("pages.calendar.title")}
+          </ButtonLink>
+        }
       />
       {reservations.length === 0 ? <EmptyState title={t("pages.ops.rezervasiyaYoxdur")} description={t("pages.ops.ictimaiElanlardanGonderilenSorgular")} /> : (
         <AdminCard bodyClassName="p-0">

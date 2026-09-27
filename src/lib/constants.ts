@@ -52,6 +52,8 @@ export const PERMISSIONS = {
    * bu məlumat kommersiya sirridir və adi paneldə avtomatik görünməməlidir.
    */
   PARTNER_CONTRACT_MANAGE: "partner:contract",
+  /** Premium paketləri və ödəniş uçotu (#109) — maliyyə qeydi olduğu üçün ayrıca icazədir. */
+  BILLING_MANAGE: "billing:manage",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -80,6 +82,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     PERMISSIONS.SEO_PUBLISH,
     PERMISSIONS.SEO_REDIRECT_MANAGE,
     PERMISSIONS.SEO_SCHEMA_MANAGE,
+    PERMISSIONS.BILLING_MANAGE,
   ],
   EDITOR: [PERMISSIONS.BLOG_MANAGE, PERMISSIONS.KNOWLEDGE_MANAGE, PERMISSIONS.MEDIA_MANAGE, PERMISSIONS.TRANSLATION_MANAGE, PERMISSIONS.PARTNER_VIEW, PERMISSIONS.SEO_VIEW],
 };
@@ -496,6 +499,10 @@ export const NOTIFICATION_TYPES = {
   RESERVATION_STATUS: "RESERVATION_STATUS",
   RECOMMENDATION: "RECOMMENDATION",
   MEETING_REMINDER: "MEETING_REMINDER",
+  /** Elan müddəti xatırlatması və arxiv bildirişi (#109). */
+  LISTING_EXPIRY: "LISTING_EXPIRY",
+  /** Premium paketin aktivləşməsi (#109). */
+  PACKAGE: "PACKAGE",
 } as const;
 
 export type NotificationType =
@@ -507,6 +514,8 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   RESERVATION_STATUS: "Rezervasiya statusu",
   RECOMMENDATION: "Fərdi tövsiyə",
   MEETING_REMINDER: "Görüş xatırlatması",
+  LISTING_EXPIRY: "Elan müddəti",
+  PACKAGE: "Premium paket",
 };
 
 // ---------------------------------------------------------------------------
@@ -606,6 +615,55 @@ export const NEARBY_PLACE_CATEGORY_LABELS: Record<NearbyPlaceCategory, string> =
 };
 
 export const PREMIUM_DURATIONS_DAYS = [3, 7, 14, 30] as const;
+
+// ---------------------------------------------------------------------------
+// PAKETLƏR VƏ ÖDƏNİŞ UÇOTU (#109)
+// ---------------------------------------------------------------------------
+
+export const PACKAGE_ORDER_STATUSES = {
+  PENDING: "PENDING",
+  PAID: "PAID",
+  CANCELLED: "CANCELLED",
+  REFUNDED: "REFUNDED",
+} as const;
+
+export type PackageOrderStatus = (typeof PACKAGE_ORDER_STATUSES)[keyof typeof PACKAGE_ORDER_STATUSES];
+
+export const PACKAGE_ORDER_STATUS_LABELS: Record<PackageOrderStatus, string> = {
+  PENDING: "Ödəniş gözlənilir",
+  PAID: "Ödənilib",
+  CANCELLED: "Ləğv edilib",
+  REFUNDED: "Geri qaytarılıb",
+};
+
+export const PACKAGE_ORDER_STATUS_TONE: Record<PackageOrderStatus, "warning" | "success" | "neutral" | "danger"> = {
+  PENDING: "warning",
+  PAID: "success",
+  CANCELLED: "neutral",
+  REFUNDED: "danger",
+};
+
+export const PACKAGE_ORDER_SOURCES = {
+  CABINET: "CABINET",
+  ADMIN: "ADMIN",
+} as const;
+
+/** Real provayder yoxdur: ödəniş ofisdə və ya köçürmə ilə alınır, burada yalnız üsulu qeyd olunur. */
+export const PAYMENT_METHODS = {
+  CASH: "CASH",
+  BANK_TRANSFER: "BANK_TRANSFER",
+  CARD_TERMINAL: "CARD_TERMINAL",
+  OTHER: "OTHER",
+} as const;
+
+export type PaymentMethod = (typeof PAYMENT_METHODS)[keyof typeof PAYMENT_METHODS];
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  CASH: "Nağd",
+  BANK_TRANSFER: "Bank köçürməsi",
+  CARD_TERMINAL: "POS terminal",
+  OTHER: "Digər",
+};
 
 export const AI_CONTENT_DRAFT_STATUSES = {
   DRAFT: "DRAFT",

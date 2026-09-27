@@ -67,6 +67,8 @@
     "@opentelemetry/api": "^1.9.1",
     "@prisma/adapter-d1": "^7.10.0",
     "@prisma/client": "^6.19.3",
+    "@simplewebauthn/browser": "^14.0.0",
+    "@simplewebauthn/server": "^14.0.3",
     "clsx": "^2.1.1",
     "jose": "^6.2.10",
     "leaflet": "^1.9.4",

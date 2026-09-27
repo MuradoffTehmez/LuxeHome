@@ -212,7 +212,7 @@ export async function updateProperty(
     const images = parseImages(formData, "images");
     const existing = await prisma.property.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true, slug: true, publishedAt: true, closedAt: true, status: true, price: true, currency: true },
+      select: { id: true, slug: true, publishedAt: true, closedAt: true, status: true, price: true, currency: true, listingExpiresAt: true, expiredAt: true },
     });
     if (!existing) return failure(msg("server.emlaklar.elanTapilmadiVeYaSilinib"));
 
@@ -366,7 +366,7 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
     try {
       const current = await prisma.property.findUnique({
         where: { id },
-        select: { publishedAt: true, closedAt: true },
+        select: { publishedAt: true, closedAt: true, listingExpiresAt: true, expiredAt: true },
       });
       if (!current) continue;
       let data: Record<string, unknown>;

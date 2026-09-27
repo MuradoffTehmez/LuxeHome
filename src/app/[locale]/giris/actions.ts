@@ -48,6 +48,8 @@ import { escapeHtml } from "@/lib/email-html";
 import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
+import { PasskeyError, passkeyLoginOptions, verifyPasskeyLogin } from "@/lib/auth/passkey";
+import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/server";
 
 /**
  * Giriş axını.
@@ -293,6 +295,72 @@ export async function verifyTwoFactor(_prev: FormState, formData: FormData): Pro
   }
 
   return startSession(user.id, step, claims.next);
+}
+
+/**
+ * Passkey ilə ikinci mərhələ (#109): TOTP koduna alternativ. Eyni sürət limiti və
+ * hesab kilidi qapısından keçir, uğursuz cəhd eyni sayğacı artırır.
+ */
+async function passkeyStage() {
+  const token = await readStageCookie();
+  const claims = token ? await verifyStageToken(token) : null;
+  if (!claims || claims.stage !== "totp") return null;
+  const user = await prisma.user.findUnique({
+    where: { id: claims.uid },
+    select: { id: true, email: true, isActive: true, lockedUntil: true, totpSecret: true },
+  });
+  if (!user?.isActive || !user.totpSecret) return null;
+  return { claims, user };
+}
+
+export type PasskeyStartState =
+  | { status: "ok"; options: PublicKeyCredentialRequestOptionsJSON }
+  | { status: "error"; error: string };
+
+export async function beginPasskeyLogin(): Promise<PasskeyStartState> {
+  const t = await getTranslations("account");
+  const stage = await passkeyStage();
+  if (!stage) return { status: "error", error: t("actions.verificationExpired") };
+
+  const ip = clientIp(await headers());
+  const gate = twoFactorGateOutcome({ withinRateLimit: await checkLoginLimit(ip), lockedUntil: stage.user.lockedUntil, now: new Date() });
+  if (gate === "RATE_LIMITED") {
+    await logRateLimited(stage.user.email, ip);
+    return { status: "error", error: t("actions.rateLimited") };
+  }
+  if (gate === "LOCKED") return { status: "error", error: t("actions.locked") };
+
+  try {
+    const options = await passkeyLoginOptions(stage.user.id);
+    return options ? { status: "ok", options } : { status: "error", error: t("actions.passkeyUnavailable") };
+  } catch (error) {
+    if (error instanceof PasskeyError) return { status: "error", error: t("actions.passkeyUnavailable") };
+    throw error;
+  }
+}
+
+export async function finishPasskeyLogin(response: AuthenticationResponseJSON): Promise<FormState> {
+  const t = await getTranslations("account");
+  const stage = await passkeyStage();
+  if (!stage) return { error: t("actions.verificationExpired") };
+
+  const ip = clientIp(await headers());
+  const gate = twoFactorGateOutcome({ withinRateLimit: await checkLoginLimit(ip), lockedUntil: stage.user.lockedUntil, now: new Date() });
+  if (gate === "RATE_LIMITED") {
+    await logRateLimited(stage.user.email, ip);
+    return { error: t("actions.rateLimited") };
+  }
+  if (gate === "LOCKED") return { error: t("actions.locked") };
+
+  try {
+    await verifyPasskeyLogin(stage.user.id, response);
+  } catch (error) {
+    if (!(error instanceof PasskeyError)) throw error;
+    await registerFailure(stage.user.id, stage.user.email, ip, "BAD_PASSKEY");
+    return { error: t("actions.passkeyFailed") };
+  }
+  // `startSession` yönləndirmə atır və heç vaxt qayıtmır
+  return startSession(stage.user.id, null, stage.claims.next);
 }
 
 /**

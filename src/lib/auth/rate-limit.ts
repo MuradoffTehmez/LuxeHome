@@ -12,6 +12,7 @@ import { isLockActive, lockUntil, shouldLock } from "./lockout";
 export type FailureReason =
   | "BAD_PASSWORD"
   | "BAD_TOTP"
+  | "BAD_PASSKEY"
   | "LOCKED"
   | "RATE_LIMITED"
   | "INACTIVE";
@@ -136,4 +137,16 @@ export async function logRateLimited(email: string, ip: string): Promise<void> {
   await prisma.loginAttempt.create({
     data: { email, ip, success: false, reason: "RATE_LIMITED" },
   });
+}
+
+/**
+ * Bilik Mərkəzi AI məsləhətçisi (#109) — `AI_LIMIT` namespace-ini ayrıca açarla işlədir:
+ * hər sual Workers AI inference-i xərcləyir, anonim çağırış isə sonsuz ola bilərdi.
+ */
+export async function checkKnowledgeAdvisorLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.AI_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `ai-advisor:${ip}` });
+  return success;
 }

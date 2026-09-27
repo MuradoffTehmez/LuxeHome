@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { requireAccount, currentSessionId } from "@/lib/auth/guard";
 import { systemModeBlock } from "@/lib/admin/guard";
@@ -58,9 +59,17 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
   if (!parsed.success) return failure(t("actions.invalidForm"), toFieldErrors(parsed.error));
 
   try {
+    // Profildəki nömrə təsdiqlənmiş nömrədən fərqlənirsə təsdiq ləğv olunur (#109):
+    // telefonla giriş yalnız hazırda göstərilən və SMS ilə sübut olunmuş nömrə ilə işləyir.
+    const current = await prisma.user.findUnique({ where: { id: user.id }, select: { verifiedPhone: true } });
+    const keepsVerifiedPhone = current?.verifiedPhone != null && normalizeAzMobile(parsed.data.phone) === current.verifiedPhone;
     await prisma.user.update({
       where: { id: user.id },
-      data: { name: parsed.data.name, phone: parsed.data.phone },
+      data: {
+        name: parsed.data.name,
+        phone: parsed.data.phone,
+        ...(current?.verifiedPhone && !keepsVerifiedPhone ? { verifiedPhone: null } : {}),
+      },
     });
 
     if (user.accountType === ACCOUNT_TYPES.AGENCY && parsed.data.agencyName) {
