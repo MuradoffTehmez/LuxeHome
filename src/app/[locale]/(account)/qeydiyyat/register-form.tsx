@@ -36,6 +36,10 @@ export function RegisterForm({ next }: { next?: string }) {
   const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(registerAccount, IDLE_STATE);
   const [accountType, setAccountType] = useState<string>(ACCOUNT_TYPES.USER);
+  // Telefon hesab növünə görə əsas bölmə ilə «Əlavə məlumat» arasında yer dəyişir.
+  // Sahə yeni yerdə yenidən yaradıldığı üçün dəyər state-də saxlanılır — əks halda
+  // növü dəyişəndə yazılmış nömrə səssizcə silinirdi.
+  const [phone, setPhone] = useState("");
   const requirements = profileRequirements(accountType);
   const typeKey = accountTypeKey(accountType) as TypeKey;
   const optionalError = Boolean(state.fieldErrors?.birthDate || (!requirements.phoneRequired && state.fieldErrors?.phone));
@@ -47,6 +51,8 @@ export function RegisterForm({ next }: { next?: string }) {
       type="tel"
       autoComplete="tel"
       placeholder="+994 XX XXX XX XX"
+      value={phone}
+      onChange={(event) => setPhone(event.target.value)}
       required={requirements.phoneRequired}
       hint={requirements.phoneRequired ? t("fields.phoneRequired") : undefined}
       error={state.fieldErrors?.phone}
