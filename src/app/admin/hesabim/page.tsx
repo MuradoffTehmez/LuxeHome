@@ -6,6 +6,8 @@ import { PasswordForm } from "./password-form";
 import { ProfileForm } from "./profile-form";
 import { BackupCodesForm } from "./backup-codes-form";
 import { revokeOne, revokeOtherSessions } from "./actions";
+import { CalendarSubscription } from "./calendar-subscription";
+import { siteUrl } from "@/config/site";
 import { getAdminT } from "@/lib/admin-i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -49,7 +51,7 @@ export default async function AccountPage({
     prisma.backupCode.count({ where: { userId: user.id, usedAt: null } }),
     prisma.user.findUniqueOrThrow({
       where: { id: user.id },
-      select: { name: true, phone: true, locale: true, themePreference: true, avatarUrl: true },
+      select: { name: true, phone: true, locale: true, themePreference: true, avatarUrl: true, calendarToken: true },
     }),
   ]);
 
@@ -72,6 +74,13 @@ export default async function AccountPage({
           themePreference: profile.themePreference,
           avatarUrl: profile.avatarUrl,
         }} />
+      </section>
+
+      <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">
+        <h2 className="font-semibold text-lg text-ink">{t("pages.account.calendarTitle")}</h2>
+        <div className="mt-4">
+          <CalendarSubscription url={profile.calendarToken ? siteUrl(`/api/calendar/${profile.calendarToken}`) : null} />
+        </div>
       </section>
 
       <section className="min-w-0 rounded-sm border border-line bg-paper p-4 sm:p-6">

@@ -76,6 +76,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "leadBoard", href: "/admin/muracietler/lovhe" },
           { labelKey: "funnel", href: "/admin/huni" },
           { labelKey: "reservations", href: "/admin/rezervasiyalar" },
+          { labelKey: "calendar", href: "/admin/rezervasiyalar/teqvim" },
           { labelKey: "email", href: "/admin/e-poct" },
           { labelKey: "agencies", href: "/admin/agentlikler" },
           { labelKey: "agents", href: "/admin/agentler" },

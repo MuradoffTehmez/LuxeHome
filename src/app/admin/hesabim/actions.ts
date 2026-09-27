@@ -162,3 +162,32 @@ export async function revokeOtherSessions(): Promise<void> {
 
   revalidatePath("/admin/hesabim");
 }
+
+/** Şəxsi təqvim abunəsi linkini yaradır və ya yeniləyir (#109). Köhnə link dərhal ölür. */
+export async function rotateCalendarToken(_previous: ActionState, _formData: FormData): Promise<ActionState> {
+  await assertSameOrigin();
+  const user = await requireStaff();
+  try {
+    const bytes = crypto.getRandomValues(new Uint8Array(32));
+    const token = btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    await prisma.user.update({ where: { id: user.id }, data: { calendarToken: token } });
+    await recordAudit(user, "UPDATE", "User", user.id, "Təqvim abunəsi linki yeniləndi");
+    revalidatePath("/admin/hesabim");
+    return success(msg("server.hesabim.calendarRotated"));
+  } catch (error) {
+    return unexpected("təqvim linki yaradılmadı", error, msg("server.common.unexpected"));
+  }
+}
+
+export async function revokeCalendarToken(_previous: ActionState, _formData: FormData): Promise<ActionState> {
+  await assertSameOrigin();
+  const user = await requireStaff();
+  try {
+    await prisma.user.update({ where: { id: user.id }, data: { calendarToken: null } });
+    await recordAudit(user, "UPDATE", "User", user.id, "Təqvim abunəsi linki ləğv edildi");
+    revalidatePath("/admin/hesabim");
+    return success(msg("server.hesabim.calendarRevoked"));
+  } catch (error) {
+    return unexpected("təqvim linki ləğv edilmədi", error, msg("server.common.unexpected"));
+  }
+}

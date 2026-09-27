@@ -81,7 +81,8 @@
       "demoContent": "Демоконтент",
       "systemMode": "Системные настройки",
       "leadBoard": "Доска заявок",
-      "funnel": "Воронка конверсии"
+      "funnel": "Воронка конверсии",
+      "calendar": "Календарь"
     }
   },
   "actions": {
@@ -1036,7 +1037,17 @@
       "yeniParolunTekrari": "Повтор нового пароля",
       "sizeMuveqqetiParolVerilib": "Вам выдан временный пароль. Смените его перед переходом в панель.",
       "generateNewCodes": "Создать новые коды",
-      "changePassword": "Изменить пароль"
+      "changePassword": "Изменить пароль",
+      "calendarTitle": "Подписка на календарь",
+      "calendarHint": "Бронирования показов и дни открытых дверей будут автоматически в вашем календаре Google, Apple или Outlook. Добавьте ссылку как «По URL».",
+      "calendarUrl": "Ссылка календаря",
+      "calendarCopy": "Копировать",
+      "calendarCopied": "Скопировано",
+      "calendarGoogle": "Добавить в Google Календарь",
+      "calendarSecret": "Ссылка работает как пароль — в ней имена и телефоны клиентов. Не делитесь ею; при утечке обновите.",
+      "calendarRotate": "Обновить ссылку",
+      "calendarRevoke": "Отозвать",
+      "calendarCreate": "Создать ссылку календаря"
     },
     "knowledge": {
       "beledci": "Руководство",
@@ -2438,6 +2449,15 @@
       "registrations": "{count, plural, one {# регистрация} few {# регистрации} many {# регистраций} other {# регистрации}}",
       "delete": "Удалить слот",
       "deleteHint": "Слот и его регистрации будут удалены (заявки останутся в CRM)."
+    },
+    "calendar": {
+      "title": "Календарь",
+      "description": "{count, plural, one {# событие в этом месяце} few {# события в этом месяце} many {# событий в этом месяце} other {# события в этом месяце}} — брони показов и дни открытых дверей.",
+      "monthNav": "Навигация по месяцам",
+      "prev": "Предыдущий месяц",
+      "next": "Следующий месяц",
+      "empty": "В этом месяце событий нет.",
+      "subscribeHint": "Подключите календарь к телефону и Google Календарю в разделе «Мой аккаунт → Подписка на календарь»."
     }
   },
   "server": {
@@ -2558,7 +2578,9 @@
       "yeniParolEnAziSimvol": "Новый пароль должен содержать не менее {p0} символов.",
       "yeniParolTekrariUygunGelmir": "Подтверждение нового пароля не совпадает.",
       "yeniParolKohnesindenFerqliOlmalidir": "Новый пароль должен отличаться от старого.",
-      "parolDeyisdirildiVeDigerCihazlardaki": "Пароль изменён, сеансы на других устройствах завершены."
+      "parolDeyisdirildiVeDigerCihazlardaki": "Пароль изменён, сеансы на других устройствах завершены.",
+      "calendarRotated": "Ссылка обновлена. Старая больше не работает.",
+      "calendarRevoked": "Ссылка календаря отозвана."
     },
     "hesablar": {
       "hesabTapilmadi": "Аккаунт не найден.",

@@ -81,7 +81,8 @@
       "demoContent": "Demo content",
       "systemMode": "System settings",
       "leadBoard": "Lead board",
-      "funnel": "Conversion funnel"
+      "funnel": "Conversion funnel",
+      "calendar": "Calendar"
     }
   },
   "actions": {
@@ -1036,7 +1037,17 @@
       "yeniParolunTekrari": "Repeat the new password",
       "sizeMuveqqetiParolVerilib": "You were given a temporary password. Change it before continuing to the panel.",
       "generateNewCodes": "Generate new codes",
-      "changePassword": "Change password"
+      "changePassword": "Change password",
+      "calendarTitle": "Calendar subscription",
+      "calendarHint": "Show viewing reservations and open house days in your Google, Apple or Outlook calendar automatically. Add the link as “From URL”.",
+      "calendarUrl": "Calendar link",
+      "calendarCopy": "Copy",
+      "calendarCopied": "Copied",
+      "calendarGoogle": "Add to Google Calendar",
+      "calendarSecret": "The link works like a password — it carries client names and phones. Do not share it; rotate it if it leaks.",
+      "calendarRotate": "Rotate link",
+      "calendarRevoke": "Revoke",
+      "calendarCreate": "Create calendar link"
     },
     "knowledge": {
       "beledci": "Guide",
@@ -2438,6 +2449,15 @@
       "registrations": "{count, plural, one {# registration} other {# registrations}}",
       "delete": "Delete slot",
       "deleteHint": "The slot and its registrations will be deleted (leads remain in the CRM)."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "{count, plural, one {# event this month} other {# events this month}} — viewing reservations and open house days.",
+      "monthNav": "Month navigation",
+      "prev": "Previous month",
+      "next": "Next month",
+      "empty": "No events this month.",
+      "subscribeHint": "Connect this calendar to your phone and Google Calendar under “My account → Calendar subscription”."
     }
   },
   "server": {
@@ -2558,7 +2578,9 @@
       "yeniParolEnAziSimvol": "The new password must be at least {p0} characters long.",
       "yeniParolTekrariUygunGelmir": "The new password confirmation does not match.",
       "yeniParolKohnesindenFerqliOlmalidir": "The new password must differ from the old one.",
-      "parolDeyisdirildiVeDigerCihazlardaki": "Password changed and sessions on other devices were signed out."
+      "parolDeyisdirildiVeDigerCihazlardaki": "Password changed and sessions on other devices were signed out.",
+      "calendarRotated": "Calendar link rotated. The old link no longer works.",
+      "calendarRevoked": "Calendar link revoked."
     },
     "hesablar": {
       "hesabTapilmadi": "Account not found.",

@@ -81,7 +81,8 @@
       "demoContent": "Nümunə məzmun",
       "systemMode": "Sistem ayarları",
       "leadBoard": "Müraciət lövhəsi",
-      "funnel": "Konversiya hunisi"
+      "funnel": "Konversiya hunisi",
+      "calendar": "Təqvim"
     }
   },
   "actions": {
@@ -1036,7 +1037,17 @@
       "yeniParolunTekrari": "Yeni parolun təkrarı",
       "sizeMuveqqetiParolVerilib": "Sizə müvəqqəti parol verilib. Panelə keçməzdən əvvəl onu dəyişməlisiniz.",
       "generateNewCodes": "Yeni kodlar yarat",
-      "changePassword": "Parolu dəyiş"
+      "changePassword": "Parolu dəyiş",
+      "calendarTitle": "Təqvim abunəsi",
+      "calendarHint": "Baxış rezervasiyaları və açıq qapı günləri Google, Apple və ya Outlook təqviminizdə avtomatik görünsün. Linki təqvimə «URL ilə əlavə et» kimi verin.",
+      "calendarUrl": "Təqvim linki",
+      "calendarCopy": "Kopyala",
+      "calendarCopied": "Kopyalandı",
+      "calendarGoogle": "Google Təqvimə əlavə et",
+      "calendarSecret": "Link parol kimidir — müştəri adı və telefonu daşıyır. Paylaşmayın; sızarsa yeniləyin.",
+      "calendarRotate": "Linki yenilə",
+      "calendarRevoke": "Ləğv et",
+      "calendarCreate": "Təqvim linki yarat"
     },
     "knowledge": {
       "beledci": "Bələdçi",
@@ -2438,6 +2449,15 @@
       "registrations": "{count, plural, other {# qeydiyyat}}",
       "delete": "Slotu sil",
       "deleteHint": "Slot və onun qeydiyyatları silinəcək (müraciətlər CRM-də qalır)."
+    },
+    "calendar": {
+      "title": "Təqvim",
+      "description": "{count, plural, other {Bu ayda # hadisə}} — baxış rezervasiyaları və açıq qapı günləri.",
+      "monthNav": "Ay seçimi",
+      "prev": "Əvvəlki ay",
+      "next": "Növbəti ay",
+      "empty": "Bu ayda hadisə yoxdur.",
+      "subscribeHint": "Təqvimi telefonunuza və Google Təqvimə «Hesabım → Təqvim abunəsi» bölməsindən qoşun."
     }
   },
   "server": {
@@ -2558,7 +2578,9 @@
       "yeniParolEnAziSimvol": "Yeni parol ən azı {p0} simvol olmalıdır.",
       "yeniParolTekrariUygunGelmir": "Yeni parol təkrarı uyğun gəlmir.",
       "yeniParolKohnesindenFerqliOlmalidir": "Yeni parol köhnəsindən fərqli olmalıdır.",
-      "parolDeyisdirildiVeDigerCihazlardaki": "Parol dəyişdirildi və digər cihazlardakı sessiyalar bağlandı."
+      "parolDeyisdirildiVeDigerCihazlardaki": "Parol dəyişdirildi və digər cihazlardakı sessiyalar bağlandı.",
+      "calendarRotated": "Təqvim linki yeniləndi. Köhnə link artıq işləmir.",
+      "calendarRevoked": "Təqvim linki ləğv edildi."
     },
     "hesablar": {
       "hesabTapilmadi": "Hesab tapılmadı.",

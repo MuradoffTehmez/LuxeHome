@@ -47,6 +47,8 @@ model User {
 
   /// İstifadəçinin seçdiyi dil: az | en | ru. `src/lib/constants.ts`-dəki LOCALES-dən.
   locale          String @default("az")
+  /// Şəxsi təqvim abunəsinin (ICS) gizli açarı (#109). Yenidən yaradılanda köhnə link ölür.
+  calendarToken   String? @unique
   /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
   themePreference String @default("light")
 
