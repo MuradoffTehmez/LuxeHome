@@ -156,5 +156,26 @@
     "knowledge": "Knowledge Hub",
     "glossary": "Glossary",
     "calculator": "Calculator"
+  },
+  "advisor": {
+    "eyebrow": "AI advisor",
+    "title": "Ask your question",
+    "description": "Answers are built only from guides published in the Knowledge Hub, and every point shows its source.",
+    "label": "Your question",
+    "placeholder": "e.g. Which documents should I check when buying an apartment?",
+    "ask": "Ask",
+    "thinking": "Reading sources…",
+    "empty": "Ask a question — the articles used for the answer will be listed below it.",
+    "sources": "Sources",
+    "related": "Guides that may help",
+    "noAnswer": "Our guides don’t answer this question precisely. See the articles below or contact our agent.",
+    "noSources": "No published guide covers this topic. Try rephrasing your question or contact us.",
+    "unavailable": "The advisor can’t answer right now. Guides on this topic are listed below.",
+    "rateLimited": "Too many questions in a short time. Please try again in a minute.",
+    "invalid": "Please write your question in 5–300 characters.",
+    "disclaimer": "This answer is for information only and is not legal advice. Confirm with a notary or lawyer before signing any deal.",
+    "example1": "Which documents should I check when buying an apartment?",
+    "example2": "What are the requirements for a mortgage?",
+    "example3": "What should I watch for in a rental agreement?"
   }
 }

@@ -156,5 +156,26 @@
     "knowledge": "Bilik Mərkəzi",
     "glossary": "Lüğət",
     "calculator": "Hesablayıcı"
+  },
+  "advisor": {
+    "eyebrow": "AI məsləhətçi",
+    "title": "Sualınızı yazın",
+    "description": "Cavab yalnız Bilik Mərkəzində dərc olunmuş bələdçilərdən qurulur və hər fikrin mənbəsi göstərilir.",
+    "label": "Sualınız",
+    "placeholder": "Məsələn: mənzil alarkən hansı sənədləri yoxlamalıyam?",
+    "ask": "Soruş",
+    "thinking": "Mənbələr oxunur…",
+    "empty": "Sual verin — cavabın altında istifadə olunan məqalələrin siyahısı görünəcək.",
+    "sources": "Mənbələr",
+    "related": "Faydalı ola biləcək bələdçilər",
+    "noAnswer": "Bələdçilərimizdə bu suala dəqiq cavab tapılmadı. Aşağıdakı məqalələrə baxın və ya agentimizlə əlaqə saxlayın.",
+    "noSources": "Bu mövzuda dərc olunmuş bələdçi tapılmadı. Sualı başqa sözlərlə yazın və ya bizimlə əlaqə saxlayın.",
+    "unavailable": "Məsləhətçi hazırda cavab verə bilmir. Bu mövzudakı bələdçilər aşağıdadır.",
+    "rateLimited": "Qısa müddətdə çox sual göndərildi. Bir dəqiqə sonra yenidən cəhd edin.",
+    "invalid": "Sualı 5–300 simvol arasında yazın.",
+    "disclaimer": "Bu cavab məlumat xarakterlidir və hüquqi məsləhət deyil. Əqd bağlamazdan əvvəl notarius və ya hüquqşünasla dəqiqləşdirin.",
+    "example1": "Mənzil alarkən hansı sənədləri yoxlamalıyam?",
+    "example2": "İpoteka üçün hansı şərtlər var?",
+    "example3": "Kirayə müqaviləsində nələrə diqqət etməliyəm?"
   }
 }

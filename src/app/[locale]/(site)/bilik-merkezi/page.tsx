@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Pagination } from "@/components/ui/pagination";
 import { KnowledgeCard } from "@/components/site/knowledge-card";
+import { KnowledgeAdvisor } from "@/components/site/knowledge-advisor";
 import { buildManagedMetadata, breadcrumbSchema, itemListSchema, jsonLd } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 import { KNOWLEDGE_AUDIENCES, type Locale } from "@/lib/constants";
@@ -181,6 +182,15 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
           </nav>
         </Container>
       </div>
+
+      {/* AI məsləhətçi (#109) — yalnız dərc olunmuş məqalələrdən, mənbə ilə cavab verir */}
+      {!filtered && (
+        <Section tone="ivory" spacing="compact">
+          <Container>
+            <KnowledgeAdvisor examples={[t("advisor.example1"), t("advisor.example2"), t("advisor.example3")]} />
+          </Container>
+        </Section>
+      )}
 
       {/* Mövzular — hər kateqoriyanın öz izahı ilə */}
       {categories.length > 0 && !filtered && (
