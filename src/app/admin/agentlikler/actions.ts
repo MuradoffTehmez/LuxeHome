@@ -15,6 +15,9 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { uniqueSlug } from "@/lib/admin/slug";
 import * as form from "@/lib/admin/form";
 import { msg } from "@/lib/admin/server-message";
+import { isBulkFailure, readBulkSelection, runBulk } from "@/lib/admin/bulk";
+import { findManyInChunks } from "@/lib/d1-chunks";
+import { deletePublicAccount } from "../hesablar/actions";
 
 const LIST_PATH = "/admin/agentlikler";
 
@@ -183,4 +186,37 @@ async function reviewAgencyEmployee(
   } catch (error) {
     return unexpected("dəvət yenilənmədi", error, msg("server.common.unexpected"));
   }
+}
+
+const AGENCY_BULK_INTENTS = ["approve", "revoke", "delete"] as const;
+
+/**
+ * «Agentliklər» siyahısında toplu təsdiq, təsdiqin ləğvi və silmə.
+ *
+ * Siyahının sətri agentlik hesabıdır (`User.id`); silmə hesabı «Hesablar»dakı eyni
+ * iki mərhələli yolla silir, agentlik profili isə kaskadla gedir.
+ */
+export async function bulkAgencies(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const selection = readBulkSelection(formData, AGENCY_BULK_INTENTS);
+  if (isBulkFailure(selection)) return selection;
+  const { ids, intent } = selection;
+
+  if (intent === "delete") return runBulk(ids, deletePublicAccount);
+
+  const agencies = await findManyInChunks(ids, 0, (chunk) =>
+    prisma.agency.findMany({ where: { userId: { in: chunk } }, select: { id: true, userId: true, isVerified: true } }),
+  );
+  const target = intent === "approve";
+  return runBulk(ids, async (userId) => {
+    const agency = agencies.find((item) => item.userId === userId);
+    if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+    return agency.isVerified === target ? success("") : toggleAgencyVerification(agency.id);
+  });
 }

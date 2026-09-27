@@ -9,6 +9,7 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { leadUpdateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
 import { msg } from "@/lib/admin/server-message";
+import { guardedBulk } from "@/lib/admin/bulk";
 
 /**
  * Müraciətlərin idarəsi.
@@ -149,4 +150,9 @@ export async function assignLeadToMe(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("müraciət təyin edilmədi", error, msg("server.common.unexpected"));
   }
+}
+
+/** Siyahıdakı toplu seçim üçün — hər qeyd mövcud tək action-dan keçir. */
+export async function bulkLeads(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  return guardedBulk(PERMISSIONS.LEAD_MANAGE, formData, { delete: deleteLead });
 }

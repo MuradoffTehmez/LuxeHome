@@ -13,6 +13,9 @@ import {
 } from "@/components/admin/admin-responsive-list";
 import { AccountToggle } from "./account-toggle";
 import { AccountApproval } from "./account-approval";
+import { AccountDelete } from "./account-delete";
+import { bulkPublicAccounts } from "./actions";
+import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 import { formatRelative } from "@/lib/utils";
 import { PERMISSIONS, type AccountType } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
@@ -38,6 +41,22 @@ export default async function AdminPublicAccountsPage() {
   const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
   const accounts = await getAdminPublicAccounts();
+  const bulkIntents = [
+    { intent: "approve", label: t("components.bulk.approve"), icon: "approve" as const },
+    { intent: "activate", label: t("components.bulk.activate"), icon: "activate" as const },
+    { intent: "deactivate", label: t("components.bulk.deactivate"), icon: "deactivate" as const },
+    {
+      intent: "delete",
+      label: t("components.bulk.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      confirm: {
+        title: t("components.bulk.deleteAccountsTitle"),
+        description: t("components.bulk.deleteAccountsDescription"),
+        confirmLabel: t("components.bulk.delete"),
+      },
+    },
+  ];
 
   return (
     <>
@@ -47,7 +66,9 @@ export default async function AdminPublicAccountsPage() {
         breadcrumbs={[{ label: t("pages.users.idarePaneli"), href: "/admin" }, { label: t("pages.users.hesablar") }]}
       />
 
-      <AdminCard bodyClassName="p-4 lg:p-0">
+      <AdminCard bodyClassName="p-0">
+        <BulkSelectionForm action={bulkPublicAccounts} intents={bulkIntents}>
+        <div className="p-4 lg:p-0">
         <AdminResponsiveList
           ariaLabel={t("pages.users.ictimaiHesablar")}
           items={accounts}
@@ -55,13 +76,19 @@ export default async function AdminPublicAccountsPage() {
           empty={<p className="py-10 text-center text-sm text-ink-muted">{t("pages.users.heleIctimaiHesabYoxdur")}</p>}
           renderCard={(account) => (
             <AdminListCard
-              title={account.name}
+              title={
+                <span className="flex items-start gap-2">
+                  <BulkRowCheckbox id={account.id} label={t("components.bulk.selectRow", { name: account.name })} />
+                  {account.name}
+                </span>
+              }
               meta={account.email}
               status={<Badge tone={TYPE_TONE[account.accountType as AccountType]}>{t(`labels.accountType.${account.accountType as AccountType}`)}</Badge>}
               actions={
                 <>
                   <AccountApproval id={account.id} name={account.name} approved={Boolean(account.approvedAt)} className="size-11" />
                   <AccountToggle id={account.id} name={account.name} isActive={account.isActive} className="size-11" />
+                  <AccountDelete id={account.id} name={account.name} className="size-11" />
                 </>
               }
             >
@@ -91,6 +118,7 @@ export default async function AdminPublicAccountsPage() {
             <AdminTable
               caption={t("pages.users.hesablar")}
               headers={[
+                { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                 { label: t("pages.users.hesab") },
                 { label: t("pages.users.nov") },
                 { label: t("pages.users.tesdiq") },
@@ -102,6 +130,9 @@ export default async function AdminPublicAccountsPage() {
             >
               {items.map((account) => (
                 <AdminTableRow key={account.id}>
+                  <AdminTableCell className="w-9">
+                    <BulkRowCheckbox id={account.id} label={t("components.bulk.selectRow", { name: account.name })} />
+                  </AdminTableCell>
                   <AdminTableCell>
                     <span className="font-medium text-ink">{account.name}</span>
                     <p className="mt-0.5 text-xs text-ink-muted">{account.email}</p>
@@ -120,6 +151,7 @@ export default async function AdminPublicAccountsPage() {
                     <div className="flex justify-end">
                       <AccountApproval id={account.id} name={account.name} approved={Boolean(account.approvedAt)} className="size-11" />
                       <AccountToggle id={account.id} name={account.name} isActive={account.isActive} className="size-11" />
+                      <AccountDelete id={account.id} name={account.name} className="size-11" />
                     </div>
                   </AdminTableCell>
                 </AdminTableRow>
@@ -127,6 +159,8 @@ export default async function AdminPublicAccountsPage() {
             </AdminTable>
           )}
         />
+        </div>
+        </BulkSelectionForm>
       </AdminCard>
     </>
   );

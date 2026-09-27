@@ -595,6 +595,34 @@
       "floor": "Floor {floor}",
       "description": "Description",
       "features": "Features"
+    },
+    "bulk": {
+      "selectAll": "Select all",
+      "selected": "{count} selected",
+      "hint": "Select rows for a bulk action",
+      "clear": "Clear selection",
+      "select": "Select",
+      "selectRow": "Select “{name}”",
+      "approve": "Approve",
+      "revoke": "Revoke approval",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete",
+      "restore": "Restore",
+      "active": "Active",
+      "hidden": "Hidden",
+      "deleteTitle": "Delete the selected records?",
+      "deleteDescription": "The same deletion rule applies to every selected record. Each one is written to the audit log.",
+      "deleteAccountsTitle": "Delete the selected accounts?",
+      "deleteAccountsDescription": "The accounts are deactivated immediately, their sessions are closed, their listings are archived and then the accounts are permanently deleted. This cannot be undone.",
+      "deleteAgenciesTitle": "Delete the selected agencies?",
+      "deleteAgenciesDescription": "The agency account, profile and team are deleted and its listings are archived. This cannot be undone."
+    },
+    "accountDelete": {
+      "label": "Delete the “{name}” account",
+      "title": "Delete account",
+      "description": "The “{name}” account will be deactivated, its sessions closed, its listings archived and the account permanently deleted. This cannot be undone.",
+      "confirm": "Delete account"
     }
   },
   "pages": {
@@ -2776,7 +2804,10 @@
       "hesabTapilmadi": "Account not found.",
       "hesabAktivlesdirildi": "Account activated.",
       "hesabTesdiqlendi": "Account approved.",
-      "hesabTesdiqiLegvEdildi": "Account approval revoked."
+      "hesabTesdiqiLegvEdildi": "Account approval revoked.",
+      "hesabDeaktivEdildi": "Account deactivated.",
+      "hesabSilindi": "Account deleted.",
+      "hesabSilinmeNovbesinde": "Account deactivated; deletion will be completed by the daily maintenance job."
     },
     "ictimaiImkanlar": {
       "yaxinObyektElaveEdildi": "Nearby place added.",
@@ -2999,6 +3030,14 @@
       "orderActivated": "Premium applied to the listing.",
       "orderCancelled": "Order cancelled.",
       "orderRefunded": "Refund recorded."
+    },
+    "bulk": {
+      "hecNeSecilmeyib": "No records selected.",
+      "limitAsildi": "You can select at most {p0} records at a time.",
+      "namelumEmeliyyat": "Unknown action.",
+      "hecBiriAlinmadi": "None of the selected records could be processed.",
+      "qismenTamamlandi": "{p0} of {p1} records processed; the rest failed.",
+      "tamamlandi": "{p0} records processed."
     }
   }
 }

@@ -595,6 +595,34 @@
       "floor": "Mərtəbə {floor}",
       "description": "Təsvir",
       "features": "Xüsusiyyətlər"
+    },
+    "bulk": {
+      "selectAll": "Hamısını seç",
+      "selected": "{count} qeyd seçilib",
+      "hint": "Toplu əməliyyat üçün sətirləri seçin",
+      "clear": "Seçimi təmizlə",
+      "select": "Seç",
+      "selectRow": "«{name}» seç",
+      "approve": "Təsdiqlə",
+      "revoke": "Təsdiqi ləğv et",
+      "activate": "Aktivləşdir",
+      "deactivate": "Deaktiv et",
+      "delete": "Sil",
+      "restore": "Bərpa et",
+      "active": "Aktiv",
+      "hidden": "Gizli",
+      "deleteTitle": "Seçilmiş qeydlər silinsin?",
+      "deleteDescription": "Seçilmiş qeydlərin hamısına eyni silmə qaydası tətbiq olunur. Hər biri audit jurnalına yazılır.",
+      "deleteAccountsTitle": "Seçilmiş hesablar silinsin?",
+      "deleteAccountsDescription": "Hesablar dərhal deaktiv olur, sessiyaları bağlanır, elanları arxivlənir, sonra hesab birdəfəlik silinir. Bu əməliyyat geri qaytarılmır.",
+      "deleteAgenciesTitle": "Seçilmiş agentliklər silinsin?",
+      "deleteAgenciesDescription": "Agentlik hesabı, profili və komandası silinir, elanları arxivlənir. Bu əməliyyat geri qaytarılmır."
+    },
+    "accountDelete": {
+      "label": "«{name}» hesabını sil",
+      "title": "Hesabı silmək",
+      "description": "«{name}» hesabı deaktiv ediləcək, sessiyaları bağlanacaq, elanları arxivlənəcək və hesab birdəfəlik silinəcək. Bu əməliyyat geri qaytarılmır.",
+      "confirm": "Hesabı sil"
     }
   },
   "pages": {
@@ -2776,7 +2804,10 @@
       "hesabTapilmadi": "Hesab tapılmadı.",
       "hesabAktivlesdirildi": "Hesab aktivləşdirildi.",
       "hesabTesdiqlendi": "Hesab təsdiqləndi.",
-      "hesabTesdiqiLegvEdildi": "Hesab təsdiqi ləğv edildi."
+      "hesabTesdiqiLegvEdildi": "Hesab təsdiqi ləğv edildi.",
+      "hesabDeaktivEdildi": "Hesab deaktiv edildi.",
+      "hesabSilindi": "Hesab silindi.",
+      "hesabSilinmeNovbesinde": "Hesab deaktiv edildi; silinmə gündəlik texniki işdə tamamlanacaq."
     },
     "ictimaiImkanlar": {
       "yaxinObyektElaveEdildi": "Yaxın obyekt əlavə edildi.",
@@ -2999,6 +3030,14 @@
       "orderActivated": "Premium elana tətbiq olundu.",
       "orderCancelled": "Sifariş ləğv edildi.",
       "orderRefunded": "Geri qaytarma qeydə alındı."
+    },
+    "bulk": {
+      "hecNeSecilmeyib": "Heç bir qeyd seçilməyib.",
+      "limitAsildi": "Bir dəfəyə ən çox {p0} qeyd seçmək olar.",
+      "namelumEmeliyyat": "Naməlum əməliyyat.",
+      "hecBiriAlinmadi": "Seçilmiş qeydlərin heç biri işlənmədi.",
+      "qismenTamamlandi": "{p1} qeyddən {p0}-i işləndi; qalanları alınmadı.",
+      "tamamlandi": "{p0} qeyd işləndi."
     }
   }
 }

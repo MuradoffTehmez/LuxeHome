@@ -26,9 +26,10 @@ import {
 } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminLeads } from "@/lib/queries";
-import { deleteLead } from "./actions";
+import { deleteLead, bulkLeads } from "./actions";
 import { LeadQuickStatus } from "./lead-quick-status";
 import { getAdminT } from "@/lib/admin-i18n";
+import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -94,6 +95,20 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
     );
   }
 
+  const bulkIntents = [
+    {
+      intent: "delete",
+      label: t("components.bulk.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      confirm: {
+        title: t("components.bulk.deleteTitle"),
+        description: t("components.bulk.deleteDescription"),
+        confirmLabel: t("components.bulk.delete"),
+      },
+    },
+  ];
+
   return (
     <>
       <AdminPageHeader
@@ -142,6 +157,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
           ]}
         />
 
+        <BulkSelectionForm action={bulkLeads} intents={bulkIntents}>
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
             ariaLabel={t("pages.leads.muracietler")}
@@ -156,6 +172,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
             }
             renderCard={(lead) => (
               <AdminListCard
+                select={<BulkRowCheckbox id={lead.id} label={t("components.bulk.selectRow", { name: lead.name })} />}
                 title={
                   <Link href={`${LIST_PATH}/${lead.id}`} className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] transition-colors hover:text-gold-deep">
                     {lead.name}
@@ -191,6 +208,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
               <AdminTable
                 caption={t("pages.leads.muracietler")}
                 headers={[
+                  { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                   { label: t("pages.leads.musteri") },
                   { label: t("pages.leads.movzu") },
                   { label: t("pages.leads.menbe") },
@@ -202,6 +220,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
               >
                 {items.map((lead) => (
                   <AdminTableRow key={lead.id}>
+                    <AdminTableCell className="w-9"><BulkRowCheckbox id={lead.id} label={t("components.bulk.selectRow", { name: lead.name })} /></AdminTableCell>
                     <AdminTableCell>
                       <Link href={`${LIST_PATH}/${lead.id}`} className="font-medium text-ink transition-colors hover:text-gold-deep">{lead.name}</Link>
                       <a href={`tel:${lead.phone}`} className="tabular mt-0.5 flex items-center gap-1 text-xs text-ink-muted transition-colors hover:text-gold-deep">
@@ -220,6 +239,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
             )}
           />
         </div>
+        </BulkSelectionForm>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">
