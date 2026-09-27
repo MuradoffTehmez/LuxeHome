@@ -38,3 +38,16 @@ export function parseServerMessage(text: string | null | undefined): { key: stri
     return { key: body.slice(0, separator) };
   }
 }
+
+/**
+ * Bazada saxlanmış markeri (məs. `SeoAlert.message`) server komponentində tərcümə edir.
+ * Client tərəfdəki `useServerMessage()`-in server ekvivalentidir: adi mətn olduğu kimi qalır.
+ */
+export function translateServerMessage(
+  t: (key: never, values?: never) => string,
+  text: string,
+): string {
+  const parsed = parseServerMessage(text);
+  if (!parsed) return text;
+  return (t as (key: string, values?: ServerMessageValues) => string)(parsed.key, parsed.values);
+}

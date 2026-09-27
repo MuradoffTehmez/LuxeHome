@@ -14,6 +14,7 @@ import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
+import { guardedBulk } from "@/lib/admin/bulk";
 
 /**
  * Layihə CRUD-u.
@@ -261,4 +262,9 @@ export async function restoreProject(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("layihə bərpa edilmədi", error, msg("server.common.unexpected"));
   }
+}
+
+/** Siyahıdakı toplu seçim üçün — hər qeyd mövcud tək action-dan keçir. */
+export async function bulkProjects(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  return guardedBulk(PERMISSIONS.PROJECT_MANAGE, formData, { delete: deleteProject, restore: restoreProject });
 }

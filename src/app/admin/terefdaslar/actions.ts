@@ -27,6 +27,7 @@ import { slugify } from "@/lib/utils";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import type { AuthUser } from "@/lib/auth/types";
 import { msg } from "@/lib/admin/server-message";
+import { guardedBulk } from "@/lib/admin/bulk";
 
 const LIST_PATH = "/admin/terefdaslar";
 
@@ -78,8 +79,29 @@ function readContractForm(formData: FormData): PartnerContractInput {
   };
 }
 
-function firstImage(formData: FormData, name: string): string | null {
-  return parseImages(formData, name)[0]?.url ?? null;
+type PartnerImages = { logoUrl: string | null; logoLight: string | null; logoDark: string | null; coverImage: string | null };
+
+/**
+ * Tək şəkil sahəsi. Yüklənən fayl `/media/...` olur və `parseImages()`-dən keçir.
+ *
+ * Mövcud kənar ünvan (məs. TREVA-nın `treva.realestate/...svg` loqosu) isə o
+ * yoxlamadan keçmir — əvvəllər tərəfdaşı bir dəfə saxlamaq loqo və örtüyü səssizcə
+ * `null` edirdi və saytda boş yer qalırdı. İndi formadakı dəyər bazadakı ilə eynidirsə
+ * saxlanılır; yeni kənar ünvan yenə də qəbul edilmir.
+ */
+function firstImage(formData: FormData, name: string, current: string | null = null): string | null {
+  const uploaded = parseImages(formData, name)[0]?.url;
+  if (uploaded) return uploaded;
+  if (!current) return null;
+  const kept = formData.getAll(name).some((raw) => {
+    try {
+      const value = JSON.parse(String(raw)) as { url?: unknown };
+      return value?.url === current;
+    } catch {
+      return false;
+    }
+  });
+  return kept ? current : null;
 }
 
 function can(user: AuthUser, permission: Permission): boolean {
@@ -103,7 +125,7 @@ function publicSnapshot(value: PartnerInput) {
   };
 }
 
-async function sanitizePartnerData(input: PartnerInput, formData: FormData) {
+async function sanitizePartnerData(input: PartnerInput, formData: FormData, current?: PartnerImages) {
   const [description, descriptionEn, descriptionRu] = await Promise.all([
     input.description ? sanitizeRichText(input.description) : null,
     input.descriptionEn ? sanitizeRichText(input.descriptionEn) : null,
@@ -115,10 +137,10 @@ async function sanitizePartnerData(input: PartnerInput, formData: FormData) {
     description,
     descriptionEn,
     descriptionRu,
-    logoUrl: firstImage(formData, "logo"),
-    logoLight: firstImage(formData, "logoLight"),
-    logoDark: firstImage(formData, "logoDark"),
-    coverImage: firstImage(formData, "coverImage"),
+    logoUrl: firstImage(formData, "logo", current?.logoUrl),
+    logoLight: firstImage(formData, "logoLight", current?.logoLight),
+    logoDark: firstImage(formData, "logoDark", current?.logoDark),
+    coverImage: firstImage(formData, "coverImage", current?.coverImage),
   };
 }
 
@@ -271,6 +293,10 @@ export async function updatePartner(
         partnershipEndDate: true,
         partnershipType: true,
         sortOrder: true,
+        logoUrl: true,
+        logoLight: true,
+        logoDark: true,
+        coverImage: true,
       },
     });
     if (!existing) return failure(msg("server.terefdaslar.terefdasTapilmadiVeYaSilinib"));
@@ -283,7 +309,7 @@ export async function updatePartner(
       return failure(msg("server.terefdaslar.eyniTerefdasaBenzeyenQeydArtiq"), duplicate.errors);
     }
 
-    const data = await sanitizePartnerData(parsed.data, formData);
+    const data = await sanitizePartnerData(parsed.data, formData, existing);
     const contractResult = can(user, PERMISSIONS.PARTNER_CONTRACT_MANAGE)
       ? partnerContractSchema.safeParse(readContractForm(formData))
       : null;
@@ -597,4 +623,9 @@ export async function removePartnerRelation(
   } catch (error) {
     return unexpected("tərəfdaş əlaqəsi silinmədi", error, msg("server.common.unexpected"));
   }
+}
+
+/** Siyahıdakı toplu seçim üçün — hər qeyd mövcud tək action-dan keçir. */
+export async function bulkPartners(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  return guardedBulk(PERMISSIONS.PARTNER_DELETE, formData, { delete: deletePartner, restore: restorePartner });
 }

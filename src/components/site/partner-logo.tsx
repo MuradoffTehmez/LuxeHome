@@ -34,6 +34,9 @@ const SIZES = {
   xl: { box: "h-16 sm:h-20", width: 420, height: 96, sizes: "(max-width: 640px) 240px, 420px" },
 } as const;
 
+const WORDMARK_TEXT = { sm: "text-sm", md: "text-base", lg: "text-lg", xl: "text-xl sm:text-2xl" } as const;
+const WORDMARK_ICON = { sm: "size-4", md: "size-5", lg: "size-6", xl: "size-7 sm:size-8" } as const;
+
 export function PartnerLogo({
   partner,
   size = "md",
@@ -43,17 +46,15 @@ export function PartnerLogo({
   const { light, dark, hasThemeVariants, hasDarkOnly } = partnerLogoVariants(partner);
   const config = SIZES[size];
 
+  // Loqo yoxdursa brendin adı wordmark kimi yazılır. Əvvəlki boz ikon qutusu
+  // (kartda bütün eni tutan zolaq) ana səhifədə «şəkil yüklənmədi» kimi görünürdü.
   if (!light && !dark) {
     return (
-      <span
-        className={cn(
-          "grid shrink-0 place-items-center rounded-xs bg-beige px-4 text-ink-muted",
-          config.box,
-          className,
-        )}
-      >
-        <Building2 className="size-5" aria-hidden="true" />
-        <span className="sr-only">{partner.name}</span>
+      <span className={cn("inline-flex max-w-full shrink-0 items-center gap-2.5 self-start", config.box, className)}>
+        <Building2 className={cn("shrink-0 text-gold-deep", WORDMARK_ICON[size])} aria-hidden="true" />
+        <span className={cn("truncate font-display font-semibold tracking-[0.08em] text-ink uppercase", WORDMARK_TEXT[size])}>
+          {partner.name}
+        </span>
       </span>
     );
   }
@@ -71,8 +72,11 @@ export function PartnerLogo({
     return (
       <span
         className={cn(
-          "flex shrink-0 items-center",
-          hasDarkOnly && "rounded-sm bg-navy px-3 py-2",
+          // `w-fit`: flex-col kartda konteyner əks halda bütün eni tutur və tünd
+          // fonlu loqo kartın enində zolağa çevrilirdi
+          "flex w-fit max-w-full shrink-0 items-center",
+          // Sabit tünd fon: `bg-navy` tünd rejimdə açığa dönür və ağ loqo görünmürdü
+          hasDarkOnly && "rounded-sm bg-[#17202b] px-3 py-2",
           config.box,
           className,
         )}
@@ -91,7 +95,7 @@ export function PartnerLogo({
   // oxuyucuya çatmır, ona görə ad `sr-only` mətnə köçürülür və hər iki şəkil
   // dekorativ (`alt=""`) olur — əks halda dark rejimdə loqonun adı itərdi.
   return (
-    <span className={cn("flex shrink-0 items-center", config.box, className)}>
+    <span className={cn("flex w-fit max-w-full shrink-0 items-center", config.box, className)}>
       <span className="sr-only">{partner.name}</span>
       <span className={cn("theme-light-only h-full", config.box)} aria-hidden="true">
         <Image

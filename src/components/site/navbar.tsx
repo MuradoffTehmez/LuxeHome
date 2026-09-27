@@ -12,6 +12,7 @@ import { IconButton, buttonClassName } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Overlay } from "@/components/ui/overlay";
 import { AccountMenu } from "./account-menu";
+import { useSessionState } from "./use-session-state";
 import { Logo } from "./logo";
 import { LocaleSwitcher } from "./locale-switcher";
 import { ThemeSelector } from "./theme-selector";
@@ -105,6 +106,10 @@ export function Navbar({
   }, [overflowOpen]);
 
   const isOverlay = transparent && !scrolled && !menuOpen;
+  // Şəxsi istifadəçi (USER) elan yerləşdirə bilmir — düymə onu qadağan səhifəsinə aparardı.
+  // Qonaq üçün düymə qalır: kabinet onu əvvəlcə giriş səhifəsinə yönləndirir.
+  const session = useSessionState("");
+  const showListProperty = !(session.status === "signed-in" && !session.isStaff && !session.canPostListing);
 
   return (
     <header
@@ -285,16 +290,18 @@ export function Navbar({
             <AccountMenu isOverlay={isOverlay} />
           </div>
 
-          <Link
-            href="/kabinet/elanlar/yeni"
-            aria-label={t("listProperty")}
-            className={buttonClassName("primary", "sm", false, "inline-flex min-w-11 px-2.5 sm:px-3 xl:px-4")}
-          >
-            <Plus className="size-4" aria-hidden="true" />
-            <span className="max-sm:hidden [@media(min-width:1440px)_and_(max-width:1799px)]:sr-only">
-              {t("listProperty")}
-            </span>
-          </Link>
+          {showListProperty ? (
+            <Link
+              href="/kabinet/elanlar/yeni"
+              aria-label={t("listProperty")}
+              className={buttonClassName("primary", "sm", false, "inline-flex min-w-11 px-2.5 sm:px-3 xl:px-4")}
+            >
+              <Plus className="size-4" aria-hidden="true" />
+              <span className="max-sm:hidden [@media(min-width:1440px)_and_(max-width:1799px)]:sr-only">
+                {t("listProperty")}
+              </span>
+            </Link>
+          ) : null}
 
           <IconButton
             label={menuOpen ? t("menuOpen") : t("openMenu")}
@@ -330,14 +337,16 @@ export function Navbar({
               <Search className="size-4" aria-hidden="true" />
               {t("searchProperties")}
             </Link>
-            <Link
-              href="/kabinet/elanlar/yeni"
-              onClick={() => setMenuOpen(false)}
-              className={buttonClassName("outline", "lg", true)}
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              {t("listProperty")}
-            </Link>
+            {showListProperty ? (
+              <Link
+                href="/kabinet/elanlar/yeni"
+                onClick={() => setMenuOpen(false)}
+                className={buttonClassName("outline", "lg", true)}
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                {t("listProperty")}
+              </Link>
+            ) : null}
           </div>
         </section>
 

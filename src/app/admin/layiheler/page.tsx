@@ -28,10 +28,11 @@ import {
 } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminProjects } from "@/lib/queries";
-import { deleteProject, restoreProject } from "./actions";
+import { deleteProject, restoreProject, bulkProjects } from "./actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
+import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -129,6 +130,22 @@ export default async function AdminProjectsPage({
     );
   }
 
+  const bulkIntents = deleted ? [
+    { intent: "restore", label: t("components.bulk.restore"), icon: "activate" as const },
+  ] : [
+    {
+      intent: "delete",
+      label: t("components.bulk.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      confirm: {
+        title: t("components.bulk.deleteTitle"),
+        description: t("components.bulk.deleteDescription"),
+        confirmLabel: t("components.bulk.delete"),
+      },
+    },
+  ];
+
   return (
     <>
       <AdminPageHeader
@@ -195,6 +212,7 @@ export default async function AdminProjectsPage({
           ]}
         />
 
+        <BulkSelectionForm action={bulkProjects} intents={bulkIntents}>
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
             ariaLabel={t("pages.projects.layiheler")}
@@ -209,6 +227,7 @@ export default async function AdminProjectsPage({
             }
             renderCard={(project) => (
               <AdminListCard
+                select={<BulkRowCheckbox id={project.id} label={t("components.bulk.selectRow", { name: project.name })} />}
                 title={
                   <Link href={`${LIST_PATH}/${project.id}`} className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] transition-colors hover:text-gold-deep">
                     {project.name}
@@ -250,6 +269,7 @@ export default async function AdminProjectsPage({
               <AdminTable
                 caption={t("pages.projects.layiheler")}
                 headers={[
+                  { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                   { label: t("pages.projects.layihe") },
                   { label: t("pages.projects.nov") },
                   { label: t("pages.projects.status") },
@@ -261,6 +281,7 @@ export default async function AdminProjectsPage({
               >
                 {items.map((project) => (
                   <AdminTableRow key={project.id}>
+                    <AdminTableCell className="w-9"><BulkRowCheckbox id={project.id} label={t("components.bulk.selectRow", { name: project.name })} /></AdminTableCell>
                     <AdminTableCell className="max-w-xs">
                       <Link href={`${LIST_PATH}/${project.id}`} className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep">
                         {project.name}
@@ -290,6 +311,7 @@ export default async function AdminProjectsPage({
             )}
           />
         </div>
+        </BulkSelectionForm>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">

@@ -29,10 +29,11 @@ import {
 } from "@/lib/queries";
 import { daysUntilPartnershipEnd } from "@/lib/partners";
 import { formatRelative, isUnoptimizedImage } from "@/lib/utils";
-import { deletePartner, restorePartner, togglePartnerVisibility } from "./actions";
+import { deletePartner, restorePartner, togglePartnerVisibility, bulkPartners } from "./actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
+import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -169,6 +170,22 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
     </>
   );
 
+  const bulkIntents = !canDelete ? [] : deleted ? [
+    { intent: "restore", label: t("components.bulk.restore"), icon: "activate" as const },
+  ] : [
+    {
+      intent: "delete",
+      label: t("components.bulk.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      confirm: {
+        title: t("components.bulk.deleteTitle"),
+        description: t("components.bulk.deleteDescription"),
+        confirmLabel: t("components.bulk.delete"),
+      },
+    },
+  ];
+
   return (
     <>
       <AdminPageHeader
@@ -234,6 +251,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           ]}
         />
 
+        <BulkSelectionForm action={bulkPartners} intents={bulkIntents}>
         <div className="p-4 sm:p-5">
           <AdminResponsiveList
             ariaLabel={t("pages.partners.terefdasSiyahisi")}
@@ -242,6 +260,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
             empty={<EmptyState title={t("pages.partners.terefdasTapilmadi")} description={t("pages.partners.filtrleriDeyisinVeYa")} />}
             renderCard={(partner) => (
               <AdminListCard
+                select={<BulkRowCheckbox id={partner.id} label={t("components.bulk.selectRow", { name: partner.name })} />}
                 title={partner.name}
                 meta={`${t(`labels.partnershipType.${partner.partnershipType as PartnershipType}`) ?? partner.partnershipType} · ${partner.city || partner.country || t("pages.misc.yerlesmeYoxdur")}`}
                 status={statusBadge(partner.status, t)}
@@ -257,6 +276,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
               <AdminTable
                 caption={t("pages.partners.terefdaslar")}
                 headers={[
+                  { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                   { label: t("pages.partners.loqoAd") }, { label: t("pages.partners.tip") }, { label: t("pages.partners.status") },
                   { label: t("pages.partners.tesdiqResmi") }, { label: t("pages.partners.secilmisAnaSehife") },
                   { label: t("pages.partners.baslamaBitme") }, { label: t("pages.partners.elanLayihe") },
@@ -265,10 +285,11 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
               >
                 {rows.map((partner) => (
                   <AdminTableRow key={partner.id}>
+                    <AdminTableCell className="w-9"><BulkRowCheckbox id={partner.id} label={t("components.bulk.selectRow", { name: partner.name })} /></AdminTableCell>
                     <AdminTableCell>
                       <div className="flex min-w-44 items-center gap-3">
                         <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-sm border border-line bg-ivory text-xs font-semibold text-ink">
-                          {partner.logoUrl ?? partner.logoLight ?? partner.logoDark ? <Image src={(partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string} alt="" fill sizes="44px" unoptimized={isUnoptimizedImage((partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string)} className={!partner.logoUrl && !partner.logoLight ? "object-contain bg-navy p-1" : "object-contain p-1"} /> : partner.name.slice(0, 2).toUpperCase()}
+                          {partner.logoUrl ?? partner.logoLight ?? partner.logoDark ? <Image src={(partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string} alt="" fill sizes="44px" unoptimized={isUnoptimizedImage((partner.logoUrl ?? partner.logoLight ?? partner.logoDark) as string)} className={!partner.logoUrl && !partner.logoLight ? "object-contain bg-[#17202b] p-1" : "object-contain p-1"} /> : partner.name.slice(0, 2).toUpperCase()}
                         </span>
                         <div><p className="font-medium text-ink">{partner.name}</p><p className="text-xs text-ink-muted">/{partner.slug}</p></div>
                       </div>
@@ -288,6 +309,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
           />
           <div className="mt-5"><Pagination page={page} totalPages={totalPages} buildHref={buildHref} /></div>
         </div>
+        </BulkSelectionForm>
       </AdminCard>
     </>
   );

@@ -15,6 +15,7 @@ import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
+import { guardedBulk } from "@/lib/admin/bulk";
 
 /**
  * Xidmət CRUD-u.
@@ -153,4 +154,9 @@ export async function deleteService(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("xidmət silinmədi", error, msg("server.common.unexpected"));
   }
+}
+
+/** Siyahıdakı toplu seçim üçün — hər qeyd mövcud tək action-dan keçir. */
+export async function bulkServices(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  return guardedBulk(PERMISSIONS.SERVICE_MANAGE, formData, { delete: deleteService });
 }

@@ -25,10 +25,11 @@ import {
 } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminBlogCategories, getAdminPosts } from "@/lib/queries";
-import { deletePost, restorePost } from "./actions";
+import { deletePost, restorePost, bulkPosts } from "./actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
+import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -125,6 +126,22 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
     );
   }
 
+  const bulkIntents = deleted ? [
+    { intent: "restore", label: t("components.bulk.restore"), icon: "activate" as const },
+  ] : [
+    {
+      intent: "delete",
+      label: t("components.bulk.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      confirm: {
+        title: t("components.bulk.deleteTitle"),
+        description: t("components.bulk.deleteDescription"),
+        confirmLabel: t("components.bulk.delete"),
+      },
+    },
+  ];
+
   return (
     <>
       <AdminPageHeader
@@ -192,6 +209,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
           ]}
         />
 
+        <BulkSelectionForm action={bulkPosts} intents={bulkIntents}>
         <div className="p-4 lg:p-0">
           <AdminResponsiveList
             ariaLabel={t("pages.blog.bloqMeqaleleri")}
@@ -206,6 +224,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             }
             renderCard={(post) => (
               <AdminListCard
+                select={<BulkRowCheckbox id={post.id} label={t("components.bulk.selectRow", { name: post.title })} />}
                 title={
                   <Link href={`${LIST_PATH}/${post.id}`} className="relative after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] transition-colors hover:text-gold-deep">
                     {post.title}
@@ -242,6 +261,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
               <AdminTable
                 caption={t("pages.blog.bloqMeqaleleri")}
                 headers={[
+                  { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                   { label: t("pages.blog.meqale") },
                   { label: t("pages.blog.kateqoriya") },
                   { label: t("pages.blog.muellif") },
@@ -253,6 +273,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
               >
                 {items.map((post) => (
                   <AdminTableRow key={post.id}>
+                    <AdminTableCell className="w-9"><BulkRowCheckbox id={post.id} label={t("components.bulk.selectRow", { name: post.title })} /></AdminTableCell>
                     <AdminTableCell className="max-w-sm">
                       <Link href={`${LIST_PATH}/${post.id}`} className="line-clamp-1 font-medium text-ink transition-colors hover:text-gold-deep">{post.title}</Link>
                       <p className="mt-0.5 text-xs text-ink-muted">{post.readMinutes} dəq oxu · /{post.slug}</p>
@@ -275,6 +296,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Se
             )}
           />
         </div>
+        </BulkSelectionForm>
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5 text-sm text-ink-muted">
           <span className="tabular">

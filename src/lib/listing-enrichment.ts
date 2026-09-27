@@ -4,7 +4,7 @@ import { AI_SYSTEM_PROMPTS } from "@/lib/ai-prompts";
 import { LOCATION_KINDS } from "@/lib/constants";
 import { composeImageAlt, fallbackImageAlt, parseImageRoom, type AltFacts } from "@/lib/image-alt";
 import { addressParts } from "@/lib/location-path";
-import { readImageBytes } from "@/lib/media/read-image";
+import { readPreferredImageBytes } from "@/lib/media/read-image";
 import { prisma } from "@/lib/prisma";
 import {
   SEO_COPY_SCHEMA,
@@ -202,8 +202,11 @@ function altFacts(property: EnrichmentProperty): AltFacts {
 }
 
 /** Vision modeli fotoda görünən sahəni seçir; alınmasa `null`. */
-async function classifyImage(url: string, facts: AltFacts): Promise<ReturnType<typeof parseImageRoom> | null> {
-  const bytes = await readImageBytes(url);
+async function classifyImage(
+  image: { thumbUrl: string | null; url: string },
+  facts: AltFacts,
+): Promise<ReturnType<typeof parseImageRoom> | null> {
+  const bytes = await readPreferredImageBytes(image.thumbUrl, image.url);
   if (!bytes) return null;
   try {
     const response = await runAiVision({
@@ -238,7 +241,7 @@ async function enrichAlts(property: EnrichmentProperty, force: boolean, useAi: b
 
   if (!useAi) return targets.length;
   for (const image of targets.slice(0, MAX_AI_ALT_IMAGES)) {
-    const room = await classifyImage(image.thumbUrl || image.url, facts);
+    const room = await classifyImage(image, facts);
     if (!room) continue;
     await prisma.propertyImage.update({
       where: { id: image.id },

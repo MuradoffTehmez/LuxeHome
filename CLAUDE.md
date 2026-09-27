@@ -248,6 +248,22 @@ Panel öz yolunu işlədir:
 - Paneldən ictimai sayta gedən keçidlər `localizePath(path, locale)` ilə qurulur ki,
   redaktor öz panel dilindəki səhifəni açsın.
 
+### Admin siyahıları: silmə və toplu seçim
+
+- Toplu seçim `components/admin/bulk-selection.tsx`-dir: `BulkSelectionForm` (zolaq, say, təsdiq
+  dialoqu) + sətirdə `BulkRowCheckbox` (kartda `AdminListCard select={…}`, cədvəldə ilk sütun).
+  Checkbox-lar forma `form="<id>"` ilə bağlanır — siyahı formun içində deyil, çünki sətirlərdə öz
+  `<form>`-u olan elementlər var. Server tərəfi `lib/admin/bulk.ts`: `guardedBulk(permission, formData,
+  { delete: deleteX })` hər id üçün mövcud tək action-u çağırır (guard, audit, keş onun içindədir),
+  bir sorğuda ən çox 100 id. Silmə intent-i həmişə `confirm` ilə verilir.
+- İctimai hesab/agentlik silinməsi `deletePublicAccount()`-dur və kabinetdəki özünü silmə ilə eyni
+  `requestAccountDeletion()` yolundan keçir — ayrıca `user.delete` yazma.
+- Tərəfdaş şəkilləri (`logoUrl/logoLight/logoDark/coverImage`) kənar ünvan ola bilər (TREVA).
+  `parseImages()` yalnız `/media/...` qəbul edir, ona görə tərəfdaş action-u formadakı dəyər bazadakı
+  ilə eynidirsə kənar ünvanı saxlayır — bunu silsən, ilk saxlamada loqo `null` olur (`migrations/0049`).
+- Bazada saxlanan `msg()` markeri (məs. `SeoAlert.message`) server komponentində
+  `translateServerMessage(t, text)` ilə göstərilir, xam yazılmır.
+
 ### Dizayn sistemi və dark mode
 
 `src/app/globals.css` Tailwind v4 `@theme` bloku ilə brend tokenlərini elan edir
@@ -419,6 +435,10 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - **Kalkulyatorlar:** `calculateInstallment` (tikintiçi krediti) və investor
   `calculateYield`/`computeDistrictYields` saf modullardadır (`mortgage.ts`,
   `investment-math.ts`, `stats.ts`) — brauzer kalkulyatoru Prisma idxal edən fayla toxunmamalıdır.
+- **Workers AI vision** (`runAiVision`, `lib/ai.ts`): `@cf/mistralai/mistral-small-3.1-24b-instruct`,
+  ehtiyat `llama-4-scout`; şəkil OpenAI formatlı `image_url` data URL-idir. `llama-3.2-11b-vision`
+  işlətmə — Meta lisenziyası hesabda `"agree"` ilə qəbul edilməyibsə hər çağırış `5016` verir və
+  foto məsləhətçisi «heç bir şəkil analiz edilə bilmədi» yazırdı.
 - **Semantik axtarış** (`semantic-search.ts`): Workers AI `bge-m3` + Vectorize
   (`PROPERTY_VECTORS`, indekslər `luxehome-properties[-staging]`, 1024/cosine). Elan yazan
   hər action `queuePropertyVectorSync()` çağırır (fon, xəta action-u sındırmır); gündəlik cron

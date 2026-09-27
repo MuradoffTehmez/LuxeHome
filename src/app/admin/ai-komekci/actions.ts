@@ -12,7 +12,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
 import { queuePropertyVectorSync, reindexAllProperties } from "@/lib/semantic-search";
-import { readImageBytes } from "@/lib/media/read-image";
+import { readPreferredImageBytes } from "@/lib/media/read-image";
 import { enrichListing } from "@/lib/listing-enrichment";
 
 type DescriptionOutput = { title?: string; description: string; highlights?: string[] };
@@ -165,7 +165,7 @@ export async function analyzePropertyPhotos(
       where: { id: propertyId },
       select: {
         title: true,
-        images: { orderBy: { order: "asc" }, take: MAX_ANALYZED_IMAGES, select: { id: true, url: true } },
+        images: { orderBy: { order: "asc" }, take: MAX_ANALYZED_IMAGES, select: { id: true, url: true, thumbUrl: true } },
       },
     });
     if (!property || property.images.length === 0) return failure(msg("server.aiKomekci.elaninAnalizEdilecekSekliYoxdur"));
@@ -175,7 +175,9 @@ export async function analyzePropertyPhotos(
     let model = "";
     let unreadable = 0;
     for (const image of property.images) {
-      const bytes = await readImageBytes(image.url);
+      // Kiçik nüsxə kifayətdir: texniki keyfiyyət onda da görünür, sorğu isə yüngül qalır.
+      // Oxunmasa orijinal sınanır (kiçik nüsxənin yazılması alınmamış ola bilər).
+      const bytes = await readPreferredImageBytes(image.thumbUrl, image.url);
       if (!bytes) {
         unreadable += 1;
         console.error(`[ai] «${image.id}» şəkli oxunmadı: ${image.url}`);

@@ -1,7 +1,7 @@
 "use client";
 
-import { useId } from "react";
-import { AlertCircle, ChevronDown } from "lucide-react";
+import { useId, useState } from "react";
+import { AlertCircle, ChevronDown, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Qeyd: `focus:outline-none` qəsdən istifadə olunmur — klaviatura fokusu üçün
@@ -102,6 +102,42 @@ export function Input({ label, error, hint, className, id, ...props }: InputProp
 }
 
 // ---------------------------------------------------------------------------
+
+/** Parol sahəsi — göstər/gizlət düyməsi ilə. Etiketlər çağıran tərəfdən (tərcümə) gəlir. */
+export function PasswordInput({
+  toggleLabels,
+  ...props
+}: Omit<InputProps, "type"> & { toggleLabels: { show: string; hide: string } }) {
+  const generatedId = useId();
+  const inputId = props.id ?? generatedId;
+  const [shown, setShown] = useState(false);
+  const { label, error, hint, className, id: _id, ...rest } = props;
+  void _id;
+
+  return (
+    <Field label={label} htmlFor={inputId} required={rest.required} error={error} hint={hint} className={className}>
+      <div className="relative">
+        <input
+          id={inputId}
+          type={shown ? "text" : "password"}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
+          className={cn(CONTROL_BASE, "pr-12", error ? CONTROL_ERROR : CONTROL_OK)}
+          {...rest}
+        />
+        <button
+          type="button"
+          onClick={() => setShown((value) => !value)}
+          aria-label={shown ? toggleLabels.hide : toggleLabels.show}
+          aria-pressed={shown}
+          className="absolute top-1/2 right-1 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors duration-200 hover:text-ink"
+        >
+          {shown ? <EyeOff className="size-4.5" aria-hidden="true" /> : <Eye className="size-4.5" aria-hidden="true" />}
+        </button>
+      </div>
+    </Field>
+  );
+}
 
 type TextareaProps = Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,

@@ -16,6 +16,7 @@ import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
+import { guardedBulk } from "@/lib/admin/bulk";
 
 /**
  * Bloq idarəsi.
@@ -314,4 +315,9 @@ export async function deleteBlogCategory(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("kateqoriya silinmədi", error, msg("server.common.unexpected"));
   }
+}
+
+/** Siyahıdakı toplu seçim üçün — hər qeyd mövcud tək action-dan keçir. */
+export async function bulkPosts(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  return guardedBulk(PERMISSIONS.BLOG_MANAGE, formData, { delete: deletePost, restore: restorePost });
 }

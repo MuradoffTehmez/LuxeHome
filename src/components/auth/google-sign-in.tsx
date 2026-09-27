@@ -14,7 +14,16 @@ const ERROR_KEYS = {
  * «Google ilə davam et» (#109). `GOOGLE_CLIENT_ID`/`SECRET` secret-ləri yoxdursa heç nə
  * render olunmur. Keçid adi `<a>`-dır: OAuth tam səhifə yönləndirməsi tələb edir.
  */
-export async function GoogleSignIn({ next, error }: { next?: string; error?: string }) {
+export async function GoogleSignIn({
+  next,
+  error,
+  placement = "after",
+}: {
+  next?: string;
+  error?: string;
+  /** `before` — düymə formadan əvvəl, ayırıcı («və ya e-poçt ilə») onun altında. */
+  placement?: "before" | "after";
+}) {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("auth.google")]);
   const errorKey = error && error in ERROR_KEYS ? ERROR_KEYS[error as keyof typeof ERROR_KEYS] : null;
   if (!isGoogleLoginConfigured()) return null;
@@ -23,13 +32,17 @@ export async function GoogleSignIn({ next, error }: { next?: string; error?: str
   const target = safePublicTarget(next);
   if (target) params.set("davam", target);
 
+  const divider = (
+    <div className="flex items-center gap-3 text-xs text-ink-muted" aria-hidden="true">
+      <span className="h-px flex-1 bg-line" />
+      {placement === "before" ? t("orEmail") : t("or")}
+      <span className="h-px flex-1 bg-line" />
+    </div>
+  );
+
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 text-xs text-ink-muted" aria-hidden="true">
-        <span className="h-px flex-1 bg-line" />
-        {t("or")}
-        <span className="h-px flex-1 bg-line" />
-      </div>
+      {placement === "after" ? divider : null}
       {errorKey ? (
         <p role="alert" className="rounded-xs border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
           {t(`errors.${errorKey}`)}
@@ -47,6 +60,7 @@ export async function GoogleSignIn({ next, error }: { next?: string; error?: str
         </svg>
         {t("continue")}
       </a>
+      {placement === "before" ? divider : null}
     </div>
   );
 }

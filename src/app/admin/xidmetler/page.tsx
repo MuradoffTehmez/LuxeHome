@@ -21,7 +21,8 @@ import { formatRelative } from "@/lib/utils";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminServices } from "@/lib/queries";
-import { deleteService } from "./actions";
+import { bulkServices, deleteService } from "./actions";
+import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 
@@ -38,6 +39,19 @@ export default async function AdminServicesPage() {
   const { locale } = await getAdminI18n();
   await requireAdminRead(PERMISSIONS.SERVICE_MANAGE);
   const services = await getAdminServices();
+  const bulkIntents = [
+    {
+      intent: "delete",
+      label: t("components.bulk.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      confirm: {
+        title: t("components.bulk.deleteTitle"),
+        description: t("components.bulk.deleteDescription"),
+        confirmLabel: t("components.bulk.delete"),
+      },
+    },
+  ];
 
   function renderActions(service: (typeof services)[number]) {
     return (
@@ -88,7 +102,9 @@ export default async function AdminServicesPage() {
         }
       />
 
-      <AdminCard bodyClassName="p-4 lg:p-0">
+      <AdminCard bodyClassName="p-0">
+        <BulkSelectionForm action={bulkServices} intents={bulkIntents}>
+        <div className="p-4 lg:p-0">
         <AdminResponsiveList
           ariaLabel={t("pages.services.xidmetler")}
           items={services}
@@ -96,6 +112,7 @@ export default async function AdminServicesPage() {
           empty={<p className="py-10 text-center text-sm text-ink-muted">{t("pages.services.heleXidmetElaveEdilmeyib")}</p>}
           renderCard={(service) => (
             <AdminListCard
+              select={<BulkRowCheckbox id={service.id} label={t("components.bulk.selectRow", { name: service.title })} />}
               title={
                 <span className="flex items-start gap-3">
                   <span className="grid size-11 shrink-0 place-items-center rounded-xs bg-beige text-ink-soft">
@@ -110,7 +127,7 @@ export default async function AdminServicesPage() {
                 </span>
               }
               meta={service.shortDescription}
-              status={<Badge tone={service.isActive ? "success" : "neutral"}>{service.isActive ? "Aktiv" : "Gizli"}</Badge>}
+              status={<Badge tone={service.isActive ? "success" : "neutral"}>{service.isActive ? t("components.bulk.active") : t("components.bulk.hidden")}</Badge>}
               actions={renderActions(service)}
             >
               <dl className="grid grid-cols-2 gap-3">
@@ -129,6 +146,7 @@ export default async function AdminServicesPage() {
             <AdminTable
               caption={t("pages.services.xidmetler")}
               headers={[
+                { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                 { label: t("pages.services.xidmet") },
                 { label: t("pages.services.veziyyet") },
                 { label: t("pages.services.sira"), className: "text-right" },
@@ -138,6 +156,7 @@ export default async function AdminServicesPage() {
             >
               {items.map((service) => (
                 <AdminTableRow key={service.id}>
+                  <AdminTableCell className="w-9"><BulkRowCheckbox id={service.id} label={t("components.bulk.selectRow", { name: service.title })} /></AdminTableCell>
                   <AdminTableCell className="max-w-md">
                     <div className="flex items-start gap-3">
                       <span className="mt-0.5 grid size-11 shrink-0 place-items-center rounded-xs bg-beige text-ink-soft">
@@ -150,7 +169,7 @@ export default async function AdminServicesPage() {
                     </div>
                   </AdminTableCell>
                   <AdminTableCell>
-                    <Badge tone={service.isActive ? "success" : "neutral"}>{service.isActive ? "Aktiv" : "Gizli"}</Badge>
+                    <Badge tone={service.isActive ? "success" : "neutral"}>{service.isActive ? t("components.bulk.active") : t("components.bulk.hidden")}</Badge>
                   </AdminTableCell>
                   <AdminTableCell align="right" className="tabular text-sm text-ink-soft">{service.order}</AdminTableCell>
                   <AdminTableCell align="right" className="text-xs whitespace-nowrap text-ink-muted">{formatRelative(service.updatedAt)}</AdminTableCell>
@@ -162,6 +181,8 @@ export default async function AdminServicesPage() {
             </AdminTable>
           )}
         />
+        </div>
+        </BulkSelectionForm>
       </AdminCard>
     </>
   );

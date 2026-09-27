@@ -17,7 +17,9 @@ import { formatDateTime } from "@/lib/utils";
 import { AGENCY_EMPLOYEE_ROLE_LABELS, PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminAgencies, getAdminAgencyEmployeeQueue } from "@/lib/queries";
-import { approveAgencyEmployee, rejectAgencyEmployee, toggleAgencyVerification } from "./actions";
+import { approveAgencyEmployee, bulkAgencies, rejectAgencyEmployee, toggleAgencyVerification } from "./actions";
+import { AccountDelete } from "../hesablar/account-delete";
+import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 import { AgencyProfileRepair } from "./agency-profile-repair";
 import { getAdminT } from "@/lib/admin-i18n";
 
@@ -34,6 +36,21 @@ export default async function AdminAgenciesPage() {
     getAdminAgencies(),
     getAdminAgencyEmployeeQueue(),
   ]);
+  const bulkIntents = [
+    { intent: "approve", label: t("components.bulk.approve"), icon: "approve" as const },
+    { intent: "revoke", label: t("components.bulk.revoke"), icon: "revoke" as const },
+    {
+      intent: "delete",
+      label: t("components.bulk.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      confirm: {
+        title: t("components.bulk.deleteAgenciesTitle"),
+        description: t("components.bulk.deleteAgenciesDescription"),
+        confirmLabel: t("components.bulk.delete"),
+      },
+    },
+  ];
 
   return (
     <>
@@ -96,7 +113,9 @@ export default async function AdminAgenciesPage() {
         </AdminCard>
       )}
 
-      <AdminCard bodyClassName="p-4 lg:p-0">
+      <AdminCard bodyClassName="p-0">
+        <BulkSelectionForm action={bulkAgencies} intents={bulkIntents}>
+        <div className="p-4 lg:p-0">
         <AdminResponsiveList
           ariaLabel={t("pages.agents.agentlikler")}
           items={agencies}
@@ -108,7 +127,12 @@ export default async function AdminAgenciesPage() {
           }
           renderCard={(account) => (
             <AdminListCard
-              title={account.agency?.name ?? account.name}
+              title={
+                <span className="flex items-start gap-2">
+                  <BulkRowCheckbox id={account.id} label={t("components.bulk.selectRow", { name: account.agency?.name ?? account.name })} />
+                  {account.agency?.name ?? account.name}
+                </span>
+              }
               meta={
                 <>
                   <span className="block">{account.email}</span>
@@ -124,7 +148,7 @@ export default async function AdminAgenciesPage() {
                   <Badge tone="warning">{t("pages.agents.tesdiqGozleyir")}</Badge>
                 )
               }
-              actions={account.agency ? (
+              actions={<>{account.agency ? (
                 <ConfirmAction
                   action={toggleAgencyVerification}
                   id={account.agency.id}
@@ -146,6 +170,8 @@ export default async function AdminAgenciesPage() {
                   )}
                 </ConfirmAction>
               ) : null}
+              <AccountDelete id={account.id} name={account.agency?.name ?? account.name} className="size-11" />
+              </>}
             >
               <div className="flex flex-wrap items-center gap-2">
                 <span className="tabular">{account._count.properties} elan</span>
@@ -163,6 +189,7 @@ export default async function AdminAgenciesPage() {
             <AdminTable
               caption={t("pages.agents.agentlikler")}
               headers={[
+                { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                 { label: t("pages.agents.agentlik") },
                 { label: t("pages.agents.elanSayi") },
                 { label: t("pages.agents.qeydiyyatTarixi") },
@@ -172,6 +199,9 @@ export default async function AdminAgenciesPage() {
             >
               {items.map((account) => (
                 <AdminTableRow key={account.id}>
+                  <AdminTableCell className="w-9">
+                    <BulkRowCheckbox id={account.id} label={t("components.bulk.selectRow", { name: account.agency?.name ?? account.name })} />
+                  </AdminTableCell>
                   <AdminTableCell>
                     <span className="font-medium text-ink">{account.agency?.name ?? account.name}</span>
                     <p className="mt-0.5 text-xs text-ink-muted">{account.email}</p>
@@ -218,6 +248,7 @@ export default async function AdminAgenciesPage() {
                         )}
                       </ConfirmAction>
                       )}
+                      <AccountDelete id={account.id} name={account.agency?.name ?? account.name} className="size-11" />
                     </div>
                   </AdminTableCell>
                 </AdminTableRow>
@@ -225,6 +256,8 @@ export default async function AdminAgenciesPage() {
             </AdminTable>
           )}
         />
+        </div>
+        </BulkSelectionForm>
       </AdminCard>
     </>
   );

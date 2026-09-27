@@ -22,8 +22,20 @@ const FALLBACK_TEXT_MODELS = [
   "@cf/meta/llama-3.2-3b-instruct",
 ] as const;
 
-/** Şəkil modeli — foto keyfiyyət analizi üçün. */
-const DEFAULT_VISION_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
+/**
+ * Şəkil modeli — foto keyfiyyət analizi və ALT təsnifatı üçün.
+ *
+ * `@cf/meta/llama-3.2-11b-vision-instruct` qəsdən işlədilmir: Meta lisenziyası
+ * hesab səviyyəsində bir dəfə `"agree"` sorğusu ilə qəbul edilməlidir, qəbul
+ * edilməyibsə hər çağırış `5016` xətası verir (foto məsləhətçisi buna görə
+ * «heç bir şəkil analiz edilə bilmədi» yazırdı). Aşağıdakı modellər belə tələb
+ * qoymur və OpenAI formatlı `image_url` (data URL) mesajını qəbul edir.
+ */
+const DEFAULT_VISION_MODEL = "@cf/mistralai/mistral-small-3.1-24b-instruct";
+const FALLBACK_VISION_MODELS = [
+  "@cf/mistralai/mistral-small-3.1-24b-instruct",
+  "@cf/meta/llama-4-scout-17b-16e-instruct",
+] as const;
 
 type AiRunner = {
   run(model: string, input: Record<string, unknown>): Promise<unknown>;
@@ -223,12 +235,30 @@ export async function runAiText(input: {
   throw new Error(`Workers AI cavab vermədi: ${lastError instanceof Error ? lastError.message : "naməlum xəta"}`);
 }
 
+/** Şəklin ilk baytlarından MIME tipi — data URL üçün. Tanınmayan format JPEG sayılır. */
+function imageMime(bytes: Uint8Array): string {
+  if (bytes[0] === 0x89 && bytes[1] === 0x50) return "image/png";
+  if (bytes[0] === 0x47 && bytes[1] === 0x49) return "image/gif";
+  if (bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return "image/webp";
+  return "image/jpeg";
+}
+
+function toDataUrl(bytes: Uint8Array): string {
+  // `String.fromCharCode(...bytes)` böyük massivdə stek həddini aşır — hissə-hissə
+  let binary = "";
+  for (let index = 0; index < bytes.length; index += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+  }
+  return `data:${imageMime(bytes)};base64,${btoa(binary)}`;
+}
+
 /**
  * Şəkil sorğusu.
  *
- * Llama vision bir çağırışda **bir** şəkil qəbul edir, ona görə çağıran tərəf
- * şəkilləri bir-bir göndərir. Şəkil bayt massivi kimi verilir: R2-dəki fayl
- * ictimai URL olmadan da oxuna bilir.
+ * Model bir çağırışda **bir** şəkil alır, ona görə çağıran tərəf şəkilləri bir-bir
+ * göndərir. Şəkil bayt massivi kimi verilir (R2-dəki fayl ictimai URL olmadan da
+ * oxunur) və mesaja `image_url` data URL-i kimi yerləşdirilir. Model xəta verərsə
+ * növbəti ehtiyat model sınanır; hamısı alınmasa son xəta atılır.
  */
 export async function runAiVision(input: {
   instructions: string;
@@ -237,19 +267,39 @@ export async function runAiVision(input: {
   maxTokens?: number;
 }): Promise<AiResult> {
   const ai = await aiBinding();
-  const model = visionModel();
-  const text = extractText(
-    await ai.run(model, {
-      messages: [
-        { role: "system", content: input.instructions },
-        { role: "user", content: input.prompt },
-      ],
-      image: Array.from(input.image),
-      max_tokens: input.maxTokens ?? 700,
-    }),
-  );
-  if (!text) throw new Error("AI boş cavab qaytardı.");
-  return { text, model };
+  const configuredModel = visionModel();
+  const models = [configuredModel, ...FALLBACK_VISION_MODELS.filter((item) => item !== configuredModel)];
+  const payload = {
+    messages: [
+      { role: "system", content: input.instructions },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: input.prompt },
+          { type: "image_url", image_url: { url: toDataUrl(input.image) } },
+        ],
+      },
+    ],
+    max_tokens: input.maxTokens ?? 700,
+    temperature: 0.2,
+  };
+  let lastError: unknown;
+
+  for (const model of models) {
+    try {
+      const text = extractText(await ai.run(model, payload));
+      if (!text) throw new Error("AI boş cavab qaytardı.");
+      return { text, model };
+    } catch (error) {
+      lastError = error;
+      console.error("[workers-ai] şəkil modeli xətası", {
+        model,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  throw new Error(`Workers AI şəkil modeli cavab vermədi: ${lastError instanceof Error ? lastError.message : "naməlum xəta"}`);
 }
 
 /** Panelin «hansı provayder işləyir» sətri üçün. */
