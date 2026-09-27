@@ -105,7 +105,7 @@ export default async function PackagesAdminPage({ searchParams }: { searchParams
         breadcrumbs={[{ label: t("pages.leads.idarePaneli"), href: "/admin" }, { label: t("pages.packages.title") }]}
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label={t("pages.packages.monthRevenue")} value={formatMoneyMinor(summary.monthRevenueMinor)} hint={t("pages.packages.monthPaidCount", { count: summary.monthPaidCount })} icon={CircleDollarSign} tone="success" />
         <StatCard label={t("pages.packages.pendingOrders")} value={summary.pending} icon={Clock} tone="warning" href="/admin/paketler?status=PENDING" />
         <StatCard label={t("pages.packages.awaitingActivation")} value={summary.awaitingActivation} hint={t("pages.packages.awaitingActivationHint")} icon={Sparkles} tone="gold" />

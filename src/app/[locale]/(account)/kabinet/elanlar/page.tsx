@@ -16,7 +16,7 @@ import {
 } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
-import { formatDate, formatPrice, isUnoptimizedImage } from "@/lib/utils";
+import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
 import { ConfirmAction } from "@/components/admin/confirm-action";
@@ -98,14 +98,17 @@ export default async function CabinetPropertiesPage({
     );
   }
 
+  // Rəqəmli tarix dildən asılı deyil və dar ekranda nişanı qısa saxlayır.
+  const shortDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Baku" });
+
   /** Premium göstəricisi (#109): aktivdirsə bitmə tarixi, yoxsa dərc olunmuş elanda paket keçidi. */
   function PremiumControl({ property }: { property: CabinetProperty }) {
     const active = property.isFeatured && (property.featuredUntil === null || property.featuredUntil.getTime() > now);
     if (active) {
       return (
-        <Badge tone="gold">
-          <Crown className="size-3.5" aria-hidden="true" />
-          {property.featuredUntil ? t("premiumUntil", { date: formatDate(property.featuredUntil) }) : t("premium")}
+        <Badge tone="gold" className="whitespace-normal">
+          <Crown className="size-3.5 shrink-0" aria-hidden="true" />
+          {property.featuredUntil ? t("premiumUntil", { date: shortDate.format(property.featuredUntil) }) : t("premium")}
         </Badge>
       );
     }

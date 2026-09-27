@@ -35,7 +35,7 @@
     "expiresIn": "{days, plural, other {# gün qalıb}}",
     "expired": "Müddəti bitib — bərpa edin",
     "premium": "Premium",
-    "premiumUntil": "Premium · {date} tarixinədək",
+    "premiumUntil": "Premium · {date}-dək",
     "promote": "Premium et",
     "promoteLabel": "«{title}» elanını premium et"
   },
