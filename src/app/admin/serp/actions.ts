@@ -188,6 +188,9 @@ export async function runSeoAudit(_state: ActionState, _data: FormData): Promise
     for (const issue of issues) await prisma.seoAuditIssue.create({ data: { type: issue.code, severity: issue.severity === "error" ? SEO_AUDIT_SEVERITIES.HIGH : issue.severity === "warning" ? SEO_AUDIT_SEVERITIES.MEDIUM : SEO_AUDIT_SEVERITIES.INFO, url: issue.publicPath, entityType: issue.kind.toUpperCase(), entityId: issue.contentId, message: issue.message } });
     for (const rule of redirects) { const chain = findRedirectChain(rule.fromPath, rule.toPath, redirects); if (chain) await prisma.seoAuditIssue.create({ data: { type: "REDIRECT_CHAIN", severity: SEO_AUDIT_SEVERITIES.HIGH, url: rule.fromPath, entityType: "REDIRECT", entityId: rule.id, message: chain.join(" → ") } }); }
     const criticalCount = issues.filter((issue) => issue.severity === "error").length;
+    // Əvvəlki auditin xəbərdarlığı yeni nəticə ilə əvəz olunur — əks halda hər işə salma
+    // eyni problemi siyahıya bir daha əlavə edirdi.
+    await prisma.seoAlert.updateMany({ where: { type: "SEO_AUDIT_CRITICAL", status: "OPEN" }, data: { status: "RESOLVED", resolvedAt: new Date() } });
     if (criticalCount > 0) await prisma.seoAlert.create({ data: { type: "SEO_AUDIT_CRITICAL", severity: SEO_AUDIT_SEVERITIES.CRITICAL, message: msg("server.serp.kritikSeoAuditProblemiTapildi", { p0: String(criticalCount) }) } });
     await recordAudit(user, "UPDATE", "SeoAuditIssue", null, `SEO audit: ${issues.length} problem`); refresh(`${ROOT}/audit`); return success(msg("server.serp.auditTamamlandiCariProblem", { p0: String(issues.length) }));
   } catch (error) { return unexpected("SEO audit işləmədi", error, msg("server.common.unexpected")); }
