@@ -172,7 +172,11 @@
       "newProperty": "New property listing",
       "newProject": "New development",
       "newPost": "New article",
-      "viewLeads": "View enquiries"
+      "viewLeads": "View enquiries",
+      "moderation": "Moderation queue",
+      "leadBoard": "Lead board",
+      "aiAssistant": "AI assistant (SEO, ALT)",
+      "importListings": "Import from CSV"
     }
   },
   "labels": {

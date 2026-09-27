@@ -172,7 +172,11 @@
       "newProperty": "Новое объявление",
       "newProject": "Новый комплекс",
       "newPost": "Новая статья",
-      "viewLeads": "Смотреть заявки"
+      "viewLeads": "Смотреть заявки",
+      "moderation": "Очередь модерации",
+      "leadBoard": "Доска заявок",
+      "aiAssistant": "ИИ-помощник (SEO, ALT)",
+      "importListings": "Импорт из CSV"
     }
   },
   "labels": {

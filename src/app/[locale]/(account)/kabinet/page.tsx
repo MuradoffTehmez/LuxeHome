@@ -10,6 +10,7 @@ import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
+import { CabinetQuickActions } from "./quick-actions";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -52,6 +53,8 @@ export default async function CabinetPage() {
             </Badge>
             }
           />
+
+          <CabinetQuickActions canList={canList} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <article className="rounded-xl border border-line bg-paper p-5 shadow-xs">

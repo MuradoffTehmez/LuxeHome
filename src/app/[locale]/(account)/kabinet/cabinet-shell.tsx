@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Menu } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
 import { CabinetNav } from "./cabinet-nav";
+import { CabinetBreadcrumbs } from "./cabinet-breadcrumbs";
 
 type CabinetShellProps = {
   name: string;
@@ -41,7 +42,10 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
         <aside className="hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block lg:self-start">
           <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} />
         </aside>
-        <div className="min-w-0">{children}</div>
+        <div className="min-w-0">
+          <CabinetBreadcrumbs />
+          {children}
+        </div>
       </div>
 
       <Overlay

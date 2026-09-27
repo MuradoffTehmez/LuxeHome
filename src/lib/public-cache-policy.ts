@@ -37,6 +37,10 @@ export const NEVER_CACHED_PREFIXES = [
   // Sessiyanı serverdə oxumur, amma istifadəçiyə məxsus səthdir və robots-dan
   // kənarlaşdırılıb — paylaşılan keşdə yeri yoxdur.
   "/favoritler",
+  // Kabinetə yönləndirən qısa ünvanlar (`accounts/short-links.ts`).
+  "/elan-yerlesdir",
+  "/elanlarim",
+  "/profilim",
 ] as const;
 
 const LOCALE_PREFIX = new RegExp(`^/(${Object.values(LOCALES).join("|")})(?=/|$)`);

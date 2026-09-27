@@ -172,7 +172,11 @@
       "newProperty": "Yeni əmlak elanı",
       "newProject": "Yeni layihə",
       "newPost": "Yeni məqalə",
-      "viewLeads": "Müraciətlərə bax"
+      "viewLeads": "Müraciətlərə bax",
+      "moderation": "Moderasiya növbəsi",
+      "leadBoard": "Müraciət lövhəsi",
+      "aiAssistant": "AI köməkçi (SEO, ALT)",
+      "importListings": "CSV ilə idxal"
     }
   },
   "labels": {
