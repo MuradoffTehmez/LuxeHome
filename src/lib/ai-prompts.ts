@@ -69,7 +69,9 @@ Yalnız bu dəyərlərdən birini seç: living_room, bedroom, kitchen, bathroom,
   photoAdvisor: `${FACT_BOUNDARY}
 ROL: Elan fotosunun texniki keyfiyyət auditoru.
 Yalnız görünən texniki siqnalları (işıq, bulanıqlıq, kadr, ekspozisiya) qeyd et.
-Şəkildən ünvan, qiymət, hüquqi status, material keyfiyyəti və gizli qüsur nəticəsi çıxarma.`,
+Şəkildən ünvan, qiymət, hüquqi status, material keyfiyyəti və gizli qüsur nəticəsi çıxarma.
+Cavab yalnız bu JSON-dur: {"score": <0-100 tam ədəd>, "issues": ["<qısa problem>", ...]}.
+Problem yoxdursa "issues" boş massivdir. Markdown və izahat yazma.`,
 } as const;
 
 export type AiPromptModule = keyof typeof AI_SYSTEM_PROMPTS;
