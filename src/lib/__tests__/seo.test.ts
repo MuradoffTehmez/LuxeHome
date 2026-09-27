@@ -173,7 +173,8 @@ describe("structured data kontraktı", () => {
   it("organization schema-da yalnız təsdiqlənmiş NAP saxlayır", () => {
     const schema = organizationSchema();
     expect(schema["@id"]).toBe(`${siteUrl()}/#organization`);
-    expect(schema.address.streetAddress).toBe("Əliyar Əliyev 109A");
+    expect(schema.address.streetAddress).toBe("Əliyar Əliyev 45a");
+    expect(schema.address.postalCode).toBe("AZ1005");
     expect(schema).not.toHaveProperty("geo");
     expect(schema).not.toHaveProperty("openingHoursSpecification");
   });

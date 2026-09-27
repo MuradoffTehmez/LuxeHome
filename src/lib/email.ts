@@ -588,7 +588,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
                 line-height:18px;
                 color:#8f8f8f;
               ">
-                Əliyar Əliyev 109A, Bakı, Azərbaycan
+                Əliyar Əliyev 45a, Bakı AZ1005, Azərbaycan
               </div>
               <div style="height:6px; line-height:6px;">&nbsp;</div>
               <div>

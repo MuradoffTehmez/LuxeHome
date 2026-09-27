@@ -4,7 +4,7 @@ Bu siyahı kodla təhlükəsiz həll edilə bilməyən qərarları göstərir. T
 
 | Prioritet | Blocker | Cari təhlükəsiz davranış | Tələb olunan qərar/sübut |
 | --- | --- | --- | --- |
-| P0 | Ünvan ziddiyyəti: layihə mənbəyi `Əliyar Əliyev 109A`, Seobility PDF-də `45A` | Saytın təsdiqlənmiş mənbə dəyəri 109A saxlanılır; 45A tətbiq edilmir | Hüquqi sənəd və GBP/Maps faktı ilə vahid ünvan qərarı |
+| ~~P0~~ | ~~Ünvan ziddiyyəti: `109A` / `45A`~~ | **Həll olunub (#110):** sahib təsdiqlədi — `Əliyar Əliyev 45a, Bakı AZ1005`, koordinat 40.40767, 49.87432; sayt, struktur data və D1 parametrləri GBP ilə eynidir | — |
 | P0 | GSC giriş və Domain property sahiblik təsdiqi | Env əsaslı verification hazırdır, canlı təqdimat edilməyib | DNS/Cloudflare girişli məsul şəxs və verification icazəsi |
 | P0 | Cloudflare zone/rule girişləri | Kod fallback redirect və header verir; edge qaydaları manualdır | Zone admin girişi, rule təsdiqi və rollback sahibi |
 | P0 | Google Business Profile giriş/sahiblik | GBP və Maps məlumatı koddan yaradılmır | Profil owner/manager dəvəti və duplicate profil yoxlaması |

@@ -265,6 +265,7 @@ export function organizationSchema(profile?: LocalBusinessProfile | null) {
       "@type": "PostalAddress",
       streetAddress: siteConfig.address,
       addressLocality: "Bakı",
+      postalCode: siteConfig.postalCode,
       addressCountry: "AZ",
     },
     sameAs,

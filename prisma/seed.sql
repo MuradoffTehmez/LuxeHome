@@ -222,6 +222,6 @@ ON CONFLICT("id") DO UPDATE SET
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('site.title', 'Luxe Home Estate — Həyatınızın ən dəyərli ünvanı', '2026-08-20T17:31:32.242Z');
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('site.description', 'Luxe Home Estate — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi.', '2026-08-20T17:31:32.390Z');
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('contact.phone', '+994 51 922 85 85', '2026-08-20T17:31:32.490Z');
-INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('contact.address', 'Əliyar Əliyev 109A', '2026-08-20T17:31:32.502Z');
+INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('contact.address', 'Əliyar Əliyev 45a', '2026-08-20T17:31:32.502Z');
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('contact.instagram', 'luxe_home_estate', '2026-08-20T17:31:32.530Z');
 INSERT OR IGNORE INTO "Setting" ("key", "value", "updatedAt") VALUES ('leads.notifyEmail', '', '2026-08-20T17:31:32.548Z');

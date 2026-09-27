@@ -6,7 +6,7 @@ Bu plan yalnız təsdiqlənmiş biznes məlumatları və real müştəri münasi
 
 - Google Business Profile sahiblik və girişini təsdiqlə; biznes adı kimi yalnız hüquqi/ictimai brend adını istifadə et.
 - Əsas kateqoriyanı faktiki fəaliyyətə uyğun seç, əlavə kateqoriyaları yalnız göstərilən xidmətlər olduqda əlavə et. Açar sözləri biznes adına doldurma.
-- Ünvanı 109A/45A qərarından sonra sayt, GBP, Maps və bütün kataloqlarda eyniləşdir. Telefon, e-poçt və canonical domen də eyni NAP auditinə daxil olsun.
+- Ünvan qərarı verilib (#110): **Əliyar Əliyev 45a, Bakı AZ1005** — sayt və GBP eynidir; Maps və bütün kataloqlarda da bu yazılışı işlət. Telefon, e-poçt və canonical domen də eyni NAP auditinə daxil olsun.
 - Dəqiq pin, xidmət ərazisi və iş saatlarını şirkətdən yazılı təsdiq alındıqdan sonra daxil et.
 - Real ofis, komanda, fasad və iş prosesi fotoları üçün çəkiliş siyahısı hazırla; metadata/alt mətn yalnız fotoda görünəni təsvir etsin.
 - Həftədə bir real GBP postu yayımla: yeni elan, xidmət izahı və ya faydalı Bakı əmlak məsləhəti. Qiymət və status dəyişəndə postu yenilə/sil.

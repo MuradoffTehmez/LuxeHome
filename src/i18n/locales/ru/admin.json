@@ -503,7 +503,7 @@
       "latitude": "Широта (latitude)",
       "longitude": "Долгота (longitude)",
       "searchLabel": "Найти адрес на карте",
-      "searchPlaceholder": "Например: Алияра Алиева 109A, Баку",
+      "searchPlaceholder": "Например: Алияра Алиева 45a, Баку",
       "searchAction": "Найти",
       "searching": "Поиск…",
       "noResults": "Адрес не найден. Укажите его короче или кликните прямо по карте.",
