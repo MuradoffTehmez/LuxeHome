@@ -7,7 +7,6 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
-  AUTH_KINDS,
   PUBLIC_ACCOUNT_TYPES,
   ROLES,
   type AccountType,
@@ -16,13 +15,11 @@ import {
 import {
   clearSessionCookie,
   readSessionCookie,
-  setSessionCookie,
-  signSessionToken,
   verifySessionToken,
 } from "@/lib/auth/cookies";
 import { hashPassword, needsRehash, verifyPassword } from "@/lib/auth/password";
-import { checkLoginLimit, clientIp, registerFailure, registerSuccess } from "@/lib/auth/rate-limit";
-import { createSession, revokeAllSessions, revokeSession } from "@/lib/auth/session";
+import { checkLoginLimit, clientIp, registerFailure } from "@/lib/auth/rate-limit";
+import { revokeAllSessions, revokeSession } from "@/lib/auth/session";
 import { uniqueSlug } from "@/lib/admin/slug";
 import { systemModeBlock } from "@/lib/admin/guard";
 import {
@@ -41,6 +38,7 @@ import {
 } from "@/lib/auth/account-tokens";
 import { sendAccountVerificationEmail, sendPasswordResetEmail } from "@/lib/account-email";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
+import { openPublicSession } from "@/lib/auth/public-session";
 
 /**
  * İctimai hesab axını — qeydiyyat və giriş.
@@ -61,40 +59,9 @@ const DUMMY_HASH =
 
 async function startPublicSession(userId: string, target?: string): Promise<never> {
   const locale = await getLocale() as Locale;
-  const requestHeaders = await headers();
-  const ip = clientIp(requestHeaders);
-
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: { email: true, role: true, accountType: true },
-  });
-  if (!canUsePublicSignIn(user.accountType as AccountType)) {
+  if (!(await openPublicSession(userId))) {
     redirect(localizePath("/daxil-ol?yeniden=1", locale));
   }
-
-  const session = await createSession({
-    userId,
-    totpCounter: null,
-    ip,
-    userAgent: requestHeaders.get("user-agent"),
-    authKind: AUTH_KINDS.PUBLIC,
-  });
-
-  await setSessionCookie(
-    await signSessionToken(
-      {
-        sid: session.id,
-        uid: userId,
-        role: user.role,
-        accountType: user.accountType as AccountType,
-        authKind: AUTH_KINDS.PUBLIC,
-      },
-      session.expiresAt,
-    ),
-    session.expiresAt,
-  );
-  await registerSuccess(userId, user.email, ip);
-
   redirect(target ?? localizePath(CABINET, locale));
 }
 

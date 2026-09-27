@@ -2319,7 +2319,9 @@
       "integrationTurnstile": "Turnstile bot protection",
       "integrationSavedSearchCron": "Saved-search cron",
       "integrationTelegram": "Telegram lead alerts",
-      "integrationPush": "Push notifications"
+      "integrationPush": "Push notifications",
+      "integrationGoogleLogin": "Sign in with Google",
+      "integrationPhoneLogin": "Phone OTP sign-in (SMS)"
     },
     "propertyImport": {
       "title": "Bulk CSV import",

@@ -2319,7 +2319,9 @@
       "integrationTurnstile": "Защита Turnstile",
       "integrationSavedSearchCron": "Cron сохранённых поисков",
       "integrationTelegram": "Telegram-уведомления о заявках",
-      "integrationPush": "Push-уведомления"
+      "integrationPush": "Push-уведомления",
+      "integrationGoogleLogin": "Вход через Google",
+      "integrationPhoneLogin": "Вход по SMS-коду"
     },
     "propertyImport": {
       "title": "Массовый импорт CSV",

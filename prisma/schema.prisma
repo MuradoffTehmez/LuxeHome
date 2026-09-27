@@ -49,6 +49,8 @@ model User {
   locale          String @default("az")
   /// Şəxsi təqvim abunəsinin (ICS) gizli açarı (#109). Yenidən yaradılanda köhnə link ölür.
   calendarToken   String? @unique
+  /// Google hesabının dəyişməz ID-si (`sub`, #109). E-poçt dəyişsə də bağlantı qalır.
+  googleSub       String? @unique
   /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
   themePreference String @default("light")
 

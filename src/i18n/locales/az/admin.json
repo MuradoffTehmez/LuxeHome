@@ -2319,7 +2319,9 @@
       "integrationTurnstile": "Turnstile bot müdafiəsi",
       "integrationSavedSearchCron": "Saxlanmış axtarış cron-u",
       "integrationTelegram": "Telegram lead bildirişi",
-      "integrationPush": "Push bildirişləri"
+      "integrationPush": "Push bildirişləri",
+      "integrationGoogleLogin": "Google ilə giriş",
+      "integrationPhoneLogin": "Telefonla OTP girişi (SMS)"
     },
     "propertyImport": {
       "title": "CSV ilə toplu idxal",
