@@ -178,12 +178,18 @@ export function LocationFields({ cities, places, locale, labels, initial, onChan
   function selectLeaf(kind: "settlementId" | "villageId", id: string) {
     const place = places.find((item) => item.id === id);
     const parent = place?.parentId ? places.find((item) => item.id === place.parentId) : undefined;
-    setState((current) => ({
-      ...current,
-      settlementId: kind === "settlementId" ? id : "",
-      villageId: kind === "villageId" ? id : "",
-      urbanId: parent?.kind === LOCATION_KINDS.DISTRICT ? parent.id : current.urbanId,
-    }));
+    setState((current) => {
+      const changed = current[kind] !== id;
+      return {
+        ...current,
+        settlementId: kind === "settlementId" ? id : "",
+        villageId: kind === "villageId" ? id : "",
+        urbanId: parent?.kind === LOCATION_KINDS.DISTRICT ? parent.id : current.urbanId,
+        // Massiv əvvəlki yerə aid idi — saxlanılsaydı yeni qəsəbə/kəndin altında sərbəst
+        // `neighborhoodName` kimi gedər və qarışıq ünvan yazılardı.
+        neighborhood: changed ? "" : current.neighborhood,
+      };
+    });
   }
 
   return (
@@ -223,6 +229,7 @@ export function LocationFields({ cities, places, locale, labels, initial, onChan
               urbanId: event.target.value,
               settlementId: "",
               villageId: "",
+              neighborhood: "",
             }))
           }
           placeholder={labels.notSelected}
