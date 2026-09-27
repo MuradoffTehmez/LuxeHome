@@ -8,10 +8,13 @@ import {
   type PaymentMethod,
 } from "@/lib/constants";
 import { recordDomainEvent } from "@/lib/admin/events";
+import { escapeHtml } from "@/lib/email-html";
+import { siteUrl } from "@/config/site";
 import {
   MAX_PENDING_ORDERS_PER_USER,
   bakuMonthStart,
   extendPremium,
+  formatMoneyMinor,
   isUnlimitedPremium,
   shrinkPremium,
 } from "@/lib/package-math";
@@ -271,4 +274,21 @@ async function notifyCustomer(userId: string, title: string, days: number, dedup
       dedupeKey,
     },
   }).catch(() => undefined);
+}
+
+/** Ofis Telegram çatı üçün yeni kabinet sifarişi bildirişi (HTML `parse_mode`, mətn kodlanıb). */
+export function formatPackageOrderTelegram(input: {
+  packageName: string;
+  amountMinor: number;
+  propertyTitle: string;
+  customerName: string;
+  customerPhone: string | null;
+}): string {
+  return [
+    "<b>Yeni premium paket sifarişi</b>",
+    `${escapeHtml(input.packageName)} · ${escapeHtml(formatMoneyMinor(input.amountMinor))}`,
+    `Elan: ${escapeHtml(input.propertyTitle)}`,
+    `Müştəri: ${escapeHtml(input.customerName)}${input.customerPhone ? ` · ${escapeHtml(input.customerPhone)}` : ""}`,
+    `<a href="${escapeHtml(siteUrl("/admin/paketler?status=PENDING"))}">Paneldə aç</a>`,
+  ].join("\n");
 }

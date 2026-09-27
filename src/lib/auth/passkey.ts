@@ -11,6 +11,8 @@ import {
   type RegistrationResponseJSON,
 } from "@simplewebauthn/server";
 import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/email";
+import { escapeHtml } from "@/lib/email-html";
 import { siteConfig, siteUrl } from "@/config/site";
 import { consumeWebauthnChallenge, setWebauthnChallenge } from "./cookies";
 import { fromBase64Url, toBase64Url } from "./crypto";
@@ -152,4 +154,32 @@ export async function verifyPasskeyLogin(userId: string, response: Authenticatio
     where: { id: passkey.id },
     data: { counter: verification.authenticationInfo.newCounter, lastUsedAt: new Date() },
   });
+}
+
+const ADDED_EMAIL = {
+  az: {
+    subject: "Hesabınıza yeni passkey əlavə edildi",
+    body: (name: string) => `Luxe Home Estate idarə panelindəki hesabınıza «${name}» adlı yeni passkey əlavə edildi.`,
+    advice: "Bunu siz etməmisinizsə, dərhal «Hesabım» bölməsində passkey-i silin, parolu dəyişin və bütün sessiyaları bağlayın.",
+  },
+  en: {
+    subject: "A new passkey was added to your account",
+    body: (name: string) => `A new passkey named “${name}” was added to your Luxe Home Estate admin account.`,
+    advice: "If this wasn’t you, delete the passkey under “My account” right away, change your password and sign out of all sessions.",
+  },
+  ru: {
+    subject: "В ваш аккаунт добавлен новый passkey",
+    body: (name: string) => `В ваш аккаунт панели Luxe Home Estate добавлен новый passkey «${name}».`,
+    advice: "Если это были не вы, сразу удалите passkey в разделе «Мой аккаунт», смените пароль и завершите все сеансы.",
+  },
+} as const;
+
+/** Yeni passkey haqqında təhlükəsizlik məktubu — sessiyası oğurlanmış hesabda gizli açar qalmasın. */
+export async function sendPasskeyAddedEmail(user: { email: string; locale: string }, passkeyName: string): Promise<void> {
+  const copy = ADDED_EMAIL[user.locale === "en" || user.locale === "ru" ? user.locale : "az"];
+  await sendEmail({
+    to: user.email,
+    subject: copy.subject,
+    html: `<p>${escapeHtml(copy.body(passkeyName))}</p><p>${escapeHtml(copy.advice)}</p>`,
+  }).catch(() => undefined);
 }

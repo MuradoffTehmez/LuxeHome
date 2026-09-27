@@ -7,9 +7,7 @@ import { assertSameOrigin } from "@/lib/admin/guard";
 import { recordAudit } from "@/lib/admin/audit";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { msg, type ServerMessageKey } from "@/lib/admin/server-message";
-import { PasskeyError, passkeyRegistrationOptions, registerPasskey } from "@/lib/auth/passkey";
-import { sendEmail } from "@/lib/email";
-import { escapeHtml } from "@/lib/email-html";
+import { PasskeyError, passkeyRegistrationOptions, registerPasskey, sendPasskeyAddedEmail } from "@/lib/auth/passkey";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -53,13 +51,7 @@ export async function finishPasskeyRegistration(response: RegistrationResponseJS
     return unexpected("passkey yadda saxlanmadı", error, msg("server.common.unexpected"));
   }
   await recordAudit(user, "UPDATE", "User", user.id, `Passkey əlavə edildi: ${passkey.name}`);
-  await sendEmail({
-    to: user.email,
-    subject: "Hesabınıza yeni passkey əlavə edildi",
-    html:
-      `<p>Luxe Home Estate idarə panelindəki hesabınıza «${escapeHtml(passkey.name)}» adlı yeni passkey əlavə edildi.</p>` +
-      "<p>Bunu siz etməmisinizsə, dərhal «Hesabım» bölməsində passkey-i silin, parolu dəyişin və bütün sessiyaları bağlayın.</p>",
-  }).catch(() => undefined);
+  await sendPasskeyAddedEmail(user, passkey.name);
   revalidatePath(PATH);
   return success(msg("server.hesabim.passkeyAdded"));
 }

@@ -425,6 +425,43 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   tam yenidən indeksləyir. Binding yoxdursa (lokal E2E) axtarış leksik rejimə düşür.
   Yeni elan yazma yolu əlavə edəndə sinxronizasiyanı da çağır.
 
+### 4-cü mərhələ modulları (#109)
+
+- **Elan müddəti** (`listing-expiry.ts`): sahib/agentlik elanı 60 gün yaşayır, 7 gün qalmış
+  xatırlatma, bitəndə `ARCHIVED` + `expiredAt`. Şirkət (STAFF) elanlarına toxunulmur. Kabinetdə
+  «Yenilə» 60 gün əlavə edir. Gündəlik iş `runPhase2Maintenance()`-dədir və idempotentdir.
+- **Açıq qapı** (`OpenHouse` + `OpenHouseRegistration`): qeydiyyat lead yaradır, tutum və
+  qeydiyyatın bağlanma vaxtı `open-house-availability.ts`-dədir (client də işlədir — Prisma yoxdur).
+- **Təqvim** `/admin/rezervasiyalar/teqvim` (Bakı vaxtı, UTC+4) və şəxsi ICS abunəsi
+  `/api/calendar/<token>` — token «Hesabım»da yaradılır, yenidən yaradılanda köhnə link ölür.
+- **Premium paketlər və ödəniş uçotu** (`ListingPackage`, `PackageOrder`, `packages.ts`):
+  real ödəniş provayderi **yoxdur** — sifariş kabinetdən və ya paneldən, ödəniş ofisdə/köçürmə
+  ilə alınır və `/admin/paketler`-də qeyd olunur. Məbləğ qəpiklə (`*Minor`, tam ədəd), paketin
+  adı/müddəti/qiyməti sifarişə kopyalanır. Status keçidləri şərti `updateMany` ilədir (D1-də
+  tranzaksiya yoxdur) — ikinci təsdiq premiumu təkrar uzatmır. Geri qaytarma müddəti çıxır.
+  İcazə: `billing:manage` (SUPER_ADMIN + ADMIN).
+- **Bilik Mərkəzi AI məsləhətçisi** (`knowledge-advisor.ts`): yalnız dərc olunmuş məqalə və
+  suallardan leksik seçim → Workers AI → hər iddia `[n]` istinadlı. İstinadsız və ya mövcud
+  olmayan mənbəyə istinad edən cavab göstərilmir; mənbə tapılmayanda model çağırılmır.
+  Limit `AI_LIMIT` namespace-i, `ai-advisor:` açarı ilə.
+- **Passkey (WebAuthn, admin)** — `@simplewebauthn/server` (workerd-də test olunub):
+  girişin ikinci mərhələsində TOTP-a **alternativdir**, onu əvəz etmir (TOTP məcburi qalır).
+  RP ID `Host`-dan, amma yalnız bizim domenlərdən (`passkey-policy.ts`); challenge imzalı,
+  birdəfəlik `lhe_webauthn` cookie-sindədir. `userVerification: "required"`. Passkey domenə
+  bağlıdır — `luxehomeestate.az`-da yaradılan workers.dev-də işləmir.
+- **Google ilə giriş (ictimai hesab)** — `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` olmayanda
+  tam söndürülüdür (düymə yox, marşrut 404). OIDC + PKCE + nonce, state imzalı `lhe_oauth`
+  cookie-sində. Bağlama qaydaları `google-login-policy.ts`-dədir: əməkdaş heç vaxt, yalnız
+  `email_verified`, təsdiqlənməmiş mövcud hesaba bağlananda parol ləğv olunur (pre-hijacking).
+  Yönləndirmə ünvanı: `<SITE_URL>/api/auth/google/callback`.
+- **Telefonla OTP girişi** — `SMS_PROVIDER_URL`/`SMS_PROVIDER_TOKEN` olmayanda söndürülüdür.
+  Yalnız kabinetdə SMS ilə **təsdiqlənmiş** nömrə (`User.verifiedPhone`, unikal) ilə giriş;
+  nömrə ilə hesab yaranmır, cavab nömrənin qeydiyyatda olduğunu bildirmir. Kod HMAC-lə saxlanılır,
+  5 dəq / 5 cəhd, 60 s fasilə, saatda 5 kod; göndəriş Turnstile ilə qorunur. Profildə nömrə
+  dəyişəndə təsdiq sıfırlanır. Provayder API-si fərqlidirsə yalnız `src/lib/sms.ts` dəyişir.
+- **Sessiya açma** `openPublicSession()` (`public-session.ts`) — parol, Google və telefon
+  girişi eyni yoldan keçir; ictimai sessiya açan yeni axın da onu işlətməlidir.
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai
@@ -632,7 +669,8 @@ təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
 - `next/image` optimizasiyası Cloudflare `IMAGES` binding-i üzərindən gedir (`wrangler.jsonc`).
 - Gizli dəyərlər `.env`-də deyil, Cloudflare secret-lərindədir:
   `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`,
-  `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
+  `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; istəyə bağlı `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+  `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` (#109). Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
 - **Telegram lead bildirişi** (`src/lib/telegram.ts`, #103): əlaqə müraciəti və baxış
   sorğusu ofis çatına gedir. Secret yoxdursa səssizcə buraxılır, `notifyLeadOnTelegram()`
   heç vaxt atmır — müraciət artıq yazılıb, bildiriş xətası onu uğursuz göstərməməlidir.

@@ -6,13 +6,10 @@ import { z } from "zod";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import type { Locale } from "@/lib/constants";
-import { escapeHtml } from "@/lib/email-html";
 import { localizePath } from "@/i18n/path-locale";
-import { formatMoneyMinor } from "@/lib/package-math";
-import { cancelOrder, createCabinetOrder, type OrderFailure } from "@/lib/packages";
+import { cancelOrder, createCabinetOrder, formatPackageOrderTelegram, type OrderFailure } from "@/lib/packages";
 import { prisma } from "@/lib/prisma";
 import { sendTelegramMessage } from "@/lib/telegram";
-import { siteUrl } from "@/config/site";
 
 const PATH = "/kabinet/paketler";
 
@@ -53,13 +50,13 @@ export async function requestPackage(_previous: ActionState, formData: FormData)
     });
     if (!result.ok) return failure(t(`errors.${FAILURE_KEYS[result.reason]}`));
 
-    await sendTelegramMessage([
-      "<b>Yeni premium paket sifarişi</b>",
-      `${escapeHtml(result.packageName)} · ${escapeHtml(formatMoneyMinor(result.amountMinor))}`,
-      `Elan: ${escapeHtml(result.propertyTitle)}`,
-      `Müştəri: ${escapeHtml(user.name)}${profile?.phone ? ` · ${escapeHtml(profile.phone)}` : ""}`,
-      `<a href="${escapeHtml(siteUrl("/admin/paketler?status=PENDING"))}">Paneldə aç</a>`,
-    ].join("\n")).catch(() => undefined);
+    await sendTelegramMessage(formatPackageOrderTelegram({
+      packageName: result.packageName,
+      amountMinor: result.amountMinor,
+      propertyTitle: result.propertyTitle,
+      customerName: user.name,
+      customerPhone: profile?.phone ?? null,
+    })).catch(() => undefined);
   } catch (error) {
     return unexpected("paket sifarişi yaradılmadı", error, t("errors.unavailable"));
   }
