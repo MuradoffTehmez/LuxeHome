@@ -29,6 +29,8 @@ const TYPE_TONE: Record<AccountType, "gold" | "dark" | "neutral"> = {
   STAFF: "dark",
   OWNER: "gold",
   AGENCY: "gold",
+  AGENT: "gold",
+  CORPORATE: "dark",
   USER: "neutral",
 };
 

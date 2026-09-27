@@ -5,10 +5,14 @@ import {
   Building2,
   Eye,
   FileEdit,
+  FileUp,
   Inbox,
+  KanbanSquare,
   Megaphone,
   Newspaper,
   Plus,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import {
@@ -342,6 +346,10 @@ export default async function AdminDashboardPage() {
           { label: t("dashboard.quickActions.newProject"), href: "/admin/layiheler/yeni", icon: Blocks },
           { label: t("dashboard.quickActions.newPost"), href: "/admin/blog/yeni", icon: Newspaper },
           { label: t("dashboard.quickActions.viewLeads"), href: "/admin/muracietler", icon: Inbox },
+          { label: t("dashboard.quickActions.moderation"), href: "/admin/moderation", icon: ShieldCheck },
+          { label: t("dashboard.quickActions.leadBoard"), href: "/admin/muracietler/lovhe", icon: KanbanSquare },
+          { label: t("dashboard.quickActions.aiAssistant"), href: "/admin/ai-komekci", icon: Sparkles },
+          { label: t("dashboard.quickActions.importListings"), href: "/admin/emlaklar/idxal", icon: FileUp },
         ].map((action) => (
           <Link
             key={action.href}

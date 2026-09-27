@@ -18,7 +18,9 @@
     "showAll": "Bütün şəkilləri göstər ({count})",
     "thumbnail": "{index}-ci şəklə keç",
     "cover": "Əsas şəkil",
-    "thumbnailRail": "{title} — şəkil lenti"
+    "thumbnailRail": "{title} — şəkil lenti",
+    "close": "Qalereyanı bağla",
+    "keyboardHint": "Şəkillər arasında ← və → düymələri ilə keçin, Esc ilə bağlayın. Toxunma ekranında sola və sağa sürüşdürün."
   },
   "trust": {
     "aria": "Şirkətin hüquqi və əlaqə məlumatları",

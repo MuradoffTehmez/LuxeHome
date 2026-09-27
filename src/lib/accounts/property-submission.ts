@@ -104,6 +104,15 @@ export function buildPublicPropertyData(
   };
 }
 
+/**
+ * Elan şəkli yalnız `emlaklar` qovluğundan gələ bilər — həmin qovluğa yazılan hər
+ * şəkil su nişanı ilə saxlanılır. Profil şəkli (`avatarlar`) nişansızdır və elana
+ * qoşulsaydı su nişanı qaydası yan keçilərdi.
+ */
+export function isListingMediaUrl(url: string): boolean {
+  return url.startsWith("/media/emlaklar/");
+}
+
 /** Hər göndərilən media URL-nin cari hesabın adına yazıldığını yoxlayır. */
 export function hasExclusiveMediaOwnership(submittedUrls: string[], ownedUrls: string[]): boolean {
   const owned = new Set(ownedUrls);

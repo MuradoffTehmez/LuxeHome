@@ -47,3 +47,53 @@ export function getCabinetItems(canList: boolean, canManageTeam = false): readon
 export function isCabinetItemActive(pathname: string, href: string): boolean {
   return pathname === href;
 }
+
+export type CabinetCrumb = {
+  href: string;
+  labelKey:
+    | "eyebrow"
+    | "listings"
+    | "newListing"
+    | "editListing"
+    | "packages"
+    | "team"
+    | "savedSearches"
+    | "notifications"
+    | "reservations"
+    | "recommendations"
+    | "recentlyViewed"
+    | "profile";
+};
+
+const CRUMB_SEGMENTS: Record<string, CabinetCrumb["labelKey"]> = {
+  elanlar: "listings",
+  paketler: "packages",
+  komanda: "team",
+  axtarislarim: "savedSearches",
+  bildirisler: "notifications",
+  rezervasiyalar: "reservations",
+  tovsiyeler: "recommendations",
+  "son-baxilanlar": "recentlyViewed",
+  profil: "profile",
+};
+
+/**
+ * Kabinet ünvanından breadcrumb zənciri (locale prefiksi olmadan):
+ * `/kabinet/elanlar/yeni` → Kabinet › Elanlarım › Yeni elan;
+ * `/kabinet/elanlar/<id>` → Kabinet › Elanlarım › Redaktə.
+ */
+export function cabinetBreadcrumbTrail(pathname: string): CabinetCrumb[] {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments[0] !== "kabinet") return [];
+  const trail: CabinetCrumb[] = [{ href: "/kabinet", labelKey: "eyebrow" }];
+  const section = segments[1];
+  if (!section) return trail;
+  const sectionKey = CRUMB_SEGMENTS[section];
+  if (!sectionKey) return trail;
+  trail.push({ href: `/kabinet/${section}`, labelKey: sectionKey });
+  const child = segments[2];
+  if (section === "elanlar" && child) {
+    trail.push({ href: pathname, labelKey: child === "yeni" ? "newListing" : "editListing" });
+  }
+  return trail;
+}

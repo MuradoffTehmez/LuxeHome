@@ -172,15 +172,21 @@
       "newProperty": "New property listing",
       "newProject": "New development",
       "newPost": "New article",
-      "viewLeads": "View enquiries"
+      "viewLeads": "View enquiries",
+      "moderation": "Moderation queue",
+      "leadBoard": "Lead board",
+      "aiAssistant": "AI assistant (SEO, ALT)",
+      "importListings": "Import from CSV"
     }
   },
   "labels": {
     "accountType": {
       "STAFF": "Company staff",
-      "USER": "User",
+      "USER": "Personal user",
       "OWNER": "Property owner",
-      "AGENCY": "Agency"
+      "AGENCY": "Agency",
+      "AGENT": "Agent (realtor)",
+      "CORPORATE": "Corporate account"
     },
     "agencyEmployeeRole": {
       "MANAGER": "Manager",
@@ -462,7 +468,18 @@
       "metaDescription": "Meta description",
       "metaDescriptionHint": "Recommended length: 70–160 characters.",
       "desktopPreview": "Desktop preview",
-      "mobilePreview": "Mobile preview"
+      "mobilePreview": "Mobile preview",
+      "aiFill": "Fill with AI",
+      "aiWorking": "Generating…",
+      "aiHint": "Write the SEO title — the meta description, Open Graph, keywords and social copy will be prepared by AI.",
+      "aiDone": "AI filled {count} fields. Review and save.",
+      "aiFallback": "AI was unavailable — {count} fields were generated from the content.",
+      "aiEmpty": "Write the SEO title or the content title first.",
+      "aiForbidden": "You do not have permission for this action.",
+      "keywords": "Keywords",
+      "socialText": "Social media copy",
+      "keywordsHint": "Separate with commas. Left empty, they are generated when the listing is saved.",
+      "socialTextHint": "Ready-to-share copy. Left empty, it is generated automatically."
     },
     "secret": {
       "title": "Temporary password — shown only once",
@@ -538,6 +555,46 @@
         "recenter": "Recentre the map",
         "scrollHint": "Click the map to set the point"
       }
+    },
+    "wizard": {
+      "progress": "{completed} of {total} steps completed — {percent}%",
+      "stepOf": "Step {current} of {total}",
+      "back": "Back",
+      "next": "Next",
+      "cancel": "Cancel",
+      "stepsNav": "Listing steps",
+      "draftSaved": "Draft saved · {time}",
+      "draftFound": "We found a draft saved on {time}. Would you like to continue where you left off?",
+      "draftRestore": "Continue",
+      "draftDiscard": "Discard draft"
+    },
+    "location": {
+      "region": "Region / Autonomous Republic",
+      "allRegions": "All regions",
+      "city": "City / district",
+      "urbanDistrict": "City district",
+      "settlement": "Settlement",
+      "village": "Village",
+      "neighborhood": "Neighbourhood / residential area",
+      "neighborhoodHint": "Pick from the list or type the name.",
+      "street": "Street / avenue",
+      "streetHint": "For example: Aliyar Aliyev street.",
+      "building": "Building and additional address details",
+      "buildingHint": "Building/house number, block or landmark. Do not include the flat number.",
+      "select": "Select",
+      "notSelected": "Not selected",
+      "fullAddress": "Full address"
+    },
+    "listingPreview": {
+      "noImage": "No photos added",
+      "noTitle": "No title yet",
+      "noPrice": "No price yet",
+      "images": "{count} photos",
+      "rooms": "{count} rooms",
+      "area": "{value} m²",
+      "floor": "Floor {floor}",
+      "description": "Description",
+      "features": "Features"
     }
   },
   "pages": {
@@ -649,7 +706,25 @@
       "virtualTour": "360° virtual tour",
       "virtualTourHint": "Kuula, Matterport or Momento360 share link.",
       "floorPlans": "Floor plan",
-      "floorPlansHint": "Image or scan of the plan, up to 6 files. Shown in a separate section, not in the gallery."
+      "floorPlansHint": "Image or scan of the plan, up to 6 files. Shown in a separate section, not in the gallery.",
+      "steps": {
+        "type": "Type and category",
+        "typeDescription": "Choose the listing type and property category.",
+        "location": "Address and map",
+        "locationDescription": "Pick the address level by level so buyers see exactly where the property is.",
+        "details": "Property details",
+        "detailsDescription": "Title, description, size and amenities.",
+        "price": "Price and payment",
+        "priceDescription": "Price, currency and payment options.",
+        "media": "Photos and media",
+        "mediaDescription": "The LuxeHomeEstate watermark is added to photos automatically.",
+        "contact": "Contact details",
+        "contactDescription": "Buyers will contact you using these details.",
+        "preview": "Preview",
+        "previewDescription": "This is roughly how your listing will look on the site.",
+        "confirm": "Confirm and publish",
+        "confirmDescription": "Final check and submission."
+      }
     },
     "leads": {
       "yenile": "Update",
@@ -1894,7 +1969,11 @@
       "semanticDescription": "AI search finds listings by meaning (Workers AI + Vectorize). The index updates when listings change and daily.",
       "semanticReindex": "Reindex",
       "semanticReady": "Bindings are connected. The button reindexes all public listings.",
-      "semanticMissing": "No Vectorize binding in this environment — search runs in lexical mode."
+      "semanticMissing": "No Vectorize binding in this environment — search runs in lexical mode.",
+      "seoAltTitle": "SEO and photo ALT text",
+      "seoAltDescription": "Generated automatically when a listing is saved. This button regenerates the meta, Open Graph, keywords, social copy and all ALT texts of the selected listing.",
+      "seoAltAction": "Regenerate",
+      "seoAltNote": "Manually written SEO fields are overwritten too."
     },
     "common": {
       "deqCavab": "{p0} min response",
@@ -2617,7 +2696,8 @@
       "qaralamaElanaTetbiqEdildi": "Draft applied to the listing.",
       "qaralamaReddEdildi": "Draft rejected.",
       "semanticUnavailable": "The semantic index is not connected in this environment.",
-      "semanticReindexed": "Semantic index updated: {count} listings."
+      "semanticReindexed": "Semantic index updated: {count} listings.",
+      "seoAltRegenerated": "SEO fields and ALT text for {count} photos were regenerated."
     },
     "audit": {
       "auditJurnaliniYalnizSuperAdmin": "Only a Super Admin can reset the audit log.",

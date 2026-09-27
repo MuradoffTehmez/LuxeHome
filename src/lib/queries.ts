@@ -26,6 +26,7 @@ import {
   type SortOption,
   NEARBY_PLACE_CATEGORIES,
   NEAR_METRO_METERS,
+  PUBLIC_ACCOUNT_TYPES,
 } from "@/lib/constants";
 import { demoWhere } from "@/lib/demo-content";
 import { buildCityFilterTree, withCityAndGroup } from "@/lib/location-tree";
@@ -69,7 +70,8 @@ export const propertyCardSelect = {
   districtId: true,
   type: { select: { name: true, slug: true } },
   city: { select: { name: true, slug: true } },
-  district: { select: { name: true, slug: true } },
+  // `kind` kartda yerin növünü yazmaq üçündür: «Əliabad qəsəbəsi, Naxçıvan».
+  district: { select: { name: true, slug: true, kind: true } },
   images: {
     orderBy: [{ isCover: "desc" }, { order: "asc" }],
     take: 1,
@@ -594,7 +596,13 @@ export async function getPropertyBySlug(slug: string) {
     include: {
       type: true,
       city: true,
-      district: { include: { neighborhoodProfile: true } },
+      // Valideyn tam ünvan üçündür: Maştağa → Sabunçu rayonu → Bakı.
+      district: {
+        include: {
+          neighborhoodProfile: true,
+          parent: { select: { name: true, slug: true, kind: true } },
+        },
+      },
       metro: true,
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { include: { feature: true } },
@@ -838,7 +846,7 @@ export async function getAdminTaxonomy() {
 /** Panel — ictimai qeydiyyatdan keçən hesablar (STAFF xaric). */
 export async function getAdminPublicAccounts() {
   return prisma.user.findMany({
-    where: { accountType: { in: [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY] } },
+    where: { accountType: { in: PUBLIC_ACCOUNT_TYPES } },
     select: {
       id: true,
       name: true,

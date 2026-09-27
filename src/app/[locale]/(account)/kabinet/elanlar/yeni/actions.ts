@@ -14,6 +14,7 @@ import {
   createPropertyWithRelations,
   hasAllowedPropertyImageCount,
   hasExclusiveMediaOwnership,
+  isListingMediaUrl,
   publicPropertySchema,
   readPublicPropertyForm,
   submissionPolicy,
@@ -25,6 +26,7 @@ import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { localizePath } from "@/i18n/path-locale";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { queueListingEnrichment } from "@/lib/listing-enrichment";
 
 const LIST_PATH = "/kabinet/elanlar";
 
@@ -37,7 +39,7 @@ async function ownsImages(userId: string, urls: string[]): Promise<boolean> {
   });
   return hasExclusiveMediaOwnership(
     urls,
-    owned.map((media) => media.url),
+    owned.map((media) => media.url).filter(isListingMediaUrl),
   );
 }
 
@@ -165,6 +167,7 @@ export async function createPublicProperty(
     if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED) {
       await notifyMatchingSavedSearches(created.id);
       queuePropertyVectorSync([created.id]);
+      queueListingEnrichment(created.id);
     }
   } catch (error) {
     // Şəkil yükləmələri qəsdən silinmir: istifadəçi formadakı xətanı düzəldib yenidən göndərə bilər.

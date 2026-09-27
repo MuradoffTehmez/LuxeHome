@@ -2,6 +2,7 @@ import { PROPERTY_STATUSES } from "@/lib/constants";
 import type { PropertyInput } from "./schemas";
 import * as form from "./form";
 import { propertySearchText } from "@/lib/search-normalization";
+import { composeStreetAddress } from "@/lib/location-path";
 import type { PaymentFlags } from "./payment-features";
 import { DEFAULT_EXPIRED_RETENTION_DAYS, propertyContentFingerprint } from "@/lib/serp";
 import { publicationExpiryReset, type ExpiryFields } from "@/lib/listing-expiry-policy";
@@ -33,6 +34,9 @@ export function readPropertyForm(formData: FormData): PropertyInput {
     metroId: form.optionalText(formData, "metroId"),
     projectId: form.optionalText(formData, "projectId"),
     address: form.optionalText(formData, "address"),
+    street: form.optionalText(formData, "street"),
+    building: form.optionalText(formData, "building"),
+    neighborhoodName: form.optionalText(formData, "neighborhoodName"),
     latitude: form.number(formData, "latitude"),
     longitude: form.number(formData, "longitude"),
 
@@ -76,10 +80,16 @@ export function readPropertyForm(formData: FormData): PropertyInput {
  * etməsinə gətirirdi.
  */
 export function propertyData(input: PropertyInput, payment: PaymentFlags) {
+  // Küçə/bina sahələri doludursa tam ünvan onlardan qurulur; boşdursa (CSV idxalı,
+  // köhnə elan) sərbəst `address` sətri saxlanılır.
+  const address = composeStreetAddress(input) ?? input.address;
   return {
     title: input.title,
     description: input.description,
-    searchText: propertySearchText(input),
+    searchText: propertySearchText({
+      ...input,
+      address: [input.neighborhoodName, address].filter(Boolean).join(" "),
+    }),
     listingType: input.listingType,
     status: input.status,
     price: input.price,
@@ -91,7 +101,10 @@ export function propertyData(input: PropertyInput, payment: PaymentFlags) {
     districtId: input.districtId,
     metroId: input.metroId,
     projectId: input.projectId,
-    address: input.address,
+    address,
+    street: input.street ?? null,
+    building: input.building ?? null,
+    neighborhoodName: input.neighborhoodName ?? null,
     latitude: input.latitude,
     longitude: input.longitude,
     rooms: input.rooms,

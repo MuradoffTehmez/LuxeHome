@@ -579,6 +579,36 @@ p {
   animation: luxe-slide-out-right 180ms var(--ease-in-out-soft) both;
 }
 
+/* Lightbox-da şəkil keçidi: yeni şəkil hərəkət istiqamətindən yüngülcə sürüşüb
+   gəlir. Qısa və kiçik amplitudlu saxlanılır — keçid peşəkar görünməlidir, «slayd
+   şou» kimi deyil. Hərəkət azaldılması qaydası (aşağıda) onu söndürür. */
+@keyframes luxe-lightbox-next {
+  from {
+    opacity: 0.35;
+    transform: translate3d(6%, 0, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes luxe-lightbox-previous {
+  from {
+    opacity: 0.35;
+    transform: translate3d(-6%, 0, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+.lightbox-enter-next {
+  animation: luxe-lightbox-next 260ms var(--ease-out-soft) both;
+}
+.lightbox-enter-previous {
+  animation: luxe-lightbox-previous 260ms var(--ease-out-soft) both;
+}
+
 /* --------------------------------------------------------------------------
    Səhifə keçidi
 

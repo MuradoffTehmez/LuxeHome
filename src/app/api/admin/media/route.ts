@@ -5,6 +5,7 @@ import { AdminGuardError, RateLimitGuardError, SystemModeGuardError, requireAdmi
 import { systemModeErrorResponse } from "@/lib/system-mode";
 import { recordAudit } from "@/lib/admin/audit";
 import { MEDIA_FOLDERS, deleteImage, putImage, uploadFailureStatus, type MediaFolder } from "@/lib/media/storage";
+import { isKnownWatermarkedChecksum } from "@/lib/media/known-watermark";
 import { createMediaRecordOnce, parseClientUploadId } from "@/lib/media/upload-record";
 
 /**
@@ -62,7 +63,9 @@ export async function POST(request: Request) {
   const rawFolder = String(formData.get("folder") ?? "umumi");
   const folder: MediaFolder = isFolder(rawFolder) ? rawFolder : "umumi";
 
-  const result = await putImage(file, folder, String(formData.get("seoName") ?? ""));
+  const result = await putImage(file, folder, String(formData.get("seoName") ?? ""), {
+    isKnownWatermarked: isKnownWatermarkedChecksum,
+  });
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: uploadFailureStatus(result.reason) });
   }

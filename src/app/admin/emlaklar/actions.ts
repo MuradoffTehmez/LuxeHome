@@ -29,6 +29,7 @@ import {
 } from "@/lib/property-publish-validation";
 import { msg } from "@/lib/admin/server-message";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { queueListingEnrichment } from "@/lib/listing-enrichment";
 
 /**
  * Əmlak CRUD-u.
@@ -119,6 +120,29 @@ async function replaceRelations(
   }
 }
 
+/** Açar sözlər və sosial mətn — `propertyData`-dan kənardadır, çünki kabinet onları yazmır. */
+function readExtraSeo(formData: FormData) {
+  return {
+    metaKeywords: form.optionalText(formData, "metaKeywords")?.slice(0, 600) ?? null,
+    socialText: form.optionalText(formData, "socialText")?.slice(0, 300) ?? null,
+  };
+}
+
+type SeoSnapshot = {
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  metaKeywords: string | null;
+  socialText: string | null;
+};
+
+/** Formadakı SEO dəyərləri bazadakından fərqlidirmi (redaktor əl ilə dəyişib)? */
+function seoEditedManually(stored: SeoSnapshot, submitted: SeoSnapshot): boolean {
+  const keys = ["metaTitle", "metaDescription", "ogTitle", "ogDescription", "metaKeywords", "socialText"] as const;
+  return keys.some((key) => (stored[key] ?? "").trim() !== (submitted[key] ?? "").trim());
+}
+
 export async function createProperty(
   _prev: ActionState,
   formData: FormData,
@@ -155,9 +179,11 @@ export async function createProperty(
 
     const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
 
+    const extraSeo = readExtraSeo(formData);
     const property = await prisma.property.create({
       data: {
         ...propertyData(parsed.data, paymentFlags),
+        ...extraSeo,
         slug,
         authorId: user.id,
         isDemo: false,
@@ -180,6 +206,7 @@ export async function createProperty(
   }
 
   queuePropertyVectorSync([propertyId]);
+  queueListingEnrichment(propertyId);
   revalidatePath(LIST_PATH);
   revalidatePublicContent("property");
   redirect(`${LIST_PATH}/${propertyId}?yeni=1`);
@@ -212,7 +239,12 @@ export async function updateProperty(
     const images = parseImages(formData, "images");
     const existing = await prisma.property.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true, slug: true, publishedAt: true, closedAt: true, status: true, price: true, currency: true, listingExpiresAt: true, expiredAt: true },
+      select: {
+        id: true, slug: true, publishedAt: true, closedAt: true, status: true, price: true, currency: true,
+        listingExpiresAt: true, expiredAt: true,
+        metaTitle: true, metaDescription: true, ogTitle: true, ogDescription: true,
+        metaKeywords: true, socialText: true, seoGeneratedAt: true,
+      },
     });
     if (!existing) return failure(msg("server.emlaklar.elanTapilmadiVeYaSilinib"));
 
@@ -232,9 +264,18 @@ export async function updateProperty(
 
     const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
 
+    const extraSeo = readExtraSeo(formData);
     await prisma.property.update({
       where: { id },
-      data: { ...propertyData(parsed.data, paymentFlags), slug, ...lifecycle },
+      data: {
+        ...propertyData(parsed.data, paymentFlags),
+        ...extraSeo,
+        slug,
+        ...lifecycle,
+        // Redaktor SEO sahəsini dəyişibsə sahələr artıq əl ilə idarə olunur —
+        // avtomatik generator onların üzərinə yazmır, yalnız boşları doldurur.
+        ...(seoEditedManually(existing, { ...parsed.data, ...extraSeo }) ? { seoGeneratedAt: null } : {}),
+      },
     });
 
     await recordPropertyPriceChange({
@@ -257,6 +298,7 @@ export async function updateProperty(
     }
 
     queuePropertyVectorSync([id]);
+    queueListingEnrichment(id);
     revalidatePath(LIST_PATH);
     revalidatePath(`/emlaklar/${slug}`);
     revalidatePublicContent("property", slug);

@@ -174,7 +174,7 @@ export function KnowledgeArticleForm({
       </FormSection>
 
       <FormSection title="SEO" description={t("pages.knowledge.bosBuraxilsaBasliqVe")}>
-        <SeoFields
+        <SeoFields aiKind="knowledge"
           initialTitle={initial.metaTitle}
           initialDescription={initial.metaDescription}
           fallbackTitle={initial.title || t("pages.misc.bilikMerkeziBeledcisi")}

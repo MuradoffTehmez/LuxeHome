@@ -118,7 +118,7 @@ export function ServiceForm({
       </FormSection>
 
       <FormSection title="SEO">
-        <SeoFields initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || t("pages.misc.dasinmazEmlakXidmeti")} fallbackDescription={initial.shortDescription || initial.description || t("pages.misc.xidmetHaqqindaMelumat")} pathname={`/xidmetler/${initial.slug || "yeni-xidmet"}`} />
+        <SeoFields aiKind="service" initialTitle={initial.metaTitle} initialDescription={initial.metaDescription} fallbackTitle={initial.title || t("pages.misc.dasinmazEmlakXidmeti")} fallbackDescription={initial.shortDescription || initial.description || t("pages.misc.xidmetHaqqindaMelumat")} pathname={`/xidmetler/${initial.slug || "yeni-xidmet"}`} />
         <AdminInput
           name="canonicalUrl"
           label={t("pages.services.canonicalUrl")}

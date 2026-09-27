@@ -199,7 +199,7 @@ export async function searchPropertiesWithAi(rawQuery: string) {
     select: {
       ...propertyCardSelect,
       // Qəsəbədəki elan rayon meyarına da uyğun sayılır (#85) — kataloq filtri ilə eyni.
-      district: { select: { name: true, slug: true, parent: { select: { slug: true } } } },
+      district: { select: { name: true, slug: true, kind: true, parent: { select: { slug: true } } } },
       features: { select: { feature: { select: { slug: true } } } },
     },
     orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],

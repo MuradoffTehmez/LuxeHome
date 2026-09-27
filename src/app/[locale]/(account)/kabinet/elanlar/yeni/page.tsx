@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { getPropertyFormOptions } from "@/lib/queries";
 import { requireLister } from "@/lib/auth/guard";
+import { getListingContact } from "@/lib/accounts/listing-contact";
 import { buildManagedMetadata } from "@/lib/seo";
 import { createPublicProperty } from "./actions";
 import { PublicPropertyForm } from "./public-property-form";
@@ -18,9 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NewPropertyPage() {
   const locale = await getLocale() as Locale;
-  await requireLister(locale);
-  const t = await getTranslations("account.newProperty");
-  const sourceOptions = await getPropertyFormOptions();
+  const user = await requireLister(locale);
+  const [t, sourceOptions, contact] = await Promise.all([
+    getTranslations("account.newProperty"),
+    getPropertyFormOptions(),
+    getListingContact(user.id),
+  ]);
   const options = {
     ...sourceOptions,
     types: sourceOptions.types.map((item) => localizeKnownContent("propertyType", item, locale)),
@@ -41,7 +45,12 @@ export default async function NewPropertyPage() {
           description={t("description")}
         />
         <div className="mt-8">
-        <PublicPropertyForm action={createPublicProperty} options={options} />
+        <PublicPropertyForm
+          action={createPublicProperty}
+          options={options}
+          contact={contact}
+          draftKey={`lhe:property-draft:${user.id}`}
+        />
         </div>
       </div>
   );

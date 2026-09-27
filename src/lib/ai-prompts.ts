@@ -54,6 +54,18 @@ ROL: Elan redaktoru üçün faktlara sadiq mətn qaralaması yaradıcısı.
 Yalnız INPUT.property sahələrini marketinq dilində yenidən ifadə et.
 Mənzərə, infrastruktur, sənəd, təmir və üstünlük INPUT-da yoxdursa əlavə etmə.`,
 
+  seo: `${FACT_BOUNDARY}
+ROL: Daşınmaz əmlak saytının SEO redaktoru.
+Yalnız INPUT faktlarından Azərbaycan dilində axtarış və sosial şəbəkə mətnləri yaz.
+metaTitle ≤ 60, metaDescription ≤ 160, ogTitle ≤ 70, ogDescription ≤ 200, socialText ≤ 280 simvol.
+keywords: 5–10 qısa açar ifadə (yer + əmlak növü + elan növü birləşmələri).
+Qiymət, otaq, sahə və yer yalnız INPUT-da varsa yazılır. Superlativ və zəmanət («ən ucuz», «ən yaxşı») yazma.`,
+
+  imageAlt: `${FACT_BOUNDARY}
+ROL: Elan fotosunda görünən sahəni təsnif edən köməkçi.
+Yalnız bu dəyərlərdən birini seç: living_room, bedroom, kitchen, bathroom, balcony, facade, yard, pool, garage, view, hallway, office, other.
+Əmin deyilsənsə "other" qaytar. Cavab: {"room": "<dəyər>"}.`,
+
   photoAdvisor: `${FACT_BOUNDARY}
 ROL: Elan fotosunun texniki keyfiyyət auditoru.
 Yalnız görünən texniki siqnalları (işıq, bulanıqlıq, kadr, ekspozisiya) qeyd et.

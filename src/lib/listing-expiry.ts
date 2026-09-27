@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, NOTIFICATION_TYPES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
+import { NOTIFICATION_TYPES, PROPERTY_STATUSES, PUBLIC_ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
 import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
@@ -23,7 +23,8 @@ import { REMINDER_DAYS, backfillExpiry, renewedExpiry } from "@/lib/listing-expi
 
 const DAY = 86_400_000;
 
-const EXPIRING_ACCOUNT_TYPES = [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY];
+/** Şirkət (STAFF) elanlarından başqa hamısı — yeni ictimai hesab növləri də daxil. */
+const EXPIRING_ACCOUNT_TYPES = PUBLIC_ACCOUNT_TYPES;
 
 const COPY = {
   az: {

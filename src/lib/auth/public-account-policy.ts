@@ -1,12 +1,8 @@
-import { ACCOUNT_TYPES } from "@/lib/constants";
+import { ACCOUNT_TYPES, PUBLIC_ACCOUNT_TYPES } from "@/lib/constants";
 
-/** İctimai giriş yalnız ziyarətçi, mülk sahibi və agentlik hesabları üçündür. */
+/** İctimai giriş yalnız ictimai hesab növləri (əməkdaş deyil) üçündür. */
 export function canUsePublicSignIn(accountType: string): boolean {
-  return (
-    accountType === ACCOUNT_TYPES.USER ||
-    accountType === ACCOUNT_TYPES.OWNER ||
-    accountType === ACCOUNT_TYPES.AGENCY
-  );
+  return (PUBLIC_ACCOUNT_TYPES as readonly string[]).includes(accountType);
 }
 
 /** İdarə panelinə yalnız şirkət əməkdaşları buraxılır. */

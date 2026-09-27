@@ -28,7 +28,7 @@ export default async function MetadataPage() {
         <AdminSelect name="entityType" label={t("pages.serp.entityTipi")} options={entityOptions} defaultValue="PAGE" />
         <AdminSelect name="locale" label={t("pages.serp.dil")} options={localeOptions} defaultValue="az" />
         <FullWidth><AdminInput name="entityId" label={t("pages.serp.entityIdRoute")} placeholder="/haqqimizda" required /></FullWidth>
-        <SeoFields titleName="title" descriptionName="description" fallbackTitle={t("pages.misc.avtomatikSehifeBasligi")} fallbackDescription={t("pages.misc.sehifeninAvtomatikYaradilanUnikal")} pathname="/az/numune" />
+        <SeoFields aiKind="page" titleName="title" descriptionName="description" fallbackTitle={t("pages.misc.avtomatikSehifeBasligi")} fallbackDescription={t("pages.misc.sehifeninAvtomatikYaradilanUnikal")} pathname="/az/numune" />
         <FullWidth><AdminInput name="canonical" label={t("pages.serp.canonicalOverride")} placeholder={t("pages.serp.bosBuraxilsaSelfCanonical")} /></FullWidth>
         <AdminCheckbox name="robotsIndex" label={t("pages.serp.index")} defaultChecked />
         <AdminCheckbox name="robotsFollow" label={t("pages.serp.follow")} defaultChecked />

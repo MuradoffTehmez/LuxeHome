@@ -28,11 +28,22 @@ model User {
   email           String    @unique
   passwordHash    String
   role            String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR
-  /// Hesabın kim olduğu: STAFF | USER | OWNER | AGENCY.
+  /// Hesabın kim olduğu: STAFF | USER | OWNER | AGENT | AGENCY | CORPORATE.
   /// `role` yalnız panel səlahiyyətini göstərir — iki ölçü qəsdən ayrıdır.
   accountType     String    @default("STAFF")
   phone           String?
   avatarUrl       String?
+  /// Ad və soyad ayrıca — `name` göstəriş üçün onlardan qurulur (köhnə hesablarda boşdur).
+  firstName       String?
+  lastName        String?
+  /// İstəyə bağlıdır: yalnız yaş təsdiqi üçün, ictimai profildə göstərilmir.
+  birthDate       DateTime?
+  /// Biznes hesabları (agentlik, korporativ): şirkət adı, VÖEN və sayt.
+  companyName     String?
+  companyTaxId    String?
+  companyWebsite  String?
+  /// Şirkətdəki vəzifə — korporativ və agentlik hesablarında.
+  position        String?
   emailVerifiedAt DateTime?
   /// İdarə panelində hesabın biznes baxımından yoxlanılıb təsdiqləndiyi vaxt.
   /// E-poçt doğrulamasından və bloklama (`isActive`) statusundan qəsdən ayrıdır.
@@ -429,7 +440,15 @@ model Property {
   cityId     String
   districtId String?
   metroId    String?
+  /// Tam ünvan sətri: yeni elanlarda `street` + `building`-dən qurulur, köhnə və
+  /// CSV-dən gələn elanlarda sərbəst mətndir. Axtarış, JSON-LD və geokod bunu oxuyur.
   address    String?
+  /// Küçə/prospekt — iyerarxik ünvan formasının sərbəst hissəsi.
+  street           String?
+  /// Bina/ev nömrəsi, blok, mənzil və orientir kimi əlavə ünvan məlumatı.
+  building         String?
+  /// Siyahıda olmayan məhəllə və ya yaşayış massivi (rəsmi inzibati vahid deyil).
+  neighborhoodName String?
   latitude   Float?
   longitude  Float?
 
@@ -501,6 +520,13 @@ model Property {
   ogTitle         String?
   ogDescription   String?
   ogImage         String?
+  /// Vergüllə ayrılmış açar ifadələr — `<meta name="keywords">` və JSON-LD üçün.
+  metaKeywords    String?
+  /// Sosial şəbəkədə paylaşım üçün hazır mətn.
+  socialText      String?
+  /// SEO sahələri avtomatik (AI və ya deterministik) yaradılıbsa vaxtı. `null` —
+  /// sahələr redaktor tərəfindən yazılıb; o halda yalnız boş sahələr doldurulur.
+  seoGeneratedAt  DateTime?
 
   type            PropertyType  @relation(fields: [typeId], references: [id])
   city            Location      @relation("PropertyCity", fields: [cityId], references: [id])

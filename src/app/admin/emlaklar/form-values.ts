@@ -30,6 +30,9 @@ export type PropertyFormValues = {
   metroId: string;
   projectId: string;
   address: string;
+  street: string;
+  building: string;
+  neighborhoodName: string;
   latitude: string;
   longitude: string;
   rooms: string;
@@ -55,6 +58,8 @@ export type PropertyFormValues = {
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
+  metaKeywords: string;
+  socialText: string;
   featureIds: string[];
   images: DropzoneImage[];
   floorPlans: DropzoneImage[];
@@ -75,6 +80,9 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   metroId: "",
   projectId: "",
   address: "",
+  street: "",
+  building: "",
+  neighborhoodName: "",
   latitude: "",
   longitude: "",
   rooms: "",
@@ -100,6 +108,8 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   ogTitle: "",
   ogDescription: "",
   ogImage: "",
+  metaKeywords: "",
+  socialText: "",
   featureIds: [],
   images: [],
   floorPlans: [],

@@ -64,6 +64,9 @@ export default async function EditPropertyPage({
     metroId: property.metroId ?? "",
     projectId: property.projectId ?? "",
     address: property.address ?? "",
+    street: property.street ?? "",
+    building: property.building ?? "",
+    neighborhoodName: property.neighborhoodName ?? "",
     latitude: num(property.latitude),
     longitude: num(property.longitude),
     rooms: num(property.rooms),
@@ -90,6 +93,8 @@ export default async function EditPropertyPage({
     ogTitle: property.ogTitle ?? "",
     ogDescription: property.ogDescription ?? "",
     ogImage: property.ogImage ?? "",
+    metaKeywords: property.metaKeywords ?? "",
+    socialText: property.socialText ?? "",
     featureIds: property.features.map((feature) => feature.featureId),
     images: property.images.map((image) => ({
       url: image.url,
@@ -142,6 +147,10 @@ export default async function EditPropertyPage({
               className="mr-auto"
             >
               <Trash2 className="size-4" aria-hidden="true" />
+            </ConfirmAction>
+          )
+        }
+      />
 
       {property.deletedAt ? null : (
         <OpenHouseManager
@@ -155,10 +164,6 @@ export default async function EditPropertyPage({
           }))}
         />
       )}
-            </ConfirmAction>
-          )
-        }
-      />
 
       <AdminCard
         title={t("pages.properties.qiymetTarixcesi")}

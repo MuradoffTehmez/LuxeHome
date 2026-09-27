@@ -10,6 +10,7 @@ import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
 import {
   hasAllowedPropertyImageCount,
   hasExclusiveMediaOwnership,
+  isListingMediaUrl,
   publicPropertySchema,
   readPublicPropertyForm,
   submissionPolicy,
@@ -21,6 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { queueListingEnrichment } from "@/lib/listing-enrichment";
 import { publicationExpiryReset, renewedExpiry } from "@/lib/listing-expiry-policy";
 import { recordDomainEvent } from "@/lib/admin/events";
 
@@ -118,7 +120,7 @@ export async function updatePublicProperty(
     where: { uploaderId: user.id, url: { in: images.map((image) => image.url) } },
     select: { url: true },
   });
-  const allowedUrls = [...media.map((item) => item.url), ...property.images.map((item) => item.url)];
+  const allowedUrls = [...media.map((item) => item.url).filter(isListingMediaUrl), ...property.images.map((item) => item.url)];
   if (!hasExclusiveMediaOwnership(images.map((image) => image.url), allowedUrls)) {
     return failure(t("actions.imageOwnership"));
   }
@@ -184,6 +186,7 @@ export async function updatePublicProperty(
   }
 
   queuePropertyVectorSync([id]);
+  queueListingEnrichment(id);
   revalidatePath(localizePath(LIST_PATH, locale));
   revalidatePath(localizePath(`${LIST_PATH}/${id}`, locale));
   revalidatePublicContent("property");

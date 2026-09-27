@@ -91,6 +91,10 @@ export const propertyFieldsSchema = z.object({
     metroId: cuid.nullable(),
     projectId: cuid.nullable(),
     address: optionalText(240),
+    // Köhnə çağırışlar (CSV idxalı, testlər) bu sahələri göndərməyə bilər — defolt `null`.
+    street: optionalText(160).default(null),
+    building: optionalText(160).default(null),
+    neighborhoodName: optionalText(120).default(null),
     latitude: z.number().min(-90).max(90).nullable(),
     longitude: z.number().min(-180).max(180).nullable(),
 

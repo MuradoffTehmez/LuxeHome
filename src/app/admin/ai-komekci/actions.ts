@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
@@ -13,6 +12,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
 import { queuePropertyVectorSync, reindexAllProperties } from "@/lib/semantic-search";
+import { readImageBytes } from "@/lib/media/read-image";
+import { enrichListing } from "@/lib/listing-enrichment";
 
 type DescriptionOutput = { title?: string; description: string; highlights?: string[] };
 type PhotoIssue = { score: number; issues: string[] };
@@ -80,71 +81,6 @@ export async function testAiProvider(): Promise<ActionState> {
   } catch (error) {
     return unexpected("Workers AI işləmir", error, error instanceof Error ? error.message : undefined);
   }
-}
-
-/** Vision modelinə göndərilən şəklin yuxarı həddi — böyük fayl sorğunu uzadır. */
-const MAX_IMAGE_BYTES = 6 * 1024 * 1024;
-
-/**
- * Xarici şəkil oxumaq üçün icazəli hostlar — `next.config.ts`-dəki
- * `images.remotePatterns` siyahısının eynisi. İki siyahı ayrılarsa, göstərilə
- * bilməyən bir mənbə oxuna bilən qalar; dəyişiklik hər ikisinə tətbiq olunmalıdır.
- */
-const AI_IMAGE_HOSTS = new Set([
-  "images.unsplash.com",
-  "media.luxehomeestate.az",
-  "treva.realestate",
-]);
-
-/**
- * Elan şəklini bayt massivi kimi oxuyur.
- *
- * Paneldən yüklənən şəkillərin URL-i `/media/<açar>` formatındadır və birbaşa R2
- * binding-indən oxunur: bu, bir şəbəkə gedişini aradan qaldırır və hələ dərc
- * edilməmiş elanın şəkli üçün də işləyir.
- *
- * Bazadakı hər şəkil isə R2-də olmur — stok və nümunə elanlar xarici URL daşıyır
- * (`images.unsplash.com`), R2 custom domeni də mütləq URL verir. Əvvəllər belə
- * şəkillər sadəcə `null` qaytarırdı və foto məsləhətçisi «heç bir şəkil analiz
- * edilə bilmədi» deyirdi. İndi mütləq `https:` URL-lər çəkilir.
- *
- * `http:` və digər sxemlər qəsdən qəbul edilmir, ölçü isə həm başlıqla, həm də
- * faktiki bayt sayı ilə yoxlanılır.
- */
-async function readImageBytes(url: string): Promise<Uint8Array | null> {
-  if (url.startsWith("/media/")) {
-    const bucket = getCloudflareContext().env.MEDIA;
-    const object = await bucket?.get(url.slice("/media/".length));
-    if (!object) return null;
-    return new Uint8Array(await object.arrayBuffer());
-  }
-
-  if (!url.startsWith("https://")) return null;
-
-  // Host ağ siyahısı `next.config.ts`-dəki `images.remotePatterns` ilə eynidir:
-  // şəkil hansı mənbədən göstərilə bilirsə, yalnız onu da oxuyuruq. Siyahısız
-  // funksiya ixtiyari ictimai ünvana sorğu atan bir vasitəyə çevrilirdi.
-  let host: string;
-  try {
-    host = new URL(url).hostname.toLowerCase();
-  } catch {
-    return null;
-  }
-  if (!AI_IMAGE_HOSTS.has(host)) return null;
-
-  const response = await fetch(url, { headers: { accept: "image/*" } });
-  if (!response.ok) return null;
-
-  const contentType = response.headers.get("content-type") ?? "";
-  if (!contentType.startsWith("image/")) return null;
-
-  const declaredLength = Number(response.headers.get("content-length") ?? 0);
-  if (declaredLength > MAX_IMAGE_BYTES) return null;
-
-  const buffer = await response.arrayBuffer();
-  if (buffer.byteLength === 0 || buffer.byteLength > MAX_IMAGE_BYTES) return null;
-
-  return new Uint8Array(buffer);
 }
 
 export async function generatePropertyDescription(
@@ -370,5 +306,32 @@ export async function reindexSemanticSearch(): Promise<ActionState> {
     return success(msg("server.aiKomekci.semanticReindexed", { count }));
   } catch (error) {
     return unexpected("semantik indeks yenilənmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+/**
+ * Seçilmiş elanın SEO sahələrini və bütün şəkil ALT mətnlərini yenidən yaradır.
+ * Avtomatik iş boş sahələri doldurur; bu düymə isə hamısının üzərinə yazır.
+ */
+export async function regenerateListingSeoAndAlts(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const actor = await guard();
+  if ("status" in actor) return actor;
+
+  const propertyId = form.text(formData, "propertyId");
+  if (!propertyId) return failure(msg("server.aiKomekci.elanSecin"));
+
+  try {
+    const result = await enrichListing(propertyId, { force: true });
+    if (!result) return failure(msg("server.aiKomekci.elanTapilmadi"));
+    const property = await prisma.property.findUnique({ where: { id: propertyId }, select: { slug: true } });
+    await recordAudit(actor, "UPDATE", "Property", propertyId, `AI SEO və ALT yeniləndi: ${result.alts} şəkil`);
+    revalidatePath("/admin/ai-komekci");
+    if (property) revalidatePublicContent("property", property.slug);
+    return success(msg("server.aiKomekci.seoAltRegenerated", { count: result.alts }));
+  } catch (error) {
+    return unexpected("AI SEO/ALT yaradılmadı", error, msg("server.common.unexpected"));
   }
 }
