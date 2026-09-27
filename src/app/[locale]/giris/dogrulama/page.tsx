@@ -5,6 +5,8 @@ import { ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { readStageCookie, verifyStageToken } from "@/lib/auth/cookies";
 import { VerifyForm } from "./verify-form";
+import { PasskeyButton } from "./passkey-button";
+import { prisma } from "@/lib/prisma";
 import { localizePath } from "@/i18n/path-locale";
 import type { Locale } from "@/lib/constants";
 
@@ -23,6 +25,8 @@ export default async function VerifyPage() {
   const claims = token ? await verifyStageToken(token) : null;
   if (!claims || claims.stage !== "totp") redirect(localizePath("/giris", locale));
   const t = await getTranslations("auth.verification");
+  // Passkey düyməsi yalnız qeydə alınmış açarı olan əməkdaşa göstərilir (#109).
+  const hasPasskey = (await prisma.passkey.count({ where: { userId: claims.uid } })) > 0;
 
   return (
     <AuthShell
@@ -40,7 +44,10 @@ export default async function VerifyPage() {
         </div>
       }
     >
-      <VerifyForm />
+      <div className="flex flex-col gap-5">
+        <VerifyForm />
+        {hasPasskey ? <PasskeyButton /> : null}
+      </div>
     </AuthShell>
   );
 }

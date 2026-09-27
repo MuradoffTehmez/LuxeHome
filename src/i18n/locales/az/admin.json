@@ -1061,7 +1061,22 @@
       "calendarSecret": "Link parol kimidir — müştəri adı və telefonu daşıyır. Paylaşmayın; sızarsa yeniləyin.",
       "calendarRotate": "Linki yenilə",
       "calendarRevoke": "Ləğv et",
-      "calendarCreate": "Təqvim linki yarat"
+      "calendarCreate": "Təqvim linki yarat",
+      "passkeyTitle": "Passkey-lər",
+      "passkeyHint": "Passkey (barmaq izi, Face ID və ya təhlükəsizlik açarı) girişin ikinci mərhələsində 6 rəqəmli kodun yerinə işlənə bilər və fişinq saytlarında işləmir. Doğrulama tətbiqi məcburi qalır — passkey itəndə kodla daxil ola bilərsiniz.",
+      "passkeyAdded": "Əlavə edilib: {date}",
+      "passkeyLastUsed": "son istifadə: {date}",
+      "passkeyNeverUsed": "hələ istifadə olunmayıb",
+      "passkeySynced": "cihazlar arasında sinxronlaşır",
+      "passkeyDeleteTitle": "Passkey silinsin?",
+      "passkeyDeleteDescription": "«{name}» ilə daha daxil olmaq mümkün olmayacaq. Doğrulama kodu ilə giriş davam edir.",
+      "passkeyDelete": "Sil",
+      "passkeyDeleteLabel": "{name} passkey-ini sil",
+      "passkeyName": "Passkey adı",
+      "passkeyNamePlaceholder": "Məsələn: iş noutbuku",
+      "passkeyAdd": "Passkey əlavə et",
+      "passkeyCancelled": "Passkey yaradılmadı — əməliyyat ləğv edildi və ya cihaz dəstəkləmir.",
+      "passkeyUnsupported": "Bu brauzer passkey-i dəstəkləmir."
     },
     "knowledge": {
       "beledci": "Bələdçi",
@@ -2224,7 +2239,8 @@
       "ugursuz": "Uğursuz",
       "sorguSayi": "{p0} sorğu",
       "idareOlunanUrl": "{p0} idarə olunan URL",
-      "sonYenilenmeAuditQeydleri": "Son yenilənmə: {p0}. Audit qeydləri"
+      "sonYenilenmeAuditQeydleri": "Son yenilənmə: {p0}. Audit qeydləri",
+      "yanlisPasskey": "Uğursuz passkey"
     },
     "demoContent": {
       "title": "Nümunə məzmun",
@@ -2665,7 +2681,14 @@
       "yeniParolKohnesindenFerqliOlmalidir": "Yeni parol köhnəsindən fərqli olmalıdır.",
       "parolDeyisdirildiVeDigerCihazlardaki": "Parol dəyişdirildi və digər cihazlardakı sessiyalar bağlandı.",
       "calendarRotated": "Təqvim linki yeniləndi. Köhnə link artıq işləmir.",
-      "calendarRevoked": "Təqvim linki ləğv edildi."
+      "calendarRevoked": "Təqvim linki ləğv edildi.",
+      "passkeyHost": "Passkey yalnız saytın rəsmi ünvanında yaradıla bilər.",
+      "passkeyLimit": "Passkey sayı həddə çatıb. Əvvəlcə köhnəsini silin.",
+      "passkeyExpired": "Əməliyyatın vaxtı bitdi. Yenidən cəhd edin.",
+      "passkeyFailed": "Passkey təsdiqlənmədi. Yenidən cəhd edin.",
+      "passkeyAdded": "Passkey əlavə edildi.",
+      "passkeyNotFound": "Passkey tapılmadı.",
+      "passkeyDeleted": "Passkey silindi."
     },
     "hesablar": {
       "hesabTapilmadi": "Hesab tapılmadı.",

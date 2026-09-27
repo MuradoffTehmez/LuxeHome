@@ -203,7 +203,9 @@
     "verificationSentGeneric": "If the account is not verified, a new link has been sent.",
     "passwordResetSentGeneric": "If a matching account exists, a password reset link has been sent.",
     "resetTokenInvalid": "The password reset link is invalid or has expired.",
-    "deleteConfirmationInvalid": "Enter the confirmation phrase exactly as shown."
+    "deleteConfirmationInvalid": "Enter the confirmation phrase exactly as shown.",
+    "passkeyUnavailable": "Passkey verification isn’t available right now. Enter your verification code.",
+    "passkeyFailed": "The passkey could not be verified. Try again or enter your code."
   },
   "profile": {
     "metaTitle": "Profile",

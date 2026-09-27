@@ -1061,7 +1061,22 @@
       "calendarSecret": "The link works like a password — it carries client names and phones. Do not share it; rotate it if it leaks.",
       "calendarRotate": "Rotate link",
       "calendarRevoke": "Revoke",
-      "calendarCreate": "Create calendar link"
+      "calendarCreate": "Create calendar link",
+      "passkeyTitle": "Passkeys",
+      "passkeyHint": "A passkey (fingerprint, Face ID or security key) can replace the 6-digit code at the second sign-in step and does not work on phishing sites. The authenticator app stays required — if you lose a passkey you can still sign in with a code.",
+      "passkeyAdded": "Added: {date}",
+      "passkeyLastUsed": "last used: {date}",
+      "passkeyNeverUsed": "not used yet",
+      "passkeySynced": "synced across devices",
+      "passkeyDeleteTitle": "Delete this passkey?",
+      "passkeyDeleteDescription": "You will no longer be able to sign in with “{name}”. Signing in with a verification code still works.",
+      "passkeyDelete": "Delete",
+      "passkeyDeleteLabel": "Delete passkey {name}",
+      "passkeyName": "Passkey name",
+      "passkeyNamePlaceholder": "e.g. work laptop",
+      "passkeyAdd": "Add passkey",
+      "passkeyCancelled": "No passkey was created — the action was cancelled or the device doesn’t support it.",
+      "passkeyUnsupported": "This browser doesn’t support passkeys."
     },
     "knowledge": {
       "beledci": "Guide",
@@ -2224,7 +2239,8 @@
       "ugursuz": "Failed",
       "sorguSayi": "{p0} queries",
       "idareOlunanUrl": "{p0} managed URLs",
-      "sonYenilenmeAuditQeydleri": "Last updated: {p0}. Audit records"
+      "sonYenilenmeAuditQeydleri": "Last updated: {p0}. Audit records",
+      "yanlisPasskey": "Failed passkey"
     },
     "demoContent": {
       "title": "Demo content",
@@ -2665,7 +2681,14 @@
       "yeniParolKohnesindenFerqliOlmalidir": "The new password must differ from the old one.",
       "parolDeyisdirildiVeDigerCihazlardaki": "Password changed and sessions on other devices were signed out.",
       "calendarRotated": "Calendar link rotated. The old link no longer works.",
-      "calendarRevoked": "Calendar link revoked."
+      "calendarRevoked": "Calendar link revoked.",
+      "passkeyHost": "Passkeys can only be created on the site’s official address.",
+      "passkeyLimit": "You have reached the passkey limit. Delete an old one first.",
+      "passkeyExpired": "The request expired. Please try again.",
+      "passkeyFailed": "The passkey could not be verified. Please try again.",
+      "passkeyAdded": "Passkey added.",
+      "passkeyNotFound": "Passkey not found.",
+      "passkeyDeleted": "Passkey deleted."
     },
     "hesablar": {
       "hesabTapilmadi": "Account not found.",

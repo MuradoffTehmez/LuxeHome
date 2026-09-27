@@ -7,6 +7,8 @@ import {
   STAGE_COOKIE,
   STAGE_SUBJECT,
   TOKEN_ISSUER,
+  WEBAUTHN_COOKIE,
+  WEBAUTHN_SUBJECT,
 } from "./cookie-names";
 import type { AuthStage } from "./types";
 import type { AccountType, AuthKind } from "@/lib/constants";
@@ -130,4 +132,45 @@ export async function readStageCookie(): Promise<string | null> {
 
 export async function clearStageCookie(): Promise<void> {
   (await cookies()).delete(STAGE_COOKIE);
+}
+
+// ---------------------------------------------------------------------------
+// WEBAUTHN CHALLENGE (#109)
+// ---------------------------------------------------------------------------
+
+/**
+ * Passkey mərasiminin challenge-i imzalı, qısaömürlü cookie-də saxlanılır: server
+ * cavabı yalnız özünün verdiyi challenge ilə, eyni istifadəçi və məqsəd üçün qəbul edir.
+ * `purpose` qeydiyyat challenge-inin girişdə (və əksinə) işlədilməsinin qarşısını alır.
+ */
+export type WebauthnPurpose = "register" | "login";
+export type WebauthnClaims = { uid: string; challenge: string; purpose: WebauthnPurpose };
+
+const WEBAUTHN_SECONDS = 5 * 60;
+
+export async function setWebauthnChallenge(claims: WebauthnClaims): Promise<void> {
+  const token = await new SignJWT({ ...claims })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(TOKEN_ISSUER)
+    .setSubject(WEBAUTHN_SUBJECT)
+    .setIssuedAt()
+    .setExpirationTime(Math.floor(Date.now() / 1000) + WEBAUTHN_SECONDS)
+    .sign(secretKey());
+  (await cookies()).set(WEBAUTHN_COOKIE, token, { ...BASE_COOKIE, maxAge: WEBAUTHN_SECONDS });
+}
+
+/** Challenge-i oxuyur və dərhal silir — hər challenge yalnız bir dəfə işlədilə bilər. */
+export async function consumeWebauthnChallenge(purpose: WebauthnPurpose): Promise<WebauthnClaims | null> {
+  const store = await cookies();
+  const token = store.get(WEBAUTHN_COOKIE)?.value;
+  store.delete(WEBAUTHN_COOKIE);
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, secretKey(), { issuer: TOKEN_ISSUER, subject: WEBAUTHN_SUBJECT });
+    const { uid, challenge, purpose: tokenPurpose } = payload as Record<string, unknown>;
+    if (typeof uid !== "string" || typeof challenge !== "string" || tokenPurpose !== purpose) return null;
+    return { uid, challenge, purpose };
+  } catch {
+    return null;
+  }
 }

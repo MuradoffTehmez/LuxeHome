@@ -203,7 +203,9 @@
     "verificationSentGeneric": "Hesab təsdiqlənməyibsə, yeni link e-poçt ünvanına göndərildi.",
     "passwordResetSentGeneric": "Uyğun hesab varsa, parol bərpa linki e-poçt ünvanına göndərildi.",
     "resetTokenInvalid": "Parol bərpa linki etibarsızdır və ya müddəti bitib.",
-    "deleteConfirmationInvalid": "Təsdiq mətnini göstərildiyi kimi yazın."
+    "deleteConfirmationInvalid": "Təsdiq mətnini göstərildiyi kimi yazın.",
+    "passkeyUnavailable": "Passkey ilə təsdiq hazırda mümkün deyil. Doğrulama kodunu yazın.",
+    "passkeyFailed": "Passkey təsdiqlənmədi. Yenidən cəhd edin və ya kodu yazın."
   },
   "profile": {
     "metaTitle": "Profil",

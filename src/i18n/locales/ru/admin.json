@@ -1061,7 +1061,22 @@
       "calendarSecret": "Ссылка работает как пароль — в ней имена и телефоны клиентов. Не делитесь ею; при утечке обновите.",
       "calendarRotate": "Обновить ссылку",
       "calendarRevoke": "Отозвать",
-      "calendarCreate": "Создать ссылку календаря"
+      "calendarCreate": "Создать ссылку календаря",
+      "passkeyTitle": "Passkey",
+      "passkeyHint": "Passkey (отпечаток, Face ID или ключ безопасности) можно использовать на втором шаге входа вместо 6-значного кода; на фишинговых сайтах он не работает. Приложение-аутентификатор остаётся обязательным — при потере passkey вход по коду сохраняется.",
+      "passkeyAdded": "Добавлен: {date}",
+      "passkeyLastUsed": "последнее использование: {date}",
+      "passkeyNeverUsed": "ещё не использовался",
+      "passkeySynced": "синхронизируется между устройствами",
+      "passkeyDeleteTitle": "Удалить passkey?",
+      "passkeyDeleteDescription": "Входить с помощью «{name}» будет невозможно. Вход по коду подтверждения сохраняется.",
+      "passkeyDelete": "Удалить",
+      "passkeyDeleteLabel": "Удалить passkey {name}",
+      "passkeyName": "Название passkey",
+      "passkeyNamePlaceholder": "Например: рабочий ноутбук",
+      "passkeyAdd": "Добавить passkey",
+      "passkeyCancelled": "Passkey не создан — действие отменено или устройство не поддерживает его.",
+      "passkeyUnsupported": "Этот браузер не поддерживает passkey."
     },
     "knowledge": {
       "beledci": "Руководство",
@@ -2224,7 +2239,8 @@
       "ugursuz": "Неудачно",
       "sorguSayi": "запросов: {p0}",
       "idareOlunanUrl": "управляемых URL: {p0}",
-      "sonYenilenmeAuditQeydleri": "Последнее обновление: {p0}. Записи аудита"
+      "sonYenilenmeAuditQeydleri": "Последнее обновление: {p0}. Записи аудита",
+      "yanlisPasskey": "Неудачный вход по passkey"
     },
     "demoContent": {
       "title": "Демоконтент",
@@ -2665,7 +2681,14 @@
       "yeniParolKohnesindenFerqliOlmalidir": "Новый пароль должен отличаться от старого.",
       "parolDeyisdirildiVeDigerCihazlardaki": "Пароль изменён, сеансы на других устройствах завершены.",
       "calendarRotated": "Ссылка обновлена. Старая больше не работает.",
-      "calendarRevoked": "Ссылка календаря отозвана."
+      "calendarRevoked": "Ссылка календаря отозвана.",
+      "passkeyHost": "Passkey можно создать только на официальном адресе сайта.",
+      "passkeyLimit": "Достигнут лимит passkey. Сначала удалите старый.",
+      "passkeyExpired": "Время операции истекло. Попробуйте снова.",
+      "passkeyFailed": "Passkey не подтверждён. Попробуйте снова.",
+      "passkeyAdded": "Passkey добавлен.",
+      "passkeyNotFound": "Passkey не найден.",
+      "passkeyDeleted": "Passkey удалён."
     },
     "hesablar": {
       "hesabTapilmadi": "Аккаунт не найден.",

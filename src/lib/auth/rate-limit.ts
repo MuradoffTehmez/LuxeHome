@@ -12,6 +12,7 @@ import { isLockActive, lockUntil, shouldLock } from "./lockout";
 export type FailureReason =
   | "BAD_PASSWORD"
   | "BAD_TOTP"
+  | "BAD_PASSKEY"
   | "LOCKED"
   | "RATE_LIMITED"
   | "INACTIVE";

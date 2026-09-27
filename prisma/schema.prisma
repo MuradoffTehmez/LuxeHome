@@ -70,6 +70,7 @@ model User {
 
   sessions                Session[]
   backupCodes             BackupCode[]
+  passkeys                Passkey[]
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
   agency                  Agency?
@@ -209,6 +210,32 @@ model BackupCode {
   userId   String
   codeHash String
   usedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Əməkdaşın passkey-i (WebAuthn, #109) — girişin ikinci mərhələsində TOTP koduna
+/// fişinqə davamlı alternativ. TOTP məcburi qalır: passkey itəndə giriş yolu bağlanmır.
+/// Açar domenə bağlıdır (RP ID) — `luxehomeestate.az`-da yaradılan passkey workers.dev-də işləmir.
+model Passkey {
+  id           String    @id @default(cuid())
+  userId       String
+  /// base64url — autentifikatorun verdiyi kimlik.
+  credentialId String    @unique
+  /// base64url — COSE formatında açıq açar.
+  publicKey    String
+  /// İmza sayğacı: geri gedərsə açar klonlanmış sayılır və giriş rədd edilir.
+  counter      Int       @default(0)
+  /// JSON massivi: usb | nfc | ble | internal | hybrid.
+  transports   String?
+  /// singleDevice | multiDevice (sinxronlaşan passkey).
+  deviceType   String
+  backedUp     Boolean   @default(false)
+  name         String
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
