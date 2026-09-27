@@ -35,7 +35,7 @@ function cbor(value: unknown): number[] {
   throw new Error("dəstəklənməyən CBOR dəyəri");
 }
 
-const concat = (...parts: Uint8Array[]) => {
+const concat = (...parts: Uint8Array[]): Uint8Array<ArrayBuffer> => {
   const out = new Uint8Array(parts.reduce((sum, part) => sum + part.length, 0));
   let offset = 0;
   for (const part of parts) {
@@ -44,7 +44,7 @@ const concat = (...parts: Uint8Array[]) => {
   }
   return out;
 };
-const sha256 = async (bytes: Uint8Array) => new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+const sha256 = async (bytes: Uint8Array<ArrayBuffer>) => new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
 const json = (value: unknown) => new TextEncoder().encode(JSON.stringify(value));
 
 /** WebCrypto ECDSA imzası (r||s) → WebAuthn-un gözlədiyi DER. */

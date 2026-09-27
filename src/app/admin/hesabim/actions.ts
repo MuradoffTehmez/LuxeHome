@@ -164,7 +164,7 @@ export async function revokeOtherSessions(): Promise<void> {
 }
 
 /** Şəxsi təqvim abunəsi linkini yaradır və ya yeniləyir (#109). Köhnə link dərhal ölür. */
-export async function rotateCalendarToken(_previous: ActionState, _formData: FormData): Promise<ActionState> {
+export async function rotateCalendarToken(): Promise<ActionState> {
   await assertSameOrigin();
   const user = await requireStaff();
   try {
@@ -179,7 +179,7 @@ export async function rotateCalendarToken(_previous: ActionState, _formData: For
   }
 }
 
-export async function revokeCalendarToken(_previous: ActionState, _formData: FormData): Promise<ActionState> {
+export async function revokeCalendarToken(): Promise<ActionState> {
   await assertSameOrigin();
   const user = await requireStaff();
   try {
