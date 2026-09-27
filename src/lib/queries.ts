@@ -69,7 +69,8 @@ export const propertyCardSelect = {
   districtId: true,
   type: { select: { name: true, slug: true } },
   city: { select: { name: true, slug: true } },
-  district: { select: { name: true, slug: true } },
+  // `kind` kartda yerin növünü yazmaq üçündür: «Əliabad qəsəbəsi, Naxçıvan».
+  district: { select: { name: true, slug: true, kind: true } },
   images: {
     orderBy: [{ isCover: "desc" }, { order: "asc" }],
     take: 1,
@@ -594,7 +595,13 @@ export async function getPropertyBySlug(slug: string) {
     include: {
       type: true,
       city: true,
-      district: { include: { neighborhoodProfile: true } },
+      // Valideyn tam ünvan üçündür: Maştağa → Sabunçu rayonu → Bakı.
+      district: {
+        include: {
+          neighborhoodProfile: true,
+          parent: { select: { name: true, slug: true, kind: true } },
+        },
+      },
       metro: true,
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { include: { feature: true } },

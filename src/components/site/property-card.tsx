@@ -16,7 +16,8 @@ import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { Badge } from "@/components/ui/badge";
 import type { PropertyCardData } from "@/lib/queries";
 import type { PriceBand } from "@/lib/price-benchmark";
-import { CARD_METRO_MAX_METERS } from "@/lib/constants";
+import { CARD_METRO_MAX_METERS, LOCATION_KINDS } from "@/lib/constants";
+import { shortLocation } from "@/lib/location-path";
 import { FavoriteButton } from "./favorite-button";
 import { CompareButton } from "./compare-button";
 
@@ -111,9 +112,12 @@ export function PropertyCard({
     ? nearestMetro
     : null;
 
-  const location = [property.district?.name, property.city.name]
-    .filter(Boolean)
-    .join(", ");
+  // Növ şəkilçisi ilə: «Əliabad qəsəbəsi, Naxçıvan» — tək «Əliabad» yerin hansı
+  // şəhərə və hansı inzibati vahidə aid olduğunu göstərmirdi.
+  const location = shortLocation(
+    { city: { ...property.city, kind: LOCATION_KINDS.CITY }, district: property.district },
+    locale,
+  );
 
   const period = property.pricePeriod === "MONTH"
     ? t("pricePeriod.month")

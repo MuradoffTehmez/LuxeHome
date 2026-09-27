@@ -1,3 +1,4 @@
+import { formatFullAddress } from "@/lib/location-path";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
@@ -174,6 +175,23 @@ export default async function PropertyDetailPage({ params }: Props) {
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
     .join(", ");
+  // Tam iyerarxik ünvan: region → şəhər/rayon → şəhər rayonu → qəsəbə/kənd/massiv → küçə.
+  const fullAddress = formatFullAddress(
+    {
+      city: property.city,
+      district: property.district
+        ? {
+            ...property.district,
+            parent: property.district.parent ? localizeLocation(property.district.parent, locale as Locale) : null,
+          }
+        : null,
+      neighborhoodName: property.neighborhoodName,
+      street: property.street,
+      building: property.building,
+      address: property.address,
+    },
+    locale as Locale,
+  );
 
   const metroPlace = property.nearbyPlaces
     .filter((place) => place.category === NEARBY_PLACE_CATEGORIES.METRO)
@@ -312,10 +330,10 @@ export default async function PropertyDetailPage({ params }: Props) {
                 {property.title}
               </h1>
 
-              {location && (
-                <p className="flex items-center gap-1.5 text-sm text-ink-soft">
-                  <MapPin className="size-4 shrink-0" aria-hidden="true" />
-                  {location}
+              {fullAddress && (
+                <p className="flex items-start gap-1.5 text-sm text-ink-soft">
+                  <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <span>{fullAddress}</span>
                 </p>
               )}
               {/* Ən yaxın metro (#107): təsdiqlənmiş yaxın obyektdən, yoxsa elanın metro sahəsindən. */}
@@ -628,7 +646,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     latitude={property.latitude}
                     longitude={property.longitude}
                     title={property.title}
-                    subtitle={property.address || location || null}
+                    subtitle={fullAddress || location || null}
                     mapClassName="h-80 sm:h-96"
                   />
                 </div>

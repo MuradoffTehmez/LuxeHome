@@ -429,7 +429,15 @@ model Property {
   cityId     String
   districtId String?
   metroId    String?
+  /// Tam ünvan sətri: yeni elanlarda `street` + `building`-dən qurulur, köhnə və
+  /// CSV-dən gələn elanlarda sərbəst mətndir. Axtarış, JSON-LD və geokod bunu oxuyur.
   address    String?
+  /// Küçə/prospekt — iyerarxik ünvan formasının sərbəst hissəsi.
+  street           String?
+  /// Bina/ev nömrəsi, blok, mənzil və orientir kimi əlavə ünvan məlumatı.
+  building         String?
+  /// Siyahıda olmayan məhəllə və ya yaşayış massivi (rəsmi inzibati vahid deyil).
+  neighborhoodName String?
   latitude   Float?
   longitude  Float?
 

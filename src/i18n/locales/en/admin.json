@@ -538,6 +538,46 @@
         "recenter": "Recentre the map",
         "scrollHint": "Click the map to set the point"
       }
+    },
+    "wizard": {
+      "progress": "{completed} of {total} steps completed — {percent}%",
+      "stepOf": "Step {current} of {total}",
+      "back": "Back",
+      "next": "Next",
+      "cancel": "Cancel",
+      "stepsNav": "Listing steps",
+      "draftSaved": "Draft saved · {time}",
+      "draftFound": "We found a draft saved on {time}. Would you like to continue where you left off?",
+      "draftRestore": "Continue",
+      "draftDiscard": "Discard draft"
+    },
+    "location": {
+      "region": "Region / Autonomous Republic",
+      "allRegions": "All regions",
+      "city": "City / district",
+      "urbanDistrict": "City district",
+      "settlement": "Settlement",
+      "village": "Village",
+      "neighborhood": "Neighbourhood / residential area",
+      "neighborhoodHint": "Pick from the list or type the name.",
+      "street": "Street / avenue",
+      "streetHint": "For example: Aliyar Aliyev street.",
+      "building": "Building and additional address details",
+      "buildingHint": "Building/house number, block or landmark. Do not include the flat number.",
+      "select": "Select",
+      "notSelected": "Not selected",
+      "fullAddress": "Full address"
+    },
+    "listingPreview": {
+      "noImage": "No photos added",
+      "noTitle": "No title yet",
+      "noPrice": "No price yet",
+      "images": "{count} photos",
+      "rooms": "{count} rooms",
+      "area": "{value} m²",
+      "floor": "Floor {floor}",
+      "description": "Description",
+      "features": "Features"
     }
   },
   "pages": {
@@ -649,7 +689,25 @@
       "virtualTour": "360° virtual tour",
       "virtualTourHint": "Kuula, Matterport or Momento360 share link.",
       "floorPlans": "Floor plan",
-      "floorPlansHint": "Image or scan of the plan, up to 6 files. Shown in a separate section, not in the gallery."
+      "floorPlansHint": "Image or scan of the plan, up to 6 files. Shown in a separate section, not in the gallery.",
+      "steps": {
+        "type": "Type and category",
+        "typeDescription": "Choose the listing type and property category.",
+        "location": "Address and map",
+        "locationDescription": "Pick the address level by level so buyers see exactly where the property is.",
+        "details": "Property details",
+        "detailsDescription": "Title, description, size and amenities.",
+        "price": "Price and payment",
+        "priceDescription": "Price, currency and payment options.",
+        "media": "Photos and media",
+        "mediaDescription": "The LuxeHomeEstate watermark is added to photos automatically.",
+        "contact": "Contact details",
+        "contactDescription": "Buyers will contact you using these details.",
+        "preview": "Preview",
+        "previewDescription": "This is roughly how your listing will look on the site.",
+        "confirm": "Confirm and publish",
+        "confirmDescription": "Final check and submission."
+      }
     },
     "leads": {
       "yenile": "Update",

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireLister } from "@/lib/auth/guard";
+import { getListingContact } from "@/lib/accounts/listing-contact";
 import { type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { getPropertyFormOptions } from "@/lib/queries";
@@ -32,7 +33,7 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
   const locale = await getLocale() as Locale;
   const user = await requireLister(locale);
   const { id } = await params;
-  const [property, sourceOptions, t] = await Promise.all([
+  const [property, sourceOptions, t, contact] = await Promise.all([
     prisma.property.findFirst({
       where: { id, authorId: user.id, deletedAt: null },
       select: {
@@ -46,6 +47,9 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
         cityId: true,
         districtId: true,
         address: true,
+        street: true,
+        building: true,
+        neighborhoodName: true,
         latitude: true,
         longitude: true,
         rooms: true,
@@ -66,6 +70,7 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
     }),
     getPropertyFormOptions(),
     getTranslations("account.newProperty"),
+    getListingContact(user.id),
   ]);
   if (!property) notFound();
 
@@ -98,7 +103,9 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
           action={action}
           options={options}
           initial={initial}
+          contact={contact}
           submitLabel={t("saveChanges")}
+          editing
         />
       </div>
     </div>

@@ -116,7 +116,78 @@
     "mapRegion": "Coordinate picker map",
     "mapProviderAttribution": "Address search and reverse geocoding by:",
     "virtualTour": "360° virtual tour",
-    "virtualTourHint": "Kuula, Matterport or Momento360 link"
+    "virtualTourHint": "Kuula, Matterport or Momento360 link",
+    "wizard": {
+      "progress": "{completed} of {total} steps completed — {percent}%",
+      "stepOf": "Step {current} of {total}",
+      "back": "Back",
+      "next": "Next",
+      "cancel": "Cancel",
+      "stepsNav": "Listing steps",
+      "draftSaved": "Draft saved · {time}",
+      "draftFound": "We found a draft saved on {time}. Would you like to continue where you left off?",
+      "draftRestore": "Continue",
+      "draftDiscard": "Discard draft"
+    },
+    "location": {
+      "region": "Region / Autonomous Republic",
+      "allRegions": "All regions",
+      "city": "City / district",
+      "urbanDistrict": "City district",
+      "settlement": "Settlement",
+      "village": "Village",
+      "neighborhood": "Neighbourhood / residential area",
+      "neighborhoodHint": "Pick from the list or type the name.",
+      "street": "Street / avenue",
+      "streetHint": "For example: Aliyar Aliyev street.",
+      "building": "Building and additional address details",
+      "buildingHint": "Building/house number, block or landmark. Do not include the flat number.",
+      "select": "Select",
+      "notSelected": "Not selected",
+      "fullAddress": "Full address"
+    },
+    "steps": {
+      "type": "Type and category",
+      "typeDescription": "Choose the listing type and property category.",
+      "location": "Address and map",
+      "locationDescription": "Pick the address level by level so buyers see exactly where the property is.",
+      "details": "Property details",
+      "detailsDescription": "Title, description, size and amenities.",
+      "price": "Price and payment",
+      "priceDescription": "Price, currency and payment options.",
+      "media": "Photos and media",
+      "mediaDescription": "The LuxeHomeEstate watermark is added to photos automatically.",
+      "contact": "Contact details",
+      "contactDescription": "Buyers will contact you using these details.",
+      "preview": "Preview",
+      "previewDescription": "This is roughly how your listing will look on the site.",
+      "confirm": "Confirm and publish",
+      "confirmDescription": "Final check and submission."
+    },
+    "contact": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "phoneMissing": "No phone number yet — add one to your profile so buyers can reach you.",
+      "editProfile": "Edit in profile",
+      "note": "Contact details come from your profile and stay the same across all your listings."
+    },
+    "preview": {
+      "noImage": "No photos added",
+      "noTitle": "No title yet",
+      "noPrice": "No price yet",
+      "images": "{count} photos",
+      "rooms": "{count} rooms",
+      "area": "{value} m²",
+      "floor": "Floor {floor}",
+      "description": "Description",
+      "features": "Features"
+    },
+    "confirm": {
+      "accept": "I confirm that the information is accurate and that I have the right to list this property.",
+      "moderation": "After you submit, the listing is reviewed according to your account type. SEO details and photo ALT texts are generated automatically — you do not need to write them.",
+      "checklist": "Check the preview before submitting: the address, price and photos must be correct."
+    }
   },
   "team": {
     "metaTitle": "Team",

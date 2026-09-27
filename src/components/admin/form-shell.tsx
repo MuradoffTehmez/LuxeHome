@@ -26,6 +26,11 @@ export function useFieldError(name: string): string | undefined {
   return useContext(FormStateContext).fieldErrors?.[name];
 }
 
+/** Formanın son action nəticəsi — sehrbaz xətalı sahənin addımına keçmək üçün oxuyur. */
+export function useFormActionState(): ActionState {
+  return useContext(FormStateContext);
+}
+
 type AdminFormProps = {
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
   children: React.ReactNode;
@@ -34,6 +39,11 @@ type AdminFormProps = {
   /** Saxla düyməsinin yanında göstərilən əlavə əməliyyatlar (məsələn «Sil»). */
   extraActions?: React.ReactNode;
   className?: string;
+  /**
+   * Ümumi sticky əməliyyat zolağını gizlədir — addımlı forma (`FormWizard`) öz
+   * «Geri / Növbəti / Göndər» zolağını çəkir.
+   */
+  hideActions?: boolean;
 };
 
 export function AdminForm({
@@ -43,6 +53,7 @@ export function AdminForm({
   cancelHref,
   extraActions,
   className,
+  hideActions = false,
 }: AdminFormProps) {
   const t = useTranslations("admin");
   const [rawState, formAction] = useActionState(action, IDLE_STATE);
@@ -97,7 +108,7 @@ export function AdminForm({
         {children}
 
         {/* Uzun formada saxla düyməsi həmişə əlçatan qalır */}
-        <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 flex flex-wrap items-center justify-end gap-2 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:-mx-6 sm:px-6 sm:pb-3">
+        {!hideActions && <div className="sticky bottom-0 z-[var(--z-sticky)] -mx-4 flex flex-wrap items-center justify-end gap-2 border-t border-line bg-paper/95 px-4 pt-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur sm:-mx-6 sm:px-6 sm:pb-3">
           {extraActions}
           {cancelHref && (
             <Link
@@ -108,7 +119,7 @@ export function AdminForm({
             </Link>
           )}
           <SubmitButton label={submitLabel ?? t("actions.save")} />
-        </div>
+        </div>}
       </form>
     </FormStateContext.Provider>
   );
@@ -123,9 +134,12 @@ export function AdminForm({
 export function SubmitButton({
   label,
   className,
+  onClick,
 }: {
   label?: string;
   className?: string;
+  /** `preventDefault()` göndərməni dayandırır — sehrbazın son yoxlaması üçün. */
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
   const t = useTranslations("admin");
   const { pending } = useFormStatus();
@@ -133,6 +147,7 @@ export function SubmitButton({
   return (
     <button
       type="submit"
+      onClick={onClick}
       disabled={pending}
       aria-busy={pending || undefined}
       className={cn(

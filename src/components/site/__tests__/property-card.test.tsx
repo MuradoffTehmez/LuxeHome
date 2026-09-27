@@ -25,7 +25,7 @@ const property = {
   createdAt: new Date("2026-08-20T10:00:00Z"),
   type: { name: "Mənzil", slug: "menzil" },
   city: { name: "Bakı", slug: "baki" },
-  district: { name: "Səbail", slug: "sebail" },
+  district: { name: "Səbail", slug: "sebail", kind: "DISTRICT" },
   images: [],
   _count: { images: 0 },
   typeId: "type-1",
