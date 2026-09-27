@@ -18,7 +18,9 @@
     "showAll": "Show all photos ({count})",
     "thumbnail": "Go to photo {index}",
     "cover": "Cover photo",
-    "thumbnailRail": "{title} — photo strip"
+    "thumbnailRail": "{title} — photo strip",
+    "close": "Close gallery",
+    "keyboardHint": "Use ← and → to move between photos and Esc to close. On touch screens, swipe left or right."
   },
   "trust": {
     "aria": "Company legal and contact details",

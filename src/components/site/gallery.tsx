@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
-import { Overlay } from "@/components/ui/overlay";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
+import { wrapIndex } from "@/lib/ui/gallery-navigation";
+import { GalleryLightbox } from "./gallery-lightbox";
 
 export type GalleryImage = {
   url: string;
@@ -44,7 +45,7 @@ export function Gallery({ images, title, className }: GalleryProps) {
     (nextIndex: number, behavior: ScrollBehavior = "smooth") => {
       const rail = railRef.current;
       if (!rail || total === 0) return;
-      const target = ((nextIndex % total) + total) % total;
+      const target = wrapIndex(nextIndex, total);
       rail.scrollTo({ left: target * rail.clientWidth, behavior });
       setIndex(target);
     },
@@ -54,27 +55,13 @@ export function Gallery({ images, title, className }: GalleryProps) {
   const go = useCallback(
     (nextIndex: number) => {
       if (total === 0) return;
-      const target = ((nextIndex % total) + total) % total;
-      if (fullscreen) setIndex(target);
-      else scrollToIndex(target);
+      scrollToIndex(wrapIndex(nextIndex, total));
     },
-    [fullscreen, scrollToIndex, total],
+    [scrollToIndex, total],
   );
 
   const next = useCallback(() => go(index + 1), [go, index]);
   const previous = useCallback(() => go(index - 1), [go, index]);
-
-  useEffect(() => {
-    if (!fullscreen) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") next();
-      else if (event.key === "ArrowLeft") previous();
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [fullscreen, next, previous]);
 
   // Lightbox-da oxlarla gəzdikdən sonra əsas lent həmin şəkildə qalmalıdır —
   // əks halda pəncərə bağlananda qalereya köhnə mövqeyə "qayıdır".
@@ -94,6 +81,17 @@ export function Gallery({ images, title, className }: GalleryProps) {
   function openAt(nextIndex: number) {
     setIndex(nextIndex);
     setFullscreen(true);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (total < 2) return;
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      next();
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      previous();
+    }
   }
 
   function handleRailScroll(event: React.UIEvent<HTMLDivElement>) {
@@ -116,13 +114,14 @@ export function Gallery({ images, title, className }: GalleryProps) {
     );
   }
 
-  const current = images[index];
   const arrowClassName =
     "pointer-events-auto inline-flex size-11 items-center justify-center rounded-full on-image-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold";
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <div className="relative overflow-hidden rounded-xl bg-beige">
+      {/* Qalereyadakı hər hansı düymə fokusdadırsa ←/→ şəkli dəyişir — lightbox
+          açılmadan da klaviatura ilə gəzmək mümkündür. */}
+      <div className="relative overflow-hidden rounded-xl bg-beige" onKeyDown={handleKeyDown}>
         <div
           ref={railRef}
           onScroll={handleRailScroll}
@@ -216,48 +215,15 @@ export function Gallery({ images, title, className }: GalleryProps) {
         </div>
       )}
 
-      <Overlay
-        open={fullscreen}
-        onClose={() => setFullscreen(false)}
-        title={t("title", { title, index: index + 1, total })}
-        className="h-dvh max-h-dvh max-w-none rounded-none bg-paper"
-        footer={
-          total > 1 ? (
-            <div className="flex w-full items-center justify-center gap-4">
-              <button
-                type="button"
-                onClick={previous}
-                aria-label={t("previous")}
-                className="inline-flex size-12 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-gold-soft hover:text-gold-soft"
-              >
-                <ChevronLeft className="size-5" aria-hidden="true" />
-              </button>
-              <span aria-live="polite" className="tabular min-w-16 text-center text-sm text-ink-soft">
-                {index + 1} / {total}
-              </span>
-              <button
-                type="button"
-                onClick={next}
-                aria-label={t("next")}
-                className="inline-flex size-12 items-center justify-center rounded-full border border-line-strong text-ink transition-colors hover:border-gold-soft hover:text-gold-soft"
-              >
-                <ChevronRight className="size-5" aria-hidden="true" />
-              </button>
-            </div>
-          ) : null
-        }
-      >
-        <div className="relative -mx-5 -my-5 min-h-[60dvh] w-[calc(100%+2.5rem)] bg-charcoal sm:-mx-6 sm:min-h-[70dvh] sm:w-[calc(100%+3rem)]">
-          <Image
-            src={current.url}
-            alt={current.alt || t("imageAlt", { title, index: index + 1 })}
-            fill
-            unoptimized={isUnoptimizedImage(current.url)}
-            sizes="100vw"
-            className="object-contain"
-          />
-        </div>
-      </Overlay>
+      {fullscreen && (
+        <GalleryLightbox
+          images={images}
+          title={title}
+          index={index}
+          onIndexChange={setIndex}
+          onClose={() => setFullscreen(false)}
+        />
+      )}
     </div>
   );
 }
