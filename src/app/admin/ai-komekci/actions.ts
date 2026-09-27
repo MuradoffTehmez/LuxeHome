@@ -12,7 +12,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
 import { queuePropertyVectorSync, reindexAllProperties } from "@/lib/semantic-search";
-import { readImageBytes } from "@/lib/media/read-image";
+import { readPreferredImageBytes } from "@/lib/media/read-image";
 import { enrichListing } from "@/lib/listing-enrichment";
 
 type DescriptionOutput = { title?: string; description: string; highlights?: string[] };
@@ -176,7 +176,8 @@ export async function analyzePropertyPhotos(
     let unreadable = 0;
     for (const image of property.images) {
       // Kiçik nüsxə kifayətdir: texniki keyfiyyət onda da görünür, sorğu isə yüngül qalır.
-      const bytes = await readImageBytes(image.thumbUrl || image.url);
+      // Oxunmasa orijinal sınanır (kiçik nüsxənin yazılması alınmamış ola bilər).
+      const bytes = await readPreferredImageBytes(image.thumbUrl, image.url);
       if (!bytes) {
         unreadable += 1;
         console.error(`[ai] «${image.id}» şəkli oxunmadı: ${image.url}`);

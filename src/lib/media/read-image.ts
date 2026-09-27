@@ -29,7 +29,7 @@ const AI_IMAGE_HOSTS = new Set([
  * `http:` və digər sxemlər qəsdən qəbul edilmir, ölçü isə həm başlıqla, həm də
  * faktiki bayt sayı ilə yoxlanılır.
  */
-export async function readImageBytes(url: string): Promise<Uint8Array | null> {
+async function readImageBytes(url: string): Promise<Uint8Array | null> {
   if (url.startsWith("/media/")) {
     const bucket = getCloudflareContext().env.MEDIA;
     const object = await bucket?.get(url.slice("/media/".length));
@@ -63,4 +63,19 @@ export async function readImageBytes(url: string): Promise<Uint8Array | null> {
   if (buffer.byteLength === 0 || buffer.byteLength > MAX_IMAGE_BYTES) return null;
 
   return new Uint8Array(buffer);
+}
+
+/**
+ * Əvvəlcə kiçik nüsxəni, alınmasa orijinalı oxuyur.
+ *
+ * `storeImage()` kiçik nüsxənin yazılma xətasını udur, amma `thumbUrl`-u yenə də
+ * qaytarır — bazadakı `thumbUrl` mövcud olmayan fayla işarə edə bilər. Ona görə
+ * `thumbUrl || url` kifayət deyil: oxuna bilməyən kiçik nüsxədən sonra orijinal sınanır.
+ */
+export async function readPreferredImageBytes(thumbUrl: string | null | undefined, url: string): Promise<Uint8Array | null> {
+  if (thumbUrl && thumbUrl !== url) {
+    const thumb = await readImageBytes(thumbUrl).catch(() => null);
+    if (thumb) return thumb;
+  }
+  return readImageBytes(url);
 }
