@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Bell, LayoutDashboard, LogIn, Plus, UserRound } from "lucide-react";
+import { Bell, LayoutDashboard, LogIn, UserRound } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { useSessionState } from "./use-session-state";
@@ -12,6 +12,9 @@ import { useSessionState } from "./use-session-state";
  * Sessiya vəziyyəti `useSessionState()`-dən gəlir — həmin hook `/api/hesab/menu`
  * cavabını modul səviyyəsində keşləyir və eyni səhifədəki digər istifadəçiyə
  * bağlı komponentlərlə (məsələn «axtarışı saxla» düyməsi) bölüşür.
+ *
+ * «Elan ver» düyməsi burada deyil, navbar-dadır — hər ikisində olanda başlıqda iki
+ * eyni əməl görünürdü.
  */
 
 export function AccountMenu({
@@ -32,26 +35,9 @@ export function AccountMenu({
     isOverlay ? "text-white hover:bg-white/10 hover:text-gold-soft" : "text-ink hover:bg-beige hover:text-gold-deep",
   );
 
-  // «Elan yerləşdir» — qısa ünvan (`/elan-yerlesdir`) sehrbazı birbaşa açır; girişsiz
-  // ziyarətçini kabinet özü giriş səhifəsinə aparır. Bir kliklə əsas funksiya.
-  const postListing = (
-    <Link
-      href="/elan-yerlesdir"
-      aria-label={t("postListing")}
-      className={cn(
-        linkClass,
-        isOverlay ? "border border-white/40" : "border border-gold/60 text-gold-deep hover:bg-gold/10",
-      )}
-    >
-      <Plus className="size-4" aria-hidden="true" />
-      <span className={cn(variant === "desktop" && "sr-only min-[1800px]:not-sr-only")}>{t("postListing")}</span>
-    </Link>
-  );
-
   if (state.status === "anonymous") {
     return (
       <div className={cn("flex items-center gap-3", variant === "mobile" && "flex-col items-stretch gap-2")}>
-        {postListing}
         <Link href="/daxil-ol" aria-label={t("login")} className={linkClass}>
           <LogIn className="size-4" aria-hidden="true" />
           <span className={cn(variant === "desktop" && "sr-only min-[1800px]:not-sr-only")}>{t("login")}</span>
@@ -101,8 +87,6 @@ export function AccountMenu({
 
   return (
     <div className={cn("flex items-center gap-1", variant === "mobile" && "flex-col items-stretch gap-2")}>
-      {/* Şəxsi istifadəçi elan yerləşdirə bilmir — düymə onu qadağan səhifəsinə aparardı. */}
-      {state.canPostListing && postListing}
       <Link
         href="/kabinet/bildirisler"
         aria-label={
