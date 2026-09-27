@@ -4,13 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { PROPERTY_STATUSES, TRANSLATION_ENTITY_TYPES, TRANSLATION_STATUSES, type Locale } from "@/lib/constants";
 import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib/public-cache";
+import { getMarketReportIndex } from "@/lib/market-intelligence";
 import { parseSitemapFeed, urlsetXml, type SitemapEntry } from "@/lib/sitemap-xml";
 import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import { PROJECTS_SECTION_PATH } from "@/lib/site-section-paths";
 
 export const dynamic = "force-dynamic";
 const absolute = (path: string, locale: Locale) => new URL(localizePath(path, locale), `${PRODUCTION_SITE_URL}/`).toString();
-const staticPaths = ["/", "/emlaklar", "/layiheler", "/agentler", "/agentlikler", "/terefdaslar", "/xidmetler", "/haqqimizda", "/suallar", "/blog", "/bilik-merkezi", "/lugat", "/kalkulyator", "/emlakimi-sat", "/investisiya", "/bazar-analitikasi", "/elaqe", "/mexfilik-siyaseti", "/istifade-sertleri", "/cookie-siyaseti"];
+const staticPaths = ["/", "/emlaklar", "/layiheler", "/agentler", "/agentlikler", "/terefdaslar", "/xidmetler", "/haqqimizda", "/suallar", "/blog", "/bilik-merkezi", "/bilik-merkezi/suallar", "/lugat", "/kalkulyator", "/emlakimi-sat", "/investisiya", "/bazar-analitikasi", "/mene-emlak-tap", "/ai-axtaris", "/elaqe", "/mexfilik-siyaseti", "/istifade-sertleri", "/cookie-siyaseti"];
 
 async function translatedIds(entityType: string, ids: string[], locale: Locale) {
   if (locale === "az") return new Set(ids);
@@ -35,15 +36,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ fee
   const { kind, locale, page } = descriptor;
   let entries: SitemapEntry[] = [];
   if (kind === "pages") {
-    const [projectTranslations, serviceTranslations] = await Promise.all([
+    const [projectTranslations, serviceTranslations, marketReports] = await Promise.all([
       translatedIds(TRANSLATION_ENTITY_TYPES.PROJECT, source.projects.flatMap((item) => item.id ? [item.id] : []), locale),
       translatedIds(TRANSLATION_ENTITY_TYPES.SERVICE, source.services.flatMap((item) => item.id ? [item.id] : []), locale),
+      getMarketReportIndex(),
     ]);
     entries = [
       ...visibleStaticPaths.map((path, index) => ({ url: absolute(path, locale), changeFrequency: index < 2 ? "daily" : "monthly", priority: index === 0 ? 1 : 0.6 })),
       ...source.projects.filter((item) => locale === "az" || (item.id && projectTranslations.has(item.id))).map((item) => ({ url: absolute(`/layiheler/${item.slug}`, locale), lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.7 })),
       ...source.services.filter((item) => locale === "az" || (item.id && serviceTranslations.has(item.id))).map((item) => ({ url: absolute(`/xidmetler/${item.slug}`, locale), lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 })),
       ...source.partners.map((item) => ({ url: absolute(`/terefdaslar/${item.slug}`, locale), lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 })),
+      // Rayon bazar hesabatları (`/bazar-analitikasi/<slug>`) — ölçmə tarixi və mənbəyi olan profillər.
+      ...marketReports.map((item) => ({ url: absolute(`/bazar-analitikasi/${item.location.slug}`, locale), lastModified: item.measuredAt ?? undefined, changeFrequency: "weekly", priority: 0.6 })),
     ];
   } else if (kind === "properties") {
     const eligible = source.properties.filter((item) => !item.noIndex && !item.canonicalUrl && ([PROPERTY_STATUSES.PUBLISHED, PROPERTY_STATUSES.RESERVED].includes(item.status as never) || ([PROPERTY_STATUSES.SOLD, PROPERTY_STATUSES.RENTED].includes(item.status as never) && item.retentionUntil != null && new Date(item.retentionUntil).getTime() >= Date.now())));
