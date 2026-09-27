@@ -101,7 +101,8 @@ export function AccountMenu({
 
   return (
     <div className={cn("flex items-center gap-1", variant === "mobile" && "flex-col items-stretch gap-2")}>
-      {postListing}
+      {/* Şəxsi istifadəçi elan yerləşdirə bilmir — düymə onu qadağan səhifəsinə aparardı. */}
+      {state.canPostListing && postListing}
       <Link
         href="/kabinet/bildirisler"
         aria-label={

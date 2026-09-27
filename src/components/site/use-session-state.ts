@@ -19,13 +19,15 @@ import { usePathname } from "@/i18n/navigation";
 export type SessionState =
   | { status: "loading" }
   | { status: "anonymous" }
-  | { status: "signed-in"; name: string; isStaff: boolean; unreadNotifications: number };
+  | { status: "signed-in"; name: string; isStaff: boolean; unreadNotifications: number; canPostListing: boolean };
 
 type MenuPayload = {
   signedIn: boolean;
   name?: string;
   isStaff?: boolean;
   unreadNotifications?: number;
+  /** Hesab elan yerləşdirə bilirmi (`LISTING_ACCOUNT_TYPES`) — «Elan yerləşdir» düyməsi üçün. */
+  canPostListing?: boolean;
 };
 
 /** Keş nə qədər «təzə» sayılır — bu müddət ərzində sorğu ümumiyyətlə getmir. */
@@ -59,6 +61,7 @@ async function fetchSessionState(fallbackName: string): Promise<SessionState> {
             name: data.name ?? fallbackName,
             isStaff: data.isStaff === true,
             unreadNotifications: data.unreadNotifications ?? 0,
+            canPostListing: data.canPostListing === true,
           } as const)
         : ({ status: "anonymous" } as const);
     } catch {
