@@ -595,7 +595,7 @@ async function main() {
         "Luxe Home Estate — Bakıda mənzil, villa, həyət evi, torpaq, ofis və obyektlərin alqı-satqısı və icarəsi.",
     },
     { key: "contact.phone", value: "+994 51 922 85 85" },
-    { key: "contact.address", value: "Əliyar Əliyev 109A" },
+    { key: "contact.address", value: "Əliyar Əliyev 45a" },
     { key: "contact.instagram", value: "luxe_home_estate" },
     { key: "leads.notifyEmail", value: "" },
   ];

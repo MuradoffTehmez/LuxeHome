@@ -503,7 +503,7 @@
       "latitude": "Latitude",
       "longitude": "Longitude",
       "searchLabel": "Find the address on the map",
-      "searchPlaceholder": "For example: Aliyar Aliyev 109A, Baku",
+      "searchPlaceholder": "For example: Aliyar Aliyev 45a, Baku",
       "searchAction": "Search",
       "searching": "Searching…",
       "noResults": "Address not found. Try a broader query or click the map directly.",

@@ -38,8 +38,10 @@ export const siteConfig = {
   phone: "+994 51 922 85 85",
   phoneHref: "tel:+994519228585",
   whatsapp: "994519228585",
-  address: "Əliyar Əliyev 109A",
-  addressFull: "Əliyar Əliyev 109A, Nərimanov rayonu, Bakı AZ1033, Azərbaycan",
+  /** Google Business Profile ilə eyni yazılış (#110) — NAP hər yerdə eyni olmalıdır. */
+  address: "Əliyar Əliyev 45a",
+  addressFull: "Əliyar Əliyev 45a, Nərimanov rayonu, Bakı AZ1005, Azərbaycan",
+  postalCode: "AZ1005",
   email: corporateEmails.info,
 
   /** Rəsmi qeydiyyat sənədləri (VÖEN, reyestr) əsasında — hüquqi ünvanla sinxron saxlanılmalıdır. */

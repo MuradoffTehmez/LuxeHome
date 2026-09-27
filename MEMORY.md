@@ -23,7 +23,7 @@ genişləndi: hədəf artıq təkcə frontend deyil, hər iki PRD sənədinin (b
 koda köçürülməsidir.** Bu, işin uzunmüddətli hədəfidir — qısamüddətli prioritetləşdirmə hələ
 də ardıcıl, kiçik, təsdiqlənən addımlarla gedir (bax bölmə 10).
 
-Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 109A.
+Bazar: Bakı, Azərbaycan. Şirkət: Luxe Home Estate MMC, Əliyar Əliyev 45a, Bakı AZ1005 (40.40767, 49.87432).
 
 ---
 
@@ -595,5 +595,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - `TELEGRAM_BOT_TOKEN` və `TELEGRAM_CHAT_ID` secret-ləri (bot @BotFather-də yaradılır).
 - Cloudflare Web Analytics sayt tokeni → GitHub repo dəyişəni `PRODUCTION_CF_WEB_ANALYTICS_TOKEN`.
 - Şirkətin öz fotoları (`Parametrlər → Saytın şəkilləri`) və real elanlar (CSV idxalı).
-- Google Business Profile-dakı ünvan (Əliyar Əliyev **45a**) ilə saytdakı ünvan
-  (**109A**) fərqlidir — hansının düzgün olduğu şirkətlə təsdiqlənməlidir.
+- Ünvan ziddiyyəti həll olunub (#110): sahibin təsdiqi ilə hər yerdə **Əliyar Əliyev 45a,
+  Bakı AZ1005** (Google Business Profile ilə eyni). Köhnə «109A, AZ1033» işlədilməməlidir.
