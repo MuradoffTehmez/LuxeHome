@@ -4,6 +4,7 @@ import * as form from "./form";
 import { propertySearchText } from "@/lib/search-normalization";
 import type { PaymentFlags } from "./payment-features";
 import { DEFAULT_EXPIRED_RETENTION_DAYS, propertyContentFingerprint } from "@/lib/serp";
+import { publicationExpiryReset, type ExpiryFields } from "@/lib/listing-expiry-policy";
 
 /**
  * Əmlak formasının saf (baza ilə əlaqəsiz) hissəsi.
@@ -135,7 +136,7 @@ export function nextPublishedAt(status: string, current: Date | null): Date | nu
 
 export function propertyLifecycleData(
   status: string,
-  current: { publishedAt: Date | null; closedAt?: Date | null },
+  current: { publishedAt: Date | null; closedAt?: Date | null } & ExpiryFields,
   retentionDays = DEFAULT_EXPIRED_RETENTION_DAYS,
 ) {
   const isClosed = [
@@ -151,5 +152,7 @@ export function propertyLifecycleData(
     publishedAt: nextPublishedAt(status, current.publishedAt),
     closedAt,
     retentionUntil,
+    // Yenidən dərcdə köhnəlmiş elan müddəti təzələnir (#109).
+    ...(status === PROPERTY_STATUSES.PUBLISHED ? publicationExpiryReset(current) : {}),
   };
 }

@@ -5,6 +5,8 @@ import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { recordDomainEvent } from "@/lib/admin/events";
+import { findManyInChunks } from "@/lib/d1-chunks";
+import { REMINDER_DAYS, backfillExpiry, renewedExpiry } from "@/lib/listing-expiry-policy";
 
 /**
  * Elan müddəti və yeniləmə (#109).
@@ -19,36 +21,9 @@ import { recordDomainEvent } from "@/lib/admin/events";
  * yeni dərc yolu əlavə olunanda onu unutmaq mümkün deyil.
  */
 
-export const LISTING_LIFETIME_DAYS = 60;
-export const REMINDER_DAYS = 7;
-export const BACKFILL_GRACE_DAYS = 14;
 const DAY = 86_400_000;
 
 const EXPIRING_ACCOUNT_TYPES = [ACCOUNT_TYPES.USER, ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.AGENCY];
-
-export type ExpiryState = { state: "active" | "expiring" | "expired"; daysLeft: number } | null;
-
-/** Kabinet göstəricisi üçün saf hesablama. */
-export function expiryState(
-  property: { status: string; listingExpiresAt: Date | null; expiredAt: Date | null },
-  now = Date.now(),
-): ExpiryState {
-  if (property.expiredAt && property.status === PROPERTY_STATUSES.ARCHIVED) return { state: "expired", daysLeft: 0 };
-  if (!property.listingExpiresAt || property.status !== PROPERTY_STATUSES.PUBLISHED) return null;
-  const daysLeft = Math.max(0, Math.ceil((property.listingExpiresAt.getTime() - now) / DAY));
-  return { state: daysLeft <= REMINDER_DAYS ? "expiring" : "active", daysLeft };
-}
-
-/** Yeni müddət: bu andan `LISTING_LIFETIME_DAYS` gün. */
-export function renewedExpiry(now = new Date()): Date {
-  return new Date(now.getTime() + LISTING_LIFETIME_DAYS * DAY);
-}
-
-/** Köhnə elana müddət: dərc + 60 gün, amma bu gündən ən az 14 gün sonra (qəfil arxiv olmasın). */
-export function backfillExpiry(publishedAt: Date | null, now = new Date()): Date {
-  const natural = (publishedAt ?? now).getTime() + LISTING_LIFETIME_DAYS * DAY;
-  return new Date(Math.max(natural, now.getTime() + BACKFILL_GRACE_DAYS * DAY));
-}
 
 const COPY = {
   az: {
@@ -77,7 +52,7 @@ const COPY = {
 const localeOf = (value: string | null | undefined): Locale => (value === "en" || value === "ru" ? value : "az");
 
 async function notifyOwner(
-  owner: { id: string; email: string; locale: string | null },
+  owner: Owner,
   kind: "reminder" | "expired",
   propertyId: string,
   title: string,
@@ -105,9 +80,30 @@ async function notifyOwner(
   }).catch(() => undefined);
 }
 
+type Owner = { id: string; email: string; locale: string | null };
+
+/**
+ * Müəllifləri nested əlaqə ilə deyil, ayrıca və hissə-hissə oxuyur: 98-dən çox valideynli
+ * əlaqə yüklənməsi D1-in 100 parametr həddini aşır və sorğunu ilişdirir.
+ */
+async function ownersById(authorIds: (string | null)[]): Promise<Map<string, Owner>> {
+  const ids = [...new Set(authorIds.filter((id): id is string => Boolean(id)))];
+  const owners = await findManyInChunks(ids, 0, (chunk) =>
+    prisma.user.findMany({ where: { id: { in: chunk } }, select: { id: true, email: true, locale: true } }));
+  return new Map(owners.map((owner) => [owner.id, owner]));
+}
+
 /** Gündəlik iş: müddət təyini, xatırlatma və arxiv. İdempotentdir. */
 export async function runListingExpiry(now = new Date()) {
   const owners = { author: { accountType: { in: EXPIRING_ACCOUNT_TYPES } } };
+
+  // Müddəti bitib arxivlənmiş, sonra hansısa yolla yenidən dərc olunmuş elan köhnə
+  // `expiredAt`/`listingExpiresAt` daşıyırsa, onu təkrar arxivləmək yox — təzə müddət
+  // vermək lazımdır. Dərc yolları bunu özü edir; bu addım unudulmuş yol üçün sığortadır.
+  const republished = await prisma.property.updateMany({
+    where: { deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED, expiredAt: { not: null }, ...owners },
+    data: { listingExpiresAt: renewedExpiry(now), expiredAt: null, expiryReminderSentAt: null },
+  });
 
   const missing = await prisma.property.findMany({
     where: { deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED, listingExpiresAt: null, ...owners },
@@ -127,28 +123,38 @@ export async function runListingExpiry(now = new Date()) {
       listingExpiresAt: { gt: now, lte: reminderCutoff },
       ...owners,
     },
-    select: { id: true, title: true, listingExpiresAt: true, author: { select: { id: true, email: true, locale: true } } },
+    select: { id: true, title: true, listingExpiresAt: true, authorId: true },
     take: 200,
   });
+  const expiringOwners = await ownersById(expiring.map((property) => property.authorId));
   for (const property of expiring) {
     const days = Math.max(1, Math.ceil(((property.listingExpiresAt as Date).getTime() - now.getTime()) / DAY));
-    if (property.author) await notifyOwner(property.author, "reminder", property.id, property.title, days);
+    const owner = property.authorId ? expiringOwners.get(property.authorId) : undefined;
+    if (owner) await notifyOwner(owner, "reminder", property.id, property.title, days);
     await prisma.property.update({ where: { id: property.id }, data: { expiryReminderSentAt: now } });
   }
 
   const expired = await prisma.property.findMany({
     where: { deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED, listingExpiresAt: { lte: now }, ...owners },
-    select: { id: true, title: true, author: { select: { id: true, email: true, locale: true } } },
+    select: { id: true, title: true, authorId: true },
     take: 200,
   });
+  const expiredOwners = await ownersById(expired.map((property) => property.authorId));
   for (const property of expired) {
     await prisma.property.update({
       where: { id: property.id },
       data: { status: PROPERTY_STATUSES.ARCHIVED, expiredAt: now },
     });
     await recordDomainEvent("property.expired", "Property", property.id, { title: property.title });
-    if (property.author) await notifyOwner(property.author, "expired", property.id, property.title, 0);
+    const owner = property.authorId ? expiredOwners.get(property.authorId) : undefined;
+    if (owner) await notifyOwner(owner, "expired", property.id, property.title, 0);
   }
 
-  return { backfilled: missing.length, reminded: expiring.length, expired: expired.length, expiredIds: expired.map((item) => item.id) };
+  return {
+    renewed: republished.count,
+    backfilled: missing.length,
+    reminded: expiring.length,
+    expired: expired.length,
+    expiredIds: expired.map((item) => item.id),
+  };
 }

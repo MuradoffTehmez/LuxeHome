@@ -67,20 +67,44 @@ export function sourceText(html: string, limit = SOURCE_TEXT_LIMIT): string {
     .replace(/<\/(p|li|h[1-6]|tr|div)>/gi, "\n")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
+    // `&amp;` ən sonda açılır: əvvəl açılsaydı «&amp;lt;» kimi mətn ikiqat açılıb «<» olardı.
+    .replace(/&amp;/g, "&")
     .replace(/[ \t]+/g, " ")
     .replace(/\n\s*\n+/g, "\n")
     .trim();
   return text.length > limit ? `${text.slice(0, limit).trimEnd()}…` : text;
 }
 
+const CITATION = /\[(\d{1,2})\]/g;
+/** Yalnız istinad işarələrindən ibarət parça (model nöqtədən sonra «[1]» yazanda). */
+const CITATION_ONLY = /^(\[\d{1,2}\][\s.,;:!?]*)+$/;
+/** Tək qalmış siyahı nişanı: «1.», «2)», «-», «•». */
+const LIST_MARKER = /^(\d{1,2}[.)]|[-•*])$/;
+
 /**
- * Model cavabını yoxlayır: mövcud olmayan mənbəyə `[n]` istinadı silinir, heç bir
- * etibarlı istinad qalmırsa cavab rədd edilir (null).
+ * Cavabın bir sətrini cümlələrə bölür. Yalnız nöqtədən sonra böyük hərf, rəqəm və ya
+ * dırnaq gələndə bölünür ki, «məs.», «və s.» kimi ixtisarlar cümləni parçalamasın.
+ */
+function sentences(line: string): string[] {
+  const pieces = line.split(/(?<=[.!?…])\s+(?=[\p{Lu}\d"«(\[])/u);
+  const merged: string[] = [];
+  for (const piece of pieces) {
+    if (CITATION_ONLY.test(piece) && merged.length > 0) merged[merged.length - 1] += ` ${piece}`;
+    else if (merged.length > 0 && LIST_MARKER.test(merged[merged.length - 1])) merged[merged.length - 1] += ` ${piece}`;
+    else merged.push(piece);
+  }
+  return merged;
+}
+
+/**
+ * Model cavabını **cümlə-cümlə** yoxlayır: hər cümlə ən azı bir mövcud mənbəyə `[n]` ilə
+ * istinad etməlidir, istinadsız cümlə atılır, mövcud olmayan mənbəyə istinad silinir.
+ * Cümlələrin yarısından çoxu istinadsızdırsa cavab tamamilə rədd edilir (null) — belə
+ * cavab mənbədən çox modelin öz biliyinə söykənir və hüquqi mövzuda göstərilməməlidir.
  */
 export function validateAdvisorAnswer(
   raw: { answered?: unknown; answer?: unknown },
@@ -88,20 +112,33 @@ export function validateAdvisorAnswer(
 ): { answer: string; cited: number[] } | null {
   if (raw.answered !== true || typeof raw.answer !== "string") return null;
   const cited = new Set<number>();
-  const answer = raw.answer
-    .replace(/\[(\d{1,2})\]/g, (match, value: string) => {
-      const n = Number(value);
-      if (n >= 1 && n <= sourceCount) {
-        cited.add(n);
-        return match;
+  let kept = 0;
+  let dropped = 0;
+  const lines: string[] = [];
+
+  for (const line of raw.answer.split(/\n+/).map((item) => item.trim()).filter(Boolean)) {
+    const accepted: string[] = [];
+    for (const sentence of sentences(line)) {
+      const valid = [...sentence.matchAll(CITATION)].map((match) => Number(match[1])).filter((n) => n >= 1 && n <= sourceCount);
+      if (valid.length === 0) {
+        dropped += 1;
+        continue;
       }
-      return "";
-    })
-    .replace(/[ \t]{2,}/g, " ")
-    .replace(/[ \t]+([.,;:!?])/g, "$1")
-    .trim();
-  if (!answer || cited.size === 0) return null;
-  return { answer: answer.slice(0, 2000), cited: [...cited].sort((a, b) => a - b) };
+      kept += 1;
+      for (const n of valid) cited.add(n);
+      accepted.push(
+        sentence
+          .replace(CITATION, (match, value: string) => (Number(value) >= 1 && Number(value) <= sourceCount ? match : ""))
+          .replace(/[ \t]{2,}/g, " ")
+          .replace(/[ \t]+([.,;:!?])/g, "$1")
+          .trim(),
+      );
+    }
+    if (accepted.length) lines.push(accepted.join(" "));
+  }
+
+  if (kept === 0 || dropped > kept) return null;
+  return { answer: lines.join("\n").slice(0, 2000), cited: [...cited].sort((a, b) => a - b) };
 }
 
 const LANGUAGE: Record<Locale, string> = { az: "Azərbaycan dilində", en: "in English", ru: "на русском языке" };
@@ -110,7 +147,8 @@ export function advisorInstructions(locale: Locale): string {
   return [
     "Sən Luxe Home Estate Bilik Mərkəzinin daşınmaz əmlak məsləhətçisisən.",
     "YALNIZ verilən mənbələrdəki məlumatla cavab ver. Mənbədə olmayan qanun maddəsi, rəqəm, rüsum, müddət və ya prosedur uydurma.",
-    "Hər faktdan sonra mənbənin nömrəsini kvadrat mötərizədə yaz, məsələn [1] və ya [2].",
+    "HƏR cümlənin sonunda mənbənin nömrəsini kvadrat mötərizədə yaz, məsələn [1] və ya [2]. İstinadsız cümlə istifadəçiyə göstərilmir.",
+    "Giriş və nəticə cümləsi yazma — yalnız mənbəyə əsaslanan faktlar və addımlar.",
     "Mənbələr suala cavab vermirsə answered=false qaytar və answer-i boş burax.",
     "Cavab qısa və praktik olsun (ən çox 180 söz), addımlar varsa sıra ilə yaz.",
     "Hüquqi zəmanət vermə; mürəkkəb halda notarius, hüquqşünas və ya agentlə məsləhətləşməyi tövsiyə et.",

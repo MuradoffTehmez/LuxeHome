@@ -34,7 +34,7 @@ export async function approveModerationProperty(id: string): Promise<ActionState
   try {
     const property = await prisma.property.findFirst({
       where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
-      select: { title: true, slug: true, publishedAt: true, closedAt: true },
+      select: { title: true, slug: true, publishedAt: true, closedAt: true, listingExpiresAt: true, expiredAt: true },
     });
     if (!property) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
 

@@ -12,6 +12,7 @@ import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { isSystemWriteBlocked } from "@/lib/system-mode";
 import { notifyLeadOnTelegram } from "@/lib/telegram";
 import { slotAvailability } from "@/lib/open-house-availability";
+import { reserveOpenHouseSeat } from "@/lib/open-house";
 
 /**
  * Açıq qapı gününə qeydiyyat (#109). Əlaqə forması ilə eyni spam qapısı: honeypot →
@@ -66,14 +67,20 @@ export async function registerForOpenHouse(_prev: OpenHouseState, formData: Form
     const availability = slotAvailability({ startsAt: slot.startsAt, capacity: slot.capacity, registered: slot._count.registrations });
     if (availability !== "open") return { status: "error", message: availability === "full" ? t("full") : t("closed") };
 
-    const existing = await prisma.openHouseRegistration.findUnique({
-      where: { openHouseId_phone: { openHouseId: slot.id, phone: parsed.data.phone } },
-      select: { id: true },
+    // Yer atomar ayrılır — yuxarıdakı yoxlama yalnız tez rədd üçündür, tutumu qorumur.
+    const seat = await reserveOpenHouseSeat({
+      openHouseId: slot.id,
+      name: parsed.data.name,
+      phone: parsed.data.phone,
+      email: parsed.data.email || null,
     });
-    if (existing) return { status: "success", message: t("alreadyRegistered") };
+    if (seat.status === "duplicate") return { status: "success", message: t("alreadyRegistered") };
+    if (seat.status === "full") return { status: "error", message: t("full") };
 
     const when = new Intl.DateTimeFormat("az-AZ", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Baku" }).format(slot.startsAt);
-    const lead = await prisma.lead.create({
+    let lead;
+    try {
+      lead = await prisma.lead.create({
       data: {
         name: parsed.data.name,
         phone: parsed.data.phone,
@@ -85,10 +92,13 @@ export async function registerForOpenHouse(_prev: OpenHouseState, formData: Form
         propertyId: slot.property.id,
       },
       select: { id: true },
-    });
-    await prisma.openHouseRegistration.create({
-      data: { openHouseId: slot.id, name: parsed.data.name, phone: parsed.data.phone, email: parsed.data.email || null, leadId: lead.id },
-    });
+      });
+    } catch (error) {
+      // Kompensasiya: müraciət yazılmayıbsa ayrılmış yer boşaldılır, ziyarətçi yenidən cəhd edə bilər.
+      await prisma.openHouseRegistration.delete({ where: { id: seat.registrationId } }).catch(() => undefined);
+      throw error;
+    }
+    await prisma.openHouseRegistration.update({ where: { id: seat.registrationId }, data: { leadId: lead.id } });
     await notifyLeadOnTelegram({
       kind: "reservation",
       id: lead.id,

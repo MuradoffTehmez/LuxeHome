@@ -21,7 +21,7 @@ import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { deletePublicProperty, renewPublicProperty } from "./actions";
-import { LISTING_LIFETIME_DAYS, expiryState } from "@/lib/listing-expiry";
+import { LISTING_LIFETIME_DAYS, expiryState } from "@/lib/listing-expiry-policy";
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",

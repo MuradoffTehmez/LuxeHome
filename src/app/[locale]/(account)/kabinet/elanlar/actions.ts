@@ -21,7 +21,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
-import { renewedExpiry } from "@/lib/listing-expiry";
+import { publicationExpiryReset, renewedExpiry } from "@/lib/listing-expiry-policy";
 import { recordDomainEvent } from "@/lib/admin/events";
 
 const LIST_PATH = "/kabinet/elanlar";
@@ -46,6 +46,8 @@ async function ownerAndGuard(id: string, locale: Locale) {
       ogDescription: true,
       ogImage: true,
       publishedAt: true,
+      listingExpiresAt: true,
+      expiredAt: true,
       price: true,
       currency: true,
       images: { select: { url: true } },
@@ -154,6 +156,7 @@ export async function updatePublicProperty(
         publishedAt: policy.status === PROPERTY_STATUSES.PUBLISHED
           ? (property.publishedAt ?? policy.publishedAt)
           : property.publishedAt,
+        ...(policy.status === PROPERTY_STATUSES.PUBLISHED ? publicationExpiryReset(property) : {}),
       },
     });
 

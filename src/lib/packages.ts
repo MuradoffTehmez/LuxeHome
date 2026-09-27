@@ -150,7 +150,12 @@ export async function markOrderPaid(
     return { ok: false, reason: exists ? "invalid-status" : "not-found" };
   }
   await recordDomainEvent("package.paid", "PackageOrder", orderId, { method: payment.method, by: actorId });
-  const activation = await activateOrder(orderId, now);
+  // Ödəniş artıq qeydə alınıb; aktivləşdirmə xətası onu geri qaytarmır — sifariş
+  // «tətbiq gözləyir» siyahısında qalır və menecer «Premiumu tətbiq et» ilə təkrarlayır.
+  const activation = await activateOrder(orderId, now).catch((error: unknown) => {
+    console.error("[paket] ödənişdən sonra premium tətbiq olunmadı", error);
+    return { ok: false as const, reason: "invalid-status" as const };
+  });
   return { ok: true, activated: activation.ok };
 }
 
@@ -186,7 +191,15 @@ export async function activateOrder(orderId: string, now = new Date()): Promise<
 
   const next = extendPremium(property, order.durationDays, now);
   if (!isUnlimitedPremium(property)) {
-    await prisma.property.update({ where: { id: property.id }, data: next });
+    try {
+      await prisma.property.update({ where: { id: property.id }, data: next });
+    } catch (error) {
+      // Kompensasiya: elan yazılmayıbsa aktivləşdirmə işarəsi geri alınır ki, sifariş
+      // «tətbiq gözləyir» siyahısına qayıtsın və təkrar cəhd mümkün olsun. Şərt məhz
+      // bu cəhdin yazdığı vaxtdır — başqa uğurlu cəhdin işarəsinə toxunulmur.
+      await prisma.packageOrder.updateMany({ where: { id: orderId, activatedAt: now }, data: { activatedAt: null } }).catch(() => undefined);
+      throw error;
+    }
   }
   if (order.userId) {
     await notifyCustomer(order.userId, property.title, order.durationDays, `package-activated:${orderId}`);
@@ -219,7 +232,17 @@ export async function refundOrder(orderId: string, actorId: string, now = new Da
   if (claimed.count === 0) return { ok: false, reason: "invalid-status" };
 
   if (order.activatedAt && order.property) {
-    await prisma.property.update({ where: { id: order.property.id }, data: shrinkPremium(order.property, order.durationDays, now) });
+    try {
+      await prisma.property.update({ where: { id: order.property.id }, data: shrinkPremium(order.property, order.durationDays, now) });
+    } catch (error) {
+      // Kompensasiya: premium qısaldılmayıbsa sifariş «ödənilib» vəziyyətinə qaytarılır,
+      // geri qaytarma təkrar edilə bilər — premium qalıb, sifariş isə qaytarılmış görünməz.
+      await prisma.packageOrder.updateMany({
+        where: { id: orderId, status: PACKAGE_ORDER_STATUSES.REFUNDED, refundedAt: now },
+        data: { status: PACKAGE_ORDER_STATUSES.PAID, refundedAt: null },
+      }).catch(() => undefined);
+      throw error;
+    }
   }
   await recordDomainEvent("package.refunded", "PackageOrder", orderId, { by: actorId });
   return { ok: true, propertySlug: order.activatedAt ? order.property?.slug ?? null : null };
