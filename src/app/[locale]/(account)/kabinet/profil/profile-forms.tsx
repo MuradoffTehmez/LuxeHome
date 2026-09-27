@@ -77,7 +77,7 @@ export function ProfileForm({
           name="avatar"
           label={t("avatar")}
           folder="avatarlar"
-          uploadUrl="/api/hesab/media"
+          uploadUrl="/api/hesab/media?folder=avatarlar"
           maxFiles={1}
           initial={values.avatarUrl ? [{ url: values.avatarUrl, alt: "", isCover: true }] : []}
           hint={t("avatarHint")}

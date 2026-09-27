@@ -9,16 +9,21 @@ import { isKnownWatermarkedChecksum } from "@/lib/media/known-watermark";
 export const dynamic = "force-dynamic";
 
 /**
- * Kabinetdən əmlak şəkli yükləmə.
+ * Kabinetdən əmlak və profil şəkli yükləmə.
  *
- * Qovluq müştəridən qəbul edilmir: ictimai hesab yalnız öz əmlak şəkillərini
- * `emlaklar` altında yükləyə bilər. Şəkil hələ elana bağlanmayıbsa da silinmir;
+ * Qovluq sərbəst seçilmir: elan şəkli həmişə su nişanlı `emlaklar`-a, profil şəkli
+ * (`?folder=avatarlar`) isə ayrıca qovluğa yazılır. Şəkil hələ elana bağlanmayıbsa da silinmir;
  * istifadəçi forma xətasını düzəldib həmin yükləməni yenidən göndərə bilir.
  */
 export async function POST(request: Request) {
+  // Qovluq body-dən deyil, ünvandan oxunur ki, icazə qərarı gövdə emal olunmadan
+  // verilsin. Yalnız iki qovluq: elan şəkli (su nişanlı, elan hüququ tələb edir) və
+  // profil şəkli (hər ictimai hesab). Başqa dəyər elan şəkli sayılır — su nişanı
+  // heç vaxt client-in seçimi ilə söndürülmür.
+  const folder = new URL(request.url).searchParams.get("folder") === "avatarlar" ? "avatarlar" : "emlaklar";
   let user;
   try {
-    user = await requirePublicAction("media");
+    user = await requirePublicAction(folder === "avatarlar" ? "avatar" : "media");
   } catch (error) {
     if (error instanceof SystemModeGuardError) return systemModeErrorResponse(error);
     // 429 — client növbəsi bunu keçici sayıb gözləyərək təkrar cəhd edir.
@@ -50,9 +55,6 @@ export async function POST(request: Request) {
   const existing = await findExisting();
   if (existing) return NextResponse.json(existing, { status: 200 });
 
-  // Yalnız iki qovluq: elan şəkli (su nişanlı) və profil şəkli. Başqa dəyər
-  // elan şəkli sayılır — su nişanı heç vaxt client-in seçimi ilə söndürülmür.
-  const folder = formData.get("folder") === "avatarlar" ? "avatarlar" : "emlaklar";
   const result = await putImage(file, folder, null, { isKnownWatermarked: isKnownWatermarkedChecksum });
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: uploadFailureStatus(result.reason) });
