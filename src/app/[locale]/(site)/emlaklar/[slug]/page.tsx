@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import type { Metadata } from "next";
@@ -10,12 +11,14 @@ import {
   ArrowRight,
   Crown,
   History,
+  LayoutPanelTop,
   Navigation,
   Star,
 } from "lucide-react";
-import { formatPrice, toIsoDateTime } from "@/lib/utils";
+import { formatPrice, isUnoptimizedImage, toIsoDateTime } from "@/lib/utils";
 import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import {
+  NEARBY_PLACE_CATEGORIES,
   LISTING_TYPES,
   AUTH_KINDS,
   PROPERTY_STATUS_TONE,
@@ -41,9 +44,11 @@ import { propertyQrSvg } from "@/lib/property-qr";
 import { PlaceMap } from "@/components/map/place-map";
 import { PropertyKeyFacts } from "@/components/site/property-key-facts";
 import { PriceInsight } from "@/components/site/price-insight";
+import { PropertyTour } from "@/components/site/property-tour";
 import { assessPriceBands, assessPropertyPrice } from "@/lib/price-benchmark";
 import { PropertyVideo } from "@/components/site/property-video";
 import { MortgageCalculator } from "@/components/site/mortgage-calculator";
+import { InstallmentCalculator } from "@/components/site/installment-calculator";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { RecentlyViewedTracker } from "@/components/site/recently-viewed-tracker";
@@ -167,6 +172,18 @@ export default async function PropertyDetailPage({ params }: Props) {
   const location = [property.district?.name, property.city.name]
     .filter(Boolean)
     .join(", ");
+
+  const metroPlace = property.nearbyPlaces
+    .filter((place) => place.category === NEARBY_PLACE_CATEGORIES.METRO)
+    .sort((left, right) => (left.distanceMeters ?? Infinity) - (right.distanceMeters ?? Infinity))[0];
+  const nearestMetro = metroPlace
+    ? {
+        name: metroPlace.name,
+        minutes: metroPlace.walkingMinutes ?? (metroPlace.distanceMeters != null ? Math.max(1, Math.round(metroPlace.distanceMeters / 80)) : null),
+      }
+    : property.metro
+      ? { name: property.metro.name, minutes: null }
+      : null;
 
   const [similarProperties, partnerLinks, projectsEnabled, priceAssessment, insightText] = await Promise.all([
     getSimilarProperties(property, 4),
@@ -298,6 +315,15 @@ export default async function PropertyDetailPage({ params }: Props) {
                   {location}
                 </p>
               )}
+              {/* Ən yaxın metro (#107): təsdiqlənmiş yaxın obyektdən, yoxsa elanın metro sahəsindən. */}
+              {nearestMetro ? (
+                <p className="flex items-center gap-1.5 text-sm text-ink-soft">
+                  <span className="grid size-4 shrink-0 place-items-center rounded-full bg-danger text-[0.5625rem] font-bold text-white" aria-hidden="true">M</span>
+                  {nearestMetro.minutes != null
+                    ? propertyText("metroLine", { name: nearestMetro.name, minutes: nearestMetro.minutes })
+                    : propertyText("metroOnly", { name: nearestMetro.name })}
+                </p>
+              ) : null}
             </div>
 
             <div className="flex flex-col gap-2 sm:items-end">
@@ -522,12 +548,59 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </section>
               )}
 
+              {isSale && !isClosed && property.installmentAvailable && (
+                <InstallmentCalculator defaultPrice={property.price} currency={property.currency} />
+              )}
+
               {property.videoUrl && (
                 <PropertyVideo
                   url={property.videoUrl}
                   heading={content("videoTour")}
                   openLabel={content("openVideo")}
                 />
+              )}
+
+              {property.virtualTourUrl && (
+                <PropertyTour
+                  url={property.virtualTourUrl}
+                  labels={{
+                    heading: propertyText("media.tour"),
+                    start: propertyText("media.tourStart"),
+                    note: propertyText("media.tourNote"),
+                    open: propertyText("media.openTour"),
+                  }}
+                />
+              )}
+
+              {/* Mərtəbə planı (#107) — qalereyadan ayrıdır, tam ölçüdə yeni pəncərədə açılır. */}
+              {property.floorPlans.length > 0 && (
+                <section className="flex flex-col gap-4">
+                  <h2 className="flex items-center gap-2 font-sans text-lg font-semibold text-ink">
+                    <LayoutPanelTop className="size-5 text-gold-deep" aria-hidden="true" />
+                    {propertyText("media.floorPlans")}
+                  </h2>
+                  <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {property.floorPlans.map((plan, index) => (
+                      <li key={plan.id}>
+                        <a
+                          href={plan.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative block aspect-4/3 overflow-hidden rounded-lg border border-line bg-paper"
+                        >
+                          <Image
+                            src={plan.url}
+                            alt={plan.title || `${propertyText("media.floorPlans")} ${index + 1}`}
+                            fill
+                            unoptimized={isUnoptimizedImage(plan.url)}
+                            sizes="(max-width: 639px) 100vw, 40vw"
+                            className="object-contain p-2 transition-transform duration-300 group-hover:scale-[1.02]"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
               )}
 
               {/* Xəritədə yerləşmə */}

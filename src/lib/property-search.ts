@@ -36,6 +36,8 @@ export const PROPERTY_SEARCH_KEYS = [
   "dovr",
   "mertebe_min",
   "mertebe_max",
+  // Xəritədə çəkilmiş sahə (#107), `geo-polygon.ts` formatında.
+  "sahe",
 ] as const;
 
 export type PropertySearchKey = (typeof PROPERTY_SEARCH_KEYS)[number];
@@ -46,6 +48,7 @@ export type ParsedPropertySearch = {
   excludeFirstFloor: boolean;
   excludeLastFloor: boolean;
   withImagesOnly: boolean;
+  nearMetro: boolean;
   sort: SortOption;
   page: number;
 };
@@ -98,6 +101,7 @@ export function parsePropertySearchParams(
     excludeFirstFloor: singleValue(params.ilk_mertebe_yox) === "1",
     excludeLastFloor: singleValue(params.son_mertebe_yox) === "1",
     withImagesOnly: singleValue(params.sekilli) === "1",
+    nearMetro: singleValue(params.metro_yaxin) === "1",
     sort,
     page: Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1,
   };
@@ -117,6 +121,7 @@ export function buildPropertySearchHref(
   if (state.excludeFirstFloor) params.set("ilk_mertebe_yox", "1");
   if (state.excludeLastFloor) params.set("son_mertebe_yox", "1");
   if (state.withImagesOnly) params.set("sekilli", "1");
+  if (state.nearMetro) params.set("metro_yaxin", "1");
   if (state.sort !== "newest") params.set("siralama", state.sort);
   if (state.page > 1) params.set("sehife", String(state.page));
 
@@ -184,6 +189,8 @@ export function buildActivePropertyFilters(
   if (state.excludeFirstFloor) add("ilk_mertebe_yox", "Birinci mərtəbə olmasın");
   if (state.excludeLastFloor) add("son_mertebe_yox", "Son mərtəbə olmasın");
   if (state.withImagesOnly) add("sekilli", "Yalnız şəkilli elanlar");
+  if (state.nearMetro) add("metro_yaxin", "Metroya 1 km-dən yaxın");
+  if (values.sahe) add("sahe", "Xəritədə seçilmiş sahə");
 
   for (const slug of state.featureSlugs) {
     chips.push({

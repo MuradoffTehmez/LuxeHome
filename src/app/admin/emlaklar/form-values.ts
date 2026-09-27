@@ -43,6 +43,7 @@ export type PropertyFormValues = {
   documentStatus: string;
   buildingType: string;
   videoUrl: string;
+  virtualTourUrl: string;
   isFeatured: boolean;
   featuredUntil: string;
   reservationEnabled: boolean;
@@ -56,6 +57,7 @@ export type PropertyFormValues = {
   ogImage: string;
   featureIds: string[];
   images: DropzoneImage[];
+  floorPlans: DropzoneImage[];
 };
 
 export const EMPTY_PROPERTY: PropertyFormValues = {
@@ -86,6 +88,7 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   documentStatus: "",
   buildingType: "",
   videoUrl: "",
+  virtualTourUrl: "",
   isFeatured: false,
   featuredUntil: "",
   reservationEnabled: false,
@@ -99,4 +102,5 @@ export const EMPTY_PROPERTY: PropertyFormValues = {
   ogImage: "",
   featureIds: [],
   images: [],
+  floorPlans: [],
 };

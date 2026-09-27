@@ -32,6 +32,7 @@ const property = {
   cityId: "city-1",
   districtId: null,
   priceHistory: [],
+  nearbyPlaces: [],
 } as PropertyCardData;
 
 describe("SEO landing template", () => {

@@ -58,6 +58,8 @@ function parseJsonc(text) {
 
 const config = parseJsonc(readFileSync("wrangler.jsonc", "utf8"));
 delete config.ai;
+// Vectorize yalnız remote işləyir; lokal stack binding-siz qalır və axtarış leksik rejimə düşür.
+delete config.vectorize;
 writeFileSync(E2E_CONFIG, JSON.stringify(config, null, 2));
 
 const child = spawn(

@@ -39,6 +39,7 @@ const cardProperty = {
   cityId: "city-1",
   districtId: null,
   priceHistory: [],
+  nearbyPlaces: [],
 } as PropertyCardData;
 
 const compareProperty = {
@@ -101,6 +102,7 @@ describe("adaptiv favorit və müqayisə təqdimatı", () => {
       "bottom-[calc(5rem+var(--safe-bottom))]",
     );
     expect(getCompareBarPositionClass("/emlaklar/sahil-menzili")).toContain("lg:bottom-0");
-    expect(getCompareBarPositionClass("/favoritler")).toBe("bottom-0");
+    // Digər səhifələrdə mobil alt naviqasiyanın üstünə qalxır (#107); panel yoxdursa dəyişən 0-dır.
+    expect(getCompareBarPositionClass("/favoritler")).toBe("bottom-[var(--bottom-nav-offset)]");
   });
 });

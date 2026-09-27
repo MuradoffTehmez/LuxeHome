@@ -10,7 +10,8 @@ import { AI_CONTENT_DRAFT_STATUSES, PERMISSIONS } from "@/lib/constants";
 import { aiProviderLabel } from "@/lib/ai";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
-import { analyzePropertyPhotos, applyDescriptionDraft, discardDescriptionDraft, generatePropertyDescription, testAiProvider } from "./actions";
+import { analyzePropertyPhotos, applyDescriptionDraft, discardDescriptionDraft, generatePropertyDescription, reindexSemanticSearch, testAiProvider } from "./actions";
+import { isSemanticSearchReady } from "@/lib/semantic-search";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -31,6 +32,7 @@ export default async function AiAssistantPage() {
   return <>
     <AdminPageHeader title={t("pages.ops.aiKomekci")} description={t("pages.common.faktlaraEsaslananMetnQaralamasi", { p0: aiProviderLabel() })} breadcrumbs={[{ label: t("pages.ops.idarePaneli"), href: "/admin" }, { label: t("pages.ops.aiKomekci") }]} />
     <AdminCard title={t("pages.ops.workersAiSagliqYoxlamasi")} description={t("pages.ops.bindingIVeModel")} className="mb-6"><AdminForm action={testAiProvider} submitLabel={t("pages.ops.provayderiYoxla")}><p className="text-sm text-ink-muted">{t("pages.ops.neticeSaxtaKonfiqurasiyaStatusu")}</p></AdminForm></AdminCard>
+    <AdminCard title={t("pages.ops.semanticTitle")} description={t("pages.ops.semanticDescription")} className="mb-6"><AdminForm action={reindexSemanticSearch} submitLabel={t("pages.ops.semanticReindex")}><p className="text-sm text-ink-muted">{isSemanticSearchReady() ? t("pages.ops.semanticReady") : t("pages.ops.semanticMissing")}</p></AdminForm></AdminCard>
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <AdminCard title={t("pages.ops.elanTesviriYarat")} description={t("pages.ops.neticeEvvelceQaralamaKimi")}><AdminForm action={generatePropertyDescription} submitLabel={t("pages.ops.qaralamaYarat")} className="gap-4"><label className="text-sm text-ink-soft">{t("pages.ops.elan")}<select name="propertyId" className={inputClass}>{propertySelect}</select></label><label className="text-sm text-ink-soft">{t("pages.ops.dil")}<select name="locale" className={inputClass}><option value="az">{t("pages.ops.azerbaycan")}</option><option value="en">{t("pages.ops.english")}</option><option value="ru">{t("pages.ops.item")}</option></select></label></AdminForm></AdminCard>
       <AdminCard title={t("pages.ops.fotoMeslehetcisi")} description={t("pages.ops.isiqKadrBulaniqliqVe")}><AdminForm action={analyzePropertyPhotos} submitLabel={t("pages.ops.sekilleriAnalizEt")} className="gap-4"><label className="text-sm text-ink-soft">{t("pages.ops.elan")}<select name="propertyId" className={inputClass}>{propertySelect}</select></label><p className="flex items-start gap-2 text-sm text-ink-muted"><ImageIcon className="mt-0.5 size-4 shrink-0" />{t("pages.ops.analizNeticesiSekillerinYaninda")}</p></AdminForm></AdminCard>

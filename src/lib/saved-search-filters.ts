@@ -46,6 +46,8 @@ export const savedSearchFiltersSchema = z
     excludeFirstFloor: z.boolean().optional(),
     excludeLastFloor: z.boolean().optional(),
     withImagesOnly: z.boolean().optional(),
+    nearMetro: z.boolean().optional(),
+    polygon: z.array(z.tuple([z.number().min(-90).max(90), z.number().min(-180).max(180)])).min(3).max(20).optional(),
     mortgageOnly: z.boolean().optional(),
     installmentOnly: z.boolean().optional(),
   })

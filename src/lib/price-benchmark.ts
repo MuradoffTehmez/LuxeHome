@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { PUBLIC_CACHE_TAGS } from "@/lib/cache-tags";
 import { LISTING_TYPES } from "@/lib/constants";
 import { publicPropertyWhere } from "@/lib/queries";
+import { MIN_COMPARABLES, medianOf } from "@/lib/stats";
 
 /**
  * «Qiymət bazara uyğundur?» göstəricisi (#105).
@@ -16,7 +17,6 @@ import { publicPropertyWhere } from "@/lib/queries";
  * profilidir (`NeighborhoodProfile.averagePricePerSqm`).
  */
 
-export const MIN_COMPARABLES = 5;
 /** ±bu faiz aralığı «bazara uyğun» sayılır. */
 export const FAIR_BAND_PERCENT = 10;
 const MAX_SAMPLE = 400;
@@ -31,12 +31,6 @@ export type PriceBenchmark = {
 
 export type PriceAssessment = PriceBenchmark & { band: PriceBand; diffPercent: number };
 
-export function medianOf(values: number[]): number | null {
-  if (values.length === 0) return null;
-  const sorted = [...values].sort((left, right) => left - right);
-  const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
-}
 
 export function classifyPrice(pricePerSqm: number, benchmark: PriceBenchmark): PriceAssessment {
   const diffPercent = Math.round(((pricePerSqm - benchmark.pricePerSqm) / benchmark.pricePerSqm) * 100);

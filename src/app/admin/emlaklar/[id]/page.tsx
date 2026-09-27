@@ -70,6 +70,8 @@ export default async function EditPropertyPage({
     documentStatus: property.documentStatus ?? "",
     buildingType: property.buildingType ?? "",
     videoUrl: property.videoUrl ?? "",
+    virtualTourUrl: property.virtualTourUrl ?? "",
+    floorPlans: property.floorPlans.map((plan, index) => ({ url: plan.url, alt: plan.title, isCover: index === 0 })),
     isFeatured: property.isFeatured,
     featuredUntil: property.featuredUntil ? property.featuredUntil.toISOString().slice(0, 10) : "",
     reservationEnabled: property.reservationEnabled,

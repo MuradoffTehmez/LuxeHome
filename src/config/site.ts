@@ -132,6 +132,7 @@ export const supportNavigation = [
   { label: "Əmlak lüğəti", href: "/lugat" },
   { label: "İpoteka kalkulyatoru", href: "/kalkulyator" },
   { label: "Bazar analitikası", href: "/bazar-analitikasi" },
+  { label: "İnvestorlar üçün", href: "/investisiya" },
   { label: "Tez-tez verilən suallar", href: "/suallar" },
 ] as const;
 

@@ -208,6 +208,10 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
   (staging/lokal E2E-də söndürülü) — server tərəfdə sessiya oxuyan yeni ictimai marşrut
   `SESSION_DEPENDENT_PUBLIC_ROUTES`-a yazılmalıdır. Qiymət göstəricisi median + ən azı 5 nümunə,
   `/emlakimi-sat` (lead mənbəyi `OWNER`), müraciət lövhəsi və konversiya hunisi.
+- 3-cü mərhələ (#107): **`take`-li nested əlaqə 98-dən çox valideyndə D1 sorğusunu ilişdirir** —
+  böyük sorğuda şəkilləri `findManyInChunks` ilə ayrıca yüklə. Semantik axtarış Vectorize
+  (`PROPERTY_VECTORS`) ilə; elan yazan yeni action `queuePropertyVectorSync()` çağırmalıdır.
+  Alt naviqasiya `--bottom-nav-offset` dəyişəni ilə digər sabit səthləri qaldırır.
 
 ## Digər agent konfiqurasiyaları
 

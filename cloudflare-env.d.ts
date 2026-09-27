@@ -14,6 +14,7 @@ interface __BaseEnv_CloudflareEnv {
 	ADMIN_LIMIT: RateLimit;
 	VALUATION_LIMIT: RateLimit;
 	AI: Ai;
+	PROPERTY_VECTORS: Vectorize;
 	IMAGES: ImagesBinding;
 	ASSETS: Fetcher;
 	ADMIN_ENABLED: "true";
@@ -47,6 +48,7 @@ declare namespace Cloudflare {
 		ADMIN_LIMIT: RateLimit;
 		VALUATION_LIMIT: RateLimit;
 		AI: Ai;
+		PROPERTY_VECTORS: Vectorize;
 		IMAGES: ImagesBinding;
 		ASSETS: Fetcher;
 		ADMIN_ENABLED: "true";

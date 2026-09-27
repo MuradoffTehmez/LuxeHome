@@ -166,5 +166,15 @@
     "basisProfile": "Average price per m² in the {place} district profile: {price}.",
     "disclaimer": "Calculated automatically from active listings on the site; not an official valuation.",
     "cardBelow": "Good price"
-  }
+  },
+  "media": {
+    "floorPlans": "Floor plan",
+    "tour": "360° virtual tour",
+    "tourStart": "Start the tour",
+    "tourNote": "The tour loads from an external platform.",
+    "openTour": "Open the tour in a new window"
+  },
+  "metroChip": "{name} · {minutes} min walk",
+  "metroLine": "{name} metro · {minutes} min walk",
+  "metroOnly": "{name} metro"
 }

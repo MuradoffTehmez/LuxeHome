@@ -56,6 +56,7 @@ export type SearchPanelInitial = {
   ilk_mertebe_yox?: string;
   son_mertebe_yox?: string;
   sekilli?: string;
+  metro_yaxin?: string;
   xususiyyet?: string[];
   siralama?: string;
 };
@@ -438,6 +439,7 @@ export function PropertyFilterFields({
               || initial.ilk_mertebe_yox === "1"
               || initial.son_mertebe_yox === "1"
               || initial.sekilli === "1"
+              || initial.metro_yaxin === "1"
               || undefined
             }
             className={cn(
@@ -459,6 +461,7 @@ export function PropertyFilterFields({
                   <CheckboxField name="ilk_mertebe_yox" label={t("notFirstFloor")} defaultChecked={initial.ilk_mertebe_yox === "1"} />
                   <CheckboxField name="son_mertebe_yox" label={t("notLastFloor")} defaultChecked={initial.son_mertebe_yox === "1"} />
                   <CheckboxField name="sekilli" label={t("withPhotos")} defaultChecked={initial.sekilli === "1"} />
+                  <CheckboxField name="metro_yaxin" label={t("nearMetro")} defaultChecked={initial.metro_yaxin === "1"} />
                 </div>
               </fieldset>
 

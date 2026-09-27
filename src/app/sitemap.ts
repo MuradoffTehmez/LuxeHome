@@ -67,6 +67,7 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
     ...localizedEntries("/lugat", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/kalkulyator", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/emlakimi-sat", { changeFrequency: "monthly", priority: 0.7 }),
+    ...localizedEntries("/investisiya", { changeFrequency: "weekly", priority: 0.6 }),
     ...localizedEntries("/elaqe", { changeFrequency: "yearly", priority: 0.5 }),
     ...localizedEntries("/mexfilik-siyaseti", { changeFrequency: "yearly", priority: 0.2 }),
     ...localizedEntries("/istifade-sertleri", { changeFrequency: "yearly", priority: 0.2 }),

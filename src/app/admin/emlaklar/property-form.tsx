@@ -331,6 +331,13 @@ export function PropertyForm({
           defaultValue={initial.videoUrl}
           hint={t("pages.properties.youtubeVeYaVimeo")}
         />
+        <AdminInput
+          name="virtualTourUrl"
+          label={t("pages.properties.virtualTour")}
+          type="url"
+          defaultValue={initial.virtualTourUrl}
+          hint={t("pages.properties.virtualTourHint")}
+        />
 
         <FullWidth>
           <div className="flex flex-wrap gap-x-6 gap-y-1">
@@ -400,6 +407,16 @@ export function PropertyForm({
             initial={initial.images}
             hint={t("pages.properties.yuklenenSekillerAvtomatikWebp")}
             seoNamePrefix={`${options.districts.find((item) => item.id === districtId)?.slug ?? "baki"}-${options.types.find((item) => item.id === typeId)?.slug ?? "emlak"}-${rooms || "0"}-otaqli-${uploadReference}`}
+          />
+        </FullWidth>
+        <FullWidth>
+          <ImageDropzone
+            name="floorPlans"
+            label={t("pages.properties.floorPlans")}
+            folder="emlaklar"
+            maxFiles={6}
+            initial={initial.floorPlans}
+            hint={t("pages.properties.floorPlansHint")}
           />
         </FullWidth>
       </FormSection>

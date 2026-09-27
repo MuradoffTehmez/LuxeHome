@@ -1,4 +1,7 @@
 import { notFound } from "next/navigation";
+import { InstallmentCalculator } from "@/components/site/installment-calculator";
+import { ProjectUnitGrid } from "@/components/site/project-unit-grid";
+import type { ProjectUnitStatus } from "@/lib/constants";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Calendar, MapPin, CheckCircle2, Phone, Building2 } from "lucide-react";
@@ -211,6 +214,17 @@ export default async function ProjectDetailPage({ params }: Props) {
                   ))}
                 </div>
               </div>
+
+              {project.units.length > 0 && (
+                <ProjectUnitGrid
+                  units={project.units.map((unit) => ({ ...unit, status: unit.status as ProjectUnitStatus }))}
+                  whatsapp={siteConfig.whatsapp}
+                  projectName={project.name}
+                />
+              )}
+
+              {/* Yeni tikilidə əsas ödəniş forması daxili kreditdir (#107). */}
+              <InstallmentCalculator />
 
               {project.latitude != null && project.longitude != null && (
                 <div className="flex flex-col gap-4">

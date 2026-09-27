@@ -20,6 +20,7 @@ import { localizePath } from "@/i18n/path-locale";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
+import { queuePropertyVectorSync } from "@/lib/semantic-search";
 
 const LIST_PATH = "/kabinet/elanlar";
 
@@ -177,6 +178,7 @@ export async function updatePublicProperty(
     return unexpected("istifadəçi elanı yenilənmədi", error, t("actions.unexpected"));
   }
 
+  queuePropertyVectorSync([id]);
   revalidatePath(localizePath(LIST_PATH, locale));
   revalidatePath(localizePath(`${LIST_PATH}/${id}`, locale));
   revalidatePublicContent("property");
@@ -204,6 +206,7 @@ export async function deletePublicProperty(id: string): Promise<ActionState> {
     return unexpected("istifadəçi elanı silinmədi", error, t("actions.unexpected"));
   }
 
+  queuePropertyVectorSync([id]);
   revalidatePath(localizePath(LIST_PATH, locale));
   revalidatePublicContent("property");
   return success(t("actions.propertyDeleted"));

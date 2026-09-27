@@ -66,6 +66,10 @@
     { "name": "VALUATION_LIMIT", "namespace_id": "1007", "simple": { "limit": 20, "period": 60 } }
   ],
 
+  // Semantik axtarış (#107): elan embedding-ləri. `wrangler vectorize create
+  // luxehome-properties --dimensions=1024 --metric=cosine` ilə yaradılıb (bge-m3).
+  "vectorize": [{ "binding": "PROPERTY_VECTORS", "index_name": "luxehome-properties" }],
+
   // next/image optimizasiyası Cloudflare Images binding üzərindən işləyir
   "images": {
     "binding": "IMAGES"
@@ -137,6 +141,7 @@
         "binding": "ASSETS"
       },
 
+      "vectorize": [{ "binding": "PROPERTY_VECTORS", "index_name": "luxehome-properties-staging" }],
       "images": { "binding": "IMAGES" },
       "ai": { "binding": "AI" },
 

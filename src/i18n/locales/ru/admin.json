@@ -402,6 +402,11 @@
       "NORMAL": "Нормальный",
       "MAINTENANCE": "Технические работы",
       "READ_ONLY": "Только чтение"
+    },
+    "projectUnitStatus": {
+      "AVAILABLE": "В продаже",
+      "RESERVED": "Бронь",
+      "SOLD": "Продана"
     }
   },
   "profile": {
@@ -624,7 +629,11 @@
       "deyisiklikleriSaxla": "Сохранить изменения",
       "elaniSil": "Удалить объявление",
       "elaninRedaktesi": "Редактирование объявления",
-      "redakte": "Редактирование"
+      "redakte": "Редактирование",
+      "virtualTour": "Виртуальный тур 360°",
+      "virtualTourHint": "Ссылка Kuula, Matterport или Momento360.",
+      "floorPlans": "Планировка",
+      "floorPlansHint": "Изображение или скан планировки, до 6 файлов. Показывается отдельно от галереи."
     },
     "leads": {
       "yenile": "Обновить",
@@ -1839,7 +1848,12 @@
       "rezervasiyaYoxdur": "Бронирований нет",
       "ictimaiElanlardanGonderilenSorgular": "Запросы, отправленные с публичных объявлений, появятся здесь.",
       "statusuYaddaSaxla": "Сохранить статус",
-      "qeydIsteyeBagli": "Заметка (по желанию)"
+      "qeydIsteyeBagli": "Заметка (по желанию)",
+      "semanticTitle": "Индекс семантического поиска",
+      "semanticDescription": "AI-поиск находит объявления по смыслу (Workers AI + Vectorize). Индекс обновляется при изменении объявлений и ежедневно.",
+      "semanticReindex": "Переиндексировать",
+      "semanticReady": "Привязки подключены. Кнопка переиндексирует все публичные объявления.",
+      "semanticMissing": "В этой среде нет привязки Vectorize — поиск работает в лексическом режиме."
     },
     "common": {
       "deqCavab": "ответ за {p0} мин",
@@ -2386,6 +2400,29 @@
       "reservationsColumn": "Показы",
       "leadRate": "Конверсия",
       "attention": "Внимание"
+    },
+    "projectUnits": {
+      "title": "Шахматка квартир",
+      "summary": "{name}: {total} квартир — {available} в продаже, {reserved} в брони, {sold} продано.",
+      "generate": "Создать квартиры",
+      "generatorTitle": "Генератор",
+      "generatorHint": "Создаёт сетку квартир по блокам и этажам. Существующие блок+номер не перезаписываются — статус и цена сохраняются.",
+      "blocks": "Блоки",
+      "blocksHint": "Через запятую или с новой строки: A, B, C",
+      "unitsPerFloor": "Квартир на этаже",
+      "floorFrom": "С этажа",
+      "floorTo": "По этаж",
+      "rooms": "Комнат",
+      "area": "Площадь, м²",
+      "status": "Статус",
+      "price": "Цена",
+      "saveUnit": "Сохранить квартиру {number}",
+      "empty": "Квартир пока нет",
+      "emptyHint": "Создайте блоки и этажи генератором выше.",
+      "block": "Блок {block}",
+      "floor": "{floor} этаж",
+      "deleteBlock": "Удалить блок {block}",
+      "deleteBlockHint": "Все квартиры блока будут удалены. Действие необратимо."
     }
   },
   "server": {
@@ -2440,7 +2477,9 @@
       "qaralamaTapilmadiVeYaArtiq": "Черновик не найден или уже обработан.",
       "qaralamadaTesvirYoxdur": "В черновике нет описания.",
       "qaralamaElanaTetbiqEdildi": "Черновик применён к объявлению.",
-      "qaralamaReddEdildi": "Черновик отклонён."
+      "qaralamaReddEdildi": "Черновик отклонён.",
+      "semanticUnavailable": "Семантический индекс в этой среде не подключён.",
+      "semanticReindexed": "Семантический индекс обновлён: {count} объявл."
     },
     "audit": {
       "auditJurnaliniYalnizSuperAdmin": "Сбросить журнал аудита может только супер-администратор.",
@@ -2704,6 +2743,13 @@
     "propertyImport": {
       "fileTooLarge": "Файл больше 900 КБ — разделите его на несколько частей.",
       "invalidFile": "Строка заголовков файла некорректна."
+    },
+    "projectUnits": {
+      "tooMany": "Неверные параметры или более 1500 квартир.",
+      "projectNotFound": "Проект не найден.",
+      "generated": "Создано {created} квартир, {skipped} пропущено как существующие.",
+      "saved": "Квартира сохранена.",
+      "blockDeleted": "Удалено квартир: {count}."
     }
   }
 }

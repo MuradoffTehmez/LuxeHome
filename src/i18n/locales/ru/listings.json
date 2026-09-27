@@ -175,6 +175,8 @@
     "saveSearchFrequencyImmediate": "Сразу",
     "saveSearchFrequencyDaily": "Ежедневно",
     "saveSearchFrequencyWeekly": "Еженедельно",
-    "saveSearchFrequencyOff": "Отключено"
+    "saveSearchFrequencyOff": "Отключено",
+    "nearMetro": "До 1 км от метро",
+    "drawnArea": "Область на карте"
   }
 }

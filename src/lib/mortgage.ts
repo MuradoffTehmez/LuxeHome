@@ -119,3 +119,51 @@ export function calculateAffordability(input: AffordabilityInput): Affordability
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
+
+export type InstallmentInput = {
+  price: number;
+  /** İlkin ödəniş, qiymətin faizi (0–90). */
+  downPaymentPercent: number;
+  /** Ödəniş müddəti, ay. */
+  months: number;
+  /**
+   * Tikinti şirkətinin hissə-hissə ödənişə əlavə etdiyi qiymət, **qalan borcun faizi**
+   * (bütün müddət üçün, illik deyil). Bakıda daxili kredit çox vaxt 0%-dir.
+   */
+  markupPercent: number;
+};
+
+export type InstallmentResult = {
+  downPayment: number;
+  financed: number;
+  markup: number;
+  monthlyPayment: number;
+  totalPayment: number;
+};
+
+/**
+ * Daxili (tikintiçi) hissə-hissə ödəniş — bərabər aylıq hissələr (#107).
+ *
+ * Bankın annuitet kreditindən fərqli olaraq faiz aylıq kapitallaşmır: əlavə qiymət
+ * qalan borca bir dəfə tətbiq olunur və müddətə bərabər bölünür. Mənasız daxiletmədə
+ * `null` qaytarılır.
+ */
+export function calculateInstallment(input: InstallmentInput): InstallmentResult | null {
+  const { price, downPaymentPercent, months, markupPercent } = input;
+  if (![price, downPaymentPercent, months, markupPercent].every(Number.isFinite)) return null;
+  if (price <= 0 || months < 1 || months > 120 || markupPercent < 0 || markupPercent > 100) return null;
+  if (downPaymentPercent < 0 || downPaymentPercent >= 100) return null;
+
+  const downPayment = price * (downPaymentPercent / 100);
+  const financed = price - downPayment;
+  const markup = financed * (markupPercent / 100);
+  const monthlyPayment = (financed + markup) / Math.round(months);
+
+  return {
+    downPayment: round2(downPayment),
+    financed: round2(financed),
+    markup: round2(markup),
+    monthlyPayment: round2(monthlyPayment),
+    totalPayment: round2(downPayment + financed + markup),
+  };
+}

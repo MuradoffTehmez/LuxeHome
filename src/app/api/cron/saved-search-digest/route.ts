@@ -5,6 +5,7 @@ import { savedSearchDigestStore } from "@/lib/queries";
 import { runPhase2Maintenance } from "@/lib/phase2-maintenance";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { runtimeEnv } from "@/lib/runtime-env";
+import { reindexAllProperties } from "@/lib/semantic-search";
 
 /**
  * «Gündəlik» / «Həftəlik» saxlanmış axtarış digest-inin işə salma nöqtəsi.
@@ -53,9 +54,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const [digest, maintenance] = await Promise.all([
+    const [digest, maintenance, semanticIndexed] = await Promise.all([
       runSavedSearchDigest(savedSearchDigestStore),
       runPhase2Maintenance(),
+      // Semantik indeksin gündəlik tam sinxronizasiyası (#107) — yazma yollarında fon
+      // sinxronizasiyası alınmasa belə indeks bir gündən çox köhnəlməsin.
+      reindexAllProperties().catch((error) => {
+        console.error("[cron] semantik indeks yenilənmədi:", error instanceof Error ? error.message : error);
+        return null;
+      }),
     ]);
     if (maintenance.expiredPremium > 0 || maintenance.accountDeletions.completed > 0) {
       revalidatePublicContent("property");
@@ -63,7 +70,7 @@ export async function POST(request: Request) {
     if (maintenance.expiredPartners > 0) {
       revalidatePublicContent("partner");
     }
-    return NextResponse.json({ ...digest, maintenance }, {
+    return NextResponse.json({ ...digest, maintenance, semanticIndexed }, {
       headers: { "Cache-Control": "no-store, max-age=0" },
     });
   } catch (error) {

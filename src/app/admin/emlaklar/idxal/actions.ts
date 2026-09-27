@@ -264,6 +264,7 @@ export async function commitPropertyImport(csv: string, lines: number[]): Promis
     }
   }
 
+  // Qaralamalar indeksə düşmür; sinxronizasiya onları dərc olunanda əlavə edəcək.
   if (results.some((row) => row.status === "created" || row.status === "resumed")) {
     revalidatePath("/admin/emlaklar");
     // Qaralama ictimai sayta düşmür, amma say keşləri (kateqoriya sayları) təzələnir.

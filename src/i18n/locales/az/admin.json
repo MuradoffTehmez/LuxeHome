@@ -402,6 +402,11 @@
       "NORMAL": "Normal",
       "MAINTENANCE": "Texniki xidmət",
       "READ_ONLY": "Yalnız baxış"
+    },
+    "projectUnitStatus": {
+      "AVAILABLE": "Satışda",
+      "RESERVED": "Rezerv",
+      "SOLD": "Satılıb"
     }
   },
   "profile": {
@@ -624,7 +629,11 @@
       "deyisiklikleriSaxla": "Dəyişiklikləri saxla",
       "elaniSil": "Elanı sil",
       "elaninRedaktesi": "Elanın redaktəsi",
-      "redakte": "Redaktə"
+      "redakte": "Redaktə",
+      "virtualTour": "360° virtual tur",
+      "virtualTourHint": "Kuula, Matterport və ya Momento360 paylaşım linki.",
+      "floorPlans": "Mərtəbə planı",
+      "floorPlansHint": "Planın şəkli və ya skanı, ən çox 6 fayl. Qalereyada göstərilmir, ayrıca bölmədə çıxır."
     },
     "leads": {
       "yenile": "Yenilə",
@@ -1839,7 +1848,12 @@
       "rezervasiyaYoxdur": "Rezervasiya yoxdur",
       "ictimaiElanlardanGonderilenSorgular": "İctimai elanlardan göndərilən sorğular burada görünəcək.",
       "statusuYaddaSaxla": "Statusu yadda saxla",
-      "qeydIsteyeBagli": "Qeyd (istəyə bağlı)"
+      "qeydIsteyeBagli": "Qeyd (istəyə bağlı)",
+      "semanticTitle": "Semantik axtarış indeksi",
+      "semanticDescription": "AI axtarışı elanları mənaca tapır (Workers AI + Vectorize). İndeks elan dəyişəndə və hər gün avtomatik yenilənir.",
+      "semanticReindex": "Yenidən indekslə",
+      "semanticReady": "Binding-lər qoşuludur. Düymə bütün ictimai elanları yenidən indeksləyir.",
+      "semanticMissing": "Bu mühitdə Vectorize binding-i yoxdur — axtarış leksik rejimdə işləyir."
     },
     "common": {
       "deqCavab": "{p0} dəq cavab",
@@ -2386,6 +2400,29 @@
       "reservationsColumn": "Baxış sorğusu",
       "leadRate": "Konversiya",
       "attention": "Diqqət"
+    },
+    "projectUnits": {
+      "title": "Mənzil şahmatı",
+      "summary": "{name}: {total} mənzil — {available} satışda, {reserved} rezerv, {sold} satılıb.",
+      "generate": "Mənzilləri yarat",
+      "generatorTitle": "Generator",
+      "generatorHint": "Bloklar və mərtəbələr üzrə mənzil şəbəkəsi yaradılır. Mövcud blok+nömrə üzərinə yazılmır — status və qiymət qorunur.",
+      "blocks": "Bloklar",
+      "blocksHint": "Vergül və ya yeni sətirlə: A, B, C",
+      "unitsPerFloor": "Mərtəbədə mənzil",
+      "floorFrom": "Mərtəbədən",
+      "floorTo": "Mərtəbəyə",
+      "rooms": "Otaq",
+      "area": "Sahə, m²",
+      "status": "Status",
+      "price": "Qiymət",
+      "saveUnit": "{number} nömrəli mənzili saxla",
+      "empty": "Hələ mənzil yoxdur",
+      "emptyHint": "Yuxarıdakı generatorla blok və mərtəbələri yaradın.",
+      "block": "{block} bloku",
+      "floor": "{floor}-ci mərtəbə",
+      "deleteBlock": "{block} blokunu sil",
+      "deleteBlockHint": "Blokun bütün mənzilləri silinəcək. Bu əməliyyat geri qaytarılmır."
     }
   },
   "server": {
@@ -2440,7 +2477,9 @@
       "qaralamaTapilmadiVeYaArtiq": "Qaralama tapılmadı və ya artıq işlənib.",
       "qaralamadaTesvirYoxdur": "Qaralamada təsvir yoxdur.",
       "qaralamaElanaTetbiqEdildi": "Qaralama elana tətbiq edildi.",
-      "qaralamaReddEdildi": "Qaralama rədd edildi."
+      "qaralamaReddEdildi": "Qaralama rədd edildi.",
+      "semanticUnavailable": "Bu mühitdə semantik indeks qoşulmayıb.",
+      "semanticReindexed": "Semantik indeks yeniləndi: {count} elan."
     },
     "audit": {
       "auditJurnaliniYalnizSuperAdmin": "Audit jurnalını yalnız Super Admin sıfırlaya bilər.",
@@ -2704,6 +2743,13 @@
     "propertyImport": {
       "fileTooLarge": "Fayl 900 KB-dan böyükdür — onu bir neçə hissəyə bölün.",
       "invalidFile": "Faylın başlıq sətri düzgün deyil."
+    },
+    "projectUnits": {
+      "tooMany": "Parametrlər düzgün deyil və ya mənzil sayı 1500-dən çoxdur.",
+      "projectNotFound": "Layihə tapılmadı.",
+      "generated": "{created} mənzil yaradıldı, {skipped} mövcud olduğu üçün buraxıldı.",
+      "saved": "Mənzil saxlanıldı.",
+      "blockDeleted": "{count} mənzil silindi."
     }
   }
 }

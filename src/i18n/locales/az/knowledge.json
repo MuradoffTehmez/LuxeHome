@@ -116,7 +116,22 @@
     "disclaimer": "Nəticələr yalnız məlumat xarakterlidir və maliyyə məsləhəti deyil. Faktiki şərtlər bank tərəfindən müəyyən edilir.",
     "onProperty": "Bu əmlak üçün aylıq ödəniş",
     "openCalculator": "Hesablayıcını aç",
-    "closeCalculator": "Hesablayıcını bağla"
+    "closeCalculator": "Hesablayıcını bağla",
+    "installment": {
+      "title": "Hissə-hissə ödəniş",
+      "description": "Tikinti şirkətinin daxili krediti: ilkin ödəniş və bərabər aylıq hissələr.",
+      "price": "Qiymət",
+      "months": "Müddət",
+      "monthsOption": "{count} ay",
+      "downPayment": "İlkin ödəniş",
+      "markup": "Əlavə qiymət",
+      "monthly": "Aylıq ödəniş",
+      "downPaymentAmount": "İlkin ödəniş",
+      "markupAmount": "Əlavə məbləğ",
+      "total": "Ümumi məbləğ",
+      "invalid": "Qiyməti və müddəti yoxlayın.",
+      "disclaimer": "Təxmini hesablamadır. Faktiki qrafik və əlavə qiymət tikinti şirkəti ilə razılaşdırılır."
+    }
   },
   "faq": {
     "categories": {

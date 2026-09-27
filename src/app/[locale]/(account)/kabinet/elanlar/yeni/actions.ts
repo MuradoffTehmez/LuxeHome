@@ -24,6 +24,7 @@ import { prisma } from "@/lib/prisma";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { localizePath } from "@/i18n/path-locale";
+import { queuePropertyVectorSync } from "@/lib/semantic-search";
 
 const LIST_PATH = "/kabinet/elanlar";
 
@@ -163,6 +164,7 @@ export async function createPublicProperty(
 
     if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED) {
       await notifyMatchingSavedSearches(created.id);
+      queuePropertyVectorSync([created.id]);
     }
   } catch (error) {
     // Şəkil yükləmələri qəsdən silinmir: istifadəçi formadakı xətanı düzəldib yenidən göndərə bilər.

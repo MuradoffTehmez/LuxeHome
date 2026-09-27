@@ -132,7 +132,8 @@ const PUBLIC_CSP = [
   "font-src 'self' data:",
   "connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com https://www.googletagmanager.com https://www.google-analytics.com",
   // Turnstile widget-i, GTM `noscript` freymi və elan videoları (`property-video.tsx`)
-  "frame-src https://challenges.cloudflare.com https://www.googletagmanager.com https://www.youtube-nocookie.com https://player.vimeo.com",
+  // 360° virtual tur platformaları (`property-tour.tsx`, #107).
+  "frame-src https://challenges.cloudflare.com https://www.googletagmanager.com https://www.youtube-nocookie.com https://player.vimeo.com https://kuula.co https://my.matterport.com https://momento360.com",
 ].join("; ");
 
 /**
