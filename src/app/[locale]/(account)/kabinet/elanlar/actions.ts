@@ -21,6 +21,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { renewedExpiry } from "@/lib/listing-expiry";
+import { recordDomainEvent } from "@/lib/admin/events";
 
 const LIST_PATH = "/kabinet/elanlar";
 
@@ -210,4 +212,46 @@ export async function deletePublicProperty(id: string): Promise<ActionState> {
   revalidatePath(localizePath(LIST_PATH, locale));
   revalidatePublicContent("property");
   return success(t("actions.propertyDeleted"));
+}
+
+/**
+ * Elanın müddətini yeniləyir (#109). Müddəti bitib arxivlənmiş elan yenidən dərc olunur —
+ * məzmun dəyişmədiyi üçün təkrar moderasiya tələb olunmur; redaktə edilən elan isə
+ * adi yeniləmə axınından keçir.
+ */
+export async function renewPublicProperty(id: string): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  let guarded;
+  try {
+    guarded = await ownerAndGuard(id, locale);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(t("actions.actionUnavailable"));
+    throw error;
+  }
+  if (!guarded.property) return failure(t("actions.propertyNotFound"));
+
+  try {
+    const current = await prisma.property.findUnique({ where: { id }, select: { status: true, expiredAt: true } });
+    const canRenew = current?.status === PROPERTY_STATUSES.PUBLISHED
+      || (current?.status === PROPERTY_STATUSES.ARCHIVED && current.expiredAt !== null);
+    if (!canRenew) return failure(t("listings.renewUnavailable"));
+    await prisma.property.update({
+      where: { id },
+      data: {
+        status: PROPERTY_STATUSES.PUBLISHED,
+        listingExpiresAt: renewedExpiry(),
+        expiryReminderSentAt: null,
+        expiredAt: null,
+      },
+    });
+    await recordDomainEvent("property.renewed", "Property", id, { by: guarded.user.id });
+  } catch (error) {
+    return unexpected("elan yenilənmədi", error, t("actions.unexpected"));
+  }
+
+  queuePropertyVectorSync([id]);
+  revalidatePath(localizePath(LIST_PATH, locale));
+  revalidatePublicContent("property", guarded.property.slug);
+  return success(t("listings.renewed"));
 }

@@ -5,7 +5,7 @@ import { savedSearchDigestStore } from "@/lib/queries";
 import { runPhase2Maintenance } from "@/lib/phase2-maintenance";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { runtimeEnv } from "@/lib/runtime-env";
-import { reindexAllProperties } from "@/lib/semantic-search";
+import { queuePropertyVectorSync, reindexAllProperties } from "@/lib/semantic-search";
 
 /**
  * «Gündəlik» / «Həftəlik» saxlanmış axtarış digest-inin işə salma nöqtəsi.
@@ -64,7 +64,8 @@ export async function POST(request: Request) {
         return null;
       }),
     ]);
-    if (maintenance.expiredPremium > 0 || maintenance.accountDeletions.completed > 0) {
+    if (maintenance.listingExpiry.expired > 0) queuePropertyVectorSync(maintenance.listingExpiry.expiredIds);
+    if (maintenance.expiredPremium > 0 || maintenance.accountDeletions.completed > 0 || maintenance.listingExpiry.expired > 0) {
       revalidatePublicContent("property");
     }
     if (maintenance.expiredPartners > 0) {

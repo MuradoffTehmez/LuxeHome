@@ -25,7 +25,15 @@
       "sold": "Sold",
       "rented": "Rented",
       "archived": "Archived"
-    }
+    },
+    "renew": "Renew",
+    "renewTitle": "Renew the listing",
+    "renewDescription": "The listing will stay live for another {days} days.",
+    "renewLabel": "Renew “{title}”",
+    "renewed": "Listing renewed.",
+    "renewUnavailable": "This listing cannot be renewed.",
+    "expiresIn": "{days, plural, one {# day left} other {# days left}}",
+    "expired": "Expired — restore it"
   },
   "newProperty": {
     "metaTitle": "Submit a listing",

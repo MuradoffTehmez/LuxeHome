@@ -418,6 +418,11 @@ model Property {
   closedAt           DateTime?
   /// Keçmiş elanın indeksdə saxlanıla biləcəyi son tarix. Null olduqda qlobal SEO siyasəti işləyir.
   retentionUntil     DateTime?
+  /// Sahib/agentlik elanının aktivlik müddəti (#109); STAFF elanlarında boşdur.
+  listingExpiresAt     DateTime?
+  expiryReminderSentAt DateTime?
+  /// Müddət bitdiyi üçün arxivlənib — sahib kabinetdən bir kliklə bərpa edə bilir.
+  expiredAt            DateTime?
   /// CSV idxalı (#103): sətir məzmununun SHA-256 heşi. Təkrar idxalda eyni sətri tanıyır.
   importKey          String?
   /// Bütün əlaqələr (xüsusiyyət, şəkil) yazılanda qoyulur. `null` + `importKey` = yarımçıq
@@ -459,6 +464,7 @@ model Property {
   partners           PropertyPartner[]
   priceHistory       PropertyPriceHistory[]
   floorPlans         PropertyFloorPlan[]
+  openHouses         OpenHouse[]
   reservations       Reservation[]
   nearbyPlaces       NearbyPlace[]
   aiContentDrafts    AiContentDraft[]
@@ -475,6 +481,7 @@ model Property {
   @@index([isFeatured])
   @@index([featuredUntil])
   @@index([importKey])
+  @@index([status, listingExpiresAt])
   @@index([reservationEnabled, status])
   @@index([assignedAgentId])
   @@index([deletedAt])
@@ -497,6 +504,38 @@ model PropertyFloorPlan {
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId, order])
+}
+
+/// Açıq qapı günü (#109): elanın ümumi baxış pəncərəsi, qeydiyyatla.
+model OpenHouse {
+  id        String   @id @default(cuid())
+  propertyId String
+  startsAt  DateTime
+  endsAt    DateTime
+  /// Boşdursa məhdudiyyət yoxdur.
+  capacity  Int?
+  note      String?
+  createdAt DateTime @default(now())
+
+  property      Property                @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  registrations OpenHouseRegistration[]
+
+  @@index([propertyId, startsAt])
+}
+
+model OpenHouseRegistration {
+  id          String    @id @default(cuid())
+  openHouseId String
+  name        String
+  phone       String
+  email       String?
+  leadId      String?
+  reminderSentAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  openHouse OpenHouse @relation(fields: [openHouseId], references: [id], onDelete: Cascade)
+
+  @@unique([openHouseId, phone])
 }
 
 model PropertyImage {

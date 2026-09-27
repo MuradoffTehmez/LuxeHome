@@ -25,7 +25,15 @@
       "sold": "Продано",
       "rented": "Сдано в аренду",
       "archived": "В архиве"
-    }
+    },
+    "renew": "Продлить",
+    "renewTitle": "Продлить объявление",
+    "renewDescription": "Объявление будет активно ещё {days} дн.",
+    "renewLabel": "Продлить «{title}»",
+    "renewed": "Объявление продлено.",
+    "renewUnavailable": "Это объявление нельзя продлить.",
+    "expiresIn": "{days, plural, one {Остался # день} few {Осталось # дня} many {Осталось # дней} other {Осталось # дня}}",
+    "expired": "Срок истёк — восстановите"
   },
   "newProperty": {
     "metaTitle": "Подать объявление",

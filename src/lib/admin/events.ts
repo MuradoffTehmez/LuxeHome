@@ -11,6 +11,8 @@ import { prisma } from "@/lib/prisma";
 export type DomainEventType =
   | "property.published"
   | "property.status_changed"
+  | "property.expired"
+  | "property.renewed"
   | "agency.employee_invited"
   | "agency.employee_approved"
   | "agency.employee_rejected"

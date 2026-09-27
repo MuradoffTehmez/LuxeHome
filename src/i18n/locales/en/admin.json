@@ -293,7 +293,8 @@
       "PRICE_DROP": "Price drop",
       "RESERVATION_STATUS": "Reservation status",
       "RECOMMENDATION": "Personal recommendation",
-      "MEETING_REMINDER": "Viewing reminder"
+      "MEETING_REMINDER": "Viewing reminder",
+      "LISTING_EXPIRY": "Listing expiry"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -2423,6 +2424,20 @@
       "floor": "Floor {floor}",
       "deleteBlock": "Delete block {block}",
       "deleteBlockHint": "All units of the block will be deleted. This cannot be undone."
+    },
+    "openHouse": {
+      "title": "Open house days",
+      "description": "Group viewing windows for the listing. Registrations also land in the CRM as leads.",
+      "startsAt": "Starts at",
+      "durationMinutes": "Duration (minutes)",
+      "capacity": "Capacity",
+      "capacityHint": "Leave empty for no limit",
+      "note": "Note",
+      "add": "Add slot",
+      "empty": "No open house scheduled.",
+      "registrations": "{count, plural, one {# registration} other {# registrations}}",
+      "delete": "Delete slot",
+      "deleteHint": "The slot and its registrations will be deleted (leads remain in the CRM)."
     }
   },
   "server": {
@@ -2750,6 +2765,11 @@
       "generated": "{created} units created, {skipped} skipped as existing.",
       "saved": "Unit saved.",
       "blockDeleted": "{count} units deleted."
+    },
+    "openHouse": {
+      "added": "Open house slot added.",
+      "deleted": "Slot deleted.",
+      "invalidTime": "The start time must be in the future."
     }
   }
 }

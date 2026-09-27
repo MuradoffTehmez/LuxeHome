@@ -25,7 +25,15 @@
       "sold": "Satılıb",
       "rented": "Kirayə verilib",
       "archived": "Arxivdə"
-    }
+    },
+    "renew": "Yenilə",
+    "renewTitle": "Elanın müddətini yeniləmək",
+    "renewDescription": "Elan daha {days} gün aktiv qalacaq.",
+    "renewLabel": "«{title}» elanını yenilə",
+    "renewed": "Elan yeniləndi.",
+    "renewUnavailable": "Bu elanı yeniləmək mümkün deyil.",
+    "expiresIn": "{days, plural, other {# gün qalıb}}",
+    "expired": "Müddəti bitib — bərpa edin"
   },
   "newProperty": {
     "metaTitle": "Elan göndər",

@@ -496,6 +496,8 @@ export const NOTIFICATION_TYPES = {
   RESERVATION_STATUS: "RESERVATION_STATUS",
   RECOMMENDATION: "RECOMMENDATION",
   MEETING_REMINDER: "MEETING_REMINDER",
+  /** Elan müddəti xatırlatması və arxiv bildirişi (#109). */
+  LISTING_EXPIRY: "LISTING_EXPIRY",
 } as const;
 
 export type NotificationType =
@@ -507,6 +509,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   RESERVATION_STATUS: "Rezervasiya statusu",
   RECOMMENDATION: "Fərdi tövsiyə",
   MEETING_REMINDER: "Görüş xatırlatması",
+  LISTING_EXPIRY: "Elan müddəti",
 };
 
 // ---------------------------------------------------------------------------

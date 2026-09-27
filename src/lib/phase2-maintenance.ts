@@ -3,6 +3,8 @@ import { PARTNER_STATUSES, RESERVATION_STATUSES } from "@/lib/constants";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { processPendingAccountDeletions } from "@/lib/account-deletion";
 import { startOfBakuToday } from "@/lib/partners";
+import { runListingExpiry } from "@/lib/listing-expiry";
+import { sendOpenHouseReminders } from "@/lib/open-house";
 
 const DOMAIN_EVENT_RETENTION_DAYS = 180;
 
@@ -36,6 +38,8 @@ export async function runPhase2Maintenance(now = new Date()) {
   }
 
   const accountDeletions = await processPendingAccountDeletions(now);
+  const listingExpiry = await runListingExpiry(now);
+  const openHouseReminders = await sendOpenHouseReminders(now);
   const retentionCutoff = new Date(now.getTime() - DOMAIN_EVENT_RETENTION_DAYS * 86_400_000);
   const domainEvents = await prisma.domainEvent.deleteMany({
     where: { createdAt: { lt: retentionCutoff } },
@@ -45,6 +49,8 @@ export async function runPhase2Maintenance(now = new Date()) {
     expiredPremium: premium.count,
     expiredReservations: expiring.length,
     expiredPartners: partners.count,
+    listingExpiry,
+    openHouseReminders,
     accountDeletions,
     deletedDomainEvents: domainEvents.count,
   };

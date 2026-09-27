@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarClock, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +19,8 @@ import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
 import { ConfirmAction } from "@/components/admin/confirm-action";
-import { deletePublicProperty } from "./actions";
+import { deletePublicProperty, renewPublicProperty } from "./actions";
+import { LISTING_LIFETIME_DAYS, expiryState } from "@/lib/listing-expiry";
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
@@ -49,6 +50,8 @@ export default async function CabinetPropertiesPage({
         price: true,
         currency: true,
         status: true,
+        listingExpiresAt: true,
+        expiredAt: true,
         images: { select: { url: true }, where: { isCover: true }, take: 1 },
       },
       orderBy: { createdAt: "desc" },
@@ -60,6 +63,35 @@ export default async function CabinetPropertiesPage({
 
   function propertyStatus(property: CabinetProperty) {
     return property.status as PropertyStatus;
+  }
+
+  const now = Date.now();
+
+  /** Müddət göstəricisi və «Yenilə» düyməsi (#109) — müddəti olmayan elanda heç nə. */
+  function ExpiryControls({ property }: { property: CabinetProperty }) {
+    const expiry = expiryState(property, now);
+    if (!expiry) return null;
+    return (
+      <span className="inline-flex flex-wrap items-center gap-2">
+        <Badge tone={expiry.state === "active" ? "neutral" : "warning"}>
+          <CalendarClock className="size-3.5" aria-hidden="true" />
+          {expiry.state === "expired" ? t("expired") : t("expiresIn", { days: expiry.daysLeft })}
+        </Badge>
+        {expiry.state !== "active" ? (
+          <ConfirmAction
+            action={renewPublicProperty}
+            id={property.id}
+            title={t("renewTitle")}
+            description={t("renewDescription", { days: LISTING_LIFETIME_DAYS })}
+            confirmLabel={t("renew")}
+            label={t("renewLabel", { title: property.title })}
+            tone="neutral"
+          >
+            <RefreshCw className="size-4" aria-hidden="true" />
+          </ConfirmAction>
+        ) : null}
+      </span>
+    );
   }
 
   function PropertyThumbnail({ property }: { property: CabinetProperty }) {
@@ -92,6 +124,7 @@ export default async function CabinetPropertiesPage({
             <p className="mt-2 text-sm font-medium text-ink-soft tabular-nums">
               {formatPrice(property.price, property.currency)}
             </p>
+            <div className="mt-2"><ExpiryControls property={property} /></div>
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
@@ -122,6 +155,7 @@ export default async function CabinetPropertiesPage({
                 <p className="mt-1 text-sm text-ink-soft tabular-nums">
                   {formatPrice(property.price, property.currency)}
                 </p>
+                <div className="mt-2"><ExpiryControls property={property} /></div>
               </div>
               <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
                 {t(`status.${STATUS_KEYS[status]}`)}

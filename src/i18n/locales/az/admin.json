@@ -293,7 +293,8 @@
       "PRICE_DROP": "Qiymət endirimi",
       "RESERVATION_STATUS": "Rezervasiya statusu",
       "RECOMMENDATION": "Fərdi tövsiyə",
-      "MEETING_REMINDER": "Görüş xatırlatması"
+      "MEETING_REMINDER": "Görüş xatırlatması",
+      "LISTING_EXPIRY": "Elan müddəti"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -2423,6 +2424,20 @@
       "floor": "{floor}-ci mərtəbə",
       "deleteBlock": "{block} blokunu sil",
       "deleteBlockHint": "Blokun bütün mənzilləri silinəcək. Bu əməliyyat geri qaytarılmır."
+    },
+    "openHouse": {
+      "title": "Açıq qapı günləri",
+      "description": "Elana ümumi baxış pəncərələri. Qeydiyyatlar müraciət kimi CRM-ə də düşür.",
+      "startsAt": "Başlama",
+      "durationMinutes": "Müddət (dəqiqə)",
+      "capacity": "Tutum",
+      "capacityHint": "Boş qalsa məhdudiyyət yoxdur",
+      "note": "Qeyd",
+      "add": "Slot əlavə et",
+      "empty": "Açıq qapı günü planlaşdırılmayıb.",
+      "registrations": "{count, plural, other {# qeydiyyat}}",
+      "delete": "Slotu sil",
+      "deleteHint": "Slot və onun qeydiyyatları silinəcək (müraciətlər CRM-də qalır)."
     }
   },
   "server": {
@@ -2750,6 +2765,11 @@
       "generated": "{created} mənzil yaradıldı, {skipped} mövcud olduğu üçün buraxıldı.",
       "saved": "Mənzil saxlanıldı.",
       "blockDeleted": "{count} mənzil silindi."
+    },
+    "openHouse": {
+      "added": "Açıq qapı slotu əlavə olundu.",
+      "deleted": "Slot silindi.",
+      "invalidTime": "Başlama vaxtı gələcəkdə olmalıdır."
     }
   }
 }

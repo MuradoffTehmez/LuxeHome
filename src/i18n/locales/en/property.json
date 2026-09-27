@@ -176,5 +176,26 @@
   },
   "metroChip": "{name} · {minutes} min walk",
   "metroLine": "{name} metro · {minutes} min walk",
-  "metroOnly": "{name} metro"
+  "metroOnly": "{name} metro",
+  "openHouse": {
+    "title": "Open house days",
+    "description": "Pick a time for a group viewing and register — our agent will meet you on site.",
+    "open": "Places available",
+    "seatsLeft": "{count, plural, one {# place left} other {# places left}}",
+    "full": "Fully booked",
+    "closed": "Registration closed",
+    "pickSlot": "Choose a time above to register.",
+    "name": "Full name",
+    "phone": "Phone",
+    "email": "Email",
+    "emailHint": "Add it and we will send a reminder the day before.",
+    "register": "Register",
+    "registered": "You are registered. Our agent will contact you.",
+    "alreadyRegistered": "This phone number is already registered.",
+    "rejected": "Registration was not accepted. Refresh the page and try again.",
+    "rateLimited": "Too many requests. Please wait a minute.",
+    "invalid": "Check the name and phone.",
+    "unavailable": "This viewing is no longer available.",
+    "unexpected": "Something went wrong. Please try again later."
+  }
 }
