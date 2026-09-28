@@ -1,6 +1,6 @@
 import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
-import { LOCATION_CHILD_KINDS, LOCATION_KINDS } from "@/lib/constants";
+import { LOCATION_CHILD_KINDS, LOCATION_KINDS, PROPERTY_STATUSES } from "@/lib/constants";
 import { getPublishedContentTranslations } from "@/lib/content-translation";
 import { prisma } from "@/lib/prisma";
 import { getFilterOptions, getPropertyFormOptions } from "@/lib/queries";
@@ -18,15 +18,22 @@ const DB = (env as unknown as { DB: D1Database }).DB;
 const CITY_COUNT = 75;
 const CHILD_COUNT = 600;
 
+/**
+ * Kəndlər (~3 600, miqrasiya 0050–0053) filtr və forma siyahısına bir dəfədə
+ * düşmür: filtrdə yalnız elanı olanlar, formada seçilmiş rayonunkular görünür.
+ * Ona görə gözlənilən say kəndsiz alt səviyyələrdən hesablanır.
+ */
+const NON_VILLAGE_KINDS = LOCATION_CHILD_KINDS.filter((kind) => kind !== LOCATION_KINDS.VILLAGE);
+
 async function countLocations() {
   const row = await DB.prepare(
     `SELECT
        SUM(CASE WHEN "kind" = ? THEN 1 ELSE 0 END) AS cities,
-       SUM(CASE WHEN "kind" IN (?, ?, ?, ?) THEN 1 ELSE 0 END) AS children,
-       SUM(CASE WHEN "kind" IN (?, ?, ?, ?) AND "parentId" IS NOT NULL THEN 1 ELSE 0 END) AS attached
+       SUM(CASE WHEN "kind" IN (?, ?, ?) THEN 1 ELSE 0 END) AS children,
+       SUM(CASE WHEN "kind" IN (?, ?, ?) AND "parentId" IS NOT NULL THEN 1 ELSE 0 END) AS attached
      FROM "Location"`,
   )
-    .bind(LOCATION_KINDS.CITY, ...LOCATION_CHILD_KINDS, ...LOCATION_CHILD_KINDS)
+    .bind(LOCATION_KINDS.CITY, ...NON_VILLAGE_KINDS, ...NON_VILLAGE_KINDS)
     .first<{ cities: number; children: number; attached: number }>();
   // Təzə bazada `baki` sətri olmadığı üçün 0031 miqrasiyasının bəzi yerləri
   // valideynsiz yaranır; filtr ağacı onları göstərə bilməz, forma isə `kind` üzrə alır.
@@ -83,10 +90,38 @@ describe("yerləşmə ağacı sorğuları (#74)", () => {
     // Bakı qəsəbələri üçüncü səviyyədədir.
     expect(district?.children.length).toBeGreaterThan(0);
     const total = cities.reduce(
-      (sum, city) => sum + city.children.length + city.children.reduce((inner, child) => inner + child.children.length, 0),
+      (sum, city) =>
+        sum +
+        city.children.filter((child) => child.kind !== LOCATION_KINDS.VILLAGE).length +
+        city.children.reduce((inner, child) => inner + child.children.length, 0),
       0,
     );
     expect(total).toBe(expected.attached);
+    // Elanı olmayan kənd filtr ağacına düşmür.
+    expect(cities.some((city) => city.children.some((child) => child.slug === "yer-61"))).toBe(false);
+  });
+
+  it("elanı olan kənd filtrdə görünür, redaktə olunan elanın kəndi formaya düşür", async () => {
+    await DB.batch([
+      DB.prepare('INSERT INTO "PropertyType" ("id", "name", "searchName", "slug") VALUES (?, ?, ?, ?)').bind(
+        "d1-type", "Mənzil", "menzil", "d1-menzil",
+      ),
+      DB.prepare(
+        `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price",
+           "typeId", "cityId", "districtId", "isDemo", "publishedAt", "createdAt", "updatedAt")
+         VALUES ('d1-village-listing', 'Kənddə ev', 'kendde-ev', 'Təsvir mətni', 'x', 'SALE', ?, 1000,
+           'd1-type', ?, 'place-61', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      ).bind(PROPERTY_STATUSES.PUBLISHED, "city-62"),
+    ]);
+
+    const { cities } = await getFilterOptions();
+    const village = cities.flatMap((city) => city.children).find((child) => child.slug === "yer-61");
+    expect(village?.kind).toBe(LOCATION_KINDS.VILLAGE);
+
+    const withoutProperty = await getPropertyFormOptions();
+    expect(withoutProperty.districts.some((item) => item.slug === "yer-61")).toBe(false);
+    const { districts } = await getPropertyFormOptions({ propertyId: "d1-village-listing" });
+    expect(districts.find((item) => item.slug === "yer-61")).toMatchObject({ kind: LOCATION_KINDS.VILLAGE, cityId: "city-62" });
   });
 
   it("getPropertyFormOptions() qəsəbə üçün kök şəhəri və qrupu hesablayır", async () => {

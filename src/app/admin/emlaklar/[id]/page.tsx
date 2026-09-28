@@ -38,7 +38,7 @@ export default async function EditPropertyPage({
   const { id } = await params;
   const [property, options, openHouses] = await Promise.all([
     getAdminPropertyById(id),
-    getPropertyFormOptions(),
+    getPropertyFormOptions({ propertyId: id }),
     prisma.openHouse.findMany({
       where: { propertyId: id, endsAt: { gt: new Date() } },
       orderBy: { startsAt: "asc" },

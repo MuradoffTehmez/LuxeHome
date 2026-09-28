@@ -119,6 +119,20 @@ function officialCodeFor(
   return cityCode && OFFICIAL_STREET_CODES.has(cityCode) ? cityCode : null;
 }
 
+/** Rayonun kəndləri sessiya boyu bir dəfə yüklənir. */
+const villageCache = new Map<string, Promise<LocationFieldPlace[]>>();
+
+function loadVillages(cityId: string): Promise<LocationFieldPlace[]> {
+  let pending = villageCache.get(cityId);
+  if (!pending) {
+    pending = fetch(`/api/yerler/kendler?seher=${encodeURIComponent(cityId)}`)
+      .then((response) => (response.ok ? (response.json() as Promise<LocationFieldPlace[]>) : []))
+      .catch(() => []);
+    villageCache.set(cityId, pending);
+  }
+  return pending;
+}
+
 /** Rəsmi küçə siyahısı hər vahid üçün statik fayldır; sessiya boyu bir dəfə yüklənir. */
 const streetCache = new Map<string, Promise<string[]>>();
 
@@ -151,8 +165,14 @@ function loadOfficialStreets(code: string): Promise<string[]> {
  * ilə üst-üstə düşürsə qeydə bağlanır, düşmürsə `neighborhoodName` kimi saxlanılır
  * — ağacdakı massiv siyahısı tam deyil.
  */
-export function LocationFields({ cities, places, metros, landmarks, locale, labels, initial, onChange }: Props) {
-  const [state, setState] = useState(() => initialState(initial, places, cities));
+export function LocationFields({ cities, places: basePlaces, metros, landmarks, locale, labels, initial, onChange }: Props) {
+  const [state, setState] = useState(() => initialState(initial, basePlaces, cities));
+  const [villages, setVillages] = useState<LocationFieldPlace[]>([]);
+  // Kəndlər serverdən gəlmir (ölkə üzrə ~3 600) — seçilmiş rayonun kəndləri
+  // ayrıca yüklənib ümumi siyahıya qoşulur. Redaktə olunan elanın kəndi isə
+  // artıq `basePlaces`-dədir, ona görə təkrarlanmır.
+  const baseIds = new Set(basePlaces.map((place) => place.id));
+  const places = [...basePlaces, ...villages.filter((village) => !baseIds.has(village.id))];
   const datalistId = useId();
   const districtError = useFieldError("districtId");
   const cityError = useFieldError("cityId");
@@ -207,6 +227,20 @@ export function LocationFields({ cities, places, metros, landmarks, locale, labe
   // Küçə təklifləri ən dərin rəsmi vahidin kodu ilə seçilir: qəsəbə/kənd öz
   // kodunu, massiv valideyn rayonun kodunu, rayonsuz şəhər isə öz kodunu verir.
   const streetCode = officialCodeFor(places, cities, districtId, state.cityId);
+
+  useEffect(() => {
+    let active = true;
+    if (!state.cityId) {
+      setVillages([]);
+      return;
+    }
+    void loadVillages(state.cityId).then((items) => {
+      if (active) setVillages(items);
+    });
+    return () => {
+      active = false;
+    };
+  }, [state.cityId]);
 
   useEffect(() => {
     let active = true;

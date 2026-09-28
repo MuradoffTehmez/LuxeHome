@@ -70,7 +70,7 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
         images: { select: { url: true, alt: true, isCover: true }, orderBy: { order: "asc" } },
       },
     }),
-    getPropertyFormOptions(),
+    getPropertyFormOptions({ propertyId: id }),
     getTranslations("account.newProperty"),
     getListingContact(user.id),
   ]);

@@ -138,10 +138,10 @@ async function parseQuery(query: string): Promise<{ criteria: AiSearchCriteria; 
 
   const [types, locations, features] = await Promise.all([
     prisma.propertyType.findMany({ where: { isActive: true }, select: { slug: true, name: true } }),
-    // Nişangahlar AI meyarlarına düşmür (sxemdə `landmarkSlug` yoxdur) — prompta
-    // 200-dən çox sətir əlavə edib token sərf etməsin.
+    // Nişangahlar AI meyarlarına düşmür (sxemdə `landmarkSlug` yoxdur), kəndlər
+    // isə ~3 600-dür — hər ikisi prompta minlərlə sətir əlavə edib token sərf edərdi.
     prisma.location.findMany({
-      where: { kind: { not: LOCATION_KINDS.LANDMARK } },
+      where: { kind: { notIn: [LOCATION_KINDS.LANDMARK, LOCATION_KINDS.VILLAGE] } },
       select: { slug: true, name: true, kind: true },
     }),
     prisma.feature.findMany({ select: { slug: true, name: true } }),
