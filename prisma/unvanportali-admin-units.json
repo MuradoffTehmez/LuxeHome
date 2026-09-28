@@ -1,0 +1,2666 @@
+{
+ "_source": {
+  "url": "https://unvanportali.az/api/adminUnits/list?parentId=<kod>",
+  "fetchedAt": "2026-09-28",
+  "note": "Ünvan Reyestri (Əmlak Məsələləri Dövlət Xidməti). Açar — şəhər/rayon, dəyər — uşaq vahidlər."
+ },
+ "_roots": {
+  "Bakı": {
+   "id": "55A523B5B41D4D028E38CAC00A0509DD",
+   "code": "00000002",
+   "fullName": "Bakı şəhəri",
+   "hasStreet": false
+  },
+  "Abşeron": {
+   "id": "20359BCA9B374EB1B73E9E659F9E7CFF",
+   "code": "30800001",
+   "fullName": "Abşeron rayonu",
+   "hasStreet": true
+  },
+  "Sumqayıt": {
+   "id": "cf9eb75a-adb6-4798-900a-ea9c080680bb",
+   "code": "30900002",
+   "fullName": "Sumqayıt şəhəri",
+   "hasStreet": true
+  },
+  "Gəncə": {
+   "id": "C680459919AF48DA8660CDB1FBD0791B",
+   "code": "20000002",
+   "fullName": "Gəncə şəhəri",
+   "hasStreet": true
+  },
+  "Naxçıvan": {
+   "id": "52E3A5F4CF63447A9C068989AA56E392",
+   "code": "10400002",
+   "fullName": "Naxçıvan şəhəri",
+   "hasStreet": true
+  },
+  "Mingəçevir": {
+   "id": "D463589D4F30439BA558825DF3A78DCD",
+   "code": "90200002",
+   "fullName": "Mingəçevir şəhəri",
+   "hasStreet": true
+  },
+  "Şirvan": {
+   "id": "8430804BDD244E32B615D65E15057480",
+   "code": "91100002",
+   "fullName": "Şirvan şəhəri",
+   "hasStreet": true
+  },
+  "Lənkəran": {
+   "id": "9451ADC120844CB3B0ACE80E88C6933A",
+   "code": "80200002",
+   "fullName": "Lənkəran şəhəri",
+   "hasStreet": true
+  },
+  "Şəki": {
+   "id": "EAD88E2E1FE8463D97043F738F817962",
+   "code": "40400002",
+   "fullName": "Şəki şəhəri",
+   "hasStreet": true
+  },
+  "Yevlax": {
+   "id": "83B010DC720C4F6DB3F53B2810EC4A53",
+   "code": "90100002",
+   "fullName": "Yevlax şəhəri",
+   "hasStreet": true
+  },
+  "Naftalan": {
+   "id": "7F46B48FEA464E0692E9C40DD8FCF863",
+   "code": "51000002",
+   "fullName": "Naftalan şəhəri",
+   "hasStreet": true
+  },
+  "Xankəndi": {
+   "id": "3BDAB9C653F94A4EA1C459700ABA11BE",
+   "code": "70400002",
+   "fullName": "Xankəndi şəhəri",
+   "hasStreet": true
+  }
+ },
+ "Bakı": [
+  {
+   "id": "23d47bb3-1d38-4b2d-ad3d-953a2b549844",
+   "code": "00100003",
+   "name": "Binəqədi",
+   "fullName": "Binəqədi rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true,
+   "children": [
+    {
+     "id": "C80E812635914DC9B92DEF80DB488E51",
+     "code": "00102016",
+     "name": "Biləcəri",
+     "fullName": "Biləcəri qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "15F8AE602D554AF99DDDE8C3E8A0FE57",
+     "code": "00103016",
+     "name": "Binəqədi",
+     "fullName": "Binəqədi qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "F1296FA97DCE4E83BA2AFAB5AFDF85FA",
+     "code": "00101016",
+     "name": "Xocəsən",
+     "fullName": "Xocəsən qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "B40B1D3A5E394573B8431A2DFC7BE65B",
+     "code": "00105016",
+     "name": "M.Ə.Rəsulzadə",
+     "fullName": "M.Ə.Rəsulzadə qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "530684CA48D94B129EBEB57C180432F7",
+     "code": "00101026",
+     "name": "Sulutəpə",
+     "fullName": "Sulutəpə qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "9891AFD557144242BF2F000431F0201D",
+     "code": "00104016",
+     "name": "28 May",
+     "fullName": "28 May qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "c0a5a545-a47e-47a1-96f0-864602341dce",
+   "code": "01000003",
+   "name": "Xətai",
+   "fullName": "Xətai rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true,
+   "children": [
+    {
+     "id": "B1DA2AD897804925A16717BF1EEC6A79",
+     "code": "01001016",
+     "name": "Əhmədli",
+     "fullName": "Əhmədli qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "338a6914-5a7c-4a8f-a7e9-fd801a81b85f",
+   "code": "00300003",
+   "name": "Xəzər",
+   "fullName": "Xəzər rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": false,
+   "children": [
+    {
+     "id": "E715584BDC614586B7AC4CE5222918ED",
+     "code": "00313016",
+     "name": "Binə",
+     "fullName": "Binə qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "6DD1D841344343178D7FCECCFC6627B6",
+     "code": "00314016",
+     "name": "Buzovna",
+     "fullName": "Buzovna qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "397AD331E1424AF7B9E6346BEB02FA27",
+     "code": "00317016",
+     "name": "Qala",
+     "fullName": "Qala qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "9C959F9779A34D4DBFFA4576EF6264FC",
+     "code": "00318016",
+     "name": "Mərdəkan",
+     "fullName": "Mərdəkan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "B02F71C0C87B4AE08969065197219C64",
+     "code": "00321016",
+     "name": "Şağan",
+     "fullName": "Şağan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "A1DE0B3D79D349DD8956DCB7B73CE2F3",
+     "code": "00322016",
+     "name": "Şüvəlan",
+     "fullName": "Şüvəlan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "B5D42B4BBF6C4B6D8A2DA218E98E7277",
+     "code": "00323016",
+     "name": "Türkan",
+     "fullName": "Türkan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "18EE7346A24C495D802F73D63D201619",
+     "code": "00324016",
+     "name": "Zirə",
+     "fullName": "Zirə qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "7eca806d-2705-4724-8591-b43de5e6c54a",
+   "code": "00200003",
+   "name": "Qaradağ",
+   "fullName": "Qaradağ rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true,
+   "children": [
+    {
+     "id": "222C3F512942459F9B871FCF2B78FACB",
+     "code": "00201026",
+     "name": "Baş Ələt",
+     "fullName": "Baş Ələt qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "80D0A748ABB944F598156FE3C3737F4C",
+     "code": "00205016",
+     "name": "Çeyildağ",
+     "fullName": "Çeyildağ qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "3E3FC0CB0EAB4F5FB15D7740EC0C7553",
+     "code": "00201016",
+     "name": "Ələt",
+     "fullName": "Ələt qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "97B91602943D4B0EA1F0716DE8CF04FA",
+     "code": "00204026",
+     "name": "Heybət",
+     "fullName": "Heybət qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": false
+    },
+    {
+     "id": "56E30DE0EF8B464282478778CE9E9684",
+     "code": "00206016",
+     "name": "Korgöz",
+     "fullName": "Korgöz qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "04E6493C19244BABB59D702D750FAE36",
+     "code": "00201036",
+     "name": "Kotal",
+     "fullName": "Kotal qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "FA3979D29E1B482D9ADD4C545A2F7C03",
+     "code": "00203026",
+     "name": "Qaradağ",
+     "fullName": "Qaradağ qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "453958E0F0B84317B32DD8368F4D686D",
+     "code": "00201076",
+     "name": "Qarakosa",
+     "fullName": "Qarakosa qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "69CE5326E7744CD5BA33B8411C42BA0C",
+     "code": "00202016",
+     "name": "Qızıldaş",
+     "fullName": "Qızıldaş qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "6F21DF735CEE410FB04FDF812F23C751",
+     "code": "00207016",
+     "name": "Qobustan",
+     "fullName": "Qobustan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "B8373F0DEAB94597A9D91ED7E7A3CB84",
+     "code": "00204016",
+     "name": "Lökbatan",
+     "fullName": "Lökbatan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "E7BA4AE8AC8646538CC5200E05348667",
+     "code": "00208016",
+     "name": "Müşviqabad",
+     "fullName": "Müşviqabad qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "FCAA29F830FC4B2BABC225AEF33B5CBA",
+     "code": "00201056",
+     "name": "Pirsaat",
+     "fullName": "Pirsaat qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": false
+    },
+    {
+     "id": "4A9DD7B776824874977C797F89FE24F1",
+     "code": "00209016",
+     "name": "Puta",
+     "fullName": "Puta qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "EE09FBD1531B4EA293BED3EC37A4D874",
+     "code": "00203016",
+     "name": "Sahil",
+     "fullName": "Sahil qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "4E251FFF27B340CC96EA0D0E784CD7B1",
+     "code": "00210016",
+     "name": "Sanqaçal",
+     "fullName": "Sanqaçal qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "3AF3A3AB851741AE81856E792A066177",
+     "code": "00201046",
+     "name": "Şıxlar",
+     "fullName": "Şıxlar qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "7AE138CBBA8D4999A1AA6F3756BB7980",
+     "code": "00202026",
+     "name": "Şonqar",
+     "fullName": "Şonqar qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "0E5AD62DD2B74AAA9864334D4D83B410",
+     "code": "00204036",
+     "name": "Şubanı",
+     "fullName": "Şubanı qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "60C262B2D14741F7B6CDE4631CFAFE51",
+     "code": "00211016",
+     "name": "Ümid",
+     "fullName": "Ümid qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "5DF04A89099C44B8AA2BAAD30CC3A58F",
+     "code": "00201066",
+     "name": "Yeni Ələt",
+     "fullName": "Yeni Ələt qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": false
+    }
+   ]
+  },
+  {
+   "id": "c8f5a125-5717-4982-841a-16d651c7abc0",
+   "code": "00700003",
+   "name": "Nərimanov",
+   "fullName": "Nərimanov rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true
+  },
+  {
+   "id": "1c4c6c3a-35cf-4281-9787-2aaba6b70461",
+   "code": "00800003",
+   "name": "Nəsimi",
+   "fullName": "Nəsimi rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true
+  },
+  {
+   "id": "c844c590-9c7f-4e51-9750-13279774e3b9",
+   "code": "00900003",
+   "name": "Nizami",
+   "fullName": "Nizami rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true,
+   "children": [
+    {
+     "id": "93BCDDBD248D4BBE9F4535E1AE6D86D4",
+     "code": "00901016",
+     "name": "Keşlə",
+     "fullName": "Keşlə qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "6f5c733f-39df-4d81-8c0a-94ccd9c5b239",
+   "code": "01200003",
+   "name": "Pirallahı",
+   "fullName": "Pirallahı rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": false,
+   "children": [
+    {
+     "id": "2E2C44AF9ACF425C9CCD0B7529D92DDF",
+     "code": "01202016",
+     "name": "Çilov",
+     "fullName": "Çilov qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "0A54B99F877F42ABA6AADE89F75541AE",
+     "code": "01204016",
+     "name": "Gürgən",
+     "fullName": "Gürgən qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "7E55186ABC124D9E94902F330E728682",
+     "code": "01203016",
+     "name": "Neft Daşları",
+     "fullName": "Neft Daşları qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": false
+    },
+    {
+     "id": "E52AB19643874357A999339592E0FD0D",
+     "code": "01201016",
+     "name": "Pirallahı",
+     "fullName": "Pirallahı qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "e943a236-59f9-40e2-a451-b6d587fda79e",
+   "code": "00500003",
+   "name": "Sabunçu",
+   "fullName": "Sabunçu rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": false,
+   "children": [
+    {
+     "id": "183a733d-4de1-4932-a16a-7b0457477f84",
+     "code": "00501016",
+     "name": "Bakıxanov",
+     "fullName": "Bakıxanov qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "6110af2f-c06d-4360-a18c-4de63093e990",
+     "code": "00502016",
+     "name": "Balaxanı",
+     "fullName": "Balaxanı qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "a6d68cfe-95e3-41e2-90ae-1e946683fbe5",
+     "code": "00503016",
+     "name": "Bilgəh",
+     "fullName": "Bilgəh qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "de48566b-82a7-4608-a1ec-a8a69f959924",
+     "code": "00504016",
+     "name": "Kürdəxanı",
+     "fullName": "Kürdəxanı qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "9e3064b2-0b26-4a46-a575-6800a7d2d3f6",
+     "code": "00505016",
+     "name": "Maştağa",
+     "fullName": "Maştağa qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "2A176ACBD1314A349DDA055F874A3274",
+     "code": "00506016",
+     "name": "Nardaran",
+     "fullName": "Nardaran qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "643FA3D013FE464BB6326E49077F4C6E",
+     "code": "00507016",
+     "name": "Pirşağı",
+     "fullName": "Pirşağı qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "CC2235873BB14304B312EB79E075E3BF",
+     "code": "00508016",
+     "name": "Ramana",
+     "fullName": "Ramana qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "6E3AB14E526949BE8671F108FD02397A",
+     "code": "00509016",
+     "name": "Sabunçu",
+     "fullName": "Sabunçu qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "45AD9E0487F8469BBCC5568527B9FF39",
+     "code": "00510016",
+     "name": "Zabrat",
+     "fullName": "Zabrat qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "ee8b4254-2c33-4285-bed3-edd8ef9d538c",
+   "code": "00400003",
+   "name": "Səbail",
+   "fullName": "Səbail rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true,
+   "children": [
+    {
+     "id": "6EA8DE198F0F4C3AB928D7E911A43A5F",
+     "code": "00401016",
+     "name": "Badamdar",
+     "fullName": "Badamdar qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "640B62EAA9414F27BFDEA3773089087C",
+     "code": "00402016",
+     "name": "Bibiheybət",
+     "fullName": "Bibiheybət qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "b06f1218-09a1-4400-b498-90014f9753e5",
+   "code": "00600003",
+   "name": "Suraxanı",
+   "fullName": "Suraxanı rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": false,
+   "children": [
+    {
+     "id": "b96b2f2a-34ce-470b-a66e-4ce470c29052",
+     "code": "00601016",
+     "name": "Bülbülə",
+     "fullName": "Bülbülə qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "dff688fd-5b04-4c7a-a32d-033ef6aa0e3f",
+     "code": "00602016",
+     "name": "Əmircan",
+     "fullName": "Əmircan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "f08ae468-c051-49e7-8b1a-0ae741fee045",
+     "code": "00603016",
+     "name": "Hövsan",
+     "fullName": "Hövsan qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "576A42310BF74087B81DBD5F72F8771F",
+     "code": "00604016",
+     "name": "Qaraçuxur",
+     "fullName": "Qaraçuxur qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "4518c7ab-405d-4214-839a-0b6f5c63bb59",
+     "code": "00605016",
+     "name": "Yeni Suraxanı",
+     "fullName": "Yeni Suraxanı qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    },
+    {
+     "id": "4c78430d-be07-4c2e-8c91-cc7d7bf8bcd3",
+     "code": "00606016",
+     "name": "Zığ",
+     "fullName": "Zığ qəsəbəsi",
+     "typeNormative": "qəsəbə",
+     "hasStreet": true
+    }
+   ]
+  },
+  {
+   "id": "a3e5691e-a16e-4b5a-965a-8631d6ca80f4",
+   "code": "01100003",
+   "name": "Yasamal",
+   "fullName": "Yasamal rayonu",
+   "typeNormative": "rayon",
+   "hasStreet": true
+  }
+ ],
+ "Abşeron": [
+  {
+   "id": "409DCB9AC88346CE91B4EA888372BFA3",
+   "code": "30803016",
+   "name": "Aşağı Güzdək",
+   "fullName": "Aşağı Güzdək qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "DDA9742826FD400196AC43C7AECE77D4",
+   "code": "30804016",
+   "name": "Ceyranbatan",
+   "fullName": "Ceyranbatan qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "012014B1967D46A1A78C7C9125AD2296",
+   "code": "30805016",
+   "name": "Digah",
+   "fullName": "Digah qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "30B228067998409AA24AC57E8EBCA2EA",
+   "code": "30806018",
+   "name": "Fatmayı",
+   "fullName": "Fatmayı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "ED0090AF9BA940648B63F649DE6DAAAF",
+   "code": "30807018",
+   "name": "Görədil",
+   "fullName": "Görədil kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "CD13B39ED82E416EB8C6525780FC68F7",
+   "code": "30808016",
+   "name": "Güzdək",
+   "fullName": "Güzdək qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "C6C75E5A5D9541DFBFBC7A2060ABE052",
+   "code": "30809016",
+   "name": "Hökməli",
+   "fullName": "Hökməli qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "3A8345AFA2344157B3E2D205F52FFF82",
+   "code": "30801014",
+   "name": "Xırdalan",
+   "fullName": "Xırdalan şəhəri",
+   "typeNormative": null,
+   "hasStreet": true
+  },
+  {
+   "id": "AA1F7F5DC4F94E628EA899BCEF107EB0",
+   "code": "30810016",
+   "name": "Qobu",
+   "fullName": "Qobu qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "7AA268AF6D10422291F804A4BB5DE599",
+   "code": "30802028",
+   "name": "Qobustan",
+   "fullName": "Qobustan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "39EB1425BBEC4ADDA425EF55BB0C899E",
+   "code": "30811018",
+   "name": "Masazır",
+   "fullName": "Masazır kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "73A2A62F1EAD47C9AC004661BA640AF6",
+   "code": "30812016",
+   "name": "Mehdiabad",
+   "fullName": "Mehdiabad qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "434A2BD2DB624E0DB631CEE7D8816671",
+   "code": "30813018",
+   "name": "Məmmədli",
+   "fullName": "Məmmədli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "64A34981239343DEB82AEEDC6174499E",
+   "code": "30814018",
+   "name": "Novxanı",
+   "fullName": "Novxanı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "73F02E38055241FAA77A9F9EF40EB56A",
+   "code": "30802018",
+   "name": "Pirəkəşkül",
+   "fullName": "Pirəkəşkül kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "27B065F3420248B283E0213A3EBE82A8",
+   "code": "30815016",
+   "name": "Saray",
+   "fullName": "Saray qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "593D69107B3878FCE0636305000AE7C4",
+   "code": "30816016",
+   "name": "Şəfəq",
+   "fullName": "Şəfəq qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  }
+ ],
+ "Sumqayıt": [
+  {
+   "id": "969c947b-d3b5-4965-bef2-0f04ae8988bd",
+   "code": "30902016",
+   "name": "Corat",
+   "fullName": "Corat qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "e0bcce8f-b968-49ac-83ff-1583ea5dca5f",
+   "code": "30903016",
+   "name": "Hacı Zeynalabdin",
+   "fullName": "Hacı Zeynalabdin qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  }
+ ],
+ "Gəncə": [
+  {
+   "id": "7807A5C9F73E46A0B2F3BB0F5B89F182",
+   "code": "20001016",
+   "name": "Cavadxan",
+   "fullName": "Cavadxan qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "05D65F6B8B894D849A374F81243E0E81",
+   "code": "20002016",
+   "name": "Hacıkənd",
+   "fullName": "Hacıkənd qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "EF17FF1FA4814D7F93F550DF7DC56BB5",
+   "code": "20003016",
+   "name": "Məhsəti",
+   "fullName": "Məhsəti qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "987390EB816349EA8E70AD89959C76CC",
+   "code": "20004016",
+   "name": "Natəvan",
+   "fullName": "Natəvan qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "4080E6F51A44442BAEEC62A71A3F7124",
+   "code": "20005016",
+   "name": "Sadıllı",
+   "fullName": "Sadıllı qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "05EA581B58B44B618EE139E3FA534AD3",
+   "code": "20006016",
+   "name": "Şıxzamanlı",
+   "fullName": "Şıxzamanlı qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  }
+ ],
+ "Naxçıvan": [
+  {
+   "id": "26256A2404974D9DE0636405000A902E",
+   "code": "10403028",
+   "name": "Bulqan",
+   "fullName": "Bulqan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": false
+  },
+  {
+   "id": "DC0CB24845B54D7FA44347444D1A7C97",
+   "code": "10402016",
+   "name": "Əliabad",
+   "fullName": "Əliabad qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "CC0A9D828C074B74B16FCC1834BA782B",
+   "code": "10405028",
+   "name": "Hacıniyyət",
+   "fullName": "Hacıniyyət kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "26256A2404964D9DE0636405000A902E",
+   "code": "10403018",
+   "name": "Qaraçuq",
+   "fullName": "Qaraçuq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": false
+  },
+  {
+   "id": "D3F38076A96C49F182A8C5359739F9E8",
+   "code": "10404018",
+   "name": "Qaraxanbəyli",
+   "fullName": "Qaraxanbəyli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": false
+  },
+  {
+   "id": "26256A2404984D9DE0636405000A902E",
+   "code": "10405018",
+   "name": "Tumbul",
+   "fullName": "Tumbul kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  }
+ ],
+ "Mingəçevir": [],
+ "Şirvan": [
+  {
+   "id": "7B05BB17073F4E0FBDBD0A565C7F8B35",
+   "code": "91102016",
+   "name": "Bayramlı",
+   "fullName": "Bayramlı qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "605327E55E884472A52CD428AF4E4212",
+   "code": "91103016",
+   "name": "Hacıqəhrəmanlı",
+   "fullName": "Hacıqəhrəmanlı qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  }
+ ],
+ "Lənkəran": [
+  {
+   "id": "C6E41783B296441AB4E232E13CF63518",
+   "code": "80225028",
+   "name": "Aşağı Apu",
+   "fullName": "Aşağı Apu kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": false
+  },
+  {
+   "id": "83B49C7E9573480597DFAB2EBF80F404",
+   "code": "80204016",
+   "name": "Aşağı Nüvədi",
+   "fullName": "Aşağı Nüvədi qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "611A8D207573472489E13D1D2F98F41A",
+   "code": "80239028",
+   "name": "Bala Şürük",
+   "fullName": "Bala Şürük kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "474B51C1EA8746AC8A8ADC35123EFC25",
+   "code": "80236016",
+   "name": "Balıqçılar",
+   "fullName": "Balıqçılar qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "BE50CC0285E244228926CA1DE3A3AAE7",
+   "code": "80223028",
+   "name": "Ballabur",
+   "fullName": "Ballabur kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "BA557901A1324794BC16CAC47B260DD7",
+   "code": "80243018",
+   "name": "Bəliton",
+   "fullName": "Bəliton kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "28B651CB32C14FB2A2B968EC8E9AE796",
+   "code": "80208018",
+   "name": "Biləsər",
+   "fullName": "Biləsər kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "7DAB46C179D246AA8928A9E21C8FEDE2",
+   "code": "80227018",
+   "name": "Boladı",
+   "fullName": "Boladı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "086609C87D4641498AA01A9F78C7FE0C",
+   "code": "80225058",
+   "name": "Bürcəli",
+   "fullName": "Bürcəli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "3DD170492718472F951BAE0B6764FD1E",
+   "code": "80224028",
+   "name": "Cil",
+   "fullName": "Cil kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "096F9C4DEF7546EF84B8D479E4051748",
+   "code": "80212038",
+   "name": "Darquba",
+   "fullName": "Darquba kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C2AB1A342A514686AF4E3FB10FE60952",
+   "code": "80214028",
+   "name": "Daşdalıqcar",
+   "fullName": "Daşdalıqcar kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "14552DFB00B343F7A058BDA8F68BC586",
+   "code": "80225038",
+   "name": "Daştatük",
+   "fullName": "Daştatük kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "F33CE6870BE74A2EA170A9A3EF8B83F0",
+   "code": "80209028",
+   "name": "Dıryan",
+   "fullName": "Dıryan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4AE33A01825944E98480235DAE8C6A8D",
+   "code": "80213028",
+   "name": "Digah",
+   "fullName": "Digah kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4DEC591A7FE8473980BC262440604C00",
+   "code": "80208028",
+   "name": "Ələzəpin",
+   "fullName": "Ələzəpin kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "23CE038F1D924687B4895660F2896D7D",
+   "code": "80217058",
+   "name": "Əşlə",
+   "fullName": "Əşlə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "51F47E6EAE184463AEB88D683F0C0EED",
+   "code": "80209018",
+   "name": "Gəgiran",
+   "fullName": "Gəgiran kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C8E8D095DD174A5681C8645437083AC0",
+   "code": "80206016",
+   "name": "Gərmətük",
+   "fullName": "Gərmətük qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "DC68D456A423462C989033FE722C4F36",
+   "code": "80228018",
+   "name": "Girdəni",
+   "fullName": "Girdəni kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "CA72ACF6BE6C443A9AC434260B714DE9",
+   "code": "80215018",
+   "name": "Göyşaban",
+   "fullName": "Göyşaban kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "E096E44F2BB744C282D37D45DFB15845",
+   "code": "80211018",
+   "name": "Günəhir",
+   "fullName": "Günəhir kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "F7C4B07206D3444FB0C8B4401637E143",
+   "code": "80216068",
+   "name": "Haftaruon",
+   "fullName": "Haftaruon kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "71BC1DF6574047F8AC28EA9E1260FF83",
+   "code": "80205016",
+   "name": "Haftoni",
+   "fullName": "Haftoni qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "73DEF02712A946D687059EC0132A13BE",
+   "code": "80229018",
+   "name": "Havzova",
+   "fullName": "Havzova kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "0B4FEE4130B049E4ADF7E5FACB5D9CEE",
+   "code": "80203016",
+   "name": "Hirkan",
+   "fullName": "Hirkan qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "38E8E2C72B4B4E169C1474B180C8F80C",
+   "code": "80243028",
+   "name": "Horavenc",
+   "fullName": "Horavenc kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B3C45C743E994488BC2CE7898A428667",
+   "code": "80225018",
+   "name": "Xanbulan",
+   "fullName": "Xanbulan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "22904BDF27084032B900597A2724C195",
+   "code": "80205048",
+   "name": "Xanlıqlı",
+   "fullName": "Xanlıqlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "6714DA151A0C43ED8764922099124BC1",
+   "code": "80224038",
+   "name": "Xarxatan",
+   "fullName": "Xarxatan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "524F88304A1744A4936E5EBC8781E3C1",
+   "code": "80222018",
+   "name": "Xolmili",
+   "fullName": "Xolmili kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "E3D986DB728041F7A80E9F892A5754DD",
+   "code": "80230016",
+   "name": "İstisu",
+   "fullName": "İstisu qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "934E5D4E3EA84EA0A9B26BC7AA727236",
+   "code": "80209058",
+   "name": "Jidi",
+   "fullName": "Jidi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "317219DA7D5F44D299DAFB1BDACA12C8",
+   "code": "80238018",
+   "name": "Kənarmeşə",
+   "fullName": "Kənarmeşə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "0AC1C8D0DA4143808F8ED3D0C34C0E1B",
+   "code": "80212018",
+   "name": "Kərgəlan",
+   "fullName": "Kərgəlan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "51722B0329DA4AD0A2EAE6C312DC3828",
+   "code": "80239018",
+   "name": "Kosalar",
+   "fullName": "Kosalar kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A7958847E8D34F15A877A1C7B427BB6C",
+   "code": "80244028",
+   "name": "Köhnə Gəgir",
+   "fullName": "Köhnə Gəgir kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "AD26260D2BA44904931665B6A8BFA401",
+   "code": "80204058",
+   "name": "Küvənil",
+   "fullName": "Küvənil kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A2894D9662D048859034E18B6086F9D4",
+   "code": "80211058",
+   "name": "Qodəsə",
+   "fullName": "Qodəsə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "F870FBA74E134877931DE605DF25AF97",
+   "code": "80226028",
+   "name": "Qumbaşı",
+   "fullName": "Qumbaşı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "286182BFCD0E4E3C92B5ABFA23533D0D",
+   "code": "80242018",
+   "name": "Qurumba",
+   "fullName": "Qurumba kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "E8A29D008C484A8A8C3840A1E12C4751",
+   "code": "80237018",
+   "name": "Ləj",
+   "fullName": "Ləj kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "63B03CCACCEA4815B3DF5650E4405877",
+   "code": "80226014",
+   "name": "Liman",
+   "fullName": "Liman şəhəri",
+   "typeNormative": null,
+   "hasStreet": true
+  },
+  {
+   "id": "26DF29B877F4489A8F4008AE7FA37C3E",
+   "code": "80212028",
+   "name": "Lüvəsər",
+   "fullName": "Lüvəsər kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "3EDB1C196F9642A695662487A9D96FE8",
+   "code": "80214018",
+   "name": "Mamusta",
+   "fullName": "Mamusta kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "32A6AE88F84E4BEFABA0911A2B93818B",
+   "code": "80218038",
+   "name": "Mikolan",
+   "fullName": "Mikolan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "821F53351AF14A73B3EF08D292C9DE9D",
+   "code": "80219048",
+   "name": "Moğonojoba",
+   "fullName": "Moğonojoba kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C8E8F9172E194751BBA281D49044F614",
+   "code": "80217028",
+   "name": "Mollakənd",
+   "fullName": "Mollakənd kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "7689D10E96704CD0A9E81D5A8AE09FF6",
+   "code": "80216058",
+   "name": "Moloja",
+   "fullName": "Moloja kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "34F70713DD73409C9F72F108133F4CB5",
+   "code": "80242028",
+   "name": "Narbağı",
+   "fullName": "Narbağı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "6CD89FC901844BB5AF5F154AE4DF64E7",
+   "code": "80207016",
+   "name": "Nərimanabad",
+   "fullName": "Nərimanabad qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "23558B47A76542FFA0A0FAD16B490EDC",
+   "code": "80216018",
+   "name": "Osakücə",
+   "fullName": "Osakücə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A47EFABCEA1A4F639B9A0E7BA352B46B",
+   "code": "80216028",
+   "name": "Pambəyi",
+   "fullName": "Pambəyi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "20F45238C7D646EFB79290D17D4004B5",
+   "code": "80203058",
+   "name": "Parakənd",
+   "fullName": "Parakənd kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "D91DCE66EF564AD19D44D839579DB891",
+   "code": "80225048",
+   "name": "Rəzvan",
+   "fullName": "Rəzvan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "1209C89CE65B4F80B96DCA2250B6B6DD",
+   "code": "80217018",
+   "name": "Rvo",
+   "fullName": "Rvo kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "F5BD0CD200DB4A6088A60169BD7A8F82",
+   "code": "80208068",
+   "name": "Seliqavol",
+   "fullName": "Seliqavol kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "ECCCF4B6156E4B8C80EE3AA7136D88BA",
+   "code": "80220018",
+   "name": "Separadi",
+   "fullName": "Separadi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B4C9068F1C5F47D29BF1DFE448F596B6",
+   "code": "80238028",
+   "name": "Seyidəkəran",
+   "fullName": "Seyidəkəran kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "09B6B4EFDB6B4FD6942CCC2575A64895",
+   "code": "80212048",
+   "name": "Səbir",
+   "fullName": "Səbir kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "387450CA89664409BB4168D14412FB8B",
+   "code": "80218018",
+   "name": "Səpnəkəran",
+   "fullName": "Səpnəkəran kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "065401500BC94AD6813BBC27AB063FD4",
+   "code": "80225068",
+   "name": "Sərinbulaq",
+   "fullName": "Sərinbulaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "D24C7AE70C524376AAD2409D2933FB62",
+   "code": "80216048",
+   "name": "Sinovli",
+   "fullName": "Sinovli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "F312079B9A284DC0A6F72F398A044E78",
+   "code": "80241038",
+   "name": "Siyablı",
+   "fullName": "Siyablı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "32D30D8BA5BE45AC86F1A153E68AA9FC",
+   "code": "80221018",
+   "name": "Siyavar",
+   "fullName": "Siyavar kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "7B94F5A3CC3D409DB3FE856D9642B3E7",
+   "code": "80231018",
+   "name": "Sütəmurdov",
+   "fullName": "Sütəmurdov kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "3C68F56F26E34D90BAFB3625746B0BFD",
+   "code": "80223018",
+   "name": "Şağlakücə",
+   "fullName": "Şağlakücə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "584C4CE22A694A089D3A9031262E8CC0",
+   "code": "80224018",
+   "name": "Şağlaser",
+   "fullName": "Şağlaser kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "DA0732844E82440E9D42BE267E01BF9F",
+   "code": "80240018",
+   "name": "Şıxakəran",
+   "fullName": "Şıxakəran kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "2CF5EA081F2148A8B32C635EE739234A",
+   "code": "80213018",
+   "name": "Şiləvar",
+   "fullName": "Şiləvar kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "757F26B5F5E94D08B89DA9C52AFA7B2D",
+   "code": "80238038",
+   "name": "Şilim",
+   "fullName": "Şilim kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "2547BA9E371F4C16AE433F8599CE6BC7",
+   "code": "80226036",
+   "name": "Şirinsu",
+   "fullName": "Şirinsu qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "921CF6B7AF984349A226A3DA41487C3F",
+   "code": "80243038",
+   "name": "Şivlik",
+   "fullName": "Şivlik kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "213435FA48754B0C86A2AF11430A722D",
+   "code": "80241018",
+   "name": "Şovu",
+   "fullName": "Şovu kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "F55DFA330222479490E7851F9526C360",
+   "code": "80219018",
+   "name": "Şürük",
+   "fullName": "Şürük kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "D90AD123E4D14F28898F1C1B011F005B",
+   "code": "80205038",
+   "name": "Talışlı",
+   "fullName": "Talışlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "28C438396AE848748B23FA564D2D36D5",
+   "code": "80216038",
+   "name": "Tatoba",
+   "fullName": "Tatoba kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "767D0253A5C940FFA4D331C96C3E01B2",
+   "code": "80241028",
+   "name": "Təngivan",
+   "fullName": "Təngivan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "EC466CEBFAC244F0B0F9B2930385D746",
+   "code": "80244018",
+   "name": "Tuado",
+   "fullName": "Tuado kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "E8CE5452914C4C7F86C7F45A8A5D3A99",
+   "code": "80220038",
+   "name": "Tükəvilə",
+   "fullName": "Tükəvilə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B57248BBE218499C935F5CA30AB27F6B",
+   "code": "80219028",
+   "name": "Türkəkəran",
+   "fullName": "Türkəkəran kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "843580A5F113495696C7542A8303D675",
+   "code": "80211038",
+   "name": "Türkəncil",
+   "fullName": "Türkəncil kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "FFF7A0F4693D4DC98DE4D795D282CF8F",
+   "code": "80219038",
+   "name": "Tütəpeştə",
+   "fullName": "Tütəpeştə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "F737C9DC948B4BB49D9E262B7619DEE0",
+   "code": "80215028",
+   "name": "Ürgə",
+   "fullName": "Ürgə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "109401DA185543D5918567EA4350F937",
+   "code": "80221028",
+   "name": "Vel",
+   "fullName": "Vel kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "343A09E1869F449A9D76C975F9E75026",
+   "code": "80206048",
+   "name": "Velədi",
+   "fullName": "Velədi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B4A5BD673CC642DFAA98D110C42FB7C9",
+   "code": "80208078",
+   "name": "Vıy",
+   "fullName": "Vıy kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "510EA8A3A2B74EED99C60A3CFE23905B",
+   "code": "80232018",
+   "name": "Vilvan",
+   "fullName": "Vilvan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C009241E6A5F40E3A9CC789F00F87C02",
+   "code": "80233018",
+   "name": "Viravul",
+   "fullName": "Viravul kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "737B779FBF314829B90950A6690B20EA",
+   "code": "80234018",
+   "name": "Viyən",
+   "fullName": "Viyən kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4B5402A45DD9480D986DC14521986899",
+   "code": "80218028",
+   "name": "Yuxarı Nüvədi",
+   "fullName": "Yuxarı Nüvədi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "3AE8032057E54017A284593A3BE02B73",
+   "code": "80235018",
+   "name": "Zövlə",
+   "fullName": "Zövlə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  }
+ ],
+ "Şəki": [
+  {
+   "id": "A45F16B06C014442BD3EF5175F27ED7A",
+   "code": "40404048",
+   "name": "Abbas",
+   "fullName": "Abbas kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "03DAE141FC65444598447C0AEF2A9ACA",
+   "code": "40417028",
+   "name": "Aran",
+   "fullName": "Aran kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "BF8CF71B267B42C783829BA14DEF5636",
+   "code": "40403048",
+   "name": "Aşağı Daşağıl",
+   "fullName": "Aşağı Daşağıl kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "D35595172DC84305B4A8ADB7050938A1",
+   "code": "40404018",
+   "name": "Aşağı Göynük",
+   "fullName": "Aşağı Göynük kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "EA3FC7F99FBF4CF7974446EE7C826DDF",
+   "code": "40418028",
+   "name": "Aşağı Kəldək",
+   "fullName": "Aşağı Kəldək kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "92B691515DE943DAAB31AB46819C56C4",
+   "code": "40405018",
+   "name": "Aşağı Küngüt",
+   "fullName": "Aşağı Küngüt kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "CE963DDB82AD43988B52BFF83E33A8AB",
+   "code": "40404038",
+   "name": "Aşağı Layısqı",
+   "fullName": "Aşağı Layısqı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "1CC9D017B71048A3971474A09B3429AC",
+   "code": "40415038",
+   "name": "Aşağı Şabalıd",
+   "fullName": "Aşağı Şabalıd kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "DD926A45D1624E1F809F9304ADAEAC27",
+   "code": "40403018",
+   "name": "Aydınbulaq",
+   "fullName": "Aydınbulaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "627D56BAB6CA4C10B7403F8A11356EC7",
+   "code": "40425028",
+   "name": "Babaratma",
+   "fullName": "Babaratma kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "DB8C88D7276D4C16969EE5EFDBAECBB8",
+   "code": "40419028",
+   "name": "Baqqal",
+   "fullName": "Baqqal kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4BF54373EAA04BA18E95163C8E406C97",
+   "code": "40426018",
+   "name": "Baltalı",
+   "fullName": "Baltalı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4637ADB7BF17486F83EDD448DE36957D",
+   "code": "40406018",
+   "name": "Baş Göynük",
+   "fullName": "Baş Göynük kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "626E43DB88FB4D46B850A9B5D9314B3F",
+   "code": "40418018",
+   "name": "Baş Kəldək",
+   "fullName": "Baş Kəldək kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B03448E7B51B4F21804D1BD360DBA678",
+   "code": "40408018",
+   "name": "Baş Küngüt",
+   "fullName": "Baş Küngüt kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "224CAD2BC93844CEB7E7E161F69E13E3",
+   "code": "40409018",
+   "name": "Baş Layısqı",
+   "fullName": "Baş Layısqı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "90DC2057F5CC42E3806557DB61B7B034",
+   "code": "40406028",
+   "name": "Baş Şabalıd",
+   "fullName": "Baş Şabalıd kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "FCC19718F33645A38BA3710FC8A3BE7C",
+   "code": "40407018",
+   "name": "Baş Zəyzid",
+   "fullName": "Baş Zəyzid kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "8E23681C8A6746819089B149D4DC013A",
+   "code": "40408028",
+   "name": "Bideyiz",
+   "fullName": "Bideyiz kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "BDC19A2B6E3A4F7CB7224F49930D87AA",
+   "code": "40419018",
+   "name": "Birinci Biləcik",
+   "fullName": "Birinci Biləcik kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "D8EF722E6DFE4F718833235E175B20F0",
+   "code": "40420018",
+   "name": "Bolludərə",
+   "fullName": "Bolludərə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "3BDE9BDF8B5648F39BAA66180A474328",
+   "code": "40427018",
+   "name": "Böyük Dəhnə",
+   "fullName": "Böyük Dəhnə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C28A98153C2A46149DCAB213EB9D6B79",
+   "code": "40411018",
+   "name": "Cəfərabad",
+   "fullName": "Cəfərabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "573046B1811245639216C11CB56549AE",
+   "code": "40412018",
+   "name": "Cəyirli",
+   "fullName": "Cəyirli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "737EE9EB1434483989D143767266C86B",
+   "code": "40428018",
+   "name": "Cumakənd",
+   "fullName": "Cumakənd kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "8A6DA096526645509BEF0680D30C8B32",
+   "code": "40409028",
+   "name": "Cunud",
+   "fullName": "Cunud kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "FC39A3EF9A9140C4A67C265B999FCCF5",
+   "code": "40405048",
+   "name": "Çapağan",
+   "fullName": "Çapağan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C18D9573435643DEA4A7738FB5552F68",
+   "code": "40402058",
+   "name": "Çayqaraqoyunlu",
+   "fullName": "Çayqaraqoyunlu kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "320AA2B02CBA49FF8F9749B0EE516389",
+   "code": "40421018",
+   "name": "Çeşməli",
+   "fullName": "Çeşməli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "8DB476E849404433B710952DB38F881D",
+   "code": "40410036",
+   "name": "Çələbixan",
+   "fullName": "Çələbixan qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "F8BBB1E70E6E4B87BB553234C9FF8F9D",
+   "code": "40411058",
+   "name": "Çolaqlı",
+   "fullName": "Çolaqlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A8F490FCE5E6450EB79C2D77C417F51D",
+   "code": "40410028",
+   "name": "Daşbulaq",
+   "fullName": "Daşbulaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "02DA36D4E40E4440882484343CC91440",
+   "code": "40410018",
+   "name": "Daşüz",
+   "fullName": "Daşüz kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A059F9C12E3842E696884BE3303D3E0C",
+   "code": "40416028",
+   "name": "Dərəcənnət",
+   "fullName": "Dərəcənnət kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "95137ADE996C46B281569F266045E2F3",
+   "code": "40403028",
+   "name": "Əliyar",
+   "fullName": "Əliyar kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C6779E85173E4A15A99320A514E47D5C",
+   "code": "40422028",
+   "name": "Fazıl",
+   "fullName": "Fazıl kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "38C1D8C5EE5C436AB0917FFE83B3B701",
+   "code": "40411048",
+   "name": "Göybulaq",
+   "fullName": "Göybulaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "D627D56DC8E84450B47CEC381AB32EDE",
+   "code": "40422018",
+   "name": "İbrahimkənd",
+   "fullName": "İbrahimkənd kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A97369885DC541F9B69D02BECA1B8D70",
+   "code": "40419038",
+   "name": "İkinci Biləcik",
+   "fullName": "İkinci Biləcik kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4E87685844C045EE82D1D5E19EA90C98",
+   "code": "40415018",
+   "name": "İnçə",
+   "fullName": "İnçə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "949AAE5DF2C24DB5A249BC08BB41BC95",
+   "code": "40411038",
+   "name": "Kəhrizoba",
+   "fullName": "Kəhrizoba kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": false
+  },
+  {
+   "id": "A90C3E7D78CA425488182A8CD3C48C9E",
+   "code": "40429018",
+   "name": "Kiçik Dəhnə",
+   "fullName": "Kiçik Dəhnə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "91E88737E1E64669824D9A6349A278CD",
+   "code": "40430018",
+   "name": "Kiş",
+   "fullName": "Kiş kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C7A3A2307B6547638341CB3316315C2E",
+   "code": "40423028",
+   "name": "Kosalı",
+   "fullName": "Kosalı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "775600477FEA4293BE8CE813FDE0571C",
+   "code": "40414028",
+   "name": "Köbər Zəyzid",
+   "fullName": "Köbər Zəyzid kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "36457E7B0BC34B1BB113DB4EF0D0B63B",
+   "code": "40404028",
+   "name": "Köndələn",
+   "fullName": "Köndələn kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "6608517489234CD1B703EE26AEAA62D9",
+   "code": "40423018",
+   "name": "Küdürlü",
+   "fullName": "Küdürlü kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B870E112CAFA4D5DBB7F2D99D88D5BF0",
+   "code": "40425038",
+   "name": "Qaradağlı",
+   "fullName": "Qaradağlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "62D3D8F9A3004A418B2845734B5B6D00",
+   "code": "40420028",
+   "name": "Qaratorpaq",
+   "fullName": "Qaratorpaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "0F197E6A0D754062B9C3D4E593EAADE1",
+   "code": "40424018",
+   "name": "Qayabaşı",
+   "fullName": "Qayabaşı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C6571DD1087442EFAB604EC64FC9F938",
+   "code": "40414038",
+   "name": "Qırxbulaq",
+   "fullName": "Qırxbulaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4AA7E2EEF6A84006B009D57959F7D38B",
+   "code": "40423038",
+   "name": "Qızılarx",
+   "fullName": "Qızılarx kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "322EA7A3C79A4FA18045E6A41E090C54",
+   "code": "40431018",
+   "name": "Qoxmuq",
+   "fullName": "Qoxmuq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "DAFD340E84924250A1E5FE341E837D30",
+   "code": "40412028",
+   "name": "Qozlubulaq",
+   "fullName": "Qozlubulaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "89D6439F3E364496B40F32273221F32A",
+   "code": "40425018",
+   "name": "Qudula",
+   "fullName": "Qudula kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "672B1330873A41E4A0C3CCBA9F4E60BD",
+   "code": "40409048",
+   "name": "Qumux",
+   "fullName": "Qumux kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "300D77B8B9C248B4B9D64F790D177D85",
+   "code": "40432018",
+   "name": "Oxud",
+   "fullName": "Oxud kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "7C7CDD928F174B87B400EBE51F89EA35",
+   "code": "40418038",
+   "name": "Oraban",
+   "fullName": "Oraban kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "776E3323F3434BC89B55CDDE24D77AC4",
+   "code": "40414018",
+   "name": "Orta Zəyzid",
+   "fullName": "Orta Zəyzid kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A4E4181E494348629E5A67445DB2D73F",
+   "code": "40421028",
+   "name": "Öryət",
+   "fullName": "Öryət kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "3EC1FBC07EC549F9B8FE7DBBABA06B73",
+   "code": "40424028",
+   "name": "Sarıca",
+   "fullName": "Sarıca kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C15830786FA64866933128478A019E28",
+   "code": "40416018",
+   "name": "Suçma",
+   "fullName": "Suçma kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "8A0D6BBBD1624F9A9CA2C037F6114E79",
+   "code": "40417018",
+   "name": "Şəki",
+   "fullName": "Şəki kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C74D222722834850BDE11B96093EDD2A",
+   "code": "40409038",
+   "name": "Şin",
+   "fullName": "Şin kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "04472326E4D34B74A73D625CCFD76121",
+   "code": "40433018",
+   "name": "Şirinbulaq",
+   "fullName": "Şirinbulaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "45CCB975443A4C80B5F303AE4CD82CFD",
+   "code": "40434018",
+   "name": "Şorsu",
+   "fullName": "Şorsu kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "A09ECBBF337C43B3AD9D628C2E1AD3E2",
+   "code": "40411028",
+   "name": "Təpəcənnət",
+   "fullName": "Təpəcənnət kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "7CD77552B9AC44BFACA1DCE0429C4797",
+   "code": "40402016",
+   "name": "Turan",
+   "fullName": "Turan qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "ED5A4D522C974ADEA934EAD313A38B98",
+   "code": "40407028",
+   "name": "Vərəzət",
+   "fullName": "Vərəzət kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "9963A2E934A5437E9F7CAA6D9EB44157",
+   "code": "40415028",
+   "name": "Zunud",
+   "fullName": "Zunud kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  }
+ ],
+ "Yevlax": [
+  {
+   "id": "E65234F1098E4672AB6A6F2FA6D9DF7B",
+   "code": "90116028",
+   "name": "Ağqıraqlı",
+   "fullName": "Ağqıraqlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "0B4AC41933A64728B9ECC0D8F93A6B82",
+   "code": "90118016",
+   "name": "Aran",
+   "fullName": "Aran qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "0EFF5418C3534203841900B7CB6F77D5",
+   "code": "90102018",
+   "name": "Aşağı Bucaq",
+   "fullName": "Aşağı Bucaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "41CC3192928F4F1F91FAD9FDA999C15D",
+   "code": "90114028",
+   "name": "Aşağı Qarxun",
+   "fullName": "Aşağı Qarxun kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "554EE32489654C1CA4AEB4DE1F2903F1",
+   "code": "90103018",
+   "name": "Aşağı Salamabad",
+   "fullName": "Aşağı Salamabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "51E453FB4ADC4E74A43246427097BC7E",
+   "code": "90116018",
+   "name": "Balçılı",
+   "fullName": "Balçılı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "FEE1CB2E49494B1DA7AD25834082485A",
+   "code": "90102048",
+   "name": "Bəydili",
+   "fullName": "Bəydili kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "DCFEE3B7CD33408C8AECC262E0C12F74",
+   "code": "90110028",
+   "name": "Boşçalı",
+   "fullName": "Boşçalı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "37774A1674214A929F98B43DA5FBC9F6",
+   "code": "90104048",
+   "name": "Cırdaxan",
+   "fullName": "Cırdaxan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "935B874ECB4644FAB0B5702578D07211",
+   "code": "90107048",
+   "name": "Dəlləklər",
+   "fullName": "Dəlləklər kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "302C7EE0C35743D5A652105AF1F7CD46",
+   "code": "90109036",
+   "name": "Duzdağ",
+   "fullName": "Duzdağ qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "BE4FAB1E6D2441C69C7AACE027A94C77",
+   "code": "90103028",
+   "name": "Əcəmi",
+   "fullName": "Əcəmi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "12612A82B7B5497DBC4722875BD90E4D",
+   "code": "90105028",
+   "name": "Əxşam",
+   "fullName": "Əxşam kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "2BDE3472D1FA498580D7E7730D6E8F55",
+   "code": "90117018",
+   "name": "Ərəbbəsrə",
+   "fullName": "Ərəbbəsrə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C66113889F534E5AB5EEF1BCE409C1CA",
+   "code": "90113018",
+   "name": "Ərəş",
+   "fullName": "Ərəş kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "EEA88E3D76AD48928E4BB68E59E100B8",
+   "code": "90107038",
+   "name": "Göyük",
+   "fullName": "Göyük kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "DAAC9F10FE8841A6AE3ED685032FB926",
+   "code": "90102058",
+   "name": "Gülövşə",
+   "fullName": "Gülövşə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "EE82D36375524551B62EEA6B0FC58DE1",
+   "code": "90107058",
+   "name": "Hacımahmudlu",
+   "fullName": "Hacımahmudlu kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "370BEE5F875143C3BE4488CBA5C743DF",
+   "code": "90105038",
+   "name": "Hacıselli",
+   "fullName": "Hacıselli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "507F132FF830451392B2817B12451942",
+   "code": "90105018",
+   "name": "Havarlı",
+   "fullName": "Havarlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "5079B55CBB3D42E2AA065D33FDA3B146",
+   "code": "90110038",
+   "name": "Hürüuşağı",
+   "fullName": "Hürüuşağı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "DB52A4C0B5A944A7AC832F334210C1D9",
+   "code": "90111018",
+   "name": "Xaldan",
+   "fullName": "Xaldan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "E9B55891D3B24C718F1192EAAB478B40",
+   "code": "90117028",
+   "name": "Xanabad",
+   "fullName": "Xanabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "5D5259E279724A7C96E6674032C31321",
+   "code": "90112048",
+   "name": "İsmayılabad",
+   "fullName": "İsmayılabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "87AB40A618854CE4A1F574DA5FE50485",
+   "code": "90115028",
+   "name": "Kolanı",
+   "fullName": "Kolanı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "ED832B563D7544AB97BC915F3545AB2E",
+   "code": "90115018",
+   "name": "Kövər",
+   "fullName": "Kövər kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "FFC98D91B65841F49F4C09B48F1A0624",
+   "code": "90107018",
+   "name": "Qaramanlı",
+   "fullName": "Qaramanlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4F7D7AC1440741AF98593D6B5D208295",
+   "code": "90106018",
+   "name": "Qaraməmmədli",
+   "fullName": "Qaraməmmədli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "4A84A262741D47A7A437ACB3C45EFA22",
+   "code": "90103038",
+   "name": "Qaraoğlan",
+   "fullName": "Qaraoğlan kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "FCCB4BF4943C4BC895A74429620454B5",
+   "code": "90119018",
+   "name": "Qoyunbinəsi",
+   "fullName": "Qoyunbinəsi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "D2599681EA3D4399A2D8D25C99D9A595",
+   "code": "90111028",
+   "name": "Quşçu",
+   "fullName": "Quşçu kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "907B0485CDA34277AC6EDE5EDB8FB20E",
+   "code": "90120018",
+   "name": "Malbinəsi",
+   "fullName": "Malbinəsi kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "E49C87ED659F4F23A8EE1895DC99C3E2",
+   "code": "90105048",
+   "name": "Marzılı",
+   "fullName": "Marzılı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "C4D1B5512E4D45CABE8488E3AF0B9851",
+   "code": "90113026",
+   "name": "Meyvəli",
+   "fullName": "Meyvəli qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  },
+  {
+   "id": "C9A048274E594F76B117F4BEB5C8607A",
+   "code": "90109018",
+   "name": "Nemətabad",
+   "fullName": "Nemətabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "07170B0715CF4790936A3737158C4ACC",
+   "code": "90107028",
+   "name": "Nəmirli",
+   "fullName": "Nəmirli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B80B6B887A7E4928A2EB64EBF34A6B4E",
+   "code": "90112028",
+   "name": "Nərimanabad",
+   "fullName": "Nərimanabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "8F83D7858FB7487E811759DFA0EEB143",
+   "code": "90107068",
+   "name": "Nurallar",
+   "fullName": "Nurallar kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "27C49D1BB3C345448FA62745D0CDBF08",
+   "code": "90106028",
+   "name": "Rüstəmli",
+   "fullName": "Rüstəmli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "BC6D91C83FBE41798B18BACEC9D49D4D",
+   "code": "90121018",
+   "name": "Salahlı",
+   "fullName": "Salahlı kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B2772297F24D48C78AF283689E13B3A2",
+   "code": "90112018",
+   "name": "Səmədabad",
+   "fullName": "Səmədabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "9298B73DCF3D4F68863039C19A7D6BAB",
+   "code": "90110018",
+   "name": "Tanrıqulular",
+   "fullName": "Tanrıqulular kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "7C5ABB89E45347838FFD2FE4A5DBCB74",
+   "code": "90104018",
+   "name": "Varvara",
+   "fullName": "Varvara kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "98FCDADD85944E88970CF42F1654BA4A",
+   "code": "90109028",
+   "name": "Yaldili",
+   "fullName": "Yaldili kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "973B842197E7461EB43638E69DA679EA",
+   "code": "90112038",
+   "name": "Yeni Çobankərə",
+   "fullName": "Yeni Çobankərə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "8AAF48EBE5AE4D05808070ADBC961FFF",
+   "code": "90102038",
+   "name": "Yenicə",
+   "fullName": "Yenicə kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "54A805AF792C4F6BA7BB4A3E0351A753",
+   "code": "90102028",
+   "name": "Yuxarı Bucaq",
+   "fullName": "Yuxarı Bucaq kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "E7D24F53B06E43BD96829D5EF46B060C",
+   "code": "90114018",
+   "name": "Yuxarı Qarxun",
+   "fullName": "Yuxarı Qarxun kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "54513BCF155C4CF99D2E6FB4C6FFA01D",
+   "code": "90111038",
+   "name": "Yuxarı Salamabad",
+   "fullName": "Yuxarı Salamabad kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  }
+ ],
+ "Naftalan": [
+  {
+   "id": "7CC2D8D783854BD8965C6348035495B6",
+   "code": "51001028",
+   "name": "Qasımbəyli",
+   "fullName": "Qasımbəyli kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  },
+  {
+   "id": "B0B2FEC7B99C40D7B602D10A8E726CD0",
+   "code": "51001018",
+   "name": "Qaşaltı Qaraqoyunlu",
+   "fullName": "Qaşaltı Qaraqoyunlu kəndi",
+   "typeNormative": "kənd",
+   "hasStreet": true
+  }
+ ],
+ "Xankəndi": [
+  {
+   "id": "0CEA104AF33344B0A9AAD1C7D0B0C97C",
+   "code": "70402016",
+   "name": "Kərkicahan",
+   "fullName": "Kərkicahan qəsəbəsi",
+   "typeNormative": "qəsəbə",
+   "hasStreet": true
+  }
+ ]
+}
