@@ -31,6 +31,7 @@ export default async function NewPropertyPage() {
     cities: sourceOptions.cities.map((item) => localizeLocation(item, locale)),
     districts: sourceOptions.districts.map((item) => localizeLocation(item, locale)),
     metros: sourceOptions.metros.map((item) => localizeLocation(item, locale)),
+    landmarks: sourceOptions.landmarks.map((item) => localizeLocation(item, locale)),
     features: sourceOptions.features.map((item) => localizeKnownContent("feature", item, locale)),
   };
 

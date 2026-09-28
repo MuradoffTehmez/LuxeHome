@@ -19,6 +19,7 @@ const CHIP_FIELDS: Record<string, FilterField[]> = {
   seher: ["citySlug"],
   rayon: ["districtSlug"],
   metro: ["metroSlug"],
+  nisangah: ["landmarkSlug"],
   otaq: ["rooms"],
   min: ["minPrice"],
   max: ["maxPrice"],

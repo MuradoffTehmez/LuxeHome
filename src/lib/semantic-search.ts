@@ -50,6 +50,7 @@ type EmbeddableProperty = {
   city: { name: string };
   district: { name: string } | null;
   metro: { name: string } | null;
+  landmark?: { name: string } | null;
   features: { feature: { name: string } }[];
 };
 
@@ -61,6 +62,7 @@ export function propertyEmbeddingText(property: EmbeddableProperty): string {
     property.type.name,
     [property.district?.name, property.city.name].filter(Boolean).join(", "),
     property.metro ? `Metro ${property.metro.name}` : "",
+    property.landmark ? `Nişangah ${property.landmark.name}` : "",
     property.rooms ? `${property.rooms} otaqlı` : "",
     property.area ? `${Math.round(property.area)} m²` : "",
     property.address ?? "",
@@ -90,6 +92,7 @@ const embeddableSelect = {
   city: { select: { name: true } },
   district: { select: { name: true } },
   metro: { select: { name: true } },
+  landmark: { select: { name: true } },
   features: { select: { feature: { select: { name: true } } } },
 } as const;
 

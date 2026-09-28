@@ -46,6 +46,8 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
         typeId: true,
         cityId: true,
         districtId: true,
+        metroId: true,
+        landmarkId: true,
         address: true,
         street: true,
         building: true,
@@ -80,6 +82,7 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
     cities: sourceOptions.cities.map((item) => localizeLocation(item, locale)),
     districts: sourceOptions.districts.map((item) => localizeLocation(item, locale)),
     metros: sourceOptions.metros.map((item) => localizeLocation(item, locale)),
+    landmarks: sourceOptions.landmarks.map((item) => localizeLocation(item, locale)),
     features: sourceOptions.features.map((item) => localizeKnownContent("feature", item, locale)),
   };
   const initial: PublicPropertyFormInitial = {

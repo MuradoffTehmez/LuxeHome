@@ -150,6 +150,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     citySlug: raw.seher,
     districtSlug: raw.rayon,
     metroSlug: raw.metro,
+    landmarkSlug: raw.nisangah,
     rooms: positiveNumber(raw.otaq),
     minPrice: positiveNumber(raw.min),
     maxPrice: positiveNumber(raw.max),
@@ -216,6 +217,10 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     value: metro.slug,
     label: localizeLocation(metro, locale as Locale).name,
   }));
+  const landmarkOptions = filterOptions.landmarks.map((landmark) => ({
+    value: landmark.slug,
+    label: localizeLocation(landmark, locale as Locale).name,
+  }));
 
   // Ödəniş şərtləri xüsusiyyət cədvəlində saxlanılır, ona görə eyni siyahıdan gəlir
   const featureOptions = filterOptions.features.map((feature) => ({
@@ -242,6 +247,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     types: typeOptions,
     cities: cityOptions,
     metros: metroOptions,
+    landmarks: landmarkOptions,
     features: featureOptions,
     translateLabel: (key, fallback) => {
       if (key === "elan") return raw.elan === "SALE" ? t("search.sale") : t("search.rent");
@@ -379,6 +385,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                 types={typeOptions}
                 cities={cityOptions}
                 metros={metroOptions}
+                landmarks={landmarkOptions}
                 features={featureOptions}
                 variant="page"
                 initial={initialSearch}
@@ -394,6 +401,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
                   types={typeOptions}
                   cities={cityOptions}
                   metros={metroOptions}
+                  landmarks={landmarkOptions}
                   features={featureOptions}
                   initial={initialSearch}
                   resultCount={total}

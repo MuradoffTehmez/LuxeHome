@@ -11,6 +11,7 @@ import {
   PropertyFilterFields,
   type CityOption,
   type FeatureOption,
+  type LandmarkOption,
   type MetroOption,
   type SearchPanelInitial,
   type TypeOption,
@@ -20,6 +21,7 @@ export type PropertyFilterSheetProps = {
   types: TypeOption[];
   cities: CityOption[];
   metros?: MetroOption[];
+  landmarks?: LandmarkOption[];
   features: FeatureOption[];
   initial: SearchPanelInitial;
   resultCount: number;
@@ -31,6 +33,7 @@ export function PropertyFilterSheet({
   types,
   cities,
   metros = [],
+  landmarks = [],
   features,
   initial,
   resultCount,
@@ -76,6 +79,7 @@ export function PropertyFilterSheet({
             types={types}
             cities={cities}
             metros={metros}
+            landmarks={landmarks}
             features={features}
             initial={initial}
             mode="full"

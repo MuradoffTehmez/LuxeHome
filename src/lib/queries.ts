@@ -142,6 +142,8 @@ export type PropertyFilters = {
   citySlug?: string;
   districtSlug?: string;
   metroSlug?: string;
+  /** Nişangah (`Location.kind = LANDMARK`): «28 Mall», «Neapol dairəsi». */
+  landmarkSlug?: string;
   statuses?: string[];
   minPrice?: number;
   maxPrice?: number;
@@ -242,6 +244,7 @@ export async function buildPropertyWhere(
     where.district = { OR: [{ slug: filters.districtSlug }, { parent: { slug: filters.districtSlug } }] };
   }
   if (filters.metroSlug) where.metro = { slug: filters.metroSlug };
+  if (filters.landmarkSlug) where.landmark = { slug: filters.landmarkSlug };
   if (filters.renovation) where.renovation = filters.renovation;
   if (filters.documentStatus) where.documentStatus = filters.documentStatus;
 
@@ -335,7 +338,11 @@ export async function buildPropertyWhere(
             { type: { searchName: { contains: normalized } } },
             { city: { searchName: { contains: normalized } } },
             { district: { searchName: { contains: normalized } } },
+            // Massiv/qəsəbə seçilmiş elan rayon adı ilə də tapılmalıdır:
+            // «Nəsimi» yazanda 4-cü mikrorayondakı elan da çıxır.
+            { district: { parent: { searchName: { contains: normalized } } } },
             { metro: { searchName: { contains: normalized } } },
+            { landmark: { searchName: { contains: normalized } } },
           ] : []),
           { title: { contains: term } },
           { description: { contains: term } },
@@ -604,6 +611,7 @@ export async function getPropertyBySlug(slug: string) {
         },
       },
       metro: true,
+      landmark: { select: { name: true, slug: true } },
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { include: { feature: true } },
       project: { select: { name: true, slug: true } },
@@ -677,8 +685,13 @@ export async function getPropertiesForCompare(ids: string[]) {
 // FİLTER SEÇİMLƏRİ (dropdown-lar üçün)
 // ---------------------------------------------------------------------------
 
+/** Azərbaycan əlifbası və təbii rəqəm sırası: «ASAN Xidmət №2» «№10»-dan əvvəl. */
+function byAzerbaijaniName(left: { name: string }, right: { name: string }): number {
+  return left.name.localeCompare(right.name, "az", { numeric: true });
+}
+
 export async function getFilterOptions() {
-  const [types, cities, childLocations, metros, features] = await Promise.all([
+  const [types, cities, childLocations, metros, landmarks, features] = await Promise.all([
     prisma.propertyType.findMany({
       where: { isActive: true },
       orderBy: { order: "asc" },
@@ -705,13 +718,25 @@ export async function getFilterOptions() {
       orderBy: { order: "asc" },
       select: { name: true, slug: true },
     }),
+    prisma.location.findMany({
+      where: { kind: LOCATION_KINDS.LANDMARK },
+      orderBy: { name: "asc" },
+      select: { name: true, slug: true },
+    }),
     prisma.feature.findMany({
       orderBy: { order: "asc" },
       select: { name: true, slug: true, group: true },
     }),
   ]);
 
-  return { types, cities: buildCityFilterTree(cities, childLocations), metros, features };
+  return {
+    types,
+    cities: buildCityFilterTree(cities, childLocations),
+    metros,
+    // SQLite-in binar sırası «Ə», «İ», «Ş» ilə başlayanları sona atır.
+    landmarks: landmarks.sort(byAzerbaijaniName),
+    features,
+  };
 }
 
 /** Kateqoriya kartlarında göstərilən əmlak sayları. */
@@ -1787,7 +1812,7 @@ export async function getAdminPropertyById(id: string) {
 
 /** Formadakı bütün açılan siyahılar bir sorğu dəstində gətirilir. */
 export async function getPropertyFormOptions() {
-  const [types, cities, districts, metros, features, projects, agents] = await Promise.all([
+  const [types, cities, districts, metros, landmarks, features, projects, agents] = await Promise.all([
     prisma.propertyType.findMany({
       where: { isActive: true },
       select: { id: true, name: true, slug: true },
@@ -1795,18 +1820,24 @@ export async function getPropertyFormOptions() {
     }),
     prisma.location.findMany({
       where: { kind: LOCATION_KINDS.CITY },
-      select: { id: true, name: true, slug: true },
+      // `officialCode` formada rəsmi küçə təkliflərinin faylını seçir.
+      select: { id: true, name: true, slug: true, officialCode: true },
       orderBy: { order: "asc" },
     }),
     prisma.location.findMany({
       where: { kind: { in: LOCATION_CHILD_KINDS } },
       // `parent` relation-u burada seçilmir: ~600 sətir üzrə `id IN (…)` D1-in
       // 100 parametr həddini aşır. Valideyn eyni siyahıdan tapılır.
-      select: { id: true, name: true, slug: true, kind: true, parentId: true },
+      select: { id: true, name: true, slug: true, kind: true, parentId: true, officialCode: true },
       orderBy: { name: "asc" },
     }),
     prisma.location.findMany({
       where: { kind: LOCATION_KINDS.METRO },
+      select: { id: true, name: true, slug: true, parentId: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.location.findMany({
+      where: { kind: LOCATION_KINDS.LANDMARK },
       select: { id: true, name: true, slug: true, parentId: true },
       orderBy: { name: "asc" },
     }),
@@ -1833,7 +1864,9 @@ export async function getPropertyFormOptions() {
     // seçimi şəhər üzrə süzüldüyü üçün kök şəhər (`cityId`) ayrıca hesablanır —
     // yoxsa Maştağa heç bir şəhərdə görünmür. `group` optgroup başlığıdır.
     districts: withCityAndGroup(districts),
-    metros,
+    // SQLite-in binar sırası «Ə», «İ», «Ş» ilə başlayanları sona atır.
+    metros: metros.sort(byAzerbaijaniName),
+    landmarks: landmarks.sort(byAzerbaijaniName),
     features,
     projects,
     agents,

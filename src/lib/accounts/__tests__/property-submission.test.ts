@@ -239,6 +239,29 @@ describe("ictimai elan göndərmə siyasəti", () => {
     }
   });
 
+  it("şəhərin nişangahını qəbul edir, başqa şəhərin və ya qeyri-nişangah ID-sini rədd edir", async () => {
+    const locations: Record<string, { kind: string; parentId: string | null }> = {
+      baki: { kind: "CITY", parentId: null },
+      gence: { kind: "CITY", parentId: null },
+      "nisangah-28-mall": { kind: "LANDMARK", parentId: "baki" },
+      "metro-28-may": { kind: "METRO", parentId: "baki" },
+    };
+    const store = {
+      findType: async () => ({ isActive: true }),
+      findLocation: async (id: string) => locations[id] ?? null,
+      countFeatures: async () => 0,
+    };
+    const base = { typeId: "type", districtId: null, featureIds: [] };
+
+    expect(await validatePublicPropertyRelations(store, { ...base, cityId: "baki", landmarkId: "nisangah-28-mall" })).toBeNull();
+    for (const [cityId, landmarkId] of [["gence", "nisangah-28-mall"], ["baki", "metro-28-may"], ["baki", "yoxdur"]]) {
+      expect(
+        await validatePublicPropertyRelations(store, { ...base, cityId, landmarkId }),
+        `${cityId} / ${landmarkId}`,
+      ).toMatchObject({ landmarkId: "Seçilmiş nişangah bu şəhərə aid deyil" });
+    }
+  });
+
   it("başqa şəhərin qəsəbəsini rədd edir", async () => {
     const errors = await validatePublicPropertyRelations(
       {

@@ -15,7 +15,7 @@ import {
   readPropertyForm,
 } from "@/lib/admin/property-input";
 import { paymentFlagsFromFeatures } from "@/lib/admin/payment-features";
-import { locationBelongsToCity } from "@/lib/accounts/property-submission";
+import { landmarkBelongsToCity, locationBelongsToCity } from "@/lib/accounts/property-submission";
 import { uniqueSlug } from "@/lib/admin/slug";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
@@ -49,7 +49,7 @@ const LIST_PATH = "/admin/emlaklar";
 async function validateRelations(input: PropertyInput): Promise<Record<string, string> | null> {
   const errors: Record<string, string> = {};
 
-  const [type, city, district, project] = await Promise.all([
+  const [type, city, district, landmark, project] = await Promise.all([
     prisma.propertyType.findUnique({ where: { id: input.typeId }, select: { id: true } }),
     prisma.location.findUnique({ where: { id: input.cityId }, select: { id: true } }),
     input.districtId
@@ -59,6 +59,9 @@ async function validateRelations(input: PropertyInput): Promise<Record<string, s
           // uşağıdır, tək səviyyəli yoxlama Maştağanı səhvən rədd edərdi.
           select: { kind: true, parentId: true, parent: { select: { parentId: true } } },
         })
+      : null,
+    input.landmarkId
+      ? prisma.location.findUnique({ where: { id: input.landmarkId }, select: { kind: true, parentId: true } })
       : null,
     input.projectId
       ? prisma.project.findUnique({ where: { id: input.projectId }, select: { id: true } })
@@ -70,6 +73,10 @@ async function validateRelations(input: PropertyInput): Promise<Record<string, s
   if (input.districtId && !district) errors.districtId = msg("server.emlaklar.rayonTapilmadi");
   if (district && !locationBelongsToCity(district, input.cityId)) {
     errors.districtId = msg("server.emlaklar.secilmisRayonBuSehereAid");
+  }
+  if (input.landmarkId && !landmark) errors.landmarkId = msg("server.emlaklar.nisangahTapilmadi");
+  else if (input.landmarkId && !landmarkBelongsToCity(landmark, input.cityId)) {
+    errors.landmarkId = msg("server.emlaklar.secilmisNisangahBuSehereAid");
   }
   if (input.projectId && !project) errors.projectId = msg("server.emlaklar.layiheTapilmadi");
 

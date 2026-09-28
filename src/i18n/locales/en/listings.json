@@ -132,6 +132,7 @@
     "city": "City",
     "district": "District",
     "metro": "Metro station",
+    "landmark": "Landmark",
     "selectCityFirst": "Select a city first",
     "all": "All",
     "rooms": "Rooms",

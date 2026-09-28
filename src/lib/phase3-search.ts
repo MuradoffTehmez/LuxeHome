@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { z } from "zod";
+import { LOCATION_KINDS } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { checkAiSearchLimit, clientIp } from "@/lib/auth/rate-limit";
 import { parseAiJson, runAiText } from "@/lib/ai";
@@ -137,7 +138,12 @@ async function parseQuery(query: string): Promise<{ criteria: AiSearchCriteria; 
 
   const [types, locations, features] = await Promise.all([
     prisma.propertyType.findMany({ where: { isActive: true }, select: { slug: true, name: true } }),
-    prisma.location.findMany({ select: { slug: true, name: true, kind: true } }),
+    // Nişangahlar AI meyarlarına düşmür (sxemdə `landmarkSlug` yoxdur) — prompta
+    // 200-dən çox sətir əlavə edib token sərf etməsin.
+    prisma.location.findMany({
+      where: { kind: { not: LOCATION_KINDS.LANDMARK } },
+      select: { slug: true, name: true, kind: true },
+    }),
     prisma.feature.findMany({ select: { slug: true, name: true } }),
   ]);
   try {

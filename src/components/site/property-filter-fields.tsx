@@ -33,6 +33,7 @@ export type CityOption = {
 
 export type TypeOption = { value: string; label: string };
 export type MetroOption = { value: string; label: string };
+export type LandmarkOption = { value: string; label: string };
 export type FeatureOption = { value: string; label: string; group: string };
 
 export type SearchPanelInitial = {
@@ -42,6 +43,7 @@ export type SearchPanelInitial = {
   seher?: string;
   rayon?: string;
   metro?: string;
+  nisangah?: string;
   otaq?: string;
   min?: string;
   max?: string;
@@ -65,6 +67,8 @@ export type PropertyFilterFieldsProps = {
   types: TypeOption[];
   cities: CityOption[];
   metros?: MetroOption[];
+  /** Nişangahlar («28 Mall», «Neapol dairəsi») — `?nisangah=` parametri. */
+  landmarks?: LandmarkOption[];
   features: FeatureOption[];
   initial: SearchPanelInitial;
   mode: "compact" | "full";
@@ -230,6 +234,7 @@ export function PropertyFilterFields({
   types,
   cities,
   metros = [],
+  landmarks = [],
   features,
   initial,
   mode,
@@ -357,6 +362,16 @@ export function PropertyFilterFields({
             defaultValue={initial.metro}
             options={metros}
           />
+          {landmarks.length > 0 && (
+            <SelectField
+              id={`${id}-landmark`}
+              name="nisangah"
+              label={t("landmark")}
+              placeholder={t("all")}
+              defaultValue={initial.nisangah}
+              options={landmarks}
+            />
+          )}
           <SelectField
             id={`${id}-rooms`}
             name="otaq"

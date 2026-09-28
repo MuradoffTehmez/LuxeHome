@@ -77,6 +77,8 @@ export type PublicPropertyFormInitial = {
   street?: string | null;
   building?: string | null;
   neighborhoodName?: string | null;
+  metroId?: string | null;
+  landmarkId?: string | null;
   latitude: number | string | null;
   longitude: number | string | null;
   rooms: number | string | null;
@@ -119,6 +121,8 @@ function initialFromDraft(draft: FormDraft): PublicPropertyFormInitial {
     street: optional("street"),
     building: optional("building"),
     neighborhoodName: optional("neighborhoodName"),
+    metroId: optional("metroId"),
+    landmarkId: optional("landmarkId"),
     latitude: optional("latitude"),
     longitude: optional("longitude"),
     rooms: optional("rooms"),
@@ -304,6 +308,8 @@ function PublicPropertyWizard({
             <LocationFields
               cities={options.cities}
               places={options.districts}
+              metros={options.metros}
+              landmarks={options.landmarks}
               locale={locale}
               labels={{
                 region: t("location.region"),
@@ -320,6 +326,10 @@ function PublicPropertyWizard({
                 buildingHint: t("location.buildingHint"),
                 select: t("location.select"),
                 notSelected: t("location.notSelected"),
+                metro: t("location.metro"),
+                landmark: t("location.landmark"),
+                landmarkHint: t("location.landmarkHint"),
+                streetOfficialHint: t("location.streetOfficialHint"),
               }}
               initial={{
                 cityId: initial?.cityId ?? "",
@@ -328,6 +338,8 @@ function PublicPropertyWizard({
                 building: initial?.building,
                 neighborhoodName: initial?.neighborhoodName,
                 address: initial?.address,
+                metroId: initial?.metroId,
+                landmarkId: initial?.landmarkId,
               }}
             />
           </FormSection>

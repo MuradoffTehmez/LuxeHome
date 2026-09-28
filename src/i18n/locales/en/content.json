@@ -104,6 +104,7 @@
     "publishedAt": "Published",
     "views": "Views",
     "metroNearby": "Metro",
+    "landmarkNearby": "Landmark",
     "addressLabel": "Address",
     "videoTour": "Video tour",
     "openVideo": "Open the video in a new window",

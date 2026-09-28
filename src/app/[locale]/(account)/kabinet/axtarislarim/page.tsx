@@ -34,6 +34,7 @@ function summarizeFilters(
     types: Map<string, string>;
     cities: Map<string, string>;
     metros: Map<string, string>;
+    landmarks: Map<string, string>;
     listingTypes: Map<string, string>;
     renovations: Map<string, string>;
     documents: Map<string, string>;
@@ -48,6 +49,7 @@ function summarizeFilters(
   if (filters.citySlug) parts.push(labels.cities.get(filters.citySlug) ?? filters.citySlug);
   if (filters.districtSlug) parts.push(labels.cities.get(filters.districtSlug) ?? filters.districtSlug);
   if (filters.metroSlug) parts.push(labels.metros.get(filters.metroSlug) ?? filters.metroSlug);
+  if (filters.landmarkSlug) parts.push(labels.landmarks.get(filters.landmarkSlug) ?? filters.landmarkSlug);
   if (filters.rooms !== undefined) parts.push(labels.room(filters.rooms));
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
     parts.push(`${filters.minPrice ?? 0}–${filters.maxPrice ?? "∞"} ₼`);
@@ -69,6 +71,7 @@ function filtersToSearchParams(filters: PropertyFilters): string {
   if (filters.citySlug) params.set("seher", filters.citySlug);
   if (filters.districtSlug) params.set("rayon", filters.districtSlug);
   if (filters.metroSlug) params.set("metro", filters.metroSlug);
+  if (filters.landmarkSlug) params.set("nisangah", filters.landmarkSlug);
   if (filters.rooms !== undefined) params.set("otaq", String(filters.rooms));
   if (filters.minPrice !== undefined) params.set("min", String(filters.minPrice));
   if (filters.maxPrice !== undefined) params.set("max", String(filters.maxPrice));
@@ -127,10 +130,14 @@ export default async function SavedSearchesPage() {
     ]),
   );
   const metroLabels = new Map(filterOptions.metros.map((metro) => [metro.slug, localizeLocation(metro, locale).name]));
+  const landmarkLabels = new Map(
+    filterOptions.landmarks.map((landmark) => [landmark.slug, localizeLocation(landmark, locale).name]),
+  );
   const summaryLabels = {
     types: typeLabels,
     cities: cityLabels,
     metros: metroLabels,
+    landmarks: landmarkLabels,
     listingTypes: new Map([
       [LISTING_TYPES.SALE, propertyT("listingType.sale")],
       [LISTING_TYPES.RENT, propertyT("listingType.rent")],

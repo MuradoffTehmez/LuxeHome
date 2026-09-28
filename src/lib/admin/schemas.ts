@@ -89,6 +89,8 @@ export const propertyFieldsSchema = z.object({
     cityId: cuid,
     districtId: cuid.nullable(),
     metroId: cuid.nullable(),
+    // CSV idxalı və köhnə çağırışlar nişangah göndərmir — defolt `null`.
+    landmarkId: cuid.nullable().default(null),
     projectId: cuid.nullable(),
     address: optionalText(240),
     // Köhnə çağırışlar (CSV idxalı, testlər) bu sahələri göndərməyə bilər — defolt `null`.

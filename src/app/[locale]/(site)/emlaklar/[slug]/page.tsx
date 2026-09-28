@@ -160,6 +160,7 @@ export default async function PropertyDetailPage({ params }: Props) {
     city: localizeLocation(localizedProperty.city, locale as Locale),
     district: localizedProperty.district ? localizeLocation(localizedProperty.district, locale as Locale) : null,
     metro: localizedProperty.metro ? localizeLocation(localizedProperty.metro, locale as Locale) : null,
+    landmark: localizedProperty.landmark ? localizeLocation(localizedProperty.landmark, locale as Locale) : null,
     features: localizedProperty.features.map((item) => ({
       ...item,
       feature: localizeKnownContent("feature", item.feature, locale as Locale),
@@ -245,6 +246,11 @@ export default async function PropertyDetailPage({ params }: Props) {
     property.metro && {
       href: `/metro/${property.metro.slug}`,
       label: locale === "az" ? `${property.metro.name} metrosu` : property.metro.name,
+    },
+    // Nişangahın ayrıca landing-i yoxdur — eyni nişangahlı elanların siyahısına aparır.
+    property.landmark && {
+      href: `/emlaklar?nisangah=${encodeURIComponent(property.landmark.slug)}`,
+      label: property.landmark.name,
     },
   ].filter((item): item is { href: string; label: string } => Boolean(item && item.href));
 

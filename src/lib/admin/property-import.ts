@@ -15,7 +15,7 @@ import { normalizeSearchText } from "@/lib/search-normalization";
  * CSV-dən toplu elan idxalı (#103) — bazasız, təmiz çevirmə məntiqi.
  *
  * Hər sətir admin formasının `propertySchema`-sından keçir, yəni idxal forma ilə
- * eyni qaydaları tətbiq edir. Taksonomiya (növ, şəhər, rayon, metro, xüsusiyyət)
+ * eyni qaydaları tətbiq edir. Taksonomiya (növ, şəhər, rayon, metro, nişangah, xüsusiyyət)
  * slug **və ya** ad ilə tapılır; ad diakritikdən asılı olmadan müqayisə olunur
  * («Nerimanov» = «Nərimanov»). İdxal olunan elan həmişə **qaralama** yaranır —
  * redaktor baxıb dərc edir.
@@ -37,6 +37,7 @@ export const IMPORT_COLUMNS = [
   { key: "city", required: true },
   { key: "district", required: false },
   { key: "metro", required: false },
+  { key: "landmark", required: false },
   { key: "address", required: false },
   { key: "rooms", required: false },
   { key: "area", required: false },
@@ -200,6 +201,7 @@ function mapRow(cells: string[], index: Map<ImportColumn, number>, lookups: Impo
     const candidates = lookups.locations.filter((location) =>
       location.kind !== LOCATION_KINDS.CITY &&
       location.kind !== LOCATION_KINDS.METRO &&
+      location.kind !== LOCATION_KINDS.LANDMARK &&
       (location.parentId === city.id || location.parent?.parentId === city.id));
     const district = findBy(candidates, cell("district"));
     if (district) districtId = district.id;
@@ -213,6 +215,15 @@ function mapRow(cells: string[], index: Map<ImportColumn, number>, lookups: Impo
     const metro = findBy(metros, cell("metro"));
     if (metro) metroId = metro.id;
     else invalid("metro", "notFound");
+  }
+
+  let landmarkId: string | null = null;
+  if (cell("landmark")) {
+    // Nişangah da metro kimi yalnız seçilmiş şəhərin uşaqları arasında axtarılır.
+    const landmarks = lookups.locations.filter((location) => location.kind === LOCATION_KINDS.LANDMARK && city && location.parentId === city.id);
+    const landmark = findBy(landmarks, cell("landmark"));
+    if (landmark) landmarkId = landmark.id;
+    else invalid("landmark", "notFound");
   }
 
   const featureIds: string[] = [];
@@ -243,6 +254,7 @@ function mapRow(cells: string[], index: Map<ImportColumn, number>, lookups: Impo
     cityId: city?.id ?? "",
     districtId,
     metroId,
+    landmarkId,
     projectId: null,
     address: cell("address") || null,
     street: null,
@@ -305,6 +317,7 @@ const SCHEMA_TO_COLUMN: Record<string, ImportColumn> = {
   cityId: "city",
   districtId: "district",
   metroId: "metro",
+  landmarkId: "landmark",
   landArea: "land_area",
   totalFloors: "total_floors",
   documentStatus: "document",
