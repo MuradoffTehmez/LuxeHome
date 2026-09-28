@@ -19,17 +19,18 @@ updates:
     # - eslint 10: eslint-config-next-in eslint-plugin-react-ı ESLint 10-da
     #   `context.getFilename` olmadığı üçün çökür.
     # - vitest 5: @cloudflare/vitest-plugin peer olaraq yalnız vitest ^4 qəbul edir.
+    # Yalnız sınan versiyalar bağlanır (məs. TS 6.0 hələ təklif oluna bilər).
     # Plugin/konfiq yeni major-u dəstəkləyəndə uyğun sətri sil.
     ignore:
       - dependency-name: typescript
-        update-types:
-          - version-update:semver-major
+        versions:
+          - ">=7"
       - dependency-name: eslint
-        update-types:
-          - version-update:semver-major
+        versions:
+          - ">=10"
       - dependency-name: vitest
-        update-types:
-          - version-update:semver-major
+        versions:
+          - ">=5"
     groups:
       production-dependencies:
         dependency-type: production
