@@ -69,6 +69,11 @@ Bu beşlikdən **ayrı** olaraq CI `npm audit --audit-level=high` işlədir. O, 
 deyil, asılılıqları yoxlayır, ona görə lokalda yalnız `package.json`/`package-lock.json`
 dəyişdikdə işlətmək lazımdır.
 
+`.github/dependabot.yml` üç major-u upstream uyğunsuzluğuna görə `versions` ilə saxlayır:
+`typescript >=7` (typescript-eslint TS `<6.1` tələb edir), `eslint >=10` (`eslint-plugin-react`
+çökür), `vitest >=5` (`@cloudflare/vitest-plugin` peer `^4`). Plugin dəstək verəndə sətri sil.
+CI build-də `next/font` Google Fonts-dan keçici xəta verə bilər — job-u bir dəfə yenidən işlət.
+
 **Bundler webpack-dır.** Next 16 defolt olaraq Turbopack işlədir, lakin `build` və `dev`
 skriptləri `--webpack` bayrağı ilə qəsdən webpack-da saxlanılır: Turbopack Prisma klientini
 hash-lı `@prisma/client-<hash>` symlink-i kimi xaricləşdirir, bu isə OpenNext/workerd bundle-ında

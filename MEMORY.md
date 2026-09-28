@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 2 sentyabr 2026.
+Son yenilənmə: 28 sentyabr 2026.
 
 ---
 
@@ -242,12 +242,14 @@ Tələb olunan `vars`: `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN` (`<team>.cloudfla
 
 ---
 
-## 7. Layihənin texniki sağlamlığı (2 sentyabr 2026)
+## 7. Layihənin texniki sağlamlığı (28 sentyabr 2026)
 
-- Mənbə ağacı: 582 TypeScript/TSX faylı (`src/` altında).
-- 104 Vitest faylı, 480 test; 3 sentyabr tam lokal icrasında hamısı keçib.
-- 60 Prisma modeli, 28 D1 miqrasiya faylı və audit başlanğıcında 463 commit.
-- GitHub Actions hər PR və `main` push-unda test, typecheck, lint və build işlədir.
+- 133 `page.tsx`, 58 `"use server"` faylı, 19 Route Handler.
+- 172 Vitest faylı, 875 test (workerd + Node + real miniflare D1 integration); 15 Playwright spec, 164 test.
+- 68 Prisma modeli, 50 D1 miqrasiya faylı (son: `0049_restore_treva_media.sql`).
+- GitHub Actions hər PR-da `Quality gate` (audit + test + typecheck + lint + dead-code + build) və
+  məcburi `Local stack E2E` işlədir; `main` push-unda miqrasiya → staging → E2E → production.
+- 2 sentyabr snapshot-u (tarixi): 104 fayl / 480 test, 60 model, 28 miqrasiya.
 - **Browser E2E qurulub — 2 sentyabr 2026** (Playwright, `e2e/`, 190+ test).
   Testlər canlı mühitə qarşı işləyir; `next dev` hədəf kimi yararsızdır (Prisma wasm
   engine orada yüklənmir, hər D1 səhifəsi 500 verir). CI axını:
@@ -606,3 +608,29 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - Şirkətin öz fotoları (`Parametrlər → Saytın şəkilləri`) və real elanlar (CSV idxalı).
 - Ünvan ziddiyyəti həll olunub (#110): sahibin təsdiqi ilə hər yerdə **Əliyar Əliyev 45a,
   Bakı AZ1005** (Google Business Profile ilə eyni). Köhnə «109A, AZ1033» işlədilməməlidir.
+
+**Sonrakı işlər (27–28 sentyabr):**
+- **#113 (PR, merge olunub):** 8 addımlı elan sehrbazı, iyerarxik ünvan (0046), su nişanı
+  (nisbi həndəsə, təkrar nişanın aşkarlanması), avtomatik AI SEO/ALT (0047), `AGENT` və
+  `CORPORATE` hesab növləri və genişləndirilmiş profillər (0048), lightbox, qısa ünvanlar.
+- **#114/#115 (merge olunub):** admin və sayt auditi — başlıqda təkrar düymə, foto məsləhətçisi
+  Mistral Small 3.1-ə keçdi (`llama-3.2-11b-vision` Meta lisenziyası tələb edir, `5016`), SERP
+  xəbərdarlığının tərcüməsi, sitemap-a yeni səhifələr, toplu seçim + hesab/agentlik silmə,
+  tərəfdaşın kənar loqosunun qorunması (0049), yeni qeydiyyat forması.
+
+---
+
+## 18. Asılılıq yeniləməsi və sənəd sinxronu — 28 sentyabr 2026
+
+- Açıq 6 Dependabot PR-ı PR #122-də həll edildi. Birləşdirilən: production qrupu (#116 — Next
+  16.3.6, next-intl 4.14.7, lucide-react 1.48, resend 6.29), development qrupu (#117 — wrangler
+  4.139, knip 6.38, tsx, `@types/node`, `@cloudflare/vitest-plugin` 1.2.6), CodeQL action (#121).
+- Bağlanan və `dependabot.yml`-də `versions` ilə ignore edilən: `typescript >=7` (#119 —
+  typescript-eslint TS `<6.1` tələb edir), `eslint >=10` (#120 — `eslint-plugin-react` ESLint
+  10-da `getFilename` çağırır), `vitest >=5` (#118 — vitest-plugin peer `^4`). Plugin yeni major-u
+  dəstəkləyəndə uyğun sətir silinməlidir. TS 6.0 xətti hələ təklif oluna bilər.
+- CI-da `next/font` Google Fonts yükləyicisi bir dəfə keçici xəta verdi; eyni commit-in E2E
+  build-i keçdiyi üçün job yenidən işlədildi. Təkrarlansa şriftləri `next/font/local`-a
+  köçürmək düşünülə bilər.
+- README, CONTRIBUTING və SECURITY 28 sentyabr vəziyyəti ilə sinxronlaşdırıldı; GitHub Wiki-nin
+  8 səhifəsi üçün yenilənmiş mətn hazırlandı (wiki repozitoriyasına push ayrıca icazə tələb edir).

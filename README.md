@@ -21,8 +21,8 @@
 ---
 
 > [!NOTE]
-> Bu sənəd 2 sentyabr 2026 tarixli `main` auditi, tam keçən keyfiyyət qapısı
-> (104 test faylı / 480 test) və son uğurlu CI/deploy əsasında yenilənib. Dərin texniki
+> Bu sənəd 28 sentyabr 2026 tarixli `main` auditi, tam keçən keyfiyyət qapısı
+> (172 test faylı / 875 test, 164 Playwright testi) və avtomatik CI/CD əsasında yenilənib. Dərin texniki
 > məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
 
 ## Layihə haqqında
@@ -35,30 +35,38 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 
 ### İctimai sayt
 
-- Satış və kirayə elanlarının kataloqu, səhifələmə və sıralama
-- Mətn, əmlak növü, şəhər, rayon, qiymət, otaq, sahə, təmir, sənəd, tikili növü, mərtəbə, kirayə dövrü və xüsusiyyətlər üzrə filtr
-- Əmlak detalı, qalereya, oxşar elanlar, Leaflet xəritəsi və agentlik nişanı
-- Brauzerdə saxlanan favoritlər və ən çox 4 elanın cookie əsaslı müqayisəsi
-- Layihə, agentlik, xidmət və bloq siyahıları ilə detal səhifələri
+- Satış və kirayə elanlarının kataloqu, səhifələmə, sıralama və siyahı/xəritə görünüşü
+- Mətn, əmlak növü, şəhər, rayon/qəsəbə/kənd, metro, qiymət, otaq, sahə, təmir, sənəd, tikili növü, mərtəbə, kirayə dövrü və xüsusiyyətlər üzrə filtr; xəritədə sahə çəkmə
+- Boş nəticədə hər filtri çıxaranda neçə elan qaldığını göstərən təkliflər
+- Əmlak detalı: tam ekran lightbox qalereya, plan, 360° tur, qiymət göstəricisi (rayon medianı ilə müqayisə), ən yaxın metro, açıq qapı günləri, rezervasiya, oxşar elanlar və Leaflet xəritəsi
+- Elan üçün 1200×630 OG paylaşım kartı və QR kod
+- Hesabla sinxron favoritlər və ən çox 4 elanın müqayisəsi
+- `/emlakimi-sat` satıcı səhifəsi və «Evimi qiymətləndir» aləti
+- Yaşayış kompleksləri (mənzil şahmatı ilə), agentlik, xidmət və bloq siyahıları ilə detal səhifələri
 - Rəsmi tərəfdaş kataloqu, çoxdilli profil, elan/layihə/agentlik əlaqələri və izlənən xarici keçidlər
-- Rayon, metro və axtarış niyyətli SEO landing səhifələri; paneldən idarə olunan landing runtime-ı
+- Rəsmi inzibati-ərazi bölgüsünə (2024) əsaslanan rayon, qəsəbə, kənd və metro landing səhifələri; paneldən idarə olunan landing runtime-ı
 - Bilik Mərkəzi: hüquqi bələdçi kataloqu, kateqoriya səhifələri, əmlak lüğəti və CMS FAQ-ı
-- İpoteka və büdcə kalkulyatoru
-- Cloudflare Workers AI ilə işləyən public AI axtarışı, Match Score və «Mənə əmlak tap» sehrbazı
+- İpoteka, büdcə və tikintiçi hissə-hissə ödəniş kalkulyatoru; `/investisiya` gəlirlilik kalkulyatoru
+- Cloudflare Workers AI ilə işləyən public AI axtarışı, Vectorize semantik axtarışı, Match Score və «Mənə əmlak tap» sehrbazı
+- Bilik Mərkəzi AI məsləhətçisi — yalnız dərc olunmuş məzmundan, hər iddia istinadlı
 - İctimai agent kataloqu, agent profili və moderasiyadan keçən rəylər
 - Çoxdilli bazar analitikası hesabatları
-- Əlaqə forması, same-origin + honeypot + `CONTACT_LIMIT`, D1 müraciəti və Resend bildirişi
+- Əlaqə forması: same-origin + honeypot + `CONTACT_LIMIT` + Turnstile, D1 müraciəti, Resend və Telegram bildirişi
 - Sayt haqqında `/suallar` və Bilik Mərkəzinin `/bilik-merkezi/suallar` FAQ səthləri (ayrı məhsullar)
 - Hüquqi səhifələr
 - AZ/EN/RU locale prefiksi, hreflang, canonical URL, Open Graph, Twitter Card, JSON-LD, sitemap, robots.txt və `llms.txt`
-- Responsive interfeys, dark mode, görünən klaviatura fokusu və reduced-motion dəstəyi
+- Responsive interfeys (mobil alt naviqasiya, safe area), dark mode, görünən klaviatura fokusu və reduced-motion dəstəyi
+- PWA manifesti; anonim ziyarətçi üçün kənar HTML keşi (60 s)
 
 ### İctimai hesab və kabinet
 
-- `USER`, `OWNER` və `AGENCY` hesabları üçün qeydiyyat və giriş
+- `USER`, `OWNER`, `AGENT`, `AGENCY` və `CORPORATE` hesabları üçün qeydiyyat
+- Parol (Turnstile), Google ilə (OIDC) və təsdiqlənmiş telefonla OTP girişi; son ikisi secret verilənə qədər söndürülüdür
 - D1-də saxlanan və dərhal ləğv edilə bilən sessiyalar
-- Profil, parol, e-poçt təsdiqi, parol bərpası və şəxsi data ixracı
-- Mülk sahibi və agentlik üçün şəkilli elan yaratma, redaktə və silmə
+- Profil, parol, e-poçt və telefon təsdiqi, parol bərpası, şəxsi data ixracı və iki mərhələli hesab silinməsi
+- 8 addımlı elan sehrbazı (qaralama bərpası ilə), iyerarxik ünvan (region → … → bina), su nişanlı şəkillər, avtomatik SEO və ALT
+- Elanın 60 günlük müddəti, bitməyə 7 gün qalmış xatırlatma və «Yenilə»
+- Premium paket sifarişi (ödəniş ofisdə/köçürmə ilə)
 - Mülk sahibi və təsdiqlənməmiş agentlik elanları üçün `PENDING` təsdiq axını
 - Təsdiqlənmiş agentlik elanlarının birbaşa dərc edilməsi
 - Təsdiqlənmiş agentliklərin açıq kataloqu və profil səhifəsi
@@ -71,11 +79,17 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 
 ### İdarə paneli
 
-- Məcburi TOTP 2FA, backup kodlar, hesab kilidi və sessiya idarəetməsi
+- Məcburi TOTP 2FA, passkey (TOTP-a alternativ ikinci mərhələ), backup kodlar, hesab kilidi və sessiya idarəetməsi
+- Panel AZ/EN/RU dillərindədir (`User.locale`)
 - `SUPER_ADMIN`, `ADMIN`, `EDITOR` rolları üçün icazə matrisi
 - Dashboard və real D1 statistikaları
-- Əmlak, layihə, xidmət, bloq və kateqoriya CRUD axınları
-- Müraciətlərin siyahıda sürətli statusu, məsul əməkdaşı, daxili qeydi və silinməsi
+- Əmlak, layihə, xidmət, bloq və kateqoriya CRUD axınları; siyahılarda toplu seçim və silmə
+- CSV-dən toplu elan idxalı (həmişə DRAFT, dublikat yoxlaması, kənar şəkillərin R2-yə köçürülməsi)
+- Müraciətlərin siyahıda sürətli statusu, status lövhəsi (SLA, «mənə təyin et»), konversiya hunisi, məsul əməkdaşı və daxili qeydi
+- Rezervasiya təqvimi (Bakı vaxtı) və şəxsi ICS abunəsi
+- Premium paketlər və ödəniş uçotu (`billing:manage`)
+- Mənzil şahmatı generatoru
+- Sistem rejimi (`MAINTENANCE` / `READ_ONLY`), nümunə məzmun açarı və inteqrasiya hazırlığı
 - R2 media yükləmə, WebP çevirmə, thumbnail, alt mətn və silmə
 - Əməkdaş hesabları, parol/2FA sıfırlama və sessiyaların ləğvi
 - İctimai hesabların ayrıca təsdiqi və bloklanması; çatışmayan agentlik profilinin paneldən yaradılması
@@ -88,31 +102,33 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
   indeksləmə nəzarəti, schema/sitemap və daxili link diaqnostikası, robots və lokal SEO parametrləri
 - Bilik Mərkəzi CMS-i: məqalə, kateqoriya, lüğət termini və FAQ CRUD-u ilə tərcümə axını
 - Rezervasiya idarəetməsi, agent profilləri, rəy moderasiyası və ictimai imkanlar paneli
-- AI köməkçi paneli (Cloudflare Workers AI)
+- AI köməkçi paneli və foto məsləhətçisi (Cloudflare Workers AI, vision)
 - Resend imzalı webhook-u ilə korporativ e-poçt çatdırılma/qəbul metadata jurnalı
 - Server Action-larda origin, icazə və sürət limiti yoxlaması
 
 > [!IMPORTANT]
-> Seed prosesi ictimai demo kontent yaratmır. `Property`, `Project` və `BlogPost` üçün `isDemo: true` qeydləri ictimai sorğularda görünmür.
+> Seed prosesi ictimai kontent və giriş edilə bilən hesab yaratmır. Nümunə (demo) məzmun ayrıca
+> `npm run db:demo:*` ilə yalnız staging-ə yüklənir; görünürlüyü `/admin/demo-mezmun` açarı idarə
+> edir (staging-də açıq, production-da bağlı).
 
 ## Texnologiya yığını
 
 | Qat | Texnologiya |
 |---|---|
-| Framework | Next.js 16.3 (webpack), React 19.3, App Router |
+| Framework | Next.js 16.3.6 (webpack), React 19.3, App Router |
 | Dil | TypeScript 5, strict mode |
 | UI | Tailwind CSS v4, Lucide React, `next-themes`, Leaflet |
 | Verilənlər bazası | Cloudflare D1 / SQLite |
 | ORM | Prisma 6.19.3, `@prisma/adapter-d1`, WASM client |
-| Hosting | Cloudflare Workers, OpenNext |
+| Hosting | Cloudflare Workers, OpenNext (`worker.ts` sarğısı + kənar HTML keşi) |
 | Media və keş | Cloudflare R2, Cloudflare Images, R2 incremental cache |
-| Auth | `jose`, Web Crypto PBKDF2, TOTP, AES-GCM |
+| Auth | `jose`, Web Crypto PBKDF2, TOTP, AES-GCM, `@simplewebauthn/server`, Google OIDC, Turnstile |
 | E-poçt | Resend |
-| AI | Cloudflare Workers AI (public AI axtarışı və admin köməkçisi) |
-| Bildiriş | Web Push (`web-push`), panel bildirişləri, e-poçt digest-i |
+| AI | Cloudflare Workers AI (mətn + vision), Vectorize (`bge-m3`) |
+| Bildiriş | Web Push, Telegram, SMS (istəyə bağlı), panel bildirişləri, e-poçt digest-i |
 | Lokallaşdırma | `next-intl`, AZ/EN/RU, həmişə locale prefiksi |
 | Validasiya və sanitizasiya | Zod, UltraHTML |
-| Test | Vitest, Cloudflare `workerd` runtime |
+| Test | Vitest 4 + `@cloudflare/vitest-plugin` (workerd, real D1), Playwright |
 
 ## Arxitektura
 
@@ -126,7 +142,9 @@ Cloudflare Worker / Next.js App Router
   ├── Media API ──────────► magic-byte yoxlaması ─► Images ─────► R2
   ├── Sessiya yoxlaması ──► imzalanmış cookie + D1 sessiyası
   ├── Bildiriş/webhook ───► Resend
-  ├── Digest cron ────────► ayrıca Cloudflare scheduled Worker
+  ├── AI / semantik ──────► Workers AI + Vectorize
+  ├── Digest cron ────────► ayrıca scheduled Worker (digest + maintenance + reindeks)
+  ├── Kənar HTML keşi ────► Cache API (worker.ts)
   └── ISR cache ──────────► R2
 ```
 
@@ -134,7 +152,8 @@ Cloudflare Worker / Next.js App Router
 
 - İctimai səhifələr `src/app/[locale]/(site)`, kabinet isə `src/app/[locale]/(account)` route qrupundadır; məlumatı birbaşa `src/lib/queries.ts`-dən oxuyur.
 - Yazma əməliyyatları Server Action-lar və qorunan media Route Handler-ları ilə aparılır.
-- İctimai əmlak sorğuları `deletedAt: null`, `isDemo: false` və `PUBLIC_PROPERTY_STATUSES` qaydalarını daşıyır.
+- İctimai əmlak sorğuları `publicPropertyWhere()`-dən başlayır: `deletedAt: null`, `PUBLIC_PROPERTY_STATUSES` və demo rejim şərti.
+- D1 transaction dəstəkləmir və bir sorğuda ən çox 100 bound parametr qəbul edir — kompensasiya, şərti `updateMany` və `findManyInChunks()` işlədilir.
 - Kart komponentlərinin data müqaviləsi `propertyCardSelect`, `projectCardSelect` və `postCardSelect` ilə mərkəzləşdirilib.
 - Runtime Prisma klienti yalnız `src/lib/prisma.ts` daxilindəki lazy `Proxy` üzərindən yaradılır.
 - Domen statusları, rollar və label-lər `src/lib/constants.ts` faylından gəlir.
@@ -143,17 +162,17 @@ Cloudflare Worker / Next.js App Router
 
 | Qrup | Marşrutlar |
 |---|---|
-| Əsas | `/{locale}`, `/{locale}/emlaklar`, `/{locale}/emlaklar/[slug]`, `/{locale}/layiheler/[slug]` |
+| Əsas | `/{locale}`, `/{locale}/emlaklar`, `/{locale}/emlaklar/[slug]`, `/{locale}/layiheler/[slug]`, `/{locale}/emlakimi-sat`, `/{locale}/investisiya` |
 | Məzmun | `/{locale}/xidmetler`, `/{locale}/blog`, `/{locale}/suallar`, `/{locale}/bazar-analitikasi`, SEO/rayon/metro landing-ləri |
 | Bilik Mərkəzi | `/{locale}/bilik-merkezi`, `/{locale}/bilik-merkezi/kateqoriya/[slug]`, `/{locale}/bilik-merkezi/suallar`, `/{locale}/lugat`, `/{locale}/kalkulyator` |
 | Kəşf və AI | `/{locale}/ai-axtaris`, `/{locale}/mene-emlak-tap`, `/{locale}/agentler`, `/{locale}/agentler/[slug]` |
 | Tərəfdaş və seçim | `/{locale}/agentlikler`, `/{locale}/terefdaslar`, `/{locale}/favoritler`, `/{locale}/muqayise` |
 | Şirkət və hüquqi | `/{locale}/haqqimizda`, `/{locale}/elaqe`, `/{locale}/mexfilik-siyaseti`, `/{locale}/istifade-sertleri`, `/{locale}/cookie-siyaseti` |
-| İctimai hesab | `/{locale}/qeydiyyat`, `/{locale}/daxil-ol`, kabinet, profil, komanda, elan, axtarış və bildiriş səhifələri |
+| İctimai hesab | `/{locale}/qeydiyyat`, `/{locale}/daxil-ol`, kabinet, profil, komanda, elan, paket, rezervasiya, axtarış və bildiriş səhifələri; qısa ünvanlar `/elan-yerlesdir`, `/elanlarim`, `/profilim` |
 | Əməkdaş auth | `/{locale}/giris`, doğrulama və 2FA qurulumu |
-| Admin | `/admin` və kontent, CRM, tərəfdaş, SEO, analitika, təhlükəsizlik və sistem alt marşrutları |
+| Admin | `/admin` və kontent, idxal, CRM (lövhə, huni), rezervasiya təqvimi, paketlər, tərəfdaş, SEO, AI, tərcümə, analitika, təhlükəsizlik və sistem alt marşrutları |
 | Admin SERP | `/admin/serp` və metadata, açar söz, entity, landing, audit, media, monitorinq, indeksləmə, Search Console, schema, sitemap, link, robots, parametrlər alt marşrutları |
-| Texniki | media API-ləri, saved-search cron, Resend webhook, `/media/[...key]`, `/sitemap.xml`, `/sitemap-index.xml`, `/sitemaps/[feed]`, `/robots.txt`, `/llms.txt` |
+| Texniki | media API-ləri, Google OAuth, ICS təqvim, OG kartı, geocode/tile, monitorinq, saved-search cron, Resend webhook, `/media/[...key]`, `/sitemap.xml`, `/sitemap-index.xml`, `/sitemaps/[feed]`, `/robots.txt`, `/llms.txt`, `manifest.webmanifest` |
 
 Tam marşrut inventarı və istifadəçi axınları Wiki-dəki [Funksiyalar və marşrutlar](https://github.com/MuradoffTehmez/LuxeHome/wiki/Features-and-Routes) səhifəsindədir.
 
@@ -161,15 +180,20 @@ Tam marşrut inventarı və istifadəçi axınları Wiki-dəki [Funksiyalar və 
 
 ```text
 luxehome/
-├── migrations/                 # Cloudflare D1 SQL miqrasiyaları
+├── e2e/                        # Playwright testləri və fixture-lar
+├── migrations/                 # Cloudflare D1 SQL miqrasiyaları (0001–0049)
 ├── prisma/
-│   ├── schema.prisma           # 33 domen, auth və əməliyyat modeli
+│   ├── schema.prisma           # 68 domen, auth və əməliyyat modeli
 │   ├── seed.ts                 # Sistem/taksonomiya başlanğıc məlumatları
 │   ├── seed.sql                # D1 üçün yaradılmış seed
-│   ├── taxonomy-data.ts        # Əmlak və yerləşmə taksonomiyası
-│   └── remove-demo-content.sql # Köhnə demo qeydlərinin təmizlənməsi
+│   ├── taxonomy-data.ts        # Əmlak taksonomiyası
+│   ├── az-admin-divisions.json # Rəsmi inzibati-ərazi bölgüsü snapshot-u
+│   ├── locations-data.ts       # Generasiya olunur (db:locations:build)
+│   ├── demo-content-data.ts    # Staging nümunə məzmunu
+│   └── remove-demo-content.sql # Demo qeydlərinin təmizlənməsi
 ├── public/                     # Loqo, OG şəkli və statik fayllar
-├── scripts/                    # Loqo və e-poçt köməkçi skriptləri
+├── scripts/                    # Loqo, locations generatoru, E2E stack və SEO smoke skriptləri
+├── workers/saved-search-cron/  # Gündəlik cron Worker-i
 ├── src/
 │   ├── app/                    # Səhifələr, layout-lar, actions və route handler-lar
 │   ├── components/
@@ -178,6 +202,7 @@ luxehome/
 │   │   └── ui/                 # Dizayn sistemi primitivləri
 │   ├── config/site.ts          # Brend, əlaqə və naviqasiya məlumatları
 │   └── lib/                    # Sorğular, auth, admin, media, SEO və utilitlər
+├── worker.ts                   # OpenNext sarğısı + kənar HTML keşi
 ├── next.config.ts
 ├── open-next.config.ts
 └── wrangler.jsonc              # Production və staging Cloudflare resursları
@@ -255,6 +280,12 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `NOTIFICATION_EMAIL` | Müraciət bildirişinin alıcısı | E-poçt bildirişi üçün |
 | `RESEND_WEBHOOK_SECRET` | Resend/Svix webhook imzasının doğrulanması | Korporativ e-poçt jurnalı üçün |
 | `CRON_SECRET` | Saved-search digest endpoint Bearer sirri | Digest cron üçün |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_HOSTNAMES` | Cloudflare Turnstile | Formalar üçün |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Ofis çatına lead bildirişi | İstəyə bağlı |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google ilə giriş; yoxdursa söndürülüdür | İstəyə bağlı |
+| `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` | Telefonla OTP girişi; yoxdursa söndürülüdür | İstəyə bağlı |
+| `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Web Push | Push bildirişi üçün |
+| `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN` | Cloudflare Web Analytics beacon-u (build dəyişəni) | İstəyə bağlı |
 | `CLOUDFLARE_ANALYTICS_TOKEN` | Cloudflare GraphQL analitika sorğusu (`Zone` → `Analytics Read`; `Account Analytics Read` deyil) | Admin analitika üçün |
 | `GSC_SITE_URL` | Search Console property-si (`sc-domain:luxehomeestate.az`) | Admin GSC üçün |
 | `GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON` | Google service account JSON key; access token runtime-da avtomatik alınır | Admin GSC üçün tövsiyə olunur |
@@ -292,10 +323,13 @@ prompt-una verilir.
 | `npm run start` | Hazır build üçün Next.js server |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
-| `npm test` | Vitest suite-i `workerd` mühitində işlədir |
+| `npm run dead-code` | Knip: istifadə olunmayan fayl və asılılıqlar |
+| `npm test` | Vitest suite-i `workerd` və Node mühitində işlədir (real D1 integration daxil) |
 | `npm run test:watch` | Vitest watch rejimi |
 | `npm run test:seo:routes` | Production SEO route status smoke testi |
 | `npm run test:seo:live` | Production SERP qəbul (acceptance) testi |
+| `npm run e2e` | Konfiqurasiya edilmiş workerd mühitinə qarşı Playwright |
+| `npm run e2e:local:build` / `:prepare` / `:serve` | Lokal workerd stack (bundle, təzə D1 + test hesabları, `:8787`) |
 | `npm run preview` | OpenNext build və lokal Worker preview |
 | `npm run cf-typegen` | Wrangler binding tiplərini yeniləyir |
 
@@ -312,9 +346,11 @@ prompt-una verilir.
 | `npm run db:seed:local` | Seed-i lokal D1-ə tətbiq edir |
 | `npm run db:seed:staging` | Seed-i staging D1-ə tətbiq edir |
 | `npm run db:seed:remote` | Seed-i production D1-ə tətbiq edir |
-| `npm run db:clean-demo:local` | Lokal D1-də demo kontenti təmizləyir |
-| `npm run db:clean-demo:remote` | Production D1-də demo kontenti təmizləyir |
+| `npm run db:demo:build` | Nümunə məzmun SQL-ini yaradır |
+| `npm run db:demo:local` / `:staging` | Nümunə məzmunu tətbiq edir (production-a yüklənmir) |
+| `npm run db:clean-demo:local` / `:staging` / `:remote` | Bütün `isDemo` qeydlərini silir və açarı söndürür |
 | `npm run db:studio` | Prisma Studio |
+| `npm run db:locations:build` | Rəsmi inzibati-ərazi JSON-undan `locations-data.ts` yaradır |
 | `npm run db:taxonomy:build` | Taksonomiya SQL-i yaradır |
 | `npm run db:taxonomy:local` | Taksonomiyanı lokal D1-ə tətbiq edir |
 | `npm run db:taxonomy:staging` | Taksonomiyanı staging D1-ə tətbiq edir |
@@ -343,22 +379,25 @@ prompt-una verilir.
 Prisma sxemi dəyişdikdə:
 
 1. Dəyişikliyi `prisma/schema.prisma`-da edin.
-2. `npm run db:migrate:new` çıxışını yeni, nömrələnmiş `migrations/*.sql` faylı kimi nəzərdən keçirin.
-3. `npm run db:migrate:local` ilə lokal D1-də tətbiq edin.
+2. `npm run db:migrate:local`, sonra `npm run db:migrate:new -- --output migrations/000N_ad.sql`.
+3. Yaradılmış SQL-i nəzərdən keçirin və yenidən `npm run db:migrate:local` ilə tətbiq edin.
 4. Seed/taksonomiya təsirlənirsə generatorları işlədin.
 5. Keyfiyyət qapısını keçirin.
-6. Əvvəl staging, sonra backup-dan sonra production miqrasiyası edin.
+6. `main`-ə merge-dən sonra CI miqrasiyanı hər mühitdə bundle-dan **əvvəl** tətbiq edir (staging → production).
 
 D1 üçün destruktiv dəyişikliklər geri dönüş planı olmadan production-a tətbiq edilməməlidir.
 
 ## Təhlükəsizlik xülasəsi
 
-- İşçi hesabları üçün TOTP 2FA məcburidir; ictimai hesab axını panel axınından ayrıdır.
+- İşçi hesabları üçün TOTP 2FA məcburidir, passkey alternativ ikinci mərhələdir; ictimai hesab axını panel axınından ayrıdır.
+- Formalar Cloudflare Turnstile ilə qorunur; test bypass-ı qəsdən yoxdur.
+- Google girişi OIDC + PKCE + nonce ilə, əməkdaş hesabına heç vaxt bağlanmır; telefon OTP kodu HMAC-lə saxlanılır.
 - Parollar Web Crypto PBKDF2-HMAC-SHA256, 100 000 iterasiya və təsadüfi salt ilə hash olunur.
 - TOTP sirri `AUTH_SECRET`-dən HKDF ilə törədilən AES-GCM açarı ilə şifrələnir.
 - Sessiyalar D1-də saxlanılır: 8 saat sürüşən müddət, 7 gün mütləq son hədd və dərhal revoke imkanı var.
 - Beş uğursuz cəhddən sonra hesab 15 dəqiqə kilidlənir; login və admin yazıları ayrıca Cloudflare rate-limit binding-ləri ilə qorunur.
-- Admin mutation-ları origin, canlı sessiya, rol/icazə və yazı sürəti yoxlamasından keçir.
+- Admin mutation-ları origin, canlı sessiya, rol/icazə (25 permission) və yazı sürəti yoxlamasından keçir; toplu əməliyyatlar hər id üçün eyni tək action-dan keçir.
+- AI, xəritə tile, qiymətləndirmə və monitorinq ayrıca rate-limit binding-ləri ilə kvota drenajından qorunur.
 - Media upload fayl adına etibar etmir, ölçünü və magic byte-ları yoxlayır, SVG qəbul etmir və təhlükəsiz təsadüfi R2 açarı yaradır.
 - Admin route-ları CSP, `no-store`, clickjacking və referrer başlıqları ilə sərtləşdirilib.
 
@@ -384,17 +423,22 @@ Töhfələr açığız — nasazlıq bildirişi, funksiya təklifi və ya sənə
 Dəyişiklik göndərməzdən əvvəl:
 
 ```bash
+npm run test
 npm run typecheck
 npm run lint
-npm test
+npm run dead-code
 npm run build
 ```
 
-Cari qapı **104 Vitest faylındakı 480 testi** əhatə edir. Auth, sessiya, lokallaşdırma, SEO/SERP,
-sitemap data mənbələri, saved-search, tərəfdaşlıq, axtarış normallaşdırması, Turnstile, admin
-responsive siyahıları, media rollback-i və public-content sərhədləri yoxlanır. GitHub Actions eyni
-dörd əmri hər PR və `main` push-unda işlədir. `main` push-u staging deploy və canlı Playwright
-E2E-dən keçmədən production-a yayımlanmır; production post-deploy smoke yoxlaması hələ manualdır.
+Cari qapı **172 Vitest faylındakı 875 testi** əhatə edir (workerd domen qatı, Node SSR komponentləri
+və real miniflare D1 integration testləri). GitHub Actions hər PR-da `Quality gate` (əlavə olaraq
+`npm audit --audit-level=high`) və məcburi `Local stack E2E` (lokal workerd + real D1/R2 üzərində
+Playwright) işlədir. `main` push-unda axın: **quality → deploy-staging → e2e-staging →
+deploy-production**; hər deploy job-u əvvəlcə öz D1 miqrasiyalarını tətbiq edir. Staging E2E sınarsa
+production toxunulmur.
+
+**`npm run build`-i buraxmayın:** Server Action qaydaları yalnız webpack mərhələsində yoxlanılır —
+`"use server"` faylındakı hər ixrac `async` olmalıdır.
 
 CI iş axını asılılıqları quraşdırmazdan əvvəl `package.json`-dakı `packageManager` dəyərini oxuyub
 eyni npm versiyasını qurur, Node versiyasını isə `.nvmrc`-dən götürür. Bu, lock faylı formatının
@@ -407,14 +451,16 @@ npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xət
   edilir, əlaqəli təmizlik yarımçıq qalarsa maintenance işi onu avtomatik tamamlayır.
 - Admin panel dili `User.locale` ilə AZ/EN/RU arasında saxlanılır; yeni admin mətnləri hər üç
   kataloqda parity testi ilə qorunmalıdır.
-- Playwright E2E staging-də deployment qapısıdır. `npm run test:seo:routes` və `npm run
-  test:seo:live` production SEO/SERP qəbul yoxlamasını avtomatlaşdırır; production üçün tam
-  post-deploy brauzer smoke hələ manualdır.
+- Playwright E2E PR-da (lokal stack) və staging-də deployment qapısıdır. Production üçün tam
+  post-deploy brauzer smoke hələ manualdır (`npm run test:seo:routes` / `test:seo:live` var).
+- Real ödəniş provayderi qəsdən yoxdur: premium paket ödənişi ofisdə/köçürmə ilə alınır və paneldə qeyd olunur.
+- Google və telefonla giriş, Telegram bildirişi və Web Analytics secret/token verilənə qədər söndürülüdür.
+- TypeScript 7, ESLint 10 və Vitest 5 upstream uyğunsuzluğuna görə `dependabot.yml`-də ignore edilib.
 - Avtomatlaşdırılmış D1 backup/restore drill hələ qurulmayıb.
 - Bilik Mərkəzinin idxal paketi DRAFT yaradır; hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilmir.
 - Korporativ e-poçt hadisələri yalnız `RESEND_WEBHOOK_SECRET` və Resend endpoint abunəliyi qurulduqdan sonra dolur; məzmun deyil, metadata saxlanılır.
-- Turnstile əlaqə, qeydiyyat, ictimai giriş və hesab təhlükəsizliyi formalarına bağlıdır; gizli
-  açar və hostname allowlist Cloudflare mühitində düzgün saxlanmalıdır.
+- Turnstile əlaqə, qeydiyyat, ictimai/staff giriş, telefon OTP, açıq qapı və hesab təhlükəsizliyi
+  formalarına bağlıdır; gizli açar və hostname allowlist Cloudflare mühitində düzgün saxlanmalıdır.
 - Hüquqi mətnlər, ofis koordinatları və iş saatları şirkət/hüquqşünas təsdiqi tələb edir.
 
 Ətraflı prioritetlər Wiki-dəki [Cari vəziyyət və yol xəritəsi](https://github.com/MuradoffTehmez/LuxeHome/wiki/Status-and-Roadmap) səhifəsində saxlanılır.
@@ -428,6 +474,9 @@ npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xət
 - Şirkət məlumatları `src/config/site.ts` xaricində təkrarlanmır.
 - Dark mode komponent `dark:` sinifləri ilə deyil, semantik CSS tokenləri ilə idarə olunur.
 - `Section` şaquli boşluğu `spacing` propu ilə verilir.
+- Admin server komponentləri `await getAdminT()` işlədir; panel JSX-də xam mətn yazılmır.
+- Yeni elan yazma yolu `queuePropertyVectorSync()` və `queueListingEnrichment()` çağırmalıdır.
+- Server tərəfdə sessiya oxuyan yeni ictimai səhifə `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunur.
 
 ## Müəllif hüquqları, şirkət və lisenziya
 
