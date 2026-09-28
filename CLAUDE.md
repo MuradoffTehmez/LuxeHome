@@ -329,7 +329,7 @@ Layout primitivləri: `Container` (max-width + padding) və `Section`.
 Boşluğu `className="py-10 sm:py-12"` ilə əvəzləmə — bazadakı `lg:` sinfi qüvvədə qalır və
 override desktopda səssizcə işləmir. Tam əl ilə idarə lazımdırsa `spacing="none"` ver.
 
-### Yerləşmə ağacı (şəhər / rayon / qəsəbə / kənd)
+### Yerləşmə ağacı (şəhər / rayon / qəsəbə / kənd / massiv / metro / nişangah)
 
 Mənbə **Azərbaycanın rəsmi inzibati-ərazi bölgüsüdür**: «İnzibati Ərazi Bölgüsü Təsnifatı, 2024»
 (Dövlət Statistika Komitəsi kollegiyasının 16.02.2024 tarixli 2/2 nömrəli qərarı, Milli Məclisin
@@ -338,12 +338,22 @@ Aparatı ilə razılaşdırılıb) — <https://e-qanun.az/framework/57325>.
 Data axını **generasiyalıdır**, `locations-data.ts` əl ilə redaktə edilmir:
 
 ```
-prisma/az-admin-divisions.json   # rəsmi sənəddən çıxarılmış snapshot
-  → npm run db:locations:build   # scripts/build-locations-data.py
-prisma/locations-data.ts         # generasiya olunur
+prisma/az-admin-divisions.json        # DSK təsnifatından snapshot
+prisma/unvanportali-admin-units.json  # Ünvan Reyestri: Bakı + 11 iri şəhər/rayon, rəsmi kodlar
+prisma/baku-market-locations.json     # massiv, metro, nişangah, alias (mənbə kodları ilə)
+  → npm run db:locations:build        # scripts/build-locations-data.py — ziddiyyətdə dayanır
+prisma/locations-data.ts              # generasiya olunur
   → npm run db:taxonomy:build
-prisma/taxonomy.sql              # db:taxonomy:local / :staging / :remote
+prisma/taxonomy.sql                   # db:taxonomy:local / :staging / :remote
+
+prisma/unvanportali-streets.json      # Ünvan Reyestrinin rəsmi küçələri (~20 000)
+  → npm run db:streets:build          # public/data/kuceler/<rəsmi kod>.json
+  → npm run db:locations:report       # docs/erazi/baki-erazi-bolgusu.md
 ```
+
+Tam mənbə siyahısı, ziddiyyətlərin həlli və hər rayonun siyahısı:
+`docs/erazi/baki-erazi-bolgusu.md` (generasiya olunur). CI yalnız `migrations/`-ı tətbiq etdiyi
+üçün taksonomiya dəyişikliyi production-a özü-yetərli miqrasiya ilə çatdırılır (`0031`, `0050`).
 
 `Location.kind` səviyyələri (`src/lib/constants.ts` → `LOCATION_KINDS`):
 
@@ -352,12 +362,22 @@ prisma/taxonomy.sql              # db:taxonomy:local / :staging / :remote
 | `CITY` | 11 respublika tabeli şəhər **və** 64 rayon — istifadəçinin birinci seçimi | 75 |
 | `DISTRICT` | **Yalnız şəhərdaxili** inzibati rayon: Bakının 12, Gəncənin 2 rayonu | 14 |
 | `SETTLEMENT` | Rəsmi qəsəbə və rayon tabeli şəhər (Xırdalan, Xudat, Horadiz, Liman) | 266 |
-| `VILLAGE` | Kənd | 265 |
-| `NEIGHBORHOOD` | Yaşayış massivi/mikrorayon — **rəsmi inzibati vahid deyil** | 24 |
-| `METRO` | Bakı metrosunun stansiyası; valideyni Bakıdır | 26 |
+| `VILLAGE` | Kənd (iri şəhərlərdə Ünvan Reyestrinin tam siyahısı) | 455 |
+| `NEIGHBORHOOD` | Yaşayış massivi/mikrorayon — **rəsmi inzibati vahid deyil** | 66 |
+| `METRO` | Bakı metrosunun stansiyası (Memar Əcəmi-2 daxil); valideyni Bakıdır | 27 |
+| `LANDMARK` | Nişangah (ticarət mərkəzi, park, universitet…); valideyni şəhərdir, elanda `landmarkId` | 214 |
 
 Qaydalar:
 
+- **Rəsmi status yalnız DSK/Ünvan Reyestrindən gəlir.** Elan saytlarının «qəs.» yazması qəsəbə
+  statusu vermir — belə adlar `NEIGHBORHOOD`-dur. Rəsmi rayon/qəsəbə/kənd `Location.officialCode`
+  (8 rəqəm) daşıyır; massiv, metro və nişangahda kod yoxdur.
+- **Alternativ yazılış ayrıca yer yaratmır.** «Müşfiqabad», «Kirov qəsəbəsi», «8 km» kimi adlar
+  `baku-market-locations.json` → `aliases`-dədir və `searchName`-ə yazılır (` | ` ilə).
+- **Nişangah (`LANDMARK`) `LOCATION_CHILD_KINDS`-ə salınmır** — öz sahəsi (`landmarkId`,
+  `?nisangah=`) var; validasiya `landmarkBelongsToCity()` ilə növü və şəhəri yoxlayır.
+- **Küçə sahəsi sərbəst mətndir**, rəsmi siyahı yalnız təklifdir: `LocationFields` seçimdən yuxarı
+  qalxıb kodu olan ilk vahidin `public/data/kuceler/<kod>.json` faylını yükləyir.
 - **Rayon `CITY` səviyyəsindədir, `DISTRICT` deyil.** Quba ilə Bakı axtarışda eyni açılan
   siyahıdan seçilir; `DISTRICT` yalnız şəhərin daxilindəki rayon deməkdir.
 - **Xırdalan, Novxanı, Masazır, Görədil Abşeron rayonunun altındadır** — nə Bakının rayonu,
@@ -540,7 +560,7 @@ build dəyişəni olanda ictimai səhifələrə əlavə olunur (`analytics-provi
 
 URL query parametrləri filtr vəziyyətinin yeganə mənbəyidir. `SearchPanel` göndərdiyi adlarla
 `emlaklar/page.tsx` oxuduğu adlar **eyni olmalıdır**: `elan`, `axtaris`, `tip`, `seher`, `rayon`,
-`otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `siralama`, `sehife`.
+`metro`, `nisangah`, `otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `siralama`, `sehife`.
 `elan` dəyəri `LISTING_TYPES` sabitindən gəlir (`SALE` / `RENT`) — azərbaycanca mətn deyil.
 
 Boş nəticədə `EmptySearchSuggestions` hər aktiv çipi çıxaranda neçə elan qaldığını göstərir
