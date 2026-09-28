@@ -14,6 +14,22 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    # Bu major yeniləmələr upstream uyğunluğu gələnə qədər saxlanılır:
+    # - typescript 7: typescript-eslint yalnız TS <6.1 dəstəkləyir, lint çökür.
+    # - eslint 10: eslint-config-next-in eslint-plugin-react-ı ESLint 10-da
+    #   `context.getFilename` olmadığı üçün çökür.
+    # - vitest 5: @cloudflare/vitest-plugin peer olaraq yalnız vitest ^4 qəbul edir.
+    # Plugin/konfiq yeni major-u dəstəkləyəndə uyğun sətri sil.
+    ignore:
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
+      - dependency-name: vitest
+        update-types:
+          - version-update:semver-major
     groups:
       production-dependencies:
         dependency-type: production
