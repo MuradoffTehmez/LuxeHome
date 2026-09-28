@@ -347,7 +347,8 @@ prompt-una verilir.
 | `npm run db:seed:staging` | Seed-i staging D1-ə tətbiq edir |
 | `npm run db:seed:remote` | Seed-i production D1-ə tətbiq edir |
 | `npm run db:demo:build` | Nümunə məzmun SQL-ini yaradır |
-| `npm run db:demo:local` / `:staging` | Nümunə məzmunu tətbiq edir (production-a yüklənmir) |
+| `npm run db:demo:local` / `:staging` | Nümunə məzmunu tətbiq edir |
+| `npm run db:demo:remote` | Nümunə məzmunu **production** D1-ə yazır — qərara görə production-a yüklənmir, işlətməyin |
 | `npm run db:clean-demo:local` / `:staging` / `:remote` | Bütün `isDemo` qeydlərini silir və açarı söndürür |
 | `npm run db:studio` | Prisma Studio |
 | `npm run db:locations:build` | Rəsmi inzibati-ərazi JSON-undan `locations-data.ts` yaradır |
@@ -372,7 +373,7 @@ prompt-una verilir.
 | `npm run deploy:cron:staging` | Staging scheduled Worker-i yayımlayır |
 
 > [!WARNING]
-> Remote miqrasiya, seed, taksonomiya və demo-təmizləmə əmrləri production məlumatını dəyişir. Hədəf mühiti, backup-u və SQL məzmununu ayrıca yoxlamadan bu əmrləri işlətməyin.
+> Remote miqrasiya, seed, taksonomiya, demo yükləmə (`db:demo:remote`) və demo-təmizləmə əmrləri production məlumatını dəyişir. Hədəf mühiti, backup-u və SQL məzmununu ayrıca yoxlamadan bu əmrləri işlətməyin.
 
 ## Verilənlər bazası iş axını
 
@@ -396,7 +397,7 @@ D1 üçün destruktiv dəyişikliklər geri dönüş planı olmadan production-a
 - TOTP sirri `AUTH_SECRET`-dən HKDF ilə törədilən AES-GCM açarı ilə şifrələnir.
 - Sessiyalar D1-də saxlanılır: 8 saat sürüşən müddət, 7 gün mütləq son hədd və dərhal revoke imkanı var.
 - Beş uğursuz cəhddən sonra hesab 15 dəqiqə kilidlənir; login və admin yazıları ayrıca Cloudflare rate-limit binding-ləri ilə qorunur.
-- Admin mutation-ları origin, canlı sessiya, rol/icazə (25 permission) və yazı sürəti yoxlamasından keçir; toplu əməliyyatlar hər id üçün eyni tək action-dan keçir.
+- Admin mutation-ları origin, canlı sessiya, rol/icazə (25 permission) və yazı sürəti yoxlamasından keçir; hesab, agentlik, müraciət, bloq, layihə, tərəfdaş və xidmət siyahılarında toplu əməliyyat (`guardedBulk`) hər id üçün eyni tək action-dan keçir; əmlakların toplu yeniləməsi (`bulkUpdateProperties`) isə öz guard-ı və tək ümumi audit qeydi ilə ayrıca yoldur.
 - AI, xəritə tile, qiymətləndirmə və monitorinq ayrıca rate-limit binding-ləri ilə kvota drenajından qorunur.
 - Media upload fayl adına etibar etmir, ölçünü və magic byte-ları yoxlayır, SVG qəbul etmir və təhlükəsiz təsadüfi R2 açarı yaradır.
 - Admin route-ları CSP, `no-store`, clickjacking və referrer başlıqları ilə sərtləşdirilib.
