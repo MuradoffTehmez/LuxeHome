@@ -18,7 +18,7 @@ OUT = os.path.join(ROOT, "docs", "erazi", "baki-erazi-bolgusu.md")
 
 SOURCE_NAMES = {
     "B": "bina", "K": "kub", "A": "arenda", "Y": "yeniemlak", "L": "lalafo",
-    "R": "araşdırma", "O": "OSM", "W": "rəsmi/xəbər",
+    "R": "araşdırma", "O": "OSM", "W": "rəsmi/xəbər", "T": "tap", "E": "emlak",
 }
 
 BAKU_ORDER = [
@@ -47,7 +47,10 @@ CONFLICTS = [
     ("Nübar, Atyalı, Corat, Kimyaçılar şəhərciyi, Nasosnu", "bazar saytları «Bakı» altında",
      "Bakı deyil: Nübar/Atyalı — Abşeron massivi; Corat — Sumqayıt qəsəbəsi; "
      "Nasosnu — Hacı Zeynalabdinin alias-ı"),
-    ("Şuşa (Sabunçu)", "kub, yeniemlak", "**Əlavə edilmədi** — rəsmi və müstəqil təsdiq tapılmadı"),
+    ("Şuşa (Sabunçu)", "kub, yeniemlak «Şuşa» yazır, rayon göstərmir",
+     "**Şuşa şəhərciyi → Sabunçu** (Yeni Ramana/Ramana) — emlak.az elanları və yerli mənbələr təsdiqləyir"),
+    ("Yeni Gəncə, Gülüstan", "tap.az başlıqlarında «qəs.»", "**Gəncə massivi** — evv.az/homdom.az elanları təsdiqləyir"),
+    ("Məhəmmədi", "tap.az-da bir elan", "«Məhəmmədli»nin yazı səhvi — alias, ayrıca yer yox"),
     ("Qurd qapısı", "arenda məntəqə kimi", "**Əlavə edilmədi** — qəbiristanlıqdır"),
     ("Suraxanı qəs., Yasamal qəs.", "bazar saytları ayrıca qəsəbə",
      "Rayonun özü ilə seçilir (rəsmi qəsəbə deyil / ad təkrarı)"),
@@ -157,9 +160,11 @@ def main():
         "| `docs/erazi/sources/yeniemlak-az.json`, `yeniemlak-az-etrafli.txt` |")
     add("| [lalafo.az](https://lalafo.az) — `params/filter` API | 113 məntəqə, 26 metro, 12 rayon "
         "| `docs/erazi/sources/lalafo-az.json` |")
-    add("| [tap.az](https://tap.az/elanlar/dasinmaz-emlak) | Strukturlu ərazi siyahısı yoxdur — "
-        "«Yerləşmə yeri» sərbəst mətndir | — |")
-    add("| [emlak.az](https://emlak.az) | Cloudflare yoxlaması səbəbindən oxunmadı | — |")
+    add("| [tap.az](https://tap.az/elanlar/dasinmaz-emlak) | Strukturlu filtr yoxdur («Yerləşmə yeri» sərbəst mətndir); "
+        "1 440 elan başlığının yer hissəsi sayılıb — 119 ad, hamısı ağacda var, metro qısaltmaları alias oldu "
+        "| `docs/erazi/sources/tap-az-titles.json` |")
+    add("| [emlak.az](https://emlak.az) | Cloudflare yoxlaması səbəbindən birbaşa oxunmadı; axtarış indeksindəki "
+        "rayon/metro/qəsəbə səhifələri toplanıb — hamısı ağacda var | `docs/erazi/sources/emlak-az-index.json` |")
     add("| [evimemlak.az](https://evimemlak.az) | Yalnız Naxçıvan MR: Naxçıvan şəhəri + 7 rayon (hamısı ağacda var); "
         "məhəllə siyahısı yoxdur | — |")
     add("| bina.az / kub.az / lalafo.az — digər şəhərlər | Bakıdan kənarda demək olar ki, bölgü yoxdur "
@@ -273,8 +278,8 @@ def main():
     add("")
     add("## Açıq qalan məsələlər")
     add("")
-    add("- **emlak.az** Cloudflare yoxlaması səbəbindən oxunmadı; yoxlamanı brauzerdə keçib siyahını müqayisə etmək olar.")
-    add("- **Şuşa (Sabunçu)** kub.az və yeniemlak.az-da var, amma rəsmi və müstəqil təsdiq tapılmadı — əlavə edilmədi.")
+    add("- **emlak.az** yalnız axtarış indeksi ilə yoxlanıb; Cloudflare yoxlaması keçildikdən sonra tam filtr "
+        "siyahısı tutuşdurula bilər.")
     add("- Nişangahların EN/RU adları hələlik transliterasiyadır (`localizeLocation`).")
     add("- Nişangahlar hələlik şəhərə bağlıdır; koordinatla rayona bağlamaq sonrakı mərhələdir.")
 

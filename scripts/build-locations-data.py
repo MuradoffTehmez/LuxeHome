@@ -434,7 +434,9 @@ def main():
             add('    code: %s,' % q(top_code))
             add('    districts: [%s],' % ', '.join(
                 '{ name: %s, places: [] }' % q(d) for d in GANJA_DISTRICTS))
-            add('    places: [%s],' % ', '.join(call('s', x, code_of(x)) for x in towns))
+            # Qəsəbələr + bazar massivləri (Yeni Gəncə, Gülüstan) şəhərə bağlanır.
+            emit_items(4, 'places', [call('s', x, code_of(x)) for x in towns]
+                       + [call('n', x) for x in city_hoods.get(name, [])])
             add('  },')
             return
 

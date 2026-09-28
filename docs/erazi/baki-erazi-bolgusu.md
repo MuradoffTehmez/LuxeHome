@@ -9,7 +9,7 @@
 | Şəhər rayonu | 12 | DSK təsnifatı + Ünvan Reyestri | `DISTRICT`, rəsmi kodla |
 | Rəsmi qəsəbə | 59 | DSK təsnifatı + Ünvan Reyestri | `SETTLEMENT`, rəsmi kodla (rayonla eyniadlı 4-ü rayonun özü ilə seçilir) |
 | Rəsmi kənd | 0 | DSK: Bakıda kənd yoxdur | — |
-| Bazar massivi / mikrorayon | 61 | bina, kub, arenda, yeniemlak, lalafo; rayon OSM ilə yoxlanıb | `NEIGHBORHOOD` |
+| Bazar massivi / mikrorayon | 62 | bina, kub, arenda, yeniemlak, lalafo; rayon OSM ilə yoxlanıb | `NEIGHBORHOOD` |
 | Metro stansiyası | 27 | bina, arenda, lalafo, yeniemlak | `METRO` |
 | Nişangah | 214 | bina, kub, yeniemlak (dublikatsız) | `LANDMARK`, elanda `landmarkId` |
 | Rəsmi küçə/prospekt/döngə (Bakı) | 10865 | Ünvan Reyestri (unvanportali.az) | «Küçə» sahəsində təklif |
@@ -28,8 +28,8 @@
 | [arenda.az](https://arenda.az) | 112 Bakı məntəqəsi, 27 metro, 73 Sumqayıt ərazisi | `docs/erazi/sources/arenda-az.json` |
 | [yeniemlak.az](https://yeniemlak.az) | Bakı rayonları üzrə məntəqələr, ətraflı axtarış (nişangahlar), Abşeron (19), Sumqayıt (75) | `docs/erazi/sources/yeniemlak-az.json`, `yeniemlak-az-etrafli.txt` |
 | [lalafo.az](https://lalafo.az) — `params/filter` API | 113 məntəqə, 26 metro, 12 rayon | `docs/erazi/sources/lalafo-az.json` |
-| [tap.az](https://tap.az/elanlar/dasinmaz-emlak) | Strukturlu ərazi siyahısı yoxdur — «Yerləşmə yeri» sərbəst mətndir | — |
-| [emlak.az](https://emlak.az) | Cloudflare yoxlaması səbəbindən oxunmadı | — |
+| [tap.az](https://tap.az/elanlar/dasinmaz-emlak) | Strukturlu filtr yoxdur («Yerləşmə yeri» sərbəst mətndir); 1 440 elan başlığının yer hissəsi sayılıb — 119 ad, hamısı ağacda var, metro qısaltmaları alias oldu | `docs/erazi/sources/tap-az-titles.json` |
+| [emlak.az](https://emlak.az) | Cloudflare yoxlaması səbəbindən birbaşa oxunmadı; axtarış indeksindəki rayon/metro/qəsəbə səhifələri toplanıb — hamısı ağacda var | `docs/erazi/sources/emlak-az-index.json` |
 | [evimemlak.az](https://evimemlak.az) | Yalnız Naxçıvan MR: Naxçıvan şəhəri + 7 rayon (hamısı ağacda var); məhəllə siyahısı yoxdur | — |
 | bina.az / kub.az / lalafo.az — digər şəhərlər | Bakıdan kənarda demək olar ki, bölgü yoxdur (Naxçıvan MR rayonları, Quzanlı, Nabran) | `docs/erazi/sources/bina-az-other-cities.json`, `lalafo-az.json` |
 | OpenStreetMap / Nominatim | Mənbələr ziddiyyətli olanda rayon sərhədi yoxlaması | — |
@@ -54,7 +54,9 @@
 | Müşfiqabad, Səngəçal | bazar yazılışı | Rəsmi ad **Müşviqabad, Sanqaçal**; bazar yazılışı alias |
 | Kirov qəsəbəsi | kub.az ayrıca yer kimi | **M.Ə.Rəsulzadə**-nin 1999-a qədərki adı — alias |
 | Nübar, Atyalı, Corat, Kimyaçılar şəhərciyi, Nasosnu | bazar saytları «Bakı» altında | Bakı deyil: Nübar/Atyalı — Abşeron massivi; Corat — Sumqayıt qəsəbəsi; Nasosnu — Hacı Zeynalabdinin alias-ı |
-| Şuşa (Sabunçu) | kub, yeniemlak | **Əlavə edilmədi** — rəsmi və müstəqil təsdiq tapılmadı |
+| Şuşa (Sabunçu) | kub, yeniemlak «Şuşa» yazır, rayon göstərmir | **Şuşa şəhərciyi → Sabunçu** (Yeni Ramana/Ramana) — emlak.az elanları və yerli mənbələr təsdiqləyir |
+| Yeni Gəncə, Gülüstan | tap.az başlıqlarında «qəs.» | **Gəncə massivi** — evv.az/homdom.az elanları təsdiqləyir |
+| Məhəmmədi | tap.az-da bir elan | «Məhəmmədli»nin yazı səhvi — alias, ayrıca yer yox |
 | Qurd qapısı | arenda məntəqə kimi | **Əlavə edilmədi** — qəbiristanlıqdır |
 | Suraxanı qəs., Yasamal qəs. | bazar saytları ayrıca qəsəbə | Rayonun özü ilə seçilir (rəsmi qəsəbə deyil / ad təkrarı) |
 | Sumqayıt: 72-ci / 76-cı məhəllə | hər biri yalnız bir saytda (arenda / yeniemlak) | **Əlavə edilmədi** — iki mənbədə təsdiqlənənlər (17 mikrorayon, 40 məhəllə, 10 ərazi) saxlanılıb |
@@ -81,9 +83,9 @@
 
 | Ad | Alternativ yazılış | Mənbələr |
 |---|---|---|
-| 6-cı mikrorayon | 6 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, rəsmi/xəbər |
-| 7-ci mikrorayon | 7 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, rəsmi/xəbər |
-| 8-ci mikrorayon | 8 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, rəsmi/xəbər |
+| 6-cı mikrorayon | 6 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, rəsmi/xəbər, tap |
+| 7-ci mikrorayon | 7 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, rəsmi/xəbər, tap |
+| 8-ci mikrorayon | 8 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, rəsmi/xəbər, tap |
 | 9-cu mikrorayon | 9 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, rəsmi/xəbər |
 | Dərnəgül | — | yeniemlak, araşdırma, OSM |
 | Xutor | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, OSM |
@@ -114,7 +116,7 @@ Rəsmi qəsəbə yoxdur — ərazi sahə inzibati ərazi dairələri ilə idarə
 |---|---|---|
 | 1-ci mikrorayon | 1 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
 | 2-ci mikrorayon | 2 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
-| 3-cü mikrorayon | 3 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
+| 3-cü mikrorayon | 3 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma, emlak |
 | 4-cü mikrorayon | 4 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
 | 5-ci mikrorayon | 5 mkr | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
 | Kubinka | — | bina, kub, arenda, yeniemlak, lalafo, OSM |
@@ -184,14 +186,15 @@ Rəsmi qəsəbə yoxdur — ərazi sahə inzibati ərazi dairələri ilə idarə
 
 | Ad | Alternativ yazılış | Mənbələr |
 |---|---|---|
-| Yeni Ramana | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
+| Yeni Ramana | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, emlak, tap |
 | Yeni Balaxanı | — | bina, kub, lalafo, OSM |
 | Savalan | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
 | Albalı | — | kub, yeniemlak, lalafo, araşdırma |
-| Zabrat 1 | I Zabrat, 1-ci Zabrat | yeniemlak, araşdırma, rəsmi/xəbər |
+| Zabrat 1 | I Zabrat, 1-ci Zabrat | yeniemlak, araşdırma, rəsmi/xəbər, emlak |
 | Zabrat 2 | II Zabrat, 2-ci Zabrat | yeniemlak, araşdırma |
 | Sea Breeze | — | bina, yeniemlak, OSM |
 | Ləhic bağları | Ləhiş bağları | yeniemlak, rəsmi/xəbər |
+| Şuşa şəhərciyi | Şuşa qəsəbəsi | kub, yeniemlak, emlak, rəsmi/xəbər |
 
 ### Səbail rayonu — kod `00400003`, rayon səviyyəsində 196 rəsmi küçə
 
@@ -206,7 +209,7 @@ Rəsmi qəsəbə yoxdur — ərazi sahə inzibati ərazi dairələri ilə idarə
 
 | Ad | Alternativ yazılış | Mənbələr |
 |---|---|---|
-| Bayıl | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
+| Bayıl | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, tap |
 | 20-ci sahə | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
 | İçərişəhər | — | kub, arenda, yeniemlak, araşdırma |
 | Şıxov | Şıx | bina, kub, lalafo, yeniemlak, OSM |
@@ -228,15 +231,15 @@ Rəsmi qəsəbə yoxdur — ərazi sahə inzibati ərazi dairələri ilə idarə
 
 | Ad | Alternativ yazılış | Mənbələr |
 |---|---|---|
-| Yeni Günəşli | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
-| Günəşli | — | bina, kub, lalafo, araşdırma |
+| Yeni Günəşli | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, emlak, tap |
+| Günəşli | — | bina, kub, lalafo, araşdırma, tap |
 | Yeni Günəşli A massivi | Massiv A | bina, kub, lalafo, araşdırma |
 | Yeni Günəşli B massivi | Massiv B | bina, kub, lalafo |
 | Yeni Günəşli D massivi | Massiv D | bina, kub, lalafo, araşdırma |
 | Yeni Günəşli Q massivi | Massiv G, Massiv Q | bina, kub, lalafo, araşdırma |
 | Yeni Günəşli V massivi | Massiv V | bina, kub, lalafo, araşdırma |
 | Bahar | — | bina, kub, arenda, yeniemlak, lalafo, OSM |
-| Dədə Qorqud | — | bina, kub, arenda, yeniemlak, lalafo, OSM |
+| Dədə Qorqud | — | bina, kub, arenda, yeniemlak, lalafo, OSM, emlak, tap |
 | Şərq | — | bina, kub, lalafo |
 | Qum adası | — | yeniemlak, OSM |
 
@@ -261,9 +264,9 @@ Rəsmi qəsəbə yoxdur — ərazi sahə inzibati ərazi dairələri ilə idarə
 |---|---|---|
 | Dübəndi | Dübəndi bağları | bina, kub, arenda, yeniemlak, araşdırma |
 | Şimal DRES | Şimal QRES | bina, kub, arenda, yeniemlak, lalafo, araşdırma, OSM |
-| Zağulba | Zaqulba, Zuğulba | kub, arenda, yeniemlak, lalafo, araşdırma, OSM |
+| Zağulba | Zaqulba, Zuğulba | kub, arenda, yeniemlak, lalafo, araşdırma, OSM, emlak |
 | Albalılıq | — | bina, araşdırma, OSM |
-| Xaşaxuna | — | kub, yeniemlak, OSM |
+| Xaşaxuna | — | kub, yeniemlak, OSM, emlak |
 | Binə Atçılıq | — | bina, araşdırma, OSM |
 
 ### Xətai rayonu — kod `01000003`, rayon səviyyəsində 289 rəsmi küçə
@@ -280,8 +283,8 @@ Rəsmi qəsəbə yoxdur — ərazi sahə inzibati ərazi dairələri ilə idarə
 |---|---|---|
 | Ağ şəhər | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
 | Həzi Aslanov | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
-| Köhnə Günəşli | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
-| NZS | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, OSM |
+| Köhnə Günəşli | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, tap |
+| NZS | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, OSM, tap |
 | Qara şəhər | — | kub, arenda, yeniemlak, rəsmi/xəbər |
 | UPD | — | arenda, yeniemlak, lalafo, OSM |
 
@@ -293,7 +296,7 @@ Rəsmi qəsəbə yoxdur — ərazi sahə inzibati ərazi dairələri ilə idarə
 
 | Ad | Alternativ yazılış | Mənbələr |
 |---|---|---|
-| Yeni Yasamal | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma |
+| Yeni Yasamal | — | bina, kub, arenda, yeniemlak, lalafo, araşdırma, tap |
 | 2-ci Alatava | Alatava 2, Alatava | bina, kub, lalafo, yeniemlak, OSM |
 | Sovetski | — | bina, kub, yeniemlak, rəsmi/xəbər |
 | Şamaxinka | — | arenda, rəsmi/xəbər |
@@ -615,9 +618,11 @@ bina.az, kub.az və yeniemlak.az siyahılarının birləşməsidir. Dublikatlar 
 | Zəngilan | `60400001` | 2 | 20 | 75 |
 | Zərdab | `90500001` | 2 | 40 | 583 |
 
-Abşeron bazar massivləri (rəsmi vahid deyil, 5): Qurtuluş 93 (bina, arenda, yeniemlak), Abşeron Gənclər Şəhərciyi (arenda, yeniemlak), Yeni Bakı (arenda), Atyalı (bina, kub, yeniemlak), Nübar (kub, yeniemlak, rəsmi/xəbər).
+Abşeron bazar massivləri (rəsmi vahid deyil, 5): Qurtuluş 93 (bina, arenda, yeniemlak), Abşeron Gənclər Şəhərciyi (arenda, yeniemlak), Yeni Bakı (arenda), Atyalı (bina, kub, yeniemlak, emlak), Nübar (kub, yeniemlak, rəsmi/xəbər).
 
-Sumqayıt bazar massivləri (rəsmi vahid deyil, 67): 1-ci mikrorayon (arenda, yeniemlak), 2-ci mikrorayon (arenda, yeniemlak), 3-cü mikrorayon (arenda, yeniemlak), 4-cü mikrorayon (arenda, yeniemlak), 5-ci mikrorayon (arenda, yeniemlak), 6-cı mikrorayon (arenda, yeniemlak), 8-ci mikrorayon (arenda, yeniemlak), 9-cu mikrorayon (arenda, yeniemlak), 10-cu mikrorayon (arenda, yeniemlak), 11-ci mikrorayon (arenda, yeniemlak), 12-ci mikrorayon (arenda, yeniemlak), 13-cü mikrorayon (arenda, yeniemlak), 16-cı mikrorayon (arenda, yeniemlak), 17-ci mikrorayon (arenda, yeniemlak), 18-ci mikrorayon (arenda, yeniemlak), 20-ci mikrorayon (arenda, yeniemlak), 21-ci mikrorayon (arenda, yeniemlak), 1-ci məhəllə (arenda, yeniemlak), 2-ci məhəllə (arenda, yeniemlak), 3-cü məhəllə (arenda, yeniemlak), 4-cü məhəllə (arenda, yeniemlak), 5-ci məhəllə (arenda, yeniemlak), 7-ci məhəllə (arenda, yeniemlak), 8-ci məhəllə (arenda, yeniemlak), 9-cu məhəllə (arenda, yeniemlak), 12-ci məhəllə (arenda, yeniemlak), 13-cü məhəllə (arenda, yeniemlak), 14-cü məhəllə (arenda, yeniemlak), 15-ci məhəllə (arenda, yeniemlak), 16-cı məhəllə (arenda, yeniemlak), 17-ci məhəllə (arenda, yeniemlak), 18-ci məhəllə (arenda, yeniemlak), 19-cu məhəllə (arenda, yeniemlak), 20-ci məhəllə (arenda, yeniemlak), 21-ci məhəllə (arenda, yeniemlak), 22-ci məhəllə (arenda, yeniemlak), 23-cü məhəllə (arenda, yeniemlak), 24-cü məhəllə (arenda, yeniemlak), 25-ci məhəllə (arenda, yeniemlak), 26-cı məhəllə (arenda, yeniemlak), 29-cu məhəllə (arenda, yeniemlak), 30-cu məhəllə (arenda, yeniemlak), 34-cü məhəllə (arenda, yeniemlak), 36-cı məhəllə (arenda, yeniemlak), 40-cı məhəllə (arenda, yeniemlak), 41-ci məhəllə (arenda, yeniemlak), 42-ci məhəllə (arenda, yeniemlak), 43-cü məhəllə (arenda, yeniemlak), 44-cü məhəllə (arenda, yeniemlak), 45-ci məhəllə (arenda, yeniemlak), 46-cı məhəllə (arenda, yeniemlak), 47-ci məhəllə (arenda, yeniemlak), 48-ci məhəllə (arenda, yeniemlak), 49-cu məhəllə (arenda, yeniemlak), 50-ci məhəllə (arenda, yeniemlak), 51-ci məhəllə (arenda, yeniemlak), 52-ci məhəllə (arenda, yeniemlak), Birləşmiş məhəllə (arenda, yeniemlak), İnşaatçılar (arenda, yeniemlak), Kotec (arenda, yeniemlak), Qurd dərəsi (arenda, yeniemlak), Yaşıl dərə (arenda, yeniemlak), BTZ bağları (arenda, yeniemlak), Xəzər bağları (arenda, yeniemlak), Corat bağları (arenda, yeniemlak), Yeni Corat (arenda, yeniemlak), Yaşma bağları (arenda, yeniemlak).
+Sumqayıt bazar massivləri (rəsmi vahid deyil, 67): 1-ci mikrorayon (arenda, yeniemlak), 2-ci mikrorayon (arenda, yeniemlak), 3-cü mikrorayon (arenda, yeniemlak, emlak), 4-cü mikrorayon (arenda, yeniemlak), 5-ci mikrorayon (arenda, yeniemlak), 6-cı mikrorayon (arenda, yeniemlak), 8-ci mikrorayon (arenda, yeniemlak), 9-cu mikrorayon (arenda, yeniemlak), 10-cu mikrorayon (arenda, yeniemlak), 11-ci mikrorayon (arenda, yeniemlak), 12-ci mikrorayon (arenda, yeniemlak), 13-cü mikrorayon (arenda, yeniemlak), 16-cı mikrorayon (arenda, yeniemlak), 17-ci mikrorayon (arenda, yeniemlak), 18-ci mikrorayon (arenda, yeniemlak), 20-ci mikrorayon (arenda, yeniemlak), 21-ci mikrorayon (arenda, yeniemlak), 1-ci məhəllə (arenda, yeniemlak), 2-ci məhəllə (arenda, yeniemlak), 3-cü məhəllə (arenda, yeniemlak), 4-cü məhəllə (arenda, yeniemlak), 5-ci məhəllə (arenda, yeniemlak), 7-ci məhəllə (arenda, yeniemlak), 8-ci məhəllə (arenda, yeniemlak), 9-cu məhəllə (arenda, yeniemlak), 12-ci məhəllə (arenda, yeniemlak), 13-cü məhəllə (arenda, yeniemlak), 14-cü məhəllə (arenda, yeniemlak), 15-ci məhəllə (arenda, yeniemlak), 16-cı məhəllə (arenda, yeniemlak), 17-ci məhəllə (arenda, yeniemlak), 18-ci məhəllə (arenda, yeniemlak), 19-cu məhəllə (arenda, yeniemlak), 20-ci məhəllə (arenda, yeniemlak), 21-ci məhəllə (arenda, yeniemlak), 22-ci məhəllə (arenda, yeniemlak), 23-cü məhəllə (arenda, yeniemlak), 24-cü məhəllə (arenda, yeniemlak), 25-ci məhəllə (arenda, yeniemlak), 26-cı məhəllə (arenda, yeniemlak), 29-cu məhəllə (arenda, yeniemlak), 30-cu məhəllə (arenda, yeniemlak), 34-cü məhəllə (arenda, yeniemlak), 36-cı məhəllə (arenda, yeniemlak), 40-cı məhəllə (arenda, yeniemlak), 41-ci məhəllə (arenda, yeniemlak), 42-ci məhəllə (arenda, yeniemlak), 43-cü məhəllə (arenda, yeniemlak), 44-cü məhəllə (arenda, yeniemlak), 45-ci məhəllə (arenda, yeniemlak), 46-cı məhəllə (arenda, yeniemlak), 47-ci məhəllə (arenda, yeniemlak), 48-ci məhəllə (arenda, yeniemlak), 49-cu məhəllə (arenda, yeniemlak), 50-ci məhəllə (arenda, yeniemlak), 51-ci məhəllə (arenda, yeniemlak), 52-ci məhəllə (arenda, yeniemlak), Birləşmiş məhəllə (arenda, yeniemlak), İnşaatçılar (arenda, yeniemlak, tap), Kotec (arenda, yeniemlak), Qurd dərəsi (arenda, yeniemlak), Yaşıl dərə (arenda, yeniemlak), BTZ bağları (arenda, yeniemlak), Xəzər bağları (arenda, yeniemlak), Corat bağları (arenda, yeniemlak), Yeni Corat (arenda, yeniemlak), Yaşma bağları (arenda, yeniemlak).
+
+Gəncə bazar massivləri (rəsmi vahid deyil, 2): Yeni Gəncə (tap, rəsmi/xəbər), Gülüstan (tap, rəsmi/xəbər).
 
 
 Naxçıvan şəhərinin ərazisində rəsmi olaraq Əliabad qəsəbəsi və Bulqan, Hacıniyyət, Qaraçuq, Qaraxanbəyli, Tumbul kəndləri var; Naftalanda Qasımbəyli və Qaşaltı Qaraqoyunlu kəndləri. Gəncə üçün Ünvan Reyestri qəsəbələri rayon (Kəpəz/Nizami) üzrə bölmür — onlar şəhərə bağlı qalır.
@@ -653,7 +658,6 @@ npm run db:locations:migrations  # taxonomy.sql-in yerləşmə bölməsi → mig
 
 ## Açıq qalan məsələlər
 
-- **emlak.az** Cloudflare yoxlaması səbəbindən oxunmadı; yoxlamanı brauzerdə keçib siyahını müqayisə etmək olar.
-- **Şuşa (Sabunçu)** kub.az və yeniemlak.az-da var, amma rəsmi və müstəqil təsdiq tapılmadı — əlavə edilmədi.
+- **emlak.az** yalnız axtarış indeksi ilə yoxlanıb; Cloudflare yoxlaması keçildikdən sonra tam filtr siyahısı tutuşdurula bilər.
 - Nişangahların EN/RU adları hələlik transliterasiyadır (`localizeLocation`).
 - Nişangahlar hələlik şəhərə bağlıdır; koordinatla rayona bağlamaq sonrakı mərhələdir.
