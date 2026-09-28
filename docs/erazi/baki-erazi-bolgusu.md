@@ -21,16 +21,17 @@
 | Mənbə | Nə götürüldü | Snapshot |
 |---|---|---|
 | [DSK — İnzibati Ərazi Bölgüsü Təsnifatı, 2024](https://e-qanun.az/framework/57325) | 12 rayon, 59 qəsəbə, 0 kənd | `prisma/az-admin-divisions.json` |
-| [Ünvan Portalı](https://unvanportali.az/) — `api/adminUnits/list?parentId=<kod>` | Bakı, Abşeron, Sumqayıt, Gəncə, Naxçıvan, Mingəçevir, Şirvan, Lənkəran, Şəki, Yevlax, Naftalan, Xankəndi üzrə rəsmi ağac və kodlar | `prisma/unvanportali-admin-units.json` |
-| Ünvan Portalı — `api/throughFares/<vahid>` | 19791 rəsmi küçə/prospekt/döngə/meydan/şose | `prisma/unvanportali-streets.json` → `public/data/kuceler/` |
+| [Ünvan Portalı](https://unvanportali.az/) — `api/adminUnits/list?parentId=<kod>` | bütün 75 şəhər/rayon üzrə rəsmi ağac və kodlar | `prisma/unvanportali-admin-units.json` |
+| Ünvan Portalı — `api/throughFares/<vahid>` | 62991 rəsmi küçə/prospekt/döngə/meydan/şose | `prisma/unvanportali-streets.json` → `public/data/kuceler/` |
 | [bina.az](https://bina.az) — `LocationGroups` GraphQL | 13 rayon, 25 metro, 104 qəsəbə/massiv, 112 nişangah (valideynlə) | `docs/erazi/sources/bina-az.json` |
 | [kub.az](https://kub.az) | 125 məntəqə, 25 metro, 160 nişangah | `docs/erazi/sources/kub-az.json` |
-| [arenda.az](https://arenda.az) | 112 Bakı məntəqəsi, 27 metro | `docs/erazi/sources/arenda-az.json` |
-| [yeniemlak.az](https://yeniemlak.az) | rayon üzrə məntəqələr + ətraflı axtarış (nişangahlar) | `docs/erazi/sources/yeniemlak-az.json`, `yeniemlak-az-etrafli.txt` |
+| [arenda.az](https://arenda.az) | 112 Bakı məntəqəsi, 27 metro, 73 Sumqayıt ərazisi | `docs/erazi/sources/arenda-az.json` |
+| [yeniemlak.az](https://yeniemlak.az) | Bakı rayonları üzrə məntəqələr, ətraflı axtarış (nişangahlar), Abşeron (19), Sumqayıt (75) | `docs/erazi/sources/yeniemlak-az.json`, `yeniemlak-az-etrafli.txt` |
 | [lalafo.az](https://lalafo.az) — `params/filter` API | 113 məntəqə, 26 metro, 12 rayon | `docs/erazi/sources/lalafo-az.json` |
 | [tap.az](https://tap.az/elanlar/dasinmaz-emlak) | Strukturlu ərazi siyahısı yoxdur — «Yerləşmə yeri» sərbəst mətndir | — |
 | [emlak.az](https://emlak.az) | Cloudflare yoxlaması səbəbindən oxunmadı | — |
-| [evimemlak.az](https://evimemlak.az) | Yalnız Naxçıvan MR; Bakı bölməsi yoxdur | — |
+| [evimemlak.az](https://evimemlak.az) | Yalnız Naxçıvan MR: Naxçıvan şəhəri + 7 rayon (hamısı ağacda var); məhəllə siyahısı yoxdur | — |
+| bina.az / kub.az / lalafo.az — digər şəhərlər | Bakıdan kənarda demək olar ki, bölgü yoxdur (Naxçıvan MR rayonları, Quzanlı, Nabran) | `docs/erazi/sources/bina-az-other-cities.json`, `lalafo-az.json` |
 | OpenStreetMap / Nominatim | Mənbələr ziddiyyətli olanda rayon sərhədi yoxlaması | — |
 | İstifadəçinin araşdırması (`Desktop/erazi`) | Rəsmi kodlar, RİH məlumatları, yazılış düzəlişləri | — |
 
@@ -56,6 +57,10 @@
 | Şuşa (Sabunçu) | kub, yeniemlak | **Əlavə edilmədi** — rəsmi və müstəqil təsdiq tapılmadı |
 | Qurd qapısı | arenda məntəqə kimi | **Əlavə edilmədi** — qəbiristanlıqdır |
 | Suraxanı qəs., Yasamal qəs. | bazar saytları ayrıca qəsəbə | Rayonun özü ilə seçilir (rəsmi qəsəbə deyil / ad təkrarı) |
+| Sumqayıt: 72-ci / 76-cı məhəllə | hər biri yalnız bir saytda (arenda / yeniemlak) | **Əlavə edilmədi** — iki mənbədə təsdiqlənənlər (17 mikrorayon, 40 məhəllə, 10 ərazi) saxlanılıb |
+| Sumqayıt: «21-ci mərhələ» | arenda.az yazılışı | Yazı səhvi — **21-ci məhəllə** (yeniemlak ilə eyni) |
+| Naxçıvan şəhərinin məhəllələri | evimemlak.az-da strukturlu siyahı yoxdur, yalnız elan başlıqlarında | **Əlavə edilmədi** — tək və qeyri-strukturlu mənbə; rəsmi kənd/qəsəbələr reyestrdən gəlir |
+| DSK və reyestr yazılışı fərqli olanda | məs. köhnə adlar (Orconikidze, Nehrəm) | Mövcud elanların slug-ı qorunsun deyə DSK yazılışı saxlanılır; reyestr kodu normallaşdırılmış açarla bağlanır |
 
 ## Bakı: rayon, rəsmi qəsəbə və bazar massivləri
 
@@ -531,23 +536,89 @@ bina.az, kub.az və yeniemlak.az siyahılarının birləşməsidir. Dublikatlar 
 | Ədliyyə Nazirliyi | — | kub, yeniemlak |
 | Əmək və Əhalinin Sosial Müdafiəsi Nazirliyi | — | kub, yeniemlak |
 
-## Abşeron və digər iri şəhərlər (Ünvan Reyestri)
+## Digər şəhər və rayonlar (Ünvan Reyestri)
 
 | Şəhər/rayon | Kod | Rəsmi qəsəbə / şəhər | Rəsmi kənd | Rəsmi küçə |
 |---|---|---:|---:|---:|
 | Abşeron | `30800001` | 10 | 7 | 2472 |
-| Sumqayıt | `30900002` | 2 | 0 | 820 |
+| Ağcabədi | `60800001` | 2 | 44 | 953 |
+| Ağdam | `60900001` | 14 | 56 | 1180 |
+| Ağdaş | `90300001` | 3 | 71 | 1091 |
+| Ağdərə | `61200001` | 2 | 29 | 89 |
+| Ağstafa | `50200001` | 10 | 29 | 691 |
+| Ağsu | `40900001` | 1 | 79 | 826 |
+| Astara | `80100001` | 3 | 88 | 656 |
+| Babək | `10300001` | 0 | 30 | 3 |
+| Balakən | `40100001` | 2 | 56 | 788 |
+| Beyləqan | `60700001` | 16 | 23 | 861 |
+| Bərdə | `61000001` | 1 | 110 | 1589 |
+| Biləsuvar | `80800001` | 1 | 25 | 846 |
+| Cəbrayıl | `60500001` | 1 | 22 | 106 |
+| Cəlilabad | `80600001` | 3 | 118 | 1571 |
+| Culfa | `10600001` | 1 | 22 | 0 |
+| Daşkəsən | `50600001` | 6 | 43 | 243 |
+| Füzuli | `60600001` | 18 | 40 | 662 |
+| Gədəbəy | `50500001` | 1 | 107 | 670 |
 | Gəncə | `20000002` | 6 | 0 | 1310 |
-| Naxçıvan | `10400002` | 1 | 5 | 106 |
-| Mingəçevir | `90200002` | 0 | 0 | 274 |
-| Şirvan | `91100002` | 2 | 0 | 211 |
-| Lənkəran | `80200002` | 9 | 83 | 1233 |
-| Şəki | `40400002` | 2 | 68 | 1671 |
-| Yevlax | `90100002` | 3 | 46 | 772 |
-| Naftalan | `51000002` | 0 | 2 | 57 |
+| Goranboy | `50900001` | 8 | 79 | 1196 |
+| Göyçay | `40800001` | 1 | 55 | 782 |
+| Göygöl | `50800001` | 7 | 38 | 860 |
+| Hacıqabul | `91000001` | 6 | 25 | 553 |
+| Xaçmaz | `30200001` | 14 | 137 | 2261 |
 | Xankəndi | `70400002` | 1 | 0 | 0 |
+| Xızı | `30600001` | 4 | 25 | 147 |
+| Xocalı | `70100001` | 2 | 19 | 134 |
+| Xocavənd | `70300001` | 3 | 38 | 109 |
+| İmişli | `90700001` | 2 | 49 | 914 |
+| İsmayıllı | `40700001` | 3 | 105 | 891 |
+| Kəlbəcər | `60100001` | 2 | 41 | 66 |
+| Kəngərli | `10800001` | 1 | 10 | 0 |
+| Kürdəmir | `90600001` | 3 | 59 | 800 |
+| Qax | `40300001` | 1 | 58 | 684 |
+| Qazax | `50100001` | 1 | 28 | 656 |
+| Qəbələ | `40600001` | 4 | 60 | 974 |
+| Qobustan | `30700001` | 2 | 30 | 359 |
+| Quba | `30300001` | 8 | 149 | 1620 |
+| Qubadlı | `60300001` | 1 | 30 | 0 |
+| Qusar | `30100001` | 2 | 88 | 1196 |
+| Laçın | `60200001` | 2 | 47 | 92 |
+| Lerik | `80300001` | 1 | 161 | 599 |
+| Lənkəran | `80200002` | 9 | 83 | 1233 |
+| Masallı | `80500001` | 3 | 99 | 1678 |
+| Mingəçevir | `90200002` | 0 | 0 | 274 |
+| Naftalan | `51000002` | 0 | 2 | 57 |
+| Naxçıvan | `10400002` | 1 | 5 | 106 |
+| Neftçala | `80700001` | 4 | 48 | 641 |
+| Oğuz | `40500001` | 1 | 33 | 459 |
+| Ordubad | `10700001` | 4 | 36 | 0 |
+| Saatlı | `90800001` | 1 | 43 | 842 |
+| Sabirabad | `90900001` | 1 | 74 | 1453 |
+| Salyan | `80900001` | 3 | 48 | 1035 |
+| Samux | `50700001` | 7 | 28 | 728 |
+| Sədərək | `10100001` | 1 | 3 | 0 |
+| Siyəzən | `30500001` | 2 | 32 | 322 |
+| Sumqayıt | `30900002` | 2 | 0 | 820 |
+| Şabran | `30400001` | 1 | 67 | 555 |
+| Şahbuz | `10500001` | 2 | 22 | 0 |
+| Şamaxı | `41000001` | 6 | 57 | 973 |
+| Şəki | `40400002` | 2 | 68 | 1671 |
+| Şəmkir | `50400001` | 8 | 58 | 1837 |
+| Şərur | `10200001` | 1 | 57 | 0 |
+| Şirvan | `91100002` | 2 | 0 | 211 |
+| Şuşa | `70200001` | 2 | 10 | 113 |
+| Tərtər | `61100001` | 1 | 48 | 598 |
+| Tovuz | `50300001` | 2 | 99 | 1540 |
+| Ucar | `90400001` | 1 | 29 | 570 |
+| Yardımlı | `80400001` | 1 | 84 | 465 |
+| Yevlax | `90100002` | 3 | 46 | 772 |
+| Zaqatala | `40200001` | 2 | 60 | 1010 |
+| Zəngilan | `60400001` | 2 | 20 | 75 |
+| Zərdab | `90500001` | 2 | 40 | 583 |
 
-Abşeron bazar massivləri (rəsmi vahid deyil): Qurtuluş 93 (bina, arenda, yeniemlak), Abşeron Gənclər Şəhərciyi (arenda, yeniemlak), Yeni Bakı (arenda), Atyalı (bina, kub, yeniemlak), Nübar (kub, yeniemlak, rəsmi/xəbər).
+Abşeron bazar massivləri (rəsmi vahid deyil, 5): Qurtuluş 93 (bina, arenda, yeniemlak), Abşeron Gənclər Şəhərciyi (arenda, yeniemlak), Yeni Bakı (arenda), Atyalı (bina, kub, yeniemlak), Nübar (kub, yeniemlak, rəsmi/xəbər).
+
+Sumqayıt bazar massivləri (rəsmi vahid deyil, 67): 1-ci mikrorayon (arenda, yeniemlak), 2-ci mikrorayon (arenda, yeniemlak), 3-cü mikrorayon (arenda, yeniemlak), 4-cü mikrorayon (arenda, yeniemlak), 5-ci mikrorayon (arenda, yeniemlak), 6-cı mikrorayon (arenda, yeniemlak), 8-ci mikrorayon (arenda, yeniemlak), 9-cu mikrorayon (arenda, yeniemlak), 10-cu mikrorayon (arenda, yeniemlak), 11-ci mikrorayon (arenda, yeniemlak), 12-ci mikrorayon (arenda, yeniemlak), 13-cü mikrorayon (arenda, yeniemlak), 16-cı mikrorayon (arenda, yeniemlak), 17-ci mikrorayon (arenda, yeniemlak), 18-ci mikrorayon (arenda, yeniemlak), 20-ci mikrorayon (arenda, yeniemlak), 21-ci mikrorayon (arenda, yeniemlak), 1-ci məhəllə (arenda, yeniemlak), 2-ci məhəllə (arenda, yeniemlak), 3-cü məhəllə (arenda, yeniemlak), 4-cü məhəllə (arenda, yeniemlak), 5-ci məhəllə (arenda, yeniemlak), 7-ci məhəllə (arenda, yeniemlak), 8-ci məhəllə (arenda, yeniemlak), 9-cu məhəllə (arenda, yeniemlak), 12-ci məhəllə (arenda, yeniemlak), 13-cü məhəllə (arenda, yeniemlak), 14-cü məhəllə (arenda, yeniemlak), 15-ci məhəllə (arenda, yeniemlak), 16-cı məhəllə (arenda, yeniemlak), 17-ci məhəllə (arenda, yeniemlak), 18-ci məhəllə (arenda, yeniemlak), 19-cu məhəllə (arenda, yeniemlak), 20-ci məhəllə (arenda, yeniemlak), 21-ci məhəllə (arenda, yeniemlak), 22-ci məhəllə (arenda, yeniemlak), 23-cü məhəllə (arenda, yeniemlak), 24-cü məhəllə (arenda, yeniemlak), 25-ci məhəllə (arenda, yeniemlak), 26-cı məhəllə (arenda, yeniemlak), 29-cu məhəllə (arenda, yeniemlak), 30-cu məhəllə (arenda, yeniemlak), 34-cü məhəllə (arenda, yeniemlak), 36-cı məhəllə (arenda, yeniemlak), 40-cı məhəllə (arenda, yeniemlak), 41-ci məhəllə (arenda, yeniemlak), 42-ci məhəllə (arenda, yeniemlak), 43-cü məhəllə (arenda, yeniemlak), 44-cü məhəllə (arenda, yeniemlak), 45-ci məhəllə (arenda, yeniemlak), 46-cı məhəllə (arenda, yeniemlak), 47-ci məhəllə (arenda, yeniemlak), 48-ci məhəllə (arenda, yeniemlak), 49-cu məhəllə (arenda, yeniemlak), 50-ci məhəllə (arenda, yeniemlak), 51-ci məhəllə (arenda, yeniemlak), 52-ci məhəllə (arenda, yeniemlak), Birləşmiş məhəllə (arenda, yeniemlak), İnşaatçılar (arenda, yeniemlak), Kotec (arenda, yeniemlak), Qurd dərəsi (arenda, yeniemlak), Yaşıl dərə (arenda, yeniemlak), BTZ bağları (arenda, yeniemlak), Xəzər bağları (arenda, yeniemlak), Corat bağları (arenda, yeniemlak), Yeni Corat (arenda, yeniemlak), Yaşma bağları (arenda, yeniemlak).
+
 
 Naxçıvan şəhərinin ərazisində rəsmi olaraq Əliabad qəsəbəsi və Bulqan, Hacıniyyət, Qaraçuq, Qaraxanbəyli, Tumbul kəndləri var; Naftalanda Qasımbəyli və Qaşaltı Qaraqoyunlu kəndləri. Gəncə üçün Ünvan Reyestri qəsəbələri rayon (Kəpəz/Nizami) üzrə bölmür — onlar şəhərə bağlı qalır.
 
@@ -563,8 +634,10 @@ Naxçıvan şəhərinin ərazisində rəsmi olaraq Əliabad qəsəbəsi və Bulq
 | Yadda saxlanmış axtarış | `landmarkSlug` saxlanılır, xülasədə və «nəticələrə bax» keçidində göstərilir |
 | CSV idxalı | Yeni `landmark` sütunu; rayon sütunu nişangahla qarışmır |
 | Semantik axtarış | Embedding mətninə nişangah əlavə olunur |
-| AI axtarışı | Nişangahlar prompta göndərilmir (token qənaəti) |
-| Baza | `Location.officialCode`, `Property.landmarkId`; miqrasiya `0050_baku_location_details.sql` özü-yetərlidir |
+| Kəndlər (~3 600) | Filtrdə yalnız ictimai elanı olanlar; formada seçilmiş rayonun kəndləri `/api/yerler/kendler`-dən yüklənir, redaktə olunan elanın kəndi server tərəfdə əlavə edilir |
+| AI axtarışı | Nişangahlar və kəndlər prompta göndərilmir (token qənaəti) |
+| Admin «ictimai imkanlar» | Məhəllə profili siyahısına yalnız profili olan kəndlər düşür |
+| Baza | `Location.officialCode`, `Property.landmarkId`; miqrasiyalar `0050`–`0053` özü-yetərlidir (~8 000 ifadə ardıcıl hissələrdə) |
 
 ## Yeniləmə axını
 
@@ -575,7 +648,7 @@ npm run db:locations:build   # prisma/locations-data.ts — ziddiyyətdə dayan�
 npm run db:streets:build     # public/data/kuceler/*.json
 npm run db:taxonomy:build    # prisma/taxonomy.sql
 npm run db:locations:report  # bu sənəd
-# Production-a çatdırmaq üçün taxonomy.sql-in yerləşmə bölməsi yeni miqrasiyaya köçürülür.
+npm run db:locations:migrations  # taxonomy.sql-in yerləşmə bölməsi → migrations/0050–0053
 ```
 
 ## Açıq qalan məsələlər

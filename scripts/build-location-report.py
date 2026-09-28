@@ -51,6 +51,13 @@ CONFLICTS = [
     ("Qurd qapısı", "arenda məntəqə kimi", "**Əlavə edilmədi** — qəbiristanlıqdır"),
     ("Suraxanı qəs., Yasamal qəs.", "bazar saytları ayrıca qəsəbə",
      "Rayonun özü ilə seçilir (rəsmi qəsəbə deyil / ad təkrarı)"),
+    ("Sumqayıt: 72-ci / 76-cı məhəllə", "hər biri yalnız bir saytda (arenda / yeniemlak)",
+     "**Əlavə edilmədi** — iki mənbədə təsdiqlənənlər (17 mikrorayon, 40 məhəllə, 10 ərazi) saxlanılıb"),
+    ("Sumqayıt: «21-ci mərhələ»", "arenda.az yazılışı", "Yazı səhvi — **21-ci məhəllə** (yeniemlak ilə eyni)"),
+    ("Naxçıvan şəhərinin məhəllələri", "evimemlak.az-da strukturlu siyahı yoxdur, yalnız elan başlıqlarında",
+     "**Əlavə edilmədi** — tək və qeyri-strukturlu mənbə; rəsmi kənd/qəsəbələr reyestrdən gəlir"),
+    ("DSK və reyestr yazılışı fərqli olanda", "məs. köhnə adlar (Orconikidze, Nehrəm)",
+     "Mövcud elanların slug-ı qorunsun deyə DSK yazılışı saxlanılır; reyestr kodu normallaşdırılmış açarla bağlanır"),
 ]
 
 SITE_CHANGES = [
@@ -65,8 +72,12 @@ SITE_CHANGES = [
     ("Yadda saxlanmış axtarış", "`landmarkSlug` saxlanılır, xülasədə və «nəticələrə bax» keçidində göstərilir"),
     ("CSV idxalı", "Yeni `landmark` sütunu; rayon sütunu nişangahla qarışmır"),
     ("Semantik axtarış", "Embedding mətninə nişangah əlavə olunur"),
-    ("AI axtarışı", "Nişangahlar prompta göndərilmir (token qənaəti)"),
-    ("Baza", "`Location.officialCode`, `Property.landmarkId`; miqrasiya `0050_baku_location_details.sql` özü-yetərlidir"),
+    ("Kəndlər (~3 600)", "Filtrdə yalnız ictimai elanı olanlar; formada seçilmiş rayonun kəndləri "
+     "`/api/yerler/kendler`-dən yüklənir, redaktə olunan elanın kəndi server tərəfdə əlavə edilir"),
+    ("AI axtarışı", "Nişangahlar və kəndlər prompta göndərilmir (token qənaəti)"),
+    ("Admin «ictimai imkanlar»", "Məhəllə profili siyahısına yalnız profili olan kəndlər düşür"),
+    ("Baza", "`Location.officialCode`, `Property.landmarkId`; miqrasiyalar `0050`–`0053` özü-yetərlidir "
+     "(~8 000 ifadə ardıcıl hissələrdə)"),
 ]
 
 
@@ -134,22 +145,25 @@ def main():
     add("| [DSK — İnzibati Ərazi Bölgüsü Təsnifatı, 2024](https://e-qanun.az/framework/57325) "
         "| 12 rayon, 59 qəsəbə, 0 kənd | `prisma/az-admin-divisions.json` |")
     add("| [Ünvan Portalı](https://unvanportali.az/) — `api/adminUnits/list?parentId=<kod>` "
-        "| %s üzrə rəsmi ağac və kodlar | `prisma/unvanportali-admin-units.json` |"
-        % ", ".join(units["_roots"]))
+        "| bütün %d şəhər/rayon üzrə rəsmi ağac və kodlar | `prisma/unvanportali-admin-units.json` |"
+        % (len(units["_roots"]) - 1))
     add("| Ünvan Portalı — `api/throughFares/<vahid>` | %d rəsmi küçə/prospekt/döngə/meydan/şose "
         "| `prisma/unvanportali-streets.json` → `public/data/kuceler/` |" % sum(street_count.values()))
     add("| [bina.az](https://bina.az) — `LocationGroups` GraphQL | 13 rayon, 25 metro, 104 qəsəbə/massiv, "
         "112 nişangah (valideynlə) | `docs/erazi/sources/bina-az.json` |")
     add("| [kub.az](https://kub.az) | 125 məntəqə, 25 metro, 160 nişangah | `docs/erazi/sources/kub-az.json` |")
-    add("| [arenda.az](https://arenda.az) | 112 Bakı məntəqəsi, 27 metro | `docs/erazi/sources/arenda-az.json` |")
-    add("| [yeniemlak.az](https://yeniemlak.az) | rayon üzrə məntəqələr + ətraflı axtarış (nişangahlar) "
+    add("| [arenda.az](https://arenda.az) | 112 Bakı məntəqəsi, 27 metro, 73 Sumqayıt ərazisi | `docs/erazi/sources/arenda-az.json` |")
+    add("| [yeniemlak.az](https://yeniemlak.az) | Bakı rayonları üzrə məntəqələr, ətraflı axtarış (nişangahlar), Abşeron (19), Sumqayıt (75) "
         "| `docs/erazi/sources/yeniemlak-az.json`, `yeniemlak-az-etrafli.txt` |")
     add("| [lalafo.az](https://lalafo.az) — `params/filter` API | 113 məntəqə, 26 metro, 12 rayon "
         "| `docs/erazi/sources/lalafo-az.json` |")
     add("| [tap.az](https://tap.az/elanlar/dasinmaz-emlak) | Strukturlu ərazi siyahısı yoxdur — "
         "«Yerləşmə yeri» sərbəst mətndir | — |")
     add("| [emlak.az](https://emlak.az) | Cloudflare yoxlaması səbəbindən oxunmadı | — |")
-    add("| [evimemlak.az](https://evimemlak.az) | Yalnız Naxçıvan MR; Bakı bölməsi yoxdur | — |")
+    add("| [evimemlak.az](https://evimemlak.az) | Yalnız Naxçıvan MR: Naxçıvan şəhəri + 7 rayon (hamısı ağacda var); "
+        "məhəllə siyahısı yoxdur | — |")
+    add("| bina.az / kub.az / lalafo.az — digər şəhərlər | Bakıdan kənarda demək olar ki, bölgü yoxdur "
+        "(Naxçıvan MR rayonları, Quzanlı, Nabran) | `docs/erazi/sources/bina-az-other-cities.json`, `lalafo-az.json` |")
     add("| OpenStreetMap / Nominatim | Mənbələr ziddiyyətli olanda rayon sərhədi yoxlaması | — |")
     add("| İstifadəçinin araşdırması (`Desktop/erazi`) | Rəsmi kodlar, RİH məlumatları, yazılış düzəlişləri | — |")
     add("")
@@ -217,20 +231,22 @@ def main():
                                  sources(item["sources"])))
     add("")
 
-    add("## Abşeron və digər iri şəhərlər (Ünvan Reyestri)")
+    add("## Digər şəhər və rayonlar (Ünvan Reyestri)")
     add("")
     add("| Şəhər/rayon | Kod | Rəsmi qəsəbə / şəhər | Rəsmi kənd | Rəsmi küçə |")
     add("|---|---|---:|---:|---:|")
     for city, root in units["_roots"].items():
-        if city == "Bakı":
+        if city in ("Bakı", "Ələt azad iqtisadi zonası"):
             continue
         children = units[city]
         villages = sum(1 for child in children if child["fullName"].endswith(" kəndi"))
         city_streets = sum(v for k, v in street_count.items() if streets[k]["city"] == city)
         add("| %s | `%s` | %d | %d | %d |" % (city, root["code"], len(children) - villages, villages, city_streets))
     add("")
-    add("Abşeron bazar massivləri (rəsmi vahid deyil): " + ", ".join(
-        "%s (%s)" % (item["name"], sources(item["sources"])) for item in market["abseronNeighborhoods"]) + ".")
+    for city, items in market["cityNeighborhoods"].items():
+        add("%s bazar massivləri (rəsmi vahid deyil, %d): " % (city, len(items)) + ", ".join(
+            "%s (%s)" % (item["name"], sources(item["sources"])) for item in items) + ".")
+        add("")
     add("")
     add("Naxçıvan şəhərinin ərazisində rəsmi olaraq Əliabad qəsəbəsi və Bulqan, Hacıniyyət, Qaraçuq, "
         "Qaraxanbəyli, Tumbul kəndləri var; Naftalanda Qasımbəyli və Qaşaltı Qaraqoyunlu kəndləri. Gəncə üçün "
@@ -252,7 +268,7 @@ def main():
     add("npm run db:streets:build     # public/data/kuceler/*.json")
     add("npm run db:taxonomy:build    # prisma/taxonomy.sql")
     add("npm run db:locations:report  # bu sənəd")
-    add("# Production-a çatdırmaq üçün taxonomy.sql-in yerləşmə bölməsi yeni miqrasiyaya köçürülür.")
+    add("npm run db:locations:migrations  # taxonomy.sql-in yerləşmə bölməsi → migrations/0050–0053")
     add("```")
     add("")
     add("## Açıq qalan məsələlər")
