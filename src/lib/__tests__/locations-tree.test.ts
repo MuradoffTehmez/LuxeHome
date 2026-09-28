@@ -224,3 +224,32 @@ describe("Bakı üzrə rəsmi kodlar və bazar massivləri", () => {
     expect(names).toEqual(expect.arrayContaining(["Əliabad", "Bulqan", "Qaraxanbəyli", "Tumbul"]));
   });
 });
+
+describe("ölkə üzrə Ünvan Reyestri", () => {
+  it("hər şəhər və rayon rəsmi kod daşıyır", () => {
+    for (const place of PLACES) {
+      expect(place.code, place.name).toMatch(/^\d{8}$/);
+    }
+  });
+
+  it("reyestrin kənd siyahısı bütün rayonlara yazılıb", () => {
+    const villages = PLACES.flatMap((place) => (place.places ?? []).filter((child) => child.kind === LOCATION_KINDS.VILLAGE));
+    // Reyestrdə ~3 630 kənd var; DSK-dakı köhnə yazılışlar da saxlanılır.
+    expect(villages.length).toBeGreaterThan(3500);
+    const coded = villages.filter((village) => village.code);
+    expect(coded.length / villages.length).toBeGreaterThan(0.99);
+    const quba = PLACES.find((place) => place.name === "Quba");
+    expect(quba?.places?.map((child) => child.name)).toEqual(expect.arrayContaining(["Xınalıq", "Qəçrəş"]));
+  });
+
+  it("Sumqayıtın mikrorayon və məhəllələri massiv kimi şəhərə bağlanır", () => {
+    const sumqayit = PLACES.find((place) => place.name === "Sumqayıt");
+    const hoods = (sumqayit?.places ?? []).filter((child) => child.kind === LOCATION_KINDS.NEIGHBORHOOD);
+    expect(hoods.map((child) => child.name)).toEqual(
+      expect.arrayContaining(["1-ci mikrorayon", "21-ci mikrorayon", "9-cu məhəllə", "52-ci məhəllə", "Yeni Corat"]),
+    );
+    // Rəsmi qəsəbələr massiv kimi təkrarlanmır.
+    expect(hoods.map((child) => child.name)).not.toContain("Corat");
+    expect(LOCATION_ALIASES["Corat"]).toContain("Köhnə Corat");
+  });
+});

@@ -14,381 +14,1778 @@
       "W": "rəsmi sayt, Vikipediya və ya xəbər mənbəyi (sənəddə link var)"
     }
   },
-
   "aliases": {
-    "M.Ə.Rəsulzadə": ["Rəsulzadə", "Məhəmməd Əmin Rəsulzadə", "Kirov qəsəbəsi"],
-    "Müşviqabad": ["Müşfiqabad"],
-    "Sanqaçal": ["Səngəçal", "Sangaçal"],
-    "Çeyildağ": ["Ceyildağ"],
-    "Şubanı": ["Şubani"],
-    "Bibiheybət": ["Bibi Heybət"],
-    "Maştağa": ["Məştağa"],
-    "Türkan": ["Türkən"],
-    "Pirəkəşkül": ["Perekeşkül", "Pereküşkül"],
-    "Məmmədli": ["Məhəmmədli"],
-    "Görədil": ["Goradil"],
-    "Hacı Zeynalabdin": ["Nasosnu", "Nasosnı"],
-    "İçərişəhər": ["İçəri Şəhər"],
-    "Şah İsmayıl Xətai": ["Xətai metrosu"],
-    "Xocəsən": ["Xocasən"],
-    "Azadlıq prospekti": ["Azadlıq"],
-    "8-ci kilometr": ["8 km", "8-ci km"],
-    "Yeni Günəşli": ["Y.Günəşli"],
-    "Yeni Ramana": ["Y.Ramana"],
-    "Yeni Suraxanı": ["Y.Suraxanı"],
-    "Həzi Aslanov": ["H.Aslanov"]
+    "M.Ə.Rəsulzadə": [
+      "Rəsulzadə",
+      "Məhəmməd Əmin Rəsulzadə",
+      "Kirov qəsəbəsi"
+    ],
+    "Müşviqabad": [
+      "Müşfiqabad"
+    ],
+    "Sanqaçal": [
+      "Səngəçal",
+      "Sangaçal"
+    ],
+    "Çeyildağ": [
+      "Ceyildağ"
+    ],
+    "Şubanı": [
+      "Şubani"
+    ],
+    "Bibiheybət": [
+      "Bibi Heybət"
+    ],
+    "Maştağa": [
+      "Məştağa"
+    ],
+    "Türkan": [
+      "Türkən"
+    ],
+    "Pirəkəşkül": [
+      "Perekeşkül",
+      "Pereküşkül"
+    ],
+    "Məmmədli": [
+      "Məhəmmədli"
+    ],
+    "Görədil": [
+      "Goradil"
+    ],
+    "Hacı Zeynalabdin": [
+      "Nasosnu",
+      "Nasosnı"
+    ],
+    "İçərişəhər": [
+      "İçəri Şəhər"
+    ],
+    "Şah İsmayıl Xətai": [
+      "Xətai metrosu"
+    ],
+    "Xocəsən": [
+      "Xocasən"
+    ],
+    "Azadlıq prospekti": [
+      "Azadlıq"
+    ],
+    "8-ci kilometr": [
+      "8 km",
+      "8-ci km"
+    ],
+    "Yeni Günəşli": [
+      "Y.Günəşli"
+    ],
+    "Yeni Ramana": [
+      "Y.Ramana"
+    ],
+    "Yeni Suraxanı": [
+      "Y.Suraxanı"
+    ],
+    "Həzi Aslanov": [
+      "H.Aslanov"
+    ],
+    "Corat": [
+      "Köhnə Corat",
+      "Corat köhnə"
+    ]
   },
-
   "bakuNeighborhoods": {
     "Binəqədi": [
-      { "name": "6-cı mikrorayon", "aliases": ["6 mkr"], "sources": "BKAYLRW" },
-      { "name": "7-ci mikrorayon", "aliases": ["7 mkr"], "sources": "BKAYLRW" },
-      { "name": "8-ci mikrorayon", "aliases": ["8 mkr"], "sources": "BKAYLRW" },
-      { "name": "9-cu mikrorayon", "aliases": ["9 mkr"], "sources": "BKAYLRW" },
-      { "name": "Dərnəgül", "sources": "YRO" },
-      { "name": "Xutor", "sources": "BKAYLRO" },
-      { "name": "Çiçək", "sources": "KAYLW" },
-      { "name": "Motodrom", "sources": "RW" }
+      {
+        "name": "6-cı mikrorayon",
+        "aliases": [
+          "6 mkr"
+        ],
+        "sources": "BKAYLRW"
+      },
+      {
+        "name": "7-ci mikrorayon",
+        "aliases": [
+          "7 mkr"
+        ],
+        "sources": "BKAYLRW"
+      },
+      {
+        "name": "8-ci mikrorayon",
+        "aliases": [
+          "8 mkr"
+        ],
+        "sources": "BKAYLRW"
+      },
+      {
+        "name": "9-cu mikrorayon",
+        "aliases": [
+          "9 mkr"
+        ],
+        "sources": "BKAYLRW"
+      },
+      {
+        "name": "Dərnəgül",
+        "sources": "YRO"
+      },
+      {
+        "name": "Xutor",
+        "sources": "BKAYLRO"
+      },
+      {
+        "name": "Çiçək",
+        "sources": "KAYLW"
+      },
+      {
+        "name": "Motodrom",
+        "sources": "RW"
+      }
     ],
     "Nərimanov": [
-      { "name": "Montin", "sources": "KAYLRO" },
-      { "name": "Böyükşor", "sources": "BKAYO" },
-      { "name": "Baksol", "sources": "LRO" },
-      { "name": "Çermet", "sources": "YLO" },
-      { "name": "6-cı parallel", "aliases": ["6-cı paralel", "6-cı Xrebtovı"], "sources": "YW" }
+      {
+        "name": "Montin",
+        "sources": "KAYLRO"
+      },
+      {
+        "name": "Böyükşor",
+        "sources": "BKAYO"
+      },
+      {
+        "name": "Baksol",
+        "sources": "LRO"
+      },
+      {
+        "name": "Çermet",
+        "sources": "YLO"
+      },
+      {
+        "name": "6-cı parallel",
+        "aliases": [
+          "6-cı paralel",
+          "6-cı Xrebtovı"
+        ],
+        "sources": "YW"
+      }
     ],
     "Nəsimi": [
-      { "name": "1-ci mikrorayon", "aliases": ["1 mkr"], "sources": "BKAYLR" },
-      { "name": "2-ci mikrorayon", "aliases": ["2 mkr"], "sources": "BKAYLR" },
-      { "name": "3-cü mikrorayon", "aliases": ["3 mkr"], "sources": "BKAYLR" },
-      { "name": "4-cü mikrorayon", "aliases": ["4 mkr"], "sources": "BKAYLR" },
-      { "name": "5-ci mikrorayon", "aliases": ["5 mkr"], "sources": "BKAYLR" },
-      { "name": "Kubinka", "sources": "BKAYLO" },
-      { "name": "Papanin", "sources": "KAYRO" },
-      { "name": "1-ci Alatava", "aliases": ["Alatava 1"], "sources": "KAYO" }
+      {
+        "name": "1-ci mikrorayon",
+        "aliases": [
+          "1 mkr"
+        ],
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "2-ci mikrorayon",
+        "aliases": [
+          "2 mkr"
+        ],
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "3-cü mikrorayon",
+        "aliases": [
+          "3 mkr"
+        ],
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "4-cü mikrorayon",
+        "aliases": [
+          "4 mkr"
+        ],
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "5-ci mikrorayon",
+        "aliases": [
+          "5 mkr"
+        ],
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "Kubinka",
+        "sources": "BKAYLO"
+      },
+      {
+        "name": "Papanin",
+        "sources": "KAYRO"
+      },
+      {
+        "name": "1-ci Alatava",
+        "aliases": [
+          "Alatava 1"
+        ],
+        "sources": "KAYO"
+      }
     ],
     "Nizami": [
-      { "name": "8-ci kilometr", "sources": "BKAYLR" }
+      {
+        "name": "8-ci kilometr",
+        "sources": "BKAYLR"
+      }
     ],
     "Səbail": [
-      { "name": "Bayıl", "sources": "BKAYLR" },
-      { "name": "20-ci sahə", "sources": "BKAYLR" },
-      { "name": "İçərişəhər", "sources": "KAYR" },
-      { "name": "Şıxov", "aliases": ["Şıx"], "sources": "BKLYO" }
+      {
+        "name": "Bayıl",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "20-ci sahə",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "İçərişəhər",
+        "sources": "KAYR"
+      },
+      {
+        "name": "Şıxov",
+        "aliases": [
+          "Şıx"
+        ],
+        "sources": "BKLYO"
+      }
     ],
     "Suraxanı": [
-      { "name": "Yeni Günəşli", "sources": "BKAYLR" },
-      { "name": "Günəşli", "sources": "BKLR" },
-      { "name": "Yeni Günəşli A massivi", "aliases": ["Massiv A"], "sources": "BKLR" },
-      { "name": "Yeni Günəşli B massivi", "aliases": ["Massiv B"], "sources": "BKL" },
-      { "name": "Yeni Günəşli D massivi", "aliases": ["Massiv D"], "sources": "BKLR" },
-      { "name": "Yeni Günəşli Q massivi", "aliases": ["Massiv G", "Massiv Q"], "sources": "BKLR" },
-      { "name": "Yeni Günəşli V massivi", "aliases": ["Massiv V"], "sources": "BKLR" },
-      { "name": "Bahar", "sources": "BKAYLO" },
-      { "name": "Dədə Qorqud", "sources": "BKAYLO" },
-      { "name": "Şərq", "sources": "BKL" },
-      { "name": "Qum adası", "sources": "YO" }
+      {
+        "name": "Yeni Günəşli",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "Günəşli",
+        "sources": "BKLR"
+      },
+      {
+        "name": "Yeni Günəşli A massivi",
+        "aliases": [
+          "Massiv A"
+        ],
+        "sources": "BKLR"
+      },
+      {
+        "name": "Yeni Günəşli B massivi",
+        "aliases": [
+          "Massiv B"
+        ],
+        "sources": "BKL"
+      },
+      {
+        "name": "Yeni Günəşli D massivi",
+        "aliases": [
+          "Massiv D"
+        ],
+        "sources": "BKLR"
+      },
+      {
+        "name": "Yeni Günəşli Q massivi",
+        "aliases": [
+          "Massiv G",
+          "Massiv Q"
+        ],
+        "sources": "BKLR"
+      },
+      {
+        "name": "Yeni Günəşli V massivi",
+        "aliases": [
+          "Massiv V"
+        ],
+        "sources": "BKLR"
+      },
+      {
+        "name": "Bahar",
+        "sources": "BKAYLO"
+      },
+      {
+        "name": "Dədə Qorqud",
+        "sources": "BKAYLO"
+      },
+      {
+        "name": "Şərq",
+        "sources": "BKL"
+      },
+      {
+        "name": "Qum adası",
+        "sources": "YO"
+      }
     ],
     "Xətai": [
-      { "name": "Ağ şəhər", "sources": "BKAYLR" },
-      { "name": "Həzi Aslanov", "sources": "BKAYLR" },
-      { "name": "Köhnə Günəşli", "sources": "BKAYLR" },
-      { "name": "NZS", "sources": "BKAYLRO" },
-      { "name": "Qara şəhər", "sources": "KAYW" },
-      { "name": "UPD", "sources": "AYLO" }
+      {
+        "name": "Ağ şəhər",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "Həzi Aslanov",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "Köhnə Günəşli",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "NZS",
+        "sources": "BKAYLRO"
+      },
+      {
+        "name": "Qara şəhər",
+        "sources": "KAYW"
+      },
+      {
+        "name": "UPD",
+        "sources": "AYLO"
+      }
     ],
     "Xəzər": [
-      { "name": "Dübəndi", "aliases": ["Dübəndi bağları"], "sources": "BKAYR" },
-      { "name": "Şimal DRES", "aliases": ["Şimal QRES"], "sources": "BKAYLRO" },
-      { "name": "Zağulba", "aliases": ["Zaqulba", "Zuğulba"], "sources": "KAYLRO" },
-      { "name": "Albalılıq", "sources": "BRO" },
-      { "name": "Xaşaxuna", "sources": "KYO" },
-      { "name": "Binə Atçılıq", "sources": "BRO" }
+      {
+        "name": "Dübəndi",
+        "aliases": [
+          "Dübəndi bağları"
+        ],
+        "sources": "BKAYR"
+      },
+      {
+        "name": "Şimal DRES",
+        "aliases": [
+          "Şimal QRES"
+        ],
+        "sources": "BKAYLRO"
+      },
+      {
+        "name": "Zağulba",
+        "aliases": [
+          "Zaqulba",
+          "Zuğulba"
+        ],
+        "sources": "KAYLRO"
+      },
+      {
+        "name": "Albalılıq",
+        "sources": "BRO"
+      },
+      {
+        "name": "Xaşaxuna",
+        "sources": "KYO"
+      },
+      {
+        "name": "Binə Atçılıq",
+        "sources": "BRO"
+      }
     ],
     "Sabunçu": [
-      { "name": "Yeni Ramana", "sources": "BKAYLR" },
-      { "name": "Yeni Balaxanı", "sources": "BKLO" },
-      { "name": "Savalan", "sources": "BKAYLR" },
-      { "name": "Albalı", "sources": "KYLR" },
-      { "name": "Zabrat 1", "aliases": ["I Zabrat", "1-ci Zabrat"], "sources": "YRW" },
-      { "name": "Zabrat 2", "aliases": ["II Zabrat", "2-ci Zabrat"], "sources": "YR" },
-      { "name": "Sea Breeze", "sources": "BYO" },
-      { "name": "Ləhic bağları", "aliases": ["Ləhiş bağları"], "sources": "YW" }
+      {
+        "name": "Yeni Ramana",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "Yeni Balaxanı",
+        "sources": "BKLO"
+      },
+      {
+        "name": "Savalan",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "Albalı",
+        "sources": "KYLR"
+      },
+      {
+        "name": "Zabrat 1",
+        "aliases": [
+          "I Zabrat",
+          "1-ci Zabrat"
+        ],
+        "sources": "YRW"
+      },
+      {
+        "name": "Zabrat 2",
+        "aliases": [
+          "II Zabrat",
+          "2-ci Zabrat"
+        ],
+        "sources": "YR"
+      },
+      {
+        "name": "Sea Breeze",
+        "sources": "BYO"
+      },
+      {
+        "name": "Ləhic bağları",
+        "aliases": [
+          "Ləhiş bağları"
+        ],
+        "sources": "YW"
+      }
     ],
     "Yasamal": [
-      { "name": "Yeni Yasamal", "sources": "BKAYLR" },
-      { "name": "2-ci Alatava", "aliases": ["Alatava 2", "Alatava"], "sources": "BKLYO" },
-      { "name": "Sovetski", "sources": "BKYW" },
-      { "name": "Şamaxinka", "sources": "AW" }
+      {
+        "name": "Yeni Yasamal",
+        "sources": "BKAYLR"
+      },
+      {
+        "name": "2-ci Alatava",
+        "aliases": [
+          "Alatava 2",
+          "Alatava"
+        ],
+        "sources": "BKLYO"
+      },
+      {
+        "name": "Sovetski",
+        "sources": "BKYW"
+      },
+      {
+        "name": "Şamaxinka",
+        "sources": "AW"
+      }
     ],
     "Qaradağ": [],
     "Pirallahı": []
   },
-
-  "abseronNeighborhoods": [
-    { "name": "Qurtuluş 93", "aliases": ["Qurtuluş-93"], "sources": "BAY" },
-    { "name": "Abşeron Gənclər Şəhərciyi", "aliases": ["Gənclər şəhərciyi"], "sources": "AY" },
-    { "name": "Yeni Bakı", "sources": "A" },
-    { "name": "Atyalı", "sources": "BKY" },
-    { "name": "Nübar", "sources": "KYW" }
-  ],
-
+  "cityNeighborhoods": {
+    "Abşeron": [
+      {
+        "name": "Qurtuluş 93",
+        "aliases": [
+          "Qurtuluş-93"
+        ],
+        "sources": "BAY"
+      },
+      {
+        "name": "Abşeron Gənclər Şəhərciyi",
+        "aliases": [
+          "Gənclər şəhərciyi"
+        ],
+        "sources": "AY"
+      },
+      {
+        "name": "Yeni Bakı",
+        "sources": "A"
+      },
+      {
+        "name": "Atyalı",
+        "sources": "BKY"
+      },
+      {
+        "name": "Nübar",
+        "sources": "KYW"
+      }
+    ],
+    "Sumqayıt": [
+      {
+        "name": "1-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "2-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "3-cü mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "4-cü mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "5-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "6-cı mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "8-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "9-cu mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "10-cu mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "11-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "12-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "13-cü mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "16-cı mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "17-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "18-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "20-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "21-ci mikrorayon",
+        "sources": "AY"
+      },
+      {
+        "name": "1-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "2-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "3-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "4-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "5-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "7-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "8-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "9-cu məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "12-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "13-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "14-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "15-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "16-cı məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "17-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "18-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "19-cu məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "20-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "21-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "22-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "23-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "24-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "25-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "26-cı məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "29-cu məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "30-cu məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "34-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "36-cı məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "40-cı məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "41-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "42-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "43-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "44-cü məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "45-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "46-cı məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "47-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "48-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "49-cu məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "50-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "51-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "52-ci məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "Birləşmiş məhəllə",
+        "sources": "AY"
+      },
+      {
+        "name": "İnşaatçılar",
+        "aliases": [
+          "İnşaatçılar qəsəbəsi"
+        ],
+        "sources": "AY"
+      },
+      {
+        "name": "Kotec",
+        "aliases": [
+          "Kotec qəsəbəsi"
+        ],
+        "sources": "AY"
+      },
+      {
+        "name": "Qurd dərəsi",
+        "sources": "AY"
+      },
+      {
+        "name": "Yaşıl dərə",
+        "sources": "AY"
+      },
+      {
+        "name": "BTZ bağları",
+        "sources": "AY"
+      },
+      {
+        "name": "Xəzər bağları",
+        "sources": "AY"
+      },
+      {
+        "name": "Corat bağları",
+        "sources": "AY"
+      },
+      {
+        "name": "Yeni Corat",
+        "aliases": [
+          "Novruz qəsəbəsi"
+        ],
+        "sources": "AY"
+      },
+      {
+        "name": "Yaşma bağları",
+        "sources": "AY"
+      }
+    ]
+  },
   "metro": [
-    { "name": "İçərişəhər" },
-    { "name": "Sahil" },
-    { "name": "28 May" },
-    { "name": "Cəfər Cabbarlı" },
-    { "name": "Gənclik" },
-    { "name": "Nəriman Nərimanov" },
-    { "name": "Bakmil" },
-    { "name": "Ulduz" },
-    { "name": "Koroğlu" },
-    { "name": "Qara Qarayev" },
-    { "name": "Neftçilər" },
-    { "name": "Xalqlar Dostluğu" },
-    { "name": "Əhmədli" },
-    { "name": "Həzi Aslanov" },
-    { "name": "Şah İsmayıl Xətai" },
-    { "name": "Nizami" },
-    { "name": "Elmlər Akademiyası" },
-    { "name": "İnşaatçılar" },
-    { "name": "20 Yanvar" },
-    { "name": "Memar Əcəmi" },
-    { "name": "Nəsimi" },
-    { "name": "Azadlıq prospekti" },
-    { "name": "Dərnəgül" },
-    { "name": "Xocəsən" },
-    { "name": "Memar Əcəmi-2", "aliases": ["Memar Əcəmi 2"] },
-    { "name": "Avtovağzal" },
-    { "name": "8 Noyabr" }
+    {
+      "name": "İçərişəhər"
+    },
+    {
+      "name": "Sahil"
+    },
+    {
+      "name": "28 May"
+    },
+    {
+      "name": "Cəfər Cabbarlı"
+    },
+    {
+      "name": "Gənclik"
+    },
+    {
+      "name": "Nəriman Nərimanov"
+    },
+    {
+      "name": "Bakmil"
+    },
+    {
+      "name": "Ulduz"
+    },
+    {
+      "name": "Koroğlu"
+    },
+    {
+      "name": "Qara Qarayev"
+    },
+    {
+      "name": "Neftçilər"
+    },
+    {
+      "name": "Xalqlar Dostluğu"
+    },
+    {
+      "name": "Əhmədli"
+    },
+    {
+      "name": "Həzi Aslanov"
+    },
+    {
+      "name": "Şah İsmayıl Xətai"
+    },
+    {
+      "name": "Nizami"
+    },
+    {
+      "name": "Elmlər Akademiyası"
+    },
+    {
+      "name": "İnşaatçılar"
+    },
+    {
+      "name": "20 Yanvar"
+    },
+    {
+      "name": "Memar Əcəmi"
+    },
+    {
+      "name": "Nəsimi"
+    },
+    {
+      "name": "Azadlıq prospekti"
+    },
+    {
+      "name": "Dərnəgül"
+    },
+    {
+      "name": "Xocəsən"
+    },
+    {
+      "name": "Memar Əcəmi-2",
+      "aliases": [
+        "Memar Əcəmi 2"
+      ]
+    },
+    {
+      "name": "Avtovağzal"
+    },
+    {
+      "name": "8 Noyabr"
+    }
   ],
-
   "landmarks": [
-    { "name": "28 Mall", "sources": "KY" },
-    { "name": "Gənclik Mall", "sources": "Y" },
-    { "name": "Baku Mall", "sources": "Y" },
-    { "name": "Metropark", "sources": "KY" },
-    { "name": "Park Bulvar", "sources": "KY" },
-    { "name": "Aygun City", "sources": "KY" },
-    { "name": "Megafun", "sources": "KY" },
-    { "name": "Olimpik Star", "sources": "Y" },
-    { "name": "Mərkəzi Univermaq", "aliases": ["MUM"], "sources": "BKY" },
-    { "name": "Moskva univermağı", "sources": "KY" },
-    { "name": "Bakı univermağı", "sources": "KY" },
-    { "name": "Abşeron Ticarət Mərkəzi", "sources": "B" },
-    { "name": "Binə ticarət mərkəzi", "sources": "BKY" },
-    { "name": "Elit ticarət mərkəzi", "sources": "BKY" },
-    { "name": "Eurohome Biləcəri Ticarət Mərkəzi", "sources": "B" },
-    { "name": "Laçın Ticarət Mərkəzi", "sources": "B" },
-    { "name": "Meyvəli Ticarət Mərkəzi", "sources": "B" },
-    { "name": "Nargiz ticarət mərkəzi", "sources": "KY" },
-    { "name": "Riyad Ticarət Mərkəzi", "sources": "B" },
-    { "name": "Sədərək ticarət mərkəzi", "sources": "BKY" },
-    { "name": "Sədərək «Elit»", "sources": "B" },
-    { "name": "Sədərək xalça bazarı", "sources": "B" },
-    { "name": "Sədərək şirniyyat bazarı", "sources": "B" },
-    { "name": "Sədərək tekstil bazarı", "sources": "B" },
-    { "name": "Sədərək təsərrüfat bazarı", "sources": "B" },
-    { "name": "Şüvəlan Park ticarət mərkəzi", "aliases": ["Şüvəlan ticarət mərkəzi"], "sources": "KY" },
-    { "name": "Xaqani ticarət mərkəzi", "aliases": ["Xəqani ticarət mərkəzi"], "sources": "BKY" },
-    { "name": "Caspian Shopping Center", "sources": "KY" },
-    { "name": "Keşlə bazarı", "sources": "BKY" },
-    { "name": "Montin bazarı", "sources": "BK" },
-    { "name": "Nəsimi bazarı", "sources": "BKY" },
-    { "name": "Şərq bazarı", "sources": "BKY" },
-    { "name": "Təzə bazar", "sources": "KY" },
-    { "name": "Yasamal bazarı", "sources": "BKY" },
-    { "name": "Yaşıl bazar", "sources": "KY" },
-    { "name": "Neftçi bazası", "sources": "BKY" },
-
-    { "name": "AF Business House", "sources": "KY" },
-    { "name": "AGA Business Center", "sources": "KY" },
-    { "name": "Altes Plaza", "sources": "Y" },
-    { "name": "ASK Plaza", "sources": "Y" },
-    { "name": "Babək Plaza", "sources": "KY" },
-    { "name": "Bridge Plaza", "sources": "KY" },
-    { "name": "Caspian Plaza", "sources": "KY" },
-    { "name": "Crystal Plaza", "sources": "KY" },
-    { "name": "Çıraq Plaza", "sources": "KY" },
-    { "name": "Dalğa Plaza", "sources": "KY" },
-    { "name": "Dəmirçi Plaza", "sources": "KY" },
-    { "name": "ISR Plaza", "sources": "KY" },
-    { "name": "Landmark", "sources": "KY" },
-    { "name": "Port Baku", "sources": "BKY" },
-    { "name": "World Business Center", "sources": "KY" },
-    { "name": "Flame Towers", "sources": "Y" },
-
-    { "name": "Crescent Bay", "sources": "B" },
-    { "name": "Grand Hayat Residence", "sources": "B" },
-    { "name": "İnqilab Residence", "sources": "B" },
-    { "name": "Javahir Residence", "sources": "B" },
-    { "name": "Kristal Abşeron Bayıl", "sources": "B" },
-    { "name": "Kristal Abşeron Əcəmi", "sources": "B" },
-    { "name": "Kristal Abşeron Qara Qarayev", "sources": "B" },
-    { "name": "Kristal Abşeron Yasamal", "sources": "B" },
-    { "name": "Melissa Azadlıq", "sources": "B" },
-    { "name": "Melissa Park", "sources": "B" },
-    { "name": "Merida Premium", "sources": "B" },
-    { "name": "MIDA Hövsan", "sources": "B" },
-    { "name": "MIDA Hövsan 2", "sources": "B" },
-    { "name": "MIDA Yasamal", "sources": "B" },
-    { "name": "Park Azure", "sources": "Y" },
-    { "name": "Park Yasamal 2", "sources": "B" },
-    { "name": "Royal Residence", "sources": "B" },
-
-    { "name": "Absheron Marriott otel", "sources": "KY" },
-    { "name": "Ambassador otel", "sources": "KY" },
-    { "name": "Avropa otel", "sources": "KY" },
-    { "name": "Fairmont otel", "sources": "KY" },
-    { "name": "Four Seasons otel", "sources": "KY" },
-    { "name": "Hilton otel", "sources": "KY" },
-    { "name": "Hyatt Regency", "sources": "KY" },
-    { "name": "Park Inn", "sources": "KY" },
-    { "name": "Pullman Hotel", "sources": "Y" },
-    { "name": "Qafqaz Resort otel", "sources": "KY" },
-    { "name": "Oskar şadlıq sarayı", "sources": "Y" },
-
-    { "name": "A.S.Puşkin parkı", "aliases": ["Puşkin parkı"], "sources": "KY" },
-    { "name": "AAF Park", "sources": "Y" },
-    { "name": "Aqua Park", "sources": "Y" },
-    { "name": "Atatürk parkı", "sources": "Y" },
-    { "name": "Axundov bağı", "sources": "BKY" },
-    { "name": "Bayıl parkı", "sources": "BKY" },
-    { "name": "Dağüstü parkı", "sources": "BKY" },
-    { "name": "Dədə Qorqud parkı", "sources": "KY" },
-    { "name": "Dənizkənarı Milli park", "aliases": ["Bulvar"], "sources": "KY" },
-    { "name": "Hüseyn Cavid parkı", "sources": "BKY" },
-    { "name": "İzmir parkı", "sources": "BKY" },
-    { "name": "Koala parkı", "sources": "BKY" },
-    { "name": "Koroğlu parkı", "sources": "Y" },
-    { "name": "M.Ə.Sabir parkı", "sources": "BKY" },
-    { "name": "M.Hüseynzadə parkı", "sources": "BKY" },
-    { "name": "Mərkəzi Nəbatat bağı", "aliases": ["Botanika bağı"], "sources": "BKY" },
-    { "name": "Mərkəzi Park", "sources": "B" },
-    { "name": "Molokan bağı", "aliases": ["Malokan bağı"], "sources": "KY" },
-    { "name": "Montin adına park", "sources": "KY" },
-    { "name": "Musabəyov parkı", "sources": "KY" },
-    { "name": "Nəriman Nərimanov parkı", "sources": "BKY" },
-    { "name": "Park Zorge", "sources": "BKY" },
-    { "name": "Prezident parkı", "sources": "BKY" },
-    { "name": "Qış parkı", "sources": "BKY" },
-    { "name": "Qubernator parkı", "aliases": ["Filarmoniya bağı"], "sources": "BKY" },
-    { "name": "Sahil bağı", "sources": "BKY" },
-    { "name": "Səməd Vurğun parkı", "sources": "BKY" },
-    { "name": "Sevgi parkı", "sources": "Y" },
-    { "name": "Sevil Qazıyeva parkı", "sources": "BKY" },
-    { "name": "Şəlalə parkı", "sources": "BKY" },
-    { "name": "Xaqani bağı", "sources": "B" },
-    { "name": "Yasamal parkı", "sources": "KY" },
-    { "name": "Zabitlər parkı", "sources": "BKY" },
-    { "name": "Zərifə Əliyeva adına park", "sources": "BKY" },
-    { "name": "Zoopark", "sources": "BKY" },
-
-    { "name": "Azadlıq meydanı", "sources": "BKY" },
-    { "name": "Azneft meydanı", "sources": "BKY" },
-    { "name": "Fəvvarələr meydanı", "aliases": ["Fontanlar bağı"], "sources": "BKY" },
-    { "name": "Neapol dairəsi", "sources": "BKYR" },
-    { "name": "Qələbə dairəsi", "sources": "KY" },
-    { "name": "Ukrayna dairəsi", "sources": "BKY" },
-    { "name": "Cavanşir körpüsü", "sources": "BKY" },
-    { "name": "Tarqovu", "aliases": ["Torqovı", "Nizami küçəsi"], "sources": "Y" },
-    { "name": "Beşmərtəbə", "sources": "BKY" },
-    { "name": "Şəhidlər xiyabanı", "sources": "BKY" },
-    { "name": "Qız Qalası", "sources": "Y" },
-    { "name": "Heydər Əliyev Mərkəzi", "sources": "KY" },
-    { "name": "Heydər Əliyev sarayı", "sources": "KY" },
-    { "name": "Heydər məscidi", "sources": "Y" },
-    { "name": "Xalça Muzeyi", "sources": "BKY" },
-    { "name": "Ayna Sultanova heykəli", "sources": "BKY" },
-    { "name": "C.Cabbarlı heykəli", "sources": "KY" },
-    { "name": "Nərimanov heykəli", "sources": "BKY" },
-    { "name": "Nəsimi heykəli", "sources": "KY" },
-    { "name": "Sirk", "sources": "BKY" },
-
-    { "name": "Araz kinoteatrı", "sources": "KY" },
-    { "name": "Azərbaycan kinoteatrı", "sources": "BKY" },
-    { "name": "Dostluq kinoteatrı", "sources": "BKY" },
-    { "name": "Nizami kinoteatrı", "sources": "BKY" },
-    { "name": "Sevinc kinoteatrı", "aliases": ["Sevinc k/t"], "sources": "KY" },
-    { "name": "Vətən kinoteatrı", "sources": "KY" },
-
-    { "name": "Respublika stadionu", "sources": "BKY" },
-    { "name": "Olimpia stadionu", "sources": "KY" },
-    { "name": "Tofiq Bəhramov stadionu", "sources": "KY" },
-    { "name": "Şəfa stadionu", "sources": "BKY" },
-    { "name": "Heydər Əliyev adına İdman Kompleksi", "aliases": ["İdman kompleksi"], "sources": "BK" },
-    { "name": "Sərhədçi İdman Kompleksi", "sources": "Y" },
-    { "name": "Abu Arena", "sources": "Y" },
-
-    { "name": "ADA Universiteti", "sources": "KY" },
-    { "name": "Azərbaycan Dillər Universiteti", "sources": "BKY" },
-    { "name": "Azərbaycan Dövlət Neft və Sənaye Universiteti", "aliases": ["Neft Akademiyası"], "sources": "BKY" },
-    { "name": "Azərbaycan Turizm İnstitutu", "sources": "BKY" },
-    { "name": "Bakı Asiya Universiteti", "sources": "BKY" },
-    { "name": "Bakı Dövlət Universiteti", "aliases": ["BDU"], "sources": "BKY" },
-    { "name": "Bakı Musiqi Akademiyası", "sources": "BKY" },
-    { "name": "Bakı Slavyan Universiteti", "sources": "BKY" },
-    { "name": "C.Naxçıvanski adına Hərbi Akademiya", "sources": "Y" },
-    { "name": "Dövlət İdarəçilik Akademiyası", "sources": "BKY" },
-    { "name": "Fövqəladə Hallar Nazirliyinin Akademiyası", "sources": "Y" },
-    { "name": "İncəsənət və Mədəniyyət Universiteti", "aliases": ["İncəsənət və Mədəniyyət Un."], "sources": "BKY" },
-    { "name": "İqtisadiyyat Universiteti", "aliases": ["UNEC", "İqtisad Universiteti"], "sources": "BKY" },
-    { "name": "Kooperasiya Universiteti", "sources": "KY" },
-    { "name": "Memarlıq və İnşaat Universiteti", "aliases": ["İnşaat Universiteti"], "sources": "BKY" },
-    { "name": "Milli Aviasiya Akademiyası", "aliases": ["Aviasiya Akademiyası"], "sources": "KY" },
-    { "name": "Milli Konservatoriya", "sources": "BKY" },
-    { "name": "Odlar Yurdu Universiteti", "sources": "KY" },
-    { "name": "Pedaqoji Universiteti", "sources": "BKY" },
-    { "name": "Qafqaz Universiteti", "sources": "KY" },
-    { "name": "Qərb Universiteti", "sources": "KY" },
-    { "name": "Rəssamlıq Akademiyası", "sources": "BKY" },
-    { "name": "Təfəkkür Universiteti", "sources": "KY" },
-    { "name": "Texniki Universiteti", "sources": "BKY" },
-    { "name": "Tibb Universiteti", "sources": "BKY" },
-    { "name": "Xəzər Universiteti", "sources": "KY" },
-
-    { "name": "Hərbi Hospital", "sources": "KY" },
-    { "name": "Mərkəzi Neftçilər Xəstəxanası", "sources": "Y" },
-    { "name": "ASAN Xidmət №1", "aliases": ["Asan Xidmət-1"], "sources": "BY" },
-    { "name": "ASAN Xidmət №2", "aliases": ["Asan Xidmət-2"], "sources": "BY" },
-    { "name": "ASAN Xidmət №3", "aliases": ["Asan Xidmət-3"], "sources": "BY" },
-    { "name": "ASAN Xidmət №4", "aliases": ["Asan Xidmət-4"], "sources": "Y" },
-    { "name": "ASAN Xidmət №5", "aliases": ["Asan Xidmət-5"], "sources": "BY" },
-    { "name": "ASAN Xidmət №6", "aliases": ["Asan Xidmət-6"], "sources": "Y" },
-    { "name": "Dövlət İmtahan Mərkəzi", "aliases": ["DİM", "TQDK"], "sources": "BK" },
-    { "name": "Dövlət Statistika Komitəsi", "sources": "BKY" },
-    { "name": "Milli Məclis", "sources": "Y" },
-
-    { "name": "ANS telekanalı", "sources": "KY" },
-    { "name": "ATV telekanalı", "sources": "KY" },
-    { "name": "AZTV telekanalı", "sources": "KY" },
-    { "name": "İctimai telekanalı", "aliases": ["İctimai TV"], "sources": "KY" },
-    { "name": "Lider telekanalı", "aliases": ["Lider TV"], "sources": "KY" },
-    { "name": "Space TV", "sources": "BKY" },
-    { "name": "AMAY", "sources": "KY" },
-
-    { "name": "ABŞ səfirliyi", "sources": "KY" },
-    { "name": "Çin səfirliyi", "sources": "Y" },
-    { "name": "İran səfirliyi", "aliases": ["İran İslam Respublikası səfirliyi"], "sources": "Y" },
-    { "name": "Özbəkistan səfirliyi", "sources": "Y" },
-    { "name": "Rusiya səfirliyi", "sources": "BKY" },
-    { "name": "Türkiyə səfirliyi", "sources": "KY" },
-
-    { "name": "Daxili İşlər Nazirliyi", "sources": "KY" },
-    { "name": "Ədliyyə Nazirliyi", "sources": "KY" },
-    { "name": "Ekologiya və Təbii Sərvətlər Nazirliyi", "sources": "KY" },
-    { "name": "Əmək və Əhalinin Sosial Müdafiəsi Nazirliyi", "sources": "KY" },
-    { "name": "Energetika Nazirliyi", "sources": "KY" },
-    { "name": "Fövqəladə Hallar Nazirliyi", "sources": "KY" },
-    { "name": "Gənclər və İdman Nazirliyi", "sources": "KY" },
-    { "name": "İqtisadiyyat Nazirliyi", "aliases": ["İqtisadi İnkişaf Nazirliyi"], "sources": "KY" },
-    { "name": "Maliyyə Nazirliyi", "sources": "KY" },
-    { "name": "Milli Təhlükəsizlik Nazirliyi", "sources": "Y" },
-    { "name": "Müdafiə Sənayesi Nazirliyi", "sources": "KY" },
-    { "name": "Rəqəmsal İnkişaf və Nəqliyyat Nazirliyi", "aliases": ["Nəqliyyat Nazirliyi", "Rabitə və Yüksək Texnologiyalar Nazirliyi"], "sources": "KY" },
-    { "name": "Səhiyyə Nazirliyi", "sources": "KY" },
-    { "name": "Elm və Təhsil Nazirliyi", "aliases": ["Təhsil Nazirliyi"], "sources": "BKY" },
-    { "name": "Dövlət Vergi Xidməti", "aliases": ["Vergilər Nazirliyi"], "sources": "KY" },
-    { "name": "Xarici İşlər Nazirliyi", "sources": "KY" }
+    {
+      "name": "28 Mall",
+      "sources": "KY"
+    },
+    {
+      "name": "Gənclik Mall",
+      "sources": "Y"
+    },
+    {
+      "name": "Baku Mall",
+      "sources": "Y"
+    },
+    {
+      "name": "Metropark",
+      "sources": "KY"
+    },
+    {
+      "name": "Park Bulvar",
+      "sources": "KY"
+    },
+    {
+      "name": "Aygun City",
+      "sources": "KY"
+    },
+    {
+      "name": "Megafun",
+      "sources": "KY"
+    },
+    {
+      "name": "Olimpik Star",
+      "sources": "Y"
+    },
+    {
+      "name": "Mərkəzi Univermaq",
+      "aliases": [
+        "MUM"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Moskva univermağı",
+      "sources": "KY"
+    },
+    {
+      "name": "Bakı univermağı",
+      "sources": "KY"
+    },
+    {
+      "name": "Abşeron Ticarət Mərkəzi",
+      "sources": "B"
+    },
+    {
+      "name": "Binə ticarət mərkəzi",
+      "sources": "BKY"
+    },
+    {
+      "name": "Elit ticarət mərkəzi",
+      "sources": "BKY"
+    },
+    {
+      "name": "Eurohome Biləcəri Ticarət Mərkəzi",
+      "sources": "B"
+    },
+    {
+      "name": "Laçın Ticarət Mərkəzi",
+      "sources": "B"
+    },
+    {
+      "name": "Meyvəli Ticarət Mərkəzi",
+      "sources": "B"
+    },
+    {
+      "name": "Nargiz ticarət mərkəzi",
+      "sources": "KY"
+    },
+    {
+      "name": "Riyad Ticarət Mərkəzi",
+      "sources": "B"
+    },
+    {
+      "name": "Sədərək ticarət mərkəzi",
+      "sources": "BKY"
+    },
+    {
+      "name": "Sədərək «Elit»",
+      "sources": "B"
+    },
+    {
+      "name": "Sədərək xalça bazarı",
+      "sources": "B"
+    },
+    {
+      "name": "Sədərək şirniyyat bazarı",
+      "sources": "B"
+    },
+    {
+      "name": "Sədərək tekstil bazarı",
+      "sources": "B"
+    },
+    {
+      "name": "Sədərək təsərrüfat bazarı",
+      "sources": "B"
+    },
+    {
+      "name": "Şüvəlan Park ticarət mərkəzi",
+      "aliases": [
+        "Şüvəlan ticarət mərkəzi"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Xaqani ticarət mərkəzi",
+      "aliases": [
+        "Xəqani ticarət mərkəzi"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Caspian Shopping Center",
+      "sources": "KY"
+    },
+    {
+      "name": "Keşlə bazarı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Montin bazarı",
+      "sources": "BK"
+    },
+    {
+      "name": "Nəsimi bazarı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Şərq bazarı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Təzə bazar",
+      "sources": "KY"
+    },
+    {
+      "name": "Yasamal bazarı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Yaşıl bazar",
+      "sources": "KY"
+    },
+    {
+      "name": "Neftçi bazası",
+      "sources": "BKY"
+    },
+    {
+      "name": "AF Business House",
+      "sources": "KY"
+    },
+    {
+      "name": "AGA Business Center",
+      "sources": "KY"
+    },
+    {
+      "name": "Altes Plaza",
+      "sources": "Y"
+    },
+    {
+      "name": "ASK Plaza",
+      "sources": "Y"
+    },
+    {
+      "name": "Babək Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "Bridge Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "Caspian Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "Crystal Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "Çıraq Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "Dalğa Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "Dəmirçi Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "ISR Plaza",
+      "sources": "KY"
+    },
+    {
+      "name": "Landmark",
+      "sources": "KY"
+    },
+    {
+      "name": "Port Baku",
+      "sources": "BKY"
+    },
+    {
+      "name": "World Business Center",
+      "sources": "KY"
+    },
+    {
+      "name": "Flame Towers",
+      "sources": "Y"
+    },
+    {
+      "name": "Crescent Bay",
+      "sources": "B"
+    },
+    {
+      "name": "Grand Hayat Residence",
+      "sources": "B"
+    },
+    {
+      "name": "İnqilab Residence",
+      "sources": "B"
+    },
+    {
+      "name": "Javahir Residence",
+      "sources": "B"
+    },
+    {
+      "name": "Kristal Abşeron Bayıl",
+      "sources": "B"
+    },
+    {
+      "name": "Kristal Abşeron Əcəmi",
+      "sources": "B"
+    },
+    {
+      "name": "Kristal Abşeron Qara Qarayev",
+      "sources": "B"
+    },
+    {
+      "name": "Kristal Abşeron Yasamal",
+      "sources": "B"
+    },
+    {
+      "name": "Melissa Azadlıq",
+      "sources": "B"
+    },
+    {
+      "name": "Melissa Park",
+      "sources": "B"
+    },
+    {
+      "name": "Merida Premium",
+      "sources": "B"
+    },
+    {
+      "name": "MIDA Hövsan",
+      "sources": "B"
+    },
+    {
+      "name": "MIDA Hövsan 2",
+      "sources": "B"
+    },
+    {
+      "name": "MIDA Yasamal",
+      "sources": "B"
+    },
+    {
+      "name": "Park Azure",
+      "sources": "Y"
+    },
+    {
+      "name": "Park Yasamal 2",
+      "sources": "B"
+    },
+    {
+      "name": "Royal Residence",
+      "sources": "B"
+    },
+    {
+      "name": "Absheron Marriott otel",
+      "sources": "KY"
+    },
+    {
+      "name": "Ambassador otel",
+      "sources": "KY"
+    },
+    {
+      "name": "Avropa otel",
+      "sources": "KY"
+    },
+    {
+      "name": "Fairmont otel",
+      "sources": "KY"
+    },
+    {
+      "name": "Four Seasons otel",
+      "sources": "KY"
+    },
+    {
+      "name": "Hilton otel",
+      "sources": "KY"
+    },
+    {
+      "name": "Hyatt Regency",
+      "sources": "KY"
+    },
+    {
+      "name": "Park Inn",
+      "sources": "KY"
+    },
+    {
+      "name": "Pullman Hotel",
+      "sources": "Y"
+    },
+    {
+      "name": "Qafqaz Resort otel",
+      "sources": "KY"
+    },
+    {
+      "name": "Oskar şadlıq sarayı",
+      "sources": "Y"
+    },
+    {
+      "name": "A.S.Puşkin parkı",
+      "aliases": [
+        "Puşkin parkı"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "AAF Park",
+      "sources": "Y"
+    },
+    {
+      "name": "Aqua Park",
+      "sources": "Y"
+    },
+    {
+      "name": "Atatürk parkı",
+      "sources": "Y"
+    },
+    {
+      "name": "Axundov bağı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Bayıl parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Dağüstü parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Dədə Qorqud parkı",
+      "sources": "KY"
+    },
+    {
+      "name": "Dənizkənarı Milli park",
+      "aliases": [
+        "Bulvar"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Hüseyn Cavid parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "İzmir parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Koala parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Koroğlu parkı",
+      "sources": "Y"
+    },
+    {
+      "name": "M.Ə.Sabir parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "M.Hüseynzadə parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Mərkəzi Nəbatat bağı",
+      "aliases": [
+        "Botanika bağı"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Mərkəzi Park",
+      "sources": "B"
+    },
+    {
+      "name": "Molokan bağı",
+      "aliases": [
+        "Malokan bağı"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Montin adına park",
+      "sources": "KY"
+    },
+    {
+      "name": "Musabəyov parkı",
+      "sources": "KY"
+    },
+    {
+      "name": "Nəriman Nərimanov parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Park Zorge",
+      "sources": "BKY"
+    },
+    {
+      "name": "Prezident parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Qış parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Qubernator parkı",
+      "aliases": [
+        "Filarmoniya bağı"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Sahil bağı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Səməd Vurğun parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Sevgi parkı",
+      "sources": "Y"
+    },
+    {
+      "name": "Sevil Qazıyeva parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Şəlalə parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Xaqani bağı",
+      "sources": "B"
+    },
+    {
+      "name": "Yasamal parkı",
+      "sources": "KY"
+    },
+    {
+      "name": "Zabitlər parkı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Zərifə Əliyeva adına park",
+      "sources": "BKY"
+    },
+    {
+      "name": "Zoopark",
+      "sources": "BKY"
+    },
+    {
+      "name": "Azadlıq meydanı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Azneft meydanı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Fəvvarələr meydanı",
+      "aliases": [
+        "Fontanlar bağı"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Neapol dairəsi",
+      "sources": "BKYR"
+    },
+    {
+      "name": "Qələbə dairəsi",
+      "sources": "KY"
+    },
+    {
+      "name": "Ukrayna dairəsi",
+      "sources": "BKY"
+    },
+    {
+      "name": "Cavanşir körpüsü",
+      "sources": "BKY"
+    },
+    {
+      "name": "Tarqovu",
+      "aliases": [
+        "Torqovı",
+        "Nizami küçəsi"
+      ],
+      "sources": "Y"
+    },
+    {
+      "name": "Beşmərtəbə",
+      "sources": "BKY"
+    },
+    {
+      "name": "Şəhidlər xiyabanı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Qız Qalası",
+      "sources": "Y"
+    },
+    {
+      "name": "Heydər Əliyev Mərkəzi",
+      "sources": "KY"
+    },
+    {
+      "name": "Heydər Əliyev sarayı",
+      "sources": "KY"
+    },
+    {
+      "name": "Heydər məscidi",
+      "sources": "Y"
+    },
+    {
+      "name": "Xalça Muzeyi",
+      "sources": "BKY"
+    },
+    {
+      "name": "Ayna Sultanova heykəli",
+      "sources": "BKY"
+    },
+    {
+      "name": "C.Cabbarlı heykəli",
+      "sources": "KY"
+    },
+    {
+      "name": "Nərimanov heykəli",
+      "sources": "BKY"
+    },
+    {
+      "name": "Nəsimi heykəli",
+      "sources": "KY"
+    },
+    {
+      "name": "Sirk",
+      "sources": "BKY"
+    },
+    {
+      "name": "Araz kinoteatrı",
+      "sources": "KY"
+    },
+    {
+      "name": "Azərbaycan kinoteatrı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Dostluq kinoteatrı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Nizami kinoteatrı",
+      "sources": "BKY"
+    },
+    {
+      "name": "Sevinc kinoteatrı",
+      "aliases": [
+        "Sevinc k/t"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Vətən kinoteatrı",
+      "sources": "KY"
+    },
+    {
+      "name": "Respublika stadionu",
+      "sources": "BKY"
+    },
+    {
+      "name": "Olimpia stadionu",
+      "sources": "KY"
+    },
+    {
+      "name": "Tofiq Bəhramov stadionu",
+      "sources": "KY"
+    },
+    {
+      "name": "Şəfa stadionu",
+      "sources": "BKY"
+    },
+    {
+      "name": "Heydər Əliyev adına İdman Kompleksi",
+      "aliases": [
+        "İdman kompleksi"
+      ],
+      "sources": "BK"
+    },
+    {
+      "name": "Sərhədçi İdman Kompleksi",
+      "sources": "Y"
+    },
+    {
+      "name": "Abu Arena",
+      "sources": "Y"
+    },
+    {
+      "name": "ADA Universiteti",
+      "sources": "KY"
+    },
+    {
+      "name": "Azərbaycan Dillər Universiteti",
+      "sources": "BKY"
+    },
+    {
+      "name": "Azərbaycan Dövlət Neft və Sənaye Universiteti",
+      "aliases": [
+        "Neft Akademiyası"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Azərbaycan Turizm İnstitutu",
+      "sources": "BKY"
+    },
+    {
+      "name": "Bakı Asiya Universiteti",
+      "sources": "BKY"
+    },
+    {
+      "name": "Bakı Dövlət Universiteti",
+      "aliases": [
+        "BDU"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Bakı Musiqi Akademiyası",
+      "sources": "BKY"
+    },
+    {
+      "name": "Bakı Slavyan Universiteti",
+      "sources": "BKY"
+    },
+    {
+      "name": "C.Naxçıvanski adına Hərbi Akademiya",
+      "sources": "Y"
+    },
+    {
+      "name": "Dövlət İdarəçilik Akademiyası",
+      "sources": "BKY"
+    },
+    {
+      "name": "Fövqəladə Hallar Nazirliyinin Akademiyası",
+      "sources": "Y"
+    },
+    {
+      "name": "İncəsənət və Mədəniyyət Universiteti",
+      "aliases": [
+        "İncəsənət və Mədəniyyət Un."
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "İqtisadiyyat Universiteti",
+      "aliases": [
+        "UNEC",
+        "İqtisad Universiteti"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Kooperasiya Universiteti",
+      "sources": "KY"
+    },
+    {
+      "name": "Memarlıq və İnşaat Universiteti",
+      "aliases": [
+        "İnşaat Universiteti"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Milli Aviasiya Akademiyası",
+      "aliases": [
+        "Aviasiya Akademiyası"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Milli Konservatoriya",
+      "sources": "BKY"
+    },
+    {
+      "name": "Odlar Yurdu Universiteti",
+      "sources": "KY"
+    },
+    {
+      "name": "Pedaqoji Universiteti",
+      "sources": "BKY"
+    },
+    {
+      "name": "Qafqaz Universiteti",
+      "sources": "KY"
+    },
+    {
+      "name": "Qərb Universiteti",
+      "sources": "KY"
+    },
+    {
+      "name": "Rəssamlıq Akademiyası",
+      "sources": "BKY"
+    },
+    {
+      "name": "Təfəkkür Universiteti",
+      "sources": "KY"
+    },
+    {
+      "name": "Texniki Universiteti",
+      "sources": "BKY"
+    },
+    {
+      "name": "Tibb Universiteti",
+      "sources": "BKY"
+    },
+    {
+      "name": "Xəzər Universiteti",
+      "sources": "KY"
+    },
+    {
+      "name": "Hərbi Hospital",
+      "sources": "KY"
+    },
+    {
+      "name": "Mərkəzi Neftçilər Xəstəxanası",
+      "sources": "Y"
+    },
+    {
+      "name": "ASAN Xidmət №1",
+      "aliases": [
+        "Asan Xidmət-1"
+      ],
+      "sources": "BY"
+    },
+    {
+      "name": "ASAN Xidmət №2",
+      "aliases": [
+        "Asan Xidmət-2"
+      ],
+      "sources": "BY"
+    },
+    {
+      "name": "ASAN Xidmət №3",
+      "aliases": [
+        "Asan Xidmət-3"
+      ],
+      "sources": "BY"
+    },
+    {
+      "name": "ASAN Xidmət №4",
+      "aliases": [
+        "Asan Xidmət-4"
+      ],
+      "sources": "Y"
+    },
+    {
+      "name": "ASAN Xidmət №5",
+      "aliases": [
+        "Asan Xidmət-5"
+      ],
+      "sources": "BY"
+    },
+    {
+      "name": "ASAN Xidmət №6",
+      "aliases": [
+        "Asan Xidmət-6"
+      ],
+      "sources": "Y"
+    },
+    {
+      "name": "Dövlət İmtahan Mərkəzi",
+      "aliases": [
+        "DİM",
+        "TQDK"
+      ],
+      "sources": "BK"
+    },
+    {
+      "name": "Dövlət Statistika Komitəsi",
+      "sources": "BKY"
+    },
+    {
+      "name": "Milli Məclis",
+      "sources": "Y"
+    },
+    {
+      "name": "ANS telekanalı",
+      "sources": "KY"
+    },
+    {
+      "name": "ATV telekanalı",
+      "sources": "KY"
+    },
+    {
+      "name": "AZTV telekanalı",
+      "sources": "KY"
+    },
+    {
+      "name": "İctimai telekanalı",
+      "aliases": [
+        "İctimai TV"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Lider telekanalı",
+      "aliases": [
+        "Lider TV"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Space TV",
+      "sources": "BKY"
+    },
+    {
+      "name": "AMAY",
+      "sources": "KY"
+    },
+    {
+      "name": "ABŞ səfirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Çin səfirliyi",
+      "sources": "Y"
+    },
+    {
+      "name": "İran səfirliyi",
+      "aliases": [
+        "İran İslam Respublikası səfirliyi"
+      ],
+      "sources": "Y"
+    },
+    {
+      "name": "Özbəkistan səfirliyi",
+      "sources": "Y"
+    },
+    {
+      "name": "Rusiya səfirliyi",
+      "sources": "BKY"
+    },
+    {
+      "name": "Türkiyə səfirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Daxili İşlər Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Ədliyyə Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Ekologiya və Təbii Sərvətlər Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Əmək və Əhalinin Sosial Müdafiəsi Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Energetika Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Fövqəladə Hallar Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Gənclər və İdman Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "İqtisadiyyat Nazirliyi",
+      "aliases": [
+        "İqtisadi İnkişaf Nazirliyi"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Maliyyə Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Milli Təhlükəsizlik Nazirliyi",
+      "sources": "Y"
+    },
+    {
+      "name": "Müdafiə Sənayesi Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Rəqəmsal İnkişaf və Nəqliyyat Nazirliyi",
+      "aliases": [
+        "Nəqliyyat Nazirliyi",
+        "Rabitə və Yüksək Texnologiyalar Nazirliyi"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Səhiyyə Nazirliyi",
+      "sources": "KY"
+    },
+    {
+      "name": "Elm və Təhsil Nazirliyi",
+      "aliases": [
+        "Təhsil Nazirliyi"
+      ],
+      "sources": "BKY"
+    },
+    {
+      "name": "Dövlət Vergi Xidməti",
+      "aliases": [
+        "Vergilər Nazirliyi"
+      ],
+      "sources": "KY"
+    },
+    {
+      "name": "Xarici İşlər Nazirliyi",
+      "sources": "KY"
+    }
   ]
 }

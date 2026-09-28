@@ -21,6 +21,7 @@ Ziddiyyət tapılanda skript dayanır — səhvi SQL tətbiq olunandan sonra tap
 import io
 import json
 import os
+import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRISMA = os.path.join(ROOT, "prisma")
@@ -71,15 +72,11 @@ BAKU_DISTRICT_ORDER = [
     "Səbail", "Suraxanı", "Xəzər", "Xətai", "Yasamal", "Pirallahı",
 ]
 
-# Ünvan Reyestrində ayrıca kök kimi çəkilən iri şəhər/rayonlar: DSK açarı → ad.
-# Bunların qəsəbə və kəndləri rəsmi reyestrdəki tam siyahı ilə birləşdirilir
-# (DSK çıxarışında kəndlər seçmə idi) və rəsmi kodları yazılır.
-PORTAL_ROOTS = {
-    "ABŞERON": "Abşeron", "SUMQAYIT": "Sumqayıt", "GƏNCƏ": "Gəncə",
-    "NAXÇIVAN": "Naxçıvan", "MİNGƏÇEVİR": "Mingəçevir", "ŞİRVAN": "Şirvan",
-    "LƏNKƏRAN": "Lənkəran", "ŞƏKİ": "Şəki", "YEVLAX": "Yevlax",
-    "NAFTALAN": "Naftalan", "XANKƏNDİ": "Xankəndi",
-}
+# Ünvan Reyestrinin kökləri (76) Bakıdan başqa bütün şəhər və rayonları əhatə
+# edir: onların qəsəbə və kəndləri reyestrin tam siyahısı ilə birləşdirilir (DSK
+# çıxarışında kəndlər seçmə idi) və rəsmi kodları yazılır. «Ələt azad iqtisadi
+# zonası» DSK təsnifatında inzibati vahid deyil — atılır.
+PORTAL_SKIPPED_ROOTS = {"Ələt azad iqtisadi zonası"}
 
 # Gəncənin 2 inzibati rayonu. Rəsmi sənəddə qəsəbələrin rayon bölgüsü
 # cədvəl sütunlarında itir, ona görə qəsəbələr birbaşa şəhərə bağlanır.
@@ -96,11 +93,43 @@ def load(path):
 
 
 def strip_suffix(full_name):
-    """«Biləcəri qəsəbəsi» → «Biləcəri», «Binəqədi rayonu» → «Binəqədi»."""
+    """«Biləcəri qəsəbəsi» → «Biləcəri», «Binəqədi rayonu» → «Binəqədi».
+
+    Reyestrdə bəzən artıq boşluq olur («Göytəpə  şəhəri») — sıxılır.
+    """
+    full_name = " ".join(full_name.split())
     for suffix in (" qəsəbəsi", " rayonu", " kəndi", " şəhəri"):
         if full_name.endswith(suffix):
-            return full_name[: -len(suffix)]
+            return full_name[: -len(suffix)].strip()
     return full_name
+
+
+# Azərbaycan əlifbası sırası. Python-un kod nöqtəsi sırası «Ç», «Ə», «Ş», «Ü»
+# ilə başlayanları «Z»-dən sonraya atırdı — `order` sahəsi də səhv düşürdü.
+ALPHABET = "abcçdeəfgğhxıijkqlmnoöprsştuüvyz"
+ALPHABET_ORDER = {char: index for index, char in enumerate(ALPHABET)}
+
+
+def az_key(value):
+    """Azərbaycan əlifbası + təbii rəqəm sırası («2-ci» «10-cu»dan əvvəl)."""
+    lowered = value.replace("I", "ı").replace("İ", "i").lower()
+    key = []
+    for part in re.split(r"(\d+)", lowered):
+        if not part:
+            continue
+        if part.isdigit():
+            key.append((0, int(part), ()))
+        else:
+            key.append((1, 0, tuple((1, ALPHABET_ORDER[c]) if c in ALPHABET_ORDER else (0, ord(c)) for c in part)))
+    return key
+
+
+def match_key(name):
+    """Yazılış fərqini (İ/I, boşluq, defis) nəzərə almayan müqayisə açarı."""
+    lowered = name.replace("I", "ı").replace("İ", "i").lower()
+    for src, dst in (("ə", "e"), ("ı", "i"), ("ö", "o"), ("ü", "u"), ("ş", "s"), ("ç", "c"), ("ğ", "g")):
+        lowered = lowered.replace(src, dst)
+    return "".join(char for char in lowered if char.isalnum())
 
 
 def main():
@@ -139,18 +168,27 @@ def main():
     if len(mapped) != len(set(mapped)):
         raise SystemExit("Bakı bölgüsündə təkrar qəsəbə var")
 
-    # İri şəhər/rayonların rəsmi siyahısı və kodları (qəsəbə, kənd, rayon tabeli şəhər)
+    # Bütün şəhər/rayonların rəsmi siyahısı və kodları (qəsəbə, kənd, rayon tabeli
+    # şəhər). DSK-da eyni yeri başqa yazılışla verən ad saxlanılır — mövcud
+    # elanlar onun slug-ına bağlıdır; reyestr yalnız kodu və çatışmayanları verir.
     portal_towns = {}
     portal_villages = {}
-    for key, name in PORTAL_ROOTS.items():
-        if DISPLAY[key] != name:
-            raise SystemExit("PORTAL_ROOTS adı DISPLAY ilə uyğun deyil: %s" % key)
+    roots = [name for name in units["_roots"] if name != "Bakı" and name not in PORTAL_SKIPPED_ROOTS]
+    display_names = set(DISPLAY.values())
+    stray = sorted(name for name in roots if name not in display_names)
+    if stray:
+        raise SystemExit("Reyestr kökü DISPLAY-də yoxdur: %s" % stray)
+    for name in roots:
+        key = next(k for k, v in DISPLAY.items() if v == name)
+        entry = data[key]
+        known = {match_key(x): x for x in set(entry["c"]) | set(entry["t"]) | set(entry["v"])}
         codes[(None, name)] = units["_roots"][name]["code"]
         towns, villages = set(), set()
         for child in units[name]:
             child_name = strip_suffix(child["fullName"])
+            child_name = known.get(match_key(child_name), child_name)
             codes[(name, child_name)] = child["code"]
-            (villages if child["fullName"].endswith(" kəndi") else towns).add(child_name)
+            (villages if " ".join(child["fullName"].split()).endswith(" kəndi") else towns).add(child_name)
         portal_towns[name] = towns
         portal_villages[name] = villages
 
@@ -171,11 +209,24 @@ def main():
                 raise SystemExit("Massivin mənbəyi göstərilməyib: %s" % name)
             seen.add(name)
 
-    abseron_official = set(data["ABŞERON"]["c"]) | set(data["ABŞERON"]["t"]) | set(data["ABŞERON"]["v"])
-    abseron_hoods = [item["name"] for item in market["abseronNeighborhoods"]]
-    clash = abseron_official & set(abseron_hoods)
-    if clash:
-        raise SystemExit("Abşeron massivi rəsmi məntəqə ilə eyniadlıdır: %s" % sorted(clash))
+    # Bakıdan kənar şəhər/rayonların massivləri (Abşeron, Sumqayıt): rəsmi
+    # qəsəbə/kəndlə eyniadlı ola bilməz — slug toqquşardı və status qarışardı.
+    city_hoods = {}
+    official_elsewhere = set()
+    for city, items in market["cityNeighborhoods"].items():
+        key = next((k for k, v in DISPLAY.items() if v == city), None)
+        if key is None or key == "BAKI":
+            raise SystemExit("cityNeighborhoods açarı birinci pillədə yoxdur: %s" % city)
+        official = (set(data[key]["c"]) | set(data[key]["t"]) | set(data[key]["v"])
+                    | portal_towns.get(city, set()) | portal_villages.get(city, set()))
+        official_elsewhere |= official
+        names = [item["name"] for item in items]
+        clash = official & set(names)
+        if clash:
+            raise SystemExit("%s massivi rəsmi məntəqə ilə eyniadlıdır: %s" % (city, sorted(clash)))
+        if len(names) != len(set(names)) or any(not item.get("sources") for item in items):
+            raise SystemExit("%s massivlərində təkrar ad və ya mənbəsiz qeyd var" % city)
+        city_hoods[city] = names
 
     metro = [item["name"] for item in market["metro"]]
     landmarks = [item["name"] for item in market["landmarks"]]
@@ -186,13 +237,14 @@ def main():
     # Alias açarı mövcud bir adı göstərməlidir, alias özü isə başqa yerin adı olmamalıdır
     aliases = {}
     for item in [i for items in neighborhoods.values() for i in items] + \
-            market["abseronNeighborhoods"] + market["metro"] + market["landmarks"]:
+            [i for items in market["cityNeighborhoods"].values() for i in items] + \
+            market["metro"] + market["landmarks"]:
         if item.get("aliases"):
             aliases.setdefault(item["name"], []).extend(item["aliases"])
     for name, extra in market["aliases"].items():
         aliases.setdefault(name, []).extend(extra)
-    all_names = baku_names | seen | set(metro) | set(landmarks) | abseron_official | \
-        set(abseron_hoods) | set(data["SUMQAYIT"]["t"])
+    all_names = (baku_names | seen | set(metro) | set(landmarks) | official_elsewhere
+                 | {name for names in city_hoods.values() for name in names})
     missing = sorted(name for name in aliases if name not in all_names)
     if missing:
         raise SystemExit("Alias açarı heç bir yerə uyğun gəlmir: %s" % missing)
@@ -312,7 +364,7 @@ def main():
         # Binəqədi rayonunun mərkəzidir, seçim siyahısında iki dəfə görünməsi
         # istifadəçini çaşdırardı və slug-lar da toqquşardı.
         rendered = [call('s', x, codes[(name, x)])
-                    for x in sorted(baku_split[name]) if x != name]
+                    for x in sorted(baku_split[name], key=az_key) if x != name]
         rendered += [call('n', item["name"]) for item in neighborhoods[name]]
         add('  {')
         add('    name: %s,' % q(name))
@@ -363,14 +415,13 @@ def main():
         name = DISPLAY[key]
         # Şəhər/rayonla eyniadlı qəsəbə və kənd ayrıca qeyd yaratmır — o, artıq
         # birinci pillədə seçilir (Daşkəsən, Siyəzən, Qobustan…).
-        towns = sorted((set(entry["c"]) | set(entry["t"]) | portal_towns.get(name, set())) - {name})
-        villages = sorted((set(entry["v"]) | portal_villages.get(name, set())) - set(towns) - {name})
+        towns = sorted((set(entry["c"]) | set(entry["t"]) | portal_towns.get(name, set())) - {name}, key=az_key)
+        villages = sorted((set(entry["v"]) | portal_villages.get(name, set())) - set(towns) - {name}, key=az_key)
         code_of = lambda x: codes.get((name, x))  # noqa: E731
         top_code = codes.get((None, name))
         rendered = [call('s', x, code_of(x)) for x in towns] + \
             [call('v', x, code_of(x)) for x in villages]
-        if name == "Abşeron":
-            rendered += [call('n', x) for x in abseron_hoods]
+        rendered += [call('n', x) for x in city_hoods.get(name, [])]
 
         if key == "BAKI":
             add('  { name: BAKU, tier: "CITY", code: %s, districts: BAKU_DISTRICTS },'
@@ -413,7 +464,7 @@ def main():
     add('')
     add('  // --- Rayonlar ---')
     regions = sorted((k for k in data if k not in CITY_TIER),
-                     key=lambda k: DISPLAY[k].lower())
+                     key=lambda k: az_key(DISPLAY[k]))
     for key in regions:
         render_place(key, "REGION")
     add('];')
