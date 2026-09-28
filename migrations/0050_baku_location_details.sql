@@ -1,113 +1,32 @@
--- Avtomatik yaradılıb: npm run db:taxonomy:build
--- Mövcud sətirlərə toxunmur; yalnız çatışmayanları əlavə edir və adları sinxronlaşdırır.
+-- Bakı üzrə tam ərazi bölgüsü: rəsmi kodlar, bazar massivləri, metro və nişangahlar.
+--
+-- Mənbələr (ətraflı: docs/erazi/baki-erazi-bolgusu.md):
+--   * Rəsmi: DSK «İnzibati Ərazi Bölgüsü Təsnifatı, 2024» (e-qanun.az/framework/57325)
+--     və Ünvan Reyestri (unvanportali.az) — Bakının 12 rayonu, 59 qəsəbəsi, kodları.
+--   * Bazar: bina.az, kub.az, arenda.az, yeniemlak.az, lalafo.az — massiv/mikrorayon,
+--     27 metro stansiyası və 214 nişangah; ziddiyyətli rayon bölgüsü OSM ilə yoxlanıb.
+--   * Ünvan Reyestri iri şəhərlər üçün də çəkilib (Abşeron, Sumqayıt, Gəncə, Naxçıvan,
+--     Mingəçevir, Şirvan, Lənkəran, Şəki, Yevlax, Naftalan, Xankəndi): rəsmi kodlar və
+--     tam qəsəbə/kənd siyahısı (məs. Naxçıvan şəhərinin 5 kəndi) əlavə olunur.
+--
+-- Nə dəyişir:
+--   1. `Location.officialCode` — rəsmi kod; `Property.landmarkId` — nişangah (metro kimi).
+--   2. Yerləşmə ağacının bütün sətirləri `prisma/taxonomy.sql`-in bu versiyası ilə
+--      sinxronlaşır: yeni massivlər, «Memar Əcəmi-2», nişangahlar (`kind = LANDMARK`),
+--      alias-lı `searchName`. Səhv valideynli massivlər düzəlir: «8-ci kilometr»
+--      Binəqədidən Nizamiyə, «Günəşli» Binəqədidən Suraxanıya, 6–8-ci mikrorayonlar
+--      Nəsimidən Binəqədiyə, «Sovetski» Nərimanovdan Yasamala.
+--   3. Köhnə «Alatava» (Nizami altında idi) «2-ci Alatava»-ya (Yasamal) köçürülür.
+--
+-- CI yalnız `migrations/` qovluğunu tətbiq edir, ona görə miqrasiya özü-yetərlidir.
+-- ID konvensiyası `taxonomy.sql` ilə eynidir (`loc_<slug>`); hər addım idempotentdir
+-- (D1 tranzaksiya dəstəkləmir — yarımçıq qalarsa təkrar işlədilə bilər).
 
 PRAGMA foreign_keys = ON;
 
--- Əmlak növləri
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_menziller','Mənzillər','menziller',NULL,'Building2',10,1);
-UPDATE "PropertyType" SET "name"='Mənzillər', "order"=10 WHERE "slug"='menziller';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_yeni-tikili','Yeni tikili','yeni-tikili',NULL,'Building',20,1);
-UPDATE "PropertyType" SET "name"='Yeni tikili', "order"=20 WHERE "slug"='yeni-tikili';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_kohne-tikili','Köhnə tikili','kohne-tikili',NULL,'Building',30,1);
-UPDATE "PropertyType" SET "name"='Köhnə tikili', "order"=30 WHERE "slug"='kohne-tikili';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_heyet-evleri','Həyət evi / Villa','heyet-evleri',NULL,'Home',40,1);
-UPDATE "PropertyType" SET "name"='Həyət evi / Villa', "order"=40 WHERE "slug"='heyet-evleri';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_villalar','Villalar','villalar',NULL,'Home',50,1);
-UPDATE "PropertyType" SET "name"='Villalar', "order"=50 WHERE "slug"='villalar';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_bag-evleri','Bağ evləri','bag-evleri',NULL,'TreePine',60,1);
-UPDATE "PropertyType" SET "name"='Bağ evləri', "order"=60 WHERE "slug"='bag-evleri';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_torpaq','Torpaq sahəsi','torpaq',NULL,'LandPlot',70,1);
-UPDATE "PropertyType" SET "name"='Torpaq sahəsi', "order"=70 WHERE "slug"='torpaq';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_obyektler','Obyekt','obyektler',NULL,'Store',80,1);
-UPDATE "PropertyType" SET "name"='Obyekt', "order"=80 WHERE "slug"='obyektler';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_ofisler','Ofis','ofisler',NULL,'Briefcase',90,1);
-UPDATE "PropertyType" SET "name"='Ofis', "order"=90 WHERE "slug"='ofisler';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_qarajlar','Qaraj','qarajlar',NULL,'Car',100,1);
-UPDATE "PropertyType" SET "name"='Qaraj', "order"=100 WHERE "slug"='qarajlar';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_mini-otel','Mini otel / Xostel','mini-otel',NULL,'Hotel',110,1);
-UPDATE "PropertyType" SET "name"='Mini otel / Xostel', "order"=110 WHERE "slug"='mini-otel';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_istirahet-merkezleri','İstirahət mərkəzi','istirahet-merkezleri',NULL,'Palmtree',120,1);
-UPDATE "PropertyType" SET "name"='İstirahət mərkəzi', "order"=120 WHERE "slug"='istirahet-merkezleri';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_konteyner-evler','Konteyner ev','konteyner-evler',NULL,'Container',130,1);
-UPDATE "PropertyType" SET "name"='Konteyner ev', "order"=130 WHERE "slug"='konteyner-evler';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_a-frame-evler','A-frame ev','a-frame-evler',NULL,'Triangle',140,1);
-UPDATE "PropertyType" SET "name"='A-frame ev', "order"=140 WHERE "slug"='a-frame-evler';
-INSERT OR IGNORE INTO "PropertyType" ("id","name","slug","description","icon","order","isActive") VALUES ('type_xarici-emlak','Xarici əmlak','xarici-emlak',NULL,'Globe',150,1);
-UPDATE "PropertyType" SET "name"='Xarici əmlak', "order"=150 WHERE "slug"='xarici-emlak';
-
--- Xüsusiyyətlər və ödəniş şərtləri
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_qaz','Qaz','qaz',NULL,'UTILITY',10);
-UPDATE "Feature" SET "name"='Qaz', "group"='UTILITY', "order"=10 WHERE "slug"='qaz';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_su','Su','su',NULL,'UTILITY',20);
-UPDATE "Feature" SET "name"='Su', "group"='UTILITY', "order"=20 WHERE "slug"='su';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_isiq','İşıq','isiq',NULL,'UTILITY',30);
-UPDATE "Feature" SET "name"='İşıq', "group"='UTILITY', "order"=30 WHERE "slug"='isiq';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_telefon','Telefon','telefon',NULL,'UTILITY',40);
-UPDATE "Feature" SET "name"='Telefon', "group"='UTILITY', "order"=40 WHERE "slug"='telefon';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_internet','İnternet','internet',NULL,'UTILITY',50);
-UPDATE "Feature" SET "name"='İnternet', "group"='UTILITY', "order"=50 WHERE "slug"='internet';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_kabel-tv','Kabel TV','kabel-tv',NULL,'UTILITY',60);
-UPDATE "Feature" SET "name"='Kabel TV', "group"='UTILITY', "order"=60 WHERE "slug"='kabel-tv';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_kanalizasiya','Kanalizasiya','kanalizasiya',NULL,'UTILITY',70);
-UPDATE "Feature" SET "name"='Kanalizasiya', "group"='UTILITY', "order"=70 WHERE "slug"='kanalizasiya';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_lift','Lift','lift',NULL,'INDOOR',10);
-UPDATE "Feature" SET "name"='Lift', "group"='INDOOR', "order"=10 WHERE "slug"='lift';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_pvc-pencere','PVC pəncərə','pvc-pencere',NULL,'INDOOR',20);
-UPDATE "Feature" SET "name"='PVC pəncərə', "group"='INDOOR', "order"=20 WHERE "slug"='pvc-pencere';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_balkon','Balkon','balkon',NULL,'INDOOR',30);
-UPDATE "Feature" SET "name"='Balkon', "group"='INDOOR', "order"=30 WHERE "slug"='balkon';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_kombi','Kombi','kombi',NULL,'INDOOR',40);
-UPDATE "Feature" SET "name"='Kombi', "group"='INDOOR', "order"=40 WHERE "slug"='kombi';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_merkezi-isitme','Mərkəzi qızdırıcı sistem','merkezi-isitme',NULL,'INDOOR',50);
-UPDATE "Feature" SET "name"='Mərkəzi qızdırıcı sistem', "group"='INDOOR', "order"=50 WHERE "slug"='merkezi-isitme';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_kondisioner','Kondisioner','kondisioner',NULL,'INDOOR',60);
-UPDATE "Feature" SET "name"='Kondisioner', "group"='INDOOR', "order"=60 WHERE "slug"='kondisioner';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_metbex-mebeli','Mətbəx mebeli','metbex-mebeli',NULL,'INDOOR',70);
-UPDATE "Feature" SET "name"='Mətbəx mebeli', "group"='INDOOR', "order"=70 WHERE "slug"='metbex-mebeli';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_esyali','Əşyalı','esyali',NULL,'INDOOR',80);
-UPDATE "Feature" SET "name"='Əşyalı', "group"='INDOOR', "order"=80 WHERE "slug"='esyali';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_duzelme','Düzəlmə','duzelme',NULL,'INDOOR',90);
-UPDATE "Feature" SET "name"='Düzəlmə', "group"='INDOOR', "order"=90 WHERE "slug"='duzelme';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_kamin','Kamin','kamin',NULL,'INDOOR',100);
-UPDATE "Feature" SET "name"='Kamin', "group"='INDOOR', "order"=100 WHERE "slug"='kamin';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_hovuz','Hovuz','hovuz',NULL,'OUTDOOR',10);
-UPDATE "Feature" SET "name"='Hovuz', "group"='OUTDOOR', "order"=10 WHERE "slug"='hovuz';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_avtodayanacaq','Avtodayanacaq','avtodayanacaq',NULL,'OUTDOOR',20);
-UPDATE "Feature" SET "name"='Avtodayanacaq', "group"='OUTDOOR', "order"=20 WHERE "slug"='avtodayanacaq';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_qaraj','Qaraj','qaraj',NULL,'OUTDOOR',30);
-UPDATE "Feature" SET "name"='Qaraj', "group"='OUTDOOR', "order"=30 WHERE "slug"='qaraj';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_heyet','Həyət','heyet',NULL,'OUTDOOR',40);
-UPDATE "Feature" SET "name"='Həyət', "group"='OUTDOOR', "order"=40 WHERE "slug"='heyet';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_bag-sahesi','Bağ sahəsi','bag-sahesi',NULL,'OUTDOOR',50);
-UPDATE "Feature" SET "name"='Bağ sahəsi', "group"='OUTDOOR', "order"=50 WHERE "slug"='bag-sahesi';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_hamam','Hamam / sauna','hamam',NULL,'OUTDOOR',60);
-UPDATE "Feature" SET "name"='Hamam / sauna', "group"='OUTDOOR', "order"=60 WHERE "slug"='hamam';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_mangal','Mangal yeri','mangal',NULL,'OUTDOOR',70);
-UPDATE "Feature" SET "name"='Mangal yeri', "group"='OUTDOOR', "order"=70 WHERE "slug"='mangal';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_deniz-menzeresi','Dəniz mənzərəsi','deniz-menzeresi',NULL,'OUTDOOR',80);
-UPDATE "Feature" SET "name"='Dəniz mənzərəsi', "group"='OUTDOOR', "order"=80 WHERE "slug"='deniz-menzeresi';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_muhafize','Mühafizə','muhafize',NULL,'SECURITY',10);
-UPDATE "Feature" SET "name"='Mühafizə', "group"='SECURITY', "order"=10 WHERE "slug"='muhafize';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_kamera','Video müşahidə','kamera',NULL,'SECURITY',20);
-UPDATE "Feature" SET "name"='Video müşahidə', "group"='SECURITY', "order"=20 WHERE "slug"='kamera';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_domofon','Domofon','domofon',NULL,'SECURITY',30);
-UPDATE "Feature" SET "name"='Domofon', "group"='SECURITY', "order"=30 WHERE "slug"='domofon';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_siqnalizasiya','Siqnalizasiya','siqnalizasiya',NULL,'SECURITY',40);
-UPDATE "Feature" SET "name"='Siqnalizasiya', "group"='SECURITY', "order"=40 WHERE "slug"='siqnalizasiya';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_bagli-erazi','Bağlı ərazi','bagli-erazi',NULL,'SECURITY',50);
-UPDATE "Feature" SET "name"='Bağlı ərazi', "group"='SECURITY', "order"=50 WHERE "slug"='bagli-erazi';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_ipoteka','İpoteka','ipoteka',NULL,'PAYMENT',10);
-UPDATE "Feature" SET "name"='İpoteka', "group"='PAYMENT', "order"=10 WHERE "slug"='ipoteka';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_hazir-ipoteka','Hazır ipoteka','hazir-ipoteka',NULL,'PAYMENT',20);
-UPDATE "Feature" SET "name"='Hazır ipoteka', "group"='PAYMENT', "order"=20 WHERE "slug"='hazir-ipoteka';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_kredit','Kredit','kredit',NULL,'PAYMENT',30);
-UPDATE "Feature" SET "name"='Kredit', "group"='PAYMENT', "order"=30 WHERE "slug"='kredit';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_faizsiz-kredit','Faizsiz kredit','faizsiz-kredit',NULL,'PAYMENT',40);
-UPDATE "Feature" SET "name"='Faizsiz kredit', "group"='PAYMENT', "order"=40 WHERE "slug"='faizsiz-kredit';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_taksit','Taksit','taksit',NULL,'PAYMENT',50);
-UPDATE "Feature" SET "name"='Taksit', "group"='PAYMENT', "order"=50 WHERE "slug"='taksit';
-INSERT OR IGNORE INTO "Feature" ("id","name","slug","icon","group","order") VALUES ('feat_barter','Barter','barter',NULL,'PAYMENT',60);
-UPDATE "Feature" SET "name"='Barter', "group"='PAYMENT', "order"=60 WHERE "slug"='barter';
+ALTER TABLE "Location" ADD COLUMN "officialCode" TEXT;
+ALTER TABLE "Property" ADD COLUMN "landmarkId" TEXT;
+CREATE INDEX IF NOT EXISTS "Property_landmarkId_idx" ON "Property"("landmarkId");
 
 -- Şəhərlər və rayonlar
 INSERT OR IGNORE INTO "Location" ("id","name","searchName","slug","kind","parentId","order","officialCode") VALUES ('loc_baki','Bakı','baki','baki','CITY',NULL,0,'00000002');
@@ -2351,3 +2270,18 @@ UPDATE "Location" SET "name"='Dövlət Vergi Xidməti', "searchName"='dovlet ver
 INSERT OR IGNORE INTO "Location" ("id","name","searchName","slug","kind","parentId","order","officialCode") VALUES ('loc_nisangah-xarici-isler-nazirliyi','Xarici İşlər Nazirliyi','xarici isler nazirliyi','nisangah-xarici-isler-nazirliyi','LANDMARK',(SELECT "id" FROM "Location" WHERE "slug"='baki'),2130,NULL);
 UPDATE "Location" SET "name"='Xarici İşlər Nazirliyi', "searchName"='xarici isler nazirliyi', "kind"='LANDMARK', "order"=2130, "officialCode"=NULL, "parentId"=(SELECT "id" FROM "Location" WHERE "slug"='baki') WHERE "slug"='nisangah-xarici-isler-nazirliyi';
 
+-- Köhnə «Alatava» → «2-ci Alatava» (yeniemlak.az «Alatava»nı Yasamalda göstərir;
+-- OSM sərhədi ilə 2-ci Alatava Yasamal rayonundadır).
+UPDATE "Property"
+SET "districtId" = (SELECT "id" FROM "Location" WHERE "slug" = 'baki-2-ci-alatava')
+WHERE "districtId" IN (SELECT "id" FROM "Location" WHERE "slug" = 'baki-alatava');
+
+UPDATE "NeighborhoodProfile"
+SET "locationId" = (SELECT "id" FROM "Location" WHERE "slug" = 'baki-2-ci-alatava')
+WHERE "locationId" IN (SELECT "id" FROM "Location" WHERE "slug" = 'baki-alatava')
+  AND NOT EXISTS (
+    SELECT 1 FROM "NeighborhoodProfile"
+    WHERE "locationId" = (SELECT "id" FROM "Location" WHERE "slug" = 'baki-2-ci-alatava')
+  );
+
+DELETE FROM "Location" WHERE "slug" = 'baki-alatava';

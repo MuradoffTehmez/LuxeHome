@@ -15,7 +15,8 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { FEATURES, PROPERTY_TYPES } from "./taxonomy-data";
-import { BAKU, METRO_STATIONS, PLACES } from "./locations-data";
+import { normalizeSearchText } from "../src/lib/search-normalization";
+import { BAKU, LANDMARKS, LOCATION_ALIASES, METRO_STATIONS, PLACES } from "./locations-data";
 
 const AZ_TRANSLIT: Record<string, string> = {
   ə: "e", Ə: "e",
@@ -108,12 +109,22 @@ function parentRef(parentSlug: string): string {
  */
 const seenSlugs = new Set<string>();
 
+/**
+ * Axtarış sahəsi: normallaşdırılmış ad + alternativ yazılışlar («Müşfiqabad»,
+ * «Kirov qəsəbəsi», «8 km»). Pulsuz mətn axtarışı `searchName contains` ilə
+ * işlədiyi üçün alias-lar ayrıca yer yaratmadan tapılır.
+ */
+function searchNameFor(name: string): string {
+  return [name, ...(LOCATION_ALIASES[name] ?? [])].map(normalizeSearchText).join(" | ");
+}
+
 function locationRow(
   name: string,
   kind: string,
   order: number,
   parentSlug: string | null,
   slug: string,
+  officialCode?: string,
 ): void {
   if (seenSlugs.has(slug)) {
     throw new Error(`Təkrar slug: ${slug} (${name}) — locations-data.ts-ə bax.`);
@@ -123,12 +134,16 @@ function locationRow(
   const id = `loc_${slug}`;
   const parent = parentSlug ? parentRef(parentSlug) : "NULL";
 
+  const searchName = quote(searchNameFor(name));
+  const code = officialCode ? quote(officialCode) : "NULL";
+
   lines.push(
-    `INSERT OR IGNORE INTO "Location" ("id","name","slug","kind","parentId","order") ` +
-      `VALUES (${quote(id)},${quote(name)},${quote(slug)},${quote(kind)},${parent},${order});`,
+    `INSERT OR IGNORE INTO "Location" ("id","name","searchName","slug","kind","parentId","order","officialCode") ` +
+      `VALUES (${quote(id)},${quote(name)},${searchName},${quote(slug)},${quote(kind)},${parent},${order},${code});`,
   );
   lines.push(
-    `UPDATE "Location" SET "name"=${quote(name)}, "kind"=${quote(kind)}, "order"=${order}` +
+    `UPDATE "Location" SET "name"=${quote(name)}, "searchName"=${searchName}, "kind"=${quote(kind)}, ` +
+      `"order"=${order}, "officialCode"=${code}` +
       (parentSlug ? `, "parentId"=${parent}` : "") +
       ` WHERE "slug"=${quote(slug)};`,
   );
@@ -147,7 +162,7 @@ lines.push("-- Şəhərlər və rayonlar");
 PLACES.forEach((place, index) => {
   // Şəhərlər əvvəl, rayonlar sonra sıralanır
   const base = place.tier === "CITY" ? index * 10 : 1000 + index * 10;
-  locationRow(place.name, "CITY", base, null, slugify(place.name));
+  locationRow(place.name, "CITY", base, null, slugify(place.name), place.code);
 });
 lines.push("");
 
@@ -157,17 +172,24 @@ PLACES.forEach((place) => {
 
   place.districts?.forEach((district, districtIndex) => {
     const districtSlug = scopedSlug(topSlug, district.name);
-    locationRow(district.name, "DISTRICT", districtIndex * 10, topSlug, districtSlug);
+    locationRow(district.name, "DISTRICT", districtIndex * 10, topSlug, districtSlug, district.code);
 
     district.places.forEach((child, childIndex) => {
       // Qəsəbənin slug-ı rayonun deyil, şəhərin prefiksini daşıyır: elanlar
       // ilk seed-dən bəri `baki-<qəsəbə>` slug-ına bağlıdır.
-      locationRow(child.name, child.kind, childIndex * 10, districtSlug, scopedSlug(topSlug, child.name));
+      locationRow(
+        child.name,
+        child.kind,
+        childIndex * 10,
+        districtSlug,
+        scopedSlug(topSlug, child.name),
+        child.code,
+      );
     });
   });
 
   place.places?.forEach((child, childIndex) => {
-    locationRow(child.name, child.kind, childIndex * 10, topSlug, scopedSlug(topSlug, child.name));
+    locationRow(child.name, child.kind, childIndex * 10, topSlug, scopedSlug(topSlug, child.name), child.code);
   });
 });
 lines.push("");
@@ -175,6 +197,12 @@ lines.push("");
 lines.push("-- Metro stansiyaları");
 METRO_STATIONS.forEach((station, index) => {
   locationRow(station, "METRO", index * 10, bakuSlug, `metro-${slugify(station)}`);
+});
+lines.push("");
+
+lines.push("-- Nişangahlar");
+LANDMARKS.forEach((landmark, index) => {
+  locationRow(landmark, "LANDMARK", index * 10, bakuSlug, `nisangah-${slugify(landmark)}`);
 });
 lines.push("");
 
