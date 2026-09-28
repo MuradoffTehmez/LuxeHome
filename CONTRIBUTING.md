@@ -98,8 +98,13 @@ Hər deploy job-u öz mühitinin D1 miqrasiyalarını **bundle-dan əvvəl** tə
 məcburidir: əvvəlcə worker yayımlansa, sxem gəlincəyə qədər sorğular çökür və xəta çox vaxt
 `try/catch` içində səssizcə udulur.
 
-Staging production-dan əvvəl gedir. Browser E2E dəsti (190+ test) canlı staging mühitinə
-qarşı işləyir və uğursuz olarsa production yayımını saxlayır.
+Staging production-dan əvvəl gedir. Browser E2E dəsti (15 spec, 164 test) canlı staging
+mühitinə qarşı işləyir və uğursuz olarsa production yayımını saxlayır. PR-da isə eyni dəst
+`Local stack E2E` məcburi yoxlaması kimi lokal workerd + real D1/R2 üzərində işləyir.
+
+CI-da `next/font` Google Fonts-dan şrift yükləyərkən keçici xəta verə bilər
+(`An error occurred in next/font ... reading '1'`). Bu kod xətası deyil; uğursuz job-u
+bir dəfə yenidən işlədin. İkinci dəfə də sınarsa real problem kimi araşdırın.
 
 Bu, sənəd dəyişikliyinin də tam axından keçməsi deməkdir. Qəsdəndir: «bu dəyişiklik
 zərərsizdir» qərarını avtomatlaşdırmaq, nəyin zərərsiz olduğunu səhv qiymətləndirmək üçün
@@ -152,17 +157,18 @@ BREAKING CHANGE: köhnə sessiya cookie-ləri etibarsızdır, bütün istifadə�
 
 ## Keyfiyyət qapısı
 
-Pull request açmazdan əvvəl **dörd qapının** hamısı lokal olaraq keçməlidir
+Pull request açmazdan əvvəl **beş qapının** hamısı lokal olaraq keçməlidir
 (`CLAUDE.md`-dəki siyahı ilə eynidir):
 
 ```bash
+npm run test
 npm run typecheck
 npm run lint
-npm test
+npm run dead-code
 npm run build
 ```
 
-Asılılıq auditi bu dördlüyə daxil deyil — o, kod keyfiyyətini deyil, üçüncü tərəf
+Asılılıq auditi bu beşliyə daxil deyil — o, kod keyfiyyətini deyil, üçüncü tərəf
 paketlərini yoxlayır və CI-də `Quality gate` job-unun ayrıca addımı kimi işləyir:
 
 ```bash

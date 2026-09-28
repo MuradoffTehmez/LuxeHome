@@ -77,20 +77,22 @@ Bu qaydalara vicdanla əməl edən təhlükəsizlik tədqiqatçılarına qarşı
 
 Hazırkı müdafiələrə aşağıdakılar daxildir:
 
-- əməkdaş hesabları üçün məcburi TOTP 2FA və birdəfəlik backup kodlar;
+- əməkdaş hesabları üçün məcburi TOTP 2FA, alternativ ikinci mərhələ kimi passkey (WebAuthn) və birdəfəlik backup kodlar;
+- ictimai giriş üçün Cloudflare Turnstile, Google OIDC (PKCE + nonce, əməkdaş hesabına bağlanmır) və yalnız təsdiqlənmiş nömrə ilə HMAC-li telefon OTP;
 - PBKDF2-HMAC-SHA256 parol hash-i və giriş zamanı parametr yeniləmə imkanı;
 - D1-də saxlanan, revoke edilə bilən və müddəti məhdud sessiyalar;
 - ictimai və əməkdaş auth növlərinin sərt ayrılması;
-- hesab kilidi, IP login limit-i və admin mutation rate limit-i;
+- hesab kilidi, IP login limit-i, admin mutation rate limit-i və AI/xəritə/qiymətləndirmə kvota limitləri;
 - hər admin yazısında canlı sessiya, rol/icazə və same-origin yoxlaması;
-- HTML sanitizasiyası və audit jurnalı;
-- media üçün ölçü, format və magic-byte yoxlaması, təhlükəsiz R2 açarı və SVG qadağası;
+- HTML sanitizasiyası (məzmun və tərcümə yazılarkən), e-poçt və Telegram mətnlərinin kodlanması və audit jurnalı;
+- sessiya cookie-li sorğunu keşləməyən və `Set-Cookie` saxlamayan kənar HTML keşi;
+- media üçün ölçü, format və magic-byte yoxlaması, təhlükəsiz R2 açarı, SVG qadağası və elan şəkillərinə su nişanı;
 - admin route-larında CSP, `no-store`, clickjacking və referrer müdafiəsi;
 - staging mühitində `noindex` və production resurslarından ayrı D1/R2 namespace-ləri.
 
 Məlum təhlükəsizlik boşluqları və planlaşdırılan möhkəmləndirmələr README və Wiki-də açıq şəkildə
-qeyd olunur. Əlaqə/auth anti-spam qatı, e-poçt təsdiqi, parol bərpası, CI və staging browser E2E
-qurulub; production post-deploy smoke, D1 backup/restore drill-i və xarici xidmətlərin əməliyyat
+qeyd olunur. Əlaqə/auth anti-spam qatı (Turnstile), e-poçt təsdiqi, parol bərpası, CI, PR-da lokal stack
+E2E, staging browser E2E, CodeQL və dependency review qurulub; production post-deploy smoke, D1 backup/restore drill-i və xarici xidmətlərin əməliyyat
 monitorinqi inkişaf etdirilməli sahələr olaraq qalır.
 
 ## Açıqlama və təşəkkür
