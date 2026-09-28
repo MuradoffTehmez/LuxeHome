@@ -89,7 +89,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@cloudflare/vitest-plugin": "^1.2.6",
+    "@cloudflare/vitest-plugin": "^1.2.7",
     "@opennextjs/cloudflare": "^1.20.6",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
