@@ -18,6 +18,21 @@ describe("reviveDates", () => {
     expect(() => new Intl.DateTimeFormat("az").format(revived.legalReviewedAt)).not.toThrow();
   });
 
+  it("ISO formatında olan adi mətn sahəsini (başlıq) Date-ə çevirmir", () => {
+    const revived = reviveDates(
+      JSON.parse(JSON.stringify({ title: "2026-09-01T10:15:00.000Z", items: ["2026-09-01T10:15:00.000Z"], updatedAt: new Date("2026-09-01T10:15:00.000Z") })),
+    );
+    expect(revived.title).toBe("2026-09-01T10:15:00.000Z");
+    expect(revived.items[0]).toBe("2026-09-01T10:15:00.000Z");
+    expect(revived.updatedAt).toBeInstanceOf(Date);
+  });
+
+  it("sxemin bütün tarix adlandırma formalarını tanıyır", () => {
+    const iso = "2026-01-01T00:00:00.000Z";
+    const revived = reviveDates({ featuredUntil: iso, birthDate: iso, officialSince: iso, reviewAfter: iso, requestedFor: iso, date: iso });
+    for (const value of Object.values(revived)) expect(value).toBeInstanceOf(Date);
+  });
+
   it("adi mətnə, null-a və artıq Date olan dəyərə toxunmur", () => {
     const date = new Date("2026-01-01T00:00:00.000Z");
     const revived = reviveDates({
