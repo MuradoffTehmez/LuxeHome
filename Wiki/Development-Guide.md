@@ -220,7 +220,7 @@ Prisma `DateTime` sahələri D1-də ISO-8601 mətn kimi saxlanılır. Seed, əl 
 
 > Test strategiyası, qoruyucu testlər və «hansı dəyişikliyə hansı test» cədvəli: [[Test və keyfiyyət|Testing-and-Quality]].
 
-Testlər `@cloudflare/vitest-plugin` ilə `workerd` runtime-da (domen qatı) və Node layihəsində (SSR komponentləri) işləyir. Bu, Web Crypto davranışının production-a yaxın olmasını təmin edir. `*.integration.test.ts` faylları real miniflare D1 ilə işləyir.
+Vitest dörd layihə işlədir: `workerd` (domen qatı, `@cloudflare/vitest-plugin` — Web Crypto production-a yaxın), `integration` (`*.integration.test.ts`, real miniflare D1), `repo-node` (`prisma/**`, `scripts/**` — repo fayllarını `node:fs` ilə oxuyan miqrasiya/seed testləri) və `ui-node` (SSR komponentləri).
 
 29 sentyabr 2026 snapshot-unda 173 test faylı və 889 test (lokal işləmə ~65 s) aşağıdakı sahələri əhatə edir:
 

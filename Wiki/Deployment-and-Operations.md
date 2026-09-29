@@ -137,7 +137,7 @@ sahəsindən götürür. Bu ikinci addım məcburidir: `package-lock.json`-un fo
 versiyasından asılıdır və uyğunsuz npm `npm ci`-ni `EUSAGE` ilə sındırır. Toolchain dəyişəndə
 `.nvmrc`, `packageManager` və lock faylı **eyni commit-də** yenilənməlidir.
 
-CI-da Cloudflare kimlik məlumatı yalnız miqrasiya drift addımı üçün istifadə olunur; `npm run build`
+CI-da Cloudflare kimlik məlumatı yalnız deploy job-larında (miqrasiya, taksonomiya, yayım) istifadə olunur; `Quality gate`-dəki `npm run build`
 credential olmadan da keçməlidir. Bunun üçün `next.config.ts`-dəki `initOpenNextCloudflareForDev()`
 çağırışı yalnız development-də işə düşür — əks halda `ai`/`images` binding-ləri üçün açılan remote
 proxy sessiyası tokensiz mühitdə build-i sındırır.
@@ -151,7 +151,17 @@ proxy sessiyası tokensiz mühitdə build-i sındırır.
 3. Bundle hər mühit üçün ayrıca qurulur, çünki `SITE_URL` statik səhifələrə build vaxtı yazılır.
 4. Staging E2E sınarsa production toxunulmur.
 
-Lokal və ya təcili yayımda eyni sıra əl ilə saxlanmalıdır: əvvəlcə `npm run db:migrate:remote` (və ya `:staging`), sonra `npm run deploy`.
+Lokal və ya təcili yayımda eyni sıra əl ilə saxlanmalıdır — **hər mühit üçün yalnız öz əmrləri**:
+
+| Addım | Staging | Production |
+|---|---|---|
+| 1. Miqrasiya | `npm run db:migrate:staging` | `npm run db:migrate:remote` |
+| 2. Taksonomiya | `npm run db:taxonomy:staging` | `npm run db:taxonomy:remote` |
+| 3. Worker | `npm run deploy:staging` | `npm run deploy` |
+| 4. Cron Worker (dəyişibsə) | `npm run deploy:cron:staging` | `npm run deploy:cron` |
+
+> [!WARNING]
+> `npm run deploy` production skriptidir: `SITE_URL=https://luxehomeestate.az`, `IS_STAGING=false` və `--env=""` ilə qurur. Staging miqrasiyasından sonra onu işlətmək production-a yayım deməkdir. Staging üçün həmişə `deploy:staging` işlədin.
 
 Build dəyişənləri GitHub repo dəyişənlərindən gəlir (məs. `PRODUCTION_CF_WEB_ANALYTICS_TOKEN` → `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN`, VAPID açıq açarı).
 
@@ -180,15 +190,15 @@ Adi yayım CI tərəfindən avtomatik aparılır. Aşağıdakı əl ilə runbook
    deyil; həll [[İnkişaf təlimatı|Development-Guide]] səhifəsindədir.
 
 3. Secret-lərin mövcudluğunu və staging üçün fərqli olduğunu yoxlayın.
-4. Miqrasiyanı və lazım olduqda seed/taksonomiyanı tətbiq edin:
+4. Miqrasiyanı və taksonomiyanı tətbiq edin (CI ilə eyni sıra), seed-i yalnız lazım olduqda:
 
    ```bash
    npm run db:migrate:staging
-   npm run db:seed:staging
    npm run db:taxonomy:staging
+   npm run db:seed:staging   # yalnız seed dəyişibsə
    ```
 
-   Seed və taksonomiya hər deploy-da avtomatik işlədilmir; yalnız dəyişiklik bunu tələb edirsə istifadə olunur.
+   CI taksonomiyanı hər deploy-da tətbiq edir (idempotent); seed isə avtomatik işlədilmir.
 
 5. Deploy edin:
 
@@ -216,10 +226,11 @@ Adi yayım CI tərəfindən avtomatik aparılır. Aşağıdakı əl ilə runbook
 2. D1 schema dəyişikliyi varsa backup/export və rollback planı hazırlayın.
 3. Keyfiyyət qapısını həmin commit-də yenidən işlədin.
 4. Production secret və binding-lərin adlarını yoxlayın.
-5. Miqrasiyanı tətbiq edin:
+5. Miqrasiyanı və taksonomiyanı tətbiq edin (CI ilə eyni sıra):
 
    ```bash
    npm run db:migrate:remote
+   npm run db:taxonomy:remote
    ```
 
 6. Deploy edin:

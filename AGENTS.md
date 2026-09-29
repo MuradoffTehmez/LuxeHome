@@ -25,7 +25,10 @@ npm run lint         # eslint
 npm run test         # Vitest (workerd + Node + real miniflare D1 integration)
 npm run dead-code    # Knip: istifadə olunmayan fayl/asılılıq
 npm run e2e          # Playwright, E2E_BASE_URL-dəki workerd mühitinə qarşı
-npm run e2e:local:build      # lokal stack: bundle → e2e:local:prepare → e2e:local:serve (:8787)
+npm run e2e:local:build      # lokal stack 1/3: yalnız OpenNext bundle (IS_STAGING=true, localhost:8787)
+npm run e2e:local:prepare    # lokal stack 2/3: .wrangler/e2e-state-də təzə D1 + test hesabları (AUTH_SECRET, E2E_ADMIN_TOTP_SECRET)
+npm run e2e:local:serve      # lokal stack 3/3: workerd :8787 — ayrı terminalda açıq saxla
+E2E_BASE_URL=http://localhost:8787 npm run e2e   # E2E_BASE_URL verilməsə testlər canlı staging-ə gedir
 
 npm run db:migrate:local # D1 miqrasiyalarını lokal tətbiq edir
 npx tsx prisma/seed.ts  # sistem/taksonomiya başlanğıc məlumatları (giriş edilə bilən hesab YARATMIR)
@@ -40,7 +43,8 @@ npm run db:taxonomy:build     # prisma/taxonomy.sql
 npm run db:locations:migrations # taxonomy.sql → migrations/0050–0053
 
 npm run preview      # OpenNext bundle + lokal workerd (production runtime-ı)
-npm run deploy       # əl ilə yayım — əvvəlcə db:migrate:remote (staging: :staging)
+npm run deploy:staging  # staging: db:migrate:staging → db:taxonomy:staging → deploy:staging
+npm run deploy          # PRODUCTION: db:migrate:remote → db:taxonomy:remote → deploy (staging üçün işlətmə)
 ```
 
 Bundler qəsdən **webpack**-dır (`--webpack`): Turbopack Prisma klientini hash-lı symlink kimi

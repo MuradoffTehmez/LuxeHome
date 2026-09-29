@@ -97,8 +97,10 @@ problemlər yalnız orada üzə çıxır.
 sonra worker-i yayımlayır. Sıra məcburidir: əvvəlcə worker getsə, sxem gəlincəyə qədər
 sorğular çökür və xəta çox vaxt `try/catch` içində səssizcə udulur.
 
-Lokal və ya təcili yayımda eyni sıra əl ilə saxlanmalıdır — əvvəlcə
-`npm run db:migrate:remote` (və ya `:staging`), sonra `npm run deploy`.
+Lokal və ya təcili yayımda eyni sıra əl ilə saxlanmalıdır, **hər mühit öz əmrləri ilə**:
+staging — `db:migrate:staging` → `db:taxonomy:staging` → `deploy:staging`; production —
+`db:migrate:remote` → `db:taxonomy:remote` → `deploy`. `npm run deploy` production URL-i və
+`--env=""` ilə qurulur — staging miqrasiyasından sonra işlədilsə production-a yayımlayır.
 
 ### GitHub development workflow
 

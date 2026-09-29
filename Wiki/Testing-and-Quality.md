@@ -6,13 +6,23 @@ Bu səhifə layihənin test qatlarını, keyfiyyət qapısını, CI-də hansı y
 
 | Qat | Alət | Harada işləyir | Say | Nəyi tutur |
 |---|---|---|---:|---|
-| Domen unit testləri | Vitest + `@cloudflare/vitest-plugin` | **workerd** (production ilə eyni Web Crypto) | 114 fayl | Auth, kripto, siyasətlər, parser-lər, sorğu formaları, sabitlər |
-| SSR komponent testləri | Vitest | Node | 51 fayl (`src/components/**`) | Render, əlçatanlıq atributları, i18n mətnləri |
+| Domen unit testləri | Vitest + `@cloudflare/vitest-plugin` | **workerd** (production ilə eyni Web Crypto) | 112 fayl | Auth, kripto, siyasətlər, parser-lər, sorğu formaları, sabitlər |
+| SSR komponent testləri | Vitest | Node (`ui-node`) | 51 fayl (`src/components/**`) | Render, əlçatanlıq atributları, i18n mətnləri |
 | D1 integration | Vitest + miniflare D1 | workerd, real D1, miqrasiyalar tətbiq olunmuş | 8 fayl (`*.integration.test.ts`) | 100 bound parametr həddi, nested relation ilişməsi, real SQL |
+| Repo səviyyəli testlər | Vitest | Node (`repo-node`) | 2 fayl (`prisma/__tests__`) | Miqrasiya və generasiya olunan SQL/seed faylları (`migration-0031`, `seed-dates`) |
 | Browser E2E | Playwright + axe-core | Lokal workerd stack (PR) və canlı staging (`main`) | 190 icra | İstifadəçi axınları, SEO, təhlükəsizlik başlıqları, a11y, performans, mobil |
 | Canlı SEO smoke | Node skriptləri | Production | — | Marşrut statusları, SERP qəbulu |
 
-Vitest üç layihəyə bölünür (`vitest.config.mts`): `workerd` (domen, integration və komponentlər xaric), integration layihəsi (real D1, `readD1Migrations()` ilə `migrations/` tətbiq olunur) və Node (komponentlər). Wrangler konfiqurasiyası domen testlərinə qəsdən qoşulmayıb — binding lazım deyil və testləri yavaşladardı.
+Vitest dörd layihəyə bölünür (`vitest.config.mts`), hamısı eyni `npm run test` əmrinə daxildir:
+
+| Layihə | Runtime | `include` | Nə üçün |
+|---|---|---|---|
+| `workerd` | workerd | `src/**/*.test.{ts,tsx}` (komponentlər və `*.integration.test.ts` xaric) | Domen qatı production ilə eyni Web Crypto-da |
+| `integration` | workerd + real miniflare D1 | `src/**/*.integration.test.ts` | `readD1Migrations()` ilə `migrations/` tətbiq olunur; D1 hədləri yalnız burada görünür |
+| `repo-node` | Node | `prisma/**/*.test.ts`, `scripts/**/*.test.ts` | Repo fayllarını (miqrasiya, generasiya olunan SQL) oxuyan testlər — workerd sandbox-ında `node:fs` layihə qovluğunu görmür |
+| `ui-node` | Node | `src/components/**/*.test.{ts,tsx}` | React SSR komponentləri (`src/test/setup-ui.ts`) |
+
+Miqrasiya, seed və ya generator çıxışını fayl sistemindən oxuyan yeni test `prisma/__tests__/` və ya `scripts/` altına yazılmalıdır — `src/` altında workerd-də işləyər və faylı tapmaz. Wrangler konfiqurasiyası domen testlərinə qəsdən qoşulmayıb — binding lazım deyil və testləri yavaşladardı.
 
 Paylanma (fayl sayı): `src/lib/__tests__` 70, `src/components/site` 22, `src/lib/auth` 17, `src/components/admin` 16, `src/lib/admin` 10, `src/i18n` 7, digərləri 1–5.
 
