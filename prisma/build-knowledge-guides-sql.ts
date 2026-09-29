@@ -23,6 +23,22 @@ import { EXISTING_ARTICLE_TAGS } from "./knowledge-guides/existing-articles";
 const OUTPUT = join(process.cwd(), "migrations", "0054_knowledge_guides_and_blog.sql");
 /** Bütün qeydlərin dərc tarixi — sabit saxlanılır ki, fayl hər qurulmada eyni çıxsın. */
 const PUBLISHED_AT = "2026-09-29T08:00:00.000Z";
+/**
+ * Mülkiyyətçinin bələdçiləri yoxlayıb təsdiqlədiyi tarix (29.09.2026). Yeni bələdçi
+ * əlavə olunanda yoxlanmayıbsa bu sahəni ayrıca idarə et — «yoxlanılıb» göstərilməməlidir.
+ */
+const LEGAL_REVIEWED_AT = "2026-09-29T00:00:00.000Z";
+
+/**
+ * Bloq kateqoriyaları `seed.sql`-dədir, CI isə təzə bazada miqrasiyaları seed-dən
+ * əvvəl tətbiq edir — kateqoriya olmasa yazılar `categoryId = NULL` qalardı. Eyni
+ * id/slug ilə yaradılır ki, sonrakı seed `INSERT OR IGNORE` ilə toqquşmasın.
+ */
+const BLOG_CATEGORIES: Array<[id: string, name: string, slug: string, order: number]> = [
+  ["cmt1srtz6004tuadw4lywejkj", "Daşınmaz əmlak", "dasinmaz-emlak", 0],
+  ["cmt1srtzh004uuadwwybsqt27", "Bazar xəbərləri", "bazar-xeberleri", 1],
+  ["cmt1srtzr004vuadwo0wjji9g", "Məsləhətlər", "meslehetler", 2],
+];
 
 function q(value: string | null | undefined): string {
   return value === null || value === undefined ? "NULL" : `'${value.replace(/'/g, "''")}'`;
@@ -88,11 +104,11 @@ for (const guide of KNOWLEDGE_GUIDES) {
   sql.push(
     `INSERT OR IGNORE INTO "KnowledgeArticle" (` +
       `"id","slug","title","searchText","excerpt","content","categoryId","audience","level","status",` +
-      `"legalStatus","riskLevel","jurisdiction","legalActs","sourceUrls","tags","readMinutes","isFeatured","isDemo",` +
+      `"legalStatus","riskLevel","jurisdiction","legalReviewedAt","legalActs","sourceUrls","tags","readMinutes","isFeatured","isDemo",` +
       `"metaTitle","metaDescription","publishedAt","createdAt","updatedAt") VALUES (` +
       `${q(`knowledge_guide_${guide.slug}`)},${q(guide.slug)},${q(guide.title)},${q(searchText)},${q(guide.excerpt)},${q(guide.content)},` +
       `(SELECT "id" FROM "KnowledgeCategory" WHERE "slug"=${q(guide.categorySlug)}),` +
-      `${q(guide.audience)},${q(guide.level)},'PUBLISHED','CURRENT','YELLOW','Azərbaycan Respublikası',` +
+      `${q(guide.audience)},${q(guide.level)},'PUBLISHED','CURRENT','YELLOW','Azərbaycan Respublikası',${q(LEGAL_REVIEWED_AT)},` +
       `${q(guide.legalActs.length ? JSON.stringify(guide.legalActs) : null)},${q(guide.sources.length ? JSON.stringify(guide.sources) : null)},` +
       `${q(JSON.stringify(guide.tags))},${readMinutes(guide.content)},${guide.featured ? 1 : 0},0,` +
       `${q(guide.title.length <= 70 ? guide.title : null)},${q(guide.excerpt.length <= 180 ? guide.excerpt : null)},` +
@@ -111,7 +127,8 @@ for (const [slug, tags] of Object.entries(EXISTING_ARTICLE_TAGS)) {
 // «kupca» tapmırdı). Mətn, tag və hüquqi bloklar əlavə olunur.
 const indexed = [
   `"title"`, `"excerpt"`, `COALESCE("tags",'')`, `COALESCE("legalBasis",'')`, `COALESCE("requiredDocuments",'')`,
-  `COALESCE("procedure",'')`, `COALESCE("costs",'')`, `COALESCE("risks",'')`, `COALESCE("checklist",'')`, `"content"`,
+  `COALESCE("procedure",'')`, `COALESCE("duration",'')`, `COALESCE("costs",'')`, `COALESCE("risks",'')`,
+  `COALESCE("checklist",'')`, `COALESCE("template",'')`, `COALESCE("courtPosition",'')`, `COALESCE("legalActs",'')`, `"content"`,
 ].join(` || ' ' || `);
 sql.push(
   `UPDATE "KnowledgeArticle" SET "searchText"=${sqlNormalize(indexed)} WHERE "id" NOT LIKE 'knowledge_guide_%';`,
@@ -136,6 +153,11 @@ sql.push(
 sql.push("");
 
 // --- Bloq ---------------------------------------------------------------------
+for (const [id, name, slug, order] of BLOG_CATEGORIES) {
+  sql.push(
+    `INSERT OR IGNORE INTO "BlogCategory" ("id","name","slug","description","order") VALUES (${q(id)},${q(name)},${q(slug)},NULL,${order});`,
+  );
+}
 for (const post of BLOG_POSTS) {
   sql.push(
     `INSERT OR IGNORE INTO "BlogPost" ("id","title","slug","excerpt","content","coverAlt","categoryId","tags","references","status","isDemo","readMinutes","publishedAt","metaTitle","metaDescription","createdAt","updatedAt") VALUES (` +

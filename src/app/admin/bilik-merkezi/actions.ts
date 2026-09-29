@@ -121,7 +121,19 @@ async function articleSearchText(data: KnowledgeArticleInput, content: string) {
     content,
     tags: data.tags,
     categoryName: category?.name,
-    extra: [data.legalBasis, data.requiredDocuments, data.procedure, data.costs, data.risks, data.checklist],
+    // Məqalədə göstərilən hər strukturlaşdırılmış blok axtarışa da düşür.
+    extra: [
+      data.legalBasis,
+      data.requiredDocuments,
+      data.procedure,
+      data.duration,
+      data.costs,
+      data.risks,
+      data.checklist,
+      data.template,
+      data.courtPosition,
+      ...data.legalActs,
+    ],
   });
 }
 
