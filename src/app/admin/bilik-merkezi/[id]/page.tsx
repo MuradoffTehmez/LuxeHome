@@ -7,7 +7,7 @@ import { Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { getAdminKnowledgeCategories } from "@/lib/knowledge";
+import { getAdminKnowledgeCategories, parseKnowledgeTags } from "@/lib/knowledge";
 import { parseJsonArray } from "@/lib/utils";
 import { deleteKnowledgeArticle, updateKnowledgeArticle } from "../actions";
 import { KnowledgeArticleForm } from "../article-form";
@@ -52,6 +52,7 @@ export default async function EditKnowledgeArticlePage({
       : "",
     legalActs: parseJsonArray<string>(article.legalActs).join("\n"),
     sourceUrls: parseJsonArray<string>(article.sourceUrls).join("\n"),
+    tags: parseKnowledgeTags(article.tags).join(", "),
     legalBasis: article.legalBasis ?? "",
     requiredDocuments: article.requiredDocuments ?? "",
     procedure: article.procedure ?? "",

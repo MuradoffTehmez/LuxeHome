@@ -1208,6 +1208,8 @@
       "sonHuquqiYoxlama": "Last legal review",
       "esasHuquqiAktlar": "Key legal acts",
       "herSetirdeBirQanun": "One law, code or court ruling per line.",
+      "tags": "Tags",
+      "tagsHint": "Comma-separated: title deed, mortgage, notary. Used in search and in topic links under the article.",
       "prioritetResmiMenbeler": "Primary official sources",
       "herSetirdeBirTam": "One full https:// URL per line. News and commercial sources are not accepted.",
       "strukturlasdirilmisHuquqiBloklar": "Structured legal blocks",

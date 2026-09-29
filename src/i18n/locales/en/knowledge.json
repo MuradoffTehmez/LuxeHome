@@ -18,7 +18,16 @@
     "resultCount": "{count} guides found",
     "noResults": "No guide matches your search",
     "noResultsDescription": "Try another keyword or browse all guides.",
-    "resetSearch": "All guides"
+    "resetSearch": "All guides",
+    "categoryFilterLabel": "Filter by topic",
+    "allCategories": "All topics",
+    "activeFilters": "Active filters",
+    "removeFilter": "Remove the “{name}” filter",
+    "popularTags": "Popular topics",
+    "termResults": "{count} glossary terms",
+    "faqResults": "{count} answers in FAQ",
+    "categorySearchLabel": "Search in “{name}”",
+    "categorySearchPlaceholder": "Search in “{name}”…"
   },
   "article": {
     "readMinutes": "{count} min read",
@@ -60,7 +69,8 @@
       "yellow": "Additional checks required",
       "red": "Serious legal risk",
       "legalReview": "Legal review required"
-    }
+    },
+    "tagsTitle": "Key topics"
   },
   "audience": {
     "BUYER": "Buyer",

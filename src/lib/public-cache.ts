@@ -30,6 +30,7 @@ import {
   getKnowledgeCategories,
   getKnowledgeTerms,
   getKnowledgeSitemapEntries,
+  getKnowledgeTagCounts,
   getPublishedFaqEntries,
   type KnowledgeArticleFilters,
 } from "@/lib/knowledge";
@@ -237,6 +238,12 @@ export const getCachedKnowledgeCategories = cachedQuery(
 export const getCachedKnowledgeTerms = cachedQuery(
   async (filters: { search?: string; initial?: string }) => getKnowledgeTerms(filters),
   ["public-knowledge-terms-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedKnowledgeTagCounts = cachedQuery(
+  getKnowledgeTagCounts,
+  ["public-knowledge-tags-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
 );
 

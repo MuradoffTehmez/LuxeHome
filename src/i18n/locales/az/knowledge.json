@@ -18,7 +18,16 @@
     "resultCount": "{count} bələdçi tapıldı",
     "noResults": "Axtarışa uyğun bələdçi tapılmadı",
     "noResultsDescription": "Başqa açar söz sınayın və ya bütün bələdçilərə baxın.",
-    "resetSearch": "Bütün bələdçilər"
+    "resetSearch": "Bütün bələdçilər",
+    "categoryFilterLabel": "Mövzu üzrə süz",
+    "allCategories": "Bütün mövzular",
+    "activeFilters": "Aktiv filtrlər",
+    "removeFilter": "«{name}» filtrini sil",
+    "popularTags": "Populyar mövzular",
+    "termResults": "Lüğətdə {count} termin",
+    "faqResults": "Suallarda {count} cavab",
+    "categorySearchLabel": "«{name}» bölməsində axtar",
+    "categorySearchPlaceholder": "«{name}» bölməsində axtar…"
   },
   "article": {
     "readMinutes": "{count} dəq oxu",
@@ -60,7 +69,8 @@
       "yellow": "Əlavə yoxlama tələb olunur",
       "red": "Ciddi hüquqi risk",
       "legalReview": "Hüquqi rəy tələb olunur"
-    }
+    },
+    "tagsTitle": "Açar mövzular"
   },
   "audience": {
     "BUYER": "Alıcı",

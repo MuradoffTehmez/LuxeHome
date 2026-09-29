@@ -1208,6 +1208,8 @@
       "sonHuquqiYoxlama": "Son hüquqi yoxlama",
       "esasHuquqiAktlar": "Əsas hüquqi aktlar",
       "herSetirdeBirQanun": "Hər sətirdə bir qanun, məcəllə və ya məhkəmə qərarı.",
+      "tags": "Tag-lar",
+      "tagsHint": "Vergüllə ayırın: kupça, ipoteka, notarius. Axtarışda və məqalənin altındakı mövzu keçidlərində istifadə olunur.",
       "prioritetResmiMenbeler": "Prioritet rəsmi mənbələr",
       "herSetirdeBirTam": "Hər sətirdə bir tam https:// URL. Xəbər və kommersiya mənbəyini rəsmi norma kimi göstərməyin.",
       "strukturlasdirilmisHuquqiBloklar": "Strukturlaşdırılmış hüquqi bloklar",

@@ -10,6 +10,7 @@ import {
   type KnowledgeLevel,
 } from "@/lib/constants";
 import { normalizeSearchText } from "@/lib/search-normalization";
+import { compareAzerbaijani } from "@/lib/az-collation";
 
 /**
  * Bilik Mərkəzi — sorğu və domen qatı.
@@ -54,6 +55,7 @@ export const knowledgeCardSelect = {
   isFeatured: true,
   publishedAt: true,
   updatedAt: true,
+  tags: true,
   category: { select: { slug: true, name: true, icon: true } },
 } as const;
 
@@ -70,6 +72,7 @@ export type KnowledgeCardData = {
   isFeatured: boolean;
   publishedAt: Date | null;
   updatedAt: Date;
+  tags: string | null;
   category: { slug: string; name: string; icon: string | null } | null;
 };
 
@@ -77,9 +80,92 @@ export type KnowledgeCardData = {
 // NORMALLAŞDIRMA
 // ---------------------------------------------------------------------------
 
-/** Bələdçinin registrsiz/diakritiksiz axtarış indeksi. */
-export function knowledgeSearchText(input: { title: string; excerpt: string }): string {
-  return normalizeSearchText(`${input.title} ${input.excerpt}`);
+/**
+ * Bələdçinin registrsiz/diakritiksiz axtarış indeksi.
+ *
+ * Başlıq və xülasədən əlavə məzmun, tag-lar, kateqoriya adı və hüquqi bloklar da
+ * indeksə düşür — oxucu «kupça» yazanda sözü yalnız mətnin içində keçən bələdçini
+ * də tapmalıdır. HTML teqləri atılır, mətn `normalizeSearchText()` ilə sabitlənir.
+ */
+export function knowledgeSearchText(input: {
+  title: string;
+  excerpt: string;
+  content?: string | null;
+  tags?: readonly string[] | null;
+  categoryName?: string | null;
+  extra?: ReadonlyArray<string | null | undefined>;
+}): string {
+  const parts = [
+    input.title,
+    input.excerpt,
+    ...(input.tags ?? []),
+    input.categoryName ?? "",
+    ...(input.extra ?? []).map((value) => value ?? ""),
+    input.content ?? "",
+  ];
+  return normalizeSearchText(
+    parts
+      .join(" ")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;|&amp;|&quot;|&#39;|&lt;|&gt;/g, " "),
+  );
+}
+
+/** Axtarış sorğusunu sözlərə bölür; hər söz ayrıca `contains` şərti olur (AND). */
+export function knowledgeSearchTokens(search: string | undefined): string[] {
+  if (!search?.trim()) return [];
+  return [...new Set(normalizeSearchText(search).split(" ").filter((token) => token.length > 1))].slice(0, 8);
+}
+
+/**
+ * Tag-ın URL formasını verir (`?teq=ilkin-odenis`): «İlkin ödəniş» və «ilkin odenis»
+ * eyni tag-dır. Bazada isə oxunaqlı ad saxlanılır ki, diakritika itməsin.
+ */
+export function knowledgeTagSlug(value: string): string {
+  return normalizeSearchText(value).replace(/ /g, "-").slice(0, 48);
+}
+
+/** Tag-ları təmizləyir: boşluqlar sıxılır, slug üzrə təkrarlar atılır, ən çox 20. */
+export function cleanKnowledgeTags(values: readonly string[]): string[] {
+  const bySlug = new Map<string, string>();
+  for (const value of values) {
+    const label = value.replace(/\s+/g, " ").trim().slice(0, 48);
+    const slug = knowledgeTagSlug(label);
+    if (slug.length >= 2 && !bySlug.has(slug)) bySlug.set(slug, label);
+  }
+  return [...bySlug.values()].slice(0, 20);
+}
+
+export function parseKnowledgeTags(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? cleanKnowledgeTags(parsed.filter((item): item is string => typeof item === "string"))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export type KnowledgeTagCount = { slug: string; label: string; count: number };
+
+/** Dərc olunmuş bələdçilərin tag-ları, istifadə sayına görə — «populyar mövzular». */
+export async function getKnowledgeTagCounts(): Promise<KnowledgeTagCount[]> {
+  const rows = await prisma.knowledgeArticle.findMany({
+    where: { ...publishedKnowledgeWhere(), tags: { not: null } },
+    select: { tags: true },
+  });
+  const counts = new Map<string, KnowledgeTagCount>();
+  for (const row of rows) {
+    for (const label of parseKnowledgeTags(row.tags)) {
+      const slug = knowledgeTagSlug(label);
+      const entry = counts.get(slug) ?? { slug, label, count: 0 };
+      entry.count += 1;
+      counts.set(slug, entry);
+    }
+  }
+  return [...counts.values()].sort((a, b) => b.count - a.count || compareAzerbaijani(a.label, b.label));
 }
 
 /**
@@ -111,6 +197,7 @@ export function isFaqCategory(value: string): value is FaqCategory {
 
 export type KnowledgeArticleFilters = {
   categorySlug?: string;
+  tag?: string;
   audience?: string;
   search?: string;
   page?: number;
@@ -124,9 +211,21 @@ export async function getKnowledgeArticles(filters: KnowledgeArticleFilters = {}
   const where: Record<string, unknown> = { ...publishedKnowledgeWhere() };
   if (filters.categorySlug) where.category = { slug: filters.categorySlug };
   if (filters.audience && isKnowledgeAudience(filters.audience)) where.audience = filters.audience;
-  if (filters.search?.trim()) {
-    where.searchText = { contains: normalizeSearchText(filters.search) };
+  const tokens = knowledgeSearchTokens(filters.search);
+  const and: Record<string, unknown>[] = tokens.map((token) => ({ searchText: { contains: token } }));
+  const tagSlug = filters.tag ? knowledgeTagSlug(filters.tag) : "";
+  if (tagSlug) {
+    // Bazada oxunaqlı ad saxlanılır: slug əvvəl mövcud yazılışlara çevrilir, sonra
+    // JSON massivində dırnaqlı dəqiq uyğunluq axtarılır («kupça» → «kupçasız» deyil).
+    const labels = (await getKnowledgeTagCounts())
+      .filter((item) => item.slug === tagSlug)
+      .map((item) => item.label);
+    if (labels.length === 0) {
+      return { items: [] as KnowledgeCardData[], total: 0, page, totalPages: 1 };
+    }
+    and.push({ OR: labels.map((label) => ({ tags: { contains: JSON.stringify(label) } })) });
   }
+  if (and.length > 0) where.AND = and;
 
   const [items, total] = await Promise.all([
     prisma.knowledgeArticle.findMany({
@@ -186,6 +285,7 @@ export async function getKnowledgeArticleBySlug(slug: string) {
       ogTitle: true,
       ogDescription: true,
       ogImage: true,
+      tags: true,
       category: { select: { slug: true, name: true, description: true, icon: true } },
       author: { select: { name: true } },
     },
@@ -270,9 +370,8 @@ export type KnowledgeTermData = {
 export async function getKnowledgeTerms(filters: { search?: string; initial?: string } = {}) {
   const where: Record<string, unknown> = { status: KNOWLEDGE_STATUSES.PUBLISHED };
   if (filters.initial) where.initial = filters.initial.toUpperCase();
-  if (filters.search?.trim()) {
-    where.searchName = { contains: normalizeSearchText(filters.search) };
-  }
+  const tokens = knowledgeSearchTokens(filters.search);
+  if (tokens.length > 0) where.AND = tokens.map((token) => ({ searchName: { contains: token } }));
 
   const terms = await prisma.knowledgeTerm.findMany({
     where,
@@ -344,6 +443,21 @@ export async function getPublishedFaqEntries(): Promise<FaqEntryData[]> {
     orderBy: [{ category: "asc" }, { order: "asc" }],
     select: { id: true, question: true, answer: true, category: true },
   });
+}
+
+/**
+ * FAQ-da axtarış — siyahı kiçikdir (onlarla qeyd) və keşdən gəlir, ona görə
+ * süzgəc JS-dədir: hər söz sualda və ya cavabda keçməlidir.
+ */
+export function searchFaqEntries(entries: FaqEntryData[], search: string | undefined, take = 6) {
+  const tokens = knowledgeSearchTokens(search);
+  if (tokens.length === 0) return [];
+  return entries
+    .filter((entry) => {
+      const haystack = knowledgeSearchText({ title: entry.question, excerpt: entry.answer });
+      return tokens.every((token) => haystack.includes(token));
+    })
+    .slice(0, take);
 }
 
 /** FAQ qeydlərini PRD §86-dakı kateqoriya sırası ilə qruplaşdırır. */
