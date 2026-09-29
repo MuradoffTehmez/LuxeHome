@@ -85,7 +85,7 @@ type FreeModeProps = CommonProps & {
 export type ComboboxProps = SelectModeProps | FreeModeProps;
 
 const CONTROL =
-  "w-full min-h-12 rounded-sm border bg-paper py-3 pr-20 pl-4 text-base text-ink shadow-xs " +
+  "w-full min-h-12 rounded-sm border bg-paper py-3 pr-24 pl-4 text-base text-ink shadow-xs " +
   "placeholder:text-ink-muted transition-[border-color,box-shadow] duration-200 " +
   "focus:border-gold focus:shadow-[0_0_0_4px_rgb(170_135_84/0.16)] " +
   "disabled:bg-beige disabled:text-ink-muted disabled:cursor-not-allowed";
@@ -222,7 +222,8 @@ export function Combobox(props: ComboboxProps) {
   /** Fokus itəndə: select rejimində seçilməmiş mətn geri qaytarılır. */
   function settle() {
     if (mode === "free") {
-      if (typing && query !== value) commit(query.trim(), null);
+      // Dəyər yazıldıqca yenilənir; burada yalnız kənar boşluqlar təmizlənir.
+      if (typing) commit(query.trim(), null);
       else {
         setOpen(false);
         setTyping(false);
@@ -315,12 +316,15 @@ export function Combobox(props: ComboboxProps) {
       case "Escape":
         if (open) {
           event.preventDefault();
+          // Sənəd səviyyəsindəki dinləyicilər (Overlay) paneli bağlamasın.
+          event.stopPropagation();
           setQuery(displayFor(value, selected));
           setTyping(false);
           setOpen(false);
           setActive(-1);
         } else if (clearable && value) {
           event.preventDefault();
+          event.stopPropagation();
           commit("", null);
         }
         break;
@@ -392,10 +396,17 @@ export function Combobox(props: ComboboxProps) {
           value={query}
           className={cn(CONTROL, error ? "border-danger bg-danger-bg/40" : "border-line-strong hover:border-ink-muted")}
           onChange={(event) => {
-            setQuery(event.target.value);
+            const text = event.target.value;
+            setQuery(text);
             setTyping(true);
             setOpen(true);
-            setActive(event.target.value.trim() ? 0 : -1);
+            setActive(text.trim() ? 0 : -1);
+            // Sərbəst rejimdə yazılan mətn özü dəyərdir: gizli sahə dərhal yenilənir ki,
+            // fokus itmədən saxlanan qaralama (sehrbaz, 700 ms) son mətni götürsün.
+            if (mode === "free") {
+              if (!controlled) setInnerValue(text);
+              props.onValueChange?.(text, null);
+            }
           }}
           onFocus={(event) => {
             // Mobil klaviaturada mətn seçilir ki, yeni axtarış üçün silmək lazım olmasın.
@@ -421,7 +432,7 @@ export function Combobox(props: ComboboxProps) {
                 commit("", null);
                 inputRef.current?.focus();
               }}
-              className="grid size-10 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:text-ink"
+              className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:text-ink"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -433,13 +444,13 @@ export function Combobox(props: ComboboxProps) {
             disabled={disabled}
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => {
-              if (open) setOpen(false);
+              if (open) settle();
               else {
                 inputRef.current?.focus();
                 openList("selected");
               }
             }}
-            className="grid size-10 cursor-pointer place-items-center rounded-xs text-ink-muted disabled:cursor-not-allowed"
+            className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted disabled:cursor-not-allowed"
           >
             <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} />
           </button>
