@@ -23,18 +23,39 @@ E2E_BASE_URL=https://luxehomeestate.az npm run e2e
 
 `next dev` **etibarlı hədəf deyil**: Prisma-nın wasm engine-i dev serverində
 yüklənmir və D1-dən oxuyan hər səhifə 500 qaytarır. Production ilə eyni davranışı
-yalnız workerd verir:
+yalnız workerd verir. PR-dakı məcburi `Local stack E2E` yoxlaması ilə eyni stack:
 
 ```bash
-npm run preview                                   # ayrıca terminalda
+npm run e2e:install         # bir dəfə: Chromium + sistem asılılıqları
+npm run e2e:local:build     # OpenNext bundle (IS_STAGING=true, SITE_URL=http://localhost:8787)
+npm run e2e:local:prepare   # .wrangler/e2e-state: təzə D1 + test hesabları
+npm run e2e:local:serve     # workerd :8787 (ayrıca terminalda saxla)
 E2E_BASE_URL=http://localhost:8787 npm run e2e
 ```
+
+`prepare` `AUTH_SECRET` və `E2E_ADMIN_TOTP_SECRET` tələb edir (CI onları hər run üçün
+efemer yaradır). Hazırlıq bash skriptidir — Windows-da Git Bash işlədin. Yalnız ictimai
+testlər üçün `npm run preview` də kifayətdir, amma onda auth ssenariləri atlanır.
+
+## Layihələr
+
+| Layihə | Cihaz | Nə edir |
+|---|---|---|
+| `auth-setup` | Desktop Chrome | Lokal stack-də admin bir dəfə real TOTP ilə daxil olur və sessiya paylaşılır (TOTP replay qoruması eyni 30 s addımda ikinci girişi rədd edir). Fixture yoxdursa (staging) boş vəziyyət yazılır və auth testləri atlanır |
+| `chromium` | Desktop Chrome | `mobile.spec.ts` xaric bütün spec-lər |
+| `mobile` | Pixel 7 | `mobile.spec.ts` və `smoke.spec.ts` |
+
+`npx playwright test --list` üzrə cəmi 190 test icrası (chromium 158 setup daxil, mobile 32).
+Turnstile üçün test bypass-ı **qəsdən yoxdur**; elan sahibi fixture sessiyası ilə daxil olur
+(`scripts/e2e/local-stack-fixtures.ts`, `support/auth.ts`).
 
 ## Struktur
 
 | Yol | Məzmun |
 |---|---|
 | `support/helpers.ts` | Davranış köməkçiləri — naviqasiya, JSON-LD, konsol, hidratasiya |
+| `support/auth.ts`, `support/fixtures.ts` | Admin/sahib sessiyaları və test fixture-ları |
+| `specs/auth.setup.ts` | `auth-setup` layihəsi — admin 2FA girişi |
 | `pages/*.page.ts` | Səhifə obyektləri — **seçicilər yalnız burada** |
 | `specs/*.spec.ts` | Testlər |
 
@@ -57,6 +78,9 @@ fayl yenilənir.
 | `performance` | Resurs büdcəsi, CLS, TTFB, şəkil optimizasiyası |
 | `a11y` | WCAG (axe-core), klaviatura, semantik struktur, dark kontrast |
 | `mobile` | Çekmece, üfüqi sürüşmə, toxunma hədəfləri |
+| `admin-panel` | Admin 2FA doğrulaması, panel səhifələri, toplu şəkil yükləmə (yalnız lokal stack) |
+| `kabinet-listing` | Kabinetdə elan sehrbazı forması (yalnız lokal stack) |
+| `projects-section` | «Layihələr» bölməsi açarı — naviqasiya və səhifənin gizlədilməsi |
 
 ## Yazma qaydaları
 
@@ -81,7 +105,9 @@ elementləri `name` atributu ilə seçilir.
 
 ## CI
 
-Axın: `quality → deploy-staging → e2e-staging → deploy-production`.
+PR-da: `Quality gate` + məcburi `Local stack E2E` (lokal workerd + real D1/R2, public + auth).
+
+`main` push-unda axın: `quality + e2e-local → deploy-staging → e2e-staging → deploy-production`.
 
 E2E staging yayımından **sonra**, production yayımından **əvvəl** işləyir —
 uğursuz olarsa production yayımı baş vermir. Hesabat `playwright-report`

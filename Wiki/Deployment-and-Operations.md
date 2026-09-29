@@ -12,12 +12,18 @@ Tətbiq `@opennextjs/cloudflare` ilə Cloudflare Worker formatına çevrilir. Pr
 | D1 | `luxehome-db` | `luxehome-db-staging` |
 | Media R2 | `luxehome-media` | `luxehome-media-staging` |
 | ISR cache R2 | `luxehome-next-cache` | `luxehome-next-cache-staging` |
-| Login limiter namespace | `1001` | `2001` |
-| Contact limiter namespace | `1002` | `2002` |
-| Admin limiter namespace | `1003` | `2003` |
+| Vectorize indeksi | `luxehome-properties` | `luxehome-properties-staging` |
+| Rate limit namespace-ləri | `1001`–`1007` | `2001`–`2007` |
 | `SITE_URL` | `https://luxehomeestate.az` | Staging workers.dev URL |
-| `IS_STAGING` | yoxdur/false | `true` |
+| `IS_STAGING` | yoxdur/false | `true` (kənar HTML keşi söndürülü, noindex, demo məzmun açıq) |
 | `ADMIN_ENABLED` | `true` | `true` |
+| `SYSTEM_MODE` / `FORCE_MAINTENANCE` | `NORMAL` / `false` | `NORMAL` / `false` |
+| `EDGE_HTML_CACHE_TTL` | `60` | — (keş `IS_STAGING` ilə söndürülü) |
+| `TURNSTILE_HOSTNAMES` | `luxehomeestate.az,www.luxehomeestate.az` | staging workers.dev hostu |
+| `GSC_SITE_URL` | `sc-domain:luxehomeestate.az` | eyni |
+| Custom domain | `routes` — `luxehomeestate.az`, `www.luxehomeestate.az` | `routes = []`, `workers_dev = true` |
+
+Hər iki Worker `compatibility_date: 2026-08-20`, `nodejs_compat` və `global_fetch_strictly_public` bayraqları, Smart Placement (`placement.mode = "smart"`) və aktiv observability ilə işləyir.
 
 `env.staging.routes = []` qəsdən yazılıb. Wrangler `routes` dəyərini irsən ötürə bildiyi üçün boş massiv olmasa staging deploy-u production custom domain-i öz üzərinə ala bilər.
 
@@ -30,11 +36,19 @@ Tətbiq `@opennextjs/cloudflare` ilə Cloudflare Worker formatına çevrilir. Pr
 | `NEXT_TAG_CACHE_D1` | D1 | OpenNext tag revalidation (`revalidations` cədvəli) |
 | `MEDIA` | R2 | Yüklənən şəkillər |
 | `NEXT_INC_CACHE_R2_BUCKET` | R2 | OpenNext incremental cache |
-| `IMAGES` | Images | Resize, info və WebP output |
+| `IMAGES` | Images | Resize, info, WebP və JPEG output |
+| `AI` | Workers AI | Mətn, vision və `bge-m3` embedding |
+| `PROPERTY_VECTORS` | Vectorize | Semantik axtarış (1024/cosine) |
 | `WORKER_SELF_REFERENCE` | Service | Revalidation self-call |
-| `LOGIN_LIMIT` | Rate limit | Login və public qeydiyyat |
-| `CONTACT_LIMIT` | Rate limit | Əlaqə forması üçün IP əsaslı limit |
-| `ADMIN_LIMIT` | Rate limit | Admin/public listing mutation-ları |
+| `LOGIN_LIMIT` | Rate limit | Login və public qeydiyyat (10/60 s) |
+| `CONTACT_LIMIT` | Rate limit | Əlaqə forması (5/60 s) |
+| `ADMIN_LIMIT` | Rate limit | Admin/kabinet mutation-ları (60/60 s) |
+| `MONITORING_LIMIT` | Rate limit | Client xəta və Web Vitals (60/60 s) |
+| `TILE_LIMIT` | Rate limit | Xəritə tile proksisi (240/60 s) |
+| `AI_LIMIT` | Rate limit | AI axtarışı və məsləhətçi (12/60 s) |
+| `VALUATION_LIMIT` | Rate limit | «Evimi qiymətləndir» (20/60 s) |
+
+`wrangler.jsonc`-in `main`-i `worker.ts`-dir: OpenNext worker-ini sarır, anonim ictimai HTML-i Cache API-də `EDGE_HTML_CACHE_TTL` (production-da 60) saniyə saxlayır və OpenNext-in Durable Object siniflərini (`DOQueueHandler`, `DOShardedTagCache`, `BucketCachePurge`) yenidən ixrac edir — sarğını dəyişəndə bu ixrac saxlanmalıdır. Binding dəyişəndə `npm run cf-typegen` işlədilir.
 
 ## Secret-lər
 
@@ -48,9 +62,23 @@ npx wrangler secret put NOTIFICATION_EMAIL
 npx wrangler secret put RESEND_WEBHOOK_SECRET
 npx wrangler secret put CRON_SECRET
 npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN
+npx wrangler secret put TURNSTILE_SECRET
+npx wrangler secret put GEOAPIFY_API_KEY
+npx wrangler secret put VAPID_PRIVATE_KEY
 npx wrangler secret put GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON
 npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc
+
+# İstəyə bağlı — verilməyəndə uyğun funksiya söndürülüdür
+npx wrangler secret put TELEGRAM_BOT_TOKEN
+npx wrangler secret put TELEGRAM_CHAT_ID
+npx wrangler secret put GOOGLE_CLIENT_ID
+npx wrangler secret put GOOGLE_CLIENT_SECRET
+npx wrangler secret put SMS_PROVIDER_URL
+npx wrangler secret put SMS_PROVIDER_TOKEN
+npx wrangler secret put SMS_SENDER
 ```
+
+Hazırlıq vəziyyəti (hansı inteqrasiyanın konfiqurasiya olunduğu) `/admin/sistem`-də görünür.
 
 Staging:
 
@@ -62,7 +90,6 @@ npx wrangler secret put NOTIFICATION_EMAIL --env staging
 npx wrangler secret put RESEND_WEBHOOK_SECRET --env staging
 npx wrangler secret put CRON_SECRET --env staging
 npx wrangler secret put CLOUDFLARE_ANALYTICS_TOKEN --env staging
-npx wrangler secret put GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON --env staging
 npx wrangler secret put CRON_SECRET --config workers/saved-search-cron/wrangler.jsonc --env staging
 ```
 
@@ -74,13 +101,7 @@ Qaydalar:
 - Resend credential sızma şübhəsində dərhal revoke edilməlidir.
 - `CRON_SECRET` əsas Worker və ayrıca cron Worker-də eyni mühit üçün eyni olmalıdır;
 - production və staging `CRON_SECRET` dəyərləri bir-birindən fərqli olmalıdır;
-- `CLOUDFLARE_ANALYTICS_TOKEN` konkret `luxehomeestate.az` zonası üçün yalnız
-  `Zone` → `Analytics Read` icazəsi ilə məhdudlaşdırılmalıdır;
-  hesab səviyyəli `Account Analytics Read` bu GraphQL sorğusu üçün kifayət etmir.
-- `GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON` JSON key-ni bütöv saxlayır;
-  service account `sc-domain:luxehomeestate.az` property-sinə Owner və ya Full
-  user kimi əlavə edilməlidir. Qısaömürlü access token daimi secret kimi istifadə
-  edilməməlidir.
+- `CLOUDFLARE_ANALYTICS_TOKEN` yalnız `Analytics:Read` icazəsi ilə məhdudlaşdırılmalıdır.
 
 ## OpenNext konfiqurasiyası
 
@@ -97,10 +118,19 @@ Bu parametrlər deploy workaround-u deyil, cari runtime müqaviləsinin hissəsi
 
 ## Davamlı inteqrasiya (CI)
 
-`.github/workflows/ci.yml` hər pull request və `main` push-unda `npm ci` → Vitest → typecheck →
-lint → production build ardıcıllığını işlədir. `main` push-unda, əgər `CLOUDFLARE_API_TOKEN` və
-`CLOUDFLARE_ACCOUNT_ID` secret-ləri qoyulubsa, `npx wrangler d1 migrations list DB --remote` ilə
-production miqrasiya drift-i də yoxlanılır.
+`.github/workflows/ci.yml` hər pull request, `main` push-u və `workflow_dispatch` ilə işləyir. Eyni branch üzrə köhnə run-lar ləğv olunur; `main` istisnadır — yarımçıq kəsilən deploy R2 keşini natamam qoya bildiyi üçün orada yeni run növbəyə durur. Workflow `contents: read` (least privilege) icazəsi ilə işləyir və üçüncü tərəf action-ları tam commit SHA ilə pin edilib.
+
+| Job | Addımlar |
+|---|---|
+| `Quality gate` | `npm ci` → `npm audit --audit-level=high` → `vitest` → `tsc` → ESLint → Knip → `next build` |
+| `Local stack E2E` | OpenNext bundle (`IS_STAGING=true`, localhost) → efemer test secret-ləri → lokal D1 (miqrasiya, seed, taksonomiya, demo, fixture) → lokal worker → Playwright (public + auth) → hesabat artefaktı |
+| `Deploy to staging` | Credential formatı yoxlanması → staging D1 miqrasiyaları → miqrasiya statusu logu → taksonomiya → staging bundle → yayım |
+| `Browser E2E (staging)` | Canlı staging-ə qarşı Playwright → hesabat artefaktı (14 gün) |
+| `Deploy to production` | Credential yoxlaması → production D1 miqrasiyaları → status logu → `db:taxonomy:remote` → production bundle → `wrangler deploy --env=""` |
+
+Credential yoxlaması `CLOUDFLARE_API_TOKEN` və `CLOUDFLARE_ACCOUNT_ID` secret-lərindən boşluqları təmizləyir və formatı yoxlayır: səhvən `NAME=` prefiksi, dırnaq və ya terminal marker-i ilə saxlanmış dəyər dəyərin özünü göstərmədən aydın xəta ilə dayanır.
+
+Ayrıca iş axınları: `codeql.yml` (CodeQL analizi), `dependency-review.yml` (PR-da yeni asılılıqların yoxlanması), `labeler.yml` (fayl yollarına görə avtomatik etiket).
 
 Pipeline Node versiyasını `.nvmrc`-dən, npm versiyasını isə `package.json` → `packageManager`
 sahəsindən götürür. Bu ikinci addım məcburidir: `package-lock.json`-un formatı npm major
@@ -112,9 +142,22 @@ credential olmadan da keçməlidir. Bunun üçün `next.config.ts`-dəki `initOp
 çağırışı yalnız development-də işə düşür — əks halda `ai`/`images` binding-ləri üçün açılan remote
 proxy sessiyası tokensiz mühitdə build-i sındırır.
 
-CI deploy etmir — yayım hələ manualdır (`npm run deploy`).
+### Avtomatik yayım (CD)
+
+`main` push-unda axın: **quality + e2e-local → deploy-staging → e2e-staging → deploy-production**.
+
+1. Hər deploy job-u əvvəlcə öz mühitinin D1 miqrasiyalarını tətbiq edir (`wrangler d1 migrations apply`), **sonra** bundle qurub worker-i yayımlayır. Sıra məcburidir: əvvəlcə worker getsə, sxem gəlincəyə qədər sorğular çökür və xəta çox vaxt `try/catch` içində səssizcə udulur.
+2. Hər iki deploy job-u miqrasiyadan sonra taksonomiya SQL-ini də tətbiq edir (`INSERT OR IGNORE` + slug üzrə `UPDATE`, idempotent).
+3. Bundle hər mühit üçün ayrıca qurulur, çünki `SITE_URL` statik səhifələrə build vaxtı yazılır.
+4. Staging E2E sınarsa production toxunulmur.
+
+Lokal və ya təcili yayımda eyni sıra əl ilə saxlanmalıdır: əvvəlcə `npm run db:migrate:remote` (və ya `:staging`), sonra `npm run deploy`.
+
+Build dəyişənləri GitHub repo dəyişənlərindən gəlir (məs. `PRODUCTION_CF_WEB_ANALYTICS_TOKEN` → `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN`, VAPID açıq açarı).
 
 ## Staging deploy runbook-u
+
+Adi yayım CI tərəfindən avtomatik aparılır. Aşağıdakı əl ilə runbook yalnız lokal və ya təcili yayım üçündür; miqrasiya → bundle sırası eynilə saxlanmalıdır.
 
 1. İş ağacını və commit-i yoxlayın:
 
@@ -216,6 +259,22 @@ Production seed, taksonomiya və demo-clean əmrləri deploy runbook-un standart
 - [ ] production canonical-lar `https://luxehomeestate.az` göstərir
 - [ ] admin/kabinet response `no-store` alır
 
+## Asılılıq yeniləməsi — 28 sentyabr 2026 (#122)
+
+Açıq 6 Dependabot PR-ı həll edildi: production qrupu (Next 16.3.6, next-intl 4.14.7, lucide-react 1.48, resend 6.29), development qrupu (wrangler 4.139, knip 6.38, tsx, `@types/node`, `@cloudflare/vitest-plugin` 1.2.6) və CodeQL action 4.38.2 birləşdirildi. TypeScript 7, ESLint 10 və Vitest 5 upstream uyğunsuzluğuna görə bağlandı və `dependabot.yml`-də ignore edildi.
+
+CI-da `next/font` Google Fonts yükləyicisi bir dəfə keçici xəta verdi (`Cannot read properties of null (reading '1')`); eyni commit-in E2E bundle build-i həmin vaxt keçdiyi üçün yenidən işlətmə ilə həll olunur.
+
+## Deploy qeydi — 29 sentyabr 2026 (#128)
+
+`main@199f8409` (PR #128, issue #127) CI run `36505908266` ilə 01:01–01:24 UTC arasında yayımlanıb: `Quality gate`, `Local stack E2E`, `Deploy to staging`, `Browser E2E (staging)` və `Deploy to production` job-larının hamısı uğurlu. `0050`–`0053` miqrasiyaları hər iki mühitdə bundle-dan əvvəl tətbiq olunub.
+
+## Ərazi bölgüsü miqrasiyası — 29 sentyabr 2026 (#127)
+
+`migrations/0050`–`0053` CI tərəfindən hər mühitdə bundle-dan əvvəl tətbiq olunur və özü-yetərlidir: `Location.officialCode`, `Property.landmarkId` sütunlarını əlavə edir, ölkə üzrə bütün yerləşmə sətirlərini (~8 000 ifadə, `INSERT OR IGNORE` + slug üzrə `UPDATE`) ~500 KB-lıq ardıcıl hissələrdə sinxronlaşdırır və sonda köhnə «Alatava» qeydinin elanlarını «2-ci Alatava»ya köçürür. Hissələrin sırası vacibdir — valideyn uşaqdan əvvəl yaranır. Miqrasiyalar production-a taksonomiya addımından asılı olmadan çatır; CI-dəki `db:taxonomy:*` addımı eyni sətirləri idempotent təkrarlayır. Rəsmi küçə faylları (`public/data/kuceler/`, 3 476 fayl) statik asset kimi bundle ilə gedir — Workers-in 20 000 fayl həddindən xeyli aşağıdır.
+
+Yeniləmə axını: mənbə JSON-u dəyiş → `npm run db:locations:build` → `db:streets:build` → `db:taxonomy:build` → `db:locations:report` → `taxonomy.sql`-in yerləşmə bölməsindən yeni miqrasiya. Addım-addım runbook: [[Ərazi bölgüsü və ünvan|Location-Taxonomy]].
+
 ## Deploy qeydi — 31 avqust 2026
 
 `main` branch-ı production-a yayımlanıb. Aktiv Worker versiyası **`a88cf4ab-6a5e-4b84-a038-2a6c82f0ae92`**;
@@ -264,7 +323,7 @@ Cloudflare Managed Content/Bot qaydası default CLI User-Agent ilə bəzi HTML r
 Production `robots.txt` Cloudflare Managed Content Signals blokundan sonra tətbiqin öz qaydalarını da verir:
 
 - locale-prefiksli public route-lar allow;
-- `/admin`, `/giris`, `/favoritler` disallow;
+- `/admin`, `/giris`, `/favoritler` disallow (kabinet və auth səhifələri noindex metadata daşıyır);
 - sitemap və host production domeninə bağlıdır.
 
 Staging `IS_STAGING=true` olduqda tətbiq bütün route-ları disallow edir.
@@ -314,7 +373,7 @@ müəyyən edilməlidir.
 
 ## Observability
 
-Wrangler observability production və staging üçün aktivdir. Tətbiq səviyyəsində error tracking və strukturlaşdırılmış log platforması ayrıca inteqrasiya edilməyib.
+Wrangler observability production və staging üçün aktivdir. Tətbiq client xətalarını (`/api/monitoring/error` → `ClientErrorEvent`) və Web Vitals-ı (`/api/monitoring/vitals` → `WebVitalMetric`) toplayır; Cloudflare Web Analytics beacon-u cookie-sizdir. Strukturlaşdırılmış log platforması ayrıca inteqrasiya edilməyib.
 
 İzlənməli siqnallar:
 
@@ -324,7 +383,9 @@ Wrangler observability production və staging üçün aktivdir. Tətbiq səviyy�
 - media conversion/R2 rollback xətası;
 - Resend delivery xətası;
 - Resend webhook signature/processing xətası və `EmailActivity` statusları;
-- saved-search cron çağırışı, digest nəticəsi və `CRON_SECRET` uyğunsuzluğu;
+- saved-search cron çağırışı, digest, maintenance (elan müddəti, silinmə retry) və semantik reindeks nəticəsi;
+- Telegram/SMS/Web Push provayder xətaları;
+- Workers AI `5016` (lisenziya) və ya kvota xətaları;
 - admin audit log-da kütləvi dəyişiklik;
 - sitemap və robots əlçatanlığı;
 - cache hit/revalidation problemləri.

@@ -87,7 +87,9 @@ Hazırkı müdafiələrə aşağıdakılar daxildir:
 - HTML sanitizasiyası (məzmun və tərcümə yazılarkən), e-poçt və Telegram mətnlərinin kodlanması və audit jurnalı;
 - sessiya cookie-li sorğunu keşləməyən və `Set-Cookie` saxlamayan kənar HTML keşi;
 - media üçün ölçü, format və magic-byte yoxlaması, təhlükəsiz R2 açarı, SVG qadağası və elan şəkillərinə su nişanı;
-- admin route-larında CSP, `no-store`, clickjacking və referrer müdafiəsi;
+- admin route-larında sərt CSP, `no-store`, clickjacking və referrer müdafiəsi; ictimai səhifələrdə `base-uri`, `object-src 'none'`, `form-action 'self'` və mənbə allowlist-i olan CSP;
+- panel üçün istəyə bağlı Cloudflare Access (Zero Trust) JWT qapısı (`ACCESS_ENFORCED`);
+- `MAINTENANCE` / `READ_ONLY` sistem rejimləri və D1 əlçatmaz olanda işləyən `FORCE_MAINTENANCE` açarı;
 - staging mühitində `noindex` və production resurslarından ayrı D1/R2 namespace-ləri.
 
 Məlum təhlükəsizlik boşluqları və planlaşdırılan möhkəmləndirmələr README və Wiki-də açıq şəkildə

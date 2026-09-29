@@ -3,7 +3,7 @@
 Bu fayl layihənin cari vəziyyətini, qəbul edilmiş qərarları və gözləyən işləri saxlayır.
 Kod arxitekturası üçün `CLAUDE.md`-ə bax.
 
-Son yenilənmə: 28 sentyabr 2026.
+Son yenilənmə: 29 sentyabr 2026.
 
 ---
 
@@ -242,11 +242,15 @@ Tələb olunan `vars`: `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN` (`<team>.cloudfla
 
 ---
 
-## 7. Layihənin texniki sağlamlığı (28 sentyabr 2026)
+## 7. Layihənin texniki sağlamlığı (29 sentyabr 2026)
 
-- 133 `page.tsx`, 58 `"use server"` faylı, 19 Route Handler.
-- 172 Vitest faylı, 875 test (workerd + Node + real miniflare D1 integration); 15 Playwright spec, 164 test.
-- 68 Prisma modeli, 50 D1 miqrasiya faylı (son: `0049_restore_treva_media.sql`).
+- 133 `page.tsx` (ictimai 40, kabinet/auth 24, admin 69), 58 `"use server"` faylı, 21 Route Handler.
+- 173 Vitest faylı, 889 test (workerd + Node + real miniflare D1 integration); 15 Playwright spec
+  (+ auth setup), `--list` üzrə 190 test icrası (chromium 158, mobile 32).
+- 68 Prisma modeli, 54 D1 miqrasiya faylı (son: `0053_country_locations_part4.sql`).
+- 4 337 `Location` sətri, 3 476 rəsmi küçə faylı (`public/data/kuceler/`).
+- `main@199f8409` CI run `36505908266` (29.09.2026): quality, lokal E2E, staging + E2E, production — hamısı uğurlu.
+- 28 sentyabr snapshot-u (tarixi): 172 fayl / 875 test, 19 Route Handler, 50 miqrasiya.
 - GitHub Actions hər PR-da `Quality gate` (audit + test + typecheck + lint + dead-code + build) və
   məcburi `Local stack E2E` işlədir; `main` push-unda miqrasiya → staging → E2E → production.
 - 2 sentyabr snapshot-u (tarixi): 104 fayl / 480 test, 60 model, 28 miqrasiya.
@@ -634,3 +638,39 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   köçürmək düşünülə bilər.
 - README, CONTRIBUTING və SECURITY 28 sentyabr vəziyyəti ilə sinxronlaşdırıldı; GitHub Wiki-nin
   8 səhifəsi üçün yenilənmiş mətn hazırlandı (wiki repozitoriyasına push ayrıca icazə tələb edir).
+
+---
+
+## 19. Ölkə üzrə ərazi bölgüsü — 29 sentyabr 2026 (#127 / PR #128)
+
+- Mənbələr: DSK «İnzibati Ərazi Bölgüsü Təsnifatı, 2024» + Ünvan Reyestri (unvanportali.az API —
+  bütün 75 şəhər/rayon, rəsmi 8 rəqəmli kodlar, ~63 000 küçə); bazar — bina, kub, arenda, yeniemlak,
+  lalafo; yoxlama — tap.az başlıqları, emlak.az axtarış indeksi, evimemlak.az (Naxçıvan MR); ziddiyyətdə OSM.
+- Nəticə: 75 CITY, 14 DISTRICT, 266 SETTLEMENT, 3 605 VILLAGE, 136 NEIGHBORHOOD (Bakı 62, Sumqayıt 67,
+  Abşeron 5, Gəncə 2), 27 METRO, 214 LANDMARK — cəmi 4 337; 91 alias qrupu.
+- Sxem: `Location.officialCode`, `Property.landmarkId`; miqrasiyalar `0050`–`0053` (özü-yetərli,
+  ~500 KB-lıq hissələr, sonda köhnə «Alatava» → «2-ci Alatava»).
+- Sayt: `?nisangah=` filtri, alias-lı axtarış, kabinet formasında metro (ilk dəfə), nişangah və rəsmi
+  küçə təklifləri (`public/data/kuceler/<kod>.json`), kəndlər tələb olunanda (`/api/yerler/kendler`),
+  CSV `landmark` sütunu, semantik axtarışda nişangah.
+- Qərarlar: rəsmi status yalnız DSK/reyestrdən; bazar «qəs.» yazısı massivdir. Şuşa şəhərciyi →
+  Sabunçu massivi, Qurd qapısı (qəbiristanlıq) əlavə edilmədi, Naxçıvan məhəllələri və Sumqayıtın
+  tək mənbəli məhəllələri (72-ci, 76-cı) gözləyir.
+- **Tələ:** `db:locations:migrations` `0050`–`0053`-ü yerində yenidən yazır; D1 tətbiq olunmuş faylı
+  fayl adına görə yenidən işlətmir. Mövcud mühitə dəyişiklik CI-nin `db:taxonomy:*` addımı ilə çatır
+  (`INSERT OR IGNORE` + slug üzrə `UPDATE`), silmə/birləşdirmə/slug dəyişikliyi isə yeni miqrasiyadır.
+- Hesabat: `docs/erazi/baki-erazi-bolgusu.md` (generasiya olunur, `db:locations:report`).
+
+## 20. Sənəd sinxronu — 29 sentyabr 2026
+
+- GitHub Wiki 31 avqustdan qalmışdı; istifadəçinin 28 sentyabr qaralaması (`Desktop/luxehome viki`)
+  əsasında repodakı `Wiki/` qovluğu kodla yoxlanıb yenidən yazıldı və 8 → 12 səhifəyə çatdı:
+  yeni `Location-Taxonomy`, `Admin-Panel-Guide`, `Testing-and-Quality`, `Glossary`.
+- Qaralamada düzəldilən faktlar: 21 Route Handler (19 deyil), 173/889 test, 190 E2E icrası,
+  136 massiv (133 deyil, Gəncə 2 daxil), Şuşa şəhərciyi əlavə olunub, production deploy-u da
+  taksonomiya addımı işlədir, `TURNSTILE_SECRET` əsas addır, `SYSTEM_MODE`/`FORCE_MAINTENANCE`/
+  `ACCESS_*` dəyişənləri, `/admin/serp` 15 alt səhifə.
+- README, CLAUDE.md (massiv sayı, küçə sayı, miqrasiya tələsi), AGENTS.md (build təsviri, demo rejimi,
+  remotePatterns, filtr parametrləri, yerləşmə bölməsi), CONTRIBUTING, SECURITY və `e2e/README.md` yeniləndi.
+- Wiki mənbəyi `Wiki/`-dir; GitHub Wiki repozitoriyasına (`LuxeHome.wiki.git`) push ayrıca icazə tələb edir.
+- Açıq Dependabot PR-ları: #126 (Prisma 7 major — ayrıca sınaq), #129 (vitest-plugin/wrangler patch).

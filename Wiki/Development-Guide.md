@@ -4,6 +4,8 @@
 
 - Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` — CI `.nvmrc` faylındakı `24` versiyasını işlədir;
 - **npm 12** və repozitoriyadakı `package-lock.json` (`package.json` → `packageManager: "npm@12.0.1"`);
+- **Python 3** — ərazi bölgüsü generatorları (`db:locations:build`, `db:streets:build`, `db:locations:report`, `db:locations:migrations`) `scripts/*.py`-dir; yalnız ərazi datası yenilənəndə lazımdır;
+- E2E lokal stack üçün `bash` (`scripts/e2e/prepare-local-stack.sh`) — Windows-da Git Bash;
 - remote D1 və deploy üçün Cloudflare hesabı;
 - lokal secret-lər üçün `.env`.
 
@@ -84,10 +86,28 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `RESEND_FROM_EMAIL` | Göndərən |
 | `NOTIFICATION_EMAIL` | Lead bildiriş alıcısı |
 | `CRON_SECRET` | Saved-search digest endpoint Bearer açarı |
-| `CLOUDFLARE_ANALYTICS_TOKEN` | Admin trafik analitikası üçün, konkret zonaya məhdud `Zone` → `Analytics Read` token-i (`Account Analytics Read` deyil) |
+| `CLOUDFLARE_ANALYTICS_TOKEN` | Admin trafik analitikası üçün `Analytics:Read` token-i |
 | `ADMIN_ENABLED` | Staff route feature flag-i |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET` (köhnə adı `TURNSTILE_SECRET_KEY` də oxunur), `TURNSTILE_HOSTNAMES` | Cloudflare Turnstile |
+| `GEOAPIFY_API_KEY` | Paneldə ünvan axtarışı və xəritədən ünvan seçimi |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Ofis çatına lead bildirişi (istəyə bağlı) |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google ilə giriş (yoxdursa söndürülüdür) |
+| `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` | Telefonla OTP girişi (yoxdursa söndürülüdür) |
+| `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Web Push |
+| `GSC_SITE_URL`, `GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON` | Admin Search Console inteqrasiyası |
+| `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN` | Cloudflare Web Analytics beacon-u (build dəyişəni) |
+| `AI_TEXT_MODEL`, `AI_VISION_MODEL` | Workers AI modelinin əvəzlənməsi (istəyə bağlı) |
+| `GOOGLE_SEARCH_CONSOLE_CLIENT_ID`, `_CLIENT_SECRET`, `_REFRESH_TOKEN` | Service account əvəzinə OAuth refresh dəsti; `_ACCESS_TOKEN` yalnız diaqnostika üçün |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_GTM_ID` | Google Analytics / Tag Manager (build dəyişəni; production `deploy` skripti GA ID-ni özü ötürür) |
+| `GOOGLE_SITE_VERIFICATION` | Search Console HTML meta təsdiqi |
+| `NEXT_PUBLIC_SITE_URL` | Client tərəfdə lazım olan public base URL |
+| `CF_ZONE_ID`, `CF_ACCOUNT_ID` | Admin analitikası üçün Cloudflare zona/hesab ID-si (`wrangler.jsonc` vars) |
+| `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` | İstəyə bağlı Cloudflare Access (Zero Trust) qapısı — panel üçün |
+| `SYSTEM_MODE`, `FORCE_MAINTENANCE`, `EDGE_HTML_CACHE_TTL` | Worker vars: defolt sistem rejimi, təcili texniki xidmət açarı, kənar keş TTL-i |
 
 `IS_STAGING` əsasən Wrangler staging vars daxilində təyin olunur.
+
+`process.env` Workers-də yalnız sorğu kontekstində doludur. Modul səviyyəsində oxunan konfiqurasiya boş qalır — `runtimeEnv()` və lazy funksiya işlət (`src/lib/email.ts` nümunəsi).
 
 ### Secret qaydası
 
@@ -102,15 +122,23 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 
 | Əmr | Nəticə |
 |---|---|
-| `npm run dev` | `next dev` |
-| `npm run build` | `prisma generate && next build` |
+| `npm run dev` | `next dev --webpack` |
+| `npm run build` | `prisma generate && next build --webpack` |
 | `npm run start` | `next start` |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
-| `npm test` | `vitest run` |
+| `npm run dead-code` | Knip: istifadə olunmayan fayl və asılılıqlar |
+| `npm test` | `vitest run` (workerd + Node layihələri, real D1 integration daxil) |
 | `npm run test:watch` | Vitest watch |
 | `npm run test:seo:routes` | Production SEO route status smoke testi |
 | `npm run test:seo:live` | Production SERP qəbul (acceptance) testi |
+| `npm run e2e` | Konfiqurasiya edilmiş workerd mühitinə qarşı Playwright (`E2E_BASE_URL`) |
+| `npm run e2e:local:build` | Lokal stack üçün OpenNext bundle (`IS_STAGING=true`, localhost) |
+| `npm run e2e:local:prepare` | `.wrangler/e2e-state`-də təzə D1 + test hesabları |
+| `npm run e2e:local:serve` | Lokal workerd `:8787` |
+| `npm run e2e:chromium`, `e2e:mobile`, `e2e:ui`, `e2e:report` | Playwright layihələri və hesabat |
+| `npm run e2e:install` | Playwright Chromium-u sistem asılılıqları ilə quraşdırır |
+| `npm run assets:maintenance-logo` | Texniki xidmət səhifəsinin daxili loqosunu (`maintenance-logo.ts`) yenidən qurur |
 | `npm run preview` | OpenNext build + local Worker preview |
 | `npm run cf-typegen` | Wrangler binding type generation |
 
@@ -127,14 +155,19 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `npm run db:seed:local` | Lokal D1 |
 | `npm run db:seed:staging` | Staging D1 |
 | `npm run db:seed:remote` | Production D1 |
-| `npm run db:clean-demo:local` | Lokal demo təmizliyi |
-| `npm run db:clean-demo:remote` | Production demo təmizliyi |
+| `npm run db:demo:build` | `prisma/demo-content-data.ts` → `prisma/demo-content.sql` |
+| `npm run db:demo:local` / `:staging` / `:remote` | Nümunə məzmunun tətbiqi (production-a yüklənmir) |
+| `npm run db:clean-demo:local` / `:staging` / `:remote` | Bütün `isDemo` qeydlərinin silinməsi və açarın söndürülməsi |
 | `npm run db:studio` | Prisma Studio |
 
 ### Taksonomiya və admin bootstrap
 
 | Əmr | Nəticə |
 |---|---|
+| `npm run db:locations:build` | DSK + Ünvan Reyestri + bazar massivləri JSON-undan `prisma/locations-data.ts` yaradır; ziddiyyətdə dayanır |
+| `npm run db:streets:build` | Ünvan Reyestri küçələrindən `public/data/kuceler/<kod>.json` və `src/lib/official-street-codes.ts` yaradır |
+| `npm run db:locations:report` | `docs/erazi/baki-erazi-bolgusu.md` hesabatını data fayllarından qurur |
+| `npm run db:locations:migrations` | `taxonomy.sql`-in yerləşmə bölməsini `migrations/0050`–`0053` hissələrinə bölür |
 | `npm run db:taxonomy:build` | `prisma/taxonomy.sql` yaradır |
 | `npm run db:taxonomy:local` | Lokal D1 taksonomiyası |
 | `npm run db:taxonomy:staging` | Staging D1 taksonomiyası |
@@ -161,12 +194,13 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 
 1. `prisma/schema.prisma` dəyişdirin.
 2. Domen string-i əlavə olunursa `src/lib/constants.ts` dəyər/label/tone xəritəsini yeniləyin.
-3. `npm run db:migrate:new` çıxışını yeni `migrations/000N_name.sql` faylı kimi saxlayın.
+3. `npm run db:migrate:local`, sonra `npm run db:migrate:new -- --output migrations/000N_ad.sql`.
 4. Generasiya olunmuş SQL-i əl ilə oxuyun; destruktiv əməliyyatı avtomatik qəbul etməyin.
 5. `npm run db:migrate:local` işlədin.
 6. Seed və ya taksonomiya təsirlənirsə uyğun generatoru işlədin.
 7. Test və build qapısını keçirin.
-8. Əvvəl staging, smoke test-dən sonra backup ilə production-a keçin.
+8. `main`-ə merge-dən sonra CI miqrasiyanı əvvəl staging, sonra production D1-ə bundle-dan əvvəl tətbiq edir.
+9. Sorğu formasını dəyişirsinizsə (uzun `IN`, nested relation) `*.integration.test.ts` yazın — lokal SQLite D1-in 100 parametr həddini tutmur.
 
 ### Seed mənbələri
 
@@ -174,6 +208,7 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 - `prisma/build-seed-sql.ts` — D1 üçün SQL generatoru;
 - `prisma/seed.sql` — D1-ə tətbiq olunan yaradılmış artifact;
 - `prisma/taxonomy-data.ts` və `locations-data.ts` — taksonomiya source-u;
+- `prisma/az-admin-divisions.json`, `unvanportali-admin-units.json`, `unvanportali-streets.json`, `baku-market-locations.json` — yerləşmə generatorunun girişləri (massiv/metro/nişangah/alias əlavəsi yalnız `baku-market-locations.json`-da, `sources` kodu ilə);
 - `prisma/build-taxonomy-sql.ts` — taxonomy SQL generatoru;
 - `prisma/remove-demo-content.sql` — yalnız `isDemo` kontent təmizliyi.
 
@@ -183,9 +218,11 @@ Prisma `DateTime` sahələri D1-də ISO-8601 mətn kimi saxlanılır. Seed, əl 
 
 ## Testlər
 
-Testlər `@cloudflare/vitest-plugin` ilə `workerd` runtime-da işləyir. Bu, Web Crypto davranışının production-a yaxın olmasını təmin edir.
+> Test strategiyası, qoruyucu testlər və «hansı dəyişikliyə hansı test» cədvəli: [[Test və keyfiyyət|Testing-and-Quality]].
 
-Audit snapshot-unda 89 test faylı və 373 test aşağıdakı sahələri əhatə edir:
+Testlər `@cloudflare/vitest-plugin` ilə `workerd` runtime-da (domen qatı) və Node layihəsində (SSR komponentləri) işləyir. Bu, Web Crypto davranışının production-a yaxın olmasını təmin edir. `*.integration.test.ts` faylları real miniflare D1 ilə işləyir.
+
+29 sentyabr 2026 snapshot-unda 173 test faylı və 889 test (lokal işləmə ~65 s) aşağıdakı sahələri əhatə edir:
 
 - parol, crypto, TOTP və cookie;
 - lockout, permission və session policy/projection/routing;
@@ -204,56 +241,91 @@ Audit snapshot-unda 89 test faylı və 373 test aşağıdakı sahələri əhatə
 - lead statusu, hesab təsdiqi, agency recovery və audit reset;
 - Resend webhook, e-poçt jurnalı və Cloudflare analitika helper-ları;
 - SERP siyasəti, idarə olunan metadata, sitemap data mənbələri və Cloudflare crawler challenge
-  təsnifatı.
+  təsnifatı;
+- yerləşmə ağacının struktur qaydaları, rəsmi kodlar, massiv bölgüsü, alias və nişangahlar (`locations-tree.test.ts`);
+- nişangahın şəhərə aidlik validasiyası (`property-submission.test.ts`);
+- Azərbaycan əlifbası ilə sıralama (`az-collation.test.ts`) — workerd-in ICU-su `localeCompare("az")`-ni tam dəstəkləmir;
+- kənar keşin təhlükəsizliyi (`public-cache-safety.test.ts`);
+- admin kataloq parity-si və `*_LABELS` sinxronu (`admin-label-sync.test.ts`);
+- passkey, Google və telefon giriş siyasətləri, paket/elan müddəti riyaziyyatı, qiymət göstəricisi;
+- D1 integration: xəritə sorğusu, yerləşmə ağacı (kəndlər yalnız elanlı/redaktə olunanda), tərcümə `IN` sorğuları.
 
-Hazırda yoxdur:
+### Browser E2E (Playwright)
 
-- real lokal D1 binding-i ilə integration test;
-- Server Action integration test;
-- Playwright/Cypress browser E2E.
+`e2e/specs/` qovluğunda 15 spec faylı var: `smoke`, `listings` (filtrlər), `property-detail`, `favorites-compare`, `content`, `i18n`, `api`, `seo`, `security`, `performance`, `a11y` (axe-core), `mobile`, `admin-panel` (admin 2FA, toplu şəkil yükləmə), `kabinet-listing` (kabinet forması), `projects-section` (layihələr açarı). `e2e/support/` fixture-ları, `e2e/pages/` page object-ləri saxlayır.
+
+Playwright üç layihə işlədir (`playwright.config.ts`):
+
+| Layihə | Nə edir | `--list` üzrə test |
+|---|---|---:|
+| `auth-setup` | Lokal stack-də admin bir dəfə 2FA ilə daxil olur, sessiya paylaşılır (TOTP replay qoruması eyni 30 s addımda ikinci girişi rədd edir) | 1 |
+| `chromium` | Desktop Chrome; `mobile.spec.ts` xaric bütün spec-lər | 158 (setup daxil) |
+| `mobile` | Pixel 7; `mobile.spec.ts` və `smoke.spec.ts` | 32 |
+
+Cəmi 190 test icrası. Fixture-lar yoxdursa (staging run) auth testləri atlanır.
+
+Testlər `next dev`-ə deyil, workerd-ə qarşı qurulub (Prisma wasm engine `next dev`-də yüklənmir). Lokal stack:
+
+```bash
+npm run e2e:local:build
+npm run e2e:local:prepare   # AUTH_SECRET və E2E_ADMIN_TOTP_SECRET tələb edir
+npm run e2e:local:serve
+E2E_BASE_URL=http://localhost:8787 npm run e2e
+```
+
+Turnstile test bypass-ı qəsdən yoxdur: admin stage cookie ilə TOTP addımından real keçir, elan sahibi fixture sessiyası ilə daxil olur (`scripts/e2e/`, `e2e/support/auth.ts`).
 
 ### GitHub Actions CI
 
-`.github/workflows/ci.yml` hər pull request və `main` push-unda işləyir:
+`.github/workflows/ci.yml` iş axınları (action-lar tam commit SHA ilə pin edilib):
 
-1. `actions/checkout@v4`;
-2. `actions/setup-node@v4` — Node versiyası `.nvmrc`-dən (`node-version-file`);
-3. `package.json`-dakı `packageManager` dəyərinə uyğun npm-in quraşdırılması;
-4. `npm ci`;
-5. `npm run test`;
-6. `npm run typecheck`;
-7. `npm run lint`;
-8. `npm run build`;
-9. yalnız `main` push-unda və Cloudflare secret-ləri qoyulubsa —
-   `npx wrangler d1 migrations list DB --remote` ilə production miqrasiya drift yoxlaması.
+| Job | Nə vaxt | Addımlar |
+|---|---|---|
+| `Quality gate` | Hər PR və `main` push | `npm ci` → `npm audit --audit-level=high` → test → typecheck → lint → dead-code → build |
+| `Local stack E2E` | Hər PR və `main` push (məcburi yoxlama) | OpenNext bundle → lokal D1 (miqrasiya, seed, taksonomiya, demo, fixture) → lokal worker → Playwright (public + auth) |
+| `Deploy to staging` | `main` push | Cloudflare credential formatının yoxlanması → D1 miqrasiyaları → taksonomiya → staging bundle → yayım |
+| `Browser E2E (staging)` | `main` push | Canlı staging-ə qarşı Playwright |
+| `Deploy to production` | `main` push, əvvəlki üçü uğurludursa | Credential yoxlaması → D1 miqrasiyaları → taksonomiya (`db:taxonomy:remote`) → production bundle (`SITE_URL`, GA ID, VAPID və Web Analytics dəyişənləri ilə) → `wrangler deploy --env=""` |
 
-3-cü addım qəsdən `npm ci`-dən əvvəldir: onsuz runner-in npm versiyası lock faylının formatı ilə
-uyuşmaya bilər və pipeline testlərə çatmadan sınır.
+Ayrıca iş axınları: `codeql.yml`, `dependency-review.yml`, `labeler.yml`. Node versiyası `.nvmrc`-dən, npm versiyası `packageManager`-dən gəlir — bu addım `npm ci`-dən əvvəldir, onsuz runner-in npm-i lock faylı formatı ilə uyuşmaya bilər.
 
 ### Son audit nəticəsi
 
-31 avqust 2026, `main`:
+29 sentyabr 2026, `main@199f8409` (#128 ərazi bölgüsündən sonra):
 
 | Yoxlama | Nəticə |
 |---|---:|
+| Vitest | ✅ 173 fayl, 889 test |
 | TypeScript | ✅ Keçdi |
 | ESLint | ✅ Keçdi |
-| Vitest | ✅ 89 fayl, 373 test |
-| Next.js production build | ✅ Keçdi |
-| OpenNext production deploy | ✅ Keçdi |
+| Knip (dead-code) | ✅ Keçdi |
+| Next.js production build (webpack) | ✅ Keçdi |
 
 ## Məcburi keyfiyyət qapısı
 
 Hər dəyişiklikdən sonra:
 
 ```bash
+npm run test
 npm run typecheck
 npm run lint
-npm test
+npm run dead-code
 npm run build
 ```
 
-Ən azı `typecheck` və `build` işlədilmədən dəyişiklik tamamlanmış sayılmır. Test və lint də cari layihə üçün standart completion qapısının hissəsidir.
+Beşi də işlədilmədən dəyişiklik tamamlanmış sayılmır. **`npm run build`-i buraxma:** Server Action qaydaları yalnız webpack mərhələsində yoxlanılır — `"use server"` faylındakı hər ixrac `async` olmalıdır, Promise qaytaran sinxron sarğı belə build-i saxlayır.
+
+`npm audit --audit-level=high` CI-da ayrıca işləyir; lokalda yalnız `package.json`/`package-lock.json` dəyişəndə lazımdır.
+
+### Asılılıq yeniləmələri
+
+Dependabot həftəlik qruplaşdırılmış PR açır (production/development minor+patch, GitHub Actions). Aşağıdakı major-lar upstream uyğunsuzluğuna görə `.github/dependabot.yml`-də ignore edilib: `typescript >=7` (typescript-eslint), `eslint >=10` (eslint-plugin-react), `vitest >=5` (`@cloudflare/vitest-plugin`).
+
+### Bundler: webpack
+
+Next 16 defolt olaraq Turbopack işlədir, lakin `build` və `dev` qəsdən `--webpack` ilə işləyir: Turbopack Prisma klientini hash-lı `@prisma/client-<hash>` symlink-i kimi xaricləşdirir və bu, OpenNext/workerd bundle-ında yoxlanmayıb (Windows-da symlink `EPERM` ilə düşür).
+
+`revalidateTag()` Next 16-da ikinci arqument tələb edir; `revalidatePublicContent()` `{ expire: 0 }` ilə dərhal bitmə davranışını saxlayır.
 
 ## Kod konvensiyaları
 
@@ -286,6 +358,9 @@ npm run build
 ### UI və dizayn
 
 - `dark:` class yazılmır; semantik token işlədilir;
+- foto üzərində `charcoal`/`navy` tokeni yox, `on-image-chip` və ya sabit `black/<opacity>`;
+- breakpoint-li grid-ə baza `grid-cols-1`; `overflow-x-auto` konteyneri `relative`;
+- admin JSX-də xam AZ/EN mətni yazılmır — `getAdminT()` / `useTranslations("admin")`;
 - `Section` spacing propu ilə idarə olunur;
 - 44 px touch target və görünən focus qorunur;
 - reduced-motion nəzərə alınır;
@@ -311,6 +386,8 @@ npm run build
 - [ ] Empty/error/not-found state var
 - [ ] Auth və permission yalnız layout-a buraxılmayıb
 - [ ] Sitemap/robots qərarı verilib
+- [ ] Server tərəfdə sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunub
+- [ ] Qısa ünvandırsa `NEVER_CACHED_PREFIXES`-ə yazılıb
 - [ ] Naviqasiya linki lazımdırsa `site.ts` yenilənib
 - [ ] Light/dark, mobile və keyboard yoxlanıb
 - [ ] Test, typecheck, lint və build keçib
@@ -358,7 +435,15 @@ Prisma generator output-unu custom qovluğa köçürməyin və client-i paket ad
 
 ### Azərbaycan hərfi ilə axtarış qeyri-sabitdir
 
-Bu, D1/SQLite `LIKE` registr davranışının məlum məhdudiyyətidir. `mode: "insensitive"` D1 provider-də mövcud deyil; uzunmüddətli həll normallaşdırılmış axtarış sahəsidir.
+`mode: "insensitive"` D1-də dəstəklənmir. Həll `src/lib/search-normalization.ts` və `Property.searchText` / taksonomiya `searchName` sütunlarıdır — yazma axınlarında bu sahələri doldurmağı unutma.
+
+### Build `next/font` xətası verir
+
+`An error occurred in next/font ... Cannot read properties of null (reading '1')` — Google Fonts build zamanı standart uzantısız font URL-i qaytarıb. Kod xətası deyil; build-i (və ya CI job-unu) yenidən işlətmək kifayətdir.
+
+### Sorğu staging-də 500 verir, lokalda işləyir
+
+D1-in 100 bound parametr həddi və ya `take`/`orderBy`-li nested əlaqə (98-dən çox valideyn) ola bilər. Lokal SQLite bunu tutmur — `*.integration.test.ts` yazın və `findManyInChunks()` işlədin.
 
 ### Şəkil upload lokalda “media anbarı əlçatan deyil” deyir
 

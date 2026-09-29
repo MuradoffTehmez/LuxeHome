@@ -346,7 +346,7 @@ prisma/locations-data.ts              # generasiya olunur
   → npm run db:taxonomy:build
 prisma/taxonomy.sql                   # db:taxonomy:local / :staging / :remote
 
-prisma/unvanportali-streets.json      # Ünvan Reyestrinin rəsmi küçələri (~20 000)
+prisma/unvanportali-streets.json      # Ünvan Reyestrinin rəsmi küçələri (~63 000)
   → npm run db:streets:build          # public/data/kuceler/<rəsmi kod>.json
   → npm run db:locations:report       # docs/erazi/baki-erazi-bolgusu.md
 taxonomy.sql
@@ -354,9 +354,14 @@ taxonomy.sql
 ```
 
 Tam mənbə siyahısı, ziddiyyətlərin həlli və hər rayonun siyahısı:
-`docs/erazi/baki-erazi-bolgusu.md` (generasiya olunur). CI yalnız `migrations/`-ı tətbiq etdiyi
-üçün taksonomiya dəyişikliyi production-a özü-yetərli miqrasiya ilə çatdırılır (`0031`, `0050`–`0053`;
-~8 000 ifadə ~500 KB-lıq ardıcıl hissələrə bölünüb — valideyn uşaqdan əvvəl gəlir).
+`docs/erazi/baki-erazi-bolgusu.md` (generasiya olunur). Taksonomiya dəyişikliyi özü-yetərli
+miqrasiya ilə çatdırılır (`0031`, `0050`–`0053`; ~8 000 ifadə ~500 KB-lıq ardıcıl hissələrə
+bölünüb — valideyn uşaqdan əvvəl gəlir). CI hər deploy-da `db:taxonomy:*`-i də işlədir
+(`INSERT OR IGNORE` + slug üzrə `UPDATE`, idempotent). **D1 miqrasiyanı fayl adı ilə izləyir:**
+`db:locations:migrations` `0050`–`0053`-ü yerində yenidən yazır, amma tətbiq olunmuş faylın
+dəyişməsi mövcud bazada yenidən işləmir — mövcud mühitə dəyişiklik taksonomiya addımı ilə çatır.
+Taksonomiya SQL-i sətir silmir və slug dəyişikliyini görmür: yer silmə/birləşdirmə, slug dəyişikliyi
+və elan köçürmə yeni nömrəli miqrasiya tələb edir.
 
 `Location.kind` səviyyələri (`src/lib/constants.ts` → `LOCATION_KINDS`):
 
@@ -366,9 +371,9 @@ Tam mənbə siyahısı, ziddiyyətlərin həlli və hər rayonun siyahısı:
 | `DISTRICT` | **Yalnız şəhərdaxili** inzibati rayon: Bakının 12, Gəncənin 2 rayonu | 14 |
 | `SETTLEMENT` | Rəsmi qəsəbə və rayon tabeli şəhər (Xırdalan, Xudat, Horadiz, Liman) | 266 |
 | `VILLAGE` | Kənd — bütün rayonlarda Ünvan Reyestrinin tam siyahısı | 3 605 |
-| `NEIGHBORHOOD` | Massiv/mikrorayon/məhəllə — **rəsmi inzibati vahid deyil** (Bakı 61, Sumqayıt 67, Abşeron 5) | 133 |
+| `NEIGHBORHOOD` | Massiv/mikrorayon/məhəllə — **rəsmi inzibati vahid deyil** (Bakı 62, Sumqayıt 67, Abşeron 5, Gəncə 2) | 136 |
 | `METRO` | Bakı metrosunun stansiyası (Memar Əcəmi-2 daxil); valideyni Bakıdır | 27 |
-| `LANDMARK` | Nişangah (ticarət mərkəzi, park, universitet…); valideyni şəhərdir, elanda `landmarkId` | 214 |
+| `LANDMARK` | Nişangah (ticarət mərkəzi, park, universitet…); valideyni şəhərdir (hazırda hamısı Bakı), slug `nisangah-<ad>`, elanda `landmarkId` | 214 |
 
 Qaydalar:
 
@@ -700,7 +705,10 @@ həm də defolt bağlıdır. Bu, 2 sentyabr 2026-da qəbul edilmiş qərardır.
 koda köçürülməsi uzunmüddətli məqsəddir, təkcə Phase 1 MVP deyil.** Ardıcıl iş rejimi və
 təsdiqlənmiş alt-layihə sırası üçün `MEMORY.md` bölmə 10-a bax.
 
-Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
+Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Texniki Wiki-nin mənbəyi
+repodakı `Wiki/` qovluğudur (12 səhifə, o cümlədən `Location-Taxonomy`, `Admin-Panel-Guide`,
+`Testing-and-Quality`, `Glossary`); GitHub Wiki həmin fayllardan yenilənir. Kod davranışı dəyişəndə
+uyğun Wiki səhifəsi, README, AGENTS.md və MEMORY.md eyni PR-da yenilənir. Qısa xülasə:
 
 - **Admin auth və əsas CRUD hazırdır.** PBKDF2 parol, məcburi TOTP 2FA, D1 sessiyaları,
   RBAC, dashboard, əmlak/layihə/xidmət/bloq/lead/media/istifadəçi/parametr axınları və audit
