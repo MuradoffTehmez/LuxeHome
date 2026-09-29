@@ -48,6 +48,16 @@ const RISK_LEVEL_KEYS: Record<KnowledgeRiskLevel, "green" | "yellow" | "red" | "
   LEGAL_REVIEW: "legalReview",
 };
 
+/** Mənbə siyahısında səhv yazılmış URL səhifəni sındırmamalıdır — belə qeyd göstərilmir. */
+function sourceHost(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.hostname : null;
+  } catch {
+    return null;
+  }
+}
+
 async function loadArticle(slug: string, locale: string) {
   const source = await getCachedKnowledgeArticleBySlug(slug);
   if (!source) return null;
@@ -105,7 +115,9 @@ export default async function KnowledgeArticlePage({ params }: Props) {
   const publishedAt = new Date(article.publishedAt || article.updatedAt);
   const updatedAt = new Date(article.updatedAt);
   const legalActs = parseJsonArray<string>(article.legalActs);
-  const sourceUrls = parseJsonArray<string>(article.sourceUrls);
+  const sources = parseJsonArray<string>(article.sourceUrls)
+    .map((url) => ({ url, host: sourceHost(url) }))
+    .filter((item): item is { url: string; host: string } => item.host !== null);
   const legalBlocks = [
     [t("article.legalBasis"), article.legalBasis],
     [t("article.requiredDocuments"), article.requiredDocuments],
@@ -204,10 +216,10 @@ export default async function KnowledgeArticlePage({ params }: Props) {
                     <div><dt className="text-ink-muted">{t("article.normStatus")}</dt><dd className="font-medium text-ink">{t(`article.legalStatus.${LEGAL_STATUS_KEYS[article.legalStatus as LegalContentStatus]}`)}</dd></div>
                     <div><dt className="text-ink-muted">{t("article.riskLevel")}</dt><dd className="font-medium text-ink">{t(`article.riskLevels.${RISK_LEVEL_KEYS[article.riskLevel as KnowledgeRiskLevel]}`)}</dd></div>
                     <div><dt className="text-ink-muted">{t("article.jurisdiction")}</dt><dd className="font-medium text-ink">{article.jurisdiction}</dd></div>
-                    <div><dt className="text-ink-muted">{t("article.legalReviewedAt")}</dt><dd className="font-medium text-ink">{article.legalReviewedAt ? new Intl.DateTimeFormat(locale).format(article.legalReviewedAt) : t("article.notReviewed")}</dd></div>
+                    <div><dt className="text-ink-muted">{t("article.legalReviewedAt")}</dt><dd className="font-medium text-ink">{article.legalReviewedAt ? new Intl.DateTimeFormat(locale).format(new Date(article.legalReviewedAt)) : t("article.notReviewed")}</dd></div>
                   </dl>
                   {legalActs.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.legalActs")}</h3><ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-ink-soft">{legalActs.map((act) => <li key={act}>{act}</li>)}</ul></div>}
-                  {sourceUrls.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.officialSources")}</h3><ul className="mt-2 space-y-2">{sourceUrls.map((url) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 break-all text-sm text-gold-deep underline-offset-4 hover:underline">{new URL(url).hostname}<ExternalLink className="size-3.5 shrink-0" aria-hidden="true" /></a></li>)}</ul></div>}
+                  {sources.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.officialSources")}</h3><ul className="mt-2 space-y-2">{sources.map(({ url, host }) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 break-all text-sm text-gold-deep underline-offset-4 hover:underline">{host}<ExternalLink className="size-3.5 shrink-0" aria-hidden="true" /></a></li>)}</ul></div>}
                 </div>
               </div>
             </aside>
