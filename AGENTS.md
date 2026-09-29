@@ -6,7 +6,11 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 Luxe Home Estate — Luxe Home Estate MMC (Bakı) üçün daşınmaz əmlak platforması. Next.js 16 App Router (webpack),
 React 19, Tailwind CSS v4, Prisma v6. İctimai sayt, kabinet və admin panel AZ/EN/RU dillərindədir;
-Azərbaycan dili defoltdur. İnfrastruktur Cloudflare Workers + D1 + R2 + Images üzərindədir.
+Azərbaycan dili defoltdur. İnfrastruktur tam Cloudflare-dədir: Workers (OpenNext), D1, R2, Images,
+Workers AI və Vectorize. Supabase və PostgreSQL layihədən çıxarılıb.
+
+> Bu fayl `CLAUDE.md`-in qısa variantıdır. Ziddiyyət olduqda `CLAUDE.md` həqiqət mənbəyidir;
+> dərin texniki sənəd repodakı `Wiki/` qovluğundadır (GitHub Wiki onun nüsxəsidir).
 
 **Kod dilində konvensiya:** identifikatorlar (dəyişən, funksiya, tip adları) ingiliscədir,
 şərhlər və istifadəçiyə görünən sətirlər Azərbaycan dilindədir. Yeni kod da bu qaydaya uyğun yazılır.
@@ -15,18 +19,37 @@ Azərbaycan dili defoltdur. İnfrastruktur Cloudflare Workers + D1 + R2 + Images
 
 ```bash
 npm run dev          # development server (localhost:3000)
-npm run build        # production build — lint + typecheck daxildir
+npm run build        # prisma generate + next build --webpack (lint/typecheck DAXİL DEYİL)
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
-npm run test         # Vitest
+npm run test         # Vitest (workerd + Node + real miniflare D1 integration)
 npm run dead-code    # Knip: istifadə olunmayan fayl/asılılıq
-npm run e2e          # Playwright, konfiqurasiya edilmiş staging/live runtime
+npm run e2e          # Playwright, E2E_BASE_URL-dəki workerd mühitinə qarşı
+npm run e2e:local:build      # lokal stack 1/3: yalnız OpenNext bundle (IS_STAGING=true, localhost:8787)
+npm run e2e:local:prepare    # lokal stack 2/3: .wrangler/e2e-state-də təzə D1 + test hesabları (AUTH_SECRET, E2E_ADMIN_TOTP_SECRET)
+npm run e2e:local:serve      # lokal stack 3/3: workerd :8787 — ayrı terminalda açıq saxla
+E2E_BASE_URL=http://localhost:8787 npm run e2e   # E2E_BASE_URL verilməsə testlər canlı staging-ə gedir
 
 npm run db:migrate:local # D1 miqrasiyalarını lokal tətbiq edir
-npx tsx prisma/seed.ts  # admin/taksonomiya/xidmət başlanğıc məlumatları
+npx tsx prisma/seed.ts  # sistem/taksonomiya başlanğıc məlumatları (giriş edilə bilən hesab YARATMIR)
 npm run db:seed:build # lokal SQLite-dan D1 seed.sql yaradır
 npm run db:studio    # Prisma Studio
+npm run auth:create-admin     # ilk SUPER_ADMIN üçün INSERT ifadəsi
+
+npm run db:locations:build    # (Python) DSK + Ünvan Reyestri + bazar massivləri → locations-data.ts
+npm run db:streets:build      # (Python) rəsmi küçələr → public/data/kuceler/<kod>.json
+npm run db:locations:report   # docs/erazi/baki-erazi-bolgusu.md
+npm run db:taxonomy:build     # prisma/taxonomy.sql
+npm run db:locations:migrations # taxonomy.sql → migrations/0050–0053
+
+npm run preview      # OpenNext bundle + lokal workerd (production runtime-ı)
+npm run deploy:staging  # staging: db:migrate:staging → db:taxonomy:staging → deploy:staging
+npm run deploy          # PRODUCTION: db:migrate:remote → db:taxonomy:remote → deploy (staging üçün işlətmə)
 ```
+
+Bundler qəsdən **webpack**-dır (`--webpack`): Turbopack Prisma klientini hash-lı symlink kimi
+xaricləşdirir və OpenNext/workerd bundle-ında yoxlanmayıb. `"use server"` faylındakı hər ixrac
+`async` olmalıdır — bu yalnız `npm run build`-də yoxlanılır.
 
 Keyfiyyət qapısı `npm run test` + `npm run typecheck` + `npm run lint` + `npm run dead-code` +
 `npm run build`-dır — dəyişiklikdən sonra hamısı işlədilməlidir.
@@ -70,8 +93,10 @@ icazə verilən dəyərlər **yalnız** `src/lib/constants.ts`-də toplanıb: `P
 
 Hər dəyər dəsti üçün `*_LABELS` (azərbaycanca göstərilən mətn) və bəziləri üçün `*_TONE`
 (badge rəngi) cütü var. **Status sətirini heç vaxt hardcode etmə** — sabitdən istifadə et.
-Sxem şərhləri ilə sabitlər arasında uyğunsuzluq buglara səbəb olur (məs. `add-mocks.ts`-də
-`pricePeriod: "MONTHLY"` yazılıb, düzgün dəyər `MONTH`-dur).
+Sxem şərhləri ilə sabitlər arasında uyğunsuzluq buglara səbəb olur (məs. `pricePeriod`-un düzgün
+dəyəri `MONTH`-dur, `MONTHLY` deyil). Hesab növü siyahılarını əl ilə yazma — `PUBLIC_ACCOUNT_TYPES`,
+`LISTING_ACCOUNT_TYPES`, `COMPANY_ACCOUNT_TYPES`, `accountTypeKey()`. Sabitə yeni `*_LABELS` dəyəri
+əlavə edəndə admin `labels.*` kataloqunu da yenilə (`admin-label-sync.test.ts`).
 
 ### Dizayn sistemi və dark mode
 
@@ -137,7 +162,11 @@ override desktopda səssizcə işləmir. Tam əl ilə idarə lazımdırsa `spaci
 
 URL query parametrləri filtr vəziyyətinin yeganə mənbəyidir. `SearchPanel` göndərdiyi adlarla
 `emlaklar/page.tsx` oxuduğu adlar **eyni olmalıdır**: `elan`, `axtaris`, `tip`, `seher`, `rayon`,
-`otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `siralama`, `sehife`.
+`metro`, `metro_yaxin`, `nisangah`, `otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`,
+`tikili`, `dovr`, `mertebe_min`, `mertebe_max`, `ilk_mertebe_yox`, `son_mertebe_yox`, `sekilli`,
+`xususiyyet`, `sahe` (xəritə poliqonu), `gorunus`, `siralama`, `sehife` (`src/lib/property-search.ts`).
+Boş nəticədə `EmptySearchSuggestions` hər çipi çıxaranda qalan elan sayını göstərir — yeni filtr
+`CHIP_FIELDS`-ə (`search-relaxation.ts`) də yazılmalıdır.
 `elan` dəyəri `LISTING_TYPES` sabitindən gəlir (`SALE` / `RENT`) — azərbaycanca mətn deyil.
 
 `SearchPanel` cari vəziyyəti `useSearchParams` ilə deyil, server komponentindən gələn `initial`
@@ -151,7 +180,9 @@ propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
   Hər səhifə `export const metadata` və ya `generateMetadata` içindən bunu çağırır.
 - JSON-LD generatorları: `organizationSchema()` (root layout-da, `RealEstateAgent`),
   `propertySchema()`, `articleSchema()`, `serviceSchema()`, `breadcrumbSchema()`.
-- `siteUrl(path)` — `NEXT_PUBLIC_SITE_URL` üzərindən mütləq URL qurur.
+- `siteUrl(path)` — production-da sabit kanonik hostu, staging/lokal mühitdə `SITE_URL` dəyərini
+  işlədir; staging və production bundle-ları buna görə ayrı qurulur. `IS_STAGING=true` hər
+  metadata-nı noindex edir.
 
 `getSitemapEntries()` (`queries.ts`) `app/sitemap.ts` və parçalanmış sitemap feed-ləri tərəfindən
 istifadə olunur.
@@ -166,20 +197,55 @@ Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur 
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
 
-### Demo kontent qoruması
+### Nümunə (demo) məzmun
 
-`Property`, `Project`, `BlogPost` modellərində geriyə uyğunluq üçün `isDemo` boolean sahəsi var.
-İctimai sorğular yalnız `isDemo: false` qeydlərini qaytarır; seed ictimai məzmun yaratmır.
+`Property`, `Project`, `BlogPost`, `Agency`, `AgentProfile` və `Partner` modellərində `isDemo` var.
+Görünürlük `/admin/demo-mezmun` açarı (`demo.content_enabled`) ilə idarə olunur: `demoWhere()`
+rejim bağlı olanda `{ isDemo: false }`, açıq olanda `{}` qaytarır. Açar yazılmayıbsa staging-də açıq,
+production-da bağlıdır. Buna görə `publicPropertyWhere()`, `buildPropertyWhere()` və
+`publicPartnerWhere()` **async-dir**. Sitemap/SEO üçün sinxron `indexablePropertyWhere()` /
+`indexablePartnerWhere()` həmişə `isDemo: false` daşıyır. Qeydlərin `isDemo` bayrağı heç vaxt
+dəyişmir. Nümunə məzmun yalnız staging-ə yüklənir (`npm run db:demo:*`).
+
+### Yerləşmə ağacı və ünvan
+
+Mənbə DSK-nın «İnzibati Ərazi Bölgüsü Təsnifatı, 2024» və Ünvan Reyestridir; `locations-data.ts`,
+`taxonomy.sql`, `public/data/kuceler/` və `migrations/0050`–`0053` **generasiya olunur**.
+
+| kind | Məna | Say |
+|---|---|---:|
+| `CITY` | 11 respublika tabeli şəhər və 64 rayon | 75 |
+| `DISTRICT` | Yalnız şəhərdaxili rayon (Bakı 12, Gəncə 2) | 14 |
+| `SETTLEMENT` | Rəsmi qəsəbə və rayon tabeli şəhər | 266 |
+| `VILLAGE` | Kənd (Bakıda yoxdur) | 3 605 |
+| `NEIGHBORHOOD` | Massiv — rəsmi vahid deyil (Bakı 62, Sumqayıt 67, Abşeron 5, Gəncə 2) | 136 |
+| `METRO` | Bakı metrosu | 27 |
+| `LANDMARK` | Nişangah (`landmarkId`, `?nisangah=`) | 214 |
+
+- Rəsmi status yalnız DSK/Ünvan Reyestrindən gəlir; alternativ yazılış ayrıca yer yaratmır
+  (`searchName`-də ` | ` ilə).
+- Yer adlarını `compareAzerbaijani()` / `byAzerbaijaniName` ilə sırala — `localeCompare("az")`
+  workerd-də etibarsızdır.
+- ~3 600 kəndi heç vaxt client-ə birdən göndərmə: filtrdə `villagesWithListings()`, formada
+  `/api/yerler/kendler?seher=<id>`. `METRO` və `LANDMARK` `LOCATION_CHILD_KINDS`-ə salınmır.
+- Şəhərə aidlik `locationBelongsToCity()` / `landmarkBelongsToCity()` ilə yoxlanılır (ağac iki dərinlikdədir).
+- Elanda bir yer yazılır — ən dərin seçim `districtId`; küçə sərbəst mətndir, rəsmi siyahı təklifdir.
+
+Ətraflı: `CLAUDE.md` → «Yerləşmə ağacı» və `Wiki/Location-Taxonomy.md`.
 
 ## Cari vəziyyət və bilinən boşluqlar
 
 Ətraflı siyahı və prioritetlər üçün **`MEMORY.md`** faylına bax. Qısa xülasə:
 
-- Admin CRUD, media, moderasiya, təhlükəsizlik, audit, SERP və üçdilli UI hazırdır.
-- Əsas public/kabinet marşrutları, hüquqi səhifələr, 404/error, sitemap və robots hazırdır.
+- Admin CRUD, media, moderasiya, təhlükəsizlik, audit, SERP, CRM (lövhə, huni), CSV idxalı,
+  premium paketlər (ödəniş uçotu, provayder yoxdur), təqvim + ICS və üçdilli UI hazırdır.
+- İctimai sayt: kataloq (metro, nişangah, xəritədə sahə), detal (plan, 360° tur, qiymət göstəricisi),
+  `/emlakimi-sat`, `/investisiya`, AI + semantik axtarış (Vectorize), Bilik Mərkəzi AI məsləhətçisi.
+- Kabinet: 5 hesab növü, 8 addımlı elan sehrbazı, 60 günlük elan müddəti, paketlər, bildirişlər.
+- Auth: staff TOTP (məcburi) + passkey; ictimai parol, Google OIDC və telefon OTP (secret-siz söndürülü).
 - Contact/auth formalarında same-origin, honeypot, rate limit və Turnstile qoruması var.
-- Açıq məhsul boşluqları: Finance/paket modulu, ümumi statik səhifə CMS-i, moderator xəritə
-  preview-u, production post-deploy browser smoke və embedding/vector semantik axtarış.
+- Açıq boşluqlar: avtomatlaşdırılmış D1 backup/restore, production post-deploy brauzer smoke,
+  admin JSX-də legacy xam mətn borcu, Prisma 7 / TS 7 / ESLint 10 / Vitest 5 keçidləri.
 - Self-service hesab silinməsi D1 üçün davamlı marker + maintenance retry ilə işləyir;
   `deletionRequestedAt` invariantını yan keçən ayrıca silmə axını yaratma.
 
@@ -194,8 +260,17 @@ struktur datasında göstərilir — dəyişdirilməməlidir.
   işlət və `*.integration.test.ts` (real miniflare D1) yaz (#74, #85).
 - Prisma client `src/lib/prisma.ts`-də D1 binding-i üçün lazy Proxy və WASM client istifadə edir —
   `new PrismaClient()` yazma (istisna: `prisma/` altındakı standalone lokal scriptlər).
-- `next.config.ts`-də `images.remotePatterns` yalnız `images.unsplash.com`-a icazə verir; stok
-  şəkillər oradandır. Yeni xarici şəkil mənbəyi əlavə edilərsə bu siyahı yenilənməlidir.
+- `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok), `media.luxehomeestate.az`
+  (R2 custom domain) və `treva.realestate` (rəsmi tərəfdaş) mənbələrinə icazə verir. Yeni xarici
+  şəkil mənbəyi əlavə edilərsə bu siyahı və middleware CSP-si (`img-src`) yenilənməlidir.
+- Server action-lar layout-dan keçmir: hər action ilk sətirdə öz guard-ını çağırır
+  (`requireAdminAction(permission)`, `requirePublicAction(scope)`).
+- Admin paneldə dil `User.locale`-dadır: server komponentində `await getAdminT()`, client-də
+  `useTranslations("admin")`; `useTranslations()`-ı server komponentində işlətmə.
+- Dark mode üçün `dark:` prefiksi yazma — token işlət; foto üzərində `charcoal`/`navy` yox.
+- Elan sehrbazı (#113): 8 addım, bütün sahələr DOM-da qalır; elan yazan hər action
+  `queuePropertyVectorSync()` və `queueListingEnrichment()` çağırır. Elan şəkli yalnız
+  `/media/emlaklar/`-dan qəbul olunur (su nişanı). Qısa ünvan əlavə edəndə `NEVER_CACHED_PREFIXES`-ə yaz.
 - `outputFileTracingRoot: import.meta.dirname` qəsdən qoyulub — yuxarı qovluqdakı lockfile-ın
   səhvən workspace kökü kimi seçilməsinin qarşısını alır. Silinməməlidir.
 - Yol xəritəsi 1-ci mərhələ (#103) modulları: Telegram lead bildirişi (`src/lib/telegram.ts`,

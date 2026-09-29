@@ -1,7 +1,7 @@
 # GitHub governance və repository settings
 
 Bu sənəd LuxeHome repository-sinin GitHub-da kodla saxlanmayan idarəetmə parametrlərini,
-label taksonomiyasını və release qərarını qeyd edir. Son yoxlama: **3 sentyabr 2026**.
+label taksonomiyasını və release qərarını qeyd edir. Son yoxlama: **29 sentyabr 2026** (branch protection və merge parametrləri GitHub API ilə təsdiqlənib).
 
 ## Standart development axını
 

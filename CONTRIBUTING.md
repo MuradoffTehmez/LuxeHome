@@ -98,7 +98,7 @@ Hər deploy job-u öz mühitinin D1 miqrasiyalarını **bundle-dan əvvəl** tə
 məcburidir: əvvəlcə worker yayımlansa, sxem gəlincəyə qədər sorğular çökür və xəta çox vaxt
 `try/catch` içində səssizcə udulur.
 
-Staging production-dan əvvəl gedir. Browser E2E dəsti (15 spec, 164 test) canlı staging
+Staging production-dan əvvəl gedir. Browser E2E dəsti (15 spec, 190 test icrası) canlı staging
 mühitinə qarşı işləyir və uğursuz olarsa production yayımını saxlayır. PR-da isə eyni dəst
 `Local stack E2E` məcburi yoxlaması kimi lokal workerd + real D1/R2 üzərində işləyir.
 
@@ -208,8 +208,17 @@ staging mühitində sınanmalıdır — birbaşa production-a tətbiq edilmir.
   `text-ink` və s.) istifadə olunur, onlar `.dark` klassı altında öz-özünə yenidən təyin olunur.
 - **Sirlər:** heç bir parol, API açarı, token və ya production məlumatı commit edilmir.
 
+- **Sıralama:** yer adları `compareAzerbaijani()` / `byAzerbaijaniName` ilə sıralanır;
+  `localeCompare(…, "az")` workerd-də etibarsızdır.
+- **Generasiya olunan fayllar** əl ilə redaktə edilmir: `prisma/locations-data.ts`,
+  `prisma/taxonomy.sql`, `prisma/seed.sql`, `prisma/demo-content.sql`, `public/data/kuceler/`,
+  `src/lib/official-street-codes.ts`, `docs/erazi/baki-erazi-bolgusu.md`, `migrations/0050`–`0053`.
+- **Sənədlər:** yeni marşrut, model, icazə, npm əmri, binding və təhlükəsizlik davranışı eyni PR-da
+  sənədləşdirilir — uyğun `Wiki/` səhifəsi, README, `CLAUDE.md`/`AGENTS.md` və `MEMORY.md`.
+
 Ətraflı arxitektura və qaydalar üçün [README](README.md) və
-[texniki Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
+[texniki Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın (mənbəyi repodakı
+`Wiki/` qovluğudur).
 
 ## Pull request
 

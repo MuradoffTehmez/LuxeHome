@@ -1,242 +1,165 @@
 # Cari vəziyyət və yol xəritəsi
 
-Bu səhifə 31 avqust 2026 tarixində `main` kod auditi, 89 test faylındakı 373 test və production deploy əsasında hazırlanıb. Prioritetlər faktiki boşluğu göstərir; buradakı maddə avtomatik olaraq təsdiqlənmiş məhsul planı demək deyil.
+Bu səhifə 29 sentyabr 2026 tarixində `main@199f8409` kod auditi, 173 test faylındakı 889 Vitest testi, 190 Playwright test icrası və uğurlu CI/CD run-u (`36505908266`) əsasında hazırlanıb. Prioritetlər faktiki boşluğu göstərir; buradakı maddə avtomatik olaraq təsdiqlənmiş məhsul planı demək deyil.
+
+**Uzunmüddətli hədəf (25 avqust 2026 qərarı):** hər iki PRD sənədinin (`docs/`) tam (100%) koda köçürülməsi. İş ardıcıl, kiçik və təsdiqlənən addımlarla gedir.
 
 ## Hazırlıq matrisi
 
 | Sahə | Vəziyyət | Qeyd |
 |---|---:|---|
-| Production sayt | ✅ İşlək | Worker deploy `a88cf4ab-6a5e-4b84-a038-2a6c82f0ae92`; AZ/EN/RU public route-lar işləyir |
-| Əmlak kataloqu | ✅ İşlək | Geniş filtr, sort, pagination, metro/rayon və detail |
-| Xəritə | ✅ İşlək | Koordinatlı əmlak üçün Leaflet |
-| Favorit | ✅ İşlək | LocalStorage və hesabla sinxronizasiya |
-| Müqayisə | ✅ İşlək | Cookie, maksimum 4 əmlak |
-| Layihə/xidmət/bloq | ✅ İşlək | Public read və permission əsaslı admin CRUD |
-| Tərəfdaşlıq sistemi | ✅ İşlək | Public kataloq/detail, property/project/agency əlaqələri, görünüş və audit |
-| Agentlik kataloqu | ✅ İşlək | Verification, public profil, əməkdaş heyəti və profil bərpası |
-| Public auth | ✅ İşlək | Qeydiyyat, login, approval/activation və revoke edilə bilən sessiya |
-| Public kabinet | ✅ İşlək | Profil, elan CRUD-u, saved search, rezervasiya, tövsiyə, bildiriş və son baxılanlar |
-| Staff auth | ✅ İşlək | TOTP, backup code, lockout, session və permission guard |
-| Admin panel | ✅ İşlək | Məzmun, CRM, hesab, agentlik, tərəfdaş, SEO, analitika, e-poçt və sistem idarəetməsi |
-| Media | ✅ İşlək | Admin/public upload, R2, Images və thumbnail |
-| Lead/əlaqə | ✅ İşlək | D1 + Resend, honeypot, same-origin və IP rate limit |
-| SEO | ✅ İşlək | Metadata, schema-lar, hreflang, sitemap, robots, redirect və 404 monitorinqi |
-| SERP ekosistemi | ✅ İşlək | İdarə olunan metadata/landing runtime-ı, entity schema mühərriki, sitemap index feed-ləri, açar söz/entity idarəsi, monitorinq/alert, Search Console və indeksləmə nəzarəti, link diaqnostikası |
-| Bilik Mərkəzi | ✅ İşlək | Bələdçi, lüğət, CMS FAQ, kalkulyator, tərcümə və audit |
-| AI | ✅ İşlək | Cloudflare Workers AI ilə public axtarış, Match Score və admin köməkçisi |
-| Rezervasiya və agentlər | ✅ İşlək | Rezervasiya axını, agent kataloqu, profil və rəy moderasiyası |
-| Web Push | ✅ İşlək | Abunə, kanal seçimləri və sakit saatlar |
-| E-poçt əməliyyatları | 🟡 Konfiqurasiya | Admin jurnalı və imzalı webhook hazırdır; production Resend secret/endpoint tələb edir |
-| Test | 🟡 Qismən | 89 fayl, 373 test; browser E2E və real remote D1 integration yoxdur |
-| CI | ✅ İşlək | GitHub Actions `test + typecheck + lint + build` + miqrasiya drift yoxlaması |
-| CD | 🟡 Qismən | Deploy hələ manualdır (`npm run deploy`); avtomatik yayım pipeline-ı yoxdur |
-| Backup/DR | 🔴 Yoxdur | Avtomatlaşdırılmış export/restore drill yoxdur |
-| Çoxdillilik | ✅ İşlək | Public AZ/EN/RU, locale-prefiksli URL və alternates |
+| Production sayt | ✅ İşlək | AZ/EN/RU public route-lar; kənar HTML keşi (anonim ziyarətçi üçün ≤60 s gecikmə) |
+| Əmlak kataloqu | ✅ İşlək | Geniş filtr, sort, siyahı/xəritə, xəritədə sahə, metro, nişangah, boş nəticə təklifləri |
+| Ərazi bölgüsü | ✅ İşlək | 4 337 yer: rəsmi kodlu 75 şəhər/rayon, 266 qəsəbə, 3 605 kənd; 136 massiv, 27 metro, 214 nişangah; ~63 000 rəsmi küçə təklifi |
+| Elan detalı | ✅ İşlək | Lightbox qalereya, plan, 360° tur, qiymət göstəricisi, açıq qapı, rezervasiya, OG kartı |
+| Favorit / müqayisə | ✅ İşlək | Hesabla sinxron favorit; cookie əsaslı müqayisə, maksimum 4 |
+| Layihə / mənzil şahmatı | ✅ İşlək | Yaşayış kompleksləri, `ProjectUnit` şahmatı; bölmə admin açarı ilə gizlədilə bilir |
+| Tərəfdaş, agentlik, agent | ✅ İşlək | Kataloqlar, profillər, rəylər, verification, toplu əməliyyatlar |
+| Public auth | ✅ İşlək | Parol + Turnstile, e-poçt təsdiqi, parol bərpası; Google və telefon OTP konfiqurasiyadan asılı |
+| Public kabinet | ✅ İşlək | Elan sehrbazı, müddət/yeniləmə, paketlər, rezervasiya, bildiriş, data ixracı, iki mərhələli silinmə |
+| Staff auth | ✅ İşlək | TOTP (məcburi), passkey (alternativ), backup kod, lockout, sessiya |
+| Admin panel | ✅ İşlək | Kontent, CRM lövhəsi, huni, idxal, paketlər, təqvim, SERP, AI, tərcümə, sistem rejimi |
+| Admin dili | ✅ İşlək | AZ/EN/RU, `User.locale`; kataloq parity testi |
+| Media | ✅ İşlək | R2 + Images, su nişanı (təkrar nişan aşkarlanır), toplu yükləmə növbəsi və retry |
+| Lead/əlaqə | ✅ İşlək | D1 + Resend + Telegram, honeypot, same-origin, IP limit, Turnstile |
+| SEO / SERP | ✅ İşlək | Metadata, JSON-LD, hreflang, sitemap index, SERP mərkəzi, avtomatik SEO/ALT |
+| Bilik Mərkəzi | ✅ İşlək | Bələdçi, lüğət, CMS FAQ, kalkulyator, istinadlı AI məsləhətçi |
+| AI | ✅ İşlək | Workers AI axtarışı, semantik axtarış (Vectorize), foto məsləhətçisi (Mistral Small 3.1) |
+| Web Push | ✅ İşlək | Abunə, kanal seçimləri, sakit saatlar |
+| Sistem rejimləri | ✅ İşlək | `NORMAL` / `MAINTENANCE` (503) / `READ_ONLY` |
+| Nümunə məzmun | ✅ İşlək | Staging-də açıq, production-da bağlı; `isDemo` qeydləri heç vaxt dəyişmir |
+| Test | ✅ İşlək | 173 fayl / 889 test (workerd + Node + real miniflare D1 integration) |
+| Browser E2E | ✅ İşlək | 15 spec + setup / 190 test icrası; PR-da lokal stack, `main`-də staging qapısı |
+| CI/CD | ✅ Avtomatik | quality → deploy-staging → e2e-staging → deploy-production, miqrasiyalar bundle-dan əvvəl |
+| Asılılıq idarəsi | ✅ İşlək | Dependabot (həftəlik qruplar), dependency review, CodeQL, `npm audit --audit-level=high` |
+| E-poçt əməliyyatları | 🟡 Konfiqurasiya | Webhook hazırdır; production Resend secret/endpoint təsdiqi tələb edir |
+| Ödəniş provayderi | 🟡 Qərar | Qəsdən yoxdur — ödəniş ofisdə/köçürmə ilə alınır, paneldə qeyd olunur |
+| Backup/DR | 🔴 Yoxdur | Avtomatlaşdırılmış D1 export/restore drill yoxdur |
 
-## Son tamamlanan mərhələlər
+## Sentyabr 2026-da tamamlanan mərhələlər
 
-### Lokalizasiya və SEO
+### Keyfiyyət və çatdırılma infrastrukturu
 
-- public səhifələr üçün məcburi `/az`, `/en`, `/ru` prefiksi;
-- locale dəyişdirici, message kataloqları və lokalizə edilmiş metadata;
-- canonical, Open Graph, Twitter və hreflang alternates;
-- `RealEstateAgent`, property, project, service, article, FAQ, breadcrumb, partner və website JSON-LD;
-- çoxdilli sitemap, robots, `llms.txt`, redirect və 404 hit idarəetməsi;
-- Cloudflare trafik/Search Analytics admin görünüşü.
+- **Browser E2E (2 sentyabr):** Playwright dəsti canlı workerd mühitinə qarşı işləyir (`next dev` hədəf deyil — Prisma wasm engine orada yüklənmir). İki real baq tapdı: `not-found.tsx` AZ üçün locale prefiksi vermirdi və `--color-ink-muted` 4.47:1 kontrastda idi.
+- **PR-da `Local stack E2E` (#87/#88):** bundle lokal workerd-də real D1/R2 ilə qaldırılır; admin TOTP addımından real keçir (test bypass-ı qəsdən yoxdur).
+- **Real D1 integration testləri (#85/#86):** D1-in 100 bound parametr həddi və nested relation problemləri üçün `*.integration.test.ts`.
+- **Avtomatik yayım:** `main` push-unda hər deploy job-u öz D1 miqrasiyalarını bundle-dan əvvəl tətbiq edir.
+- **GitHub governance:** CODEOWNERS, labeler, issue formaları, branch/commit konvensiyaları (`docs/github-governance.md`).
+- **Knip** dead-code yoxlaması keyfiyyət qapısına əlavə olundu.
 
-### Staff auth və admin əməliyyatları
+### Platforma və təhlükəsizlik
 
-- PBKDF2 parol, məcburi TOTP, backup kod və lockout;
-- D1 sessiyası, ayrıca public/staff auth növü və permission guard;
-- əmlak, layihə, xidmət, bloq, kateqoriya, lead, media və setting idarəetməsi;
-- public hesab approval/activation və agency verification/recovery;
-- lead üçün sürətli status dəyişməsi;
-- cədvəl/səhifələmə əsaslı audit jurnalı və yalnız Super Admin üçün sıfırlama;
-- staff profil şəkli, ad, telefon, locale, tema və backup code regenerasiyası;
-- runtime əlaqə məlumatları və default tema parametrinin paneldən idarəsi;
-- korporativ e-poçt jurnalı, Resend webhook və notification parametrləri.
+- **Maintenance və READ_ONLY rejimi (#36, #41).**
+- **Təhlükəsizlik auditinin bağlanması (#61, #63):** e-poçt şablonlarında HTML kodlaması, `TILE_LIMIT`, `AI_LIMIT`, əlaqə formasında sahə hədləri, push endpoint validasiyası, CodeQL xəbərdarlıqları.
+- **Rəsmi yerləşmə ağacı (#68, #75):** 2024 İnzibati Ərazi Bölgüsü Təsnifatı; ağac D1 parametr həddinə sığdırıldı.
+- **Next.js 16.3 keçidi (#77)** — webpack build saxlanılır.
+- **i18n (#82, #90):** admin server mesajları və xam JSX mətni kataloqa köçdü.
+- **Toplu şəkil yükləmə (#80):** növbə, retry və brauzerdə kiçiltmə.
+- **Dizayn yenilənməsi (#95, #102):** radius şkalası, `card-surface`, `on-image-chip`, 49 səhifə × 18 viewport responsive auditi.
 
-### Public kabinet və bildirişlər
+### Yol xəritəsi — 4 mərhələ (27 sentyabr)
 
-- `USER`, `OWNER`, `AGENCY` qeydiyyatı və təsdiq vəziyyəti;
-- profil və qorunan media upload;
-- owner/agency property submission və moderation statusu;
-- saved search yaratma, redaktə, silmə və uyğunluq izləmə;
-- gündəlik/həftəlik digest üçün ayrıca scheduled Worker;
-- kabinet bildirişləri və son baxılan əmlaklar;
-- agency əməkdaşlarının dəvət və idarə edilməsi.
+| Mərhələ | Əsas imkanlar |
+|---|---|
+| 1 (#103/#104) | Boş bölmələrin gizlədilməsi + sahib bloku, CSV idxalı, kart siqnalları, Telegram lead bildirişi, PWA manifest, elan OG kartı, boş axtarış təklifləri, sayt şəkilləri paneldən |
+| 2 (#105/#106) | Qiymət göstəricisi, `/emlakimi-sat` + onlayn qiymətləndirmə, müraciət lövhəsi, konversiya hunisi, kənar HTML keşi, Cloudflare Web Analytics |
+| 3 (#107/#108) | Plan və 360° tur, mobil alt naviqasiya, metro məsafəsi və filtri, hissə-hissə kalkulyator, `/investisiya`, xəritədə sahə, mənzil şahmatı, semantik axtarış |
+| 4 (#109/#112) | Elan müddəti, açıq qapı günləri, təqvim + ICS, premium paketlər, Bilik Mərkəzi AI məsləhətçisi, passkey, Google və telefonla giriş |
 
-### Rəsmi tərəfdaşlıq sistemi
+### Elan sehrbazı və admin auditi (#113, #114/#115)
 
-- partner CRUD, verification, status və public görünüşün ayrıca idarəsi;
-- public kataloq və SEO detail səhifəsi;
-- əmlak, layihə və agentliklərlə many-to-many əlaqələr;
-- layihə tərəfdaşı source URL-i və əlaqə metadata-sı;
-- public görünüş üçün `ACTIVE + verified + officialPartner + showPublicly + deletedAt=null` qaydası;
-- partner dəyişikliklərinin audit snapshot-ları.
+- 8 addımlı elan sehrbazı (kabinet + admin), `localStorage` qaralaması;
+- iyerarxik ünvan (region → … → bina), `formatFullAddress()` və `shortLocation()`;
+- su nişanı: nisbi həndəsə, təkrar nişanın bayt izi və piksel korrelyasiyası ilə aşkarlanması;
+- avtomatik AI SEO və ALT (`listing-enrichment.ts`), redaktorun sahəsinin üzərinə yazılmır;
+- `AGENT` və `CORPORATE` hesab növləri, genişləndirilmiş profillər;
+- tam ekran lightbox, sürətli əməliyyatlar, kabinet breadcrumb-ları, qısa ünvanlar;
+- toplu seçim + silmə (hesablar, agentliklər, müraciətlər, bloq, layihələr, tərəfdaşlar, xidmətlər);
+- foto məsləhətçisi Meta lisenziyası tələb etməyən modelə keçdi;
+- sitemap-a yeni səhifələr və bazar hesabatları;
+- tərəfdaşın kənar loqosu saxlamada itmir (`migrations/0049`);
+- yeni qeydiyyat forması.
 
-### SERP ekosistemi
+### Asılılıq yeniləməsi (#122)
 
-- D1-də saxlanan SERP persistence modelləri və granular SEO icazələri;
-- SERP siyasəti/validasiya primitivləri və slug redirect avtomatlaşdırması (zəncir rədd edilir);
-- idarə olunan metadata mühərriki, entity schema və public route-larda tətbiqi;
-- bazadan idarə olunan landing runtime-ı və nəzarətli landing menecceri;
-- locale və entity üzrə sitemap index feed-ləri (`/sitemap-index.xml`, `/sitemaps/[feed]`);
-- organik lead atribusiyası və hadisə jurnalı;
-- semantik WebP watermark upload pipeline-ı;
-- elan dərc bütövlüyü və saxlama (retention) qaydaları;
-- 16 səhifəlik admin SERP mərkəzi: metadata/SERP preview, açar sözlər, entity-lər, landing-lər,
-  audit kontenti və media iş siyahıları, monitorinq/alert, Search Console və indeksləmə,
-  schema/sitemap və daxili link diaqnostikası, robots və lokal SEO parametrləri;
-- `npm run test:seo:live` ilə production qəbul testi və Cloudflare crawler challenge təsnifatı.
+Next 16.3.6, next-intl 4.14.7, wrangler 4.139, knip 6.38 və s. birləşdirildi. TypeScript 7, ESLint 10 və Vitest 5 upstream uyğunsuzluğuna görə `dependabot.yml`-də ignore edilib:
 
-### Real Estate Knowledge Hub
+| Paket | Səbəb |
+|---|---|
+| `typescript >=7` | `typescript-eslint` yalnız TS `<6.1` dəstəkləyir |
+| `eslint >=10` | `eslint-config-next`-in `eslint-plugin-react`-ı ESLint 10-da çökür |
+| `vitest >=5` | `@cloudflare/vitest-plugin` peer olaraq yalnız `vitest ^4` qəbul edir |
 
-- `KnowledgeCategory`, `KnowledgeArticle`, `KnowledgeTerm` və `KnowledgeFaq` modelləri;
-- public bələdçi kataloqu, hüquqi status səhifələri, lüğət və CMS FAQ;
-- ipoteka/büdcə kalkulyatoru;
-- `/suallar` (platforma) və `/bilik-merkezi/suallar` (hüquqi CMS) səthlərinin ayrılması;
-- `Article` və `DefinedTerm` struktur datası, public keş və invalidasiya zənciri;
-- tam admin CRUD-u, tərcümə axını, validasiya və audit;
-- hüquqi araşdırmadan yaradılan **DRAFT** idxal paketi (redaktor təsdiqi olmadan PUBLISHED edilmir).
+Plugin yeni major-u dəstəkləyəndə uyğun ignore sətri silinməlidir.
 
-### Phase 2 ictimai imkanlar
+### Ölkə üzrə ərazi bölgüsü (#127 / PR #128, 29 sentyabr)
 
-- əmlak rezervasiya axını və admin/kabinet panelləri;
-- ictimai agent kataloqu, agent profili və rəy moderasiyası;
-- qiymət dəyişikliyi izləmə və alert sistemi;
-- Web Push infrastrukturu, kanal seçimləri və sakit saatlar;
-- fərdi tövsiyələr, əmlak sehrbazı və ana səhifə kəşf bölmələri;
-- Cloudflare Workers AI inteqrasiyası: public AI axtarışı, Match Score və admin köməkçisi;
-- ictimai imkanların paneldən idarəsi və müddət təmizləmə maintenance job-u.
+- **Mənbələr:** rəsmi — DSK təsnifatı və Ünvan Reyestri (unvanportali.az API: bütün 75 şəhər/rayon, rəsmi kodlar, ~63 000 küçə); bazar — bina.az, kub.az, arenda.az, yeniemlak.az, lalafo.az; ziddiyyətlər OSM sərhədləri ilə həll olunub. tap.az-da ərazi sərbəst mətndir — 1 440 elan başlığının yer hissəsi yoxlanıb (119 ad, hamısı ağacda); emlak.az birbaşa oxunmadı, axtarış indeksindəki səhifələr yoxlanıb (hamısı ağacda). Tam hesabat: `docs/erazi/baki-erazi-bolgusu.md`.
+- **Data:** 75 şəhər/rayon, 14 şəhər rayonu (Bakı 12, Gəncə 2), 266 qəsəbə və 3 605 kənd rəsmi kodla; 136 massiv — Bakı 62 (Şuşa şəhərciyi daxil), Sumqayıt 67 (17 mikrorayon, 40 məhəllə, 10 ərazi — arenda + yeniemlak), Abşeron 5, Gəncə 2 (Yeni Gəncə, Gülüstan); 27 metro; 214 nişangah; 91 alias qrupu. evimemlak.az Naxçıvan MR-in 8 vahidini təsdiqləyir.
+- **Düzəlişlər:** 8-ci kilometr → Nizami, Günəşli → Suraxanı, 6–9-cu mikrorayon → Binəqədi, Sovetski → Yasamal, Alatava → 1-ci (Nəsimi) / 2-ci (Yasamal), Şuşa şəhərciyi → Sabunçu, Gürgən → Pirallahı; Qurd qapısı (qəbiristanlıq) əlavə edilmədi.
+- **Sayt:** admin və kabinet formasında metro (kabinetdə ilk dəfə), nişangah və rəsmi küçə təklifləri; `?nisangah=` filtri, alias-lı axtarış, elan səhifəsində nişangah, yadda saxlanmış axtarış, CSV `landmark` sütunu, semantik axtarış.
+- **Baza:** `Location.officialCode`, `Property.landmarkId`; özü-yetərli `migrations/0050`–`0053` (~8 000 ifadə ardıcıl hissələrdə).
+- **Performans:** kəndlər filtrdə yalnız elanı olanda, formada seçilmiş rayon üçün (`/api/yerler/kendler`) yüklənir; AI axtarışı promptuna düşmür.
 
-### Cloudflare-native deployment
+### Sənəd sinxronu (29 sentyabr)
 
-- OpenNext Worker build və production/staging izolyasiyası;
-- Prisma D1 adapter və WASM runtime;
-- D1, R2, Cloudflare Images, incremental cache və D1 tag cache;
-- custom domain, staging noindex və server-side revalidation;
-- saved-search üçün ayrıca cron Worker;
-- qarışıq D1 tarix formatını normallaşdıran `0019` miqrasiyası.
+Wiki (8 → 12 səhifə: Ərazi bölgüsü, İdarə paneli bələdçisi, Test və keyfiyyət, Terminlər lüğəti əlavə olundu), README, CLAUDE.md, AGENTS.md, MEMORY.md, CONTRIBUTING, SECURITY və `e2e/README.md` #128-dən sonrakı faktiki vəziyyətə uyğunlaşdırıldı.
 
 ## P0 — production riskinin azaldılması
 
 ### Backup və bərpa
 
-**Mövcud:** migration və deploy manual idarə olunur; avtomatlaşdırılmış D1 export, R2 inventory və restore drill yoxdur.
+**Mövcud:** miqrasiyalar CI tərəfindən tətbiq olunur; avtomatlaşdırılmış D1 export, R2 inventory və restore drill yoxdur.
 
-**Hədəf:** planlı D1 export, retention siyasəti, RPO/RTO, R2 inventory/lifecycle, ayrıca şifrəli backup və dövri restore testi.
+**Hədəf:** planlı D1 export (Time Travel + ayrıca export), retention siyasəti, RPO/RTO, R2 inventory/lifecycle, dövri restore testi.
 
-### E-poçt və cron əməliyyat təsdiqi
+### Production post-deploy smoke
 
-**Mövcud:** imzalı Resend webhook, `EmailActivity`, qorunan digest endpoint və cron Worker kodu hazırdır.
+Staging E2E yayım qapısıdır; production üçün `npm run test:seo:routes` və `test:seo:live` var, amma tam post-deploy brauzer smoke hələ manualdır.
 
-**Hədəf:** production `RESEND_WEBHOOK_SECRET` və endpoint abunəliyini təsdiqləmək, əsas və cron Worker üçün eyni `CRON_SECRET` qurmaq, delivery/digest uğursuzluqlarına alert və runbook əlavə etmək.
+## P1 — istifadəçidən gözlənilən konfiqurasiya (koda aid deyil)
 
-## P1 — əsas məhsul boşluqları
-
-### Public elan lifecycle
-
-Public user yeni elan yaradır və statusu izləyir. Hələ lazımdır:
-
-- yalnız sahibinə açıq edit;
-- statusa görə redaktə qaydası;
-- soft-delete və yenidən göndərmə;
-- rədd səbəbinin kabinetdə aydın göstərilməsi;
-- şəkil orphan cleanup siyasəti;
-- agency verification dəyişəndə mövcud elanların davranış qərarı.
-
-### Public hesab bərpası və məlumat hüquqları
-
-- e-poçt verification;
-- “parolu unutdum” token axını;
-- e-poçt dəyişmə təsdiqi;
-- optional public 2FA;
-- hesab silmə və data export tələbi.
-
-### Browser E2E
-
-GitHub Actions pipeline **qurulub və işləyir** (`.github/workflows/ci.yml`): `npm ci`, Vitest,
-typecheck, lint, production build və `main` push-unda production miqrasiya drift yoxlaması.
-Pipeline runner-in npm versiyasını `package.json` → `packageManager` dəyərindən pinləyir; bu addım
-olmadan lock faylı formatı uyğunsuzluğu `npm ci`-ni sındırır (bax [[İnkişaf təlimatı|Development-Guide]]).
-
-Qalan boşluq brauzer E2E-dir. Minimum axınlar:
-
-- locale keçidi → search → detail → favorite/compare;
-- public register/login → media → listing submit;
-- saved search → uyğunluq → notification/digest;
-- staff login → TOTP → permission;
-- admin property/partner/agency CRUD;
-- contact submit, honeypot və rate limit;
-- Resend webhook imzası;
-- staging noindex və production canonical/hreflang.
-
-### Azərbaycan dilində axtarış normallaşdırması
-
-**Həll olunub.** `0021_azerbaijani_search_normalization.sql` miqrasiyası, `src/lib/search-normalization.ts`
-və `Property.searchText` / taksonomiya `searchName` sütunları registrsiz axtarışı təmin edir. Yeni
-yazma axınlarında bu normallaşdırılmış sahələri doldurmaq qalan öhdəlikdir.
+- `TELEGRAM_BOT_TOKEN` və `TELEGRAM_CHAT_ID` secret-ləri;
+- Cloudflare Web Analytics tokeni → GitHub repo dəyişəni `PRODUCTION_CF_WEB_ANALYTICS_TOKEN`;
+- Google ilə giriş: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; yönləndirmə `https://luxehomeestate.az/api/auth/google/callback`;
+- Telefonla giriş: SMS provayderi ilə müqavilə → `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER`;
+- production `RESEND_WEBHOOK_SECRET` və Resend endpoint abunəliyi;
+- şirkətin öz fotoları (`Parametrlər → Saytın şəkilləri`) və real elanlar (CSV idxalı).
 
 ## P2 — məhsul yetkinliyi
 
-### Tərcümə və kontent idarəetməsi
-
-Route və interfeys AZ/EN/RU işləyir. Növbəti mərhələdə admin tərəfindən daxil edilən property, project, service, blog və partner məzmunu üçün strukturlaşdırılmış tərcümə sahələri, fallback qaydası və locale parity audit-i lazımdır.
-
-### Anti-spam və abuse müdafiəsinin genişləndirilməsi
-
-Əlaqə formunda honeypot, same-origin və rate limit aktivdir. Risk artarsa Turnstile server verification, risk siqnalı və şəxsi məlumat saxlamayan abuse metrikası əlavə edilə bilər.
-
-### Observability və analitika
-
-- error tracking və alert;
-- strukturlaşdırılmış log korrelyasiyası;
-- Core Web Vitals monitorinqi;
-- e-poçt delivery və cron digest alert-ləri;
-- audit jurnalında anomaliya siqnalları.
-
-### Kontent və hüquqi təsdiq
-
-- hüquqi səhifələrin hüquqşünas yoxlaması;
-- `siteConfig.geo` koordinatının və iş saatlarının təsdiqi;
-- real şirkət foto arxivi;
-- xidmət və FAQ iddialarının əməliyyat təsdiqi;
-- Resend sender domain doğrulaması;
-- AZ/EN/RU kontent parity və terminologiya redaktəsi.
-
-### UX və performans
-
-- browser əsaslı tam accessibility və responsive regressiya testi;
-- public listing edit UX;
-- media orphan cleanup;
-- uzun filter URL-ləri üçün round-trip E2E;
-- xəritə bundle və Core Web Vitals ölçümü;
-- comparison/favorite üçün hesab sync qərarı.
+- **Admin i18n borcu:** 2 sentyabr auditində qalan legacy xam JSX sətirləri (`MEMORY.md` bölmə 5).
+- **Turbopack keçidi:** ayrıca `npm run preview` + staging E2E ilə sınanmalıdır (Prisma klientinin symlink xaricləşdirilməsi).
+- **`middleware.ts` → `proxy.ts`:** Next 16 köhnə konvensiya barədə xəbərdarlıq verir.
+- **Bilik Mərkəzi:** idxal paketi DRAFT-dır; hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilmir.
+- **Kontent və hüquqi təsdiq:** hüquqi mətnlər, iş saatları, xidmət iddiaları, AZ/EN/RU terminologiya redaktəsi.
+- **Observability:** strukturlaşdırılmış log korrelyasiyası, e-poçt/cron alert-ləri, audit anomaliya siqnalları.
+- **Nişangahlar:** koordinatla rayona bağlama və EN/RU dəqiq adları (hazırda transliterasiya).
+- **Ərazi datası:** Naxçıvan şəhərinin məhəllələri (strukturlu mənbə yoxdur) və Sumqayıtın tək mənbədə görünən məhəllələri (72-ci, 76-cı) təsdiq gözləyir; taksonomiya SQL-i sətir silmir — ad/slug birləşdirmələri ayrıca miqrasiya tələb edir.
+- **Asılılıqlar:** açıq Dependabot PR-ları — #126 (Prisma 6.19 → 7.10, major; D1 adapter və WASM client ilə ayrıca sınanmalıdır) və #129 (`@cloudflare/vitest-plugin` 1.2.8, `wrangler`, `@types/node`).
 
 ## Bilinən əməliyyat qeydləri
 
-- Cloudflare Managed Content/Bot qaydası default CLI User-Agent ilə bəzi HTML route-larına 403 verə bilər; browser tipli User-Agent ilə ayrıca yoxlanmalıdır.
+- Cloudflare Managed Content/Bot qaydası default CLI User-Agent ilə bəzi HTML route-larına 403 verə bilər; brauzer tipli User-Agent ilə yoxlanmalıdır.
 - Admin locale-siz `/admin` marşrutundadır; `/{locale}/admin/...` canonical `/admin/...` ünvanına 308 qaytarır.
-- `AUTH_SECRET` rotasiyası versiyalı deyil və TOTP secret encryption-a təsir edir.
-- Cloudflare Images çevirməsi uğursuz olarsa original image fallback yazıla bilər.
-- D1 interactive transaction olmayan axınlar tətbiq səviyyəli kompensasiya istifadə edir.
-- Prisma `DateTime` sahələri D1-də ISO-8601 mətn olmalıdır; Unix integer ilə qarışdırılmamalıdır.
-- Demo content public query-də bloklansa da admin təmizləmə üçün görə bilər.
+- `AUTH_SECRET` rotasiyası versiyalı deyil və TOTP secret şifrələməsinə təsir edir.
+- D1 transaction dəstəkləmir — axınlar kompensasiya, şərti `updateMany` və idempotent marker-lərlə qorunur.
+- D1 bir sorğuda ən çox 100 bound parametr qəbul edir; `take`/`orderBy`-li nested əlaqə 98-dən çox valideyndə sorğunu ilişdirir.
+- Passkey domenə bağlıdır — `luxehomeestate.az`-da yaradılan passkey workers.dev-də işləmir.
+- `next/font` build zamanı Google Fonts-dan yüklənir; Google-un keçici cavab xətası CI build-ini sındıra bilər (yenidən işlətmə ilə keçir).
 
 ## Tamamlanma meyarı
 
 Bir roadmap maddəsi yalnız aşağıdakılar olduqda tamamlanmış sayılır:
 
-- davranış source-da mövcuddur;
+- davranış mənbə kodda mövcuddur;
 - auth/data sərhədi serverdə qorunur;
 - uyğun unit/integration/E2E test əlavə edilib;
-- typecheck, lint, test və build keçir;
-- staging smoke test keçir;
-- README/Wiki/SECURITY təsirlənirsə yenilənib;
-- migration/deploy/rollback qeydi mövcuddur;
-- production davranışı ayrıca yoxlanıb.
+- test, typecheck, lint, dead-code və build keçir;
+- staging E2E keçir;
+- README/Wiki/CLAUDE.md/SECURITY təsirlənirsə yenilənib;
+- miqrasiya/deploy/rollback qeydi mövcuddur.
 
 ## Sənədləşdirmə borcu qaydası
 
-Yeni route, model, permission, npm script, binding və security davranışı eyni pull request-də sənədləşdirilməlidir. Wiki-ni faktiki koddan üstün həqiqət mənbəyi saymaq olmaz; ziddiyyətdə source qalibdir və sənəd düzəldilməlidir.
+Yeni route, model, permission, npm script, binding və security davranışı eyni pull request-də sənədləşdirilməlidir. Wiki-ni faktiki koddan üstün həqiqət mənbəyi saymaq olmaz; ziddiyyətdə mənbə kod qalibdir və sənəd düzəldilməlidir.

@@ -21,8 +21,8 @@
 ---
 
 > [!NOTE]
-> Bu sənəd 28 sentyabr 2026 tarixli `main` auditi, tam keçən keyfiyyət qapısı
-> (172 test faylı / 875 test, 164 Playwright testi) və avtomatik CI/CD əsasında yenilənib. Dərin texniki
+> Bu sənəd 29 sentyabr 2026 tarixli `main@199f8409` auditi (#128 ərazi bölgüsündən sonra), tam keçən
+> keyfiyyət qapısı (173 test faylı / 889 test, 190 Playwright test icrası) və avtomatik CI/CD əsasında yenilənib. Dərin texniki
 > məlumat üçün [GitHub Wiki](https://github.com/MuradoffTehmez/LuxeHome/wiki)-yə baxın.
 
 ## Layihə haqqında
@@ -36,7 +36,8 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 ### İctimai sayt
 
 - Satış və kirayə elanlarının kataloqu, səhifələmə, sıralama və siyahı/xəritə görünüşü
-- Mətn, əmlak növü, şəhər, rayon/qəsəbə/kənd, metro, qiymət, otaq, sahə, təmir, sənəd, tikili növü, mərtəbə, kirayə dövrü və xüsusiyyətlər üzrə filtr; xəritədə sahə çəkmə
+- Mətn, əmlak növü, şəhər, rayon/qəsəbə/kənd/massiv, metro, nişangah, qiymət, otaq, sahə, təmir, sənəd, tikili növü, mərtəbə, kirayə dövrü və xüsusiyyətlər üzrə filtr; xəritədə sahə çəkmə
+- Alternativ yazılışları tanıyan registrsiz yer axtarışı («Müşfiqabad», «8 km», «Kirov qəsəbəsi»)
 - Boş nəticədə hər filtri çıxaranda neçə elan qaldığını göstərən təkliflər
 - Əmlak detalı: tam ekran lightbox qalereya, plan, 360° tur, qiymət göstəricisi (rayon medianı ilə müqayisə), ən yaxın metro, açıq qapı günləri, rezervasiya, oxşar elanlar və Leaflet xəritəsi
 - Elan üçün 1200×630 OG paylaşım kartı və QR kod
@@ -44,7 +45,8 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - `/emlakimi-sat` satıcı səhifəsi və «Evimi qiymətləndir» aləti
 - Yaşayış kompleksləri (mənzil şahmatı ilə), agentlik, xidmət və bloq siyahıları ilə detal səhifələri
 - Rəsmi tərəfdaş kataloqu, çoxdilli profil, elan/layihə/agentlik əlaqələri və izlənən xarici keçidlər
-- Rəsmi inzibati-ərazi bölgüsünə (2024) əsaslanan rayon, qəsəbə, kənd və metro landing səhifələri; paneldən idarə olunan landing runtime-ı
+- Ölkə üzrə rəsmi inzibati-ərazi bölgüsü (DSK 2024 + Ünvan Reyestri): rəsmi kodlu 75 şəhər/rayon, 266 qəsəbə, 3 605 kənd; 136 bazar massivi, 27 metro və 214 nişangah
+- Rayon, qəsəbə, kənd, massiv və metro landing səhifələri; paneldən idarə olunan landing runtime-ı
 - Bilik Mərkəzi: hüquqi bələdçi kataloqu, kateqoriya səhifələri, əmlak lüğəti və CMS FAQ-ı
 - İpoteka, büdcə və tikintiçi hissə-hissə ödəniş kalkulyatoru; `/investisiya` gəlirlilik kalkulyatoru
 - Cloudflare Workers AI ilə işləyən public AI axtarışı, Vectorize semantik axtarışı, Match Score və «Mənə əmlak tap» sehrbazı
@@ -64,7 +66,7 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - Parol (Turnstile), Google ilə (OIDC) və təsdiqlənmiş telefonla OTP girişi; son ikisi secret verilənə qədər söndürülüdür
 - D1-də saxlanan və dərhal ləğv edilə bilən sessiyalar
 - Profil, parol, e-poçt və telefon təsdiqi, parol bərpası, şəxsi data ixracı və iki mərhələli hesab silinməsi
-- 8 addımlı elan sehrbazı (qaralama bərpası ilə), iyerarxik ünvan (region → … → bina), su nişanlı şəkillər, avtomatik SEO və ALT
+- 8 addımlı elan sehrbazı (qaralama bərpası ilə), iyerarxik ünvan (region → şəhər/rayon → … → massiv → metro → nişangah → küçə → bina), rəsmi küçə təklifləri (~63 000), su nişanlı şəkillər, avtomatik SEO və ALT
 - Elanın 60 günlük müddəti, bitməyə 7 gün qalmış xatırlatma və «Yenilə»
 - Premium paket sifarişi (ödəniş ofisdə/köçürmə ilə)
 - Mülk sahibi və təsdiqlənməmiş agentlik elanları üçün `PENDING` təsdiq axını
@@ -84,7 +86,7 @@ Tətbiq [Next.js App Router](https://nextjs.org/docs/app) və React Server Compo
 - `SUPER_ADMIN`, `ADMIN`, `EDITOR` rolları üçün icazə matrisi
 - Dashboard və real D1 statistikaları
 - Əmlak, layihə, xidmət, bloq və kateqoriya CRUD axınları; siyahılarda toplu seçim və silmə
-- CSV-dən toplu elan idxalı (həmişə DRAFT, dublikat yoxlaması, kənar şəkillərin R2-yə köçürülməsi)
+- CSV-dən toplu elan idxalı (həmişə DRAFT, dublikat yoxlaması, `metro`/`landmark` sütunları, kənar şəkillərin R2-yə köçürülməsi)
 - Müraciətlərin siyahıda sürətli statusu, status lövhəsi (SLA, «mənə təyin et»), konversiya hunisi, məsul əməkdaşı və daxili qeydi
 - Rezervasiya təqvimi (Bakı vaxtı) və şəxsi ICS abunəsi
 - Premium paketlər və ödəniş uçotu (`billing:manage`)
@@ -171,8 +173,8 @@ Cloudflare Worker / Next.js App Router
 | İctimai hesab | `/{locale}/qeydiyyat`, `/{locale}/daxil-ol`, kabinet, profil, komanda, elan, paket, rezervasiya, axtarış və bildiriş səhifələri; qısa ünvanlar `/elan-yerlesdir`, `/elanlarim`, `/profilim` |
 | Əməkdaş auth | `/{locale}/giris`, doğrulama və 2FA qurulumu |
 | Admin | `/admin` və kontent, idxal, CRM (lövhə, huni), rezervasiya təqvimi, paketlər, tərəfdaş, SEO, AI, tərcümə, analitika, təhlükəsizlik və sistem alt marşrutları |
-| Admin SERP | `/admin/serp` və metadata, açar söz, entity, landing, audit, media, monitorinq, indeksləmə, Search Console, schema, sitemap, link, robots, parametrlər alt marşrutları |
-| Texniki | media API-ləri, Google OAuth, ICS təqvim, OG kartı, geocode/tile, monitorinq, saved-search cron, Resend webhook, `/media/[...key]`, `/sitemap.xml`, `/sitemap-index.xml`, `/sitemaps/[feed]`, `/robots.txt`, `/llms.txt`, `manifest.webmanifest` |
+| Admin SERP | `/admin/serp` və metadata, açar söz, entity, landing, audit, məzmun, media, monitorinq, indeksləmə, Search Console, schema, sitemap, link, robots, parametrlər alt marşrutları |
+| Texniki | media API-ləri, `/api/yerler/kendler`, Google OAuth, ICS təqvim, OG kartı, geocode/tile, monitorinq, saved-search cron, Resend webhook, `/media/[...key]`, `/sitemap.xml`, `/sitemap-index.xml`, `/sitemaps/[feed]`, `/robots.txt`, `/llms.txt`, `manifest.webmanifest` |
 
 Tam marşrut inventarı və istifadəçi axınları Wiki-dəki [Funksiyalar və marşrutlar](https://github.com/MuradoffTehmez/LuxeHome/wiki/Features-and-Routes) səhifəsindədir.
 
@@ -181,18 +183,23 @@ Tam marşrut inventarı və istifadəçi axınları Wiki-dəki [Funksiyalar və 
 ```text
 luxehome/
 ├── e2e/                        # Playwright testləri və fixture-lar
-├── migrations/                 # Cloudflare D1 SQL miqrasiyaları (0001–0049)
+├── docs/                       # PRD-lər, auditlər, SEO, ərazi hesabatı və mənbə snapshot-ları
+├── migrations/                 # Cloudflare D1 SQL miqrasiyaları (0001–0053)
 ├── prisma/
 │   ├── schema.prisma           # 68 domen, auth və əməliyyat modeli
 │   ├── seed.ts                 # Sistem/taksonomiya başlanğıc məlumatları
 │   ├── seed.sql                # D1 üçün yaradılmış seed
 │   ├── taxonomy-data.ts        # Əmlak taksonomiyası
-│   ├── az-admin-divisions.json # Rəsmi inzibati-ərazi bölgüsü snapshot-u
+│   ├── az-admin-divisions.json # DSK 2024 inzibati-ərazi bölgüsü snapshot-u
+│   ├── unvanportali-*.json     # Ünvan Reyestri: rəsmi vahidlər və küçələr
+│   ├── baku-market-locations.json # Massiv, metro, nişangah, alias (mənbə kodları ilə)
 │   ├── locations-data.ts       # Generasiya olunur (db:locations:build)
+│   ├── taxonomy.sql            # Generasiya olunur (db:taxonomy:build)
 │   ├── demo-content-data.ts    # Staging nümunə məzmunu
 │   └── remove-demo-content.sql # Demo qeydlərinin təmizlənməsi
-├── public/                     # Loqo, OG şəkli və statik fayllar
-├── scripts/                    # Loqo, locations generatoru, E2E stack və SEO smoke skriptləri
+├── public/                     # Loqo, OG şəkli, statik fayllar və data/kuceler/ (3 476 rəsmi küçə faylı)
+├── scripts/                    # Loqo, ərazi generatorları (Python), E2E stack və SEO smoke skriptləri
+├── Wiki/                       # GitHub Wiki-nin mənbə faylları
 ├── workers/saved-search-cron/  # Gündəlik cron Worker-i
 ├── src/
 │   ├── app/                    # Səhifələr, layout-lar, actions və route handler-lar
@@ -213,6 +220,8 @@ luxehome/
 ### Tələblər
 
 - Node.js `^22.22.2 || ^24.15.0 || >=26.0.0` (`.nvmrc`: 24)
+- Python 3 — yalnız ərazi bölgüsü generatorları (`db:locations:*`, `db:streets:build`) üçün
+- Bash (Windows-da Git Bash) — lokal E2E stack hazırlığı üçün
 - npm 12 (`package.json` → `packageManager: "npm@12.0.1"`)
 - Remote D1 və deployment üçün Cloudflare hesabı
 
@@ -280,7 +289,7 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `NOTIFICATION_EMAIL` | Müraciət bildirişinin alıcısı | E-poçt bildirişi üçün |
 | `RESEND_WEBHOOK_SECRET` | Resend/Svix webhook imzasının doğrulanması | Korporativ e-poçt jurnalı üçün |
 | `CRON_SECRET` | Saved-search digest endpoint Bearer sirri | Digest cron üçün |
-| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_HOSTNAMES` | Cloudflare Turnstile | Formalar üçün |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET` (və ya köhnə `TURNSTILE_SECRET_KEY`), `TURNSTILE_HOSTNAMES` | Cloudflare Turnstile | Formalar üçün |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Ofis çatına lead bildirişi | İstəyə bağlı |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google ilə giriş; yoxdursa söndürülüdür | İstəyə bağlı |
 | `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` | Telefonla OTP girişi; yoxdursa söndürülüdür | İstəyə bağlı |
@@ -291,6 +300,10 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON` | Google service account JSON key; access token runtime-da avtomatik alınır | Admin GSC üçün tövsiyə olunur |
 | `GOOGLE_SEARCH_CONSOLE_CLIENT_ID`, `GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET`, `GOOGLE_SEARCH_CONSOLE_REFRESH_TOKEN` | Service account əvəzinə OAuth refresh credential dəsti | Admin GSC üçün alternativ |
 | `GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN` | Qısaömürlü legacy token | Yalnız diaqnostika üçün |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_GTM_ID`, `GOOGLE_SITE_VERIFICATION` | Google Analytics / Tag Manager və Search Console təsdiqi | İstəyə bağlı |
+| `AI_TEXT_MODEL`, `AI_VISION_MODEL` | Workers AI modelinin əvəzlənməsi | İstəyə bağlı |
+| `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` | Panel üçün Cloudflare Access (Zero Trust) qapısı | İstəyə bağlı |
+| `SYSTEM_MODE`, `FORCE_MAINTENANCE`, `EDGE_HTML_CACHE_TTL` | Worker vars: defolt sistem rejimi, təcili texniki xidmət, kənar keş TTL-i | `wrangler.jsonc`-dədir |
 
 Cloudflare secret nümunələri:
 
@@ -330,6 +343,8 @@ prompt-una verilir.
 | `npm run test:seo:live` | Production SERP qəbul (acceptance) testi |
 | `npm run e2e` | Konfiqurasiya edilmiş workerd mühitinə qarşı Playwright |
 | `npm run e2e:local:build` / `:prepare` / `:serve` | Lokal workerd stack (bundle, təzə D1 + test hesabları, `:8787`) |
+| `npm run e2e:chromium` / `:mobile` / `:ui` / `:report` / `:install` | Playwright layihələri, UI rejimi, hesabat və brauzer quraşdırılması |
+| `npm run assets:maintenance-logo` | Texniki xidmət səhifəsinin daxili loqosunu yenidən qurur |
 | `npm run preview` | OpenNext build və lokal Worker preview |
 | `npm run cf-typegen` | Wrangler binding tiplərini yeniləyir |
 
@@ -351,7 +366,10 @@ prompt-una verilir.
 | `npm run db:demo:remote` | Nümunə məzmunu **production** D1-ə yazır — qərara görə production-a yüklənmir, işlətməyin |
 | `npm run db:clean-demo:local` / `:staging` / `:remote` | Bütün `isDemo` qeydlərini silir və açarı söndürür |
 | `npm run db:studio` | Prisma Studio |
-| `npm run db:locations:build` | Rəsmi inzibati-ərazi JSON-undan `locations-data.ts` yaradır |
+| `npm run db:locations:build` | DSK + Ünvan Reyestri + bazar massivləri JSON-undan `locations-data.ts` yaradır; ziddiyyətdə dayanır |
+| `npm run db:streets:build` | Ünvan Reyestri küçələrindən `public/data/kuceler/<kod>.json` və `official-street-codes.ts` yaradır |
+| `npm run db:locations:report` | `docs/erazi/baki-erazi-bolgusu.md` hesabatını qurur |
+| `npm run db:locations:migrations` | `taxonomy.sql`-in yerləşmə bölməsini `migrations/0050`–`0053` hissələrinə bölür |
 | `npm run db:taxonomy:build` | Taksonomiya SQL-i yaradır |
 | `npm run db:taxonomy:local` | Taksonomiyanı lokal D1-ə tətbiq edir |
 | `npm run db:taxonomy:staging` | Taksonomiyanı staging D1-ə tətbiq edir |
@@ -404,6 +422,25 @@ D1 üçün destruktiv dəyişikliklər geri dönüş planı olmadan production-a
 
 Zəifliyi açıq issue kimi paylaşmayın. Bildiriş qaydası üçün [SECURITY.md](SECURITY.md)-yə baxın.
 
+## Sənədlər
+
+| Sənəd | Məzmun |
+|---|---|
+| [Wiki — Arxitektura](https://github.com/MuradoffTehmez/LuxeHome/wiki/Architecture) | Sistem sərhədləri, data axını, kənar keş, media, binding-lər |
+| [Wiki — Funksiyalar və marşrutlar](https://github.com/MuradoffTehmez/LuxeHome/wiki/Features-and-Routes) | 133 səhifə, 21 Route Handler, filtr parametrləri, icazələr |
+| [Wiki — Məlumat modeli](https://github.com/MuradoffTehmez/LuxeHome/wiki/Data-Model) | 68 model, domen sabitləri, miqrasiya tarixçəsi |
+| [Wiki — Ərazi bölgüsü və ünvan](https://github.com/MuradoffTehmez/LuxeHome/wiki/Location-Taxonomy) | Rəsmi ağac, massiv/metro/nişangah, rəsmi küçələr, yeniləmə runbook-u |
+| [Wiki — Təhlükəsizlik](https://github.com/MuradoffTehmez/LuxeHome/wiki/Security-and-Authentication) | Staff/public auth, RBAC, middleware, başlıqlar |
+| [Wiki — İdarə paneli bələdçisi](https://github.com/MuradoffTehmez/LuxeHome/wiki/Admin-Panel-Guide) | Redaktor və menecerlər üçün panel iş axınları |
+| [Wiki — Test və keyfiyyət](https://github.com/MuradoffTehmez/LuxeHome/wiki/Testing-and-Quality) | Test piramidası, qoruyucu testlər, E2E |
+| [Wiki — İnkişaf](https://github.com/MuradoffTehmez/LuxeHome/wiki/Development-Guide) / [Deployment](https://github.com/MuradoffTehmez/LuxeHome/wiki/Deployment-and-Operations) | Quraşdırma, əmrlər, CI/CD, runbook-lar |
+| [Wiki — Lüğət](https://github.com/MuradoffTehmez/LuxeHome/wiki/Glossary) | Termin və qısaltmalar |
+| [`docs/erazi/baki-erazi-bolgusu.md`](docs/erazi/baki-erazi-bolgusu.md) | Ərazi bölgüsünün generasiya olunan hesabatı |
+| [`docs/github-governance.md`](docs/github-governance.md) | GitHub UI parametrləri və branch qoruması |
+| [`CLAUDE.md`](CLAUDE.md) / [`AGENTS.md`](AGENTS.md) / [`MEMORY.md`](MEMORY.md) | AI agent qaydaları və layihə yaddaşı |
+
+Wiki-nin mənbəyi repozitoriyadakı `Wiki/` qovluğudur.
+
 ## Töhfə vermək
 
 Töhfələr açığız — nasazlıq bildirişi, funksiya təklifi və ya sənəd düzəlişi olsun.
@@ -431,7 +468,7 @@ npm run dead-code
 npm run build
 ```
 
-Cari qapı **172 Vitest faylındakı 875 testi** əhatə edir (workerd domen qatı, Node SSR komponentləri
+Cari qapı **173 Vitest faylındakı 889 testi** əhatə edir (workerd domen qatı, Node SSR komponentləri
 və real miniflare D1 integration testləri). GitHub Actions hər PR-da `Quality gate` (əlavə olaraq
 `npm audit --audit-level=high`) və məcburi `Local stack E2E` (lokal workerd + real D1/R2 üzərində
 Playwright) işlədir. `main` push-unda axın: **quality → deploy-staging → e2e-staging →
@@ -463,6 +500,8 @@ npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xət
 - Turnstile əlaqə, qeydiyyat, ictimai/staff giriş, telefon OTP, açıq qapı və hesab təhlükəsizliyi
   formalarına bağlıdır; gizli açar və hostname allowlist Cloudflare mühitində düzgün saxlanmalıdır.
 - Hüquqi mətnlər, ofis koordinatları və iş saatları şirkət/hüquqşünas təsdiqi tələb edir.
+- Nişangahlar hazırda yalnız Bakıdadır; EN/RU adları transliterasiyadır. Taksonomiya SQL-i sətir silmir — yer birləşdirmə/silmə ayrıca miqrasiya tələb edir.
+- Prisma 7 major yeniləməsi (Dependabot #126) D1 adapteri və WASM client ilə ayrıca sınanmalıdır.
 
 Ətraflı prioritetlər Wiki-dəki [Cari vəziyyət və yol xəritəsi](https://github.com/MuradoffTehmez/LuxeHome/wiki/Status-and-Roadmap) səhifəsində saxlanılır.
 
@@ -478,6 +517,7 @@ npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xət
 - Admin server komponentləri `await getAdminT()` işlədir; panel JSX-də xam mətn yazılmır.
 - Yeni elan yazma yolu `queuePropertyVectorSync()` və `queueListingEnrichment()` çağırmalıdır.
 - Server tərəfdə sessiya oxuyan yeni ictimai səhifə `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunur.
+- Yer adları `compareAzerbaijani()` / `byAzerbaijaniName` ilə sıralanır; `locations-data.ts`, `taxonomy.sql` və `public/data/kuceler/` əl ilə redaktə edilmir.
 
 ## Müəllif hüquqları, şirkət və lisenziya
 
