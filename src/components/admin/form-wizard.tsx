@@ -238,6 +238,8 @@ export function FormWizard({
     // Enter sahədə formanı vaxtından əvvəl göndərməsin — növbəti addıma keçir.
     const target = event.target as HTMLElement;
     if (event.key !== "Enter" || target.tagName !== "INPUT") return;
+    // ComboBox Enter-i variant seçmək üçün işlədib (`preventDefault`) — addım dəyişməməlidir.
+    if (event.defaultPrevented) return;
     if ((target as HTMLInputElement).type === "checkbox" || (target as HTMLInputElement).type === "radio") return;
     if (current < total - 1) {
       event.preventDefault();

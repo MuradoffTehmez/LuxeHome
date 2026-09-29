@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { ArrowRight, ChevronDown, Phone, Search } from "lucide-react";
+import { ArrowRight, Phone, Search } from "lucide-react";
+import { Combobox } from "@/components/ui/combobox";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
 import { buttonClassName } from "@/components/ui/button";
@@ -47,9 +48,10 @@ const CONTROL_CLASS =
   "min-h-12 min-w-0 w-full rounded-sm border border-line-strong bg-paper px-3 text-base text-ink transition-[border-color,box-shadow] duration-200 hover:border-ink-muted focus:border-gold focus:shadow-[0_0_0_4px_rgb(170_135_84/0.16)] sm:text-sm";
 
 /**
- * Hero axtarışı yalnız native GET formudur. Client state və bütün geniş filtr
- * komponentini ana səhifəyə daşımaq əvəzinə brauzerin öz form davranışından
- * istifadə olunur; JavaScript sönülü olanda da eyni marşrut işləyir.
+ * Hero axtarışı native GET formudur. Bütün geniş filtr komponentini ana səhifəyə
+ * daşımaq əvəzinə brauzerin öz form davranışından istifadə olunur. Növ və şəhər
+ * (75 variant) axtarışlı `Combobox`-dur və dəyəri gizli sahə ilə göndərir;
+ * JavaScript sönülü olanda da axtarış sözü və elan tipi ilə eyni marşrut işləyir.
  */
 function HeroSearchForm({
   types,
@@ -112,25 +114,16 @@ function HeroSearchForm({
             { id: "hero-property-type", name: "tip", label: labels.propertyType, options: types },
             { id: "hero-property-city", name: "seher", label: labels.city, options: cities },
           ].map((field) => (
-            <div key={field.name} className="hidden min-w-0 flex-col gap-1.5 md:flex lg:col-span-2 last:lg:col-span-3">
-              <label htmlFor={field.id} className="text-xs font-medium tracking-wide text-ink-soft">
-                {field.label}
-              </label>
-              <div className="relative">
-                <select
-                  id={field.id}
-                  name={field.name}
-                  defaultValue=""
-                  className={cn(CONTROL_CLASS, "cursor-pointer appearance-none pr-9")}
-                >
-                  <option value="">{labels.all}</option>
-                  {field.options.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-ink-muted" aria-hidden="true" />
-              </div>
-            </div>
+            <Combobox
+              key={field.name}
+              id={field.id}
+              name={field.name}
+              label={field.label}
+              placeholder={labels.all}
+              defaultValue=""
+              options={field.options}
+              className="hidden min-w-0 md:flex lg:col-span-2 last:lg:col-span-3 [&>label]:text-xs [&>label]:font-medium [&>label]:tracking-wide [&>label]:text-ink-soft"
+            />
           ))}
         </div>
 

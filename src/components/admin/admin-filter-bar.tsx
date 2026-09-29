@@ -7,6 +7,8 @@ import Link from "next/link";
 import { ListFilter, Search, X } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
 import { cn } from "@/lib/utils";
+import { Combobox } from "@/components/ui/combobox";
+import { SEARCHABLE_MIN_OPTIONS } from "@/components/ui/field";
 
 export type FilterSelectOption = { value: string; label: string };
 export type FilterSelect = {
@@ -108,7 +110,22 @@ function FilterForm({
         />
       </div>
       <div className={cn("flex gap-2", mobile ? "flex-col" : "flex-wrap items-center")}>
-        {selects.map((select) => (
+        {selects.map((select) =>
+          select.options.length >= SEARCHABLE_MIN_OPTIONS ? (
+            <Combobox
+              key={select.name}
+              name={select.name}
+              label={select.label}
+              hideLabel
+              defaultValue={select.value ?? ""}
+              // «Hamısı» variantı (boş dəyər) placeholder olur, siyahıda təkrarlanmır.
+              placeholder={select.options.find((option) => option.value === "")?.label ?? select.label}
+              options={select.options.filter((option) => option.value !== "")}
+              // Gizli sahə növbəti render-də yenilənir — göndəriş ondan sonra.
+              onValueChange={() => window.setTimeout(() => formRef.current?.requestSubmit(), 0)}
+              className={mobile ? undefined : "w-56 [&_input[role=combobox]]:min-h-11 [&_input[role=combobox]]:py-2 [&_input[role=combobox]]:lg:text-xs"}
+            />
+          ) : (
           <select
             key={select.name}
             name={select.name}
@@ -119,7 +136,8 @@ function FilterForm({
           >
             {select.options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
-        ))}
+          ),
+        )}
         <button type="submit" className="min-h-11 cursor-pointer rounded-md border border-line-strong bg-gold px-4 text-sm font-medium text-on-gold shadow-xs transition-colors hover:bg-gold-soft">
           {t("actions.apply")}
         </button>

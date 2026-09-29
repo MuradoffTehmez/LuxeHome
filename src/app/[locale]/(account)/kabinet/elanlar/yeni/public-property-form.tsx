@@ -330,6 +330,8 @@ function PublicPropertyWizard({
                 landmark: t("location.landmark"),
                 landmarkHint: t("location.landmarkHint"),
                 streetOfficialHint: t("location.streetOfficialHint"),
+                country: t("location.country"),
+                countryName: t("location.countryName"),
               }}
               initial={{
                 cityId: initial?.cityId ?? "",

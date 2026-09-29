@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
-import { Input, Select } from "@/components/ui/field";
+import { useEffect, useMemo, useState } from "react";
+import { Input } from "@/components/ui/field";
+import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { LOCATION_KINDS, type Locale } from "@/lib/constants";
 import { REGIONS, regionForCitySlug, type RegionKey } from "@/lib/regions";
 import { OFFICIAL_STREET_CODES } from "@/lib/official-street-codes";
@@ -48,6 +49,9 @@ export type LocationFieldsLabels = {
   landmark: string;
   landmarkHint: string;
   streetOfficialHint: string;
+  /** Verilibsə, zəncirin başında dəyişməz «Ölkə» pilləsi göstərilir (platforma yalnız Azərbaycanı əhatə edir). */
+  country?: string;
+  countryName?: string;
 };
 
 export type LocationFieldsInitial = {
@@ -173,13 +177,18 @@ export function LocationFields({ cities, places: basePlaces, metros, landmarks, 
   // artıq `basePlaces`-dədir, ona görə təkrarlanmır.
   const baseIds = new Set(basePlaces.map((place) => place.id));
   const places = [...basePlaces, ...villages.filter((village) => !baseIds.has(village.id))];
-  const datalistId = useId();
+  // Qaralamadan bərpa olunan kənd `basePlaces`-də olmur (kəndlər ayrıca yüklənir) —
+  // siyahı gələnə qədər seçim gözləmədə saxlanılır və `districtId` itirilmir.
+  const [pendingLeafId, setPendingLeafId] = useState(() =>
+    initial.districtId && !basePlaces.some((place) => place.id === initial.districtId) ? initial.districtId : "",
+  );
+  const [villagesLoading, setVillagesLoading] = useState(false);
+  const [streetsLoading, setStreetsLoading] = useState(false);
   const districtError = useFieldError("districtId");
   const cityError = useFieldError("cityId");
   const streetError = useFieldError("street");
   const buildingError = useFieldError("building");
   const landmarkError = useFieldError("landmarkId");
-  const streetListId = useId();
   const [streets, setStreets] = useState<string[]>([]);
 
   const regions = useMemo(() => {
@@ -216,7 +225,7 @@ export function LocationFields({ cities, places: basePlaces, metros, landmarks, 
     : undefined;
   const leafFromNeighborhood = !state.settlementId && !state.villageId ? neighborhoodMatch : undefined;
   const districtId =
-    state.settlementId || state.villageId || leafFromNeighborhood?.id || state.urbanId || "";
+    state.settlementId || state.villageId || leafFromNeighborhood?.id || state.urbanId || pendingLeafId || "";
   const neighborhoodName = leafFromNeighborhood ? "" : state.neighborhood.trim();
 
   useEffect(() => {
@@ -232,24 +241,40 @@ export function LocationFields({ cities, places: basePlaces, metros, landmarks, 
     let active = true;
     if (!state.cityId) {
       setVillages([]);
+      setVillagesLoading(false);
       return;
     }
+    setVillagesLoading(true);
     void loadVillages(state.cityId).then((items) => {
-      if (active) setVillages(items);
+      if (!active) return;
+      setVillages(items);
+      setVillagesLoading(false);
+      if (pendingLeafId) {
+        const village = items.find((item) => item.id === pendingLeafId);
+        if (village) setState((current) => ({ ...current, villageId: village.id }));
+        setPendingLeafId("");
+      }
     });
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- gözləyən kənd yalnız şəhərin kəndləri yüklənəndə yoxlanılır
   }, [state.cityId]);
 
   useEffect(() => {
     let active = true;
     if (!streetCode) {
       setStreets([]);
+      setStreetsLoading(false);
       return;
     }
+    // Yüklənərkən əvvəlki ərazinin küçələri təklif olunmasın.
+    setStreets([]);
+    setStreetsLoading(true);
     void loadOfficialStreets(streetCode).then((names) => {
-      if (active) setStreets(names);
+      if (!active) return;
+      setStreets(names);
+      setStreetsLoading(false);
     });
     return () => {
       active = false;
@@ -259,16 +284,22 @@ export function LocationFields({ cities, places: basePlaces, metros, landmarks, 
   const metroOptions = (metros ?? []).filter((metro) => metro.parentId === state.cityId);
   const landmarkOptions = (landmarks ?? []).filter((landmark) => landmark.parentId === state.cityId);
 
-  const toOptions = (items: LocationFieldPlace[], withGroup: boolean) =>
+  const toOptions = (items: LocationFieldPlace[], withGroup: boolean): ComboboxOption[] =>
     items.map((place) => ({
       value: place.id,
       label: place.name,
       group: withGroup ? (place.group ?? null) : null,
     }));
+  const streetOptions = useMemo<ComboboxOption[]>(() => streets.map((name) => ({ value: name, label: name })), [streets]);
+  const neighborhoodSuggestions: ComboboxOption[] = neighborhoodOptions.map((place) => ({ value: place.id, label: place.name }));
 
   function selectCity(cityId: string) {
+    const city = cities.find((item) => item.id === cityId);
+    setPendingLeafId("");
     setState((current) => ({
       ...current,
+      // Region şəhərdən bilinir: «Bakı» seçiləndə region zənciri də dolur.
+      region: (city ? regionForCitySlug(city.slug)?.key : undefined) ?? current.region,
       cityId,
       urbanId: "",
       settlementId: "",
@@ -315,36 +346,46 @@ export function LocationFields({ cities, places: basePlaces, metros, landmarks, 
       <input type="hidden" name="districtId" value={districtId} />
       <input type="hidden" name="neighborhoodName" value={neighborhoodName} />
 
+      {labels.country && labels.countryName ? (
+        <Combobox
+          label={labels.country}
+          options={[{ value: "AZ", label: labels.countryName }]}
+          value="AZ"
+          disabled
+          clearable={false}
+        />
+      ) : null}
+
       {regions.length > 1 && (
-        <Select
+        <Combobox
           label={labels.region}
           value={state.region}
-          onChange={(event) => selectRegion(event.target.value)}
+          onValueChange={selectRegion}
           placeholder={labels.allRegions}
           options={regions.map((region) => ({ value: region.key, label: region.names[locale] }))}
         />
       )}
 
-      <Select
+      <Combobox
         name="cityId"
         label={labels.city}
         required
         value={state.cityId}
         error={cityError}
-        onChange={(event) => selectCity(event.target.value)}
+        onValueChange={selectCity}
         placeholder={labels.select}
         options={cityOptions}
       />
 
       {urbanOptions.length > 0 && (
-        <Select
+        <Combobox
           label={labels.urbanDistrict}
           value={state.urbanId}
           error={districtError}
-          onChange={(event) =>
+          onValueChange={(urbanId) =>
             setState((current) => ({
               ...current,
-              urbanId: event.target.value,
+              urbanId,
               settlementId: "",
               villageId: "",
               neighborhood: "",
@@ -356,89 +397,80 @@ export function LocationFields({ cities, places: basePlaces, metros, landmarks, 
       )}
 
       {settlementOptions.length > 0 && (
-        <Select
+        <Combobox
           label={labels.settlement}
           value={state.settlementId}
-          onChange={(event) => selectLeaf("settlementId", event.target.value)}
+          onValueChange={(id) => selectLeaf("settlementId", id)}
           placeholder={labels.notSelected}
           options={toOptions(settlementOptions, !state.urbanId)}
         />
       )}
 
-      {villageOptions.length > 0 && (
-        <Select
+      {(villageOptions.length > 0 || (villagesLoading && !urbanOptions.length)) && (
+        <Combobox
           label={labels.village}
           value={state.villageId}
-          onChange={(event) => selectLeaf("villageId", event.target.value)}
+          loading={villagesLoading}
+          onValueChange={(id) => selectLeaf("villageId", id)}
           placeholder={labels.notSelected}
           options={toOptions(villageOptions, false)}
         />
       )}
 
-      <div>
-        <Input
-          label={labels.neighborhood}
-          value={state.neighborhood}
-          maxLength={120}
-          list={neighborhoodOptions.length > 0 ? datalistId : undefined}
-          hint={labels.neighborhoodHint}
-          onChange={(event) => setState((current) => ({ ...current, neighborhood: event.target.value }))}
-        />
-        {neighborhoodOptions.length > 0 && (
-          <datalist id={datalistId}>
-            {neighborhoodOptions.map((place) => (
-              <option key={place.id} value={place.name} />
-            ))}
-          </datalist>
-        )}
-      </div>
+      <Combobox
+        mode="free"
+        allowCreate
+        label={labels.neighborhood}
+        placeholder={labels.notSelected}
+        value={state.neighborhood}
+        maxLength={120}
+        hint={labels.neighborhoodHint}
+        options={neighborhoodSuggestions}
+        onValueChange={(neighborhood) => setState((current) => ({ ...current, neighborhood }))}
+      />
 
       {!urbanOptions.length && districtError ? (
         <p className="text-sm text-danger sm:col-span-2">{districtError}</p>
       ) : null}
 
       {metroOptions.length > 0 && (
-        <Select
+        <Combobox
           name="metroId"
           label={labels.metro}
           value={state.metroId}
-          onChange={(event) => setState((current) => ({ ...current, metroId: event.target.value }))}
+          onValueChange={(metroId) => setState((current) => ({ ...current, metroId }))}
           placeholder={labels.notSelected}
           options={metroOptions.map((metro) => ({ value: metro.id, label: metro.name }))}
         />
       )}
 
       {landmarkOptions.length > 0 && (
-        <Select
+        <Combobox
           name="landmarkId"
           label={labels.landmark}
           hint={labels.landmarkHint}
           value={state.landmarkId}
           error={landmarkError}
-          onChange={(event) => setState((current) => ({ ...current, landmarkId: event.target.value }))}
+          onValueChange={(landmarkId) => setState((current) => ({ ...current, landmarkId }))}
           placeholder={labels.notSelected}
           options={landmarkOptions.map((landmark) => ({ value: landmark.id, label: landmark.name }))}
         />
       )}
 
       <FullWidth>
-        <Input
+        <Combobox
+          mode="free"
+          allowCreate
           name="street"
           label={labels.street}
           value={state.street}
           maxLength={160}
-          list={streets.length > 0 ? streetListId : undefined}
+          loading={streetsLoading}
+          options={streetOptions}
           hint={streets.length > 0 ? `${labels.streetHint} ${labels.streetOfficialHint}` : labels.streetHint}
           error={streetError}
-          onChange={(event) => setState((current) => ({ ...current, street: event.target.value }))}
+          onValueChange={(street) => setState((current) => ({ ...current, street }))}
         />
-        {streets.length > 0 && (
-          <datalist id={streetListId}>
-            {streets.map((name) => (
-              <option key={name} value={name} />
-            ))}
-          </datalist>
-        )}
       </FullWidth>
       <FullWidth>
         <Input

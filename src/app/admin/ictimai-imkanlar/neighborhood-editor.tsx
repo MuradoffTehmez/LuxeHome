@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Combobox } from "@/components/ui/combobox";
 import { useState } from "react";
 import { AdminForm } from "@/components/admin/form-shell";
 import { upsertNeighborhoodProfile } from "./actions";
@@ -76,24 +77,19 @@ export function NeighborhoodEditor({
 
   return (
     <AdminForm action={upsertNeighborhoodProfile} submitLabel={t("pages.amenities.analitikaniYaddaSaxla")} className="gap-4">
-      <label className="text-sm text-ink-soft">
-        {t("pages.amenities.rayonQesebe")}
-        <select
-          className={inputClass}
-          name="locationId"
-          required
-          value={locationId}
-          onChange={(event) => setLocationId(event.target.value)}
-        >
-          <option value="">{t("pages.amenities.secin")}</option>
-          {locations.map((location) => (
-            <option key={location.id} value={location.id}>
-              {location.label}
-              {profiles[location.id] ? " · analitika var" : ""}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Combobox
+        label={t("pages.amenities.rayonQesebe")}
+        name="locationId"
+        required
+        value={locationId}
+        onValueChange={setLocationId}
+        placeholder={t("pages.amenities.secin")}
+        options={locations.map((location) => ({
+          value: location.id,
+          label: location.label,
+          description: profiles[location.id] ? t("pages.amenities.analitikaVar") : null,
+        }))}
+      />
 
       <div key={locationId || "empty"} className="flex flex-col gap-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">

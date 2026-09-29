@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Combobox } from "@/components/ui/combobox";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { Loader2, Plus, Trash2 } from "lucide-react";
@@ -43,12 +44,13 @@ export function ProjectPartnersManager({ projectId, links, options }: { projectI
       <form action={addAction} className="grid grid-cols-1 gap-4 border-b border-line p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
         <input type="hidden" name="entityType" value="project" />
         <input type="hidden" name="entityId" value={projectId} />
-        <label className="text-sm text-ink-soft">{t("pages.projects.terefdas")}
-          <select name="partnerId" required defaultValue="" className={`${fieldClass} mt-1`}>
-            <option value="" disabled>{t("pages.projects.secin")}</option>
-            {options.filter((option) => !linkedIds.has(option.id)).map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-          </select>
-        </label>
+        <Combobox
+          label={t("pages.projects.terefdas")}
+          name="partnerId"
+          required
+          placeholder={t("pages.projects.secin")}
+          options={options.filter((option) => !linkedIds.has(option.id)).map((option) => ({ value: option.id, label: option.name }))}
+        />
         <label className="text-sm text-ink-soft">{t("pages.projects.rol")}
           <select name="role" defaultValue={PARTNER_RELATION_ROLES.DEVELOPER} className={`${fieldClass} mt-1`}>
             {Object.values(PARTNER_RELATION_ROLES).map((role) => <option key={role} value={role}>{t(`labels.partnerRelationRole.${role}`)}</option>)}

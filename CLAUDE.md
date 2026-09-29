@@ -339,6 +339,23 @@ qradiyent/modal fonu üçün sabit `black/<opacity>` işlət.
 - Interaktiv element mobil ekranda ≥44px; mətn linkini böyütmək lazımdırsa layout-u
   dəyişməyən `after:absolute after:-inset-y-3` toxunma sahəsi işlət.
 
+**Seçim sahələri vahid `Combobox`-dur** (`components/ui/combobox.tsx`, #136): ARIA 1.2 combobox +
+listbox, diakritikasız axtarış («seki» → «Şəki»), klaviatura (↑↓, PageUp/Down, Enter, Esc, Tab),
+loading, boş nəticə mesajı, qrup başlıqları, `mode="free"` + `allowCreate` (küçə, massiv — «“…” əlavə
+et»). Forma dəyəri gizli `name` sahəsindədir; `required` görünən sahədə işləyir (sehrbazın «Növbəti»
+yoxlaması). Qaydalar:
+
+- `Select` (`ui/field.tsx`) `SEARCHABLE_MIN_OPTIONS` (8) və daha çox variantda özü ComboBox olur;
+  qısa siyahı native qalır, görünüş eynidir. Uzun siyahı üçün xam `<select>` və ya `<datalist>` yazma.
+- Mətnlər `src/i18n/combobox-messages.ts`-dədir (`useLocale()`): panel client-ə yalnız `admin`
+  kataloqunu ötürür, ona görə ortaq UI komponenti JSON kataloqundan oxuya bilməz.
+- ComboBox Enter-i seçim üçün işlədəndə `preventDefault` edir; formanın öz Enter emalı
+  (`form-wizard.tsx`) `event.defaultPrevented`-ə baxmalıdır, əks halda addım dəyişir.
+- Nəzarətsiz rejimdə dəyər siyahıdan çıxanda (şəhər dəyişdi) sıfırlanır — native select kimi.
+- `LocationFields` zənciri: Ölkə (sabit) → Region → Şəhər/rayon → Şəhər rayonu → Qəsəbə → Kənd →
+  Massiv → Metro/Nişangah → Küçə → Bina. Şəhər seçiləndə region özü dolur; qaralamadan bərpa olunan
+  kənd asinxron yüklənən siyahı gələnə qədər `pendingLeafId`-də saxlanılır.
+
 Layout primitivləri: `Container` (max-width + padding) və `Section`.
 
 `Section` şaquli boşluğu **`spacing` propu ilə** verilir (`default` | `cozy` | `compact` | `none`).

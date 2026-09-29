@@ -142,6 +142,8 @@
       "landmark": "Landmark",
       "landmarkHint": "A well-known place nearby: mall, park, university, square.",
       "streetOfficialHint": "Suggestions come from the official Address Registry (unvanportali.az).",
+      "country": "Country",
+      "countryName": "Azerbaijan",
       "street": "Street / avenue",
       "streetHint": "For example: Aliyar Aliyev street.",
       "building": "Building and additional address details",
