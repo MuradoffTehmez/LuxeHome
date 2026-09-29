@@ -2099,4 +2099,16 @@ WHERE "locationId" IN (SELECT "id" FROM "Location" WHERE "slug" = 'baki-alatava'
     WHERE "locationId" = (SELECT "id" FROM "Location" WHERE "slug" = 'baki-2-ci-alatava')
   );
 
+-- Saxlanmış axtarış və SEO landinq filtrləri slug-ı JSON-da saxlayır (`PropertyFilters`).
+-- Yenilənməsə bildiriş uyğunlaşması və keçidlər səssizcə boş nəticə verərdi.
+UPDATE "SavedSearch"
+SET "filters" = json_set("filters", '$.districtSlug', 'baki-2-ci-alatava')
+WHERE json_valid("filters")
+  AND json_extract("filters", '$.districtSlug') = 'baki-alatava';
+
+UPDATE "SeoLandingPage"
+SET "filtersJson" = json_set("filtersJson", '$.districtSlug', 'baki-2-ci-alatava')
+WHERE json_valid("filtersJson")
+  AND json_extract("filtersJson", '$.districtSlug') = 'baki-alatava';
+
 DELETE FROM "Location" WHERE "slug" = 'baki-alatava';
