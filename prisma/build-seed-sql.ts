@@ -14,10 +14,13 @@ const OUT_PATH = path.join(import.meta.dirname, "seed.sql");
 
 const db = new DatabaseSync(DB_PATH, { readOnly: true });
 
+// `Location` burada yoxdur: yerləşmə ağacının yeganə mənbəyi `migrations/0050`–`0053`
+// və `taxonomy.sql`-dir (`loc_<slug>` ID-ləri). Təzə bazada miqrasiyalar seed-dən əvvəl
+// işləyir; seed-in köhnə sabit ID-li yerləri slug toqquşmasından atılır və onlara
+// istinad edən uşaq sətirlər FOREIGN KEY xətası verirdi (lokal stack E2E, #127).
 const BOOTSTRAP_TABLES = new Set([
   "BlogCategory",
   "Feature",
-  "Location",
   "Partner",
   "PropertyType",
   "Service",
