@@ -1,0 +1,8 @@
+{
+ "_note": "bina.az LocationGroups (ids 1-4) — Bakıdan kənar 70 şəhər üzrə sorğu, 2026-09-28. Yalnız boş olmayanlar.",
+ "Ağdam": {"Rayon": ["Ağdam"], "Qəsəbə": ["Quzanlı qəs. <Ağdam r.>"]},
+ "Astara": {"Rayon": ["Astara", "Kəngərli"]},
+ "Gədəbəy": {"Rayon": ["Gədəbəy"]},
+ "Naxçıvan MR": {"Rayon": ["Babək", "Culfa", "Ordubad", "Sədərək", "Şahbuz", "Şərur"], "Qəsəbə": ["Xalxal k. <Babək r.>"]},
+ "Xaçmaz": {"Rayon": ["Xaçmaz", "Nabran"]}
+}

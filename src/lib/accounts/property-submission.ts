@@ -190,16 +190,31 @@ export function locationBelongsToCity(location: PublicLocationRow, cityId: strin
   return location.parent?.parentId === cityId;
 }
 
+/**
+ * Nişangah yalnız `LANDMARK` növündə və birbaşa şəhərin uşağı ola bilər —
+ * saxta ID ilə başqa şəhərin nişangahı və ya rayon ID-si yazılmasın.
+ */
+export function landmarkBelongsToCity(location: PublicLocationRow | null, cityId: string): boolean {
+  return location?.kind === LOCATION_KINDS.LANDMARK && location.parentId === cityId;
+}
+
 /** İctimai forma üçün saxtalaşdırılmış və passiv taksonomiya ID-lərini rədd edir. */
 export async function validatePublicPropertyRelations(
   store: PublicPropertyRelationStore,
-  input: { typeId: string; cityId: string; districtId: string | null; featureIds: string[] },
+  input: {
+    typeId: string;
+    cityId: string;
+    districtId: string | null;
+    landmarkId?: string | null;
+    featureIds: string[];
+  },
 ): Promise<Record<string, string> | null> {
   const errors: Record<string, string> = {};
-  const [type, city, district, featureCount] = await Promise.all([
+  const [type, city, district, landmark, featureCount] = await Promise.all([
     store.findType(input.typeId),
     store.findLocation(input.cityId),
     input.districtId ? store.findLocation(input.districtId) : null,
+    input.landmarkId ? store.findLocation(input.landmarkId) : null,
     store.countFeatures(input.featureIds),
   ]);
 
@@ -211,6 +226,9 @@ export async function validatePublicPropertyRelations(
   }
   if (district && !locationBelongsToCity(district, input.cityId)) {
     errors.districtId = "Seçilmiş rayon bu şəhərə aid deyil";
+  }
+  if (input.landmarkId && !landmarkBelongsToCity(landmark, input.cityId)) {
+    errors.landmarkId = "Seçilmiş nişangah bu şəhərə aid deyil";
   }
   if (featureCount !== input.featureIds.length) {
     errors.featureIds = "Seçilmiş xüsusiyyətlərdən biri tapılmadı";

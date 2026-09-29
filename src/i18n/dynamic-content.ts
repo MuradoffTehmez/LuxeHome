@@ -45,6 +45,7 @@ const LOCATION_NAMES: Record<string, { en: string; ru: string }> = {
   "Koroğlu": { en: "Koroglu", ru: "Кёроглу" },
   "Qara Qarayev": { en: "Gara Garayev", ru: "Кара Караев" },
   "Memar Əcəmi": { en: "Memar Ajami", ru: "Мемар Аджеми" },
+  "Memar Əcəmi-2": { en: "Memar Ajami-2", ru: "Мемар Аджеми-2" },
   "Nəriman Nərimanov": { en: "Nariman Narimanov", ru: "Нариман Нариманов" },
   "Neftçilər": { en: "Neftchilar", ru: "Нефтчиляр" },
   "Sahil": { en: "Sahil", ru: "Сахиль" },

@@ -54,8 +54,15 @@ export default async function PublicFeaturesAdminPage() {
     }),
     // Valideyn adı `parent` relation-u ilə deyil, ayrıca xəritədən gəlir:
     // ~600 alt yer üzrə `id IN (…)` D1-in 100 parametr həddini aşır.
+    // Kəndlərdən (~3 600) yalnız profili olanlar seçimə düşür — hamısı bir
+    // açılan siyahıda istifadəyararsız olardı.
     prisma.location.findMany({
-      where: { kind: { in: [LOCATION_KINDS.CITY, ...LOCATION_CHILD_KINDS] } },
+      where: {
+        OR: [
+          { kind: { in: [LOCATION_KINDS.CITY, ...LOCATION_CHILD_KINDS.filter((kind) => kind !== LOCATION_KINDS.VILLAGE)] } },
+          { kind: LOCATION_KINDS.VILLAGE, neighborhoodProfile: { isNot: null } },
+        ],
+      },
       select: { id: true, name: true, kind: true, parentId: true },
       orderBy: { name: "asc" },
     }),

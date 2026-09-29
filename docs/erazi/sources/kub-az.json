@@ -1,0 +1,1322 @@
+{
+ "region": [
+  {
+   "id": "197",
+   "name": "Abşeron r."
+  },
+  {
+   "id": "235",
+   "name": "Babək r."
+  },
+  {
+   "id": "58",
+   "name": "Binəqədi r."
+  },
+  {
+   "id": "238",
+   "name": "Culfa r."
+  },
+  {
+   "id": "16",
+   "name": "Xətai r."
+  },
+  {
+   "id": "15",
+   "name": "Xəzər r."
+  },
+  {
+   "id": "57",
+   "name": "Qaradağ r."
+  },
+  {
+   "id": "10",
+   "name": "Nərimanov r."
+  },
+  {
+   "id": "190",
+   "name": "Nəsimi r."
+  },
+  {
+   "id": "11",
+   "name": "Nizami r."
+  },
+  {
+   "id": "237",
+   "name": "Ordubad r."
+  },
+  {
+   "id": "249",
+   "name": "Pirallahı r."
+  },
+  {
+   "id": "13",
+   "name": "Sabunçu r."
+  },
+  {
+   "id": "12",
+   "name": "Səbail r."
+  },
+  {
+   "id": "240",
+   "name": "Sədərək r."
+  },
+  {
+   "id": "14",
+   "name": "Suraxanı r."
+  },
+  {
+   "id": "236",
+   "name": "Şahbuz r."
+  },
+  {
+   "id": "56",
+   "name": "Yasamal r."
+  }
+ ],
+ "subwayStation": [
+  {
+   "id": "5",
+   "name": "20 Yanvar m."
+  },
+  {
+   "id": "8",
+   "name": "28 May m."
+  },
+  {
+   "id": "64",
+   "name": "8 Noyabr"
+  },
+  {
+   "id": "24",
+   "name": "Avtovağzal m."
+  },
+  {
+   "id": "6",
+   "name": "Azadlıq Prospekti m."
+  },
+  {
+   "id": "63",
+   "name": "Bakmil m."
+  },
+  {
+   "id": "62",
+   "name": "Cəfər Cabbarlı m."
+  },
+  {
+   "id": "61",
+   "name": "Dərnəgül m."
+  },
+  {
+   "id": "34",
+   "name": "Elmlər Akademiyası m."
+  },
+  {
+   "id": "51",
+   "name": "Əhmədli m."
+  },
+  {
+   "id": "2",
+   "name": "Gənclik m."
+  },
+  {
+   "id": "33",
+   "name": "Həzi Aslanov m."
+  },
+  {
+   "id": "54",
+   "name": "Xalqlar Dostluğu m."
+  },
+  {
+   "id": "37",
+   "name": "İçəri Şəhər m."
+  },
+  {
+   "id": "7",
+   "name": "İnşaatçılar m."
+  },
+  {
+   "id": "4",
+   "name": "Koroğlu m."
+  },
+  {
+   "id": "52",
+   "name": "Qara Qarayev m."
+  },
+  {
+   "id": "59",
+   "name": "Memar Əcəmi m."
+  },
+  {
+   "id": "53",
+   "name": "Neftçilər m."
+  },
+  {
+   "id": "1",
+   "name": "Nəriman Nərimanov m."
+  },
+  {
+   "id": "60",
+   "name": "Nəsimi m."
+  },
+  {
+   "id": "35",
+   "name": "Nizami m."
+  },
+  {
+   "id": "38",
+   "name": "Sahil m."
+  },
+  {
+   "id": "36",
+   "name": "Şah İsmayıl Xətai m."
+  },
+  {
+   "id": "3",
+   "name": "Ulduz m."
+  }
+ ],
+ "district": [
+  {
+   "id": "123",
+   "name": "1-ci mikrorayon"
+  },
+  {
+   "id": "48",
+   "name": "20-ci sahə"
+  },
+  {
+   "id": "309",
+   "name": "28 may"
+  },
+  {
+   "id": "124",
+   "name": "2-ci mikrorayon"
+  },
+  {
+   "id": "125",
+   "name": "3-cü mikrorayon"
+  },
+  {
+   "id": "126",
+   "name": "4-cü mikrorayon"
+  },
+  {
+   "id": "127",
+   "name": "5-ci mikrorayon"
+  },
+  {
+   "id": "128",
+   "name": "6-cı mikrorayon"
+  },
+  {
+   "id": "129",
+   "name": "7-ci mikrorayon"
+  },
+  {
+   "id": "74",
+   "name": "8-ci kilometr"
+  },
+  {
+   "id": "130",
+   "name": "8-ci mikrorayon"
+  },
+  {
+   "id": "131",
+   "name": "9-cu mikrorayon"
+  },
+  {
+   "id": "308",
+   "name": "Ağ şəhər"
+  },
+  {
+   "id": "73",
+   "name": "Alatava"
+  },
+  {
+   "id": "310",
+   "name": "Albalı"
+  },
+  {
+   "id": "311",
+   "name": "Atyalı"
+  },
+  {
+   "id": "46",
+   "name": "Badamdar"
+  },
+  {
+   "id": "260",
+   "name": "Bahar"
+  },
+  {
+   "id": "69",
+   "name": "Bakıxanov"
+  },
+  {
+   "id": "243",
+   "name": "Balaxanı"
+  },
+  {
+   "id": "49",
+   "name": "Bayıl"
+  },
+  {
+   "id": "47",
+   "name": "Bibi Heybət"
+  },
+  {
+   "id": "17",
+   "name": "Biləcəri"
+  },
+  {
+   "id": "118",
+   "name": "Bilgəh"
+  },
+  {
+   "id": "79",
+   "name": "Binə"
+  },
+  {
+   "id": "18",
+   "name": "Binəqədi"
+  },
+  {
+   "id": "68",
+   "name": "Böyükşor"
+  },
+  {
+   "id": "117",
+   "name": "Buzovna"
+  },
+  {
+   "id": "244",
+   "name": "Bülbülə"
+  },
+  {
+   "id": "261",
+   "name": "Ceyildağ"
+  },
+  {
+   "id": "254",
+   "name": "Ceyranbatan"
+  },
+  {
+   "id": "65",
+   "name": "Çiçək"
+  },
+  {
+   "id": "251",
+   "name": "Çilov"
+  },
+  {
+   "id": "262",
+   "name": "Dədə Qorqud"
+  },
+  {
+   "id": "255",
+   "name": "Digah"
+  },
+  {
+   "id": "97",
+   "name": "Dübəndi"
+  },
+  {
+   "id": "100",
+   "name": "Əhmədli"
+  },
+  {
+   "id": "24",
+   "name": "Ələt"
+  },
+  {
+   "id": "72",
+   "name": "Əmircan"
+  },
+  {
+   "id": "116",
+   "name": "Fatmayı"
+  },
+  {
+   "id": "256",
+   "name": "Goradil"
+  },
+  {
+   "id": "194",
+   "name": "Görədil"
+  },
+  {
+   "id": "91",
+   "name": "Günəşli"
+  },
+  {
+   "id": "252",
+   "name": "Gürgən"
+  },
+  {
+   "id": "2530",
+   "name": "Güzdək"
+  },
+  {
+   "id": "253",
+   "name": "Güzdək"
+  },
+  {
+   "id": "263",
+   "name": "Heybət"
+  },
+  {
+   "id": "99",
+   "name": "Həzi Aslanov"
+  },
+  {
+   "id": "50",
+   "name": "Hökməli"
+  },
+  {
+   "id": "93",
+   "name": "Hövsan"
+  },
+  {
+   "id": "304",
+   "name": "Xaşaxuna"
+  },
+  {
+   "id": "9",
+   "name": "Xocəsən"
+  },
+  {
+   "id": "104",
+   "name": "Xutor"
+  },
+  {
+   "id": "264",
+   "name": "İçəri şəhər"
+  },
+  {
+   "id": "105",
+   "name": "Keşlə"
+  },
+  {
+   "id": "66",
+   "name": "Kirov"
+  },
+  {
+   "id": "265",
+   "name": "Korgöz"
+  },
+  {
+   "id": "266",
+   "name": "Kotal"
+  },
+  {
+   "id": "115",
+   "name": "Köhnə Corat"
+  },
+  {
+   "id": "200",
+   "name": "Köhnə Günəşli"
+  },
+  {
+   "id": "70",
+   "name": "Kubinka"
+  },
+  {
+   "id": "120",
+   "name": "Kürdəxanı"
+  },
+  {
+   "id": "95",
+   "name": "Qala"
+  },
+  {
+   "id": "301",
+   "name": "Qara şəhər"
+  },
+  {
+   "id": "75",
+   "name": "Qaraçuxur"
+  },
+  {
+   "id": "269",
+   "name": "Qaradağ"
+  },
+  {
+   "id": "270",
+   "name": "Qarakosa"
+  },
+  {
+   "id": "271",
+   "name": "Qızıldaş"
+  },
+  {
+   "id": "258",
+   "name": "Qobu"
+  },
+  {
+   "id": "45",
+   "name": "Qobustan"
+  },
+  {
+   "id": "20",
+   "name": "Lökbatan"
+  },
+  {
+   "id": "19",
+   "name": "M.Ə.Rəsulzadə"
+  },
+  {
+   "id": "198",
+   "name": "Masazır"
+  },
+  {
+   "id": "81",
+   "name": "Massiv A"
+  },
+  {
+   "id": "82",
+   "name": "Massiv B"
+  },
+  {
+   "id": "85",
+   "name": "Massiv D"
+  },
+  {
+   "id": "84",
+   "name": "Massiv G"
+  },
+  {
+   "id": "83",
+   "name": "Massiv V"
+  },
+  {
+   "id": "122",
+   "name": "Maştağa"
+  },
+  {
+   "id": "112",
+   "name": "Mehdiabad"
+  },
+  {
+   "id": "257",
+   "name": "Məhəmmədli"
+  },
+  {
+   "id": "109",
+   "name": "Mərdəkan"
+  },
+  {
+   "id": "267",
+   "name": "Montin"
+  },
+  {
+   "id": "98",
+   "name": "Müşviqabad"
+  },
+  {
+   "id": "119",
+   "name": "Nardaran"
+  },
+  {
+   "id": "250",
+   "name": "Neft Daşları"
+  },
+  {
+   "id": "113",
+   "name": "Novxanı"
+  },
+  {
+   "id": "307",
+   "name": "Nübar"
+  },
+  {
+   "id": "233",
+   "name": "NZS"
+  },
+  {
+   "id": "306",
+   "name": "Papanin"
+  },
+  {
+   "id": "305",
+   "name": "Pirallahı"
+  },
+  {
+   "id": "241",
+   "name": "Pirəkəşkül"
+  },
+  {
+   "id": "268",
+   "name": "Pirsaat"
+  },
+  {
+   "id": "121",
+   "name": "Pirşağı"
+  },
+  {
+   "id": "22",
+   "name": "Puta"
+  },
+  {
+   "id": "76",
+   "name": "Ramana"
+  },
+  {
+   "id": "86",
+   "name": "Sabunçu"
+  },
+  {
+   "id": "21",
+   "name": "Sahil"
+  },
+  {
+   "id": "111",
+   "name": "Saray"
+  },
+  {
+   "id": "234",
+   "name": "Savalan"
+  },
+  {
+   "id": "23",
+   "name": "Səngəçal"
+  },
+  {
+   "id": "64",
+   "name": "Sulutəpə"
+  },
+  {
+   "id": "87",
+   "name": "Suraxanı"
+  },
+  {
+   "id": "108",
+   "name": "Şağan"
+  },
+  {
+   "id": "80",
+   "name": "Şərq"
+  },
+  {
+   "id": "272",
+   "name": "Şıxlar"
+  },
+  {
+   "id": "302",
+   "name": "Şıxov"
+  },
+  {
+   "id": "107",
+   "name": "Şimal DRES"
+  },
+  {
+   "id": "273",
+   "name": "Şonqar"
+  },
+  {
+   "id": "71",
+   "name": "Şubani"
+  },
+  {
+   "id": "303",
+   "name": "Şuşa"
+  },
+  {
+   "id": "110",
+   "name": "Şüvəlan"
+  },
+  {
+   "id": "94",
+   "name": "Türkən"
+  },
+  {
+   "id": "274",
+   "name": "Ümid"
+  },
+  {
+   "id": "103",
+   "name": "Yasamal"
+  },
+  {
+   "id": "242",
+   "name": "Yeni Balaxanı"
+  },
+  {
+   "id": "114",
+   "name": "Yeni Corat"
+  },
+  {
+   "id": "92",
+   "name": "Yeni Günəşli"
+  },
+  {
+   "id": "77",
+   "name": "Yeni Ramana"
+  },
+  {
+   "id": "88",
+   "name": "Yeni Suraxanı"
+  },
+  {
+   "id": "102",
+   "name": "Yeni Yasamal"
+  },
+  {
+   "id": "78",
+   "name": "Zabrat"
+  },
+  {
+   "id": "106",
+   "name": "Zağulba"
+  },
+  {
+   "id": "89",
+   "name": "Zığ"
+  },
+  {
+   "id": "96",
+   "name": "Zirə"
+  }
+ ],
+ "orientmark": [
+  {
+   "id": "301",
+   "name": "28 Mall"
+  },
+  {
+   "id": "304",
+   "name": "Absheron Marriott otel"
+  },
+  {
+   "id": "303",
+   "name": "ABŞ səfirliyi"
+  },
+  {
+   "id": "305",
+   "name": "ADA universiteti"
+  },
+  {
+   "id": "306",
+   "name": "AF Business House"
+  },
+  {
+   "id": "307",
+   "name": "AGA Business Center"
+  },
+  {
+   "id": "246",
+   "name": "Ağ şəhər"
+  },
+  {
+   "id": "30",
+   "name": "Axundov bağı"
+  },
+  {
+   "id": "308",
+   "name": "AMAY"
+  },
+  {
+   "id": "309",
+   "name": "Ambassador otel"
+  },
+  {
+   "id": "310",
+   "name": "ANS"
+  },
+  {
+   "id": "311",
+   "name": "Araz kinoteatrı"
+  },
+  {
+   "id": "312",
+   "name": "ATV"
+  },
+  {
+   "id": "313",
+   "name": "Aviasiya Akademiyası"
+  },
+  {
+   "id": "314",
+   "name": "Avropa otel"
+  },
+  {
+   "id": "315",
+   "name": "Aygun City"
+  },
+  {
+   "id": "31",
+   "name": "Ayna Sultanova heykəli"
+  },
+  {
+   "id": "182",
+   "name": "Azadlıq meydanı"
+  },
+  {
+   "id": "159",
+   "name": "Azərbaycan Dillər Universiteti"
+  },
+  {
+   "id": "173",
+   "name": "Azərbaycan kinoteatrı"
+  },
+  {
+   "id": "162",
+   "name": "Azərbaycan turizm institutu"
+  },
+  {
+   "id": "174",
+   "name": "Azneft meydanı"
+  },
+  {
+   "id": "316",
+   "name": "AZTV"
+  },
+  {
+   "id": "317",
+   "name": "Babək Plaza"
+  },
+  {
+   "id": "166",
+   "name": "Bakı Asiya Universiteti"
+  },
+  {
+   "id": "164",
+   "name": "Bakı Dövlət Universiteti"
+  },
+  {
+   "id": "163",
+   "name": "Bakı Musiqi Akademiyası"
+  },
+  {
+   "id": "165",
+   "name": "Bakı Slavyan Universiteti"
+  },
+  {
+   "id": "318",
+   "name": "Bakı univermağı"
+  },
+  {
+   "id": "156",
+   "name": "Bayıl parkı"
+  },
+  {
+   "id": "168",
+   "name": "Beşmərtəbə"
+  },
+  {
+   "id": "319",
+   "name": "Binə ticarət mərkəzi"
+  },
+  {
+   "id": "157",
+   "name": "Botanika bağı"
+  },
+  {
+   "id": "320",
+   "name": "Bridge Plaza"
+  },
+  {
+   "id": "321",
+   "name": "C.Cabbarlı heykəli"
+  },
+  {
+   "id": "322",
+   "name": "Caspian Plaza"
+  },
+  {
+   "id": "323",
+   "name": "Caspian Shopping Center"
+  },
+  {
+   "id": "180",
+   "name": "Cavanşir körpüsü"
+  },
+  {
+   "id": "325",
+   "name": "Crystal Plaza"
+  },
+  {
+   "id": "324",
+   "name": "Çıraq Plaza"
+  },
+  {
+   "id": "153",
+   "name": "Dağüstü parkı"
+  },
+  {
+   "id": "327",
+   "name": "Daxili İşlər Nazirliyi"
+  },
+  {
+   "id": "326",
+   "name": "Dalğa Plaza"
+  },
+  {
+   "id": "328",
+   "name": "Dədə Qorqud parkı"
+  },
+  {
+   "id": "329",
+   "name": "Dəmirçi Plaza"
+  },
+  {
+   "id": "330",
+   "name": "Dənizkənarı Milli park"
+  },
+  {
+   "id": "176",
+   "name": "Dostluq kinoteatrı"
+  },
+  {
+   "id": "146",
+   "name": "Dövlət İdarəçilik Akademiyası"
+  },
+  {
+   "id": "170",
+   "name": "Dövlət Statistika Komitəsi"
+  },
+  {
+   "id": "247",
+   "name": "Dövlət Statistika Komitəsini"
+  },
+  {
+   "id": "331",
+   "name": "Ekologiya və Təbii Sərvətlər Nazirliyi"
+  },
+  {
+   "id": "332",
+   "name": "Elit ticarət mərkəzi"
+  },
+  {
+   "id": "333",
+   "name": "Energetika Nazirliyi"
+  },
+  {
+   "id": "388",
+   "name": "Ədliyyə Nazirliyi"
+  },
+  {
+   "id": "389",
+   "name": "Əmək və Əhalinin Sosial Müdafiəsi Nazirliyi"
+  },
+  {
+   "id": "334",
+   "name": "Fairmont otel"
+  },
+  {
+   "id": "337",
+   "name": "Fəvvarələr meydanı"
+  },
+  {
+   "id": "151",
+   "name": "Fontanlar bağı"
+  },
+  {
+   "id": "335",
+   "name": "Four Seasons otel"
+  },
+  {
+   "id": "336",
+   "name": "Fövqəladə Hallar Nazirliyi"
+  },
+  {
+   "id": "338",
+   "name": "Gənclər və İdman Nazirliyi"
+  },
+  {
+   "id": "340",
+   "name": "Heydər Əliyev Mərkəzi"
+  },
+  {
+   "id": "339",
+   "name": "Heydər Əliyev Sarayı"
+  },
+  {
+   "id": "343",
+   "name": "Hərbi Hospital"
+  },
+  {
+   "id": "341",
+   "name": "Hilton otel"
+  },
+  {
+   "id": "29",
+   "name": "Hüseyn Cavid parkı"
+  },
+  {
+   "id": "342",
+   "name": "Hyatt Regency"
+  },
+  {
+   "id": "193",
+   "name": "Xalça Muzeyi"
+  },
+  {
+   "id": "383",
+   "name": "Xarici İşlər Nazirliyi"
+  },
+  {
+   "id": "384",
+   "name": "Xəqani ticarət mərkəzi"
+  },
+  {
+   "id": "385",
+   "name": "Xəzər Universiteti"
+  },
+  {
+   "id": "347",
+   "name": "ISR Plaza"
+  },
+  {
+   "id": "344",
+   "name": "İctimai tv"
+  },
+  {
+   "id": "172",
+   "name": "İçəri Şəhər"
+  },
+  {
+   "id": "171",
+   "name": "İdman kompleksi"
+  },
+  {
+   "id": "143",
+   "name": "İqsadiyyat Universiteti"
+  },
+  {
+   "id": "346",
+   "name": "İqtisadi İnkişaf Nazirliyi"
+  },
+  {
+   "id": "144",
+   "name": "İncəsənət və Mədəniyyət Un."
+  },
+  {
+   "id": "345",
+   "name": "İnşaat Universiteti"
+  },
+  {
+   "id": "138",
+   "name": "İzmir parkı"
+  },
+  {
+   "id": "196",
+   "name": "Keşlə bazarı"
+  },
+  {
+   "id": "25",
+   "name": "Koala parkı"
+  },
+  {
+   "id": "348",
+   "name": "Kooperasiya Universiteti"
+  },
+  {
+   "id": "366",
+   "name": "Qafqaz Resort otel"
+  },
+  {
+   "id": "367",
+   "name": "Qafqaz Universiteti"
+  },
+  {
+   "id": "368",
+   "name": "Qələbə dairəsi"
+  },
+  {
+   "id": "369",
+   "name": "Qərb Universiteti"
+  },
+  {
+   "id": "152",
+   "name": "Qış parkı"
+  },
+  {
+   "id": "150",
+   "name": "Qubernator parkı"
+  },
+  {
+   "id": "349",
+   "name": "Landmark"
+  },
+  {
+   "id": "350",
+   "name": "Lider tv"
+  },
+  {
+   "id": "27",
+   "name": "M.Ə.Sabir parkı"
+  },
+  {
+   "id": "137",
+   "name": "M.Hüseynzadə parkı"
+  },
+  {
+   "id": "351",
+   "name": "Maliyyə Nazirliyi"
+  },
+  {
+   "id": "155",
+   "name": "Malokan bağı"
+  },
+  {
+   "id": "390",
+   "name": "Megafun"
+  },
+  {
+   "id": "141",
+   "name": "Memarlıq və İnşaat Universiteti"
+  },
+  {
+   "id": "352",
+   "name": "Metropark"
+  },
+  {
+   "id": "167",
+   "name": "Mərkəzi Univermaq"
+  },
+  {
+   "id": "161",
+   "name": "Milli Konservatoriya"
+  },
+  {
+   "id": "353",
+   "name": "Montin adına park"
+  },
+  {
+   "id": "132",
+   "name": "Montin bazarı"
+  },
+  {
+   "id": "354",
+   "name": "Moskva univermağı"
+  },
+  {
+   "id": "357",
+   "name": "Musabəyov parkı"
+  },
+  {
+   "id": "355",
+   "name": "Müdafiə Sənayesi Nazirliyi"
+  },
+  {
+   "id": "358",
+   "name": "Nargiz ticarət mərkəzi"
+  },
+  {
+   "id": "178",
+   "name": "Neapol dairəsi"
+  },
+  {
+   "id": "139",
+   "name": "Neft Akademiyası"
+  },
+  {
+   "id": "187",
+   "name": "Neftçi bazası"
+  },
+  {
+   "id": "359",
+   "name": "Nəqliyyat Nazirliyi"
+  },
+  {
+   "id": "26",
+   "name": "Nəriman Nərimanov parkı"
+  },
+  {
+   "id": "32",
+   "name": "Nərimanov heykəli"
+  },
+  {
+   "id": "189",
+   "name": "Nəsimi bazarı"
+  },
+  {
+   "id": "360",
+   "name": "Nəsimi heykəli"
+  },
+  {
+   "id": "175",
+   "name": "Nizami kinoteatrı"
+  },
+  {
+   "id": "361",
+   "name": "Odlar Yurdu Universiteti"
+  },
+  {
+   "id": "362",
+   "name": "Olimpia Stadionu"
+  },
+  {
+   "id": "363",
+   "name": "Park Bulvar"
+  },
+  {
+   "id": "364",
+   "name": "Park Inn"
+  },
+  {
+   "id": "133",
+   "name": "Park Zorge"
+  },
+  {
+   "id": "145",
+   "name": "Pedaqoji Universiteti"
+  },
+  {
+   "id": "365",
+   "name": "Port Baku"
+  },
+  {
+   "id": "148",
+   "name": "Prezident parkı"
+  },
+  {
+   "id": "302",
+   "name": "Puşkin parkı"
+  },
+  {
+   "id": "370",
+   "name": "Rabitə və Yüksək Texnologiyalar Nazirliyi"
+  },
+  {
+   "id": "191",
+   "name": "Respublika stadionu"
+  },
+  {
+   "id": "160",
+   "name": "Rəssamlıq Akademiyası"
+  },
+  {
+   "id": "177",
+   "name": "Rusiya səfirliyi"
+  },
+  {
+   "id": "154",
+   "name": "Sahil bağı"
+  },
+  {
+   "id": "134",
+   "name": "Sevil Qazıyeva parkı"
+  },
+  {
+   "id": "371",
+   "name": "Sevinc kinoteatrı"
+  },
+  {
+   "id": "373",
+   "name": "Sədərək ticarət mərkəzi"
+  },
+  {
+   "id": "374",
+   "name": "Səhiyyə Nazirliyi"
+  },
+  {
+   "id": "28",
+   "name": "Səməd Vurğun parkı"
+  },
+  {
+   "id": "183",
+   "name": "Sirk"
+  },
+  {
+   "id": "169",
+   "name": "Sovetski"
+  },
+  {
+   "id": "181",
+   "name": "Space TV"
+  },
+  {
+   "id": "185",
+   "name": "Şəfa stadionu"
+  },
+  {
+   "id": "184",
+   "name": "Şəhidlər xiyabanı"
+  },
+  {
+   "id": "147",
+   "name": "Şəlalə parkı"
+  },
+  {
+   "id": "375",
+   "name": "Şərq Bazarı"
+  },
+  {
+   "id": "372",
+   "name": "Şüvəlan ticarət mərkəzi"
+  },
+  {
+   "id": "140",
+   "name": "Texniki Universiteti"
+  },
+  {
+   "id": "378",
+   "name": "Təfəkkür Universiteti"
+  },
+  {
+   "id": "192",
+   "name": "Təhsil Nazirliyi"
+  },
+  {
+   "id": "379",
+   "name": "Təzə bazar"
+  },
+  {
+   "id": "142",
+   "name": "Tibb Universiteti"
+  },
+  {
+   "id": "186",
+   "name": "TQDK"
+  },
+  {
+   "id": "376",
+   "name": "Tofiq Bəhramov stadionu"
+  },
+  {
+   "id": "377",
+   "name": "Türkiyə səfirliyi"
+  },
+  {
+   "id": "179",
+   "name": "Ukrayna dairəsi"
+  },
+  {
+   "id": "380",
+   "name": "Vergilər Nazirliyi"
+  },
+  {
+   "id": "381",
+   "name": "Vətən kinoteatrı"
+  },
+  {
+   "id": "382",
+   "name": "World Business Center"
+  },
+  {
+   "id": "188",
+   "name": "Yasamal bazarı"
+  },
+  {
+   "id": "386",
+   "name": "Yasamal parkı"
+  },
+  {
+   "id": "387",
+   "name": "Yaşıl bazar"
+  },
+  {
+   "id": "135",
+   "name": "Zabitlər parkı"
+  },
+  {
+   "id": "158",
+   "name": "Zərifə Əliyeva adına park"
+  },
+  {
+   "id": "136",
+   "name": "Zoopark"
+  }
+ ]
+}

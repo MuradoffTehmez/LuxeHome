@@ -32,42 +32,6 @@ INSERT OR IGNORE INTO "Feature" ("id", "name", "slug", "icon", "group", "order")
 INSERT OR IGNORE INTO "Feature" ("id", "name", "slug", "icon", "group", "order") VALUES ('cmt1srtol002muadws8joq3a0', 'Dəniz mənzərəsi', 'deniz-menzeresi', 'Sailboat', 'GENERAL', 19);
 
 -- Location (36)
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt7g0009uadw3shuvtzf', 'Bakı', 'baki', 'CITY', NULL, 0);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt7s000buadw3iyxdeju', 'Səbail', 'baki-sebail', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 0);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt81000duadwisl035ld', 'Nəsimi', 'baki-nesimi', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 1);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt89000fuadw126fgssr', 'Yasamal', 'baki-yasamal', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 2);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt8i000huadwff75kgrm', 'Nərimanov', 'baki-nerimanov', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 3);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt8v000juadwt7opt9xq', 'Xətai', 'baki-xetai', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 4);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt94000luadwpz0hkxz9', 'Nizami', 'baki-nizami', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 5);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt9b000nuadwv20clbta', 'Binəqədi', 'baki-bineqedi', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 6);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt9j000puadw0y28etm4', 'Xəzər', 'baki-xezer', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 7);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt9r000ruadw0a33cb8i', 'Sabunçu', 'baki-sabuncu', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 8);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srt9z000tuadwr9x5p099', 'Suraxanı', 'baki-suraxani', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 9);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srta8000vuadwqtocx1cq', 'Qaradağ', 'baki-qaradag', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 10);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtah000xuadwro8q5l8n', 'Pirallahı', 'baki-pirallahi', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 11);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtap000zuadwprywft8f', 'Mərdəkan', 'baki-merdekan', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 12);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtaz0011uadwdiz35izv', 'Şüvəlan', 'baki-suvelan', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 13);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtb70013uadwhr5o2aen', 'Buzovna', 'baki-buzovna', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 14);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtbf0015uadwkgedm4k8', 'Novxanı', 'baki-novxani', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 15);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtbl0017uadwn26l6dsd', 'Bilgəh', 'baki-bilgeh', 'DISTRICT', 'cmt1srt7g0009uadw3shuvtzf', 16);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtbu0018uadwfe1c1vv4', 'Sumqayıt', 'sumqayit', 'CITY', NULL, 1);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtc5001auadwxbnmw5h7', 'Mərkəz', 'sumqayit-merkez', 'DISTRICT', 'cmt1srtbu0018uadwfe1c1vv4', 0);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtcf001cuadw7iro4qn7', 'Corat', 'sumqayit-corat', 'DISTRICT', 'cmt1srtbu0018uadwfe1c1vv4', 1);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtcn001euadwz1rf57mg', 'Haci Zeynalabdin', 'sumqayit-haci-zeynalabdin', 'DISTRICT', 'cmt1srtbu0018uadwfe1c1vv4', 2);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtcx001fuadw4zx16opk', 'Xırdalan', 'xirdalan', 'CITY', NULL, 2);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtd6001huadwzxcd1efq', 'Mərkəz', 'xirdalan-merkez', 'DISTRICT', 'cmt1srtcx001fuadw4zx16opk', 0);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtde001juadwov8tgney', 'Masazır', 'xirdalan-masazir', 'DISTRICT', 'cmt1srtcx001fuadw4zx16opk', 1);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtdo001luadw9d19jurl', 'Digah', 'xirdalan-digah', 'DISTRICT', 'cmt1srtcx001fuadw4zx16opk', 2);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtdw001muadwtgzvfmnb', 'Qəbələ', 'qebele', 'CITY', NULL, 3);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srte4001ouadwq4dt7oq5', 'Mərkəz', 'qebele-merkez', 'DISTRICT', 'cmt1srtdw001muadwtgzvfmnb', 0);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtec001quadwjyetvp61', 'Həmzəli', 'qebele-hemzeli', 'DISTRICT', 'cmt1srtdw001muadwtgzvfmnb', 1);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtej001suadwz1q3239t', 'Vəndam', 'qebele-vendam', 'DISTRICT', 'cmt1srtdw001muadwtgzvfmnb', 2);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtes001tuadwgpe5bual', 'Şəki', 'seki', 'CITY', NULL, 4);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtf0001vuadwmxxwk2md', 'Mərkəz', 'seki-merkez', 'DISTRICT', 'cmt1srtes001tuadwgpe5bual', 0);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtfa001xuadw8q0jxuk0', 'Kiş', 'seki-kis', 'DISTRICT', 'cmt1srtes001tuadwgpe5bual', 1);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtfk001yuadwlvhafy2k', 'Quba', 'quba', 'CITY', NULL, 5);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtft0020uadw6r62fvkb', 'Mərkəz', 'quba-merkez', 'DISTRICT', 'cmt1srtfk001yuadwlvhafy2k', 0);
-INSERT OR IGNORE INTO "Location" ("id", "name", "slug", "kind", "parentId", "order") VALUES ('cmt1srtg20022uadwxsjq0gxk', 'Qriz', 'quba-qriz', 'DISTRICT', 'cmt1srtfk001yuadwlvhafy2k', 1);
 
 -- PropertyType (7)
 INSERT OR IGNORE INTO "PropertyType" ("id", "name", "slug", "description", "icon", "imageUrl", "order", "isActive") VALUES ('cmt1srt5w0002uadwl2otnc2z', 'Mənzillər', 'menziller', 'Yeni tikili və köhnə fondda mənzillər.', 'Building2', 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80', 0, 1);

@@ -29,6 +29,7 @@ export const savedSearchFiltersSchema = z
     citySlug: slug.optional(),
     districtSlug: slug.optional(),
     metroSlug: slug.optional(),
+    landmarkSlug: slug.optional(),
     minPrice: money.optional(),
     maxPrice: money.optional(),
     rooms: positiveInt.optional(),

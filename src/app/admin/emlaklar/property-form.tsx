@@ -113,8 +113,6 @@ function PropertyWizard({
   const [rooms, setRooms] = useState(initial.rooms);
   const [uploadReference] = useState(() => initial.id ? `LHE${initial.id.slice(-8)}` : `LHE${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`);
 
-  const metros = options.metros.filter((metro) => metro.parentId === cityId);
-
   const paymentFeatures = options.features.filter((feature) => feature.group === FEATURE_GROUPS.PAYMENT);
   const featureGroups = options.features
     .filter((feature) => feature.group !== FEATURE_GROUPS.PAYMENT)
@@ -166,6 +164,10 @@ function PropertyWizard({
     buildingHint: t("components.location.buildingHint"),
     select: t("components.location.select"),
     notSelected: t("components.location.notSelected"),
+    metro: t("components.location.metro"),
+    landmark: t("components.location.landmark"),
+    landmarkHint: t("components.location.landmarkHint"),
+    streetOfficialHint: t("components.location.streetOfficialHint"),
   };
 
   return (
@@ -232,6 +234,8 @@ function PropertyWizard({
             <LocationFields
               cities={options.cities}
               places={options.districts}
+              metros={options.metros}
+              landmarks={options.landmarks}
               locale={locale}
               labels={locationLabels}
               initial={{
@@ -241,18 +245,13 @@ function PropertyWizard({
                 building: initial.building,
                 neighborhoodName: initial.neighborhoodName,
                 address: initial.address,
+                metroId: initial.metroId,
+                landmarkId: initial.landmarkId,
               }}
               onChange={(value) => {
                 setCityId(value.cityId);
                 setDistrictId(value.districtId);
               }}
-            />
-            <AdminSelect
-              name="metroId"
-              label={t("pages.properties.metro")}
-              defaultValue={initial.metroId}
-              placeholder={t("pages.properties.secilmeyib")}
-              options={metros.map((metro) => ({ value: metro.id, label: metro.name }))}
             />
             <FullWidth>
               <AdminLocationPicker

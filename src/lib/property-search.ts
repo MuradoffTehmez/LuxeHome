@@ -25,6 +25,8 @@ export const PROPERTY_SEARCH_KEYS = [
   "seher",
   "rayon",
   "metro",
+  // Nişangah slug-ı («nisangah-28-mall»).
+  "nisangah",
   "otaq",
   "min",
   "max",
@@ -62,6 +64,7 @@ export type PropertyFilterLabelOptions = {
   }[];
   features?: readonly { value: string; label: string }[];
   metros?: readonly { value: string; label: string }[];
+  landmarks?: readonly { value: string; label: string }[];
   translateLabel?: (key: string, fallback: string) => string;
 };
 
@@ -174,6 +177,7 @@ export function buildActivePropertyFilters(
     add("rayon", optionLabel(districts, values.rayon));
   }
   if (values.metro) add("metro", optionLabel(options.metros, values.metro));
+  if (values.nisangah) add("nisangah", optionLabel(options.landmarks, values.nisangah));
   if (values.otaq) add("otaq", Number(values.otaq) >= 5 ? "5+ otaq" : `${values.otaq} otaq`);
   if (values.min) add("min", numericLabel(values.min, " ₼-dən"));
   if (values.max) add("max", numericLabel(values.max, " ₼-dək"));

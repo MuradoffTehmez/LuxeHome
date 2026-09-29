@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { Input, Select } from "@/components/ui/field";
 import { LOCATION_KINDS, type Locale } from "@/lib/constants";
 import { REGIONS, regionForCitySlug, type RegionKey } from "@/lib/regions";
+import { OFFICIAL_STREET_CODES } from "@/lib/official-street-codes";
 import { normalizeSearchText } from "@/lib/search-normalization";
 import { useFieldError } from "./form-shell";
 import { FullWidth } from "./form-fields";
@@ -17,6 +18,15 @@ export type LocationFieldPlace = {
   /** Kök şəhər/rayon — Bakı qəsəbələrində babadır (`withCityAndGroup`). */
   cityId: string | null;
   group?: string | null;
+  /** Rəsmi kod (Ünvan Reyestri) — küçə təkliflərinin faylını seçir. */
+  officialCode?: string | null;
+};
+
+/** Metro stansiyası və ya nişangah — valideyni şəhərdir. */
+export type LocationFieldOption = {
+  id: string;
+  name: string;
+  parentId: string | null;
 };
 
 export type LocationFieldsLabels = {
@@ -34,6 +44,10 @@ export type LocationFieldsLabels = {
   buildingHint: string;
   select: string;
   notSelected: string;
+  metro: string;
+  landmark: string;
+  landmarkHint: string;
+  streetOfficialHint: string;
 };
 
 export type LocationFieldsInitial = {
@@ -44,11 +58,16 @@ export type LocationFieldsInitial = {
   neighborhoodName?: string | null;
   /** Köhnə elanın sərbəst ünvanı — yeni sahələr boşdursa küçə sahəsinə düşür. */
   address?: string | null;
+  metroId?: string | null;
+  landmarkId?: string | null;
 };
 
 type Props = {
-  cities: ReadonlyArray<{ id: string; name: string; slug: string }>;
+  cities: ReadonlyArray<{ id: string; name: string; slug: string; officialCode?: string | null }>;
   places: ReadonlyArray<LocationFieldPlace>;
+  /** Verilməsə metro/nişangah sahəsi göstərilmir. */
+  metros?: ReadonlyArray<LocationFieldOption>;
+  landmarks?: ReadonlyArray<LocationFieldOption>;
   locale: Locale;
   labels: LocationFieldsLabels;
   initial: LocationFieldsInitial;
@@ -77,7 +96,55 @@ function initialState(initial: LocationFieldsInitial, places: Props["places"], c
     neighborhood: leaf?.kind === LOCATION_KINDS.NEIGHBORHOOD ? leaf.name : (initial.neighborhoodName ?? ""),
     street: hasNewFields ? (initial.street ?? "") : (initial.address ?? ""),
     building: initial.building ?? "",
+    metroId: initial.metroId ?? "",
+    landmarkId: initial.landmarkId ?? "",
   };
+}
+
+/**
+ * Seçimdən yuxarı qalxaraq küçə faylı olan ilk rəsmi vahidi tapır: massivin kodu
+ * yoxdur, Bakının kök kodunun isə faylı — küçələr rayon və qəsəbə səviyyəsindədir.
+ */
+function officialCodeFor(
+  places: Props["places"],
+  cities: Props["cities"],
+  leafId: string,
+  cityId: string,
+): string | null {
+  const byId = new Map(places.map((place) => [place.id, place]));
+  for (let place = byId.get(leafId); place; place = place.parentId ? byId.get(place.parentId) : undefined) {
+    if (place.officialCode && OFFICIAL_STREET_CODES.has(place.officialCode)) return place.officialCode;
+  }
+  const cityCode = cities.find((city) => city.id === cityId)?.officialCode;
+  return cityCode && OFFICIAL_STREET_CODES.has(cityCode) ? cityCode : null;
+}
+
+/** Rayonun kəndləri sessiya boyu bir dəfə yüklənir. */
+const villageCache = new Map<string, Promise<LocationFieldPlace[]>>();
+
+function loadVillages(cityId: string): Promise<LocationFieldPlace[]> {
+  let pending = villageCache.get(cityId);
+  if (!pending) {
+    pending = fetch(`/api/yerler/kendler?seher=${encodeURIComponent(cityId)}`)
+      .then((response) => (response.ok ? (response.json() as Promise<LocationFieldPlace[]>) : []))
+      .catch(() => []);
+    villageCache.set(cityId, pending);
+  }
+  return pending;
+}
+
+/** Rəsmi küçə siyahısı hər vahid üçün statik fayldır; sessiya boyu bir dəfə yüklənir. */
+const streetCache = new Map<string, Promise<string[]>>();
+
+function loadOfficialStreets(code: string): Promise<string[]> {
+  let pending = streetCache.get(code);
+  if (!pending) {
+    pending = fetch(`/data/kuceler/${code}.json`)
+      .then((response) => (response.ok ? (response.json() as Promise<string[]>) : []))
+      .catch(() => []);
+    streetCache.set(code, pending);
+  }
+  return pending;
 }
 
 /**
@@ -90,17 +157,30 @@ function initialState(initial: LocationFieldsInitial, places: Props["places"], c
  * (`location-path.ts`). Qəsəbə, kənd və massiv eyni pillədədir, ona görə biri
  * seçiləndə digər ikisi sıfırlanır.
  *
+ * Metro və nişangah şəhərə bağlı ayrıca sahələrdir (`metroId`, `landmarkId`).
+ * Küçə sahəsi rəsmi Ünvan Reyestrinin siyahısını təklif edir, amma sərbəst
+ * mətn kimi qalır — reyestr hər yeni küçəni dərhal əks etdirmir.
+ *
  * Massiv sahəsi sərbəst mətndir və siyahıdakı adları təklif edir: ad siyahıdakı
  * ilə üst-üstə düşürsə qeydə bağlanır, düşmürsə `neighborhoodName` kimi saxlanılır
  * — ağacdakı massiv siyahısı tam deyil.
  */
-export function LocationFields({ cities, places, locale, labels, initial, onChange }: Props) {
-  const [state, setState] = useState(() => initialState(initial, places, cities));
+export function LocationFields({ cities, places: basePlaces, metros, landmarks, locale, labels, initial, onChange }: Props) {
+  const [state, setState] = useState(() => initialState(initial, basePlaces, cities));
+  const [villages, setVillages] = useState<LocationFieldPlace[]>([]);
+  // Kəndlər serverdən gəlmir (ölkə üzrə ~3 600) — seçilmiş rayonun kəndləri
+  // ayrıca yüklənib ümumi siyahıya qoşulur. Redaktə olunan elanın kəndi isə
+  // artıq `basePlaces`-dədir, ona görə təkrarlanmır.
+  const baseIds = new Set(basePlaces.map((place) => place.id));
+  const places = [...basePlaces, ...villages.filter((village) => !baseIds.has(village.id))];
   const datalistId = useId();
   const districtError = useFieldError("districtId");
   const cityError = useFieldError("cityId");
   const streetError = useFieldError("street");
   const buildingError = useFieldError("building");
+  const landmarkError = useFieldError("landmarkId");
+  const streetListId = useId();
+  const [streets, setStreets] = useState<string[]>([]);
 
   const regions = useMemo(() => {
     const present = new Set(cities.map((city) => regionForCitySlug(city.slug)?.key).filter(Boolean));
@@ -144,6 +224,41 @@ export function LocationFields({ cities, places, locale, labels, initial, onChan
     // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnız dəyər dəyişəndə
   }, [state.cityId, districtId]);
 
+  // Küçə təklifləri ən dərin rəsmi vahidin kodu ilə seçilir: qəsəbə/kənd öz
+  // kodunu, massiv valideyn rayonun kodunu, rayonsuz şəhər isə öz kodunu verir.
+  const streetCode = officialCodeFor(places, cities, districtId, state.cityId);
+
+  useEffect(() => {
+    let active = true;
+    if (!state.cityId) {
+      setVillages([]);
+      return;
+    }
+    void loadVillages(state.cityId).then((items) => {
+      if (active) setVillages(items);
+    });
+    return () => {
+      active = false;
+    };
+  }, [state.cityId]);
+
+  useEffect(() => {
+    let active = true;
+    if (!streetCode) {
+      setStreets([]);
+      return;
+    }
+    void loadOfficialStreets(streetCode).then((names) => {
+      if (active) setStreets(names);
+    });
+    return () => {
+      active = false;
+    };
+  }, [streetCode]);
+
+  const metroOptions = (metros ?? []).filter((metro) => metro.parentId === state.cityId);
+  const landmarkOptions = (landmarks ?? []).filter((landmark) => landmark.parentId === state.cityId);
+
   const toOptions = (items: LocationFieldPlace[], withGroup: boolean) =>
     items.map((place) => ({
       value: place.id,
@@ -159,6 +274,9 @@ export function LocationFields({ cities, places, locale, labels, initial, onChan
       settlementId: "",
       villageId: "",
       neighborhood: "",
+      // Metro və nişangah şəhərə bağlıdır — başqa şəhərdə qalsaydı server rədd edərdi.
+      metroId: "",
+      landmarkId: "",
     }));
   }
 
@@ -279,16 +397,48 @@ export function LocationFields({ cities, places, locale, labels, initial, onChan
         <p className="text-sm text-danger sm:col-span-2">{districtError}</p>
       ) : null}
 
+      {metroOptions.length > 0 && (
+        <Select
+          name="metroId"
+          label={labels.metro}
+          value={state.metroId}
+          onChange={(event) => setState((current) => ({ ...current, metroId: event.target.value }))}
+          placeholder={labels.notSelected}
+          options={metroOptions.map((metro) => ({ value: metro.id, label: metro.name }))}
+        />
+      )}
+
+      {landmarkOptions.length > 0 && (
+        <Select
+          name="landmarkId"
+          label={labels.landmark}
+          hint={labels.landmarkHint}
+          value={state.landmarkId}
+          error={landmarkError}
+          onChange={(event) => setState((current) => ({ ...current, landmarkId: event.target.value }))}
+          placeholder={labels.notSelected}
+          options={landmarkOptions.map((landmark) => ({ value: landmark.id, label: landmark.name }))}
+        />
+      )}
+
       <FullWidth>
         <Input
           name="street"
           label={labels.street}
           value={state.street}
           maxLength={160}
-          hint={labels.streetHint}
+          list={streets.length > 0 ? streetListId : undefined}
+          hint={streets.length > 0 ? `${labels.streetHint} ${labels.streetOfficialHint}` : labels.streetHint}
           error={streetError}
           onChange={(event) => setState((current) => ({ ...current, street: event.target.value }))}
         />
+        {streets.length > 0 && (
+          <datalist id={streetListId}>
+            {streets.map((name) => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
+        )}
       </FullWidth>
       <FullWidth>
         <Input

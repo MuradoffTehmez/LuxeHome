@@ -26,6 +26,7 @@ const TEMPLATE_ROW: Record<string, string> = {
   city: "Bakı",
   district: "Nərimanov",
   metro: "28 May",
+  landmark: "Gənclik Mall",
   address: "Əliyar Əliyev küç.",
   rooms: "3",
   area: "95",

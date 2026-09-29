@@ -23,41 +23,41 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model User {
-  id              String    @id @default(cuid())
-  name            String
-  email           String    @unique
-  passwordHash    String
-  role            String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR
+  id                  String    @id @default(cuid())
+  name                String
+  email               String    @unique
+  passwordHash        String
+  role                String    @default("EDITOR") // SUPER_ADMIN | ADMIN | EDITOR
   /// Hesabın kim olduğu: STAFF | USER | OWNER | AGENT | AGENCY | CORPORATE.
   /// `role` yalnız panel səlahiyyətini göstərir — iki ölçü qəsdən ayrıdır.
-  accountType     String    @default("STAFF")
-  phone           String?
-  avatarUrl       String?
+  accountType         String    @default("STAFF")
+  phone               String?
+  avatarUrl           String?
   /// Ad və soyad ayrıca — `name` göstəriş üçün onlardan qurulur (köhnə hesablarda boşdur).
-  firstName       String?
-  lastName        String?
+  firstName           String?
+  lastName            String?
   /// İstəyə bağlıdır: yalnız yaş təsdiqi üçün, ictimai profildə göstərilmir.
-  birthDate       DateTime?
+  birthDate           DateTime?
   /// Biznes hesabları (agentlik, korporativ): şirkət adı, VÖEN və sayt.
-  companyName     String?
-  companyTaxId    String?
-  companyWebsite  String?
+  companyName         String?
+  companyTaxId        String?
+  companyWebsite      String?
   /// Şirkətdəki vəzifə — korporativ və agentlik hesablarında.
-  position        String?
-  emailVerifiedAt DateTime?
+  position            String?
+  emailVerifiedAt     DateTime?
   /// İdarə panelində hesabın biznes baxımından yoxlanılıb təsdiqləndiyi vaxt.
   /// E-poçt doğrulamasından və bloklama (`isActive`) statusundan qəsdən ayrıdır.
-  approvedAt      DateTime?
-  isActive        Boolean   @default(true)
+  approvedAt          DateTime?
+  isActive            Boolean   @default(true)
   /// Self-service silinmə başladılıbsa hesab dərhal deaktiv olur; cron yarımçıq
   /// qalan əlaqəli təmizliyi bu marker üzrə idempotent şəkildə tamamlayır.
   deletionRequestedAt DateTime?
-  lastLoginAt     DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  lastLoginAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   /// İstifadəçinin seçdiyi dil: az | en | ru. `src/lib/constants.ts`-dəki LOCALES-dən.
-  locale          String @default("az")
+  locale          String  @default("az")
   /// Şəxsi təqvim abunəsinin (ICS) gizli açarı (#109). Yenidən yaradılanda köhnə link ölür.
   calendarToken   String? @unique
   /// Google hesabının dəyişməz ID-si (`sub`, #109). E-poçt dəyişsə də bağlantı qalır.
@@ -66,7 +66,7 @@ model User {
   /// Profildə nömrə dəyişəndə sıfırlanır; iki hesab eyni nömrəni təsdiqləyə bilmir.
   verifiedPhone   String? @unique
   /// light | dark | system — next-themes-in cari seçimini profil üzrə saxlayır.
-  themePreference String @default("light")
+  themePreference String  @default("light")
 
   /// AES-GCM ilə şifrələnmiş TOTP sirri. Açıq mətn heç vaxt saxlanılmır.
   totpSecret         String?
@@ -76,11 +76,11 @@ model User {
   failedAttempts     Int       @default(0)
   lockedUntil        DateTime?
 
-  properties Property[] @relation("PropertyAuthor")
-  posts      BlogPost[] @relation("PostAuthor")
-  media      Media[]    @relation("MediaUploader")
-  favorites  Favorite[]
-  leadNotes  Lead[]     @relation("LeadAssignee")
+  properties            Property[]     @relation("PropertyAuthor")
+  posts                 BlogPost[]     @relation("PostAuthor")
+  media                 Media[]        @relation("MediaUploader")
+  favorites             Favorite[]
+  leadNotes             Lead[]         @relation("LeadAssignee")
   packageOrders         PackageOrder[] @relation("PackageOrderCustomer")
   packageOrdersRecorded PackageOrder[] @relation("PackageOrderRecorder")
 
@@ -366,23 +366,28 @@ model PropertyType {
 /// - VILLAGE      — kənd
 /// - NEIGHBORHOOD — yaşayış massivi/mikrorayon; rəsmi inzibati vahid deyil
 /// - METRO        — Bakı metrosunun stansiyası; valideyni Bakıdır
+/// - LANDMARK     — nişangah (ticarət mərkəzi, park, universitet…); valideyni Bakıdır
 model Location {
-  id         String  @id @default(cuid())
-  name       String
-  searchName String  @default("")
-  slug       String  @unique
-  kind       String  @default("CITY")
-  parentId   String?
-  order      Int     @default(0)
+  id           String  @id @default(cuid())
+  name         String
+  searchName   String  @default("")
+  slug         String  @unique
+  kind         String  @default("CITY")
+  parentId     String?
+  order        Int     @default(0)
+  /// Rəsmi kod (DSK təsnifatı / Ünvan Reyestri): Bakı rayonları «00100003»,
+  /// qəsəbələr «00102016». Massiv, metro və nişangahda boşdur.
+  officialCode String?
 
   parent   Location?  @relation("LocationTree", fields: [parentId], references: [id], onDelete: SetNull)
   children Location[] @relation("LocationTree")
 
-  propertiesInCity     Property[]           @relation("PropertyCity")
-  propertiesInDistrict Property[]           @relation("PropertyDistrict")
-  propertiesNearMetro  Property[]           @relation("PropertyMetro")
-  projects             Project[]            @relation("ProjectCity")
-  neighborhoodProfile  NeighborhoodProfile?
+  propertiesInCity       Property[]           @relation("PropertyCity")
+  propertiesInDistrict   Property[]           @relation("PropertyDistrict")
+  propertiesNearMetro    Property[]           @relation("PropertyMetro")
+  propertiesNearLandmark Property[]           @relation("PropertyLandmark")
+  projects               Project[]            @relation("ProjectCity")
+  neighborhoodProfile    NeighborhoodProfile?
 
   @@index([parentId])
   @@index([kind])
@@ -436,21 +441,23 @@ model Property {
   /// Kirayə üçün: MONTH | DAY — satış üçün null
   pricePeriod String?
 
-  typeId     String
-  cityId     String
-  districtId String?
-  metroId    String?
+  typeId           String
+  cityId           String
+  districtId       String?
+  metroId          String?
+  /// Nişangah (`Location.kind = LANDMARK`) — «28 Mall», «Neapol dairəsi».
+  landmarkId       String?
   /// Tam ünvan sətri: yeni elanlarda `street` + `building`-dən qurulur, köhnə və
   /// CSV-dən gələn elanlarda sərbəst mətndir. Axtarış, JSON-LD və geokod bunu oxuyur.
-  address    String?
+  address          String?
   /// Küçə/prospekt — iyerarxik ünvan formasının sərbəst hissəsi.
   street           String?
   /// Bina/ev nömrəsi, blok, mənzil və orientir kimi əlavə ünvan məlumatı.
   building         String?
   /// Siyahıda olmayan məhəllə və ya yaşayış massivi (rəsmi inzibati vahid deyil).
   neighborhoodName String?
-  latitude   Float?
-  longitude  Float?
+  latitude         Float?
+  longitude        Float?
 
   rooms       Int?
   bedrooms    Int?
@@ -466,7 +473,7 @@ model Property {
   /// TITLE_DEED (çıxarış) | CONTRACT (müqavilə) | NONE
   documentStatus String?
 
-  videoUrl String?
+  videoUrl       String?
   /// 360° virtual tur (Kuula, Matterport, Momento360) — #107. Tanınmayan host embed olunmur.
   virtualTourUrl String?
 
@@ -486,35 +493,35 @@ model Property {
   /// Nümunə/demo qeydi — real məlumatla əvəzlənəndə false olur.
   isDemo             Boolean   @default(false)
 
-  viewCount          Int       @default(0)
-  publishedAt        DateTime?
+  viewCount            Int       @default(0)
+  publishedAt          DateTime?
   /// SOLD/RENTED/ARCHIVED vəziyyətinə ilk keçid; retention siyasəti bu real tarixdən hesablanır.
-  closedAt           DateTime?
+  closedAt             DateTime?
   /// Keçmiş elanın indeksdə saxlanıla biləcəyi son tarix. Null olduqda qlobal SEO siyasəti işləyir.
-  retentionUntil     DateTime?
+  retentionUntil       DateTime?
   /// Sahib/agentlik elanının aktivlik müddəti (#109); STAFF elanlarında boşdur.
   listingExpiresAt     DateTime?
   expiryReminderSentAt DateTime?
   /// Müddət bitdiyi üçün arxivlənib — sahib kabinetdən bir kliklə bərpa edə bilir.
   expiredAt            DateTime?
   /// CSV idxalı (#103): sətir məzmununun SHA-256 heşi. Təkrar idxalda eyni sətri tanıyır.
-  importKey          String?
+  importKey            String?
   /// Bütün əlaqələr (xüsusiyyət, şəkil) yazılanda qoyulur. `null` + `importKey` = yarımçıq
   /// idxal; təkrar cəhd onu dublikat saymır, davam etdirir (D1-də tranzaksiya yoxdur).
-  importCompletedAt  DateTime?
+  importCompletedAt    DateTime?
   /// Semantik indeksə yazılma vaxtı (#107). Tam yenidən indeksləmə bu işarəsi olub
   /// artıq ictimai olmayan elanların vektorlarını silir.
-  vectorIndexedAt    DateTime?
+  vectorIndexedAt      DateTime?
   /// Duplikat aşkarlanması üçün normallaşdırılmış ünvan+təsvir+əsas atribut fingerprint-i.
-  contentFingerprint String?
-  deletedAt          DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  contentFingerprint   String?
+  deletedAt            DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   metaTitle       String?
   metaDescription String?
   /// Google-a "bu URL-i indeksləşdirmə" deyir — duplikat və ya keçici səhifələr üçün.
-  noIndex         Boolean @default(false)
+  noIndex         Boolean   @default(false)
   /// Boş buraxılsa canonical öz URL-inə işarə edir; yalnız duplikat kontent halında doldurulur.
   canonicalUrl    String?
   ogTitle         String?
@@ -532,6 +539,7 @@ model Property {
   city            Location      @relation("PropertyCity", fields: [cityId], references: [id])
   district        Location?     @relation("PropertyDistrict", fields: [districtId], references: [id], onDelete: SetNull)
   metro           Location?     @relation("PropertyMetro", fields: [metroId], references: [id], onDelete: SetNull)
+  landmark        Location?     @relation("PropertyLandmark", fields: [landmarkId], references: [id], onDelete: SetNull)
   author          User?         @relation("PropertyAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   authorId        String?
   assignedAgent   AgentProfile? @relation(fields: [assignedAgentId], references: [id], onDelete: SetNull)
@@ -559,6 +567,7 @@ model Property {
   @@index([cityId])
   @@index([districtId])
   @@index([metroId])
+  @@index([landmarkId])
   @@index([price])
   @@index([isFeatured])
   @@index([featuredUntil])
@@ -590,14 +599,14 @@ model PropertyFloorPlan {
 
 /// Açıq qapı günü (#109): elanın ümumi baxış pəncərəsi, qeydiyyatla.
 model OpenHouse {
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
   propertyId String
-  startsAt  DateTime
-  endsAt    DateTime
+  startsAt   DateTime
+  endsAt     DateTime
   /// Boşdursa məhdudiyyət yoxdur.
-  capacity  Int?
-  note      String?
-  createdAt DateTime @default(now())
+  capacity   Int?
+  note       String?
+  createdAt  DateTime @default(now())
 
   property      Property                @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   registrations OpenHouseRegistration[]
@@ -606,14 +615,14 @@ model OpenHouse {
 }
 
 model OpenHouseRegistration {
-  id          String    @id @default(cuid())
-  openHouseId String
-  name        String
-  phone       String
-  email       String?
-  leadId      String?
+  id             String    @id @default(cuid())
+  openHouseId    String
+  name           String
+  phone          String
+  email          String?
+  leadId         String?
   reminderSentAt DateTime?
-  createdAt   DateTime  @default(now())
+  createdAt      DateTime  @default(now())
 
   openHouse OpenHouse @relation(fields: [openHouseId], references: [id], onDelete: Cascade)
 
@@ -771,19 +780,19 @@ model Project {
 /// Yeni tikilinin mənzil şahmatı (#107): blok → mərtəbə → mənzil. Status və qiymət
 /// satış ofisinin cari vəziyyətidir; elan (`Property`) yaradılması tələb olunmur.
 model ProjectUnit {
-  id         String   @id @default(cuid())
-  projectId  String
-  block      String
-  floor      Int
-  number     String
-  rooms      Int?
-  area       Float?
-  price      Float?
-  currency   String   @default("AZN")
+  id        String   @id @default(cuid())
+  projectId String
+  block     String
+  floor     Int
+  number    String
+  rooms     Int?
+  area      Float?
+  price     Float?
+  currency  String   @default("AZN")
   /// AVAILABLE | RESERVED | SOLD — `PROJECT_UNIT_STATUSES`
-  status     String   @default("AVAILABLE")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  status    String   @default("AVAILABLE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 

@@ -1,0 +1,57 @@
+{
+ "_note": "emlak.az Cloudflare yoxlaması ilə qorunur (birbaşa və server sorğusu 403/CAPTCHA). Siyahı axtarış indeksindəki /elan/<ad>-(qesebesinde|metrosunda|rayonunda)-... səhifələrindən toplanıb, 2026-09-29. Hamısı saytın yerləşmə ağacında mövcuddur.",
+ "rayonunda": [
+  "Binəqədi",
+  "Nərimanov",
+  "Nəsimi",
+  "Nizami",
+  "Qaradağ",
+  "Sabunçu",
+  "Səbail",
+  "Suraxanı",
+  "Xəzər",
+  "Yasamal"
+ ],
+ "metrosunda": [
+  "20 Yanvar",
+  "Gənclik",
+  "Əhmədli",
+  "Koroğlu",
+  "Memar Əcəmi",
+  "Nəriman Nərimanov",
+  "Nəsimi",
+  "İnşaatçılar",
+  "Ulduz",
+  "Şah İsmayıl Xətai"
+ ],
+ "qesebesinde": [
+  "Əmircan",
+  "Y.Ramana",
+  "Hövsan",
+  "Saray",
+  "Maştağa",
+  "Masazır",
+  "Y.Günəşli",
+  "Kürdəxanı",
+  "Qala",
+  "Dədə Qorqud",
+  "Türkan",
+  "Buzovna",
+  "Ramana",
+  "Hökməli",
+  "Zağulba",
+  "Xaşaxuna",
+  "Biləcəri",
+  "Atyalı",
+  "Zabrat 1",
+  "3 mkr",
+  "Şuşa"
+ ],
+ "listing_text": [
+  "Şuşa şəhərciyi 2 massivi (Ramana)",
+  "Albalı 1 massivi (Sabunçu)",
+  "Ləhiş bağları massivi",
+  "Yeni Günəşli AB, V massivi",
+  "Hövsan bağlar massivi"
+ ]
+}

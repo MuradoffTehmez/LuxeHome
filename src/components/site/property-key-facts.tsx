@@ -59,6 +59,7 @@ export type PropertyKeyFactsData = {
   viewCount: number;
   publishedAt: Date | null;
   metro: { name: string } | null;
+  landmark?: { name: string } | null;
 };
 
 type Fact = { key: string; icon: LucideIcon; label: string; value: string };
@@ -162,6 +163,7 @@ export async function PropertyKeyFacts({
         : null,
   );
   push("metro", TrainFront, content("metroNearby"), property.metro?.name ?? null);
+  push("landmark", Landmark, content("landmarkNearby"), property.landmark?.name ?? null);
   push("publishedAt", CalendarDays, content("publishedAt"), formatLocalizedDate(property.publishedAt, locale));
   push("views", Eye, content("views"), property.viewCount > 0 ? String(property.viewCount) : null);
   // Elan kodu — dəstəklə danışarkən istifadəçinin oxuya biləcəyi qısa istinad.

@@ -1,0 +1,800 @@
+{
+ "rayon": [
+  {
+   "id": "97",
+   "name": "Abşeron"
+  },
+  {
+   "id": "88",
+   "name": "Sabunçu"
+  },
+  {
+   "id": "159",
+   "name": "Suraxanı"
+  },
+  {
+   "id": "160",
+   "name": "Səbail"
+  },
+  {
+   "id": "70",
+   "name": "Nizami"
+  },
+  {
+   "id": "71",
+   "name": "Nərimanov"
+  },
+  {
+   "id": "72",
+   "name": "Nəsimi"
+  },
+  {
+   "id": "73",
+   "name": "Qaradağ"
+  },
+  {
+   "id": "163",
+   "name": "Pirallahı"
+  },
+  {
+   "id": "158",
+   "name": "Binəqədi"
+  },
+  {
+   "id": "91",
+   "name": "Xətai"
+  },
+  {
+   "id": "161",
+   "name": "Xəzər"
+  },
+  {
+   "id": "162",
+   "name": "Yasamal"
+  }
+ ],
+ "menteqe": [
+  {
+   "id": "273",
+   "name": "Masazır"
+  },
+  {
+   "id": "358",
+   "name": "Mehdiabad"
+  },
+  {
+   "id": "363",
+   "name": "Məhəmmədli"
+  },
+  {
+   "id": "182",
+   "name": "Montin qəs."
+  },
+  {
+   "id": "199",
+   "name": "Müşviqabad qəs."
+  },
+  {
+   "id": "218",
+   "name": "Maştağa qəs."
+  },
+  {
+   "id": "252",
+   "name": "Mərdəkan"
+  },
+  {
+   "id": "353",
+   "name": "Aşağı Güzdək"
+  },
+  {
+   "id": "853",
+   "name": "Ağ şəhər"
+  },
+  {
+   "id": "261",
+   "name": "Alatava"
+  },
+  {
+   "id": "362",
+   "name": "Saray"
+  },
+  {
+   "id": "173",
+   "name": "Sulutəpə qəs."
+  },
+  {
+   "id": "206",
+   "name": "Sahil qəs."
+  },
+  {
+   "id": "207",
+   "name": "Səngəçal qəs."
+  },
+  {
+   "id": "223",
+   "name": "Sabunçu qəs."
+  },
+  {
+   "id": "219",
+   "name": "Savalan qəs."
+  },
+  {
+   "id": "234",
+   "name": "Suraxanı qəs."
+  },
+  {
+   "id": "359",
+   "name": "Novxanı"
+  },
+  {
+   "id": "220",
+   "name": "Nardaran qəs."
+  },
+  {
+   "id": "180",
+   "name": "NZS"
+  },
+  {
+   "id": "354",
+   "name": "Fatmayi"
+  },
+  {
+   "id": "357",
+   "name": "Hökməli"
+  },
+  {
+   "id": "195",
+   "name": "Heybət qəs."
+  },
+  {
+   "id": "366",
+   "name": "Hövsan qəs."
+  },
+  {
+   "id": "245",
+   "name": "H.Aslanov qəs."
+  },
+  {
+   "id": "355",
+   "name": "Goradil"
+  },
+  {
+   "id": "356",
+   "name": "Güzdək"
+  },
+  {
+   "id": "251",
+   "name": "Gürgən"
+  },
+  {
+   "id": "360",
+   "name": "Qobu"
+  },
+  {
+   "id": "202",
+   "name": "Qaradağ qəs."
+  },
+  {
+   "id": "203",
+   "name": "Qarakosa qəs."
+  },
+  {
+   "id": "204",
+   "name": "Qızıldaş qəs."
+  },
+  {
+   "id": "205",
+   "name": "Qobustan qəs."
+  },
+  {
+   "id": "233",
+   "name": "Qaraçuxur qəs."
+  },
+  {
+   "id": "1162",
+   "name": "Qurd Qapısı"
+  },
+  {
+   "id": "246",
+   "name": "Qara şəhər"
+  },
+  {
+   "id": "253",
+   "name": "Qala"
+  },
+  {
+   "id": "364",
+   "name": "Ceyranbatan qəs."
+  },
+  {
+   "id": "193",
+   "name": "Ceyildağ qəs."
+  },
+  {
+   "id": "365",
+   "name": "Digah"
+  },
+  {
+   "id": "229",
+   "name": "Dədə Qorqud qəs."
+  },
+  {
+   "id": "250",
+   "name": "Dübəndi"
+  },
+  {
+   "id": "404",
+   "name": "Pereküşkül"
+  },
+  {
+   "id": "864",
+   "name": "Papanin"
+  },
+  {
+   "id": "200",
+   "name": "Pirsaat qəs."
+  },
+  {
+   "id": "201",
+   "name": "Puta qəs."
+  },
+  {
+   "id": "221",
+   "name": "Pirşağı qəs."
+  },
+  {
+   "id": "266",
+   "name": "Pirallahı"
+  },
+  {
+   "id": "164",
+   "name": "28 may qəs."
+  },
+  {
+   "id": "186",
+   "name": "2-ci mikrorayon"
+  },
+  {
+   "id": "239",
+   "name": "20-ci sahə"
+  },
+  {
+   "id": "165",
+   "name": "6-cı mikrorayon"
+  },
+  {
+   "id": "166",
+   "name": "7-ci mikrorayon"
+  },
+  {
+   "id": "167",
+   "name": "8-ci mikrorayon"
+  },
+  {
+   "id": "177",
+   "name": "8-ci kilometr"
+  },
+  {
+   "id": "168",
+   "name": "9-cu mikrorayon"
+  },
+  {
+   "id": "169",
+   "name": "Biləcəri qəs."
+  },
+  {
+   "id": "170",
+   "name": "Binəqədi qəs."
+  },
+  {
+   "id": "181",
+   "name": "Böyükşor qəs."
+  },
+  {
+   "id": "192",
+   "name": "Baş Ələt qəs."
+  },
+  {
+   "id": "214",
+   "name": "Bakıxanov qəs."
+  },
+  {
+   "id": "215",
+   "name": "Balaxanı qəs."
+  },
+  {
+   "id": "216",
+   "name": "Bilgəh qəs."
+  },
+  {
+   "id": "227",
+   "name": "Bahar qəs."
+  },
+  {
+   "id": "228",
+   "name": "Bülbülə qəs."
+  },
+  {
+   "id": "240",
+   "name": "Badamdar qəs."
+  },
+  {
+   "id": "241",
+   "name": "Bayıl qəs."
+  },
+  {
+   "id": "242",
+   "name": "Bibi Heybət qəs."
+  },
+  {
+   "id": "248",
+   "name": "Binə qəs."
+  },
+  {
+   "id": "249",
+   "name": "Buzovna"
+  },
+  {
+   "id": "171",
+   "name": "Çiçək qəs."
+  },
+  {
+   "id": "264",
+   "name": "Çilov qəs."
+  },
+  {
+   "id": "172",
+   "name": "Rəsulzadə qəs."
+  },
+  {
+   "id": "222",
+   "name": "Ramana qəs."
+  },
+  {
+   "id": "174",
+   "name": "Xocəsən qəs."
+  },
+  {
+   "id": "863",
+   "name": "Xutor qəsəbəsi"
+  },
+  {
+   "id": "1366",
+   "name": "Şamaxinka"
+  },
+  {
+   "id": "208",
+   "name": "Şıxlar qəs."
+  },
+  {
+   "id": "209",
+   "name": "Şonqar qəs."
+  },
+  {
+   "id": "210",
+   "name": "Şubani qəs."
+  },
+  {
+   "id": "254",
+   "name": "Şağan"
+  },
+  {
+   "id": "255",
+   "name": "Şimal qres"
+  },
+  {
+   "id": "256",
+   "name": "Şüvəlan"
+  },
+  {
+   "id": "178",
+   "name": "Keşlə qəs."
+  },
+  {
+   "id": "191",
+   "name": "Kubinka"
+  },
+  {
+   "id": "865",
+   "name": "Kimyaçılar şəhərciyi"
+  },
+  {
+   "id": "196",
+   "name": "Korgöz qəs."
+  },
+  {
+   "id": "197",
+   "name": "Kotal qəs."
+  },
+  {
+   "id": "217",
+   "name": "Kürdəxanı qəs."
+  },
+  {
+   "id": "232",
+   "name": "Köhnə Günəşli qəs."
+  },
+  {
+   "id": "179",
+   "name": "UPD"
+  },
+  {
+   "id": "187",
+   "name": "1-ci mikrorayon"
+  },
+  {
+   "id": "188",
+   "name": "3-cü mikrorayon"
+  },
+  {
+   "id": "189",
+   "name": "4-cü mikrorayon"
+  },
+  {
+   "id": "190",
+   "name": "5-ci mikrorayon"
+  },
+  {
+   "id": "194",
+   "name": "Ələt qəs."
+  },
+  {
+   "id": "230",
+   "name": "Əmircan qəs."
+  },
+  {
+   "id": "244",
+   "name": "Əhmədli"
+  },
+  {
+   "id": "198",
+   "name": "Lökbatan qəs."
+  },
+  {
+   "id": "211",
+   "name": "Ümid qəs."
+  },
+  {
+   "id": "212",
+   "name": "Yeni Ələt qəs."
+  },
+  {
+   "id": "224",
+   "name": "Yeni Ramana"
+  },
+  {
+   "id": "235",
+   "name": "Yeni Günəşli qəs."
+  },
+  {
+   "id": "236",
+   "name": "Yeni Suraxanı qəs."
+  },
+  {
+   "id": "263",
+   "name": "Yasamal qəs."
+  },
+  {
+   "id": "262",
+   "name": "Yeni Yasamal qəs."
+  },
+  {
+   "id": "225",
+   "name": "Zabrat qəs."
+  },
+  {
+   "id": "237",
+   "name": "Zığ qəs."
+  },
+  {
+   "id": "258",
+   "name": "Zaqulba"
+  },
+  {
+   "id": "259",
+   "name": "Zirə"
+  },
+  {
+   "id": "1913",
+   "name": "kənd Əhmədli"
+  },
+  {
+   "id": "257",
+   "name": "Türkan"
+  }
+ ],
+ "sumqayit_rayon": [
+  {
+   "id": "6914",
+   "name": "Sumqayıt Bulvarı"
+  },
+  {
+   "id": "6915",
+   "name": "St.Sumqayıt"
+  },
+  {
+   "id": "6927",
+   "name": "Novxanı bağ massivi"
+  },
+  {
+   "id": "6926",
+   "name": "Hacı Zeynalabdin"
+  },
+  {
+   "id": "6918",
+   "name": "Qurd dərəsi"
+  },
+  {
+   "id": "6922",
+   "name": "Corat bağları"
+  },
+  {
+   "id": "6923",
+   "name": "Corat köhnə"
+  },
+  {
+   "id": "6852",
+   "name": "2-ci məhəllə"
+  },
+  {
+   "id": "6869",
+   "name": "20-ci məhəllə"
+  },
+  {
+   "id": "6870",
+   "name": "21-ci mərhələ"
+  },
+  {
+   "id": "6871",
+   "name": "22-ci məhəllə"
+  },
+  {
+   "id": "6872",
+   "name": "23-cü məhəllə"
+  },
+  {
+   "id": "6873",
+   "name": "24-cü məhəllə "
+  },
+  {
+   "id": "6874",
+   "name": "25-ci məhəllə"
+  },
+  {
+   "id": "6875",
+   "name": "26-ci məhəllə"
+  },
+  {
+   "id": "6876",
+   "name": "29-cu məhəllə"
+  },
+  {
+   "id": "6896",
+   "name": "2-ci mikrorayon"
+  },
+  {
+   "id": "6911",
+   "name": "20-ci mikrorayon"
+  },
+  {
+   "id": "6912",
+   "name": "21-ci mikrorayon"
+  },
+  {
+   "id": "6900",
+   "name": "6-ci mikrorayon"
+  },
+  {
+   "id": "6856",
+   "name": "7-ci məhəllə"
+  },
+  {
+   "id": "6894",
+   "name": "72-ci məhəllə"
+  },
+  {
+   "id": "6857",
+   "name": "8-ci məhəllə"
+  },
+  {
+   "id": "6901",
+   "name": "8-ci mikrorayon"
+  },
+  {
+   "id": "6860",
+   "name": "9-cu məhəllə"
+  },
+  {
+   "id": "6902",
+   "name": "9-cu mikrorayon"
+  },
+  {
+   "id": "6913",
+   "name": "Birləşmiş məhəllə"
+  },
+  {
+   "id": "6920",
+   "name": "BTZ bağları"
+  },
+  {
+   "id": "6921",
+   "name": "Xəzər bağları"
+  },
+  {
+   "id": "6917",
+   "name": "Kotec"
+  },
+  {
+   "id": "6851",
+   "name": "1-ci məhəllə"
+  },
+  {
+   "id": "6861",
+   "name": "12-ci məhəllə"
+  },
+  {
+   "id": "6862",
+   "name": "13-cü məhəllə"
+  },
+  {
+   "id": "6863",
+   "name": "14-cü məhəllə"
+  },
+  {
+   "id": "6864",
+   "name": "15-ci məhəllə"
+  },
+  {
+   "id": "6865",
+   "name": "16-ci məhəllə"
+  },
+  {
+   "id": "6866",
+   "name": "17-ci məhəllə"
+  },
+  {
+   "id": "6867",
+   "name": "18-ci məhəllə"
+  },
+  {
+   "id": "6868",
+   "name": "19-cu məhəllə"
+  },
+  {
+   "id": "6895",
+   "name": "1-ci mikrorayon"
+  },
+  {
+   "id": "6903",
+   "name": "10-cu mikrorayon"
+  },
+  {
+   "id": "6904",
+   "name": "11-ci mikrorayon"
+  },
+  {
+   "id": "6906",
+   "name": "12-ci mikrorayon"
+  },
+  {
+   "id": "6907",
+   "name": "13-cü mikrorayon"
+  },
+  {
+   "id": "6908",
+   "name": "16-ci mikrorayon"
+  },
+  {
+   "id": "6909",
+   "name": "17-ci mikrorayon"
+  },
+  {
+   "id": "6910",
+   "name": "18-ci mikrorayon"
+  },
+  {
+   "id": "6853",
+   "name": "3-ci məhəllə"
+  },
+  {
+   "id": "6877",
+   "name": "30-cu məhəllə"
+  },
+  {
+   "id": "6878",
+   "name": "34-cü məhəllə"
+  },
+  {
+   "id": "6879",
+   "name": "36-ci məhəllə"
+  },
+  {
+   "id": "6897",
+   "name": "3-cü mikrorayon"
+  },
+  {
+   "id": "6854",
+   "name": "4-cü məhəllə"
+  },
+  {
+   "id": "6880",
+   "name": "40-ci məhəllə"
+  },
+  {
+   "id": "6881",
+   "name": "41-ci məhəllə"
+  },
+  {
+   "id": "6882",
+   "name": "42-ci məhəllə"
+  },
+  {
+   "id": "6883",
+   "name": "43-cü məhəllə"
+  },
+  {
+   "id": "6884",
+   "name": "44-cü məhəllə"
+  },
+  {
+   "id": "6885",
+   "name": "45-ci məhəllə"
+  },
+  {
+   "id": "6886",
+   "name": "46-ci məhəllə"
+  },
+  {
+   "id": "6888",
+   "name": "47-ci məhəllə"
+  },
+  {
+   "id": "6889",
+   "name": "48-ci məhəllə"
+  },
+  {
+   "id": "6890",
+   "name": "49-cu məhəllə"
+  },
+  {
+   "id": "6898",
+   "name": "4-cü mikrorayon"
+  },
+  {
+   "id": "6855",
+   "name": "5-ci məhəllə"
+  },
+  {
+   "id": "6891",
+   "name": "50-ci məhəllə"
+  },
+  {
+   "id": "6892",
+   "name": "51-ci məhəllə"
+  },
+  {
+   "id": "6893",
+   "name": "52-ci məhəllə"
+  },
+  {
+   "id": "6899",
+   "name": "5-ci mikrorayon"
+  },
+  {
+   "id": "6919",
+   "name": "Yaşıl dərə"
+  },
+  {
+   "id": "6924",
+   "name": "Yeni corat "
+  },
+  {
+   "id": "6925",
+   "name": "Yaşma bağları"
+  },
+  {
+   "id": "6916",
+   "name": "İnşaatçılar"
+  }
+ ]
+}
