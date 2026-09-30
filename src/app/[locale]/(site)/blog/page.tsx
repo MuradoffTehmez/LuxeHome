@@ -110,7 +110,9 @@ export default async function BlogPage({ params: routeParams, searchParams }: Pr
                   )}
                 >
                   {cat.name}
-                  <span className="ml-1.5 text-xs opacity-60">
+                  {/* Şəffaflıq (opacity) kontrastı 3:1-ə salırdı — sayı tokenlə rənglənir:
+                      aktiv çipdə ağ mətni irsən alır, qalanlarda ink-muted (AA, 5.1:1). */}
+                  <span className={cn("ml-1.5 text-xs", categorySlug !== cat.slug && "text-ink-muted")}>
                     {cat._count.posts}
                   </span>
                 </Link>

@@ -18,6 +18,10 @@ const AUDITED_PAGES = [
   { name: "Ana səhifə", path: "/az" },
   { name: "Kataloq", path: "/az/emlaklar" },
   { name: "Bloq", path: "/az/blog" },
+  // Məzmun miqrasiya ilə gəlir (0054) — təzə lokal D1-də də mövcuddur.
+  { name: "Bloq yazısı", path: "/az/blog/azerbaycanda-emlak-nece-alinmalidir" },
+  { name: "Bilik Mərkəzi", path: "/az/bilik-merkezi" },
+  { name: "Bilik Mərkəzi məqaləsi", path: "/az/bilik-merkezi/emlak-alarken-yoxlanilmali-meqamlar" },
   { name: "Əlaqə", path: "/az/elaqe" },
   { name: "Kalkulyator", path: "/az/kalkulyator" },
 ];
