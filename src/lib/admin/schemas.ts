@@ -275,6 +275,7 @@ export const knowledgeArticleSchema = z.object({
   legalReviewedAt: z.coerce.date().nullable(),
   legalActs: z.array(z.string().trim().min(2).max(300)).max(30),
   sourceUrls: z.array(z.string().url("Rəsmi mənbə URL-i düzgün deyil").max(1000)).max(30),
+  tags: z.array(z.string().min(2).max(48)).max(20),
   legalBasis: optionalText(40000),
   requiredDocuments: optionalText(40000),
   procedure: optionalText(40000),

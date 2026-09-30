@@ -61,6 +61,7 @@
     "db:taxonomy:local": "wrangler d1 execute luxehome-db --local --file=prisma/taxonomy.sql",
     "db:taxonomy:remote": "wrangler d1 execute luxehome-db --remote --file=prisma/taxonomy.sql",
     "db:taxonomy:staging": "wrangler d1 execute luxehome-db-staging --remote --env staging --file=prisma/taxonomy.sql",
+    "db:guides:build": "tsx prisma/build-knowledge-guides-sql.ts",
     "db:knowledge:build": "tsx prisma/build-knowledge-hub-sql.ts",
     "db:knowledge:local": "wrangler d1 execute DB --local --file=prisma/knowledge-hub.sql",
     "db:knowledge:remote": "wrangler d1 execute DB --remote --file=prisma/knowledge-hub.sql",

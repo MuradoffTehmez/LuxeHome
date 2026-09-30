@@ -179,6 +179,20 @@ Modulun public sorğuları `src/lib/knowledge.ts`, admin yazmaları
   sərhədinə köçürmək və ya tərcümə action-ında ötürmək olmaz.
 - Bilik məzmunu dəyişəndə `public:knowledge` keşi və əlaqəli list/detail/sitemap yolları
   invalidasiya edilməlidir.
+- **Axtarış tam mətnlidir** (#134): `searchText` başlıq, xülasə, məzmun, tag, kateqoriya adı və
+  hüquqi blokları daxil edir (`knowledgeSearchText()`, `src/lib/knowledge-text.ts` — Prisma-sız,
+  generator da onu işlədir). Sorğu sözlərə bölünür və hər söz `AND` şərtidir. Hub `?kateqoriya=`,
+  `?teq=` (slug) və `?kim=` filtrlərini, axtarışda lüğət terminləri və FAQ nəticələrini göstərir.
+  Tag bazada oxunaqlı adla saxlanılır (`cleanKnowledgeTags()`), URL-də slug işlənir.
+- **Keşlənmiş sorğunu `unstable_cache` ilə birbaşa sarma** — `public-cache.ts`-dəki `cachedQuery()`
+  `reviveDates()` ilə tarixləri bərpa edir. Keş dəyəri JSON-dur: `Date` sahələri keş dolandan sonra
+  sətir qayıdırdı və `Intl.DateTimeFormat().format()` bütün məqalələri 500-ə salırdı (#132).
+- Praktiki bələdçilər, əlavə lüğət terminləri və bloq yazıları kodda saxlanılır
+  (`prisma/knowledge-guides/`) və `npm run db:guides:build` ilə özü-yetərli miqrasiyaya
+  (`migrations/0054_knowledge_guides_and_blog.sql`) çevrilir; `INSERT OR IGNORE` redaktorun
+  düzəlişinin üzərinə yazmır. Mənbə URL-ləri yalnız `src/lib/official-sources.ts`-dəki yoxlanmış
+  siyahıdan olmalıdır; daxili keçidlərin 404 verməməsini `prisma/__tests__/knowledge-guides.test.ts`
+  yoxlayır. Məzmun HTML-i sanitizer-in ağ siyahısına uyğun olmalıdır (məs. `<ol start>` atılır).
 - `docs/Real Estate Knowledge Hub/Real Estate Knowledge Hub.md` hüquqi mənbə materialıdır,
   avtomatik dərc müqaviləsi deyil. `prisma/build-knowledge-hub-sql.ts` qeydləri DRAFT yaradır;
   hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilməməlidir.

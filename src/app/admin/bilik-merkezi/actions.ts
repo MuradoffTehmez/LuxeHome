@@ -15,12 +15,13 @@ import {
   knowledgeCategorySchema,
   knowledgeFaqSchema,
   knowledgeTermSchema,
+  type KnowledgeArticleInput,
 } from "@/lib/admin/schemas";
 import { uniqueSlug } from "@/lib/admin/slug";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { normalizeSearchText } from "@/lib/search-normalization";
-import { knowledgeSearchText, termInitial } from "@/lib/knowledge";
+import { cleanKnowledgeTags, knowledgeSearchText, termInitial } from "@/lib/knowledge";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { msg } from "@/lib/admin/server-message";
 
@@ -62,6 +63,7 @@ function readArticleForm(formData: FormData) {
     legalReviewedAt: form.date(formData, "legalReviewedAt"),
     legalActs: form.lines(formData, "legalActs"),
     sourceUrls: form.lines(formData, "sourceUrls"),
+    tags: cleanKnowledgeTags(form.text(formData, "tags").split(",")),
     legalBasis: form.optionalText(formData, "legalBasis"),
     requiredDocuments: form.optionalText(formData, "requiredDocuments"),
     procedure: form.optionalText(formData, "procedure"),
@@ -108,6 +110,33 @@ async function legalArticleData(data: ReturnType<typeof readArticleForm> & {
   };
 }
 
+/** Axtarış indeksi: məzmun, tag, kateqoriya adı və hüquqi bloklar daxil. */
+async function articleSearchText(data: KnowledgeArticleInput, content: string) {
+  const category = data.categoryId
+    ? await prisma.knowledgeCategory.findUnique({ where: { id: data.categoryId }, select: { name: true } })
+    : null;
+  return knowledgeSearchText({
+    title: data.title,
+    excerpt: data.excerpt,
+    content,
+    tags: data.tags,
+    categoryName: category?.name,
+    // Məqalədə göstərilən hər strukturlaşdırılmış blok axtarışa da düşür.
+    extra: [
+      data.legalBasis,
+      data.requiredDocuments,
+      data.procedure,
+      data.duration,
+      data.costs,
+      data.risks,
+      data.checklist,
+      data.template,
+      data.courtPosition,
+      ...data.legalActs,
+    ],
+  });
+}
+
 // ---------------------------------------------------------------------------
 // BƏLƏDÇİLƏR
 // ---------------------------------------------------------------------------
@@ -139,7 +168,8 @@ export async function createKnowledgeArticle(
       data: {
         title: parsed.data.title,
         slug,
-        searchText: knowledgeSearchText(parsed.data),
+        searchText: await articleSearchText(parsed.data, content),
+        tags: form.jsonArray(parsed.data.tags),
         excerpt: parsed.data.excerpt,
         content,
         coverUrl: cover?.url ?? null,
@@ -214,7 +244,8 @@ export async function updateKnowledgeArticle(
       data: {
         title: parsed.data.title,
         slug,
-        searchText: knowledgeSearchText(parsed.data),
+        searchText: await articleSearchText(parsed.data, content),
+        tags: form.jsonArray(parsed.data.tags),
         excerpt: parsed.data.excerpt,
         content,
         coverUrl: cover?.url ?? null,
@@ -415,7 +446,7 @@ export async function saveKnowledgeTerm(
     const data = {
       term: parsed.data.term,
       slug,
-      searchName: normalizeSearchText(parsed.data.term),
+      searchName: normalizeSearchText(`${parsed.data.term} ${parsed.data.shortDefinition}`),
       shortDefinition: parsed.data.shortDefinition,
       definition: parsed.data.definition
         ? await sanitizeRichText(parsed.data.definition)

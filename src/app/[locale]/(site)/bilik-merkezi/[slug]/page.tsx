@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { ExternalLink, Info, Scale } from "lucide-react";
+import { ExternalLink, Info, Scale, Tag } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -19,7 +19,8 @@ import {
   knowledgeArticleSchema,
 } from "@/lib/seo";
 import { getCachedKnowledgeArticleBySlug } from "@/lib/public-cache";
-import { getRelatedKnowledgeArticles } from "@/lib/knowledge";
+import { describeSource } from "@/lib/official-sources";
+import { getRelatedKnowledgeArticles, knowledgeTagSlug, parseKnowledgeTags } from "@/lib/knowledge";
 import { recordView } from "@/lib/view-counter";
 import { isUnoptimizedImage, parseJsonArray } from "@/lib/utils";
 import {
@@ -47,16 +48,6 @@ const RISK_LEVEL_KEYS: Record<KnowledgeRiskLevel, "green" | "yellow" | "red" | "
   RED: "red",
   LEGAL_REVIEW: "legalReview",
 };
-
-/** Mənbə siyahısında səhv yazılmış URL səhifəni sındırmamalıdır — belə qeyd göstərilmir. */
-function sourceHost(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.hostname : null;
-  } catch {
-    return null;
-  }
-}
 
 async function loadArticle(slug: string, locale: string) {
   const source = await getCachedKnowledgeArticleBySlug(slug);
@@ -115,9 +106,10 @@ export default async function KnowledgeArticlePage({ params }: Props) {
   const publishedAt = new Date(article.publishedAt || article.updatedAt);
   const updatedAt = new Date(article.updatedAt);
   const legalActs = parseJsonArray<string>(article.legalActs);
+  const tags = parseKnowledgeTags(article.tags);
   const sources = parseJsonArray<string>(article.sourceUrls)
-    .map((url) => ({ url, host: sourceHost(url) }))
-    .filter((item): item is { url: string; host: string } => item.host !== null);
+    .map(describeSource)
+    .filter((item) => item !== null);
   const legalBlocks = [
     [t("article.legalBasis"), article.legalBasis],
     [t("article.requiredDocuments"), article.requiredDocuments],
@@ -219,7 +211,7 @@ export default async function KnowledgeArticlePage({ params }: Props) {
                     <div><dt className="text-ink-muted">{t("article.legalReviewedAt")}</dt><dd className="font-medium text-ink">{article.legalReviewedAt ? new Intl.DateTimeFormat(locale).format(new Date(article.legalReviewedAt)) : t("article.notReviewed")}</dd></div>
                   </dl>
                   {legalActs.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.legalActs")}</h3><ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-ink-soft">{legalActs.map((act) => <li key={act}>{act}</li>)}</ul></div>}
-                  {sources.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.officialSources")}</h3><ul className="mt-2 space-y-2">{sources.map(({ url, host }) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 break-all text-sm text-gold-deep underline-offset-4 hover:underline">{host}<ExternalLink className="size-3.5 shrink-0" aria-hidden="true" /></a></li>)}</ul></div>}
+                  {sources.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.officialSources")}</h3><ul className="mt-2 space-y-2">{sources.map(({ url, label, host }) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 break-all text-sm text-gold-deep underline-offset-4 hover:underline">{label}{label !== host ? <span className="text-xs text-ink-muted">· {host}</span> : null}<ExternalLink className="size-3.5 shrink-0" aria-hidden="true" /></a></li>)}</ul></div>}
                 </div>
               </div>
             </aside>
@@ -252,6 +244,25 @@ export default async function KnowledgeArticlePage({ params }: Props) {
               <Info className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
               <span>{t("article.disclaimer")}</span>
             </p>
+
+            {tags.length > 0 && (
+              <nav className="mt-8" aria-label={t("article.tagsTitle")}>
+                <h2 className="font-sans text-sm font-semibold text-ink">{t("article.tagsTitle")}</h2>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {tags.map((label) => (
+                    <li key={label}>
+                      <Link
+                        href={`/bilik-merkezi?teq=${encodeURIComponent(knowledgeTagSlug(label))}`}
+                        className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line-strong bg-paper px-4 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
+                      >
+                        <Tag className="size-3.5 text-gold" aria-hidden="true" />
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
 
             <div className="mt-8 flex flex-col gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
               <span className="font-display text-lg text-ink">{t("article.shareTitle")}</span>

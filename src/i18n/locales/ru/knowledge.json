@@ -18,7 +18,16 @@
     "resultCount": "Найдено руководств: {count}",
     "noResults": "По запросу ничего не найдено",
     "noResultsDescription": "Попробуйте другое слово или посмотрите все руководства.",
-    "resetSearch": "Все руководства"
+    "resetSearch": "Все руководства",
+    "categoryFilterLabel": "Фильтр по теме",
+    "allCategories": "Все темы",
+    "activeFilters": "Активные фильтры",
+    "removeFilter": "Убрать фильтр «{name}»",
+    "popularTags": "Популярные темы",
+    "termResults": "Терминов в словаре: {count}",
+    "faqResults": "Ответов в FAQ: {count}",
+    "categorySearchLabel": "Поиск в разделе «{name}»",
+    "categorySearchPlaceholder": "Поиск в разделе «{name}»…"
   },
   "article": {
     "readMinutes": "{count} мин чтения",
@@ -60,7 +69,8 @@
       "yellow": "Требуется дополнительная проверка",
       "red": "Серьёзный юридический риск",
       "legalReview": "Требуется юридическое заключение"
-    }
+    },
+    "tagsTitle": "Ключевые темы"
   },
   "audience": {
     "BUYER": "Покупатель",

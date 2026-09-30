@@ -125,6 +125,10 @@ export function KnowledgeArticleForm({
         </FullWidth>
 
         <FullWidth>
+          <AdminInput name="tags" label={t("pages.knowledge.tags")} maxLength={600} defaultValue={initial.tags} hint={t("pages.knowledge.tagsHint")} />
+        </FullWidth>
+
+        <FullWidth>
           <AdminCheckbox
             name="isFeatured"
             label={t("pages.knowledge.bilikMerkezininGirisindeOne")}

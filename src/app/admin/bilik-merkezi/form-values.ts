@@ -31,6 +31,7 @@ export type KnowledgeArticleFormValues = {
   legalReviewedAt: string;
   legalActs: string;
   sourceUrls: string;
+  tags: string;
   legalBasis: string;
   requiredDocuments: string;
   procedure: string;
@@ -66,6 +67,7 @@ export const EMPTY_KNOWLEDGE_ARTICLE: KnowledgeArticleFormValues = {
   legalReviewedAt: "",
   legalActs: "",
   sourceUrls: "",
+  tags: "",
   legalBasis: "",
   requiredDocuments: "",
   procedure: "",
