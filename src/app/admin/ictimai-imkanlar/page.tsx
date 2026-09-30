@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Select } from "@/components/ui/field";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
@@ -121,14 +122,14 @@ export default async function PublicFeaturesAdminPage() {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <AdminCard title={t("pages.amenities.premiumElan")} description={t("pages.amenities.yalnizUygunNeticelerDaxilinde")}>
           <AdminForm action={activatePremiumListing} submitLabel={t("pages.amenities.premiumAktivEt")} className="gap-4">
-            <label className="text-sm text-ink-soft">{t("pages.amenities.elan")}<select className={inputClass} name="propertyId" required><option value="">{t("pages.amenities.secin")}</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
+            <Select searchable required label={t("pages.amenities.elan")} name="propertyId" placeholder={t("pages.amenities.secin")} options={properties.map((property) => ({ value: property.id, label: property.title }))} />
             <label className="text-sm text-ink-soft">{t("pages.amenities.muddet")}<select className={inputClass} name="durationDays">{PREMIUM_DURATIONS_DAYS.map((days) => <option key={days} value={days}>{t("pages.amenities.durationDays", { days })}</option>)}</select></label>
           </AdminForm>
         </AdminCard>
 
         <AdminCard title={t("pages.amenities.yaxinObyekt")}>
           <AdminForm action={createNearbyPlace} submitLabel={t("pages.amenities.obyektiElaveEt")} className="gap-4">
-            <label className="text-sm text-ink-soft">{t("pages.amenities.elan")}<select className={inputClass} name="propertyId" required><option value="">{t("pages.amenities.secin")}</option>{properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}</select></label>
+            <Select searchable required label={t("pages.amenities.elan")} name="propertyId" placeholder={t("pages.amenities.secin")} options={properties.map((property) => ({ value: property.id, label: property.title }))} />
             <label className="text-sm text-ink-soft">{t("pages.amenities.kateqoriya")}<select className={inputClass} name="category">{Object.entries(NEARBY_PLACE_CATEGORY_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
             <label className="text-sm text-ink-soft">{t("pages.amenities.ad")}<input className={inputClass} name="name" required /></label>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

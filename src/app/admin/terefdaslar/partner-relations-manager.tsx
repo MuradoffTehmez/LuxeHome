@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { Combobox } from "@/components/ui/combobox";
 import Link from "next/link";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
@@ -56,15 +57,13 @@ export function PartnerRelationsManager({
             <option value="agency">{t("pages.partners.agentlik")}</option>
           </select>
         </label>
-        <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
-          {t("pages.partners.qeyd")}
-          <select name="entityId" required className={fieldClass} defaultValue="">
-            <option value="" disabled>{t("pages.partners.secin")}</option>
-            {entityOptions.map((item) => (
-              <option key={item.value} value={item.value}>{item.label}</option>
-            ))}
-          </select>
-        </label>
+        <Combobox
+          label={t("pages.partners.qeyd")}
+          name="entityId"
+          required
+          placeholder={t("pages.partners.secin")}
+          options={entityOptions}
+        />
         <label className="flex flex-col gap-1.5 text-sm text-ink-soft">
           {t("pages.partners.rol")}
           <select name="role" className={fieldClass} defaultValue={PARTNER_RELATION_ROLES.SOURCE}>

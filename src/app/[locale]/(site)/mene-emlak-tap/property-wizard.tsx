@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Combobox } from "@/components/ui/combobox";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { DOCUMENT_STATUSES, LISTING_TYPES, RENOVATIONS } from "@/lib/constants";
@@ -31,9 +32,9 @@ export function PropertyWizard({ types, cities }: { types: Option[]; cities: Cit
     <form action={submit} className="rounded-xl border border-line bg-paper p-5 sm:p-7 shadow-xs">
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         <label className="text-sm text-ink-soft">1. {t("saleRent")}<select name="elan" className={fieldClass}><option value="">{t("any")}</option><option value={LISTING_TYPES.SALE}>{propertyT("listingType.sale")}</option><option value={LISTING_TYPES.RENT}>{propertyT("listingType.rent")}</option></select></label>
-        <label className="text-sm text-ink-soft">2. {t("propertyType")}<select name="tip" className={fieldClass}><option value="">{t("any")}</option>{types.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
-        <label className="text-sm text-ink-soft">3. {t("city")}<select name="seher" value={city} onChange={(event) => setCity(event.target.value)} className={fieldClass}><option value="">{t("any")}</option>{cities.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
-        <label className="text-sm text-ink-soft">4. {t("district")}<select name="rayon" className={fieldClass} disabled={!city}><option value="">{t("any")}</option>{districts.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
+        <Combobox label={`2. ${t("propertyType")}`} name="tip" placeholder={t("any")} options={types} className="[&>label]:font-normal [&>label]:text-ink-soft" />
+        <Combobox label={`3. ${t("city")}`} name="seher" value={city} onValueChange={setCity} placeholder={t("any")} options={cities} className="[&>label]:font-normal [&>label]:text-ink-soft" />
+        <Combobox label={`4. ${t("district")}`} name="rayon" placeholder={t("any")} options={districts} disabled={!city} className="[&>label]:font-normal [&>label]:text-ink-soft" />
         <label className="text-sm text-ink-soft">5. {t("rooms")}<select name="otaq" className={fieldClass}><option value="">{t("any")}</option>{[1,2,3,4,5].map((room) => <option key={room} value={room}>{room === 5 ? "5+" : room}</option>)}</select></label>
         <label className="text-sm text-ink-soft">6. {t("minPrice")}<input name="min" type="number" min="0" step="1000" className={fieldClass} /></label>
         <label className="text-sm text-ink-soft">7. {t("maxPrice")}<input name="max" type="number" min="0" step="1000" className={fieldClass} /></label>

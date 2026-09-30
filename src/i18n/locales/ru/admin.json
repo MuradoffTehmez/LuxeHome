@@ -581,6 +581,8 @@
       "landmark": "Ориентир",
       "landmarkHint": "Известное место рядом: торговый центр, парк, университет, площадь.",
       "streetOfficialHint": "Подсказки — из официального Адресного реестра (unvanportali.az).",
+      "country": "Страна",
+      "countryName": "Азербайджан",
       "street": "Улица / проспект",
       "streetHint": "Например: улица Алияра Алиева.",
       "building": "Дом и дополнительные данные адреса",
@@ -1593,6 +1595,7 @@
     "amenities": {
       "analitikaniYaddaSaxla": "Сохранить аналитику",
       "rayonQesebe": "Район / посёлок",
+      "analitikaVar": "есть аналитика",
       "secin": "Выберите",
       "azTesvir": "Описание AZ",
       "enTesvir": "Описание EN",

@@ -168,6 +168,8 @@ function PropertyWizard({
     landmark: t("components.location.landmark"),
     landmarkHint: t("components.location.landmarkHint"),
     streetOfficialHint: t("components.location.streetOfficialHint"),
+    country: t("components.location.country"),
+    countryName: t("components.location.countryName"),
   };
 
   return (

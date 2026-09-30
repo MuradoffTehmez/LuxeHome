@@ -1,4 +1,5 @@
 import { getAdminT } from "@/lib/admin-i18n";
+import { Select } from "@/components/ui/field";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Check, Eye, EyeOff, Pencil, Star, Trash2, X } from "lucide-react";
@@ -65,7 +66,7 @@ export default async function AdminAgentsPage() {
           <AdminForm action={createTestimonial} submitLabel={t("pages.agents.reyiDercEt")} className="gap-4">
             <label className="text-sm text-ink-soft">{t("pages.agents.musterininAdi")}<input className={`${inputClass} mt-1`} name="customerName" required /></label>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"><label className="text-sm text-ink-soft">{t("pages.agents.qiymet")}<select className={`${inputClass} mt-1`} name="rating" defaultValue="5">{[5,4,3,2,1].map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label className="text-sm text-ink-soft">{t("pages.agents.xidmetNovu")}<input className={`${inputClass} mt-1`} name="serviceType" /></label></div>
-            <label className="text-sm text-ink-soft">{t("pages.agents.agent")}<select className={`${inputClass} mt-1`} name="agentId"><option value="">{t("pages.agents.sirketReyi")}</option>{agents.map((agent) => <option key={agent.id} value={agent.id}>{agent.name}</option>)}</select></label>
+            <Select searchable label={t("pages.agents.agent")} name="agentId" placeholder={t("pages.agents.sirketReyi")} options={agents.map((agent) => ({ value: agent.id, label: agent.name }))} />
             <label className="text-sm text-ink-soft">{t("pages.agents.rey")}<textarea className={`${inputClass} mt-1 min-h-32 py-2`} name="review" required /></label>
           </AdminForm>
         </AdminCard>

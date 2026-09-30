@@ -4,6 +4,8 @@ import { useId, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Combobox } from "@/components/ui/combobox";
+import { SEARCHABLE_MIN_OPTIONS } from "@/components/ui/field";
 import {
   BUILDING_TYPES,
   DOCUMENT_STATUSES,
@@ -109,6 +111,26 @@ function SelectField({
   onChange?: (value: string) => void;
   className?: string;
 }) {
+  // Uzun siyahı (şəhər, rayon, metro, nişangah, növ) axtarışlı ComboBox olur —
+  // qısa siyahı (otaq, təmir, sənəd) native qalır, amma eyni görünüşdədir.
+  if (options.length >= SEARCHABLE_MIN_OPTIONS) {
+    return (
+      <Combobox
+        id={id}
+        name={name}
+        label={label}
+        placeholder={placeholder}
+        defaultValue={defaultValue ?? ""}
+        options={options}
+        onValueChange={onChange ? (value) => onChange(value) : undefined}
+        className={cn(
+          "min-w-0 [&>label]:text-xs [&>label]:font-semibold [&>label]:text-ink-soft",
+          className,
+        )}
+      />
+    );
+  }
+
   // Ardıcıl eyni `group` dəyərləri bir `<optgroup>`-a yığılır. Sıra serverdən
   // gəldiyi kimi saxlanılır — rayon, sonra onun qəsəbələri.
   const groups: { group?: string; items: { value: string; label: string }[] }[] = [];

@@ -581,6 +581,8 @@
       "landmark": "Nişangah",
       "landmarkHint": "Yaxınlıqdakı tanınan yer: ticarət mərkəzi, park, universitet, meydan.",
       "streetOfficialHint": "Təkliflər rəsmi Ünvan Reyestrindəndir (unvanportali.az).",
+      "country": "Ölkə",
+      "countryName": "Azərbaycan",
       "street": "Küçə / prospekt",
       "streetHint": "Məsələn: Əliyar Əliyev küçəsi.",
       "building": "Bina və əlavə ünvan məlumatı",
@@ -1593,6 +1595,7 @@
     "amenities": {
       "analitikaniYaddaSaxla": "Analitikanı yadda saxla",
       "rayonQesebe": "Rayon / qəsəbə",
+      "analitikaVar": "analitika var",
       "secin": "Seçin",
       "azTesvir": "AZ təsvir",
       "enTesvir": "EN təsvir",

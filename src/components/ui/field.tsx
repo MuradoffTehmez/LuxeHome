@@ -1,7 +1,9 @@
 "use client";
 
 import { useId, useState } from "react";
-import { AlertCircle, ChevronDown, Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
+import { Field } from "./field-frame";
+import { Combobox } from "./combobox";
 import { cn } from "@/lib/utils";
 
 // Qeyd: `focus:outline-none` qəsdən istifadə olunmur — klaviatura fokusu üçün
@@ -15,58 +17,7 @@ const CONTROL_BASE =
 const CONTROL_OK = "border-line-strong hover:border-ink-muted";
 const CONTROL_ERROR = "border-danger bg-danger-bg/40";
 
-type FieldWrapperProps = {
-  label: string;
-  htmlFor: string;
-  required?: boolean;
-  error?: string;
-  hint?: string;
-  className?: string;
-  children: React.ReactNode;
-};
-
-/** Etiket + kömək mətni + xəta mesajını sahənin ətrafına yığır. */
-export function Field({
-  label,
-  htmlFor,
-  required,
-  error,
-  hint,
-  className,
-  children,
-}: FieldWrapperProps) {
-  return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={htmlFor} className="text-sm font-medium text-ink">
-        {label}
-        {required && (
-          <span className="ml-1 text-danger" aria-hidden="true">
-            *
-          </span>
-        )}
-      </label>
-
-      {children}
-
-      {hint && !error && (
-        <p id={`${htmlFor}-hint`} className="text-xs text-ink-muted">
-          {hint}
-        </p>
-      )}
-
-      {error && (
-        <p
-          id={`${htmlFor}-error`}
-          role="alert"
-          className="flex items-center gap-1.5 text-xs font-medium text-danger"
-        >
-          <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
+export { Field } from "./field-frame";
 
 // ---------------------------------------------------------------------------
 
@@ -208,7 +159,15 @@ type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "classNam
   error?: string;
   hint?: string;
   className?: string;
+  /**
+   * Axtarışlı ComboBox kimi göstər. Verilməsə, `SEARCHABLE_MIN_OPTIONS` və daha
+   * çox variantda avtomatik açılır — qısa siyahı (2–7 variant) native qalır.
+   */
+  searchable?: boolean;
 };
+
+/** Bu saydan çox variantda seçim sahəsi axtarışlı ComboBox olur. */
+export const SEARCHABLE_MIN_OPTIONS = 8;
 
 export function Select({
   label,
@@ -218,10 +177,39 @@ export function Select({
   hint,
   className,
   id,
+  searchable,
   ...props
 }: SelectProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
+
+  if (!props.multiple && (searchable ?? options.length >= SEARCHABLE_MIN_OPTIONS)) {
+    const { name, value, defaultValue, onChange, required, disabled, form } = props;
+    return (
+      <Combobox
+        id={inputId}
+        label={label}
+        name={name}
+        options={options}
+        placeholder={placeholder}
+        required={required}
+        disabled={disabled}
+        error={error}
+        hint={hint}
+        className={className}
+        form={form}
+        value={value === undefined ? undefined : String(value)}
+        defaultValue={defaultValue === undefined ? undefined : String(defaultValue)}
+        onValueChange={(next) => {
+          // Mövcud çağırışlar yalnız `event.target.value`/`name` oxuyur.
+          onChange?.({
+            target: { value: next, name: name ?? "" },
+            currentTarget: { value: next, name: name ?? "" },
+          } as unknown as React.ChangeEvent<HTMLSelectElement>);
+        }}
+      />
+    );
+  }
 
   return (
     <Field
