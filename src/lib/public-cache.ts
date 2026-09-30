@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { reviveDates } from "@/lib/revive-dates";
 import { PUBLIC_CACHE_TAGS } from "@/lib/cache-tags";
 import {
   getBlogCategories,
@@ -35,19 +36,34 @@ import {
 
 const FIVE_MINUTES = 300;
 
-export const getCachedProperties = unstable_cache(
+/**
+ * `unstable_cache` + tarix bərpası. Keş dəyəri JSON-dur, `Date` sahələri sətir
+ * kimi qayıdır — `reviveDates()` onları geri çevirir ki, səhifə keşin boş və ya
+ * dolu olmasından asılı olmadan eyni tipi alsın. Bu faylda `unstable_cache`-i
+ * birbaşa çağırma.
+ */
+function cachedQuery<Args extends unknown[], Result>(
+  fn: (...args: Args) => Promise<Result>,
+  keyParts: string[],
+  options: { tags: string[]; revalidate: number },
+): (...args: Args) => Promise<Result> {
+  const cached = unstable_cache(fn, keyParts, options);
+  return async (...args: Args) => reviveDates(await cached(...args));
+}
+
+export const getCachedProperties = cachedQuery(
   async (filters: PropertyFilters) => getProperties(filters),
   ["public-property-list-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPropertyCount = unstable_cache(
+export const getCachedPropertyCount = cachedQuery(
   async (filters: PropertyFilters) => countProperties(filters),
   ["public-property-count-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPropertiesForMap = unstable_cache(
+export const getCachedPropertiesForMap = cachedQuery(
   async (filters: PropertyFilters) => getPropertiesForMap(filters),
   ["public-property-map-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
@@ -60,44 +76,44 @@ export const getCachedPropertiesForMap = unstable_cache(
  * halbuki taksonomiya ayda bir dəfə dəyişir. Nəticələr `taxonomy` teqi ilə
  * bağlıdır, ona görə paneldən taksonomiya dəyişəndə keş dərhal təmizlənir.
  */
-export const getCachedFilterOptions = unstable_cache(
+export const getCachedFilterOptions = cachedQuery(
   getFilterOptions,
   ["public-filter-options-v1"],
   { tags: [PUBLIC_CACHE_TAGS.taxonomy], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPosts = unstable_cache(
+export const getCachedPosts = cachedQuery(
   async (filters: { categorySlug?: string; page?: number; pageSize?: number; search?: string }) =>
     getPosts(filters),
   ["public-post-list-v1"],
   { tags: [PUBLIC_CACHE_TAGS.posts], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPropertyBySlug = unstable_cache(
+export const getCachedPropertyBySlug = cachedQuery(
   async (slug: string) => getPropertyBySlug(slug),
   ["public-property-detail-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedProjectBySlug = unstable_cache(
+export const getCachedProjectBySlug = cachedQuery(
   async (slug: string) => getProjectBySlug(slug),
   ["public-project-detail-v1"],
   { tags: [PUBLIC_CACHE_TAGS.projects], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPostBySlug = unstable_cache(
+export const getCachedPostBySlug = cachedQuery(
   async (slug: string) => getPostBySlug(slug),
   ["public-post-detail-v1"],
   { tags: [PUBLIC_CACHE_TAGS.posts], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedServiceBySlug = unstable_cache(
+export const getCachedServiceBySlug = cachedQuery(
   async (slug: string) => getServiceBySlug(slug),
   ["public-service-detail-v1"],
   { tags: [PUBLIC_CACHE_TAGS.services], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedHomePageData = unstable_cache(
+export const getCachedHomePageData = cachedQuery(
   async () => {
     const [featured, propertyTypes, services, projects, posts, filterOptions, categories, partners] =
       await Promise.all([
@@ -135,7 +151,7 @@ export const getCachedHomePageData = unstable_cache(
  * yüklənişində iki əlavə D1 sorğusu, üstəlik ardıcıl gedirdi. Məzmun günlərlə
  * dəyişmir, ona görə eyni beş dəqiqəlik pəncərəyə salınır.
  */
-export const getCachedHomeSocialProof = unstable_cache(
+export const getCachedHomeSocialProof = cachedQuery(
   async () => {
     const [testimonials, agents] = await Promise.all([
       getApprovedTestimonials(6),
@@ -150,7 +166,7 @@ export const getCachedHomeSocialProof = unstable_cache(
   },
 );
 
-export const getCachedSitemapEntries = unstable_cache(
+export const getCachedSitemapEntries = cachedQuery(
   getSitemapEntries,
   ["public-sitemap-entries-v1"],
   { tags: [PUBLIC_CACHE_TAGS.sitemap], revalidate: FIVE_MINUTES },
@@ -163,19 +179,19 @@ export const getCachedSitemapEntries = unstable_cache(
  * (`revalidatePublicContent("partner", slug)`), ona görə beş dəqiqəlik
  * revalidate yalnız son çarə kimi işləyir — redaktə dərhal görünür.
  */
-export const getCachedPublicPartners = unstable_cache(
+export const getCachedPublicPartners = cachedQuery(
   async (filters: { types?: string[] | null; page?: number }) => getPublicPartners(filters),
   ["public-partner-list-v1"],
   { tags: [PUBLIC_CACHE_TAGS.partners], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPartnerTypeCounts = unstable_cache(
+export const getCachedPartnerTypeCounts = cachedQuery(
   getPublicPartnerTypeCounts,
   ["public-partner-type-counts-v1"],
   { tags: [PUBLIC_CACHE_TAGS.partners], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPartnerBySlug = unstable_cache(
+export const getCachedPartnerBySlug = cachedQuery(
   async (slug: string) => getPartnerBySlug(slug),
   ["public-partner-detail-v1"],
   {
@@ -200,37 +216,37 @@ export const getCachedPartnerBySlug = unstable_cache(
  * saxlanılır: paneldən yazma `knowledge` teqini onsuz da dərhal təmizləyir,
  * ona görə uzun TTL yalnız gecikmiş nasazlıq halında fərq yaradardı.
  */
-export const getCachedKnowledgeArticles = unstable_cache(
+export const getCachedKnowledgeArticles = cachedQuery(
   async (filters: KnowledgeArticleFilters) => getKnowledgeArticles(filters),
   ["public-knowledge-list-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedKnowledgeArticleBySlug = unstable_cache(
+export const getCachedKnowledgeArticleBySlug = cachedQuery(
   async (slug: string) => getKnowledgeArticleBySlug(slug),
   ["public-knowledge-detail-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedKnowledgeCategories = unstable_cache(
+export const getCachedKnowledgeCategories = cachedQuery(
   getKnowledgeCategories,
   ["public-knowledge-categories-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedKnowledgeTerms = unstable_cache(
+export const getCachedKnowledgeTerms = cachedQuery(
   async (filters: { search?: string; initial?: string }) => getKnowledgeTerms(filters),
   ["public-knowledge-terms-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedFaqEntries = unstable_cache(
+export const getCachedFaqEntries = cachedQuery(
   getPublishedFaqEntries,
   ["public-knowledge-faq-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedKnowledgeSitemapEntries = unstable_cache(
+export const getCachedKnowledgeSitemapEntries = cachedQuery(
   getKnowledgeSitemapEntries,
   ["public-knowledge-sitemap-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge, PUBLIC_CACHE_TAGS.sitemap], revalidate: FIVE_MINUTES },
