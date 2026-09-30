@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { BookOpen, Calculator, ChevronDown, HelpCircle, Library, Search, Tag, X } from "lucide-react";
+import { BookOpen, Calculator, HelpCircle, Library, Search, Tag, X } from "lucide-react";
+import { Combobox } from "@/components/ui/combobox";
 import { Link } from "@/i18n/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -160,22 +161,15 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
                 className="min-h-12 w-full bg-transparent text-base text-ink placeholder:text-ink-muted focus:outline-none sm:text-sm"
               />
             </label>
-            <label className="relative flex min-w-0 sm:w-64">
-              <span className="sr-only">{t("hub.categoryFilterLabel")}</span>
-              <select
-                name="kateqoriya"
-                defaultValue={categorySlug ?? ""}
-                className="min-h-12 w-full cursor-pointer appearance-none rounded-sm border border-line-strong bg-paper px-4 pr-10 text-base text-ink focus:border-gold sm:text-sm"
-              >
-                <option value="">{t("hub.allCategories")}</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.slug}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-ink-muted" aria-hidden="true" />
-            </label>
+            <Combobox
+              name="kateqoriya"
+              label={t("hub.categoryFilterLabel")}
+              hideLabel
+              placeholder={t("hub.allCategories")}
+              defaultValue={categorySlug ?? ""}
+              options={categories.map((category) => ({ value: category.slug, label: category.name }))}
+              className="min-w-0 sm:w-72"
+            />
             {audience ? <input type="hidden" name="kim" value={audience} /> : null}
             {tag ? <input type="hidden" name="teq" value={tag} /> : null}
             <button
