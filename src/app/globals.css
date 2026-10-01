@@ -88,6 +88,7 @@
   --animate-slide-up: slide-up 0.6s var(--ease-out-soft) both;
   --animate-slow-zoom: slow-zoom 15s linear infinite alternate;
   --animate-scale-in: scale-in 0.35s var(--ease-out-soft) both;
+  --animate-consent-in: consent-in 0.28s var(--ease-out-soft) both;
 
   @keyframes fade-in {
     from { opacity: 0; }
@@ -104,6 +105,10 @@
   @keyframes scale-in {
     from { opacity: 0; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes consent-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* --- Breakpoint-lər --- */
@@ -169,6 +174,9 @@
      `--bottom-safe-rest` isə panel home indicator-u artıq örtəndə təkrar boşluq qoymur. */
   --bottom-nav-offset: 0px;
   --bottom-safe-rest: var(--safe-bottom);
+  /* Əmlak detalındakı mobil «Zəng et / WhatsApp» zolağının hündürlüyü (safe-area xaric — o
+     `--bottom-safe-rest` ilə əlavə olunur); razılıq kartı və toast onun üstündə qalır. */
+  --sticky-bar-offset: 0px;
 
   --z-base: 0;
   --z-sticky: 20;
@@ -825,5 +833,10 @@ p {
   body:has([data-bottom-nav]) {
     --bottom-nav-offset: calc(4rem + var(--safe-bottom));
     --bottom-safe-rest: 0px;
+  }
+
+  /* `StickyActionBar` (`lg:hidden`): pt-3 + 44 px düymə + pb-3 + 1 px sərhəd. */
+  body:has([data-sticky-action-bar]) {
+    --sticky-bar-offset: 4.3125rem;
   }
 }

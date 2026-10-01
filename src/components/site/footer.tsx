@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { ChevronDown, Globe, Mail, MapPin, Navigation, Phone } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/ui/container";
+import { CookiePreferencesButton } from "@/components/analytics/cookie-preferences-button";
+import { analyticsConfigured } from "@/lib/client-analytics";
 import {
   legalNavigation,
   listingLinks,
@@ -340,6 +342,11 @@ export async function Footer() {
                 </Link>
               </li>
             ))}
+            {analyticsConfigured() ? (
+              <li>
+                <CookiePreferencesButton variant="footer" />
+              </li>
+            ) : null}
           </ul>
         </div>
       </Container>

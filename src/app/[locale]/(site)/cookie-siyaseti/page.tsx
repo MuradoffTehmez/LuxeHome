@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CookiePreferencesButton } from "@/components/analytics/cookie-preferences-button";
 import { LocalizedLegalPage } from "@/components/site/localized-legal-page";
 import { siteConfig } from "@/config/site";
 import { getLegalDocuments } from "@/i18n/public-content";
@@ -38,6 +39,8 @@ export default async function CookiePage({ params }: PageProps) {
       email={siteConfig.email}
       phone={siteConfig.phone}
       phoneHref={siteConfig.phoneHref}
+      // 2-ci bölmə «İdarə etmək / Managing your choices»: düymə seçimin dəyişdirilməsini izah edən mətnin altındadır.
+      actionAfterSection={{ index: 1, node: <CookiePreferencesButton variant="page" /> }}
     />
   );
 }

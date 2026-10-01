@@ -36,12 +36,15 @@ export function LocalizedLegalPage({
   email,
   phone,
   phoneHref,
+  actionAfterSection,
 }: {
   document: LegalDocument;
   path: string;
   email: string;
   phone: string;
   phoneHref: string;
+  /** Verilmiş sıradakı bölmənin mətnindən dərhal sonra göstərilən əməl (məs. «Cookie parametrləri» düyməsi). */
+  actionAfterSection?: { index: number; node: React.ReactNode };
 }) {
   return (
     <LegalArticle
@@ -51,7 +54,7 @@ export function LocalizedLegalPage({
       path={path}
     >
       <p>{document.introduction}</p>
-      {document.sections.map((section) => (
+      {document.sections.map((section, sectionIndex) => (
         <Fragment key={section.heading}>
           <h2>{section.heading}</h2>
           {section.bullets ? (
@@ -77,6 +80,7 @@ export function LocalizedLegalPage({
               phoneHref={phoneHref}
             />
           ))}
+          {actionAfterSection?.index === sectionIndex ? <div>{actionAfterSection.node}</div> : null}
         </Fragment>
       ))}
     </LegalArticle>

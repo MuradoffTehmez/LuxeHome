@@ -45,6 +45,17 @@ export function analyticsRuntimeEnabled(input: {
   return input.production && Boolean(input.measurementId?.trim()) && input.consent;
 }
 
+/**
+ * Production-da GA/GTM identifikatoru varsa analitika «konfiqurasiya olunub» sayılır: banner,
+ * footer-dakı «Cookie parametrləri» düyməsi və skript yalnız bu halda mövcuddur.
+ * `process.env.NEXT_PUBLIC_*` literal yazılmalıdır — Next.js onları build zamanı bu formada əvəz edir.
+ */
+export function analyticsConfigured() {
+  const measurementId =
+    process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || process.env.NEXT_PUBLIC_GTM_ID?.trim();
+  return process.env.NODE_ENV === "production" && Boolean(measurementId);
+}
+
 export function sanitizeAnalyticsPayload(
   event: string,
   payload: Record<string, unknown>,

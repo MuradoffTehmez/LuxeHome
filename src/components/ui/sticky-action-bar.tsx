@@ -13,6 +13,8 @@ export function StickyActionBar({ children, className }: StickyActionBarProps) {
   return (
     <aside
       aria-label={t("pageActions")}
+      // `globals.css` bu atribut görünəndə `--sticky-bar-offset` təyin edir: razılıq kartı və toast zolağın üstündə qalır.
+      data-sticky-action-bar=""
       className={cn(
         "fixed inset-x-0 bottom-0 z-[var(--z-sticky)] border-t border-line bg-paper/95 pt-3 pr-[max(1rem,var(--safe-right))] pb-[calc(0.75rem+var(--safe-bottom))] pl-[max(1rem,var(--safe-left))] shadow-[0_-12px_30px_rgba(24,29,39,0.08)] backdrop-blur lg:hidden",
         className,
