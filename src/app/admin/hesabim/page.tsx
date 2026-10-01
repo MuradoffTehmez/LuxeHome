@@ -159,7 +159,7 @@ export default async function AccountPage({
                   </p>
                   <p className="text-xs text-ink-muted [overflow-wrap:anywhere]">
                     {session.ip ?? t("pages.misc.ipYoxdur")} · {t("pages.security.sonAktivlik").toLocaleLowerCase()}{" "}
-                    {session.lastSeenAt.toLocaleString("az-AZ")}
+                    {formatDateTime(session.lastSeenAt)}
                   </p>
                 </div>
 

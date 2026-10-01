@@ -19,6 +19,7 @@ import { buildManagedMetadata } from "@/lib/seo";
 import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
+import { formatLocalizedDate } from "@/i18n/date";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { deletePublicProperty, renewPublicProperty } from "./actions";
 import { LISTING_LIFETIME_DAYS, expiryState } from "@/lib/listing-expiry-policy";
@@ -99,7 +100,6 @@ export default async function CabinetPropertiesPage({
   }
 
   // Rəqəmli tarix dildən asılı deyil və dar ekranda nişanı qısa saxlayır.
-  const shortDate = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Baku" });
 
   /** Premium göstəricisi (#109): aktivdirsə bitmə tarixi, yoxsa dərc olunmuş elanda paket keçidi. */
   function PremiumControl({ property }: { property: CabinetProperty }) {
@@ -108,7 +108,7 @@ export default async function CabinetPropertiesPage({
       return (
         <Badge tone="gold" className="whitespace-normal">
           <Crown className="size-3.5 shrink-0" aria-hidden="true" />
-          {property.featuredUntil ? t("premiumUntil", { date: shortDate.format(property.featuredUntil) }) : t("premium")}
+          {property.featuredUntil ? t("premiumUntil", { date: formatLocalizedDate(property.featuredUntil, locale as Locale, "numeric") ?? "" }) : t("premium")}
         </Badge>
       );
     }

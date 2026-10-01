@@ -22,6 +22,7 @@ import { PartnerRelations } from "@/components/site/partner-relations";
 import { siteConfig, siteUrl } from "@/config/site";
 import { TRANSLATION_ENTITY_TYPES, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
+import { formatLocalizedDate } from "@/i18n/date";
 import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -95,7 +96,6 @@ export default async function ProjectDetailPage({ params }: Props) {
     ONGOING: t("projectStatusOngoing"),
     COMPLETED: t("projectStatusCompleted"),
   };
-  const dateLocale = locale === "ru" ? "ru-RU" : locale === "en" ? "en-GB" : "az-AZ";
 
   // JSON-LD for Project
   const projectSchema = {
@@ -176,7 +176,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                     <Calendar className="size-5 text-gold-deep" aria-hidden="true" />
                     <span className="text-xs font-semibold text-ink-muted">{t("deliveryDate")}</span>
                     <span className="tabular font-medium text-ink">
-                      {new Intl.DateTimeFormat(dateLocale, { month: "long", year: "numeric" }).format(new Date(project.deliveryDate))}
+                      {formatLocalizedDate(project.deliveryDate, locale as Locale, "monthYear")}
                     </span>
                   </div>
                 )}
@@ -185,7 +185,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                     <Calendar className="size-5 text-gold-deep" aria-hidden="true" />
                     <span className="text-xs font-semibold text-ink-muted">{t("startDate")}</span>
                     <span className="tabular font-medium text-ink">
-                      {new Intl.DateTimeFormat(dateLocale, { month: "long", year: "numeric" }).format(new Date(project.startDate))}
+                      {formatLocalizedDate(project.startDate, locale as Locale, "monthYear")}
                     </span>
                   </div>
                 )}

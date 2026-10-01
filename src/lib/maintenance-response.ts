@@ -1,4 +1,5 @@
-import { DEFAULT_LOCALE, LOCALE_TAGS, type Locale } from "@/lib/constants";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/constants";
+import { formatLocalizedDateTime } from "@/i18n/date";
 import { siteConfig } from "@/config/site";
 import { MAINTENANCE_LOGO_DATA_URI } from "@/lib/maintenance-logo";
 import {
@@ -98,15 +99,7 @@ function escapeHtml(value: string): string {
 function formatMoment(iso: string, locale: Locale): string | null {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  try {
-    return new Intl.DateTimeFormat(LOCALE_TAGS[locale], {
-      dateStyle: "long",
-      timeStyle: "short",
-      timeZone: "Asia/Baku",
-    }).format(date);
-  } catch {
-    return date.toISOString();
-  }
+  return formatLocalizedDateTime(date, locale) ?? date.toISOString();
 }
 
 function renderHtml(config: SystemModeConfig, locale: Locale, now: Date): string {

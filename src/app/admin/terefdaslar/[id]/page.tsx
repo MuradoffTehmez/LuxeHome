@@ -6,7 +6,7 @@ import { ExternalLink, Trash2 } from "lucide-react";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { ButtonLink } from "@/components/ui/button";
-import { PERMISSIONS } from "@/lib/constants";
+import { PERMISSIONS, type Locale } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { hasPermission } from "@/lib/auth/permissions";
 import {
@@ -19,6 +19,7 @@ import type { PartnerFormValues } from "../form-values";
 import { PartnerForm } from "../partner-form";
 import { PartnerRelationsManager } from "../partner-relations-manager";
 import { localizePath } from "@/i18n/path-locale";
+import { formatLocalizedDateTime } from "@/i18n/date";
 import { getAdminI18n } from "@/lib/admin-i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -146,7 +147,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
       ) : null}
 
       <p className="mt-6 text-xs text-ink-muted">
-        {t("pages.misc.sonYenilenmeAuditQeydleri", { p0: partner.updatedAt.toLocaleString(locale) })}{" "}
+        {t("pages.misc.sonYenilenmeAuditQeydleri", { p0: formatLocalizedDateTime(partner.updatedAt, locale as Locale, "numeric") ?? "" })}{" "}
         <Link href={`/admin/audit?entity=Partner&q=${partner.id}`} className="underline hover:text-ink">
           {t("pages.partners.auditJurnalinda")}
         </Link>{" "}

@@ -7,6 +7,7 @@ import { type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
+import { formatLocalizedRelative } from "@/i18n/date";
 import { resolveNotificationPreferences } from "@/lib/notification-preferences";
 import { NotificationList, type NotificationListItem } from "./notification-list";
 import { NotificationPreferences } from "./notification-preferences";
@@ -16,30 +17,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "account.notifications" });
   return buildManagedMetadata({ title: t("metaTitle"), description: t("metaDescription"), path: "/kabinet/bildirisler", noIndex: true, locale: locale as Locale });
-}
-
-const DIVISIONS: { amount: number; unit: Intl.RelativeTimeFormatUnit }[] = [
-  { amount: 60, unit: "seconds" },
-  { amount: 60, unit: "minutes" },
-  { amount: 24, unit: "hours" },
-  { amount: 7, unit: "days" },
-  { amount: 4.34524, unit: "weeks" },
-  { amount: 12, unit: "months" },
-  { amount: Number.POSITIVE_INFINITY, unit: "years" },
-];
-
-/** `createdAt`-i "3 saat əvvəl" formatında insan-oxunaqlı nisbi vaxta çevirir. */
-function formatRelativeTime(date: Date, locale: Locale): string {
-  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-  let duration = (date.getTime() - Date.now()) / 1000;
-
-  for (const division of DIVISIONS) {
-    if (Math.abs(duration) < division.amount) {
-      return formatter.format(Math.round(duration), division.unit);
-    }
-    duration /= division.amount;
-  }
-  return formatter.format(Math.round(duration), "years");
 }
 
 export default async function NotificationsPage() {
@@ -64,7 +41,7 @@ export default async function NotificationsPage() {
     content: notification.content,
     actionUrl: notification.actionUrl,
     isRead: notification.readAt !== null,
-    relativeTime: formatRelativeTime(notification.createdAt, locale),
+    relativeTime: formatLocalizedRelative(notification.createdAt, locale) ?? "",
   }));
 
   return (

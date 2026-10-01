@@ -16,9 +16,11 @@ import {
   PARTNER_STATUSES,
   PARTNERSHIP_TYPES,
   PERMISSIONS,
+  type Locale,
   type PartnerStatus,
   type PartnershipType,
 } from "@/lib/constants";
+import { formatLocalizedDate } from "@/i18n/date";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { hasPermission } from "@/lib/auth/permissions";
 import {
@@ -298,7 +300,7 @@ export default async function AdminPartnersPage({ searchParams }: { searchParams
                     <AdminTableCell>{statusBadge(partner.status, t)}</AdminTableCell>
                     <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.verified ? t("pages.misc.tesdiqlenib") : t("pages.misc.tesdiqsiz")}</span><span>{partner.officialPartner ? t("pages.misc.resmi") : t("pages.misc.resmiDeyil")}</span></div></AdminTableCell>
                     <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.featured ? t("pages.misc.secilmis") : "Adi"}</span><span>{partner.showOnHomepage ? t("pages.misc.anaSehifede") : t("pages.misc.gosterilmir")}</span></div></AdminTableCell>
-                    <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{partner.officialSince?.toLocaleDateString("az-AZ") ?? "—"}</span><span>{partner.partnershipEndDate?.toLocaleDateString("az-AZ") ?? "—"}</span></div></AdminTableCell>
+                    <AdminTableCell><div className="flex flex-col gap-1 text-xs"><span>{formatLocalizedDate(partner.officialSince, locale as Locale, "numeric") ?? "—"}</span><span>{formatLocalizedDate(partner.partnershipEndDate, locale as Locale, "numeric") ?? "—"}</span></div></AdminTableCell>
                     <AdminTableCell>{partner._count.properties} / {partner._count.projects}</AdminTableCell>
                     <AdminTableCell className="whitespace-nowrap text-xs text-ink-muted">{formatRelative(partner.updatedAt)}</AdminTableCell>
                     <AdminTableCell><div className="flex justify-end">{renderActions(partner)}</div></AdminTableCell>

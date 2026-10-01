@@ -3,7 +3,6 @@ import { AlertTriangle, Database, Info, ShieldCheck, Timer } from "lucide-react"
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { Badge } from "@/components/ui/badge";
 import {
-  LOCALE_TAGS,
   PERMISSIONS,
   SYSTEM_MODES,
   SYSTEM_MODE_TONE,
@@ -11,6 +10,7 @@ import {
 } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminI18n } from "@/lib/admin-i18n";
+import { formatLocalizedDateTime } from "@/i18n/date";
 import { getSystemModeConfig } from "@/lib/system-mode";
 import { getIntegrationHealth, type IntegrationHealthId } from "@/lib/integration-health";
 import { SystemModeForm, type SystemModeFormValues } from "./system-mode-form";
@@ -73,11 +73,7 @@ export default async function AdminSystemModePage() {
   };
 
   const updatedAt = config.updatedAt
-    ? new Intl.DateTimeFormat(LOCALE_TAGS[locale as Locale], {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "Asia/Baku",
-      }).format(new Date(config.updatedAt))
+    ? formatLocalizedDateTime(config.updatedAt, locale as Locale, "short")
     : null;
 
   return (

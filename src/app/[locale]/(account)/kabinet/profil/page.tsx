@@ -5,6 +5,7 @@ import { requireAccount } from "@/lib/auth/guard";
 import { Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
+import { formatLocalizedDate } from "@/i18n/date";
 import { accountTypeKey, ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { profileRequirements, splitName } from "@/lib/accounts/profile-fields";
 import { prisma } from "@/lib/prisma";
@@ -114,7 +115,7 @@ export default async function CabinetProfilePage() {
             </p>
           )}
           <p className="mt-1 text-sm text-ink-muted">
-            {t("memberSince", { date: new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(profile.createdAt) })}
+            {t("memberSince", { date: formatLocalizedDate(profile.createdAt, locale, "monthYear") ?? "" })}
             {listingCount > 0 ? ` · ${t("listingsCount", { count: listingCount })}` : ""}
           </p>
           {requirements.agent && (

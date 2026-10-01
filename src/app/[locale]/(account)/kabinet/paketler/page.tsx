@@ -17,6 +17,7 @@ import { getActivePackages } from "@/lib/packages";
 import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
+import { formatLocalizedDate } from "@/i18n/date";
 import { CancelOrderButton } from "./cancel-order-button";
 import { PackageRequestForm } from "./package-request-form";
 
@@ -67,7 +68,6 @@ export default async function CabinetPackagesPage({ searchParams }: { searchPara
   ]);
   const initialPropertyId = properties.some((property) => property.id === params.elan) ? params.elan! : null;
   const steps = [t("step1"), t("step2"), t("step3")];
-  const dateFormat = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Baku" });
 
   return (
     <div className="min-w-0">
@@ -123,7 +123,7 @@ export default async function CabinetPackagesPage({ searchParams }: { searchPara
                     <p className="mt-1 text-sm text-ink-soft [overflow-wrap:anywhere]">
                       {order.property?.title ?? t("listingRemoved")} · {t("days", { days: order.durationDays })}
                     </p>
-                    <p className="mt-1 text-xs text-ink-muted">{t("orderedAt", { date: dateFormat.format(order.createdAt) })}</p>
+                    <p className="mt-1 text-xs text-ink-muted">{t("orderedAt", { date: formatLocalizedDate(order.createdAt, locale as Locale, "numeric") ?? "" })}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={PACKAGE_ORDER_STATUS_TONE[status]}>{t(`status.${STATUS_KEYS[status]}`)}</Badge>
