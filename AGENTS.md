@@ -251,6 +251,22 @@ Mənbə DSK-nın «İnzibati Ərazi Bölgüsü Təsnifatı, 2024» və Ünvan Re
 
 ## Diqqət tələb edən məqamlar
 
+- **Tarixi yalnız `src/i18n/date.ts`-dəki köməkçilərlə yaz** (`formatLocalizedDate`, `formatLocalizedDateTime`,
+  `formatLocalizedTime`, `formatLocalizedRelative`; üslublar: `long` «29 sentyabr 2026», `short`, `numeric`,
+  `monthYear`, `weekday`, `full`). Workers-in yığcam ICU datasında `az` tarix şablonları yoxdur: `Intl.DateTimeFormat("az", …)`,
+  `toLocaleDateString` və `next-intl`-in `format.dateTime()` səssizcə kök şablona düşür və saytda «2026 M09 29»
+  çıxır. Köməkçilər rəqəmi `en-US` formatter-i ilə **Bakı vaxtında** götürür, ay/həftə günü adı isə öz lüğətindən
+  gəlir — server (UTC) və brauzer eyni mətni verir. `scripts/__tests__/date-format-source.test.ts` `src/`-də yeni
+  `Intl.DateTimeFormat` / `toLocaleDateString` yazılsa testi yıxır.
+- **Bloq üz qabığı** `resolveBlogCover()` (`src/lib/blog-covers.ts`) ilədir: paneldən yüklənmiş `/media/...` şəkli
+  həmişə üstündür; yoxdursa ilk 10 bloq yazısı üçün `public/images/blog/<slug>.webp`, yeni yazılar üçün slug-a görə sabit
+  seçilən `public/images/categories/*` fotosu göstərilir (`coverUrl` bazaya yazılmır, admin forması şəkli silməz). Hazır
+  üz qabıqları `npm run assets:blog-covers` (`scripts/build-blog-covers.mjs`) ilə kateqoriya fotolarından kəsilib
+  qurulur; yeni seed yazısı əlavə edəndə `BLOG_COVER_SLUGS`-ə də yaz (`scripts/__tests__/blog-covers-assets.test.ts` yoxlayır).
+  Bilik Mərkəzi bələdçilərinin şəkli yoxdursa `KnowledgeCover` (qızılı şəbəkə + auditoriya ikonu) göstərilir.
+- Bloq/Bilik Mərkəzi səhifələri ortaq `PageHeader` (`footer` propu — məqalə meta sətri), `ArticleTrustMeta`
+  (başlıqlı blok-lar), `FilterChip`/`FilterChipRow` və `SectionHeading` komponentlərini paylaşır; kart `PostCard` /
+  `KnowledgeCard` eyni sıra ilə düzülür (şəkil → tarix/kateqoriya → başlıq → xülasə → «Oxu»).
 - Production bazası Cloudflare D1-dir. D1 transaction dəstəkləmir; çoxaddımlı yazıları
   idempotent marker/retry və ya kompensasiya ilə dizayn et.
 - **D1 bir sorğuda ən çox 100 bound parametr qəbul edir.** Prisma `IN (…)` siyahısını

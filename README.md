@@ -345,6 +345,7 @@ prompt-una verilir.
 | `npm run e2e:local:build` / `:prepare` / `:serve` | Lokal workerd stack (bundle, təzə D1 + test hesabları, `:8787`) |
 | `npm run e2e:chromium` / `:mobile` / `:ui` / `:report` / `:install` | Playwright layihələri, UI rejimi, hesabat və brauzer quraşdırılması |
 | `npm run assets:maintenance-logo` | Texniki xidmət səhifəsinin daxili loqosunu yenidən qurur |
+| `npm run assets:blog-covers` | Bloq üz qabığı şəkillərini (`public/images/blog`) kateqoriya fotolarından yenidən qurur |
 | `npm run preview` | OpenNext build və lokal Worker preview |
 | `npm run cf-typegen` | Wrangler binding tiplərini yeniləyir |
 
