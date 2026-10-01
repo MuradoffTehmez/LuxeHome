@@ -85,6 +85,13 @@
     "emptyTitle": "Hazırda məqalə əlavə edilməyib",
     "emptyDescription": "Yeni məqalələr dərc edildikcə bu səhifədə göstəriləcək.",
     "viewAll": "Bütün məqalələr",
+    "lead": "Alqı-satqı, kirayə, ipoteka və qiymətləndirmə üzrə praktik məsləhətlər — sadə dildə, rəsmi mənbələrə əsaslanaraq.",
+    "featured": "Seçilmiş məqalə",
+    "latest": "Son məqalələr",
+    "readMore": "Oxu",
+    "knowledgeCtaTitle": "Daha dərin məlumat lazımdır?",
+    "knowledgeCtaDescription": "Bilik Mərkəzində sənədləşmə, vergi və ipoteka üzrə addım-addım bələdçilər, lüğət və hesablayıcılar var.",
+    "knowledgeCtaAction": "Bilik Mərkəzinə keç",
     "notFound": "Məqalə tapılmadı"
   },
   "detail": {

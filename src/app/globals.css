@@ -639,9 +639,10 @@ p {
    -------------------------------------------------------------------------- */
 .prose-luxe {
   max-width: 68ch;
-  line-height: 1.75;
+  line-height: 1.85;
   color: var(--color-ink-soft);
   overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .prose-luxe img,
@@ -657,20 +658,46 @@ p {
   overflow-x: auto;
 }
 
-.prose-luxe > * + * {
-  margin-top: 1.25rem;
+/* Məzmun `<article class="prose-luxe"><div>…HTML…</div></article>` kimi sarğının içində gəlir,
+   ona görə yalnız birbaşa uşaqlara baxan `> * + *` kifayət etmir: abzas, siyahı, sitat və
+   cədvəl arasında boşluq olmayanda mətn bir-birinə qarışırdı. `:where()` spesifikliyi artırmır. */
+.prose-luxe > * + *,
+.prose-luxe :where(p, ul, ol, dl, blockquote, table, pre, figure, hr, img) + :where(p, ul, ol, dl, blockquote, table, pre, figure, hr, img, h2, h3, h4) {
+  margin-top: 1.5rem;
+}
+
+/* Siyahı bəndinin içindəki abzas/alt siyahı daha sıx durur. */
+.prose-luxe li > * + * {
+  margin-top: 0.5rem;
 }
 
 .prose-luxe h2 {
-  font-size: 1.6rem;
+  font-size: clamp(1.5rem, 1.25rem + 0.9vw, 1.875rem);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
   color: var(--color-ink);
-  margin-top: 2.5rem;
+  margin-top: 3.5rem;
+  scroll-margin-top: 7rem;
 }
 
 .prose-luxe h3 {
-  font-size: 1.25rem;
+  font-size: 1.3125rem;
+  line-height: 1.35;
   color: var(--color-ink);
-  margin-top: 2rem;
+  margin-top: 2.5rem;
+  scroll-margin-top: 7rem;
+}
+
+/* Başlıq öz mətninə yaxın durur, əvvəlki bölmədən isə aydın ayrılır. */
+.prose-luxe h2 + *,
+.prose-luxe h3 + * {
+  margin-top: 1rem;
+}
+
+.prose-luxe hr {
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  margin-block: 3rem;
 }
 
 .prose-luxe strong {
@@ -686,7 +713,12 @@ p {
 
 .prose-luxe ul,
 .prose-luxe ol {
-  padding-left: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.prose-luxe li::marker {
+  color: var(--color-gold-deep);
+  font-weight: 600;
 }
 
 .prose-luxe ul {
@@ -698,14 +730,37 @@ p {
 }
 
 .prose-luxe li + li {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .prose-luxe blockquote {
-  border-left: 2px solid var(--color-gold);
-  padding-left: 1.25rem;
+  border-left: 3px solid var(--color-gold);
+  background-color: var(--color-paper);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 1.25rem 1.5rem;
   font-style: italic;
   color: var(--color-ink);
+}
+
+.prose-luxe table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375em;
+  line-height: 1.6;
+}
+
+.prose-luxe th,
+.prose-luxe td {
+  border: 1px solid var(--color-line);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-luxe th {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-weight: 600;
 }
 
 /* --------------------------------------------------------------------------

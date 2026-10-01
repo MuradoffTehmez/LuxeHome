@@ -85,6 +85,13 @@
     "emptyTitle": "No articles have been published yet",
     "emptyDescription": "New articles will appear on this page as they are published.",
     "viewAll": "All articles",
+    "lead": "Practical advice on buying, selling, renting, mortgages and valuation — in plain language, grounded in official sources.",
+    "featured": "Featured article",
+    "latest": "Latest articles",
+    "readMore": "Read",
+    "knowledgeCtaTitle": "Need to go deeper?",
+    "knowledgeCtaDescription": "The Knowledge Hub has step-by-step guides on paperwork, taxes and mortgages, plus a glossary and calculators.",
+    "knowledgeCtaAction": "Open the Knowledge Hub",
     "notFound": "Article not found"
   },
   "detail": {

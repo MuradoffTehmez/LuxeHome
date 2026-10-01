@@ -8,6 +8,7 @@
     "featured": "Избранные руководства",
     "allGuides": "Все руководства",
     "categories": "Темы",
+    "categoriesLead": "Оформление, налоги и практические шаги по каждой теме — в одном месте.",
     "categoryCount": "{count} руководств",
     "termCount": "{count} терминов",
     "empty": "В этом разделе пока ничего не опубликовано.",
@@ -31,6 +32,7 @@
   },
   "article": {
     "readMinutes": "{count} мин чтения",
+    "readMore": "Читать",
     "updatedAt": "Обновлено: {date}",
     "backToHub": "Назад в базу знаний",
     "related": "Читать далее",

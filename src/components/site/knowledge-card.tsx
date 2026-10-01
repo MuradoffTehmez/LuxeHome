@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { BookOpen, Clock } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { Badge } from "@/components/ui/badge";
+import { KnowledgeCover } from "@/components/site/knowledge-cover";
 import { isUnoptimizedImage } from "@/lib/utils";
 import type { KnowledgeCardData } from "@/lib/knowledge";
 import type { KnowledgeAudience, KnowledgeLevel } from "@/lib/constants";
@@ -12,7 +12,7 @@ import type { KnowledgeAudience, KnowledgeLevel } from "@/lib/constants";
  *
  * `PostCard`-dan ayrıdır: bloq kartı tarixi önə çəkir (xəbər axını), bələdçidə
  * isə oxucunun ilk soruşduğu «kimə uyğundur / nə qədər vaxt aparır» məlumatıdır.
- * Şəkil olmadıqda kart ikon ilə düzgün görünür — bələdçilərin çoxu foto tələb etmir.
+ * Şəkil olmadıqda `KnowledgeCover` brend səthi göstərilir — bələdçilərin çoxu foto tələb etmir.
  */
 export function KnowledgeCard({
   article,
@@ -37,39 +37,50 @@ export function KnowledgeCard({
             sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 33vw"
           />
         ) : (
-          <div className="grid h-full place-items-center">
-            <BookOpen className="size-10 text-gold" aria-hidden="true" />
-          </div>
+          <KnowledgeCover audience={article.audience} />
         )}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-3 p-5">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-4 p-6">
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
           {article.category ? (
-            <Badge tone="neutral">{article.category.name}</Badge>
+            <span className="editorial-kicker text-gold-deep">{article.category.name}</span>
           ) : null}
-          <Badge tone="gold">{t(`audience.${article.audience as KnowledgeAudience}`)}</Badge>
-        </div>
+          <span className="inline-flex items-center rounded-full border border-line-strong bg-ivory px-2.5 py-0.5 font-semibold text-ink-soft">
+            {t(`audience.${article.audience as KnowledgeAudience}`)}
+          </span>
+        </p>
 
-        <h3 className="text-lg leading-snug text-ink">
+        <h3 className="text-xl leading-snug font-semibold tracking-tight text-ink">
           <Link
             href={`/bilik-merkezi/${article.slug}`}
-            className="rounded-xs after:absolute after:inset-0 after:rounded-lg transition-colors hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            className="line-clamp-3 min-h-11 rounded-xs transition-colors after:absolute after:inset-0 after:rounded-lg hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
             {article.title}
           </Link>
         </h3>
 
-        <p className="line-clamp-3 min-w-0 text-sm text-ink-soft [overflow-wrap:anywhere]">
+        <p className="line-clamp-3 min-w-0 text-[0.9375rem] leading-7 text-ink-soft [overflow-wrap:anywhere]">
           {article.excerpt}
         </p>
 
-        <p className="mt-auto flex items-center gap-1.5 pt-1 text-xs text-ink-muted">
-          <Clock className="size-3.5" aria-hidden="true" />
-          {t("article.readMinutes", { count: article.readMinutes })}
-          <span aria-hidden="true">·</span>
-          {t(`level.${article.level as KnowledgeLevel}`)}
-        </p>
+        <div className="mt-auto flex items-center justify-between gap-4 border-t border-line pt-4 text-sm">
+          <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-muted">
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="size-4" aria-hidden="true" />
+              {t("article.readMinutes", { count: article.readMinutes })}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>{t(`level.${article.level as KnowledgeLevel}`)}</span>
+          </span>
+          <span className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-gold-deep">
+            {t("article.readMore")}
+            <ArrowRight
+              className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          </span>
+        </div>
       </div>
     </article>
   );

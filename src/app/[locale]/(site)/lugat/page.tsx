@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
+import { FilterChip, FilterChipRow } from "@/components/ui/filter-chip";
 import {
   breadcrumbSchema,
   buildManagedMetadata,
@@ -16,7 +17,6 @@ import { routing } from "@/i18n/routing";
 import { getCachedKnowledgeTerms } from "@/lib/public-cache";
 import { groupTermsByInitial } from "@/lib/knowledge";
 import type { Locale } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -95,9 +95,9 @@ export default async function GlossaryPage({ params, searchParams }: Props) {
             method="GET"
             action=""
             role="search"
-            className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center"
+            className="flex flex-col gap-3 pt-6 pb-5 sm:flex-row sm:items-center"
           >
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-sm border border-line-strong bg-paper px-3 focus-within:border-gold">
+            <label className="flex min-w-0 flex-1 items-center gap-3 rounded-sm border border-line-strong bg-paper px-4 focus-within:border-gold">
               <Search className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
               <span className="sr-only">{t("glossary.searchLabel")}</span>
               <input
@@ -110,43 +110,28 @@ export default async function GlossaryPage({ params, searchParams }: Props) {
             </label>
             <button
               type="submit"
-              className="inline-flex min-h-12 items-center justify-center rounded-xs border border-charcoal bg-charcoal px-6 text-sm font-medium text-ink-invert transition-colors hover:bg-ink"
+              className="inline-flex min-h-12 items-center justify-center rounded-xs border border-charcoal bg-charcoal px-8 text-sm font-medium text-ink-invert transition-colors hover:bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             >
               {t("glossary.searchAction")}
             </button>
           </form>
 
           {letters.length > 0 && (
-            <nav
-              aria-label={t("glossary.allLetters")}
-              className="-mx-5 flex snap-x gap-1.5 overflow-x-auto px-5 pb-4 [scrollbar-width:none] lg:mx-0 lg:flex-wrap lg:px-0 [&::-webkit-scrollbar]:hidden"
-            >
-              <Link
-                href="/lugat"
-                className={cn(
-                  "inline-flex min-h-11 min-w-11 shrink-0 snap-start items-center justify-center rounded-xs border px-3 text-sm font-medium transition-colors",
-                  !initial
-                    ? "border-charcoal bg-charcoal text-ink-invert"
-                    : "border-line-strong text-ink-soft hover:border-gold hover:text-gold-deep",
-                )}
-              >
+            <FilterChipRow label={t("glossary.allLetters")} className="pb-5">
+              <FilterChip href="/lugat" active={!initial}>
                 {t("glossary.allLetters")}
-              </Link>
+              </FilterChip>
               {letters.map((letter) => (
-                <Link
+                <FilterChip
                   key={letter}
                   href={`/lugat?herf=${encodeURIComponent(letter)}`}
-                  className={cn(
-                    "inline-flex min-h-11 min-w-11 shrink-0 snap-start items-center justify-center rounded-xs border text-sm font-medium transition-colors",
-                    initial === letter
-                      ? "border-charcoal bg-charcoal text-ink-invert"
-                      : "border-line-strong text-ink-soft hover:border-gold hover:text-gold-deep",
-                  )}
+                  active={initial === letter}
+                  className="min-w-11 px-0"
                 >
                   {letter}
-                </Link>
+                </FilterChip>
               ))}
-            </nav>
+            </FilterChipRow>
           )}
         </Container>
       </div>
@@ -154,19 +139,19 @@ export default async function GlossaryPage({ params, searchParams }: Props) {
       <Section tone="ivory" spacing="cozy">
         <Container>
           {groups.length > 0 ? (
-            <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-14">
               {groups.map(([letter, items]) => (
                 <section key={letter} aria-labelledby={`letter-${letter}`} className="min-w-0">
                   <h2
                     id={`letter-${letter}`}
-                    className="border-b border-line pb-3 font-display text-3xl text-gold-deep"
+                    className="border-b border-gold-line pb-3 font-display text-3xl text-gold-deep"
                   >
                     {letter}
                   </h2>
-                  <dl className="mt-6 grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-2">
+                  <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-8 lg:grid-cols-2">
                     {items.map((term) => (
                       <div key={term.id} className="min-w-0">
-                        <dt className="font-display text-lg text-ink">
+                        <dt className="font-sans text-lg font-semibold leading-snug text-ink">
                           <Link
                             href={`/lugat/${term.slug}`}
                             className="rounded-xs transition-colors hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
@@ -174,7 +159,7 @@ export default async function GlossaryPage({ params, searchParams }: Props) {
                             {term.term}
                           </Link>
                         </dt>
-                        <dd className="mt-1 text-sm text-ink-soft [overflow-wrap:anywhere]">
+                        <dd className="mt-2 text-[0.9375rem] leading-7 text-ink-soft [overflow-wrap:anywhere]">
                           {term.shortDefinition}
                         </dd>
                       </div>

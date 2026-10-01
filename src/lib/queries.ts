@@ -1186,19 +1186,34 @@ export async function getPostBySlug(slug: string) {
   });
 }
 
+/**
+ * Oxşar yazılar: əvvəl eyni kateqoriyadan, çatmadıqda ən son digər yazılarla tamamlanır —
+ * kateqoriyasında tək yazı olan məqalənin sonunda boş «oxşar yazılar» bölməsi qalmasın.
+ */
 export async function getRelatedPosts(postId: string, categoryId: string | null, take = 3) {
-  return prisma.blogPost.findMany({
-    where: {
-      deletedAt: null,
-      ...(await demoWhere()),
-      status: POST_STATUSES.PUBLISHED,
-      id: { not: postId },
-      ...(categoryId ? { categoryId } : {}),
-    },
+  const base = {
+    deletedAt: null,
+    ...(await demoWhere()),
+    status: POST_STATUSES.PUBLISHED,
+  };
+
+  const sameCategory = categoryId
+    ? await prisma.blogPost.findMany({
+        where: { ...base, id: { not: postId }, categoryId },
+        select: postCardSelect,
+        orderBy: { publishedAt: "desc" },
+        take,
+      })
+    : [];
+  if (sameCategory.length >= take) return sameCategory;
+
+  const others = await prisma.blogPost.findMany({
+    where: { ...base, id: { notIn: [postId, ...sameCategory.map((post) => post.id)] } },
     select: postCardSelect,
     orderBy: { publishedAt: "desc" },
-    take,
+    take: take - sameCategory.length,
   });
+  return [...sameCategory, ...others];
 }
 
 export async function getBlogCategories() {

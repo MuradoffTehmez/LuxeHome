@@ -33,10 +33,12 @@
     "email": "Электронная почта"
   },
   "articleMeta": {
-    "published": "Опубликовано:",
-    "updated": "Обновлено:",
-    "read": "{count, plural, one {# мин чтения} few {# мин чтения} many {# мин чтения} other {# мин чтения}}",
-    "views": "{count, plural, one {# просмотр} few {# просмотра} many {# просмотров} other {# просмотра}}"
+    "author": "Автор",
+    "published": "Опубликовано",
+    "updated": "Обновлено",
+    "readingTime": "Время чтения",
+    "readValue": "{count} мин",
+    "views": "Просмотры"
   },
   "propertyActions": "Действия с объектом",
   "call": "Позвонить",

@@ -33,10 +33,12 @@
     "email": "Email"
   },
   "articleMeta": {
-    "published": "Published:",
-    "updated": "Updated:",
-    "read": "{count, plural, one {# min read} other {# min read}}",
-    "views": "{count, plural, one {# view} other {# views}}"
+    "author": "Author",
+    "published": "Published",
+    "updated": "Updated",
+    "readingTime": "Reading time",
+    "readValue": "{count} min",
+    "views": "Views"
   },
   "propertyActions": "Property actions",
   "call": "Call",

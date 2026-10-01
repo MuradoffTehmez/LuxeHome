@@ -10,6 +10,8 @@ export type PageHeaderProps = {
   description?: string;
   breadcrumbs?: { label: string; href?: string }[];
   actions?: React.ReactNode;
+  /** Başlıq blokunun altında, nazik xətlə ayrılmış sətir (məqalənin müəllif/tarix məlumatı). */
+  footer?: React.ReactNode;
   /** Başlığın solunda göstərilən loqo/avatar (agentlik, tərəfdaş, agent profili). */
   media?: React.ReactNode;
   compact?: boolean;
@@ -23,6 +25,7 @@ export function PageHeader({
   description,
   breadcrumbs,
   actions,
+  footer,
   media,
   compact = false,
   contained = false,
@@ -95,6 +98,8 @@ export function PageHeader({
           </div>
         ) : null}
       </div>
+
+      {footer ? <div className="mt-8 border-t border-line pt-6">{footer}</div> : null}
     </>
   );
 
