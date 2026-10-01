@@ -125,9 +125,10 @@ export default async function RootLayout({
         <script {...jsonLd(websiteSchema())} />
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
+            {/* Razılıq kartı DOM-da birinci gəlir: klaviatura və ekran oxuyucu ona səhifənin 100+ elementini keçmədən çatır. */}
+            <AnalyticsProvider />
             <DeploymentRecovery />
             {children}
-            <AnalyticsProvider />
             <WebVitalsReporter />
           </NextIntlClientProvider>
         </ThemeProvider>

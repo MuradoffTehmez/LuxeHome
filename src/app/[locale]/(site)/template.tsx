@@ -11,7 +11,7 @@
  * sərhədi yaratmır, ona görə status kodları toxunulmaz qalır, keçid isə
  * kəskin sıçrayış olmaqdan çıxır.
  *
- * Animasiya qəsdən kiçikdir (160 ms, 4 px) — məzmunun gec gəldiyi hissi
+ * Animasiya qəsdən kiçikdir (160 ms, yalnız opacity) — məzmunun gec gəldiyi hissi
  * yaratmamalıdır. `prefers-reduced-motion` `globals.css`-dəki ümumi qayda ilə
  * onsuz da neytrallaşır.
  */

@@ -88,6 +88,7 @@
   --animate-slide-up: slide-up 0.6s var(--ease-out-soft) both;
   --animate-slow-zoom: slow-zoom 15s linear infinite alternate;
   --animate-scale-in: scale-in 0.35s var(--ease-out-soft) both;
+  --animate-consent-in: consent-in 0.28s var(--ease-out-soft) both;
 
   @keyframes fade-in {
     from { opacity: 0; }
@@ -104,6 +105,10 @@
   @keyframes scale-in {
     from { opacity: 0; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes consent-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* --- Breakpoint-lər --- */
@@ -169,6 +174,9 @@
      `--bottom-safe-rest` isə panel home indicator-u artıq örtəndə təkrar boşluq qoymur. */
   --bottom-nav-offset: 0px;
   --bottom-safe-rest: var(--safe-bottom);
+  /* Əmlak detalındakı mobil «Zəng et / WhatsApp» zolağının hündürlüyü (safe-area xaric — o
+     `--bottom-safe-rest` ilə əlavə olunur); razılıq kartı və toast onun üstündə qalır. */
+  --sticky-bar-offset: 0px;
 
   --z-base: 0;
   --z-sticky: 20;
@@ -616,22 +624,23 @@ p {
    animasiya hər keçiddə işə düşür. Qəsdən qısadır: uzun animasiya məzmunun
    gec gəldiyi hissi yaradır, halbuki məqsəd kəskin sıçrayışı yumşaltmaqdır.
 
-   `translate3d` GPU qatına keçirir — mətn ağır səhifədə (əmlak detalı) 8 px-lik
-   sürüşmə də sub-pixel yenidən rəsm tələb edə bilir.
+   **Yalnız `opacity`, `transform` yox.** Animasiya `both` ilə `transform: translate3d(0,0,0)`-da
+   qalanda sarğıda daimi `transform: matrix(1,0,0,1,0,0)` qalırdı — bu isə `position: fixed`
+   nəslin yeni containing block-u deməkdir: əmlak detalındakı mobil «Zəng et / WhatsApp»
+   zolağı viewport-a deyil, sarğıya (sənədin sonuna) görə yerləşirdi; səhifə içindəki tam ekran
+   xəritə də eyni təsirə məruz qalırdı. `backwards` animasiyadan sonra heç nə saxlamır.
    -------------------------------------------------------------------------- */
 @keyframes luxe-page-enter {
   from {
     opacity: 0;
-    transform: translate3d(0, 4px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 
 .page-transition {
-  animation: luxe-page-enter 160ms var(--ease-out-soft) both;
+  animation: luxe-page-enter 160ms var(--ease-out-soft) backwards;
 }
 
 /* --------------------------------------------------------------------------
@@ -825,5 +834,10 @@ p {
   body:has([data-bottom-nav]) {
     --bottom-nav-offset: calc(4rem + var(--safe-bottom));
     --bottom-safe-rest: 0px;
+  }
+
+  /* `StickyActionBar` (`lg:hidden`): pt-3 + 44 px düymə + pb-3 + 1 px sərhəd. */
+  body:has([data-sticky-action-bar]) {
+    --sticky-bar-offset: 4.3125rem;
   }
 }

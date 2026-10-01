@@ -13,4 +13,14 @@ describe("analytics translation context", () => {
     expect(analytics).toBeGreaterThan(intlStart);
     expect(intlEnd).toBeGreaterThan(analytics);
   });
+
+  /**
+   * Razılıq kartı fokus tələsi olmayan dialoqdur; DOM-un sonunda olanda klaviatura istifadəçisi
+   * ona çatmaq üçün səhifənin 100+ elementini Tab ilə keçməli idi.
+   */
+  it("AnalyticsProvider-i məzmundan əvvəl render edir ki, razılıq kartı ilk fokus nöqtəsi olsun", () => {
+    const source = readFileSync(join(process.cwd(), "src/app/layout.tsx"), "utf8");
+
+    expect(source.indexOf("<AnalyticsProvider />")).toBeLessThan(source.indexOf("{children}"));
+  });
 });

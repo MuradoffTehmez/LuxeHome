@@ -19,11 +19,17 @@
     "switch": "Change language"
   },
   "analytics": {
-    "ariaLabel": "Analytics preferences",
-    "title": "Analytics preferences",
-    "description": "You can allow analytics cookies so we can understand how the website is used without collecting personal information. If you decline, the analytics script will not load.",
+    "title": "Analytics cookies",
+    "description": "You can allow analytics cookies so we can see how the website is used without collecting details such as your name, phone number or email. If you decline, the analytics script will not load. Learn more: <policy>Cookie policy</policy>.",
     "accept": "Allow analytics",
-    "decline": "Decline"
+    "decline": "Decline",
+    "close": "Close",
+    "manage": "Cookie settings",
+    "current": {
+      "granted": "Current choice: analytics allowed.",
+      "denied": "Current choice: analytics declined.",
+      "unset": "No choice made yet."
+    }
   },
   "notFound": {
     "title": "The page you requested was not found",

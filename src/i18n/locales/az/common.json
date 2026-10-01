@@ -19,11 +19,17 @@
     "switch": "Dili dəyiş"
   },
   "analytics": {
-    "ariaLabel": "Analitika seçimi",
-    "title": "Analitika seçimi",
-    "description": "Saytın necə istifadə edildiyini şəxsi məlumat toplamadan ölçmək üçün analitika cookie-sinə icazə verə bilərsiniz. İmtina etdikdə analitika skripti yüklənmir.",
+    "title": "Analitika cookie-ləri",
+    "description": "Saytın necə istifadə edildiyini ad, telefon və ya e-poçt kimi məlumat toplamadan ölçmək üçün analitika cookie-sinə icazə verə bilərsiniz. İmtina etdikdə analitika skripti yüklənmir. Ətraflı: <policy>Cookie siyasəti</policy>.",
     "accept": "İcazə verirəm",
-    "decline": "İmtina edirəm"
+    "decline": "İmtina edirəm",
+    "close": "Bağla",
+    "manage": "Cookie parametrləri",
+    "current": {
+      "granted": "Hazırkı seçim: analitikaya icazə verilib.",
+      "denied": "Hazırkı seçim: analitikadan imtina edilib.",
+      "unset": "Hələ seçim edilməyib."
+    }
   },
   "notFound": {
     "title": "Axtardığınız səhifə tapılmadı",
