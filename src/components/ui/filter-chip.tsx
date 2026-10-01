@@ -48,7 +48,9 @@ export function FilterChipRow({
     <nav
       aria-label={label}
       className={cn(
-        "-mx-5 flex snap-x gap-2.5 overflow-x-auto px-5 py-0.5 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:px-0 [&::-webkit-scrollbar]:hidden",
+        // `relative`: overflow-x-auto sərhədi olan konteyner mövqe konteksti yaratmalıdır — əks halda
+        // içindəki absolute element (məs. sr-only) kənar ancestor-a görə yerləşib sənədi daşdırır.
+        "relative -mx-5 flex snap-x gap-2.5 overflow-x-auto px-5 py-0.5 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:px-0 [&::-webkit-scrollbar]:hidden",
         className,
       )}
     >
