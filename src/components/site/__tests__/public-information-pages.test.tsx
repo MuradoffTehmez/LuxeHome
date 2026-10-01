@@ -45,8 +45,12 @@ describe("ictimai məlumat səhifələri", () => {
     );
 
     expect(html).toContain("Aynur Məmmədova");
-    expect(html).toContain("Dərc edilib:");
-    expect(html).toContain("Yenilənib:");
+    expect(html).toContain("Dərc edilib");
+    expect(html).toContain("Yenilənib");
+    // Tarix ICU-dan deyil, öz lüğətimizdən gəlir: «2026 M08 20» kimi ehtiyat mətn çıxmamalıdır
+    expect(html).toContain("20 avqust 2026");
+    expect(html).toContain("24 avqust 2026");
+    expect(html).not.toMatch(/\d{4} M\d{2}/);
     expect(html).toContain('dateTime="2026-08-20T09:00:00.000Z"');
     expect(html).toContain('dateTime="2026-08-24T09:00:00.000Z"');
   });

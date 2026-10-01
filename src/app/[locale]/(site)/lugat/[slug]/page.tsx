@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Info } from "lucide-react";
+import { ArrowLeft, Info } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -102,35 +102,38 @@ export default async function GlossaryTermPage({ params }: Props) {
             </article>
           ) : null}
 
-          <p className="mt-8 flex items-start gap-3 rounded-xl border border-line bg-paper p-4 text-sm text-ink-soft shadow-xs">
+          <p className="mt-12 flex items-start gap-3 rounded-xl border border-line bg-paper p-5 text-sm leading-6 text-ink-soft shadow-xs">
             <Info className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
             <span>{t("article.disclaimer")}</span>
           </p>
 
           {related.length > 0 && (
-            <div className="mt-10 border-t border-line pt-8">
-              <h2 className="font-display text-xl text-ink">{t("glossary.seeAlso")}</h2>
-              <ul className="mt-4 flex flex-col gap-3">
+            <div className="mt-12 border-t border-line pt-10">
+              <h2 className="font-display text-2xl text-ink">{t("glossary.seeAlso")}</h2>
+              <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {related.map((item) => (
                   <li key={item.slug} className="min-w-0">
                     <Link
                       href={`/lugat/${item.slug}`}
-                      className="rounded-xs font-medium text-gold-deep underline underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                      className="card-surface group flex h-full min-w-0 flex-col gap-2 bg-ivory p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                     >
-                      {item.term}
+                      <span className="font-sans text-base font-semibold text-ink transition-colors group-hover:text-gold-deep">
+                        {item.term}
+                      </span>
+                      <span className="line-clamp-3 text-sm leading-6 text-ink-soft">{item.shortDefinition}</span>
                     </Link>
-                    <p className="mt-0.5 text-sm text-ink-soft">{item.shortDefinition}</p>
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
-          <div className="mt-10">
+          <div className="mt-12">
             <Link
               href="/lugat"
-              className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-4 text-sm font-medium text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
+              className="group inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong bg-paper px-5 text-sm font-medium text-ink-soft transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
+              <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
               {t("glossary.backToGlossary")}
             </Link>
           </div>

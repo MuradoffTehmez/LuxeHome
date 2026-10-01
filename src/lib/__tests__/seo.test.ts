@@ -231,6 +231,15 @@ describe("structured data kontraktı", () => {
     });
     expect(JSON.stringify(article)).toContain("/logo-full.png");
 
+    // Nisbi üz qabığı yolu struktur datada mütləq ünvana çevrilir
+    const withCover = articleSchema({
+      title: "Mənzil seçimi",
+      description: "Praktik bələdçi",
+      slug: "menzil-secimi",
+      image: "/images/blog/menzil-secimi.webp",
+    });
+    expect(withCover.image).toEqual([siteUrl("/images/blog/menzil-secimi.webp")]);
+
     expect(serviceSchema({ title: "Əmlak satışı", description: "Satış xidməti", slug: "emlak-satisi" })["@id"]).toContain("#service");
     expect(agencySchema({ name: "Test Agentlik", slug: "test-agentlik", phone: "+994501112233" })).toMatchObject({
       "@type": "RealEstateAgent",

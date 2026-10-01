@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { formatLocalizedDate, formatLocalizedRelative, formatLocalizedTime } from "@/i18n/date";
 
 /** Tailwind siniflərini konfliktsiz birləşdirir. */
 export function cn(...inputs: ClassValue[]) {
@@ -47,34 +48,16 @@ export function formatArea(value: number): string {
   return `${azNumber.format(value)} m²`;
 }
 
-const AZ_MONTHS = [
-  "yanvar",
-  "fevral",
-  "mart",
-  "aprel",
-  "may",
-  "iyun",
-  "iyul",
-  "avqust",
-  "sentyabr",
-  "oktyabr",
-  "noyabr",
-  "dekabr",
-];
-
-/** Date → "12 avqust 2026" */
+/** Date → "12 avqust 2026" (Bakı vaxtı — Workers-in yerli saat qurşağı UTC-dir). */
 export function formatDate(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
-  if (Number.isNaN(d.getTime())) return "";
-  return `${d.getDate()} ${AZ_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  return formatLocalizedDate(date, "az") ?? "";
 }
 
-/** Date → "12.08.2026 19:40" */
+/** Date → "12.08.2026 19:40" (Bakı vaxtı) */
 export function formatDateTime(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const day = formatLocalizedDate(date, "az", "numeric");
+  const time = formatLocalizedTime(date);
+  return day && time ? `${day} ${time}` : "";
 }
 
 /** Cache sərhədində mətnə çevrilmiş DateTime dəyərini metadata üçün normallaşdırır. */
@@ -86,21 +69,7 @@ export function toIsoDateTime(value: Date | string | null | undefined): string |
 
 /** "2 saat əvvəl", "dünən", "3 gün əvvəl" */
 export function formatRelative(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
-  const diffMs = Date.now() - d.getTime();
-  const minutes = Math.floor(diffMs / 60000);
-
-  if (minutes < 1) return "indicə";
-  if (minutes < 60) return `${minutes} dəqiqə əvvəl`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} saat əvvəl`;
-
-  const days = Math.floor(hours / 24);
-  if (days === 1) return "dünən";
-  if (days < 30) return `${days} gün əvvəl`;
-
-  return formatDate(d);
+  return formatLocalizedRelative(date, "az") ?? "";
 }
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 import { runtimeEnv } from "@/lib/runtime-env";
 import { escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
+import { formatLocalizedDateTime } from "@/i18n/date";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
 
 /**
@@ -81,11 +82,7 @@ export function formatLeadTelegramMessage(payload: TelegramLeadPayload): string 
   if (payload.email) lines.push(`✉️ ${escapeHtml(payload.email)}`);
   if (payload.propertyTitle) lines.push(`🏠 ${escapeHtml(payload.propertyTitle)}`);
   if (payload.requestedFor) {
-    const when = new Intl.DateTimeFormat("az-AZ", {
-      dateStyle: "medium",
-      timeStyle: "short",
-      timeZone: "Asia/Baku",
-    }).format(payload.requestedFor);
+    const when = formatLocalizedDateTime(payload.requestedFor, "az", "short") ?? "";
     lines.push(`🕒 ${escapeHtml(when)}`);
   }
   if (payload.subject) lines.push(`📌 ${escapeHtml(payload.subject)}`);

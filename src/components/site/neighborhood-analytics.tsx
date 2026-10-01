@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { formatLocalizedDate } from "@/i18n/date";
 import { Container, Section } from "@/components/ui/container";
 import type { Locale } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
@@ -37,7 +38,6 @@ export function NeighborhoodAnalytics({
   locale: Locale;
 }) {
   const t = useTranslations("phase2.neighborhood");
-  const format = useFormatter();
 
   const description =
     locale === "en"
@@ -91,7 +91,7 @@ export function NeighborhoodAnalytics({
             {profile.dataSource ? `${t("source")}: ${profile.dataSource}` : ""}
             {profile.dataSource && profile.measuredAt ? " · " : ""}
             {profile.measuredAt
-              ? `${t("measuredAt")}: ${format.dateTime(profile.measuredAt, { dateStyle: "medium" })}`
+              ? `${t("measuredAt")}: ${formatLocalizedDate(profile.measuredAt, locale, "short")}`
               : ""}
           </p>
         )}

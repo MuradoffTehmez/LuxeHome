@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { escapeHtml } from "@/lib/email-html";
 import { findManyInChunks } from "@/lib/d1-chunks";
+import { formatLocalizedDateTime } from "@/i18n/date";
 
 /**
  * Açıq qapı günləri (#109) — elanın ümumi baxış pəncərəsi və qeydiyyat.
@@ -97,7 +98,7 @@ export async function sendOpenHouseReminders(now = new Date()) {
     const slot = slotById.get(registration.openHouseId);
     const property = slot ? propertyById.get(slot.propertyId) : undefined;
     if (!slot || !property) continue;
-    const when = new Intl.DateTimeFormat("az-AZ", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Baku" }).format(slot.startsAt);
+    const when = formatLocalizedDateTime(slot.startsAt, "az", "full") ?? "";
     const place = [property.title, property.address].filter(Boolean).join(" — ");
     await sendEmail({
       to: registration.email as string,

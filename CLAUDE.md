@@ -34,6 +34,7 @@ npm run deploy       # OpenNext bundle + Cloudflare Workers-ə yayım (productio
 npm run cf-typegen   # wrangler.jsonc-dən CloudflareEnv tiplərini yenidən yaradır
 
 npm run auth:create-admin  # ilk SUPER_ADMIN üçün INSERT ifadəsi çap edir
+npm run assets:blog-covers # bloq üz qabıqlarını (public/images/blog) kateqoriya fotolarından yenidən qurur
 npm run db:locations:build    # rəsmi inzibati-ərazi JSON-undan locations-data.ts yaradır
 npm run db:knowledge:build    # hüquqi mənbə sənədindən DRAFT Knowledge Hub SQL yaradır
 npm run db:knowledge:local    # yaradılmış Knowledge Hub SQL-i lokal D1-ə tətbiq edir
@@ -776,6 +777,22 @@ uyğun Wiki səhifəsi, README, AGENTS.md və MEMORY.md eyni PR-da yenilənir. Q
 
 ## Diqqət tələb edən məqamlar
 
+- **Tarixi yalnız `src/i18n/date.ts`-dəki köməkçilərlə yaz** (`formatLocalizedDate`, `formatLocalizedDateTime`,
+  `formatLocalizedTime`, `formatLocalizedRelative`; üslublar: `long` «29 sentyabr 2026», `short`, `numeric`,
+  `monthYear`, `weekday`, `full`). Workers-in yığcam ICU datasında `az` tarix şablonları yoxdur: `Intl.DateTimeFormat("az", …)`,
+  `toLocaleDateString` və `next-intl`-in `format.dateTime()` səssizcə kök şablona düşür və saytda «2026 M09 29»
+  çıxır. Köməkçilər rəqəmi `en-US` formatter-i ilə **Bakı vaxtında** götürür, ay/həftə günü adı isə öz lüğətindən
+  gəlir — server (UTC) və brauzer eyni mətni verir. `scripts/__tests__/date-format-source.test.ts` `src/`-də yeni
+  `Intl.DateTimeFormat` / `toLocaleDateString` yazılsa testi yıxır.
+- **Bloq üz qabığı** `resolveBlogCover()` (`src/lib/blog-covers.ts`) ilədir: paneldən yüklənmiş `/media/...` şəkli
+  həmişə üstündür; yoxdursa ilk 10 bloq yazısı üçün `public/images/blog/<slug>.webp`, yeni yazılar üçün slug-a görə sabit
+  seçilən `public/images/categories/*` fotosu göstərilir (`coverUrl` bazaya yazılmır, admin forması şəkli silməz). Hazır
+  üz qabıqları `npm run assets:blog-covers` (`scripts/build-blog-covers.mjs`) ilə kateqoriya fotolarından kəsilib
+  qurulur; yeni seed yazısı əlavə edəndə `BLOG_COVER_SLUGS`-ə də yaz (`scripts/__tests__/blog-covers-assets.test.ts` yoxlayır).
+  Bilik Mərkəzi bələdçilərinin şəkli yoxdursa `KnowledgeCover` (qızılı şəbəkə + auditoriya ikonu) göstərilir.
+- Bloq/Bilik Mərkəzi səhifələri ortaq `PageHeader` (`footer` propu — məqalə meta sətri), `ArticleTrustMeta`
+  (başlıqlı blok-lar), `FilterChip`/`FilterChipRow` və `SectionHeading` komponentlərini paylaşır; kart `PostCard` /
+  `KnowledgeCard` eyni sıra ilə düzülür (şəkil → tarix/kateqoriya → başlıq → xülasə → «Oxu»).
 - **Verilənlər bazası Cloudflare D1-dir (SQLite).** `mode: "insensitive"` D1-də dəstəklənmir və
   yazılmamalıdır. Azərbaycanca registrsiz axtarış `src/lib/search-normalization.ts` və
   `Property.searchText` / taksonomiya `searchName` sütunları ilə həll olunur. Əmlak və

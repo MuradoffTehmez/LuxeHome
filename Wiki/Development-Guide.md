@@ -139,6 +139,7 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `npm run e2e:chromium`, `e2e:mobile`, `e2e:ui`, `e2e:report` | Playwright layihələri və hesabat |
 | `npm run e2e:install` | Playwright Chromium-u sistem asılılıqları ilə quraşdırır |
 | `npm run assets:maintenance-logo` | Texniki xidmət səhifəsinin daxili loqosunu (`maintenance-logo.ts`) yenidən qurur |
+| `npm run assets:blog-covers` | Bloq üz qabığı şəkillərini (`public/images/blog`) kateqoriya fotolarından yenidən qurur |
 | `npm run preview` | OpenNext build + local Worker preview |
 | `npm run cf-typegen` | Wrangler binding type generation |
 

@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Reveal } from "@/components/ui/reveal";
 import { Pagination } from "@/components/ui/pagination";
+import { SectionHeading } from "@/components/site/section-heading";
 import { KnowledgeCard } from "@/components/site/knowledge-card";
 import { breadcrumbSchema, buildManagedMetadata, itemListSchema, jsonLd } from "@/lib/seo";
 import { getCachedKnowledgeArticles } from "@/lib/public-cache";
@@ -98,8 +99,8 @@ export default async function KnowledgeCategoryPage({ params, searchParams }: Pr
 
       <div className="border-b border-line bg-paper">
         <Container>
-          <form method="GET" action="" role="search" className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center">
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-sm border border-line-strong bg-paper px-3 focus-within:border-gold">
+          <form method="GET" action="" role="search" className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center">
+            <label className="flex min-w-0 flex-1 items-center gap-3 rounded-sm border border-line-strong bg-paper px-4 focus-within:border-gold">
               <Search className="size-4 shrink-0 text-ink-muted" aria-hidden="true" />
               <span className="sr-only">{t("hub.categorySearchLabel", { name: category.name })}</span>
               <input
@@ -112,7 +113,7 @@ export default async function KnowledgeCategoryPage({ params, searchParams }: Pr
             </label>
             <button
               type="submit"
-              className="inline-flex min-h-12 items-center justify-center rounded-xs border border-charcoal bg-charcoal px-6 text-sm font-medium text-ink-invert transition-colors hover:bg-ink"
+              className="inline-flex min-h-12 items-center justify-center rounded-xs border border-charcoal bg-charcoal px-8 text-sm font-medium text-ink-invert transition-colors hover:bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             >
               {t("hub.searchAction")}
             </button>
@@ -124,10 +125,10 @@ export default async function KnowledgeCategoryPage({ params, searchParams }: Pr
         <Container>
           {result.items.length > 0 ? (
             <>
-              <p className="mb-8 text-sm text-ink-muted">
+              <p className="mb-8 text-sm font-medium text-ink-muted">
                 {t("hub.categoryCount", { count: result.total })}
               </p>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 xl:grid-cols-3">
                 {result.items.map((article, index) => (
                   <Reveal key={article.id} delay={index * 50}>
                     <KnowledgeCard article={article} priority={index === 0} />
@@ -144,7 +145,7 @@ export default async function KnowledgeCategoryPage({ params, searchParams }: Pr
                   const qs = sp.toString();
                   return `/bilik-merkezi/kateqoriya/${category.slug}${qs ? `?${qs}` : ""}`;
                 }}
-                className="mt-12"
+                className="mt-14"
               />
             </>
           ) : (
@@ -164,13 +165,13 @@ export default async function KnowledgeCategoryPage({ params, searchParams }: Pr
       {categoryTerms.length > 0 && (
         <Section tone="paper" spacing="compact" className="border-t border-line">
           <Container>
-            <h2 className="font-display text-2xl text-ink sm:text-3xl">{t("glossary.title")}</h2>
-            <ul className="mt-6 flex flex-wrap gap-2">
+            <SectionHeading title={t("glossary.title")} description={t("glossary.description")} />
+            <ul className="flex flex-wrap gap-2.5">
               {categoryTerms.map((term) => (
                 <li key={term.id}>
                   <Link
                     href={`/lugat/${term.slug}`}
-                    className="inline-flex min-h-11 items-center rounded-xs border border-line-strong px-4 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                    className="inline-flex min-h-11 items-center rounded-full border border-line-strong bg-paper px-5 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                   >
                     {term.term}
                   </Link>

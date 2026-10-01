@@ -1,4 +1,5 @@
 import { getAdminT } from "@/lib/admin-i18n";
+import { formatLocalizedDate, formatLocalizedDateTime } from "@/i18n/date";
 import type { Metadata } from "next";
 import { Activity, AlertTriangle, Eye, FileStack, Gauge, Users, Zap } from "lucide-react";
 import { AdminCard, AdminPageHeader, AdminTable, AdminTableCell, AdminTableRow, StatCard } from "@/components/admin/admin-ui";
@@ -18,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-const dateFormatter = new Intl.DateTimeFormat("az-AZ", { day: "2-digit", month: "2-digit" });
+const dateFormatter = { format: (value: Date) => (formatLocalizedDate(value, "az", "numeric") ?? "").slice(0, 5) };
 const numberFormatter = new Intl.NumberFormat("az-AZ");
 
 export default async function AdminAnalyticsPage() {
@@ -58,7 +59,7 @@ export default async function AdminAnalyticsPage() {
           <AdminTable headers={[{ label: t("pages.ops.vaxt") }, { label: t("pages.ops.marsrut") }, { label: t("pages.ops.xeta") }, { label: t("pages.ops.kod") }]}>
             {errors.slice(0, 20).map((error) => (
               <AdminTableRow key={error.id}>
-                <AdminTableCell className="whitespace-nowrap text-xs text-ink-muted">{error.createdAt.toLocaleString("az-AZ")}</AdminTableCell>
+                <AdminTableCell className="whitespace-nowrap text-xs text-ink-muted">{formatLocalizedDateTime(error.createdAt, "az", "numeric")}</AdminTableCell>
                 <AdminTableCell className="max-w-52 truncate font-mono text-xs">{error.path ?? "—"}</AdminTableCell>
                 <AdminTableCell className="max-w-xl"><span className="line-clamp-2 text-sm">{error.message}</span></AdminTableCell>
                 <AdminTableCell className="font-mono text-xs text-ink-muted">{error.digest ?? "—"}</AdminTableCell>

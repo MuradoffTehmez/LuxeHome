@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { LEAD_SOURCES, LEAD_STATUSES, PROPERTY_STATUSES } from "@/lib/constants";
+import { formatLocalizedDateTime } from "@/i18n/date";
 import { SameOriginError, assertSameOrigin } from "@/lib/request-origin";
 import { checkContactLimit, clientIp } from "@/lib/auth/rate-limit";
 import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
@@ -77,7 +78,7 @@ export async function registerForOpenHouse(_prev: OpenHouseState, formData: Form
     if (seat.status === "duplicate") return { status: "success", message: t("alreadyRegistered") };
     if (seat.status === "full") return { status: "error", message: t("full") };
 
-    const when = new Intl.DateTimeFormat("az-AZ", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Baku" }).format(slot.startsAt);
+    const when = formatLocalizedDateTime(slot.startsAt, "az", "short") ?? "";
     let lead;
     try {
       lead = await prisma.lead.create({

@@ -13,6 +13,8 @@ export type ShareButtonsProps = {
   title: string;
   /** Detal toolbar-ı üçün vahid native-share/copy düyməsi. */
   compact?: boolean;
+  /** Yanındakı başlıq artıq «Paylaş» deyirsə, düymə sırasının öz yazısını gizlədir. */
+  showLabel?: boolean;
   className?: string;
 };
 
@@ -21,7 +23,7 @@ const ITEM =
   "text-sm text-ink-soft transition-colors duration-200 " +
   "hover:border-gold hover:text-gold-deep cursor-pointer";
 
-export function ShareButtons({ path, title, compact = false, className }: ShareButtonsProps) {
+export function ShareButtons({ path, title, compact = false, showLabel = true, className }: ShareButtonsProps) {
   const t = useTranslations("property.share");
   const [copied, setCopied] = useState(false);
   const url = siteUrl(path);
@@ -90,7 +92,7 @@ export function ShareButtons({ path, title, compact = false, className }: ShareB
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
-      <span className="mr-1 text-sm font-medium text-ink">{t("label")}:</span>
+      {showLabel ? <span className="mr-1 text-sm font-medium text-ink">{t("label")}:</span> : null}
 
       {targets.map((target) => (
         <a

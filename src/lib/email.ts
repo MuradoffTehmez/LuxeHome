@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
 import { corporateEmails, siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
+import { formatLocalizedDateTime } from "@/i18n/date";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import { recordEmailActivity } from "@/lib/email-activity";
 import { runtimeEnv } from "@/lib/runtime-env";
@@ -229,11 +230,7 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload) {
   }
 
   const recipient = await notificationEmail();
-  const timeFormatted = new Intl.DateTimeFormat("az-AZ", {
-    dateStyle: "full",
-    timeStyle: "short",
-    timeZone: "Asia/Baku",
-  }).format(new Date());
+  const timeFormatted = formatLocalizedDateTime(new Date(), "az", "full") ?? "";
 
   const subject = `🔔 Yeni Müraciət: ${payload.name} — ${payload.subject || "Luxe Home Estate"}`;
 

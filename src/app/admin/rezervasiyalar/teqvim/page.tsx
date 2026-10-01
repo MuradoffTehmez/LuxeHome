@@ -9,6 +9,7 @@ import { getAdminI18n } from "@/lib/admin-i18n";
 import { getStaffCalendar } from "@/lib/calendar-events";
 import { bakuMonthGrid, bakuDayKey } from "@/lib/calendar-grid";
 import { cn } from "@/lib/utils";
+import { formatLocalizedDate, formatLocalizedTime, localizedWeekdayShort } from "@/i18n/date";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getAdminI18n();
@@ -36,10 +37,10 @@ export default async function ReservationCalendarPage({ searchParams }: { search
     const key = bakuDayKey(event.start);
     byDay.set(key, [...(byDay.get(key) ?? []), event]);
   }
-  const monthLabel = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "Asia/Baku" }).format(grid.monthStart);
-  const weekday = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" });
-  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku" });
-  const dayLabel = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+  const monthLabel = formatLocalizedDate(grid.monthStart, locale, "monthYear") ?? "";
+  const weekday = (date: Date) => localizedWeekdayShort(locale, date.getUTCDay());
+  const time = (date: Date) => formatLocalizedTime(date) ?? "";
+  const dayLabel = (date: Date) => formatLocalizedDate(date, locale, "weekday") ?? "";
   const navClass = "inline-flex min-h-11 items-center gap-1 rounded-sm border border-line-strong px-3 text-sm text-ink hover:border-gold";
 
   return (
@@ -71,7 +72,7 @@ export default async function ReservationCalendarPage({ searchParams }: { search
       <div className="hidden overflow-hidden rounded-xl border border-line bg-paper lg:block">
         <div className="grid grid-cols-7 border-b border-line bg-ivory">
           {grid.days.slice(0, 7).map((day) => (
-            <p key={day.key} className="px-3 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">{weekday.format(day.date)}</p>
+            <p key={day.key} className="px-3 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">{weekday(day.date)}</p>
           ))}
         </div>
         <div className="grid grid-cols-7">
@@ -91,7 +92,7 @@ export default async function ReservationCalendarPage({ searchParams }: { search
                         event.kind === "openHouse" ? "bg-gold/15 text-gold-deep" : event.status === "CONFIRMED" ? "bg-success-bg text-success" : "bg-info-bg text-info",
                       )}
                     >
-                      <span className="tabular">{time.format(event.start)}</span> {event.summary}
+                      <span className="tabular">{time(event.start)}</span> {event.summary}
                     </Link>
                   </li>
                 ))}
@@ -108,7 +109,7 @@ export default async function ReservationCalendarPage({ searchParams }: { search
         ) : null}
         {grid.days.filter((day) => day.inMonth && byDay.has(day.key)).map((day) => (
           <section key={day.key} className="rounded-xl border border-line bg-paper p-4">
-            <h2 className="text-sm font-semibold text-ink first-letter:uppercase">{dayLabel.format(day.date)}</h2>
+            <h2 className="text-sm font-semibold text-ink first-letter:uppercase">{dayLabel(day.date)}</h2>
             <ul className="mt-2 flex flex-col gap-2">
               {(byDay.get(day.key) ?? []).map((event) => (
                 <li key={event.uid}>
@@ -116,7 +117,7 @@ export default async function ReservationCalendarPage({ searchParams }: { search
                     href={event.kind === "reservation" ? "/admin/rezervasiyalar" : `/admin/emlaklar/${event.propertyId}`}
                     className="flex min-h-11 items-center gap-3 rounded-sm border border-line px-3 py-2 text-sm hover:border-gold"
                   >
-                    <span className="tabular shrink-0 font-semibold text-ink">{time.format(event.start)}</span>
+                    <span className="tabular shrink-0 font-semibold text-ink">{time(event.start)}</span>
                     <span className="min-w-0 text-ink-soft [overflow-wrap:anywhere]">{event.summary}</span>
                   </Link>
                 </li>

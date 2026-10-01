@@ -59,6 +59,7 @@ import { PartnerRelations } from "@/components/site/partner-relations";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
+import { formatLocalizedDate } from "@/i18n/date";
 import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ReservationForm } from "./reservation-form";
@@ -422,7 +423,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     {property.priceHistory.map((entry) => (
                       <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 py-3 first:pt-0 last:pb-0">
                         <time className="text-sm text-ink-muted" dateTime={entry.changedAt.toISOString()}>
-                          {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(entry.changedAt)}
+                          {formatLocalizedDate(entry.changedAt, locale as Locale, "short")}
                         </time>
                         <span className="tabular text-sm text-ink-soft">
                           <span className="line-through">{formatPrice(entry.oldPrice, entry.currency)}</span>
@@ -482,7 +483,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     return <>
                       {description ? <p className="mt-3 leading-relaxed text-ink-soft">{description}</p> : null}
                       {metrics.length > 0 ? <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{metrics.map(([label, value]) => <div key={label} className="rounded-xl border border-line bg-ivory p-3.5 shadow-xs"><dt className="text-xs text-ink-muted">{label}</dt><dd className="tabular mt-1 font-medium text-ink">{value}</dd></div>)}</dl> : null}
-                      {(profile.dataSource || profile.measuredAt) ? <p className="mt-4 text-xs text-ink-muted">{profile.dataSource ? `${neighborhoodText("source")}: ${profile.dataSource}` : ""}{profile.dataSource && profile.measuredAt ? " · " : ""}{profile.measuredAt ? `${neighborhoodText("measuredAt")}: ${new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(profile.measuredAt)}` : ""}</p> : null}
+                      {(profile.dataSource || profile.measuredAt) ? <p className="mt-4 text-xs text-ink-muted">{profile.dataSource ? `${neighborhoodText("source")}: ${profile.dataSource}` : ""}{profile.dataSource && profile.measuredAt ? " · " : ""}{profile.measuredAt ? `${neighborhoodText("measuredAt")}: ${formatLocalizedDate(profile.measuredAt, locale as Locale, "short")}` : ""}</p> : null}
                     </>;
                   })()}
                 </section>

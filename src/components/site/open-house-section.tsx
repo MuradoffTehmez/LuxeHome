@@ -9,6 +9,8 @@ import { TurnstileWidget } from "@/components/security/turnstile-widget";
 import { HONEYPOT_FIELD } from "@/lib/spam";
 import { cn } from "@/lib/utils";
 import { slotAvailability } from "@/lib/open-house-availability";
+import { formatLocalizedDate, formatLocalizedTime } from "@/i18n/date";
+import type { Locale } from "@/lib/constants";
 import { registerForOpenHouse, type OpenHouseState } from "@/app/[locale]/(site)/emlaklar/[slug]/open-house-actions";
 
 type Slot = { id: string; startsAt: string; endsAt: string; capacity: number | null; registered: number; note: string | null };
@@ -21,8 +23,6 @@ export function OpenHouseSection({ slots, locale }: { slots: Slot[]; locale: str
   const t = useTranslations("property.openHouse");
   const [selected, setSelected] = useState<string | null>(null);
   const [state, action, pending] = useActionState<OpenHouseState, FormData>(registerForOpenHouse, { status: "idle" });
-  const dateFormat = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Baku" });
-  const timeFormat = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku" });
 
   return (
     <section aria-labelledby="open-house-title" className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-7">
@@ -49,8 +49,8 @@ export function OpenHouseSection({ slots, locale }: { slots: Slot[]; locale: str
                   selected === slot.id ? "border-gold bg-gold/10" : "border-line hover:border-gold",
                 )}
               >
-                <span className="text-sm font-semibold text-ink first-letter:uppercase">{dateFormat.format(starts)}</span>
-                <span className="tabular text-sm text-ink-soft">{timeFormat.format(starts)} – {timeFormat.format(new Date(slot.endsAt))}</span>
+                <span className="text-sm font-semibold text-ink first-letter:uppercase">{formatLocalizedDate(starts, locale as Locale, "weekday")}</span>
+                <span className="tabular text-sm text-ink-soft">{formatLocalizedTime(starts)} – {formatLocalizedTime(slot.endsAt)}</span>
                 <span className="mt-1 inline-flex items-center gap-1 text-xs text-ink-muted">
                   <Users className="size-3.5" aria-hidden="true" />
                   {availability === "full" ? t("full") : availability === "closed" ? t("closed") : left === null ? t("open") : t("seatsLeft", { count: left })}

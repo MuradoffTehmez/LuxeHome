@@ -3,14 +3,16 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { ExternalLink, Info, Scale, Tag } from "lucide-react";
+import { ArrowLeft, ExternalLink, Info, Scale, Tag } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { formatLocalizedDate } from "@/i18n/date";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/ui/reveal";
 import { ShareButtons } from "@/components/site/share-buttons";
 import { KnowledgeCard } from "@/components/site/knowledge-card";
+import { SectionHeading } from "@/components/site/section-heading";
 import { ArticleTrustMeta } from "@/components/site/article-trust-meta";
 import {
   breadcrumbSchema,
@@ -48,6 +50,18 @@ const RISK_LEVEL_KEYS: Record<KnowledgeRiskLevel, "green" | "yellow" | "red" | "
   RED: "red",
   LEGAL_REVIEW: "legalReview",
 };
+/** Status və risk nişanlarının rəngi — mətn həmişə yanındadır, rəng yeganə siqnal deyil. */
+const LEGAL_STATUS_TONE: Record<LegalContentStatus, "success" | "warning" | "info"> = {
+  CURRENT: "success",
+  PROPOSAL: "warning",
+  MIXED: "info",
+};
+const RISK_LEVEL_TONE: Record<KnowledgeRiskLevel, "success" | "warning" | "danger" | "info"> = {
+  GREEN: "success",
+  YELLOW: "warning",
+  RED: "danger",
+  LEGAL_REVIEW: "info",
+};
 
 async function loadArticle(slug: string, locale: string) {
   const source = await getCachedKnowledgeArticleBySlug(slug);
@@ -82,6 +96,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     locale: locale as Locale,
     managedEntity: { type: TRANSLATION_ENTITY_TYPES.KNOWLEDGE_ARTICLE, id: article.id },
   });
+}
+
+function FactLabel({ children }: { children: React.ReactNode }) {
+  return <dt className="text-xs font-medium tracking-wide text-ink-muted uppercase">{children}</dt>;
 }
 
 export default async function KnowledgeArticlePage({ params }: Props) {
@@ -121,6 +139,10 @@ export default async function KnowledgeArticlePage({ params }: Props) {
     [t("article.template"), article.template],
     [t("article.courtPosition"), article.courtPosition],
   ].filter((item): item is [string, string] => Boolean(item[1]));
+
+  const legalStatus = article.legalStatus as LegalContentStatus;
+  const riskLevel = article.riskLevel as KnowledgeRiskLevel;
+  const reviewedAt = formatLocalizedDate(article.legalReviewedAt, locale as Locale);
 
   return (
     <>
@@ -180,7 +202,7 @@ export default async function KnowledgeArticlePage({ params }: Props) {
             : []),
           { label: article.title },
         ]}
-        actions={
+        footer={
           <ArticleTrustMeta
             authorName={article.author?.name}
             publishedAt={publishedAt}
@@ -194,30 +216,8 @@ export default async function KnowledgeArticlePage({ params }: Props) {
       <Section tone="ivory" spacing="compact">
         <Container size="narrow">
           <div className="min-w-0">
-            <div className="mb-8 flex flex-wrap items-center gap-2">
-              <Badge tone="gold">{t(`audience.${article.audience as KnowledgeAudience}`)}</Badge>
-              <Badge tone="neutral">{t(`level.${article.level as KnowledgeLevel}`)}</Badge>
-            </div>
-
-            <aside className="mb-10 rounded-md border border-gold-line bg-paper p-5 sm:p-6" aria-label={t("article.legalStatusPanel")}>
-              <div className="flex items-start gap-3">
-                <Scale className="mt-0.5 size-5 shrink-0 text-gold-deep" aria-hidden="true" />
-                <div className="min-w-0 flex-1">
-                  <h2 className="font-display text-xl text-ink">{t("article.legalStatusPanel")}</h2>
-                  <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                    <div><dt className="text-ink-muted">{t("article.normStatus")}</dt><dd className="font-medium text-ink">{t(`article.legalStatus.${LEGAL_STATUS_KEYS[article.legalStatus as LegalContentStatus]}`)}</dd></div>
-                    <div><dt className="text-ink-muted">{t("article.riskLevel")}</dt><dd className="font-medium text-ink">{t(`article.riskLevels.${RISK_LEVEL_KEYS[article.riskLevel as KnowledgeRiskLevel]}`)}</dd></div>
-                    <div><dt className="text-ink-muted">{t("article.jurisdiction")}</dt><dd className="font-medium text-ink">{article.jurisdiction}</dd></div>
-                    <div><dt className="text-ink-muted">{t("article.legalReviewedAt")}</dt><dd className="font-medium text-ink">{article.legalReviewedAt ? new Intl.DateTimeFormat(locale).format(new Date(article.legalReviewedAt)) : t("article.notReviewed")}</dd></div>
-                  </dl>
-                  {legalActs.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.legalActs")}</h3><ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-ink-soft">{legalActs.map((act) => <li key={act}>{act}</li>)}</ul></div>}
-                  {sources.length > 0 && <div className="mt-5"><h3 className="text-sm font-semibold text-ink">{t("article.officialSources")}</h3><ul className="mt-2 space-y-2">{sources.map(({ url, label, host }) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 break-all text-sm text-gold-deep underline-offset-4 hover:underline">{label}{label !== host ? <span className="text-xs text-ink-muted">· {host}</span> : null}<ExternalLink className="size-3.5 shrink-0" aria-hidden="true" /></a></li>)}</ul></div>}
-                </div>
-              </div>
-            </aside>
-
             {article.coverUrl && (
-              <div className="relative mb-10 aspect-16/9 w-full overflow-hidden rounded-md bg-beige shadow-sm">
+              <div className="relative mb-10 aspect-16/9 w-full overflow-hidden rounded-xl bg-beige shadow-sm">
                 <Image
                   src={article.coverUrl}
                   alt={article.coverAlt || article.title}
@@ -230,8 +230,99 @@ export default async function KnowledgeArticlePage({ params }: Props) {
               </div>
             )}
 
+            <div className="mb-8 flex flex-wrap items-center gap-2.5">
+              <Badge tone="gold">{t(`audience.${article.audience as KnowledgeAudience}`)}</Badge>
+              <Badge tone="neutral">{t(`level.${article.level as KnowledgeLevel}`)}</Badge>
+            </div>
+
+            <aside
+              className="mb-12 overflow-hidden rounded-xl border border-gold-line bg-paper shadow-xs"
+              aria-label={t("article.legalStatusPanel")}
+            >
+              <div className="flex items-center gap-3 border-b border-gold-line bg-ivory px-5 py-4 sm:px-6">
+                <span
+                  aria-hidden="true"
+                  className="grid size-10 shrink-0 place-items-center rounded-full border border-gold-line bg-paper text-gold-deep"
+                >
+                  <Scale className="size-5" />
+                </span>
+                <h2 className="font-sans text-lg font-semibold text-ink">{t("article.legalStatusPanel")}</h2>
+              </div>
+
+              <div className="p-5 sm:p-6">
+                <dl className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
+                  <div>
+                    <FactLabel>{t("article.normStatus")}</FactLabel>
+                    <dd className="mt-2">
+                      <Badge tone={LEGAL_STATUS_TONE[legalStatus] ?? "neutral"} className="whitespace-normal">
+                        {t(`article.legalStatus.${LEGAL_STATUS_KEYS[legalStatus]}`)}
+                      </Badge>
+                    </dd>
+                  </div>
+                  <div>
+                    <FactLabel>{t("article.riskLevel")}</FactLabel>
+                    <dd className="mt-2">
+                      <Badge tone={RISK_LEVEL_TONE[riskLevel] ?? "neutral"} className="whitespace-normal">
+                        {t(`article.riskLevels.${RISK_LEVEL_KEYS[riskLevel]}`)}
+                      </Badge>
+                    </dd>
+                  </div>
+                  <div>
+                    <FactLabel>{t("article.jurisdiction")}</FactLabel>
+                    <dd className="mt-2 text-sm font-semibold text-ink">{article.jurisdiction}</dd>
+                  </div>
+                  <div>
+                    <FactLabel>{t("article.legalReviewedAt")}</FactLabel>
+                    <dd className="mt-2 text-sm font-semibold text-ink">
+                      {reviewedAt ?? t("article.notReviewed")}
+                    </dd>
+                  </div>
+                </dl>
+
+                {legalActs.length > 0 && (
+                  <div className="mt-6 border-t border-line pt-5">
+                    <h3 className="text-sm font-semibold text-ink">{t("article.legalActs")}</h3>
+                    <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-ink-soft marker:text-gold-deep">
+                      {legalActs.map((act) => (
+                        <li key={act}>{act}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {sources.length > 0 && (
+                  <div className="mt-6 border-t border-line pt-5">
+                    <h3 className="text-sm font-semibold text-ink">{t("article.officialSources")}</h3>
+                    <ul className="mt-3 space-y-1">
+                      {sources.map(({ url, label, host }) => (
+                        <li key={url}>
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex min-h-11 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-xs py-1.5 text-sm leading-6 text-gold-deep underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                          >
+                            <span className="min-w-0 [overflow-wrap:anywhere]">{label}</span>
+                            {label !== host ? (
+                              <span className="text-xs whitespace-nowrap text-ink-muted">· {host}</span>
+                            ) : null}
+                            <ExternalLink className="size-3.5 shrink-0" aria-hidden="true" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </aside>
+
             <article className="prose-luxe min-w-0 max-w-[68ch] text-base [overflow-wrap:anywhere] sm:text-lg">
-              {legalBlocks.map(([title, html]) => <section key={title}><h2>{title}</h2><div dangerouslySetInnerHTML={{ __html: html }} /></section>)}
+              {legalBlocks.map(([title, html]) => (
+                <section key={title}>
+                  <h2>{title}</h2>
+                  <div dangerouslySetInnerHTML={{ __html: html }} />
+                </section>
+              ))}
               <div dangerouslySetInnerHTML={{ __html: article.content }} />
             </article>
 
@@ -240,20 +331,20 @@ export default async function KnowledgeArticlePage({ params }: Props) {
               Məzmun Azərbaycan Respublikasının qanunvericiliyinə istinad etsə də,
               konkret əməliyyat üzrə qərar peşəkar məsləhət tələb edir.
             */}
-            <p className="mt-10 flex items-start gap-3 rounded-xl border border-line bg-paper p-4 text-sm text-ink-soft shadow-xs">
+            <p className="mt-14 flex items-start gap-3 rounded-xl border border-line bg-paper p-5 text-sm leading-6 text-ink-soft shadow-xs">
               <Info className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden="true" />
               <span>{t("article.disclaimer")}</span>
             </p>
 
             {tags.length > 0 && (
-              <nav className="mt-8" aria-label={t("article.tagsTitle")}>
+              <nav className="mt-10" aria-label={t("article.tagsTitle")}>
                 <h2 className="font-sans text-sm font-semibold text-ink">{t("article.tagsTitle")}</h2>
-                <ul className="mt-3 flex flex-wrap gap-2">
+                <ul className="mt-4 flex flex-wrap gap-2.5">
                   {tags.map((label) => (
                     <li key={label}>
                       <Link
                         href={`/bilik-merkezi?teq=${encodeURIComponent(knowledgeTagSlug(label))}`}
-                        className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line-strong bg-paper px-4 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-strong bg-paper px-4 text-sm text-ink-soft transition-colors hover:border-gold hover:text-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                       >
                         <Tag className="size-3.5 text-gold" aria-hidden="true" />
                         {label}
@@ -264,10 +355,18 @@ export default async function KnowledgeArticlePage({ params }: Props) {
               </nav>
             )}
 
-            <div className="mt-8 flex flex-col gap-4 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-display text-lg text-ink">{t("article.shareTitle")}</span>
-              <ShareButtons title={article.title} path={`/bilik-merkezi/${article.slug}`} />
+            <div className="mt-10 flex flex-col gap-4 border-t border-line pt-8">
+              <h2 className="font-sans text-base font-semibold text-ink">{t("article.shareTitle")}</h2>
+              <ShareButtons title={article.title} path={`/bilik-merkezi/${article.slug}`} showLabel={false} />
             </div>
+
+            <Link
+              href="/bilik-merkezi"
+              className="group relative mt-8 inline-flex min-h-11 items-center gap-2 rounded-xs text-sm font-medium text-gold-deep transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            >
+              <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
+              {t("article.backToHub")}
+            </Link>
           </div>
         </Container>
       </Section>
@@ -275,10 +374,8 @@ export default async function KnowledgeArticlePage({ params }: Props) {
       {related.length > 0 && (
         <Section tone="paper" spacing="cozy" className="border-t border-line">
           <Container>
-            <h2 className="mb-8 font-display text-2xl text-ink sm:text-3xl">
-              {t("article.related")}
-            </h2>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <SectionHeading title={t("article.related")} />
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 lg:grid-cols-3">
               {related.map((item, index) => (
                 <Reveal key={item.id} delay={index * 50}>
                   <KnowledgeCard article={item} />
@@ -291,14 +388,14 @@ export default async function KnowledgeArticlePage({ params }: Props) {
 
       <Section tone="beige" spacing="compact">
         <Container size="narrow">
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <h2 className="font-display text-xl text-ink">{t("article.ctaTitle")}</h2>
-              <p className="mt-1 text-sm text-ink-soft">{t("article.ctaDescription")}</p>
+              <h2 className="font-display text-xl text-ink sm:text-2xl">{t("article.ctaTitle")}</h2>
+              <p className="mt-2 text-[0.9375rem] leading-7 text-ink-soft">{t("article.ctaDescription")}</p>
             </div>
             <Link
               href="/elaqe"
-              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xs border border-charcoal bg-charcoal px-6 text-sm font-medium text-ink-invert transition-colors hover:bg-ink"
+              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xs border border-charcoal bg-charcoal px-6 text-sm font-medium text-ink-invert transition-colors hover:bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             >
               {t("article.ctaAction")}
             </Link>

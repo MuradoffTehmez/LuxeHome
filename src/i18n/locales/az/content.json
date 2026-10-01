@@ -33,10 +33,12 @@
     "email": "E-poçt"
   },
   "articleMeta": {
-    "published": "Dərc edilib:",
-    "updated": "Yenilənib:",
-    "read": "{count} dəq oxuma",
-    "views": "{count} baxış"
+    "author": "Müəllif",
+    "published": "Dərc edilib",
+    "updated": "Yenilənib",
+    "readingTime": "Oxuma vaxtı",
+    "readValue": "{count} dəq",
+    "views": "Baxış"
   },
   "propertyActions": "Əmlak əməliyyatları",
   "call": "Zəng et",

@@ -8,6 +8,7 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { formatDateTime, formatPrice } from "@/lib/utils";
+import { formatLocalizedTime } from "@/i18n/date";
 import { getAdminPropertyById, getPropertyFormOptions } from "@/lib/queries";
 import { deleteProperty, updateProperty } from "../actions";
 import type { PropertyFormValues } from "../form-values";
@@ -158,7 +159,7 @@ export default async function EditPropertyPage({
           propertyId={property.id}
           slots={openHouses.map((slot) => ({
             id: slot.id,
-            label: `${formatDateTime(slot.startsAt)} – ${new Intl.DateTimeFormat("az-AZ", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku" }).format(slot.endsAt)}`,
+            label: `${formatDateTime(slot.startsAt)} – ${formatLocalizedTime(slot.endsAt) ?? ""}`,
             capacity: slot.capacity,
             registrations: slot._count.registrations,
             note: slot.note,

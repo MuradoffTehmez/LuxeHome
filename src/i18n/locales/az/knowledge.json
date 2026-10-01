@@ -8,6 +8,7 @@
     "featured": "Seçilmiş bələdçilər",
     "allGuides": "Bütün bələdçilər",
     "categories": "Mövzular",
+    "categoriesLead": "Hər mövzuda sənədləşmə, vergi və praktiki addımlar bir yerdə toplanıb.",
     "categoryCount": "{count} bələdçi",
     "termCount": "{count} termin",
     "empty": "Bu bölmədə hələ məzmun dərc edilməyib.",
@@ -31,6 +32,7 @@
   },
   "article": {
     "readMinutes": "{count} dəq oxu",
+    "readMore": "Oxu",
     "updatedAt": "Yenilənib: {date}",
     "backToHub": "Bilik Mərkəzinə qayıt",
     "related": "Növbəti oxu",

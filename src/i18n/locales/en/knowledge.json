@@ -8,6 +8,7 @@
     "featured": "Featured guides",
     "allGuides": "All guides",
     "categories": "Topics",
+    "categoriesLead": "Paperwork, taxes and practical steps for every topic, in one place.",
     "categoryCount": "{count} guides",
     "termCount": "{count} terms",
     "empty": "Nothing has been published in this section yet.",
@@ -31,6 +32,7 @@
   },
   "article": {
     "readMinutes": "{count} min read",
+    "readMore": "Read",
     "updatedAt": "Updated: {date}",
     "backToHub": "Back to Knowledge Hub",
     "related": "Read next",

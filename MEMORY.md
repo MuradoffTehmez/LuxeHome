@@ -661,6 +661,24 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   (`INSERT OR IGNORE` + slug üzrə `UPDATE`), silmə/birləşdirmə/slug dəyişikliyi isə yeni miqrasiyadır.
 - Hesabat: `docs/erazi/baki-erazi-bolgusu.md` (generasiya olunur, `db:locations:report`).
 
+## 21. Bloq və Bilik Mərkəzi dizaynı, tarix formatı — 1 oktyabr 2026
+
+- **Səbəb:** saytda tarixlər «2026 M09 29» çıxırdı (bloq kartı, məqalə meta sətri, hüquqi yoxlama tarixi və s.).
+  Kök səbəb: Workers-in yığcam ICU datasında `az` tarix şablonu yoxdur; `Intl.DateTimeFormat("az")` və `next-intl`
+  `format.dateTime()` kök şablona düşür. Əvvəl yalnız `property-key-facts` öz lüğətindən istifadə edirdi.
+- **Həll:** `src/i18n/date.ts` genişləndi (`formatLocalizedDate` üslubları, `formatLocalizedDateTime`,
+  `formatLocalizedTime`, `formatLocalizedRelative`, təqvim köməkçiləri; hamısı Bakı vaxtında). İctimai səhifələr,
+  kabinet, admin təqvim/sistem, e-poçt, Telegram, açıq qapı xatırlatması, texniki xidmət səhifəsi və `utils.formatDate*`
+  buna keçirildi. Mənbə-skan testi (`date-format-source.test.ts`) geriyə qayıdışı bağlayır.
+- **Bloq üz qabığı:** 10 ilk yazı üçün `public/images/blog/*.webp` (kateqoriya fotolarından kəsilib; «yeni vs köhnə
+  tikili» üçün iki fotolu diptix), yeni yazılar üçün slug-a görə sabit ehtiyat foto. `resolveBlogCover()`; admin
+  formundakı `/media/` yükləməsi həmişə üstündür. OG şəkli və JSON-LD `image` mütləq ünvana çevrilir.
+- **Dizayn:** `PostCard`/`KnowledgeCard` yenidən quruldu (kateqoriya çipi, tarix, başlıq, xülasə, «Oxu»), bloq siyahısında
+  «seçilmiş məqalə» + «Son məqalələr», məqalə başlığında `ArticleTrustMeta` (müəllif/tarix/oxuma/baxış ayrı bloklar),
+  hüquqi status paneli (rəngli status/risk nişanı), Bilik Mərkəzi süzgəc paneli, mövzu kartları, lüğət və FAQ boşluqları,
+  `prose-luxe` tipoqrafiyası (sətir hündürlüyü, başlıq boşluğu, cədvəl, sitat). Oxşar yazılar kateqoriyada az olanda
+  ən son digər yazılarla tamamlanır.
+
 ## 20. Sənəd sinxronu — 29 sentyabr 2026
 
 - GitHub Wiki 31 avqustdan qalmışdı; istifadəçinin 28 sentyabr qaralaması (`Desktop/luxehome viki`)
