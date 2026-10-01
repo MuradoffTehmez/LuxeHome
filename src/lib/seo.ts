@@ -487,6 +487,11 @@ export function agentSchema(agent: {
   };
 }
 
+/** JSON-LD `image` mütləq ünvan tələb edir — `/media/...` və `/images/...` yolları sayt kökünə bağlanır. */
+function absoluteImageUrl(url: string) {
+  return url.startsWith("http") ? url : siteUrl(url);
+}
+
 type ArticleSchemaInput = {
   title: string;
   description: string;
@@ -505,7 +510,7 @@ export function articleSchema(post: ArticleSchemaInput, locale: Locale = DEFAULT
     "@id": `${url}#article`,
     headline: post.title,
     description: post.description,
-    image: post.image ? [post.image] : undefined,
+    image: post.image ? [absoluteImageUrl(post.image)] : undefined,
     url,
     datePublished: post.publishedAt
       ? new Date(post.publishedAt).toISOString()
@@ -554,7 +559,7 @@ export function knowledgeArticleSchema(
     "@id": `${url}#article`,
     headline: article.title,
     description: article.description,
-    image: article.image ? [article.image] : undefined,
+    image: article.image ? [absoluteImageUrl(article.image)] : undefined,
     url,
     articleSection: article.section || undefined,
     datePublished: article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined,

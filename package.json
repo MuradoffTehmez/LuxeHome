@@ -53,6 +53,7 @@
     "test:seo:live": "node scripts/serp-live-acceptance.mjs",
     "auth:create-admin": "tsx prisma/create-admin.ts",
     "assets:maintenance-logo": "node scripts/build-maintenance-logo.mjs",
+    "assets:blog-covers": "node scripts/build-blog-covers.mjs",
     "db:locations:build": "python scripts/build-locations-data.py",
     "db:streets:build": "python scripts/build-official-streets.py",
     "db:locations:report": "python scripts/build-location-report.py",
