@@ -73,6 +73,30 @@ export function closeConsentPreferences() {
   if (target) requestAnimationFrame(() => target.isConnected && target.focus());
 }
 
+/** GA-nın rəsmi söndürmə bayrağı: `window['ga-disable-G-XXXX'] = true` bütün sonrakı hit-ləri bağlayır. */
+export function setGaDisabled(gaId: string, disabled: boolean) {
+  (window as unknown as Record<string, unknown>)[`ga-disable-${gaId}`] = disabled;
+}
+
+/**
+ * Razılıq geri çəkildi (bu və ya başqa tabda) və ya heç verilməyib: yüklənmiş analitikanı dayandırır.
+ *
+ * - GA birbaşa qoşulubsa `ga-disable-<ID>` bayrağı sonrakı hit-ləri bağlayır.
+ * - Gözləyən hadisələr atılır, analitika cookie-ləri silinir.
+ * - **GTM konteyneri yüklənibsə** onu dayandırmağın yolu yoxdur — səhifə yenilənir. Qərar cookie-lərin
+ *   sayından ASILI DEYİL: seçim başqa tabda geri çəkiləndə o tab cookie-ləri artıq silə bilər
+ *   (`purged === 0`), amma bu tabda konteyner və onun tag-ları hələ işləyir. Yenilənmədən sonra
+ *   konteyner yüklənmir (razılıq yoxdur), ona görə dövr yaranmır.
+ */
+export function withdrawAnalytics(options: { gaId?: string }): { purged: number; reloaded: boolean } {
+  if (options.gaId) setGaDisabled(options.gaId, true);
+  window.pendingAnalyticsEvents = [];
+  const purged = purgeAnalyticsCookies();
+  const gtmRunning = !options.gaId && Boolean(document.getElementById("luxe-gtm"));
+  if (gtmRunning) location.reload();
+  return { purged, reloaded: gtmRunning };
+}
+
 /** Razılıq geri çəkiləndə `_ga*`/`_gid` və s. cookie-ləri bütün domen variantlarında silir. */
 export function purgeAnalyticsCookies(): number {
   const names = analyticsCookieNames(document.cookie);

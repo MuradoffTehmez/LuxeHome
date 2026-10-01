@@ -10,10 +10,11 @@ import {
 import { ConsentBanner } from "./consent-banner";
 import {
   closeConsentPreferences,
-  purgeAnalyticsCookies,
   setConsent,
+  setGaDisabled,
   useAnalyticsConsent,
   usePreferencesOpen,
+  withdrawAnalytics,
 } from "./consent-store";
 
 /**
@@ -24,11 +25,6 @@ import {
  */
 export function isAdminRoute(pathname: string | null): boolean {
   return pathname === "/admin" || (pathname?.startsWith("/admin/") ?? false);
-}
-
-/** GA-nın rəsmi söndürmə bayrağı: `window['ga-disable-G-XXXX'] = true` bütün sonrakı hit-ləri bağlayır. */
-function setGaDisabled(gaId: string, disabled: boolean) {
-  (window as unknown as Record<string, unknown>)[`ga-disable-${gaId}`] = disabled;
 }
 
 export function AnalyticsProvider() {
@@ -90,15 +86,11 @@ export function AnalyticsProvider() {
     document.head.appendChild(script);
   }, [consent, gaId, gtmId, measurementId, onAdmin, pathname]);
 
-  // Razılıq geri çəkilib (bu və ya başqa tabda): yüklənmiş GA susdurulur, cookie-lər silinir,
-  // gözləyən hadisələr atılır. GA yalnız Tag Manager vasitəsilə qoşulubsa söndürmə bayrağı yoxdur —
-  // orada skripti sökmək üçün səhifə bir dəfə yenilənir.
+  // Razılıq geri çəkilib (bu və ya başqa tabda): yüklənmiş analitika dayandırılır (təfərrüat və
+  // GTM üçün yenilənmə qaydası `withdrawAnalytics`-də).
   useEffect(() => {
     if (!configured || consent === "pending" || consent === "granted") return;
-    if (gaId) setGaDisabled(gaId, true);
-    window.pendingAnalyticsEvents = [];
-    const purged = purgeAnalyticsCookies();
-    if (purged > 0 && !gaId && document.getElementById("luxe-gtm")) window.location.reload();
+    withdrawAnalytics({ gaId });
   }, [configured, consent, gaId]);
 
   if (!configured) return null;

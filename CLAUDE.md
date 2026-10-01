@@ -788,7 +788,8 @@ uyğun Wiki səhifəsi, README, AGENTS.md və MEMORY.md eyni PR-da yenilənir. Q
   alt kənara yapışan digər səthlərlə eyni ofsetləri işlədir: `--bottom-nav-offset` (mobil alt naviqasiya) və
   `--sticky-bar-offset` (əmlak detalındakı `StickyActionBar`, `body:has([data-sticky-action-bar])`). Footer-dakı və cookie
   siyasətindəki «Cookie parametrləri» düyməsi (`CookiePreferencesButton`) seçimi yenidən açır; razılıq geri çəkiləndə GA
-  `ga-disable-<ID>` ilə susdurulur və `_ga*`/`_gid` cookie-ləri silinir. Yeni analitika/izləmə vasitəsi əlavə edəndə onu da
+  `ga-disable-<ID>` ilə susdurulur və `_ga*`/`_gid` cookie-ləri silinir; yalnız GTM ilə qoşulubsa və konteyner yüklənibsə
+  səhifə yenilənir — **cookie-lərin sayından asılı olmayaraq** (başqa tab onları əvvəlcədən silmiş ola bilər), məntiq `withdrawAnalytics()`-dədir. Yeni analitika/izləmə vasitəsi əlavə edəndə onu da
   yalnız `consent === "granted"` şərtində yüklə və geri çəkmədə söndür. Konfiqurasiya olunmuş bundle ilə yoxlamaq üçün:
   `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-TEST npm run e2e:local:build` (staging/lokal bundle-da GA ID yoxdur, `consent.spec.ts` orada atlanır).
 - **Tarixi yalnız `src/i18n/date.ts`-dəki köməkçilərlə yaz** (`formatLocalizedDate`, `formatLocalizedDateTime`,

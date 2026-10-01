@@ -10,9 +10,12 @@ type FakeDocument = {
   activeElement: unknown;
   addEventListener: ReturnType<typeof vi.fn>;
   removeEventListener: ReturnType<typeof vi.fn>;
+  getElementById: (id: string) => unknown;
 };
 
-function installDom(options: { cookiesBlocked?: boolean; protocol?: string; hostname?: string } = {}) {
+function installDom(
+  options: { cookiesBlocked?: boolean; protocol?: string; hostname?: string; scripts?: string[] } = {},
+) {
   const jar = new Map<string, string>();
   const written: string[] = [];
   const doc: FakeDocument = {
@@ -31,14 +34,21 @@ function installDom(options: { cookiesBlocked?: boolean; protocol?: string; host
     activeElement: null,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
+    getElementById: (id: string) => ((options.scripts ?? []).includes(id) ? { id } : null),
   } as unknown as FakeDocument;
+  const win: Record<string, unknown> = { addEventListener: vi.fn(), removeEventListener: vi.fn() };
+  const reload = vi.fn();
 
   vi.stubGlobal("document", doc);
-  vi.stubGlobal("window", { addEventListener: vi.fn(), removeEventListener: vi.fn() });
-  vi.stubGlobal("location", { protocol: options.protocol ?? "https:", hostname: options.hostname ?? "luxehomeestate.az" });
+  vi.stubGlobal("window", win);
+  vi.stubGlobal("location", {
+    protocol: options.protocol ?? "https:",
+    hostname: options.hostname ?? "luxehomeestate.az",
+    reload,
+  });
   vi.stubGlobal("HTMLElement", class {});
   vi.stubGlobal("requestAnimationFrame", (callback: () => void) => callback());
-  return { doc, jar, written };
+  return { doc, jar, written, win, reload };
 }
 
 async function loadStore() {
@@ -134,6 +144,74 @@ describe("consent-store", () => {
     store.closeConsentPreferences();
 
     expect(focus).toHaveBeenCalledTimes(1);
+  });
+
+  describe("withdrawAnalytics", () => {
+    it("GA birbaşa qoşulubsa söndürmə bayrağını qoyur, cookie-ləri silir, səhifəni yeniləmir", async () => {
+      const { jar, win, reload } = installDom({ scripts: ["luxe-ga"] });
+      jar.set("_ga", "GA1.1.1");
+      jar.set("_ga_54KSFRM17B", "GS2");
+      win.pendingAnalyticsEvents = [{ event: "phone_click", payload: {} }];
+      const store = await loadStore();
+
+      const result = store.withdrawAnalytics({ gaId: "G-54KSFRM17B" });
+
+      expect(win["ga-disable-G-54KSFRM17B"]).toBe(true);
+      expect(win.pendingAnalyticsEvents).toEqual([]);
+      expect(result).toEqual({ purged: 2, reloaded: false });
+      expect(jar.size).toBe(0);
+      expect(reload).not.toHaveBeenCalled();
+    });
+
+    it("GTM konteyneri yüklənibsə cookie-lər artıq silinmiş olsa belə (başqa tabda geri çəkilib) səhifəni yeniləyir", async () => {
+      // Reqressiya: yeniləmə `purged > 0` şərtinə bağlı idi — başqa tab cookie-ləri əvvəlcədən silibsə
+      // bu tabda işləyən konteyner və tag-lar razılıq olmadan aktiv qalırdı.
+      const { jar, reload } = installDom({ scripts: ["luxe-gtm"] });
+      expect(jar.size).toBe(0);
+      const store = await loadStore();
+
+      const result = store.withdrawAnalytics({});
+
+      expect(result).toEqual({ purged: 0, reloaded: true });
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it("GTM cookie-lərlə birlikdə yüklənibsə də bir dəfə yeniləyir", async () => {
+      const { jar, reload } = installDom({ scripts: ["luxe-gtm"] });
+      jar.set("_ga", "GA1.1.1");
+      jar.set("_gcl_au", "1");
+      const store = await loadStore();
+
+      expect(store.withdrawAnalytics({})).toEqual({ purged: 2, reloaded: true });
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(jar.size).toBe(0);
+    });
+
+    it("GTM heç yüklənməyibsə (məs. imtina ilə açılan səhifə) yeniləmir — dövr yoxdur", async () => {
+      const { reload } = installDom();
+      const store = await loadStore();
+
+      expect(store.withdrawAnalytics({})).toEqual({ purged: 0, reloaded: false });
+      expect(reload).not.toHaveBeenCalled();
+    });
+
+    it("yalnız GA ID olanda GTM skripti olsa belə yeniləmir (söndürmə bayrağı kifayətdir)", async () => {
+      const { reload } = installDom({ scripts: ["luxe-gtm"] });
+      const store = await loadStore();
+
+      expect(store.withdrawAnalytics({ gaId: "G-X" }).reloaded).toBe(false);
+      expect(reload).not.toHaveBeenCalled();
+    });
+  });
+
+  it("setGaDisabled bayrağı aça və bağlaya bilir", async () => {
+    const { win } = installDom();
+    const store = await loadStore();
+
+    store.setGaDisabled("G-X", true);
+    expect(win["ga-disable-G-X"]).toBe(true);
+    store.setGaDisabled("G-X", false);
+    expect(win["ga-disable-G-X"]).toBe(false);
   });
 
   it("açıq olmayan parametrləri bağlamaq heç nə etmir", async () => {
