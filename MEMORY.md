@@ -661,6 +661,19 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   (`INSERT OR IGNORE` + slug üzrə `UPDATE`), silmə/birləşdirmə/slug dəyişikliyi isə yeni miqrasiyadır.
 - Hesabat: `docs/erazi/baki-erazi-bolgusu.md` (generasiya olunur, `db:locations:report`).
 
+## 22. Analitika razılıq kartı — 1 oktyabr 2026 (#143)
+
+- **Tapıntılar (canlıda Playwright ilə):** banner server HTML-inə hamı üçün yazılırdı (seçim edən istifadəçi də JS-dən əvvəl
+  görürdü); seçimi dəyişmək üçün UI yox idi, geri çəkmə `_ga*` cookie-lərini silmirdi; banner DOM-un sonunda idi (112-dən
+  110-cu fokus); `role=dialog`-da `aria-labelledby` yox idi; mobildə ekranın 26%-ni tuturdu; əmlak detalında sticky CTA
+  zolağını örtürdü; «şəxsi məlumat toplamadan» ifadəsi dəqiq deyildi.
+- **Həll:** `consent-store.ts` + `ConsentBanner` + `CookiePreferencesButton` (footer və cookie siyasəti), `analytics-consent.ts`
+  saf köməkçiləri, `--sticky-bar-offset`, AZ/EN/RU mətnlər və cookie siyasətinin «idarə etmək» bəndi (hüquqi baxış təsdiqlənib).
+- **Yolüstü tapıntı:** `.page-transition` animasiyası `both` + `translate3d(0,0,0)` ilə sarğıda daimi `transform` saxlayır, bu da `position: fixed` nəslin containing block-unu dəyişir — mobil əmlak detalındakı «Zəng et / WhatsApp» zolağı viewport-un altında deyil, sənədin sonunda (top ≈ 6400 px) dayanırdı. Yalnız opacity + `backwards` ilə düzəldildi.
+- **Test:** SSR-də banner yoxdur, store, cookie köməkçiləri, komponent, `page-transition.test.ts`, `e2e/specs/consent.spec.ts` (GA ID olan bundle-da).
+- **Açıq qalan:** GA4-də «Page changes based on browser history events» açıqdırsa SPA baxışları ikiqat sayıla bilər və real
+  brauzerdə `g/collect` hit-i GA Realtime-da yoxlanmalıdır — bunlar GA parametrləridir, koddan həll olunmur.
+
 ## 21. Bloq və Bilik Mərkəzi dizaynı, tarix formatı — 1 oktyabr 2026
 
 - **Səbəb:** saytda tarixlər «2026 M09 29» çıxırdı (bloq kartı, məqalə meta sətri, hüquqi yoxlama tarixi və s.).
