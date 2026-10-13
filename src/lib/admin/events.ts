@@ -21,6 +21,8 @@ export type DomainEventType =
   | "agency.employee_approved"
   | "agency.employee_rejected"
   | "agency.employee_removed"
+  | "agency.employee_requested"
+  | "agency.employee_left"
   | "reservation.requested"
   | "reservation.status_changed"
   | "lead.created"
