@@ -13,6 +13,7 @@ const agency = { name: "Kapital Əmlak", slug: "kapital-emlak", logoUrl: "/media
 function author(overrides: Partial<NonNullable<PublisherContactSource>> = {}): NonNullable<PublisherContactSource> {
   return {
     accountType: "OWNER",
+    isActive: true,
     name: "Aysel Məmmədova",
     phone: "+994501234567",
     email: "aysel@example.az",
@@ -28,6 +29,14 @@ describe("elanı yerləşdirən", () => {
     expect(resolveListingPublisher(null)).toEqual({ kind: "company" });
     expect(resolveListingPublisher(author({ accountType: "STAFF" }))).toEqual({ kind: "company" });
     expect(listingPublisherBadge(undefined)).toEqual({ kind: "company", agency: null });
+  });
+
+  it("deaktiv edilmiş hesabın elanında əlaqə ofisə düşür", () => {
+    expect(resolveListingPublisher(author({ isActive: false }))).toEqual({ kind: "company" });
+    expect(listingPublisherBadge({ accountType: "AGENCY", isActive: false, agency, agencyEmployments: [] })).toEqual({
+      kind: "company",
+      agency: null,
+    });
   });
 
   it("mülk sahibinin öz adını, nömrəsini və e-poçtunu göstərir", () => {
@@ -55,7 +64,7 @@ describe("elanı yerləşdirən", () => {
   it("agentliyin təsdiqlənmiş əməkdaşı öz nömrəsi ilə, agentlik adı altında görünür", () => {
     const publisher = resolveListingPublisher(author({ accountType: "OWNER", agencyEmployments: [{ agency }] }));
     expect(publisher).toMatchObject({ kind: "agent", phone: "+994501234567", agency: { name: "Kapital Əmlak" } });
-    expect(listingPublisherBadge({ accountType: "AGENT", agency: null, agencyEmployments: [{ agency }] })).toMatchObject({
+    expect(listingPublisherBadge({ accountType: "AGENT", isActive: true, agency: null, agencyEmployments: [{ agency }] })).toMatchObject({
       kind: "agent",
       agency: { slug: "kapital-emlak" },
     });

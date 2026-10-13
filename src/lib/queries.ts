@@ -58,6 +58,7 @@ const publisherAgencySelect = { name: true, slug: true, logoUrl: true, isVerifie
  */
 const publisherContactSelect = {
   accountType: true,
+  isActive: true,
   name: true,
   phone: true,
   email: true,
@@ -65,6 +66,8 @@ const publisherContactSelect = {
   agency: { select: { ...publisherAgencySelect, phone: true } },
   agencyEmployments: {
     where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    // Tək valideynli sorğular üçündür (detal, «Nömrəni göstər») — orderBy burada təhlükəsizdir.
+    orderBy: { approvedAt: "desc" },
     select: { agency: { select: { ...publisherAgencySelect, phone: true } } },
   },
 } satisfies Prisma.UserSelect;
@@ -121,6 +124,7 @@ export const propertyCardSelect = {
   author: {
     select: {
       accountType: true,
+      isActive: true,
       agency: { select: publisherAgencySelect },
       agencyEmployments: {
         where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
@@ -274,6 +278,7 @@ export function sellerWhere(seller: string | undefined): Prisma.PropertyWhereInp
     case SELLER_FILTERS.OWNER:
       return {
         author: {
+          isActive: true,
           accountType: { in: [ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.USER, ACCOUNT_TYPES.CORPORATE] },
           agencyEmployments: { none: approvedEmployment },
         },
@@ -281,12 +286,13 @@ export function sellerWhere(seller: string | undefined): Prisma.PropertyWhereInp
     case SELLER_FILTERS.AGENCY:
       return {
         OR: [
-          { author: { accountType: { in: [ACCOUNT_TYPES.AGENCY, ACCOUNT_TYPES.AGENT] } } },
-          { author: { agencyEmployments: { some: approvedEmployment } } },
+          { author: { isActive: true, accountType: { in: [ACCOUNT_TYPES.AGENCY, ACCOUNT_TYPES.AGENT] } } },
+          { author: { isActive: true, agencyEmployments: { some: approvedEmployment } } },
         ],
       };
     case SELLER_FILTERS.COMPANY:
-      return { OR: [{ authorId: null }, { author: { accountType: ACCOUNT_TYPES.STAFF } }] };
+      // Deaktiv hesabın elanının əlaqəsi ofisə düşür (`resolveListingPublisher`) — burada da şirkətindir.
+      return { OR: [{ authorId: null }, { author: { accountType: ACCOUNT_TYPES.STAFF } }, { author: { isActive: false } }] };
     default:
       return null;
   }
@@ -3460,6 +3466,7 @@ export async function getSellerProfile(userId: string) {
       name: true,
       companyName: true,
       accountType: true,
+      isActive: true,
       createdAt: true,
       agency: { select: publisherAgencySelect },
       agencyEmployments: {

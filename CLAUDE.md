@@ -610,7 +610,15 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   dəvətlərə aiddir; sorğu yer tutmur, təsdiqdə yoxlanılır, gözləyən sorğu sayı
   `MAX_PENDING_AGENCY_REQUESTS` ilə məhduddur. Qaydalar `lib/accounts/agency-membership.ts`-dədir;
   təsdiqdə `AgentProfile.agencyId` bağlanır, çıxarılanda ayrılır — bunu yan keçən axın yazma.
-  Status keçidləri şərti `updateMany` ilədir (sahib və admin eyni anda baxa bilər).
+  Qərar yalnız `commitMembershipDecision()` ilə yazılır: şərti `updateMany` (sahib və admin eyni
+  anda baxa bilər), profil bağlantısı alınmasa status `PENDING`-ə qaytarılır, təsdiqlənmiş qeydin
+  təkrar təsdiqi qalan addımı tamamlayır. **Bir aktiv agentlik:** başqa agentlikdə təsdiqlənmiş
+  istifadəçi dəvət/təsdiq olunmur (`hasOtherApprovedMembership`) — kart `agencyEmployments[0]`-ə
+  buna görə etibar edir. Komanda bildirişinin `dedupeKey`-i cəhd vaxtını (`invitedAt`) daşıyır,
+  çünki rədd edilmiş sorğu eyni id ilə yenidən açılır. Agentin öz action-ları da
+  `requirePublicAction("team")`-dən keçir.
+- **Deaktiv hesabın elanı** ictimai qala bilər, amma əlaqəsi, müraciəti və satıcı filtri şirkətə aiddir
+  (`isActive` həm `resolveListingPublisher`, həm `resolveLeadProperty`, həm `sellerWhere`-dədir).
 - **Agentlik loqosu** profil şəkli ilə eynidir (`User.avatarUrl` = `Agency.logoUrl`, `avatarlar`
   qovluğu). Qeydiyyatda loqo Server Action-un özündə saxlanılır (`storeAgencyLogo`) — client onu
   512 px WebP-yə kiçildir, çünki action gövdəsinin Next limiti 1 MB-dır. Paneldən dəyişəndə də

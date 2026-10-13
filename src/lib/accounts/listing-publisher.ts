@@ -7,10 +7,15 @@ import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
  * Əvvəl detal səhifəsi hər elanda şirkətin nömrəsini göstərirdi — mülk sahibinin
  * və ya agentliyin elanına zəng edən alıcı Luxe Home ofisinə düşürdü. Qayda:
  *
- * - müəllif yoxdursa və ya əməkdaşdırsa (STAFF) — şirkət əlaqəsi;
+ * - müəllif yoxdursa, əməkdaşdırsa (STAFF) və ya deaktiv edilibsə — şirkət əlaqəsi
+ *   (müraciət forması da belə elanı ofisə yönəldir, `resolveLeadProperty`);
  * - agentlik hesabı — agentliyin adı, loqosu və nömrəsi (yoxdursa hesabın nömrəsi);
  * - agentliyin təsdiqlənmiş əməkdaşı — agentin öz adı/nömrəsi + agentliyin adı;
  * - digər ictimai hesablar — hesabın ad soyadı, telefonu və e-poçtu.
+ *
+ * Agentlik `agencyEmployments[0]`-dan götürülür: «bir aktiv agentlik» invariantı
+ * (`hasOtherApprovedMembership`) dəvət və təsdiqdə qorunur, ona görə ən çox bir
+ * təsdiqlənmiş üzvlük olur.
  *
  * Modul Prisma idxal etmir: kart (client) və detal (server) eyni qaydanı işlədir.
  */
@@ -27,6 +32,8 @@ export type PublisherKind = "company" | "agency" | "agent" | "owner" | "corporat
 /** Kartda göstərilən qısa forma — telefon/e-poçt kart sorğusuna düşmür. */
 export type PublisherCardSource = {
   accountType: string;
+  /** Deaktiv hesabın elanı ictimai qala bilər — əlaqə o zaman ofisə düşür. */
+  isActive: boolean;
   agency: PublisherAgency | null;
   agencyEmployments: { agency: PublisherAgency }[];
 } | null | undefined;
@@ -34,6 +41,7 @@ export type PublisherCardSource = {
 /** Detal səhifəsinin tam forması. */
 export type PublisherContactSource = {
   accountType: string;
+  isActive: boolean;
   name: string;
   phone: string | null;
   email: string;
@@ -67,7 +75,7 @@ function publisherKind(accountType: string, hasEmployerAgency: boolean): Publish
 
 /** Kart üçün: yalnız növ və agentlik — əlaqə məlumatı kartda göstərilmir. */
 export function listingPublisherBadge(author: PublisherCardSource): { kind: PublisherKind; agency: PublisherAgency | null } {
-  if (!author) return { kind: "company", agency: null };
+  if (!author || !author.isActive) return { kind: "company", agency: null };
   const employer = author.agencyEmployments[0]?.agency ?? null;
   const kind = publisherKind(author.accountType, employer != null);
   if (kind === "company") return { kind, agency: null };
@@ -75,7 +83,7 @@ export function listingPublisherBadge(author: PublisherCardSource): { kind: Publ
 }
 
 export function resolveListingPublisher(author: PublisherContactSource): ListingPublisher {
-  if (!author) return { kind: "company" };
+  if (!author || !author.isActive) return { kind: "company" };
   const employer = author.agencyEmployments[0]?.agency ?? null;
   const kind = publisherKind(author.accountType, employer != null);
   if (kind === "company") return { kind };
