@@ -13,6 +13,11 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 import { registerAccount } from "../hesab/actions";
 import { TurnstileWidget } from "@/components/security/turnstile-widget";
+import { Combobox } from "@/components/ui/combobox";
+import { LogoPicker } from "@/components/auth/logo-picker";
+
+/** Agentin qoşula biləcəyi təsdiqlənmiş agentlik — qeydiyyat səhifəsi server-də yükləyir. */
+export type RegistrationAgency = { name: string; slug: string };
 
 type TypeKey = "user" | "owner" | "agent" | "agency" | "corporate";
 
@@ -32,7 +37,7 @@ const TYPE_ICONS: Record<TypeKey, LucideIcon> = {
  * (doğum tarixi, tələb olunmayanda telefon) yığılan bölmədədir. Bütün sahələr yenə də
  * eyni `name`-lərlə göndərilir — server action (`registerAccount`) dəyişmir.
  */
-export function RegisterForm({ next }: { next?: string }) {
+export function RegisterForm({ next, agencies = [] }: { next?: string; agencies?: RegistrationAgency[] }) {
   const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(registerAccount, IDLE_STATE);
   const [accountType, setAccountType] = useState<string>(ACCOUNT_TYPES.USER);
@@ -42,6 +47,7 @@ export function RegisterForm({ next }: { next?: string }) {
   const [phone, setPhone] = useState("");
   const requirements = profileRequirements(accountType);
   const typeKey = accountTypeKey(accountType) as TypeKey;
+  const agencyOptions = agencies.map((agency) => ({ value: agency.slug, label: agency.name }));
   const optionalError = Boolean(state.fieldErrors?.birthDate || (!requirements.phoneRequired && state.fieldErrors?.phone));
 
   const phoneField = (
@@ -173,6 +179,21 @@ export function RegisterForm({ next }: { next?: string }) {
             maxLength={160}
             error={state.fieldErrors?.companyName}
           />
+          {accountType === ACCOUNT_TYPES.AGENCY && (
+            <LogoPicker
+              name="logo"
+              error={state.fieldErrors?.logo}
+              labels={{
+                label: t("fields.agencyLogo"),
+                hint: t("fields.agencyLogoHint"),
+                choose: t("fields.agencyLogoChoose"),
+                change: t("fields.agencyLogoChange"),
+                remove: t("fields.agencyLogoRemove"),
+                invalid: t("fields.agencyLogoInvalid"),
+                tooLarge: t("fields.agencyLogoTooLarge"),
+              }}
+            />
+          )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               name="companyTaxId"
@@ -192,6 +213,20 @@ export function RegisterForm({ next }: { next?: string }) {
             />
           </div>
         </fieldset>
+      )}
+
+      {/* Agent qeydiyyatda agentliyini adla tapıb seçir — sorğu agentlik sahibinə gedir. */}
+      {accountType === ACCOUNT_TYPES.AGENT && agencyOptions.length > 0 && (
+        <Combobox
+          name="agencySlug"
+          label={t("fields.joinAgency")}
+          placeholder={t("fields.joinAgencyPlaceholder")}
+          hint={t("fields.joinAgencyHint")}
+          options={agencyOptions}
+          clearable
+          error={state.fieldErrors?.agencySlug}
+          messages={{ noResults: t("fields.joinAgencyEmpty") }}
+        />
       )}
 
       {/* Server xətası bu bölmədəki sahəyə aiddirsə bölmə açıq gəlir */}

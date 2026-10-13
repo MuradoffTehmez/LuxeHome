@@ -9,6 +9,7 @@ import { buildManagedMetadata } from "@/lib/seo";
 import { GoogleSignIn } from "@/components/auth/google-sign-in";
 import { RegisterForm } from "./register-form";
 import { localizePath } from "@/i18n/path-locale";
+import { getAgencyDirectory } from "@/lib/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -31,7 +32,11 @@ export default async function RegisterPage({
 
   const params = await searchParams;
   const next = typeof params.davam === "string" ? params.davam : undefined;
-  const t = await getTranslations("auth.registration");
+  const [t, agencies] = await Promise.all([
+    getTranslations("auth.registration"),
+    // Siyahı boş qalsa da qeydiyyat işləməlidir — agentlik seçimi istəyə bağlıdır.
+    getAgencyDirectory().catch(() => []),
+  ]);
   const benefits = [t("benefits.type"), t("benefits.secure"), t("benefits.track")];
 
   return (
@@ -43,7 +48,7 @@ export default async function RegisterPage({
     >
       <div className="flex flex-col gap-5">
         <GoogleSignIn next={next} placement="before" />
-        <RegisterForm next={next} />
+        <RegisterForm next={next} agencies={agencies} />
       </div>
     </AuthShell>
   );

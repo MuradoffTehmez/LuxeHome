@@ -13,15 +13,22 @@ export type PublicAccountInput = {
   companyName?: string | null;
   companyTaxId?: string | null;
   companyWebsite?: string | null;
+  /**
+   * Agentin qeydiyyatda seçdiyi agentlik (`Agency.id`). Sorğu PENDING yaranır və
+   * agentlik sahibi (və ya admin) təsdiqləyənə qədər heç bir hüquq vermir.
+   */
+  joinAgencyId?: string | null;
 };
 
-type PublicUserInput = Omit<PublicAccountInput, "agencyName">;
+type PublicUserInput = Omit<PublicAccountInput, "agencyName" | "joinAgencyId">;
 
 export type PublicAccountStore = {
   createUser(input: PublicUserInput): Promise<{ id: string }>;
   createAgency(input: { userId: string; name: string; phone: string | null }): Promise<void>;
   /** Agent hesabı üçün ictimai olmayan (admin təsdiqi gözləyən) agent profili. */
   createAgentProfile?(input: { userId: string; name: string; phone: string | null; email: string }): Promise<void>;
+  /** Agentlik komandasına qoşulma sorğusu (`AgencyEmployee`, source = REQUEST). */
+  requestAgencyMembership?(input: { userId: string; agencyId: string }): Promise<void>;
   deleteUser(userId: string): Promise<void>;
 };
 
@@ -33,7 +40,7 @@ export async function createPublicAccount(
   store: PublicAccountStore,
   input: PublicAccountInput,
 ): Promise<{ id: string }> {
-  const { agencyName, ...userInput } = input;
+  const { agencyName, joinAgencyId, ...userInput } = input;
   const user = await store.createUser(userInput);
 
   try {
@@ -52,6 +59,10 @@ export async function createPublicAccount(
         phone: input.phone,
         email: input.email,
       });
+    }
+    // Qoşulma sorğusu yalnız agentdə: agentlik hesabı başqa agentliyə qoşulmur.
+    if (input.accountType === ACCOUNT_TYPES.AGENT && joinAgencyId && store.requestAgencyMembership) {
+      await store.requestAgencyMembership({ userId: user.id, agencyId: joinAgencyId });
     }
     return user;
   } catch (error) {

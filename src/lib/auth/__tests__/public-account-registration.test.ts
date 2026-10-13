@@ -5,9 +5,10 @@ import {
   type PublicAccountStore,
 } from "../public-account-registration";
 
-function createStore(options: { failAgency?: boolean } = {}) {
+function createStore(options: { failAgency?: boolean; failMembership?: boolean } = {}) {
   const users = new Map<string, { id: string; email: string }>();
   const agencies = new Map<string, { userId: string; name: string }>();
+  const memberships: { userId: string; agencyId: string }[] = [];
   let createdUserInput: unknown;
 
   const store: PublicAccountStore = {
@@ -21,6 +22,10 @@ function createStore(options: { failAgency?: boolean } = {}) {
       if (options.failAgency) throw new Error("slug artıq var");
       agencies.set(input.userId, { userId: input.userId, name: input.name });
     },
+    async requestAgencyMembership(input) {
+      if (options.failMembership) throw new Error("agentlik tapılmadı");
+      memberships.push(input);
+    },
     async deleteUser(userId) {
       users.delete(userId);
     },
@@ -30,6 +35,7 @@ function createStore(options: { failAgency?: boolean } = {}) {
     store,
     users,
     agencies,
+    memberships,
     createdUserInput: () => createdUserInput,
   };
 }
@@ -67,5 +73,53 @@ describe("ictimai hesabın qeydiyyatı", () => {
     expect(user.id).toBe("new-user");
     expect(users.has("new-user")).toBe(true);
     expect(agencies.size).toBe(0);
+  });
+
+  it("agentin seçdiyi agentliyə qoşulma sorğusu yaradır", async () => {
+    const { store, memberships } = createStore();
+
+    await createPublicAccount(store, {
+      name: "Rauf Əliyev",
+      email: "rauf@example.az",
+      phone: "+994501112233",
+      passwordHash: "hash",
+      accountType: ACCOUNT_TYPES.AGENT,
+      joinAgencyId: "agency-1",
+    });
+
+    expect(memberships).toEqual([{ userId: "new-user", agencyId: "agency-1" }]);
+  });
+
+  it("agentlik seçimini agent olmayan hesabda nəzərə almır", async () => {
+    const { store, memberships, createdUserInput } = createStore();
+
+    await createPublicAccount(store, {
+      name: "Aysel Məmmədova",
+      email: "aysel@example.az",
+      phone: "+994551234567",
+      passwordHash: "hash",
+      accountType: ACCOUNT_TYPES.OWNER,
+      joinAgencyId: "agency-1",
+    });
+
+    expect(memberships).toEqual([]);
+    expect(createdUserInput()).not.toHaveProperty("joinAgencyId");
+  });
+
+  it("qoşulma sorğusu yazılmayanda yeni istifadəçini geri silir", async () => {
+    const { store, users } = createStore({ failMembership: true });
+
+    await expect(
+      createPublicAccount(store, {
+        name: "Rauf Əliyev",
+        email: "rauf@example.az",
+        phone: "+994501112233",
+        passwordHash: "hash",
+        accountType: ACCOUNT_TYPES.AGENT,
+        joinAgencyId: "agency-1",
+      }),
+    ).rejects.toThrow("agentlik tapılmadı");
+
+    expect(users.has("new-user")).toBe(false);
   });
 });

@@ -8,6 +8,9 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
+  AGENCY_EMPLOYEE_SOURCES,
+  AGENCY_EMPLOYEE_STATUSES,
+  MAX_PENDING_AGENCY_REQUESTS,
   PUBLIC_ACCOUNT_TYPES,
   ROLES,
   type AccountType,
@@ -40,6 +43,8 @@ import {
 import { sendAccountVerificationEmail, sendPasswordResetEmail } from "@/lib/account-email";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { openPublicSession } from "@/lib/auth/public-session";
+import { checkLogoFile, logoFromForm, storeAgencyLogo } from "@/lib/accounts/agency-logo";
+import { noticeAgencyJoinRequest } from "@/lib/accounts/account-notices";
 
 /**
  * İctimai hesab axını — qeydiyyat və giriş.
@@ -141,8 +146,44 @@ export async function registerAccount(
     return failure(t("actions.invalidForm"), { companyTaxId: t("actions.invalidTaxId") });
   }
   const requirements = profileRequirements(parsed.data.accountType);
+  const isAgency = parsed.data.accountType === ACCOUNT_TYPES.AGENCY;
+  const isAgent = parsed.data.accountType === ACCOUNT_TYPES.AGENT;
+
+  // Agentlik loqosu hesab yaradılmazdan əvvəl yoxlanılır — xətalı faylda yarımçıq hesab qalmasın.
+  const logo = isAgency ? logoFromForm(formData) : null;
+  if (logo) {
+    const check = await checkLogoFile(logo);
+    if (check !== "ok") {
+      const message = check === "tooLarge" ? t("actions.logoTooLarge") : t("actions.logoInvalid");
+      return failure(message, { logo: message });
+    }
+  }
+
+  // Agentin seçdiyi agentlik: yalnız təsdiqlənmiş və aktiv agentlik qəbul olunur.
+  const agencySlug = isAgent ? form.optionalText(formData, "agencySlug") : null;
+  let joinAgency: { id: string; name: string; userId: string } | null = null;
+  if (agencySlug) {
+    joinAgency = await prisma.agency.findFirst({
+      where: { slug: agencySlug, isVerified: true, user: { isActive: true } },
+      select: { id: true, name: true, userId: true },
+    });
+    if (!joinAgency) {
+      return failure(t("actions.agencyNotFound"), { agencySlug: t("actions.agencyNotFound") });
+    }
+    const pendingRequests = await prisma.agencyEmployee.count({
+      where: {
+        agencyId: joinAgency.id,
+        status: AGENCY_EMPLOYEE_STATUSES.PENDING,
+        source: AGENCY_EMPLOYEE_SOURCES.REQUEST,
+      },
+    });
+    if (pendingRequests >= MAX_PENDING_AGENCY_REQUESTS) {
+      return failure(t("actions.agencyRequestsFull"), { agencySlug: t("actions.agencyRequestsFull") });
+    }
+  }
 
   let userId: string;
+  let membershipId: string | null = null;
 
   try {
     const existing = await prisma.user.findUnique({
@@ -187,6 +228,17 @@ export async function registerAccount(
             data: { ...input, slug, isPublic: false, isVerified: false },
           });
         },
+        async requestAgencyMembership(input) {
+          const employee = await prisma.agencyEmployee.create({
+            data: {
+              agencyId: input.agencyId,
+              userId: input.userId,
+              source: AGENCY_EMPLOYEE_SOURCES.REQUEST,
+            },
+            select: { id: true },
+          });
+          membershipId = employee.id;
+        },
         async deleteUser(userId) {
           await prisma.user.delete({ where: { id: userId } });
         },
@@ -204,12 +256,25 @@ export async function registerAccount(
         companyName: requirements.company ? parsed.data.companyName : null,
         companyTaxId: requirements.company ? companyTaxId : null,
         companyWebsite: requirements.company ? parsed.data.companyWebsite : null,
+        joinAgencyId: joinAgency?.id ?? null,
       },
     );
 
     userId = user.id;
   } catch (error) {
     return unexpected("qeydiyyat tamamlanmadı", error, t("actions.unexpected"));
+  }
+
+  if (logo && parsed.data.companyName) {
+    await storeAgencyLogo(userId, logo, parsed.data.companyName);
+  }
+  if (joinAgency && membershipId) {
+    await noticeAgencyJoinRequest({
+      ownerUserId: joinAgency.userId,
+      employeeId: membershipId,
+      applicantName: composeName(parsed.data.firstName, parsed.data.lastName),
+      agencyName: joinAgency.name,
+    });
   }
 
   const token = await issueEmailVerificationToken(userId);
