@@ -2734,7 +2734,8 @@
       "emekdasLimiti": "The agency has reached its limit of {count} approved team members.",
       "loqoYenilendi": "Agency logo updated.",
       "loqoSilindi": "Agency logo removed.",
-      "loqoXetasi": "Logo upload failed: JPEG, PNG, WebP or AVIF, up to 2 MB."
+      "loqoXetasi": "Logo upload failed: JPEG, PNG, WebP or AVIF, up to 2 MB.",
+      "basqaAgentlikdedir": "This person is already an approved member of another agency."
     },
     "aiKomekci": {
       "workersAiCavabVerdiAmma": "Workers AI responded, but the reply did not match the health-check schema.",

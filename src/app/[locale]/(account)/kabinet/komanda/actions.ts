@@ -17,7 +17,13 @@ import { type ActionState, failure, success, toFieldErrors, unexpected } from "@
 import * as form from "@/lib/admin/form";
 import { localizePath } from "@/i18n/path-locale";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
-import { hasFreeApprovedSeat, linkAgentProfileToAgency, occupiedAgencySeats } from "@/lib/accounts/agency-membership";
+import {
+  commitMembershipDecision,
+  hasFreeApprovedSeat,
+  hasOtherApprovedMembership,
+  linkAgentProfileToAgency,
+  occupiedAgencySeats,
+} from "@/lib/accounts/agency-membership";
 import { noticeAgencyDecision } from "@/lib/accounts/account-notices";
 
 /**
@@ -90,6 +96,10 @@ export async function inviteAgencyEmployee(_prev: ActionState, formData: FormDat
     }
     if (invitee.id === owner.user.id) {
       return failure(t("actions.selfInvite"), { email: t("actions.selfInviteField") });
+    }
+    // Bir aktiv agentlik: agentlik hesabı və başqa agentliyin təsdiqlənmiş əməkdaşı dəvət olunmur.
+    if (invitee.accountType === ACCOUNT_TYPES.AGENCY || (await hasOtherApprovedMembership(invitee.id, owner.agency.id))) {
+      return failure(t("actions.employeeOtherAgency"), { email: t("actions.employeeOtherAgency") });
     }
 
     const existing = await prisma.agencyEmployee.findUnique({
@@ -195,36 +205,55 @@ async function reviewAgencyRequest(
   try {
     const request = await prisma.agencyEmployee.findUnique({
       where: { id },
-      select: { id: true, agencyId: true, userId: true, status: true, source: true },
+      select: { id: true, agencyId: true, userId: true, status: true, source: true, invitedAt: true },
     });
+    const approved = decision === AGENCY_EMPLOYEE_STATUSES.APPROVED;
+    // Artıq təsdiqlənmiş sorğunun təkrar təsdiqi qalan addımı (profil bağlantısı) tamamlayır.
+    const reviewable = request?.status === AGENCY_EMPLOYEE_STATUSES.PENDING
+      || (approved && request?.status === AGENCY_EMPLOYEE_STATUSES.APPROVED);
     if (
       !request ||
       request.agencyId !== owner.agency.id ||
       request.source !== AGENCY_EMPLOYEE_SOURCES.REQUEST ||
-      request.status !== AGENCY_EMPLOYEE_STATUSES.PENDING
+      !reviewable
     ) {
       return failure(t("actions.requestNotFound"));
     }
-    const approved = decision === AGENCY_EMPLOYEE_STATUSES.APPROVED;
-    if (approved && !(await hasFreeApprovedSeat(owner.agency.id))) {
-      return failure(t("actions.employeeLimit", { count: MAX_AGENCY_EMPLOYEES }));
+    if (approved && request.status === AGENCY_EMPLOYEE_STATUSES.PENDING) {
+      if (!(await hasFreeApprovedSeat(owner.agency.id))) {
+        return failure(t("actions.employeeLimit", { count: MAX_AGENCY_EMPLOYEES }));
+      }
+      if (await hasOtherApprovedMembership(request.userId, owner.agency.id)) {
+        return failure(t("actions.employeeOtherAgency"));
+      }
     }
 
-    // Şərti yeniləmə — admin eyni anda baxıbsa ikinci qərar səssizcə üzərinə yazmır.
-    const { count } = await prisma.agencyEmployee.updateMany({
-      where: { id, status: AGENCY_EMPLOYEE_STATUSES.PENDING },
-      data: { status: decision, approvedAt: approved ? new Date() : null },
+    const result = await commitMembershipDecision({
+      id,
+      userId: request.userId,
+      agencyId: owner.agency.id,
+      approved,
+      currentStatus: request.status,
     });
-    if (count === 0) return failure(t("actions.requestNotFound"));
+    if (result === "conflict") return failure(t("actions.requestNotFound"));
+    if (result === "resumed") {
+      revalidatePublicContent("agency", owner.agency.slug);
+      return success(t("actions.requestApproved"));
+    }
 
-    if (approved) await linkAgentProfileToAgency(request.userId, owner.agency.id, true);
     await recordDomainEvent(
       approved ? "agency.employee_approved" : "agency.employee_rejected",
       "AgencyEmployee",
       id,
       { agencyId: owner.agency.id, reviewer: "owner" },
     );
-    await noticeAgencyDecision({ userId: request.userId, employeeId: id, agencyName: owner.agency.name, approved });
+    await noticeAgencyDecision({
+      userId: request.userId,
+      employeeId: id,
+      attemptAt: request.invitedAt,
+      agencyName: owner.agency.name,
+      approved,
+    });
 
     revalidatePublicContent("agency", owner.agency.slug);
     revalidatePublicContent("property");

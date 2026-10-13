@@ -2734,7 +2734,8 @@
       "emekdasLimiti": "Agentliyin təsdiqlənmiş əməkdaş sayı limitə ({count}) çatıb.",
       "loqoYenilendi": "Agentliyin loqosu yeniləndi.",
       "loqoSilindi": "Agentliyin loqosu silindi.",
-      "loqoXetasi": "Loqo yüklənmədi: JPEG, PNG, WebP və ya AVIF, ən çox 2 MB."
+      "loqoXetasi": "Loqo yüklənmədi: JPEG, PNG, WebP və ya AVIF, ən çox 2 MB.",
+      "basqaAgentlikdedir": "Bu şəxs artıq başqa agentliyin təsdiqlənmiş əməkdaşıdır."
     },
     "aiKomekci": {
       "workersAiCavabVerdiAmma": "Workers AI cavab verdi, amma sağlıq sxeminə uyğun olmadı.",

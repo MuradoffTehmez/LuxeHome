@@ -308,7 +308,8 @@
     "agencyAlreadyMember": "Artıq agentliyə qoşulmusunuz və ya sorğunuz gözləyir.",
     "agencyRequestSent": "Sorğu «{name}» agentliyinə göndərildi. Təsdiqləndikdə bildiriş alacaqsınız.",
     "agencyLeft": "Agentlikdən çıxdınız.",
-    "agencyRequestCancelled": "Sorğu ləğv edildi."
+    "agencyRequestCancelled": "Sorğu ləğv edildi.",
+    "employeeOtherAgency": "Bu şəxs artıq başqa agentliyin əməkdaşıdır və ya agentlik hesabıdır."
   },
   "profile": {
     "metaTitle": "Profil",

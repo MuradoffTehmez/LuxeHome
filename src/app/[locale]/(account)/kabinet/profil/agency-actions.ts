@@ -10,8 +10,7 @@ import {
   MAX_PENDING_AGENCY_REQUESTS,
   type Locale,
 } from "@/lib/constants";
-import { requireAccount } from "@/lib/auth/guard";
-import { systemModeBlock } from "@/lib/admin/guard";
+import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
 import * as form from "@/lib/admin/form";
@@ -26,18 +25,28 @@ import { noticeAgencyJoinRequest } from "@/lib/accounts/account-notices";
  * elan kartında hansı agentliyin adı görünəcəyi birmənalı olmalıdır.
  */
 
-async function requireAgent(locale: Locale) {
-  const user = await requireAccount(locale);
-  return user.accountType === ACCOUNT_TYPES.AGENT ? user : null;
+/**
+ * Kabinetin digər yazıları kimi `requirePublicAction("team")`-dən keçir: same-origin,
+ * yazma rejimi və istifadəçi üzrə sürət limiti. Bu action-lar sahibə bildiriş/e-poçt
+ * göndərdiyi üçün limitsiz çağırıla bilməməlidir.
+ */
+async function requireAgent(locale: Locale, agentOnly: string) {
+  const user = await requirePublicAction("team", locale);
+  if (user.accountType !== ACCOUNT_TYPES.AGENT) throw new AdminGuardError(agentOnly);
+  return user;
 }
 
 export async function requestAgencyJoin(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account");
-  const user = await requireAgent(locale);
-  if (!user) return failure(t("actions.agentOnly"));
-  const blocked = await systemModeBlock();
-  if (blocked) return blocked;
+  let user;
+  try {
+    user = await requireAgent(locale, t("actions.agentOnly"));
+  } catch (error) {
+    // `redirect()` də istisna kimi atılır — yalnız qapı xətası mesaja çevrilir.
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
 
   const slug = form.optionalText(formData, "agencySlug");
   if (!slug) return failure(t("actions.agencyNotFound"), { agencySlug: t("actions.agencyNotFound") });
@@ -77,17 +86,18 @@ export async function requestAgencyJoin(_prev: ActionState, formData: FormData):
             invitedAt: new Date(),
             approvedAt: null,
           },
-          select: { id: true },
+          select: { id: true, invitedAt: true },
         })
       : await prisma.agencyEmployee.create({
           data: { agencyId: agency.id, userId: user.id, source: AGENCY_EMPLOYEE_SOURCES.REQUEST },
-          select: { id: true },
+          select: { id: true, invitedAt: true },
         });
 
     await recordDomainEvent("agency.employee_requested", "AgencyEmployee", employee.id, { agencyId: agency.id });
     await noticeAgencyJoinRequest({
       ownerUserId: agency.userId,
       employeeId: employee.id,
+      attemptAt: employee.invitedAt,
       applicantName: user.name,
       agencyName: agency.name,
     });
@@ -103,10 +113,13 @@ export async function requestAgencyJoin(_prev: ActionState, formData: FormData):
 export async function leaveAgency(id: string): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account");
-  const user = await requireAgent(locale);
-  if (!user) return failure(t("actions.agentOnly"));
-  const blocked = await systemModeBlock();
-  if (blocked) return blocked;
+  let user;
+  try {
+    user = await requireAgent(locale, t("actions.agentOnly"));
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
 
   try {
     const membership = await prisma.agencyEmployee.findUnique({

@@ -83,10 +83,21 @@ async function notifyAccount(
   }
 }
 
+/**
+ * Komanda bildirişinin təkrar açarı cəhd üzrədir: rədd edilmiş sorğu eyni
+ * `AgencyEmployee.id` ilə yenidən açılır (`invitedAt` yenilənir). Açar yalnız id-dən
+ * qurulsaydı, ikinci cəhdin bildirişi unikal açara dəyib səssizcə itərdi.
+ */
+function attemptKey(attemptAt: Date | string): string {
+  return new Date(attemptAt).getTime().toString(36);
+}
+
 /** Agentlik sahibinə: agent qeydiyyatda agentliyi seçdi. */
 export async function noticeAgencyJoinRequest(input: {
   ownerUserId: string;
   employeeId: string;
+  /** Sorğunun bu cəhdinin vaxtı (`AgencyEmployee.invitedAt`). */
+  attemptAt: Date;
   applicantName: string;
   agencyName: string;
 }): Promise<void> {
@@ -94,7 +105,7 @@ export async function noticeAgencyJoinRequest(input: {
     input.ownerUserId,
     NOTIFICATION_TYPES.AGENCY_TEAM,
     "/kabinet/komanda",
-    `agency-request:${input.employeeId}`,
+    `agency-request:${input.employeeId}:${attemptKey(input.attemptAt)}`,
     (copy) => ({ title: copy.agencyRequestTitle, content: copy.agencyRequest(input.applicantName, input.agencyName) }),
   );
 }
@@ -103,6 +114,8 @@ export async function noticeAgencyJoinRequest(input: {
 export async function noticeAgencyDecision(input: {
   userId: string;
   employeeId: string;
+  /** Qərar verilən cəhdin vaxtı (`AgencyEmployee.invitedAt`). */
+  attemptAt: Date;
   agencyName: string;
   approved: boolean;
 }): Promise<void> {
@@ -110,7 +123,7 @@ export async function noticeAgencyDecision(input: {
     input.userId,
     NOTIFICATION_TYPES.AGENCY_TEAM,
     "/kabinet",
-    `agency-decision:${input.employeeId}:${input.approved ? "approved" : "rejected"}`,
+    `agency-decision:${input.employeeId}:${attemptKey(input.attemptAt)}:${input.approved ? "approved" : "rejected"}`,
     (copy) => input.approved
       ? { title: copy.agencyApprovedTitle, content: copy.agencyApproved(input.agencyName) }
       : { title: copy.agencyRejectedTitle, content: copy.agencyRejected(input.agencyName) },

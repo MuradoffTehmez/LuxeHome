@@ -308,7 +308,8 @@
     "agencyAlreadyMember": "Вы уже состоите в агентстве или ваш запрос ожидает рассмотрения.",
     "agencyRequestSent": "Запрос отправлен в «{name}». Вы получите уведомление после одобрения.",
     "agencyLeft": "Вы вышли из агентства.",
-    "agencyRequestCancelled": "Запрос отменён."
+    "agencyRequestCancelled": "Запрос отменён.",
+    "employeeOtherAgency": "Этот человек уже работает в другом агентстве или является аккаунтом агентства."
   },
   "profile": {
     "metaTitle": "Профиль",

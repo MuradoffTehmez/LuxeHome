@@ -19,7 +19,7 @@ import { isBulkFailure, readBulkSelection, runBulk } from "@/lib/admin/bulk";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { deletePublicAccount } from "../hesablar/actions";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
-import { hasFreeApprovedSeat, linkAgentProfileToAgency } from "@/lib/accounts/agency-membership";
+import { commitMembershipDecision, hasFreeApprovedSeat, hasOtherApprovedMembership } from "@/lib/accounts/agency-membership";
 import { noticeAgencyDecision } from "@/lib/accounts/account-notices";
 import { checkLogoFile, logoFromForm, storeAgencyLogo } from "@/lib/accounts/agency-logo";
 
@@ -152,32 +152,46 @@ async function reviewAgencyEmployee(
         id: true,
         status: true,
         userId: true,
+        invitedAt: true,
         agency: { select: { id: true, name: true, slug: true } },
         user: { select: { name: true, email: true } },
       },
     });
     if (!employee) return failure(msg("server.agentlikler.devetTapilmadi"));
-    if (employee.status !== AGENCY_EMPLOYEE_STATUSES.PENDING) {
+    const approved = decision === AGENCY_EMPLOYEE_STATUSES.APPROVED;
+    // Artıq təsdiqlənmiş qeydin təkrar təsdiqi yarımçıq qalmış profil bağlantısını tamamlayır.
+    const reviewable = employee.status === AGENCY_EMPLOYEE_STATUSES.PENDING
+      || (approved && employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED);
+    if (!reviewable) {
       return failure(msg("server.agentlikler.buDevetArtiqNezerdenKecirilib"));
     }
-    const approved = decision === AGENCY_EMPLOYEE_STATUSES.APPROVED;
-    if (approved && !(await hasFreeApprovedSeat(employee.agency.id))) {
-      return failure(msg("server.agentlikler.emekdasLimiti", { count: MAX_AGENCY_EMPLOYEES }));
+    if (approved && employee.status === AGENCY_EMPLOYEE_STATUSES.PENDING) {
+      if (!(await hasFreeApprovedSeat(employee.agency.id))) {
+        return failure(msg("server.agentlikler.emekdasLimiti", { count: MAX_AGENCY_EMPLOYEES }));
+      }
+      if (await hasOtherApprovedMembership(employee.userId, employee.agency.id)) {
+        return failure(msg("server.agentlikler.basqaAgentlikdedir"));
+      }
     }
 
-    // Şərti yeniləmə — sahib eyni sorğunu kabinetdə eyni anda təsdiqləyə bilər.
-    const { count } = await prisma.agencyEmployee.updateMany({
-      where: { id, status: AGENCY_EMPLOYEE_STATUSES.PENDING },
-      data: {
-        status: decision,
-        approvedAt: approved ? new Date() : null,
-      },
+    // Şərti yeniləmə + kompensasiya — sahib eyni sorğunu kabinetdə eyni anda təsdiqləyə bilər.
+    const result = await commitMembershipDecision({
+      id,
+      userId: employee.userId,
+      agencyId: employee.agency.id,
+      approved,
+      currentStatus: employee.status,
     });
-    if (count === 0) return failure(msg("server.agentlikler.buDevetArtiqNezerdenKecirilib"));
-    if (approved) await linkAgentProfileToAgency(employee.userId, employee.agency.id, true);
+    if (result === "conflict") return failure(msg("server.agentlikler.buDevetArtiqNezerdenKecirilib"));
+    if (result === "resumed") {
+      revalidatePath(LIST_PATH);
+      revalidatePublicContent("agency", employee.agency.slug);
+      return success(msg("server.agentlikler.emekdasTesdiqlendi"));
+    }
     await noticeAgencyDecision({
       userId: employee.userId,
       employeeId: id,
+      attemptAt: employee.invitedAt,
       agencyName: employee.agency.name,
       approved,
     });

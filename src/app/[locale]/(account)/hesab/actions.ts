@@ -183,7 +183,8 @@ export async function registerAccount(
   }
 
   let userId: string;
-  let membershipId: string | null = null;
+  // Qutuya yazılır: closure-da təyin olunan `let`-i TypeScript `null`-a daraldır.
+  const created: { membership: { id: string; invitedAt: Date } | null } = { membership: null };
 
   try {
     const existing = await prisma.user.findUnique({
@@ -235,9 +236,9 @@ export async function registerAccount(
               userId: input.userId,
               source: AGENCY_EMPLOYEE_SOURCES.REQUEST,
             },
-            select: { id: true },
+            select: { id: true, invitedAt: true },
           });
-          membershipId = employee.id;
+          created.membership = employee;
         },
         async deleteUser(userId) {
           await prisma.user.delete({ where: { id: userId } });
@@ -268,10 +269,12 @@ export async function registerAccount(
   if (logo && parsed.data.companyName) {
     await storeAgencyLogo(userId, logo, parsed.data.companyName);
   }
-  if (joinAgency && membershipId) {
+  const membership = created.membership;
+  if (joinAgency && membership) {
     await noticeAgencyJoinRequest({
       ownerUserId: joinAgency.userId,
-      employeeId: membershipId,
+      employeeId: membership.id,
+      attemptAt: membership.invitedAt,
       applicantName: composeName(parsed.data.firstName, parsed.data.lastName),
       agencyName: joinAgency.name,
     });

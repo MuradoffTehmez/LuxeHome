@@ -308,7 +308,8 @@
     "agencyAlreadyMember": "You have already joined an agency or have a pending request.",
     "agencyRequestSent": "Your request was sent to “{name}”. You will be notified once it is approved.",
     "agencyLeft": "You have left the agency.",
-    "agencyRequestCancelled": "Request cancelled."
+    "agencyRequestCancelled": "Request cancelled.",
+    "employeeOtherAgency": "This person already works for another agency or is an agency account."
   },
   "profile": {
     "metaTitle": "Profile",
