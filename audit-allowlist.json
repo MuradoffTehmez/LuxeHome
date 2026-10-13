@@ -1,0 +1,8 @@
+[
+  {
+    "id": "GHSA-vfj7-8cjw-p6xm",
+    "package": "braces",
+    "reason": "Yamaq yoxdur (<= 3.0.3). Yalnız dev zənciri: eslint-config-next → @next/eslint-plugin-next → fast-glob 3.3.1 (pinli) → micromatch → braces. Lint vaxtı konfiqurasiyadakı sabit nümunələri işləyir, ziyarətçi girişi almır; production bundle-a düşmür.",
+    "expires": "2026-11-15"
+  }
+]
