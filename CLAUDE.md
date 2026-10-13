@@ -590,6 +590,34 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - Qısa ünvanlar `/elan-yerlesdir`, `/elanlarim`, `/profilim` (`accounts/short-links.ts`) —
   yenisini əlavə edəndə `NEVER_CACHED_PREFIXES`-ə də yaz.
 
+### Elanı yerləşdirən, agentlik komandası və müraciət yönləndirməsi (2026-10)
+
+- **Əlaqə elanı yerləşdirənə gedir** (`lib/accounts/listing-publisher.ts`, Prisma-sız): STAFF və ya
+  müəllifsiz elanda şirkətin nömrəsi; agentlik hesabında agentliyin adı, loqosu və ofis nömrəsi;
+  agentliyin təsdiqlənmiş əməkdaşında agentin öz nömrəsi + agentlik adı; digərlərində hesabın ad
+  soyadı/telefonu/e-poçtu. Kart (`listingPublisherBadge`) və detal (`resolveListingPublisher`) eyni
+  qaydanı işlədir; kart sorğusu yalnız növ + agentliyi seçir, əlaqə məlumatı kart payload-ına düşmür.
+- **İctimai hesabın nömrəsi və e-poçtu HTML-ə yazılmır.** Detal maskalı nömrə (`maskPhone`) göstərir,
+  tam əlaqə «Nömrəni göstər» ilə `POST /api/emlaklar/<id>/elaqe`-dən gəlir (same-origin + IP limiti
+  `checkContactRevealLimit`). Bu əlaqəni server komponentindən client-ə prop kimi ötürmə.
+- **Elan səhifəsindəki müraciət elana bağlanır** (`propertyId`, `source = PROPERTY`). İctimai hesabın
+  elanında müraciət ofis kanallarına (e-poçt/Telegram) getmir — sahibə bildiriş + e-poçt
+  (`noticeListingLead`) gedir və `/kabinet/muracietler`-də görünür. ID yalnız ictimai elana uyğun
+  gəlsə qəbul olunur (`resolveLeadProperty`).
+- **Agentlik komandası:** limit `MAX_AGENCY_EMPLOYEES` (50). `AgencyEmployee.source`: `INVITE` (sahib
+  dəvət edir, admin təsdiqləyir) və `REQUEST` (agent qeydiyyatda və ya profildə agentliyi seçir,
+  sahib `/kabinet/komanda`-da və ya admin təsdiqləyir). Yer limiti təsdiqlənmişlərə + gözləyən
+  dəvətlərə aiddir; sorğu yer tutmur, təsdiqdə yoxlanılır, gözləyən sorğu sayı
+  `MAX_PENDING_AGENCY_REQUESTS` ilə məhduddur. Qaydalar `lib/accounts/agency-membership.ts`-dədir;
+  təsdiqdə `AgentProfile.agencyId` bağlanır, çıxarılanda ayrılır — bunu yan keçən axın yazma.
+  Status keçidləri şərti `updateMany` ilədir (sahib və admin eyni anda baxa bilər).
+- **Agentlik loqosu** profil şəkli ilə eynidir (`User.avatarUrl` = `Agency.logoUrl`, `avatarlar`
+  qovluğu). Qeydiyyatda loqo Server Action-un özündə saxlanılır (`storeAgencyLogo`) — client onu
+  512 px WebP-yə kiçildir, çünki action gövdəsinin Next limiti 1 MB-dır. Paneldən dəyişəndə də
+  fayl agentlik hesabının adına yazılır, əks halda sahibin profil saxlaması «şəkil sizə aid deyil» verir.
+- **Satıcı filtri** `?satici=OWNER|AGENCY|COMPANY` (`SELLER_FILTERS`, `sellerWhere()`); satıcı səhifəsi
+  `/satici/<userId>` (noindex, təsdiqlənmiş agentlikdə agentlik səhifəsinə 308).
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai

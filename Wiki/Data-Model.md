@@ -95,7 +95,7 @@ Həm staff, həm ictimai hesabların əsas modelidir.
 
 ### `AgencyEmployee`
 
-Agentlik sahibindən əlavə ən çox 3 komanda üzvünü saxlayır. E-poçt, ad, `MANAGER`/`AGENT` rolu və `PENDING`/`APPROVED`/`REJECTED` təsdiq statusu agentlik kabinetindən idarə olunur.
+Agentlik sahibindən əlavə ən çox 50 komanda üzvünü (`MAX_AGENCY_EMPLOYEES`) saxlayır. `MANAGER`/`AGENT` rolu, `PENDING`/`APPROVED`/`REJECTED` statusu və `source` (`INVITE` — sahibin dəvəti, admin təsdiqləyir; `REQUEST` — agentin qoşulma sorğusu, sahib və ya admin təsdiqləyir, `0055`) var. Təsdiqdə agentin `AgentProfile.agencyId` sahəsi agentliyə bağlanır; təsdiqlənmiş əməkdaşın elanlarında agentliyin adı görünür.
 
 ### `Session`
 
