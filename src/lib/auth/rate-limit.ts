@@ -59,6 +59,18 @@ export async function checkValuationLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/**
+ * Elan sahibinin nömrəsini açmaq («Nömrəni göstər»). Ayrıca binding yaradılmır —
+ * `VALUATION_LIMIT` (20/dəq) öz açar prefiksi ilə işlədilir, sayğac qiymətləndirmə ilə qarışmır.
+ */
+export async function checkContactRevealLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `contact-reveal:${ip}` });
+  return success;
+}
+
 /** Brauzer monitorinq hadisələri üçün ayrıca, daha geniş büdcə. */
 export async function checkMonitoringLimit(ip: string): Promise<boolean> {
   const limiter = getCloudflareContext().env.MONITORING_LIMIT;

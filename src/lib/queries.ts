@@ -47,6 +47,26 @@ import { parseJsonArray } from "@/lib/utils";
 // SEÇİM (SELECT) TƏRİFLƏRİ — kart və detal görünüşləri üçün
 // ---------------------------------------------------------------------------
 
+/** Elanı yerləşdirənin agentliyi — kart və detal eyni sahə dəstini işlədir. */
+const publisherAgencySelect = { name: true, slug: true, logoUrl: true, isVerified: true } as const;
+
+/**
+ * Elanı yerləşdirənin əlaqəsi (`resolveListingPublisher`). Parol, 2FA və s. sahələr
+ * qəsdən seçilmir — nəticə ictimai keşə yazılır.
+ */
+const publisherContactSelect = {
+  accountType: true,
+  name: true,
+  phone: true,
+  email: true,
+  companyName: true,
+  agency: { select: { ...publisherAgencySelect, phone: true } },
+  agencyEmployments: {
+    where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    select: { agency: { select: { ...publisherAgencySelect, phone: true } } },
+  },
+} satisfies Prisma.UserSelect;
+
 export const propertyCardSelect = {
   id: true,
   title: true,
@@ -94,6 +114,17 @@ export const propertyCardSelect = {
     orderBy: { changedAt: "desc" },
     take: 1,
     select: { oldPrice: true, newPrice: true, changedAt: true },
+  },
+  // Kartdakı «Agentlik / Mülkiyyətçi» nişanı — əlaqə məlumatı kart sorğusuna düşmür.
+  author: {
+    select: {
+      accountType: true,
+      agency: { select: publisherAgencySelect },
+      agencyEmployments: {
+        where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+        select: { agency: { select: publisherAgencySelect } },
+      },
+    },
   },
 } satisfies Prisma.PropertySelect;
 
@@ -625,7 +656,17 @@ export async function getPropertyBySlug(slug: string) {
           reviews: { where: { status: REVIEW_STATUSES.APPROVED }, orderBy: { createdAt: "desc" }, take: 5 },
         },
       },
+      // Səhifə əlaqəni maskalı göstərir; tam nömrə `getPropertyPublisherContact` ilə kliklə gəlir.
+      author: { select: { ...publisherContactSelect, id: true } },
     },
+  });
+}
+
+/** «Nömrəni göstər» — yalnız ictimai elanın müəllif əlaqəsi. */
+export async function getPropertyPublisherContact(propertyId: string) {
+  return prisma.property.findFirst({
+    where: { ...(await publicPropertyWhere()), id: propertyId },
+    select: { id: true, author: { select: publisherContactSelect } },
   });
 }
 

@@ -20,9 +20,11 @@ type ContactFormProps = {
   defaultMessage?: string;
   /** Analitika hadisəsindəki yerləşmə adı. */
   placement?: string;
+  /** Elan səhifəsindəki forma — müraciət elana bağlanır və elan sahibinə gedir. */
+  propertyId?: string;
 };
 
-export function ContactForm({ source = "CONTACT", defaultSubject, defaultMessage, placement = "contact_form" }: ContactFormProps = {}) {
+export function ContactForm({ source = "CONTACT", defaultSubject, defaultMessage, placement = "contact_form", propertyId }: ContactFormProps = {}) {
   const t = useTranslations("contact");
   const [state, formAction, isPending] = useActionState(
     submitContactForm,
@@ -55,6 +57,7 @@ export function ContactForm({ source = "CONTACT", defaultSubject, defaultMessage
     <form action={formAction} className="flex flex-col gap-5">
       <AttributionFields />
       <input type="hidden" name="source" value={source} />
+      {propertyId && <input type="hidden" name="propertyId" value={propertyId} />}
       {/*
         Honeypot — ziyarətçi görmür, bot doldurur. Ekrandan kənara çıxarılır,
         `display: none` işlədilmir: botların bir hissəsi məhz həmin xassəyə görə

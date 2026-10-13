@@ -15,6 +15,9 @@ import {
   LayoutPanelTop,
   Navigation,
   Star,
+  Building2,
+  ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 import { formatPrice, isUnoptimizedImage, toIsoDateTime } from "@/lib/utils";
 import { isProjectsSectionEnabled } from "@/lib/site-sections";
@@ -63,6 +66,9 @@ import { formatLocalizedDate } from "@/i18n/date";
 import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ReservationForm } from "./reservation-form";
+import { maskPhone, resolveListingPublisher } from "@/lib/accounts/listing-publisher";
+import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
+import { PublisherContactButtons } from "@/components/site/publisher-contact";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -228,9 +234,24 @@ export default async function PropertyDetailPage({ params }: Props) {
     ? await getOptionalUser(AUTH_KINDS.PUBLIC)
     : null;
   const propertyPath = `/emlaklar/${property.slug}`;
-  const whatsappHref = whatsappLink(
-    content("whatsappMessage", { title: property.title }),
-  );
+  // Əlaqə elanı yerləşdirənə gedir; şirkət (STAFF) elanında şirkətin nömrəsi qalır.
+  const publisher = resolveListingPublisher(property.author);
+  const whatsappMessage = content("whatsappMessage", { title: property.title });
+  const whatsappHref = whatsappLink(whatsappMessage);
+  // İctimai hesabın nömrəsi HTML-ə yazılmır — yalnız maska və «var/yox» bayraqları (bot-lardan qoruma).
+  const reveal = publisher.kind === "company"
+    ? null
+    : {
+        hasPhone: Boolean(publisher.phone),
+        hasWhatsapp: normalizeAzMobile(publisher.phone) != null,
+        whatsappMessage,
+      };
+  // Satıcının bütün elanları: agentlikdə agentlik səhifəsi, digərlərində satıcı səhifəsi.
+  const sellerHref = publisher.kind === "company"
+    ? null
+    : publisher.kind === "agency" && publisher.agency?.isVerified
+      ? `/agentlikler/${publisher.agency.slug}`
+      : property.author ? `/satici/${property.author.id}` : null;
   const relatedLandingLinks = [
     {
       href: propertyFiltersToLandingPath({ listingType: property.listingType }) ?? "/emlaklar",
@@ -335,6 +356,14 @@ export default async function PropertyDetailPage({ params }: Props) {
                     {commonContent("phase2.premium")}
                   </Badge>
                 )}
+                {publisher.kind !== "company" && publisher.kind !== "private" && (
+                  <Badge tone="neutral">
+                    {publisher.agency?.isVerified && <ShieldCheck className="size-3.5 text-success" aria-hidden="true" />}
+                    {publisher.agency
+                      ? propertyText("publisher.agencyNamed", { name: publisher.agency.name })
+                      : propertyText(`publisher.${publisher.kind}`)}
+                  </Badge>
+                )}
               </div>
               
               <h1 className="font-display text-3xl leading-[1.12] tracking-[-0.02em] text-ink sm:text-4xl lg:text-[2.75rem]">
@@ -374,6 +403,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             title={property.title}
             phone={siteConfig.phoneHref}
             whatsappHref={whatsappHref}
+            reveal={reveal}
             qrSvg={propertyQrSvg(propertyPath)}
             slug={property.slug}
           />
@@ -697,33 +727,120 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <p className="text-sm text-ink-soft">
                     {isClosed
                       ? content("closedDescription")
-                      : content("contactDescription")}
+                      : publisher.kind === "company"
+                        ? content("contactDescription")
+                        : content("publisherDescription")}
                   </p>
                 </div>
 
-                <div className="mb-6 flex flex-col gap-2">
-                  <ButtonAnchor
-                    href={siteConfig.phoneHref}
-                    variant="ghost"
-                    fullWidth
-                    className="border border-line hover:border-gold hover:text-gold-deep"
-                  >
-                    <Phone className="size-4" aria-hidden="true" />
-                    {siteConfig.phone}
-                  </ButtonAnchor>
+                {publisher.kind !== "company" && (
+                  <div className="mb-5 flex items-center gap-3 rounded-lg border border-line bg-ivory p-3.5">
+                    <div className="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-md border border-line bg-paper">
+                      {publisher.agency?.logoUrl ? (
+                        <Image
+                          src={publisher.agency.logoUrl}
+                          alt=""
+                          fill
+                          sizes="48px"
+                          unoptimized={isUnoptimizedImage(publisher.agency.logoUrl)}
+                          className="object-contain p-1"
+                        />
+                      ) : publisher.agency ? (
+                        <Building2 className="size-5 text-gold-deep" aria-hidden="true" />
+                      ) : (
+                        <span className="font-semibold text-gold-deep" aria-hidden="true">
+                          {publisher.displayName.trim().charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold tracking-wide text-gold-deep uppercase">
+                        {content("publisherTitle")}
+                        {publisher.kind !== "private" ? ` · ${propertyText(`publisher.${publisher.kind}`)}` : ""}
+                      </p>
+                      <p className="truncate font-medium text-ink">{publisher.displayName}</p>
+                      {publisher.agency && publisher.kind === "agent" && (
+                        <p className="truncate text-sm text-ink-muted">{publisher.agency.name}</p>
+                      )}
+                      {publisher.displayName !== publisher.contactName && (
+                        <p className="truncate text-sm text-ink-muted">
+                          {content("publisherContactPerson", { name: publisher.contactName })}
+                        </p>
+                      )}
+                      {publisher.agency?.isVerified && (
+                        <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-success">
+                          <ShieldCheck className="size-3.5" aria-hidden="true" />
+                          {content("verifiedAgency")}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap gap-x-3">
+                        {publisher.agency?.isVerified && publisher.kind === "agent" && (
+                          <Link
+                            href={`/agentlikler/${publisher.agency.slug}`}
+                            className="relative text-sm font-medium text-gold-deep underline-offset-4 after:absolute after:inset-x-0 after:-inset-y-3 hover:underline"
+                          >
+                            {content("publisherAgencyPage")}
+                          </Link>
+                        )}
+                        {sellerHref && (
+                          <Link
+                            href={sellerHref}
+                            className="relative text-sm font-medium text-gold-deep underline-offset-4 after:absolute after:inset-x-0 after:-inset-y-3 hover:underline"
+                          >
+                            {content("sellerListings")}
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                  <ButtonAnchor
-                    href={whatsappHref}
-                    variant="ghost"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    fullWidth
-                    className="border border-success/30 bg-success-bg text-success hover:border-success hover:bg-success-bg/70"
-                  >
-                    <WhatsAppIcon className="size-4 text-success" />
-                    WhatsApp
-                  </ButtonAnchor>
+                <div className="mb-6">
+                  {publisher.kind === "company" ? (
+                    <div className="flex flex-col gap-2">
+                      <ButtonAnchor
+                        href={siteConfig.phoneHref}
+                        variant="ghost"
+                        fullWidth
+                        className="border border-line hover:border-gold hover:text-gold-deep"
+                      >
+                        <Phone className="size-4" aria-hidden="true" />
+                        {siteConfig.phone}
+                      </ButtonAnchor>
+                      <ButtonAnchor
+                        href={whatsappHref}
+                        variant="ghost"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        fullWidth
+                        className="border border-success/30 bg-success-bg text-success hover:border-success hover:bg-success-bg/70"
+                      >
+                        <WhatsAppIcon className="size-4 text-success" />
+                        WhatsApp
+                      </ButtonAnchor>
+                    </div>
+                  ) : (
+                    <PublisherContactButtons
+                      propertyId={property.id}
+                      maskedPhone={publisher.phone ? maskPhone(publisher.phone) : null}
+                      hasEmail={Boolean(publisher.email)}
+                      whatsappMessage={whatsappMessage}
+                      labels={{
+                        showPhone: content("showPhone"),
+                        showEmail: content("showEmail"),
+                        revealError: content("revealError"),
+                        noPhone: content("publisherNoPhone"),
+                      }}
+                    />
+                  )}
                 </div>
+
+                {publisher.kind !== "company" && (
+                  <p className="mb-6 flex items-start gap-2 rounded-md bg-warning-bg p-3 text-xs leading-5 text-ink-soft">
+                    <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
+                    {content("publisherNotice")}
+                  </p>
+                )}
 
                 <div className="relative mb-6 text-center">
                   <div className="absolute inset-0 flex items-center" aria-hidden="true">
@@ -732,7 +849,8 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <span className="relative bg-paper px-3 text-xs font-medium uppercase text-ink-muted">{content("orEnquiry")}</span>
                 </div>
 
-                <ContactForm />
+                {/* Müraciət elana bağlanır: şirkət elanında ofisə, digərlərində elan sahibinin kabinetinə gedir. */}
+                <ContactForm propertyId={property.id} placement="property_detail" />
               </div>
             </div>
           </div>

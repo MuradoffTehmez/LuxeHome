@@ -39,6 +39,7 @@ const cardProperty = {
   cityId: "city-1",
   districtId: null,
   priceHistory: [],
+  author: null,
   nearbyPlaces: [],
 } as PropertyCardData;
 
