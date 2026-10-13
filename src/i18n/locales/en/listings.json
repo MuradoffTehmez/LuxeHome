@@ -185,6 +185,10 @@
     "saveSearchFrequencyWeekly": "Weekly",
     "saveSearchFrequencyOff": "Off",
     "nearMetro": "Within 1 km of a metro",
-    "drawnArea": "Area drawn on the map"
+    "drawnArea": "Area drawn on the map",
+    "seller": "Seller",
+    "sellerOwner": "Owner",
+    "sellerAgency": "Agency / agent",
+    "sellerCompany": "Luxe Home Estate"
   }
 }

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { BadgePercent, BedDouble, Building2, Camera, Crown, Layers, Maximize, MapPin, Sparkles, TrendingDown } from "lucide-react";
+import { BadgePercent, BedDouble, Building2, Camera, Crown, Home, Layers, Maximize, MapPin, ShieldCheck, Sparkles, TrendingDown, UserRound } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
   LISTING_TYPES,
@@ -18,6 +18,7 @@ import type { PropertyCardData } from "@/lib/queries";
 import type { PriceBand } from "@/lib/price-benchmark";
 import { CARD_METRO_MAX_METERS, LOCATION_KINDS } from "@/lib/constants";
 import { shortLocation } from "@/lib/location-path";
+import { listingPublisherBadge } from "@/lib/accounts/listing-publisher";
 import { FavoriteButton } from "./favorite-button";
 import { CompareButton } from "./compare-button";
 
@@ -107,6 +108,17 @@ export function PropertyCard({
   const isPremium = property.isFeatured && (!property.featuredUntil || new Date(property.featuredUntil).getTime() >= Date.now());
 
   const signals = cardSignals(sourceProperty);
+  // Elanı kim yerləşdirib: agentlik adı, mülkiyyətçi və ya agent. Şirkət elanında nişan yoxdur.
+  const publisher = listingPublisherBadge(sourceProperty.author);
+  const publisherLabel = publisher.agency
+    ? t("publisher.agencyNamed", { name: publisher.agency.name })
+    : publisher.kind === "company" || publisher.kind === "private"
+      ? null
+      : t(`publisher.${publisher.kind}`);
+  // Təsdiqlənmiş agentlik qalxan işarəsi ilə — ziyarətçi üçün etibar siqnalı.
+  const PublisherIcon = publisher.agency?.isVerified
+    ? ShieldCheck
+    : publisher.agency || publisher.kind === "corporate" ? Building2 : publisher.kind === "owner" ? Home : UserRound;
   const nearestMetro = sourceProperty.nearbyPlaces?.[0];
   const metro = nearestMetro && nearestMetro.distanceMeters != null && nearestMetro.distanceMeters <= CARD_METRO_MAX_METERS
     ? nearestMetro
@@ -189,6 +201,14 @@ export function PropertyCard({
             <Camera className="size-3.5" aria-hidden="true" />
             {signals.photoCount}
             <span className="sr-only">{t("signals.photos", { count: signals.photoCount })}</span>
+          </span>
+        )}
+
+        {publisherLabel && (
+          <span className="on-image-chip pointer-events-none absolute right-3 bottom-3 inline-flex max-w-[calc(100%-5.5rem)] items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+            <PublisherIcon className="size-3.5 shrink-0" aria-hidden="true" />
+            <span className="truncate">{publisherLabel}</span>
+            {publisher.agency?.isVerified && <span className="sr-only">{t("publisher.verified")}</span>}
           </span>
         )}
 

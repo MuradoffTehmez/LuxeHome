@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { Bell, CalendarCheck, Crown, History, LayoutGrid, ListChecks, LogOut, Plus, Search, Sparkles, UserRound, Users } from "lucide-react";
+import { Bell, CalendarCheck, Crown, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, Search, Sparkles, UserRound, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
@@ -28,6 +28,7 @@ const ICONS = {
   overview: LayoutGrid,
   listings: ListChecks,
   "new-listing": Plus,
+  leads: MessageSquare,
   packages: Crown,
   team: Users,
   "saved-searches": Search,
@@ -42,6 +43,7 @@ const LABEL_KEYS = {
   overview: "overview",
   listings: "listings",
   "new-listing": "newListing",
+  leads: "leads",
   packages: "packages",
   team: "team",
   "saved-searches": "savedSearches",

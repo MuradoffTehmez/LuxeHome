@@ -51,6 +51,7 @@ export const savedSearchFiltersSchema = z
     polygon: z.array(z.tuple([z.number().min(-90).max(90), z.number().min(-180).max(180)])).min(3).max(20).optional(),
     mortgageOnly: z.boolean().optional(),
     installmentOnly: z.boolean().optional(),
+    seller: z.string().trim().max(20).optional(),
   })
   .strip();
 

@@ -185,6 +185,10 @@
     "saveSearchFrequencyWeekly": "Həftəlik",
     "saveSearchFrequencyOff": "Söndürülüb",
     "nearMetro": "Metroya 1 km-dən yaxın",
-    "drawnArea": "Xəritədə seçilmiş sahə"
+    "drawnArea": "Xəritədə seçilmiş sahə",
+    "seller": "Satıcı",
+    "sellerOwner": "Mülkiyyətçi",
+    "sellerAgency": "Agentlik / agent",
+    "sellerCompany": "Luxe Home Estate"
   }
 }

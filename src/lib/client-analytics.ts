@@ -21,6 +21,8 @@ export const ANALYTICS_EVENTS = [
   "partner_external_website_click",
   "partner_listing_click",
   "valuation_estimate",
+  // Elan sahibinin maskalı nömrəsini açmaq — zəngdən əvvəlki niyyət siqnalı.
+  "phone_reveal",
 ] as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];

@@ -66,9 +66,10 @@ Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run lint` + `np
 `npm run build` — dəyişiklikdən sonra beşi də işlədilməlidir. Testlər `@cloudflare/vitest-plugin` vasitəsilə
 workerd runtime-ında (domen qatı) və Node layihəsində (SSR komponentləri) işləyir.
 
-Bu beşlikdən **ayrı** olaraq CI `npm audit --audit-level=high` işlədir. O, kod keyfiyyətini
-deyil, asılılıqları yoxlayır, ona görə lokalda yalnız `package.json`/`package-lock.json`
-dəyişdikdə işlətmək lazımdır.
+Bu beşlikdən **ayrı** olaraq CI `npm run audit:gate` işlədir (`npm audit --audit-level=high` +
+`audit-allowlist.json`). O, kod keyfiyyətini deyil, asılılıqları yoxlayır, ona görə lokalda yalnız
+`package.json`/`package-lock.json` dəyişdikdə işlətmək lazımdır. Yamağı olmayan advisory yalnız
+səbəb və bitmə tarixi ilə istisnaya yazılır; müddət bitəndə qapı yenidən yıxılır.
 
 `.github/dependabot.yml` üç major-u upstream uyğunsuzluğuna görə `versions` ilə saxlayır:
 `typescript >=7` (typescript-eslint TS `<6.1` tələb edir), `eslint >=10` (`eslint-plugin-react`
@@ -589,6 +590,42 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   Doğum tarixi istəyə bağlıdır və yalnız 18 yaş yoxlaması üçündür (`accounts/profile-fields.ts`).
 - Qısa ünvanlar `/elan-yerlesdir`, `/elanlarim`, `/profilim` (`accounts/short-links.ts`) —
   yenisini əlavə edəndə `NEVER_CACHED_PREFIXES`-ə də yaz.
+
+### Elanı yerləşdirən, agentlik komandası və müraciət yönləndirməsi (2026-10)
+
+- **Əlaqə elanı yerləşdirənə gedir** (`lib/accounts/listing-publisher.ts`, Prisma-sız): STAFF və ya
+  müəllifsiz elanda şirkətin nömrəsi; agentlik hesabında agentliyin adı, loqosu və ofis nömrəsi;
+  agentliyin təsdiqlənmiş əməkdaşında agentin öz nömrəsi + agentlik adı; digərlərində hesabın ad
+  soyadı/telefonu/e-poçtu. Kart (`listingPublisherBadge`) və detal (`resolveListingPublisher`) eyni
+  qaydanı işlədir; kart sorğusu yalnız növ + agentliyi seçir, əlaqə məlumatı kart payload-ına düşmür.
+- **İctimai hesabın nömrəsi və e-poçtu HTML-ə yazılmır.** Detal maskalı nömrə (`maskPhone`) göstərir,
+  tam əlaqə «Nömrəni göstər» ilə `POST /api/emlaklar/<id>/elaqe`-dən gəlir (same-origin + IP limiti
+  `checkContactRevealLimit`). Bu əlaqəni server komponentindən client-ə prop kimi ötürmə.
+- **Elan səhifəsindəki müraciət elana bağlanır** (`propertyId`, `source = PROPERTY`). İctimai hesabın
+  elanında müraciət ofis kanallarına (e-poçt/Telegram) getmir — sahibə bildiriş + e-poçt
+  (`noticeListingLead`) gedir və `/kabinet/muracietler`-də görünür. ID yalnız ictimai elana uyğun
+  gəlsə qəbul olunur (`resolveLeadProperty`).
+- **Agentlik komandası:** limit `MAX_AGENCY_EMPLOYEES` (50). `AgencyEmployee.source`: `INVITE` (sahib
+  dəvət edir, admin təsdiqləyir) və `REQUEST` (agent qeydiyyatda və ya profildə agentliyi seçir,
+  sahib `/kabinet/komanda`-da və ya admin təsdiqləyir). Yer limiti təsdiqlənmişlərə + gözləyən
+  dəvətlərə aiddir; sorğu yer tutmur, təsdiqdə yoxlanılır, gözləyən sorğu sayı
+  `MAX_PENDING_AGENCY_REQUESTS` ilə məhduddur. Qaydalar `lib/accounts/agency-membership.ts`-dədir;
+  təsdiqdə `AgentProfile.agencyId` bağlanır, çıxarılanda ayrılır — bunu yan keçən axın yazma.
+  Qərar yalnız `commitMembershipDecision()` ilə yazılır: şərti `updateMany` (sahib və admin eyni
+  anda baxa bilər), profil bağlantısı alınmasa status `PENDING`-ə qaytarılır, təsdiqlənmiş qeydin
+  təkrar təsdiqi qalan addımı tamamlayır. **Bir aktiv agentlik:** başqa agentlikdə təsdiqlənmiş
+  istifadəçi dəvət/təsdiq olunmur (`hasOtherApprovedMembership`) — kart `agencyEmployments[0]`-ə
+  buna görə etibar edir. Komanda bildirişinin `dedupeKey`-i cəhd vaxtını (`invitedAt`) daşıyır,
+  çünki rədd edilmiş sorğu eyni id ilə yenidən açılır. Agentin öz action-ları da
+  `requirePublicAction("team")`-dən keçir.
+- **Deaktiv hesabın elanı** ictimai qala bilər, amma əlaqəsi, müraciəti və satıcı filtri şirkətə aiddir
+  (`isActive` həm `resolveListingPublisher`, həm `resolveLeadProperty`, həm `sellerWhere`-dədir).
+- **Agentlik loqosu** profil şəkli ilə eynidir (`User.avatarUrl` = `Agency.logoUrl`, `avatarlar`
+  qovluğu). Qeydiyyatda loqo Server Action-un özündə saxlanılır (`storeAgencyLogo`) — client onu
+  512 px WebP-yə kiçildir, çünki action gövdəsinin Next limiti 1 MB-dır. Paneldən dəyişəndə də
+  fayl agentlik hesabının adına yazılır, əks halda sahibin profil saxlaması «şəkil sizə aid deyil» verir.
+- **Satıcı filtri** `?satici=OWNER|AGENCY|COMPANY` (`SELLER_FILTERS`, `sellerWhere()`); satıcı səhifəsi
+  `/satici/<userId>` (noindex, təsdiqlənmiş agentlikdə agentlik səhifəsinə 308).
 
 ### Kənar HTML keşi (#105)
 

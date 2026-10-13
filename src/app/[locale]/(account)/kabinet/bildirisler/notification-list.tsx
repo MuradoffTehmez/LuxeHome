@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Bookmark, CalendarClock, CheckCheck, Sparkles, Trash2, TrendingDown } from "lucide-react";
+import { Bookmark, CalendarClock, CheckCheck, MessageSquare, Sparkles, Trash2, TrendingDown, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Locale, NotificationType } from "@/lib/constants";
@@ -29,6 +29,8 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
   MEETING_REMINDER: CalendarClock,
   LISTING_EXPIRY: CalendarClock,
   PACKAGE: Sparkles,
+  AGENCY_TEAM: Users,
+  LISTING_LEAD: MessageSquare,
 };
 
 function NotificationRow({ item }: { item: NotificationListItem }) {

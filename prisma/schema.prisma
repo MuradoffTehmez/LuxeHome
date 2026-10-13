@@ -174,7 +174,7 @@ model Agency {
 }
 
 /// Agentlik işçisi. Sahibin (Agency.userId) özü bura yazılmır — yalnız dəvət
-/// olunan əməkdaşlar. Maksimum say (3) tətbiq səviyyəsində yoxlanılır, çünki
+/// olunan əməkdaşlar. Maksimum say (`MAX_AGENCY_EMPLOYEES`, 50) tətbiq səviyyəsində yoxlanılır, çünki
 /// D1 tranzaksiya dəstəkləmədiyi üçün DB-səviyyəli CHECK etibarlı deyil.
 model AgencyEmployee {
   id       String @id @default(cuid())
@@ -185,6 +185,9 @@ model AgencyEmployee {
   role   String @default("AGENT")
   /// PENDING | APPROVED | REJECTED — admin təsdiqi tələb olunur.
   status String @default("PENDING")
+  /// INVITE | REQUEST — dəvəti sahib göndərib, yoxsa agent qeydiyyatda sorğu edib.
+  /// Sorğunu agentlik sahibi də təsdiqləyə bilər; dəvəti yalnız admin.
+  source String @default("INVITE")
 
   invitedAt  DateTime  @default(now())
   approvedAt DateTime?

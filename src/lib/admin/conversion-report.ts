@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 import { LEAD_STATUSES, PROPERTY_STATUSES } from "@/lib/constants";
 
 /**
@@ -59,7 +60,8 @@ export function toListingRow(property: {
 
 export async function getConversionReport(days = 30) {
   const since = new Date(Date.now() - days * DAY);
-  const leadWhere = { createdAt: { gte: since } };
+  // Elan sahibinin öz müraciətləri ofisin hunisinə sayılmır.
+  const leadWhere = { ...OFFICE_LEAD_WHERE, createdAt: { gte: since } };
 
   const [leadTotal, byStatus, bySource, reservations, listings] = await Promise.all([
     prisma.lead.count({ where: leadWhere }),

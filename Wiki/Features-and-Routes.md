@@ -76,6 +76,13 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 - Boş nəticədə `EmptySearchSuggestions` hər aktiv çipi çıxaranda neçə elan qaldığını göstərir. Yeni filtr `CHIP_FIELDS`-ə də yazılmalıdır.
 - Xəritədə sahə: SQL sərhəd qutusunu süzür, dəqiq poliqon yoxlaması JS-də; ən çox 1000 namizəd.
 
+### Elanı yerləşdirən və satıcı
+
+- Detal səhifəsi əlaqəni elanı yerləşdirənə yönəldir: agentlik (ad, loqo, «Təsdiqlənmiş agentlik»), agent, mülkiyyətçi və ya şirkət. İctimai hesabın nömrəsi maskalıdır, «Nömrəni göstər» `POST /api/emlaklar/<id>/elaqe`-dən açır.
+- Kartda «Agentlik: Ad», «Mülkiyyətçi», «Agent» nişanı; siyahıda `?satici=OWNER|AGENCY|COMPANY` filtri.
+- `/satici/<id>` — satıcının bütün aktiv elanları (noindex).
+- Elan səhifəsindən gələn müraciət elana bağlanır və ictimai hesabın elanında sahibin `/kabinet/muracietler` bölməsinə düşür.
+
 ### Favorit və müqayisə
 
 - Favorit əvvəl LocalStorage-də saxlanılır; hesabla daxil olanda `/api/hesab/favoritler` ilə sinxronlaşır. Hidrasiyadan əvvəl kliklər bloklanır.

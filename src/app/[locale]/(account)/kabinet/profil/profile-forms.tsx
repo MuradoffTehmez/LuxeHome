@@ -75,12 +75,13 @@ export function ProfileForm({
         <legend className={sectionTitle}>{t("personalSection")}</legend>
         <ImageDropzone
           name="avatar"
-          label={t("avatar")}
+          // Agentlikdə bu şəkil agentliyin loqosudur — kartlarda və agentlik səhifəsində görünür.
+          label={isAgency ? t("logo") : t("avatar")}
           folder="avatarlar"
           uploadUrl="/api/hesab/media?folder=avatarlar"
           maxFiles={1}
           initial={values.avatarUrl ? [{ url: values.avatarUrl, alt: "", isCover: true }] : []}
-          hint={t("avatarHint")}
+          hint={isAgency ? t("logoHint") : t("avatarHint")}
         />
         {state.fieldErrors?.avatar && <p className="text-sm text-danger">{state.fieldErrors.avatar}</p>}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

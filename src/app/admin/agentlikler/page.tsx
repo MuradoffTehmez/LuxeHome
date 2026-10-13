@@ -14,13 +14,14 @@ import {
 } from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatDateTime } from "@/lib/utils";
-import { AGENCY_EMPLOYEE_ROLE_LABELS, PERMISSIONS } from "@/lib/constants";
+import { AGENCY_EMPLOYEE_ROLE_LABELS, AGENCY_EMPLOYEE_SOURCES, PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminAgencies, getAdminAgencyEmployeeQueue } from "@/lib/queries";
 import { approveAgencyEmployee, bulkAgencies, rejectAgencyEmployee, toggleAgencyVerification } from "./actions";
 import { AccountDelete } from "../hesablar/account-delete";
 import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 import { AgencyProfileRepair } from "./agency-profile-repair";
+import { AgencyLogoEditor } from "./agency-logo-editor";
 import { getAdminT } from "@/lib/admin-i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -78,7 +79,8 @@ export default async function AdminAgenciesPage() {
                   <p className="mt-0.5 truncate text-xs text-ink-muted">
                     {employee.user.email} · {employee.agency.name} ·{" "}
                     {t(`labels.agencyEmployeeRole.${employee.role as keyof typeof AGENCY_EMPLOYEE_ROLE_LABELS}`) ??
-                      employee.role}
+                      employee.role}{" "}
+                    · {employee.source === AGENCY_EMPLOYEE_SOURCES.REQUEST ? t("pages.agents.qosulmaSorgusu") : t("pages.agents.devet")}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
@@ -177,6 +179,9 @@ export default async function AdminAgenciesPage() {
                 <span className="tabular">{account._count.properties} elan</span>
                 {!account.isActive ? <Badge tone="neutral">{t("pages.agents.deaktivHesab")}</Badge> : null}
               </div>
+              {account.agency ? (
+                <AgencyLogoEditor agencyId={account.agency.id} name={account.agency.name} logoUrl={account.agency.logoUrl} />
+              ) : null}
               {!account.agency ? (
                 <div className="mt-4 border-t border-line pt-4">
                   <p className="mb-3 text-xs text-ink-muted">{t("pages.agents.kohneQeydiyyatYarimciqQalib")}</p>
@@ -208,6 +213,9 @@ export default async function AdminAgenciesPage() {
                     {!account.isActive && (
                       <Badge tone="neutral" className="mt-1">{t("pages.agents.deaktivHesab")}</Badge>
                     )}
+                    {account.agency ? (
+                      <AgencyLogoEditor agencyId={account.agency.id} name={account.agency.name} logoUrl={account.agency.logoUrl} />
+                    ) : null}
                   </AdminTableCell>
                   <AdminTableCell className="tabular">{account._count.properties}</AdminTableCell>
                   <AdminTableCell className="text-xs text-ink-muted">

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { AGENCY_EMPLOYEE_STATUSES, PERMISSIONS } from "@/lib/constants";
+import { AGENCY_EMPLOYEE_STATUSES, MAX_AGENCY_EMPLOYEES, PERMISSIONS } from "@/lib/constants";
 import {
   type ActionState,
   failure,
@@ -18,6 +18,10 @@ import { msg } from "@/lib/admin/server-message";
 import { isBulkFailure, readBulkSelection, runBulk } from "@/lib/admin/bulk";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { deletePublicAccount } from "../hesablar/actions";
+import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { commitMembershipDecision, hasFreeApprovedSeat, hasOtherApprovedMembership } from "@/lib/accounts/agency-membership";
+import { noticeAgencyDecision } from "@/lib/accounts/account-notices";
+import { checkLogoFile, logoFromForm, storeAgencyLogo } from "@/lib/accounts/agency-logo";
 
 const LIST_PATH = "/admin/agentlikler";
 
@@ -147,21 +151,49 @@ async function reviewAgencyEmployee(
       select: {
         id: true,
         status: true,
-        agency: { select: { id: true, name: true } },
+        userId: true,
+        invitedAt: true,
+        agency: { select: { id: true, name: true, slug: true } },
         user: { select: { name: true, email: true } },
       },
     });
     if (!employee) return failure(msg("server.agentlikler.devetTapilmadi"));
-    if (employee.status !== AGENCY_EMPLOYEE_STATUSES.PENDING) {
+    const approved = decision === AGENCY_EMPLOYEE_STATUSES.APPROVED;
+    // Artıq təsdiqlənmiş qeydin təkrar təsdiqi yarımçıq qalmış profil bağlantısını tamamlayır.
+    const reviewable = employee.status === AGENCY_EMPLOYEE_STATUSES.PENDING
+      || (approved && employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED);
+    if (!reviewable) {
       return failure(msg("server.agentlikler.buDevetArtiqNezerdenKecirilib"));
     }
+    if (approved && employee.status === AGENCY_EMPLOYEE_STATUSES.PENDING) {
+      if (!(await hasFreeApprovedSeat(employee.agency.id))) {
+        return failure(msg("server.agentlikler.emekdasLimiti", { count: MAX_AGENCY_EMPLOYEES }));
+      }
+      if (await hasOtherApprovedMembership(employee.userId, employee.agency.id)) {
+        return failure(msg("server.agentlikler.basqaAgentlikdedir"));
+      }
+    }
 
-    await prisma.agencyEmployee.update({
-      where: { id },
-      data: {
-        status: decision,
-        approvedAt: decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? new Date() : null,
-      },
+    // Şərti yeniləmə + kompensasiya — sahib eyni sorğunu kabinetdə eyni anda təsdiqləyə bilər.
+    const result = await commitMembershipDecision({
+      id,
+      userId: employee.userId,
+      agencyId: employee.agency.id,
+      approved,
+      currentStatus: employee.status,
+    });
+    if (result === "conflict") return failure(msg("server.agentlikler.buDevetArtiqNezerdenKecirilib"));
+    if (result === "resumed") {
+      revalidatePath(LIST_PATH);
+      revalidatePublicContent("agency", employee.agency.slug);
+      return success(msg("server.agentlikler.emekdasTesdiqlendi"));
+    }
+    await noticeAgencyDecision({
+      userId: employee.userId,
+      employeeId: id,
+      attemptAt: employee.invitedAt,
+      agencyName: employee.agency.name,
+      approved,
     });
 
     await recordAudit(
@@ -180,6 +212,8 @@ async function reviewAgencyEmployee(
 
     revalidatePath(LIST_PATH);
     revalidatePath("/kabinet/komanda");
+    revalidatePublicContent("agency", employee.agency.slug);
+    revalidatePublicContent("property");
     return success(
       decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? msg("server.agentlikler.emekdasTesdiqlendi") : msg("server.agentlikler.devetReddEdildi"),
     );
@@ -219,4 +253,79 @@ export async function bulkAgencies(_previous: ActionState, formData: FormData): 
     if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
     return agency.isVerified === target ? success("") : toggleAgencyVerification(agency.id);
   });
+}
+
+/**
+ * Agentliyin loqosunu paneldən yeniləyir. Fayl agentlik hesabının adına yazılır
+ * (`Media.uploaderId` = agentlik sahibi): kabinet profili loqonu sahibin öz faylı kimi
+ * yoxlayır və əks halda sahibin növbəti profil saxlaması «şəkil sizə aid deyil» xətası verərdi.
+ */
+export async function updateAgencyLogo(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const agencyId = form.text(formData, "agencyId");
+  const logo = logoFromForm(formData);
+  if (!logo || (await checkLogoFile(logo)) !== "ok") {
+    return failure(msg("server.agentlikler.loqoXetasi"), { logo: msg("server.agentlikler.loqoXetasi") });
+  }
+
+  try {
+    const agency = await prisma.agency.findUnique({
+      where: { id: agencyId },
+      select: { id: true, name: true, slug: true, userId: true },
+    });
+    if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+
+    const url = await storeAgencyLogo(agency.userId, logo, agency.name);
+    if (!url) return failure(msg("server.agentlikler.loqoXetasi"));
+
+    await recordAudit(actor, "UPDATE", "Agency", agency.id, `${agency.name} — loqo yeniləndi`);
+    revalidatePath(LIST_PATH);
+    revalidatePublicContent("agency", agency.slug);
+    revalidatePublicContent("property");
+    return success(msg("server.agentlikler.loqoYenilendi"));
+  } catch (error) {
+    return unexpected("agentlik loqosu yenilənmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+export async function removeAgencyLogo(id: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  try {
+    const agency = await prisma.agency.findUnique({
+      where: { id },
+      select: { id: true, name: true, slug: true, userId: true, logoUrl: true },
+    });
+    if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+
+    await prisma.agency.update({ where: { id }, data: { logoUrl: null } });
+    if (agency.logoUrl) {
+      // Loqo hesabın profil şəkli ilə eynidirsə o da təmizlənir — profil saxlananda geri yazılmasın.
+      await prisma.user.updateMany({
+        where: { id: agency.userId, avatarUrl: agency.logoUrl },
+        data: { avatarUrl: null },
+      });
+    }
+
+    await recordAudit(actor, "UPDATE", "Agency", agency.id, `${agency.name} — loqo silindi`);
+    revalidatePath(LIST_PATH);
+    revalidatePublicContent("agency", agency.slug);
+    revalidatePublicContent("property");
+    return success(msg("server.agentlikler.loqoSilindi"));
+  } catch (error) {
+    return unexpected("agentlik loqosu silinmədi", error, msg("server.common.unexpected"));
+  }
 }

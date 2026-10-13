@@ -28,7 +28,7 @@ import {
   buildPropertySearchHref,
   parsePropertySearchParams,
 } from "@/lib/property-search";
-import { LOCATION_KINDS, SORT_OPTIONS, type Locale } from "@/lib/constants";
+import { LOCATION_KINDS, SORT_OPTIONS, isSellerFilter, type Locale } from "@/lib/constants";
 import { cn, formatPrice } from "@/lib/utils";
 import { localizePath } from "@/i18n/path-locale";
 import { Link } from "@/i18n/navigation";
@@ -167,6 +167,8 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     withImagesOnly: searchState.withImagesOnly,
     nearMetro: searchState.nearMetro,
     polygon: parsePolygon(raw.sahe) ?? undefined,
+    // Naməlum dəyər filtr sayılmır — URL-dən gələn sətir allowlist-dən keçir.
+    seller: isSellerFilter(raw.satici) ? raw.satici : undefined,
     featureSlugs: searchState.featureSlugs,
     sort,
     page: searchState.page,
@@ -273,6 +275,10 @@ export default async function PropertiesPage({ params: routeParams, searchParams
       if (key === "sekilli") return t("search.withPhotos");
       if (key === "metro_yaxin") return t("search.nearMetro");
       if (key === "sahe") return t("search.drawnArea");
+      if (key === "satici" && raw.satici) {
+        const labels: Record<string, string> = { OWNER: t("search.sellerOwner"), AGENCY: t("search.sellerAgency"), COMPANY: t("search.sellerCompany") };
+        return labels[raw.satici] ?? fallback;
+      }
       if (key === "siralama") {
         const labels: Record<string, string> = { newest: t("search.sortNewest"), price_asc: t("search.sortPriceAsc"), price_desc: t("search.sortPriceDesc"), area_desc: t("search.sortAreaDesc") };
         return labels[sort] ?? fallback;

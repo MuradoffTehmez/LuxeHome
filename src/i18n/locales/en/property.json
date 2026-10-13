@@ -197,5 +197,14 @@
     "invalid": "Check the name and phone.",
     "unavailable": "This viewing is no longer available.",
     "unexpected": "Something went wrong. Please try again later."
+  },
+  "publisher": {
+    "agency": "Agency",
+    "agent": "Agent",
+    "owner": "Owner",
+    "corporate": "Company",
+    "private": "Private listing",
+    "agencyNamed": "Agency: {name}",
+    "verified": "Verified agency"
   }
 }

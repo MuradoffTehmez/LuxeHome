@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AgencyMembershipCard, type AgentMembership } from "./agency-membership";
+import { getAgencyDirectory } from "@/lib/queries";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAccount } from "@/lib/auth/guard";
@@ -31,7 +33,8 @@ export default async function CabinetProfilePage() {
   const isAgency = user.accountType === ACCOUNT_TYPES.AGENCY;
   const requirements = profileRequirements(user.accountType);
 
-  const [profile, agency, agent, listingCount] = await Promise.all([
+  const isAgent = user.accountType === ACCOUNT_TYPES.AGENT;
+  const [profile, agency, agent, listingCount, membership, agencyDirectory] = await Promise.all([
     prisma.user.findUniqueOrThrow({
       where: { id: user.id },
       select: {
@@ -63,6 +66,15 @@ export default async function CabinetProfilePage() {
         })
       : null,
     prisma.property.count({ where: { authorId: user.id, deletedAt: null } }),
+    // Agentin agentlik üzvlüyü: aktiv (gözləyən/təsdiqlənmiş) qeyd, yoxdursa son rədd edilən.
+    isAgent
+      ? prisma.agencyEmployee.findFirst({
+          where: { userId: user.id },
+          orderBy: [{ approvedAt: { sort: "desc", nulls: "last" } }, { invitedAt: "desc" }],
+          select: { id: true, status: true, agency: { select: { name: true } } },
+        })
+      : null,
+    isAgent ? getAgencyDirectory() : [],
   ]);
 
   // Köhnə hesablarda ad/soyad ayrıca yazılmayıb — tək addan bölünür.
@@ -155,6 +167,23 @@ export default async function CabinetProfilePage() {
           }}
         />
       </section>
+
+      {isAgent && (
+        <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+          <h2 className="font-display text-lg text-ink">{t("agencySection")}</h2>
+          <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">{t("agencySectionDescription")}</p>
+          <AgencyMembershipCard
+            membership={membership
+              ? {
+                  id: membership.id,
+                  status: membership.status as AgentMembership["status"],
+                  agencyName: membership.agency.name,
+                }
+              : null}
+            agencies={agencyDirectory}
+          />
+        </section>
+      )}
 
       {isSmsConfigured() ? (
         <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">

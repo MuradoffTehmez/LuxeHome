@@ -503,6 +503,10 @@ export const NOTIFICATION_TYPES = {
   LISTING_EXPIRY: "LISTING_EXPIRY",
   /** Premium paketin aktivləşməsi (#109). */
   PACKAGE: "PACKAGE",
+  /** Agentlik komandası: qoşulma sorğusu və onun nəticəsi. */
+  AGENCY_TEAM: "AGENCY_TEAM",
+  /** Elan sahibinə gələn müraciət. */
+  LISTING_LEAD: "LISTING_LEAD",
 } as const;
 
 export type NotificationType =
@@ -516,6 +520,8 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   MEETING_REMINDER: "Görüş xatırlatması",
   LISTING_EXPIRY: "Elan müddəti",
   PACKAGE: "Premium paket",
+  AGENCY_TEAM: "Agentlik komandası",
+  LISTING_LEAD: "Elana müraciət",
 };
 
 // ---------------------------------------------------------------------------
@@ -1057,8 +1063,43 @@ export const AGENCY_EMPLOYEE_STATUS_LABELS: Record<AgencyEmployeeStatus, string>
   REJECTED: "Rədd edildi",
 };
 
-/** Sahibdən əlavə maksimum əməkdaş sayı — PRD Phase 1 tələbi. */
-export const MAX_AGENCY_EMPLOYEES = 3;
+/** Sahibdən əlavə maksimum əməkdaş sayı. PRD-dəki 3 nəfər real agentliklər üçün az idi — 13.10.2026-da sahibin qərarı ilə 50-yə qaldırıldı. */
+export const MAX_AGENCY_EMPLOYEES = 50;
+
+/**
+ * Elan siyahısında «Satıcı» filtri (`?satici=`): mülkiyyətçi (birbaşa satıcı),
+ * agentlik/agent (vasitəçi) və şirkətin öz portfeli. Dəyər URL-də sabit kimi gedir.
+ */
+export const SELLER_FILTERS = {
+  OWNER: "OWNER",
+  AGENCY: "AGENCY",
+  COMPANY: "COMPANY",
+} as const;
+
+export type SellerFilter = (typeof SELLER_FILTERS)[keyof typeof SELLER_FILTERS];
+
+export function isSellerFilter(value: unknown): value is SellerFilter {
+  return typeof value === "string" && (Object.values(SELLER_FILTERS) as string[]).includes(value);
+}
+
+/**
+ * Komanda qeydinin mənbəyi: sahibin dəvəti (`INVITE`, admin təsdiqləyir) və ya
+ * agentin qeydiyyatda göndərdiyi qoşulma sorğusu (`REQUEST`, sahib təsdiqləyir).
+ */
+export const AGENCY_EMPLOYEE_SOURCES = {
+  INVITE: "INVITE",
+  REQUEST: "REQUEST",
+} as const;
+
+export type AgencyEmployeeSource =
+  (typeof AGENCY_EMPLOYEE_SOURCES)[keyof typeof AGENCY_EMPLOYEE_SOURCES];
+
+/**
+ * Bir agentliyə eyni anda gözləyən qoşulma sorğularının həddi. Sorğu yer tutmur
+ * (limit təsdiqdə yoxlanılır), ona görə kənar şəxs sorğu yağdırıb sahibin
+ * siyahısını doldurmasın deyə ayrıca hədd var.
+ */
+export const MAX_PENDING_AGENCY_REQUESTS = 20;
 
 // ---------------------------------------------------------------------------
 // TƏRƏFDAŞLAR (PARTNERS)

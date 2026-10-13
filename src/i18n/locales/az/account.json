@@ -217,7 +217,14 @@
       "pending": "Təsdiq gözləyir",
       "approved": "Təsdiqlənib",
       "rejected": "Rədd edilib"
-    }
+    },
+    "requests": "Qoşulma sorğuları",
+    "requestsDescription": "Qeydiyyat zamanı agentliyinizi seçən agentlər. Təsdiqləsəniz, onların elanlarında agentliyinizin adı görünəcək.",
+    "approve": "Təsdiqlə",
+    "reject": "Rədd et",
+    "approveLabel": "{name} sorğusunu təsdiqlə",
+    "rejectLabel": "{name} sorğusunu rədd et",
+    "requestSource": "Qoşulma sorğusu"
   },
   "actions": {
     "genericCredentials": "E-poçt və ya parol yanlışdır.",
@@ -289,7 +296,20 @@
     "underage": "Qeydiyyat üçün ən azı 18 yaşınız olmalıdır.",
     "companyNameRequired": "Şirkətin adını yazın.",
     "invalidTaxId": "VÖEN 10 rəqəmdən ibarət olmalıdır.",
-    "avatarOwnership": "Profil şəkli yalnız öz yüklədiyiniz fayl ola bilər."
+    "avatarOwnership": "Profil şəkli yalnız öz yüklədiyiniz fayl ola bilər.",
+    "agencyNotFound": "Seçilmiş agentlik tapılmadı. Siyahıdan seçin və ya sahəni boş saxlayın.",
+    "agencyRequestsFull": "Bu agentliyin çoxlu gözləyən sorğusu var. Qeydiyyatı agentliksiz tamamlayın və agentliyə müraciət edin.",
+    "logoInvalid": "Loqo JPEG, PNG, WebP və ya AVIF formatında olmalıdır.",
+    "logoTooLarge": "Loqo 2 MB-dan böyük olmamalıdır.",
+    "requestApproved": "Sorğu təsdiqləndi. Agentin elanlarında agentliyinizin adı görünəcək.",
+    "requestRejected": "Sorğu rədd edildi.",
+    "requestNotFound": "Sorğu tapılmadı və ya artıq baxılıb.",
+    "agentOnly": "Bu funksiya yalnız agent hesabları üçündür.",
+    "agencyAlreadyMember": "Artıq agentliyə qoşulmusunuz və ya sorğunuz gözləyir.",
+    "agencyRequestSent": "Sorğu «{name}» agentliyinə göndərildi. Təsdiqləndikdə bildiriş alacaqsınız.",
+    "agencyLeft": "Agentlikdən çıxdınız.",
+    "agencyRequestCancelled": "Sorğu ləğv edildi.",
+    "employeeOtherAgency": "Bu şəxs artıq başqa agentliyin əməkdaşıdır və ya agentlik hesabıdır."
   },
   "profile": {
     "metaTitle": "Profil",
@@ -348,7 +368,18 @@
     "verified": "Təsdiqlənib",
     "pending": "Təsdiq gözləyir",
     "memberSince": "{date} tarixindən üzv",
-    "listingsCount": "{count} elan"
+    "listingsCount": "{count} elan",
+    "logo": "Agentliyin loqosu",
+    "logoHint": "Elan kartlarında və agentlik səhifəsində göstərilir. Kvadrat loqo ən yaxşı görünür.",
+    "agencySection": "Agentliyim",
+    "agencySectionDescription": "Agentliyin təsdiqlənmiş əməkdaşı olanda elanlarınızda agentliyin adı və loqosu görünür.",
+    "agencyPending": "Təsdiq gözləyir",
+    "agencyApproved": "Əməkdaşsınız",
+    "agencyRejected": "Sorğu rədd edilib",
+    "agencyRequest": "Sorğu göndər",
+    "agencyCancel": "Sorğunu ləğv et",
+    "agencyLeave": "Agentlikdən çıx",
+    "agencyLeaveDescription": "«{name}» ilə əlaqə kəsiləcək. Yenidən qoşulmaq üçün yeni sorğu lazımdır."
   },
   "savedSearches": {
     "metaTitle": "Saxlanmış axtarışlarım",
@@ -521,5 +552,17 @@
     "sendFailed": "SMS göndərilmədi. Bir az sonra yenidən cəhd edin.",
     "invalidCode": "Kod yanlışdır.",
     "expiredCode": "Kodun vaxtı bitib və ya cəhd limiti dolub. Yeni kod istəyin."
+  },
+  "leads": {
+    "metaTitle": "Müraciətlər",
+    "metaDescription": "Elanlarınıza gələn müraciətlər.",
+    "eyebrow": "Kabinet",
+    "title": "Elanlarıma gələn müraciətlər",
+    "description": "Ziyarətçilərin elan səhifəsindən göndərdiyi müraciətlər. Tez cavab vermək alıcının etibarını artırır.",
+    "empty": "Hələ müraciət yoxdur",
+    "emptyDescription": "Elan səhifəsindən göndərilən müraciətlər burada görünəcək.",
+    "listing": "Elan: {title}",
+    "call": "Zəng et",
+    "reply": "Cavab yaz"
   }
 }

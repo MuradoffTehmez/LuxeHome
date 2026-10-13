@@ -1,14 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const database = vi.hoisted(() => ({ leadCreate: vi.fn() }));
-const effects = vi.hoisted(() => ({ sendEmail: vi.fn(), telegram: vi.fn() }));
+const database = vi.hoisted(() => ({ leadCreate: vi.fn(), propertyFindFirst: vi.fn() }));
+const effects = vi.hoisted(() => ({ sendEmail: vi.fn(), telegram: vi.fn(), listerNotice: vi.fn() }));
 const guard = vi.hoisted(() => ({
   requestHeaders: new Headers(),
   contactLimitOk: true,
 }));
 
 vi.mock("@/lib/prisma", () => ({
-  prisma: { lead: { create: database.leadCreate } },
+  prisma: { lead: { create: database.leadCreate }, property: { findFirst: database.propertyFindFirst } },
+}));
+vi.mock("@/lib/accounts/account-notices", () => ({
+  noticeListingLead: effects.listerNotice,
 }));
 vi.mock("@/lib/email", () => ({
   sendLeadNotificationEmail: effects.sendEmail,
@@ -178,5 +181,65 @@ describe("əlaqə forması — spam qapısı", () => {
 
     expect(result.success).toBe(true);
     expect(database.leadCreate).toHaveBeenCalledOnce();
+  });
+});
+
+describe("əlaqə forması — elan müraciəti", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    guard.requestHeaders = new Headers();
+    guard.contactLimitOk = true;
+    database.leadCreate.mockImplementation(async ({ data }) => ({ id: "lead-1", ...data }));
+  });
+
+  it("sahibin elanına gələn müraciəti elana bağlayır və ofisə deyil, sahibə göndərir", async () => {
+    database.propertyFindFirst.mockResolvedValue({
+      id: "prop-1",
+      title: "Yasamalda 3 otaqlı mənzil",
+      authorId: "owner-1",
+      author: { accountType: "OWNER", isActive: true },
+    });
+    const formData = validFormData();
+    formData.set("propertyId", "prop-1");
+
+    await expect(submitContactForm({ success: false }, formData)).resolves.toEqual({ success: true });
+
+    expect(database.leadCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ propertyId: "prop-1", source: "PROPERTY" }),
+    });
+    expect(effects.listerNotice).toHaveBeenCalledWith(expect.objectContaining({ userId: "owner-1", leadId: "lead-1" }));
+    expect(effects.sendEmail).not.toHaveBeenCalled();
+    expect(effects.telegram).not.toHaveBeenCalled();
+  });
+
+  it("şirkət elanına gələn müraciət ofisə gedir və elana bağlanır", async () => {
+    database.propertyFindFirst.mockResolvedValue({
+      id: "prop-2",
+      title: "Villa",
+      authorId: "staff-1",
+      author: { accountType: "STAFF", isActive: true },
+    });
+    const formData = validFormData();
+    formData.set("propertyId", "prop-2");
+
+    await submitContactForm({ success: false }, formData);
+
+    expect(database.leadCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ propertyId: "prop-2", source: "PROPERTY" }),
+    });
+    expect(effects.listerNotice).not.toHaveBeenCalled();
+    expect(effects.telegram).toHaveBeenCalled();
+  });
+
+  it("ictimai olmayan elan id-sini nəzərə almır", async () => {
+    database.propertyFindFirst.mockResolvedValue(null);
+    const formData = validFormData();
+    formData.set("propertyId", "gizli-elan");
+
+    await submitContactForm({ success: false }, formData);
+
+    expect(database.leadCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ propertyId: null, source: "CONTACT" }),
+    });
   });
 });

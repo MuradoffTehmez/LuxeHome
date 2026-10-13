@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
+  SELLER_FILTERS,
   ADMIN_PAGE_SIZE,
   AGENCY_EMPLOYEE_STATUSES,
   DEFAULT_LOCALE,
@@ -42,10 +43,34 @@ import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo
 import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
 import { landingCanBeIndexed } from "@/lib/serp";
 import { parseJsonArray } from "@/lib/utils";
+import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 
 // ---------------------------------------------------------------------------
 // SEÇİM (SELECT) TƏRİFLƏRİ — kart və detal görünüşləri üçün
 // ---------------------------------------------------------------------------
+
+/** Elanı yerləşdirənin agentliyi — kart və detal eyni sahə dəstini işlədir. */
+const publisherAgencySelect = { name: true, slug: true, logoUrl: true, isVerified: true } as const;
+
+/**
+ * Elanı yerləşdirənin əlaqəsi (`resolveListingPublisher`). Parol, 2FA və s. sahələr
+ * qəsdən seçilmir — nəticə ictimai keşə yazılır.
+ */
+const publisherContactSelect = {
+  accountType: true,
+  isActive: true,
+  name: true,
+  phone: true,
+  email: true,
+  companyName: true,
+  agency: { select: { ...publisherAgencySelect, phone: true } },
+  agencyEmployments: {
+    where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    // Tək valideynli sorğular üçündür (detal, «Nömrəni göstər») — orderBy burada təhlükəsizdir.
+    orderBy: { approvedAt: "desc" },
+    select: { agency: { select: { ...publisherAgencySelect, phone: true } } },
+  },
+} satisfies Prisma.UserSelect;
 
 export const propertyCardSelect = {
   id: true,
@@ -94,6 +119,18 @@ export const propertyCardSelect = {
     orderBy: { changedAt: "desc" },
     take: 1,
     select: { oldPrice: true, newPrice: true, changedAt: true },
+  },
+  // Kartdakı «Agentlik / Mülkiyyətçi» nişanı — əlaqə məlumatı kart sorğusuna düşmür.
+  author: {
+    select: {
+      accountType: true,
+      isActive: true,
+      agency: { select: publisherAgencySelect },
+      agencyEmployments: {
+        where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+        select: { agency: { select: publisherAgencySelect } },
+      },
+    },
   },
 } satisfies Prisma.PropertySelect;
 
@@ -177,6 +214,8 @@ export type PropertyFilters = {
   polygon?: [number, number][];
   mortgageOnly?: boolean;
   installmentOnly?: boolean;
+  /** Satıcı növü (`?satici=`): mülkiyyətçi, agentlik/agent və ya şirkətin portfeli. */
+  seller?: string;
 };
 
 /**
@@ -228,6 +267,37 @@ function andWhere(
   where.AND = [...existing, ...conditions];
 }
 
+/**
+ * Satıcı növü filtri. Qayda `resolveListingPublisher` ilə eynidir: agentliyin
+ * təsdiqlənmiş əməkdaşı hesab növündən asılı olmayaraq vasitəçi sayılır;
+ * korporativ hesab (developer, bank) birbaşa satıcıdır.
+ */
+export function sellerWhere(seller: string | undefined): Prisma.PropertyWhereInput | null {
+  const approvedEmployment = { status: AGENCY_EMPLOYEE_STATUSES.APPROVED };
+  switch (seller) {
+    case SELLER_FILTERS.OWNER:
+      return {
+        author: {
+          isActive: true,
+          accountType: { in: [ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.USER, ACCOUNT_TYPES.CORPORATE] },
+          agencyEmployments: { none: approvedEmployment },
+        },
+      };
+    case SELLER_FILTERS.AGENCY:
+      return {
+        OR: [
+          { author: { isActive: true, accountType: { in: [ACCOUNT_TYPES.AGENCY, ACCOUNT_TYPES.AGENT] } } },
+          { author: { isActive: true, agencyEmployments: { some: approvedEmployment } } },
+        ],
+      };
+    case SELLER_FILTERS.COMPANY:
+      // Deaktiv hesabın elanının əlaqəsi ofisə düşür (`resolveListingPublisher`) — burada da şirkətindir.
+      return { OR: [{ authorId: null }, { author: { accountType: ACCOUNT_TYPES.STAFF } }, { author: { isActive: false } }] };
+    default:
+      return null;
+  }
+}
+
 /** Yalnız oxuma — filtr birləşmə məntiqi unit testlərlə örtülsün deyə ixrac olunur. */
 export async function buildPropertyWhere(
   filters: PropertyFilters,
@@ -248,6 +318,8 @@ export async function buildPropertyWhere(
   if (filters.landmarkSlug) where.landmark = { slug: filters.landmarkSlug };
   if (filters.renovation) where.renovation = filters.renovation;
   if (filters.documentStatus) where.documentStatus = filters.documentStatus;
+  const sellerCondition = sellerWhere(filters.seller);
+  if (sellerCondition) andWhere(where, sellerCondition);
 
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
     where.price = {
@@ -625,7 +697,17 @@ export async function getPropertyBySlug(slug: string) {
           reviews: { where: { status: REVIEW_STATUSES.APPROVED }, orderBy: { createdAt: "desc" }, take: 5 },
         },
       },
+      // Səhifə əlaqəni maskalı göstərir; tam nömrə `getPropertyPublisherContact` ilə kliklə gəlir.
+      author: { select: { ...publisherContactSelect, id: true } },
     },
+  });
+}
+
+/** «Nömrəni göstər» — yalnız ictimai elanın müəllif əlaqəsi. */
+export async function getPropertyPublisherContact(propertyId: string) {
+  return prisma.property.findFirst({
+    where: { ...(await publicPropertyWhere()), id: propertyId },
+    select: { id: true, author: { select: publisherContactSelect } },
   });
 }
 
@@ -926,6 +1008,7 @@ export async function getAdminAgencies() {
           id: true,
           name: true,
           slug: true,
+          logoUrl: true,
           isVerified: true,
           createdAt: true,
         },
@@ -942,13 +1025,40 @@ export async function getAgencyBySlug(slug: string) {
   });
   if (!agency) return null;
 
-  const properties = await prisma.property.findMany({
-    where: { ...(await publicPropertyWhere()), authorId: agency.userId },
-    select: propertyCardSelect,
-    orderBy: { publishedAt: "desc" },
+  // Agentliyin elanları: sahibin və təsdiqlənmiş əməkdaşların elanları birlikdə.
+  const employees = await prisma.agencyEmployee.findMany({
+    where: { agencyId: agency.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    select: { userId: true },
   });
+  const where = {
+    ...(await publicPropertyWhere()),
+    authorId: { in: [agency.userId, ...employees.map((employee) => employee.userId)] },
+  };
+  // `take`-li nested şəkil seçimi 98-dən çox valideyndə D1 sorğusunu ilişdirir (#107) —
+  // siyahı məhdudlaşdırılır, ümumi say ayrıca sayılır.
+  const [properties, propertyCount] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: propertyCardSelect,
+      orderBy: { publishedAt: "desc" },
+      take: AGENCY_PAGE_LISTING_LIMIT,
+    }),
+    prisma.property.count({ where }),
+  ]);
 
-  return { agency, properties };
+  return { agency, properties, propertyCount };
+}
+
+/** Agentlik səhifəsində göstərilən ən çox elan sayı. */
+const AGENCY_PAGE_LISTING_LIMIT = 60;
+
+/** Qeydiyyat forması — agentin qoşula biləcəyi təsdiqlənmiş agentliklər. */
+export async function getAgencyDirectory() {
+  return prisma.agency.findMany({
+    where: { isVerified: true, ...(await demoWhere()), user: { isActive: true } },
+    select: { name: true, slug: true },
+    orderBy: { name: "asc" },
+  });
 }
 
 /** Kabinet — sahibin öz agentlik qeydi (komanda idarəetməsi üçün). */
@@ -967,9 +1077,10 @@ export async function getAgencyEmployees(agencyId: string) {
       id: true,
       role: true,
       status: true,
+      source: true,
       invitedAt: true,
       approvedAt: true,
-      user: { select: { id: true, name: true, email: true } },
+      user: { select: { id: true, name: true, email: true, phone: true } },
     },
     orderBy: { invitedAt: "desc" },
   });
@@ -1108,6 +1219,7 @@ export async function getAdminAgencyEmployeeQueue() {
     select: {
       id: true,
       role: true,
+      source: true,
       invitedAt: true,
       user: { select: { name: true, email: true } },
       agency: { select: { name: true, slug: true } },
@@ -1494,8 +1606,8 @@ export async function getDashboardStats() {
       where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.DRAFT },
     }),
     prisma.project.count({ where: { deletedAt: null, isDemo: false, status: "ONGOING" } }),
-    prisma.lead.count({ where: { status: LEAD_STATUSES.NEW } }),
-    prisma.lead.count(),
+    prisma.lead.count({ where: { ...OFFICE_LEAD_WHERE, status: LEAD_STATUSES.NEW } }),
+    prisma.lead.count({ where: OFFICE_LEAD_WHERE }),
     prisma.blogPost.count({
       where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
     }),
@@ -1544,7 +1656,7 @@ export async function getTopViewedProperties(take = 5) {
 
 /** İdarə paneli — müraciətlərin status üzrə bölgüsü. */
 export async function getLeadStatusBreakdown() {
-  const rows = await prisma.lead.groupBy({ by: ["status"], _count: { _all: true } });
+  const rows = await prisma.lead.groupBy({ by: ["status"], where: OFFICE_LEAD_WHERE, _count: { _all: true } });
   return rows.map((row) => ({ status: row.status, count: row._count._all }));
 }
 
@@ -1735,6 +1847,7 @@ export async function getRecentAdminProperties(take = 5) {
 
 export async function getRecentAdminLeads(take = 5) {
   return prisma.lead.findMany({
+    where: OFFICE_LEAD_WHERE,
     select: {
       id: true,
       name: true,
@@ -3339,4 +3452,40 @@ export async function getPartnerExpiryAlerts(withinDays: number, now: Date = new
     orderBy: { partnershipEndDate: "asc" },
     take: 10,
   });
+}
+
+/**
+ * Satıcı səhifəsi (`/satici/<id>`) — ictimai hesabın bütün aktiv elanları.
+ * Əməkdaş (STAFF) və deaktiv hesab üçün null: şirkət elanlarının öz siyahısı var.
+ */
+export async function getSellerProfile(userId: string) {
+  const seller = await prisma.user.findFirst({
+    where: { id: userId, isActive: true, accountType: { in: PUBLIC_ACCOUNT_TYPES } },
+    select: {
+      id: true,
+      name: true,
+      companyName: true,
+      accountType: true,
+      isActive: true,
+      createdAt: true,
+      agency: { select: publisherAgencySelect },
+      agencyEmployments: {
+        where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+        select: { agency: { select: publisherAgencySelect } },
+      },
+    },
+  });
+  if (!seller) return null;
+
+  const where = { ...(await publicPropertyWhere()), authorId: seller.id };
+  const [properties, propertyCount] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: propertyCardSelect,
+      orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
+      take: AGENCY_PAGE_LISTING_LIMIT,
+    }),
+    prisma.property.count({ where }),
+  ]);
+  return { seller, properties, propertyCount };
 }

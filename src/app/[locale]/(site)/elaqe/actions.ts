@@ -13,6 +13,8 @@ import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { readLeadAttribution } from "@/lib/lead-attribution";
 import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
 import { SYSTEM_READ_ONLY_MESSAGE, isSystemWriteBlocked } from "@/lib/system-mode";
+import { resolveLeadProperty } from "@/lib/accounts/listing-leads";
+import { noticeListingLead } from "@/lib/accounts/account-notices";
 
 async function contactSchema() {
   let nameMin = "Ad ən azı 2 simvol olmalıdır";
@@ -129,19 +131,38 @@ export async function submitContactForm(
   }
 
   try {
+    // Elan səhifəsindən gələn müraciət elana bağlanır; id yalnız ictimai elana uyğun gəlsə qəbul olunur.
+    const rawPropertyId = formData.get("propertyId");
+    const property = typeof rawPropertyId === "string" ? await resolveLeadProperty(rawPropertyId) : null;
+
     const lead = await prisma.lead.create({
       data: {
         name: result.data.name,
         phone: result.data.phone,
         email: result.data.email || null,
-        subject: result.data.subject || null,
+        subject: result.data.subject || property?.title || null,
         message: result.data.message,
         // Forma yalnız iki mənbə daşıya bilər — client-in göndərdiyi dəyər allowlist-dən keçir.
-        source: formData.get("source") === LEAD_SOURCES.OWNER ? LEAD_SOURCES.OWNER : LEAD_SOURCES.CONTACT,
+        source: property
+          ? LEAD_SOURCES.PROPERTY
+          : formData.get("source") === LEAD_SOURCES.OWNER ? LEAD_SOURCES.OWNER : LEAD_SOURCES.CONTACT,
+        propertyId: property?.id ?? null,
         status: LEAD_STATUSES.NEW,
         ...readLeadAttribution(formData),
       },
     });
+
+    // İctimai hesabın elanı: müraciət sahibinə gedir (kabinet + e-poçt). Ofis kanallarına
+    // göndərilmir — ofis bu elanın tərəfi deyil, ziyarətçinin məlumatı lazımsız yayılmasın.
+    if (property?.listerId) {
+      await noticeListingLead({
+        userId: property.listerId,
+        leadId: lead.id,
+        propertyTitle: property.title,
+        visitorName: lead.name,
+      });
+      return { success: true };
+    }
 
     // Resend vasitəsilə bildiriş göndər
     try {

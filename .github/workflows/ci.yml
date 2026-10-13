@@ -61,9 +61,10 @@ jobs:
 
       # Yüksək və kritik zəifliklər build-i saxlayır. Aşağı/orta səviyyələr qəsdən
       # buraxılır: tranzitiv asılılıqlarda onlar tez-tez görünür və hər dəfə yayımı
-      # dayandırsaydı, qapı çox keçmədən söndürülərdi.
+      # dayandırsaydı, qapı çox keçmədən söndürülərdi. Yamağı olmayan advisory yalnız
+      # `audit-allowlist.json`-da səbəb və bitmə tarixi ilə buraxılır (scripts/audit-gate.mjs).
       - name: Audit dependencies
-        run: npm audit --audit-level=high
+        run: npm run audit:gate
 
       - name: Run unit tests
         run: npm run test

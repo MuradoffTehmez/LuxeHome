@@ -217,7 +217,14 @@
       "pending": "Pending approval",
       "approved": "Approved",
       "rejected": "Rejected"
-    }
+    },
+    "requests": "Join requests",
+    "requestsDescription": "Agents who selected your agency when registering. Once approved, your agency name appears on their listings.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveLabel": "Approve the request from {name}",
+    "rejectLabel": "Reject the request from {name}",
+    "requestSource": "Join request"
   },
   "actions": {
     "genericCredentials": "The email or password is incorrect.",
@@ -289,7 +296,20 @@
     "underage": "You must be at least 18 to register.",
     "companyNameRequired": "Enter the company name.",
     "invalidTaxId": "The tax ID must be 10 digits.",
-    "avatarOwnership": "The profile photo must be a file you uploaded."
+    "avatarOwnership": "The profile photo must be a file you uploaded.",
+    "agencyNotFound": "The selected agency was not found. Choose it from the list or leave the field empty.",
+    "agencyRequestsFull": "This agency has too many pending requests. Complete registration without an agency and contact the agency.",
+    "logoInvalid": "The logo must be a JPEG, PNG, WebP or AVIF image.",
+    "logoTooLarge": "The logo must not exceed 2 MB.",
+    "requestApproved": "Request approved. Your agency name will appear on the agent's listings.",
+    "requestRejected": "Request rejected.",
+    "requestNotFound": "The request was not found or has already been reviewed.",
+    "agentOnly": "This feature is available to agent accounts only.",
+    "agencyAlreadyMember": "You have already joined an agency or have a pending request.",
+    "agencyRequestSent": "Your request was sent to “{name}”. You will be notified once it is approved.",
+    "agencyLeft": "You have left the agency.",
+    "agencyRequestCancelled": "Request cancelled.",
+    "employeeOtherAgency": "This person already works for another agency or is an agency account."
   },
   "profile": {
     "metaTitle": "Profile",
@@ -348,7 +368,18 @@
     "verified": "Verified",
     "pending": "Awaiting verification",
     "memberSince": "Member since {date}",
-    "listingsCount": "{count} listings"
+    "listingsCount": "{count} listings",
+    "logo": "Agency logo",
+    "logoHint": "Shown on listing cards and the agency page. A square logo looks best.",
+    "agencySection": "My agency",
+    "agencySectionDescription": "Once you are an approved team member, your listings show the agency name and logo.",
+    "agencyPending": "Pending approval",
+    "agencyApproved": "Team member",
+    "agencyRejected": "Request rejected",
+    "agencyRequest": "Send request",
+    "agencyCancel": "Cancel request",
+    "agencyLeave": "Leave agency",
+    "agencyLeaveDescription": "You will be disconnected from “{name}”. Rejoining requires a new request."
   },
   "savedSearches": {
     "metaTitle": "My saved searches",
@@ -521,5 +552,17 @@
     "sendFailed": "The SMS could not be sent. Please try again shortly.",
     "invalidCode": "The code is incorrect.",
     "expiredCode": "The code has expired or the attempt limit was reached. Request a new code."
+  },
+  "leads": {
+    "metaTitle": "Enquiries",
+    "metaDescription": "Enquiries about your listings.",
+    "eyebrow": "Account",
+    "title": "Enquiries about my listings",
+    "description": "Messages visitors sent from your listing pages. Replying quickly builds buyer trust.",
+    "empty": "No enquiries yet",
+    "emptyDescription": "Enquiries sent from your listing pages will appear here.",
+    "listing": "Listing: {title}",
+    "call": "Call",
+    "reply": "Reply"
   }
 }

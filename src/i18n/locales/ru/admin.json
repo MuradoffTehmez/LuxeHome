@@ -303,7 +303,9 @@
       "RECOMMENDATION": "Персональная рекомендация",
       "MEETING_REMINDER": "Напоминание о просмотре",
       "LISTING_EXPIRY": "Срок объявления",
-      "PACKAGE": "Премиум-пакет"
+      "PACKAGE": "Премиум-пакет",
+      "AGENCY_TEAM": "Команда агентства",
+      "LISTING_LEAD": "Заявка по объявлению"
     },
     "partnershipType": {
       "BROKER": "Брокер",
@@ -1590,7 +1592,19 @@
       "profilYoxdur": "Профиля нет",
       "tesdiqGozleyir": "Ожидает подтверждения",
       "deaktivHesab": "Неактивный аккаунт",
-      "kohneQeydiyyatYarimciqQalib": "Прежняя регистрация осталась незавершённой. Проверьте публичное название и создайте профиль."
+      "kohneQeydiyyatYarimciqQalib": "Прежняя регистрация осталась незавершённой. Проверьте публичное название и создайте профиль.",
+      "loqo": "Логотип",
+      "loqoIpucu": "Показывается на карточках и странице агентства. Лучше всего смотрится квадратный логотип.",
+      "loqoSec": "Выбрать логотип",
+      "loqoDeyis": "Изменить",
+      "loqoLegv": "Отмена",
+      "loqoYaddaSaxla": "Сохранить логотип",
+      "loqoSil": "Удалить логотип",
+      "loqoSilTesvir": "Логотип агентства {p0} будет удалён.",
+      "loqoSehv": "Выберите изображение JPEG, PNG, WebP или AVIF.",
+      "loqoBoyuk": "Логотип слишком большой.",
+      "qosulmaSorgusu": "Запрос на присоединение",
+      "devet": "Приглашение"
     },
     "amenities": {
       "analitikaniYaddaSaxla": "Сохранить аналитику",
@@ -2716,7 +2730,12 @@
       "devetTapilmadi": "Приглашение не найдено.",
       "buDevetArtiqNezerdenKecirilib": "Это приглашение уже рассмотрено.",
       "emekdasTesdiqlendi": "Сотрудник одобрен.",
-      "devetReddEdildi": "Приглашение отклонено."
+      "devetReddEdildi": "Приглашение отклонено.",
+      "emekdasLimiti": "Агентство достигло лимита подтверждённых сотрудников ({count}).",
+      "loqoYenilendi": "Логотип агентства обновлён.",
+      "loqoSilindi": "Логотип агентства удалён.",
+      "loqoXetasi": "Не удалось загрузить логотип: JPEG, PNG, WebP или AVIF, до 2 МБ.",
+      "basqaAgentlikdedir": "Этот человек уже является подтверждённым сотрудником другого агентства."
     },
     "aiKomekci": {
       "workersAiCavabVerdiAmma": "Workers AI ответил, но ответ не соответствует схеме проверки.",
