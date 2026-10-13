@@ -172,8 +172,12 @@ Asılılıq auditi bu beşliyə daxil deyil — o, kod keyfiyyətini deyil, üç
 paketlərini yoxlayır və CI-də `Quality gate` job-unun ayrıca addımı kimi işləyir:
 
 ```bash
-npm audit --audit-level=high
+npm run audit:gate   # npm audit --audit-level=high + audit-allowlist.json istisnaları
 ```
+
+Yamağı hələ olmayan high/critical advisory yalnız `audit-allowlist.json`-a səbəb və
+**bitmə tarixi** ilə yazılaraq buraxıla bilər; müddət bitəndə qapı yenidən yıxılır və
+istisna təzədən qiymətləndirilir. `--omit=dev` işlətmə — bütün dev asılılıqlarını gizlədər.
 
 `package.json` və ya `package-lock.json`-a toxunmusunuzsa, onu da lokalda işlədin.
 Yalnız kod dəyişikliyində nəticə dəyişmir.

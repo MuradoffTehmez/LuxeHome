@@ -66,9 +66,10 @@ Keyfiyyət qapısı: `npm run test` + `npm run typecheck` + `npm run lint` + `np
 `npm run build` — dəyişiklikdən sonra beşi də işlədilməlidir. Testlər `@cloudflare/vitest-plugin` vasitəsilə
 workerd runtime-ında (domen qatı) və Node layihəsində (SSR komponentləri) işləyir.
 
-Bu beşlikdən **ayrı** olaraq CI `npm audit --audit-level=high` işlədir. O, kod keyfiyyətini
-deyil, asılılıqları yoxlayır, ona görə lokalda yalnız `package.json`/`package-lock.json`
-dəyişdikdə işlətmək lazımdır.
+Bu beşlikdən **ayrı** olaraq CI `npm run audit:gate` işlədir (`npm audit --audit-level=high` +
+`audit-allowlist.json`). O, kod keyfiyyətini deyil, asılılıqları yoxlayır, ona görə lokalda yalnız
+`package.json`/`package-lock.json` dəyişdikdə işlətmək lazımdır. Yamağı olmayan advisory yalnız
+səbəb və bitmə tarixi ilə istisnaya yazılır; müddət bitəndə qapı yenidən yıxılır.
 
 `.github/dependabot.yml` üç major-u upstream uyğunsuzluğuna görə `versions` ilə saxlayır:
 `typescript >=7` (typescript-eslint TS `<6.1` tələb edir), `eslint >=10` (`eslint-plugin-react`
