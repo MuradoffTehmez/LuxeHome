@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { LEAD_STATUSES, type LeadStatus } from "@/lib/constants";
+import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 
 /**
  * Müraciətlər lövhəsi (#105) — status sütunları və SLA xəbərdarlıqları.
@@ -57,6 +58,7 @@ export async function getLeadBoard(options: { assigneeId?: string } = {}) {
   const columns = await Promise.all(
     BOARD_COLUMNS.map(async (status) => {
       const where = {
+        ...OFFICE_LEAD_WHERE,
         status,
         ...(options.assigneeId ? { assigneeId: options.assigneeId } : {}),
         ...(status === LEAD_STATUSES.CLOSED || status === LEAD_STATUSES.COMPLETED ? { updatedAt: { gte: closedSince } } : {}),

@@ -42,6 +42,7 @@ import { MIN_INDEXABLE_LISTINGS, SEO_LANDINGS, type SeoLanding } from "@/lib/seo
 import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
 import { landingCanBeIndexed } from "@/lib/serp";
 import { parseJsonArray } from "@/lib/utils";
+import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 
 // ---------------------------------------------------------------------------
 // SEÇİM (SELECT) TƏRİFLƏRİ — kart və detal görünüşləri üçün
@@ -1565,8 +1566,8 @@ export async function getDashboardStats() {
       where: { deletedAt: null, isDemo: false, status: PROPERTY_STATUSES.DRAFT },
     }),
     prisma.project.count({ where: { deletedAt: null, isDemo: false, status: "ONGOING" } }),
-    prisma.lead.count({ where: { status: LEAD_STATUSES.NEW } }),
-    prisma.lead.count(),
+    prisma.lead.count({ where: { ...OFFICE_LEAD_WHERE, status: LEAD_STATUSES.NEW } }),
+    prisma.lead.count({ where: OFFICE_LEAD_WHERE }),
     prisma.blogPost.count({
       where: { deletedAt: null, isDemo: false, status: POST_STATUSES.PUBLISHED },
     }),
@@ -1615,7 +1616,7 @@ export async function getTopViewedProperties(take = 5) {
 
 /** İdarə paneli — müraciətlərin status üzrə bölgüsü. */
 export async function getLeadStatusBreakdown() {
-  const rows = await prisma.lead.groupBy({ by: ["status"], _count: { _all: true } });
+  const rows = await prisma.lead.groupBy({ by: ["status"], where: OFFICE_LEAD_WHERE, _count: { _all: true } });
   return rows.map((row) => ({ status: row.status, count: row._count._all }));
 }
 
@@ -1806,6 +1807,7 @@ export async function getRecentAdminProperties(take = 5) {
 
 export async function getRecentAdminLeads(take = 5) {
   return prisma.lead.findMany({
+    where: OFFICE_LEAD_WHERE,
     select: {
       id: true,
       name: true,

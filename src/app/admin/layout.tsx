@@ -9,6 +9,7 @@ import { requireStaff } from "@/lib/auth/guard";
 import { getAdminI18n, getAdminMetadataT } from "@/lib/admin-i18n";
 import { prisma } from "@/lib/prisma";
 import { LEAD_STATUSES, PROPERTY_STATUSES } from "@/lib/constants";
+import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminMetadataT();
@@ -53,7 +54,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   const [newLeads, draftProperties, pendingModeration] = await Promise.all([
-    prisma.lead.count({ where: { status: LEAD_STATUSES.NEW } }),
+    prisma.lead.count({ where: { ...OFFICE_LEAD_WHERE, status: LEAD_STATUSES.NEW } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.DRAFT, deletedAt: null } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.PENDING, deletedAt: null } }),
   ]);

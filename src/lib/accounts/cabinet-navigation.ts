@@ -3,6 +3,7 @@ export type CabinetNavItem = {
     | "overview"
     | "listings"
     | "new-listing"
+    | "leads"
     | "packages"
     | "team"
     | "saved-searches"
@@ -23,6 +24,7 @@ const BASE_ITEMS: readonly CabinetNavItem[] = [
 const LISTING_ITEMS: readonly CabinetNavItem[] = [
   { id: "listings", href: "/kabinet/elanlar", label: "Elanlarım" },
   { id: "new-listing", href: "/kabinet/elanlar/yeni", label: "Yeni elan" },
+  { id: "leads", href: "/kabinet/muracietler", label: "Müraciətlər" },
   { id: "packages", href: "/kabinet/paketler", label: "Premium paketlər" },
 ];
 
@@ -55,6 +57,7 @@ export type CabinetCrumb = {
     | "listings"
     | "newListing"
     | "editListing"
+    | "leads"
     | "packages"
     | "team"
     | "savedSearches"
@@ -67,6 +70,7 @@ export type CabinetCrumb = {
 
 const CRUMB_SEGMENTS: Record<string, CabinetCrumb["labelKey"]> = {
   elanlar: "listings",
+  muracietler: "leads",
   paketler: "packages",
   komanda: "team",
   axtarislarim: "savedSearches",
