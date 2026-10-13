@@ -8,6 +8,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { SEARCHABLE_MIN_OPTIONS } from "@/components/ui/field";
 import {
   BUILDING_TYPES,
+  SELLER_FILTERS,
   DOCUMENT_STATUSES,
   LISTING_TYPES,
   PRICE_PERIODS,
@@ -54,6 +55,7 @@ export type SearchPanelInitial = {
   temir?: string;
   sened?: string;
   tikili?: string;
+  satici?: string;
   dovr?: string;
   mertebe_min?: string;
   mertebe_max?: string;
@@ -270,6 +272,11 @@ export function PropertyFilterFields({
   const renovationOptions = Object.values(RENOVATIONS).map((value) => ({ value, label: propertyT(`renovation.${RENOVATION_KEYS[value]}`) }));
   const buildingOptions = Object.values(BUILDING_TYPES).map((value) => ({ value, label: propertyT(`building.${BUILDING_KEYS[value]}`) }));
   const documentOptions = Object.values(DOCUMENT_STATUSES).map((value) => ({ value, label: propertyT(`document.${DOCUMENT_KEYS[value]}`) }));
+  const sellerOptions = [
+    { value: SELLER_FILTERS.OWNER, label: t("sellerOwner") },
+    { value: SELLER_FILTERS.AGENCY, label: t("sellerAgency") },
+    { value: SELLER_FILTERS.COMPANY, label: t("sellerCompany") },
+  ];
   const periodOptions = Object.values(PRICE_PERIODS).map((value) => ({ value, label: value === PRICE_PERIODS.MONTH ? t("monthly") : t("daily") }));
   const [listingType, setListingType] = useState(initial.elan ?? LISTING_TYPES.SALE);
   const [citySlug, setCitySlug] = useState(initial.seher ?? "");
@@ -445,6 +452,14 @@ export function PropertyFilterFields({
             placeholder={t("any")}
             defaultValue={initial.tikili}
             options={buildingOptions}
+          />
+          <SelectField
+            id={`${id}-seller`}
+            name="satici"
+            label={t("seller")}
+            placeholder={t("any")}
+            defaultValue={initial.satici}
+            options={sellerOptions}
           />
           {listingType === LISTING_TYPES.RENT ? (
             <SelectField

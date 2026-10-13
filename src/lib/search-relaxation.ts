@@ -36,6 +36,7 @@ const CHIP_FIELDS: Record<string, FilterField[]> = {
   sekilli: ["withImagesOnly"],
   metro_yaxin: ["nearMetro"],
   sahe: ["polygon"],
+  satici: ["seller"],
 };
 
 const FEATURE_PREFIX = "xususiyyet:";

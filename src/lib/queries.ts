@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
+  SELLER_FILTERS,
   ADMIN_PAGE_SIZE,
   AGENCY_EMPLOYEE_STATUSES,
   DEFAULT_LOCALE,
@@ -209,6 +210,8 @@ export type PropertyFilters = {
   polygon?: [number, number][];
   mortgageOnly?: boolean;
   installmentOnly?: boolean;
+  /** Satıcı növü (`?satici=`): mülkiyyətçi, agentlik/agent və ya şirkətin portfeli. */
+  seller?: string;
 };
 
 /**
@@ -260,6 +263,35 @@ function andWhere(
   where.AND = [...existing, ...conditions];
 }
 
+/**
+ * Satıcı növü filtri. Qayda `resolveListingPublisher` ilə eynidir: agentliyin
+ * təsdiqlənmiş əməkdaşı hesab növündən asılı olmayaraq vasitəçi sayılır;
+ * korporativ hesab (developer, bank) birbaşa satıcıdır.
+ */
+export function sellerWhere(seller: string | undefined): Prisma.PropertyWhereInput | null {
+  const approvedEmployment = { status: AGENCY_EMPLOYEE_STATUSES.APPROVED };
+  switch (seller) {
+    case SELLER_FILTERS.OWNER:
+      return {
+        author: {
+          accountType: { in: [ACCOUNT_TYPES.OWNER, ACCOUNT_TYPES.USER, ACCOUNT_TYPES.CORPORATE] },
+          agencyEmployments: { none: approvedEmployment },
+        },
+      };
+    case SELLER_FILTERS.AGENCY:
+      return {
+        OR: [
+          { author: { accountType: { in: [ACCOUNT_TYPES.AGENCY, ACCOUNT_TYPES.AGENT] } } },
+          { author: { agencyEmployments: { some: approvedEmployment } } },
+        ],
+      };
+    case SELLER_FILTERS.COMPANY:
+      return { OR: [{ authorId: null }, { author: { accountType: ACCOUNT_TYPES.STAFF } }] };
+    default:
+      return null;
+  }
+}
+
 /** Yalnız oxuma — filtr birləşmə məntiqi unit testlərlə örtülsün deyə ixrac olunur. */
 export async function buildPropertyWhere(
   filters: PropertyFilters,
@@ -280,6 +312,8 @@ export async function buildPropertyWhere(
   if (filters.landmarkSlug) where.landmark = { slug: filters.landmarkSlug };
   if (filters.renovation) where.renovation = filters.renovation;
   if (filters.documentStatus) where.documentStatus = filters.documentStatus;
+  const sellerCondition = sellerWhere(filters.seller);
+  if (sellerCondition) andWhere(where, sellerCondition);
 
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
     where.price = {
@@ -3412,4 +3446,39 @@ export async function getPartnerExpiryAlerts(withinDays: number, now: Date = new
     orderBy: { partnershipEndDate: "asc" },
     take: 10,
   });
+}
+
+/**
+ * Satıcı səhifəsi (`/satici/<id>`) — ictimai hesabın bütün aktiv elanları.
+ * Əməkdaş (STAFF) və deaktiv hesab üçün null: şirkət elanlarının öz siyahısı var.
+ */
+export async function getSellerProfile(userId: string) {
+  const seller = await prisma.user.findFirst({
+    where: { id: userId, isActive: true, accountType: { in: PUBLIC_ACCOUNT_TYPES } },
+    select: {
+      id: true,
+      name: true,
+      companyName: true,
+      accountType: true,
+      createdAt: true,
+      agency: { select: publisherAgencySelect },
+      agencyEmployments: {
+        where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+        select: { agency: { select: publisherAgencySelect } },
+      },
+    },
+  });
+  if (!seller) return null;
+
+  const where = { ...(await publicPropertyWhere()), authorId: seller.id };
+  const [properties, propertyCount] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: propertyCardSelect,
+      orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
+      take: AGENCY_PAGE_LISTING_LIMIT,
+    }),
+    prisma.property.count({ where }),
+  ]);
+  return { seller, properties, propertyCount };
 }

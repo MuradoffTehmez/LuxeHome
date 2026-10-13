@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
 import {
   BUILDING_TYPES,
+  SELLER_FILTERS,
   DOCUMENT_STATUSES,
   LISTING_TYPES,
   RENOVATIONS,
@@ -39,6 +40,7 @@ function summarizeFilters(
     renovations: Map<string, string>;
     documents: Map<string, string>;
     buildings: Map<string, string>;
+    sellers: Map<string, string>;
     room: (count: number) => string;
   },
 ): string[] {
@@ -57,6 +59,7 @@ function summarizeFilters(
   if (filters.renovation) parts.push(labels.renovations.get(filters.renovation) ?? filters.renovation);
   if (filters.documentStatus) parts.push(labels.documents.get(filters.documentStatus) ?? filters.documentStatus);
   if (filters.buildingType) parts.push(labels.buildings.get(filters.buildingType) ?? filters.buildingType);
+  if (filters.seller) parts.push(labels.sellers.get(filters.seller) ?? filters.seller);
   if (filters.search) parts.push(`"${filters.search}"`);
 
   return parts;
@@ -79,6 +82,8 @@ function filtersToSearchParams(filters: PropertyFilters): string {
   if (filters.maxArea !== undefined) params.set("sahe_max", String(filters.maxArea));
   if (filters.renovation) params.set("temir", filters.renovation);
   if (filters.documentStatus) params.set("sened", filters.documentStatus);
+  if (filters.buildingType) params.set("tikili", filters.buildingType);
+  if (filters.seller) params.set("satici", filters.seller);
   const query = params.toString();
   return query ? `/emlaklar?${query}` : "/emlaklar";
 }
@@ -145,6 +150,11 @@ export default async function SavedSearchesPage() {
     renovations: new Map(Object.values(RENOVATIONS).map((value) => [value, propertyT(`renovation.${RENOVATION_KEYS[value]}`)])),
     documents: new Map(Object.values(DOCUMENT_STATUSES).map((value) => [value, propertyT(`document.${DOCUMENT_KEYS[value]}`)])),
     buildings: new Map(Object.values(BUILDING_TYPES).map((value) => [value, propertyT(`building.${BUILDING_KEYS[value]}`)])),
+    sellers: new Map([
+      [SELLER_FILTERS.OWNER, searchT("sellerOwner")],
+      [SELLER_FILTERS.AGENCY, searchT("sellerAgency")],
+      [SELLER_FILTERS.COMPANY, searchT("sellerCompany")],
+    ]),
     room: (count: number) => count >= 5 ? searchT("fivePlusRooms") : searchT("roomOption", { count }),
   };
 
