@@ -967,6 +967,7 @@ export async function getAdminAgencies() {
           id: true,
           name: true,
           slug: true,
+          logoUrl: true,
           isVerified: true,
           createdAt: true,
         },
@@ -983,13 +984,40 @@ export async function getAgencyBySlug(slug: string) {
   });
   if (!agency) return null;
 
-  const properties = await prisma.property.findMany({
-    where: { ...(await publicPropertyWhere()), authorId: agency.userId },
-    select: propertyCardSelect,
-    orderBy: { publishedAt: "desc" },
+  // Agentliyin elanları: sahibin və təsdiqlənmiş əməkdaşların elanları birlikdə.
+  const employees = await prisma.agencyEmployee.findMany({
+    where: { agencyId: agency.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    select: { userId: true },
   });
+  const where = {
+    ...(await publicPropertyWhere()),
+    authorId: { in: [agency.userId, ...employees.map((employee) => employee.userId)] },
+  };
+  // `take`-li nested şəkil seçimi 98-dən çox valideyndə D1 sorğusunu ilişdirir (#107) —
+  // siyahı məhdudlaşdırılır, ümumi say ayrıca sayılır.
+  const [properties, propertyCount] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: propertyCardSelect,
+      orderBy: { publishedAt: "desc" },
+      take: AGENCY_PAGE_LISTING_LIMIT,
+    }),
+    prisma.property.count({ where }),
+  ]);
 
-  return { agency, properties };
+  return { agency, properties, propertyCount };
+}
+
+/** Agentlik səhifəsində göstərilən ən çox elan sayı. */
+const AGENCY_PAGE_LISTING_LIMIT = 60;
+
+/** Qeydiyyat forması — agentin qoşula biləcəyi təsdiqlənmiş agentliklər. */
+export async function getAgencyDirectory() {
+  return prisma.agency.findMany({
+    where: { isVerified: true, ...(await demoWhere()), user: { isActive: true } },
+    select: { name: true, slug: true },
+    orderBy: { name: "asc" },
+  });
 }
 
 /** Kabinet — sahibin öz agentlik qeydi (komanda idarəetməsi üçün). */
@@ -1008,9 +1036,10 @@ export async function getAgencyEmployees(agencyId: string) {
       id: true,
       role: true,
       status: true,
+      source: true,
       invitedAt: true,
       approvedAt: true,
-      user: { select: { id: true, name: true, email: true } },
+      user: { select: { id: true, name: true, email: true, phone: true } },
     },
     orderBy: { invitedAt: "desc" },
   });
@@ -1149,6 +1178,7 @@ export async function getAdminAgencyEmployeeQueue() {
     select: {
       id: true,
       role: true,
+      source: true,
       invitedAt: true,
       user: { select: { name: true, email: true } },
       agency: { select: { name: true, slug: true } },

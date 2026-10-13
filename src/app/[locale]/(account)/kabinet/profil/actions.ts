@@ -111,7 +111,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
 
     // Profildəki nömrə təsdiqlənmiş nömrədən fərqlənirsə təsdiq ləğv olunur (#109):
     // telefonla giriş yalnız hazırda göstərilən və SMS ilə sübut olunmuş nömrə ilə işləyir.
-    const current = await prisma.user.findUnique({ where: { id: user.id }, select: { verifiedPhone: true } });
+    const current = await prisma.user.findUnique({ where: { id: user.id }, select: { verifiedPhone: true, avatarUrl: true } });
     const keepsVerifiedPhone = current?.verifiedPhone != null && normalizeAzMobile(data.phone) === current.verifiedPhone;
     await prisma.user.update({
       where: { id: user.id },
@@ -133,7 +133,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
     if (user.accountType === ACCOUNT_TYPES.AGENCY && data.companyName) {
       const existing = await prisma.agency.findUnique({
         where: { userId: user.id },
-        select: { id: true, name: true, slug: true },
+        select: { id: true, name: true, slug: true, logoUrl: true },
       });
 
       // Ad dəyişəndə slug da yenilənir, amma yalnız toqquşma olmayan variantla
@@ -154,11 +154,18 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
         address: data.agencyAddress,
         website: data.companyWebsite,
         phone: data.phone,
-        ...(data.avatarUrl ? { logoUrl: data.avatarUrl } : {}),
+        // Loqo profil şəkli ilə eynidir: şəkil silinəndə agentlikdən də silinir (əvvəl köhnə
+        // loqo qalırdı). Profil şəklindən gəlməyən köhnə loqoya isə toxunulmur.
+        logoUrl: data.avatarUrl
+          ?? (existing?.logoUrl && existing.logoUrl !== current?.avatarUrl ? existing.logoUrl : null),
       };
 
       if (existing) {
         await prisma.agency.update({ where: { id: existing.id }, data: agencyData });
+        // Agentlik adı/loqosu elan kartlarında və agentlik səhifəsində göstərilir.
+        revalidatePublicContent("agency", existing.slug);
+        if (existing.slug !== slug) revalidatePublicContent("agency", slug);
+        revalidatePublicContent("property");
       } else {
         await prisma.agency.create({ data: { ...agencyData, userId: user.id, isVerified: false } });
       }

@@ -2,12 +2,12 @@
 
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertCircle, CheckCircle2, UserX } from "lucide-react";
+import { AlertCircle, Check, CheckCircle2, UserX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
-import { inviteAgencyEmployee, removeAgencyEmployee } from "./actions";
+import { approveAgencyRequest, inviteAgencyEmployee, rejectAgencyRequest, removeAgencyEmployee } from "./actions";
 
 function StateMessage({ state }: { state: ActionState }) {
   if (state.status === "idle" || !state.message) return null;
@@ -70,5 +70,36 @@ export function RemoveEmployeeButton({ id, name }: { id: string; name: string })
     >
       <UserX className="size-4" aria-hidden="true" />
     </ConfirmAction>
+  );
+}
+
+/** Agentin qoşulma sorğusu: sahib təsdiqləyir və ya rədd edir. */
+export function ReviewRequestButtons({ id, name }: { id: string; name: string }) {
+  const t = useTranslations("account.team");
+  return (
+    <div className="flex shrink-0 items-center gap-1">
+      <ConfirmAction
+        action={approveAgencyRequest}
+        id={id}
+        label={t("approveLabel", { name })}
+        title={t("approve")}
+        description={t("approveLabel", { name })}
+        confirmLabel={t("approve")}
+        tone="neutral"
+      >
+        <Check className="size-4" aria-hidden="true" />
+      </ConfirmAction>
+      <ConfirmAction
+        action={rejectAgencyRequest}
+        id={id}
+        label={t("rejectLabel", { name })}
+        title={t("reject")}
+        description={t("rejectLabel", { name })}
+        confirmLabel={t("reject")}
+        tone="danger"
+      >
+        <X className="size-4" aria-hidden="true" />
+      </ConfirmAction>
+    </div>
   );
 }

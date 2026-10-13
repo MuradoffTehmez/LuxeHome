@@ -49,7 +49,7 @@ export default async function AgencyDetailPage({ params }: Props) {
 
   if (!data) notFound();
 
-  const { agency, properties } = data;
+  const { agency, properties, propertyCount } = data;
 
   return (
     <>
@@ -97,7 +97,7 @@ export default async function AgencyDetailPage({ params }: Props) {
           <div className="flex flex-col gap-4 rounded-xl border border-line bg-paper p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="gold">{t("verifiedAgency")}</Badge>
-              <Badge tone="neutral">{t("activeListingCount", { count: properties.length })}</Badge>
+              <Badge tone="neutral">{t("activeListingCount", { count: propertyCount })}</Badge>
             </div>
               <div className="flex min-w-0 flex-col gap-1 text-sm text-ink-soft sm:flex-row sm:flex-wrap sm:gap-x-6">
                 {agency.phone && (
