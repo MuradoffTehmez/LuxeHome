@@ -303,7 +303,9 @@
       "RECOMMENDATION": "Fərdi tövsiyə",
       "MEETING_REMINDER": "Görüş xatırlatması",
       "LISTING_EXPIRY": "Elan müddəti",
-      "PACKAGE": "Premium paket"
+      "PACKAGE": "Premium paket",
+      "AGENCY_TEAM": "Agentlik komandası",
+      "LISTING_LEAD": "Elana müraciət"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -1590,7 +1592,19 @@
       "profilYoxdur": "Profil yoxdur",
       "tesdiqGozleyir": "Təsdiq gözləyir",
       "deaktivHesab": "Deaktiv hesab",
-      "kohneQeydiyyatYarimciqQalib": "Köhnə qeydiyyat yarımçıq qalıb. İctimai adı yoxlayıb profil yaradın; sonra təsdiq düyməsi açılacaq."
+      "kohneQeydiyyatYarimciqQalib": "Köhnə qeydiyyat yarımçıq qalıb. İctimai adı yoxlayıb profil yaradın; sonra təsdiq düyməsi açılacaq.",
+      "loqo": "Loqo",
+      "loqoIpucu": "Kartlarda və agentlik səhifəsində görünür. Kvadrat loqo ən yaxşı görünür.",
+      "loqoSec": "Loqo seçin",
+      "loqoDeyis": "Dəyiş",
+      "loqoLegv": "Ləğv et",
+      "loqoYaddaSaxla": "Loqonu saxla",
+      "loqoSil": "Loqonu sil",
+      "loqoSilTesvir": "{p0} agentliyinin loqosu silinəcək.",
+      "loqoSehv": "Yalnız JPEG, PNG, WebP və ya AVIF şəkli seçin.",
+      "loqoBoyuk": "Loqo çox böyükdür.",
+      "qosulmaSorgusu": "Qoşulma sorğusu",
+      "devet": "Dəvət"
     },
     "amenities": {
       "analitikaniYaddaSaxla": "Analitikanı yadda saxla",
@@ -2716,7 +2730,11 @@
       "devetTapilmadi": "Dəvət tapılmadı.",
       "buDevetArtiqNezerdenKecirilib": "Bu dəvət artıq nəzərdən keçirilib.",
       "emekdasTesdiqlendi": "Əməkdaş təsdiqləndi.",
-      "devetReddEdildi": "Dəvət rədd edildi."
+      "devetReddEdildi": "Dəvət rədd edildi.",
+      "emekdasLimiti": "Agentliyin təsdiqlənmiş əməkdaş sayı limitə ({count}) çatıb.",
+      "loqoYenilendi": "Agentliyin loqosu yeniləndi.",
+      "loqoSilindi": "Agentliyin loqosu silindi.",
+      "loqoXetasi": "Loqo yüklənmədi: JPEG, PNG, WebP və ya AVIF, ən çox 2 MB."
     },
     "aiKomekci": {
       "workersAiCavabVerdiAmma": "Workers AI cavab verdi, amma sağlıq sxeminə uyğun olmadı.",

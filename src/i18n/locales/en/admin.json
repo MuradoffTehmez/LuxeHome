@@ -303,7 +303,9 @@
       "RECOMMENDATION": "Personal recommendation",
       "MEETING_REMINDER": "Viewing reminder",
       "LISTING_EXPIRY": "Listing expiry",
-      "PACKAGE": "Premium package"
+      "PACKAGE": "Premium package",
+      "AGENCY_TEAM": "Agency team",
+      "LISTING_LEAD": "Listing enquiry"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -1590,7 +1592,19 @@
       "profilYoxdur": "No profile",
       "tesdiqGozleyir": "Awaiting approval",
       "deaktivHesab": "Inactive account",
-      "kohneQeydiyyatYarimciqQalib": "An older registration was left unfinished. Check the public name and create the profile."
+      "kohneQeydiyyatYarimciqQalib": "An older registration was left unfinished. Check the public name and create the profile.",
+      "loqo": "Logo",
+      "loqoIpucu": "Shown on cards and the agency page. A square logo looks best.",
+      "loqoSec": "Choose a logo",
+      "loqoDeyis": "Change",
+      "loqoLegv": "Cancel",
+      "loqoYaddaSaxla": "Save logo",
+      "loqoSil": "Remove logo",
+      "loqoSilTesvir": "The logo of {p0} will be removed.",
+      "loqoSehv": "Please choose a JPEG, PNG, WebP or AVIF image.",
+      "loqoBoyuk": "The logo is too large.",
+      "qosulmaSorgusu": "Join request",
+      "devet": "Invitation"
     },
     "amenities": {
       "analitikaniYaddaSaxla": "Save analytics",
@@ -2716,7 +2730,11 @@
       "devetTapilmadi": "Invitation not found.",
       "buDevetArtiqNezerdenKecirilib": "This invitation has already been reviewed.",
       "emekdasTesdiqlendi": "Team member approved.",
-      "devetReddEdildi": "Invitation rejected."
+      "devetReddEdildi": "Invitation rejected.",
+      "emekdasLimiti": "The agency has reached its limit of {count} approved team members.",
+      "loqoYenilendi": "Agency logo updated.",
+      "loqoSilindi": "Agency logo removed.",
+      "loqoXetasi": "Logo upload failed: JPEG, PNG, WebP or AVIF, up to 2 MB."
     },
     "aiKomekci": {
       "workersAiCavabVerdiAmma": "Workers AI responded, but the reply did not match the health-check schema.",

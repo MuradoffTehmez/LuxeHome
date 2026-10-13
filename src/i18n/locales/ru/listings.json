@@ -185,6 +185,10 @@
     "saveSearchFrequencyWeekly": "Еженедельно",
     "saveSearchFrequencyOff": "Отключено",
     "nearMetro": "До 1 км от метро",
-    "drawnArea": "Область на карте"
+    "drawnArea": "Область на карте",
+    "seller": "Продавец",
+    "sellerOwner": "Собственник",
+    "sellerAgency": "Агентство / агент",
+    "sellerCompany": "Luxe Home Estate"
   }
 }

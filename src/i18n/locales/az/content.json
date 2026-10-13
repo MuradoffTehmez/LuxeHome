@@ -111,7 +111,19 @@
     "videoTour": "Video tur",
     "openVideo": "Videonu yeni pəncərədə aç",
     "mortgageTitle": "İpoteka hesablaması",
-    "mortgageDescription": "Bu elanın qiyməti ilə təxmini aylıq ödəniş. Nəticə məlumat xarakterlidir, bank təklifi deyil."
+    "mortgageDescription": "Bu elanın qiyməti ilə təxmini aylıq ödəniş. Nəticə məlumat xarakterlidir, bank təklifi deyil.",
+    "publisherTitle": "Elanı yerləşdirən",
+    "publisherDescription": "Bu elanla bağlı birbaşa elan sahibi ilə əlaqə saxlayın.",
+    "publisherContactPerson": "Əlaqə şəxsi: {name}",
+    "publisherEmail": "E-poçt yaz",
+    "publisherAgencyPage": "Agentliyin səhifəsi",
+    "publisherNotice": "Elan istifadəçi tərəfindən yerləşdirilib. Əmlakı və sənədləri görmədən ödəniş etməyin.",
+    "publisherNoPhone": "Elan sahibi telefon nömrəsi göstərməyib — e-poçtla yazın.",
+    "showPhone": "Nömrəni göstər",
+    "showEmail": "E-poçtu göstər",
+    "revealError": "Əlaqə məlumatı yüklənmədi. Bir az sonra yenidən cəhd edin.",
+    "verifiedAgency": "Təsdiqlənmiş agentlik",
+    "sellerListings": "Satıcının bütün elanları"
   },
   "map": {
     "region": "{title} xəritədə",
@@ -142,5 +154,15 @@
     "drawFinish": "Tamamla",
     "drawCancel": "Ləğv et",
     "drawHint": "Xəritəyə toxunaraq sahənin künclərini seçin ({count} nöqtə, ən az 3)."
+  },
+  "seller": {
+    "eyebrow": "Satıcı",
+    "metaTitle": "{name} — elanlar",
+    "metaDescription": "{name} tərəfindən yerləşdirilmiş {count, plural, other {# aktiv elan}}.",
+    "memberSince": "Luxe Home Estate-də {date} tarixindən",
+    "listingCount": "{count, plural, other {# aktiv elan}}",
+    "agencyPage": "Agentliyin səhifəsi",
+    "emptyTitle": "Aktiv elan yoxdur",
+    "emptyDescription": "Bu satıcının hazırda dərc olunmuş elanı yoxdur."
   }
 }

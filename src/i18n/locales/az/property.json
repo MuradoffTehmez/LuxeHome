@@ -197,5 +197,14 @@
     "invalid": "Ad və telefonu yoxlayın.",
     "unavailable": "Bu baxış artıq əlçatan deyil.",
     "unexpected": "Xəta baş verdi. Bir az sonra yenidən cəhd edin."
+  },
+  "publisher": {
+    "agency": "Agentlik",
+    "agent": "Agent",
+    "owner": "Mülkiyyətçi",
+    "corporate": "Şirkət",
+    "private": "Şəxsi elan",
+    "agencyNamed": "Agentlik: {name}",
+    "verified": "Təsdiqlənmiş agentlik"
   }
 }
