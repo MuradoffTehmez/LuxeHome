@@ -40,7 +40,7 @@ const rowClass = "flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:j
 export default async function AdminApprovalsPage() {
   const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
-  const [counts, agencies, agents, employees] = await Promise.all([
+  const [counts, pendingAgencies, pendingAgents, employees] = await Promise.all([
     getApprovalCounts(),
     prisma.agency.findMany({
       where: PENDING_AGENCY_WHERE,
@@ -49,6 +49,7 @@ export default async function AdminApprovalsPage() {
         name: true,
         logoUrl: true,
         createdAt: true,
+        reviewRequestedAt: true,
         user: { select: { name: true, email: true, phone: true, companyTaxId: true } },
       },
       orderBy: { createdAt: "asc" },
@@ -61,6 +62,7 @@ export default async function AdminApprovalsPage() {
         isPublic: true,
         isVerified: true,
         createdAt: true,
+        reviewRequestedAt: true,
         agency: { select: { name: true } },
         user: { select: { email: true, phone: true } },
       },
@@ -69,6 +71,12 @@ export default async function AdminApprovalsPage() {
     getAdminAgencyEmployeeQueue(),
   ]);
 
+  // SLA və sıra son göndərilmədən: rədd edilib yenidən göndərilən müraciət sıfırdan sayılır (#157).
+  const submittedAt = (item: { createdAt: Date; reviewRequestedAt: Date | null }) => item.reviewRequestedAt ?? item.createdAt;
+  const oldestFirst = <T extends { createdAt: Date; reviewRequestedAt: Date | null }>(items: T[]) =>
+    [...items].sort((left, right) => submittedAt(left).getTime() - submittedAt(right).getTime());
+  const agencies = oldestFirst(pendingAgencies);
+  const agents = oldestFirst(pendingAgents);
   const now = new Date();
   const waiting = (since: Date) => {
     const sla = approvalSla(since, now);
@@ -80,8 +88,8 @@ export default async function AdminApprovalsPage() {
     );
   };
   const overdue = [
-    ...agencies.map((item) => item.createdAt),
-    ...agents.map((item) => item.createdAt),
+    ...agencies.map(submittedAt),
+    ...agents.map(submittedAt),
     ...employees.map((item) => item.invitedAt),
   ].filter((since) => approvalSla(since, now).level === "overdue").length;
 
@@ -184,13 +192,13 @@ export default async function AdminApprovalsPage() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate text-sm font-medium text-ink">{agency.name}</p>
-                        {waiting(agency.createdAt)}
+                        {waiting(submittedAt(agency))}
                         {!agency.user.companyTaxId && <Badge tone="warning">{t("pages.agencyHub.taxIdMissing")}</Badge>}
                       </div>
                       <p className="mt-0.5 truncate text-xs text-ink-muted">
                         {[agency.user.name, agency.user.email, agency.user.phone, agency.user.companyTaxId && t("pages.agencyHub.taxIdShort", { value: agency.user.companyTaxId })].filter(Boolean).join(" · ")}
                       </p>
-                      <p className="mt-0.5 text-xs text-ink-muted">{formatDateTime(agency.createdAt)}</p>
+                      <p className="mt-0.5 text-xs text-ink-muted">{formatDateTime(submittedAt(agency))}</p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
@@ -240,7 +248,7 @@ export default async function AdminApprovalsPage() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate text-sm font-medium text-ink">{agent.name}</p>
-                        {waiting(agent.createdAt)}
+                        {waiting(submittedAt(agent))}
                         {agent.isPublic ? <Badge tone="gold">{t("pages.agents.ictimai")}</Badge> : <Badge tone="neutral">{t("pages.agents.gizli")}</Badge>}
                       </div>
                       <p className="mt-0.5 truncate text-xs text-ink-muted">

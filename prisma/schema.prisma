@@ -173,6 +173,9 @@ model Agency {
   /// yeniləyəndə `rejectedAt` sıfırlanır və agentlik növbəyə qayıdır.
   rejectionReason      String?
   rejectedAt           DateTime?
+  /// Rədd edilib yenidən göndərilmə vaxtı (#157): növbənin SLA-sı bundan (yoxdursa
+  /// `createdAt`-dan) sayılır — həftələr əvvəl yaradılıb bu gün düzəldilən müraciət gecikmiş deyil.
+  reviewRequestedAt    DateTime?
   isVerified           Boolean   @default(false)
   verifiedAt           DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
@@ -1148,33 +1151,35 @@ model PropertyPriceHistory {
 
 /// İctimai agent profili User hesabından ayrıdır, amma lazım olduqda bir hesaba bağlanır.
 model AgentProfile {
-  id              String    @id @default(cuid())
-  userId          String?   @unique
-  agencyId        String?
-  slug            String    @unique
-  name            String
-  avatarUrl       String?
-  roleTitle       String?
-  specialization  String?
-  experienceYears Int?
-  bio             String?
-  phone           String?
-  whatsapp        String?
-  email           String?
-  languages       String    @default("[]")
-  areas           String    @default("[]")
-  isVerified      Boolean   @default(false)
-  isPublic        Boolean   @default(false)
+  id                String    @id @default(cuid())
+  userId            String?   @unique
+  agencyId          String?
+  slug              String    @unique
+  name              String
+  avatarUrl         String?
+  roleTitle         String?
+  specialization    String?
+  experienceYears   Int?
+  bio               String?
+  phone             String?
+  whatsapp          String?
+  email             String?
+  languages         String    @default("[]")
+  areas             String    @default("[]")
+  isVerified        Boolean   @default(false)
+  isPublic          Boolean   @default(false)
   /// Təsdiq mərkəzində rədd (#157); agent profili yeniləyəndə sıfırlanır.
-  rejectionReason String?
-  rejectedAt      DateTime?
+  rejectionReason   String?
+  rejectedAt        DateTime?
+  /// Rədd edilib yenidən göndərilmə vaxtı (#157) — bax `Agency.reviewRequestedAt`.
+  reviewRequestedAt DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
-  isDemo          Boolean   @default(false)
-  soldCount       Int       @default(0)
-  rentedCount     Int       @default(0)
-  responseMinutes Int?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  isDemo            Boolean   @default(false)
+  soldCount         Int       @default(0)
+  rentedCount       Int       @default(0)
+  responseMinutes   Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   agency       Agency?       @relation(fields: [agencyId], references: [id], onDelete: SetNull)

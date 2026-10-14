@@ -8,6 +8,7 @@ import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
 import { PERMISSIONS, REJECTION_REASON_MAX, REJECTION_REASON_MIN, REVIEW_STATUSES } from "@/lib/constants";
 import { noticeAccountReview } from "@/lib/accounts/account-notices";
+import { approveAndPublishAgentAs } from "@/lib/admin/agent-approval";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { parseSingleImage } from "@/lib/admin/images";
 import { prisma } from "@/lib/prisma";
@@ -236,36 +237,7 @@ export async function approveAndPublishAgent(id: string): Promise<ActionState> {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
-  try {
-    const current = await prisma.agentProfile.findUnique({
-      where: { id },
-      select: { name: true, slug: true, userId: true, isVerified: true },
-    });
-    if (!current) return failure(msg("server.agentler.agentTapilmadi"));
-    await prisma.agentProfile.update({
-      where: { id },
-      data: { isVerified: true, isPublic: true, rejectedAt: null, rejectionReason: null },
-    });
-    // Bildiriş yalnız ilk təsdiqdə — gizlədilib yenidən dərc edilən profil üçün təkrar getmir.
-    if (!current.isVerified && current.userId) {
-      await noticeAccountReview({
-        userId: current.userId,
-        kind: "agent",
-        subjectId: id,
-        name: current.name,
-        approved: true,
-        decidedAt: new Date(),
-      });
-    }
-    await recordAudit(actor, "UPDATE", "AgentProfile", id, `${current.name} — təsdiqləndi və dərc edildi`);
-    revalidatePath("/admin/agentler");
-    revalidatePath("/admin/agentlikler/tesdiq");
-    revalidatePublicContent("agent", current.slug);
-    revalidatePublicContent("agency");
-    return success(msg("server.agentler.tesdiqlendiVeDercEdildi"));
-  } catch (error) {
-    return unexpected("agent təsdiqlənmədi", error, msg("server.common.unexpected"));
-  }
+  return approveAndPublishAgentAs(actor, id);
 }
 
 /**

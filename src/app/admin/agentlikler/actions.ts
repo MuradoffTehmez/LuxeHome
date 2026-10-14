@@ -34,7 +34,8 @@ import { isPhoneLike, normalizeTaxId } from "@/lib/accounts/profile-fields";
 import { isAgencyTaxIdTaken } from "@/lib/accounts/agency-tax-id";
 import { parseSingleImage } from "@/lib/admin/images";
 import { createAgencyOffice, deleteAgencyOffice, parseOfficeForm } from "@/lib/accounts/agency-offices";
-import { approveAndPublishAgent } from "../agentler/actions";
+import { approveAndPublishAgentAs } from "@/lib/admin/agent-approval";
+import type { AuthUser } from "@/lib/auth/types";
 import { z } from "zod";
 
 const LIST_PATH = "/admin/agentlikler";
@@ -60,7 +61,15 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
+  return toggleAgencyVerificationAs(actor, id);
+}
 
+/**
+ * Guard-sız daxili addım — yalnız artıq yoxlanmış `actor` ilə çağırılır (tək action və
+ * toplu əməliyyat). Toplu əməliyyat hər qeyd üçün `requireAdminAction` çağırsaydı,
+ * hər çağırış yazma limitindən (60/dəq) bir vahid yeyərdi və 60-cı qeyd kəsilərdi.
+ */
+async function toggleAgencyVerificationAs(actor: AuthUser, id: string): Promise<ActionState> {
   try {
     const agency = await prisma.agency.findUnique({
       where: { id },
@@ -185,7 +194,16 @@ async function reviewAgencyEmployee(
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
+  return reviewAgencyEmployeeAs(actor, id, decision, note);
+}
 
+/** Guard-sız daxili addım (bax `toggleAgencyVerificationAs`). */
+async function reviewAgencyEmployeeAs(
+  actor: AuthUser,
+  id: string,
+  decision: typeof AGENCY_EMPLOYEE_STATUSES.APPROVED | typeof AGENCY_EMPLOYEE_STATUSES.REJECTED,
+  note: string | null,
+): Promise<ActionState> {
   try {
     const employee = await prisma.agencyEmployee.findUnique({
       where: { id },
@@ -325,13 +343,15 @@ const QUEUE_BULK_INTENTS = ["agency", "agent", "employee"] as const;
 
 /**
  * Təsdiq növbəsində toplu təsdiq (#157). Hər kart öz intent-i ilə gəlir (agentlik,
- * agent profili, komanda sorğusu) və hər id mövcud tək action-dan keçir — guard,
- * yer limiti, «bir aktiv agentlik» qaydası, bildiriş və audit onun içindədir.
+ * agent profili, komanda sorğusu). Guard **bir dəfə** çağırılır, sonra hər id tək
+ * action-un daxili addımından keçir — yer limiti, «bir aktiv agentlik» qaydası, bildiriş
+ * və audit onun içindədir, yazma limiti isə toplu əməliyyat üçün bir vahiddir.
  * Rədd toplu edilmir: hər rəddin öz səbəbi olmalıdır.
  */
 export async function bulkApproveQueue(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  let actor;
   try {
-    await requireAdminAction(PERMISSIONS.USER_MANAGE);
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
@@ -341,8 +361,10 @@ export async function bulkApproveQueue(_previous: ActionState, formData: FormDat
   if (isBulkFailure(selection)) return selection;
   const { ids, intent } = selection;
 
-  if (intent === "agent") return runBulk(ids, approveAndPublishAgent);
-  if (intent === "employee") return runBulk(ids, approveAgencyEmployee);
+  if (intent === "agent") return runBulk(ids, (id) => approveAndPublishAgentAs(actor, id));
+  if (intent === "employee") {
+    return runBulk(ids, (id) => reviewAgencyEmployeeAs(actor, id, AGENCY_EMPLOYEE_STATUSES.APPROVED, null));
+  }
 
   const agencies = await findManyInChunks(ids, 0, (chunk) =>
     prisma.agency.findMany({ where: { id: { in: chunk } }, select: { id: true, isVerified: true } }),
@@ -351,7 +373,7 @@ export async function bulkApproveQueue(_previous: ActionState, formData: FormDat
     const agency = agencies.find((item) => item.id === id);
     if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
     // Təsdiq açarı «toggle»-dur — artıq təsdiqlənmiş agentliyin təsdiqi ləğv olunmamalıdır.
-    return agency.isVerified ? success("") : toggleAgencyVerification(agency.id);
+    return agency.isVerified ? success("") : toggleAgencyVerificationAs(actor, agency.id);
   });
 }
 
@@ -364,8 +386,9 @@ const AGENCY_BULK_INTENTS = ["approve", "revoke", "delete"] as const;
  * iki mərhələli yolla silir, agentlik profili isə kaskadla gedir.
  */
 export async function bulkAgencies(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  let actor;
   try {
-    await requireAdminAction(PERMISSIONS.USER_MANAGE);
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
@@ -384,7 +407,7 @@ export async function bulkAgencies(_previous: ActionState, formData: FormData): 
   return runBulk(ids, async (userId) => {
     const agency = agencies.find((item) => item.userId === userId);
     if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
-    return agency.isVerified === target ? success("") : toggleAgencyVerification(agency.id);
+    return agency.isVerified === target ? success("") : toggleAgencyVerificationAs(actor, agency.id);
   });
 }
 

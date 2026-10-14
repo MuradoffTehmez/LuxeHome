@@ -657,8 +657,13 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   saxlayanda sahələr sıfırlanır və müraciət geri qayıdır. Səbəb `noticeAccountReview()` ilə bildiriş +
   e-poçt kimi gedir (`ACCOUNT_REVIEW`); təsdiq də bildirilir. Rədd şərti `updateMany` ilədir — eyni anda
   təsdiq edilən agentliyin üzərinə yazılmır. Uzunluq `REJECTION_REASON_MIN/MAX`, dialoq `ReasonAction`.
-- **Toplu təsdiq** `bulkApproveQueue` — hər id mövcud tək action-dan keçir (yer limiti, «bir aktiv
-  agentlik», bildiriş, audit). SLA `lib/admin/approval-sla.ts` (24 saat sarı, 72 saat qırmızı).
+- **Toplu təsdiq** `bulkApproveQueue` — guard **bir dəfə**, sonra hər id tək action-un guard-sız daxili
+  addımından keçir (`*As(actor, id)`, agent üçün `lib/admin/agent-approval.ts`): hər qeyd üçün
+  `requireAdminAction` yazma limitindən (60/dəq) vahid yeyirdi və 60-cı qeyd kəsilirdi. Yeni toplu
+  əməliyyatı da belə yaz. SLA `lib/admin/approval-sla.ts` (24 saat sarı, 72 saat qırmızı) son göndərilmədən
+  sayılır: rədd edilib düzəldilən müraciətdə `reviewRequestedAt`, yoxdursa `createdAt`.
+- Dəvət linki ilə qeydiyyatda token hesab yarandıqdan sonra, qoşulmadan dərhal əvvəl **yenidən** oxunur —
+  qeydiyyat davam edərkən söndürülən link işləməməlidir.
 - **VÖEN** (`normalizeTaxId`): 10 rəqəm, sonuncu 1 və ya 2, təkrar rəqəm rədd olunur; eyni VÖEN ilə ikinci
   aktiv agentlik hesabı açılmır (`isAgencyTaxIdTaken`). Nəzarət rəqəminin alqoritmi dərc olunmayıb — yoxlanılmır.
 - **Dəvət linki** `/qosul/<token>` (`lib/accounts/agency-invite.ts`): sahib kabinetdə yaradır/yeniləyir/

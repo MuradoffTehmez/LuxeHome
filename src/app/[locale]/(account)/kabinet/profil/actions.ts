@@ -166,7 +166,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
     if (user.accountType === ACCOUNT_TYPES.AGENCY && data.companyName) {
       const existing = await prisma.agency.findUnique({
         where: { userId: user.id },
-        select: { id: true, name: true, slug: true, logoUrl: true },
+        select: { id: true, name: true, slug: true, logoUrl: true, rejectedAt: true },
       });
 
       // Ad dəyişəndə slug da yenilənir, amma yalnız toqquşma olmayan variantla
@@ -199,10 +199,13 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
       };
 
       if (existing) {
-        // Rədd edilmiş müraciət profil yenilənəndə yenidən təsdiq növbəsinə düşür (#157).
+        // Rədd edilmiş müraciət profil yenilənəndə yenidən təsdiq növbəsinə düşür (#157);
+        // SLA yeni göndərilmə vaxtından sayılır.
         await prisma.agency.update({
           where: { id: existing.id },
-          data: { ...agencyData, rejectedAt: null, rejectionReason: null },
+          data: existing.rejectedAt
+            ? { ...agencyData, rejectedAt: null, rejectionReason: null, reviewRequestedAt: new Date() }
+            : agencyData,
         });
         // Agentlik adı/loqosu elan kartlarında və agentlik səhifəsində göstərilir.
         revalidatePublicContent("agency", existing.slug);
@@ -224,11 +227,16 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
         experienceYears: data.agentExperience,
         bio: data.agentBio,
       };
-      const existing = await prisma.agentProfile.findUnique({ where: { userId: user.id }, select: { id: true, slug: true } });
+      const existing = await prisma.agentProfile.findUnique({
+        where: { userId: user.id },
+        select: { id: true, slug: true, rejectedAt: true },
+      });
       if (existing) {
         await prisma.agentProfile.update({
           where: { id: existing.id },
-          data: { ...agentData, rejectedAt: null, rejectionReason: null },
+          data: existing.rejectedAt
+            ? { ...agentData, rejectedAt: null, rejectionReason: null, reviewRequestedAt: new Date() }
+            : agentData,
         });
         revalidatePublicContent("agent", existing.slug);
       } else {

@@ -286,11 +286,16 @@ export async function registerAccount(
   if (logo && parsed.data.companyName) {
     await storeAgencyLogo(userId, logo, parsed.data.companyName);
   }
-  if (inviteAgency) {
+  if (inviteAgency && inviteToken) {
     // Hesab artıq yaranıb — qoşulma alınmasa da qeydiyyat davam edir, agent linki yenidən aça bilər.
     try {
-      const joined = await joinAgencyByLink(inviteAgency, { id: userId, accountType: parsed.data.accountType });
-      if (joined.status === "joined") {
+      // Token qoşulmadan dərhal əvvəl yenidən oxunur: qeydiyyat davam edərkən sahib linki
+      // söndürə və ya yeniləyə bilər — köhnə link ilə qoşulma olmamalıdır.
+      const liveAgency = await findAgencyByInviteToken(inviteToken);
+      const joined = liveAgency?.id === inviteAgency.id
+        ? await joinAgencyByLink(liveAgency, { id: userId, accountType: parsed.data.accountType })
+        : null;
+      if (joined?.status === "joined") {
         await recordDomainEvent("agency.employee_joined_link", "AgencyEmployee", joined.employeeId, { agencyId: inviteAgency.id });
         await noticeAgencyLinkJoined({
           ownerUserId: inviteAgency.userId,

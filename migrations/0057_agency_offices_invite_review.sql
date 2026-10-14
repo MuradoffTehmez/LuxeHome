@@ -2,6 +2,7 @@
 --   * örtük şəkli (`coverUrl`);
 --   * dəvət linki — sahib yaradır, agent linklə birbaşa komandaya qoşulur (`inviteToken`);
 --   * təsdiq mərkəzində rədd səbəbi — agentlik, agent profili və komanda sorğusu üçün;
+--   * rədd edilib yenidən göndərilən müraciətin vaxtı (`reviewRequestedAt`) — SLA ondan sayılır;
 --   * filiallar (`AgencyOffice`).
 -- Hamısı istəyə bağlıdır; mövcud qeydlər dəyişmir.
 
@@ -11,10 +12,12 @@ ALTER TABLE "Agency" ADD COLUMN "inviteToken" TEXT;
 ALTER TABLE "Agency" ADD COLUMN "inviteTokenCreatedAt" DATETIME;
 ALTER TABLE "Agency" ADD COLUMN "rejectionReason" TEXT;
 ALTER TABLE "Agency" ADD COLUMN "rejectedAt" DATETIME;
+ALTER TABLE "Agency" ADD COLUMN "reviewRequestedAt" DATETIME;
 
 -- AlterTable
 ALTER TABLE "AgentProfile" ADD COLUMN "rejectionReason" TEXT;
 ALTER TABLE "AgentProfile" ADD COLUMN "rejectedAt" DATETIME;
+ALTER TABLE "AgentProfile" ADD COLUMN "reviewRequestedAt" DATETIME;
 
 -- AlterTable
 ALTER TABLE "AgencyEmployee" ADD COLUMN "decisionNote" TEXT;
