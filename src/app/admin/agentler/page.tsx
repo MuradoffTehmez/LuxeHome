@@ -56,10 +56,11 @@ export default async function AdminAgentsPage({
     prisma.agency.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
   ]);
 
-  // Təsdiq gözləyən = gizli və ya təsdiqlənməmiş profil (təsdiq növbəsi ilə eyni qayda).
+  // Təsdiq gözləyən = heç təsdiqlənməmiş profil (təsdiq növbəsi ilə eyni qayda);
+  // təsdiqlənib qəsdən gizlədilən profil «Gizli» tabındadır.
   const matches = (agent: (typeof allAgents)[number], value: AgentStatus) =>
     value === "all"
-    || (value === "pending" && (!agent.isPublic || !agent.isVerified))
+    || (value === "pending" && !agent.isVerified)
     || (value === "public" && agent.isPublic)
     || (value === "hidden" && !agent.isPublic);
   const agents = allAgents.filter((agent) => matches(agent, status));
@@ -138,7 +139,7 @@ export default async function AdminAgentsPage({
               </p>
             </div>
             <div className="flex shrink-0 items-center">
-              {(!agent.isPublic || !agent.isVerified) && (
+              {!agent.isVerified && (
                 <ConfirmAction
                   action={approveAndPublishAgent}
                   id={agent.id}

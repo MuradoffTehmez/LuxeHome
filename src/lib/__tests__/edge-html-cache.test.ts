@@ -47,6 +47,8 @@ describe("kənar HTML keşi", () => {
   it("baxış sayan bloq və bilik detal səhifələrini keşləmir, siyahıları keşləyir", () => {
     expect(isEdgeCacheableRequest(request("/az/blog/menzil-alarken"))).toBe(false);
     expect(isEdgeCacheableRequest(request("/ru/bilik-merkezi/kupca"))).toBe(false);
+    expect(isEdgeCacheableRequest(request("/az/agentlikler/one-home"))).toBe(false);
+    expect(isEdgeCacheableRequest(request("/az/agentlikler"))).toBe(true);
     expect(isEdgeCacheableRequest(request("/az/blog"))).toBe(true);
     expect(isEdgeCacheableRequest(request("/az/bilik-merkezi/suallar"))).toBe(true);
     expect(isEdgeCacheableRequest(request("/az/bilik-merkezi/kateqoriya/huquq"))).toBe(true);

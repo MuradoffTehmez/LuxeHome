@@ -354,7 +354,7 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                   propertyId={agency.slug}
                   endpoint={`/api/agentlikler/${encodeURIComponent(agency.slug)}/elaqe`}
                   maskedPhone={phone ? maskPhone(phone) : null}
-                  hasEmail
+                  hasEmail={Boolean(agency.email?.trim() || agency.phone?.includes("@"))}
                   whatsappMessage={agency.name}
                   labels={{
                     showPhone: content("showPhone"),

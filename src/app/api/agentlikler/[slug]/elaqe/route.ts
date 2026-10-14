@@ -17,6 +17,10 @@ const NO_STORE = { "Cache-Control": "private, no-store" };
  * daşıyır, tam əlaqə yalnız same-origin + IP limiti ilə verilir. Yalnız ictimai
  * (təsdiqlənmiş, aktiv) agentlik. Telefon sahəsində telefon olmayan köhnə dəyər
  * (məs. e-poçt) telefon kimi qaytarılmır.
+ *
+ * E-poçt yalnız agentliyin özünün ictimai əlaqə kimi yazdığı dəyərdən gəlir
+ * (`Agency.email` və ya telefon sahəsinə yazılmış e-poçt). Hesabın giriş e-poçtu
+ * heç vaxt açılmır — o, ofis əlaqəsi deyil, giriş məlumatıdır.
  */
 export async function POST(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
@@ -33,7 +37,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ sl
   const agency = slug.length <= 200
     ? await prisma.agency.findFirst({
         where: { slug, isVerified: true, ...(await demoWhere()), user: { isActive: true } },
-        select: { phone: true, whatsapp: true, email: true, user: { select: { email: true } } },
+        select: { phone: true, whatsapp: true, email: true },
       })
     : null;
   if (!agency) return NextResponse.json({ error: "not_found" }, { status: 404, headers: NO_STORE });
@@ -44,7 +48,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ sl
     {
       phone,
       whatsapp: isPhoneLike(agency.whatsapp) ? agency.whatsapp!.trim() : null,
-      email: agency.email?.trim() || misplacedEmail || agency.user.email,
+      email: agency.email?.trim() || misplacedEmail,
     },
     { headers: NO_STORE },
   );

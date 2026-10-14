@@ -25,7 +25,12 @@ const LOCALE_PATH = /^\/(az|en|ru)(\/|$)/;
  * komponentindədir; keşdən verilən cavab onu işə salmazdı və sayğac donardı.
  * (`/emlaklar/[slug]` sessiyadan asılı olduğu üçün onsuz da keşlənmir.)
  */
-const SIDE_EFFECT_ROUTES = [/^\/(az|en|ru)\/blog\/[^/]+\/?$/, /^\/(az|en|ru)\/bilik-merkezi\/[^/]+\/?$/];
+const SIDE_EFFECT_ROUTES = [
+  /^\/(az|en|ru)\/blog\/[^/]+\/?$/,
+  /^\/(az|en|ru)\/bilik-merkezi\/[^/]+\/?$/,
+  // Agentlik profili baxış sayğacını (`recordView("agency")`) render-də artırır (#155).
+  /^\/(az|en|ru)\/agentlikler\/[^/]+\/?$/,
+];
 /** `bilik-merkezi/kateqoriya/...` və `bilik-merkezi/suallar` detal deyil — sayğac yoxdur. */
 const SIDE_EFFECT_EXCEPTIONS = [/^\/(az|en|ru)\/bilik-merkezi\/(kateqoriya|suallar)\/?/];
 

@@ -8,6 +8,7 @@ import { getPublicAgentBySlug } from "@/lib/phase2";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
+import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/states";
 import { buttonClassName } from "@/components/ui/button";
 import { PropertyCard } from "@/components/site/property-card";
@@ -17,7 +18,10 @@ import { TrackedAnchor } from "@/components/analytics/analytics-event";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ locale: string; slug: string }> };
+type Props = {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export async function generateMetadata({ params }: Props) {
   const { locale, slug } = await params;
@@ -33,10 +37,11 @@ export async function generateMetadata({ params }: Props) {
   });
 }
 
-export default async function AgentPage({ params }: Props) {
+export default async function AgentPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
+  const rawPage = (await searchParams).sehife;
   const t = await getTranslations({ locale, namespace: "phase2.agents" });
-  const agent = await getPublicAgentBySlug(slug);
+  const agent = await getPublicAgentBySlug(slug, Number(typeof rawPage === "string" ? rawPage : 1));
   if (!agent) notFound();
   const rating = agent.reviews.length
     ? agent.reviews.reduce((sum, review) => sum + review.rating, 0) / agent.reviews.length
@@ -123,7 +128,7 @@ export default async function AgentPage({ params }: Props) {
             <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="rounded-lg border border-line bg-ivory px-5 py-4">
                 <p className="text-xs text-ink-muted">{t("listings")}</p>
-                <p className="tabular mt-1 text-2xl font-semibold text-ink">{agent.properties.length}</p>
+                <p className="tabular mt-1 text-2xl font-semibold text-ink">{agent.propertyCount}</p>
               </div>
               <ul className="flex flex-wrap gap-2">
                 {agent.experienceYears != null && <li><Badge tone="neutral">{t("experience", { count: agent.experienceYears })}</Badge></li>}
@@ -140,6 +145,14 @@ export default async function AgentPage({ params }: Props) {
         <Container>
           <h2 className="font-display text-3xl tracking-[-0.02em] text-ink">{t("listings")}</h2>
           {agent.properties.length ? <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">{agent.properties.map((property) => <PropertyCard key={property.id} property={property} />)}</div> : <div className="mt-6"><EmptyState title={t("noListings")} /></div>}
+          {agent.pageCount > 1 && (
+            <Pagination
+              className="mt-8"
+              page={agent.page}
+              totalPages={agent.pageCount}
+              buildHref={(target) => (target > 1 ? `/agentler/${agent.slug}?sehife=${target}` : `/agentler/${agent.slug}`)}
+            />
+          )}
         </Container>
       </Section>
 

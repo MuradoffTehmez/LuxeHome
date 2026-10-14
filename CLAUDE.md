@@ -639,13 +639,16 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   şəbəkəli örtük, statistika zolağı (təklif/satış/kirayə/agent/baxış), `?elan=`/`?tip=`/`?siralama=`/
   `?sehife=` ilə təkliflər, elanlardan çıxarılan «Fəaliyyət əraziləri», agentlər, yapışqan əlaqə
   paneli. Ofis nömrəsi/WhatsApp/e-poçt `POST /api/agentlikler/<slug>/elaqe`-dən «Nömrəni göstər» ilə
-  gəlir (elan əlaqəsi ilə eyni qayda). `Agency.viewCount` `recordView("agency")` ilə artır.
+  gəlir (elan əlaqəsi ilə eyni qayda). **Hesabın giriş e-poçtu heç vaxt açılmır** — yalnız `Agency.email`.
+  `Agency.viewCount` `recordView("agency")` ilə artır, ona görə profil `SIDE_EFFECT_ROUTES`-dadır
+  (kənar keşdən yan keçir; keş hit-i sayğacı işə salmazdı).
 - **Telefon sahəsi telefon olmalıdır** (`isPhoneLike`, qeydiyyat/profil/panel). Köhnə qeyddə telefon
   yerində e-poçt varsa, o telefon kimi göstərilmir.
 - **Panel:** «Agentliklər və agentlər» ayrıca menyu bəndidir, sayğac `getApprovalCounts()`-dəndir
   (`PENDING_AGENCY_WHERE`/`PENDING_AGENT_WHERE` — növbə səhifəsi ilə eyni şərt). `/admin/agentlikler/tesdiq`
   — təsdiq növbəsi; `/admin/agentlikler/<id>` — agentlik profilinin tam redaktəsi; siyahılarda status
-  tabları və «Təsdiqlə və dərc et» (`approveAndPublishAgent`).
+  tabları və «Təsdiqlə və dərc et» (`approveAndPublishAgent`). Növbədə yalnız heç təsdiqlənməmiş
+  agent var (`isVerified: false`); təsdiqlənib qəsdən gizlədilən profil növbəyə qayıtmır.
 
 ### Kənar HTML keşi (#105)
 

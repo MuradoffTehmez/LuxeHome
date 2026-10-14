@@ -10,11 +10,15 @@ import { AGENCY_EMPLOYEE_STATUSES, REVIEW_STATUSES } from "@/lib/constants";
  */
 export const PENDING_AGENCY_WHERE: Prisma.AgencyWhereInput = { isVerified: false, isDemo: false, user: { isActive: true } };
 
-/** Qeydiyyatdan keçmiş agentin profili hələ təsdiqlənməyib və ya dərc olunmayıb. */
+/**
+ * Heç vaxt təsdiqlənməmiş agent profili. Gizli (`isPublic: false`), amma təsdiqlənmiş
+ * profil növbəyə düşmür: admin onu qəsdən gizlədib, «Təsdiqlə və dərc et» onu
+ * yenidən dərc edərdi və sayğac heç vaxt sıfırlanmazdı.
+ */
 export const PENDING_AGENT_WHERE: Prisma.AgentProfileWhereInput = {
   isDemo: false,
   user: { isActive: true },
-  OR: [{ isPublic: false }, { isVerified: false }],
+  isVerified: false,
 };
 
 export type ApprovalCounts = {

@@ -23,7 +23,10 @@ export async function getPublicAgents() {
   return agents.map((agent) => ({ ...agent, _count: { properties: counts.get(agent.id) ?? 0 } }));
 }
 
-export async function getPublicAgentBySlug(slug: string) {
+/** Agent səhifəsində bir səhifədə göstərilən elan sayı. */
+export const AGENT_LISTINGS_PAGE_SIZE = 24;
+
+export async function getPublicAgentBySlug(slug: string, page = 1) {
   const agent = await prisma.agentProfile.findFirst({
     where: { slug, isPublic: true, ...(await demoWhere()) },
     include: {
@@ -35,14 +38,27 @@ export async function getPublicAgentBySlug(slug: string) {
     },
   });
   if (!agent) return null;
-  // Agentin öz yerləşdirdiyi və ona təyin edilmiş elanlar birlikdə.
-  const properties = await prisma.property.findMany({
-    where: { ...(await publicPropertyWhere()), ...agentListingWhere(agent) },
-    select: propertyCardSelect,
-    orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
-    take: 60,
-  });
-  return { ...agent, properties };
+  // Agentin öz yerləşdirdiyi və ona təyin edilmiş elanlar birlikdə. Ümumi say ayrıca
+  // sayılır — səhifədəki kart sayı (`properties.length`) cəm deyil.
+  const where = { ...(await publicPropertyWhere()), ...agentListingWhere(agent) };
+  const currentPage = Math.max(1, Math.floor(page) || 1);
+  const [properties, propertyCount] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: propertyCardSelect,
+      orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
+      skip: (currentPage - 1) * AGENT_LISTINGS_PAGE_SIZE,
+      take: AGENT_LISTINGS_PAGE_SIZE,
+    }),
+    prisma.property.count({ where }),
+  ]);
+  return {
+    ...agent,
+    properties,
+    propertyCount,
+    page: currentPage,
+    pageCount: Math.max(1, Math.ceil(propertyCount / AGENT_LISTINGS_PAGE_SIZE)),
+  };
 }
 
 export async function getApprovedTestimonials(take = 6) {
