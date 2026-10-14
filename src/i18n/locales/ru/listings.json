@@ -233,7 +233,17 @@
     "officesTitle": "Наши офисы",
     "officesDescription": "Филиалов помимо главного офиса: {count}",
     "ogEyebrow": "Агентство недвижимости",
-    "ogOffers": "Предложения"
+    "ogOffers": "Предложения",
+    "ratingLabel": "Рейтинг",
+    "ratingSummary": "{rating} · {count, plural, one {# отзыв} few {# отзыва} many {# отзывов} other {# отзыва}}",
+    "fastResponse": "Быстро отвечает",
+    "reviewsTitle": "Отзывы клиентов",
+    "reviewsSummary": "Средняя оценка {rating} · отзывов: {count} (агенты и агентство)",
+    "reviewStars": "{rating} из 5",
+    "reviewAgent": "Агент: {name}",
+    "enquiryTitle": "Заявка в агентство",
+    "enquiryDescription": "Напишите вопрос — {name} свяжется с вами. Заявка поступит дежурному агенту агентства.",
+    "enquiryButton": "Отправить заявку"
   },
   "agencyDirectory": {
     "searchLabel": "Поиск агентства",
@@ -243,10 +253,24 @@
     "split": "Продажа {sale} · Аренда {rent}",
     "agents": "{count, plural, one {# агент} few {# агента} many {# агентов} other {# агента}}",
     "noResults": "Агентство «{query}» не найдено",
-    "viewProfile": "Открыть профиль"
+    "viewProfile": "Открыть профиль",
+    "areaOffers": "{place}: предложений — {count}"
   },
   "deals": {
     "title": "Успешные сделки",
     "summary": "За последние 12 месяцев: продаж — {sold}, аренд — {rented}"
+  },
+  "areaAgencies": {
+    "blockTitle": "Агентства, активные в этом районе",
+    "blockDescription": "Проверенные агентства с активными предложениями в районе {place} ({count}).",
+    "viewAll": "Смотреть все",
+    "metaTitle": "{place} — агентства недвижимости",
+    "metaDescription": "Проверенные агентства недвижимости с активными предложениями в районе {place} ({count}): предложения, рейтинг и контакты.",
+    "eyebrow": "Агентства",
+    "title": "{place}: агентства недвижимости",
+    "description": "Проверенные агентства с активными предложениями в этом районе ({count}), по числу предложений здесь.",
+    "emptyTitle": "В этом районе пока нет агентств",
+    "emptyDescription": "Проверенных агентств с активными предложениями в районе {place} не найдено.",
+    "allAgencies": "Все агентства"
   }
 }

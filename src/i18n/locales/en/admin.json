@@ -262,7 +262,8 @@
       "CONTACT": "Contact page",
       "SERVICE": "Service page",
       "PROJECT": "Development page",
-      "OWNER": "Owner request"
+      "OWNER": "Owner request",
+      "AGENCY": "Agency profile"
     },
     "leadStatus": {
       "NEW": "New",
@@ -310,7 +311,8 @@
       "AGENCY_TEAM": "Agency team",
       "LISTING_LEAD": "Listing enquiry",
       "ACCOUNT_REVIEW": "Profile review",
-      "LISTING_REPORT": "Listing report"
+      "LISTING_REPORT": "Listing report",
+      "LEAD_ESCALATION": "Unanswered enquiry"
     },
     "partnershipType": {
       "BROKER": "Broker",

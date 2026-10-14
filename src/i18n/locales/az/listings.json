@@ -233,7 +233,17 @@
     "officesTitle": "Ofislərimiz",
     "officesDescription": "Baş ofisdən əlavə {count, plural, other {# filial}}",
     "ogEyebrow": "Daşınmaz əmlak agentliyi",
-    "ogOffers": "Təklif"
+    "ogOffers": "Təklif",
+    "ratingLabel": "Reytinq",
+    "ratingSummary": "{rating} · {count} rəy",
+    "fastResponse": "Tez cavab verir",
+    "reviewsTitle": "Müştəri rəyləri",
+    "reviewsSummary": "Orta qiymət {rating} · {count} rəy (agentlər və agentlik)",
+    "reviewStars": "5 üzərindən {rating}",
+    "reviewAgent": "Agent: {name}",
+    "enquiryTitle": "Agentliyə müraciət",
+    "enquiryDescription": "Sualınızı yazın — {name} sizinlə əlaqə saxlayacaq. Müraciət agentliyin növbədəki agentinə çatdırılır.",
+    "enquiryButton": "Müraciət göndər"
   },
   "agencyDirectory": {
     "searchLabel": "Agentlik axtarışı",
@@ -243,10 +253,24 @@
     "split": "Satış {sale} · Kirayə {rent}",
     "agents": "{count, plural, other {# agent}}",
     "noResults": "«{query}» adlı agentlik tapılmadı",
-    "viewProfile": "Profilə bax"
+    "viewProfile": "Profilə bax",
+    "areaOffers": "{place}: {count} təklif"
   },
   "deals": {
     "title": "Uğurlu sövdələşmələr",
     "summary": "Son 12 ayda {sold} satış, {rented} icarə"
+  },
+  "areaAgencies": {
+    "blockTitle": "Bu ərazidə fəal agentliklər",
+    "blockDescription": "{place} üzrə aktiv təklifi olan təsdiqlənmiş agentliklər ({count}).",
+    "viewAll": "Hamısına bax",
+    "metaTitle": "{place} — əmlak agentlikləri",
+    "metaDescription": "{place} ərazisində aktiv təklifi olan {count} təsdiqlənmiş əmlak agentliyi: təklif sayı, reytinq və əlaqə.",
+    "eyebrow": "Agentliklər",
+    "title": "{place}: əmlak agentlikləri",
+    "description": "Bu ərazidə aktiv təklifi olan təsdiqlənmiş agentliklər ({count}), ərazidəki təklif sayına görə.",
+    "emptyTitle": "Bu ərazidə hələ agentlik yoxdur",
+    "emptyDescription": "{place} üzrə aktiv təklifi olan təsdiqlənmiş agentlik tapılmadı.",
+    "allAgencies": "Bütün agentliklər"
   }
 }
