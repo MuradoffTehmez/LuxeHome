@@ -32,7 +32,7 @@ export function AgencyLogoEditor({ agencyId, name, logoUrl }: { agencyId: string
         <span className="relative grid size-8 place-items-center overflow-hidden rounded-xs border border-line bg-paper">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- panel önizləməsi, 32 px
-            <img src={logoUrl} alt="" className="size-full object-contain p-0.5" />
+            <img src={logoUrl} alt="" className="size-full object-contain" />
           ) : (
             <Building2 className="size-4 text-ink-muted" aria-hidden="true" />
           )}

@@ -6,7 +6,9 @@ import { recordAudit } from "@/lib/admin/audit";
 import { failure, invalid, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import * as form from "@/lib/admin/form";
-import { PERMISSIONS, REVIEW_STATUSES } from "@/lib/constants";
+import { PERMISSIONS, REJECTION_REASON_MAX, REJECTION_REASON_MIN, REVIEW_STATUSES } from "@/lib/constants";
+import { noticeAccountReview } from "@/lib/accounts/account-notices";
+import { recordDomainEvent } from "@/lib/admin/events";
 import { parseSingleImage } from "@/lib/admin/images";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
@@ -235,9 +237,26 @@ export async function approveAndPublishAgent(id: string): Promise<ActionState> {
     throw error;
   }
   try {
-    const current = await prisma.agentProfile.findUnique({ where: { id }, select: { name: true, slug: true } });
+    const current = await prisma.agentProfile.findUnique({
+      where: { id },
+      select: { name: true, slug: true, userId: true, isVerified: true },
+    });
     if (!current) return failure(msg("server.agentler.agentTapilmadi"));
-    await prisma.agentProfile.update({ where: { id }, data: { isVerified: true, isPublic: true } });
+    await prisma.agentProfile.update({
+      where: { id },
+      data: { isVerified: true, isPublic: true, rejectedAt: null, rejectionReason: null },
+    });
+    // Bildiriş yalnız ilk təsdiqdə — gizlədilib yenidən dərc edilən profil üçün təkrar getmir.
+    if (!current.isVerified && current.userId) {
+      await noticeAccountReview({
+        userId: current.userId,
+        kind: "agent",
+        subjectId: id,
+        name: current.name,
+        approved: true,
+        decidedAt: new Date(),
+      });
+    }
     await recordAudit(actor, "UPDATE", "AgentProfile", id, `${current.name} — təsdiqləndi və dərc edildi`);
     revalidatePath("/admin/agentler");
     revalidatePath("/admin/agentlikler/tesdiq");
@@ -246,6 +265,56 @@ export async function approveAndPublishAgent(id: string): Promise<ActionState> {
     return success(msg("server.agentler.tesdiqlendiVeDercEdildi"));
   } catch (error) {
     return unexpected("agent təsdiqlənmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+/**
+ * Agent profilini səbəblə rədd edir (#157): profil təsdiqsiz və gizli qalır, növbədən
+ * çıxır; agent profili yeniləyəndə yenidən növbəyə düşür. Səbəb agentə bildirişlə gedir.
+ */
+export async function rejectAgentApplication(id: string, reason: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  const note = typeof reason === "string" ? reason.trim().replace(/\s+/g, " ") : "";
+  if (note.length < REJECTION_REASON_MIN || note.length > REJECTION_REASON_MAX) {
+    return failure(msg("server.agentlikler.reddSebebiUzunlugu", { min: REJECTION_REASON_MIN, max: REJECTION_REASON_MAX }));
+  }
+  try {
+    const current = await prisma.agentProfile.findUnique({
+      where: { id },
+      select: { name: true, slug: true, userId: true },
+    });
+    if (!current) return failure(msg("server.agentler.agentTapilmadi"));
+    const decidedAt = new Date();
+    const { count } = await prisma.agentProfile.updateMany({
+      where: { id, isVerified: false },
+      data: { rejectedAt: decidedAt, rejectionReason: note, isPublic: false },
+    });
+    if (count === 0) return failure(msg("server.agentler.artiqTesdiqlenib"));
+    if (current.userId) {
+      await noticeAccountReview({
+        userId: current.userId,
+        kind: "agent",
+        subjectId: id,
+        name: current.name,
+        approved: false,
+        decidedAt,
+        reason: note,
+      });
+    }
+    await recordAudit(actor, "UPDATE", "AgentProfile", id, `${current.name} — profil rədd edildi: ${note}`);
+    await recordDomainEvent("agent.application_rejected", "AgentProfile", id, { reason: note });
+    revalidatePath("/admin/agentler");
+    revalidatePath("/admin/agentlikler/tesdiq");
+    revalidatePublicContent("agent", current.slug);
+    return success(msg("server.agentler.profilReddEdildi"));
+  } catch (error) {
+    return unexpected("agent profili rədd edilmədi", error, msg("server.common.unexpected"));
   }
 }
 

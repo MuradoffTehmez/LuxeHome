@@ -25,6 +25,17 @@ const COPY = {
     agencyRejected: (agency: string) => `«${agency}» qoşulma sorğunuzu rədd etdi.`,
     leadTitle: "Elanınıza yeni müraciət",
     lead: (title: string, name: string) => `${name} «${title}» elanınızla maraqlanır. Əlaqə məlumatı kabinetdəki «Müraciətlər» bölməsindədir.`,
+    reason: (text: string) => `Səbəb: ${text}`,
+    agencyLinkJoinedTitle: "Komandaya yeni agent qoşuldu",
+    agencyLinkJoined: (name: string, agency: string) => `${name} dəvət linki ilə «${agency}» komandasına qoşuldu. Komandanı «Komanda» bölməsində idarə edə bilərsiniz.`,
+    agencyVerifiedTitle: "Agentliyiniz təsdiqləndi",
+    agencyVerified: (agency: string) => `«${agency}» təsdiqləndi və agentliklər kataloqunda görünür. Profilinizi tamamlayın — loqo, örtük və filiallar müştəri etimadını artırır.`,
+    agencyReviewRejectedTitle: "Agentlik müraciətiniz rədd edildi",
+    agencyReviewRejected: (agency: string) => `«${agency}» profili təsdiqlənmədi. Məlumatları düzəldib profili yadda saxlayın — müraciət yenidən baxışa düşəcək.`,
+    agentVerifiedTitle: "Agent profiliniz təsdiqləndi",
+    agentVerified: (name: string) => `${name}, agent profiliniz təsdiqləndi və saytda dərc olundu.`,
+    agentReviewRejectedTitle: "Agent profiliniz təsdiqlənmədi",
+    agentReviewRejected: (name: string) => `${name}, agent profiliniz təsdiqlənmədi. Məlumatları düzəldib profili yadda saxlayın — müraciət yenidən baxışa düşəcək.`,
     open: "Kabinetdə aç",
   },
   en: {
@@ -36,6 +47,17 @@ const COPY = {
     agencyRejected: (agency: string) => `“${agency}” rejected your join request.`,
     leadTitle: "New enquiry for your listing",
     lead: (title: string, name: string) => `${name} is interested in your listing “${title}”. Contact details are in the Enquiries section of your account.`,
+    reason: (text: string) => `Reason: ${text}`,
+    agencyLinkJoinedTitle: "A new agent joined your team",
+    agencyLinkJoined: (name: string, agency: string) => `${name} joined the “${agency}” team using your invite link. You can manage the team in the Team section.`,
+    agencyVerifiedTitle: "Your agency has been verified",
+    agencyVerified: (agency: string) => `“${agency}” has been verified and now appears in the agency directory. Complete your profile — a logo, cover image and branches build client trust.`,
+    agencyReviewRejectedTitle: "Your agency application was rejected",
+    agencyReviewRejected: (agency: string) => `The “${agency}” profile was not verified. Correct the details and save your profile — the application will be reviewed again.`,
+    agentVerifiedTitle: "Your agent profile has been verified",
+    agentVerified: (name: string) => `${name}, your agent profile has been verified and published on the site.`,
+    agentReviewRejectedTitle: "Your agent profile was not verified",
+    agentReviewRejected: (name: string) => `${name}, your agent profile was not verified. Correct the details and save your profile — it will be reviewed again.`,
     open: "Open in your account",
   },
   ru: {
@@ -47,6 +69,17 @@ const COPY = {
     agencyRejected: (agency: string) => `«${agency}» отклонило ваш запрос на присоединение.`,
     leadTitle: "Новая заявка по вашему объявлению",
     lead: (title: string, name: string) => `${name} интересуется вашим объявлением «${title}». Контакты — в разделе «Заявки» личного кабинета.`,
+    reason: (text: string) => `Причина: ${text}`,
+    agencyLinkJoinedTitle: "В команду вступил новый агент",
+    agencyLinkJoined: (name: string, agency: string) => `${name} присоединился к команде «${agency}» по ссылке-приглашению. Управлять командой можно в разделе «Команда».`,
+    agencyVerifiedTitle: "Ваше агентство подтверждено",
+    agencyVerified: (agency: string) => `«${agency}» подтверждено и отображается в каталоге агентств. Заполните профиль — логотип, обложка и филиалы повышают доверие клиентов.`,
+    agencyReviewRejectedTitle: "Заявка агентства отклонена",
+    agencyReviewRejected: (agency: string) => `Профиль «${agency}» не подтверждён. Исправьте данные и сохраните профиль — заявка будет рассмотрена повторно.`,
+    agentVerifiedTitle: "Ваш профиль агента подтверждён",
+    agentVerified: (name: string) => `${name}, ваш профиль агента подтверждён и опубликован на сайте.`,
+    agentReviewRejectedTitle: "Профиль агента не подтверждён",
+    agentReviewRejected: (name: string) => `${name}, ваш профиль агента не подтверждён. Исправьте данные и сохраните профиль — он будет рассмотрен повторно.`,
     open: "Открыть в кабинете",
   },
 } as const;
@@ -110,7 +143,13 @@ export async function noticeAgencyJoinRequest(input: {
   );
 }
 
-/** Agentə: qoşulma sorğusunun nəticəsi. */
+/** Səbəb varsa mətnin sonuna ayrıca cümlə kimi əlavə olunur. */
+function withReason(content: string, copy: NoticeCopy, reason: string | null | undefined): string {
+  const text = reason?.trim();
+  return text ? `${content} ${copy.reason(text)}` : content;
+}
+
+/** Agentə: qoşulma sorğusunun nəticəsi; rədd edilibsə səbəbi ilə (#157). */
 export async function noticeAgencyDecision(input: {
   userId: string;
   employeeId: string;
@@ -118,6 +157,7 @@ export async function noticeAgencyDecision(input: {
   attemptAt: Date;
   agencyName: string;
   approved: boolean;
+  reason?: string | null;
 }): Promise<void> {
   await notifyAccount(
     input.userId,
@@ -126,7 +166,56 @@ export async function noticeAgencyDecision(input: {
     `agency-decision:${input.employeeId}:${attemptKey(input.attemptAt)}:${input.approved ? "approved" : "rejected"}`,
     (copy) => input.approved
       ? { title: copy.agencyApprovedTitle, content: copy.agencyApproved(input.agencyName) }
-      : { title: copy.agencyRejectedTitle, content: copy.agencyRejected(input.agencyName) },
+      : { title: copy.agencyRejectedTitle, content: withReason(copy.agencyRejected(input.agencyName), copy, input.reason) },
+  );
+}
+
+/** Agentlik sahibinə: agent dəvət linki ilə komandaya birbaşa qoşuldu (#157). */
+export async function noticeAgencyLinkJoined(input: {
+  ownerUserId: string;
+  employeeId: string;
+  attemptAt: Date;
+  agentName: string;
+  agencyName: string;
+}): Promise<void> {
+  await notifyAccount(
+    input.ownerUserId,
+    NOTIFICATION_TYPES.AGENCY_TEAM,
+    "/kabinet/komanda",
+    `agency-link:${input.employeeId}:${attemptKey(input.attemptAt)}`,
+    (copy) => ({ title: copy.agencyLinkJoinedTitle, content: copy.agencyLinkJoined(input.agentName, input.agencyName) }),
+  );
+}
+
+/**
+ * Agentlik və ya agent profilinin təsdiq mərkəzindəki nəticəsi (#157). Rədd edilibsə
+ * səbəb bildirişə və e-poçta yazılır; təkrar açar qərarın vaxtını daşıyır — profil
+ * yenidən göndərilib ikinci dəfə rədd edilə bilər.
+ */
+export async function noticeAccountReview(input: {
+  userId: string;
+  kind: "agency" | "agent";
+  subjectId: string;
+  name: string;
+  approved: boolean;
+  decidedAt: Date;
+  reason?: string | null;
+}): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.ACCOUNT_REVIEW,
+    "/kabinet/profil",
+    `account-review:${input.kind}:${input.subjectId}:${attemptKey(input.decidedAt)}:${input.approved ? "approved" : "rejected"}`,
+    (copy) => {
+      if (input.kind === "agency") {
+        return input.approved
+          ? { title: copy.agencyVerifiedTitle, content: copy.agencyVerified(input.name) }
+          : { title: copy.agencyReviewRejectedTitle, content: withReason(copy.agencyReviewRejected(input.name), copy, input.reason) };
+      }
+      return input.approved
+        ? { title: copy.agentVerifiedTitle, content: copy.agentVerified(input.name) }
+        : { title: copy.agentReviewRejectedTitle, content: withReason(copy.agentReviewRejected(input.name), copy, input.reason) };
+    },
   );
 }
 

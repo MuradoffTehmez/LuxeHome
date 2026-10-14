@@ -8,7 +8,16 @@ import { AGENCY_EMPLOYEE_STATUSES, REVIEW_STATUSES } from "@/lib/constants";
  *
  * Nümunə (demo) qeydlər və deaktiv hesablar növbəyə düşmür.
  */
-export const PENDING_AGENCY_WHERE: Prisma.AgencyWhereInput = { isVerified: false, isDemo: false, user: { isActive: true } };
+/**
+ * Rədd edilmiş agentlik (`rejectedAt`) sahib profili yeniləyənə qədər növbəyə qayıtmır (#157) —
+ * əks halda eyni müraciət hər gün yenidən baxılardı.
+ */
+export const PENDING_AGENCY_WHERE: Prisma.AgencyWhereInput = {
+  isVerified: false,
+  isDemo: false,
+  rejectedAt: null,
+  user: { isActive: true },
+};
 
 /**
  * Heç vaxt təsdiqlənməmiş agent profili. Gizli (`isPublic: false`), amma təsdiqlənmiş
@@ -19,6 +28,7 @@ export const PENDING_AGENT_WHERE: Prisma.AgentProfileWhereInput = {
   isDemo: false,
   user: { isActive: true },
   isVerified: false,
+  rejectedAt: null,
 };
 
 export type ApprovalCounts = {

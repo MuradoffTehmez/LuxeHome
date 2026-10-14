@@ -978,6 +978,8 @@ export async function getAdminAgencies() {
           slug: true,
           logoUrl: true,
           isVerified: true,
+          rejectedAt: true,
+          rejectionReason: true,
           createdAt: true,
         },
       },
@@ -1003,7 +1005,7 @@ export async function getAgencyDirectory() {
 export async function getAgencyForOwner(userId: string) {
   return prisma.agency.findUnique({
     where: { userId },
-    select: { id: true, name: true, isVerified: true },
+    select: { id: true, name: true, isVerified: true, inviteToken: true, inviteTokenCreatedAt: true },
   });
 }
 
