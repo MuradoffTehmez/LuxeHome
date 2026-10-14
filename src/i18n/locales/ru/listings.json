@@ -229,7 +229,11 @@
     "website": "Сайт",
     "instagram": "Instagram",
     "notice": "Агентство — независимый партнёр. Не платите, не увидев объект и документы.",
-    "sectionNav": "Разделы страницы агентства"
+    "sectionNav": "Разделы страницы агентства",
+    "officesTitle": "Наши офисы",
+    "officesDescription": "Филиалов помимо главного офиса: {count}",
+    "ogEyebrow": "Агентство недвижимости",
+    "ogOffers": "Предложения"
   },
   "agencyDirectory": {
     "searchLabel": "Поиск агентства",

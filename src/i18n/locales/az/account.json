@@ -224,7 +224,21 @@
     "reject": "Rədd et",
     "approveLabel": "{name} sorğusunu təsdiqlə",
     "rejectLabel": "{name} sorğusunu rədd et",
-    "requestSource": "Qoşulma sorğusu"
+    "requestSource": "Qoşulma sorğusu",
+    "inviteLink": {
+      "title": "Dəvət linki",
+      "description": "Linki agentlərinizə göndərin: qeydiyyatdan keçən və ya daxil olan agent təsdiq gözləmədən komandanıza qoşulur. Link yanlış yerə düşübsə, onu yeniləyin — köhnəsi dərhal etibarsız olur.",
+      "notVerified": "Link agentliyiniz təsdiqləndikdən sonra işləyəcək.",
+      "label": "Dəvət linki",
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "createdAt": "Yaradılıb: {date}",
+      "regenerate": "Yeni link yarat",
+      "disable": "Linki söndür",
+      "create": "Dəvət linki yarat",
+      "created": "Yeni dəvət linki yaradıldı. Köhnə link artıq işləmir.",
+      "disabled": "Dəvət linki söndürüldü."
+    }
   },
   "actions": {
     "genericCredentials": "E-poçt və ya parol yanlışdır.",
@@ -295,7 +309,7 @@
     "invalidBirthDate": "Doğum tarixi düzgün deyil.",
     "underage": "Qeydiyyat üçün ən azı 18 yaşınız olmalıdır.",
     "companyNameRequired": "Şirkətin adını yazın.",
-    "invalidTaxId": "VÖEN 10 rəqəmdən ibarət olmalıdır.",
+    "invalidTaxId": "VÖEN 10 rəqəmdən ibarət olmalı və 1 və ya 2 ilə bitməlidir.",
     "avatarOwnership": "Profil şəkli yalnız öz yüklədiyiniz fayl ola bilər.",
     "agencyNotFound": "Seçilmiş agentlik tapılmadı. Siyahıdan seçin və ya sahəni boş saxlayın.",
     "agencyRequestsFull": "Bu agentliyin çoxlu gözləyən sorğusu var. Qeydiyyatı agentliksiz tamamlayın və agentliyə müraciət edin.",
@@ -310,7 +324,8 @@
     "agencyLeft": "Agentlikdən çıxdınız.",
     "agencyRequestCancelled": "Sorğu ləğv edildi.",
     "employeeOtherAgency": "Bu şəxs artıq başqa agentliyin əməkdaşıdır və ya agentlik hesabıdır.",
-    "invalidInstagram": "Instagram istifadəçi adını yazın (hərf, rəqəm, nöqtə, alt xətt)."
+    "invalidInstagram": "Instagram istifadəçi adını yazın (hərf, rəqəm, nöqtə, alt xətt).",
+    "taxIdTaken": "Bu VÖEN ilə artıq agentlik qeydiyyatdan keçib. Səhv olduğunu düşünürsünüzsə, bizimlə əlaqə saxlayın."
   },
   "profile": {
     "metaTitle": "Profil",
@@ -386,7 +401,16 @@
     "agencyEmail": "Ofis e-poçtu",
     "agencyWhatsapp": "WhatsApp nömrəsi",
     "agencyInstagram": "Instagram",
-    "agencyInstagramHint": "İstifadəçi adı, məsələn @onehome"
+    "agencyInstagramHint": "İstifadəçi adı, məsələn @onehome",
+    "companyTaxIdHint": "10 rəqəm, sonuncusu 1 və ya 2. Təsdiq zamanı Vergilər Nazirliyinin bazası ilə yoxlanılır.",
+    "agencyCover": "Örtük şəkli",
+    "agencyCoverHint": "Profil səhifəsinin başında geniş foto — ofis, komanda və ya layihə. Tövsiyə: 1600×600 px.",
+    "rejectedAgencyTitle": "Agentlik müraciətiniz rədd edildi",
+    "rejectedAgentTitle": "Agent profiliniz təsdiqlənmədi",
+    "rejectedReason": "Səbəb: {reason}",
+    "rejectedHint": "Məlumatları düzəldib profili yadda saxlayın — müraciət avtomatik olaraq yenidən baxışa düşəcək.",
+    "officesSection": "Filiallar",
+    "officesSectionDescription": "Baş ofis yuxarıdakı «Ünvan» sahəsidir. Burada əlavə ofisləri yazın — onlar agentlik profilinizdə «Ofislərimiz» bölməsində görünəcək."
   },
   "savedSearches": {
     "metaTitle": "Saxlanmış axtarışlarım",
@@ -571,5 +595,82 @@
     "listing": "Elan: {title}",
     "call": "Zəng et",
     "reply": "Cavab yaz"
+  },
+  "offices": {
+    "name": "Filialın adı",
+    "namePlaceholder": "məs. Nərimanov filialı",
+    "city": "Şəhər / rayon",
+    "cityPlaceholder": "Seçin",
+    "address": "Ünvan",
+    "phone": "Filialın telefonu",
+    "hours": "İş saatları",
+    "hoursHint": "məs. B.e.–Cümə: 10:00–19:00",
+    "add": "Filial əlavə et",
+    "addTitle": "Yeni filial",
+    "empty": "Hələ filial əlavə edilməyib.",
+    "limit": "Ən çox {count} filial əlavə etmək olar.",
+    "removeLabel": "{name} filialını sil",
+    "removeTitle": "Filial silinsin?",
+    "removeDescription": "«{name}» agentlik profilindən çıxarılacaq.",
+    "remove": "Sil",
+    "added": "Filial əlavə olundu.",
+    "removed": "Filial silindi.",
+    "errors": {
+      "name": "Filialın adını yazın (2–120 simvol).",
+      "address": "Filialın ünvanını yazın (5–240 simvol).",
+      "city": "Siyahıdan şəhər və ya rayon seçin.",
+      "limit": "Ən çox {count} filial əlavə etmək olar.",
+      "notFound": "Filial tapılmadı."
+    }
+  },
+  "completeness": {
+    "title": "Profiliniz {percent}% doludur",
+    "doneTitle": "Profiliniz tam doludur",
+    "progressLabel": "Profilin doluluq faizi",
+    "hintAgency": "Tam profil müştəri etimadını və profil baxışlarını artırır. Ən çox fayda verən addımlar:",
+    "hintAgent": "Şəkli və geniş bio-su olan agentə müştərilər daha tez yazır. Ən çox fayda verən addımlar:",
+    "doneAgency": "Əla! Agentlik profiliniz müştərilər üçün tam hazırdır.",
+    "doneAgent": "Əla! Agent profiliniz müştərilər üçün tam hazırdır.",
+    "items": {
+      "logo": "Loqo yükləyin",
+      "description": "Agentlik haqqında ən azı 2–3 cümlə yazın",
+      "phone": "Ofis telefonunu düzgün formatda yazın",
+      "cover": "Örtük şəkli əlavə edin",
+      "address": "Ofis ünvanını yazın",
+      "hours": "İş saatlarını göstərin",
+      "taxId": "VÖEN-i daxil edin",
+      "whatsapp": "WhatsApp nömrəsi əlavə edin",
+      "email": "Ofis e-poçtunu yazın",
+      "web": "Sayt və ya Instagram əlavə edin",
+      "bio": "Özünüz haqqında ən azı 2–3 cümlə yazın",
+      "avatar": "Profil şəkli yükləyin",
+      "specialization": "İxtisasınızı göstərin",
+      "roleTitle": "Vəzifənizi yazın",
+      "experience": "Təcrübə ilini göstərin"
+    },
+    "more": "və daha {count} addım",
+    "cta": "Profili tamamla"
+  },
+  "join": {
+    "metaTitle": "Agentliyə qoşul",
+    "metaDescription": "Agentliyin dəvət linki ilə komandaya qoşulun.",
+    "eyebrow": "Komanda dəvəti",
+    "invalidTitle": "Link etibarsızdır",
+    "invalid": "Bu dəvət linki etibarsızdır və ya yenilənib. Agentlikdən yeni link istəyin.",
+    "browseAgencies": "Agentliklərə bax",
+    "title": "«{name}» sizi komandaya dəvət edir",
+    "description": "Agent hesabınızla bir kliklə «{name}» agentliyinə qoşulun.",
+    "verified": "Təsdiqlənmiş agentlik",
+    "benefitBadge": "Elanlarınızda agentliyin adı və nişanı görünəcək.",
+    "benefitProfile": "Agent profiliniz agentlik səhifəsinin «Agentlər» bölməsinə düşəcək.",
+    "benefitLeave": "İstənilən vaxt kabinetdən agentlikdən çıxa bilərsiniz.",
+    "register": "Agent kimi qeydiyyatdan keç",
+    "login": "Hesabım var — daxil ol",
+    "already": "Siz artıq «{name}» komandasındasınız.",
+    "openCabinet": "Kabinetə keç",
+    "notAgent": "Komandaya yalnız agent hesabı ilə qoşulmaq olar. Agent kimi ayrıca hesab yaradın.",
+    "submit": "«{name}» komandasına qoşul",
+    "otherAgency": "Siz başqa agentliyin əməkdaşısınız. Əvvəlcə kabinetdə həmin agentlikdən çıxın.",
+    "full": "Agentliyin komandasında boş yer qalmayıb. Agentliklə əlaqə saxlayın."
   }
 }

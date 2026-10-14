@@ -307,7 +307,8 @@
       "LISTING_EXPIRY": "Listing expiry",
       "PACKAGE": "Premium package",
       "AGENCY_TEAM": "Agency team",
-      "LISTING_LEAD": "Listing enquiry"
+      "LISTING_LEAD": "Listing enquiry",
+      "ACCOUNT_REVIEW": "Profile review"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -633,6 +634,14 @@
       "title": "Delete account",
       "description": "The “{name}” account will be deactivated, its sessions closed, its listings archived and the account permanently deleted. This cannot be undone.",
       "confirm": "Delete account"
+    },
+    "reason": {
+      "length": "The reason must be {min}–{max} characters.",
+      "failed": "The action failed. Please try again.",
+      "presets": "Quick reasons",
+      "label": "Reason (sent to the user)",
+      "labelOptional": "Reason (optional, sent to the user)",
+      "hint": "{count}/{max} characters"
     }
   },
   "pages": {
@@ -2753,7 +2762,52 @@
       "teamDescription": "Invitations and join requests; approved agents' listings count toward the agency's offers.",
       "teamEmpty": "No team members.",
       "rejected": "Rejected",
-      "backToList": "← Back to agencies"
+      "backToList": "← Back to agencies",
+      "waitingHours": "Waiting {count} h",
+      "waitingDays": "Waiting {count} days",
+      "overdueNotice": "{count} applications have been waiting more than 72 hours — review the red ones first.",
+      "bulkApprove": "Approve selected",
+      "bulkApproveTitle": "Bulk approval",
+      "bulkApproveAgencies": "The selected agencies will be verified and listed in the public directory. Owners will be notified.",
+      "bulkApproveAgents": "The selected agent profiles will be verified and published on the site. Agents will be notified.",
+      "bulkApproveTeam": "The selected employees will be added to their agency teams. The seat limit and the one-active-agency rule are checked for each.",
+      "rejectPresets": {
+        "agencyTaxId": "The tax ID (VÖEN) is invalid or was not found in the Ministry of Taxes register.",
+        "agencyBrand": "The agency name or logo does not match the company's official details.",
+        "agencyContact": "Contact details are incomplete — add an office phone and address.",
+        "agencyDuplicate": "This agency is already registered on the platform.",
+        "agentProfile": "The profile photo or full name is incomplete.",
+        "agentPhone": "We could not reach you on the phone number provided.",
+        "agentAgency": "Your work at the stated agency could not be confirmed.",
+        "teamUnknown": "The agency did not confirm this person as its employee.",
+        "teamProfile": "Account details are incomplete — complete the profile and apply again."
+      },
+      "inviteLinkSource": "Invite link",
+      "taxIdMissing": "No tax ID",
+      "taxIdHint": "10 digits, the last one is 1 or 2.",
+      "rejectNamed": "Reject {name}",
+      "rejectAgencyTitle": "Reject agency application",
+      "rejectAgencyDescription": "“{name}” stays unverified and leaves the queue. The reason is sent to the owner as a notification and email; the application returns to the queue when they update the profile.",
+      "rejectAgentTitle": "Reject agent profile",
+      "rejectAgentDescription": "The profile of “{name}” stays hidden and leaves the queue. The reason is sent to the agent as a notification and email.",
+      "reject": "Reject",
+      "tabRejected": "Rejected",
+      "rejectionReasonShort": "Rejection reason: {reason}",
+      "rejectedOn": "Rejected on {date}.",
+      "cover": "Cover image",
+      "coverHint": "A wide photo at the top of the profile. Recommended: 1600×600 px.",
+      "officesTitle": "Branches",
+      "officesDescription": "Offices in addition to the head office — shown in the “Our offices” section of the profile.",
+      "officesEmpty": "No branches.",
+      "officesLimit": "The branch limit ({count}) has been reached.",
+      "officeRemoveNamed": "Remove the {name} branch",
+      "officeRemoveTitle": "Remove branch",
+      "officeRemoveDescription": "“{name}” will be removed from the agency profile.",
+      "officeRemove": "Remove",
+      "officeAdd": "Add branch",
+      "officeName": "Branch name",
+      "officeCity": "City / district",
+      "officeCityPlaceholder": "Select"
     }
   },
   "server": {
@@ -2779,7 +2833,9 @@
       "musteriReyiDercEdildi": "Client review published.",
       "reyTapilmadi": "Review not found.",
       "musteriReyiSilindi": "Client review deleted.",
-      "tesdiqlendiVeDercEdildi": "The agent was approved and published in the public directory."
+      "tesdiqlendiVeDercEdildi": "The agent was approved and published in the public directory.",
+      "artiqTesdiqlenib": "The agent profile is already verified.",
+      "profilReddEdildi": "Profile rejected; the reason was sent to the agent."
     },
     "agentlikler": {
       "agentlikTapilmadi": "Agency not found.",
@@ -2803,7 +2859,20 @@
       "epoctFormati": "Enter a valid email address.",
       "saytFormati": "The website must start with https://.",
       "instagramFormati": "Enter an Instagram username (letters, digits, dot, underscore).",
-      "profilYenilendi": "Agency profile updated."
+      "profilYenilendi": "Agency profile updated.",
+      "reddSebebiUzunlugu": "The rejection reason must be {min}–{max} characters.",
+      "artiqTesdiqlenib": "The agency is already verified — revoke verification first to reject it.",
+      "muracietReddEdildi": "Application rejected; the reason was sent to the owner.",
+      "voenFormati": "The tax ID (VÖEN) must be 10 digits and end in 1 or 2.",
+      "voenTekrar": "This tax ID is registered on another active agency account.",
+      "ortukXetasi": "The cover image was not found in the media library — upload it again.",
+      "filialAdi": "Enter the branch name (2–120 characters).",
+      "filialUnvani": "Enter the branch address (5–240 characters).",
+      "filialSeheri": "Select a city or district from the list.",
+      "filialLimiti": "You can add up to {count} branches.",
+      "filialElaveEdildi": "Branch added.",
+      "filialTapilmadi": "Branch not found.",
+      "filialSilindi": "Branch removed."
     },
     "aiKomekci": {
       "workersAiCavabVerdiAmma": "Workers AI responded, but the reply did not match the health-check schema.",
