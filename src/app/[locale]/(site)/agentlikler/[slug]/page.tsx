@@ -48,7 +48,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: data.agency.name,
     description: data.agency.description || t("agencyFallback", { name: data.agency.name }),
     path: `/agentlikler/${data.agency.slug}`,
-    image: data.agency.logoUrl ?? undefined,
+    // Paylaşım kartı (#157): loqo + təklif sayı, 1200×630 — çılpaq loqo əvəzinə.
+    image: `/api/og/agency/${encodeURIComponent(data.agency.slug)}?l=${locale}`,
     locale: locale as Locale,
     managedEntity: { type: "AGENCY", id: data.agency.id },
   });
@@ -150,8 +151,28 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
             ]}
             className="mb-6"
           />
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-            <div className="relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-xl border border-gold-line bg-paper shadow-md sm:size-28">
+          {/* Örtük şəkli (#157): varsa loqo lövhəsi onun alt kənarına asılır. */}
+          {agency.coverUrl && (
+            <div className="relative h-40 overflow-hidden rounded-xl border border-line bg-beige shadow-xs sm:h-56 lg:h-64">
+              <Image
+                src={agency.coverUrl}
+                alt=""
+                fill
+                priority
+                sizes="(min-width: 1280px) 1200px, 100vw"
+                unoptimized={isUnoptimizedImage(agency.coverUrl)}
+                className="object-cover"
+              />
+              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent" />
+            </div>
+          )}
+          <div className={cn("flex flex-col gap-4 sm:flex-row sm:gap-6", agency.coverUrl ? "sm:items-end" : "sm:items-center")}>
+            <div
+              className={cn(
+                "relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-xl border border-gold-line bg-paper shadow-md sm:size-28",
+                agency.coverUrl && "-mt-12 ml-4 ring-4 ring-ivory sm:-mt-14 sm:ml-6",
+              )}
+            >
               {agency.logoUrl ? (
                 <Image
                   src={agency.logoUrl}
@@ -160,13 +181,13 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                   priority
                   sizes="112px"
                   unoptimized={isUnoptimizedImage(agency.logoUrl)}
-                  className="object-contain p-2"
+                  className="object-contain"
                 />
               ) : (
                 <Building2 className="size-10 text-gold-deep" strokeWidth={1.5} aria-hidden="true" />
               )}
             </div>
-            <div className="min-w-0">
+            <div className={cn("min-w-0", agency.coverUrl && "sm:pt-4")}>
               <p className="text-xs font-semibold tracking-[0.18em] text-gold-deep uppercase">{t("eyebrow")}</p>
               <h1 className="mt-1 font-display text-3xl leading-tight tracking-[-0.02em] text-ink sm:text-4xl">{agency.name}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -188,7 +209,7 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
           </div>
 
           {/* Statistika zolağı — təklif agentlik üçün, elan agent üçün (sahibin tələbi). */}
-          <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line shadow-xs sm:grid-cols-5">
+          <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line shadow-xs sm:grid-cols-5 [&>*:last-child]:col-span-2 sm:[&>*:last-child]:col-span-1">
             {statItems.map((item) => (
               <div key={item.label} className="flex items-center gap-3 bg-paper px-4 py-3.5">
                 <item.icon className="size-5 shrink-0 text-gold-deep" strokeWidth={1.5} aria-hidden="true" />
@@ -325,6 +346,61 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                             {place.name}
                             <span className="tabular text-xs text-ink-muted">{area.count}</span>
                           </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              )}
+
+              {data.offices.length > 0 && (
+                <section aria-labelledby="ofisler-title">
+                  <h2 id="ofisler-title" className="font-sans text-lg font-semibold text-ink">{t("officesTitle")}</h2>
+                  <p className="mt-1 text-sm text-ink-muted">{t("officesDescription", { count: data.offices.length })}</p>
+                  <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {data.offices.map((office) => {
+                      const officePhone = isPhoneLike(office.phone) ? office.phone : null;
+                      const place = [office.city ? localizeLocation(office.city, locale as Locale).name : null, office.address]
+                        .filter(Boolean)
+                        .join(", ");
+                      return (
+                        <li key={office.id} className="flex flex-col gap-3 rounded-lg border border-line bg-paper p-4 shadow-xs">
+                          <div>
+                            <p className="font-medium text-ink">{office.name}</p>
+                            <p className="mt-1 flex items-start gap-1.5 text-sm text-ink-soft">
+                              <MapPin className="mt-0.5 size-3.5 shrink-0 text-gold-deep" aria-hidden="true" />
+                              <span className="[overflow-wrap:anywhere]">{place}</span>
+                            </p>
+                            {office.workingHours && (
+                              <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-muted">
+                                <Clock className="size-3.5 shrink-0 text-gold-deep" aria-hidden="true" />
+                                {office.workingHours}
+                              </p>
+                            )}
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative mt-1 inline-block text-sm font-medium text-gold-deep underline-offset-4 after:absolute after:inset-x-0 after:-inset-y-3 hover:underline"
+                            >
+                              {t("openMap")}
+                            </a>
+                          </div>
+                          {officePhone && (
+                            <PublisherContactButtons
+                              propertyId={`${agency.slug}:${office.id}`}
+                              endpoint={`/api/agentlikler/${encodeURIComponent(agency.slug)}/elaqe?ofis=${encodeURIComponent(office.id)}`}
+                              maskedPhone={maskPhone(officePhone)}
+                              hasEmail={false}
+                              whatsappMessage={`${agency.name} — ${office.name}`}
+                              labels={{
+                                showPhone: content("showPhone"),
+                                showEmail: content("showEmail"),
+                                revealError: content("revealError"),
+                                noPhone: content("publisherNoPhone"),
+                              }}
+                            />
+                          )}
                         </li>
                       );
                     })}

@@ -43,7 +43,7 @@ export function AgencyCard({
               fill
               unoptimized={isUnoptimizedImage(agency.logoUrl)}
               sizes="64px"
-              className="object-contain p-1"
+              className="object-contain"
             />
           ) : (
             <Building2 className="size-7 text-gold-deep" strokeWidth={1.5} aria-hidden="true" />

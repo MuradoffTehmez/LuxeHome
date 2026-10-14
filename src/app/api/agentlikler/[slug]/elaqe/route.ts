@@ -22,7 +22,7 @@ const NO_STORE = { "Cache-Control": "private, no-store" };
  * (`Agency.email` və ya telefon sahəsinə yazılmış e-poçt). Hesabın giriş e-poçtu
  * heç vaxt açılmır — o, ofis əlaqəsi deyil, giriş məlumatıdır.
  */
-export async function POST(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
+export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     await assertSameOrigin();
   } catch (error) {
@@ -37,10 +37,23 @@ export async function POST(_request: Request, { params }: { params: Promise<{ sl
   const agency = slug.length <= 200
     ? await prisma.agency.findFirst({
         where: { slug, isVerified: true, ...(await demoWhere()), user: { isActive: true } },
-        select: { phone: true, whatsapp: true, email: true },
+        select: { id: true, phone: true, whatsapp: true, email: true },
       })
     : null;
   if (!agency) return NextResponse.json({ error: "not_found" }, { status: 404, headers: NO_STORE });
+
+  // Filialın nömrəsi (#157): `?ofis=<id>` — yalnız həmin agentliyin filialı.
+  const officeId = new URL(request.url).searchParams.get("ofis");
+  if (officeId) {
+    const office = officeId.length <= 40
+      ? await prisma.agencyOffice.findFirst({ where: { id: officeId, agencyId: agency.id }, select: { phone: true } })
+      : null;
+    if (!office) return NextResponse.json({ error: "not_found" }, { status: 404, headers: NO_STORE });
+    return NextResponse.json(
+      { phone: isPhoneLike(office.phone) ? office.phone!.trim() : null, whatsapp: null, email: null },
+      { headers: NO_STORE },
+    );
+  }
 
   const phone = isPhoneLike(agency.phone) ? agency.phone!.trim() : null;
   const misplacedEmail = agency.phone?.includes("@") ? agency.phone.trim() : null;

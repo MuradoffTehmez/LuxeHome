@@ -743,7 +743,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                           fill
                           sizes="48px"
                           unoptimized={isUnoptimizedImage(publisher.agency.logoUrl)}
-                          className="object-contain p-1"
+                          className="object-contain"
                         />
                       ) : publisher.agency ? (
                         <Building2 className="size-5 text-gold-deep" aria-hidden="true" />
