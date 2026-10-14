@@ -26,8 +26,10 @@ import type { AuthUser } from "@/lib/auth/types";
 
 /**
  * Elan şikayətlərinə admin qərarı (#159). Qərar elan üzrədir: həmin elanın bütün açıq
- * şikayətləri birlikdə bağlanır. Status keçidi şərti `updateMany` ilədir — iki moderator
- * eyni anda baxanda şikayət iki dəfə «həll edilmir».
+ * şikayətləri birlikdə bağlanır. D1-də tranzaksiya olmadığı üçün açıq şikayətlər əvvəl
+ * şərti `updateMany` ilə **götürülür**: yalnız onları götürən sorğu elanı dəyişir, sahibə
+ * bildiriş və audit yazır. Gecikmiş/eyni anda gələn ikinci sorğu heç nə götürmür və dayanır;
+ * elan yazılmasa götürülmüş şikayətlər yenidən açılır.
  */
 
 const LIST_PATH = "/admin/sikayetler";
@@ -49,12 +51,41 @@ async function closeOpenReports(
   status: typeof REPORT_STATUSES.RESOLVED | typeof REPORT_STATUSES.DISMISSED,
   resolution: string,
   note: string | null,
+  decidedAt = new Date(),
 ): Promise<number> {
   const { count } = await prisma.listingReport.updateMany({
     where: { propertyId, status: REPORT_STATUSES.OPEN },
-    data: { status, resolution, resolutionNote: note, resolvedById: actor.id, resolvedAt: new Date() },
+    data: { status, resolution, resolutionNote: note, resolvedById: actor.id, resolvedAt: decidedAt },
   });
   return count;
+}
+
+/** Kompensasiya: elan yazılmadısa bu sorğunun götürdüyü şikayətlər yenidən açılır. */
+async function reopenClaimedReports(actor: AuthUser, propertyId: string, decidedAt: Date): Promise<void> {
+  await prisma.listingReport.updateMany({
+    where: { propertyId, status: REPORT_STATUSES.RESOLVED, resolvedById: actor.id, resolvedAt: decidedAt },
+    data: { status: REPORT_STATUSES.OPEN, resolution: null, resolutionNote: null, resolvedById: null, resolvedAt: null },
+  });
+}
+
+/** Açıq şikayətləri götürür, sonra elanı dəyişir; elan yazılmasa götürüləni geri açır. */
+async function claimThenUpdate(
+  actor: AuthUser,
+  propertyId: string,
+  resolution: string,
+  note: string | null,
+  decidedAt: Date,
+  apply: () => Promise<unknown>,
+): Promise<boolean> {
+  const claimed = await closeOpenReports(actor, propertyId, REPORT_STATUSES.RESOLVED, resolution, note, decidedAt);
+  if (claimed === 0) return false;
+  try {
+    await apply();
+  } catch (error) {
+    await reopenClaimedReports(actor, propertyId, decidedAt).catch(() => undefined);
+    throw error;
+  }
+  return true;
 }
 
 async function loadProperty(propertyId: string) {
@@ -96,15 +127,18 @@ export async function archiveReportedListing(propertyId: string, reason: string)
     if (!property) return failure(msg("server.reports.elanTapilmadi"));
 
     const decidedAt = new Date();
-    await prisma.property.update({
-      where: { id: property.id },
-      data: {
-        status: PROPERTY_STATUSES.ARCHIVED,
-        ...propertyLifecycleData(PROPERTY_STATUSES.ARCHIVED, property, await propertyRetentionDays()),
-        moderationNote: note,
-      },
-    });
-    await closeOpenReports(actor, property.id, REPORT_STATUSES.RESOLVED, REPORT_RESOLUTIONS.ARCHIVED, note);
+    const retentionDays = await propertyRetentionDays();
+    const applied = await claimThenUpdate(actor, property.id, REPORT_RESOLUTIONS.ARCHIVED, note, decidedAt, () =>
+      prisma.property.update({
+        where: { id: property.id },
+        data: {
+          status: PROPERTY_STATUSES.ARCHIVED,
+          ...propertyLifecycleData(PROPERTY_STATUSES.ARCHIVED, property, retentionDays),
+          moderationNote: note,
+        },
+      }),
+    );
+    if (!applied) return failure(msg("server.reports.acikSikayetYoxdur"));
     if (property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF) {
       await noticeListingReportDecision({
         userId: property.author.id,
@@ -140,11 +174,14 @@ export async function closeReportedListing(propertyId: string): Promise<ActionSt
 
     const status = property.listingType === LISTING_TYPES.RENT ? PROPERTY_STATUSES.RENTED : PROPERTY_STATUSES.SOLD;
     const decidedAt = new Date();
-    await prisma.property.update({
-      where: { id: property.id },
-      data: { status, ...propertyLifecycleData(status, property, await propertyRetentionDays()) },
-    });
-    await closeOpenReports(actor, property.id, REPORT_STATUSES.RESOLVED, REPORT_RESOLUTIONS.MARKED_CLOSED, null);
+    const retentionDays = await propertyRetentionDays();
+    const applied = await claimThenUpdate(actor, property.id, REPORT_RESOLUTIONS.MARKED_CLOSED, null, decidedAt, () =>
+      prisma.property.update({
+        where: { id: property.id },
+        data: { status, ...propertyLifecycleData(status, property, retentionDays) },
+      }),
+    );
+    if (!applied) return failure(msg("server.reports.acikSikayetYoxdur"));
     if (property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF) {
       await noticeListingReportDecision({
         userId: property.author.id,
