@@ -507,6 +507,8 @@ export const NOTIFICATION_TYPES = {
   AGENCY_TEAM: "AGENCY_TEAM",
   /** Elan sahibinə gələn müraciət. */
   LISTING_LEAD: "LISTING_LEAD",
+  /** Agentlik/agent profilinin təsdiqi və ya rədd səbəbi (#157). */
+  ACCOUNT_REVIEW: "ACCOUNT_REVIEW",
 } as const;
 
 export type NotificationType =
@@ -522,6 +524,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   PACKAGE: "Premium paket",
   AGENCY_TEAM: "Agentlik komandası",
   LISTING_LEAD: "Elana müraciət",
+  ACCOUNT_REVIEW: "Profil təsdiqi",
 };
 
 // ---------------------------------------------------------------------------
@@ -1083,12 +1086,15 @@ export function isSellerFilter(value: unknown): value is SellerFilter {
 }
 
 /**
- * Komanda qeydinin mənbəyi: sahibin dəvəti (`INVITE`, admin təsdiqləyir) və ya
- * agentin qeydiyyatda göndərdiyi qoşulma sorğusu (`REQUEST`, sahib təsdiqləyir).
+ * Komanda qeydinin mənbəyi: sahibin dəvəti (`INVITE`, admin təsdiqləyir), agentin
+ * qeydiyyatda göndərdiyi qoşulma sorğusu (`REQUEST`, sahib təsdiqləyir) və ya sahibin
+ * dəvət linki ilə birbaşa qoşulma (`LINK`, #157 — linki sahib özü paylaşıb, ona görə
+ * qeyd dərhal təsdiqlənir).
  */
 export const AGENCY_EMPLOYEE_SOURCES = {
   INVITE: "INVITE",
   REQUEST: "REQUEST",
+  LINK: "LINK",
 } as const;
 
 export type AgencyEmployeeSource =
@@ -1100,6 +1106,13 @@ export type AgencyEmployeeSource =
  * siyahısını doldurmasın deyə ayrıca hədd var.
  */
 export const MAX_PENDING_AGENCY_REQUESTS = 20;
+
+/** Agentliyin baş ofisdən əlavə filial sayı (#157). */
+export const MAX_AGENCY_OFFICES = 20;
+
+/** Təsdiq mərkəzində rədd səbəbinin uzunluğu (#157) — bildiriş və e-poçta gedir. */
+export const REJECTION_REASON_MIN = 5;
+export const REJECTION_REASON_MAX = 500;
 
 // ---------------------------------------------------------------------------
 // TƏRƏFDAŞLAR (PARTNERS)
