@@ -191,7 +191,12 @@ export async function updatePublicProperty(
   const risk = await refreshListingRisk(id);
   const heldForReview = policy.status === PROPERTY_STATUSES.PUBLISHED && risk.level === "hold";
   if (heldForReview) {
-    await prisma.property.update({ where: { id }, data: { status: PROPERTY_STATUSES.PENDING } }).catch(() => undefined);
+    // Saxlama səssizcə udulmur: alınmasa elan dərcdə qalardı, istifadəçi xəta görüb təkrar göndərir.
+    try {
+      await prisma.property.update({ where: { id }, data: { status: PROPERTY_STATUSES.PENDING } });
+    } catch (error) {
+      return unexpected("riskli elan moderasiyaya göndərilmədi", error, t("actions.unexpected"));
+    }
   }
 
   queuePropertyVectorSync([id]);

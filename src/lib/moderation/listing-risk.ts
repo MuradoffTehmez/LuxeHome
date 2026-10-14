@@ -20,13 +20,16 @@ import {
  * elanları yoxlanılmır. Nəticə `Property.riskScore`/`riskFlags`-a yazılır və
  * moderasiya növbəsində göstərilir; `hold` səviyyəsində elan avtomatik dərc olunmur.
  *
- * Hesablama heç vaxt atmır: xəta olsa risk 0 sayılır — moderasiya köməkçisi elanın
- * saxlanmasını sındırmamalıdır (moderator onsuz da `PENDING` elanlara baxır).
+ * Hesablama heç vaxt atmır — moderasiya köməkçisi elanın saxlanmasını sındırmamalıdır.
+ * Amma nəticəsi bilinməyən yoxlama «təmiz» sayılmır: xəta olsa `hold` qaytarılır və elan
+ * moderatorun növbəsinə düşür (keçici D1 xətası avtomatik moderasiyanı yan keçməsin).
  */
 
 export type ListingRisk = { score: number; level: RiskLevel; flags: RiskFlag[] };
 
 const NO_RISK: ListingRisk = { score: 0, level: "none", flags: [] };
+/** Yoxlama alınmadı — nəticə bilinmir, elan dərc olunmadan moderatora gedir. */
+const UNKNOWN_RISK: ListingRisk = { score: 0, level: "hold", flags: [] };
 const DAY = 86_400_000;
 
 export async function assessListingRisk(propertyId: string, now = new Date()): Promise<ListingRisk> {
@@ -125,7 +128,7 @@ async function countForeignPhotoListings(urls: string[], authorId: string): Prom
   return foreign.length;
 }
 
-/** Riski hesablayıb elana yazır. Xəta olsa elan saxlanması sınmır — risk 0 qaytarılır. */
+/** Riski hesablayıb elana yazır. Xəta olsa elan saxlanması sınmır — `hold` qaytarılır. */
 export async function refreshListingRisk(propertyId: string): Promise<ListingRisk> {
   try {
     const risk = await assessListingRisk(propertyId);
@@ -140,6 +143,6 @@ export async function refreshListingRisk(propertyId: string): Promise<ListingRis
     return risk;
   } catch (error) {
     console.error("[moderation] risk hesablanmadı:", error instanceof Error ? error.message : error);
-    return NO_RISK;
+    return UNKNOWN_RISK;
   }
 }
