@@ -14,7 +14,8 @@ import { readLeadAttribution } from "@/lib/lead-attribution";
 import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
 import { SYSTEM_READ_ONLY_MESSAGE, isSystemWriteBlocked } from "@/lib/system-mode";
 import { resolveLeadProperty } from "@/lib/accounts/listing-leads";
-import { noticeListingLead } from "@/lib/accounts/account-notices";
+import { noticeAgencyLead, noticeLeadRouted, noticeListingLead } from "@/lib/accounts/account-notices";
+import { routeAgencyLead, routePropertyLead, type LeadRoute } from "@/lib/accounts/lead-routing";
 
 async function contactSchema() {
   let nameMin = "Ad ən azı 2 simvol olmalıdır";
@@ -134,19 +135,32 @@ export async function submitContactForm(
     // Elan səhifəsindən gələn müraciət elana bağlanır; id yalnız ictimai elana uyğun gəlsə qəbul olunur.
     const rawPropertyId = formData.get("propertyId");
     const property = typeof rawPropertyId === "string" ? await resolveLeadProperty(rawPropertyId) : null;
+    // Ünvan (#161): ictimai hesabın elanı müəllifə, agentliyin elanı/profil forması bölgü ilə agentə.
+    // Agentlik profilindəki forma `agency` slug-ı daşıyır; yalnız təsdiqlənmiş agentlik qəbul olunur.
+    const rawAgency = formData.get("agency");
+    const route: LeadRoute | null = property
+      ? await routePropertyLead(property)
+      : typeof rawAgency === "string" && rawAgency
+        ? await routeAgencyLead(rawAgency)
+        : null;
+    const toAgency = !property && route !== null;
 
     const lead = await prisma.lead.create({
       data: {
         name: result.data.name,
         phone: result.data.phone,
         email: result.data.email || null,
-        subject: result.data.subject || property?.title || null,
+        subject: result.data.subject || property?.title || (toAgency ? route?.agencyName : null) || null,
         message: result.data.message,
         // Forma yalnız iki mənbə daşıya bilər — client-in göndərdiyi dəyər allowlist-dən keçir.
         source: property
           ? LEAD_SOURCES.PROPERTY
-          : formData.get("source") === LEAD_SOURCES.OWNER ? LEAD_SOURCES.OWNER : LEAD_SOURCES.CONTACT,
+          : toAgency
+            ? LEAD_SOURCES.AGENCY
+            : formData.get("source") === LEAD_SOURCES.OWNER ? LEAD_SOURCES.OWNER : LEAD_SOURCES.CONTACT,
         propertyId: property?.id ?? null,
+        handlerId: route?.handlerId ?? null,
+        agencyId: route?.agencyId ?? null,
         status: LEAD_STATUSES.NEW,
         ...readLeadAttribution(formData),
       },
@@ -154,13 +168,25 @@ export async function submitContactForm(
 
     // İctimai hesabın elanı: müraciət sahibinə gedir (kabinet + e-poçt). Ofis kanallarına
     // göndərilmir — ofis bu elanın tərəfi deyil, ziyarətçinin məlumatı lazımsız yayılmasın.
-    if (property?.listerId) {
-      await noticeListingLead({
-        userId: property.listerId,
-        leadId: lead.id,
-        propertyTitle: property.title,
-        visitorName: lead.name,
-      });
+    if (route?.handlerId) {
+      if (route.routed) {
+        await noticeLeadRouted({
+          userId: route.handlerId,
+          leadId: lead.id,
+          agencyName: route.agencyName ?? "",
+          subject: property?.title ?? lead.subject ?? "",
+          visitorName: lead.name,
+        });
+      } else if (property) {
+        await noticeListingLead({
+          userId: route.handlerId,
+          leadId: lead.id,
+          propertyTitle: property.title,
+          visitorName: lead.name,
+        });
+      } else {
+        await noticeAgencyLead({ userId: route.handlerId, leadId: lead.id, visitorName: lead.name });
+      }
       return { success: true };
     }
 

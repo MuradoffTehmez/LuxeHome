@@ -158,13 +158,13 @@ export async function requireAdminAction(
 
 /** İctimai kabinet yazıları üçün CSRF, hesab növü və ayrıca sürət limiti qapısı. */
 export async function requirePublicAction(
-  scope: "media" | "avatar" | "property" | "review" | "reservation" | "preferences" | "push" | "team",
+  scope: "media" | "avatar" | "property" | "review" | "reservation" | "preferences" | "push" | "team" | "lead",
   locale: Locale = DEFAULT_LOCALE,
 ): Promise<AuthUser> {
   await assertSameOrigin();
   // Elan şəkli və elan yalnız elan yerləşdirə bilən hesaba açıqdır; profil şəkli
   // (`avatar`) isə hər ictimai hesaba — şəxsi istifadəçi də profilini tamamlaya bilməlidir.
-  const user = scope === "media" || scope === "property"
+  const user = scope === "media" || scope === "property" || scope === "lead"
     ? await requireLister(locale)
     : await requireAccount(locale);
   // İctimai hesab heç vaxt super admin deyil — rejim bağlıdırsa yazma da bağlıdır.

@@ -1,7 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const database = vi.hoisted(() => ({ leadCreate: vi.fn(), propertyFindFirst: vi.fn() }));
-const effects = vi.hoisted(() => ({ sendEmail: vi.fn(), telegram: vi.fn(), listerNotice: vi.fn() }));
+const effects = vi.hoisted(() => ({
+  sendEmail: vi.fn(),
+  telegram: vi.fn(),
+  listerNotice: vi.fn(),
+  routedNotice: vi.fn(),
+  agencyNotice: vi.fn(),
+}));
 const guard = vi.hoisted(() => ({
   requestHeaders: new Headers(),
   contactLimitOk: true,
@@ -12,6 +18,19 @@ vi.mock("@/lib/prisma", () => ({
 }));
 vi.mock("@/lib/accounts/account-notices", () => ({
   noticeListingLead: effects.listerNotice,
+  noticeLeadRouted: effects.routedNotice,
+  noticeAgencyLead: effects.agencyNotice,
+}));
+// Bölgü məntiqi öz testindədir (`lead-routing.integration.test.ts`); burada ünvan sadəcə ötürülür.
+vi.mock("@/lib/accounts/lead-routing", () => ({
+  routePropertyLead: async (property: { listerId: string | null }) => ({
+    handlerId: property.listerId,
+    agencyId: null,
+    agencyName: null,
+    routed: false,
+  }),
+  routeAgencyLead: async (slug: string) =>
+    slug === "alfa" ? { handlerId: "agent-1", agencyId: "agency-1", agencyName: "Alfa", routed: true } : null,
 }));
 vi.mock("@/lib/email", () => ({
   sendLeadNotificationEmail: effects.sendEmail,
@@ -228,6 +247,31 @@ describe("əlaqə forması — elan müraciəti", () => {
       data: expect.objectContaining({ propertyId: "prop-2", source: "PROPERTY" }),
     });
     expect(effects.listerNotice).not.toHaveBeenCalled();
+    expect(effects.telegram).toHaveBeenCalled();
+  });
+
+  it("agentlik profilindəki müraciəti agentliyə yazır və bölgü ilə seçilən agentə bildirir", async () => {
+    const formData = validFormData();
+    formData.set("agency", "alfa");
+
+    await submitContactForm({ success: false }, formData);
+
+    expect(database.leadCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ source: "AGENCY", agencyId: "agency-1", handlerId: "agent-1", propertyId: null }),
+    });
+    expect(effects.routedNotice).toHaveBeenCalledWith(expect.objectContaining({ userId: "agent-1", agencyName: "Alfa" }));
+    expect(effects.telegram).not.toHaveBeenCalled();
+  });
+
+  it("naməlum agentlik slug-ı ümumi müraciət kimi ofisə gedir", async () => {
+    const formData = validFormData();
+    formData.set("agency", "yoxdur");
+
+    await submitContactForm({ success: false }, formData);
+
+    expect(database.leadCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ source: "CONTACT", agencyId: null, handlerId: null }),
+    });
     expect(effects.telegram).toHaveBeenCalled();
   });
 

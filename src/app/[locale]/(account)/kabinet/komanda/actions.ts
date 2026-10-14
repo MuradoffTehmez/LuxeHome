@@ -10,6 +10,7 @@ import {
   AGENCY_EMPLOYEE_STATUSES,
   LISTING_HANDOVER,
   MAX_AGENCY_EMPLOYEES,
+  isLeadRoutingMode,
   type Locale,
 } from "@/lib/constants";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
@@ -345,5 +346,57 @@ async function setInviteLink(enabled: boolean): Promise<ActionState> {
     return success(enabled ? t("team.inviteLink.created") : t("team.inviteLink.disabled"));
   } catch (error) {
     return unexpected("dəvət linki dəyişmədi", error, t("actions.unexpected"));
+  }
+}
+
+/** Müraciət bölgüsü rejimi (#161): söndürülü, növbə ilə və ya ərazi üzrə. */
+export async function updateLeadRouting(mode: string): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  let owner;
+  try {
+    owner = await requireAgencyOwner(locale, {
+      agencyOnly: t("actions.agencyOnly"),
+      agencyProfileRequired: t("actions.agencyProfileRequired"),
+    });
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  if (!isLeadRoutingMode(mode)) return failure(t("actions.invalidForm"));
+  try {
+    await prisma.agency.update({ where: { id: owner.agency.id }, data: { leadRouting: mode } });
+    await recordDomainEvent("agency.lead_routing_changed", "Agency", owner.agency.id, { mode });
+    revalidatePath(localizePath("/kabinet/komanda", locale));
+    return success(t("team.routing.saved"));
+  } catch (error) {
+    return unexpected("müraciət bölgüsü saxlanmadı", error, t("actions.unexpected"));
+  }
+}
+
+/** Agentin müraciət növbəsində olub-olmaması (#161) — məsələn, məzuniyyətdə olan agent. */
+export async function setEmployeeReceivesLeads(id: string, receives: boolean): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  let owner;
+  try {
+    owner = await requireAgencyOwner(locale, {
+      agencyOnly: t("actions.agencyOnly"),
+      agencyProfileRequired: t("actions.agencyProfileRequired"),
+    });
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  try {
+    const { count } = await prisma.agencyEmployee.updateMany({
+      where: { id, agencyId: owner.agency.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+      data: { receivesLeads: receives === true },
+    });
+    if (count === 0) return failure(t("actions.employeeNotFound"));
+    revalidatePath(localizePath("/kabinet/komanda", locale));
+    return success(receives ? t("team.routing.memberOn") : t("team.routing.memberOff"));
+  } catch (error) {
+    return unexpected("agentin növbə ayarı saxlanmadı", error, t("actions.unexpected"));
   }
 }
