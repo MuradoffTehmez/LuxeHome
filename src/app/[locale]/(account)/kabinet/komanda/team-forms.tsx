@@ -1,13 +1,21 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { AlertCircle, Check, CheckCircle2, UserX, X } from "lucide-react";
+import { AlertCircle, Check, CheckCircle2, Copy, Link2, Link2Off, RefreshCw, UserX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
-import { approveAgencyRequest, inviteAgencyEmployee, rejectAgencyRequest, removeAgencyEmployee } from "./actions";
+import {
+  approveAgencyRequest,
+  disableInviteLink,
+  inviteAgencyEmployee,
+  regenerateInviteLink,
+  rejectAgencyRequest,
+  removeAgencyEmployee,
+} from "./actions";
 
 function StateMessage({ state }: { state: ActionState }) {
   if (state.status === "idle" || !state.message) return null;
@@ -100,6 +108,97 @@ export function ReviewRequestButtons({ id, name }: { id: string; name: string })
       >
         <X className="size-4" aria-hidden="true" />
       </ConfirmAction>
+    </div>
+  );
+}
+
+/**
+ * Dəvət linki (#157): sahib linki kopyalayıb agentlərinə göndərir, linklə gələn agent
+ * komandaya birbaşa qoşulur. «Yenilə» köhnə linki öldürür, «Söndür» linki bağlayır.
+ */
+export function InviteLinkCard({
+  url,
+  createdLabel,
+  agencyVerified,
+  disabled,
+}: {
+  url: string | null;
+  createdLabel: string | null;
+  agencyVerified: boolean;
+  disabled: boolean;
+}) {
+  const t = useTranslations("account.team.inviteLink");
+  const [state, setState] = useState<ActionState>(IDLE_STATE);
+  const [copied, setCopied] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+
+  function run(action: () => Promise<ActionState>) {
+    startTransition(async () => {
+      const result = await action();
+      setState(result);
+      setCopied(false);
+      if (result.status === "success") router.refresh();
+    });
+  }
+
+  async function copy() {
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <StateMessage state={state} />
+      {!agencyVerified && <p className="rounded-xs bg-warning-bg px-4 py-3 text-sm text-ink-soft">{t("notVerified")}</p>}
+      {url ? (
+        <>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <label className="sr-only" htmlFor="invite-link-url">{t("label")}</label>
+            <input
+              id="invite-link-url"
+              readOnly
+              value={url}
+              onFocus={(event) => event.currentTarget.select()}
+              className="min-h-11 min-w-0 flex-1 rounded-sm border border-line bg-ivory px-3 font-mono text-sm text-ink"
+            />
+            <Button type="button" variant="primary" onClick={copy} className="shrink-0">
+              {copied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
+              {copied ? t("copied") : t("copy")}
+            </Button>
+          </div>
+          <p className="text-xs text-ink-muted" aria-live="polite">
+            {createdLabel ? t("createdAt", { date: createdLabel }) : null}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" loading={pending} onClick={() => run(regenerateInviteLink)} disabled={disabled}>
+              <RefreshCw className="size-4" aria-hidden="true" />
+              {t("regenerate")}
+            </Button>
+            <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={() => run(disableInviteLink)}>
+              <Link2Off className="size-4" aria-hidden="true" />
+              {t("disable")}
+            </Button>
+          </div>
+        </>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          loading={pending}
+          onClick={() => run(regenerateInviteLink)}
+          disabled={disabled}
+          className="w-full sm:w-fit"
+        >
+          <Link2 className="size-4" aria-hidden="true" />
+          {t("create")}
+        </Button>
+      )}
     </div>
   );
 }

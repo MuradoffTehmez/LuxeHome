@@ -37,10 +37,19 @@ const TYPE_ICONS: Record<TypeKey, LucideIcon> = {
  * (doğum tarixi, tələb olunmayanda telefon) yığılan bölmədədir. Bütün sahələr yenə də
  * eyni `name`-lərlə göndərilir — server action (`registerAccount`) dəyişmir.
  */
-export function RegisterForm({ next, agencies = [] }: { next?: string; agencies?: RegistrationAgency[] }) {
+export function RegisterForm({
+  next,
+  agencies = [],
+  invite = null,
+}: {
+  next?: string;
+  agencies?: RegistrationAgency[];
+  /** Dəvət linki ilə gəlib (#157): forma agent növündə açılır, agentlik seçimi gizlənir. */
+  invite?: { token: string; agencyName: string } | null;
+}) {
   const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(registerAccount, IDLE_STATE);
-  const [accountType, setAccountType] = useState<string>(ACCOUNT_TYPES.USER);
+  const [accountType, setAccountType] = useState<string>(invite ? ACCOUNT_TYPES.AGENT : ACCOUNT_TYPES.USER);
   // Telefon hesab növünə görə əsas bölmə ilə «Əlavə məlumat» arasında yer dəyişir.
   // Sahə yeni yerdə yenidən yaradıldığı üçün dəyər state-də saxlanılır — əks halda
   // növü dəyişəndə yazılmış nömrə səssizcə silinirdi.
@@ -199,7 +208,8 @@ export function RegisterForm({ next, agencies = [] }: { next?: string; agencies?
               name="companyTaxId"
               label={t("fields.companyTaxId")}
               inputMode="numeric"
-              maxLength={14}
+              autoComplete="off"
+              maxLength={12}
               hint={t("fields.companyTaxIdHint")}
               error={state.fieldErrors?.companyTaxId}
             />
@@ -215,8 +225,17 @@ export function RegisterForm({ next, agencies = [] }: { next?: string; agencies?
         </fieldset>
       )}
 
+      {/* Dəvət linki: agent bu agentliyə birbaşa qoşulacaq (#157). */}
+      {invite && accountType === ACCOUNT_TYPES.AGENT && (
+        <div role="status" className="flex items-start gap-2.5 rounded-lg border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ink">
+          <Building2 className="mt-0.5 size-4 shrink-0 text-gold-deep" aria-hidden="true" />
+          <span>{t("registration.inviteBanner", { name: invite.agencyName })}</span>
+          <input type="hidden" name="inviteToken" value={invite.token} />
+        </div>
+      )}
+
       {/* Agent qeydiyyatda agentliyini adla tapıb seçir — sorğu agentlik sahibinə gedir. */}
-      {accountType === ACCOUNT_TYPES.AGENT && agencyOptions.length > 0 && (
+      {accountType === ACCOUNT_TYPES.AGENT && !invite && agencyOptions.length > 0 && (
         <Combobox
           name="agencySlug"
           label={t("fields.joinAgency")}

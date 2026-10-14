@@ -34,6 +34,8 @@ export const NEVER_CACHED_PREFIXES = [
   "/qeydiyyat",
   "/kabinet",
   "/hesab",
+  // Agentliyin dəvət linki (#157) — sessiya oxuyur və token daşıyır.
+  "/qosul",
   // Sessiyanı serverdə oxumur, amma istifadəçiyə məxsus səthdir və robots-dan
   // kənarlaşdırılıb — paylaşılan keşdə yeri yoxdur.
   "/favoritler",
