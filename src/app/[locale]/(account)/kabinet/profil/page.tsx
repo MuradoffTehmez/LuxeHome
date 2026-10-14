@@ -56,7 +56,18 @@ export default async function CabinetProfilePage() {
     isAgency
       ? prisma.agency.findUnique({
           where: { userId: user.id },
-          select: { name: true, slug: true, description: true, address: true, website: true, isVerified: true },
+          select: {
+            name: true,
+            slug: true,
+            description: true,
+            address: true,
+            website: true,
+            isVerified: true,
+            email: true,
+            whatsapp: true,
+            instagram: true,
+            workingHours: true,
+          },
         })
       : null,
     requirements.agent
@@ -160,6 +171,10 @@ export default async function CabinetProfilePage() {
             position: profile.position ?? "",
             agencyDescription: agency?.description ?? "",
             agencyAddress: agency?.address ?? "",
+            agencyEmail: agency?.email ?? "",
+            agencyWhatsapp: agency?.whatsapp ?? "",
+            agencyInstagram: agency?.instagram ?? "",
+            agencyHours: agency?.workingHours ?? "",
             agentRoleTitle: agent?.roleTitle ?? "",
             agentSpecialization: agent?.specialization ?? "",
             agentExperience: agent?.experienceYears != null ? String(agent.experienceYears) : "",

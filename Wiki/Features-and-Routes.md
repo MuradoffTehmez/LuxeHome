@@ -81,6 +81,9 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 - Detal səhifəsi əlaqəni elanı yerləşdirənə yönəldir: agentlik (ad, loqo, «Təsdiqlənmiş agentlik»), agent, mülkiyyətçi və ya şirkət. İctimai hesabın nömrəsi maskalıdır, «Nömrəni göstər» `POST /api/emlaklar/<id>/elaqe`-dən açır.
 - Kartda «Agentlik: Ad», «Mülkiyyətçi», «Agent» nişanı; siyahıda `?satici=OWNER|AGENCY|COMPANY` filtri.
 - `/satici/<id>` — satıcının bütün aktiv elanları (noindex).
+- `/agentlikler` — kataloq: adla axtarış (`?axtaris=`), kartda təklif sayı (satış/kirayə), agent sayı, təsvir; təklif sayına görə sıralanır.
+- `/agentlikler/<slug>` — agentlik profili: statistika (təklif, satış, kirayə, agent, baxış), Satış/Kirayə və növ bölmələri, sıralama, səhifələmə, fəaliyyət əraziləri, agentlər, «Nömrəni göstər», ünvan/iş saatları/sayt/Instagram.
+- Agentin elan sayı və səhifəsi öz yerləşdirdiyi və ona təyin edilmiş elanları birlikdə göstərir.
 - Elan səhifəsindən gələn müraciət elana bağlanır və ictimai hesabın elanında sahibin `/kabinet/muracietler` bölməsinə düşür.
 
 ### Favorit və müqayisə

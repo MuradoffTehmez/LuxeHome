@@ -222,6 +222,33 @@ export async function toggleAgentVisibility(id: string): Promise<ActionState> {
   }
 }
 
+/**
+ * Təsdiq növbəsindən bir kliklə: agent profilini təsdiqləyir və ictimai kataloqda dərc edir
+ * (#155). Əvvəl bunun üçün redaktə formasına girib iki ayrı bayrağı dəyişmək lazım idi.
+ */
+export async function approveAndPublishAgent(id: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  try {
+    const current = await prisma.agentProfile.findUnique({ where: { id }, select: { name: true, slug: true } });
+    if (!current) return failure(msg("server.agentler.agentTapilmadi"));
+    await prisma.agentProfile.update({ where: { id }, data: { isVerified: true, isPublic: true } });
+    await recordAudit(actor, "UPDATE", "AgentProfile", id, `${current.name} — təsdiqləndi və dərc edildi`);
+    revalidatePath("/admin/agentler");
+    revalidatePath("/admin/agentlikler/tesdiq");
+    revalidatePublicContent("agent", current.slug);
+    revalidatePublicContent("agency");
+    return success(msg("server.agentler.tesdiqlendiVeDercEdildi"));
+  } catch (error) {
+    return unexpected("agent təsdiqlənmədi", error, msg("server.common.unexpected"));
+  }
+}
+
 const testimonialSchema = z.object({
   customerName: z.string().trim().min(2).max(120),
   review: z.string().trim().min(10).max(2000),

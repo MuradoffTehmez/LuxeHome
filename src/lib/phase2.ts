@@ -2,36 +2,63 @@ import { prisma } from "@/lib/prisma";
 import { demoWhere } from "@/lib/demo-content";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
 import { REVIEW_STATUSES } from "@/lib/constants";
+import { agentListingWhere, countAgentListings } from "@/lib/agency-profile";
 
-/** İctimai agent kataloqu — qaralama və gizli profillər heç vaxt sızmır. */
+/**
+ * İctimai agent kataloqu — qaralama və gizli profillər heç vaxt sızmır.
+ * `_count.properties` agentin öz yerləşdirdiyi + ona təyin edilmiş elanların
+ * təkrarsız sayıdır (`countAgentListings`) — əlaqənin `_count`-u yalnız təyin edilmişləri
+ * sayırdı və agentin öz elanı kartda «0» görünürdü (#155).
+ */
 export async function getPublicAgents() {
-  return prisma.agentProfile.findMany({
+  const agents = await prisma.agentProfile.findMany({
     where: { isPublic: true, ...(await demoWhere()) },
     include: {
       agency: { select: { name: true, slug: true } },
       reviews: { where: { status: REVIEW_STATUSES.APPROVED }, select: { rating: true } },
-      _count: { select: { properties: { where: await publicPropertyWhere() } } },
     },
     orderBy: [{ isVerified: "desc" }, { soldCount: "desc" }, { name: "asc" }],
   });
+  const counts = await countAgentListings(agents);
+  return agents.map((agent) => ({ ...agent, _count: { properties: counts.get(agent.id) ?? 0 } }));
 }
 
-export async function getPublicAgentBySlug(slug: string) {
-  return prisma.agentProfile.findFirst({
+/** Agent səhifəsində bir səhifədə göstərilən elan sayı. */
+export const AGENT_LISTINGS_PAGE_SIZE = 24;
+
+export async function getPublicAgentBySlug(slug: string, page = 1) {
+  const agent = await prisma.agentProfile.findFirst({
     where: { slug, isPublic: true, ...(await demoWhere()) },
     include: {
       agency: { select: { name: true, slug: true, logoUrl: true } },
-      properties: {
-        where: await publicPropertyWhere(),
-        select: propertyCardSelect,
-        orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
-      },
       reviews: {
         where: { status: REVIEW_STATUSES.APPROVED },
         orderBy: { createdAt: "desc" },
       },
     },
   });
+  if (!agent) return null;
+  // Agentin öz yerləşdirdiyi və ona təyin edilmiş elanlar birlikdə. Ümumi say ayrıca
+  // sayılır — səhifədəki kart sayı (`properties.length`) cəm deyil.
+  const where = { ...(await publicPropertyWhere()), ...agentListingWhere(agent) };
+  const currentPage = Math.max(1, Math.floor(page) || 1);
+  const [properties, propertyCount] = await Promise.all([
+    prisma.property.findMany({
+      where,
+      select: propertyCardSelect,
+      orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
+      skip: (currentPage - 1) * AGENT_LISTINGS_PAGE_SIZE,
+      take: AGENT_LISTINGS_PAGE_SIZE,
+    }),
+    prisma.property.count({ where }),
+  ]);
+  return {
+    ...agent,
+    properties,
+    propertyCount,
+    page: currentPage,
+    pageCount: Math.max(1, Math.ceil(propertyCount / AGENT_LISTINGS_PAGE_SIZE)),
+  };
 }
 
 export async function getApprovedTestimonials(take = 6) {

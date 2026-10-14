@@ -10,6 +10,7 @@ import { getAdminI18n, getAdminMetadataT } from "@/lib/admin-i18n";
 import { prisma } from "@/lib/prisma";
 import { LEAD_STATUSES, PROPERTY_STATUSES } from "@/lib/constants";
 import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
+import { getApprovalCounts } from "@/lib/admin/approvals";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminMetadataT();
@@ -53,17 +54,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/admin/hesabim?parol=deyis");
   }
 
-  const [newLeads, draftProperties, pendingModeration] = await Promise.all([
+  const [newLeads, draftProperties, pendingModeration, approvals] = await Promise.all([
     prisma.lead.count({ where: { ...OFFICE_LEAD_WHERE, status: LEAD_STATUSES.NEW } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.DRAFT, deletedAt: null } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.PENDING, deletedAt: null } }),
+    getApprovalCounts(),
   ]);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ToastProvider>
         <ThemeSync preference={user.themePreference} />
-        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration }}>
+        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration, pendingApprovals: approvals.total }}>
           {children}
         </AdminShell>
       </ToastProvider>

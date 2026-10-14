@@ -2,7 +2,9 @@ import { getAdminT } from "@/lib/admin-i18n";
 import { Select } from "@/components/ui/field";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, Eye, EyeOff, Pencil, Star, Trash2, X } from "lucide-react";
+import { BadgeCheck, Check, Eye, EyeOff, Pencil, Star, Trash2, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { countAgentListings } from "@/lib/agency-profile";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { AdminForm } from "@/components/admin/form-shell";
@@ -15,6 +17,7 @@ import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { AgentForm, EMPTY_AGENT_FORM } from "./agent-form";
 import {
   approveAgentReview,
+  approveAndPublishAgent,
   createTestimonial,
   deleteAgentProfile,
   deleteTestimonial,
@@ -30,10 +33,19 @@ export const dynamic = "force-dynamic";
 
 const inputClass = "min-h-11 w-full rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink";
 
-export default async function AdminAgentsPage() {
+const AGENT_STATUSES = ["all", "pending", "public", "hidden"] as const;
+type AgentStatus = (typeof AGENT_STATUSES)[number];
+
+export default async function AdminAgentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
-  const [agents, reviews, testimonials, users, agencies] = await Promise.all([
+  const params = await searchParams;
+  const status: AgentStatus = AGENT_STATUSES.includes(params.status as AgentStatus) ? (params.status as AgentStatus) : "all";
+  const [allAgents, reviews, testimonials, users, agencies] = await Promise.all([
     prisma.agentProfile.findMany({
       include: { agency: { select: { name: true } }, _count: { select: { properties: true, reviews: true } } },
       orderBy: { name: "asc" },
@@ -43,6 +55,22 @@ export default async function AdminAgentsPage() {
     prisma.user.findMany({ where: { isActive: true, agentProfile: null }, select: { id: true, name: true, email: true }, orderBy: { name: "asc" } }),
     prisma.agency.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
   ]);
+
+  // Təsdiq gözləyən = heç təsdiqlənməmiş profil (təsdiq növbəsi ilə eyni qayda);
+  // təsdiqlənib qəsdən gizlədilən profil «Gizli» tabındadır.
+  const matches = (agent: (typeof allAgents)[number], value: AgentStatus) =>
+    value === "all"
+    || (value === "pending" && !agent.isVerified)
+    || (value === "public" && agent.isPublic)
+    || (value === "hidden" && !agent.isPublic);
+  const agents = allAgents.filter((agent) => matches(agent, status));
+  const listingCounts = await countAgentListings(agents);
+  const statusTabs = [
+    { value: "all" as const, label: t("pages.agencyHub.tabAll") },
+    { value: "pending" as const, label: t("pages.agencyHub.tabPending") },
+    { value: "public" as const, label: t("pages.agents.ictimai") },
+    { value: "hidden" as const, label: t("pages.agents.gizli") },
+  ].map((tab) => ({ ...tab, count: allAgents.filter((agent) => matches(agent, tab.value)).length }));
 
   const userOptions = users.map((user) => ({ id: user.id, label: `${user.name} · ${user.email}` }));
   const agencyOptions = agencies.map((agency) => ({ id: agency.id, label: agency.name }));
@@ -66,13 +94,36 @@ export default async function AdminAgentsPage() {
           <AdminForm action={createTestimonial} submitLabel={t("pages.agents.reyiDercEt")} className="gap-4">
             <label className="text-sm text-ink-soft">{t("pages.agents.musterininAdi")}<input className={`${inputClass} mt-1`} name="customerName" required /></label>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"><label className="text-sm text-ink-soft">{t("pages.agents.qiymet")}<select className={`${inputClass} mt-1`} name="rating" defaultValue="5">{[5,4,3,2,1].map((value) => <option key={value} value={value}>{value}</option>)}</select></label><label className="text-sm text-ink-soft">{t("pages.agents.xidmetNovu")}<input className={`${inputClass} mt-1`} name="serviceType" /></label></div>
-            <Select searchable label={t("pages.agents.agent")} name="agentId" placeholder={t("pages.agents.sirketReyi")} options={agents.map((agent) => ({ value: agent.id, label: agent.name }))} />
+            <Select searchable label={t("pages.agents.agent")} name="agentId" placeholder={t("pages.agents.sirketReyi")} options={allAgents.map((agent) => ({ value: agent.id, label: agent.name }))} />
             <label className="text-sm text-ink-soft">{t("pages.agents.rey")}<textarea className={`${inputClass} mt-1 min-h-32 py-2`} name="review" required /></label>
           </AdminForm>
         </AdminCard>
       </div>
 
-      <AdminCard title={t("pages.agents.agentProfilleri")} className="mt-6" bodyClassName="p-0">
+      <AdminCard
+        id="profiller"
+        title={t("pages.agents.agentProfilleri")}
+        className="mt-6"
+        bodyClassName="p-0"
+        actions={
+          <nav aria-label={t("pages.agencyHub.statusNav")} className="flex flex-wrap gap-1.5">
+            {statusTabs.map((tab) => (
+              <Link
+                key={tab.value}
+                href={tab.value === "all" ? "/admin/agentler#profiller" : `/admin/agentler?status=${tab.value}#profiller`}
+                aria-current={status === tab.value ? "page" : undefined}
+                className={cn(
+                  "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors",
+                  status === tab.value ? "border-gold bg-gold/10 font-medium text-ink" : "border-line bg-paper text-ink-soft hover:border-gold",
+                )}
+              >
+                {tab.label}
+                <span className="tabular text-xs text-ink-muted">{tab.count}</span>
+              </Link>
+            ))}
+          </nav>
+        }
+      >
         {agents.length === 0 ? <div className="p-5"><EmptyState title={t("pages.agents.agentProfiliYoxdur")} /></div> : <ul className="divide-y divide-line">{agents.map((agent) => (
           <li key={agent.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="min-w-0">
@@ -82,12 +133,25 @@ export default async function AdminAgentsPage() {
                 {agent.isPublic ? <Badge tone="gold">{t("pages.agents.ictimai")}</Badge> : <Badge tone="neutral">{t("pages.agents.gizli")}</Badge>}
               </div>
               <p className="mt-1 text-xs text-ink-muted">
-                {agent.agency?.name ?? t("pages.misc.musteqil")} · {t("pages.misc.elanRey", { p0: agent._count.properties, p1: agent._count.reviews })} ·{" "}
+                {agent.agency?.name ?? t("pages.misc.musteqil")} · {t("pages.misc.elanRey", { p0: listingCounts.get(agent.id) ?? 0, p1: agent._count.reviews })} ·{" "}
                 {agent.responseMinutes != null ? t("pages.common.deqCavab", { p0: agent.responseMinutes }) : t("pages.misc.cavabMuddetiYoxdur")} ·{" "}
                 {parseJsonArray(agent.languages).join(", ") || t("pages.misc.dilQeydEdilmeyib")}
               </p>
             </div>
             <div className="flex shrink-0 items-center">
+              {!agent.isVerified && (
+                <ConfirmAction
+                  action={approveAndPublishAgent}
+                  id={agent.id}
+                  label={t("pages.agencyHub.approvePublishNamed", { name: agent.name })}
+                  title={t("pages.agencyHub.approvePublish")}
+                  description={t("pages.agencyHub.approvePublishDescription", { name: agent.name })}
+                  confirmLabel={t("pages.agencyHub.approvePublish")}
+                  tone="neutral"
+                >
+                  <BadgeCheck className="size-4" aria-hidden="true" />
+                </ConfirmAction>
+              )}
               <Link
                 href={`/admin/agentler/${agent.id}`}
                 aria-label={t("pages.common.profiliniRedakteEt", { p0: agent.name })}
@@ -102,7 +166,7 @@ export default async function AdminAgentsPage() {
         ))}</ul>}
       </AdminCard>
 
-      <AdminCard title={t("pages.agents.moderasiyaGozleyenAgentReyleri")} className="mt-6" bodyClassName="p-0">
+      <AdminCard id="reyler" title={t("pages.agents.moderasiyaGozleyenAgentReyleri")} className="mt-6" bodyClassName="p-0">
         {reviews.length === 0 ? <div className="p-5"><EmptyState title={t("pages.agents.moderasiyaNovbesiBosdur")} /></div> : <ul className="divide-y divide-line">{reviews.map((review) => (
           <li key={review.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><div className="flex items-center gap-2"><p className="font-medium text-ink">{review.customerName} → {review.agent.name}</p><span className="flex items-center gap-1 text-sm text-gold-deep"><Star className="size-4 fill-current" /> {review.rating}</span></div><p className="mt-1 max-w-3xl text-sm text-ink-soft">{review.comment}</p><p className="mt-1 text-xs text-ink-muted">{formatDateTime(review.createdAt)}</p></div><div className="flex shrink-0"><ConfirmAction action={approveAgentReview} id={review.id} label={t("pages.agents.reyiTesdiqle")} title={t("pages.agents.reyTesdiqlensin")} description={t("pages.agents.reyAgentProfilindeIctimai")} confirmLabel={t("pages.agents.tesdiqle")} tone="neutral"><Check className="size-4" /></ConfirmAction><ConfirmAction action={rejectAgentReview} id={review.id} label={t("pages.agents.reyiReddEt")} title={t("pages.agents.reyReddEdilsin")} description={t("pages.agents.reyIctimaiGosterilmeyecek")} confirmLabel={t("pages.agents.reddEt")}><X className="size-4" /></ConfirmAction></div></li>
         ))}</ul>}

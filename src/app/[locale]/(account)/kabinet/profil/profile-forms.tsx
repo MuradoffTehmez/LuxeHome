@@ -43,6 +43,10 @@ export type ProfileFormValues = {
   position: string;
   agencyDescription: string;
   agencyAddress: string;
+  agencyEmail: string;
+  agencyWhatsapp: string;
+  agencyInstagram: string;
+  agencyHours: string;
   agentRoleTitle: string;
   agentSpecialization: string;
   agentExperience: string;
@@ -147,6 +151,42 @@ export function ProfileForm({
                 maxLength={240}
                 error={state.fieldErrors?.agencyAddress}
               />
+              {/* Agentliyin ictimai profil səhifəsində göstərilir (#155). */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <Input
+                  name="agencyHours"
+                  label={t("agencyHours")}
+                  hint={t("agencyHoursHint")}
+                  defaultValue={values.agencyHours}
+                  maxLength={120}
+                  error={state.fieldErrors?.agencyHours}
+                />
+                <Input
+                  name="agencyEmail"
+                  label={t("agencyEmail")}
+                  type="email"
+                  defaultValue={values.agencyEmail}
+                  maxLength={200}
+                  error={state.fieldErrors?.agencyEmail}
+                />
+                <Input
+                  name="agencyWhatsapp"
+                  label={t("agencyWhatsapp")}
+                  type="tel"
+                  placeholder="+994 XX XXX XX XX"
+                  defaultValue={values.agencyWhatsapp}
+                  maxLength={30}
+                  error={state.fieldErrors?.agencyWhatsapp}
+                />
+                <Input
+                  name="agencyInstagram"
+                  label={t("agencyInstagram")}
+                  hint={t("agencyInstagramHint")}
+                  defaultValue={values.agencyInstagram}
+                  maxLength={31}
+                  error={state.fieldErrors?.agencyInstagram}
+                />
+              </div>
             </>
           )}
         </fieldset>

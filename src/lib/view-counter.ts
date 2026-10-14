@@ -28,11 +28,15 @@ export function isLikelyBot(userAgent: string | null | undefined): boolean {
   return BOT_PATTERN.test(userAgent);
 }
 
-type ViewTarget = "property" | "post" | "knowledge";
+type ViewTarget = "property" | "post" | "knowledge" | "agency";
 
 function incrementQuery(target: ViewTarget, id: string): Promise<unknown> {
   if (target === "property") {
     return prisma.property.update({ where: { id }, data: { viewCount: { increment: 1 } } });
+  }
+  if (target === "agency") {
+    // Agentlik profilinin «Baxışlar» göstəricisi (#155).
+    return prisma.agency.update({ where: { id }, data: { viewCount: { increment: 1 } } });
   }
   if (target === "knowledge") {
     return prisma.knowledgeArticle.update({ where: { id }, data: { viewCount: { increment: 1 } } });

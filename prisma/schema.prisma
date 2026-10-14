@@ -155,6 +155,14 @@ model Agency {
   phone       String?
   address     String?
   website     String?
+  /// İctimai profil (bina.az tipli): ofis e-poçtu, WhatsApp, Instagram və iş saatları
+  /// («Hər gün: 10:00-20:00» kimi sərbəst mətn). Telefonla eyni «Nömrəni göstər» ilə açılır.
+  email        String?
+  whatsapp     String?
+  instagram    String?
+  workingHours String?
+  /// Profil səhifəsinin baxış sayğacı (`recordView("agency")`), bot-lar sayılmır.
+  viewCount    Int       @default(0)
   isVerified  Boolean   @default(false)
   verifiedAt  DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.

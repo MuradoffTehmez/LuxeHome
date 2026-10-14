@@ -6,7 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
-import { composeName, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
+import { composeName, isPhoneLike, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
 import { requireAccount, currentSessionId } from "@/lib/auth/guard";
 import { systemModeBlock } from "@/lib/admin/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
@@ -46,13 +46,22 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
     .object({
       firstName: z.string().trim().min(2, t("actions.firstNameRequired")).max(60, t("actions.invalidField")),
       lastName: z.string().trim().min(2, t("actions.lastNameRequired")).max(60, t("actions.invalidField")),
-      phone: z.string().trim().min(7, t("actions.invalidPhone")).max(30, t("actions.invalidField")).nullable(),
+      phone: z.string().trim().max(30, t("actions.invalidField")).refine(isPhoneLike, t("actions.invalidPhone")).nullable(),
       avatarUrl: z.string().trim().max(500).nullable(),
       companyName: z.string().trim().max(160, t("actions.invalidField")).nullable(),
       companyWebsite: optionalUrl,
       position: z.string().trim().max(120, t("actions.invalidField")).nullable(),
       agencyDescription: z.string().trim().max(2000, t("actions.invalidField")).nullable(),
       agencyAddress: z.string().trim().max(240, t("actions.invalidField")).nullable(),
+      agencyEmail: z.string().trim().toLowerCase().max(200, t("actions.invalidField")).pipe(z.email(t("actions.invalidEmail"))).nullable(),
+      agencyWhatsapp: z.string().trim().max(30, t("actions.invalidField")).refine(isPhoneLike, t("actions.invalidPhone")).nullable(),
+      agencyInstagram: z
+        .string()
+        .trim()
+        .regex(/^@?[A-Za-z0-9._]{1,30}$/, t("actions.invalidInstagram"))
+        .transform((value) => value.replace(/^@/, ""))
+        .nullable(),
+      agencyHours: z.string().trim().max(120, t("actions.invalidField")).nullable(),
       agentRoleTitle: z.string().trim().max(120, t("actions.invalidField")).nullable(),
       agentSpecialization: z.string().trim().max(160, t("actions.invalidField")).nullable(),
       agentExperience: z.number().int().min(0).max(70).nullable(),
@@ -77,6 +86,10 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
     position: form.optionalText(formData, "position"),
     agencyDescription: form.optionalText(formData, "agencyDescription"),
     agencyAddress: form.optionalText(formData, "agencyAddress"),
+    agencyEmail: form.optionalText(formData, "agencyEmail"),
+    agencyWhatsapp: form.optionalText(formData, "agencyWhatsapp"),
+    agencyInstagram: form.optionalText(formData, "agencyInstagram"),
+    agencyHours: form.optionalText(formData, "agencyHours"),
     agentRoleTitle: form.optionalText(formData, "agentRoleTitle"),
     agentSpecialization: form.optionalText(formData, "agentSpecialization"),
     agentExperience: form.integer(formData, "agentExperience"),
@@ -153,6 +166,10 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
         description: data.agencyDescription,
         address: data.agencyAddress,
         website: data.companyWebsite,
+        email: data.agencyEmail,
+        whatsapp: data.agencyWhatsapp,
+        instagram: data.agencyInstagram,
+        workingHours: data.agencyHours,
         phone: data.phone,
         // Loqo profil şəkli ilə eynidir: şəkil silinəndə agentlikdən də silinir (əvvəl köhnə
         // loqo qalırdı). Profil şəklindən gəlməyən köhnə loqoya isə toxunulmur.

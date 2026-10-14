@@ -160,7 +160,8 @@ export const getCachedHomeSocialProof = cachedQuery(
     ]);
     return { testimonials, agents: agents.slice(0, 3) };
   },
-  ["public-home-social-proof-v1"],
+  // v2: agent elan sayı öz elanlarını da sayır (#155).
+  ["public-home-social-proof-v2"],
   {
     tags: [PUBLIC_CACHE_TAGS.home, PUBLIC_CACHE_TAGS.agents],
     revalidate: FIVE_MINUTES,

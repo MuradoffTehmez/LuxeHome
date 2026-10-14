@@ -119,7 +119,11 @@ Paketin adı, müddəti və qiyməti sifarişə kopyalanır (sonrakı qiymət d�
 
 - `/admin/istifadeciler` — əməkdaş yaratma, rol, aktivlik, parol/2FA sıfırlama, sessiyaların ləğvi (`user:manage`).
 - `/admin/hesablar` — ictimai hesabların təsdiqi (`approvedAt`), bloklanması (`isActive`) və silinməsi. Silmə kabinetdəki self-service silmə ilə eyni iki mərhələli yoldan keçir.
-- `/admin/agentlikler`, `/admin/agentler` — agentlik verification, agent profilləri, rəy moderasiyası.
+- **Agentliklər və agentlər** (ayrıca menyu bəndi, gözləyən təsdiqlərin sayğacı ilə):
+  - `/admin/agentlikler/tesdiq` — təsdiq növbəsi: gözləyən agentliklər (bir kliklə təsdiq), agent profilləri («Təsdiqlə və dərc et»), komanda sorğuları və rəylər.
+  - `/admin/agentlikler` — status tabları (gözləyən / təsdiqlənmiş / profilsiz), ad və e-poçt axtarışı, təklif sayı, loqo, redaktəyə keçid.
+  - `/admin/agentlikler/<id>` — agentlik profilinin tam redaktəsi (ad, təsvir, telefon, WhatsApp, e-poçt, iş saatları, ünvan, sayt, Instagram), loqo, təsdiq və komanda.
+  - `/admin/agentler` — status tabları (gözləyən / ictimai / gizli), agent profilləri, rəy moderasiyası.
 
 ## Məzmun
 

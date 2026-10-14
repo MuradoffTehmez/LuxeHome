@@ -309,7 +309,8 @@
     "agencyRequestSent": "Sorğu «{name}» agentliyinə göndərildi. Təsdiqləndikdə bildiriş alacaqsınız.",
     "agencyLeft": "Agentlikdən çıxdınız.",
     "agencyRequestCancelled": "Sorğu ləğv edildi.",
-    "employeeOtherAgency": "Bu şəxs artıq başqa agentliyin əməkdaşıdır və ya agentlik hesabıdır."
+    "employeeOtherAgency": "Bu şəxs artıq başqa agentliyin əməkdaşıdır və ya agentlik hesabıdır.",
+    "invalidInstagram": "Instagram istifadəçi adını yazın (hərf, rəqəm, nöqtə, alt xətt)."
   },
   "profile": {
     "metaTitle": "Profil",
@@ -379,7 +380,13 @@
     "agencyRequest": "Sorğu göndər",
     "agencyCancel": "Sorğunu ləğv et",
     "agencyLeave": "Agentlikdən çıx",
-    "agencyLeaveDescription": "«{name}» ilə əlaqə kəsiləcək. Yenidən qoşulmaq üçün yeni sorğu lazımdır."
+    "agencyLeaveDescription": "«{name}» ilə əlaqə kəsiləcək. Yenidən qoşulmaq üçün yeni sorğu lazımdır.",
+    "agencyHours": "İş saatları",
+    "agencyHoursHint": "Məsələn: Hər gün 10:00–20:00",
+    "agencyEmail": "Ofis e-poçtu",
+    "agencyWhatsapp": "WhatsApp nömrəsi",
+    "agencyInstagram": "Instagram",
+    "agencyInstagramHint": "İstifadəçi adı, məsələn @onehome"
   },
   "savedSearches": {
     "metaTitle": "Saxlanmış axtarışlarım",

@@ -67,6 +67,7 @@ export async function AdminPageHeader({
 // ---------------------------------------------------------------------------
 
 export function AdminCard({
+  id,
   title,
   description,
   actions,
@@ -74,6 +75,8 @@ export function AdminCard({
   bodyClassName,
   children,
 }: {
+  /** Səhifədaxili keçid hədəfi (`#agentlikler`). */
+  id?: string;
   title?: string;
   description?: string;
   actions?: React.ReactNode;
@@ -83,7 +86,8 @@ export function AdminCard({
 }) {
   return (
     <section
-      className={cn("overflow-hidden rounded-xl border border-line bg-paper shadow-xs", className)}
+      id={id}
+      className={cn("scroll-mt-24 overflow-hidden rounded-xl border border-line bg-paper shadow-xs", className)}
     >
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">

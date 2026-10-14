@@ -11,13 +11,27 @@ test.skip(!authFixturesEnabled, "auth fixture-ları yoxdur (staging run)");
 test.use({ storageState: ADMIN_STORAGE_STATE });
 
 test.describe("Admin panel", () => {
-  const pages = ["/admin", "/admin/emlaklar", "/admin/emlaklar/yeni", "/admin/media", "/admin/parametrler", "/admin/layiheler"];
+  const pages = [
+    "/admin",
+    "/admin/emlaklar",
+    "/admin/emlaklar/yeni",
+    "/admin/media",
+    "/admin/parametrler",
+    "/admin/layiheler",
+    // Agentlik və agent idarəetməsi (#155): təsdiq növbəsi, status tabları.
+    "/admin/agentlikler/tesdiq",
+    "/admin/agentlikler",
+    "/admin/agentlikler?status=pending",
+    "/admin/agentler?status=pending",
+  ];
 
   for (const path of pages) {
     test(`«${path}» sessiya ilə açılır və xam tərcümə açarı göstərmir`, async ({ page }) => {
       const response = await page.goto(path);
       expect(response?.status(), `${path} statusu`).toBe(200);
-      await expect(page).toHaveURL(new RegExp(`${path}(?:[?#]|$)`));
+      // Yol `?status=` daşıya bilər — regex metasimvolları escape olunur.
+      const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      await expect(page).toHaveURL(new RegExp(`${escaped}(?:[?#&]|$)`));
       await expectNoRawMessageKeys(page);
     });
   }

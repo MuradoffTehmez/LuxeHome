@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Check, ShieldCheck, ShieldX, X } from "lucide-react";
+import { Building2, Pencil, Search, ShieldCheck, ShieldX } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   AdminCard,
@@ -14,10 +15,13 @@ import {
 } from "@/components/admin/admin-responsive-list";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatDateTime } from "@/lib/utils";
-import { AGENCY_EMPLOYEE_ROLE_LABELS, AGENCY_EMPLOYEE_SOURCES, PERMISSIONS } from "@/lib/constants";
+import { PERMISSIONS } from "@/lib/constants";
+import { countAgencyOffers } from "@/lib/agency-profile";
+import { buttonClassName } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminAgencies, getAdminAgencyEmployeeQueue } from "@/lib/queries";
-import { approveAgencyEmployee, bulkAgencies, rejectAgencyEmployee, toggleAgencyVerification } from "./actions";
+import { bulkAgencies, toggleAgencyVerification } from "./actions";
 import { AccountDelete } from "../hesablar/account-delete";
 import { BulkRowCheckbox, BulkSelectionForm } from "@/components/admin/bulk-selection";
 import { AgencyProfileRepair } from "./agency-profile-repair";
@@ -30,13 +34,70 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-export default async function AdminAgenciesPage() {
+const STATUSES = ["all", "pending", "verified", "missing"] as const;
+type StatusFilter = (typeof STATUSES)[number];
+
+export default async function AdminAgenciesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
-  const [agencies, employeeQueue] = await Promise.all([
+  const params = await searchParams;
+  const status: StatusFilter = STATUSES.includes(params.status as StatusFilter) ? (params.status as StatusFilter) : "all";
+  const query = typeof params.q === "string" ? params.q.trim().slice(0, 80) : "";
+  const [allAgencies, employeeQueue] = await Promise.all([
     getAdminAgencies(),
     getAdminAgencyEmployeeQueue(),
   ]);
+  const matchesStatus = (account: (typeof allAgencies)[number], value: StatusFilter) =>
+    value === "all"
+    || (value === "pending" && account.agency != null && !account.agency.isVerified)
+    || (value === "verified" && account.agency?.isVerified === true)
+    || (value === "missing" && account.agency == null);
+  const needle = query.toLocaleLowerCase("az");
+  const agencies = allAgencies.filter((account) =>
+    matchesStatus(account, status)
+    && (!needle || [account.agency?.name, account.name, account.email].some((value) => value?.toLocaleLowerCase("az").includes(needle))),
+  );
+  const tabs = [
+    { value: "all" as const, label: t("pages.agencyHub.tabAll") },
+    { value: "pending" as const, label: t("pages.agencyHub.tabPending") },
+    { value: "verified" as const, label: t("pages.agencyHub.tabVerified") },
+    { value: "missing" as const, label: t("pages.agencyHub.tabMissing") },
+  ].map((tab) => ({ ...tab, count: allAgencies.filter((account) => matchesStatus(account, tab.value)).length }));
+  const tabHref = (value: StatusFilter) => {
+    const next = new URLSearchParams();
+    if (value !== "all") next.set("status", value);
+    if (query) next.set("q", query);
+    const text = next.toString();
+    return text ? `/admin/agentlikler?${text}` : "/admin/agentlikler";
+  };
+  // Təklif sayı sahib + təsdiqlənmiş agentlərin elanlarıdır — ictimai kataloqla eyni qayda.
+  const offers = await countAgencyOffers(
+    agencies.flatMap((account) => (account.agency ? [{ id: account.agency.id, userId: account.id }] : [])),
+  );
+  const offerTotal = (account: (typeof agencies)[number]) => (account.agency ? offers.get(account.agency.id)?.total ?? 0 : 0);
+  const editLink = (account: (typeof agencies)[number]) => account.agency ? (
+    <Link
+      href={`/admin/agentlikler/${account.agency.id}`}
+      aria-label={t("pages.agencyHub.editNamed", { name: account.agency.name })}
+      className="inline-flex size-11 items-center justify-center rounded-xs text-ink-soft transition-colors hover:text-gold-deep"
+    >
+      <Pencil className="size-4" aria-hidden="true" />
+    </Link>
+  ) : null;
+  const logo = (account: (typeof agencies)[number]) => (
+    <span className="relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-xs border border-line bg-paper">
+      {account.agency?.logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element -- panel önizləməsi
+        <img src={account.agency.logoUrl} alt="" className="size-full object-contain p-0.5" />
+      ) : (
+        <Building2 className="size-4 text-ink-muted" aria-hidden="true" />
+      )}
+    </span>
+  );
   const bulkIntents = [
     { intent: "approve", label: t("components.bulk.approve"), icon: "approve" as const },
     { intent: "revoke", label: t("components.bulk.revoke"), icon: "revoke" as const },
@@ -62,58 +123,48 @@ export default async function AdminAgenciesPage() {
       />
 
       {employeeQueue.length > 0 && (
-        <AdminCard
-          title={t("pages.agents.komandaDevetleri")}
-          description={t("pages.agents.agentlikSahiblerininDevetEtdiyi")}
-          bodyClassName="p-0"
-          className="mb-6"
-        >
-          <ul className="divide-y divide-line">
-            {employeeQueue.map((employee) => (
-              <li
-                key={employee.id}
-                className="flex flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-ink">{employee.user.name}</p>
-                  <p className="mt-0.5 truncate text-xs text-ink-muted">
-                    {employee.user.email} · {employee.agency.name} ·{" "}
-                    {t(`labels.agencyEmployeeRole.${employee.role as keyof typeof AGENCY_EMPLOYEE_ROLE_LABELS}`) ??
-                      employee.role}{" "}
-                    · {employee.source === AGENCY_EMPLOYEE_SOURCES.REQUEST ? t("pages.agents.qosulmaSorgusu") : t("pages.agents.devet")}
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-1">
-                  <ConfirmAction
-                    action={approveAgencyEmployee}
-                    id={employee.id}
-                    label={t("pages.common.tesdiqle", { p0: employee.user.name })}
-                    title={t("pages.agents.emekdasiTesdiqlemek")}
-                    description={t("pages.common.agentliyineEmekdasKimiElave", { p0: employee.user.name, p1: employee.user.email, p2: employee.agency.name })}
-                    confirmLabel={t("pages.agents.tesdiqle")}
-                    tone="neutral"
-                    className="size-11"
-                  >
-                    <Check className="size-4" aria-hidden="true" />
-                  </ConfirmAction>
-                  <ConfirmAction
-                    action={rejectAgencyEmployee}
-                    id={employee.id}
-                    label={t("pages.common.devetiniReddEt", { p0: employee.user.name })}
-                    title={t("pages.agents.devetiReddEtmek")}
-                    description={t("pages.common.ucunKomandaDevetiRedd", { p0: employee.user.name })}
-                    confirmLabel={t("pages.agents.reddEt")}
-                    tone="danger"
-                    className="size-11"
-                  >
-                    <X className="size-4" aria-hidden="true" />
-                  </ConfirmAction>
-                </div>
-              </li>
-            ))}
-          </ul>
+        <AdminCard className="mb-6">
+          <Link href="/admin/agentlikler/tesdiq#komanda" className="text-sm font-medium text-gold-deep hover:underline">
+            {t("pages.agencyHub.teamQueueLink", { count: employeeQueue.length })}
+          </Link>
         </AdminCard>
       )}
+
+      {/* Status tabları və axtarış — URL-dədir, JS-siz də işləyir. */}
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <nav aria-label={t("pages.agencyHub.statusNav")} className="flex flex-wrap gap-2">
+          {tabs.map((tab) => (
+            <Link
+              key={tab.value}
+              href={tabHref(tab.value)}
+              aria-current={status === tab.value ? "page" : undefined}
+              className={cn(
+                "inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-sm transition-colors",
+                status === tab.value ? "border-gold bg-gold/10 font-medium text-ink" : "border-line bg-paper text-ink-soft hover:border-gold",
+              )}
+            >
+              {tab.label}
+              <span className="tabular text-xs text-ink-muted">{tab.count}</span>
+            </Link>
+          ))}
+        </nav>
+        <form className="flex gap-2" role="search" aria-label={t("pages.agencyHub.searchLabel")}>
+          {status !== "all" && <input type="hidden" name="status" value={status} />}
+          <label htmlFor="agency-admin-search" className="sr-only">{t("pages.agencyHub.searchLabel")}</label>
+          <input
+            id="agency-admin-search"
+            name="q"
+            type="search"
+            defaultValue={query}
+            placeholder={t("pages.agencyHub.searchPlaceholder")}
+            className="min-h-11 w-full min-w-0 rounded-sm border border-line-strong bg-paper px-3 text-sm text-ink lg:w-72"
+          />
+          <button type="submit" className={buttonClassName("outline", "sm", false, "min-h-11 shrink-0")}>
+            <Search className="size-4" aria-hidden="true" />
+            <span className="sr-only">{t("pages.agencyHub.searchLabel")}</span>
+          </button>
+        </form>
+      </div>
 
       <AdminCard bodyClassName="p-0">
         <BulkSelectionForm action={bulkAgencies} intents={bulkIntents}>
@@ -130,8 +181,9 @@ export default async function AdminAgenciesPage() {
           renderCard={(account) => (
             <AdminListCard
               title={
-                <span className="flex items-start gap-2">
+                <span className="flex items-center gap-2">
                   <BulkRowCheckbox id={account.id} label={t("components.bulk.selectRow", { name: account.agency?.name ?? account.name })} />
+                  {logo(account)}
                   {account.agency?.name ?? account.name}
                 </span>
               }
@@ -150,7 +202,7 @@ export default async function AdminAgenciesPage() {
                   <Badge tone="warning">{t("pages.agents.tesdiqGozleyir")}</Badge>
                 )
               }
-              actions={<>{account.agency ? (
+              actions={<>{editLink(account)}{account.agency ? (
                 <ConfirmAction
                   action={toggleAgencyVerification}
                   id={account.agency.id}
@@ -176,7 +228,7 @@ export default async function AdminAgenciesPage() {
               </>}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="tabular">{account._count.properties} elan</span>
+                <span className="tabular">{t("pages.agencyHub.offerCount", { count: offerTotal(account) })}</span>
                 {!account.isActive ? <Badge tone="neutral">{t("pages.agents.deaktivHesab")}</Badge> : null}
               </div>
               {account.agency ? (
@@ -196,7 +248,7 @@ export default async function AdminAgenciesPage() {
               headers={[
                 { label: t("components.bulk.select"), srOnly: true, className: "w-9" },
                 { label: t("pages.agents.agentlik") },
-                { label: t("pages.agents.elanSayi") },
+                { label: t("pages.agencyHub.offersColumn") },
                 { label: t("pages.agents.qeydiyyatTarixi") },
                 { label: t("pages.agents.status") },
                 { label: t("pages.agents.idareetme"), className: "text-right" },
@@ -208,7 +260,10 @@ export default async function AdminAgenciesPage() {
                     <BulkRowCheckbox id={account.id} label={t("components.bulk.selectRow", { name: account.agency?.name ?? account.name })} />
                   </AdminTableCell>
                   <AdminTableCell>
-                    <span className="font-medium text-ink">{account.agency?.name ?? account.name}</span>
+                    <span className="flex items-center gap-2">
+                      {logo(account)}
+                      <span className="font-medium text-ink">{account.agency?.name ?? account.name}</span>
+                    </span>
                     <p className="mt-0.5 text-xs text-ink-muted">{account.email}</p>
                     {!account.isActive && (
                       <Badge tone="neutral" className="mt-1">{t("pages.agents.deaktivHesab")}</Badge>
@@ -217,7 +272,7 @@ export default async function AdminAgenciesPage() {
                       <AgencyLogoEditor agencyId={account.agency.id} name={account.agency.name} logoUrl={account.agency.logoUrl} />
                     ) : null}
                   </AdminTableCell>
-                  <AdminTableCell className="tabular">{account._count.properties}</AdminTableCell>
+                  <AdminTableCell className="tabular">{offerTotal(account)}</AdminTableCell>
                   <AdminTableCell className="text-xs text-ink-muted">
                     {formatDateTime(account.createdAt)}
                   </AdminTableCell>
@@ -232,6 +287,7 @@ export default async function AdminAgenciesPage() {
                   </AdminTableCell>
                   <AdminTableCell align="right">
                     <div className="flex min-w-72 justify-end">
+                      {editLink(account)}
                       {!account.agency ? (
                         <AgencyProfileRepair userId={account.id} defaultName={account.name} />
                       ) : (

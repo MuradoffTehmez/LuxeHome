@@ -14,9 +14,10 @@ describe("public kolleksiya kartları", () => {
           name: "Luxe Partners",
           slug: "luxe-partners",
           logoUrl: null,
-          phone: "+994 12 000 00 00",
+          description: "Bakıda alqı-satqı və kirayə.",
           address: "Bakı",
-          propertyCount: 12,
+          agentCount: 3,
+          offers: { total: 12, sale: 8, rent: 4 },
         }}
       />,
     );

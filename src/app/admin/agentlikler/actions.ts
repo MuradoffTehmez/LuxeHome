@@ -7,6 +7,7 @@ import {
   type ActionState,
   failure,
   success,
+  toFieldErrors,
   unexpected,
 } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
@@ -22,6 +23,8 @@ import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { commitMembershipDecision, hasFreeApprovedSeat, hasOtherApprovedMembership } from "@/lib/accounts/agency-membership";
 import { noticeAgencyDecision } from "@/lib/accounts/account-notices";
 import { checkLogoFile, logoFromForm, storeAgencyLogo } from "@/lib/accounts/agency-logo";
+import { isPhoneLike } from "@/lib/accounts/profile-fields";
+import { z } from "zod";
 
 const LIST_PATH = "/admin/agentlikler";
 
@@ -327,5 +330,90 @@ export async function removeAgencyLogo(id: string): Promise<ActionState> {
     return success(msg("server.agentlikler.loqoSilindi"));
   } catch (error) {
     return unexpected("agentlik loqosu silinmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+const optionalText = (max: number) => z.string().trim().max(max).nullable();
+
+/**
+ * Paneldən agentlik profilinin tam redaktəsi (#155): ad, təsvir, əlaqə, iş saatları.
+ * Telefon və WhatsApp telefon formatında olmalıdır — kartda telefon yerində e-poçt
+ * görünürdü. Ad dəyişəndə slug toqquşmasız yenilənir.
+ */
+export async function updateAgencyByAdmin(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const phoneRule = z.string().trim().max(30).refine(isPhoneLike, msg("server.agentlikler.telefonFormati")).nullable();
+  const parsed = z
+    .object({
+      id: z.string().trim().min(1),
+      name: z.string().trim().min(2, msg("server.agentlikler.agentlikAdi2160Simvol")).max(160, msg("server.agentlikler.agentlikAdi2160Simvol")),
+      description: optionalText(2000),
+      phone: phoneRule,
+      whatsapp: phoneRule,
+      email: z.string().trim().toLowerCase().max(200).pipe(z.email(msg("server.agentlikler.epoctFormati"))).nullable(),
+      address: optionalText(240),
+      workingHours: optionalText(120),
+      website: z.string().trim().url(msg("server.agentlikler.saytFormati")).refine((value) => value.startsWith("https://"), msg("server.agentlikler.saytFormati")).nullable(),
+      instagram: z
+        .string()
+        .trim()
+        .regex(/^@?[A-Za-z0-9._]{1,30}$/, msg("server.agentlikler.instagramFormati"))
+        .transform((value) => value.replace(/^@/, ""))
+        .nullable(),
+    })
+    .safeParse({
+      id: form.text(formData, "id"),
+      name: form.text(formData, "name"),
+      description: form.optionalText(formData, "description"),
+      phone: form.optionalText(formData, "phone"),
+      whatsapp: form.optionalText(formData, "whatsapp"),
+      email: form.optionalText(formData, "email"),
+      address: form.optionalText(formData, "address"),
+      workingHours: form.optionalText(formData, "workingHours"),
+      website: form.optionalText(formData, "website"),
+      instagram: form.optionalText(formData, "instagram"),
+    });
+  if (!parsed.success) return failure(msg("server.common.formInvalid"), toFieldErrors(parsed.error));
+  const data = parsed.data;
+
+  try {
+    const current = await prisma.agency.findUnique({ where: { id: data.id }, select: { id: true, name: true, slug: true } });
+    if (!current) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+    const slug = current.name === data.name
+      ? current.slug
+      : await uniqueSlug(data.name, (candidate) =>
+          prisma.agency.findUnique({ where: { slug: candidate }, select: { id: true } }), current.id);
+
+    await prisma.agency.update({
+      where: { id: current.id },
+      data: {
+        name: data.name,
+        slug,
+        description: data.description,
+        phone: data.phone,
+        whatsapp: data.whatsapp,
+        email: data.email,
+        address: data.address,
+        workingHours: data.workingHours,
+        website: data.website,
+        instagram: data.instagram,
+      },
+    });
+    await recordAudit(actor, "UPDATE", "Agency", current.id, `${data.name} — profil redaktə edildi`);
+    revalidatePath(LIST_PATH);
+    revalidatePath(`${LIST_PATH}/${current.id}`);
+    revalidatePublicContent("agency", current.slug);
+    if (slug !== current.slug) revalidatePublicContent("agency", slug);
+    revalidatePublicContent("property");
+    return success(msg("server.agentlikler.profilYenilendi"));
+  } catch (error) {
+    return unexpected("agentlik profili yenilənmədi", error, msg("server.common.unexpected"));
   }
 }
