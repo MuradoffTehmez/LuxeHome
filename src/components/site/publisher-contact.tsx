@@ -39,6 +39,14 @@ export function revealPublisherContact(propertyId: string): Promise<RevealedCont
   return revealContact(propertyContactEndpoint(propertyId));
 }
 
+/**
+ * Elanın WhatsApp klikini sahibin analitikasına yazır (#161). `keepalive` — səhifə WhatsApp-a
+ * keçəndə də sorğu getsin; nəticə gözlənilmir, xəta udulur.
+ */
+export function trackWhatsappClick(propertyId: string): void {
+  void fetch(`/api/emlaklar/${encodeURIComponent(propertyId)}/klik`, { method: "POST", keepalive: true }).catch(() => undefined);
+}
+
 export type PublisherContactLabels = {
   showPhone: string;
   showEmail: string;
@@ -133,7 +141,11 @@ export function PublisherContactButtons({
           rel="noopener noreferrer"
           fullWidth
           className="border border-success/30 bg-success-bg text-success hover:border-success hover:bg-success-bg/70"
-          onClick={() => trackEvent("whatsapp_click", { property_id: propertyId, placement: "contact_card" })}
+          onClick={() => {
+            trackEvent("whatsapp_click", { property_id: propertyId, placement: "contact_card" });
+            // Agentlik profilinin əlaqəsi (`endpoint`) elan deyil — elan analitikasına yazılmır.
+            if (!endpoint) trackWhatsappClick(propertyId);
+          }}
         >
           <WhatsAppIcon className="size-4 text-success" />
           WhatsApp

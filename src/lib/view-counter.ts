@@ -1,5 +1,6 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { prisma } from "@/lib/prisma";
+import { incrementListingStat } from "@/lib/listing-stats";
 
 /**
  * Baxış sayğacı.
@@ -32,7 +33,11 @@ type ViewTarget = "property" | "post" | "knowledge" | "agency";
 
 function incrementQuery(target: ViewTarget, id: string): Promise<unknown> {
   if (target === "property") {
-    return prisma.property.update({ where: { id }, data: { viewCount: { increment: 1 } } });
+    // Ümumi sayğac + kabinet analitikası üçün gündəlik sətir (#161).
+    return Promise.all([
+      prisma.property.update({ where: { id }, data: { viewCount: { increment: 1 } } }),
+      incrementListingStat(id, "views"),
+    ]);
   }
   if (target === "agency") {
     // Agentlik profilinin «Baxışlar» göstəricisi (#155).

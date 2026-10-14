@@ -12,7 +12,7 @@ import { ShareButtons } from "./share-buttons";
 import { WhatsAppIcon } from "./brand-icons";
 import { trackEvent } from "@/lib/client-analytics";
 import { phoneHref, publisherWhatsappHref } from "@/lib/accounts/listing-publisher";
-import { revealPublisherContact } from "./publisher-contact";
+import { revealPublisherContact, trackWhatsappClick } from "./publisher-contact";
 
 /** İctimai hesabın elanı: nömrə HTML-də yoxdur, düymə kliklə onu API-dən alır. */
 export type ToolbarReveal = {
@@ -114,6 +114,7 @@ function RevealStickyBar({ propertyId, reveal }: { propertyId: string; reveal: T
     setLoading(null);
     if (!contact?.phone) return;
     trackEvent(kind === "call" ? "phone_click" : "whatsapp_click", { property_id: propertyId, placement: "sticky_toolbar" });
+    if (kind === "whatsapp") trackWhatsappClick(propertyId);
     const href = kind === "call" ? phoneHref(contact.phone) : publisherWhatsappHref(contact.phone, reveal.whatsappMessage);
     if (href) window.location.href = href;
   }
