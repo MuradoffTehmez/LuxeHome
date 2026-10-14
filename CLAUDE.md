@@ -627,6 +627,26 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - **Satıcı filtri** `?satici=OWNER|AGENCY|COMPANY` (`SELLER_FILTERS`, `sellerWhere()`); satıcı səhifəsi
   `/satici/<userId>` (noindex, təsdiqlənmiş agentlikdə agentlik səhifəsinə 308).
 
+### Agentlik profili, sayma qaydası və admin təsdiq mərkəzi (#155)
+
+- **Sayma qaydası `lib/agency-profile.ts`-dədir — başqa yerdə yenidən yazma.** Agentliyin **təklifi**
+  = sahibin + təsdiqlənmiş əməkdaşların ictimai elanları (`countAgencyOffers`); agentin **elanı** =
+  öz yerləşdirdiyi (`authorId = userId`) + ona təyin edilmiş (`assignedAgentId`), təkrarsız
+  (`countAgentListings`, `agentListingWhere`). Əlaqənin `_count.properties`-i yalnız təyin
+  edilmişləri sayırdı: kartda «0 elan», səhifədə 1 elan görünürdü. UI-da agentlik üçün «təklif»,
+  agent üçün «elan» sözü işlənir.
+- **Agentlik profili** `/agentlikler/<slug>` (bina.az + Property Finder + Zillow sintezi): qızılı
+  şəbəkəli örtük, statistika zolağı (təklif/satış/kirayə/agent/baxış), `?elan=`/`?tip=`/`?siralama=`/
+  `?sehife=` ilə təkliflər, elanlardan çıxarılan «Fəaliyyət əraziləri», agentlər, yapışqan əlaqə
+  paneli. Ofis nömrəsi/WhatsApp/e-poçt `POST /api/agentlikler/<slug>/elaqe`-dən «Nömrəni göstər» ilə
+  gəlir (elan əlaqəsi ilə eyni qayda). `Agency.viewCount` `recordView("agency")` ilə artır.
+- **Telefon sahəsi telefon olmalıdır** (`isPhoneLike`, qeydiyyat/profil/panel). Köhnə qeyddə telefon
+  yerində e-poçt varsa, o telefon kimi göstərilmir.
+- **Panel:** «Agentliklər və agentlər» ayrıca menyu bəndidir, sayğac `getApprovalCounts()`-dəndir
+  (`PENDING_AGENCY_WHERE`/`PENDING_AGENT_WHERE` — növbə səhifəsi ilə eyni şərt). `/admin/agentlikler/tesdiq`
+  — təsdiq növbəsi; `/admin/agentlikler/<id>` — agentlik profilinin tam redaktəsi; siyahılarda status
+  tabları və «Təsdiqlə və dərc et» (`approveAndPublishAgent`).
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai
