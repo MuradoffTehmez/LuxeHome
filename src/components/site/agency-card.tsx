@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { ArrowRight, Building2, MapPin, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, Building2, MapPin, ShieldCheck, Star, Users, Zap } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 
 export type AgencyCardData = {
@@ -16,6 +16,12 @@ export type AgencyCardData = {
   agentCount: number;
   /** Sahib + təsdiqlənmiş agentlərin ictimai təklifləri (`countAgencyOffers`). */
   offers: { total: number; sale: number; rent: number };
+  /** Agentlərin + agentliyin təsdiqlənmiş rəyləri (#161). */
+  rating?: { average: number; count: number } | null;
+  /** «Tez cavab verir» nişanı (#161). */
+  fastResponse?: boolean;
+  /** Ərazi səhifəsində (#161, C6): həmin ərazidəki aktiv təklif sayı. */
+  areaOffers?: number;
 };
 
 /**
@@ -26,9 +32,12 @@ export type AgencyCardData = {
 export function AgencyCard({
   agency,
   className,
+  areaName,
 }: {
   agency: AgencyCardData;
   className?: string;
+  /** Verilsə ərazidəki təklif sayı göstərilir. */
+  areaName?: string;
 }) {
   const t = useTranslations("listings.agencyDirectory");
   const profile = useTranslations("listings.agencyProfile");
@@ -63,8 +72,32 @@ export function AgencyCard({
             <ShieldCheck className="size-3.5" aria-hidden="true" />
             {profile("verified")}
           </p>
+          {(agency.rating || agency.fastResponse) && (
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-soft">
+              {agency.rating && (
+                <span className="inline-flex items-center gap-1">
+                  <Star className="size-3.5 fill-gold text-gold-deep" aria-hidden="true" />
+                  <span className="sr-only">{profile("ratingLabel")}:</span>
+                  {profile("ratingSummary", { rating: agency.rating.average.toFixed(1), count: agency.rating.count })}
+                </span>
+              )}
+              {agency.fastResponse && (
+                <span className="inline-flex items-center gap-1 font-medium text-gold-deep">
+                  <Zap className="size-3.5" aria-hidden="true" />
+                  {profile("fastResponse")}
+                </span>
+              )}
+            </p>
+          )}
         </div>
       </div>
+
+      {areaName && agency.areaOffers ? (
+        <p className="inline-flex items-center gap-1.5 text-sm font-medium text-ink">
+          <MapPin className="size-4 text-gold-deep" aria-hidden="true" />
+          {t("areaOffers", { place: areaName, count: agency.areaOffers })}
+        </p>
+      ) : null}
 
       {agency.description && (
         <p className="line-clamp-2 text-sm leading-relaxed text-ink-soft">{agency.description}</p>

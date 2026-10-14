@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { BadgeCheck, Building2, MessageCircle, Phone, Star, UserRound } from "lucide-react";
+import { BadgeCheck, Building2, MessageCircle, Phone, Star, UserRound, Zap } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { agentSchema, buildManagedMetadata, jsonLd } from "@/lib/seo";
 import { getPublicAgentBySlug } from "@/lib/phase2";
 import { isUnoptimizedImage } from "@/lib/utils";
+import { isFastResponder } from "@/lib/accounts/response-stats";
 import { Container, Section } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
@@ -47,6 +48,9 @@ export default async function AgentPage({ params, searchParams }: Props) {
   const rating = agent.reviews.length
     ? agent.reviews.reduce((sum, review) => sum + review.rating, 0) / agent.reviews.length
     : null;
+  // Cavab müddəti (#161): ölçülmüş göstərici varsa o, yoxdursa admin yazdığı rəqəm.
+  const fast = isFastResponder({ minutes: agent.measuredResponseMinutes, sample: agent.responseSample, rate: agent.responseRate });
+  const responseMinutes = agent.measuredResponseMinutes ?? agent.responseMinutes;
   const stringList = (value: string) => {
     try { const parsed: unknown = JSON.parse(value); return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : []; }
     catch { return []; }
@@ -98,6 +102,9 @@ export default async function AgentPage({ params, searchParams }: Props) {
                 {rating != null && (
                   <Badge tone="gold"><Star className="size-3.5 fill-current" aria-hidden="true" />{rating.toFixed(1)} ({agent.reviews.length})</Badge>
                 )}
+                {fast && (
+                  <Badge tone="neutral" className="gap-1 text-gold-deep"><Zap className="size-3.5" aria-hidden="true" />{t("fastResponse")}</Badge>
+                )}
               </div>
             </div>
 
@@ -135,7 +142,7 @@ export default async function AgentPage({ params, searchParams }: Props) {
                 {agent.experienceYears != null && <li><Badge tone="neutral">{t("experience", { count: agent.experienceYears })}</Badge></li>}
                 <li><Badge tone="neutral">{t("soldRented", { sold: agent.soldCount, rented: agent.rentedCount })}</Badge></li>
                 {/* PRD bölmə 165 — metrik yalnız real ölçü daxil ediləndə göstərilir. */}
-                {agent.responseMinutes != null && <li><Badge tone="neutral">{t("responseTime", { count: agent.responseMinutes })}</Badge></li>}
+                {responseMinutes != null && <li><Badge tone="neutral">{t("responseTime", { count: responseMinutes })}</Badge></li>}
               </ul>
             </div>
           </div>

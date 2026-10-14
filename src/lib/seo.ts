@@ -697,6 +697,8 @@ export function agencySchema(agency: {
   address?: string | null;
   website?: string | null;
   logoUrl?: string | null;
+  /** Agentlik reytinqi (#161) — yalnız real rəy varsa yazılır. */
+  rating?: { average: number; count: number } | null;
 }, locale: Locale = DEFAULT_LOCALE) {
   const url = siteUrl(localizePath(`/agentlikler/${agency.slug}`, locale));
   return {
@@ -712,6 +714,9 @@ export function agencySchema(agency: {
       ? { "@type": "PostalAddress", streetAddress: agency.address, addressCountry: "AZ" }
       : undefined,
     sameAs: agency.website ? [agency.website] : undefined,
+    aggregateRating: agency.rating && agency.rating.count > 0
+      ? { "@type": "AggregateRating", ratingValue: agency.rating.average, reviewCount: agency.rating.count, bestRating: 5, worstRating: 1 }
+      : undefined,
     parentOrganization: { "@id": `${siteUrl()}/#organization` },
   };
 }
