@@ -63,3 +63,15 @@ export function profileRequirements(accountType: AccountType | string): ProfileR
     agent: accountType === ACCOUNT_TYPES.AGENT,
   };
 }
+
+/**
+ * Telefon sahəsi telefon olmalıdır: «+994 50 123 45 67», «(012) 526-94-94». Əvvəl
+ * yalnız uzunluq yoxlanılırdı və agentliyin telefon sahəsinə e-poçt yazılmışdı —
+ * kartda telefon ikonu ilə e-poçt görünürdü (#155). 7–15 rəqəm (E.164 həddi).
+ */
+export function isPhoneLike(value: string | null | undefined): boolean {
+  const text = value?.trim() ?? "";
+  if (!/^\+?[\d\s().-]+$/.test(text)) return false;
+  const digits = text.replace(/\D/g, "").length;
+  return digits >= 7 && digits <= 15;
+}

@@ -1,6 +1,6 @@
 "use server";
 
-import { composeName, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
+import { composeName, isPhoneLike, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -94,7 +94,7 @@ export async function registerAccount(
       firstName: z.string().trim().min(2, t("actions.firstNameRequired")).max(60, t("actions.invalidField")),
       lastName: z.string().trim().min(2, t("actions.lastNameRequired")).max(60, t("actions.invalidField")),
       email: z.string().trim().toLowerCase().pipe(z.email(t("actions.invalidEmail"))),
-      phone: z.string().trim().min(7, t("actions.invalidPhone")).max(30, t("actions.invalidField")).nullable(),
+      phone: z.string().trim().max(30, t("actions.invalidField")).refine(isPhoneLike, t("actions.invalidPhone")).nullable(),
       password: passwordRule,
       accountType: z.enum(PUBLIC_ACCOUNT_TYPES as [AccountType, ...AccountType[]]),
       companyName: z.string().trim().max(160, t("actions.invalidField")).nullable(),

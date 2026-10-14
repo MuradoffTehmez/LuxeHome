@@ -2,36 +2,47 @@ import { prisma } from "@/lib/prisma";
 import { demoWhere } from "@/lib/demo-content";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
 import { REVIEW_STATUSES } from "@/lib/constants";
+import { agentListingWhere, countAgentListings } from "@/lib/agency-profile";
 
-/** İctimai agent kataloqu — qaralama və gizli profillər heç vaxt sızmır. */
+/**
+ * İctimai agent kataloqu — qaralama və gizli profillər heç vaxt sızmır.
+ * `_count.properties` agentin öz yerləşdirdiyi + ona təyin edilmiş elanların
+ * təkrarsız sayıdır (`countAgentListings`) — əlaqənin `_count`-u yalnız təyin edilmişləri
+ * sayırdı və agentin öz elanı kartda «0» görünürdü (#155).
+ */
 export async function getPublicAgents() {
-  return prisma.agentProfile.findMany({
+  const agents = await prisma.agentProfile.findMany({
     where: { isPublic: true, ...(await demoWhere()) },
     include: {
       agency: { select: { name: true, slug: true } },
       reviews: { where: { status: REVIEW_STATUSES.APPROVED }, select: { rating: true } },
-      _count: { select: { properties: { where: await publicPropertyWhere() } } },
     },
     orderBy: [{ isVerified: "desc" }, { soldCount: "desc" }, { name: "asc" }],
   });
+  const counts = await countAgentListings(agents);
+  return agents.map((agent) => ({ ...agent, _count: { properties: counts.get(agent.id) ?? 0 } }));
 }
 
 export async function getPublicAgentBySlug(slug: string) {
-  return prisma.agentProfile.findFirst({
+  const agent = await prisma.agentProfile.findFirst({
     where: { slug, isPublic: true, ...(await demoWhere()) },
     include: {
       agency: { select: { name: true, slug: true, logoUrl: true } },
-      properties: {
-        where: await publicPropertyWhere(),
-        select: propertyCardSelect,
-        orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
-      },
       reviews: {
         where: { status: REVIEW_STATUSES.APPROVED },
         orderBy: { createdAt: "desc" },
       },
     },
   });
+  if (!agent) return null;
+  // Agentin öz yerləşdirdiyi və ona təyin edilmiş elanlar birlikdə.
+  const properties = await prisma.property.findMany({
+    where: { ...(await publicPropertyWhere()), ...agentListingWhere(agent) },
+    select: propertyCardSelect,
+    orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
+    take: 60,
+  });
+  return { ...agent, properties };
 }
 
 export async function getApprovedTestimonials(take = 6) {

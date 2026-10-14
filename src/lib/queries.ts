@@ -909,38 +909,6 @@ export async function getProjectBySlug(slug: string) {
 // AGENTLİKLƏR
 // ---------------------------------------------------------------------------
 
-export async function getAgencies() {
-  const agencies = await prisma.agency.findMany({
-    where: { isVerified: true, ...(await demoWhere()), user: { isActive: true } },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      logoUrl: true,
-      phone: true,
-      address: true,
-      user: {
-        select: {
-          _count: {
-            select: { properties: { where: await publicPropertyWhere() } },
-          },
-        },
-      },
-    },
-    orderBy: { name: "asc" },
-  });
-
-  return agencies.map((agency) => ({
-    id: agency.id,
-    name: agency.name,
-    slug: agency.slug,
-    logoUrl: agency.logoUrl,
-    phone: agency.phone,
-    address: agency.address,
-    propertyCount: agency.user._count.properties,
-  }));
-}
-
 /** Panel — əmlak növü və xüsusiyyət taksonomiyası, idarəetmə üçün tam siyahı. */
 export async function getAdminTaxonomy() {
   const [types, features] = await Promise.all([
@@ -1017,36 +985,6 @@ export async function getAdminAgencies() {
     },
     orderBy: { createdAt: "desc" },
   });
-}
-
-export async function getAgencyBySlug(slug: string) {
-  const agency = await prisma.agency.findFirst({
-    where: { slug, isVerified: true, ...(await demoWhere()), user: { isActive: true } },
-  });
-  if (!agency) return null;
-
-  // Agentliyin elanları: sahibin və təsdiqlənmiş əməkdaşların elanları birlikdə.
-  const employees = await prisma.agencyEmployee.findMany({
-    where: { agencyId: agency.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
-    select: { userId: true },
-  });
-  const where = {
-    ...(await publicPropertyWhere()),
-    authorId: { in: [agency.userId, ...employees.map((employee) => employee.userId)] },
-  };
-  // `take`-li nested şəkil seçimi 98-dən çox valideyndə D1 sorğusunu ilişdirir (#107) —
-  // siyahı məhdudlaşdırılır, ümumi say ayrıca sayılır.
-  const [properties, propertyCount] = await Promise.all([
-    prisma.property.findMany({
-      where,
-      select: propertyCardSelect,
-      orderBy: { publishedAt: "desc" },
-      take: AGENCY_PAGE_LISTING_LIMIT,
-    }),
-    prisma.property.count({ where }),
-  ]);
-
-  return { agency, properties, propertyCount };
 }
 
 /** Agentlik səhifəsində göstərilən ən çox elan sayı. */
