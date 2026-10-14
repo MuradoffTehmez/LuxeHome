@@ -26,6 +26,11 @@ export async function escalateStaleLeads(now = new Date()): Promise<{ escalated:
     where: {
       agencyId: { not: null },
       handlerId: { not: null },
+      // Sahibin özündəki müraciət eskalasiya olunmur — partiya limitindən **əvvəl** süzülür,
+      // əks halda 50 köhnə sahib müraciəti hər dəfə partiyanı tutub agentlərinkini gizlədərdi.
+      // Agentlik sahibi başqa agentliyin müraciətinə baxa bilmir, ona görə «sahibi olduğu
+      // agentlik var» şərti kifayətdir.
+      handler: { agency: null },
       respondedAt: null,
       escalatedAt: null,
       status: { notIn: [LEAD_STATUSES.CLOSED, LEAD_STATUSES.COMPLETED] },
@@ -51,14 +56,20 @@ export async function escalateStaleLeads(now = new Date()): Promise<{ escalated:
     if (!lead.agency || lead.handlerId === lead.agency.userId) continue;
     const claimed = await prisma.lead.updateMany({ where: { id: lead.id, escalatedAt: null }, data: { escalatedAt: now } });
     if (claimed.count === 0) continue;
-    escalated += 1;
-    await noticeLeadEscalation({
+    const delivered = await noticeLeadEscalation({
       userId: lead.agency.userId,
       leadId: lead.id,
       visitorName: lead.name,
       handlerName: lead.handler?.name ?? "—",
       minutes: Math.max(LEAD_ESCALATION_MINUTES, Math.round((now.getTime() - lead.createdAt.getTime()) / 60_000)),
     });
+    if (delivered) {
+      escalated += 1;
+      continue;
+    }
+    // Bildiriş yazılmadı (keçici xəta) — marker geri qaytarılır ki, növbəti cron təkrar cəhd etsin.
+    // Bildirişin `dedupeKey`-i müraciətə bağlıdır, ona görə təkrar cəhd ikiqat bildiriş yaratmır.
+    await prisma.lead.updateMany({ where: { id: lead.id, escalatedAt: now }, data: { escalatedAt: null } });
   }
   return { escalated };
 }

@@ -5,7 +5,8 @@ import { LEAD_ROUTING_MODES, LOCATION_KINDS, PROPERTY_STATUSES } from "@/lib/con
 const notices = vi.hoisted(() => ({ escalation: vi.fn() }));
 vi.mock("@/lib/accounts/account-notices", () => ({ noticeLeadEscalation: notices.escalation }));
 
-import { routeAgencyLead, routePropertyLead } from "@/lib/accounts/lead-routing";
+import { releaseAgentLeads, routeAgencyLead, routePropertyLead } from "@/lib/accounts/lead-routing";
+import { findManageableLead, getAccountLeads } from "@/lib/accounts/listing-leads";
 import { escalateStaleLeads, refreshResponseStats } from "@/lib/accounts/lead-jobs";
 import { incrementListingStat } from "@/lib/listing-stats";
 import { getListingAnalytics } from "@/lib/accounts/listing-analytics";
@@ -104,7 +105,16 @@ describe("müraciət işləri", () => {
     ]);
   });
 
+  it("bildiriş yazılmasa eskalasiya markeri geri qaytarılır və növbəti cəhddə təkrarlanır", async () => {
+    notices.escalation.mockResolvedValueOnce(false);
+    await expect(escalateStaleLeads(now)).resolves.toEqual({ escalated: 0 });
+    const lead = await DB.prepare('SELECT "escalatedAt" FROM "Lead" WHERE "id" = ?').bind("rt-l-stale").first<{ escalatedAt: string | null }>();
+    expect(lead?.escalatedAt).toBeNull();
+    notices.escalation.mockClear();
+  });
+
   it("30 dəqiqə cavabsız agent müraciətini sahibə bir dəfə eskalasiya edir", async () => {
+    notices.escalation.mockResolvedValue(true);
     await expect(escalateStaleLeads(now)).resolves.toEqual({ escalated: 1 });
     expect(notices.escalation).toHaveBeenCalledOnce();
     expect(notices.escalation).toHaveBeenCalledWith(expect.objectContaining({ userId: "rt-owner", leadId: "rt-l-stale", handlerName: "Birinci agent" }));
@@ -119,6 +129,24 @@ describe("müraciət işləri", () => {
     expect(agent).toEqual({ measuredResponseMinutes: 20, responseSample: 4, responseRate: 75 });
     const agency = await DB.prepare('SELECT "responseSample" FROM "Agency" WHERE "id" = ?').bind("rt-agency").first<{ responseSample: number }>();
     expect(agency?.responseSample).toBe(5);
+  });
+});
+
+describe("komandadan çıxmış agent", () => {
+  it("agentlik müraciətini artıq görmür, açıq müraciətlər sahibə qaytarılır", async () => {
+    await DB.batch([
+      DB.prepare(`INSERT INTO "Lead" ("id", "name", "phone", "message", "source", "status", "handlerId", "agencyId", "createdAt", "updatedAt")
+        VALUES ('rt-l-left', 'Profil müraciəti', '+994501234567', 'Salam', 'AGENCY', 'NEW', 'rt-agent2', 'rt-agency', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`),
+      // Agent komandadan çıxır (üzvlük silinir), müraciət hələ onun adındadır.
+      DB.prepare('DELETE FROM "AgencyEmployee" WHERE "id" = ?').bind("rt-e2"),
+    ]);
+    expect((await getAccountLeads("rt-agent2")).leads.map((lead) => lead.id)).not.toContain("rt-l-left");
+    await expect(findManageableLead("rt-agent2", "rt-l-left")).resolves.toBeNull();
+
+    await expect(releaseAgentLeads({ agencyId: "rt-agency", userId: "rt-agent2", ownerUserId: "rt-owner" })).resolves.toBe(1);
+    const lead = await DB.prepare('SELECT "handlerId" FROM "Lead" WHERE "id" = ?').bind("rt-l-left").first<{ handlerId: string }>();
+    expect(lead?.handlerId).toBe("rt-owner");
+    await expect(findManageableLead("rt-owner", "rt-l-left")).resolves.toMatchObject({ isOwner: true });
   });
 });
 

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation } from "@/lib/media/upload-record";
 import { NOTIFICATION_TYPES, type Locale, type NotificationType } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
 import { emailHref, escapeHtml } from "@/lib/email-html";
@@ -134,33 +135,46 @@ const COPY = {
 
 type NoticeCopy = (typeof COPY)[Locale];
 
+/**
+ * Hesab bildirişi (kabinet + e-poçt). Heç vaxt atmır; `true` — kabinet bildirişi yazılıb
+ * (və ya eyni `dedupeKey` ilə artıq var) və ya alıcı aktiv deyil (çatdırılacaq yer yoxdur).
+ * `false` — keçici xəta: çağıran təkrar cəhd üçün öz markerini geri qaytara bilər (#161).
+ * E-poçt ən yaxşı cəhddir və nəticəyə təsir etmir.
+ */
 async function notifyAccount(
   userId: string,
   type: NotificationType,
   path: string,
   dedupeKey: string,
   build: (copy: NoticeCopy) => { title: string; content: string },
-): Promise<void> {
+): Promise<boolean> {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { email: true, locale: true, isActive: true },
     });
-    if (!user?.isActive) return;
+    if (!user?.isActive) return true;
     const locale = localeOf(user.locale);
     const copy = COPY[locale];
     const { title, content } = build(copy);
+    let stored = true;
     await prisma.notification.create({
       data: { userId, type, title, content, actionUrl: path, dedupeKey },
-    }).catch(() => undefined);
+    }).catch((error: unknown) => {
+      // Eyni açarla bildiriş artıq var — təkrar cəhd sayılır, çatdırılıb.
+      stored = isUniqueViolation(error);
+    });
+    if (!stored) return false;
     const url = siteUrl(localizePath(path, locale));
     await sendEmail({
       to: user.email,
       subject: title,
       html: `<p>${escapeHtml(content)}</p><p><a href="${emailHref(url)}">${copy.open}</a></p>`,
-    });
+    }).catch((error: unknown) => console.error("[notice] e-poçt göndərilmədi:", error));
+    return true;
   } catch (error) {
     console.error("[notice] hesab bildirişi göndərilmədi:", error);
+    return false;
   }
 }
 
@@ -314,15 +328,18 @@ export async function noticeLeadRouted(input: {
   );
 }
 
-/** Agentlik sahibinə: müraciət `LEAD_ESCALATION_MINUTES` dəqiqə cavabsız qaldı (#161). */
+/**
+ * Agentlik sahibinə: müraciət `LEAD_ESCALATION_MINUTES` dəqiqə cavabsız qaldı (#161).
+ * `false` — bildiriş yazılmadı, eskalasiya növbəti cron-da təkrarlanmalıdır.
+ */
 export async function noticeLeadEscalation(input: {
   userId: string;
   leadId: string;
   visitorName: string;
   handlerName: string;
   minutes: number;
-}): Promise<void> {
-  await notifyAccount(
+}): Promise<boolean> {
+  return notifyAccount(
     input.userId,
     NOTIFICATION_TYPES.LEAD_ESCALATION,
     "/kabinet/muracietler",

@@ -729,11 +729,13 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   (`AgencyEmployee.lastLeadAt`), `AREA` (rayonda ən çox elanı olan agent), `OFF` (sahibə). Agentin öz elanı həmişə
   agentə gedir, amma agentliyə bağlanır. `receivesLeads = false` agent növbədən kənardır. Elansız agentlik
   müraciəti ofis sayğaclarına düşmür (`OFFICE_LEAD_WHERE`). Kabinetdə «Əlaqə saxladım» ilk cavabı (`respondedAt`,
-  bir dəfə) yazır, sahib müraciəti agentə verə bilir.
+  bir dəfə) yazır, sahib müraciəti agentə verə bilir. Agentlik müraciəti yalnız agentliyin hazırkı təsdiqlənmiş
+  üzvünə görünür (`currentHandlerWhere`); agent komandadan çıxanda açıq müraciətləri sahibə qayıdır (`releaseAgentLeads`).
 - **Cron `worker.ts`-dədir:** `wrangler.jsonc` → `triggers.crons` + `scheduled()` işi `openNext.fetch` ilə
   `/api/cron/leads?is=…` marşrutuna ötürür; açar `AUTH_SECRET`-dən törədilir (`lib/cron-auth.ts`), `CRON_SECRET`
   lazım deyil. İfadələr `CRON_JOBS` ilə eyni olmalıdır (`scripts/__tests__/cron-triggers.test.ts`). İşlər:
-  10 dəqiqədən bir eskalasiya (30 dəq cavabsız agent müraciəti sahibə, `escalatedAt` şərti götürülür) və gündəlik
+  10 dəqiqədən bir eskalasiya (30 dəq cavabsız agent müraciəti sahibə, `escalatedAt` şərti götürülür; sahibdəki
+  müraciət `take`-dən əvvəl süzülür; bildiriş yazılmasa — `notifyAccount` `false` — marker geri qaytarılır) və gündəlik
   cavab göstəriciləri (`refreshResponseStats`). Lokal yoxlama: `wrangler dev --test-scheduled` + `/__scheduled?cron=…`.
 - **«Tez cavab verir»** (`lib/accounts/response-stats.ts`, saf): son 90 gün, ≥3 müraciət, median ≤60 dəq, ≥80%
   cavab. Hələ 30 dəqiqəsi keçməmiş cavabsız müraciət nümunəyə düşmür. Ölçülmüş göstərici `AgentProfile.measured*` və
