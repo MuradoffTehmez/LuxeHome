@@ -121,9 +121,15 @@ Paketin adı, müddəti və qiyməti sifarişə kopyalanır (sonrakı qiymət d�
 - `/admin/hesablar` — ictimai hesabların təsdiqi (`approvedAt`), bloklanması (`isActive`) və silinməsi. Silmə kabinetdəki self-service silmə ilə eyni iki mərhələli yoldan keçir.
 - **Agentliklər və agentlər** (ayrıca menyu bəndi, gözləyən təsdiqlərin sayğacı ilə):
   - `/admin/agentlikler/tesdiq` — təsdiq növbəsi: gözləyən agentliklər (bir kliklə təsdiq), agent profilləri («Təsdiqlə və dərc et»), komanda sorğuları və rəylər.
-  - `/admin/agentlikler` — status tabları (gözləyən / təsdiqlənmiş / profilsiz), ad və e-poçt axtarışı, təklif sayı, loqo, redaktəyə keçid.
-  - `/admin/agentlikler/<id>` — agentlik profilinin tam redaktəsi (ad, təsvir, telefon, WhatsApp, e-poçt, iş saatları, ünvan, sayt, Instagram), loqo, təsdiq və komanda.
-  - `/admin/agentler` — status tabları (gözləyən / ictimai / gizli), agent profilləri, rəy moderasiyası.
+    - Hər kartda **toplu təsdiq**. Rədd toplu edilmir — hər rəddin öz səbəbi olmalıdır.
+    - **Səbəbli rədd** (hazır şablonlarla). Səbəb istifadəçiyə kabinet bildirişi və e-poçt kimi gedir; rədd edilən müraciət növbədən çıxır və sahib profili yeniləyəndə geri qayıdır.
+    - **SLA rəngi:** 24 saatdan çox gözləyən sarı, 72 saatdan çox gözləyən qırmızıdır.
+    - VÖEN-i olmayan agentlik ayrıca nişanla göstərilir.
+  - `/admin/agentlikler` — status tabları (gözləyən / rədd edilənlər / təsdiqlənmiş / profilsiz), ad və e-poçt axtarışı, təklif sayı, loqo, redaktəyə keçid.
+  - `/admin/agentlikler/<id>` — agentlik profilinin tam redaktəsi.
+    - Sahələr: ad, təsvir, telefon, WhatsApp, e-poçt, iş saatları, ünvan, sayt, Instagram, VÖEN, örtük şəkli.
+    - Bundan başqa: loqo, filiallar, təsdiq və səbəbli rədd, komanda (rədd səbəbi ilə).
+  - `/admin/agentler` — status tabları (gözləyən / rədd edilənlər / ictimai / gizli), agent profilləri, rəy moderasiyası.
 
 ## Məzmun
 
