@@ -135,13 +135,15 @@ export async function leaveAgency(id: string, handover: string = LISTING_HANDOVE
       return failure(t("actions.requestNotFound"));
     }
 
-    await prisma.agencyEmployee.delete({ where: { id } });
     const wasMember = membership.status === AGENCY_EMPLOYEE_STATUSES.APPROVED;
-    let handedOver = 0;
+    // Agent yalnız agentliyin özünə təhvil verə bilər — başqa agenti sahib seçir. Təhvil
+    // üzvlük silinməzdən əvvəldir: alınmasa üzvlük qalır və agent təkrar cəhd edə bilir.
+    const handedOver = wasMember && handover === LISTING_HANDOVER.AGENCY
+      ? await handOverListings(user.id, membership.agency.userId)
+      : 0;
+    await prisma.agencyEmployee.delete({ where: { id } });
     if (wasMember) {
       await linkAgentProfileToAgency(user.id, membership.agency.id, false);
-      // Agent yalnız agentliyin özünə təhvil verə bilər — başqa agenti sahib seçir.
-      if (handover === LISTING_HANDOVER.AGENCY) handedOver = await handOverListings(user.id, membership.agency.userId);
       revalidatePublicContent("agency", membership.agency.slug);
       revalidatePublicContent("property");
       await noticeAgentLeft({

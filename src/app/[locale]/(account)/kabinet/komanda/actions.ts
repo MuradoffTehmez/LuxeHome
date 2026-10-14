@@ -186,9 +186,12 @@ export async function removeAgencyEmployee(
       : null;
     if (target && !target.ok) return failure(t("team.handover.invalidTarget"));
 
+    // Əvvəl təhvil, sonra üzvlüyün silinməsi (D1-də tranzaksiya yoxdur): təhvil alınmasa
+    // üzvlük qalır və sahib təkrar cəhd edə bilir; silmə alınmasa elanlar artıq keçib,
+    // təkrar cəhd elansız üzvü adi qaydada çıxarır.
+    const handedOver = target?.ok ? await handOverListings(employee.userId, target.userId) : 0;
     await prisma.agencyEmployee.delete({ where: { id } });
     await linkAgentProfileToAgency(employee.userId, owner.agency.id, false);
-    const handedOver = target?.ok ? await handOverListings(employee.userId, target.userId) : 0;
     await recordDomainEvent("agency.employee_removed", "AgencyEmployee", id, {
       agencyId: owner.agency.id,
       handover: target?.ok ? handover : LISTING_HANDOVER.KEEP,
