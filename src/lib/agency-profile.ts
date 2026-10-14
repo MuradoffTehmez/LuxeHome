@@ -52,19 +52,20 @@ export type DealStats = { total: number; sold: number; rented: number };
 
 /**
  * Son 12 ayın bağlanmış sövdələşmələri (#159, Zillow «Past sales»): statistika + son
- * kartlar. `closedAt` statusun bağlandığı vaxtdır; köhnə qeydlərdə boşdursa `updatedAt`.
+ * kartlar. Tarix yalnız `closedAt`-dır — `updatedAt` baxış sayğacı ilə də dəyişir və köhnə
+ * satışı «son 12 ay»a salardı. Köhnə qeydlər `migrations/0058`-də bir dəfə doldurulub.
  */
 export async function getClosedDeals(scope: Prisma.PropertyWhereInput, take = 6) {
   const since = new Date(Date.now() - DEAL_STATS_WINDOW_DAYS * 86_400_000);
   const where: Prisma.PropertyWhereInput = {
     ...(await publicPropertyWhere()),
     status: { in: CLOSED_DEAL_STATUSES },
-    AND: [scope, { OR: [{ closedAt: { gte: since } }, { closedAt: null, updatedAt: { gte: since } }] }],
+    AND: [scope, { closedAt: { gte: since } }],
   };
   const [groups, recent] = await Promise.all([
     prisma.property.groupBy({ by: ["listingType"], where, _count: { _all: true } }),
     take > 0
-      ? prisma.property.findMany({ where, select: propertyCardSelect, orderBy: [{ closedAt: "desc" }, { updatedAt: "desc" }], take })
+      ? prisma.property.findMany({ where, select: propertyCardSelect, orderBy: [{ closedAt: "desc" }, { id: "asc" }], take })
       : Promise.resolve([]),
   ]);
   const stats: DealStats = { total: 0, sold: 0, rented: 0 };

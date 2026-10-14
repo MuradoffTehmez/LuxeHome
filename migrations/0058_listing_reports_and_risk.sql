@@ -4,6 +4,12 @@
 --     risk siqnalları (aşağı qiymət, mətndə əlaqə, başqa hesabın fotosu və s.).
 -- Mövcud elanlar `riskScore = 0` ilə qalır; risk növbəti saxlamada hesablanır.
 
+-- «Uğurlu sövdələşmələr» yalnız `closedAt`-a baxır. Köhnə SOLD/RENTED qeydlərində tarix boşdur;
+-- bir dəfəlik doldurma `updatedAt` snapshot-ıdır — sonrakı baxışlar (`updatedAt`-ı dəyişən
+-- sayğac) onu artıq yerindən oynatmır.
+UPDATE "Property" SET "closedAt" = "updatedAt"
+WHERE "status" IN ('SOLD', 'RENTED') AND "closedAt" IS NULL;
+
 -- AlterTable
 ALTER TABLE "Property" ADD COLUMN "riskScore" INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE "Property" ADD COLUMN "riskFlags" TEXT;

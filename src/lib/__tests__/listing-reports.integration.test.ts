@@ -29,7 +29,9 @@ beforeAll(async () => {
     property.bind("rep-live", "Aktiv", "rep-live", "SALE", PROPERTY_STATUSES.PUBLISHED, "rep-agent", null, now),
     property.bind("rep-draft", "Qaralama", "rep-draft", "SALE", PROPERTY_STATUSES.DRAFT, "rep-agent", null, now),
     property.bind("rep-sold", "Satılıb", "rep-sold", "SALE", PROPERTY_STATUSES.SOLD, "rep-agent", now, now),
-    property.bind("rep-rented", "İcarədə", "rep-rented", "RENT", PROPERTY_STATUSES.RENTED, "rep-agent", null, now),
+    property.bind("rep-rented", "İcarədə", "rep-rented", "RENT", PROPERTY_STATUSES.RENTED, "rep-agent", now, now),
+    // Bağlanma tarixi olmayan qeyd sayılmır — `updatedAt` baxışla da dəyişir, tarix deyil.
+    property.bind("rep-legacy", "Tarixsiz", "rep-legacy", "SALE", PROPERTY_STATUSES.SOLD, "rep-agent", null, now),
     // 12 aydan köhnə bağlanmış elan statistikaya düşmür.
     property.bind("rep-sold-old", "Köhnə satış", "rep-sold-old", "SALE", PROPERTY_STATUSES.SOLD, "rep-agent", old, old),
   ]);
@@ -75,12 +77,12 @@ describe("bağlanmış sövdələşmələr və aktiv təkliflər", () => {
 describe("agent komandadan çıxanda elan təhvili", () => {
   it("silinməmiş bütün elanları yeni müəllifə keçirir", async () => {
     const before = await countOwnListings(["rep-agent", "rep-owner"]);
-    expect(before.get("rep-agent")).toBe(5);
+    expect(before.get("rep-agent")).toBe(6);
     expect(before.get("rep-owner")).toBeUndefined();
 
-    await expect(handOverListings("rep-agent", "rep-owner")).resolves.toBe(5);
+    await expect(handOverListings("rep-agent", "rep-owner")).resolves.toBe(6);
     const after = await countOwnListings(["rep-agent", "rep-owner"]);
     expect(after.get("rep-agent")).toBeUndefined();
-    expect(after.get("rep-owner")).toBe(5);
+    expect(after.get("rep-owner")).toBe(6);
   });
 });
