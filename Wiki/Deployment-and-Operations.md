@@ -100,6 +100,9 @@ Qaydalar:
 - `AUTH_SECRET` versiyasız rotasiya sessiya JWT-lərini etibarsız edir və TOTP secret-lərinin açılmasını poza bilər;
 - Resend credential sızma şübhəsində dərhal revoke edilməlidir.
 - `CRON_SECRET` əsas Worker və ayrıca cron Worker-də eyni mühit üçün eyni olmalıdır;
+- Əsas Worker-in öz cron trigger-ləri də var (#161, `wrangler.jsonc` → `triggers.crons`): `*/10 * * * *` müraciət
+  eskalasiyası, `20 0 * * *` cavab göstəriciləri. `worker.ts` → `scheduled()` `/api/cron/leads`-i `AUTH_SECRET`-dən
+  törədilən açarla çağırır — ayrıca secret lazım deyil; `triggers` staging-ə də irsi keçir;
 - production və staging `CRON_SECRET` dəyərləri bir-birindən fərqli olmalıdır;
 - `CLOUDFLARE_ANALYTICS_TOKEN` yalnız `Analytics:Read` icazəsi ilə məhdudlaşdırılmalıdır.
 
