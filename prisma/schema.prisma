@@ -81,6 +81,8 @@ model User {
   media                 Media[]        @relation("MediaUploader")
   favorites             Favorite[]
   leadNotes             Lead[]         @relation("LeadAssignee")
+  /// İctimai hesabın baxdığı müraciətlər (#161) — agent və ya elan sahibi.
+  handledLeads          Lead[]         @relation("LeadHandler")
   packageOrders         PackageOrder[] @relation("PackageOrderCustomer")
   packageOrdersRecorded PackageOrder[] @relation("PackageOrderRecorder")
 
@@ -183,11 +185,20 @@ model Agency {
   verifiedAt           DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
   isDemo               Boolean   @default(false)
+  /// Müraciət bölgüsü (#161): OFF | ROUND_ROBIN | AREA (`LEAD_ROUTING_MODES`).
+  leadRouting          String    @default("ROUND_ROBIN")
+  /// Ölçülmüş cavab göstəriciləri (#161, gündəlik hesablanır): median dəqiqə, nümunə sayı,
+  /// cavab verilən müraciət payı (%). Nümunə azdırsa `responseMinutes` boşdur.
+  responseMinutes      Int?
+  responseSample       Int       @default(0)
+  responseRate         Int?
+  responseComputedAt   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leads         Lead[]
   employees     AgencyEmployee[]
   partners      AgencyPartner[]
   agentProfiles AgentProfile[]
@@ -236,10 +247,13 @@ model AgencyEmployee {
   /// Sorğunu agentlik sahibi də təsdiqləyə bilər; dəvəti yalnız admin.
   source String @default("INVITE")
 
-  invitedAt    DateTime  @default(now())
-  approvedAt   DateTime?
+  invitedAt     DateTime  @default(now())
+  approvedAt    DateTime?
+  /// Müraciət bölgüsü (#161): agent növbəyə daxildirmi və sonuncu dəfə nə vaxt müraciət alıb.
+  receivesLeads Boolean   @default(true)
+  lastLeadAt    DateTime?
   /// Rədd səbəbi (#157) — agentə bildirişdə göstərilir.
-  decisionNote String?
+  decisionNote  String?
 
   agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -617,6 +631,7 @@ model Property {
   nearbyPlaces       NearbyPlace[]
   aiContentDrafts    AiContentDraft[]
   reports            ListingReport[]
+  dailyStats         PropertyDailyStat[]
 
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
@@ -994,6 +1009,17 @@ model Lead {
   partnerId String?
   projectId String?
 
+  /// Müraciətə baxan ictimai hesab (#161): elanın sahibi və ya agentliyin bölgü ilə seçdiyi
+  /// agent. Ofisin işçisi (`assigneeId`) ilə qarışdırılmamalıdır.
+  handlerId   String?
+  /// Agentliyə aid müraciət (agentliyin/agentinin elanı və ya agentlik profilindəki forma) —
+  /// sahib hamısını görür, cavabsız qalanı ona eskalasiya olunur.
+  agencyId    String?
+  /// İlk cavab vaxtı (kabinetdə «Əlaqə saxladım») — «Tez cavab verir» nişanı buradan ölçülür.
+  respondedAt DateTime?
+  /// 30 dəqiqə cavabsız qalan müraciətin sahibə eskalasiya vaxtı — təkrar bildirişi kəsir.
+  escalatedAt DateTime?
+
   /// Organic/paid/direct atribusiyası `source` domen sahəsindən qəsdən ayrıdır.
   acquisitionSource String?
   acquisitionMedium String?
@@ -1011,12 +1037,17 @@ model Lead {
   property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
   assignee User?     @relation("LeadAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   partner  Partner?  @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+  handler  User?     @relation("LeadHandler", fields: [handlerId], references: [id], onDelete: SetNull)
+  agency   Agency?   @relation(fields: [agencyId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([createdAt])
   @@index([propertyId])
   @@index([partnerId])
   @@index([acquisitionSource, acquisitionMedium, createdAt])
+  @@index([handlerId, createdAt])
+  @@index([agencyId, createdAt])
+  @@index([respondedAt, escalatedAt, createdAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -1161,35 +1192,41 @@ model PropertyPriceHistory {
 
 /// İctimai agent profili User hesabından ayrıdır, amma lazım olduqda bir hesaba bağlanır.
 model AgentProfile {
-  id                String    @id @default(cuid())
-  userId            String?   @unique
-  agencyId          String?
-  slug              String    @unique
-  name              String
-  avatarUrl         String?
-  roleTitle         String?
-  specialization    String?
-  experienceYears   Int?
-  bio               String?
-  phone             String?
-  whatsapp          String?
-  email             String?
-  languages         String    @default("[]")
-  areas             String    @default("[]")
-  isVerified        Boolean   @default(false)
-  isPublic          Boolean   @default(false)
+  id                      String    @id @default(cuid())
+  userId                  String?   @unique
+  agencyId                String?
+  slug                    String    @unique
+  name                    String
+  avatarUrl               String?
+  roleTitle               String?
+  specialization          String?
+  experienceYears         Int?
+  bio                     String?
+  phone                   String?
+  whatsapp                String?
+  email                   String?
+  languages               String    @default("[]")
+  areas                   String    @default("[]")
+  isVerified              Boolean   @default(false)
+  isPublic                Boolean   @default(false)
   /// Təsdiq mərkəzində rədd (#157); agent profili yeniləyəndə sıfırlanır.
-  rejectionReason   String?
-  rejectedAt        DateTime?
+  rejectionReason         String?
+  rejectedAt              DateTime?
   /// Rədd edilib yenidən göndərilmə vaxtı (#157) — bax `Agency.reviewRequestedAt`.
-  reviewRequestedAt DateTime?
+  reviewRequestedAt       DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
-  isDemo            Boolean   @default(false)
-  soldCount         Int       @default(0)
-  rentedCount       Int       @default(0)
-  responseMinutes   Int?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  isDemo                  Boolean   @default(false)
+  soldCount               Int       @default(0)
+  rentedCount             Int       @default(0)
+  /// Admin tərəfindən yazılan cavab müddəti (köhnə, əl ilə). Ölçülmüş göstərici varsa o üstündür.
+  responseMinutes         Int?
+  /// Ölçülmüş cavab göstəriciləri (#161) — `Agency.response*` ilə eyni məna.
+  measuredResponseMinutes Int?
+  responseSample          Int       @default(0)
+  responseRate            Int?
+  responseComputedAt      DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   agency       Agency?       @relation(fields: [agencyId], references: [id], onDelete: SetNull)
@@ -2019,4 +2056,20 @@ model ListingReport {
   @@index([status, createdAt])
   @@index([propertyId, status])
   @@index([reporterKey, createdAt])
+}
+
+/// Elanın gündəlik statistikası (#161, kabinet analitikası). Gün Bakı vaxtı ilə «YYYY-MM-DD».
+/// Baxış botsuz sayılır; «Nömrəni göstər» və WhatsApp klikləri əlaqə marşrutlarından artırılır.
+/// Müraciət və favorit öz cədvəllərindən sayılır, burada təkrar saxlanmır.
+model PropertyDailyStat {
+  propertyId     String
+  day            String
+  views          Int    @default(0)
+  contactReveals Int    @default(0)
+  whatsappClicks Int    @default(0)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, day])
+  @@index([day])
 }

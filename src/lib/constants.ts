@@ -551,6 +551,8 @@ export const LEAD_SOURCES = {
   PROJECT: "PROJECT",
   /** Satmaq/kirayə vermək istəyən sahib — `/emlakimi-sat` və qiymətləndirmə aləti (#105). */
   OWNER: "OWNER",
+  /** Agentlik profilindəki əlaqə forması (#161) — agentliyin özünə gedir, ofisə yox. */
+  AGENCY: "AGENCY",
 } as const;
 
 export type LeadSource = (typeof LEAD_SOURCES)[keyof typeof LEAD_SOURCES];
@@ -561,7 +563,42 @@ export const LEAD_SOURCE_LABELS: Record<LeadSource, string> = {
   SERVICE: "Xidmət səhifəsi",
   PROJECT: "Layihə səhifəsi",
   OWNER: "Sahib müraciəti",
+  AGENCY: "Agentlik profili",
 };
+
+/**
+ * Agentliyə gələn müraciətin agentlər arasında bölünməsi (#161):
+ * - `OFF` — hamısı sahibə (agentliyin hesabına) gedir;
+ * - `ROUND_ROBIN` — növbə ilə: ən çoxdan müraciət almayan agent;
+ * - `AREA` — elanın rayonunda (yoxdursa şəhərində) ən çox aktiv elanı olan agent, bərabərlikdə növbə.
+ * Agentin öz elanına gələn müraciət həmişə ona gedir.
+ */
+export const LEAD_ROUTING_MODES = {
+  OFF: "OFF",
+  ROUND_ROBIN: "ROUND_ROBIN",
+  AREA: "AREA",
+} as const;
+
+export type LeadRoutingMode = (typeof LEAD_ROUTING_MODES)[keyof typeof LEAD_ROUTING_MODES];
+
+export function isLeadRoutingMode(value: unknown): value is LeadRoutingMode {
+  return typeof value === "string" && (Object.values(LEAD_ROUTING_MODES) as string[]).includes(value);
+}
+
+/** Cavabsız agentlik müraciəti bu qədər dəqiqədən sonra sahibə eskalasiya olunur. */
+export const LEAD_ESCALATION_MINUTES = 30;
+/** Eskalasiya yalnız son bir gündəki müraciətlərə aiddir — köhnə yığın bir anda bildiriş yağdırmasın. */
+export const LEAD_ESCALATION_MAX_AGE_HOURS = 24;
+
+/**
+ * «Tez cavab verir» nişanı (#161): son `windowDays` gündə ən azı `minSample` müraciət,
+ * cavab müddətinin medianı `maxMinutes`-dan az və müraciətlərin ən azı `minRate`%-nə cavab.
+ */
+export const FAST_RESPONSE = { windowDays: 90, minSample: 3, maxMinutes: 60, minRate: 80 } as const;
+
+/** Kabinet analitikasının dövrləri, gün (#161). */
+export const ANALYTICS_PERIODS = [7, 30, 90] as const;
+export type AnalyticsPeriod = (typeof ANALYTICS_PERIODS)[number];
 
 // ---------------------------------------------------------------------------
 // SAXLANMIŞ AXTARIŞLAR VƏ BİLDİRİŞLƏR
@@ -601,6 +638,8 @@ export const NOTIFICATION_TYPES = {
   ACCOUNT_REVIEW: "ACCOUNT_REVIEW",
   /** Elan şikayət əsasında dayandırıldı (#159). */
   LISTING_REPORT: "LISTING_REPORT",
+  /** Agentlik sahibinə: müraciət 30 dəqiqə cavabsız qaldı (#161). */
+  LEAD_ESCALATION: "LEAD_ESCALATION",
 } as const;
 
 export type NotificationType =
@@ -618,6 +657,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   LISTING_LEAD: "Elana müraciət",
   ACCOUNT_REVIEW: "Profil təsdiqi",
   LISTING_REPORT: "Elan şikayəti",
+  LEAD_ESCALATION: "Cavabsız müraciət",
 };
 
 // ---------------------------------------------------------------------------
