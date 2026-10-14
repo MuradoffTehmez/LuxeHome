@@ -22,6 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { refreshListingRisk } from "@/lib/moderation/listing-risk";
 import { queueListingEnrichment } from "@/lib/listing-enrichment";
 import { publicationExpiryReset, renewedExpiry } from "@/lib/listing-expiry-policy";
 import { recordDomainEvent } from "@/lib/admin/events";
@@ -185,12 +186,20 @@ export async function updatePublicProperty(
     return unexpected("istifadəçi elanı yenilənmədi", error, t("actions.unexpected"));
   }
 
+  // Avtomatik moderasiya (#159): redaktədən sonra risk yenidən hesablanır; dərc olunmuş
+  // elan yüksək riskə düşərsə yenidən moderatora gedir.
+  const risk = await refreshListingRisk(id);
+  const heldForReview = policy.status === PROPERTY_STATUSES.PUBLISHED && risk.level === "hold";
+  if (heldForReview) {
+    await prisma.property.update({ where: { id }, data: { status: PROPERTY_STATUSES.PENDING } }).catch(() => undefined);
+  }
+
   queuePropertyVectorSync([id]);
   queueListingEnrichment(id);
   revalidatePath(localizePath(LIST_PATH, locale));
   revalidatePath(localizePath(`${LIST_PATH}/${id}`, locale));
   revalidatePublicContent("property");
-  return success(t("actions.propertyUpdated"));
+  return success(heldForReview ? t("listings.heldForReview") : t("actions.propertyUpdated"));
 }
 
 export async function deletePublicProperty(id: string): Promise<ActionState> {

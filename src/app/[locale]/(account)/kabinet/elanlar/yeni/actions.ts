@@ -26,6 +26,7 @@ import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { localizePath } from "@/i18n/path-locale";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { refreshListingRisk } from "@/lib/moderation/listing-risk";
 import { queueListingEnrichment } from "@/lib/listing-enrichment";
 
 const LIST_PATH = "/kabinet/elanlar";
@@ -120,6 +121,8 @@ export async function createPublicProperty(
       ? await prisma.agency.findUnique({ where: { userId: user.id }, select: { isVerified: true } })
       : null;
   const finalPolicy = submissionPolicy(user.accountType, agency?.isVerified ?? false);
+  // Avtomatik moderasiya (#159): yüksək riskli elan təsdiqlənmiş agentlikdən gəlsə də dərc olunmur.
+  let heldForReview = false;
   try {
     const slug = await uniqueSlug(parsed.data.title, (candidate) =>
       prisma.property.findUnique({ where: { slug: candidate }, select: { id: true } }),
@@ -164,7 +167,16 @@ export async function createPublicProperty(
       finalPolicy.status === PROPERTY_STATUSES.PUBLISHED,
     );
 
-    if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED) {
+    const risk = await refreshListingRisk(created.id);
+    if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED && risk.level === "hold") {
+      await prisma.property.update({
+        where: { id: created.id },
+        data: { status: PROPERTY_STATUSES.PENDING, publishedAt: null },
+      });
+      heldForReview = true;
+    }
+
+    if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED && !heldForReview) {
       await notifyMatchingSavedSearches(created.id);
       queuePropertyVectorSync([created.id]);
       queueListingEnrichment(created.id);
@@ -177,5 +189,5 @@ export async function createPublicProperty(
   revalidatePath(localizePath("/kabinet", locale));
   revalidatePath(localizePath(LIST_PATH, locale));
   revalidatePublicContent("property");
-  redirect(localizePath(`${LIST_PATH}?yeni=1`, locale));
+  redirect(localizePath(`${LIST_PATH}?yeni=1${heldForReview ? "&yoxlama=1" : ""}`, locale));
 }
