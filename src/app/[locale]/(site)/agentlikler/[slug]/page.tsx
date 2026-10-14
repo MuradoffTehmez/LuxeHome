@@ -12,6 +12,8 @@ import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { PropertyCard } from "@/components/site/property-card";
 import { AgentCard } from "@/components/site/agent-card";
 import { PublisherContactButtons } from "@/components/site/publisher-contact";
+import { SafetyTips } from "@/components/site/safety-tips";
+import { ClosedDeals } from "@/components/site/closed-deals";
 import { Link } from "@/i18n/navigation";
 import { agencySchema, buildManagedMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getAgencyProfile } from "@/lib/agency-profile";
@@ -318,6 +320,8 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                 )}
               </section>
 
+              <ClosedDeals deals={data.deals} />
+
               {agency.description && (
                 <section aria-labelledby="haqqinda-title">
                   <h2 id="haqqinda-title" className="font-sans text-lg font-semibold text-ink">{t("about")}</h2>
@@ -501,7 +505,7 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                     </div>
                   )}
                 </dl>
-                <p className="mt-5 rounded-md bg-warning-bg p-3 text-xs leading-5 text-ink-soft">{t("notice")}</p>
+                <SafetyTips className="mt-5" />
               </div>
             </aside>
           </div>

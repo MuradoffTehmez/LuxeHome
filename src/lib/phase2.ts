@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { demoWhere } from "@/lib/demo-content";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
 import { REVIEW_STATUSES } from "@/lib/constants";
-import { agentListingWhere, countAgentListings } from "@/lib/agency-profile";
+import { activeOfferWhere, agentListingWhere, countAgentListings, getClosedDeals } from "@/lib/agency-profile";
 
 /**
  * İctimai agent kataloqu — qaralama və gizli profillər heç vaxt sızmır.
@@ -38,11 +38,12 @@ export async function getPublicAgentBySlug(slug: string, page = 1) {
     },
   });
   if (!agent) return null;
-  // Agentin öz yerləşdirdiyi və ona təyin edilmiş elanlar birlikdə. Ümumi say ayrıca
-  // sayılır — səhifədəki kart sayı (`properties.length`) cəm deyil.
-  const where = { ...(await publicPropertyWhere()), ...agentListingWhere(agent) };
+  // Agentin öz yerləşdirdiyi və ona təyin edilmiş aktiv elanlar birlikdə. Ümumi say ayrıca
+  // sayılır — səhifədəki kart sayı (`properties.length`) cəm deyil. Satılmış/icarəyə
+  // verilmiş elanlar «Uğurlu sövdələşmələr»dədir (#159).
+  const where = { ...(await activeOfferWhere()), ...agentListingWhere(agent) };
   const currentPage = Math.max(1, Math.floor(page) || 1);
-  const [properties, propertyCount] = await Promise.all([
+  const [properties, propertyCount, deals] = await Promise.all([
     prisma.property.findMany({
       where,
       select: propertyCardSelect,
@@ -51,11 +52,13 @@ export async function getPublicAgentBySlug(slug: string, page = 1) {
       take: AGENT_LISTINGS_PAGE_SIZE,
     }),
     prisma.property.count({ where }),
+    getClosedDeals(agentListingWhere(agent)),
   ]);
   return {
     ...agent,
     properties,
     propertyCount,
+    deals,
     page: currentPage,
     pageCount: Math.max(1, Math.ceil(propertyCount / AGENT_LISTINGS_PAGE_SIZE)),
   };

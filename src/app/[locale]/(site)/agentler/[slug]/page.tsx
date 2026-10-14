@@ -12,6 +12,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/ui/states";
 import { buttonClassName } from "@/components/ui/button";
 import { PropertyCard } from "@/components/site/property-card";
+import { ClosedDeals } from "@/components/site/closed-deals";
 import type { Locale } from "@/lib/constants";
 import { AgentReviewForm } from "./review-form";
 import { TrackedAnchor } from "@/components/analytics/analytics-event";
@@ -153,6 +154,7 @@ export default async function AgentPage({ params, searchParams }: Props) {
               buildHref={(target) => (target > 1 ? `/agentler/${agent.slug}?sehife=${target}` : `/agentler/${agent.slug}`)}
             />
           )}
+          <ClosedDeals deals={agent.deals} className="mt-14" columns="sm:grid-cols-2 xl:grid-cols-3" />
         </Container>
       </Section>
 
