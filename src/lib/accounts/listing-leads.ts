@@ -48,9 +48,25 @@ export async function resolveLeadProperty(propertyId: string | null | undefined)
  * Hesabın gördüyü müraciətlər (#161): ona yönləndirilənlər, elanlarına gələnlər (elan ona
  * təhvil verilibsə köhnə müraciətlər də) və agentlik sahibidirsə agentliyin bütün müraciətləri.
  */
+/**
+ * Müraciətə baxan kimi görmək üçün: müraciət agentliyə aid deyilsə, və ya baxan həmin
+ * agentliyin hələ də təsdiqlənmiş üzvüdür. Komandadan çıxan agent agentlik müraciətlərinin
+ * (müştərinin adı, nömrəsi, mesajı) sahibi olaraq qalmamalıdır — onlar agentliyindir.
+ */
+function currentHandlerWhere(userId: string): Prisma.LeadWhereInput {
+  return {
+    handlerId: userId,
+    OR: [
+      { agencyId: null },
+      { agency: { employees: { some: { userId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED } } } },
+      { agency: { userId } },
+    ],
+  };
+}
+
 export async function leadScope(userId: string): Promise<{ where: Prisma.LeadWhereInput; agency: { id: string; name: string } | null }> {
   const agency = await prisma.agency.findUnique({ where: { userId }, select: { id: true, name: true } });
-  const or: Prisma.LeadWhereInput[] = [{ handlerId: userId }, { property: { authorId: userId } }];
+  const or: Prisma.LeadWhereInput[] = [currentHandlerWhere(userId), { property: { authorId: userId } }];
   if (agency) or.push({ agencyId: agency.id });
   return { where: { OR: or }, agency };
 }
@@ -99,8 +115,9 @@ export async function getLeadAssignees(agency: { id: string }, ownerUserId: stri
  */
 export async function findManageableLead(userId: string, leadId: string) {
   if (!leadId || leadId.length > 64) return null;
-  const lead = await prisma.lead.findUnique({
-    where: { id: leadId },
+  const { where } = await leadScope(userId);
+  const lead = await prisma.lead.findFirst({
+    where: { AND: [{ id: leadId }, where] },
     select: {
       id: true,
       name: true,
@@ -113,7 +130,5 @@ export async function findManageableLead(userId: string, leadId: string) {
     },
   });
   if (!lead) return null;
-  const isOwner = lead.agency?.userId === userId;
-  if (lead.handlerId !== userId && lead.property?.authorId !== userId && !isOwner) return null;
-  return { ...lead, isOwner };
+  return { ...lead, isOwner: lead.agency?.userId === userId };
 }

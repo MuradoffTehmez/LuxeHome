@@ -20,6 +20,7 @@ import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { linkAgentProfileToAgency } from "@/lib/accounts/agency-membership";
 import { noticeAgencyJoinRequest, noticeAgentLeft } from "@/lib/accounts/account-notices";
 import { handOverListings } from "@/lib/accounts/agency-listings";
+import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
 
 /**
  * Agentin özü: agentliyə qoşulma sorğusu (qeydiyyatda seçməyibsə), sorğunu ləğv
@@ -141,6 +142,8 @@ export async function leaveAgency(id: string, handover: string = LISTING_HANDOVE
     const handedOver = wasMember && handover === LISTING_HANDOVER.AGENCY
       ? await handOverListings(user.id, membership.agency.userId)
       : 0;
+    // Agentlik müraciətləri sahibə qayıdır (#161); agentdə qalan elanlarına gələnlər onundur.
+    if (wasMember) await releaseAgentLeads({ agencyId: membership.agency.id, userId: user.id, ownerUserId: membership.agency.userId });
     await prisma.agencyEmployee.delete({ where: { id } });
     if (wasMember) {
       await linkAgentProfileToAgency(user.id, membership.agency.id, false);

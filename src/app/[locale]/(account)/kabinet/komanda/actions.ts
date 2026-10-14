@@ -29,6 +29,7 @@ import {
 import { noticeAgencyDecision, noticeListingsHandedOver } from "@/lib/accounts/account-notices";
 import { handOverListings, isListingHandover, resolveHandoverTarget } from "@/lib/accounts/agency-listings";
 import { generateInviteToken } from "@/lib/accounts/agency-invite";
+import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
 
 /**
  * Agentlik komandası — sahib (owner) idarə edir.
@@ -191,6 +192,8 @@ export async function removeAgencyEmployee(
     // üzvlük qalır və sahib təkrar cəhd edə bilir; silmə alınmasa elanlar artıq keçib,
     // təkrar cəhd elansız üzvü adi qaydada çıxarır.
     const handedOver = target?.ok ? await handOverListings(employee.userId, target.userId) : 0;
+    // Agentlik müraciətləri sahibə qayıdır (#161) — elan təhvilindən sonra, elanla keçənlər də daxil.
+    await releaseAgentLeads({ agencyId: owner.agency.id, userId: employee.userId, ownerUserId: owner.user.id });
     await prisma.agencyEmployee.delete({ where: { id } });
     await linkAgentProfileToAgency(employee.userId, owner.agency.id, false);
     await recordDomainEvent("agency.employee_removed", "AgencyEmployee", id, {

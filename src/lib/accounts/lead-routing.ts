@@ -140,3 +140,19 @@ export async function routeAgencyLead(slug: string, now = new Date()): Promise<L
   if (!agency) return null;
   return routeWithinAgency(agency, {}, now);
 }
+
+/**
+ * Agent komandadan çıxanda (#161): ona düşmüş agentlik müraciətləri sahibə qaytarılır — açıq
+ * müraciət cavabsız qalmasın. Agentin özündə qalan elanlarına gələn müraciətlər ona qalır.
+ */
+export async function releaseAgentLeads(input: { agencyId: string; userId: string; ownerUserId: string }): Promise<number> {
+  const { count } = await prisma.lead.updateMany({
+    where: {
+      agencyId: input.agencyId,
+      handlerId: input.userId,
+      OR: [{ propertyId: null }, { property: { authorId: { not: input.userId } } }],
+    },
+    data: { handlerId: input.ownerUserId },
+  });
+  return count;
+}
