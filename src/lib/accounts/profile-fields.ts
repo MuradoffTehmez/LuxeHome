@@ -40,11 +40,22 @@ export function parseBirthDate(value: string | null | undefined, now = new Date(
   return { ok: true, value: date };
 }
 
-/** VÖEN — 10 rəqəm. Boşluqlar atılır; boş dəyər qəbul olunur (sahə istəyə bağlıdır). */
+/**
+ * VÖEN (#157). Vergilər Nazirliyinin qaydasına görə 10 rəqəmdir: ilk ikisi ərazi kodu,
+ * sonrakı altısı sıra nömrəsi, 9-cu nəzarət rəqəmi, 10-cu isə ödəyicinin hüquqi statusu
+ * (fiziki və ya hüquqi şəxs) — https://taxes.gov.az/az/post/300. Nəzarət rəqəminin
+ * alqoritmi açıq dərc olunmayıb, ona görə yoxlanılmır; status rəqəmi yalnız 1 və ya 2 ola
+ * bilər, eyni rəqəmin təkrarı («1111111111») isə uydurma dəyərdir.
+ *
+ * Boşluq və tire atılır; boş dəyər qəbul olunur (sahə istəyə bağlıdır).
+ */
 export function normalizeTaxId(value: string | null | undefined): string | null | false {
-  const digits = value?.replace(/\s+/g, "") ?? "";
+  const digits = value?.replace(/[\s-]+/g, "") ?? "";
   if (!digits) return null;
-  return /^\d{10}$/.test(digits) ? digits : false;
+  if (!/^\d{10}$/.test(digits)) return false;
+  if (digits[9] !== "1" && digits[9] !== "2") return false;
+  if (/^(\d)\1{9}$/.test(digits)) return false;
+  return digits;
 }
 
 export type ProfileRequirements = {

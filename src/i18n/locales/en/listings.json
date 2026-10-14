@@ -229,7 +229,11 @@
     "website": "Website",
     "instagram": "Instagram",
     "notice": "The agency is an independent partner. Do not pay before seeing the property and its documents.",
-    "sectionNav": "Agency page sections"
+    "sectionNav": "Agency page sections",
+    "officesTitle": "Our offices",
+    "officesDescription": "{count, plural, one {# branch} other {# branches}} in addition to the head office",
+    "ogEyebrow": "Real estate agency",
+    "ogOffers": "Offers"
   },
   "agencyDirectory": {
     "searchLabel": "Agency search",

@@ -6,8 +6,11 @@ import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, MAX_AGENCY_EMPLOYEES, type Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencyEmployees, getAgencyForOwner } from "@/lib/queries";
-import { InviteEmployeeForm, RemoveEmployeeButton, ReviewRequestButtons } from "./team-forms";
+import { InviteEmployeeForm, InviteLinkCard, RemoveEmployeeButton, ReviewRequestButtons } from "./team-forms";
 import { forbidden } from "next/navigation";
+import { siteUrl } from "@/config/site";
+import { localizePath } from "@/i18n/path-locale";
+import { formatLocalizedDateTime } from "@/i18n/date";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -69,6 +72,18 @@ export default async function CabinetTeamPage() {
               </ul>
             </section>
           )}
+
+          {/* Dəvət linki (#157): linklə gələn agent sahibin təsdiqini gözləmədən qoşulur. */}
+          <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+            <h2 className="font-display text-lg text-ink">{t("inviteLink.title")}</h2>
+            <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">{t("inviteLink.description")}</p>
+            <InviteLinkCard
+              url={agency.inviteToken ? siteUrl(localizePath(`/qosul/${agency.inviteToken}`, locale)) : null}
+              createdLabel={agency.inviteTokenCreatedAt ? formatLocalizedDateTime(agency.inviteTokenCreatedAt, locale) : null}
+              agencyVerified={agency.isVerified}
+              disabled={occupiedSeats >= MAX_AGENCY_EMPLOYEES}
+            />
+          </section>
 
           <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
             <h2 className="mb-5 font-display text-lg text-ink">{t("newInvite")}</h2>

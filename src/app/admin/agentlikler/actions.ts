@@ -2,7 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { AGENCY_EMPLOYEE_STATUSES, MAX_AGENCY_EMPLOYEES, PERMISSIONS } from "@/lib/constants";
+import {
+  AGENCY_EMPLOYEE_STATUSES,
+  MAX_AGENCY_EMPLOYEES,
+  MAX_AGENCY_OFFICES,
+  PERMISSIONS,
+  REJECTION_REASON_MAX,
+  REJECTION_REASON_MIN,
+} from "@/lib/constants";
 import {
   type ActionState,
   failure,
@@ -21,12 +28,24 @@ import { findManyInChunks } from "@/lib/d1-chunks";
 import { deletePublicAccount } from "../hesablar/actions";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { commitMembershipDecision, hasFreeApprovedSeat, hasOtherApprovedMembership } from "@/lib/accounts/agency-membership";
-import { noticeAgencyDecision } from "@/lib/accounts/account-notices";
+import { noticeAccountReview, noticeAgencyDecision } from "@/lib/accounts/account-notices";
 import { checkLogoFile, logoFromForm, storeAgencyLogo } from "@/lib/accounts/agency-logo";
-import { isPhoneLike } from "@/lib/accounts/profile-fields";
+import { isPhoneLike, normalizeTaxId } from "@/lib/accounts/profile-fields";
+import { isAgencyTaxIdTaken } from "@/lib/accounts/agency-tax-id";
+import { parseSingleImage } from "@/lib/admin/images";
+import { createAgencyOffice, deleteAgencyOffice, parseOfficeForm } from "@/lib/accounts/agency-offices";
+import { approveAndPublishAgentAs } from "@/lib/admin/agent-approval";
+import type { AuthUser } from "@/lib/auth/types";
 import { z } from "zod";
 
 const LIST_PATH = "/admin/agentlikler";
+const QUEUE_PATH = "/admin/agentlikler/tesdiq";
+
+/** Rədd səbəbi (#157): bildiriş və e-poçta gedir, ona görə boş və ya həddən uzun ola bilməz. */
+function parseRejectionReason(reason: unknown): string | null {
+  const text = typeof reason === "string" ? reason.trim().replace(/\s+/g, " ") : "";
+  return text.length >= REJECTION_REASON_MIN && text.length <= REJECTION_REASON_MAX ? text : null;
+}
 
 /**
  * Agentlik təsdiqi açar-bağlayır.
@@ -42,22 +61,42 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
+  return toggleAgencyVerificationAs(actor, id);
+}
 
+/**
+ * Guard-sız daxili addım — yalnız artıq yoxlanmış `actor` ilə çağırılır (tək action və
+ * toplu əməliyyat). Toplu əməliyyat hər qeyd üçün `requireAdminAction` çağırsaydı,
+ * hər çağırış yazma limitindən (60/dəq) bir vahid yeyərdi və 60-cı qeyd kəsilərdi.
+ */
+async function toggleAgencyVerificationAs(actor: AuthUser, id: string): Promise<ActionState> {
   try {
     const agency = await prisma.agency.findUnique({
       where: { id },
-      select: { id: true, userId: true, name: true, isVerified: true },
+      select: { id: true, userId: true, name: true, slug: true, isVerified: true },
     });
     if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
 
     const next = !agency.isVerified;
+    const decidedAt = new Date();
 
     await prisma.agency.update({
       where: { id },
-      data: { isVerified: next, verifiedAt: next ? new Date() : null },
+      // Təsdiq əvvəlki rəddi bağlayır — kabinetdə köhnə səbəb görünməsin (#157).
+      data: next
+        ? { isVerified: true, verifiedAt: decidedAt, rejectedAt: null, rejectionReason: null }
+        : { isVerified: false, verifiedAt: null },
     });
     if (next) {
-      await prisma.user.update({ where: { id: agency.userId }, data: { approvedAt: new Date() } });
+      await prisma.user.update({ where: { id: agency.userId }, data: { approvedAt: decidedAt } });
+      await noticeAccountReview({
+        userId: agency.userId,
+        kind: "agency",
+        subjectId: agency.id,
+        name: agency.name,
+        approved: true,
+        decidedAt,
+      });
     }
 
     await recordAudit(
@@ -69,7 +108,9 @@ export async function toggleAgencyVerification(id: string): Promise<ActionState>
     );
 
     revalidatePath(LIST_PATH);
+    revalidatePath(QUEUE_PATH);
     revalidatePath("/agentlikler");
+    revalidatePublicContent("agency", agency.slug);
     return success(next ? msg("server.agentlikler.agentlikTesdiqlendi") : msg("server.agentlikler.agentliyinTesdiqiLegvEdildi"));
   } catch (error) {
     return unexpected("agentlik yenilənmədi", error, msg("server.common.unexpected"));
@@ -131,14 +172,20 @@ export async function approveAgencyEmployee(id: string): Promise<ActionState> {
   return reviewAgencyEmployee(id, AGENCY_EMPLOYEE_STATUSES.APPROVED);
 }
 
-export async function rejectAgencyEmployee(id: string): Promise<ActionState> {
-  return reviewAgencyEmployee(id, AGENCY_EMPLOYEE_STATUSES.REJECTED);
+/** Rədd səbəbi (#157) istəyə bağlıdır — yazılıbsa agentə bildirişdə göstərilir. */
+export async function rejectAgencyEmployee(id: string, reason?: string): Promise<ActionState> {
+  const note = typeof reason === "string" && reason.trim() ? parseRejectionReason(reason) : null;
+  if (typeof reason === "string" && reason.trim() && !note) {
+    return failure(msg("server.agentlikler.reddSebebiUzunlugu", { min: REJECTION_REASON_MIN, max: REJECTION_REASON_MAX }));
+  }
+  return reviewAgencyEmployee(id, AGENCY_EMPLOYEE_STATUSES.REJECTED, note);
 }
 
 /** Agentlik komandasına dəvət olunan əməkdaşı təsdiqləyir və ya rədd edir. */
 async function reviewAgencyEmployee(
   id: string,
   decision: typeof AGENCY_EMPLOYEE_STATUSES.APPROVED | typeof AGENCY_EMPLOYEE_STATUSES.REJECTED,
+  note: string | null = null,
 ): Promise<ActionState> {
   let actor;
   try {
@@ -147,7 +194,16 @@ async function reviewAgencyEmployee(
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
+  return reviewAgencyEmployeeAs(actor, id, decision, note);
+}
 
+/** Guard-sız daxili addım (bax `toggleAgencyVerificationAs`). */
+async function reviewAgencyEmployeeAs(
+  actor: AuthUser,
+  id: string,
+  decision: typeof AGENCY_EMPLOYEE_STATUSES.APPROVED | typeof AGENCY_EMPLOYEE_STATUSES.REJECTED,
+  note: string | null,
+): Promise<ActionState> {
   try {
     const employee = await prisma.agencyEmployee.findUnique({
       where: { id },
@@ -191,12 +247,14 @@ async function reviewAgencyEmployee(
       revalidatePublicContent("agency", employee.agency.slug);
       return success(msg("server.agentlikler.emekdasTesdiqlendi"));
     }
+    await prisma.agencyEmployee.update({ where: { id }, data: { decisionNote: approved ? null : note } });
     await noticeAgencyDecision({
       userId: employee.userId,
       employeeId: id,
       attemptAt: employee.invitedAt,
       agencyName: employee.agency.name,
       approved,
+      reason: note,
     });
 
     await recordAudit(
@@ -204,7 +262,7 @@ async function reviewAgencyEmployee(
       "UPDATE",
       "Agency",
       employee.agency.id,
-      `${employee.user.email} — komanda dəvəti ${decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "təsdiqləndi" : "rədd edildi"}`,
+      `${employee.user.email} — komanda dəvəti ${decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "təsdiqləndi" : "rədd edildi"}${note ? ` (${note})` : ""}`,
     );
     await recordDomainEvent(
       decision === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "agency.employee_approved" : "agency.employee_rejected",
@@ -214,6 +272,7 @@ async function reviewAgencyEmployee(
     );
 
     revalidatePath(LIST_PATH);
+    revalidatePath(QUEUE_PATH);
     revalidatePath("/kabinet/komanda");
     revalidatePublicContent("agency", employee.agency.slug);
     revalidatePublicContent("property");
@@ -225,6 +284,99 @@ async function reviewAgencyEmployee(
   }
 }
 
+/**
+ * Agentlik müraciətini səbəblə rədd edir (#157). Agentlik təsdiqsiz qalır və növbədən
+ * çıxır (`rejectedAt`); sahib profili yeniləyəndə növbəyə qayıdır. Səbəb sahibə
+ * kabinet bildirişi və e-poçt kimi gedir.
+ */
+export async function rejectAgencyApplication(id: string, reason: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  const note = parseRejectionReason(reason);
+  if (!note) {
+    return failure(msg("server.agentlikler.reddSebebiUzunlugu", { min: REJECTION_REASON_MIN, max: REJECTION_REASON_MAX }));
+  }
+
+  try {
+    const agency = await prisma.agency.findUnique({
+      where: { id },
+      select: { id: true, userId: true, name: true, isVerified: true },
+    });
+    if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+    if (agency.isVerified) return failure(msg("server.agentlikler.artiqTesdiqlenib"));
+
+    const decidedAt = new Date();
+    // Şərti yeniləmə: başqa admin eyni anda təsdiqləyibsə rədd üzərinə yazılmır.
+    const { count } = await prisma.agency.updateMany({
+      where: { id, isVerified: false },
+      data: { rejectedAt: decidedAt, rejectionReason: note },
+    });
+    if (count === 0) return failure(msg("server.agentlikler.artiqTesdiqlenib"));
+
+    await noticeAccountReview({
+      userId: agency.userId,
+      kind: "agency",
+      subjectId: agency.id,
+      name: agency.name,
+      approved: false,
+      decidedAt,
+      reason: note,
+    });
+    await recordAudit(actor, "UPDATE", "Agency", id, `${agency.name} — müraciət rədd edildi: ${note}`);
+    await recordDomainEvent("agency.application_rejected", "Agency", id, { reason: note });
+
+    revalidatePath(LIST_PATH);
+    revalidatePath(QUEUE_PATH);
+    revalidatePath(`${LIST_PATH}/${id}`);
+    return success(msg("server.agentlikler.muracietReddEdildi"));
+  } catch (error) {
+    return unexpected("agentlik müraciəti rədd edilmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+const QUEUE_BULK_INTENTS = ["agency", "agent", "employee"] as const;
+
+/**
+ * Təsdiq növbəsində toplu təsdiq (#157). Hər kart öz intent-i ilə gəlir (agentlik,
+ * agent profili, komanda sorğusu). Guard **bir dəfə** çağırılır, sonra hər id tək
+ * action-un daxili addımından keçir — yer limiti, «bir aktiv agentlik» qaydası, bildiriş
+ * və audit onun içindədir, yazma limiti isə toplu əməliyyat üçün bir vahiddir.
+ * Rədd toplu edilmir: hər rəddin öz səbəbi olmalıdır.
+ */
+export async function bulkApproveQueue(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const selection = readBulkSelection(formData, QUEUE_BULK_INTENTS);
+  if (isBulkFailure(selection)) return selection;
+  const { ids, intent } = selection;
+
+  if (intent === "agent") return runBulk(ids, (id) => approveAndPublishAgentAs(actor, id));
+  if (intent === "employee") {
+    return runBulk(ids, (id) => reviewAgencyEmployeeAs(actor, id, AGENCY_EMPLOYEE_STATUSES.APPROVED, null));
+  }
+
+  const agencies = await findManyInChunks(ids, 0, (chunk) =>
+    prisma.agency.findMany({ where: { id: { in: chunk } }, select: { id: true, isVerified: true } }),
+  );
+  return runBulk(ids, async (id) => {
+    const agency = agencies.find((item) => item.id === id);
+    if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+    // Təsdiq açarı «toggle»-dur — artıq təsdiqlənmiş agentliyin təsdiqi ləğv olunmamalıdır.
+    return agency.isVerified ? success("") : toggleAgencyVerificationAs(actor, agency.id);
+  });
+}
+
 const AGENCY_BULK_INTENTS = ["approve", "revoke", "delete"] as const;
 
 /**
@@ -234,8 +386,9 @@ const AGENCY_BULK_INTENTS = ["approve", "revoke", "delete"] as const;
  * iki mərhələli yolla silir, agentlik profili isə kaskadla gedir.
  */
 export async function bulkAgencies(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  let actor;
   try {
-    await requireAdminAction(PERMISSIONS.USER_MANAGE);
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
@@ -254,7 +407,7 @@ export async function bulkAgencies(_previous: ActionState, formData: FormData): 
   return runBulk(ids, async (userId) => {
     const agency = agencies.find((item) => item.userId === userId);
     if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
-    return agency.isVerified === target ? success("") : toggleAgencyVerification(agency.id);
+    return agency.isVerified === target ? success("") : toggleAgencyVerificationAs(actor, agency.id);
   });
 }
 
@@ -367,6 +520,7 @@ export async function updateAgencyByAdmin(_previous: ActionState, formData: Form
         .regex(/^@?[A-Za-z0-9._]{1,30}$/, msg("server.agentlikler.instagramFormati"))
         .transform((value) => value.replace(/^@/, ""))
         .nullable(),
+      companyTaxId: z.string().nullable(),
     })
     .safeParse({
       id: form.text(formData, "id"),
@@ -379,13 +533,31 @@ export async function updateAgencyByAdmin(_previous: ActionState, formData: Form
       workingHours: form.optionalText(formData, "workingHours"),
       website: form.optionalText(formData, "website"),
       instagram: form.optionalText(formData, "instagram"),
+      companyTaxId: form.optionalText(formData, "companyTaxId"),
     });
   if (!parsed.success) return failure(msg("server.common.formInvalid"), toFieldErrors(parsed.error));
   const data = parsed.data;
+  const companyTaxId = normalizeTaxId(data.companyTaxId);
+  if (companyTaxId === false) {
+    return failure(msg("server.common.formInvalid"), { companyTaxId: msg("server.agentlikler.voenFormati") });
+  }
+  // Örtük şəkli paneldən yüklənir (`/media/umumi/...`) və ya kabinetdən gələn dəyər saxlanılır.
+  const cover = parseSingleImage(formData, "cover");
 
   try {
-    const current = await prisma.agency.findUnique({ where: { id: data.id }, select: { id: true, name: true, slug: true } });
+    const current = await prisma.agency.findUnique({
+      where: { id: data.id },
+      select: { id: true, name: true, slug: true, userId: true, coverUrl: true },
+    });
     if (!current) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+    if (companyTaxId && (await isAgencyTaxIdTaken(companyTaxId, current.userId))) {
+      return failure(msg("server.common.formInvalid"), { companyTaxId: msg("server.agentlikler.voenTekrar") });
+    }
+    // Dəyişməyən örtük yoxlanılmır; yeni şəkil media kitabxanasında olmalıdır.
+    if (cover && cover.url !== current.coverUrl) {
+      const known = await prisma.media.findFirst({ where: { url: cover.url }, select: { id: true } });
+      if (!known) return failure(msg("server.common.formInvalid"), { cover: msg("server.agentlikler.ortukXetasi") });
+    }
     const slug = current.name === data.name
       ? current.slug
       : await uniqueSlug(data.name, (candidate) =>
@@ -404,8 +576,10 @@ export async function updateAgencyByAdmin(_previous: ActionState, formData: Form
         workingHours: data.workingHours,
         website: data.website,
         instagram: data.instagram,
+        coverUrl: cover?.url ?? null,
       },
     });
+    await prisma.user.update({ where: { id: current.userId }, data: { companyTaxId } });
     await recordAudit(actor, "UPDATE", "Agency", current.id, `${data.name} — profil redaktə edildi`);
     revalidatePath(LIST_PATH);
     revalidatePath(`${LIST_PATH}/${current.id}`);
@@ -415,5 +589,70 @@ export async function updateAgencyByAdmin(_previous: ActionState, formData: Form
     return success(msg("server.agentlikler.profilYenilendi"));
   } catch (error) {
     return unexpected("agentlik profili yenilənmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+/** Panel: agentliyə filial əlavə edir (#157) — kabinetlə eyni yoxlama (`agency-offices.ts`). */
+export async function addAgencyOfficeByAdmin(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const parsed = parseOfficeForm(formData, {
+    name: msg("server.agentlikler.filialAdi"),
+    address: msg("server.agentlikler.filialUnvani"),
+    phone: msg("server.agentlikler.telefonFormati"),
+    city: msg("server.agentlikler.filialSeheri"),
+    invalid: msg("server.common.formInvalid"),
+  });
+  if (!parsed.ok) return failure(msg("server.common.formInvalid"), parsed.fieldErrors);
+
+  try {
+    const agency = await prisma.agency.findUnique({
+      where: { id: form.text(formData, "agencyId") },
+      select: { id: true, name: true, slug: true },
+    });
+    if (!agency) return failure(msg("server.agentlikler.agentlikTapilmadi"));
+    const result = await createAgencyOffice(agency.id, parsed.data);
+    if (result === "limit") return failure(msg("server.agentlikler.filialLimiti", { count: MAX_AGENCY_OFFICES }));
+    if (result === "city") return failure(msg("server.common.formInvalid"), { officeCityId: msg("server.agentlikler.filialSeheri") });
+
+    await recordAudit(actor, "UPDATE", "Agency", agency.id, `${agency.name} — filial əlavə edildi: ${parsed.data.name}`);
+    revalidatePath(`${LIST_PATH}/${agency.id}`);
+    revalidatePublicContent("agency", agency.slug);
+    return success(msg("server.agentlikler.filialElaveEdildi"));
+  } catch (error) {
+    return unexpected("filial əlavə olunmadı", error, msg("server.common.unexpected"));
+  }
+}
+
+/** Panel: filialı silir (#157). */
+export async function removeAgencyOfficeByAdmin(id: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  try {
+    const office = await prisma.agencyOffice.findUnique({
+      where: { id },
+      select: { id: true, name: true, agency: { select: { id: true, name: true, slug: true } } },
+    });
+    if (!office || !(await deleteAgencyOffice(office.agency.id, office.id))) {
+      return failure(msg("server.agentlikler.filialTapilmadi"));
+    }
+    await recordAudit(actor, "UPDATE", "Agency", office.agency.id, `${office.agency.name} — filial silindi: ${office.name}`);
+    revalidatePath(`${LIST_PATH}/${office.agency.id}`);
+    revalidatePublicContent("agency", office.agency.slug);
+    return success(msg("server.agentlikler.filialSilindi"));
+  } catch (error) {
+    return unexpected("filial silinmədi", error, msg("server.common.unexpected"));
   }
 }

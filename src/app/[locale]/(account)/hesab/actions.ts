@@ -1,6 +1,10 @@
 "use server";
 
 import { composeName, isPhoneLike, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
+import { isAgencyTaxIdTaken } from "@/lib/accounts/agency-tax-id";
+import { findAgencyByInviteToken, joinAgencyByLink, type InviteAgency } from "@/lib/accounts/agency-invite";
+import { hasFreeApprovedSeat } from "@/lib/accounts/agency-membership";
+import { recordDomainEvent } from "@/lib/admin/events";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -44,7 +48,7 @@ import { sendAccountVerificationEmail, sendPasswordResetEmail } from "@/lib/acco
 import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { openPublicSession } from "@/lib/auth/public-session";
 import { checkLogoFile, logoFromForm, storeAgencyLogo } from "@/lib/accounts/agency-logo";
-import { noticeAgencyJoinRequest } from "@/lib/accounts/account-notices";
+import { noticeAgencyJoinRequest, noticeAgencyLinkJoined } from "@/lib/accounts/account-notices";
 
 /**
  * İctimai hesab axını — qeydiyyat və giriş.
@@ -148,6 +152,9 @@ export async function registerAccount(
   const requirements = profileRequirements(parsed.data.accountType);
   const isAgency = parsed.data.accountType === ACCOUNT_TYPES.AGENCY;
   const isAgent = parsed.data.accountType === ACCOUNT_TYPES.AGENT;
+  if (isAgency && companyTaxId && (await isAgencyTaxIdTaken(companyTaxId))) {
+    return failure(t("actions.invalidForm"), { companyTaxId: t("actions.taxIdTaken") });
+  }
 
   // Agentlik loqosu hesab yaradılmazdan əvvəl yoxlanılır — xətalı faylda yarımçıq hesab qalmasın.
   const logo = isAgency ? logoFromForm(formData) : null;
@@ -159,8 +166,18 @@ export async function registerAccount(
     }
   }
 
+  // Dəvət linki (#157): agent qeydiyyatdan keçən kimi agentliyə birbaşa qoşulur. Link etibarsız
+  // və ya yer yoxdursa hesab yaranmazdan əvvəl dayanılır — agent səbəbi formada görür.
+  const inviteToken = isAgent ? form.optionalText(formData, "inviteToken") : null;
+  let inviteAgency: InviteAgency | null = null;
+  if (inviteToken) {
+    inviteAgency = await findAgencyByInviteToken(inviteToken);
+    if (!inviteAgency) return failure(t("join.invalid"));
+    if (!(await hasFreeApprovedSeat(inviteAgency.id))) return failure(t("join.full"));
+  }
+
   // Agentin seçdiyi agentlik: yalnız təsdiqlənmiş və aktiv agentlik qəbul olunur.
-  const agencySlug = isAgent ? form.optionalText(formData, "agencySlug") : null;
+  const agencySlug = isAgent && !inviteAgency ? form.optionalText(formData, "agencySlug") : null;
   let joinAgency: { id: string; name: string; userId: string } | null = null;
   if (agencySlug) {
     joinAgency = await prisma.agency.findFirst({
@@ -269,6 +286,30 @@ export async function registerAccount(
   if (logo && parsed.data.companyName) {
     await storeAgencyLogo(userId, logo, parsed.data.companyName);
   }
+  if (inviteAgency && inviteToken) {
+    // Hesab artıq yaranıb — qoşulma alınmasa da qeydiyyat davam edir, agent linki yenidən aça bilər.
+    try {
+      // Token qoşulmadan dərhal əvvəl yenidən oxunur: qeydiyyat davam edərkən sahib linki
+      // söndürə və ya yeniləyə bilər — köhnə link ilə qoşulma olmamalıdır.
+      const liveAgency = await findAgencyByInviteToken(inviteToken);
+      const joined = liveAgency?.id === inviteAgency.id
+        ? await joinAgencyByLink(liveAgency, { id: userId, accountType: parsed.data.accountType })
+        : null;
+      if (joined?.status === "joined") {
+        await recordDomainEvent("agency.employee_joined_link", "AgencyEmployee", joined.employeeId, { agencyId: inviteAgency.id });
+        await noticeAgencyLinkJoined({
+          ownerUserId: inviteAgency.userId,
+          employeeId: joined.employeeId,
+          attemptAt: joined.attemptAt,
+          agentName: composeName(parsed.data.firstName, parsed.data.lastName),
+          agencyName: inviteAgency.name,
+        });
+      }
+    } catch (error) {
+      console.error("[register] dəvət linki ilə qoşulma alınmadı:", error);
+    }
+  }
+
   const membership = created.membership;
   if (joinAgency && membership) {
     await noticeAgencyJoinRequest({

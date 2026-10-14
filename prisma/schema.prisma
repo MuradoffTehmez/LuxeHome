@@ -146,27 +146,40 @@ model PasswordResetToken {
 /// `isVerified` admin təsdiqidir: təsdiqlənmiş agentliyin elanı birbaşa dərc olunur,
 /// təsdiqlənməmişin elanı «Təsdiq gözləyir» statusunda qalır.
 model Agency {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  name        String
-  slug        String    @unique
-  description String?
-  logoUrl     String?
-  phone       String?
-  address     String?
-  website     String?
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  name                 String
+  slug                 String    @unique
+  description          String?
+  logoUrl              String?
+  phone                String?
+  address              String?
+  website              String?
   /// İctimai profil (bina.az tipli): ofis e-poçtu, WhatsApp, Instagram və iş saatları
   /// («Hər gün: 10:00-20:00» kimi sərbəst mətn). Telefonla eyni «Nömrəni göstər» ilə açılır.
-  email        String?
-  whatsapp     String?
-  instagram    String?
-  workingHours String?
+  email                String?
+  whatsapp             String?
+  instagram            String?
+  workingHours         String?
   /// Profil səhifəsinin baxış sayğacı (`recordView("agency")`), bot-lar sayılmır.
-  viewCount    Int       @default(0)
-  isVerified  Boolean   @default(false)
-  verifiedAt  DateTime?
+  viewCount            Int       @default(0)
+  /// Profil örtüyünün şəkli (#157) — kabinetdən (`avatarlar`) və ya paneldən yüklənir.
+  coverUrl             String?
+  /// Dəvət linki (#157): `/qosul/<token>` ilə agent komandaya birbaşa qoşulur. Sahib
+  /// linki yenidən yaradanda köhnəsi ölür, söndürəndə `null` olur.
+  inviteToken          String?   @unique
+  inviteTokenCreatedAt DateTime?
+  /// Təsdiq mərkəzində rədd (#157): səbəb sahibə bildiriş kimi gedir. Sahib profili
+  /// yeniləyəndə `rejectedAt` sıfırlanır və agentlik növbəyə qayıdır.
+  rejectionReason      String?
+  rejectedAt           DateTime?
+  /// Rədd edilib yenidən göndərilmə vaxtı (#157): növbənin SLA-sı bundan (yoxdursa
+  /// `createdAt`-dan) sayılır — həftələr əvvəl yaradılıb bu gün düzəldilən müraciət gecikmiş deyil.
+  reviewRequestedAt    DateTime?
+  isVerified           Boolean   @default(false)
+  verifiedAt           DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
-  isDemo      Boolean   @default(false)
+  isDemo               Boolean   @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -176,9 +189,31 @@ model Agency {
   partners      AgencyPartner[]
   agentProfiles AgentProfile[]
   testimonials  Testimonial[]
+  offices       AgencyOffice[]
 
   @@index([isVerified])
   @@index([isDemo])
+  @@index([rejectedAt])
+}
+
+/// Agentliyin filialı (#157). Baş ofis `Agency.address`-dədir; burada əlavə ofislər.
+/// Nömrə HTML-ə yazılmır — profil səhifəsində «Nömrəni göstər» ilə açılır.
+model AgencyOffice {
+  id           String   @id @default(cuid())
+  agencyId     String
+  name         String
+  address      String
+  cityId       String?
+  phone        String?
+  workingHours String?
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  agency Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  city   Location? @relation("AgencyOfficeCity", fields: [cityId], references: [id], onDelete: SetNull)
+
+  @@index([agencyId, order])
 }
 
 /// Agentlik işçisi. Sahibin (Agency.userId) özü bura yazılmır — yalnız dəvət
@@ -193,12 +228,15 @@ model AgencyEmployee {
   role   String @default("AGENT")
   /// PENDING | APPROVED | REJECTED — admin təsdiqi tələb olunur.
   status String @default("PENDING")
-  /// INVITE | REQUEST — dəvəti sahib göndərib, yoxsa agent qeydiyyatda sorğu edib.
+  /// INVITE | REQUEST | LINK — dəvəti sahib göndərib, agent qeydiyyatda sorğu edib,
+  /// yoxsa sahibin dəvət linki ilə birbaşa qoşulub (#157, dərhal APPROVED).
   /// Sorğunu agentlik sahibi də təsdiqləyə bilər; dəvəti yalnız admin.
   source String @default("INVITE")
 
-  invitedAt  DateTime  @default(now())
-  approvedAt DateTime?
+  invitedAt    DateTime  @default(now())
+  approvedAt   DateTime?
+  /// Rədd səbəbi (#157) — agentə bildirişdə göstərilir.
+  decisionNote String?
 
   agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -398,6 +436,7 @@ model Location {
   propertiesNearMetro    Property[]           @relation("PropertyMetro")
   propertiesNearLandmark Property[]           @relation("PropertyLandmark")
   projects               Project[]            @relation("ProjectCity")
+  agencyOffices          AgencyOffice[]       @relation("AgencyOfficeCity")
   neighborhoodProfile    NeighborhoodProfile?
 
   @@index([parentId])
@@ -1112,30 +1151,35 @@ model PropertyPriceHistory {
 
 /// İctimai agent profili User hesabından ayrıdır, amma lazım olduqda bir hesaba bağlanır.
 model AgentProfile {
-  id              String   @id @default(cuid())
-  userId          String?  @unique
-  agencyId        String?
-  slug            String   @unique
-  name            String
-  avatarUrl       String?
-  roleTitle       String?
-  specialization  String?
-  experienceYears Int?
-  bio             String?
-  phone           String?
-  whatsapp        String?
-  email           String?
-  languages       String   @default("[]")
-  areas           String   @default("[]")
-  isVerified      Boolean  @default(false)
-  isPublic        Boolean  @default(false)
+  id                String    @id @default(cuid())
+  userId            String?   @unique
+  agencyId          String?
+  slug              String    @unique
+  name              String
+  avatarUrl         String?
+  roleTitle         String?
+  specialization    String?
+  experienceYears   Int?
+  bio               String?
+  phone             String?
+  whatsapp          String?
+  email             String?
+  languages         String    @default("[]")
+  areas             String    @default("[]")
+  isVerified        Boolean   @default(false)
+  isPublic          Boolean   @default(false)
+  /// Təsdiq mərkəzində rədd (#157); agent profili yeniləyəndə sıfırlanır.
+  rejectionReason   String?
+  rejectedAt        DateTime?
+  /// Rədd edilib yenidən göndərilmə vaxtı (#157) — bax `Agency.reviewRequestedAt`.
+  reviewRequestedAt DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
-  isDemo          Boolean  @default(false)
-  soldCount       Int      @default(0)
-  rentedCount     Int      @default(0)
-  responseMinutes Int?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isDemo            Boolean   @default(false)
+  soldCount         Int       @default(0)
+  rentedCount       Int       @default(0)
+  responseMinutes   Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   agency       Agency?       @relation(fields: [agencyId], references: [id], onDelete: SetNull)

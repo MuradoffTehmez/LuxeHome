@@ -120,7 +120,7 @@ export function LogoPicker({ name, labels, error }: { name: string; labels: Logo
         >
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element -- yerli blob önizləməsi, optimizasiya lazım deyil
-            <img src={preview} alt="" className="size-full object-contain p-1.5" />
+            <img src={preview} alt="" className="size-full object-contain" />
           ) : (
             <ImagePlus className="size-6 text-ink-muted" aria-hidden="true" />
           )}

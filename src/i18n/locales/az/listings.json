@@ -229,7 +229,11 @@
     "website": "Sayt",
     "instagram": "Instagram",
     "notice": "Agentlik müstəqil tərəfdaşdır. Əmlakı və sənədləri görmədən ödəniş etməyin.",
-    "sectionNav": "Agentlik səhifəsinin bölmələri"
+    "sectionNav": "Agentlik səhifəsinin bölmələri",
+    "officesTitle": "Ofislərimiz",
+    "officesDescription": "Baş ofisdən əlavə {count, plural, other {# filial}}",
+    "ogEyebrow": "Daşınmaz əmlak agentliyi",
+    "ogOffers": "Təklif"
   },
   "agencyDirectory": {
     "searchLabel": "Agentlik axtarışı",

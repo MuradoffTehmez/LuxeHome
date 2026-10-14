@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { demoWhere } from "@/lib/demo-content";
 import { findManyInChunks } from "@/lib/d1-chunks";
+import { getAgencyOffices } from "@/lib/accounts/agency-offices";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
 import { AGENCY_EMPLOYEE_STATUSES, LISTING_TYPES, PUBLIC_PROPERTY_STATUSES, REVIEW_STATUSES, type SortOption } from "@/lib/constants";
 
@@ -177,6 +178,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
       slug: true,
       description: true,
       logoUrl: true,
+      coverUrl: true,
       address: true,
       website: true,
       instagram: true,
@@ -204,7 +206,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
   };
   const page = Math.max(1, filters.page ?? 1);
 
-  const [properties, filteredCount, byListingType, byType, byDistrict, agents] = await Promise.all([
+  const [properties, filteredCount, byListingType, byType, byDistrict, agents, offices] = await Promise.all([
     prisma.property.findMany({
       where,
       select: propertyCardSelect,
@@ -229,6 +231,8 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
       },
       orderBy: [{ isVerified: "desc" }, { name: "asc" }],
     }),
+    // Filiallar (#157) — nömrə səhifədə maskalanır, tam dəyər `elaqe?ofis=` ilə açılır.
+    getAgencyOffices(agency.id),
   ]);
 
   const stats: OfferStats = { ...EMPTY_STATS };
@@ -274,5 +278,6 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
       ...agent,
       _count: { properties: agentCounts.get(agent.id) ?? 0 },
     })),
+    offices,
   };
 }

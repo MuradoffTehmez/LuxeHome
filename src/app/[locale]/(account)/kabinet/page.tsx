@@ -11,6 +11,8 @@ import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
 import { CabinetQuickActions } from "./quick-actions";
+import { ProfileCompletenessCard } from "./profil/profile-completeness-card";
+import { getProfileCompleteness } from "@/lib/accounts/profile-completeness-data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -34,6 +36,8 @@ export default async function CabinetPage() {
     user,
   );
 
+  // Profil tamlığı yalnız agentlik və agent üçün; 100%-də ana səhifədə göstərilmir (#157).
+  const profileCompleteness = await getProfileCompleteness(user.id, user.accountType);
   const canList = user.accountType !== ACCOUNT_TYPES.USER;
   const t = await getTranslations("auth.cabinet");
   const accountT = await getTranslations("auth.accountTypes");
@@ -55,6 +59,10 @@ export default async function CabinetPage() {
           />
 
           <CabinetQuickActions canList={canList} />
+
+          {profileCompleteness && profileCompleteness.completeness.percent < 100 && (
+            <ProfileCompletenessCard completeness={profileCompleteness.completeness} kind={profileCompleteness.kind} compact />
+          )}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <article className="rounded-xl border border-line bg-paper p-5 shadow-xs">

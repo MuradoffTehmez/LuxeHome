@@ -25,6 +25,7 @@ import {
   occupiedAgencySeats,
 } from "@/lib/accounts/agency-membership";
 import { noticeAgencyDecision } from "@/lib/accounts/account-notices";
+import { generateInviteToken } from "@/lib/accounts/agency-invite";
 
 /**
  * Agentlik komandası — sahib (owner) idarə edir.
@@ -261,5 +262,48 @@ async function reviewAgencyRequest(
     return success(approved ? t("actions.requestApproved") : t("actions.requestRejected"));
   } catch (error) {
     return unexpected("qoşulma sorğusu yenilənmədi", error, t("actions.unexpected"));
+  }
+}
+
+/**
+ * Dəvət linkini yaradır və ya yeniləyir (#157). Yeni link köhnəsini dərhal öldürür —
+ * link yanlış yerə paylaşılıbsa sahib onu bir kliklə etibarsız edə bilir. Link yalnız
+ * təsdiqlənmiş agentlikdə işləyir; təsdiqdən əvvəl yaradılsa da açılmır.
+ */
+export async function regenerateInviteLink(): Promise<ActionState> {
+  return setInviteLink(true);
+}
+
+/** Dəvət linkini söndürür — köhnə link ilə qoşulmaq mümkün olmur. */
+export async function disableInviteLink(): Promise<ActionState> {
+  return setInviteLink(false);
+}
+
+async function setInviteLink(enabled: boolean): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  let owner;
+  try {
+    owner = await requireAgencyOwner(locale, {
+      agencyOnly: t("actions.agencyOnly"),
+      agencyProfileRequired: t("actions.agencyProfileRequired"),
+    });
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  try {
+    await prisma.agency.update({
+      where: { id: owner.agency.id },
+      data: enabled
+        ? { inviteToken: generateInviteToken(), inviteTokenCreatedAt: new Date() }
+        : { inviteToken: null, inviteTokenCreatedAt: null },
+    });
+    await recordDomainEvent("agency.invite_link_changed", "Agency", owner.agency.id, { enabled });
+    revalidatePath(localizePath("/kabinet/komanda", locale));
+    return success(enabled ? t("team.inviteLink.created") : t("team.inviteLink.disabled"));
+  } catch (error) {
+    return unexpected("dəvət linki dəyişmədi", error, t("actions.unexpected"));
   }
 }

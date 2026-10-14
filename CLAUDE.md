@@ -650,6 +650,39 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   tabları və «Təsdiqlə və dərc et» (`approveAndPublishAgent`). Növbədə yalnız heç təsdiqlənməmiş
   agent var (`isVerified: false`); təsdiqlənib qəsdən gizlədilən profil növbəyə qayıtmır.
 
+### Agentlik profilinin genişlənməsi, rədd səbəbi, dəvət linki və məlumat ixracı (#157)
+
+- **Rədd səbəbi:** agentlik/agent `rejectedAt` + `rejectionReason`, komanda qeydi `decisionNote`. Rədd
+  edilən müraciət növbədən çıxır (`PENDING_*_WHERE`-də `rejectedAt: null`); sahib kabinetdə profili
+  saxlayanda sahələr sıfırlanır və müraciət geri qayıdır. Səbəb `noticeAccountReview()` ilə bildiriş +
+  e-poçt kimi gedir (`ACCOUNT_REVIEW`); təsdiq də bildirilir. Rədd şərti `updateMany` ilədir — eyni anda
+  təsdiq edilən agentliyin üzərinə yazılmır. Uzunluq `REJECTION_REASON_MIN/MAX`, dialoq `ReasonAction`.
+- **Toplu təsdiq** `bulkApproveQueue` — guard **bir dəfə**, sonra hər id tək action-un guard-sız daxili
+  addımından keçir (`*As(actor, id)`, agent üçün `lib/admin/agent-approval.ts`): hər qeyd üçün
+  `requireAdminAction` yazma limitindən (60/dəq) vahid yeyirdi və 60-cı qeyd kəsilirdi. Yeni toplu
+  əməliyyatı da belə yaz. SLA `lib/admin/approval-sla.ts` (24 saat sarı, 72 saat qırmızı) son göndərilmədən
+  sayılır: rədd edilib düzəldilən müraciətdə `reviewRequestedAt`, yoxdursa `createdAt`.
+- Dəvət linki ilə qeydiyyatda token hesab yarandıqdan sonra, qoşulmadan dərhal əvvəl **yenidən** oxunur —
+  qeydiyyat davam edərkən söndürülən link işləməməlidir.
+- **VÖEN** (`normalizeTaxId`): 10 rəqəm, sonuncu 1 və ya 2, təkrar rəqəm rədd olunur; eyni VÖEN ilə ikinci
+  aktiv agentlik hesabı açılmır (`isAgencyTaxIdTaken`). Nəzarət rəqəminin alqoritmi dərc olunmayıb — yoxlanılmır.
+- **Dəvət linki** `/qosul/<token>` (`lib/accounts/agency-invite.ts`): sahib kabinetdə yaradır/yeniləyir/
+  söndürür, linklə gələn agent `source = LINK` ilə **dərhal APPROVED** olur — qərar yenə
+  `commitMembershipDecision()`-dən keçir. Qeydiyyat `?devet=<token>` ilə agent növündə açılır.
+  `/qosul` `NEVER_CACHED_PREFIXES`-dədir (sessiya oxuyur, token daşıyır).
+- **Filiallar** `AgencyOffice` (`lib/accounts/agency-offices.ts`, ən çox `MAX_AGENCY_OFFICES`): kabinet və
+  panel eyni yoxlamanı işlədir; nömrə HTML-ə yazılmır, `POST /api/agentlikler/<slug>/elaqe?ofis=<id>`-dən açılır.
+- **Örtük şəkli** `Agency.coverUrl`: kabinetdən `avatarlar`, paneldən `umumi`; dəyişməyən dəyər mülkiyyət
+  yoxlamasından keçmir (panelin qoyduğu şəkil sahibin növbəti saxlamasını sındırmasın).
+- **Paylaşım kartı** `/api/og/agency/<slug>` — şəkil köməkçiləri `lib/og-image.ts`-dədir (elan kartı da
+  işlədir). Satori `textTransform`-u dilə həssas deyil: böyük hərf `toLocaleUpperCase("az-AZ")` ilə.
+- **Profil tamlığı** `lib/accounts/profile-completeness.ts` (saf modul, çəkilərin cəmi 100) — kabinet ana
+  səhifəsi və profil kartı.
+- **«Məlumatlarımı yüklə»** `lib/accounts/data-export.ts`: yalnız şəxsin öz məlumatı, gizli dəyər yoxdur
+  (parol heşi, TOTP, tokenlər, push açarları); başqasının əlaqəsi (müraciət, rəy yazan) düşmür. Hesab üzrə
+  limit (`checkDataExportLimit`). `scripts/__tests__/data-export-source.test.ts` gizli sahə adlarını yoxlayır.
+- **Loqo lövhəsində padding yazma:** kvadrat loqo (fonu rəngli) lövhəni tam doldurmalıdır — `object-contain` padding-siz.
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai

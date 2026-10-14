@@ -71,6 +71,18 @@ export async function checkContactRevealLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/**
+ * «Məlumatlarımı yüklə» (#157): ixrac bir neçə sorğu edir, ona görə hesab üzrə limitlənir.
+ * `VALUATION_LIMIT` öz açar prefiksi ilə işlədilir (ayrıca binding lazım deyil).
+ */
+export async function checkDataExportLimit(userId: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `data-export:${userId}` });
+  return success;
+}
+
 /** Brauzer monitorinq hadisələri üçün ayrıca, daha geniş büdcə. */
 export async function checkMonitoringLimit(ip: string): Promise<boolean> {
   const limiter = getCloudflareContext().env.MONITORING_LIMIT;

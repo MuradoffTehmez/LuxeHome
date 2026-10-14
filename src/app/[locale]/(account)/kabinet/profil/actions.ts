@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { composeName, isPhoneLike, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
+import { isAgencyTaxIdTaken } from "@/lib/accounts/agency-tax-id";
 import { requireAccount, currentSessionId } from "@/lib/auth/guard";
 import { systemModeBlock } from "@/lib/admin/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
@@ -107,10 +108,29 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
   if (companyTaxId === false) {
     return failure(t("actions.invalidForm"), { companyTaxId: t("actions.invalidTaxId") });
   }
+  if (user.accountType === ACCOUNT_TYPES.AGENCY && companyTaxId && (await isAgencyTaxIdTaken(companyTaxId, user.id))) {
+    return failure(t("actions.invalidForm"), { companyTaxId: t("actions.taxIdTaken") });
+  }
   const data = parsed.data;
   const name = composeName(data.firstName, data.lastName);
 
   try {
+    // Agentliyin örtük şəkli (#157): dəyişməyibsə (o cümlədən paneldən qoyulubsa) yoxlanılmır,
+    // yenisi isə avatar kimi bu hesabın profil qovluğuna yüklədiyi fayl olmalıdır.
+    const coverUrl = user.accountType === ACCOUNT_TYPES.AGENCY ? imageUrlFromForm(formData, "cover") : null;
+    const storedAgency = user.accountType === ACCOUNT_TYPES.AGENCY
+      ? await prisma.agency.findUnique({ where: { userId: user.id }, select: { coverUrl: true } })
+      : null;
+    if (coverUrl && coverUrl !== storedAgency?.coverUrl) {
+      const owned = await prisma.media.findFirst({
+        where: { uploaderId: user.id, url: coverUrl },
+        select: { id: true },
+      });
+      if (!owned || !coverUrl.startsWith("/media/avatarlar/")) {
+        return failure(t("actions.avatarOwnership"), { cover: t("actions.avatarOwnership") });
+      }
+    }
+
     // Profil şəkli yalnız bu hesabın profil qovluğuna yüklədiyi fayl ola bilər.
     if (data.avatarUrl) {
       const owned = await prisma.media.findFirst({
@@ -146,7 +166,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
     if (user.accountType === ACCOUNT_TYPES.AGENCY && data.companyName) {
       const existing = await prisma.agency.findUnique({
         where: { userId: user.id },
-        select: { id: true, name: true, slug: true, logoUrl: true },
+        select: { id: true, name: true, slug: true, logoUrl: true, rejectedAt: true },
       });
 
       // Ad dəyişəndə slug da yenilənir, amma yalnız toqquşma olmayan variantla
@@ -170,6 +190,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
         whatsapp: data.agencyWhatsapp,
         instagram: data.agencyInstagram,
         workingHours: data.agencyHours,
+        coverUrl,
         phone: data.phone,
         // Loqo profil şəkli ilə eynidir: şəkil silinəndə agentlikdən də silinir (əvvəl köhnə
         // loqo qalırdı). Profil şəklindən gəlməyən köhnə loqoya isə toxunulmur.
@@ -178,7 +199,14 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
       };
 
       if (existing) {
-        await prisma.agency.update({ where: { id: existing.id }, data: agencyData });
+        // Rədd edilmiş müraciət profil yenilənəndə yenidən təsdiq növbəsinə düşür (#157);
+        // SLA yeni göndərilmə vaxtından sayılır.
+        await prisma.agency.update({
+          where: { id: existing.id },
+          data: existing.rejectedAt
+            ? { ...agencyData, rejectedAt: null, rejectionReason: null, reviewRequestedAt: new Date() }
+            : agencyData,
+        });
         // Agentlik adı/loqosu elan kartlarında və agentlik səhifəsində göstərilir.
         revalidatePublicContent("agency", existing.slug);
         if (existing.slug !== slug) revalidatePublicContent("agency", slug);
@@ -199,9 +227,17 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
         experienceYears: data.agentExperience,
         bio: data.agentBio,
       };
-      const existing = await prisma.agentProfile.findUnique({ where: { userId: user.id }, select: { id: true, slug: true } });
+      const existing = await prisma.agentProfile.findUnique({
+        where: { userId: user.id },
+        select: { id: true, slug: true, rejectedAt: true },
+      });
       if (existing) {
-        await prisma.agentProfile.update({ where: { id: existing.id }, data: agentData });
+        await prisma.agentProfile.update({
+          where: { id: existing.id },
+          data: existing.rejectedAt
+            ? { ...agentData, rejectedAt: null, rejectionReason: null, reviewRequestedAt: new Date() }
+            : agentData,
+        });
         revalidatePublicContent("agent", existing.slug);
       } else {
         const slug = await uniqueSlug(name, (candidate) =>
@@ -223,7 +259,12 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
 
 /** Dropzone profil şəklini JSON sətri kimi göndərir (`{ url, alt, isCover }`). */
 function avatarFromForm(formData: FormData): string | null {
-  const raw = form.optionalText(formData, "avatar");
+  return imageUrlFromForm(formData, "avatar");
+}
+
+/** Dropzone sahəsindən (`{ url, alt, isCover }` JSON) şəklin ünvanı. */
+function imageUrlFromForm(formData: FormData, name: string): string | null {
+  const raw = form.optionalText(formData, name);
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as { url?: unknown };

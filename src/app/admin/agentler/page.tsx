@@ -33,7 +33,7 @@ export const dynamic = "force-dynamic";
 
 const inputClass = "min-h-11 w-full rounded-xs border border-line-strong bg-paper px-3 text-sm text-ink";
 
-const AGENT_STATUSES = ["all", "pending", "public", "hidden"] as const;
+const AGENT_STATUSES = ["all", "pending", "rejected", "public", "hidden"] as const;
 type AgentStatus = (typeof AGENT_STATUSES)[number];
 
 export default async function AdminAgentsPage({
@@ -56,11 +56,12 @@ export default async function AdminAgentsPage({
     prisma.agency.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
   ]);
 
-  // Təsdiq gözləyən = heç təsdiqlənməmiş profil (təsdiq növbəsi ilə eyni qayda);
-  // təsdiqlənib qəsdən gizlədilən profil «Gizli» tabındadır.
+  // Təsdiq gözləyən = heç təsdiqlənməmiş və rədd edilməmiş profil (təsdiq növbəsi ilə eyni
+  // qayda, #157); təsdiqlənib qəsdən gizlədilən profil «Gizli» tabındadır.
   const matches = (agent: (typeof allAgents)[number], value: AgentStatus) =>
     value === "all"
-    || (value === "pending" && !agent.isVerified)
+    || (value === "pending" && !agent.isVerified && !agent.rejectedAt)
+    || (value === "rejected" && !agent.isVerified && agent.rejectedAt != null)
     || (value === "public" && agent.isPublic)
     || (value === "hidden" && !agent.isPublic);
   const agents = allAgents.filter((agent) => matches(agent, status));
@@ -68,6 +69,7 @@ export default async function AdminAgentsPage({
   const statusTabs = [
     { value: "all" as const, label: t("pages.agencyHub.tabAll") },
     { value: "pending" as const, label: t("pages.agencyHub.tabPending") },
+    { value: "rejected" as const, label: t("pages.agencyHub.tabRejected") },
     { value: "public" as const, label: t("pages.agents.ictimai") },
     { value: "hidden" as const, label: t("pages.agents.gizli") },
   ].map((tab) => ({ ...tab, count: allAgents.filter((agent) => matches(agent, tab.value)).length }));
@@ -130,8 +132,12 @@ export default async function AdminAgentsPage({
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-medium text-ink">{agent.name}</p>
                 {agent.isVerified ? <Badge tone="success">{t("pages.agents.tesdiqlenib")}</Badge> : null}
+                {!agent.isVerified && agent.rejectedAt ? <Badge tone="danger">{t("pages.agencyHub.rejected")}</Badge> : null}
                 {agent.isPublic ? <Badge tone="gold">{t("pages.agents.ictimai")}</Badge> : <Badge tone="neutral">{t("pages.agents.gizli")}</Badge>}
               </div>
+              {!agent.isVerified && agent.rejectionReason ? (
+                <p className="mt-1 text-xs text-danger [overflow-wrap:anywhere]">{t("pages.agencyHub.rejectionReasonShort", { reason: agent.rejectionReason })}</p>
+              ) : null}
               <p className="mt-1 text-xs text-ink-muted">
                 {agent.agency?.name ?? t("pages.misc.musteqil")} · {t("pages.misc.elanRey", { p0: listingCounts.get(agent.id) ?? 0, p1: agent._count.reviews })} ·{" "}
                 {agent.responseMinutes != null ? t("pages.common.deqCavab", { p0: agent.responseMinutes }) : t("pages.misc.cavabMuddetiYoxdur")} ·{" "}

@@ -47,6 +47,7 @@ export type ProfileFormValues = {
   agencyWhatsapp: string;
   agencyInstagram: string;
   agencyHours: string;
+  agencyCoverUrl: string | null;
   agentRoleTitle: string;
   agentSpecialization: string;
   agentExperience: string;
@@ -123,7 +124,7 @@ export function ProfileForm({
             error={state.fieldErrors?.companyName}
           />
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <Input name="companyTaxId" label={t("companyTaxId")} inputMode="numeric" maxLength={14} defaultValue={values.companyTaxId} error={state.fieldErrors?.companyTaxId} />
+            <Input name="companyTaxId" label={t("companyTaxId")} inputMode="numeric" autoComplete="off" maxLength={12} hint={t("companyTaxIdHint")} defaultValue={values.companyTaxId} error={state.fieldErrors?.companyTaxId} />
             <Input name="position" label={t("position")} defaultValue={values.position} maxLength={120} error={state.fieldErrors?.position} />
           </div>
           <Input
@@ -136,6 +137,17 @@ export function ProfileForm({
           />
           {isAgency && (
             <>
+              {/* Agentlik profilinin örtüyü (#157) — geniş foto, loqo onun üzərində durur. */}
+              <ImageDropzone
+                name="cover"
+                label={t("agencyCover")}
+                folder="avatarlar"
+                uploadUrl="/api/hesab/media?folder=avatarlar"
+                mode="single"
+                initial={values.agencyCoverUrl ? [{ url: values.agencyCoverUrl, alt: "", isCover: true }] : []}
+                hint={t("agencyCoverHint")}
+              />
+              {state.fieldErrors?.cover && <p className="text-sm text-danger">{state.fieldErrors.cover}</p>}
               <Textarea
                 name="agencyDescription"
                 label={t("agencyDescription")}

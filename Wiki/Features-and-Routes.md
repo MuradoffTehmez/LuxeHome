@@ -82,7 +82,13 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 - Kartda «Agentlik: Ad», «Mülkiyyətçi», «Agent» nişanı; siyahıda `?satici=OWNER|AGENCY|COMPANY` filtri.
 - `/satici/<id>` — satıcının bütün aktiv elanları (noindex).
 - `/agentlikler` — kataloq: adla axtarış (`?axtaris=`), kartda təklif sayı (satış/kirayə), agent sayı, təsvir; təklif sayına görə sıralanır.
-- `/agentlikler/<slug>` — agentlik profili: statistika (təklif, satış, kirayə, agent, baxış), Satış/Kirayə və növ bölmələri, sıralama, səhifələmə, fəaliyyət əraziləri, agentlər, «Nömrəni göstər», ünvan/iş saatları/sayt/Instagram.
+- `/agentlikler/<slug>` — agentlik profili:
+  - örtük şəkli və loqo;
+  - statistika (təklif, satış, kirayə, agent, baxış);
+  - Satış/Kirayə və növ bölmələri, sıralama, səhifələmə;
+  - fəaliyyət əraziləri, «Ofislərimiz» (filiallar, nömrə «Nömrəni göstər» ilə), agentlər;
+  - «Nömrəni göstər», ünvan/iş saatları/sayt/Instagram.
+- Paylaşım kartı `/api/og/agency/<slug>?l=az` — loqo, ad və təklif/agent sayı ilə 1200×630.
 - Agentin elan sayı və səhifəsi öz yerləşdirdiyi və ona təyin edilmiş elanları birlikdə göstərir.
 - Elan səhifəsindən gələn müraciət elana bağlanır və ictimai hesabın elanında sahibin `/kabinet/muracietler` bölməsinə düşür.
 
@@ -102,14 +108,15 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/hesab/e-poct-tesdiqi`, `/hesab/e-poct-gonderildi` | E-poçt təsdiqi |
 | `/hesab/parolu-unutdum`, `/hesab/parolu-yenile` | Parol bərpası |
 | `/kabinet` | Hesab xülasəsi |
-| `/kabinet/profil` | Profil, parol, telefon təsdiqi, şəxsi data ixracı, hesabın silinməsi |
+| `/kabinet/profil` | Profil, profil tamlığı (%), agentlik örtüyü və filialları, rədd səbəbi, parol, telefon təsdiqi, «Məlumatlarımı yüklə» (JSON), hesabın silinməsi |
 | `/kabinet/elanlar`, `/kabinet/elanlar/yeni`, `/kabinet/elanlar/[id]` | Elan siyahısı, 8 addımlı sehrbaz, redaktə, «Yenilə» (+60 gün) |
 | `/kabinet/paketler` | Premium paket sifarişi və tarixçə |
 | `/kabinet/rezervasiyalar` | Rezervasiyalar |
 | `/kabinet/axtarislarim` | Saxlanmış axtarışlar və tezlik |
 | `/kabinet/bildirisler` | Bildirişlər, kanal seçimləri, sakit saatlar |
 | `/kabinet/son-baxilanlar`, `/kabinet/tovsiyeler` | Son baxılanlar və fərdi tövsiyələr |
-| `/kabinet/komanda` | Agentlik komandası (ən çox 3 üzv) |
+| `/kabinet/komanda` | Agentlik komandası (ən çox 50 üzv), e-poçtla dəvət və dəvət linki |
+| `/qosul/<token>` | Agentliyin dəvət linki: agent birbaşa komandaya qoşulur, qonaq agent kimi qeydiyyata yönəlir |
 | `/elan-yerlesdir`, `/elanlarim`, `/profilim` | Qısa ünvanlar (`accounts/short-links.ts`) |
 
 ### Hesab növləri

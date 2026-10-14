@@ -10,6 +10,7 @@ import { GoogleSignIn } from "@/components/auth/google-sign-in";
 import { RegisterForm } from "./register-form";
 import { localizePath } from "@/i18n/path-locale";
 import { getAgencyDirectory } from "@/lib/queries";
+import { findAgencyByInviteToken } from "@/lib/accounts/agency-invite";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -32,10 +33,13 @@ export default async function RegisterPage({
 
   const params = await searchParams;
   const next = typeof params.davam === "string" ? params.davam : undefined;
-  const [t, agencies] = await Promise.all([
+  const inviteToken = typeof params.devet === "string" ? params.devet : null;
+  const [t, agencies, inviteAgency] = await Promise.all([
     getTranslations("auth.registration"),
     // Siyahı boş qalsa da qeydiyyat işləməlidir — agentlik seçimi istəyə bağlıdır.
     getAgencyDirectory().catch(() => []),
+    // Dəvət linki (#157): forma agent növündə açılır və agentlik adı göstərilir.
+    inviteToken ? findAgencyByInviteToken(inviteToken).catch(() => null) : null,
   ]);
   const benefits = [t("benefits.type"), t("benefits.secure"), t("benefits.track")];
 
@@ -48,7 +52,11 @@ export default async function RegisterPage({
     >
       <div className="flex flex-col gap-5">
         <GoogleSignIn next={next} placement="before" />
-        <RegisterForm next={next} agencies={agencies} />
+        <RegisterForm
+          next={next}
+          agencies={agencies}
+          invite={inviteAgency && inviteToken ? { token: inviteToken, agencyName: inviteAgency.name } : null}
+        />
       </div>
     </AuthShell>
   );

@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-const STATUSES = ["all", "pending", "verified", "missing"] as const;
+const STATUSES = ["all", "pending", "rejected", "verified", "missing"] as const;
 type StatusFilter = (typeof STATUSES)[number];
 
 export default async function AdminAgenciesPage({
@@ -53,7 +53,8 @@ export default async function AdminAgenciesPage({
   ]);
   const matchesStatus = (account: (typeof allAgencies)[number], value: StatusFilter) =>
     value === "all"
-    || (value === "pending" && account.agency != null && !account.agency.isVerified)
+    || (value === "pending" && account.agency != null && !account.agency.isVerified && !account.agency.rejectedAt)
+    || (value === "rejected" && account.agency != null && !account.agency.isVerified && account.agency.rejectedAt != null)
     || (value === "verified" && account.agency?.isVerified === true)
     || (value === "missing" && account.agency == null);
   const needle = query.toLocaleLowerCase("az");
@@ -64,6 +65,7 @@ export default async function AdminAgenciesPage({
   const tabs = [
     { value: "all" as const, label: t("pages.agencyHub.tabAll") },
     { value: "pending" as const, label: t("pages.agencyHub.tabPending") },
+    { value: "rejected" as const, label: t("pages.agencyHub.tabRejected") },
     { value: "verified" as const, label: t("pages.agencyHub.tabVerified") },
     { value: "missing" as const, label: t("pages.agencyHub.tabMissing") },
   ].map((tab) => ({ ...tab, count: allAgencies.filter((account) => matchesStatus(account, tab.value)).length }));
@@ -92,7 +94,7 @@ export default async function AdminAgenciesPage({
     <span className="relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-xs border border-line bg-paper">
       {account.agency?.logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element -- panel önizləməsi
-        <img src={account.agency.logoUrl} alt="" className="size-full object-contain p-0.5" />
+        <img src={account.agency.logoUrl} alt="" className="size-full object-contain" />
       ) : (
         <Building2 className="size-4 text-ink-muted" aria-hidden="true" />
       )}
@@ -198,6 +200,8 @@ export default async function AdminAgenciesPage({
                   <Badge tone="danger">{t("pages.agents.profilYoxdur")}</Badge>
                 ) : account.agency.isVerified ? (
                   <Badge tone="success">{t("pages.agents.tesdiqlenib")}</Badge>
+                ) : account.agency.rejectedAt ? (
+                  <Badge tone="danger" title={account.agency.rejectionReason ?? undefined}>{t("pages.agencyHub.rejected")}</Badge>
                 ) : (
                   <Badge tone="warning">{t("pages.agents.tesdiqGozleyir")}</Badge>
                 )
@@ -281,6 +285,8 @@ export default async function AdminAgenciesPage({
                       <Badge tone="danger">{t("pages.agents.profilYoxdur")}</Badge>
                     ) : account.agency.isVerified ? (
                       <Badge tone="success">{t("pages.agents.tesdiqlenib")}</Badge>
+                    ) : account.agency.rejectedAt ? (
+                      <Badge tone="danger" title={account.agency.rejectionReason ?? undefined}>{t("pages.agencyHub.rejected")}</Badge>
                     ) : (
                       <Badge tone="warning">{t("pages.agents.tesdiqGozleyir")}</Badge>
                     )}

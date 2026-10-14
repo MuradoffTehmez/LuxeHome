@@ -224,7 +224,21 @@
     "reject": "Reject",
     "approveLabel": "Approve the request from {name}",
     "rejectLabel": "Reject the request from {name}",
-    "requestSource": "Join request"
+    "requestSource": "Join request",
+    "inviteLink": {
+      "title": "Invite link",
+      "description": "Send this link to your agents: an agent who registers or signs in joins your team without waiting for approval. If the link ends up in the wrong place, regenerate it — the old one stops working immediately.",
+      "notVerified": "The link will work once your agency is verified.",
+      "label": "Invite link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "createdAt": "Created: {date}",
+      "regenerate": "Generate a new link",
+      "disable": "Disable link",
+      "create": "Create an invite link",
+      "created": "A new invite link was created. The old link no longer works.",
+      "disabled": "The invite link was disabled."
+    }
   },
   "actions": {
     "genericCredentials": "The email or password is incorrect.",
@@ -295,7 +309,7 @@
     "invalidBirthDate": "The date of birth is not valid.",
     "underage": "You must be at least 18 to register.",
     "companyNameRequired": "Enter the company name.",
-    "invalidTaxId": "The tax ID must be 10 digits.",
+    "invalidTaxId": "The tax ID (VÖEN) must be 10 digits and end in 1 or 2.",
     "avatarOwnership": "The profile photo must be a file you uploaded.",
     "agencyNotFound": "The selected agency was not found. Choose it from the list or leave the field empty.",
     "agencyRequestsFull": "This agency has too many pending requests. Complete registration without an agency and contact the agency.",
@@ -310,7 +324,8 @@
     "agencyLeft": "You have left the agency.",
     "agencyRequestCancelled": "Request cancelled.",
     "employeeOtherAgency": "This person already works for another agency or is an agency account.",
-    "invalidInstagram": "Enter an Instagram username (letters, digits, dot, underscore)."
+    "invalidInstagram": "Enter an Instagram username (letters, digits, dot, underscore).",
+    "taxIdTaken": "An agency with this tax ID is already registered. If you think this is a mistake, please contact us."
   },
   "profile": {
     "metaTitle": "Profile",
@@ -386,7 +401,16 @@
     "agencyEmail": "Office email",
     "agencyWhatsapp": "WhatsApp number",
     "agencyInstagram": "Instagram",
-    "agencyInstagramHint": "Username, for example @onehome"
+    "agencyInstagramHint": "Username, for example @onehome",
+    "companyTaxIdHint": "10 digits, the last one is 1 or 2. Checked against the Ministry of Taxes register during verification.",
+    "agencyCover": "Cover image",
+    "agencyCoverHint": "A wide photo at the top of your profile page — your office, team or a project. Recommended: 1600×600 px.",
+    "rejectedAgencyTitle": "Your agency application was rejected",
+    "rejectedAgentTitle": "Your agent profile was not verified",
+    "rejectedReason": "Reason: {reason}",
+    "rejectedHint": "Correct the details and save your profile — the application will be reviewed again automatically.",
+    "officesSection": "Branches",
+    "officesSectionDescription": "Your head office is the Address field above. Add any other offices here — they appear in the “Our offices” section of your agency profile."
   },
   "savedSearches": {
     "metaTitle": "My saved searches",
@@ -571,5 +595,82 @@
     "listing": "Listing: {title}",
     "call": "Call",
     "reply": "Reply"
+  },
+  "offices": {
+    "name": "Branch name",
+    "namePlaceholder": "e.g. Narimanov branch",
+    "city": "City / district",
+    "cityPlaceholder": "Select",
+    "address": "Address",
+    "phone": "Branch phone",
+    "hours": "Working hours",
+    "hoursHint": "e.g. Mon–Fri: 10:00–19:00",
+    "add": "Add branch",
+    "addTitle": "New branch",
+    "empty": "No branches added yet.",
+    "limit": "You can add up to {count} branches.",
+    "removeLabel": "Remove the {name} branch",
+    "removeTitle": "Remove this branch?",
+    "removeDescription": "“{name}” will be removed from your agency profile.",
+    "remove": "Remove",
+    "added": "Branch added.",
+    "removed": "Branch removed.",
+    "errors": {
+      "name": "Enter the branch name (2–120 characters).",
+      "address": "Enter the branch address (5–240 characters).",
+      "city": "Select a city or district from the list.",
+      "limit": "You can add up to {count} branches.",
+      "notFound": "Branch not found."
+    }
+  },
+  "completeness": {
+    "title": "Your profile is {percent}% complete",
+    "doneTitle": "Your profile is complete",
+    "progressLabel": "Profile completeness",
+    "hintAgency": "A complete profile builds client trust and gets more views. The most useful next steps:",
+    "hintAgent": "Clients contact agents with a photo and a detailed bio sooner. The most useful next steps:",
+    "doneAgency": "Great! Your agency profile is fully ready for clients.",
+    "doneAgent": "Great! Your agent profile is fully ready for clients.",
+    "items": {
+      "logo": "Upload a logo",
+      "description": "Write at least 2–3 sentences about your agency",
+      "phone": "Add your office phone in a valid format",
+      "cover": "Add a cover image",
+      "address": "Add your office address",
+      "hours": "Show your working hours",
+      "taxId": "Enter your tax ID (VÖEN)",
+      "whatsapp": "Add a WhatsApp number",
+      "email": "Add your office email",
+      "web": "Add a website or Instagram",
+      "bio": "Write at least 2–3 sentences about yourself",
+      "avatar": "Upload a profile photo",
+      "specialization": "Add your specialisation",
+      "roleTitle": "Add your job title",
+      "experience": "Add your years of experience"
+    },
+    "more": "and {count} more steps",
+    "cta": "Complete your profile"
+  },
+  "join": {
+    "metaTitle": "Join an agency",
+    "metaDescription": "Join an agency team using its invite link.",
+    "eyebrow": "Team invitation",
+    "invalidTitle": "Invalid link",
+    "invalid": "This invite link is invalid or has been replaced. Ask the agency for a new link.",
+    "browseAgencies": "Browse agencies",
+    "title": "“{name}” invites you to its team",
+    "description": "Join the “{name}” agency in one click with your agent account.",
+    "verified": "Verified agency",
+    "benefitBadge": "Your listings will show the agency name and badge.",
+    "benefitProfile": "Your agent profile will appear in the Agents section of the agency page.",
+    "benefitLeave": "You can leave the agency at any time from your account.",
+    "register": "Register as an agent",
+    "login": "I have an account — sign in",
+    "already": "You are already on the “{name}” team.",
+    "openCabinet": "Go to your account",
+    "notAgent": "Only an agent account can join a team. Create a separate agent account.",
+    "submit": "Join the “{name}” team",
+    "otherAgency": "You are an employee of another agency. Leave that agency in your account first.",
+    "full": "The agency team has no free seats left. Please contact the agency."
   }
 }

@@ -1,50 +1,40 @@
 import { NextResponse } from "next/server";
 import { AUTH_KINDS } from "@/lib/constants";
 import { getOptionalUser } from "@/lib/auth/guard";
-import { prisma } from "@/lib/prisma";
+import { checkDataExportLimit } from "@/lib/auth/rate-limit";
+import { recordDomainEvent } from "@/lib/admin/events";
+import { buildAccountExport } from "@/lib/accounts/data-export";
 import { isPublicApiBlocked, maintenanceApiResponse } from "@/lib/system-mode";
 
 export const dynamic = "force-dynamic";
 
+const NO_STORE = "private, no-store, max-age=0";
+
+/**
+ * «Məlumatlarımı yüklə» (#157). Tərkib və gizli dəyərlərin çıxarılması qaydası
+ * `lib/accounts/data-export.ts`-dədir; burada yalnız sessiya, limit və fayl başlıqları.
+ */
 export async function GET() {
   // Texniki xidmət rejimində ictimai hesab API-si də bağlanır —
   // middleware matcher-i `/api/*` yollarını əhatə etmir.
   if (await isPublicApiBlocked()) return maintenanceApiResponse();
 
   const sessionUser = await getOptionalUser(AUTH_KINDS.PUBLIC);
-  if (!sessionUser) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401 });
+  if (!sessionUser) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401, headers: { "Cache-Control": NO_STORE } });
+  if (!(await checkDataExportLimit(sessionUser.id))) {
+    return NextResponse.json({ error: "rate_limited" }, { status: 429, headers: { "Cache-Control": NO_STORE } });
+  }
 
-  const user = await prisma.user.findUnique({
-    where: { id: sessionUser.id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      avatarUrl: true,
-      accountType: true,
-      emailVerifiedAt: true,
-      approvedAt: true,
-      locale: true,
-      themePreference: true,
-      createdAt: true,
-      updatedAt: true,
-      agency: { select: { name: true, description: true, phone: true, address: true, website: true, isVerified: true, createdAt: true, updatedAt: true } },
-      properties: { select: { id: true, title: true, slug: true, status: true, price: true, currency: true, createdAt: true, updatedAt: true, deletedAt: true } },
-      favorites: { select: { createdAt: true, property: { select: { id: true, title: true, slug: true } } } },
-      savedSearches: { select: { id: true, name: true, filters: true, frequency: true, enabled: true, createdAt: true } },
-      notifications: { select: { id: true, type: true, title: true, content: true, actionUrl: true, readAt: true, createdAt: true } },
-      sessions: { select: { createdAt: true, lastSeenAt: true, expiresAt: true, revokedAt: true, authKind: true } },
-    },
-  });
-  if (!user) return NextResponse.json({ error: "Hesab tapılmadı" }, { status: 404 });
+  const data = await buildAccountExport(sessionUser.id);
+  if (!data) return NextResponse.json({ error: "Hesab tapılmadı" }, { status: 404, headers: { "Cache-Control": NO_STORE } });
+  await recordDomainEvent("account.data_exported", "User", sessionUser.id, { version: data.version });
 
-  const body = JSON.stringify({ exportedAt: new Date().toISOString(), user }, null, 2);
-  return new NextResponse(body, {
+  const date = data.exportedAt.slice(0, 10);
+  return new NextResponse(JSON.stringify(data, null, 2), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Content-Disposition": `attachment; filename="luxehome-data-${user.id}.json"`,
-      "Cache-Control": "private, no-store, max-age=0",
+      "Content-Disposition": `attachment; filename="luxehome-melumatlarim-${date}.json"`,
+      "Cache-Control": NO_STORE,
       "X-Content-Type-Options": "nosniff",
     },
   });

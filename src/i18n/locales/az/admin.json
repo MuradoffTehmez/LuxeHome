@@ -307,7 +307,8 @@
       "LISTING_EXPIRY": "Elan müddəti",
       "PACKAGE": "Premium paket",
       "AGENCY_TEAM": "Agentlik komandası",
-      "LISTING_LEAD": "Elana müraciət"
+      "LISTING_LEAD": "Elana müraciət",
+      "ACCOUNT_REVIEW": "Profil təsdiqi"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -633,6 +634,14 @@
       "title": "Hesabı silmək",
       "description": "«{name}» hesabı deaktiv ediləcək, sessiyaları bağlanacaq, elanları arxivlənəcək və hesab birdəfəlik silinəcək. Bu əməliyyat geri qaytarılmır.",
       "confirm": "Hesabı sil"
+    },
+    "reason": {
+      "length": "Səbəb {min}–{max} simvol olmalıdır.",
+      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin.",
+      "presets": "Hazır səbəblər",
+      "label": "Səbəb (istifadəçiyə göndərilir)",
+      "labelOptional": "Səbəb (istəyə bağlı, istifadəçiyə göndərilir)",
+      "hint": "{count}/{max} simvol"
     }
   },
   "pages": {
@@ -2753,7 +2762,52 @@
       "teamDescription": "Dəvətlər və qoşulma sorğuları; təsdiqlənmiş agentlərin elanları agentliyin təklifinə daxildir.",
       "teamEmpty": "Komanda üzvü yoxdur.",
       "rejected": "Rədd edilib",
-      "backToList": "← Agentliklər siyahısına qayıt"
+      "backToList": "← Agentliklər siyahısına qayıt",
+      "waitingHours": "{count} saat gözləyir",
+      "waitingDays": "{count} gün gözləyir",
+      "overdueNotice": "{count} müraciət 72 saatdan çoxdur gözləyir — əvvəlcə qırmızı nişanlılara baxın.",
+      "bulkApprove": "Seçilənləri təsdiqlə",
+      "bulkApproveTitle": "Toplu təsdiq",
+      "bulkApproveAgencies": "Seçilmiş agentliklər təsdiqlənəcək və ictimai kataloqda görünəcək. Sahiblərə bildiriş gedəcək.",
+      "bulkApproveAgents": "Seçilmiş agent profilləri təsdiqlənəcək və saytda dərc olunacaq. Agentlərə bildiriş gedəcək.",
+      "bulkApproveTeam": "Seçilmiş əməkdaşlar agentlik komandalarına əlavə olunacaq. Yer limiti və «bir aktiv agentlik» qaydası hər biri üçün yoxlanılır.",
+      "rejectPresets": {
+        "agencyTaxId": "VÖEN düzgün deyil və ya Vergilər Nazirliyinin bazasında tapılmadı.",
+        "agencyBrand": "Agentlik adı və ya loqo şirkətin rəsmi məlumatına uyğun gəlmir.",
+        "agencyContact": "Əlaqə məlumatı natamamdır — ofis telefonu və ünvanı əlavə edin.",
+        "agencyDuplicate": "Bu agentlik platformada artıq qeydiyyatdan keçib.",
+        "agentProfile": "Profil şəkli və ya ad-soyad natamamdır.",
+        "agentPhone": "Telefon nömrəsi ilə əlaqə saxlamaq mümkün olmadı.",
+        "agentAgency": "Göstərilən agentlikdə fəaliyyətiniz təsdiqlənmədi.",
+        "teamUnknown": "Agentlik bu şəxsi öz əməkdaşı kimi təsdiqləmədi.",
+        "teamProfile": "Hesab məlumatları natamamdır — profili tamamlayıb yenidən müraciət edin."
+      },
+      "inviteLinkSource": "Dəvət linki",
+      "taxIdMissing": "VÖEN yoxdur",
+      "taxIdHint": "10 rəqəm, sonuncusu 1 və ya 2.",
+      "rejectNamed": "{name} — rədd et",
+      "rejectAgencyTitle": "Agentlik müraciətini rədd et",
+      "rejectAgencyDescription": "«{name}» təsdiqsiz qalacaq və növbədən çıxacaq. Səbəb sahibə bildiriş və e-poçt kimi gedəcək; profili yeniləyəndə müraciət növbəyə qayıdır.",
+      "rejectAgentTitle": "Agent profilini rədd et",
+      "rejectAgentDescription": "«{name}» profili gizli qalacaq və növbədən çıxacaq. Səbəb agentə bildiriş və e-poçt kimi gedəcək.",
+      "reject": "Rədd et",
+      "tabRejected": "Rədd edilənlər",
+      "rejectionReasonShort": "Rədd səbəbi: {reason}",
+      "rejectedOn": "{date} tarixində rədd edilib.",
+      "cover": "Örtük şəkli",
+      "coverHint": "Profilin başındakı geniş foto. Tövsiyə: 1600×600 px.",
+      "officesTitle": "Filiallar",
+      "officesDescription": "Baş ofisdən əlavə ofislər — profildə «Ofislərimiz» bölməsində görünür.",
+      "officesEmpty": "Filial yoxdur.",
+      "officesLimit": "Filial limiti ({count}) dolub.",
+      "officeRemoveNamed": "{name} filialını sil",
+      "officeRemoveTitle": "Filialı silmək",
+      "officeRemoveDescription": "«{name}» agentlik profilindən çıxarılacaq.",
+      "officeRemove": "Sil",
+      "officeAdd": "Filial əlavə et",
+      "officeName": "Filialın adı",
+      "officeCity": "Şəhər / rayon",
+      "officeCityPlaceholder": "Seçin"
     }
   },
   "server": {
@@ -2779,7 +2833,9 @@
       "musteriReyiDercEdildi": "Müştəri rəyi dərc edildi.",
       "reyTapilmadi": "Rəy tapılmadı.",
       "musteriReyiSilindi": "Müştəri rəyi silindi.",
-      "tesdiqlendiVeDercEdildi": "Agent təsdiqləndi və ictimai kataloqda dərc edildi."
+      "tesdiqlendiVeDercEdildi": "Agent təsdiqləndi və ictimai kataloqda dərc edildi.",
+      "artiqTesdiqlenib": "Agent profili artıq təsdiqlənib.",
+      "profilReddEdildi": "Profil rədd edildi, agentə səbəb göndərildi."
     },
     "agentlikler": {
       "agentlikTapilmadi": "Agentlik tapılmadı.",
@@ -2803,7 +2859,20 @@
       "epoctFormati": "Düzgün e-poçt ünvanı yazın.",
       "saytFormati": "Sayt https:// ilə başlamalıdır.",
       "instagramFormati": "Instagram istifadəçi adını yazın (hərf, rəqəm, nöqtə, alt xətt).",
-      "profilYenilendi": "Agentlik profili yeniləndi."
+      "profilYenilendi": "Agentlik profili yeniləndi.",
+      "reddSebebiUzunlugu": "Rədd səbəbi {min}–{max} simvol olmalıdır.",
+      "artiqTesdiqlenib": "Agentlik artıq təsdiqlənib — rədd etmək üçün əvvəlcə təsdiqi ləğv edin.",
+      "muracietReddEdildi": "Müraciət rədd edildi, sahibə səbəb göndərildi.",
+      "voenFormati": "VÖEN 10 rəqəmdən ibarət olmalı və 1 və ya 2 ilə bitməlidir.",
+      "voenTekrar": "Bu VÖEN başqa aktiv agentlik hesabında qeydiyyatdadır.",
+      "ortukXetasi": "Örtük şəkli media kitabxanasında tapılmadı — yenidən yükləyin.",
+      "filialAdi": "Filialın adını yazın (2–120 simvol).",
+      "filialUnvani": "Filialın ünvanını yazın (5–240 simvol).",
+      "filialSeheri": "Siyahıdan şəhər və ya rayon seçin.",
+      "filialLimiti": "Ən çox {count} filial əlavə etmək olar.",
+      "filialElaveEdildi": "Filial əlavə olundu.",
+      "filialTapilmadi": "Filial tapılmadı.",
+      "filialSilindi": "Filial silindi."
     },
     "aiKomekci": {
       "workersAiCavabVerdiAmma": "Workers AI cavab verdi, amma sağlıq sxeminə uyğun olmadı.",

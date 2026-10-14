@@ -23,6 +23,9 @@ test.describe("Admin panel", () => {
     "/admin/agentlikler",
     "/admin/agentlikler?status=pending",
     "/admin/agentler?status=pending",
+    // Rədd edilənlər tabı (#157).
+    "/admin/agentlikler?status=rejected",
+    "/admin/agentler?status=rejected",
   ];
 
   for (const path of pages) {

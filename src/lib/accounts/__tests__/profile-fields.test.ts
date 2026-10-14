@@ -18,9 +18,19 @@ describe("profil sahələri", () => {
   });
 
   it("VÖEN 10 rəqəmdir, boş dəyər qəbul olunur", () => {
-    expect(normalizeTaxId("1234 567 890")).toBe("1234567890");
+    expect(normalizeTaxId("1700 767 721")).toBe("1700767721");
+    expect(normalizeTaxId("1305-476-312")).toBe("1305476312");
     expect(normalizeTaxId("")).toBeNull();
     expect(normalizeTaxId("12345")).toBe(false);
+  });
+
+  it("VÖEN-in status rəqəmi 1 və ya 2-dir, təkrar rəqəm uydurmadır (#157)", () => {
+    expect(normalizeTaxId("1234567890")).toBe(false);
+    expect(normalizeTaxId("1234567893")).toBe(false);
+    expect(normalizeTaxId("1111111111")).toBe(false);
+    expect(normalizeTaxId("2222222222")).toBe(false);
+    expect(normalizeTaxId("12345678901")).toBe(false);
+    expect(normalizeTaxId("12345A7891")).toBe(false);
   });
 
   it("hesab növünə görə tələb olunan bölmələr", () => {
