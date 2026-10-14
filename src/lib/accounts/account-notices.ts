@@ -36,6 +36,16 @@ const COPY = {
     agentVerified: (name: string) => `${name}, agent profiliniz təsdiqləndi və saytda dərc olundu.`,
     agentReviewRejectedTitle: "Agent profiliniz təsdiqlənmədi",
     agentReviewRejected: (name: string) => `${name}, agent profiliniz təsdiqlənmədi. Məlumatları düzəldib profili yadda saxlayın — müraciət yenidən baxışa düşəcək.`,
+    listingArchivedTitle: "Elanınız dayandırıldı",
+    listingArchived: (title: string) => `«${title}» elanı ziyarətçi şikayəti yoxlanıldıqdan sonra dayandırıldı. Məlumatları düzəldib elanı yenidən göndərə bilərsiniz.`,
+    agentLeftTitle: "Agent komandadan çıxdı",
+    agentLeft: (name: string, agency: string, count: number) => count > 0
+      ? `${name} «${agency}» komandasından çıxdı və ${count} elanını agentliyə təhvil verdi. Elanlar artıq «Elanlarım» bölmənizdədir.`
+      : `${name} «${agency}» komandasından çıxdı.`,
+    listingsHandedTitle: "Sizə elan təhvil verildi",
+    listingsHanded: (count: number, from: string, agency: string) => `«${agency}» komandasından çıxan ${from} adlı agentin ${count} elanı sizə təhvil verildi. Elanlar və onlara gələn müraciətlər kabinetinizdədir.`,
+    listingClosedTitle: "Elanınız bağlandı",
+    listingClosed: (title: string) => `«${title}» elanı satılmış və ya kirayəyə verilmiş kimi işarələndi. Səhvdirsə, bizimlə əlaqə saxlayın.`,
     open: "Kabinetdə aç",
   },
   en: {
@@ -58,6 +68,16 @@ const COPY = {
     agentVerified: (name: string) => `${name}, your agent profile has been verified and published on the site.`,
     agentReviewRejectedTitle: "Your agent profile was not verified",
     agentReviewRejected: (name: string) => `${name}, your agent profile was not verified. Correct the details and save your profile — it will be reviewed again.`,
+    listingArchivedTitle: "Your listing was suspended",
+    listingArchived: (title: string) => `The listing “${title}” was suspended after a visitor report was reviewed. You can correct the details and submit it again.`,
+    agentLeftTitle: "An agent left your team",
+    agentLeft: (name: string, agency: string, count: number) => count > 0
+      ? `${name} left the “${agency}” team and handed over ${count} listings to the agency. They are now in your Listings section.`
+      : `${name} left the “${agency}” team.`,
+    listingsHandedTitle: "Listings were handed over to you",
+    listingsHanded: (count: number, from: string, agency: string) => `${count} listings of ${from}, who left the “${agency}” team, were handed over to you. The listings and their enquiries are in your account.`,
+    listingClosedTitle: "Your listing was closed",
+    listingClosed: (title: string) => `The listing “${title}” was marked as sold or rented. If this is a mistake, please contact us.`,
     open: "Open in your account",
   },
   ru: {
@@ -80,6 +100,16 @@ const COPY = {
     agentVerified: (name: string) => `${name}, ваш профиль агента подтверждён и опубликован на сайте.`,
     agentReviewRejectedTitle: "Профиль агента не подтверждён",
     agentReviewRejected: (name: string) => `${name}, ваш профиль агента не подтверждён. Исправьте данные и сохраните профиль — он будет рассмотрен повторно.`,
+    listingArchivedTitle: "Ваше объявление приостановлено",
+    listingArchived: (title: string) => `Объявление «${title}» приостановлено после проверки жалобы посетителя. Исправьте данные и отправьте его снова.`,
+    agentLeftTitle: "Агент покинул команду",
+    agentLeft: (name: string, agency: string, count: number) => count > 0
+      ? `${name} покинул команду «${agency}» и передал агентству объявлений: ${count}. Они уже в разделе «Мои объявления».`
+      : `${name} покинул команду «${agency}».`,
+    listingsHandedTitle: "Вам переданы объявления",
+    listingsHanded: (count: number, from: string, agency: string) => `Вам переданы объявления (${count}) агента ${from}, покинувшего команду «${agency}». Объявления и заявки по ним — в вашем кабинете.`,
+    listingClosedTitle: "Ваше объявление закрыто",
+    listingClosed: (title: string) => `Объявление «${title}» отмечено как проданное или сданное. Если это ошибка, свяжитесь с нами.`,
     open: "Открыть в кабинете",
   },
 } as const;
@@ -232,5 +262,64 @@ export async function noticeListingLead(input: {
     "/kabinet/muracietler",
     `listing-lead:${input.leadId}`,
     (copy) => ({ title: copy.leadTitle, content: copy.lead(input.propertyTitle, input.visitorName) }),
+  );
+}
+
+/**
+ * Elan sahibinə: şikayət yoxlanıldı və elan dayandırıldı və ya bağlandı (#159).
+ * Dayandırmada admin səbəbi göndərilir — sahib elanı düzəldib yenidən göndərə bilsin.
+ */
+export async function noticeListingReportDecision(input: {
+  userId: string;
+  propertyId: string;
+  propertyTitle: string;
+  decision: "archived" | "closed";
+  decidedAt: Date;
+  reason?: string | null;
+}): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_REPORT,
+    "/kabinet/elanlar",
+    `listing-report:${input.propertyId}:${attemptKey(input.decidedAt)}:${input.decision}`,
+    (copy) => input.decision === "archived"
+      ? { title: copy.listingArchivedTitle, content: withReason(copy.listingArchived(input.propertyTitle), copy, input.reason) }
+      : { title: copy.listingClosedTitle, content: copy.listingClosed(input.propertyTitle) },
+  );
+}
+
+/** Agentlik sahibinə: agent komandadan özü çıxdı (#159) — təhvil verdiyi elan sayı ilə. */
+export async function noticeAgentLeft(input: {
+  ownerUserId: string;
+  employeeId: string;
+  leftAt: Date;
+  agentName: string;
+  agencyName: string;
+  handedOver: number;
+}): Promise<void> {
+  await notifyAccount(
+    input.ownerUserId,
+    NOTIFICATION_TYPES.AGENCY_TEAM,
+    input.handedOver > 0 ? "/kabinet/elanlar" : "/kabinet/komanda",
+    `agency-left:${input.employeeId}:${attemptKey(input.leftAt)}`,
+    (copy) => ({ title: copy.agentLeftTitle, content: copy.agentLeft(input.agentName, input.agencyName, input.handedOver) }),
+  );
+}
+
+/** Agentə: komandadan çıxan həmkarının elanları ona təhvil verildi (#159). */
+export async function noticeListingsHandedOver(input: {
+  userId: string;
+  employeeId: string;
+  handedAt: Date;
+  count: number;
+  fromName: string;
+  agencyName: string;
+}): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.AGENCY_TEAM,
+    "/kabinet/elanlar",
+    `listings-handed:${input.employeeId}:${attemptKey(input.handedAt)}`,
+    (copy) => ({ title: copy.listingsHandedTitle, content: copy.listingsHanded(input.count, input.fromName, input.agencyName) }),
   );
 }

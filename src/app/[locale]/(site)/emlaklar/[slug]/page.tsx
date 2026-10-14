@@ -16,7 +16,6 @@ import {
   Navigation,
   Star,
   Building2,
-  ShieldAlert,
   ShieldCheck,
 } from "lucide-react";
 import { formatPrice, isUnoptimizedImage, toIsoDateTime } from "@/lib/utils";
@@ -69,6 +68,8 @@ import { ReservationForm } from "./reservation-form";
 import { maskPhone, resolveListingPublisher } from "@/lib/accounts/listing-publisher";
 import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
 import { PublisherContactButtons } from "@/components/site/publisher-contact";
+import { SafetyTips } from "@/components/site/safety-tips";
+import { ReportListingButton } from "@/components/site/report-listing";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -835,11 +836,13 @@ export default async function PropertyDetailPage({ params }: Props) {
                   )}
                 </div>
 
-                {publisher.kind !== "company" && (
-                  <p className="mb-6 flex items-start gap-2 rounded-md bg-warning-bg p-3 text-xs leading-5 text-ink-soft">
-                    <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
-                    {content("publisherNotice")}
-                  </p>
+                {/* Fırıldaqdan qorunma (#159): şirkət elanında da şikayət mümkündür (məs. «artıq satılıb»). */}
+                {publisher.kind !== "company" ? (
+                  <SafetyTips className="mb-6" footer={<ReportListingButton propertyId={property.id} />} />
+                ) : (
+                  <div className="mb-6 flex justify-end">
+                    <ReportListingButton propertyId={property.id} />
+                  </div>
                 )}
 
                 <div className="relative mb-6 text-center">

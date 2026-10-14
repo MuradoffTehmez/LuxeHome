@@ -83,6 +83,18 @@ export async function checkDataExportLimit(userId: string): Promise<boolean> {
   return success;
 }
 
+/**
+ * Elan şikayəti (#159): IP üzrə limit. `VALUATION_LIMIT` öz açar prefiksi ilə işlədilir;
+ * eyni elana təkrar şikayət isə `listing-reports.ts`-də 24 saatlıq açarla süzülür.
+ */
+export async function checkReportLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `listing-report:${ip}` });
+  return success;
+}
+
 /** Brauzer monitorinq hadisələri üçün ayrıca, daha geniş büdcə. */
 export async function checkMonitoringLimit(ip: string): Promise<boolean> {
   const limiter = getCloudflareContext().env.MONITORING_LIMIT;

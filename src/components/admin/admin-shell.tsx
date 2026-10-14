@@ -13,20 +13,20 @@ import type { Locale } from "@/lib/constants";
 import { siteConfig } from "@/config/site";
 import type { AuthUser } from "@/lib/auth/types";
 import { signOut } from "@/app/[locale]/giris/actions";
-import { adminNav } from "./admin-nav";
+import { adminNav, type AdminNavBadgeKey } from "./admin-nav";
 import { AdminIcon } from "./admin-icon";
 import { AdminCommandMenu } from "./admin-command-menu";
 
 type AdminShellProps = {
   user: AuthUser;
-  counters?: { newLeads?: number; draftProperties?: number; pendingModeration?: number; pendingApprovals?: number };
+  counters?: Partial<Record<AdminNavBadgeKey, number>>;
   children: React.ReactNode;
 };
 
 type SidebarContentProps = {
   pathname: string;
   user: AuthUser;
-  counters: { newLeads?: number; draftProperties?: number; pendingModeration?: number; pendingApprovals?: number };
+  counters: Partial<Record<AdminNavBadgeKey, number>>;
   tone: "light" | "dark";
   onNavigate?: () => void;
 };
@@ -217,6 +217,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
                       <ul id={submenuId} className={cn("mt-1 ml-5 grid gap-0.5 border-l py-1 pl-3", dark ? "border-white/12" : "border-line-strong")}>
                         {item.children?.map((child) => {
                           const active = child.href.split("#", 1)[0] === activeChildHref;
+                          const childBadge = child.badgeKey ? counters[child.badgeKey] : undefined;
                           return (
                             <li key={child.href}>
                               <Link
@@ -231,7 +232,12 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
                                 )}
                               >
                                 {active && <span className="absolute top-1/2 -left-[13px] h-5 w-0.5 -translate-y-1/2 bg-gold" aria-hidden="true" />}
-                                <span className="truncate">{t(`nav.items.${child.labelKey}`)}</span>
+                                <span className="min-w-0 flex-1 truncate">{t(`nav.items.${child.labelKey}`)}</span>
+                                {childBadge ? (
+                                  <span className={cn("ml-2 inline-flex min-w-5 justify-center rounded-full px-1.5 text-[10px] font-semibold tabular-nums", dark ? "bg-white/12 text-white" : "bg-beige text-ink")}>
+                                    {childBadge}
+                                  </span>
+                                ) : null}
                               </Link>
                             </li>
                           );
