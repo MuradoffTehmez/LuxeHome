@@ -7,7 +7,8 @@ import { WhatsAppIcon } from "./brand-icons";
 import { trackEvent } from "@/lib/client-analytics";
 import { phoneHref, publisherWhatsappHref } from "@/lib/accounts/listing-publisher";
 
-export type RevealedContact = { phone: string | null; email: string | null };
+/** `whatsapp` yalnız agentlik profilində ayrıca nömrə ola bilər; yoxdursa telefon işlədilir. */
+export type RevealedContact = { phone: string | null; email: string | null; whatsapp?: string | null };
 
 /**
  * Bir səhifədə sağ blok və mobil zolaq eyni əlaqəni istəyir — sorğu bir dəfə gedir.
@@ -15,18 +16,27 @@ export type RevealedContact = { phone: string | null; email: string | null };
  */
 const pending = new Map<string, Promise<RevealedContact | null>>();
 
-export function revealPublisherContact(propertyId: string): Promise<RevealedContact | null> {
-  const existing = pending.get(propertyId);
+/** Əlaqəni ünvandan alır: elan (`/api/emlaklar/<id>/elaqe`) və ya agentlik (`/api/agentlikler/<slug>/elaqe`). */
+export function revealContact(endpoint: string): Promise<RevealedContact | null> {
+  const existing = pending.get(endpoint);
   if (existing) return existing;
-  const request = fetch(`/api/emlaklar/${encodeURIComponent(propertyId)}/elaqe`, { method: "POST" })
+  const request = fetch(endpoint, { method: "POST" })
     .then(async (response) => (response.ok ? ((await response.json()) as RevealedContact) : null))
     .catch(() => null)
     .then((contact) => {
-      if (!contact) pending.delete(propertyId);
+      if (!contact) pending.delete(endpoint);
       return contact;
     });
-  pending.set(propertyId, request);
+  pending.set(endpoint, request);
   return request;
+}
+
+export function propertyContactEndpoint(propertyId: string): string {
+  return `/api/emlaklar/${encodeURIComponent(propertyId)}/elaqe`;
+}
+
+export function revealPublisherContact(propertyId: string): Promise<RevealedContact | null> {
+  return revealContact(propertyContactEndpoint(propertyId));
 }
 
 export type PublisherContactLabels = {
@@ -42,12 +52,16 @@ export type PublisherContactLabels = {
  */
 export function PublisherContactButtons({
   propertyId,
+  endpoint,
   maskedPhone,
   hasEmail,
   whatsappMessage,
   labels,
 }: {
+  /** Analitika üçün id (elan id-si və ya agentlik slug-ı). */
   propertyId: string;
+  /** Verilməsə elanın əlaqə ünvanı işlədilir. */
+  endpoint?: string;
   maskedPhone: string | null;
   hasEmail: boolean;
   whatsappMessage: string;
@@ -60,7 +74,7 @@ export function PublisherContactButtons({
   async function reveal() {
     setLoading(true);
     setFailed(false);
-    const result = await revealPublisherContact(propertyId);
+    const result = await revealContact(endpoint ?? propertyContactEndpoint(propertyId));
     setLoading(false);
     if (!result) {
       setFailed(true);
@@ -96,7 +110,7 @@ export function PublisherContactButtons({
     );
   }
 
-  const whatsapp = publisherWhatsappHref(contact.phone, whatsappMessage);
+  const whatsapp = publisherWhatsappHref(contact.whatsapp || contact.phone, whatsappMessage);
   return (
     <div className="flex flex-col gap-2" aria-live="polite">
       {contact.phone && (
