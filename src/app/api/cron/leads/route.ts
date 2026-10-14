@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "@/lib/auth/crypto";
-import { internalCronToken } from "@/lib/cron-auth";
+import { CRON_JOBS, internalCronToken, type CronJob } from "@/lib/cron-auth";
 import { runtimeEnv } from "@/lib/runtime-env";
 import { escalateStaleLeads, refreshResponseStats } from "@/lib/accounts/lead-jobs";
 
@@ -30,13 +30,14 @@ async function isAuthorized(request: Request): Promise<boolean> {
 export async function POST(request: Request) {
   if (!(await isAuthorized(request))) return new NextResponse(null, { status: 404 });
 
-  const job = new URL(request.url).searchParams.get("is");
+  // İş adı allowlist-dən götürülür — sorğudakı xam dəyər nə işə, nə loga düşür.
+  const requested = new URL(request.url).searchParams.get("is");
+  const job = (Object.values(CRON_JOBS) as CronJob[]).find((name) => name === requested);
+  if (!job) return NextResponse.json({ error: "unknown_job" }, { status: 400 });
   try {
-    if (job === "escalate") return NextResponse.json(await escalateStaleLeads());
-    if (job === "response-stats") return NextResponse.json(await refreshResponseStats());
-    return NextResponse.json({ error: "unknown_job" }, { status: 400 });
+    return NextResponse.json(job === "escalate" ? await escalateStaleLeads() : await refreshResponseStats());
   } catch (error) {
-    console.error(`[cron] «${job}» işi alınmadı:`, error);
+    console.error("[cron] müraciət işi alınmadı:", job, error);
     return NextResponse.json({ error: "failed" }, { status: 500 });
   }
 }
