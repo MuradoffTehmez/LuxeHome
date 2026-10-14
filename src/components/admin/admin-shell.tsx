@@ -19,14 +19,14 @@ import { AdminCommandMenu } from "./admin-command-menu";
 
 type AdminShellProps = {
   user: AuthUser;
-  counters?: { newLeads?: number; draftProperties?: number; pendingModeration?: number };
+  counters?: { newLeads?: number; draftProperties?: number; pendingModeration?: number; pendingApprovals?: number };
   children: React.ReactNode;
 };
 
 type SidebarContentProps = {
   pathname: string;
   user: AuthUser;
-  counters: { newLeads?: number; draftProperties?: number; pendingModeration?: number };
+  counters: { newLeads?: number; draftProperties?: number; pendingModeration?: number; pendingApprovals?: number };
   tone: "light" | "dark";
   onNavigate?: () => void;
 };

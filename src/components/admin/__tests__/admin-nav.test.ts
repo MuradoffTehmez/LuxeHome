@@ -9,6 +9,7 @@ describe("adminNav", () => {
       "portfolio",
       "contentHub",
       "crm",
+      "agencyHub",
       "serp",
       "analytics",
       "aiAssistant",

@@ -16,7 +16,7 @@ export type AdminNavItem = {
   /** lucide-react ikon adı — `admin-icon.tsx` içindəki icazə siyahısından seçilir. */
   icon: string;
   /** Yan paneldə göstərilən sayğac açarı. */
-  badgeKey?: "newLeads" | "draftProperties" | "pendingModeration";
+  badgeKey?: "newLeads" | "draftProperties" | "pendingModeration" | "pendingApprovals";
   /** Böyük modulların sidebar daxilində açılan ikinci səviyyə keçidləri. */
   children?: AdminNavChild[];
 };
@@ -79,9 +79,20 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "reservations", href: "/admin/rezervasiyalar" },
           { labelKey: "calendar", href: "/admin/rezervasiyalar/teqvim" },
           { labelKey: "email", href: "/admin/e-poct" },
+          { labelKey: "accounts", href: "/admin/hesablar" },
+        ],
+      },
+      {
+        // Agentlik və agentlərin təsdiqi/dərci/redaktəsi CRM alt menyusunda gizlənmişdi —
+        // ayrıca bölmə və gözləyən təsdiqlərin sayğacı ilə (#155).
+        labelKey: "agencyHub",
+        href: "/admin/agentlikler/tesdiq",
+        icon: "UserRoundCheck",
+        badgeKey: "pendingApprovals",
+        children: [
+          { labelKey: "approvals", href: "/admin/agentlikler/tesdiq" },
           { labelKey: "agencies", href: "/admin/agentlikler" },
           { labelKey: "agents", href: "/admin/agentler" },
-          { labelKey: "accounts", href: "/admin/hesablar" },
         ],
       },
     ],
