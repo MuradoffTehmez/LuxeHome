@@ -3,10 +3,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
-import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, MAX_AGENCY_EMPLOYEES, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, LEAD_ROUTING_MODES, MAX_AGENCY_EMPLOYEES, isLeadRoutingMode, type Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencyEmployees, getAgencyForOwner } from "@/lib/queries";
-import { InviteEmployeeForm, InviteLinkCard, RemoveEmployeeButton, ReviewRequestButtons } from "./team-forms";
+import { InviteEmployeeForm, InviteLinkCard, LeadRoutingForm, ReceivesLeadsToggle, RemoveEmployeeButton, ReviewRequestButtons } from "./team-forms";
 import { forbidden } from "next/navigation";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
@@ -89,6 +89,13 @@ export default async function CabinetTeamPage() {
             />
           </section>
 
+          {/* Müraciət bölgüsü (#161): agentliyə gələn müraciət agentlərə növbə ilə və ya ərazi üzrə düşür. */}
+          <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+            <h2 className="font-display text-lg text-ink">{t("routing.title")}</h2>
+            <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">{t("routing.description")}</p>
+            <LeadRoutingForm mode={isLeadRoutingMode(agency.leadRouting) ? agency.leadRouting : LEAD_ROUTING_MODES.ROUND_ROBIN} />
+          </section>
+
           <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
             <h2 className="mb-5 font-display text-lg text-ink">{t("newInvite")}</h2>
             <InviteEmployeeForm disabled={occupiedSeats >= MAX_AGENCY_EMPLOYEES} />
@@ -109,6 +116,10 @@ export default async function CabinetTeamPage() {
                         {employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED && ` · ${t("listingCount", { count: listingCounts.get(employee.user.id) ?? 0 })}`}
                       </p>
                     </div>
+                    <div className="flex shrink-0 items-center gap-1">
+                    {employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED && (
+                      <ReceivesLeadsToggle id={employee.id} name={employee.user.name} receives={employee.receivesLeads} />
+                    )}
                     <RemoveEmployeeButton
                       id={employee.id}
                       name={employee.user.name}
@@ -117,6 +128,7 @@ export default async function CabinetTeamPage() {
                         .filter((teammate) => teammate.id !== employee.id)
                         .map((teammate) => ({ userId: teammate.user.id, name: teammate.user.name }))}
                     />
+                    </div>
                   </li>
                 ))}
               </ul>

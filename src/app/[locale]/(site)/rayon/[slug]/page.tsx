@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { NeighborhoodAnalytics } from "@/components/site/neighborhood-analytics";
 import { SeoLandingPage } from "@/components/site/seo-landing-page";
+import { AreaAgencies } from "@/components/site/area-agencies";
+import { localizeLocation } from "@/i18n/dynamic-content";
 import { routing } from "@/i18n/routing";
 import { type Locale } from "@/lib/constants";
 import { getTaxonomyLandingProperties } from "@/lib/queries";
@@ -71,6 +73,8 @@ export default async function DistrictLandingPage({ params, searchParams }: Prop
           locale={localeValue}
         />
       )}
+      {/* Bu ərazidə fəal agentliklər (#161) — yalnız ilk səhifədə. */}
+      {page === 1 && <AreaAgencies slug={result.location.slug} placeName={localizeLocation(result.location, localeValue).name} />}
     </>
   );
 }

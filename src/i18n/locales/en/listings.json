@@ -233,7 +233,17 @@
     "officesTitle": "Our offices",
     "officesDescription": "{count, plural, one {# branch} other {# branches}} in addition to the head office",
     "ogEyebrow": "Real estate agency",
-    "ogOffers": "Offers"
+    "ogOffers": "Offers",
+    "ratingLabel": "Rating",
+    "ratingSummary": "{rating} · {count, plural, one {# review} other {# reviews}}",
+    "fastResponse": "Responds fast",
+    "reviewsTitle": "Client reviews",
+    "reviewsSummary": "Average {rating} · {count, plural, one {# review} other {# reviews}} (agents and agency)",
+    "reviewStars": "{rating} out of 5",
+    "reviewAgent": "Agent: {name}",
+    "enquiryTitle": "Contact the agency",
+    "enquiryDescription": "Write your question and {name} will get back to you. The enquiry goes to the agency’s next available agent.",
+    "enquiryButton": "Send an enquiry"
   },
   "agencyDirectory": {
     "searchLabel": "Agency search",
@@ -243,10 +253,24 @@
     "split": "Sale {sale} · Rent {rent}",
     "agents": "{count, plural, one {# agent} other {# agents}}",
     "noResults": "No agency named “{query}” was found",
-    "viewProfile": "View profile"
+    "viewProfile": "View profile",
+    "areaOffers": "{place}: {count, plural, one {# offer} other {# offers}}"
   },
   "deals": {
     "title": "Closed deals",
     "summary": "In the last 12 months: {sold, plural, one {# sale} other {# sales}}, {rented, plural, one {# rental} other {# rentals}}"
+  },
+  "areaAgencies": {
+    "blockTitle": "Agencies active in this area",
+    "blockDescription": "Verified agencies with active offers in {place} ({count}).",
+    "viewAll": "View all",
+    "metaTitle": "{place} — real estate agencies",
+    "metaDescription": "{count, plural, one {# verified real estate agency} other {# verified real estate agencies}} with active offers in {place}: offers, ratings and contacts.",
+    "eyebrow": "Agencies",
+    "title": "{place}: real estate agencies",
+    "description": "Verified agencies with active offers in this area ({count}), ranked by their offers here.",
+    "emptyTitle": "No agencies in this area yet",
+    "emptyDescription": "No verified agency has active offers in {place}.",
+    "allAgencies": "All agencies"
   }
 }

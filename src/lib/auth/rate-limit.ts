@@ -71,6 +71,15 @@ export async function checkContactRevealLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/** Elanın WhatsApp klik sayğacı (#161) — skript sahibin analitikasını şişirtməsin. */
+export async function checkListingClickLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `listing-click:${ip}` });
+  return success;
+}
+
 /**
  * «Məlumatlarımı yüklə» (#157): ixrac bir neçə sorğu edir, ona görə hesab üzrə limitlənir.
  * `VALUATION_LIMIT` öz açar prefiksi ilə işlədilir (ayrıca binding lazım deyil).

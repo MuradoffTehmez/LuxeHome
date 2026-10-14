@@ -715,6 +715,36 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - next-intl tipli açarlarında namespace birliyi çox böyükdür: `getTranslations("property.safety")` kimi yeni
   dərin namespace tip xətası verə bilər — üst namespace + nöqtəli açar (`t("safety.title")`) işlət.
 
+### Kabinet analitikası, müraciət bölgüsü, cavab nişanı, agentlik reytinqi və ərazi agentlikləri (#161)
+
+- **Gündəlik elan statistikası** `PropertyDailyStat` (elan + Bakı günü): baxış (`recordView("property")`),
+  «Nömrəni göstər» (`/api/emlaklar/<id>/elaqe`) və WhatsApp kliki (`POST /api/emlaklar/<id>/klik`, `keepalive`,
+  IP limiti, bot filtri). Artım `INSERT … ON CONFLICT DO UPDATE` ilə atomikdir (`lib/listing-stats.ts`) — oxu-yaz
+  ilə yazma (D1-də tranzaksiya yoxdur). Müraciət və favorit öz cədvəllərindən sayılır, burada təkrarlanmır.
+  `/kabinet/analitika` (`lib/accounts/listing-analytics.ts`): 7/30/90 gün, agentlik sahibi komandanın elanlarını agent
+  filtri ilə görür; bazar müqayisəsi eyni növ + şəhərdə elan başına orta baxışdır (xam SQL, parametr sayı məhdud).
+- **Müraciət ünvanı** `Lead.handlerId` (ictimai hesab; ofis işçisi `assigneeId` ilə qarışdırma) + `Lead.agencyId`.
+  `lib/accounts/lead-routing.ts`: agentliyin (sahibin) elanına və agentlik profilindəki formaya (`ContactForm
+  agencySlug`, `source = AGENCY`) gələn müraciət `Agency.leadRouting` ilə agentə düşür — `ROUND_ROBIN`
+  (`AgencyEmployee.lastLeadAt`), `AREA` (rayonda ən çox elanı olan agent), `OFF` (sahibə). Agentin öz elanı həmişə
+  agentə gedir, amma agentliyə bağlanır. `receivesLeads = false` agent növbədən kənardır. Elansız agentlik
+  müraciəti ofis sayğaclarına düşmür (`OFFICE_LEAD_WHERE`). Kabinetdə «Əlaqə saxladım» ilk cavabı (`respondedAt`,
+  bir dəfə) yazır, sahib müraciəti agentə verə bilir. Agentlik müraciəti yalnız agentliyin hazırkı təsdiqlənmiş
+  üzvünə görünür (`currentHandlerWhere`); agent komandadan çıxanda açıq müraciətləri sahibə qayıdır (`releaseAgentLeads`).
+- **Cron `worker.ts`-dədir:** `wrangler.jsonc` → `triggers.crons` + `scheduled()` işi `openNext.fetch` ilə
+  `/api/cron/leads?is=…` marşrutuna ötürür; açar `AUTH_SECRET`-dən törədilir (`lib/cron-auth.ts`), `CRON_SECRET`
+  lazım deyil. İfadələr `CRON_JOBS` ilə eyni olmalıdır (`scripts/__tests__/cron-triggers.test.ts`). İşlər:
+  10 dəqiqədən bir eskalasiya (30 dəq cavabsız agent müraciəti sahibə, `escalatedAt` şərti götürülür; sahibdəki
+  müraciət `take`-dən əvvəl süzülür; bildiriş yazılmasa — `notifyAccount` `false` — marker geri qaytarılır) və gündəlik
+  cavab göstəriciləri (`refreshResponseStats`). Lokal yoxlama: `wrangler dev --test-scheduled` + `/__scheduled?cron=…`.
+- **«Tez cavab verir»** (`lib/accounts/response-stats.ts`, saf): son 90 gün, ≥3 müraciət, median ≤60 dəq, ≥80%
+  cavab. Hələ 30 dəqiqəsi keçməmiş cavabsız müraciət nümunəyə düşmür. Ölçülmüş göstərici `AgentProfile.measured*` və
+  `Agency.response*`-dədir; admin yazdığı `AgentProfile.responseMinutes` yalnız ehtiyatdır və nişan vermir.
+- **Agentlik reytinqi** `lib/agency-ratings.ts`: ictimai agentlərin təsdiqlənmiş rəyləri + `Testimonial.agencyId`,
+  rəy sayı ilə çəkili; profil, kart və `agencySchema` `aggregateRating`-ində.
+- **Ərazi agentlikləri:** `/rayon/<slug>` altında blok və `/rayon/<slug>/agentlikler` landing-i
+  (`getPublicAgencyCatalog({ area })`, ərazi qaydası rayon səhifəsi ilə eynidir). 2-dən az agentlik varsa noindex.
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai

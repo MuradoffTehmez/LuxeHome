@@ -11,11 +11,12 @@ import { ACCOUNT_TYPES } from "@/lib/constants";
  * yaradır və konversiya rəqəmlərini şişirdirdi.
  *
  * Qayda `resolveLeadProperty` ilə eynidir: müəllif yoxdursa, əməkdaşdırsa və ya
- * deaktivdirsə müraciət ofisə düşür.
+ * deaktivdirsə müraciət ofisə düşür. Agentlik profilindəki formadan gələn elansız müraciət
+ * (#161) agentliyindir — agentlik silinəndə (`agencyId` boşalır) ofisə qayıdır.
  */
 export const OFFICE_LEAD_WHERE: Prisma.LeadWhereInput = {
   OR: [
-    { propertyId: null },
+    { propertyId: null, agencyId: null },
     { property: { authorId: null } },
     { property: { author: { accountType: ACCOUNT_TYPES.STAFF } } },
     { property: { author: { isActive: false } } },

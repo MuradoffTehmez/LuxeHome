@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Building2, Clock, Eye, FileBadge, Globe, KeyRound, MapPin, ShieldCheck, Tag, Users } from "lucide-react";
+import { Building2, Clock, Eye, FileBadge, Globe, KeyRound, MapPin, MessageSquare, ShieldCheck, Star, Tag, Users, Zap } from "lucide-react";
 import { InstagramIcon } from "@/components/site/brand-icons";
 import { Container, Section } from "@/components/ui/container";
 import { EmptyState } from "@/components/ui/states";
@@ -14,6 +14,7 @@ import { AgentCard } from "@/components/site/agent-card";
 import { PublisherContactButtons } from "@/components/site/publisher-contact";
 import { SafetyTips } from "@/components/site/safety-tips";
 import { ClosedDeals } from "@/components/site/closed-deals";
+import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { Link } from "@/i18n/navigation";
 import { agencySchema, buildManagedMetadata, jsonLd, breadcrumbSchema } from "@/lib/seo";
 import { getAgencyProfile } from "@/lib/agency-profile";
@@ -126,7 +127,7 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
 
   return (
     <>
-      <script {...jsonLd(agencySchema({ ...agency, phone }, locale as Locale))} />
+      <script {...jsonLd(agencySchema({ ...agency, phone, rating: data.rating }, locale as Locale))} />
       <script
         {...jsonLd(
           breadcrumbSchema([
@@ -201,6 +202,22 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1 text-xs text-ink-soft">
                     <FileBadge className="size-3.5 text-gold-deep" aria-hidden="true" />
                     {t("taxId", { value: agency.user.companyTaxId })}
+                  </span>
+                )}
+                {data.rating && (
+                  <a
+                    href="#reyler"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1 text-xs text-ink-soft transition-colors hover:border-gold"
+                  >
+                    <Star className="size-3.5 fill-gold text-gold-deep" aria-hidden="true" />
+                    <span className="sr-only">{t("ratingLabel")}:</span>
+                    {t("ratingSummary", { rating: data.rating.average.toFixed(1), count: data.rating.count })}
+                  </a>
+                )}
+                {data.fastResponse && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold-deep">
+                    <Zap className="size-3.5" aria-hidden="true" />
+                    {t("fastResponse")}
                   </span>
                 )}
                 <span className="text-xs text-ink-muted">
@@ -423,6 +440,49 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                   </div>
                 </section>
               )}
+
+              {/* Agentlik reytinqi (#161): agentlərin və agentliyin təsdiqlənmiş rəyləri. */}
+              {data.reviews.length > 0 && (
+                <section id="reyler" aria-labelledby="reyler-title" className="scroll-mt-28">
+                  <h2 id="reyler-title" className="font-display text-3xl tracking-[-0.02em] text-ink">{t("reviewsTitle")}</h2>
+                  {data.rating && (
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-soft">
+                      <Star className="size-4 fill-gold text-gold-deep" aria-hidden="true" />
+                      {t("reviewsSummary", { rating: data.rating.average.toFixed(1), count: data.rating.count })}
+                    </p>
+                  )}
+                  <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {data.reviews.map((review) => (
+                      <li key={review.id} className="flex flex-col gap-2 rounded-lg border border-line bg-paper p-4 shadow-xs">
+                        <p className="flex items-center gap-0.5 text-gold-deep" aria-label={t("reviewStars", { rating: review.rating })}>
+                          {Array.from({ length: 5 }, (_, index) => (
+                            <Star key={index} className={cn("size-4", index < review.rating ? "fill-current" : "text-line-strong")} aria-hidden="true" />
+                          ))}
+                        </p>
+                        <p className="text-sm leading-relaxed text-ink-soft [overflow-wrap:anywhere]">{review.comment}</p>
+                        <p className="mt-auto text-xs text-ink-muted">
+                          {review.customerName}
+                          {review.agentName && review.agentSlug && (
+                            <>
+                              {" · "}
+                              <Link href={`/agentler/${review.agentSlug}`} className="text-gold-deep underline-offset-4 hover:underline">
+                                {t("reviewAgent", { name: review.agentName })}
+                              </Link>
+                            </>
+                          )}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* Agentliyə müraciət (#161): bölgü açıqdırsa agentlərdən birinə düşür. */}
+              <section id="muraciet" aria-labelledby="muraciet-title" className="scroll-mt-28 rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">
+                <h2 id="muraciet-title" className="font-sans text-lg font-semibold text-ink">{t("enquiryTitle")}</h2>
+                <p className="mt-1 mb-5 text-sm text-ink-soft">{t("enquiryDescription", { name: agency.name })}</p>
+                <ContactForm agencySlug={agency.slug} placement="agency_profile" defaultSubject={agency.name} />
+              </section>
             </div>
 
             {/* Yapışqan əlaqə paneli: nömrə HTML-də maskalıdır, kliklə limitli API-dən açılır. */}
@@ -430,6 +490,13 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
               <div className="rounded-xl border border-line bg-paper p-5 shadow-md sm:p-6">
                 <h2 className="font-display text-2xl text-ink">{t("contactTitle")}</h2>
                 <p className="mt-1 mb-5 text-sm text-ink-soft">{t("contactDescription")}</p>
+                <a
+                  href="#muraciet"
+                  className="mb-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm bg-gold px-4 text-sm font-semibold text-on-gold shadow-xs transition-colors hover:bg-gold-soft"
+                >
+                  <MessageSquare className="size-4" aria-hidden="true" />
+                  {t("enquiryButton")}
+                </a>
                 <PublisherContactButtons
                   propertyId={agency.slug}
                   endpoint={`/api/agentlikler/${encodeURIComponent(agency.slug)}/elaqe`}

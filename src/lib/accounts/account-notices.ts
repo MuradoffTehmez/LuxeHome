@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation } from "@/lib/media/upload-record";
 import { NOTIFICATION_TYPES, type Locale, type NotificationType } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
 import { emailHref, escapeHtml } from "@/lib/email-html";
@@ -25,6 +26,12 @@ const COPY = {
     agencyRejected: (agency: string) => `«${agency}» qoşulma sorğunuzu rədd etdi.`,
     leadTitle: "Elanınıza yeni müraciət",
     lead: (title: string, name: string) => `${name} «${title}» elanınızla maraqlanır. Əlaqə məlumatı kabinetdəki «Müraciətlər» bölməsindədir.`,
+    agencyLeadTitle: "Agentliyinizə yeni müraciət",
+    agencyLead: (name: string) => `${name} agentlik profilinizdən müraciət göndərdi. Əlaqə məlumatı kabinetdəki «Müraciətlər» bölməsindədir.`,
+    leadRoutedTitle: "Sizə yeni müraciət yönləndirildi",
+    leadRouted: (agency: string, subject: string, name: string) => `«${agency}» agentliyinə gələn müraciət sizə yönləndirildi: ${name} — ${subject}. Əlaqə məlumatı kabinetdəki «Müraciətlər» bölməsindədir.`,
+    leadEscalationTitle: "Müraciət cavabsız qalıb",
+    leadEscalation: (name: string, handler: string, minutes: number) => `${name} adlı müştərinin müraciətinə ${minutes} dəqiqədir cavab verilməyib (məsul: ${handler}). Müraciəti başqa agentə verə və ya özünüz əlaqə saxlaya bilərsiniz.`,
     reason: (text: string) => `Səbəb: ${text}`,
     agencyLinkJoinedTitle: "Komandaya yeni agent qoşuldu",
     agencyLinkJoined: (name: string, agency: string) => `${name} dəvət linki ilə «${agency}» komandasına qoşuldu. Komandanı «Komanda» bölməsində idarə edə bilərsiniz.`,
@@ -57,6 +64,12 @@ const COPY = {
     agencyRejected: (agency: string) => `“${agency}” rejected your join request.`,
     leadTitle: "New enquiry for your listing",
     lead: (title: string, name: string) => `${name} is interested in your listing “${title}”. Contact details are in the Enquiries section of your account.`,
+    agencyLeadTitle: "New enquiry for your agency",
+    agencyLead: (name: string) => `${name} sent an enquiry from your agency profile. Contact details are in the Enquiries section of your account.`,
+    leadRoutedTitle: "A new enquiry was assigned to you",
+    leadRouted: (agency: string, subject: string, name: string) => `An enquiry to “${agency}” was assigned to you: ${name} — ${subject}. Contact details are in the Enquiries section of your account.`,
+    leadEscalationTitle: "An enquiry is still unanswered",
+    leadEscalation: (name: string, handler: string, minutes: number) => `The enquiry from ${name} has not been answered for ${minutes} minutes (assigned to ${handler}). You can reassign it to another agent or contact the client yourself.`,
     reason: (text: string) => `Reason: ${text}`,
     agencyLinkJoinedTitle: "A new agent joined your team",
     agencyLinkJoined: (name: string, agency: string) => `${name} joined the “${agency}” team using your invite link. You can manage the team in the Team section.`,
@@ -89,6 +102,12 @@ const COPY = {
     agencyRejected: (agency: string) => `«${agency}» отклонило ваш запрос на присоединение.`,
     leadTitle: "Новая заявка по вашему объявлению",
     lead: (title: string, name: string) => `${name} интересуется вашим объявлением «${title}». Контакты — в разделе «Заявки» личного кабинета.`,
+    agencyLeadTitle: "Новая заявка в ваше агентство",
+    agencyLead: (name: string) => `${name} отправил(а) заявку из профиля вашего агентства. Контакты — в разделе «Заявки» личного кабинета.`,
+    leadRoutedTitle: "Вам передана новая заявка",
+    leadRouted: (agency: string, subject: string, name: string) => `Заявка в агентство «${agency}» передана вам: ${name} — ${subject}. Контакты — в разделе «Заявки» личного кабинета.`,
+    leadEscalationTitle: "Заявка остаётся без ответа",
+    leadEscalation: (name: string, handler: string, minutes: number) => `На заявку клиента ${name} нет ответа уже ${minutes} мин. (ответственный: ${handler}). Передайте её другому агенту или свяжитесь с клиентом сами.`,
     reason: (text: string) => `Причина: ${text}`,
     agencyLinkJoinedTitle: "В команду вступил новый агент",
     agencyLinkJoined: (name: string, agency: string) => `${name} присоединился к команде «${agency}» по ссылке-приглашению. Управлять командой можно в разделе «Команда».`,
@@ -116,33 +135,46 @@ const COPY = {
 
 type NoticeCopy = (typeof COPY)[Locale];
 
+/**
+ * Hesab bildirişi (kabinet + e-poçt). Heç vaxt atmır; `true` — kabinet bildirişi yazılıb
+ * (və ya eyni `dedupeKey` ilə artıq var) və ya alıcı aktiv deyil (çatdırılacaq yer yoxdur).
+ * `false` — keçici xəta: çağıran təkrar cəhd üçün öz markerini geri qaytara bilər (#161).
+ * E-poçt ən yaxşı cəhddir və nəticəyə təsir etmir.
+ */
 async function notifyAccount(
   userId: string,
   type: NotificationType,
   path: string,
   dedupeKey: string,
   build: (copy: NoticeCopy) => { title: string; content: string },
-): Promise<void> {
+): Promise<boolean> {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { email: true, locale: true, isActive: true },
     });
-    if (!user?.isActive) return;
+    if (!user?.isActive) return true;
     const locale = localeOf(user.locale);
     const copy = COPY[locale];
     const { title, content } = build(copy);
+    let stored = true;
     await prisma.notification.create({
       data: { userId, type, title, content, actionUrl: path, dedupeKey },
-    }).catch(() => undefined);
+    }).catch((error: unknown) => {
+      // Eyni açarla bildiriş artıq var — təkrar cəhd sayılır, çatdırılıb.
+      stored = isUniqueViolation(error);
+    });
+    if (!stored) return false;
     const url = siteUrl(localizePath(path, locale));
     await sendEmail({
       to: user.email,
       subject: title,
       html: `<p>${escapeHtml(content)}</p><p><a href="${emailHref(url)}">${copy.open}</a></p>`,
-    });
+    }).catch((error: unknown) => console.error("[notice] e-poçt göndərilmədi:", error));
+    return true;
   } catch (error) {
     console.error("[notice] hesab bildirişi göndərilmədi:", error);
+    return false;
   }
 }
 
@@ -262,6 +294,57 @@ export async function noticeListingLead(input: {
     "/kabinet/muracietler",
     `listing-lead:${input.leadId}`,
     (copy) => ({ title: copy.leadTitle, content: copy.lead(input.propertyTitle, input.visitorName) }),
+  );
+}
+
+/** Agentlik sahibinə: agentlik profilindəki formadan müraciət (bölgü söndürülü və ya agent yoxdur). */
+export async function noticeAgencyLead(input: { userId: string; leadId: string; visitorName: string }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_LEAD,
+    "/kabinet/muracietler",
+    `agency-lead:${input.leadId}`,
+    (copy) => ({ title: copy.agencyLeadTitle, content: copy.agencyLead(input.visitorName) }),
+  );
+}
+
+/**
+ * Agentə: agentliyə gələn müraciət bölgü ilə ona düşdü (#161). Açar müraciət + alan üzrədir —
+ * sahib müraciəti başqa agentə verəndə yeni agent də bildiriş alır.
+ */
+export async function noticeLeadRouted(input: {
+  userId: string;
+  leadId: string;
+  agencyName: string;
+  subject: string;
+  visitorName: string;
+}): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_LEAD,
+    "/kabinet/muracietler",
+    `lead-routed:${input.leadId}:${input.userId}`,
+    (copy) => ({ title: copy.leadRoutedTitle, content: copy.leadRouted(input.agencyName, input.subject, input.visitorName) }),
+  );
+}
+
+/**
+ * Agentlik sahibinə: müraciət `LEAD_ESCALATION_MINUTES` dəqiqə cavabsız qaldı (#161).
+ * `false` — bildiriş yazılmadı, eskalasiya növbəti cron-da təkrarlanmalıdır.
+ */
+export async function noticeLeadEscalation(input: {
+  userId: string;
+  leadId: string;
+  visitorName: string;
+  handlerName: string;
+  minutes: number;
+}): Promise<boolean> {
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LEAD_ESCALATION,
+    "/kabinet/muracietler",
+    `lead-escalation:${input.leadId}`,
+    (copy) => ({ title: copy.leadEscalationTitle, content: copy.leadEscalation(input.visitorName, input.handlerName, input.minutes) }),
   );
 }
 

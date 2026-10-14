@@ -9,7 +9,7 @@ import { Input, Select } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmAction } from "@/components/admin/confirm-action";
-import { LISTING_HANDOVER, type ListingHandover } from "@/lib/constants";
+import { LEAD_ROUTING_MODES, LISTING_HANDOVER, type LeadRoutingMode, type ListingHandover } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
 import {
@@ -19,6 +19,8 @@ import {
   regenerateInviteLink,
   rejectAgencyRequest,
   removeAgencyEmployee,
+  setEmployeeReceivesLeads,
+  updateLeadRouting,
 } from "./actions";
 
 function StateMessage({ state }: { state: ActionState }) {
@@ -326,3 +328,95 @@ export function InviteLinkCard({
     </div>
   );
 }
+
+/** Müraciət bölgüsü rejimi (#161): agentliyə gələn müraciət kimə düşsün. */
+export function LeadRoutingForm({ mode }: { mode: LeadRoutingMode }) {
+  const t = useTranslations("account.team.routing");
+  const { toast } = useToast();
+  const router = useRouter();
+  const [value, setValue] = useState<LeadRoutingMode>(mode);
+  const [pending, startTransition] = useTransition();
+  const options: { value: LeadRoutingMode; label: string; hint: string }[] = [
+    { value: LEAD_ROUTING_MODES.ROUND_ROBIN, label: t("roundRobin"), hint: t("roundRobinHint") },
+    { value: LEAD_ROUTING_MODES.AREA, label: t("area"), hint: t("areaHint") },
+    { value: LEAD_ROUTING_MODES.OFF, label: t("off"), hint: t("offHint") },
+  ];
+
+  function save() {
+    startTransition(async () => {
+      const result = await updateLeadRouting(value);
+      toast(result.message ?? t("saved"), result.status === "success" ? "success" : "error");
+      if (result.status === "success") router.refresh();
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <fieldset className="grid grid-cols-1 gap-2 md:grid-cols-3">
+        <legend className="sr-only">{t("legend")}</legend>
+        {options.map((option) => (
+          <label
+            key={option.value}
+            className={cn(
+              "flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors",
+              value === option.value ? "border-gold bg-gold/10" : "border-line hover:border-gold",
+            )}
+          >
+            <input
+              type="radio"
+              name="leadRouting"
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => setValue(option.value)}
+              className="mt-0.5 size-4 accent-gold"
+            />
+            <span className="min-w-0">
+              <span className="block text-sm font-medium text-ink">{option.label}</span>
+              <span className="block text-xs text-ink-muted">{option.hint}</span>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      <div>
+        <Button type="button" size="sm" onClick={save} loading={pending} disabled={value === mode}>
+          {t("save")}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/** Agentin müraciət növbəsində olub-olmaması — sətirdəki açar (#161). */
+export function ReceivesLeadsToggle({ id, name, receives }: { id: string; name: string; receives: boolean }) {
+  const t = useTranslations("account.team.routing");
+  const { toast } = useToast();
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={receives}
+      aria-label={t("memberToggle", { name })}
+      disabled={pending}
+      onClick={() =>
+        startTransition(async () => {
+          const result = await setEmployeeReceivesLeads(id, !receives);
+          toast(result.message ?? t("saved"), result.status === "success" ? "success" : "error");
+          if (result.status === "success") router.refresh();
+        })
+      }
+      className={cn(
+        "inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-2 text-xs font-medium transition-colors disabled:opacity-50",
+        receives ? "text-success" : "text-ink-muted",
+      )}
+    >
+      <span className={cn("relative h-5 w-9 rounded-full transition-colors", receives ? "bg-success" : "bg-line-strong")}>
+        <span className={cn("absolute top-0.5 size-4 rounded-full bg-paper shadow-xs transition-[left]", receives ? "left-4.5" : "left-0.5")} />
+      </span>
+      {receives ? t("memberOnShort") : t("memberOffShort")}
+    </button>
+  );
+}
+

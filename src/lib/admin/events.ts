@@ -26,6 +26,7 @@ export type DomainEventType =
   | "agency.employee_joined_link"
   | "agency.application_rejected"
   | "agency.invite_link_changed"
+  | "agency.lead_routing_changed"
   | "agent.application_rejected"
   | "reservation.requested"
   | "reservation.status_changed"

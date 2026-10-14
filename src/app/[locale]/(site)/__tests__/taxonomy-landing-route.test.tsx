@@ -10,6 +10,11 @@ vi.mock("@/components/site/seo-landing-page", () => ({
   SeoLandingPage: () => null,
 }));
 
+// Ərazi agentlikləri bloku (#161) öz sorğusunu edir və kart `next/image` işlədir.
+vi.mock("@/components/site/area-agencies", () => ({
+  AreaAgencies: () => null,
+}));
+
 vi.mock("@/lib/queries", () => ({
   getTaxonomyLandingProperties: vi.fn(async (kind: "DISTRICT" | "METRO") => ({
     location: {

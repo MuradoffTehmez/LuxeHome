@@ -1006,7 +1006,7 @@ export async function getAgencyDirectory() {
 export async function getAgencyForOwner(userId: string) {
   return prisma.agency.findUnique({
     where: { userId },
-    select: { id: true, name: true, isVerified: true, inviteToken: true, inviteTokenCreatedAt: true },
+    select: { id: true, name: true, isVerified: true, inviteToken: true, inviteTokenCreatedAt: true, leadRouting: true },
   });
 }
 
@@ -1021,6 +1021,7 @@ export async function getAgencyEmployees(agencyId: string) {
       source: true,
       invitedAt: true,
       approvedAt: true,
+      receivesLeads: true,
       user: { select: { id: true, name: true, email: true, phone: true } },
     },
     orderBy: { invitedAt: "desc" },

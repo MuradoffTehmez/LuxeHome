@@ -30,7 +30,8 @@
 | `/muqayise` | Ən çox 4 elanın yan-yana müqayisəsi | Cookie ID → Server Action |
 | `/haqqimizda`, `/elaqe` | Şirkət məlumatı, əlaqə forması (Turnstile, `CONTACT`/`OWNER` mənbəyi) | Server Action → D1 + Resend + Telegram |
 | `/mexfilik-siyaseti`, `/istifade-sertleri`, `/cookie-siyaseti` | Hüquqi səhifələr | Statik |
-| `/rayon/[slug]`, `/metro/[slug]` | Yerə görə indekslənən landing; rayon landing-i qəsəbə/kənd/massivi də açır | D1 |
+| `/rayon/[slug]`, `/metro/[slug]` | Yerə görə indekslənən landing; rayon landing-i qəsəbə/kənd/massivi də açır, altında «Bu ərazidə fəal agentliklər» | D1 |
+| `/rayon/[slug]/agentlikler` | Ərazidə aktiv təklifi olan təsdiqlənmiş agentliklər (SEO landing, 2-dən az agentlikdə noindex) | D1 |
 | `/[seoLanding]` | Bazadan idarə olunan SEO landing runtime-ı | D1 |
 | `/[...slug]` | Aktiv 301/302 redirect və 404 hit qeydiyyatı | D1 |
 
@@ -93,6 +94,8 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 - Agentin elan sayı və səhifəsi öz yerləşdirdiyi və ona təyin edilmiş aktiv elanları birlikdə göstərir; bağlanmışlar «Uğurlu sövdələşmələr»dədir.
 - Elan detalında «Elandan şikayət et» (səbəb + izah, Turnstile) və ictimai hesabın elanında təhlükəsizlik məsləhətləri.
 - Elan səhifəsindən gələn müraciət elana bağlanır və ictimai hesabın elanında sahibin `/kabinet/muracietler` bölməsinə düşür.
+- Agentliyin elanına və agentlik profilindəki «Agentliyə müraciət» formasına gələn müraciət bölgü ilə agentə düşür (növbə ilə / ərazi üzrə / söndürülü); 30 dəqiqə cavabsız qalan sahibə bildirilir.
+- Agentlik profilində reytinq (agentlərin və agentliyin rəyləri), son rəylər və «Tez cavab verir» nişanı; agent kartında da eyni nişan.
 
 ### Favorit və müqayisə
 
@@ -112,6 +115,8 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet` | Hesab xülasəsi |
 | `/kabinet/profil` | Profil, profil tamlığı (%), agentlik örtüyü və filialları, rədd səbəbi, parol, telefon təsdiqi, «Məlumatlarımı yüklə» (JSON), hesabın silinməsi |
 | `/kabinet/elanlar`, `/kabinet/elanlar/yeni`, `/kabinet/elanlar/[id]` | Elan siyahısı, 8 addımlı sehrbaz, redaktə, «Yenilə» (+60 gün) |
+| `/kabinet/muracietler` | Müraciətlər: «Əlaqə saxladım», bağla, cavabsız filtri; agentlik sahibi bütün agentlik müraciətlərini görür və agentə verir |
+| `/kabinet/analitika` | Elan analitikası: baxış, nömrə açılışı, WhatsApp, müraciət, favorit, gündəlik qrafik, bazarla müqayisə (7/30/90 gün, agent filtri) |
 | `/kabinet/paketler` | Premium paket sifarişi və tarixçə |
 | `/kabinet/rezervasiyalar` | Rezervasiyalar |
 | `/kabinet/axtarislarim` | Saxlanmış axtarışlar və tezlik |
@@ -221,11 +226,13 @@ Toplu seçim `components/admin/bulk-selection.tsx` + `lib/admin/bulk.ts`-dir: h�
 | `POST /api/monitoring/error`, `/vitals` | Client xətaları və Web Vitals | `MONITORING_LIMIT` |
 | `POST /api/security/turnstile` | Turnstile yoxlaması | Public |
 | `POST /api/cron/saved-search-digest` | Digest, maintenance (elan müddəti, silinmə retry), semantik reindeks | `CRON_SECRET` Bearer |
+| `POST /api/cron/leads?is=escalate\|response-stats` | Cavabsız agentlik müraciətinin eskalasiyası (10 dəq), cavab göstəriciləri (gündəlik) — `worker.ts` `scheduled()` çağırır | `AUTH_SECRET`-dən törədilən açar və ya `CRON_SECRET`; açarsız 404 |
+| `POST /api/emlaklar/[id]/klik` | Elanın WhatsApp klikini analitikaya yazır (həmişə 204) | Same-origin, IP limiti, bot filtri |
 | `POST /api/webhooks/resend` | Resend/Svix event qəbulu | `RESEND_WEBHOOK_SECRET` imzası |
 | `GET /media/[...key]` | R2 obyektinin delivery-si | Key parser + cache metadata |
 | `GET /llms.txt`, `/sitemap-index.xml`, `/sitemaps/[feed]` | Maşın oxunaqlı xəritə və sitemap feed-ləri | Public |
 
-Cəmi 21 Route Handler: `src/app/api` altında 17, üstəgəl `media/[...key]`, `llms.txt`, `sitemap-index.xml` və `sitemaps/[feed]`. Rəsmi küçə siyahıları Route Handler deyil — `public/data/kuceler/<officialCode>.json` statik fayllarıdır.
+Cəmi 26 Route Handler (14 oktyabr 2026, #161): `src/app/api` altında 22, üstəgəl `media/[...key]`, `llms.txt`, `sitemap-index.xml` və `sitemaps/[feed]`. Rəsmi küçə siyahıları Route Handler deyil — `public/data/kuceler/<officialCode>.json` statik fayllarıdır.
 
 ## SEO və sistem marşrutları
 

@@ -20,6 +20,11 @@
     "enabled": true
   },
 
+  // Cron (#161): `worker.ts` → `scheduled()` işi `/api/cron/leads` marşrutu ilə özü çağırır.
+  // İfadələr `src/lib/cron-auth.ts` → `CRON_JOBS` ilə eyni olmalıdır (test yoxlayır).
+  // `triggers` irsi ötürülən açardır — staging də eyni cədvəllə işləyir.
+  "triggers": { "crons": ["*/10 * * * *", "20 0 * * *"] },
+
   // Custom domain — DNS yazıları Cloudflare tərəfindən avtomatik idarə olunur
   "routes": [
     { "pattern": "luxehomeestate.az", "custom_domain": true },

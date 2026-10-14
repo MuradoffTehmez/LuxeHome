@@ -1,5 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getAgencyRatings, getAgencyReviews } from "@/lib/agency-ratings";
+import { isFastResponder } from "@/lib/accounts/response-stats";
 import { demoWhere } from "@/lib/demo-content";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { getAgencyOffices } from "@/lib/accounts/agency-offices";
@@ -10,6 +12,7 @@ import {
   CLOSED_DEAL_STATUSES,
   DEAL_STATS_WINDOW_DAYS,
   LISTING_TYPES,
+  LOCATION_CHILD_KINDS,
   PUBLIC_PROPERTY_STATUSES,
   REVIEW_STATUSES,
   type SortOption,
@@ -158,8 +161,43 @@ export async function countAgentListings(agents: { id: string; userId: string | 
   return counts;
 }
 
-/** İctimai agentlik kataloqu (`/agentlikler`) — təklif statistikası ilə. */
-export async function getPublicAgencyCatalog(options: { search?: string } = {}) {
+/**
+ * Ərazidə fəal agentliklər (#161, C6): sahib + təsdiqlənmiş agentlərin həmin ərazidəki aktiv
+ * təklif sayı. Ərazi `/rayon/<slug>` ilə eyni qaydadır — yerin özü və onun birbaşa uşaqları.
+ */
+async function countAreaOffers(agencies: { id: string; userId: string }[], areaSlug: string): Promise<Map<string, number>> {
+  const members = await agencyMemberIds(agencies);
+  const owner = new Map<string, string>();
+  for (const [agencyId, userIds] of members) for (const userId of userIds) owner.set(userId, agencyId);
+  const where: Prisma.PropertyWhereInput = {
+    ...(await activeOfferWhere()),
+    district: { OR: [{ slug: areaSlug }, { parent: { slug: areaSlug } }] },
+  };
+  const rows = await findManyInChunks([...owner.keys()], RESERVED_PARAMS + 2, (ids) =>
+    prisma.property.groupBy({ by: ["authorId"], where: { ...where, authorId: { in: ids } }, _count: { _all: true } }),
+  );
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    const agencyId = row.authorId ? owner.get(row.authorId) : undefined;
+    if (agencyId) counts.set(agencyId, (counts.get(agencyId) ?? 0) + row._count._all);
+  }
+  return counts;
+}
+
+/** `/rayon/<slug>/agentlikler` landing-inin yeri — rayon səhifəsi ilə eyni səviyyələr. */
+export async function getAgencyArea(slug: string) {
+  if (!slug || slug.length > 160) return null;
+  return prisma.location.findFirst({
+    where: { slug, kind: { in: LOCATION_CHILD_KINDS } },
+    select: { id: true, name: true, slug: true, kind: true },
+  });
+}
+
+/**
+ * İctimai agentlik kataloqu (`/agentlikler`) — təklif statistikası ilə. `area` (rayon/qəsəbə
+ * slug-ı) verilsə yalnız həmin ərazidə aktiv təklifi olan agentliklər, ərazidəki təklif sayına görə.
+ */
+export async function getPublicAgencyCatalog(options: { search?: string; area?: string } = {}) {
   const search = options.search?.trim();
   const agencies = await prisma.agency.findMany({
     where: {
@@ -176,12 +214,19 @@ export async function getPublicAgencyCatalog(options: { search?: string } = {}) 
       logoUrl: true,
       description: true,
       address: true,
+      responseMinutes: true,
+      responseSample: true,
+      responseRate: true,
       _count: { select: { agentProfiles: { where: { isPublic: true } } } },
     },
     orderBy: { name: "asc" },
   });
-  const stats = await countAgencyOffers(agencies);
-  return agencies
+  const [stats, ratings, areaCounts] = await Promise.all([
+    countAgencyOffers(agencies),
+    getAgencyRatings(agencies.map((agency) => agency.id)),
+    options.area ? countAreaOffers(agencies, options.area) : Promise.resolve(null),
+  ]);
+  const catalog = agencies
     .map((agency) => ({
       id: agency.id,
       name: agency.name,
@@ -191,9 +236,16 @@ export async function getPublicAgencyCatalog(options: { search?: string } = {}) 
       address: agency.address,
       agentCount: agency._count.agentProfiles,
       offers: stats.get(agency.id) ?? { ...EMPTY_STATS },
+      rating: ratings.get(agency.id) ?? null,
+      fastResponse: isFastResponder({ minutes: agency.responseMinutes, sample: agency.responseSample, rate: agency.responseRate }),
+      areaOffers: areaCounts?.get(agency.id) ?? 0,
     }))
     // Ən çox təklifi olan agentlik əvvəl — bina.az və Property Finder kimi.
     .sort((left, right) => right.offers.total - left.offers.total);
+  if (!areaCounts) return catalog;
+  return catalog
+    .filter((agency) => agency.areaOffers > 0)
+    .sort((left, right) => right.areaOffers - left.areaOffers || right.offers.total - left.offers.total);
 }
 
 export type AgencyOfferFilters = {
@@ -235,6 +287,9 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
       viewCount: true,
       createdAt: true,
       isDemo: true,
+      responseMinutes: true,
+      responseSample: true,
+      responseRate: true,
       user: { select: { companyTaxId: true } },
     },
   });
@@ -252,7 +307,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
   };
   const page = Math.max(1, filters.page ?? 1);
 
-  const [properties, filteredCount, byListingType, byType, byDistrict, agents, offices, deals] = await Promise.all([
+  const [properties, filteredCount, byListingType, byType, byDistrict, agents, offices, deals, ratings, reviews] = await Promise.all([
     prisma.property.findMany({
       where,
       select: propertyCardSelect,
@@ -281,6 +336,9 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
     getAgencyOffices(agency.id),
     // Uğurlu sövdələşmələr (#159) — sahib + təsdiqlənmiş agentlərin son 12 ayı.
     getClosedDeals({ authorId: { in: members } }),
+    // Agentlik reytinqi və son rəylər (#161).
+    getAgencyRatings([agency.id]),
+    getAgencyReviews(agency.id),
   ]);
 
   const stats: OfferStats = { ...EMPTY_STATS };
@@ -328,5 +386,8 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
     })),
     offices,
     deals,
+    rating: ratings.get(agency.id) ?? null,
+    reviews,
+    fastResponse: isFastResponder({ minutes: agency.responseMinutes, sample: agency.responseSample, rate: agency.responseRate }),
   };
 }

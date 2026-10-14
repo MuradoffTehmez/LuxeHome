@@ -262,7 +262,8 @@
       "CONTACT": "Əlaqə səhifəsi",
       "SERVICE": "Xidmət səhifəsi",
       "PROJECT": "Layihə səhifəsi",
-      "OWNER": "Sahib müraciəti"
+      "OWNER": "Sahib müraciəti",
+      "AGENCY": "Agentlik profili"
     },
     "leadStatus": {
       "NEW": "Yeni",
@@ -310,7 +311,8 @@
       "AGENCY_TEAM": "Agentlik komandası",
       "LISTING_LEAD": "Elana müraciət",
       "ACCOUNT_REVIEW": "Profil təsdiqi",
-      "LISTING_REPORT": "Elan şikayəti"
+      "LISTING_REPORT": "Elan şikayəti",
+      "LEAD_ESCALATION": "Cavabsız müraciət"
     },
     "partnershipType": {
       "BROKER": "Broker",

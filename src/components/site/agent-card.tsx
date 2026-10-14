@@ -1,9 +1,10 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Star, UserRound } from "lucide-react";
+import { Star, UserRound, Zap } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { isUnoptimizedImage } from "@/lib/utils";
+import { isFastResponder } from "@/lib/accounts/response-stats";
 import type { getPublicAgents } from "@/lib/phase2";
 
 type PublicAgent = Awaited<ReturnType<typeof getPublicAgents>>[number];
@@ -25,6 +26,8 @@ export async function AgentCard({
   // Yeni agentdə `soldCount`/`rentedCount` sıfırdır. «0 satış · 0 icarə»
   // yazmaq kartı boş göstərir, ona görə sətir yalnız real nəticə olanda çıxır.
   const hasDeals = agent.soldCount > 0 || agent.rentedCount > 0;
+  // «Tez cavab verir» (#161) — yalnız ölçülmüş göstəricidən, admin yazdığı rəqəmdən yox.
+  const fast = isFastResponder({ minutes: agent.measuredResponseMinutes, sample: agent.responseSample, rate: agent.responseRate });
   const summary = agent.specialization || agent.roleTitle || null;
 
   return (
@@ -68,9 +71,15 @@ export async function AgentCard({
             </p>
           )}
 
-          {(agent.isVerified || rating != null) && (
+          {(agent.isVerified || rating != null || fast) && (
             <div className="mt-1 flex flex-wrap gap-2">
               {agent.isVerified && <Badge tone="gold">{t("verified")}</Badge>}
+              {fast && (
+                <Badge tone="neutral" className="gap-1 text-gold-deep">
+                  <Zap className="size-3.5" aria-hidden="true" />
+                  {t("fastResponse")}
+                </Badge>
+              )}
               {rating != null && (
                 <Badge tone="neutral">
                   <Star className="mr-1 size-3.5 fill-gold text-gold-deep" aria-hidden="true" />
