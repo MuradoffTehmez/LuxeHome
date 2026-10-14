@@ -206,5 +206,43 @@
     "private": "Private listing",
     "agencyNamed": "Agency: {name}",
     "verified": "Verified agency"
+  },
+  "report": {
+    "button": "Report this listing",
+    "title": "Report listing",
+    "description": "What is wrong with this listing? Moderators review reports; the owner does not see who you are.",
+    "thanksTitle": "Thank you",
+    "thanks": "Your report was received. Moderators will review the listing.",
+    "close": "Close",
+    "reasonLabel": "Reason",
+    "reasons": {
+      "FAKE": "Fake or non-existent listing",
+      "SOLD": "Already sold or rented",
+      "WRONG_PRICE": "Wrong price",
+      "WRONG_INFO": "Wrong address, photos or details",
+      "FRAUD": "Asks for a deposit upfront, suspected fraud",
+      "NOT_OWNER": "An intermediary poses as the owner",
+      "DUPLICATE": "The same listing is posted repeatedly",
+      "OTHER": "Other"
+    },
+    "messageRequired": "Please describe the issue",
+    "messageOptional": "Additional note (optional)",
+    "cancel": "Cancel",
+    "submit": "Send",
+    "privacy": "The owner does not see who reported. Your IP address is not stored in plain form — only a hashed fingerprint to prevent duplicate reports.",
+    "errors": {
+      "generic": "The report could not be sent. Please try again later.",
+      "rateLimited": "Too many reports were sent. Please try again later.",
+      "reason": "Choose a reason for the report.",
+      "messageRequired": "When choosing “Other”, write at least 10 characters.",
+      "security": "The security check failed. Refresh the page and try again."
+    }
+  },
+  "safety": {
+    "title": "Safety tips",
+    "tipDeposit": "Never pay a deposit or advance before seeing the property and checking the documents.",
+    "tipDocuments": "Check the title extract and the seller's identity, and sign the contract at a notary.",
+    "tipPlatform": "Be cautious of sellers who rush you to move communication or payment off the site.",
+    "guideLink": "How to spot a fake listing"
   }
 }

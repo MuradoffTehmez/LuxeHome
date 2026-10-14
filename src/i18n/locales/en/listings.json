@@ -244,5 +244,9 @@
     "agents": "{count, plural, one {# agent} other {# agents}}",
     "noResults": "No agency named “{query}” was found",
     "viewProfile": "View profile"
+  },
+  "deals": {
+    "title": "Closed deals",
+    "summary": "In the last 12 months: {sold, plural, one {# sale} other {# sales}}, {rented, plural, one {# rental} other {# rentals}}"
   }
 }

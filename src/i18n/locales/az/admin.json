@@ -85,7 +85,8 @@
       "calendar": "Təqvim",
       "packages": "Paketlər və ödənişlər",
       "agencyHub": "Agentliklər və agentlər",
-      "approvals": "Təsdiq növbəsi"
+      "approvals": "Təsdiq növbəsi",
+      "reports": "Şikayətlər"
     }
   },
   "actions": {
@@ -308,7 +309,8 @@
       "PACKAGE": "Premium paket",
       "AGENCY_TEAM": "Agentlik komandası",
       "LISTING_LEAD": "Elana müraciət",
-      "ACCOUNT_REVIEW": "Profil təsdiqi"
+      "ACCOUNT_REVIEW": "Profil təsdiqi",
+      "LISTING_REPORT": "Elan şikayəti"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -434,6 +436,21 @@
       "BANK_TRANSFER": "Bank köçürməsi",
       "CARD_TERMINAL": "POS terminal",
       "OTHER": "Digər"
+    },
+    "reportReason": {
+      "FAKE": "Saxta və ya mövcud olmayan elan",
+      "SOLD": "Artıq satılıb və ya kirayəyə verilib",
+      "WRONG_PRICE": "Qiymət yanlışdır",
+      "WRONG_INFO": "Ünvan, foto və ya məlumat yanlışdır",
+      "FRAUD": "Beh/avans tələb edir, fırıldaq şübhəsi",
+      "NOT_OWNER": "Vasitəçi özünü mülkiyyətçi kimi təqdim edir",
+      "DUPLICATE": "Eyni elan təkrar yerləşdirilib",
+      "OTHER": "Digər"
+    },
+    "reportStatus": {
+      "OPEN": "Açıq",
+      "RESOLVED": "Həll edildi",
+      "DISMISSED": "Əsassız"
     }
   },
   "profile": {
@@ -818,7 +835,17 @@
       "novbeBosdur": "Növbə boşdur",
       "tesdiqGozleyenElanYoxdur": "Təsdiq gözləyən elan yoxdur.",
       "idarePaneli": "İdarə paneli",
-      "tesdiqlenmemisAgentlik": "Təsdiqlənməmiş agentlik"
+      "tesdiqlenmemisAgentlik": "Təsdiqlənməmiş agentlik",
+      "risk": {
+        "lowPrice": "Qiymət bazardan {value}% aşağı",
+        "contactInText": "Mətndə əlaqə məlumatı",
+        "duplicatePhotos": "Foto {value} başqa elanda var",
+        "duplicateText": "Mətn başqa elandan köçürülüb",
+        "newAccount": "Yeni hesab",
+        "openReports": "Şikayət: {value}",
+        "score": "Risk {score}",
+        "summary": "Növbədə {count} elanda avtomatik risk siqnalı var. Onları əvvəlcə yoxlayın."
+      }
     },
     "projects": {
       "layiheniBerpaEtmek": "Layihəni bərpa etmək",
@@ -2808,6 +2835,41 @@
       "officeName": "Filialın adı",
       "officeCity": "Şəhər / rayon",
       "officeCityPlaceholder": "Seçin"
+    },
+    "reports": {
+      "title": "Şikayətlər",
+      "description": "Ziyarətçilərin elanlar barədə şikayətləri. Eyni elana gələn şikayətlər birlikdə göstərilir.",
+      "tabsLabel": "Şikayət statusu",
+      "tabOpen": "Açıq",
+      "tabResolved": "Həll edilmiş",
+      "tabDismissed": "Əsassız",
+      "empty": "Şikayət yoxdur",
+      "emptyDescription": "Bu bölmədə hələ şikayət yoxdur.",
+      "count": "{count} şikayət",
+      "urgent": "Təcili",
+      "companyListing": "Şirkət elanı",
+      "resolutionArchived": "Elan dayandırıldı",
+      "resolutionClosed": "Satılmış/icarəyə verilmiş kimi bağlandı",
+      "resolutionNone": "Dəyişiklik edilmədi",
+      "viewListing": "Elana bax",
+      "editListing": "Redaktə et",
+      "archive": "Elanı dayandır",
+      "archiveTitle": "Elanı dayandırmaq",
+      "archiveDescription": "«{title}» arxivə köçürüləcək və sahibinə səbəb göndəriləcək.",
+      "presets": {
+        "fake": "Elan saxta və ya mövcud olmayan əmlak barədədir.",
+        "price": "Elanın qiyməti real deyil.",
+        "info": "Elandakı ünvan, foto və ya məlumat yanlışdır.",
+        "fraud": "Elanda fırıldaq əlamətləri var (beh/avans tələbi)."
+      },
+      "markSold": "Satılıb",
+      "markRented": "İcarəyə verilib",
+      "markClosedDescription": "«{title}» bağlanmış elan kimi qeyd olunacaq və sahibinə bildiriş gedəcək.",
+      "confirm": "Təsdiqlə",
+      "resolve": "Həll edildi",
+      "resolveDescription": "Elan dəyişmədən şikayətlər həll edilmiş kimi qeyd olunacaq.",
+      "dismiss": "Əsassızdır",
+      "dismissDescription": "Şikayətlər əsassız sayılacaq, elan dəyişmir."
     }
   },
   "server": {
@@ -3206,6 +3268,14 @@
       "hecBiriAlinmadi": "Seçilmiş qeydlərin heç biri işlənmədi.",
       "qismenTamamlandi": "{p1} qeyddən {p0}-i işləndi; qalanları alınmadı.",
       "tamamlandi": "{p0} qeyd işləndi."
+    },
+    "reports": {
+      "elanTapilmadi": "Elan tapılmadı.",
+      "elanDayandirildi": "Elan dayandırıldı, şikayətlər həll edildi.",
+      "elanBaglandi": "Elan bağlandı, şikayətlər həll edildi.",
+      "acikSikayetYoxdur": "Bu elan üzrə açıq şikayət yoxdur.",
+      "esassizSayildi": "Şikayətlər əsassız sayıldı.",
+      "hellEdildi": "Şikayətlər həll edildi."
     }
   }
 }

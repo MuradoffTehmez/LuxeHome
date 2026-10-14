@@ -244,5 +244,9 @@
     "agents": "{count, plural, one {# агент} few {# агента} many {# агентов} other {# агента}}",
     "noResults": "Агентство «{query}» не найдено",
     "viewProfile": "Открыть профиль"
+  },
+  "deals": {
+    "title": "Успешные сделки",
+    "summary": "За последние 12 месяцев: продаж — {sold}, аренд — {rented}"
   }
 }

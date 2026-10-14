@@ -206,5 +206,43 @@
     "private": "Şəxsi elan",
     "agencyNamed": "Agentlik: {name}",
     "verified": "Təsdiqlənmiş agentlik"
+  },
+  "report": {
+    "button": "Elandan şikayət et",
+    "title": "Elandan şikayət",
+    "description": "Elanda nə yanlışdır? Şikayəti moderatorlar yoxlayır, elan sahibi sizin kim olduğunuzu görmür.",
+    "thanksTitle": "Təşəkkür edirik",
+    "thanks": "Şikayətiniz qəbul olundu. Moderatorlar elanı yoxlayacaq.",
+    "close": "Bağla",
+    "reasonLabel": "Səbəb",
+    "reasons": {
+      "FAKE": "Saxta və ya mövcud olmayan elan",
+      "SOLD": "Artıq satılıb və ya kirayəyə verilib",
+      "WRONG_PRICE": "Qiymət yanlışdır",
+      "WRONG_INFO": "Ünvan, foto və ya məlumat yanlışdır",
+      "FRAUD": "Beh/avans tələb edir, fırıldaq şübhəsi",
+      "NOT_OWNER": "Vasitəçi özünü mülkiyyətçi kimi təqdim edir",
+      "DUPLICATE": "Eyni elan təkrar yerləşdirilib",
+      "OTHER": "Digər"
+    },
+    "messageRequired": "Ətraflı yazın",
+    "messageOptional": "Əlavə qeyd (istəyə bağlı)",
+    "cancel": "Ləğv et",
+    "submit": "Göndər",
+    "privacy": "Elan sahibi şikayət edəni görmür. IP ünvanınız açıq şəkildə saxlanılmır — yalnız təkrar şikayətin qarşısını almaq üçün şifrələnmiş iz yazılır.",
+    "errors": {
+      "generic": "Şikayət göndərilmədi. Bir az sonra yenidən cəhd edin.",
+      "rateLimited": "Çox sayda şikayət göndərilib. Bir az sonra yenidən cəhd edin.",
+      "reason": "Şikayətin səbəbini seçin.",
+      "messageRequired": "«Digər» seçiləndə ən azı 10 simvolluq izah yazın.",
+      "security": "Təhlükəsizlik yoxlaması keçmədi. Səhifəni yeniləyib yenidən cəhd edin."
+    }
+  },
+  "safety": {
+    "title": "Təhlükəsizlik məsləhətləri",
+    "tipDeposit": "Əmlakı görmədən və sənədləri yoxlamadan beh və ya avans ödəməyin.",
+    "tipDocuments": "Çıxarışı və satıcının şəxsiyyətini yoxlayın, müqaviləni notariusda bağlayın.",
+    "tipPlatform": "Ünsiyyəti və ödənişi saytdan kənara çəkməyə tələsdirən satıcıya ehtiyatla yanaşın.",
+    "guideLink": "Saxta elanı necə tanımaq olar"
   }
 }

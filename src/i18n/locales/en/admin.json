@@ -85,7 +85,8 @@
       "calendar": "Calendar",
       "packages": "Packages & payments",
       "agencyHub": "Agencies and agents",
-      "approvals": "Approval queue"
+      "approvals": "Approval queue",
+      "reports": "Reports"
     }
   },
   "actions": {
@@ -308,7 +309,8 @@
       "PACKAGE": "Premium package",
       "AGENCY_TEAM": "Agency team",
       "LISTING_LEAD": "Listing enquiry",
-      "ACCOUNT_REVIEW": "Profile review"
+      "ACCOUNT_REVIEW": "Profile review",
+      "LISTING_REPORT": "Listing report"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -434,6 +436,21 @@
       "BANK_TRANSFER": "Bank transfer",
       "CARD_TERMINAL": "POS terminal",
       "OTHER": "Other"
+    },
+    "reportReason": {
+      "FAKE": "Fake or non-existent listing",
+      "SOLD": "Already sold or rented",
+      "WRONG_PRICE": "Wrong price",
+      "WRONG_INFO": "Wrong address, photos or details",
+      "FRAUD": "Asks for a deposit upfront, suspected fraud",
+      "NOT_OWNER": "An intermediary poses as the owner",
+      "DUPLICATE": "Duplicate listing",
+      "OTHER": "Other"
+    },
+    "reportStatus": {
+      "OPEN": "Open",
+      "RESOLVED": "Resolved",
+      "DISMISSED": "Dismissed"
     }
   },
   "profile": {
@@ -818,7 +835,17 @@
       "novbeBosdur": "The queue is empty",
       "tesdiqGozleyenElanYoxdur": "No listings are awaiting approval.",
       "idarePaneli": "Dashboard",
-      "tesdiqlenmemisAgentlik": "Unverified agency"
+      "tesdiqlenmemisAgentlik": "Unverified agency",
+      "risk": {
+        "lowPrice": "Price {value}% below market",
+        "contactInText": "Contact details in text",
+        "duplicatePhotos": "Photos used in {value, plural, one {# other listing} other {# other listings}}",
+        "duplicateText": "Text copied from another listing",
+        "newAccount": "New account",
+        "openReports": "Reports: {value}",
+        "score": "Risk {score}",
+        "summary": "{count, plural, one {# listing} other {# listings}} in the queue {count, plural, one {has} other {have}} automatic risk signals. Review {count, plural, one {it} other {them}} first."
+      }
     },
     "projects": {
       "layiheniBerpaEtmek": "Restore the development",
@@ -2808,6 +2835,41 @@
       "officeName": "Branch name",
       "officeCity": "City / district",
       "officeCityPlaceholder": "Select"
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Visitor reports about listings. Reports about the same listing are grouped together.",
+      "tabsLabel": "Report status",
+      "tabOpen": "Open",
+      "tabResolved": "Resolved",
+      "tabDismissed": "Dismissed",
+      "empty": "No reports",
+      "emptyDescription": "There are no reports in this section yet.",
+      "count": "{count, plural, one {# report} other {# reports}}",
+      "urgent": "Urgent",
+      "companyListing": "Company listing",
+      "resolutionArchived": "Listing suspended",
+      "resolutionClosed": "Closed as sold/rented",
+      "resolutionNone": "No changes made",
+      "viewListing": "View listing",
+      "editListing": "Edit",
+      "archive": "Suspend listing",
+      "archiveTitle": "Suspend the listing",
+      "archiveDescription": "“{title}” will be archived and the owner will receive the reason.",
+      "presets": {
+        "fake": "The listing is about a fake or non-existent property.",
+        "price": "The listing price is not real.",
+        "info": "The address, photos or details in the listing are wrong.",
+        "fraud": "The listing shows signs of fraud (asking for a deposit upfront)."
+      },
+      "markSold": "Sold",
+      "markRented": "Rented",
+      "markClosedDescription": "“{title}” will be marked as a closed listing and the owner will be notified.",
+      "confirm": "Confirm",
+      "resolve": "Resolved",
+      "resolveDescription": "Reports will be marked as resolved without changing the listing.",
+      "dismiss": "Unfounded",
+      "dismissDescription": "Reports will be dismissed as unfounded; the listing does not change."
     }
   },
   "server": {
@@ -3206,6 +3268,14 @@
       "hecBiriAlinmadi": "None of the selected records could be processed.",
       "qismenTamamlandi": "{p0} of {p1} records processed; the rest failed.",
       "tamamlandi": "{p0} records processed."
+    },
+    "reports": {
+      "elanTapilmadi": "Listing not found.",
+      "elanDayandirildi": "The listing was suspended and the reports resolved.",
+      "elanBaglandi": "The listing was closed and the reports resolved.",
+      "acikSikayetYoxdur": "There are no open reports for this listing.",
+      "esassizSayildi": "The reports were dismissed.",
+      "hellEdildi": "The reports were resolved."
     }
   }
 }
