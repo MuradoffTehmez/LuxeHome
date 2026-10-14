@@ -309,7 +309,8 @@
     "agencyRequestSent": "Your request was sent to “{name}”. You will be notified once it is approved.",
     "agencyLeft": "You have left the agency.",
     "agencyRequestCancelled": "Request cancelled.",
-    "employeeOtherAgency": "This person already works for another agency or is an agency account."
+    "employeeOtherAgency": "This person already works for another agency or is an agency account.",
+    "invalidInstagram": "Enter an Instagram username (letters, digits, dot, underscore)."
   },
   "profile": {
     "metaTitle": "Profile",
@@ -379,7 +380,13 @@
     "agencyRequest": "Send request",
     "agencyCancel": "Cancel request",
     "agencyLeave": "Leave agency",
-    "agencyLeaveDescription": "You will be disconnected from “{name}”. Rejoining requires a new request."
+    "agencyLeaveDescription": "You will be disconnected from “{name}”. Rejoining requires a new request.",
+    "agencyHours": "Opening hours",
+    "agencyHoursHint": "For example: Daily 10:00–20:00",
+    "agencyEmail": "Office email",
+    "agencyWhatsapp": "WhatsApp number",
+    "agencyInstagram": "Instagram",
+    "agencyInstagramHint": "Username, for example @onehome"
   },
   "savedSearches": {
     "metaTitle": "My saved searches",

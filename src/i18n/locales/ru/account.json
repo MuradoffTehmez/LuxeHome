@@ -309,7 +309,8 @@
     "agencyRequestSent": "Запрос отправлен в «{name}». Вы получите уведомление после одобрения.",
     "agencyLeft": "Вы вышли из агентства.",
     "agencyRequestCancelled": "Запрос отменён.",
-    "employeeOtherAgency": "Этот человек уже работает в другом агентстве или является аккаунтом агентства."
+    "employeeOtherAgency": "Этот человек уже работает в другом агентстве или является аккаунтом агентства.",
+    "invalidInstagram": "Укажите имя пользователя Instagram (буквы, цифры, точка, подчёркивание)."
   },
   "profile": {
     "metaTitle": "Профиль",
@@ -379,7 +380,13 @@
     "agencyRequest": "Отправить запрос",
     "agencyCancel": "Отменить запрос",
     "agencyLeave": "Выйти из агентства",
-    "agencyLeaveDescription": "Связь с «{name}» будет прекращена. Для повторного присоединения нужен новый запрос."
+    "agencyLeaveDescription": "Связь с «{name}» будет прекращена. Для повторного присоединения нужен новый запрос.",
+    "agencyHours": "Часы работы",
+    "agencyHoursHint": "Например: Ежедневно 10:00–20:00",
+    "agencyEmail": "E-mail офиса",
+    "agencyWhatsapp": "Номер WhatsApp",
+    "agencyInstagram": "Instagram",
+    "agencyInstagramHint": "Имя пользователя, например @onehome"
   },
   "savedSearches": {
     "metaTitle": "Мои сохранённые поиски",
