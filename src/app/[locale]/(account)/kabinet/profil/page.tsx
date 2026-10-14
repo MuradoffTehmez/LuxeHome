@@ -16,6 +16,11 @@ import { ThemeSelector } from "@/components/site/theme-selector";
 import { AccountDataForm, PasswordForm, ProfileForm } from "./profile-forms";
 import { PhoneVerification } from "./phone-verification";
 import { isSmsConfigured } from "@/lib/sms";
+import { OfficeManager } from "./office-manager";
+import { ProfileCompletenessCard } from "./profile-completeness-card";
+import { getAgencyOffices, getOfficeCityOptions } from "@/lib/accounts/agency-offices";
+import { agencyCompleteness, agentCompleteness } from "@/lib/accounts/profile-completeness";
+import { AlertTriangle } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -57,6 +62,7 @@ export default async function CabinetProfilePage() {
       ? prisma.agency.findUnique({
           where: { userId: user.id },
           select: {
+            id: true,
             name: true,
             slug: true,
             description: true,
@@ -67,13 +73,27 @@ export default async function CabinetProfilePage() {
             whatsapp: true,
             instagram: true,
             workingHours: true,
+            logoUrl: true,
+            coverUrl: true,
+            rejectedAt: true,
+            rejectionReason: true,
           },
         })
       : null,
     requirements.agent
       ? prisma.agentProfile.findUnique({
           where: { userId: user.id },
-          select: { slug: true, roleTitle: true, specialization: true, experienceYears: true, bio: true, isPublic: true, isVerified: true },
+          select: {
+            slug: true,
+            roleTitle: true,
+            specialization: true,
+            experienceYears: true,
+            bio: true,
+            isPublic: true,
+            isVerified: true,
+            rejectedAt: true,
+            rejectionReason: true,
+          },
         })
       : null,
     prisma.property.count({ where: { authorId: user.id, deletedAt: null } }),
@@ -87,6 +107,39 @@ export default async function CabinetProfilePage() {
       : null,
     isAgent ? getAgencyDirectory() : [],
   ]);
+
+  // Filiallar və şəhər siyahısı yalnız agentlik profili olanda (#157).
+  const [offices, cities] = agency
+    ? await Promise.all([getAgencyOffices(agency.id), getOfficeCityOptions()])
+    : [[], []];
+  const completeness = agency
+    ? agencyCompleteness({
+        logoUrl: agency.logoUrl,
+        coverUrl: agency.coverUrl,
+        description: agency.description,
+        phone: profile.phone,
+        whatsapp: agency.whatsapp,
+        address: agency.address,
+        workingHours: agency.workingHours,
+        email: agency.email,
+        website: agency.website,
+        instagram: agency.instagram,
+        taxId: profile.companyTaxId,
+      })
+    : agent
+      ? agentCompleteness({
+          avatarUrl: profile.avatarUrl,
+          phone: profile.phone,
+          roleTitle: agent.roleTitle,
+          specialization: agent.specialization,
+          experienceYears: agent.experienceYears,
+          bio: agent.bio,
+        })
+      : null;
+  // Təsdiq mərkəzinin rəddi (#157): səbəb profil yenidən saxlanana qədər göstərilir.
+  const rejection = isAgency
+    ? agency && !agency.isVerified && agency.rejectedAt ? agency.rejectionReason : null
+    : agent && !agent.isVerified && agent.rejectedAt ? agent.rejectionReason : null;
 
   // Köhnə hesablarda ad/soyad ayrıca yazılmayıb — tək addan bölünür.
   const names = profile.firstName || profile.lastName
@@ -155,7 +208,20 @@ export default async function CabinetProfilePage() {
         )}
       </section>
 
-      <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+      {rejection != null && (
+        <section role="alert" className="flex items-start gap-3 rounded-xl border border-danger/30 bg-danger-bg p-4 sm:p-5">
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-danger" aria-hidden="true" />
+          <div className="min-w-0">
+            <h2 className="font-sans text-base font-semibold text-danger">{t(isAgency ? "rejectedAgencyTitle" : "rejectedAgentTitle")}</h2>
+            {rejection && <p className="mt-1 text-sm text-ink [overflow-wrap:anywhere]">{t("rejectedReason", { reason: rejection })}</p>}
+            <p className="mt-1 text-sm text-ink-soft">{t("rejectedHint")}</p>
+          </div>
+        </section>
+      )}
+
+      {completeness && <ProfileCompletenessCard completeness={completeness} kind={isAgency ? "agency" : "agent"} />}
+
+      <section id="profil-formu" className="scroll-mt-24 rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
         <h2 className="mb-5 font-display text-lg text-ink">{t("accountInfo")}</h2>
         <ProfileForm
           isAgency={isAgency}
@@ -175,6 +241,7 @@ export default async function CabinetProfilePage() {
             agencyWhatsapp: agency?.whatsapp ?? "",
             agencyInstagram: agency?.instagram ?? "",
             agencyHours: agency?.workingHours ?? "",
+            agencyCoverUrl: agency?.coverUrl ?? null,
             agentRoleTitle: agent?.roleTitle ?? "",
             agentSpecialization: agent?.specialization ?? "",
             agentExperience: agent?.experienceYears != null ? String(agent.experienceYears) : "",
@@ -182,6 +249,24 @@ export default async function CabinetProfilePage() {
           }}
         />
       </section>
+
+      {agency && (
+        <section id="filiallar" className="scroll-mt-24 rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+          <h2 className="font-display text-lg text-ink">{t("officesSection")}</h2>
+          <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">{t("officesSectionDescription")}</p>
+          <OfficeManager
+            offices={offices.map((office) => ({
+              id: office.id,
+              name: office.name,
+              address: office.address,
+              phone: office.phone,
+              workingHours: office.workingHours,
+              cityName: office.city?.name ?? null,
+            }))}
+            cities={cities}
+          />
+        </section>
+      )}
 
       {isAgent && (
         <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
