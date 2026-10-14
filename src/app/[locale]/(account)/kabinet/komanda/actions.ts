@@ -8,6 +8,7 @@ import {
   ACCOUNT_TYPES,
   AGENCY_EMPLOYEE_SOURCES,
   AGENCY_EMPLOYEE_STATUSES,
+  LISTING_HANDOVER,
   MAX_AGENCY_EMPLOYEES,
   type Locale,
 } from "@/lib/constants";
@@ -24,7 +25,8 @@ import {
   linkAgentProfileToAgency,
   occupiedAgencySeats,
 } from "@/lib/accounts/agency-membership";
-import { noticeAgencyDecision } from "@/lib/accounts/account-notices";
+import { noticeAgencyDecision, noticeListingsHandedOver } from "@/lib/accounts/account-notices";
+import { handOverListings, isListingHandover, resolveHandoverTarget } from "@/lib/accounts/agency-listings";
 import { generateInviteToken } from "@/lib/accounts/agency-invite";
 
 /**
@@ -137,7 +139,15 @@ export async function inviteAgencyEmployee(_prev: ActionState, formData: FormDat
   }
 }
 
-export async function removeAgencyEmployee(id: string): Promise<ActionState> {
+/**
+ * Əməkdaşı komandadan çıxarır (#159): sahib onun elanlarının taleyini seçir — agentdə
+ * qalır (`KEEP`), agentliyə (`AGENCY`) və ya başqa təsdiqlənmiş agentə (`AGENT`) keçir.
+ */
+export async function removeAgencyEmployee(
+  id: string,
+  handover: string = LISTING_HANDOVER.KEEP,
+  targetUserId: string | null = null,
+): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account");
   const messages = {
@@ -157,21 +167,48 @@ export async function removeAgencyEmployee(id: string): Promise<ActionState> {
   try {
     const employee = await prisma.agencyEmployee.findUnique({
       where: { id },
-      select: { id: true, agencyId: true, userId: true },
+      select: { id: true, agencyId: true, userId: true, status: true, user: { select: { name: true } } },
     });
     if (!employee || employee.agencyId !== owner.agency.id) {
       return failure(t("actions.employeeNotFound"));
     }
+    if (!isListingHandover(handover)) return failure(t("actions.invalidForm"));
+
+    // Təhvil yalnız təsdiqlənmiş üzvün elanlarına aiddir — gözləyən dəvətin elanları agentlikdə sayılmırdı.
+    const target = employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED
+      ? await resolveHandoverTarget({
+          handover,
+          agencyId: owner.agency.id,
+          ownerUserId: owner.user.id,
+          fromUserId: employee.userId,
+          targetUserId,
+        })
+      : null;
+    if (target && !target.ok) return failure(t("team.handover.invalidTarget"));
 
     await prisma.agencyEmployee.delete({ where: { id } });
     await linkAgentProfileToAgency(employee.userId, owner.agency.id, false);
+    const handedOver = target?.ok ? await handOverListings(employee.userId, target.userId) : 0;
     await recordDomainEvent("agency.employee_removed", "AgencyEmployee", id, {
       agencyId: owner.agency.id,
+      handover: target?.ok ? handover : LISTING_HANDOVER.KEEP,
+      handedOver,
     });
+    if (target?.ok && handedOver > 0 && target.userId !== owner.user.id) {
+      await noticeListingsHandedOver({
+        userId: target.userId,
+        employeeId: id,
+        handedAt: new Date(),
+        count: handedOver,
+        fromName: employee.user.name,
+        agencyName: owner.agency.name,
+      });
+    }
 
     revalidatePublicContent("agency", owner.agency.slug);
     revalidatePath(localizePath("/kabinet/komanda", locale));
-    return success(t("actions.employeeRemoved"));
+    revalidatePath(localizePath("/kabinet/elanlar", locale));
+    return success(handedOver > 0 ? t("team.handover.done", { count: handedOver }) : t("actions.employeeRemoved"));
   } catch (error) {
     return unexpected("əməkdaş çıxarılmadı", error, t("actions.unexpected"));
   }

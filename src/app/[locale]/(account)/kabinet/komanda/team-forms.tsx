@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertCircle, Check, CheckCircle2, Copy, Link2, Link2Off, RefreshCw, UserX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/field";
+import { Input, Select } from "@/components/ui/field";
+import { Modal } from "@/components/ui/modal";
+import { useToast } from "@/components/ui/toast";
 import { ConfirmAction } from "@/components/admin/confirm-action";
+import { LISTING_HANDOVER, type ListingHandover } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
 import {
   approveAgencyRequest,
@@ -64,20 +68,140 @@ export function InviteEmployeeForm({ disabled }: { disabled: boolean }) {
   );
 }
 
-export function RemoveEmployeeButton({ id, name }: { id: string; name: string }) {
+/**
+ * Əməkdaşı çıxarmaq (#159): elanı varsa sahib onların taleyini seçir — agentdə qalır,
+ * agentliyə və ya başqa agentə keçir. Elanı yoxdursa adi təsdiq dialoqu.
+ */
+export function RemoveEmployeeButton({
+  id,
+  name,
+  listingCount = 0,
+  teammates = [],
+}: {
+  id: string;
+  name: string;
+  listingCount?: number;
+  teammates?: { userId: string; name: string }[];
+}) {
   const t = useTranslations("account.team");
+  const { toast } = useToast();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [handover, setHandover] = useState<ListingHandover>(LISTING_HANDOVER.AGENCY);
+  const [target, setTarget] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  if (listingCount === 0) {
+    return (
+      <ConfirmAction
+        action={(employeeId) => removeAgencyEmployee(employeeId)}
+        id={id}
+        label={t("removeLabel", { name })}
+        title={t("removeTitle")}
+        description={t("removeDescription", { name })}
+        confirmLabel={t("remove")}
+        tone="danger"
+      >
+        <UserX className="size-4" aria-hidden="true" />
+      </ConfirmAction>
+    );
+  }
+
+  const options: { value: ListingHandover; label: string; hint: string }[] = [
+    { value: LISTING_HANDOVER.AGENCY, label: t("handover.agency"), hint: t("handover.agencyHint") },
+    ...(teammates.length > 0 ? [{ value: LISTING_HANDOVER.AGENT, label: t("handover.agent"), hint: t("handover.agentHint") }] : []),
+    { value: LISTING_HANDOVER.KEEP, label: t("handover.keep"), hint: t("handover.keepHint", { name }) },
+  ];
+
+  function submit() {
+    if (handover === LISTING_HANDOVER.AGENT && !target) {
+      setError(t("handover.chooseAgent"));
+      return;
+    }
+    startTransition(async () => {
+      const result = await removeAgencyEmployee(id, handover, handover === LISTING_HANDOVER.AGENT ? target : null);
+      if (result.status !== "success") {
+        setError(result.message ?? t("handover.failed"));
+        return;
+      }
+      if (result.message) toast(result.message, "success");
+      setOpen(false);
+      router.refresh();
+    });
+  }
+
   return (
-    <ConfirmAction
-      action={removeAgencyEmployee}
-      id={id}
-      label={t("removeLabel", { name })}
-      title={t("removeTitle")}
-      description={t("removeDescription", { name })}
-      confirmLabel={t("remove")}
-      tone="danger"
-    >
-      <UserX className="size-4" aria-hidden="true" />
-    </ConfirmAction>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={t("removeLabel", { name })}
+        title={t("removeLabel", { name })}
+        className="grid size-11 cursor-pointer place-items-center rounded-xs text-ink-muted transition-colors hover:bg-danger-bg hover:text-danger"
+      >
+        <UserX className="size-4" aria-hidden="true" />
+      </button>
+      <Modal
+        open={open}
+        onClose={() => (pending ? undefined : setOpen(false))}
+        title={t("removeTitle")}
+        description={t("handover.description", { name, count: listingCount })}
+        size="sm"
+        footer={
+          <>
+            <Button variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={pending}>
+              {t("handover.cancel")}
+            </Button>
+            <Button variant="danger" size="sm" onClick={submit} loading={pending}>
+              {t("remove")}
+            </Button>
+          </>
+        }
+      >
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 text-sm font-medium text-ink">{t("handover.question", { count: listingCount })}</legend>
+          {options.map((option) => (
+            <label
+              key={option.value}
+              className={cn(
+                "flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors",
+                handover === option.value ? "border-gold bg-gold/10" : "border-line hover:border-gold",
+              )}
+            >
+              <input
+                type="radio"
+                name={`handover-${id}`}
+                value={option.value}
+                checked={handover === option.value}
+                onChange={() => {
+                  setHandover(option.value);
+                  setError(null);
+                }}
+                className="mt-0.5 size-4 accent-gold"
+              />
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-ink">{option.label}</span>
+                <span className="block text-xs text-ink-muted">{option.hint}</span>
+              </span>
+            </label>
+          ))}
+          {handover === LISTING_HANDOVER.AGENT && (
+            <Select
+              label={t("handover.agentSelect")}
+              placeholder={t("handover.chooseAgent")}
+              options={teammates.map((teammate) => ({ value: teammate.userId, label: teammate.name }))}
+              value={target}
+              onChange={(event) => {
+                setTarget(event.target.value);
+                setError(null);
+              }}
+            />
+          )}
+          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+        </fieldset>
+      </Modal>
+    </>
   );
 }
 

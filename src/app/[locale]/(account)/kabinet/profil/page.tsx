@@ -281,6 +281,7 @@ export default async function CabinetProfilePage() {
                 }
               : null}
             agencies={agencyDirectory}
+            listingCount={listingCount}
           />
         </section>
       )}
