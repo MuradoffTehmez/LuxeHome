@@ -37,7 +37,8 @@
     "premium": "Premium",
     "premiumUntil": "Premium · until {date}",
     "promote": "Promote",
-    "promoteLabel": "Promote “{title}”"
+    "promoteLabel": "Promote “{title}”",
+    "heldForReview": "The listing was flagged by automatic checks and will be published after a moderator approves it. This usually takes a few hours."
   },
   "newProperty": {
     "metaTitle": "Submit a listing",
@@ -238,6 +239,28 @@
       "create": "Create an invite link",
       "created": "A new invite link was created. The old link no longer works.",
       "disabled": "The invite link was disabled."
+    },
+    "listingCount": "{count, plural, one {# listing} other {# listings}}",
+    "handover": {
+      "done": "The employee was removed and {count, plural, one {# listing was} other {# listings were}} handed over.",
+      "invalidTarget": "The selected agent is not on the team. Refresh the list and choose again.",
+      "leftHanded": "You left the agency and {count, plural, one {# listing was} other {# listings were}} handed over to it.",
+      "description": "{name} has {count, plural, one {# listing} other {# listings}}. Choose what happens to them before removing.",
+      "question": "Who should keep {count, plural, one {the listing} other {the # listings}}?",
+      "agency": "Hand over to the agency",
+      "agencyHint": "Listings and their enquiries move to the agency account.",
+      "agent": "Hand over to another agent",
+      "agentHint": "Listings move to the agent you choose, who gets a notification.",
+      "keep": "Agent keeps them",
+      "keepHint": "Listings stay on {name}'s personal account and leave the agency profile.",
+      "agentSelect": "Agent",
+      "chooseAgent": "Choose an agent",
+      "cancel": "Cancel",
+      "failed": "Something went wrong. Please try again.",
+      "keepOwn": "Keep the listings",
+      "keepOwnHint": "Listings stay on your personal account and are no longer shown on the agency profile.",
+      "giveAgency": "Hand over to {name}",
+      "giveAgencyHint": "Listings and their enquiries stay with the agency."
     }
   },
   "actions": {

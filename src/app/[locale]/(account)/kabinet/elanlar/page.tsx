@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CabinetPropertiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ yeni?: string }>;
+  searchParams: Promise<{ yeni?: string; yoxlama?: string }>;
 }) {
   const locale = await getLocale() as Locale;
   const user = await requireLister(locale);
@@ -217,9 +217,16 @@ export default async function CabinetPropertiesPage({
         />
 
         {params.yeni === "1" && (
-          <p role="status" className="mt-6 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success">
-            {t("submitted")}
-          </p>
+          params.yoxlama === "1" ? (
+            // Avtomatik moderasiya elanı saxladı (#159) — səbəb açıqlanmır, moderator baxır.
+            <p role="status" className="mt-6 rounded-xs border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
+              {t("heldForReview")}
+            </p>
+          ) : (
+            <p role="status" className="mt-6 rounded-xs border border-success/30 bg-success-bg px-4 py-3 text-sm text-success">
+              {t("submitted")}
+            </p>
+          )
         )}
 
         <div className="mt-8">

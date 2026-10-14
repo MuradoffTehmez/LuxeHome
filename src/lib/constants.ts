@@ -289,6 +289,96 @@ export const PUBLIC_PROPERTY_STATUSES: PropertyStatus[] = [
   PROPERTY_STATUSES.RENTED,
 ];
 
+/**
+ * Aktiv təklif (#159): agentlik «təklif» və agent «elan» sayına yalnız bunlar düşür.
+ * Satılmış/icarəyə verilmiş elan ictimai qalır, amma «Uğurlu sövdələşmələr»də sayılır.
+ */
+export const ACTIVE_OFFER_STATUSES: PropertyStatus[] = [PROPERTY_STATUSES.PUBLISHED, PROPERTY_STATUSES.RESERVED];
+
+/** Bağlanmış sövdələşmə — satılıb və ya icarəyə verilib (#159). */
+export const CLOSED_DEAL_STATUSES: PropertyStatus[] = [PROPERTY_STATUSES.SOLD, PROPERTY_STATUSES.RENTED];
+
+/** Profildəki «Son 12 ayda» sövdələşmə statistikasının pəncərəsi (gün). */
+export const DEAL_STATS_WINDOW_DAYS = 365;
+
+/**
+ * Avtomatik moderasiya hədləri (#159, `lib/moderation/listing-risk.ts`): `review` və yuxarı —
+ * növbədə xəbərdarlıq nişanı; `hold` və yuxarı — təsdiqlənmiş agentliyin elanı belə avtomatik
+ * dərc olunmur, moderatora düşür.
+ */
+export const LISTING_RISK_THRESHOLDS = { review: 30, hold: 50 } as const;
+
+// ---------------------------------------------------------------------------
+// ELAN ŞİKAYƏTİ (#159)
+// ---------------------------------------------------------------------------
+
+export const REPORT_REASONS = {
+  FAKE: "FAKE",
+  SOLD: "SOLD",
+  WRONG_PRICE: "WRONG_PRICE",
+  WRONG_INFO: "WRONG_INFO",
+  FRAUD: "FRAUD",
+  NOT_OWNER: "NOT_OWNER",
+  DUPLICATE: "DUPLICATE",
+  OTHER: "OTHER",
+} as const;
+
+export type ReportReason = (typeof REPORT_REASONS)[keyof typeof REPORT_REASONS];
+
+export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
+  FAKE: "Saxta və ya mövcud olmayan elan",
+  SOLD: "Artıq satılıb və ya kirayəyə verilib",
+  WRONG_PRICE: "Qiymət yanlışdır",
+  WRONG_INFO: "Ünvan, foto və ya məlumat yanlışdır",
+  FRAUD: "Beh/avans tələb edir, fırıldaq şübhəsi",
+  NOT_OWNER: "Vasitəçi özünü mülkiyyətçi kimi təqdim edir",
+  DUPLICATE: "Eyni elan təkrar yerləşdirilib",
+  OTHER: "Digər",
+};
+
+export function isReportReason(value: unknown): value is ReportReason {
+  return typeof value === "string" && (Object.values(REPORT_REASONS) as string[]).includes(value);
+}
+
+export const REPORT_STATUSES = {
+  OPEN: "OPEN",
+  RESOLVED: "RESOLVED",
+  DISMISSED: "DISMISSED",
+} as const;
+
+export type ReportStatus = (typeof REPORT_STATUSES)[keyof typeof REPORT_STATUSES];
+
+export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
+  OPEN: "Açıq",
+  RESOLVED: "Həll edildi",
+  DISMISSED: "Əsassız",
+};
+
+/** Admin qərarı: elan dayandırıldı, satılmış/icarəyə verilmiş kimi bağlandı, dəyişiklik yoxdur. */
+export const REPORT_RESOLUTIONS = {
+  ARCHIVED: "ARCHIVED",
+  MARKED_CLOSED: "MARKED_CLOSED",
+  NO_ACTION: "NO_ACTION",
+} as const;
+
+export const REPORT_MESSAGE_MAX = 1000;
+
+/** Bu sayda açıq şikayəti olan elan növbədə «təcili» nişanı alır. */
+export const REPORT_URGENT_THRESHOLD = 3;
+
+/**
+ * Agent komandadan çıxanda onun elanlarının taleyi (#159): agentdə qalır, agentlik
+ * sahibinə və ya başqa təsdiqlənmiş agentə təhvil verilir. Müraciətlər elana bağlıdır,
+ * ona görə elanla birlikdə keçir.
+ */
+export const LISTING_HANDOVER = {
+  KEEP: "KEEP",
+  AGENCY: "AGENCY",
+  AGENT: "AGENT",
+} as const;
+
+export type ListingHandover = (typeof LISTING_HANDOVER)[keyof typeof LISTING_HANDOVER];
+
 export const RENOVATIONS = {
   NEW_BUILDING: "NEW_BUILDING",
   DESIGNER: "DESIGNER",
@@ -509,6 +599,8 @@ export const NOTIFICATION_TYPES = {
   LISTING_LEAD: "LISTING_LEAD",
   /** Agentlik/agent profilinin təsdiqi və ya rədd səbəbi (#157). */
   ACCOUNT_REVIEW: "ACCOUNT_REVIEW",
+  /** Elan şikayət əsasında dayandırıldı (#159). */
+  LISTING_REPORT: "LISTING_REPORT",
 } as const;
 
 export type NotificationType =
@@ -525,6 +617,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   AGENCY_TEAM: "Agentlik komandası",
   LISTING_LEAD: "Elana müraciət",
   ACCOUNT_REVIEW: "Profil təsdiqi",
+  LISTING_REPORT: "Elan şikayəti",
 };
 
 // ---------------------------------------------------------------------------

@@ -683,6 +683,38 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   limit (`checkDataExportLimit`). `scripts/__tests__/data-export-source.test.ts` gizli sahə adlarını yoxlayır.
 - **Loqo lövhəsində padding yazma:** kvadrat loqo (fonu rəngli) lövhəni tam doldurmalıdır — `object-contain` padding-siz.
 
+### Şikayət, avtomatik moderasiya, elan təhvili və bağlanmış sövdələşmələr (#159)
+
+- **Elan şikayəti** (`lib/listing-reports.ts`, `ListingReport`): ictimai elanın detalında «Elandan şikayət et»
+  (səbəb `REPORT_REASONS`, «Digər»də izah məcburi). Same-origin + honeypot + `checkReportLimit` (IP) + Turnstile;
+  xam IP saxlanmır — `reporterKey` = `AUTH_SECRET` ilə duzlanmış IP + elan heşi, yalnız 24 saatlıq təkrarı süzür.
+  Admin növbəsi `/admin/sikayetler` şikayətləri elan üzrə qruplaşdırır (`REPORT_URGENT_THRESHOLD` = təcili):
+  elanı səbəblə dayandır (arxiv + sahibə bildiriş), satılıb/icarəyə verilib kimi bağla, həll edildi, əsassız.
+  Elanı dəyişən qərar əvvəl açıq şikayətləri şərti `updateMany` ilə **götürür**; heç nə götürməyən (gecikmiş,
+  eyni anda gələn) sorğu elana toxunmur, elan yazılmasa götürülən şikayətlər yenidən açılır.
+  Hər qərar audit + `noticeListingReportDecision()`; sayğac menyuda `openReports`.
+- **Avtomatik risk siqnalları** (`lib/moderation/risk-signals.ts` saf, `listing-risk.ts` D1): bazardan
+  ≥35% ucuz qiymət, mətndə telefon/e-poçt/link, başqa müəllifin elanındakı eyni foto (`Media.checksum`),
+  köçürülmüş mətn, 3 gündən təzə hesab, açıq şikayət. Bal `Property.riskScore` (0–100) + `riskFlags` (JSON).
+  Kabinetdən yaradılan/redaktə edilən elan `hold` həddində (≥50) dərc olunmur, `PENDING`-ə düşür; şirkət
+  (STAFF) elanı yoxlanmır. `refreshListingRisk()` heç vaxt atmır — siqnal xətası elan yazmasını sındırmamalıdır,
+  amma nəticəsi bilinməyən yoxlama `hold` sayılır (keçici D1 xətası moderasiyanı yan keçməsin).
+  Moderasiya növbəsi riskli elanları rozetlə göstərir.
+- **Elan təhvili** (`lib/accounts/agency-listings.ts`): sahib əməkdaşı çıxaranda elanları (silinməmiş, bütün
+  statuslar) agentliyə, başqa təsdiqlənmiş agentə və ya agentdə saxlamağı seçir (təhvil üzvlük silinməzdən
+  **əvvəl** gedir — alınmasa üzvlük qalır və təkrar cəhd mümkündür); agent özü çıxanda yalnız
+  «məndə qalsın» və «agentliyə ver» var. Hədəf `resolveHandoverTarget()` ilə yoxlanır — kənar id qəbul olunmur.
+  Müraciət, şəkil, paket elana bağlıdır, elanla keçir.
+- **Bağlanmış sövdələşmələr:** «təklif»/«elan» sayı yalnız `ACTIVE_OFFER_STATUSES` (PUBLISHED + RESERVED) —
+  `activeOfferWhere()`. Satılmış/icarəyə verilmiş elan «Uğurlu sövdələşmələr» bölməsindədir (`getClosedDeals`,
+  son `DEAL_STATS_WINDOW_DAYS` gün, **yalnız `closedAt`** — `updatedAt` baxış sayğacı ilə də dəyişir; köhnə
+  qeydlər `0058`-də bir dəfə doldurulub). Agentin admin tərəfindən yazılan
+  `soldCount`/`rentedCount` ayrıca ömürlük göstəricidir və toxunulmur.
+- **Təhlükəsizlik məsləhətləri** (`components/site/safety-tips.tsx`): ictimai hesabın elanında və agentlik
+  profilində; Bilik Mərkəzinin saxta elan bələdçisinə keçid (`SCAM_GUIDE_PATH`).
+- next-intl tipli açarlarında namespace birliyi çox böyükdür: `getTranslations("property.safety")` kimi yeni
+  dərin namespace tip xətası verə bilər — üst namespace + nöqtəli açar (`t("safety.title")`) işlət.
+
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai

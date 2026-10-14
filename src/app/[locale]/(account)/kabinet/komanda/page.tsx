@@ -11,6 +11,7 @@ import { forbidden } from "next/navigation";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { formatLocalizedDateTime } from "@/i18n/date";
+import { countOwnListings } from "@/lib/accounts/agency-listings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -35,6 +36,9 @@ export default async function CabinetTeamPage() {
   // Yer tutanlar: təsdiqlənmişlər və gözləyən dəvətlər (`occupiedAgencySeats` ilə eyni qayda).
   const occupiedSeats = employees.filter((employee) => employee.status !== AGENCY_EMPLOYEE_STATUSES.REJECTED).length;
   const t = await getTranslations("account.team");
+  // Çıxarılan agentin elanlarının taleyi üçün (#159): elan sayı və təhvil ala biləcək həmkarlar.
+  const approved = employees.filter((employee) => employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED);
+  const listingCounts = await countOwnListings(approved.map((employee) => employee.user.id));
 
   return (
     <div className="flex flex-col gap-8">
@@ -102,9 +106,17 @@ export default async function CabinetTeamPage() {
                       <p className="truncate text-sm font-medium text-ink">{employee.user.name}</p>
                       <p className="truncate text-xs text-ink-muted">
                         {employee.user.email} · {t(`status.${employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "approved" : employee.status === AGENCY_EMPLOYEE_STATUSES.REJECTED ? "rejected" : "pending"}`)}
+                        {employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED && ` · ${t("listingCount", { count: listingCounts.get(employee.user.id) ?? 0 })}`}
                       </p>
                     </div>
-                    <RemoveEmployeeButton id={employee.id} name={employee.user.name} />
+                    <RemoveEmployeeButton
+                      id={employee.id}
+                      name={employee.user.name}
+                      listingCount={employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED ? listingCounts.get(employee.user.id) ?? 0 : 0}
+                      teammates={approved
+                        .filter((teammate) => teammate.id !== employee.id)
+                        .map((teammate) => ({ userId: teammate.user.id, name: teammate.user.name }))}
+                    />
                   </li>
                 ))}
               </ul>

@@ -61,6 +61,23 @@ Sahib/agentlik elanı 60 gün yaşayır, 7 gün qalmış sahibinə xatırlatma g
 
 `PENDING` elanlar burada təsdiqlənir və ya rədd edilir. Təsdiqlənmiş agentliyin elanı moderasiyadan keçmədən dərc olunur.
 
+Hər elanın yanında avtomatik **risk balı** (0–100) və siqnallar görünür: bazardan çox ucuz qiymət, mətndə
+telefon/e-poçt/link, başqa elanda eyni foto, köçürülmüş mətn, yeni hesab, açıq şikayət. Balı 50 və yuxarı olan
+sahib/agentlik elanı dərc olunmur, növbəyə düşür; riskli elanları əvvəlcə yoxlayın.
+
+### Şikayətlər (`/admin/sikayetler`)
+
+Ziyarətçilərin elan şikayətləri elan üzrə qruplaşdırılır (3+ şikayət «Təcili»). Tablar: Açıq / Həll edilmiş / Əsassız.
+
+| Əməliyyat | Nəticə |
+|---|---|
+| Elanı dayandır | Elan arxivə keçir, sahibə səbəb (hazır şablon və ya öz mətniniz) bildiriş + e-poçt ilə gedir |
+| Satılıb / İcarəyə verilib | Elan bağlanır, sahibə bildirilir |
+| Həll edildi | Elan dəyişmir, şikayətlər bağlanır |
+| Əsassızdır | Şikayətlər əsassız sayılır |
+
+Hər qərar audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
+
 ### CSV idxalı (`/admin/emlaklar/idxal`)
 
 | Sütun | Məcburi |

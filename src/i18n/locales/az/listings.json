@@ -244,5 +244,9 @@
     "agents": "{count, plural, other {# agent}}",
     "noResults": "«{query}» adlı agentlik tapılmadı",
     "viewProfile": "Profilə bax"
+  },
+  "deals": {
+    "title": "Uğurlu sövdələşmələr",
+    "summary": "Son 12 ayda {sold} satış, {rented} icarə"
   }
 }

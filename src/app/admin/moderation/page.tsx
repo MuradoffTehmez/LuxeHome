@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { EmptyState } from "@/components/ui/states";
 import { formatDateTime, formatPrice } from "@/lib/utils";
-import { ACCOUNT_TYPE_LABELS, LISTING_TYPE_LABELS, PERMISSIONS } from "@/lib/constants";
+import { ACCOUNT_TYPE_LABELS, LISTING_TYPE_LABELS, PERMISSIONS, REPORT_URGENT_THRESHOLD } from "@/lib/constants";
+import { parseRiskFlags, riskLevel, type RiskFlag } from "@/lib/moderation/risk-signals";
+import { AlertTriangle, Flag, ShieldAlert } from "lucide-react";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getModerationQueue } from "@/lib/queries";
 import { ApprovePropertyButton, RejectPropertyButton } from "./moderation-forms";
@@ -21,6 +23,19 @@ export default async function AdminModerationPage() {
   const t = await getAdminT();
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
   const queue = await getModerationQueue();
+  // Avtomatik moderasiya (#159): siqnal mətni panel dilində, dəyər (faiz, say) ilə.
+  const flagLabel = (flag: RiskFlag) => {
+    const value = Math.abs(flag.value ?? 0);
+    switch (flag.code) {
+      case "LOW_PRICE": return t("pages.moderation.risk.lowPrice", { value });
+      case "CONTACT_IN_TEXT": return t("pages.moderation.risk.contactInText");
+      case "DUPLICATE_PHOTOS": return t("pages.moderation.risk.duplicatePhotos", { value });
+      case "DUPLICATE_TEXT": return t("pages.moderation.risk.duplicateText");
+      case "NEW_ACCOUNT": return t("pages.moderation.risk.newAccount");
+      case "OPEN_REPORTS": return t("pages.moderation.risk.openReports", { value });
+    }
+  };
+  const risky = queue.filter((property) => riskLevel(property.riskScore) !== "none").length;
 
   return (
     <>
@@ -33,10 +48,20 @@ export default async function AdminModerationPage() {
       {queue.length === 0 ? (
         <EmptyState title={t("pages.moderation.novbeBosdur")} description={t("pages.moderation.tesdiqGozleyenElanYoxdur")} />
       ) : (
+        <>
+        {risky > 0 && (
+          <p role="status" className="mb-4 flex items-start gap-2.5 rounded-md border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-ink">
+            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
+            {t("pages.moderation.risk.summary", { count: risky })}
+          </p>
+        )}
         <AdminCard bodyClassName="p-0">
           <ul className="divide-y divide-line">
             {queue.map((property) => {
-              const image = property.images[0];
+              const image = property.cover;
+              const level = riskLevel(property.riskScore);
+              const flags = parseRiskFlags(property.riskFlags);
+              const reports = property._count.reports;
               return (
                 <li
                   key={property.id}
@@ -71,6 +96,27 @@ export default async function AdminModerationPage() {
                         {" · "}
                         {formatDateTime(property.createdAt)}
                       </p>
+                      {(level !== "none" || reports > 0) && (
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                          {level !== "none" && (
+                            <Badge tone={level === "hold" ? "danger" : "warning"} className="gap-1">
+                              <AlertTriangle className="size-3" aria-hidden="true" />
+                              {t("pages.moderation.risk.score", { score: property.riskScore })}
+                            </Badge>
+                          )}
+                          {flags.filter((flag) => flag.code !== "OPEN_REPORTS").map((flag) => (
+                            <Badge key={flag.code} tone="neutral">{flagLabel(flag)}</Badge>
+                          ))}
+                          {reports > 0 && (
+                            <Link href="/admin/sikayetler" className="inline-flex">
+                              <Badge tone={reports >= REPORT_URGENT_THRESHOLD ? "danger" : "warning"} className="gap-1">
+                                <Flag className="size-3" aria-hidden="true" />
+                                {t("pages.moderation.risk.openReports", { value: reports })}
+                              </Badge>
+                            </Link>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -83,6 +129,7 @@ export default async function AdminModerationPage() {
             })}
           </ul>
         </AdminCard>
+        </>
       )}
     </>
   );

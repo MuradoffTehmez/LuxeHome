@@ -4,7 +4,16 @@ import { demoWhere } from "@/lib/demo-content";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { getAgencyOffices } from "@/lib/accounts/agency-offices";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
-import { AGENCY_EMPLOYEE_STATUSES, LISTING_TYPES, PUBLIC_PROPERTY_STATUSES, REVIEW_STATUSES, type SortOption } from "@/lib/constants";
+import {
+  ACTIVE_OFFER_STATUSES,
+  AGENCY_EMPLOYEE_STATUSES,
+  CLOSED_DEAL_STATUSES,
+  DEAL_STATS_WINDOW_DAYS,
+  LISTING_TYPES,
+  PUBLIC_PROPERTY_STATUSES,
+  REVIEW_STATUSES,
+  type SortOption,
+} from "@/lib/constants";
 
 /**
  * Agentlik və agentin ictimai statistikası və agentlik profil səhifəsi.
@@ -17,6 +26,9 @@ import { AGENCY_EMPLOYEE_STATUSES, LISTING_TYPES, PUBLIC_PROPERTY_STATUSES, REVI
  * - **Agentin elanı** = agentin öz yerləşdirdiyi (`authorId = userId`) + ona təyin
  *   edilmiş (`assignedAgentId`) elanlar, təkrarsız. Əvvəl yalnız təyin edilmişlər
  *   sayılırdı — agentin öz elanları nə kartda, nə profil səhifəsində görünürdü.
+ * - **Yalnız aktiv elan** (#159, `ACTIVE_OFFER_STATUSES`): satılmış/icarəyə verilmiş elan
+ *   ictimai qalır, amma «təklif» deyil — o, «Uğurlu sövdələşmələr»də sayılır
+ *   (`getClosedDeals`, son `DEAL_STATS_WINDOW_DAYS` gün).
  */
 
 /** Profil səhifəsində bir səhifədə göstərilən təklif sayı. */
@@ -30,6 +42,40 @@ const SERVICE_AREA_LIMIT = 8;
 const RESERVED_PARAMS = PUBLIC_PROPERTY_STATUSES.length + 4;
 
 export type OfferStats = { total: number; sale: number; rent: number };
+
+/** Aktiv təklif şərti — ictimai elan, amma satılmış/icarəyə verilmiş deyil. */
+export async function activeOfferWhere(): Promise<Prisma.PropertyWhereInput> {
+  return { ...(await publicPropertyWhere()), status: { in: ACTIVE_OFFER_STATUSES } };
+}
+
+export type DealStats = { total: number; sold: number; rented: number };
+
+/**
+ * Son 12 ayın bağlanmış sövdələşmələri (#159, Zillow «Past sales»): statistika + son
+ * kartlar. Tarix yalnız `closedAt`-dır — `updatedAt` baxış sayğacı ilə də dəyişir və köhnə
+ * satışı «son 12 ay»a salardı. Köhnə qeydlər `migrations/0058`-də bir dəfə doldurulub.
+ */
+export async function getClosedDeals(scope: Prisma.PropertyWhereInput, take = 6) {
+  const since = new Date(Date.now() - DEAL_STATS_WINDOW_DAYS * 86_400_000);
+  const where: Prisma.PropertyWhereInput = {
+    ...(await publicPropertyWhere()),
+    status: { in: CLOSED_DEAL_STATUSES },
+    AND: [scope, { closedAt: { gte: since } }],
+  };
+  const [groups, recent] = await Promise.all([
+    prisma.property.groupBy({ by: ["listingType"], where, _count: { _all: true } }),
+    take > 0
+      ? prisma.property.findMany({ where, select: propertyCardSelect, orderBy: [{ closedAt: "desc" }, { id: "asc" }], take })
+      : Promise.resolve([]),
+  ]);
+  const stats: DealStats = { total: 0, sold: 0, rented: 0 };
+  for (const row of groups) {
+    stats.total += row._count._all;
+    if (row.listingType === LISTING_TYPES.SALE) stats.sold += row._count._all;
+    if (row.listingType === LISTING_TYPES.RENT) stats.rented += row._count._all;
+  }
+  return { stats, recent };
+}
 
 const EMPTY_STATS: OfferStats = { total: 0, sale: 0, rent: 0 };
 
@@ -52,7 +98,7 @@ export async function countAgencyOffers(agencies: { id: string; userId: string }
   const members = await agencyMemberIds(agencies);
   const owner = new Map<string, string>();
   for (const [agencyId, userIds] of members) for (const userId of userIds) owner.set(userId, agencyId);
-  const where = await publicPropertyWhere();
+  const where = await activeOfferWhere();
   const rows = await findManyInChunks([...owner.keys()], RESERVED_PARAMS, (ids) =>
     prisma.property.groupBy({
       by: ["authorId", "listingType"],
@@ -83,7 +129,7 @@ export function agentListingWhere(agent: { id: string; userId: string | null }):
 export async function countAgentListings(agents: { id: string; userId: string | null }[]): Promise<Map<string, number>> {
   const counts = new Map(agents.map((agent) => [agent.id, 0]));
   if (agents.length === 0) return counts;
-  const where = await publicPropertyWhere();
+  const where = await activeOfferWhere();
   // Hər agent iki parametr (id + userId) gətirir — 40-lıq hissə limitdən aşağı qalır.
   const chunks: { id: string; userId: string | null }[][] = [];
   for (let index = 0; index < agents.length; index += 40) chunks.push(agents.slice(index, index + 40));
@@ -195,7 +241,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
   if (!agency) return null;
 
   const members = (await agencyMemberIds([agency])).get(agency.id) ?? [agency.userId];
-  const base: Prisma.PropertyWhereInput = { ...(await publicPropertyWhere()), authorId: { in: members } };
+  const base: Prisma.PropertyWhereInput = { ...(await activeOfferWhere()), authorId: { in: members } };
   const listingType = filters.listingType === LISTING_TYPES.SALE || filters.listingType === LISTING_TYPES.RENT
     ? filters.listingType
     : undefined;
@@ -206,7 +252,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
   };
   const page = Math.max(1, filters.page ?? 1);
 
-  const [properties, filteredCount, byListingType, byType, byDistrict, agents, offices] = await Promise.all([
+  const [properties, filteredCount, byListingType, byType, byDistrict, agents, offices, deals] = await Promise.all([
     prisma.property.findMany({
       where,
       select: propertyCardSelect,
@@ -233,6 +279,8 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
     }),
     // Filiallar (#157) — nömrə səhifədə maskalanır, tam dəyər `elaqe?ofis=` ilə açılır.
     getAgencyOffices(agency.id),
+    // Uğurlu sövdələşmələr (#159) — sahib + təsdiqlənmiş agentlərin son 12 ayı.
+    getClosedDeals({ authorId: { in: members } }),
   ]);
 
   const stats: OfferStats = { ...EMPTY_STATS };
@@ -279,5 +327,6 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
       _count: { properties: agentCounts.get(agent.id) ?? 0 },
     })),
     offices,
+    deals,
   };
 }

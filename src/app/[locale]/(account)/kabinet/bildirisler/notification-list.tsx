@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Bookmark, CalendarClock, CheckCheck, MessageSquare, ShieldCheck, Sparkles, Trash2, TrendingDown, Users } from "lucide-react";
+import { Bookmark, CalendarClock, CheckCheck, Flag, MessageSquare, ShieldCheck, Sparkles, Trash2, TrendingDown, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Locale, NotificationType } from "@/lib/constants";
@@ -32,6 +32,7 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
   AGENCY_TEAM: Users,
   LISTING_LEAD: MessageSquare,
   ACCOUNT_REVIEW: ShieldCheck,
+  LISTING_REPORT: Flag,
 };
 
 function NotificationRow({ item }: { item: NotificationListItem }) {

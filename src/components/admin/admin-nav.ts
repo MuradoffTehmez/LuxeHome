@@ -16,14 +16,18 @@ export type AdminNavItem = {
   /** lucide-react ikon adı — `admin-icon.tsx` içindəki icazə siyahısından seçilir. */
   icon: string;
   /** Yan paneldə göstərilən sayğac açarı. */
-  badgeKey?: "newLeads" | "draftProperties" | "pendingModeration" | "pendingApprovals";
+  badgeKey?: AdminNavBadgeKey;
   /** Böyük modulların sidebar daxilində açılan ikinci səviyyə keçidləri. */
   children?: AdminNavChild[];
 };
 
+export type AdminNavBadgeKey = "newLeads" | "draftProperties" | "pendingModeration" | "pendingApprovals" | "openReports";
+
 export type AdminNavChild = {
   labelKey: AdminNavItemKey;
   href: string;
+  /** Alt bənddə kiçik sayğac (#159) — məs. moderasiya növbəsi, açıq şikayətlər. */
+  badgeKey?: AdminNavBadgeKey;
 };
 
 export type AdminNavGroup = {
@@ -47,7 +51,8 @@ export const adminNav: AdminNavGroup[] = [
         badgeKey: "draftProperties",
         children: [
           { labelKey: "properties", href: "/admin/emlaklar" },
-          { labelKey: "moderation", href: "/admin/moderation" },
+          { labelKey: "moderation", href: "/admin/moderation", badgeKey: "pendingModeration" },
+          { labelKey: "reports", href: "/admin/sikayetler", badgeKey: "openReports" },
           { labelKey: "projects", href: "/admin/layiheler" },
           { labelKey: "taxonomy", href: "/admin/taksonomiya" },
           { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar" },

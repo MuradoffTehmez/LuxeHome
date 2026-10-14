@@ -18,6 +18,7 @@ import {
   LEAD_STATUSES,
   LOCATION_CHILD_KINDS,
   LOCATION_KINDS,
+  REPORT_STATUSES,
   REVIEW_STATUSES,
   SEO_LANDING_STATUSES,
   PUBLIC_PARTNER_STATUSES,
@@ -1121,8 +1122,13 @@ export async function getAdminDomainEvents(limit = 50) {
 }
 
 /** Panel — moderasiya növbəsi: kənar istifadəçilərin göndərdiyi təsdiq gözləyən elanlar. */
+/**
+ * Moderasiya növbəsi. Örtük şəkli ayrıca oxunur: `take`-li iç-içə əlaqə 98-dən çox
+ * gözləyən elanda D1 sorğusunu ilişdirir (#107). Risk balı və açıq şikayət sayı (#159)
+ * moderatorun diqqətini riskli elanlara yönəldir.
+ */
 export async function getModerationQueue() {
-  return prisma.property.findMany({
+  const properties = await prisma.property.findMany({
     where: { status: PROPERTY_STATUSES.PENDING, deletedAt: null },
     select: {
       id: true,
@@ -1132,13 +1138,10 @@ export async function getModerationQueue() {
       price: true,
       currency: true,
       createdAt: true,
+      riskScore: true,
+      riskFlags: true,
       type: { select: { name: true } },
       city: { select: { name: true } },
-      images: {
-        orderBy: [{ isCover: "desc" }, { order: "asc" }],
-        take: 1,
-        select: { url: true, alt: true },
-      },
       author: {
         select: {
           name: true,
@@ -1147,9 +1150,24 @@ export async function getModerationQueue() {
           agency: { select: { name: true, isVerified: true } },
         },
       },
+      _count: { select: { reports: { where: { status: REPORT_STATUSES.OPEN } } } },
     },
     orderBy: { createdAt: "asc" },
   });
+  const images = await findManyInChunks(
+    properties.map((property) => property.id),
+    0,
+    (chunk) =>
+      prisma.propertyImage.findMany({
+        where: { propertyId: { in: chunk } },
+        select: { propertyId: true, url: true, alt: true, isCover: true, order: true },
+      }),
+  );
+  const cover = new Map<string, { url: string; alt: string }>();
+  for (const image of images.sort((a, b) => Number(b.isCover) - Number(a.isCover) || a.order - b.order)) {
+    if (!cover.has(image.propertyId)) cover.set(image.propertyId, { url: image.url, alt: image.alt });
+  }
+  return properties.map((property) => ({ ...property, cover: cover.get(property.id) ?? null }));
 }
 
 /** Panel — təsdiq gözləyən agentlik əməkdaşları. */

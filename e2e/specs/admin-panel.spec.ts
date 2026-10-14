@@ -26,6 +26,10 @@ test.describe("Admin panel", () => {
     // Rədd edilənlər tabı (#157).
     "/admin/agentlikler?status=rejected",
     "/admin/agentler?status=rejected",
+    // Şikayətlər və risk siqnallı moderasiya növbəsi (#159).
+    "/admin/sikayetler",
+    "/admin/sikayetler?status=RESOLVED",
+    "/admin/moderation",
   ];
 
   for (const path of pages) {

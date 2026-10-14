@@ -37,7 +37,8 @@
     "premium": "Premium",
     "premiumUntil": "Premium · {date}-dək",
     "promote": "Premium et",
-    "promoteLabel": "«{title}» elanını premium et"
+    "promoteLabel": "«{title}» elanını premium et",
+    "heldForReview": "Elan avtomatik yoxlamaya düşdü və moderatorun təsdiqindən sonra dərc olunacaq. Bu, adətən bir neçə saat çəkir."
   },
   "newProperty": {
     "metaTitle": "Elan göndər",
@@ -238,6 +239,28 @@
       "create": "Dəvət linki yarat",
       "created": "Yeni dəvət linki yaradıldı. Köhnə link artıq işləmir.",
       "disabled": "Dəvət linki söndürüldü."
+    },
+    "listingCount": "{count} elan",
+    "handover": {
+      "done": "Əməkdaş çıxarıldı, {count} elan təhvil verildi.",
+      "invalidTarget": "Seçilmiş agent komandada deyil. Siyahını yeniləyib yenidən seçin.",
+      "leftHanded": "Agentlikdən çıxdınız, {count} elan agentliyə təhvil verildi.",
+      "description": "{name} adlı agentin {count} elanı var. Çıxarmadan əvvəl elanların taleyini seçin.",
+      "question": "{count} elan kimdə qalsın?",
+      "agency": "Agentliyə təhvil ver",
+      "agencyHint": "Elanlar və onlara gələn müraciətlər agentlik hesabına keçir.",
+      "agent": "Başqa agentə təhvil ver",
+      "agentHint": "Elanlar seçdiyiniz agentə keçir, ona bildiriş gedir.",
+      "keep": "Agentdə qalsın",
+      "keepHint": "Elanlar {name} adlı agentin şəxsi hesabında qalır və agentlik profilindən çıxır.",
+      "agentSelect": "Agent",
+      "chooseAgent": "Agenti seçin",
+      "cancel": "Ləğv et",
+      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin.",
+      "keepOwn": "Elanlar məndə qalsın",
+      "keepOwnHint": "Elanlar şəxsi hesabınızda qalır, agentlik profilində görünmür.",
+      "giveAgency": "{name} agentliyinə təhvil ver",
+      "giveAgencyHint": "Elanlar və onlara gələn müraciətlər agentlikdə qalır."
     }
   },
   "actions": {
