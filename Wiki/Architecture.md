@@ -126,7 +126,8 @@ D1 məhdudiyyətləri:
 
 - transaction yoxdur — kompensasiya, şərti `updateMany` və idempotent marker-lər işlədilir;
 - bir sorğuda ən çox 100 bound parametr — uzun id siyahısında `findManyInChunks()` (`d1-chunks.ts`);
-- `take`/`orderBy`-li nested əlaqə 98-dən çox valideyndə sorğunu ilişdirir — böyük siyahıda əlaqəni ayrıca yüklə (`withMapImages()`).
+- `take`/`orderBy`-li nested əlaqə 98-dən çox valideyndə sorğunu ilişdirir — böyük siyahıda əlaqəni ayrıca yüklə (`withMapImages()`);
+- `include` əlaqələri **ardıcıl** yüklənir: hər əlaqə D1-ə ayrıca gediş-gəlişdir. Çox əlaqəli isti sorğuda (elan detalı, #179) hər əlaqəni ayrıca `findFirst` ilə `Promise.all`-da oxu (`getPropertyBySlug()`).
 
 Runtime kodunda ayrıca `new PrismaClient()` yaratmaq olmaz. İstisna yalnız `prisma/` altındakı standalone generator və bootstrap skriptləridir.
 

@@ -671,37 +671,61 @@ export async function getHomeShowcaseProperties(take = 6) {
   return [...featured, ...latest];
 }
 
-export async function getPropertyBySlug(slug: string) {
-  return prisma.property.findFirst({
-    where: { ...(await publicPropertyWhere()), slug },
+/**
+ * Detal səhifəsinin əlaqələri. Forma `include`-dur, amma bir sorğuda verilmir — bax
+ * `getPropertyBySlug()`.
+ */
+const propertyDetailInclude = {
+  type: true,
+  city: true,
+  // Valideyn tam ünvan üçündür: Maştağa → Sabunçu rayonu → Bakı.
+  district: {
     include: {
-      type: true,
-      city: true,
-      // Valideyn tam ünvan üçündür: Maştağa → Sabunçu rayonu → Bakı.
-      district: {
-        include: {
-          neighborhoodProfile: true,
-          parent: { select: { name: true, slug: true, kind: true } },
-        },
-      },
-      metro: true,
-      landmark: { select: { name: true, slug: true } },
-      images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
-      features: { include: { feature: true } },
-      project: { select: { name: true, slug: true } },
-      priceHistory: { orderBy: { changedAt: "desc" }, take: 20 },
-      floorPlans: { orderBy: { order: "asc" }, select: { id: true, url: true, title: true } },
-      nearbyPlaces: { orderBy: [{ category: "asc" }, { distanceMeters: "asc" }] },
-      assignedAgent: {
-        include: {
-          agency: { select: { name: true, slug: true } },
-          reviews: { where: { status: REVIEW_STATUSES.APPROVED }, orderBy: { createdAt: "desc" }, take: 5 },
-        },
-      },
-      // Səhifə əlaqəni maskalı göstərir; tam nömrə `getPropertyPublisherContact` ilə kliklə gəlir.
-      author: { select: { ...publisherContactSelect, id: true } },
+      neighborhoodProfile: true,
+      parent: { select: { name: true, slug: true, kind: true } },
     },
-  });
+  },
+  metro: true,
+  landmark: { select: { name: true, slug: true } },
+  images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
+  features: { include: { feature: true } },
+  project: { select: { name: true, slug: true } },
+  priceHistory: { orderBy: { changedAt: "desc" }, take: 20 },
+  floorPlans: { orderBy: { order: "asc" }, select: { id: true, url: true, title: true } },
+  nearbyPlaces: { orderBy: [{ category: "asc" }, { distanceMeters: "asc" }] },
+  assignedAgent: {
+    include: {
+      agency: { select: { name: true, slug: true } },
+      reviews: { where: { status: REVIEW_STATUSES.APPROVED }, orderBy: { createdAt: "desc" }, take: 5 },
+    },
+  },
+  // Səhifə əlaqəni maskalı göstərir; tam nömrə `getPropertyPublisherContact` ilə kliklə gəlir.
+  author: { select: { ...publisherContactSelect, id: true } },
+} satisfies Prisma.PropertyInclude;
+
+type PropertyDetail = Prisma.PropertyGetPayload<{ include: typeof propertyDetailInclude }>;
+
+/**
+ * Elan detalı — hər əlaqə ayrıca sorğuda, **paralel** (#179).
+ *
+ * D1-də Prisma `include` əlaqələrini ardıcıl yükləyir: hər əlaqə (və iç-içə əlaqə) D1-ə ayrıca
+ * gediş-gəlişdir. Tək `findFirst` ~19 ardıcıl gediş-gəliş idi və keşsiz detal production-da
+ * 1,7 s çəkirdi. İndi əsas sətir və hər əlaqə eyni şərtlə eyni anda oxunur; gözləmə ən dərin
+ * əlaqə qədərdir (~3 gediş-gəliş). Sorğu sayı artır, amma hamısı unikal `slug` indeksi üzrədir.
+ * Nəticənin forması `include` ilə eynidir (`property-detail-query.integration.test.ts`).
+ */
+export async function getPropertyBySlug(slug: string): Promise<PropertyDetail | null> {
+  const where = { ...(await publicPropertyWhere()), slug };
+  const relations = Object.keys(propertyDetailInclude) as (keyof typeof propertyDetailInclude)[];
+  const [base, ...parts] = await Promise.all([
+    prisma.property.findFirst({ where }),
+    ...relations.map((relation) =>
+      prisma.property.findFirst({ where, select: { [relation]: propertyDetailInclude[relation] } }),
+    ),
+  ]);
+  // Oxunuşlar arasında elan gizlədilə bilər — yarımçıq nəticə qaytarılmır.
+  if (!base || parts.some((part) => !part)) return null;
+  return Object.assign(base, ...parts) as PropertyDetail;
 }
 
 /** «Nömrəni göstər» — yalnız ictimai elanın müəllif əlaqəsi. */
