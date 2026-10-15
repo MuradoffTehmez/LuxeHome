@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { useSessionState } from "@/components/site/use-session-state";
 import { IDLE_STATE } from "@/lib/admin/action-state";
 import { Button } from "@/components/ui/button";
 import { createReservation } from "./reservation-actions";
@@ -22,33 +21,48 @@ function fillIfEmpty(input: HTMLInputElement | null, value: string) {
  * Daxil olmuş ictimai istifadəçinin ad/e-poçtu brauzerdə gətirilir (#177): səhifə sessiya
  * oxumur ki, kənar keşdən verilə bilsin. Sahələr idarə olunmur, ona görə dəyər yalnız
  * boş sahəyə yazılır — ziyarətçinin yazdığı mətn üzərinə yazılmır.
+ *
+ * `useSessionState()`-ə baxılmır: onun keşi başqa tabda daxil olmadan sonra 60 s köhnə
+ * «anonim» qala bilir (Codex rəyi). `/api/hesab/elaqe` `no-store`-dur və cookie-siz sorğuda
+ * D1-ə getmədən cavab verir; forma açılanda və pəncərə yenidən fokus alanda (başqa tabda
+ * daxil olub qayıdan istifadəçi) çağırılır, hesab tapılandan sonra dinləyici dayanır.
  */
 function useAccountPrefill(fields: {
   firstName: React.RefObject<HTMLInputElement | null>;
   lastName: React.RefObject<HTMLInputElement | null>;
   email: React.RefObject<HTMLInputElement | null>;
 }) {
-  // Ad burada göstərilmir — yalnız giriş vəziyyəti lazımdır.
-  const session = useSessionState("");
-  const signedInPublic = session.status === "signed-in" && !session.isStaff;
-
   useEffect(() => {
-    if (!signedInPublic) return;
-    let cancelled = false;
-    fetch("/api/hesab/elaqe", { cache: "no-store" })
-      .then((response) => (response.ok ? (response.json() as Promise<AccountContact>) : null))
-      .then((contact) => {
-        if (cancelled || !contact?.signedIn) return;
-        const [firstName = "", ...lastNameParts] = contact.name.trim().split(/\s+/);
-        fillIfEmpty(fields.firstName.current, firstName);
-        fillIfEmpty(fields.lastName.current, lastNameParts.join(" "));
-        fillIfEmpty(fields.email.current, contact.email);
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
+    let done = false;
+    let inFlight = false;
+
+    const prefill = () => {
+      if (done || inFlight) return;
+      inFlight = true;
+      fetch("/api/hesab/elaqe", { cache: "no-store" })
+        .then((response) => (response.ok ? (response.json() as Promise<AccountContact>) : null))
+        .then((contact) => {
+          if (done || !contact?.signedIn) return;
+          done = true;
+          window.removeEventListener("focus", prefill);
+          const [firstName = "", ...lastNameParts] = contact.name.trim().split(/\s+/);
+          fillIfEmpty(fields.firstName.current, firstName);
+          fillIfEmpty(fields.lastName.current, lastNameParts.join(" "));
+          fillIfEmpty(fields.email.current, contact.email);
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          inFlight = false;
+        });
     };
-  }, [signedInPublic, fields.firstName, fields.lastName, fields.email]);
+
+    prefill();
+    window.addEventListener("focus", prefill);
+    return () => {
+      done = true;
+      window.removeEventListener("focus", prefill);
+    };
+  }, [fields.firstName, fields.lastName, fields.email]);
 }
 
 export function ReservationForm({
