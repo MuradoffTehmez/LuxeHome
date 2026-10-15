@@ -138,6 +138,25 @@ async function serveOptimizedImage(request: Request, url: URL, env: Env, ctx: Ex
   });
 }
 
+/**
+ * `Server-Timing` (#173): `app` — OpenNext cavabının başlıqlarına qədər keçən vaxt, `edge` — kənar
+ * HTML keşinin qərarı. Workers-də saat yalnız I/O zamanı irəliləyir, ona görə `app` təmiz CPU deyil,
+ * D1/R2 gözləməsi daxil olmaqla server tərəfindəki divar vaxtıdır. Brauzerin DevTools-unda və
+ * `curl -D -` ilə görünür; qeyri-HTML cavablarda (`webSocket`, 101) toxunulmur.
+ */
+function withServerTiming(response: Response, entries: string[]): Response {
+  if (response.status === 101 || (response as Response & { webSocket?: unknown }).webSocket) return response;
+  const timed = new Response(response.body, response);
+  timed.headers.append("server-timing", entries.join(", "));
+  return timed;
+}
+
+async function timedOpenNext(request: Request, env: Env, ctx: ExecutionContext): Promise<{ response: Response; ms: number }> {
+  const started = Date.now();
+  const response: Response = await openNext.fetch(request, env, ctx);
+  return { response, ms: Date.now() - started };
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // `/` həmişə `/az`-a gedir — OpenNext və middleware-i işə salmadan, keşlənə bilən cavabla (#169).
@@ -155,7 +174,8 @@ const worker = {
     const ttl = edgeCacheTtl(env);
     // Texniki xidmət rejimində keş həm oxunmur, həm yazılmır — middleware qapısı işləsin.
     if (ttl === 0 || !isEdgeCacheableRequest(request) || !(await systemModeAllowsCache(env))) {
-      return openNext.fetch(request, env, ctx);
+      const { response, ms } = await timedOpenNext(request, env, ctx);
+      return withServerTiming(response, [`app;dur=${ms}`, 'edge;desc="BYPASS"']);
     }
 
     const cache = (caches as unknown as { default: Cache }).default;
@@ -166,16 +186,18 @@ const worker = {
       hit.headers.set(EDGE_CACHE_HEADER, "HIT");
       // Brauzer öz keşində saxlamasın — yeniləmə kənarda idarə olunur.
       hit.headers.set("cache-control", "private, no-cache");
+      hit.headers.set("server-timing", 'edge;desc="HIT"');
       return hit;
     }
 
-    const response: Response = await openNext.fetch(request, env, ctx);
-    if (!isStorableResponse(response)) return response;
+    const { response, ms } = await timedOpenNext(request, env, ctx);
+    if (!isStorableResponse(response)) return withServerTiming(response, [`app;dur=${ms}`, 'edge;desc="MISS"']);
 
     const [forClient, forCache] = response.body ? response.body.tee() : [null, null];
     ctx.waitUntil(cache.put(key, toCachedCopy(new Response(forCache, response), ttl)).catch(() => undefined));
     const miss = new Response(forClient, response);
     miss.headers.set(EDGE_CACHE_HEADER, "MISS");
+    miss.headers.append("server-timing", `app;dur=${ms}, edge;desc="MISS"`);
     return miss;
   },
 
