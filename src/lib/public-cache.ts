@@ -13,6 +13,7 @@ import {
   getProperties,
   getPropertiesForMap,
   getPropertyBySlug,
+  getPropertyPartners,
   getPropertyTypesWithCounts,
   getHomepagePartners,
   getPartnerBySlug,
@@ -20,6 +21,7 @@ import {
   getPublicPartnerTypeCounts,
   getServiceBySlug,
   getServices,
+  getSimilarProperties,
   getSitemapEntries,
   type PropertyFilters,
 } from "@/lib/queries";
@@ -94,6 +96,24 @@ export const getCachedPropertyBySlug = cachedQuery(
   async (slug: string) => getPropertyBySlug(slug),
   ["public-property-detail-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
+);
+
+/**
+ * Elan detalının ikinci dalğası (#179): oxşar elanlar və tərəfdaşlar hər keşsiz render-də
+ * D1-ə gedirdi (kart əlaqələri ardıcıl yüklənir). Açar yalnız seçim sahələridir — bütün elan
+ * obyektini arqument vermə, `unstable_cache` onu açara serializə edir.
+ */
+export const getCachedSimilarProperties = cachedQuery(
+  async (property: { id: string; cityId: string; typeId: string; listingType: string }, take: number) =>
+    getSimilarProperties(property, take),
+  ["public-similar-properties-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
+);
+
+export const getCachedPropertyPartners = cachedQuery(
+  async (propertyId: string) => getPropertyPartners(propertyId),
+  ["public-property-partners-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.properties, PUBLIC_CACHE_TAGS.partners], revalidate: FIVE_MINUTES },
 );
 
 export const getCachedProjectBySlug = cachedQuery(
