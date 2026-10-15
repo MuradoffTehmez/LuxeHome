@@ -5,6 +5,7 @@ import {
   MAX_UPLOAD_SIZE,
 } from "@/lib/constants";
 import { runtimeEnv } from "@/lib/runtime-env";
+import { purgeMediaCache } from "@/lib/media-response";
 import {
   DETECTION_SIZE,
   WATERMARK_OPACITY,
@@ -417,6 +418,8 @@ export async function deleteImage(url: string): Promise<void> {
 
   await bucket.delete(key);
   if (thumbKey) await bucket.delete(thumbKey).catch(() => undefined);
+  // Worker şəkli kənar keşdən verir (#165) — silinən fayl orada qalmasın.
+  await purgeMediaCache([`/media/${key}`, ...(thumbKey ? [`/media/${thumbKey}`] : [])]);
 }
 
 /** `/media/emlaklar/2026/08/uuid.webp` → `emlaklar/2026/08/uuid.webp` */

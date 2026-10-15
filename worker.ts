@@ -15,7 +15,13 @@ import {
   toCachedCopy,
 } from "./src/lib/edge-html-cache";
 import { cronJobFor, internalCronToken } from "./src/lib/cron-auth";
-import { mediaKeyFromPath, mediaResponse } from "./src/lib/media-response";
+import {
+  MEDIA_CLIENT_CACHE_CONTROL,
+  MEDIA_EDGE_TTL,
+  mediaCacheKey,
+  mediaKeyFromPath,
+  mediaResponse,
+} from "./src/lib/media-response";
 
 // Durable Object sinifləri OpenNext worker-indən olduğu kimi ixrac olunur.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,17 +43,26 @@ type Env = {
  * keşlənmir, ona görə nəticə Cache API-də saxlanılır. Məzmun dəyişməzdir (UUID açar), açara
  * yalnız yol düşür — query string eyni faylın yeni nüsxəsini yaratmasın. Sorğunun başlıqları
  * ötürülür ki, `If-None-Match` ilə təkrar baxış 304 alsın.
+ *
+ * Kənar nüsxə `MEDIA_EDGE_TTL` (1 gün) yaşayır, brauzer isə bir il — silinən şəkil kənarda
+ * il boyu qalmasın (`deleteImage()` → `purgeMediaCache()`).
  */
 async function serveMedia(request: Request, url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
   const cache = (caches as unknown as { default: Cache }).default;
-  const key = new Request(`${url.origin}${url.pathname}`, { headers: request.headers });
+  const key = new Request(mediaCacheKey(url.pathname), { headers: request.headers });
   const cached = await cache.match(key);
-  if (cached) return cached;
+  if (cached) {
+    const hit = new Response(cached.body, cached);
+    hit.headers.set("cache-control", MEDIA_CLIENT_CACHE_CONTROL);
+    return hit;
+  }
 
   const response = await mediaResponse(env.MEDIA, mediaKeyFromPath(url.pathname));
   if (response.status !== 200 || !response.body) return response;
   const [forClient, forCache] = response.body.tee();
-  ctx.waitUntil(cache.put(key, new Response(forCache, response)).catch(() => undefined));
+  const edgeCopy = new Response(forCache, response);
+  edgeCopy.headers.set("cache-control", `public, max-age=${MEDIA_EDGE_TTL}`);
+  ctx.waitUntil(cache.put(key, edgeCopy).catch(() => undefined));
   return new Response(forClient, response);
 }
 

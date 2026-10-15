@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mediaKeyFromPath, mediaResponse } from "@/lib/media-response";
+import { mediaCacheKey, mediaKeyFromPath, mediaResponse, purgeMediaCache } from "@/lib/media-response";
 
 function bucketWith(objects: Record<string, { body: string; contentType?: string }>): R2Bucket {
   return {
@@ -47,5 +47,26 @@ describe("media cavabı", () => {
       expect(response.status).toBe(404);
       expect(response.headers.get("cache-control")).toBe("no-store");
     }
+  });
+});
+
+describe("media kənar keşinin təmizlənməsi", () => {
+  it("açar host-dan asılı deyil", () => {
+    expect(mediaCacheKey("/media/a/x.webp")).toBe("https://media-cache.internal/media/a/x.webp");
+  });
+
+  it("silinən şəklin keş girişini götürür, digərinə toxunmur", async () => {
+    const cache = (caches as unknown as { default: Cache }).default;
+    const put = (path: string) =>
+      cache.put(mediaCacheKey(path), new Response("img", { headers: { "cache-control": "public, max-age=86400" } }));
+    await put("/media/a/x.webp");
+    await put("/media/a/x-thumb.webp");
+    await put("/media/a/y.webp");
+
+    await purgeMediaCache(["/media/a/x.webp", "/media/a/x-thumb.webp"]);
+
+    expect(await cache.match(mediaCacheKey("/media/a/x.webp"))).toBeUndefined();
+    expect(await cache.match(mediaCacheKey("/media/a/x-thumb.webp"))).toBeUndefined();
+    expect(await cache.match(mediaCacheKey("/media/a/y.webp"))).toBeDefined();
   });
 });
