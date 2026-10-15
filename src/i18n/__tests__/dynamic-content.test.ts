@@ -1,5 +1,10 @@
+/// <reference types="vite/client" />
+
 import { describe, expect, it } from "vitest";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
+import { localizeService } from "@/i18n/service-content";
+
+const sources = import.meta.glob(["../../**/*.{ts,tsx}", "!../../**/__tests__/**"], { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
 
 describe("production dynamic content localization", () => {
   it("property title, description and SEO fields no longer leak AZ content", () => {
@@ -25,8 +30,7 @@ describe("production dynamic content localization", () => {
   });
 
   it("service metadata uses the translated title and summary", () => {
-    const service = localizeKnownContent(
-      "service",
+    const service = localizeService(
       {
         slug: "alqi-satqi",
         title: "Alqı-Satqı",
@@ -53,5 +57,14 @@ describe("production dynamic content localization", () => {
   it("covers production property types and feature values", () => {
     expect(localizeKnownContent("propertyType", { slug: "mini-otel", name: "Mini otel" }, "ru").name).toBe("Мини-отели / хостелы");
     expect(localizeKnownContent("feature", { slug: "hazir-ipoteka", name: "Hazır ipoteka" }, "en").name).toBe("Existing mortgage");
+  });
+  it("xidmət mətnləri client bundle-ına düşmür (#187)", () => {
+    // `PropertyCard` client komponentidir və `dynamic-content.ts`-i işlədir: xidmət kataloqu oraya
+    // qayıtsa, uzun mətnlər hər ictimai səhifənin JS-inə düşər.
+    expect(sources["../dynamic-content.ts"]).not.toMatch(/SERVICES|alqi-satqi/);
+    const clientImporters = Object.entries(sources)
+      .filter(([, source]) => /^\s*["']use client["']/m.test(source) && source.includes("i18n/service-content"))
+      .map(([path]) => path);
+    expect(clientImporters).toEqual([]);
   });
 });
