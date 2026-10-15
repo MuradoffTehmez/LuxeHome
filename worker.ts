@@ -15,6 +15,7 @@ import {
   toCachedCopy,
 } from "./src/lib/edge-html-cache";
 import { cronJobFor, internalCronToken } from "./src/lib/cron-auth";
+import { rootRedirect } from "./src/lib/root-redirect";
 import {
   MEDIA_CLIENT_CACHE_CONTROL,
   MEDIA_EDGE_TTL,
@@ -139,6 +140,10 @@ async function serveOptimizedImage(request: Request, url: URL, env: Env, ctx: Ex
 
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    // `/` həmişə `/az`-a gedir — OpenNext və middleware-i işə salmadan, keşlənə bilən cavabla (#169).
+    const redirect = rootRedirect(request);
+    if (redirect) return redirect;
+
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname.startsWith("/media/")) {
       return serveMedia(request, url, env, ctx);

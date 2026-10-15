@@ -764,6 +764,10 @@ yol + `w`/`q`-dur, qalan query string atılır). `src/app/media/[...key]/route.t
 Kənar nüsxə 1 gün yaşayır (brauzer bir il); `deleteImage()` bütün ölçüləri `purgeMediaCache()` ilə bu data
 mərkəzində təmizləyir. Kiçiltmə alınmayanda orijinal keşə yazılmadan verilir — növbəti sorğu yenidən sınayır.
 
+Kanonik `https://luxehomeestate.az/` → `/az` yönləndirməsini də `worker.ts` verir (`src/lib/root-redirect.ts`,
+#169): 307 + 1 saatlıq keş, query string saxlanılır. Bu, yalnız `routing.ts`-də `localeDetection: false` olduqca
+doğrudur — dil təyinini açsan qısa yol özü söndürülür, amma testi də yenilə.
+
 Cloudflare Web Analytics beacon-u (cookie-siz, razılıq tələb etmir) `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN`
 build dəyişəni olanda ictimai səhifələrə əlavə olunur (`analytics-provider.tsx`).
 
