@@ -1,7 +1,6 @@
 import { formatFullAddress } from "@/lib/location-path";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -23,7 +22,6 @@ import { isProjectsSectionEnabled } from "@/lib/site-sections";
 import {
   NEARBY_PLACE_CATEGORIES,
   LISTING_TYPES,
-  AUTH_KINDS,
   PROPERTY_STATUS_TONE,
   PROPERTY_STATUSES,
   TRANSLATION_ENTITY_TYPES,
@@ -32,7 +30,6 @@ import {
 } from "@/lib/constants";
 import { getPropertyPartners, getSimilarProperties } from "@/lib/queries";
 import { getCachedPropertyBySlug } from "@/lib/public-cache";
-import { recordView } from "@/lib/view-counter";
 import { buildManagedMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
@@ -57,13 +54,13 @@ import { InstallmentCalculator } from "@/components/site/installment-calculator"
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { RecentlyViewedTracker } from "@/components/site/recently-viewed-tracker";
+import { PropertyViewBeacon } from "@/components/site/property-view-beacon";
 import { PartnerRelations } from "@/components/site/partner-relations";
 import { WhatsAppIcon } from "@/components/site/brand-icons";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { formatLocalizedDate } from "@/i18n/date";
 import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
-import { getOptionalUser } from "@/lib/auth/guard";
 import { ReservationForm } from "./reservation-form";
 import { maskPhone, resolveListingPublisher } from "@/lib/accounts/listing-publisher";
 import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
@@ -153,9 +150,6 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   if (!sourceProperty) notFound();
 
-  // Sayğac cavabı gözlətmir — `waitUntil` ilə render bitdikdən sonra yazılır
-  recordView("property", sourceProperty.id, (await headers()).get("user-agent"));
-
   const knownProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
   const localizedProperty = applyContentTranslation(
     TRANSLATION_ENTITY_TYPES.PROPERTY,
@@ -231,9 +225,6 @@ export default async function PropertyDetailPage({ params }: Props) {
   const benchmarkPrice = priceAssessment
     ? `${formatPrice(Math.round(priceAssessment.pricePerSqm), property.currency)}/m²`
     : "";
-  const reservationUser = property.reservationEnabled && !isClosed
-    ? await getOptionalUser(AUTH_KINDS.PUBLIC)
-    : null;
   const propertyPath = `/emlaklar/${property.slug}`;
   // Əlaqə elanı yerləşdirənə gedir; şirkət (STAFF) elanında şirkətin nömrəsi qalır.
   const publisher = resolveListingPublisher(property.author);
@@ -281,6 +272,8 @@ export default async function PropertyDetailPage({ params }: Props) {
     <>
       <AnalyticsEventBeacon event="property_view" payload={{ property_id: property.id }} />
       <RecentlyViewedTracker propertyId={property.id} />
+      {/* Baxış sayğacı brauzerdən — səhifə sessiyadan asılı olmasın, kənar keşə düşsün (#177) */}
+      <PropertyViewBeacon propertyId={property.id} />
       <script
         {...jsonLd(
           propertySchema({
@@ -545,7 +538,6 @@ export default async function PropertyDetailPage({ params }: Props) {
               {property.reservationEnabled && !isClosed && (
                 <ReservationForm
                   propertyId={property.id}
-                  initial={reservationUser ? { name: reservationUser.name, phone: null, email: reservationUser.email } : null}
                   labels={{
                     title: reservationText("title"),
                     description: reservationText("description"),

@@ -756,6 +756,10 @@ mühitdə (staging, lokal E2E) keş söndürülüdür. Nəticə: admin dəyişik
 ziyarətçiyə ən çox 60 saniyə gecikmə ilə çatır. **Yeni ictimai səhifə server tərəfdə
 sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunmalıdır** — əks halda
 bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test.ts` qoruyur).
+**Elan detalı (#177) keşlənir:** baxış sayğacı render-də deyil, `PropertyViewBeacon` →
+`POST /api/emlaklar/<id>/baxis` ilə yazılır (same-origin, bot filtri, `checkListingViewLimit`);
+rezervasiya formasının ad/e-poçtu `GET /api/hesab/elaqe` (`no-store`) ilə brauzerdə doldurulur.
+Detal səhifəsinə `recordView`, `headers()`/`cookies()` və ya sessiya oxunuşu əlavə etmə — test yıxılır.
 Durable Object sinifləri `worker.ts`-dən yenidən ixrac olunur — sarğını dəyişəndə saxla.
 
 `/media/<açar>` şəkilləri də `worker.ts`-də OpenNext-dən **əvvəl** verilir (`src/lib/media-response.ts`,

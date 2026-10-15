@@ -15,7 +15,9 @@ import { LOCALES } from "./constants";
 
 /** Server komponentində sessiya oxuyan ictimai marşrutlar (locale prefiksi olmadan). */
 export const SESSION_DEPENDENT_PUBLIC_ROUTES = [
-  "/emlaklar/[param]",
+  // `/emlaklar/[param]` (elan detalı) #177-dən bəri burada deyil: baxış sayğacı beacon ilə
+  // (`/api/emlaklar/<id>/baxis`), rezervasiya formasının doldurulması `/api/hesab/elaqe` ilə
+  // brauzerdə gedir. Səhifəyə yenidən sessiya oxunuşu əlavə etmə — keşdə başqasına verilər.
   "/mene-emlak-tap",
 ] as const;
 

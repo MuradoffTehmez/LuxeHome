@@ -23,7 +23,7 @@ const LOCALE_PATH = /^\/(az|en|ru)(\/|$)/;
 /**
  * Render zamanı yan təsiri olan marşrutlar — baxış sayğacı (`recordView`) server
  * komponentindədir; keşdən verilən cavab onu işə salmazdı və sayğac donardı.
- * (`/emlaklar/[slug]` sessiyadan asılı olduğu üçün onsuz da keşlənmir.)
+ * (`/emlaklar/[slug]` sayğacı brauzer beacon-u ilə yazır (#177), ona görə keşlənir.)
  */
 const SIDE_EFFECT_ROUTES = [
   /^\/(az|en|ru)\/blog\/[^/]+\/?$/,
