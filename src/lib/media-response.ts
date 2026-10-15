@@ -13,10 +13,62 @@
  * yüklənmiş fayl brauzerdə HTML kimi şərh olunub sayt daxilində skript işlətməməlidir.
  */
 
-import { DEFAULT_IMAGE_QUALITY, isAllowedImageQuality, isAllowedImageWidth } from "./image-sizes";
+import {
+  DEFAULT_IMAGE_QUALITY,
+  IMAGE_DEVICE_SIZES,
+  IMAGE_QUALITIES,
+  IMAGE_SIZES,
+  isAllowedImageQuality,
+  isAllowedImageWidth,
+} from "./image-sizes";
 
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
-const IMMUTABLE = "public, max-age=31536000, immutable";
+export const MEDIA_CLIENT_CACHE_CONTROL = "public, max-age=31536000, immutable";
+
+/**
+ * Kənar keşdəki nüsxənin ömrü. Brauzer faylı bir il saxlayır (URL dəyişməz UUID-dir), amma
+ * paneldən silinən şəkil kənarda da tez yox olmalıdır: `purgeMediaCache()` yalnız silmənin
+ * baş verdiyi data mərkəzini təmizləyə bilir (Cache API lokaldır), digərlərində nüsxə ən çox
+ * bu müddət yaşayır.
+ */
+export const MEDIA_EDGE_TTL = 86_400;
+
+/**
+ * Cache API açarı. Host-dan asılı deyil (kanonik domen, workers.dev) — silmə zamanı açarı
+ * sorğu kontekstindən kənarda da eyni şəkildə qurmaq olsun.
+ */
+export function mediaCacheKey(pathname: string, variant?: MediaVariant | null): string {
+  const suffix = variant ? `?w=${variant.width}&q=${variant.quality}` : "";
+  return `https://media-cache.internal${pathname}${suffix}`;
+}
+
+/** Bir faylın bütün mümkün kənar nüsxələri: orijinal + hər icazəli en × keyfiyyət (#167). */
+function allMediaCacheKeys(pathname: string): string[] {
+  const keys = [mediaCacheKey(pathname)];
+  for (const width of [...IMAGE_DEVICE_SIZES, ...IMAGE_SIZES]) {
+    for (const quality of IMAGE_QUALITIES) keys.push(mediaCacheKey(pathname, { width, quality }));
+  }
+  return keys;
+}
+
+/**
+ * Kiçiltmə alınmayıb orijinal verilən cavabın işarəsi: worker onu kənar keşə yazmır (başlığı
+ * silib klientə verir), yoxsa həmin data mərkəzi çevirməni bir də sınamazdı (Codex rəyi, #168).
+ */
+export const MEDIA_NO_EDGE_CACHE_HEADER = "x-media-no-edge-cache";
+/** Ehtiyat (kiçildilməmiş) cavabın brauzer ömrü — çevirmə bərpa olunanda tez yenilənsin. */
+const MEDIA_FALLBACK_CACHE_CONTROL = "public, max-age=300";
+
+/**
+ * Silinən şəklin kənar nüsxələrini (orijinal + bütün ölçülər) bu data mərkəzində təmizləyir
+ * (best-effort, heç vaxt atmır). Digər data mərkəzlərində nüsxə `MEDIA_EDGE_TTL` bitəndə düşür.
+ */
+export async function purgeMediaCache(pathnames: string[]): Promise<void> {
+  const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
+  if (!cache) return;
+  const keys = pathnames.flatMap(allMediaCacheKeys);
+  await Promise.all(keys.map((key) => cache.delete(key).catch(() => false)));
+}
 
 // `..` seqmenti R2-də qovluq mənası daşımır, amma açarın gözlənilən formada
 // olduğunu yoxlamaq gələcək dəyişikliklərdə də qorunma verir.
@@ -45,7 +97,7 @@ export async function mediaResponse(bucket: R2Bucket | undefined, key: string | 
     headers: {
       "Content-Type": ALLOWED_TYPES.has(contentType) ? contentType : "application/octet-stream",
       "Content-Disposition": "inline",
-      "Cache-Control": IMMUTABLE,
+      "Cache-Control": MEDIA_CLIENT_CACHE_CONTROL,
       "X-Content-Type-Options": "nosniff",
       etag: object.httpEtag,
     },
@@ -81,7 +133,7 @@ export async function resizedMediaResponse(
   key: string | null,
   variant: MediaVariant,
 ): Promise<Response> {
-  if (!key || !bucket || !images) return mediaResponse(bucket, key);
+  if (!key || !bucket || !images) return fallbackMediaResponse(bucket, key);
   const object = await bucket.get(key);
   if (!object) return notFound();
 
@@ -94,13 +146,23 @@ export async function resizedMediaResponse(
       headers: {
         "Content-Type": result.contentType(),
         "Content-Disposition": "inline",
-        "Cache-Control": IMMUTABLE,
+        "Cache-Control": MEDIA_CLIENT_CACHE_CONTROL,
         "X-Content-Type-Options": "nosniff",
         etag: `"${object.etag}-w${variant.width}q${variant.quality}"`,
       },
     });
   } catch (error) {
     console.error("[media] kiçiltmə alınmadı", key, error);
-    return mediaResponse(bucket, key);
+    return fallbackMediaResponse(bucket, key);
   }
+}
+
+/** Orijinal, amma kənar keşə yazılmayan və brauzerdə qısa yaşayan cavab. */
+async function fallbackMediaResponse(bucket: R2Bucket | undefined, key: string | null): Promise<Response> {
+  const response = await mediaResponse(bucket, key);
+  if (response.status !== 200) return response;
+  const fallback = new Response(response.body, response);
+  fallback.headers.set("Cache-Control", MEDIA_FALLBACK_CACHE_CONTROL);
+  fallback.headers.set(MEDIA_NO_EDGE_CACHE_HEADER, "1");
+  return fallback;
 }

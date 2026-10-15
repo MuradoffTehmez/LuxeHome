@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { mediaKeyFromPath, mediaResponse, mediaVariantFromSearch, resizedMediaResponse } from "@/lib/media-response";
+import {
+  MEDIA_NO_EDGE_CACHE_HEADER,
+  mediaCacheKey,
+  mediaKeyFromPath,
+  mediaResponse,
+  mediaVariantFromSearch,
+  purgeMediaCache,
+  resizedMediaResponse,
+} from "@/lib/media-response";
 
 function bucketWith(objects: Record<string, { body: string; contentType?: string }>): R2Bucket {
   return {
@@ -97,6 +105,43 @@ describe("media nüsxəsi (?w=&q=)", () => {
     expect(await failed.text()).toBe("big");
     const unbound = await resizedMediaResponse(bucket, undefined, "a/x.webp", { width: 640, quality: 75 });
     expect(await unbound.text()).toBe("big");
+    // Ehtiyat cavab kənar keşə yazılmamalı və brauzerdə qısa yaşamalıdır — çevirmə yenidən sınansın.
+    for (const response of [failed, unbound]) {
+      expect(response.headers.get(MEDIA_NO_EDGE_CACHE_HEADER)).toBe("1");
+      expect(response.headers.get("cache-control")).toBe("public, max-age=300");
+    }
     expect((await resizedMediaResponse(bucket, imagesBinding(() => undefined), "a/yox.webp", { width: 640, quality: 75 })).status).toBe(404);
+  });
+});
+
+describe("media kənar keşinin təmizlənməsi", () => {
+  it("açar host-dan asılı deyil, nüsxə eni və keyfiyyəti daşıyır", () => {
+    expect(mediaCacheKey("/media/a/x.webp")).toBe("https://media-cache.internal/media/a/x.webp");
+    expect(mediaCacheKey("/media/a/x.webp", { width: 640, quality: 75 })).toBe("https://media-cache.internal/media/a/x.webp?w=640&q=75");
+  });
+
+  it("silinən şəklin kiçildilmiş nüsxələrini də götürür", async () => {
+    const cache = (caches as unknown as { default: Cache }).default;
+    const variants = [{ width: 360, quality: 75 }, { width: 1920, quality: 65 }, { width: 64, quality: 75 }];
+    for (const variant of variants) await cache.put(mediaCacheKey("/media/b/x.webp", variant), new Response("img"));
+
+    await purgeMediaCache(["/media/b/x.webp"]);
+
+    for (const variant of variants) expect(await cache.match(mediaCacheKey("/media/b/x.webp", variant))).toBeUndefined();
+  });
+
+  it("silinən şəklin keş girişini götürür, digərinə toxunmur", async () => {
+    const cache = (caches as unknown as { default: Cache }).default;
+    const put = (path: string) =>
+      cache.put(mediaCacheKey(path), new Response("img", { headers: { "cache-control": "public, max-age=86400" } }));
+    await put("/media/a/x.webp");
+    await put("/media/a/x-thumb.webp");
+    await put("/media/a/y.webp");
+
+    await purgeMediaCache(["/media/a/x.webp", "/media/a/x-thumb.webp"]);
+
+    expect(await cache.match(mediaCacheKey("/media/a/x.webp"))).toBeUndefined();
+    expect(await cache.match(mediaCacheKey("/media/a/x-thumb.webp"))).toBeUndefined();
+    expect(await cache.match(mediaCacheKey("/media/a/y.webp"))).toBeDefined();
   });
 });

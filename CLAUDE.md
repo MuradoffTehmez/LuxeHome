@@ -761,6 +761,8 @@ Durable Object sinifləri `worker.ts`-dən yenidən ixrac olunur — sarğını 
 `/media/<açar>` şəkilləri də `worker.ts`-də OpenNext-dən **əvvəl** verilir (`src/lib/media-response.ts`,
 #165): Worker cavabı CDN-də öz-özünə keşlənmir, ona görə R2 nəticəsi Cache API-də saxlanılır (açar
 yol + `w`/`q`-dur, qalan query string atılır). `src/app/media/[...key]/route.ts` eyni modulu işlədir — qaydanı bir yerdə dəyiş.
+Kənar nüsxə 1 gün yaşayır (brauzer bir il); `deleteImage()` bütün ölçüləri `purgeMediaCache()` ilə bu data
+mərkəzində təmizləyir. Kiçiltmə alınmayanda orijinal keşə yazılmadan verilir — növbəti sorğu yenidən sınayır.
 
 Cloudflare Web Analytics beacon-u (cookie-siz, razılıq tələb etmir) `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN`
 build dəyişəni olanda ictimai səhifələrə əlavə olunur (`analytics-provider.tsx`).
