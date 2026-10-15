@@ -51,8 +51,13 @@ type Env = {
   IMAGES?: ImagesBinding;
 };
 
-/** `public` qovluğundakı şəkil deploy ilə dəyişə bilər — `/_next/image` nüsxəsi bir gün saxlanılır. */
+/** `public` qovluğundakı şəkil deploy ilə dəyişə bilər — `/_next/image` kənar nüsxəsi bir gün saxlanılır. */
 const OPTIMIZED_IMAGE_TTL = 86_400;
+/**
+ * Brauzer isə 7 gün saxlayır (#189): kateqoriya şəkilləri və loqo təkrar ziyarətdə şəbəkəyə
+ * getməsin. Fayl adı eyni qalıb məzmun dəyişsə, köhnə nüsxə ən çox bir həftə görünə bilər.
+ */
+const OPTIMIZED_IMAGE_CLIENT_CACHE_CONTROL = "public, max-age=604800, stale-while-revalidate=86400";
 
 type CacheThroughOptions = {
   /** Kənar nüsxənin ömrü (saniyə); verilməsə cavabın öz `Cache-Control`-u saxlanılır. */
@@ -135,15 +140,19 @@ function negotiatedImageFormat(request: Request): string {
 async function serveOptimizedImage(request: Request, url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
   const keyUrl = new URL(url);
   keyUrl.searchParams.set("__fmt", negotiatedImageFormat(request));
-  return cacheThrough(request, keyUrl.href, ctx, async () => {
-    const response: Response = await openNext.fetch(request, env, ctx);
-    if (response.status !== 200) return response;
-    const copy = new Response(response.body, response);
-    if (!copy.headers.get("cache-control")?.includes("immutable")) {
-      copy.headers.set("cache-control", `public, max-age=${OPTIMIZED_IMAGE_TTL}`);
-    }
-    return copy;
-  });
+  return cacheThrough(
+    request,
+    keyUrl.href,
+    ctx,
+    async () => {
+      const response: Response = await openNext.fetch(request, env, ctx);
+      if (response.status !== 200) return response;
+      const copy = new Response(response.body, response);
+      copy.headers.set("cache-control", OPTIMIZED_IMAGE_CLIENT_CACHE_CONTROL);
+      return copy;
+    },
+    { edgeTtl: OPTIMIZED_IMAGE_TTL, clientCacheControl: OPTIMIZED_IMAGE_CLIENT_CACHE_CONTROL },
+  );
 }
 
 /**

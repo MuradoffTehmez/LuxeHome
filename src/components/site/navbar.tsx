@@ -137,11 +137,13 @@ export function Navbar({
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
+          priority
           className="shrink-0 max-[639px]:[&>span]:hidden min-[1440px]:hidden"
         />
         <Logo
           tone={isOverlay ? "dark" : "light"}
           compact
+          priority
           className="hidden shrink-0 min-[1440px]:inline-flex [&>span]:hidden min-[1800px]:[&>span]:flex"
         />
 
