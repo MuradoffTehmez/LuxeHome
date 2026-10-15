@@ -18,9 +18,12 @@ import { cronJobFor, internalCronToken } from "./src/lib/cron-auth";
 import {
   MEDIA_CLIENT_CACHE_CONTROL,
   MEDIA_EDGE_TTL,
+  MEDIA_NO_EDGE_CACHE_HEADER,
   mediaCacheKey,
   mediaKeyFromPath,
   mediaResponse,
+  mediaVariantFromSearch,
+  resizedMediaResponse,
 } from "./src/lib/media-response";
 
 // Durable Object sinifləri OpenNext worker-indən olduğu kimi ixrac olunur.
@@ -36,34 +39,102 @@ type Env = {
   SITE_URL?: string;
   AUTH_SECRET?: string;
   MEDIA?: R2Bucket;
+  IMAGES?: ImagesBinding;
+};
+
+/** `public` qovluğundakı şəkil deploy ilə dəyişə bilər — `/_next/image` nüsxəsi bir gün saxlanılır. */
+const OPTIMIZED_IMAGE_TTL = 86_400;
+
+type CacheThroughOptions = {
+  /** Kənar nüsxənin ömrü (saniyə); verilməsə cavabın öz `Cache-Control`-u saxlanılır. */
+  edgeTtl?: number;
+  /** Klientə gedən `Cache-Control` (keşdən verilən cavabda da). */
+  clientCacheControl?: string;
 };
 
 /**
+ * Cavabı Cache API-dən verir, yoxdursa `produce()` ilə qurub `waitUntil` ilə keşə yazır.
+ * Açar sintetik URL-dir; sorğunun başlıqları ötürülür ki, `If-None-Match` ilə təkrar baxış
+ * 304 alsın. Yalnız 200 saxlanılır; `MEDIA_NO_EDGE_CACHE_HEADER` daşıyan cavab (kiçiltmə
+ * alınmayıb orijinal verilib) keşə yazılmır ki, növbəti sorğu çevirməni yenidən sınasın.
+ */
+async function cacheThrough(
+  request: Request,
+  keyUrl: string,
+  ctx: ExecutionContext,
+  produce: () => Promise<Response>,
+  options: CacheThroughOptions = {},
+): Promise<Response> {
+  const cache = (caches as unknown as { default: Cache }).default;
+  const key = new Request(keyUrl, { headers: request.headers });
+  const cached = await cache.match(key);
+  if (cached) {
+    if (!options.clientCacheControl) return cached;
+    const hit = new Response(cached.body, cached);
+    hit.headers.set("cache-control", options.clientCacheControl);
+    return hit;
+  }
+
+  const response = await produce();
+  if (response.headers.has(MEDIA_NO_EDGE_CACHE_HEADER)) {
+    const uncached = new Response(response.body, response);
+    uncached.headers.delete(MEDIA_NO_EDGE_CACHE_HEADER);
+    return uncached;
+  }
+  if (response.status !== 200 || !response.body) return response;
+  const [forClient, forCache] = response.body.tee();
+  const edgeCopy = new Response(forCache, response);
+  if (options.edgeTtl) edgeCopy.headers.set("cache-control", `public, max-age=${options.edgeTtl}`);
+  ctx.waitUntil(cache.put(key, edgeCopy).catch(() => undefined));
+  return new Response(forClient, response);
+}
+
+/**
  * `/media/<açar>` şəkli OpenNext-dən əvvəl verilir (#165): Worker cavabı CDN-də öz-özünə
- * keşlənmir, ona görə nəticə Cache API-də saxlanılır. Məzmun dəyişməzdir (UUID açar), açara
- * yalnız yol düşür — query string eyni faylın yeni nüsxəsini yaratmasın. Sorğunun başlıqları
- * ötürülür ki, `If-None-Match` ilə təkrar baxış 304 alsın.
+ * keşlənmir, ona görə nəticə Cache API-də saxlanılır. Məzmun dəyişməzdir (UUID açar).
+ * `?w=&q=` (qlobal loader, #167) kiçildilmiş nüsxə istəyir; açara yalnız yol və bu iki dəyər
+ * düşür — başqa query string eyni faylın yeni nüsxəsini yaratmasın.
  *
  * Kənar nüsxə `MEDIA_EDGE_TTL` (1 gün) yaşayır, brauzer isə bir il — silinən şəkil kənarda
  * il boyu qalmasın (`deleteImage()` → `purgeMediaCache()`).
  */
 async function serveMedia(request: Request, url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
-  const cache = (caches as unknown as { default: Cache }).default;
-  const key = new Request(mediaCacheKey(url.pathname), { headers: request.headers });
-  const cached = await cache.match(key);
-  if (cached) {
-    const hit = new Response(cached.body, cached);
-    hit.headers.set("cache-control", MEDIA_CLIENT_CACHE_CONTROL);
-    return hit;
-  }
+  const variant = mediaVariantFromSearch(url.searchParams);
+  if (variant === "invalid") return new Response("Yanlış ölçü", { status: 400, headers: { "Cache-Control": "no-store" } });
+  const key = mediaKeyFromPath(url.pathname);
+  return cacheThrough(
+    request,
+    mediaCacheKey(url.pathname, variant),
+    ctx,
+    () => (variant ? resizedMediaResponse(env.MEDIA, env.IMAGES, key, variant) : mediaResponse(env.MEDIA, key)),
+    { edgeTtl: MEDIA_EDGE_TTL, clientCacheControl: MEDIA_CLIENT_CACHE_CONTROL },
+  );
+}
 
-  const response = await mediaResponse(env.MEDIA, mediaKeyFromPath(url.pathname));
-  if (response.status !== 200 || !response.body) return response;
-  const [forClient, forCache] = response.body.tee();
-  const edgeCopy = new Response(forCache, response);
-  edgeCopy.headers.set("cache-control", `public, max-age=${MEDIA_EDGE_TTL}`);
-  ctx.waitUntil(cache.put(key, edgeCopy).catch(() => undefined));
-  return new Response(forClient, response);
+/** OpenNext-in seçdiyi çıxış formatı `Accept`-dən asılıdır — açar onu da daşıyır (`next.config` sırası). */
+function negotiatedImageFormat(request: Request): string {
+  const accept = request.headers.get("accept") ?? "";
+  if (accept.includes("image/avif")) return "avif";
+  if (accept.includes("image/webp")) return "webp";
+  return "orig";
+}
+
+/**
+ * `/_next/image` (statik fayl, Unsplash) OpenNext-də IMAGES binding-i ilə çevrilir, amma cavab
+ * heç yerdə saxlanılmırdı — `Cache-Control` yox idi və loqo hər səhifədə 1–2 s-də gəlirdi (#167).
+ */
+async function serveOptimizedImage(request: Request, url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
+  const keyUrl = new URL(url);
+  keyUrl.searchParams.set("__fmt", negotiatedImageFormat(request));
+  return cacheThrough(request, keyUrl.href, ctx, async () => {
+    const response: Response = await openNext.fetch(request, env, ctx);
+    if (response.status !== 200) return response;
+    const copy = new Response(response.body, response);
+    if (!copy.headers.get("cache-control")?.includes("immutable")) {
+      copy.headers.set("cache-control", `public, max-age=${OPTIMIZED_IMAGE_TTL}`);
+    }
+    return copy;
+  });
 }
 
 const worker = {
@@ -71,6 +142,9 @@ const worker = {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname.startsWith("/media/")) {
       return serveMedia(request, url, env, ctx);
+    }
+    if (request.method === "GET" && url.pathname === "/_next/image") {
+      return serveOptimizedImage(request, url, env, ctx);
     }
 
     const ttl = edgeCacheTtl(env);

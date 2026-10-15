@@ -30,7 +30,8 @@ describe("PostCard", () => {
       await PostCard({ post: { ...basePost, coverUrl: "/media/bloq/2026/09/abc.webp", coverAlt: "Ev" } }),
     );
 
-    expect(html).toContain("/media/bloq/2026/09/abc.webp");
+    // Testdə `next.config`-in qlobal loader-i yüklənmir — ünvan defolt loader ilə kodlanır.
+    expect(html).toContain(encodeURIComponent("/media/bloq/2026/09/abc.webp"));
     expect(html).toContain('alt="Ev"');
     expect(html).not.toContain("images%2Fblog");
   });

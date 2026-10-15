@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import { IMAGE_DEVICE_SIZES, IMAGE_QUALITIES, IMAGE_SIZES } from "./src/lib/image-sizes";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -39,12 +40,13 @@ const nextConfig: NextConfig = {
   images: {
     // Müasir formatlar — WebP/AVIF avtomatik seçilir
     formats: ["image/avif", "image/webp"],
-    // Hero 65 keyfiyyətindən istifadə edir. OpenNext Cloudflare image worker-i
-    // bu ağ siyahı verilməyəndə yalnız defolt 75-i qəbul edib q=65 sorğusuna
-    // 400 qaytarır. 75 digər şəkillərin defolt keyfiyyəti üçün saxlanılır.
-    qualities: [65, 75],
-    deviceSizes: [360, 640, 750, 828, 1080, 1200, 1600, 1920],
-    imageSizes: [64, 96, 128, 256, 384],
+    // Siyahılar `src/lib/image-sizes.ts`-dədir — worker `/media/...?w=` sorğusunu onlarla yoxlayır.
+    qualities: [...IMAGE_QUALITIES],
+    deviceSizes: [...IMAGE_DEVICE_SIZES],
+    imageSizes: [...IMAGE_SIZES],
+    // `/media` ünvanları worker-də R2-dən kiçildilir (`?w=&q=`), qalanı `/_next/image`-ə gedir (#167).
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
     remotePatterns: [
       {
         // Demo mərhələsində istifadə olunan lisenziyalı Unsplash şəkilləri.
