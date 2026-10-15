@@ -748,12 +748,17 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai
-HTML-i Cloudflare Cache API-də `EDGE_HTML_CACHE_TTL` saniyə (production-da 60) saxlayır.
+HTML-i Cloudflare Cache API-də saxlayır: `EDGE_HTML_CACHE_TTL` saniyə (production-da 60) təzə,
+sonra `EDGE_HTML_STALE_TTL` (defolt 1 gün) ərzində köhnə nüsxə dərhal verilir və fonda yenilənir
+(stale-while-revalidate, #175). Açar Worker versiyasını (`version_metadata` → `CF_VERSION_METADATA`)
+daşıyır — deploy-dan sonra köhnə HTML artıq olmayan JS chunk-larına istinad etməsin.
 Qaydalar `src/lib/edge-html-cache.ts`-dədir və `public-cache-policy.ts`-ə söykənir:
 sessiya/2FA/preview cookie-li sorğu, sessiya oxuyan marşrut, panel, auth və API keçir;
 açar RSC/router başlıqlarını daxil edir; `Set-Cookie` saxlanmır; `IS_STAGING` olan
-mühitdə (staging, lokal E2E) keş söndürülüdür. Nəticə: admin dəyişikliyi anonim
-ziyarətçiyə ən çox 60 saniyə gecikmə ilə çatır. **Yeni ictimai səhifə server tərəfdə
+mühitdə (staging, lokal E2E) keş söndürülüdür. Nəticə: admin dəyişikliyindən sonra həmin data
+mərkəzində **ilk** anonim ziyarətçi köhnə nüsxəni bir dəfə görə bilər (60 s-dən köhnədirsə), sonrakılar
+yenisini; daxil olmuş istifadəçi həmişə təzəsini. Lokalda SWR-i yoxlamaq üçün stack-i `IS_STAGING:false`
+ilə qaldır və sorğuya `Host: luxehomeestate.az` + `x-forwarded-proto: https` əlavə et (yoxsa kanonik host 308 verir). **Yeni ictimai səhifə server tərəfdə
 sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunmalıdır** — əks halda
 bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test.ts` qoruyur).
 **Elan detalı (#177) keşlənir:** baxış sayğacı render-də deyil, `PropertyViewBeacon` →
@@ -767,6 +772,11 @@ Durable Object sinifləri `worker.ts`-dən yenidən ixrac olunur — sarğını 
 yol + `w`/`q`-dur, qalan query string atılır). `src/app/media/[...key]/route.ts` eyni modulu işlədir — qaydanı bir yerdə dəyiş.
 Kənar nüsxə 1 gün yaşayır (brauzer bir il); `deleteImage()` bütün ölçüləri `purgeMediaCache()` ilə bu data
 mərkəzində təmizləyir. Kiçiltmə alınmayanda orijinal keşə yazılmadan verilir — növbəti sorğu yenidən sınayır.
+
+**Ölçmə (#173):** worker hər HTML/RSC cavabına `Server-Timing` yazır (`app;dur=` — OpenNext başlıqlarına
+qədər server vaxtı, `edge;desc=HIT|MISS|BYPASS`). Prisma klienti `$extends` ilə sarılıb: 200 ms-dən uzun sorğu
+Workers Logs-a `[db] yavaş sorğu <Model>.<əməliyyat> <ms> ms` kimi yazılır (parametrsiz). Paneldə LCP/INP
+orta deyil, p75-dir (`lib/web-vitals-stats.ts`, 60 s-dən böyük fon tabı ölçüləri atılır).
 
 Kanonik `https://luxehomeestate.az/` → `/az` yönləndirməsini də `worker.ts` verir (`src/lib/root-redirect.ts`,
 #169): 307 + 1 saatlıq keş, query string saxlanılır. Bu, yalnız `routing.ts`-də `localeDetection: false` olduqca

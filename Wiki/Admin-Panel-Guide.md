@@ -189,4 +189,4 @@ Panelə girmək mümkün deyilsə və ya D1 əlçatmazdırsa, texniki xidmət re
 
 ## Dəyişiklik saytda nə vaxt görünür
 
-Anonim ziyarətçiyə ictimai HTML kənar keşdən verilir: paneldəki dəyişiklik ən çox **60 saniyə** gecikmə ilə görünür. Daxil olmuş istifadəçi və staging dərhal görür.
+Anonim ziyarətçiyə ictimai HTML kənar keşdən verilir: nüsxə 60 saniyə təzədir, sonra köhnə nüsxə dərhal verilib fonda yenilənir (1 günə qədər). Paneldəki dəyişikliyi həmin data mərkəzində **ilk** anonim ziyarətçi köhnə halda bir dəfə görə bilər, növbəti ziyarətçi yenisini görür. Daxil olmuş istifadəçi və staging dərhal görür.

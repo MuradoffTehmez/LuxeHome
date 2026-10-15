@@ -49,7 +49,7 @@ flowchart LR
 
 ## Render və məlumat axını
 
-İctimai səhifələr Server Component-dir. Ana səhifə və sabit locale səhifələri SSG ola bilər; request-time D1 lazım olan detail, axtarış, sitemap və texniki marşrutlar dinamik render olunur. Tez-tez oxunan public sorğular `unstable_cache`, mərkəzi public tag-lər, D1 revalidation cədvəli və R2 incremental cache ilə idarə olunur. Runtime parametr build zamanı əlçatan olmadıqda təsdiqlənmiş `siteConfig` ehtiyat dəyərinə düşür.
+İctimai səhifələr Server Component-dir. Ana səhifə və sabit locale səhifələri SSG ola bilər; request-time D1 lazım olan detail, axtarış, sitemap və texniki marşrutlar dinamik render olunur. Tez-tez oxunan public sorğular `unstable_cache`, mərkəzi public tag-lər, D1 revalidation cədvəli və R2 incremental cache ilə idarə olunur; R2-nin qarşısında data mərkəzinin Cache API-si (`withRegionalCache`, long-lived) durur, hit-də D1 teq yoxlaması yenə işləyir. Runtime parametr build zamanı əlçatan olmadıqda təsdiqlənmiş `siteConfig` ehtiyat dəyərinə düşür.
 
 ```mermaid
 sequenceDiagram
@@ -74,7 +74,7 @@ Public ağacda route səviyyəli `loading.tsx` qəsdən istifadə edilmir: Suspe
 
 ## Kənar HTML keşi
 
-`wrangler.jsonc`-in `main`-i `worker.ts`-dir. O, anonim ictimai HTML-i Cloudflare Cache API-də `EDGE_HTML_CACHE_TTL` saniyə (production-da 60) saxlayır. Qaydalar `src/lib/edge-html-cache.ts` və `public-cache-policy.ts`-dədir:
+`wrangler.jsonc`-in `main`-i `worker.ts`-dir. O, anonim ictimai HTML-i Cloudflare Cache API-də saxlayır: `EDGE_HTML_CACHE_TTL` saniyə (production-da 60) təzə, sonra `EDGE_HTML_STALE_TTL` (defolt 1 gün) ərzində köhnə nüsxə verilir və fonda yenilənir; açar Worker versiyasını daşıyır. Qaydalar `src/lib/edge-html-cache.ts` və `public-cache-policy.ts`-dədir:
 
 - sessiya/2FA/preview cookie-li sorğu, sessiya oxuyan marşrut, panel, auth və API keşdən keçmir;
 - açar RSC/router başlıqlarını daxil edir; `Set-Cookie` saxlanmır;
@@ -82,7 +82,7 @@ Public ağacda route səviyyəli `loading.tsx` qəsdən istifadə edilmir: Suspe
 - sistem rejimi `NORMAL` deyilsə və ya `FORCE_MAINTENANCE="true"`-dursa keş nə oxunur, nə yazılır (`systemModeAllowsCache()`), ki texniki xidmət səhifəsi dərhal görünsün;
 - cavab `x-edge-cache: HIT|MISS` başlığı daşıyır, brauzerə isə `private, no-cache` verilir — yeniləmə yalnız kənarda idarə olunur.
 
-Yeni ictimai səhifə server tərəfdə sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunmalıdır, əks halda bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test.ts` qoruyur). Admin dəyişikliyi anonim ziyarətçiyə ən çox 60 saniyə gecikmə ilə çatır.
+Yeni ictimai səhifə server tərəfdə sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunmalıdır, əks halda bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test.ts` qoruyur). Admin dəyişikliyini həmin data mərkəzində ilk anonim ziyarətçi köhnə halda bir dəfə görə bilər (stale-while-revalidate), sonrakılar yenisini görür.
 
 ## İctimai data təhlükəsizlik müqaviləsi
 
@@ -297,7 +297,7 @@ luxehome/
 ├── src/config/          mərkəzi sayt konfiqurasiyası
 ├── src/lib/             query, auth, admin, media, SEO və utilitlər
 ├── next.config.ts       Next.js, images, header və dev binding-ləri
-├── open-next.config.ts  R2 incremental cache
+├── open-next.config.ts  R2 incremental cache (+ regional Cache API keşi)
 └── wrangler.jsonc       production/staging Cloudflare konfiqurasiyası
 ```
 

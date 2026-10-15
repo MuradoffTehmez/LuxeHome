@@ -28,8 +28,28 @@ const requestClients = new WeakMap<object, PrismaClient>();
 /** Sorğu konteksti olmayan hallar (skript, test) üçün tək klient. */
 let contextlessClient: PrismaClient | undefined;
 
+/**
+ * Bu həddən uzun sorğu Workers Logs-a yazılır (#173) — hansı səhifənin hansı sorğuda
+ * gözlədiyini görmək üçün. Yalnız model, əməliyyat və müddət yazılır; parametrlər
+ * (şəxsi məlumat ola bilər) yazılmır.
+ */
+const SLOW_QUERY_MS = 200;
+
 function createClient(db: D1Database): PrismaClient {
-  return new PrismaClient({ adapter: new PrismaD1(db) });
+  const client = new PrismaClient({ adapter: new PrismaD1(db) });
+  return client.$extends({
+    query: {
+      async $allOperations({ model, operation, args, query }) {
+        const started = Date.now();
+        try {
+          return await query(args);
+        } finally {
+          const ms = Date.now() - started;
+          if (ms >= SLOW_QUERY_MS) console.warn(`[db] yavaş sorğu ${model ?? "raw"}.${operation} ${ms} ms`);
+        }
+      },
+    },
+  }) as unknown as PrismaClient;
 }
 
 function getClient(): PrismaClient {
