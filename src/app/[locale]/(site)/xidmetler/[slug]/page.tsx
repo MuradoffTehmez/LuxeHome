@@ -14,7 +14,7 @@ import { getCachedServiceBySlug } from "@/lib/public-cache";
 import { siteConfig } from "@/config/site";
 import { isUnoptimizedImage } from "@/lib/utils";
 import { TRANSLATION_ENTITY_TYPES, type Locale } from "@/lib/constants";
-import { localizeKnownContent } from "@/i18n/dynamic-content";
+import { localizeService } from "@/i18n/service-content";
 import { applyContentTranslation, getPublishedContentTranslation } from "@/lib/content-translation";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sourceService = await getCachedServiceBySlug(slug);
 
   if (!sourceService) return { title: t("detail.notFound") };
-  const knownService = localizeKnownContent("service", sourceService, locale as Locale);
+  const knownService = localizeService(sourceService, locale as Locale);
   const service = applyContentTranslation(
     TRANSLATION_ENTITY_TYPES.SERVICE,
     knownService,
@@ -63,7 +63,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   const sourceService = await getCachedServiceBySlug(slug);
 
   if (!sourceService) notFound();
-  const knownService = localizeKnownContent("service", sourceService, locale as Locale);
+  const knownService = localizeService(sourceService, locale as Locale);
   const service = applyContentTranslation(
     TRANSLATION_ENTITY_TYPES.SERVICE,
     knownService,
