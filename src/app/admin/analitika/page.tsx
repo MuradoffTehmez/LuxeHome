@@ -12,6 +12,7 @@ import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getSearchAnalytics, type DailyTraffic } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
+import { vitalP75 } from "@/lib/web-vitals-stats";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
@@ -32,10 +33,9 @@ export default async function AdminAnalyticsPage() {
     prisma.webVitalMetric.findMany({ where: { createdAt: { gte: since } }, orderBy: { createdAt: "desc" }, take: 1_000 }),
   ]);
   const poorVitals = vitals.filter((metric) => metric.rating === "poor").length;
-  const vitalAverage = (name: "LCP" | "INP") => {
-    const values = vitals.filter((metric) => metric.name === name).map((metric) => metric.value);
-    return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : null;
-  };
+  // Orta deyil, p75: fon tabının saatlarla ölçüsü ortanı 110 s-yə çıxarırdı (#173).
+  const lcpP75 = vitalP75(vitals, "LCP");
+  const inpP75 = vitalP75(vitals, "INP");
 
   return (
     <>
@@ -48,8 +48,8 @@ export default async function AdminAnalyticsPage() {
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label={t("pages.ops.brauzerXetasi")} value={errors.length} hint={t("pages.ops.son7Gun")} icon={AlertTriangle} tone={errors.length ? "warning" : "success"} />
         <StatCard label={t("pages.ops.zeifCwvOlcumu")} value={poorVitals} hint={t("pages.common.olcuIcinde", { p0: vitals.length })} icon={Activity} tone={poorVitals ? "warning" : "success"} />
-        <StatCard label={t("pages.ops.ortaLcp")} value={vitalAverage("LCP") === null ? "—" : `${vitalAverage("LCP")} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
-        <StatCard label={t("pages.ops.ortaInp")} value={vitalAverage("INP") === null ? "—" : `${vitalAverage("INP")} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
+        <StatCard label={t("pages.ops.lcpP75")} value={lcpP75 === null ? "—" : `${numberFormatter.format(lcpP75)} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
+        <StatCard label={t("pages.ops.inpP75")} value={inpP75 === null ? "—" : `${numberFormatter.format(inpP75)} ms`} hint={t("pages.ops.son7Gun")} icon={Gauge} tone="neutral" />
       </div>
 
       <AdminCard title={t("pages.ops.sonBrauzerXetalari")} description={t("pages.ops.sexsiMelumatlarVeQuery")} bodyClassName="p-4 lg:p-0" className="mb-6">

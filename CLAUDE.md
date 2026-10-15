@@ -764,6 +764,11 @@ yol + `w`/`q`-dur, qalan query string atılır). `src/app/media/[...key]/route.t
 Kənar nüsxə 1 gün yaşayır (brauzer bir il); `deleteImage()` bütün ölçüləri `purgeMediaCache()` ilə bu data
 mərkəzində təmizləyir. Kiçiltmə alınmayanda orijinal keşə yazılmadan verilir — növbəti sorğu yenidən sınayır.
 
+**Ölçmə (#173):** worker hər HTML/RSC cavabına `Server-Timing` yazır (`app;dur=` — OpenNext başlıqlarına
+qədər server vaxtı, `edge;desc=HIT|MISS|BYPASS`). Prisma klienti `$extends` ilə sarılıb: 200 ms-dən uzun sorğu
+Workers Logs-a `[db] yavaş sorğu <Model>.<əməliyyat> <ms> ms` kimi yazılır (parametrsiz). Paneldə LCP/INP
+orta deyil, p75-dir (`lib/web-vitals-stats.ts`, 60 s-dən böyük fon tabı ölçüləri atılır).
+
 Kanonik `https://luxehomeestate.az/` → `/az` yönləndirməsini də `worker.ts` verir (`src/lib/root-redirect.ts`,
 #169): 307 + 1 saatlıq keş, query string saxlanılır. Bu, yalnız `routing.ts`-də `localeDetection: false` olduqca
 doğrudur — dil təyinini açsan qısa yol özü söndürülür, amma testi də yenilə.
