@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { Expand, Minimize2, Crosshair } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNearViewport } from "@/lib/ui/near-viewport";
 import {
   BAKU_CENTER,
   FALLBACK_ATTRIBUTION,
@@ -150,6 +151,10 @@ export function LeafletMap({
   const [degraded, setDegraded] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  // Leaflet modulu və tile-lar (~900 KB, `@2x`) yalnız qutu görünüşə yaxınlaşanda qurulur (#191):
+  // elan detalında xəritə səhifənin aşağısındadır və mobil şəbəkədə LCP-ni gecikdirirdi.
+  // Qutunun hündürlüyü `className`-dədir, ona görə gecikmə layout sürüşməsi yaratmır.
+  const nearViewport = useNearViewport(containerRef);
 
   // Klik handler-i effektin asılılığına düşməsin deyə ref-də saxlanılır:
   // əks halda hər render xəritəni yenidən qurardı.
@@ -168,8 +173,9 @@ export function LeafletMap({
     [center?.[0], center?.[1], markers[0]?.latitude, markers[0]?.longitude],
   );
 
-  // 1) Xəritənin qurulması — bir dəfə.
+  // 1) Xəritənin qurulması — bir dəfə, qutu görünüşə yaxınlaşanda.
   useEffect(() => {
+    if (!nearViewport) return;
     let cancelled = false;
 
     import("leaflet").then((L) => {
@@ -229,9 +235,9 @@ export function LeafletMap({
       overlayLayerRef.current = null;
       setReady(false);
     };
-    // Yalnız mount/unmount: sonrakı dəyişikliklər ayrıca effektlərdə tətbiq olunur.
+    // Yalnız qurulma/unmount: sonrakı dəyişikliklər ayrıca effektlərdə tətbiq olunur.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [nearViewport]);
 
   // 2) Tema dəyişəndə tile qatı əvəzlənir.
   useEffect(() => {
