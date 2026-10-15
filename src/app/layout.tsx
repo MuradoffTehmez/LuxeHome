@@ -16,11 +16,14 @@ import "./globals.css";
  * Şrift seçimi:
  * Hər iki ailə `latin-ext` alt dəstini daxil edir — Azərbaycan əlifbasının
  * ə, ı, ö, ü, ş, ç, ğ simvolları tam dəstəklənir.
+ *
+ * Hər iki ailə variable fontdur: `weight` verilmir. Playfair-ə `["400", "500", …]`
+ * yazmaq eyni faylı hər çəki üçün ayrıca `@font-face` ilə təkrarlayırdı (16 qayda,
+ * render-i bloklayan CSS) — bayt qazandırmırdı (#185).
  */
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
