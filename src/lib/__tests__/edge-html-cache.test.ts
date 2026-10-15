@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { edgeCacheKey, edgeCacheTtl, isEdgeCacheableRequest, isModeCacheable, isStorableResponse, toCachedCopy } from "@/lib/edge-html-cache";
+import {
+  EDGE_CACHED_AT_HEADER,
+  edgeCacheKey,
+  edgeCacheTtl,
+  edgeCacheVersion,
+  edgeFreshness,
+  edgeStaleTtl,
+  isEdgeCacheableRequest,
+  isModeCacheable,
+  isStorableResponse,
+  refreshRequest,
+  shouldEvictOnRefresh,
+  toCachedCopy,
+} from "@/lib/edge-html-cache";
 
 const request = (path: string, init: RequestInit = {}) => new Request(`https://luxehomeestate.az${path}`, init);
 
@@ -39,9 +52,45 @@ describe("kənar HTML keşi", () => {
     expect(isStorableResponse(new Response("x", { headers: { "content-type": "text/html; charset=utf-8" } }))).toBe(true);
     expect(isStorableResponse(new Response("x", { status: 404, headers: { "content-type": "text/html" } }))).toBe(false);
     expect(isStorableResponse(new Response("{}", { headers: { "content-type": "application/json" } }))).toBe(false);
-    const copy = toCachedCopy(new Response("x", { headers: { "content-type": "text/html", "set-cookie": "NEXT_LOCALE=az" } }), 60);
+    const copy = toCachedCopy(new Response("x", { headers: { "content-type": "text/html", "set-cookie": "NEXT_LOCALE=az" } }), 60, 1_000);
     expect(copy.headers.get("set-cookie")).toBeNull();
     expect(copy.headers.get("cache-control")).toBe("public, max-age=60");
+    expect(copy.headers.get(EDGE_CACHED_AT_HEADER)).toBe("1000");
+  });
+
+  it("saxlanan nüsxəyə köhnə Server-Timing düşmür", () => {
+    const copy = toCachedCopy(new Response("x", { headers: { "content-type": "text/html", "server-timing": "app;dur=900" } }), 60, 1);
+    expect(copy.headers.get("server-timing")).toBeNull();
+  });
+
+  it("SWR pəncərəsi: defolt 1 gün, 0 söndürür, yuxarı həddi 7 gündür (#175)", () => {
+    expect(edgeStaleTtl({})).toBe(86_400);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "" })).toBe(86_400);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "0" })).toBe(0);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "abc" })).toBe(0);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "3600" })).toBe(3_600);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "99999999" })).toBe(7 * 86_400);
+  });
+
+  it("nüsxənin yaşına görə təzə / köhnə / bitmiş qərarı", () => {
+    const now = 10_000_000;
+    expect(edgeFreshness(String(now - 30_000), now, 60, 86_400)).toBe("fresh");
+    expect(edgeFreshness(String(now - 60_000), now, 60, 86_400)).toBe("fresh");
+    expect(edgeFreshness(String(now - 61_000), now, 60, 86_400)).toBe("stale");
+    expect(edgeFreshness(String(now - 61_000), now, 60, 0)).toBe("expired");
+    expect(edgeFreshness(String(now - (60 + 86_400 + 1) * 1_000), now, 60, 86_400)).toBe("expired");
+    // Möhürsüz (köhnə formatlı) giriş, pozulmuş və gələcək möhür təzə sayılmır.
+    expect(edgeFreshness(null, now, 60, 86_400)).toBe("expired");
+    expect(edgeFreshness("abc", now, 60, 86_400)).toBe("expired");
+    expect(edgeFreshness(String(now + 5_000), now, 60, 86_400)).toBe("expired");
+  });
+
+  it("keş açarı Worker versiyasını daşıyır — deploy-dan sonra köhnə HTML verilmir", async () => {
+    expect(edgeCacheVersion({ CF_VERSION_METADATA: { id: "v-123" } })).toBe("v-123");
+    expect(edgeCacheVersion({})).toBe("local");
+    const before = await edgeCacheKey(request("/az"), "v-1");
+    expect(await edgeCacheKey(request("/az"), "v-1")).toBe(before);
+    expect(await edgeCacheKey(request("/az"), "v-2")).not.toBe(before);
   });
 
   it("baxış sayan bloq və bilik detal səhifələrini keşləmir, siyahıları keşləyir", () => {
@@ -69,5 +118,26 @@ describe("kənar HTML keşi", () => {
     const stale = { mode: "NORMAL", startAt: "2026-09-12T07:24:00.000Z", endAt: "2026-09-19T08:00:00.000Z" };
     expect(isModeCacheable(JSON.stringify(stale), undefined)).toBe(true);
     expect(isModeCacheable(JSON.stringify({ ...stale, endAt: "2099-01-01T00:00:00.000Z" }), undefined)).toBe(true);
+  });
+
+  it("fon yenilənməsində qəti cavab köhnə nüsxəni silir, keçici xəta saxlayır (Codex, #176)", () => {
+    // Silinmiş/gizlədilmiş profil və ya elan, köçmüş səhifə
+    for (const status of [301, 302, 307, 308, 400, 403, 404, 410]) expect(shouldEvictOnRefresh(status), String(status)).toBe(true);
+    // Keçici xəta və şərti cavab — köhnə nüsxə qalır
+    for (const status of [200, 304, 408, 429, 500, 502, 503, 504]) expect(shouldEvictOnRefresh(status), String(status)).toBe(false);
+  });
+
+  it("fon sorğusu şərti başlıqları atır, açar başlıqlarını saxlayır", () => {
+    const original = request("/az/emlaklar", {
+      headers: { rsc: "1", "next-router-state-tree": "x", "if-none-match": '"abc"', "if-modified-since": "Wed, 01 Oct 2026 00:00:00 GMT", range: "bytes=0-1" },
+    });
+    const refreshed = refreshRequest(original);
+    expect(refreshed.method).toBe("GET");
+    expect(refreshed.url).toBe(original.url);
+    expect(refreshed.headers.get("rsc")).toBe("1");
+    expect(refreshed.headers.get("next-router-state-tree")).toBe("x");
+    expect(refreshed.headers.get("if-none-match")).toBeNull();
+    expect(refreshed.headers.get("if-modified-since")).toBeNull();
+    expect(refreshed.headers.get("range")).toBeNull();
   });
 });

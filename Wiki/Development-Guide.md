@@ -103,7 +103,7 @@ Development server standart olaraq [http://localhost:3000](http://localhost:3000
 | `NEXT_PUBLIC_SITE_URL` | Client tərəfdə lazım olan public base URL |
 | `CF_ZONE_ID`, `CF_ACCOUNT_ID` | Admin analitikası üçün Cloudflare zona/hesab ID-si (`wrangler.jsonc` vars) |
 | `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` | İstəyə bağlı Cloudflare Access (Zero Trust) qapısı — panel üçün |
-| `SYSTEM_MODE`, `FORCE_MAINTENANCE`, `EDGE_HTML_CACHE_TTL` | Worker vars: defolt sistem rejimi, təcili texniki xidmət açarı, kənar keş TTL-i |
+| `SYSTEM_MODE`, `FORCE_MAINTENANCE`, `EDGE_HTML_CACHE_TTL`, `EDGE_HTML_STALE_TTL` | Worker vars: defolt sistem rejimi, təcili texniki xidmət açarı, kənar keş TTL-i və SWR pəncərəsi |
 
 `IS_STAGING` əsasən Wrangler staging vars daxilində təyin olunur.
 

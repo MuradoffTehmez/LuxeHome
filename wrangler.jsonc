@@ -80,6 +80,10 @@
     "binding": "IMAGES"
   },
 
+  // Worker versiyası — kənar HTML keşinin açarına düşür ki, deploy-dan sonra köhnə HTML
+  // (artıq olmayan JS chunk-larına istinadla) SWR ilə verilməsin (#175).
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
+
   // Workers AI — elan təsviri və foto keyfiyyət analizi (`src/lib/ai.ts`).
   // Xarici AI provayderi (OpenAI) qəsdən işlədilmir: binding hesab daxilində qalır,
   // ayrıca API açarı saxlanmır və elan məlumatı üçüncü tərəfə göndərilmir.
@@ -148,6 +152,7 @@
 
       "vectorize": [{ "binding": "PROPERTY_VECTORS", "index_name": "luxehome-properties-staging" }],
       "images": { "binding": "IMAGES" },
+      "version_metadata": { "binding": "CF_VERSION_METADATA" },
       "ai": { "binding": "AI" },
 
       "vars": {

@@ -7,10 +7,16 @@
 import openNext from "./.open-next/worker.js";
 import {
   EDGE_CACHE_HEADER,
+  EDGE_CACHED_AT_HEADER,
   edgeCacheKey,
   edgeCacheTtl,
+  edgeCacheVersion,
+  edgeFreshness,
+  edgeStaleTtl,
   isEdgeCacheableRequest,
   isStorableResponse,
+  refreshRequest,
+  shouldEvictOnRefresh,
   systemModeAllowsCache,
   toCachedCopy,
 } from "./src/lib/edge-html-cache";
@@ -34,6 +40,8 @@ export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-nex
 
 type Env = {
   EDGE_HTML_CACHE_TTL?: string;
+  EDGE_HTML_STALE_TTL?: string;
+  CF_VERSION_METADATA?: { id?: string };
   IS_STAGING?: string;
   FORCE_MAINTENANCE?: string;
   DB?: D1Database;
@@ -157,6 +165,37 @@ async function timedOpenNext(request: Request, env: Env, ctx: ExecutionContext):
   return { response, ms: Date.now() - started };
 }
 
+function storeEdgeCopy(cache: Cache, key: string, response: Response, storeTtl: number): Promise<void> {
+  return cache.put(key, toCachedCopy(response, storeTtl, Date.now())).catch(() => undefined);
+}
+
+/** Eyni açarın paralel fon yenilənməsini bir dəfəyə endirir (izolyat daxilində). */
+const refreshing = new Set<string>();
+
+/**
+ * Köhnə nüsxəni fonda yeniləyir (#175). Saxlanıla bilən (200, HTML/RSC) cavab yazılır; qəti cavab
+ * (səhifə silinib, gizlədilib, köçüb — `shouldEvictOnRefresh`) nüsxəni silir; keçici xətada köhnə
+ * nüsxə qalır və növbəti hit yenidən sınayır.
+ */
+async function refreshEdgeCopy(request: Request, key: string, env: Env, ctx: ExecutionContext, storeTtl: number): Promise<void> {
+  if (refreshing.has(key)) return;
+  refreshing.add(key);
+  try {
+    const cache = (caches as unknown as { default: Cache }).default;
+    const response: Response = await openNext.fetch(refreshRequest(request), env, ctx);
+    if (isStorableResponse(response)) {
+      await storeEdgeCopy(cache, key, response, storeTtl);
+    } else if (shouldEvictOnRefresh(response.status)) {
+      // Səhifə silinib/gizlədilib və ya köçüb — köhnə nüsxə bir daha verilməsin.
+      await cache.delete(key);
+    }
+  } catch {
+    // Fon yenilənməsinin xətası ziyarətçiyə təsir etmir — növbəti köhnə hit yenidən sınayır.
+  } finally {
+    refreshing.delete(key);
+  }
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // `/` həmişə `/az`-a gedir — OpenNext və middleware-i işə salmadan, keşlənə bilən cavabla (#169).
@@ -179,14 +218,20 @@ const worker = {
     }
 
     const cache = (caches as unknown as { default: Cache }).default;
-    const key = await edgeCacheKey(request);
+    const key = await edgeCacheKey(request, edgeCacheVersion(env));
+    const staleTtl = edgeStaleTtl(env);
     const cached = await cache.match(key);
-    if (cached) {
+    const freshness = cached ? edgeFreshness(cached.headers.get(EDGE_CACHED_AT_HEADER), Date.now(), ttl, staleTtl) : "expired";
+    if (cached && freshness !== "expired") {
+      // Köhnə nüsxə dərhal verilir, yenisi fonda qurulur (#175).
+      if (freshness === "stale") ctx.waitUntil(refreshEdgeCopy(request, key, env, ctx, ttl + staleTtl));
+      const status = freshness === "fresh" ? "HIT" : "STALE";
       const hit = new Response(cached.body, cached);
-      hit.headers.set(EDGE_CACHE_HEADER, "HIT");
+      hit.headers.delete(EDGE_CACHED_AT_HEADER);
+      hit.headers.set(EDGE_CACHE_HEADER, status);
       // Brauzer öz keşində saxlamasın — yeniləmə kənarda idarə olunur.
       hit.headers.set("cache-control", "private, no-cache");
-      hit.headers.set("server-timing", 'edge;desc="HIT"');
+      hit.headers.set("server-timing", `edge;desc="${status}"`);
       return hit;
     }
 
@@ -194,7 +239,7 @@ const worker = {
     if (!isStorableResponse(response)) return withServerTiming(response, [`app;dur=${ms}`, 'edge;desc="MISS"']);
 
     const [forClient, forCache] = response.body ? response.body.tee() : [null, null];
-    ctx.waitUntil(cache.put(key, toCachedCopy(new Response(forCache, response), ttl)).catch(() => undefined));
+    ctx.waitUntil(storeEdgeCopy(cache, key, new Response(forCache, response), ttl + staleTtl));
     const miss = new Response(forClient, response);
     miss.headers.set(EDGE_CACHE_HEADER, "MISS");
     miss.headers.append("server-timing", `app;dur=${ms}, edge;desc="MISS"`);

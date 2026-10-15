@@ -748,12 +748,17 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 ### Kənar HTML keşi (#105)
 
 `wrangler.jsonc` `main`-i `worker.ts`-dir: OpenNext worker-ini sarır və anonim ictimai
-HTML-i Cloudflare Cache API-də `EDGE_HTML_CACHE_TTL` saniyə (production-da 60) saxlayır.
+HTML-i Cloudflare Cache API-də saxlayır: `EDGE_HTML_CACHE_TTL` saniyə (production-da 60) təzə,
+sonra `EDGE_HTML_STALE_TTL` (defolt 1 gün) ərzində köhnə nüsxə dərhal verilir və fonda yenilənir
+(stale-while-revalidate, #175). Açar Worker versiyasını (`version_metadata` → `CF_VERSION_METADATA`)
+daşıyır — deploy-dan sonra köhnə HTML artıq olmayan JS chunk-larına istinad etməsin.
 Qaydalar `src/lib/edge-html-cache.ts`-dədir və `public-cache-policy.ts`-ə söykənir:
 sessiya/2FA/preview cookie-li sorğu, sessiya oxuyan marşrut, panel, auth və API keçir;
 açar RSC/router başlıqlarını daxil edir; `Set-Cookie` saxlanmır; `IS_STAGING` olan
-mühitdə (staging, lokal E2E) keş söndürülüdür. Nəticə: admin dəyişikliyi anonim
-ziyarətçiyə ən çox 60 saniyə gecikmə ilə çatır. **Yeni ictimai səhifə server tərəfdə
+mühitdə (staging, lokal E2E) keş söndürülüdür. Nəticə: admin dəyişikliyindən sonra həmin data
+mərkəzində **ilk** anonim ziyarətçi köhnə nüsxəni bir dəfə görə bilər (60 s-dən köhnədirsə), sonrakılar
+yenisini; daxil olmuş istifadəçi həmişə təzəsini. Lokalda SWR-i yoxlamaq üçün stack-i `IS_STAGING:false`
+ilə qaldır və sorğuya `Host: luxehomeestate.az` + `x-forwarded-proto: https` əlavə et (yoxsa kanonik host 308 verir). **Yeni ictimai səhifə server tərəfdə
 sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunmalıdır** — əks halda
 bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test.ts` qoruyur).
 Durable Object sinifləri `worker.ts`-dən yenidən ixrac olunur — sarğını dəyişəndə saxla.

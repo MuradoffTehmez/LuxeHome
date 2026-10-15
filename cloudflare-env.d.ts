@@ -16,6 +16,7 @@ interface __BaseEnv_CloudflareEnv {
 	AI: Ai;
 	PROPERTY_VECTORS: Vectorize;
 	IMAGES: ImagesBinding;
+	CF_VERSION_METADATA: WorkerVersionMetadata;
 	ASSETS: Fetcher;
 	ADMIN_ENABLED: "true";
 	SYSTEM_MODE: "NORMAL";
@@ -50,6 +51,7 @@ declare namespace Cloudflare {
 		AI: Ai;
 		PROPERTY_VECTORS: Vectorize;
 		IMAGES: ImagesBinding;
+		CF_VERSION_METADATA: WorkerVersionMetadata;
 		ASSETS: Fetcher;
 		ADMIN_ENABLED: "true";
 		SYSTEM_MODE: "NORMAL";
