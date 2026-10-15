@@ -139,6 +139,84 @@ export type PropertyCardData = Prisma.PropertyGetPayload<{
   select: typeof propertyCardSelect;
 }>;
 
+/**
+ * Kart seçiminin elan üzərindən oxunan əlaqələri — `findPropertyCards()` onları ayrıca, paralel
+ * oxuyur. `author` burada deyil: o, `User` cədvəlindən birbaşa oxunur (zəncir qısalır).
+ */
+const PROPERTY_CARD_RELATIONS = [
+  "type",
+  "city",
+  "district",
+  "images",
+  "nearbyPlaces",
+  "priceHistory",
+] as const satisfies readonly (keyof typeof propertyCardSelect)[];
+
+/** Bir sorğuda `id IN (…)` üçün təhlükəsiz hədd (D1: ≤100 parametr, iç-içə `take` ≤98 valideyn). */
+const PARALLEL_CARD_LIMIT = 90;
+
+type PropertyCardArgs = Omit<Prisma.PropertyFindManyArgs, "select" | "include" | "distinct">;
+type RelationRows = ({ id: string } & Record<string, unknown>)[];
+
+/**
+ * `findMany({ ...args, select: propertyCardSelect })` ilə eyni nəticə, amma əlaqələr paralel (#181).
+ *
+ * D1-də Prisma əlaqələri ardıcıl yükləyir (#179): kart seçimi ~11 ardıcıl gediş-gəliş idi.
+ * İndi əvvəl sıralı sətirlər (skalyar sahələr + `_count`) bir sorğu ilə gəlir, sonra hər əlaqə
+ * `id IN (…)` ilə eyni anda oxunur və sıra saxlanılır. Müəllif (ən uzun zəncir: müəllif →
+ * əməkdaşlıq → agentlik) `User`-dən birbaşa, iki paralel sorğu ilə oxunur. Böyük nəticədə
+ * (>90) köhnə tək sorğuya düşür — `IN` siyahısı D1 limitinə toxunmasın.
+ */
+export async function findPropertyCards(args: PropertyCardArgs): Promise<PropertyCardData[]> {
+  const { author: authorSelect, ...withoutAuthor } = propertyCardSelect;
+  const scalarSelect = Object.fromEntries(
+    Object.entries(withoutAuthor).filter(([key]) => !(PROPERTY_CARD_RELATIONS as readonly string[]).includes(key)),
+  ) as Prisma.PropertySelect;
+  const base = (await prisma.property.findMany({
+    ...args,
+    select: { ...scalarSelect, authorId: true },
+  })) as unknown as ({ id: string; authorId: string | null } & Record<string, unknown>)[];
+  if (base.length === 0) return [];
+  if (base.length > PARALLEL_CARD_LIMIT) {
+    return prisma.property.findMany({ ...args, select: propertyCardSelect });
+  }
+
+  const ids = base.map((row) => row.id);
+  const authorIds = [...new Set(base.map((row) => row.authorId).filter((id): id is string => Boolean(id)))];
+  const { agencyEmployments, ...authorFields } = authorSelect.select;
+  const [parts, authorProfiles, authorEmployments] = await Promise.all([
+    Promise.all(
+      PROPERTY_CARD_RELATIONS.map(
+        (relation) =>
+          prisma.property.findMany({
+            where: { id: { in: ids } },
+            select: { id: true, [relation]: propertyCardSelect[relation] },
+          }) as unknown as Promise<RelationRows>,
+      ),
+    ),
+    authorIds.length
+      ? (prisma.user.findMany({ where: { id: { in: authorIds } }, select: { id: true, ...authorFields } }) as unknown as Promise<RelationRows>)
+      : Promise.resolve([] as RelationRows),
+    authorIds.length
+      ? (prisma.user.findMany({ where: { id: { in: authorIds } }, select: { id: true, agencyEmployments } }) as unknown as Promise<RelationRows>)
+      : Promise.resolve([] as RelationRows),
+  ]);
+
+  const authors = new Map(authorProfiles.map(({ id, ...profile }) => [id, profile]));
+  for (const { id, ...rest } of authorEmployments) Object.assign(authors.get(id) ?? {}, rest);
+
+  const byId = new Map(
+    base.map(({ authorId, ...row }) => [row.id, { ...row, author: authorId ? authors.get(authorId) ?? null : null }]),
+  );
+  for (const rows of parts) {
+    for (const row of rows) {
+      const target = byId.get(row.id);
+      if (target) Object.assign(target, row);
+    }
+  }
+  return ids.map((id) => byId.get(id)) as unknown as PropertyCardData[];
+}
+
 export const projectCardSelect = {
   id: true,
   name: true,
@@ -485,7 +563,7 @@ export async function getProperties(filters: PropertyFilters = {}) {
     const ids = await polygonMatchIds(filters, where);
     const pageIds = ids.slice((page - 1) * pageSize, page * pageSize);
     const rows = pageIds.length
-      ? await prisma.property.findMany({ where: { id: { in: pageIds } }, select: propertyCardSelect })
+      ? await findPropertyCards({ where: { id: { in: pageIds } } })
       : [];
     const byId = new Map(rows.map((row) => [row.id, row]));
     return {
@@ -509,9 +587,8 @@ export async function getProperties(filters: PropertyFilters = {}) {
     const offset = (page - 1) * pageSize;
     const premiumTake = Math.max(0, Math.min(pageSize, premiumCount - offset));
     const premiumItems = premiumTake > 0
-      ? await prisma.property.findMany({
+      ? await findPropertyCards({
           where: activePremium,
-          select: propertyCardSelect,
           orderBy: [{ featuredUntil: "desc" }, { publishedAt: "desc" }],
           skip: offset,
           take: premiumTake,
@@ -520,9 +597,8 @@ export async function getProperties(filters: PropertyFilters = {}) {
     const regularTake = pageSize - premiumItems.length;
     const regularSkip = Math.max(0, offset - premiumCount);
     const regularItems = regularTake > 0
-      ? await prisma.property.findMany({
+      ? await findPropertyCards({
           where: { AND: [where, { NOT: activePremium }] },
-          select: propertyCardSelect,
           orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
           skip: regularSkip,
           take: regularTake,
@@ -539,9 +615,8 @@ export async function getProperties(filters: PropertyFilters = {}) {
   }
 
   const [items, total] = await Promise.all([
-    prisma.property.findMany({
+    findPropertyCards({
       where,
-      select: propertyCardSelect,
       orderBy: buildPropertyOrderBy(filters.sort),
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -643,13 +718,12 @@ export async function getPropertiesForMap(filters: PropertyFilters = {}) {
 }
 
 async function getFeaturedProperties(take = 6) {
-  return prisma.property.findMany({
+  return findPropertyCards({
     where: {
       ...(await publicPropertyWhere()),
       isFeatured: true,
       OR: [{ featuredUntil: null }, { featuredUntil: { gte: new Date() } }],
     },
-    select: propertyCardSelect,
     orderBy: [{ publishedAt: "desc" }],
     take,
   });
@@ -662,9 +736,8 @@ async function getFeaturedProperties(take = 6) {
 export async function getHomeShowcaseProperties(take = 6) {
   const featured = await getFeaturedProperties(take);
   if (featured.length >= take) return featured;
-  const latest = await prisma.property.findMany({
+  const latest = await findPropertyCards({
     where: { ...(await publicPropertyWhere()), id: { notIn: featured.map((property) => property.id) } },
-    select: propertyCardSelect,
     orderBy: [{ publishedAt: "desc" }],
     take: take - featured.length,
   });
@@ -741,14 +814,13 @@ export async function getSimilarProperties(
   property: { id: string; cityId: string; typeId: string; listingType: string },
   take = 4,
 ) {
-  return prisma.property.findMany({
+  return findPropertyCards({
     where: {
       ...(await publicPropertyWhere()),
       id: { not: property.id },
       listingType: property.listingType,
       OR: [{ cityId: property.cityId }, { typeId: property.typeId }],
     },
-    select: propertyCardSelect,
     orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
     take,
   });
