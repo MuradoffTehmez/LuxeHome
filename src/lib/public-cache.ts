@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { reviveDates } from "@/lib/revive-dates";
 import { PUBLIC_CACHE_TAGS } from "@/lib/cache-tags";
+import { startOfBakuToday } from "@/lib/partners";
 import {
   getBlogCategories,
   getHomeShowcaseProperties,
@@ -110,11 +111,21 @@ export const getCachedSimilarProperties = cachedQuery(
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 
-export const getCachedPropertyPartners = cachedQuery(
-  async (propertyId: string) => getPropertyPartners(propertyId),
+const getCachedPropertyPartnersForDay = cachedQuery(
+  // `bakuDay` yalnız açar üçündür: `publicPartnerWhere()` tərəfdaşlığın bitmə tarixini Bakı günü ilə
+  // yoxlayır, keş hit-i isə onu yenidən hesablamır. Gün açarda olanda gecə yarısı yeni giriş başlayır
+  // və müddəti bitmiş tərəfdaş 5 dəqiqə də görünmür (Codex, #180).
+  async (propertyId: string, bakuDay: string) => {
+    void bakuDay;
+    return getPropertyPartners(propertyId);
+  },
   ["public-property-partners-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties, PUBLIC_CACHE_TAGS.partners], revalidate: FIVE_MINUTES },
 );
+
+export function getCachedPropertyPartners(propertyId: string) {
+  return getCachedPropertyPartnersForDay(propertyId, startOfBakuToday().toISOString());
+}
 
 export const getCachedProjectBySlug = cachedQuery(
   async (slug: string) => getProjectBySlug(slug),
