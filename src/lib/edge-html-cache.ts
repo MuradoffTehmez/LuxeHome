@@ -91,15 +91,20 @@ let modeSnapshot: { allowed: boolean; expiresAt: number } | null = null;
 /**
  * Keşdən cavab vermək yalnız sayt adi rejimdədirsə təhlükəsizdir. Texniki xidmət açılanda
  * keşlənmiş səhifə `maintenanceGate()`-dən yan keçməməlidir — ona görə rejim oxunur
- * (middleware kimi 15 s izolyat snapshot-u ilə). Planlaşdırılmış pəncərə varsa və ya rejim
- * oxunmursa keş işlədilmir: şübhəli halda sorğu OpenNext-ə gedir və qərarı middleware verir.
+ * (middleware kimi 15 s izolyat snapshot-u ilə). Rejim oxunmursa keş işlədilmir: şübhəli
+ * halda sorğu OpenNext-ə gedir və qərarı middleware verir.
+ *
+ * Qərar yalnız `mode`-dan asılıdır — `decideMaintenanceGate()` kimi. `startAt` informativdir,
+ * `endAt` isə yalnız geri sayımdır; qapı onlara baxmır. Əvvəllər onlardan biri dolu olanda
+ * keş bağlanırdı və sentyabrdakı test pəncərəsi qalan ayar production keşini həftələrlə
+ * söndürmüşdü (#163).
  */
 export function isModeCacheable(raw: string | null | undefined, forceMaintenance: string | undefined): boolean {
   if (forceMaintenance === "true") return false;
   if (!raw?.trim()) return true;
   try {
-    const config = JSON.parse(raw) as { mode?: unknown; startAt?: unknown; endAt?: unknown };
-    return (config.mode ?? "NORMAL") === "NORMAL" && !config.startAt && !config.endAt;
+    const config = JSON.parse(raw) as { mode?: unknown };
+    return (config.mode ?? "NORMAL") === "NORMAL";
   } catch {
     return false;
   }
