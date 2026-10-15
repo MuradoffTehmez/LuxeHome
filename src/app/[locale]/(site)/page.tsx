@@ -42,6 +42,7 @@ import { buildManagedMetadata } from "@/lib/seo";
 import { getCachedHomePageData, getCachedHomeSocialProof } from "@/lib/public-cache";
 import { getCategoryImageUrl } from "@/lib/category-images";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
+import { localizeService } from "@/i18n/service-content";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -107,7 +108,7 @@ export default async function HomePage({ params }: HomePageProps) {
     getSiteImages(),
   ]);
   const priceBands = await assessPriceBands(featured);
-  const localizedServices = services.map((service) => localizeKnownContent("service", service, resolvedLocale));
+  const localizedServices = services.map((service) => localizeService(service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 
   const typeOptions = filterOptions.types.map((type) => ({
