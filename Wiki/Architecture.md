@@ -49,7 +49,7 @@ flowchart LR
 
 ## Render və məlumat axını
 
-İctimai səhifələr Server Component-dir. Ana səhifə və sabit locale səhifələri SSG ola bilər; request-time D1 lazım olan detail, axtarış, sitemap və texniki marşrutlar dinamik render olunur. Tez-tez oxunan public sorğular `unstable_cache`, mərkəzi public tag-lər, D1 revalidation cədvəli və R2 incremental cache ilə idarə olunur. Runtime parametr build zamanı əlçatan olmadıqda təsdiqlənmiş `siteConfig` ehtiyat dəyərinə düşür.
+İctimai səhifələr Server Component-dir. Ana səhifə və sabit locale səhifələri SSG ola bilər; request-time D1 lazım olan detail, axtarış, sitemap və texniki marşrutlar dinamik render olunur. Tez-tez oxunan public sorğular `unstable_cache`, mərkəzi public tag-lər, D1 revalidation cədvəli və R2 incremental cache ilə idarə olunur; R2-nin qarşısında data mərkəzinin Cache API-si (`withRegionalCache`, long-lived) durur, hit-də D1 teq yoxlaması yenə işləyir. Runtime parametr build zamanı əlçatan olmadıqda təsdiqlənmiş `siteConfig` ehtiyat dəyərinə düşür.
 
 ```mermaid
 sequenceDiagram
@@ -297,7 +297,7 @@ luxehome/
 ├── src/config/          mərkəzi sayt konfiqurasiyası
 ├── src/lib/             query, auth, admin, media, SEO və utilitlər
 ├── next.config.ts       Next.js, images, header və dev binding-ləri
-├── open-next.config.ts  R2 incremental cache
+├── open-next.config.ts  R2 incremental cache (+ regional Cache API keşi)
 └── wrangler.jsonc       production/staging Cloudflare konfiqurasiyası
 ```
 
