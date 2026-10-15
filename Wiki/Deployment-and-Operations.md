@@ -19,6 +19,7 @@ Tətbiq `@opennextjs/cloudflare` ilə Cloudflare Worker formatına çevrilir. Pr
 | `ADMIN_ENABLED` | `true` | `true` |
 | `SYSTEM_MODE` / `FORCE_MAINTENANCE` | `NORMAL` / `false` | `NORMAL` / `false` |
 | `EDGE_HTML_CACHE_TTL` | `60` | — (keş `IS_STAGING` ilə söndürülü) |
+| `EDGE_HTML_STALE_TTL` | yazılmayıb → `86400` (SWR pəncərəsi; `0` söndürür) | — |
 | `TURNSTILE_HOSTNAMES` | `luxehomeestate.az,www.luxehomeestate.az` | staging workers.dev hostu |
 | `GSC_SITE_URL` | `sc-domain:luxehomeestate.az` | eyni |
 | Custom domain | `routes` — `luxehomeestate.az`, `www.luxehomeestate.az` | `routes = []`, `workers_dev = true` |
@@ -48,7 +49,7 @@ Hər iki Worker `compatibility_date: 2026-08-20`, `nodejs_compat` və `global_fe
 | `AI_LIMIT` | Rate limit | AI axtarışı və məsləhətçi (12/60 s) |
 | `VALUATION_LIMIT` | Rate limit | «Evimi qiymətləndir» (20/60 s) |
 
-`wrangler.jsonc`-in `main`-i `worker.ts`-dir: OpenNext worker-ini sarır, anonim ictimai HTML-i Cache API-də `EDGE_HTML_CACHE_TTL` (production-da 60) saniyə saxlayır və OpenNext-in Durable Object siniflərini (`DOQueueHandler`, `DOShardedTagCache`, `BucketCachePurge`) yenidən ixrac edir — sarğını dəyişəndə bu ixrac saxlanmalıdır. Binding dəyişəndə `npm run cf-typegen` işlədilir.
+`wrangler.jsonc`-in `main`-i `worker.ts`-dir: OpenNext worker-ini sarır, anonim ictimai HTML-i Cache API-də `EDGE_HTML_CACHE_TTL` (production-da 60) saniyə təzə, sonra `EDGE_HTML_STALE_TTL` ərzində stale-while-revalidate ilə saxlayır (açar `CF_VERSION_METADATA` ilə versiyalanır) və OpenNext-in Durable Object siniflərini (`DOQueueHandler`, `DOShardedTagCache`, `BucketCachePurge`) yenidən ixrac edir — sarğını dəyişəndə bu ixrac saxlanmalıdır. Binding dəyişəndə `npm run cf-typegen` işlədilir.
 
 ## Secret-lər
 

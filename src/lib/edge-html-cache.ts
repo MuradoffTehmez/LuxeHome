@@ -61,10 +61,10 @@ export function isEdgeCacheableRequest(request: Request): boolean {
   return isCacheablePublicRoute(url.pathname);
 }
 
-/** Keş açarı — URL + naviqasiya başlıqlarının heşi (sintetik URL kimi). */
-export async function edgeCacheKey(request: Request): Promise<string> {
+/** Keş açarı — Worker versiyası + URL + naviqasiya başlıqlarının heşi (sintetik URL kimi). */
+export async function edgeCacheKey(request: Request, version = ""): Promise<string> {
   const vary = VARY_HEADERS.map((name) => `${name}=${request.headers.get(name) ?? ""}`).join("\n");
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${request.url}\n${vary}`));
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${version}\n${request.url}\n${vary}`));
   const hash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
   return `https://edge-html-cache.internal/${hash}`;
 }
@@ -75,11 +75,52 @@ export function isStorableResponse(response: Response): boolean {
   return type.startsWith("text/html") || type.startsWith("text/x-component");
 }
 
-/** Saxlanacaq nüsxə: `Set-Cookie` atılır, keş müddəti yazılır. */
-export function toCachedCopy(response: Response, ttl: number): Response {
+/** Nüsxənin keşə yazıldığı an (ms) — təzə/köhnə qərarı üçün; klientə ötürülmür. */
+export const EDGE_CACHED_AT_HEADER = "x-edge-cached-at";
+const DEFAULT_STALE_TTL = 86_400;
+const MAX_STALE_TTL = 7 * 86_400;
+
+/**
+ * Stale-while-revalidate pəncərəsi (#175), saniyə: təzəlik bitəndən sonra köhnə nüsxə bu
+ * müddət ərzində dərhal verilir və fonda yenilənir. Aşağı trafikdə 60 s-lik keş real
+ * ziyarətçilərin çoxuna MISS verirdi. `EDGE_HTML_STALE_TTL=0` SWR-i söndürür.
+ */
+export function edgeStaleTtl(env: { EDGE_HTML_STALE_TTL?: string }): number {
+  const raw = env.EDGE_HTML_STALE_TTL;
+  if (raw === undefined || raw === "") return DEFAULT_STALE_TTL;
+  const ttl = Number(raw);
+  return Number.isFinite(ttl) && ttl > 0 ? Math.min(Math.floor(ttl), MAX_STALE_TTL) : 0;
+}
+
+export type EdgeFreshness = "fresh" | "stale" | "expired";
+
+/** Keşdəki nüsxənin yaşına görə qərar; möhür yoxdursa, pozulubsa və ya gələcəkdədirsə `expired`. */
+export function edgeFreshness(cachedAt: string | null, now: number, ttl: number, staleTtl: number): EdgeFreshness {
+  const stamp = Number(cachedAt);
+  if (!cachedAt || !Number.isFinite(stamp) || stamp > now) return "expired";
+  const ageSeconds = (now - stamp) / 1_000;
+  if (ageSeconds <= ttl) return "fresh";
+  return ageSeconds <= ttl + staleTtl ? "stale" : "expired";
+}
+
+/**
+ * Keş açarının versiya hissəsi: deploy-dan sonra köhnə HTML (artıq olmayan JS chunk-larına
+ * istinadla) verilməsin. `version_metadata` binding-i yoxdursa (lokal), sabit dəyər.
+ */
+export function edgeCacheVersion(env: { CF_VERSION_METADATA?: { id?: string } }): string {
+  return env.CF_VERSION_METADATA?.id || "local";
+}
+
+/**
+ * Saxlanacaq nüsxə: `Set-Cookie` və `Server-Timing` atılır, yazılma anı möhürlənir. Cache API
+ * girişi təzəlik + SWR pəncərəsi qədər yaşayır; təzə/köhnə qərarını möhür verir, `max-age` deyil.
+ */
+export function toCachedCopy(response: Response, storeTtl: number, cachedAt: number): Response {
   const headers = new Headers(response.headers);
   headers.delete("set-cookie");
-  headers.set("cache-control", `public, max-age=${ttl}`);
+  headers.delete("server-timing");
+  headers.set("cache-control", `public, max-age=${storeTtl}`);
+  headers.set(EDGE_CACHED_AT_HEADER, String(cachedAt));
   return new Response(response.body, { status: response.status, headers });
 }
 

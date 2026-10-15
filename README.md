@@ -303,7 +303,7 @@ Sayt [http://localhost:3000](http://localhost:3000) ünvanında açılır. `next
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_GTM_ID`, `GOOGLE_SITE_VERIFICATION` | Google Analytics / Tag Manager və Search Console təsdiqi | İstəyə bağlı |
 | `AI_TEXT_MODEL`, `AI_VISION_MODEL` | Workers AI modelinin əvəzlənməsi | İstəyə bağlı |
 | `ACCESS_ENFORCED`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` | Panel üçün Cloudflare Access (Zero Trust) qapısı | İstəyə bağlı |
-| `SYSTEM_MODE`, `FORCE_MAINTENANCE`, `EDGE_HTML_CACHE_TTL` | Worker vars: defolt sistem rejimi, təcili texniki xidmət, kənar keş TTL-i | `wrangler.jsonc`-dədir |
+| `SYSTEM_MODE`, `FORCE_MAINTENANCE`, `EDGE_HTML_CACHE_TTL`, `EDGE_HTML_STALE_TTL` | Worker vars: defolt sistem rejimi, təcili texniki xidmət, kənar keş TTL-i və SWR pəncərəsi | `wrangler.jsonc`-dədir |
 
 Cloudflare secret nümunələri:
 

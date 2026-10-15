@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { edgeCacheKey, edgeCacheTtl, isEdgeCacheableRequest, isModeCacheable, isStorableResponse, toCachedCopy } from "@/lib/edge-html-cache";
+import {
+  EDGE_CACHED_AT_HEADER,
+  edgeCacheKey,
+  edgeCacheTtl,
+  edgeCacheVersion,
+  edgeFreshness,
+  edgeStaleTtl,
+  isEdgeCacheableRequest,
+  isModeCacheable,
+  isStorableResponse,
+  toCachedCopy,
+} from "@/lib/edge-html-cache";
 
 const request = (path: string, init: RequestInit = {}) => new Request(`https://luxehomeestate.az${path}`, init);
 
@@ -39,9 +50,45 @@ describe("kənar HTML keşi", () => {
     expect(isStorableResponse(new Response("x", { headers: { "content-type": "text/html; charset=utf-8" } }))).toBe(true);
     expect(isStorableResponse(new Response("x", { status: 404, headers: { "content-type": "text/html" } }))).toBe(false);
     expect(isStorableResponse(new Response("{}", { headers: { "content-type": "application/json" } }))).toBe(false);
-    const copy = toCachedCopy(new Response("x", { headers: { "content-type": "text/html", "set-cookie": "NEXT_LOCALE=az" } }), 60);
+    const copy = toCachedCopy(new Response("x", { headers: { "content-type": "text/html", "set-cookie": "NEXT_LOCALE=az" } }), 60, 1_000);
     expect(copy.headers.get("set-cookie")).toBeNull();
     expect(copy.headers.get("cache-control")).toBe("public, max-age=60");
+    expect(copy.headers.get(EDGE_CACHED_AT_HEADER)).toBe("1000");
+  });
+
+  it("saxlanan nüsxəyə köhnə Server-Timing düşmür", () => {
+    const copy = toCachedCopy(new Response("x", { headers: { "content-type": "text/html", "server-timing": "app;dur=900" } }), 60, 1);
+    expect(copy.headers.get("server-timing")).toBeNull();
+  });
+
+  it("SWR pəncərəsi: defolt 1 gün, 0 söndürür, yuxarı həddi 7 gündür (#175)", () => {
+    expect(edgeStaleTtl({})).toBe(86_400);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "" })).toBe(86_400);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "0" })).toBe(0);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "abc" })).toBe(0);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "3600" })).toBe(3_600);
+    expect(edgeStaleTtl({ EDGE_HTML_STALE_TTL: "99999999" })).toBe(7 * 86_400);
+  });
+
+  it("nüsxənin yaşına görə təzə / köhnə / bitmiş qərarı", () => {
+    const now = 10_000_000;
+    expect(edgeFreshness(String(now - 30_000), now, 60, 86_400)).toBe("fresh");
+    expect(edgeFreshness(String(now - 60_000), now, 60, 86_400)).toBe("fresh");
+    expect(edgeFreshness(String(now - 61_000), now, 60, 86_400)).toBe("stale");
+    expect(edgeFreshness(String(now - 61_000), now, 60, 0)).toBe("expired");
+    expect(edgeFreshness(String(now - (60 + 86_400 + 1) * 1_000), now, 60, 86_400)).toBe("expired");
+    // Möhürsüz (köhnə formatlı) giriş, pozulmuş və gələcək möhür təzə sayılmır.
+    expect(edgeFreshness(null, now, 60, 86_400)).toBe("expired");
+    expect(edgeFreshness("abc", now, 60, 86_400)).toBe("expired");
+    expect(edgeFreshness(String(now + 5_000), now, 60, 86_400)).toBe("expired");
+  });
+
+  it("keş açarı Worker versiyasını daşıyır — deploy-dan sonra köhnə HTML verilmir", async () => {
+    expect(edgeCacheVersion({ CF_VERSION_METADATA: { id: "v-123" } })).toBe("v-123");
+    expect(edgeCacheVersion({})).toBe("local");
+    const before = await edgeCacheKey(request("/az"), "v-1");
+    expect(await edgeCacheKey(request("/az"), "v-1")).toBe(before);
+    expect(await edgeCacheKey(request("/az"), "v-2")).not.toBe(before);
   });
 
   it("baxış sayan bloq və bilik detal səhifələrini keşləmir, siyahıları keşləyir", () => {
