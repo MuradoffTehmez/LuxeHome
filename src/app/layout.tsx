@@ -9,6 +9,7 @@ import { THEME_RUNTIME_SHIM } from "@/lib/theme-runtime";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { WebVitalsReporter } from "@/components/analytics/web-vitals-reporter";
 import { DeploymentRecovery } from "@/components/deployment-recovery";
+import { PUBLIC_CLIENT_MESSAGE_PATHS, pickMessages } from "@/i18n/client-messages";
 import "./globals.css";
 
 /**
@@ -110,7 +111,9 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
-  const messages = await getMessages();
+  // Klientə yalnız client komponentlərinin oxuduğu yollar (#183); hesab kataloqları
+  // `(account)`/`giris` layout-larında əlavə olunur.
+  const messages = pickMessages(await getMessages(), PUBLIC_CLIENT_MESSAGE_PATHS);
   // Paneldə təsdiqlənmiş koordinat / iş saatları / xidmət bölgələri struktur dataya
   // buradan qoşulur. Nəticə keşlənir, ona görə hər sorğuda D1-ə müraciət olmur.
   const localBusiness = await getLocalBusinessProfile();
