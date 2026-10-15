@@ -15,6 +15,7 @@ import {
   toCachedCopy,
 } from "./src/lib/edge-html-cache";
 import { cronJobFor, internalCronToken } from "./src/lib/cron-auth";
+import { mediaKeyFromPath, mediaResponse } from "./src/lib/media-response";
 
 // Durable Object sinifləri OpenNext worker-indən olduğu kimi ixrac olunur.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -28,10 +29,35 @@ type Env = {
   DB?: D1Database;
   SITE_URL?: string;
   AUTH_SECRET?: string;
+  MEDIA?: R2Bucket;
 };
+
+/**
+ * `/media/<açar>` şəkli OpenNext-dən əvvəl verilir (#165): Worker cavabı CDN-də öz-özünə
+ * keşlənmir, ona görə nəticə Cache API-də saxlanılır. Məzmun dəyişməzdir (UUID açar), açara
+ * yalnız yol düşür — query string eyni faylın yeni nüsxəsini yaratmasın. Sorğunun başlıqları
+ * ötürülür ki, `If-None-Match` ilə təkrar baxış 304 alsın.
+ */
+async function serveMedia(request: Request, url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
+  const cache = (caches as unknown as { default: Cache }).default;
+  const key = new Request(`${url.origin}${url.pathname}`, { headers: request.headers });
+  const cached = await cache.match(key);
+  if (cached) return cached;
+
+  const response = await mediaResponse(env.MEDIA, mediaKeyFromPath(url.pathname));
+  if (response.status !== 200 || !response.body) return response;
+  const [forClient, forCache] = response.body.tee();
+  ctx.waitUntil(cache.put(key, new Response(forCache, response)).catch(() => undefined));
+  return new Response(forClient, response);
+}
 
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname.startsWith("/media/")) {
+      return serveMedia(request, url, env, ctx);
+    }
+
     const ttl = edgeCacheTtl(env);
     // Texniki xidmət rejimində keş həm oxunmur, həm yazılmır — middleware qapısı işləsin.
     if (ttl === 0 || !isEdgeCacheableRequest(request) || !(await systemModeAllowsCache(env))) {

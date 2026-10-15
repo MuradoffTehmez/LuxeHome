@@ -758,6 +758,10 @@ sessiya oxuyursa `SESSION_DEPENDENT_PUBLIC_ROUTES`-a əlavə olunmalıdır** —
 bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test.ts` qoruyur).
 Durable Object sinifləri `worker.ts`-dən yenidən ixrac olunur — sarğını dəyişəndə saxla.
 
+`/media/<açar>` şəkilləri də `worker.ts`-də OpenNext-dən **əvvəl** verilir (`src/lib/media-response.ts`,
+#165): Worker cavabı CDN-də öz-özünə keşlənmir, ona görə R2 nəticəsi Cache API-də saxlanılır (açar yalnız
+yoldur, query string atılır). `src/app/media/[...key]/route.ts` eyni modulu işlədir — qaydanı bir yerdə dəyiş.
+
 Cloudflare Web Analytics beacon-u (cookie-siz, razılıq tələb etmir) `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN`
 build dəyişəni olanda ictimai səhifələrə əlavə olunur (`analytics-provider.tsx`).
 
