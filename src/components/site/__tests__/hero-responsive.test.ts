@@ -21,4 +21,11 @@ describe("Hero responsive typography", () => {
     expect(heroTitleClassName("az")).toContain("max-w-[18ch]");
     expect(heroTitleClassName("en")).toContain("max-w-[18ch]");
   });
+
+  it("başlıq opacity animasiyası ilə gizlənmir — mobil LCP elementidir (#193)", () => {
+    for (const locale of ["az", "ru", "en"] as const) {
+      expect(heroTitleClassName(locale)).toContain("animate-rise");
+      expect(heroTitleClassName(locale)).not.toMatch(/animate-(slide-up|fade-in|scale-in)/);
+    }
+  });
 });
