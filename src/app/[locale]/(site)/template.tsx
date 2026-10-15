@@ -1,3 +1,5 @@
+import { PageTransition } from "@/components/site/page-transition";
+
 /**
  * Səhifə keçidi animasiyası.
  *
@@ -13,8 +15,8 @@
  *
  * Animasiya qəsdən kiçikdir (160 ms, yalnız opacity) — məzmunun gec gəldiyi hissi
  * yaratmamalıdır. `prefers-reduced-motion` `globals.css`-dəki ümumi qayda ilə
- * onsuz da neytrallaşır.
+ * onsuz da neytrallaşır. İlk açılışda işləmir (LCP, #193) — bax `PageTransition`.
  */
 export default function SiteTemplate({ children }: { children: React.ReactNode }) {
-  return <div className="page-transition">{children}</div>;
+  return <PageTransition>{children}</PageTransition>;
 }

@@ -139,7 +139,7 @@ function HeroSearchForm({
 /** Başlığın şkalası bütün dillərdə eynidir; yalnız oxunaqlı sətir eni locale-a uyğunlaşır. */
 export function heroTitleClassName(locale: Locale): string {
   return cn(
-    "animate-slide-up mt-6 font-display text-[clamp(2.35rem,11vw,3.4rem)] leading-[1.05] tracking-[-0.035em] text-balance text-white sm:text-[clamp(3rem,7vw,4.5rem)] sm:leading-[1.04] lg:text-[clamp(3.8rem,5.4vw,5.5rem)] lg:tracking-[-0.04em] [overflow-wrap:normal] [word-break:normal]",
+    "animate-rise mt-6 font-display text-[clamp(2.35rem,11vw,3.4rem)] leading-[1.05] tracking-[-0.035em] text-balance text-white sm:text-[clamp(3rem,7vw,4.5rem)] sm:leading-[1.04] lg:text-[clamp(3.8rem,5.4vw,5.5rem)] lg:tracking-[-0.04em] [overflow-wrap:normal] [word-break:normal]",
     locale === "ru" ? "max-w-[20ch]" : "max-w-[18ch]",
   );
 }
@@ -178,16 +178,12 @@ export function Hero({ imageUrl, types, cities, locale, labels }: HeroProps) {
             {labels.eyebrow}
           </p>
 
-          <h1
-            className={heroTitleClassName(locale)}
-            style={{ animationDelay: "100ms" }}
-          >
+          <h1 className={heroTitleClassName(locale)}>
             {labels.title}
           </h1>
 
           <p
-            className="animate-slide-up mt-7 max-w-[58ch] text-base leading-relaxed text-white/78 sm:text-lg"
-            style={{ animationDelay: "200ms" }}
+            className="animate-rise mt-7 max-w-[58ch] text-base leading-relaxed text-white/78 sm:text-lg"
           >
             {labels.description}
           </p>
