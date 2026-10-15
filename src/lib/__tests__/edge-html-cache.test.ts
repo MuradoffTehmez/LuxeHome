@@ -54,13 +54,20 @@ describe("kənar HTML keşi", () => {
     expect(isEdgeCacheableRequest(request("/az/bilik-merkezi/kateqoriya/huquq"))).toBe(true);
   });
 
-  it("keş yalnız adi rejimdə, planlaşdırılmış pəncərə olmadan işləyir", () => {
+  it("keş yalnız adi rejimdə işləyir", () => {
     expect(isModeCacheable(null, undefined)).toBe(true);
     expect(isModeCacheable(JSON.stringify({ mode: "NORMAL" }), undefined)).toBe(true);
     expect(isModeCacheable(JSON.stringify({ mode: "MAINTENANCE" }), undefined)).toBe(false);
     expect(isModeCacheable(JSON.stringify({ mode: "READ_ONLY" }), undefined)).toBe(false);
-    expect(isModeCacheable(JSON.stringify({ mode: "NORMAL", startAt: "2026-10-01T00:00:00Z" }), undefined)).toBe(false);
+    expect(isModeCacheable(JSON.stringify({ mode: "MAINTENANCE", startAt: "2026-10-01T00:00:00Z" }), undefined)).toBe(false);
     expect(isModeCacheable(JSON.stringify({ mode: "NORMAL" }), "true")).toBe(false);
     expect(isModeCacheable("{pozulmuş", undefined)).toBe(false);
+  });
+
+  it("pəncərə sahələri qapı kimi qərara təsir etmir (#163)", () => {
+    // Production-da qalan ayarın forması: rejim adi, pəncərə çoxdan bitib.
+    const stale = { mode: "NORMAL", startAt: "2026-09-12T07:24:00.000Z", endAt: "2026-09-19T08:00:00.000Z" };
+    expect(isModeCacheable(JSON.stringify(stale), undefined)).toBe(true);
+    expect(isModeCacheable(JSON.stringify({ ...stale, endAt: "2099-01-01T00:00:00.000Z" }), undefined)).toBe(true);
   });
 });
