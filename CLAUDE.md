@@ -1015,6 +1015,8 @@ uyğun Wiki səhifəsi, README, AGENTS.md və MEMORY.md eyni PR-da yenilənir. Q
   gediş-gəlişdir (~50–90 ms). Elan detalının ~19 əlaqəli `findFirst`-ü keşsiz render-də 1,7 s çəkirdi; indi hər əlaqə
   ayrıca `findFirst` ilə paralel oxunur (`getPropertyBySlug()`, #179). Ayrı Prisma sorğuları `Promise.all`-da üst-üstə
   düşür. Forma testi və gecikmə testi: `property-detail-query.integration.test.ts`.
+  Elan kartları (`propertyCardSelect`) üçün eyni qayda `findPropertyCards()`-dədir (#181) — siyahı, vitrin və oxşar elanlar
+  onu işlədir; yeni kart siyahısı yazanda `findMany({ select: propertyCardSelect })` əvəzinə onu çağır.
 - Prisma client `src/lib/prisma.ts`-dəki singleton üzərindən istifadə olunur — `new PrismaClient()`
   yazma (istisna: `prisma/` altındakı standalone scriptlər).
 - `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər),

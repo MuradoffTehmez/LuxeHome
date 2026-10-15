@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { LOCATION_KINDS, PROPERTY_STATUSES, REVIEW_STATUSES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { getPropertyBySlug } from "@/lib/queries";
+import { withSlowD1 } from "@/test/slow-d1";
 
 /**
  * Elan detalı əlaqələri paralel oxuyur (#179). Bu test iki şeyi qoruyur:
@@ -11,8 +12,6 @@ import { getPropertyBySlug } from "@/lib/queries";
  */
 
 const DB = (env as unknown as { DB: D1Database }).DB;
-type Context = { env: { DB: D1Database } };
-const context = () => (globalThis as Record<symbol, Context>)[Symbol.for("__cloudflare-context__")];
 
 beforeAll(async () => {
   await DB.batch([
@@ -110,51 +109,11 @@ describe("elan detalının paralel oxunuşu (#179)", () => {
   });
 
   it("D1 gediş-gəlişləri ardıcıl deyil, üst-üstə düşür", async () => {
-    // Hər D1 çağırışına gecikmə əlavə edən sarğı: ardıcıl yükləmə ~sorğu sayı × gecikmə çəkərdi.
+    // Ardıcıl yükləmə ~`calls × delay` çəkərdi; paralel yükləmə ən dərin əlaqəyə bağlıdır.
     const delay = 60;
-    let calls = 0;
-    const wrapStatement = (statement: D1PreparedStatement): D1PreparedStatement =>
-      new Proxy(statement, {
-        get(target, property) {
-          const value = Reflect.get(target, property) as unknown;
-          if (typeof value !== "function") return value;
-          if (property === "bind") return (...args: unknown[]) => wrapStatement((value as (...a: unknown[]) => D1PreparedStatement).apply(target, args));
-          if (["all", "raw", "first", "run"].includes(String(property))) {
-            return async (...args: unknown[]) => {
-              calls += 1;
-              await new Promise((resolve) => setTimeout(resolve, delay));
-              return (value as (...a: unknown[]) => unknown).apply(target, args);
-            };
-          }
-          return (value as (...a: unknown[]) => unknown).bind(target);
-        },
-      });
-    const slowDb = new Proxy(DB, {
-      get(target, property) {
-        if (property === "prepare") return (sql: string) => wrapStatement(target.prepare(sql));
-        const value = Reflect.get(target, property) as unknown;
-        return typeof value === "function" ? (value as (...a: unknown[]) => unknown).bind(target) : value;
-      },
-    });
-
-    const ctx = context();
-    const original = ctx.env;
-    // Klient sorğu konteksti (`ctx`) üzrə yaradılır — yeni kontekst yeni (yavaş) klient verir.
-    (globalThis as Record<symbol, unknown>)[Symbol.for("__cloudflare-context__")] = {
-      ...ctx,
-      env: { ...original, DB: slowDb },
-      ctx: { waitUntil: () => undefined, passThroughOnException: () => undefined },
-    };
-    try {
-      const started = Date.now();
-      const detail = await getPropertyBySlug("pd-elan");
-      const elapsed = Date.now() - started;
-      expect(detail).not.toBeNull();
-      // Ardıcıl yükləmədə `calls × delay` olardı; paralel yükləmə ən dərin əlaqəyə bağlıdır.
-      expect(calls).toBeGreaterThan(10);
-      expect(elapsed).toBeLessThan((calls * delay) / 2);
-    } finally {
-      (globalThis as Record<symbol, unknown>)[Symbol.for("__cloudflare-context__")] = ctx;
-    }
+    const { result, elapsed, calls } = await withSlowD1(DB, delay, () => getPropertyBySlug("pd-elan"));
+    expect(result).not.toBeNull();
+    expect(calls).toBeGreaterThan(10);
+    expect(elapsed).toBeLessThan((calls * delay) / 2);
   });
 });
