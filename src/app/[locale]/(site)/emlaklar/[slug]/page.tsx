@@ -1,5 +1,6 @@
 import { formatFullAddress } from "@/lib/location-path";
 import Image from "next/image";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -28,8 +29,7 @@ import {
   type PropertyStatus,
   type Locale,
 } from "@/lib/constants";
-import { getPropertyPartners, getSimilarProperties } from "@/lib/queries";
-import { getCachedPropertyBySlug } from "@/lib/public-cache";
+import { getCachedPropertyBySlug, getCachedPropertyPartners, getCachedSimilarProperties } from "@/lib/public-cache";
 import { buildManagedMetadata, jsonLd, propertySchema, breadcrumbSchema, truncateAtWord } from "@/lib/seo";
 import { siteConfig, whatsappLink } from "@/config/site";
 import { propertyFiltersToLandingPath } from "@/lib/seo-landings";
@@ -87,16 +87,25 @@ const NEARBY_KEYS: Record<string, "metro" | "bus" | "school" | "university" | "k
   PARK: "park", SHOPPING_CENTER: "shoppingCenter",
 };
 
+/**
+ * Metadata və səhifə eyni elanı və tərcüməni oxuyur — `cache()` onları sorğu daxilində bir
+ * dəfəyə endirir (#179). `unstable_cache` eyni anda gələn iki çağırışı birləşdirmir.
+ */
+const loadProperty = cache(getCachedPropertyBySlug);
+const loadTranslation = cache((propertyId: string, locale: Locale) =>
+  getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROPERTY, propertyId, locale),
+);
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const sourceProperty = await getCachedPropertyBySlug(slug);
+  const sourceProperty = await loadProperty(slug);
 
   if (!sourceProperty) notFound();
   const knownProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
   const localizedProperty = applyContentTranslation(
     TRANSLATION_ENTITY_TYPES.PROPERTY,
     knownProperty,
-    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROPERTY, sourceProperty.id, locale as Locale),
+    await loadTranslation(sourceProperty.id, locale as Locale),
   );
   const property = {
     ...localizedProperty,
@@ -146,15 +155,39 @@ export default async function PropertyDetailPage({ params }: Props) {
     getTranslations({ locale, namespace: "phase2.reservation" }),
     getTranslations({ locale, namespace: "phase2.neighborhood" }),
   ]);
-  const sourceProperty = await getCachedPropertyBySlug(slug);
+  const sourceProperty = await loadProperty(slug);
 
   if (!sourceProperty) notFound();
+
+  // Tərcümədən asılı olmayan bütün oxunuşlar elan tapılan kimi birlikdə başlayır (#179):
+  // əvvəl tərcümə → oxşar/tərəfdaş/qiymət → qiymət zolaqları ardıcıl gözlənilirdi.
+  // Seçim sahələri (id, şəhər, növ, qiymət) tərcümə ilə dəyişmir, ona görə mənbə elan işlənir.
+  const isClosed = sourceProperty.status === PROPERTY_STATUSES.SOLD || sourceProperty.status === PROPERTY_STATUSES.RENTED;
+  const similarPromise = getCachedSimilarProperties(
+    {
+      id: sourceProperty.id,
+      cityId: sourceProperty.cityId,
+      typeId: sourceProperty.typeId,
+      listingType: sourceProperty.listingType,
+    },
+    4,
+  );
+  const [translation, similarProperties, similarBands, partnerLinks, projectsEnabled, priceAssessment, insightText, openHouses] = await Promise.all([
+    loadTranslation(sourceProperty.id, locale as Locale),
+    similarPromise,
+    similarPromise.then(assessPriceBands),
+    getCachedPropertyPartners(sourceProperty.id),
+    isProjectsSectionEnabled(),
+    isClosed ? Promise.resolve(null) : assessPropertyPrice(sourceProperty),
+    getTranslations({ locale, namespace: "property.priceInsight" }),
+    isClosed ? Promise.resolve([]) : getUpcomingOpenHouses(sourceProperty.id),
+  ]);
 
   const knownProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
   const localizedProperty = applyContentTranslation(
     TRANSLATION_ENTITY_TYPES.PROPERTY,
     knownProperty,
-    await getPublishedContentTranslation(TRANSLATION_ENTITY_TYPES.PROPERTY, sourceProperty.id, locale as Locale),
+    translation,
   );
   const property = {
     ...localizedProperty,
@@ -171,7 +204,6 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const isSale = property.listingType === LISTING_TYPES.SALE;
   const status = property.status as PropertyStatus;
-  const isClosed = status === PROPERTY_STATUSES.SOLD || status === PROPERTY_STATUSES.RENTED;
   const isPremium = property.isFeatured && (
     property.featuredUntil == null || new Date(property.featuredUntil).getTime() > Date.now()
   );
@@ -212,15 +244,6 @@ export default async function PropertyDetailPage({ params }: Props) {
       ? { name: property.metro.name, minutes: null }
       : null;
 
-  const [similarProperties, partnerLinks, projectsEnabled, priceAssessment, insightText, openHouses] = await Promise.all([
-    getSimilarProperties(property, 4),
-    getPropertyPartners(property.id),
-    isProjectsSectionEnabled(),
-    isClosed ? Promise.resolve(null) : assessPropertyPrice(property),
-    getTranslations({ locale, namespace: "property.priceInsight" }),
-    isClosed ? Promise.resolve([]) : getUpcomingOpenHouses(property.id),
-  ]);
-  const similarBands = await assessPriceBands(similarProperties);
   const benchmarkPlace = priceAssessment?.scope === "city" ? property.city.name : property.district?.name ?? property.city.name;
   const benchmarkPrice = priceAssessment
     ? `${formatPrice(Math.round(priceAssessment.pricePerSqm), property.currency)}/m²`

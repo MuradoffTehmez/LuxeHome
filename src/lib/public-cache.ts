@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { reviveDates } from "@/lib/revive-dates";
 import { PUBLIC_CACHE_TAGS } from "@/lib/cache-tags";
+import { startOfBakuToday } from "@/lib/partners";
 import {
   getBlogCategories,
   getHomeShowcaseProperties,
@@ -13,6 +14,7 @@ import {
   getProperties,
   getPropertiesForMap,
   getPropertyBySlug,
+  getPropertyPartners,
   getPropertyTypesWithCounts,
   getHomepagePartners,
   getPartnerBySlug,
@@ -20,6 +22,7 @@ import {
   getPublicPartnerTypeCounts,
   getServiceBySlug,
   getServices,
+  getSimilarProperties,
   getSitemapEntries,
   type PropertyFilters,
 } from "@/lib/queries";
@@ -95,6 +98,34 @@ export const getCachedPropertyBySlug = cachedQuery(
   ["public-property-detail-v1"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
+
+/**
+ * Elan detalının ikinci dalğası (#179): oxşar elanlar və tərəfdaşlar hər keşsiz render-də
+ * D1-ə gedirdi (kart əlaqələri ardıcıl yüklənir). Açar yalnız seçim sahələridir — bütün elan
+ * obyektini arqument vermə, `unstable_cache` onu açara serializə edir.
+ */
+export const getCachedSimilarProperties = cachedQuery(
+  async (property: { id: string; cityId: string; typeId: string; listingType: string }, take: number) =>
+    getSimilarProperties(property, take),
+  ["public-similar-properties-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
+);
+
+const getCachedPropertyPartnersForDay = cachedQuery(
+  // `bakuDay` yalnız açar üçündür: `publicPartnerWhere()` tərəfdaşlığın bitmə tarixini Bakı günü ilə
+  // yoxlayır, keş hit-i isə onu yenidən hesablamır. Gün açarda olanda gecə yarısı yeni giriş başlayır
+  // və müddəti bitmiş tərəfdaş 5 dəqiqə də görünmür (Codex, #180).
+  async (propertyId: string, bakuDay: string) => {
+    void bakuDay;
+    return getPropertyPartners(propertyId);
+  },
+  ["public-property-partners-v1"],
+  { tags: [PUBLIC_CACHE_TAGS.properties, PUBLIC_CACHE_TAGS.partners], revalidate: FIVE_MINUTES },
+);
+
+export function getCachedPropertyPartners(propertyId: string) {
+  return getCachedPropertyPartnersForDay(propertyId, startOfBakuToday().toISOString());
+}
 
 export const getCachedProjectBySlug = cachedQuery(
   async (slug: string) => getProjectBySlug(slug),
