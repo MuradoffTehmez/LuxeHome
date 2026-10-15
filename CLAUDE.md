@@ -244,6 +244,15 @@ Aralıq mərhələ ayrıca `subject`-li cookie ilə işarələnir, ona görə ik
 düşmək mümkün deyil. `?davam=` parametri bu cookie-nin içində daşınır və yalnız `/admin` ilə
 başlayan marşrutlar qəbul edilir (açıq yönləndirmə qorunması).
 
+### Klientə gedən mesajlar (#183)
+
+Kök layout `NextIntlClientProvider`-ə bütün kataloqu deyil, yalnız `src/i18n/client-messages.ts`-dəki
+`PUBLIC_CLIENT_MESSAGE_PATHS` yollarını ötürür (AZ-da ~99 KB → ~39 KB hər HTML-də). `account` və `auth` yalnız
+`(account)` və `giris` layout-larında `ExtendedMessagesProvider` ilə əlavə olunur (dərin birləşmə). Server komponentləri
+mesajları request konfiqurasiyasından oxuyur və siyahıdan asılı deyil. **Client komponentində yeni namespace/açar
+işlədəndə siyahıya əlavə et** — `client-messages.test.ts` mənbədəki `useTranslations("…")` çağırışlarını yoxlayır;
+siyahıda olmayan açar ekranda adı ilə görünərdi.
+
 ### Admin panelin tərcüməsi
 
 `/admin` locale prefiksi daşımır (`routing.ts`), ona görə `request.ts`-dəki
