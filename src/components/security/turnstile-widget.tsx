@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useNearViewport } from "@/lib/ui/near-viewport";
 
 const TURNSTILE_RESPONSE_FIELD = "cf-turnstile-response";
 
@@ -62,6 +63,12 @@ export function TurnstileWidget({
   resetSignal?: unknown;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Skript (~700 KB) yalnız widget görünüşə yaxınlaşanda və ya forma fokus alanda yüklənir (#191):
+  // elan detalında forma səhifənin aşağısındadır və mobil şəbəkədə LCP-ni gecikdirirdi.
+  const nearViewport = useNearViewport(rootRef);
+  const [formFocused, setFormFocused] = useState(false);
+  const armed = nearViewport || formFocused;
   const widgetIdRef = useRef<string | null>(null);
   const initialResetRef = useRef(true);
   const [siteKey, setSiteKey] = useState<string | null>(null);
@@ -81,6 +88,15 @@ export function TurnstileWidget({
   }, []);
 
   useEffect(() => {
+    const form = rootRef.current?.closest("form");
+    if (!form || formFocused) return;
+    const onFocus = () => setFormFocused(true);
+    form.addEventListener("focusin", onFocus);
+    return () => form.removeEventListener("focusin", onFocus);
+  }, [formFocused]);
+
+  useEffect(() => {
+    if (!armed) return;
     let active = true;
     fetch("/api/security/turnstile", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : Promise.reject()))
@@ -94,7 +110,7 @@ export function TurnstileWidget({
     return () => {
       active = false;
     };
-  }, []);
+  }, [armed]);
 
   useEffect(() => {
     if (!siteKey || !size || !containerRef.current) return;
@@ -145,7 +161,7 @@ export function TurnstileWidget({
     // `overflow-hidden`: widget-in 300px min-content eni valideyn kartı böyütməsin —
     // əks halda konteyner heç vaxt 300px-dən daralmır və ResizeObserver `compact`-a
     // keçməyi görmürdü (ölçü dəyişəndə forma yenə daşırdı).
-    <div className="min-h-[65px] w-full min-w-0 overflow-hidden" role="group" aria-label="Təhlükəsizlik yoxlaması">
+    <div ref={rootRef} className="min-h-[65px] w-full min-w-0 overflow-hidden" role="group" aria-label="Təhlükəsizlik yoxlaması">
       <div ref={containerRef} className="w-full" />
       {failed && (
         <p role="alert" className="mt-2 text-sm text-danger">
