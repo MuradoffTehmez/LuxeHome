@@ -13,6 +13,11 @@ type LogoProps = {
   compact?: boolean;
   /** Gerb nişanını gizlədir — yalnız wordmark göstərilir. */
   markless?: boolean;
+  /**
+   * İlk ekrandakı loqo (navbar): erkən yüklənir. Mobil ana səhifədə LCP elementi məhz bu
+   * gerbdir — `lazy` olanda brauzer onu gec kəşf edirdi və LCP 4,5 s idi (#189).
+   */
+  priority?: boolean;
 };
 
 /**
@@ -29,6 +34,7 @@ export function Logo({
   className,
   compact = false,
   markless = false,
+  priority = false,
 }: LogoProps) {
   const t = useTranslations("navigation");
   const isDark = tone === "dark";
@@ -46,6 +52,7 @@ export function Logo({
           // Göstərilən ölçü 32–44 px-dir: 512 yazılanda srcset 640/1080 px istəyirdi (#167).
           width={44}
           height={44}
+          priority={priority}
           className="size-8 shrink-0 sm:size-11"
         />
       )}
