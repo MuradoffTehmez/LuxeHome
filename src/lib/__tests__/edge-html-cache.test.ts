@@ -9,6 +9,8 @@ import {
   isEdgeCacheableRequest,
   isModeCacheable,
   isStorableResponse,
+  refreshRequest,
+  shouldEvictOnRefresh,
   toCachedCopy,
 } from "@/lib/edge-html-cache";
 
@@ -116,5 +118,26 @@ describe("kənar HTML keşi", () => {
     const stale = { mode: "NORMAL", startAt: "2026-09-12T07:24:00.000Z", endAt: "2026-09-19T08:00:00.000Z" };
     expect(isModeCacheable(JSON.stringify(stale), undefined)).toBe(true);
     expect(isModeCacheable(JSON.stringify({ ...stale, endAt: "2099-01-01T00:00:00.000Z" }), undefined)).toBe(true);
+  });
+
+  it("fon yenilənməsində qəti cavab köhnə nüsxəni silir, keçici xəta saxlayır (Codex, #176)", () => {
+    // Silinmiş/gizlədilmiş profil və ya elan, köçmüş səhifə
+    for (const status of [301, 302, 307, 308, 400, 403, 404, 410]) expect(shouldEvictOnRefresh(status), String(status)).toBe(true);
+    // Keçici xəta və şərti cavab — köhnə nüsxə qalır
+    for (const status of [200, 304, 408, 429, 500, 502, 503, 504]) expect(shouldEvictOnRefresh(status), String(status)).toBe(false);
+  });
+
+  it("fon sorğusu şərti başlıqları atır, açar başlıqlarını saxlayır", () => {
+    const original = request("/az/emlaklar", {
+      headers: { rsc: "1", "next-router-state-tree": "x", "if-none-match": '"abc"', "if-modified-since": "Wed, 01 Oct 2026 00:00:00 GMT", range: "bytes=0-1" },
+    });
+    const refreshed = refreshRequest(original);
+    expect(refreshed.method).toBe("GET");
+    expect(refreshed.url).toBe(original.url);
+    expect(refreshed.headers.get("rsc")).toBe("1");
+    expect(refreshed.headers.get("next-router-state-tree")).toBe("x");
+    expect(refreshed.headers.get("if-none-match")).toBeNull();
+    expect(refreshed.headers.get("if-modified-since")).toBeNull();
+    expect(refreshed.headers.get("range")).toBeNull();
   });
 });

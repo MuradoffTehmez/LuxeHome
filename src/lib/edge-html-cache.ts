@@ -92,6 +92,28 @@ export function edgeStaleTtl(env: { EDGE_HTML_STALE_TTL?: string }): number {
   return Number.isFinite(ttl) && ttl > 0 ? Math.min(Math.floor(ttl), MAX_STALE_TTL) : 0;
 }
 
+/**
+ * Fon yenilənməsinin cavabı köhnə nüsxəni silməlidirmi (#176, Codex rəyi). Qəti cavab — səhifə
+ * silinib/gizlədilib (404, 410 və digər 4xx) və ya köçüb (3xx) — köhnə nüsxəni dərhal götürür,
+ * yoxsa silinmiş profil/elan (əlaqə məlumatı ilə) SWR pəncərəsi boyu hamıya verilərdi. Keçici
+ * xəta (5xx, 408, 429) köhnə nüsxəni saxlayır: səhifə işləyir, növbəti hit yenidən sınayır.
+ */
+export function shouldEvictOnRefresh(status: number): boolean {
+  // 304 şərti sorğunun cavabıdır, səhifənin taleyi haqqında heç nə demir.
+  if (status === 304 || status === 408 || status === 429) return false;
+  return status >= 300 && status < 500;
+}
+
+/**
+ * Fon yenilənməsinin sorğusu: ziyarətçinin başlıqları (RSC/router — açarın bir hissəsi) saxlanılır,
+ * şərti başlıqlar atılır ki, cavab 304 deyil, tam səhifə olsun.
+ */
+export function refreshRequest(request: Request): Request {
+  const headers = new Headers(request.headers);
+  for (const name of ["if-none-match", "if-modified-since", "if-match", "if-unmodified-since", "if-range", "range"]) headers.delete(name);
+  return new Request(request.url, { method: "GET", headers });
+}
+
 export type EdgeFreshness = "fresh" | "stale" | "expired";
 
 /** Keşdəki nüsxənin yaşına görə qərar; möhür yoxdursa, pozulubsa və ya gələcəkdədirsə `expired`. */

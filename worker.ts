@@ -15,6 +15,8 @@ import {
   edgeStaleTtl,
   isEdgeCacheableRequest,
   isStorableResponse,
+  refreshRequest,
+  shouldEvictOnRefresh,
   systemModeAllowsCache,
   toCachedCopy,
 } from "./src/lib/edge-html-cache";
@@ -171,16 +173,22 @@ function storeEdgeCopy(cache: Cache, key: string, response: Response, storeTtl: 
 const refreshing = new Set<string>();
 
 /**
- * Köhnə nüsxəni fonda yeniləyir (#175). Yalnız saxlanıla bilən (200, HTML/RSC) cavab yazılır —
- * səhifə silinibsə və ya xəta veribsə köhnə nüsxə SWR pəncərəsi bitənə qədər qalır, sonra MISS olur.
+ * Köhnə nüsxəni fonda yeniləyir (#175). Saxlanıla bilən (200, HTML/RSC) cavab yazılır; qəti cavab
+ * (səhifə silinib, gizlədilib, köçüb — `shouldEvictOnRefresh`) nüsxəni silir; keçici xətada köhnə
+ * nüsxə qalır və növbəti hit yenidən sınayır.
  */
 async function refreshEdgeCopy(request: Request, key: string, env: Env, ctx: ExecutionContext, storeTtl: number): Promise<void> {
   if (refreshing.has(key)) return;
   refreshing.add(key);
   try {
-    const response: Response = await openNext.fetch(new Request(request.url, { method: "GET", headers: request.headers }), env, ctx);
-    if (!isStorableResponse(response)) return;
-    await storeEdgeCopy((caches as unknown as { default: Cache }).default, key, response, storeTtl);
+    const cache = (caches as unknown as { default: Cache }).default;
+    const response: Response = await openNext.fetch(refreshRequest(request), env, ctx);
+    if (isStorableResponse(response)) {
+      await storeEdgeCopy(cache, key, response, storeTtl);
+    } else if (shouldEvictOnRefresh(response.status)) {
+      // Səhifə silinib/gizlədilib və ya köçüb — köhnə nüsxə bir daha verilməsin.
+      await cache.delete(key);
+    }
   } catch {
     // Fon yenilənməsinin xətası ziyarətçiyə təsir etmir — növbəti köhnə hit yenidən sınayır.
   } finally {
