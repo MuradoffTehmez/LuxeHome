@@ -10,15 +10,13 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * `next/image`-in `unoptimized` bayrağı üçün.
  *
- * OpenNext Cloudflare adapteri nisbi (`/`-lə başlayan) URL-ləri yalnız `ASSETS`
- * binding-i (build-vaxtı statik fayllar) üzərindən axtarır — R2-dən `/media/[...key]`
- * dinamik route-u ilə verilən şəkilləri tapmır və 404 qaytarır. `/media/`-dən gələn
- * şəkillər onsuz da yüklənmə anında WebP-ə çevrilib ölçülənib, ona görə runtime
- * optimizasiyası həm mümkün deyil, həm lazımsızdır — server tərəf artıq işini görüb.
+ * `/media/` şəkilləri artıq optimallaşdırılır: qlobal loader (`image-loader.ts`) onları
+ * `?w=&q=` ilə worker-ə göndərir və `srcset` yaranır (#167). Əvvəllər burada idi və mobil
+ * cihaz da 2400 px-lik master faylı yükləyirdi. Brauzer yaddaşındakı `blob:` önizləmə
+ * və SVG çevrilmir.
  */
 export function isUnoptimizedImage(url: string): boolean {
   return (
-    url.startsWith("/media/") ||
     url.startsWith("blob:") ||
     /\.svg(?:[?#]|$)/i.test(url)
   );

@@ -43,8 +43,9 @@ export function Logo({
         <Image
           src="/logo-mark.png"
           alt=""
-          width={512}
-          height={512}
+          // Göstərilən ölçü 32–44 px-dir: 512 yazılanda srcset 640/1080 px istəyirdi (#167).
+          width={44}
+          height={44}
           className="size-8 shrink-0 sm:size-11"
         />
       )}
