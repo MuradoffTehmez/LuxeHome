@@ -1,4 +1,4 @@
-const PRODUCTION_HOST = "luxehomeestate.az";
+export const PRODUCTION_HOST = "luxehomeestate.az";
 
 type CanonicalHostInput = {
   hostname: string;
