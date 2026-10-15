@@ -759,8 +759,10 @@ bir istifadəçinin HTML-i başqasına verilə bilər (`public-cache-safety.test
 Durable Object sinifləri `worker.ts`-dən yenidən ixrac olunur — sarğını dəyişəndə saxla.
 
 `/media/<açar>` şəkilləri də `worker.ts`-də OpenNext-dən **əvvəl** verilir (`src/lib/media-response.ts`,
-#165): Worker cavabı CDN-də öz-özünə keşlənmir, ona görə R2 nəticəsi Cache API-də saxlanılır (açar yalnız
-yoldur, query string atılır). `src/app/media/[...key]/route.ts` eyni modulu işlədir — qaydanı bir yerdə dəyiş.
+#165): Worker cavabı CDN-də öz-özünə keşlənmir, ona görə R2 nəticəsi Cache API-də saxlanılır (açar
+yol + `w`/`q`-dur, qalan query string atılır). `src/app/media/[...key]/route.ts` eyni modulu işlədir — qaydanı bir yerdə dəyiş.
+Kənar nüsxə 1 gün yaşayır (brauzer bir il); `deleteImage()` bütün ölçüləri `purgeMediaCache()` ilə bu data
+mərkəzində təmizləyir. Kiçiltmə alınmayanda orijinal keşə yazılmadan verilir — növbəti sorğu yenidən sınayır.
 
 Kanonik `https://luxehomeestate.az/` → `/az` yönləndirməsini də `worker.ts` verir (`src/lib/root-redirect.ts`,
 #169): 307 + 1 saatlıq keş, query string saxlanılır. Bu, yalnız `routing.ts`-də `localeDetection: false` olduqca
@@ -991,7 +993,11 @@ uyğun Wiki səhifəsi, README, AGENTS.md və MEMORY.md eyni PR-da yenilənir. Q
 - `next.config.ts`-də `images.remotePatterns` `images.unsplash.com` (stok şəkillər),
   `media.luxehomeestate.az` (R2 custom domain) və `treva.realestate` (rəsmi tərəfdaş media-sı)
   mənbələrinə icazə verir. Yeni mənbə əlavə edilərsə bu siyahı yenilənməlidir.
-- `next/image` optimizasiyası Cloudflare `IMAGES` binding-i üzərindən gedir (`wrangler.jsonc`).
+- `next/image` optimizasiyası Cloudflare `IMAGES` binding-i üzərindən gedir (`wrangler.jsonc`). Qlobal loader
+  (`src/lib/image-loader.ts`, #167) `/media/...` şəklini `?w=&q=` ilə worker-ə göndərir — worker onu R2-dən
+  kiçildib WebP verir və keşləyir; qalan ünvanlar `/_next/image`-ə gedir (worker o cavabı da keşləyir).
+  En/keyfiyyət siyahısı `src/lib/image-sizes.ts`-dədir — `next.config` də oradan oxuyur; siyahıdan kənar en 400 alır.
+  `/media` şəklinə `unoptimized` yazma — `isUnoptimizedImage()` yalnız `blob:` və SVG üçündür.
 - Gizli dəyərlər `.env`-də deyil, Cloudflare secret-lərindədir:
   `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`,
   `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; istəyə bağlı `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,

@@ -63,11 +63,11 @@ describe("AdminShell", () => {
   });
 
   /**
-   * R2-dən gələn `/media/...` avatarı `next/image` optimizatorundan keçirilsə,
-   * `/_next/image?url=/media/...` 404 qaytarır və paneldə sınıq şəkil görünür.
-   * Optimizator yan keçildikdə `src` xam yolu saxlayır.
+   * `/_next/image?url=/media/...` OpenNext-də 404 qaytarır — ona görə `/media` avatarı
+   * əvvəllər `unoptimized` idi. İndi qlobal loader onu worker-in `/media/...?w=` yoluna
+   * göndərir (#167), şəkil isə srcset ilə optimallaşdırılır.
    */
-  it("R2 avatarını next/image optimizatorundan yan keçirir", () => {
+  it("R2 avatarı optimallaşdırılmış srcset ilə verilir", () => {
     pathname = "/admin";
     const html = renderToStaticMarkup(
       <AdminShell
@@ -88,7 +88,10 @@ describe("AdminShell", () => {
       </AdminShell>,
     );
 
-    expect(html).toContain('src="/media/umumi/2026/09/avatar.webp"');
-    expect(html).not.toContain("/_next/image?url=%2Fmedia");
+    // `/media` artıq optimallaşdırılır (#167): production-da qlobal loader onu `/media/...?w=`-ə
+    // çevirir və `/_next/image`-ə getmir (`image-loader.test.ts`). Testdə `next.config` yüklənmir,
+    // ona görə burada yalnız şəklin `unoptimized` olmadığı (srcset yarandığı) yoxlanılır.
+    expect(html).toContain(encodeURIComponent("/media/umumi/2026/09/avatar.webp"));
+    expect(html).toContain("srcSet=");
   });
 });

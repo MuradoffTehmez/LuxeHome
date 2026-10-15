@@ -158,7 +158,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
       <div className={cn("shrink-0 border-b px-4 py-4", dark ? "border-white/10" : "border-line")}>
         <Link href="/admin" onClick={onNavigate} className={cn("flex min-h-14 items-center gap-3 rounded-md px-2 leading-none", dark ? "text-white" : "text-ink")}>
           <span className={cn("grid size-10 shrink-0 place-items-center rounded-md", dark ? "bg-white/8" : "bg-beige")}>
-            <Image src="/logo-mark.png" alt="" width={512} height={512} className="size-8" />
+            <Image src="/logo-mark.png" alt="" width={32} height={32} className="size-8" />
           </span>
           <span className="min-w-0">
             <span className="block truncate font-display text-sm tracking-[0.14em]">LUXE HOME ESTATE</span>

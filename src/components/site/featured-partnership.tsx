@@ -113,7 +113,7 @@ async function SinglePartnerShowcase({
             <Divider />
 
             <div className="flex items-center justify-center sm:flex-1 sm:justify-start">
-              <PartnerLogo partner={partner} size="xl" priority />
+              <PartnerLogo partner={partner} size="xl" />
             </div>
           </div>
 
@@ -157,9 +157,8 @@ function HouseLogo() {
       <Image
         src="/logo-mark.png"
         alt=""
-        width={512}
-        height={512}
-        priority
+        width={64}
+        height={64}
         className="size-12 shrink-0 sm:size-16"
       />
       <span className="flex flex-col whitespace-nowrap leading-none text-left">
