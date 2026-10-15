@@ -32,8 +32,10 @@ describe("kənar HTML keşi", () => {
     expect(isEdgeCacheableRequest(request("/az", { headers: { cookie: "theme=dark; lhe_session=abc" } }))).toBe(false);
     // Adi cookie keşi bağlamır
     expect(isEdgeCacheableRequest(request("/az", { headers: { cookie: "analytics_consent=denied" } }))).toBe(true);
+    // Elan detalı #177-dən bəri sessiyadan asılı deyil (baxış beacon ilə) — keşlənir
+    expect(isEdgeCacheableRequest(request("/az/emlaklar/villa-1"))).toBe(true);
     // Sessiyadan asılı marşrut, panel, API, locale-siz yol və POST
-    expect(isEdgeCacheableRequest(request("/az/emlaklar/villa-1"))).toBe(false);
+    expect(isEdgeCacheableRequest(request("/az/mene-emlak-tap"))).toBe(false);
     expect(isEdgeCacheableRequest(request("/az/kabinet"))).toBe(false);
     expect(isEdgeCacheableRequest(request("/admin"))).toBe(false);
     expect(isEdgeCacheableRequest(request("/api/og/property/x"))).toBe(false);

@@ -81,6 +81,18 @@ export async function checkListingClickLimit(ip: string): Promise<boolean> {
 }
 
 /**
+ * Elan baxışı beacon-u (#177) — klikdən ayrı açar: elanları ardıcıl gəzən ziyarətçinin
+ * baxışları WhatsApp klik limitini yeməsin, skript isə baxış sayını şişirtməsin.
+ */
+export async function checkListingViewLimit(ip: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `listing-view:${ip}` });
+  return success;
+}
+
+/**
  * «Məlumatlarımı yüklə» (#157): ixrac bir neçə sorğu edir, ona görə hesab üzrə limitlənir.
  * `VALUATION_LIMIT` öz açar prefiksi ilə işlədilir (ayrıca binding lazım deyil).
  */

@@ -89,6 +89,8 @@ describe("ictimai keş təhlükəsizliyi", () => {
       "/admin",
       "/admin/emlaklar",
       "/api/hesab/menu",
+      "/api/hesab/elaqe",
+      "/api/emlaklar/x/baxis",
     ]) {
       expect(isCacheablePublicRoute(route), route).toBe(false);
     }
@@ -102,8 +104,20 @@ describe("ictimai keş təhlükəsizliyi", () => {
       "/ru/bilik-merkezi/suallar",
       "/az/xidmetler",
       "/az/blog",
+      "/az/emlaklar/villa-1",
     ]) {
       expect(isCacheablePublicRoute(route), route).toBe(true);
     }
+  });
+
+  it("elan detalı render-də yan təsir və sorğu başlığı oxumur (#177)", () => {
+    // Səhifə kənar keşdən verilir: render-də sayğac artırılsa keş hit-i onu işə salmazdı,
+    // `headers()`/sessiya oxunuşu isə HTML-i ziyarətçiyə bağlayardı. Baxış beacon ilə gedir.
+    const detail = Object.entries(pageModules).find(([path]) => routeOf(path) === "/emlaklar/[param]");
+    expect(detail, "elan detalı səhifəsi tapılmadı").toBeDefined();
+    const source = detail![1];
+    expect(source).not.toMatch(/\brecordView\s*\(/);
+    expect(source).not.toMatch(/\b(headers|cookies)\s*\(\s*\)/);
+    expect(source).toContain("PropertyViewBeacon");
   });
 });
