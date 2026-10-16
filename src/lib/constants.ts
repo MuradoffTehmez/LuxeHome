@@ -312,54 +312,133 @@ export const LISTING_RISK_THRESHOLDS = { review: 30, hold: 50 } as const;
 // ELAN ŞİKAYƏTİ (#159)
 // ---------------------------------------------------------------------------
 
+/**
+ * Şikayət səbəbləri (PRD v2 Modul 01, #195). Ziyarətçi bir neçəsini birlikdə seçə bilir.
+ * `WRONG_INFO` və `NOT_OWNER` #159-dakı köhnə qeydlərdə qalır — formada artıq təklif olunmur,
+ * amma növbədə və statistikada göstərilməlidir (`REPORT_REASON_LABELS`).
+ */
 export const REPORT_REASONS = {
   FAKE: "FAKE",
   SOLD: "SOLD",
+  RENTED: "RENTED",
   WRONG_PRICE: "WRONG_PRICE",
-  WRONG_INFO: "WRONG_INFO",
-  FRAUD: "FRAUD",
-  NOT_OWNER: "NOT_OWNER",
+  NOT_EXISTS: "NOT_EXISTS",
+  PHOTOS_MISMATCH: "PHOTOS_MISMATCH",
   DUPLICATE: "DUPLICATE",
+  WRONG_PHONE: "WRONG_PHONE",
+  NO_RESPONSE: "NO_RESPONSE",
+  WRONG_ADDRESS: "WRONG_ADDRESS",
+  MISLEADING: "MISLEADING",
+  PREPAYMENT: "PREPAYMENT",
+  FRAUD: "FRAUD",
+  INAPPROPRIATE: "INAPPROPRIATE",
   OTHER: "OTHER",
 } as const;
 
 export type ReportReason = (typeof REPORT_REASONS)[keyof typeof REPORT_REASONS];
 
-export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
-  FAKE: "Saxta və ya mövcud olmayan elan",
-  SOLD: "Artıq satılıb və ya kirayəyə verilib",
+/** Yalnız köhnə qeydlərdə olan səbəblər (#159) — yeni şikayətdə qəbul edilmir. */
+export const LEGACY_REPORT_REASONS = {
+  WRONG_INFO: "WRONG_INFO",
+  NOT_OWNER: "NOT_OWNER",
+} as const;
+
+export type StoredReportReason = ReportReason | (typeof LEGACY_REPORT_REASONS)[keyof typeof LEGACY_REPORT_REASONS];
+
+export const REPORT_REASON_LABELS: Record<StoredReportReason, string> = {
+  FAKE: "Saxta elan",
+  SOLD: "Əmlak artıq satılıb",
+  RENTED: "Əmlak artıq kirayəyə verilib",
   WRONG_PRICE: "Qiymət yanlışdır",
-  WRONG_INFO: "Ünvan, foto və ya məlumat yanlışdır",
-  FRAUD: "Beh/avans tələb edir, fırıldaq şübhəsi",
-  NOT_OWNER: "Vasitəçi özünü mülkiyyətçi kimi təqdim edir",
+  NOT_EXISTS: "Əmlak mövcud deyil",
+  PHOTOS_MISMATCH: "Şəkillər əmlaka aid deyil",
   DUPLICATE: "Eyni elan təkrar yerləşdirilib",
-  OTHER: "Digər",
+  WRONG_PHONE: "Əlaqə nömrəsi yanlışdır",
+  NO_RESPONSE: "Elan sahibi cavab vermir",
+  WRONG_ADDRESS: "Əmlakın ünvanı yanlışdır",
+  MISLEADING: "Aldadıcı məlumat verilib",
+  PREPAYMENT: "Beh və ya əvvəlcədən ödəniş tələb edilir",
+  FRAUD: "Dələduzluq şübhəsi",
+  INAPPROPRIATE: "Ayrı-seçkilik və ya uyğunsuz məzmun",
+  OTHER: "Digər səbəb",
+  WRONG_INFO: "Ünvan, foto və ya məlumat yanlışdır",
+  NOT_OWNER: "Vasitəçi özünü mülkiyyətçi kimi təqdim edir",
 };
 
 export function isReportReason(value: unknown): value is ReportReason {
   return typeof value === "string" && (Object.values(REPORT_REASONS) as string[]).includes(value);
 }
 
+/** Bu səbəblərdən biri olan şikayət növbədə sayından asılı olmayaraq yüksək prioritet alır. */
+export const HIGH_PRIORITY_REPORT_REASONS: readonly StoredReportReason[] = [
+  REPORT_REASONS.PREPAYMENT,
+  REPORT_REASONS.FRAUD,
+];
+
+/**
+ * Şikayətin iş axını mərhələsi (#195). `OPEN` — yeni; `IN_REVIEW` — moderator götürüb;
+ * `NEEDS_INFO` — elan sahibindən izahat gözlənilir. Qalan üçü qərardır: `RESOLVED` —
+ * şikayət təsdiqləndi, `DISMISSED` — əsassızdır, `CLOSED` — aktuallığını itirib (elan artıq
+ * yoxdur, təkrar şikayət). Elana nə edildiyi ayrıca `resolution`-dadır.
+ */
 export const REPORT_STATUSES = {
   OPEN: "OPEN",
+  IN_REVIEW: "IN_REVIEW",
+  NEEDS_INFO: "NEEDS_INFO",
   RESOLVED: "RESOLVED",
   DISMISSED: "DISMISSED",
+  CLOSED: "CLOSED",
 } as const;
 
 export type ReportStatus = (typeof REPORT_STATUSES)[keyof typeof REPORT_STATUSES];
 
 export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
-  OPEN: "Açıq",
-  RESOLVED: "Həll edildi",
-  DISMISSED: "Əsassız",
+  OPEN: "Yeni",
+  IN_REVIEW: "Yoxlanılır",
+  NEEDS_INFO: "Əlavə məlumat gözlənilir",
+  RESOLVED: "Təsdiqlənib",
+  DISMISSED: "Rədd edilib",
+  CLOSED: "Bağlanıb",
 };
 
-/** Admin qərarı: elan dayandırıldı, satılmış/icarəyə verilmiş kimi bağlandı, dəyişiklik yoxdur. */
+/**
+ * Hələ qərar verilməmiş şikayətlər. Risk siqnalı, menyu sayğacı və admin qərarının
+ * «götürmə» şərti bu dəstə baxır — yalnız `OPEN`-ə baxmaq yoxlanılan şikayəti itirərdi.
+ */
+export const ACTIVE_REPORT_STATUSES: readonly ReportStatus[] = [
+  REPORT_STATUSES.OPEN,
+  REPORT_STATUSES.IN_REVIEW,
+  REPORT_STATUSES.NEEDS_INFO,
+];
+
+export function isActiveReportStatus(value: string): boolean {
+  return (ACTIVE_REPORT_STATUSES as readonly string[]).includes(value);
+}
+
+/** Qərarın elana təsiri: gizlədildi, satılmış/kirayəyə verilmiş kimi bağlandı, düzəldildi, tədbirsiz. */
 export const REPORT_RESOLUTIONS = {
   ARCHIVED: "ARCHIVED",
   MARKED_CLOSED: "MARKED_CLOSED",
+  LISTING_FIXED: "LISTING_FIXED",
   NO_ACTION: "NO_ACTION",
 } as const;
+
+export type ReportResolution = (typeof REPORT_RESOLUTIONS)[keyof typeof REPORT_RESOLUTIONS];
+
+export const REPORT_RESOLUTION_LABELS: Record<ReportResolution, string> = {
+  ARCHIVED: "Elan gizlədilib",
+  MARKED_CLOSED: "Satılmış/kirayəyə verilmiş kimi bağlanıb",
+  LISTING_FIXED: "Elan düzəldilib",
+  NO_ACTION: "Elan dəyişmədi",
+};
+
+/** Sübut şəkilləri (#195): yalnız daxil olmuş istifadəçidən, bir şikayətdə ən çox bu qədər. */
+export const REPORT_EVIDENCE_MAX_FILES = 3;
+/**
+ * Bir sübut faylının server həddi. Brauzer şəkli göndərməzdən əvvəl WebP-yə kiçildir:
+ * Server Action gövdəsinin Next limiti 1 MB-dır, üç fayl + forma sahələri ona sığmalıdır.
+ */
+export const REPORT_EVIDENCE_MAX_BYTES = 300 * 1024;
 
 export const REPORT_MESSAGE_MAX = 1000;
 

@@ -18,7 +18,7 @@ import {
   LEAD_STATUSES,
   LOCATION_CHILD_KINDS,
   LOCATION_KINDS,
-  REPORT_STATUSES,
+  ACTIVE_REPORT_STATUSES,
   REVIEW_STATUSES,
   SEO_LANDING_STATUSES,
   PUBLIC_PARTNER_STATUSES,
@@ -1247,7 +1247,7 @@ export async function getModerationQueue() {
           agency: { select: { name: true, isVerified: true } },
         },
       },
-      _count: { select: { reports: { where: { status: REPORT_STATUSES.OPEN } } } },
+      _count: { select: { reports: { where: { status: { in: [...ACTIVE_REPORT_STATUSES] } } } } },
     },
     orderBy: { createdAt: "asc" },
   });

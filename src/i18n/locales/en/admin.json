@@ -440,19 +440,37 @@
       "OTHER": "Other"
     },
     "reportReason": {
-      "FAKE": "Fake or non-existent listing",
-      "SOLD": "Already sold or rented",
-      "WRONG_PRICE": "Wrong price",
+      "FAKE": "Fake listing",
+      "SOLD": "The property is already sold",
+      "RENTED": "The property is already rented",
+      "WRONG_PRICE": "The price is wrong",
+      "NOT_EXISTS": "The property does not exist",
+      "PHOTOS_MISMATCH": "The photos are not of this property",
+      "DUPLICATE": "The same listing is posted repeatedly",
+      "WRONG_PHONE": "The contact number is wrong",
+      "NO_RESPONSE": "The owner does not respond",
+      "WRONG_ADDRESS": "The address is wrong",
+      "MISLEADING": "Misleading information",
+      "PREPAYMENT": "A deposit or advance payment is requested",
+      "FRAUD": "Suspected fraud",
+      "INAPPROPRIATE": "Discrimination or inappropriate content",
+      "OTHER": "Other reason",
       "WRONG_INFO": "Wrong address, photos or details",
-      "FRAUD": "Asks for a deposit upfront, suspected fraud",
-      "NOT_OWNER": "An intermediary poses as the owner",
-      "DUPLICATE": "Duplicate listing",
-      "OTHER": "Other"
+      "NOT_OWNER": "An intermediary poses as the owner"
     },
     "reportStatus": {
-      "OPEN": "Open",
-      "RESOLVED": "Resolved",
-      "DISMISSED": "Dismissed"
+      "OPEN": "New",
+      "IN_REVIEW": "In review",
+      "NEEDS_INFO": "Awaiting information",
+      "RESOLVED": "Confirmed",
+      "DISMISSED": "Rejected",
+      "CLOSED": "Closed"
+    },
+    "reportResolution": {
+      "ARCHIVED": "Listing hidden",
+      "MARKED_CLOSED": "Closed as sold/rented",
+      "LISTING_FIXED": "Listing corrected",
+      "NO_ACTION": "Listing unchanged"
     }
   },
   "profile": {
@@ -2840,23 +2858,17 @@
     },
     "reports": {
       "title": "Reports",
-      "description": "Visitor reports about listings. Reports about the same listing are grouped together.",
+      "description": "Visitor reports about listings. Reports for the same listing are grouped; deposit requests, suspected fraud and repeated reports are shown first.",
       "tabsLabel": "Report status",
-      "tabOpen": "Open",
-      "tabResolved": "Resolved",
-      "tabDismissed": "Dismissed",
       "empty": "No reports",
       "emptyDescription": "There are no reports in this section yet.",
       "count": "{count, plural, one {# report} other {# reports}}",
       "urgent": "Urgent",
       "companyListing": "Company listing",
-      "resolutionArchived": "Listing suspended",
-      "resolutionClosed": "Closed as sold/rented",
-      "resolutionNone": "No changes made",
       "viewListing": "View listing",
       "editListing": "Edit",
-      "archive": "Suspend listing",
-      "archiveTitle": "Suspend the listing",
+      "archive": "Hide listing",
+      "archiveTitle": "Hide the listing",
       "archiveDescription": "“{title}” will be archived and the owner will receive the reason.",
       "presets": {
         "fake": "The listing is about a fake or non-existent property.",
@@ -2868,10 +2880,50 @@
       "markRented": "Rented",
       "markClosedDescription": "“{title}” will be marked as a closed listing and the owner will be notified.",
       "confirm": "Confirm",
-      "resolve": "Resolved",
-      "resolveDescription": "Reports will be marked as resolved without changing the listing.",
-      "dismiss": "Unfounded",
-      "dismissDescription": "Reports will be dismissed as unfounded; the listing does not change."
+      "resolve": "Listing corrected",
+      "resolveDescription": "The report is confirmed; the listing was corrected, so its status does not change.",
+      "dismiss": "Reject",
+      "dismissDescription": "The reports will be marked as unfounded; the listing does not change.",
+      "tabActive": "Active",
+      "mine": "Assigned to me",
+      "assignee": "Moderator",
+      "unassigned": "Unassigned",
+      "reviewedBy": "Reviewed by {name}",
+      "take": "Take it",
+      "takeDescription": "The active reports for this listing will be assigned to you and moved to “In review”.",
+      "reopen": "Review again",
+      "reopenDescription": "The last decision is cancelled and the reports return to review. Any action already taken on the listing is not reverted automatically.",
+      "requestInfo": "Request clarification",
+      "requestInfoTitle": "Request clarification from the owner",
+      "requestInfoDescription": "Your question will be sent to the owner of “{title}” as a notification and email; the reports move to “Awaiting information”.",
+      "infoPresets": {
+        "documents": "Please confirm that you hold the property ownership document (extract).",
+        "photos": "Please confirm the photos belong to this property or upload the correct ones.",
+        "price": "Please confirm the listed price is current.",
+        "availability": "Please confirm the property is still for sale or rent."
+      },
+      "infoRequested": "Clarification requested from the owner:",
+      "closeReports": "Close",
+      "closeReportsDescription": "The reports will be closed without a decision (e.g. the listing is no longer relevant). The listing does not change.",
+      "risk": "Risk {score}",
+      "reasons": "Reasons",
+      "evidence": "Evidence images",
+      "evidenceAlt": "Evidence image {index}",
+      "signedInReporter": "Signed-in user",
+      "guestReporter": "Guest",
+      "evidenceRule": "Many reports do not automatically prove a listing is fake — decide based on evidence.",
+      "stats": {
+        "total": "Total reports",
+        "new": "New",
+        "highPriority": "High-priority listings",
+        "repeated": "Listings with repeat reports",
+        "confirmedRate": "Confirmation rate",
+        "averageResolution": "Average resolution time",
+        "percent": "{value}%",
+        "hours": "{value} h",
+        "lessThanHour": "Under 1 h",
+        "window": "Confirmation rate and average resolution time cover decisions from the last 90 days."
+      }
     }
   },
   "server": {
@@ -3273,11 +3325,19 @@
     },
     "reports": {
       "elanTapilmadi": "Listing not found.",
-      "elanDayandirildi": "The listing was suspended and the reports resolved.",
-      "elanBaglandi": "The listing was closed and the reports resolved.",
-      "acikSikayetYoxdur": "There are no open reports for this listing.",
-      "esassizSayildi": "The reports were dismissed.",
-      "hellEdildi": "The reports were resolved."
+      "elanDayandirildi": "The listing was hidden and the reports confirmed.",
+      "elanBaglandi": "The listing was closed and the reports confirmed.",
+      "acikSikayetYoxdur": "There are no active reports for this listing.",
+      "esassizSayildi": "The reports were rejected.",
+      "hellEdildi": "Report confirmed: the listing was corrected.",
+      "moderatorTapilmadi": "Moderator not found or not allowed to review reports.",
+      "teyinEdildi": "Reports assigned to {name}.",
+      "izahatIstenildi": "The question was sent to the listing owner.",
+      "izahatQeydEdildi": "The clarification request was recorded (the listing has no public owner).",
+      "qerarYoxdur": "There is no decision to review for this listing.",
+      "yenidenAcildi": "The reports were returned to review.",
+      "baglandi": "The reports were closed.",
+      "izahatGonderilmedi": "The question could not be delivered to the listing owner; the status was not changed. Please try again shortly."
     }
   }
 }

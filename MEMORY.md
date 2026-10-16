@@ -705,3 +705,17 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   remotePatterns, filtr parametrləri, yerləşmə bölməsi), CONTRIBUTING, SECURITY və `e2e/README.md` yeniləndi.
 - Wiki mənbəyi `Wiki/`-dir; GitHub Wiki repozitoriyasına (`LuxeHome.wiki.git`) push ayrıca icazə tələb edir.
 - Açıq Dependabot PR-ları: #126 (Prisma 7 major — ayrıca sınaq), #129 (vitest-plugin/wrangler patch).
+
+## 21. PRD v2.0 (`prompt.md`, 14 oktyabr 2026) — 16 oktyabr 2026
+
+- Yeni PRD 24 modul təklif edir; çoxu (şikayət, risk siqnalları, elan müddəti, agentlik komandası, müraciət bölgüsü,
+  kabinet analitikası, reytinq, ərazi səhifələri) artıq var — məqsəd onları peşəkarlaşdırmaq və boşluqları doldurmaqdır.
+- İstifadəçi qərarları: iş **PRD mərhələləri 1→6** ardıcıllığı ilə, hər modul ayrıca issue/branch/PR; mövcud ofis
+  ödənişli paketləri (`ListingPackage`/`PackageOrder`) **saxlanılır**, Basic/Pro/Premium onların üzərinə gəlir;
+  agentliklərarası elan köçürməsi **A agentliyi + admin** təsdiqi ilə; şikayət sübutunu **yalnız daxil olmuş** istifadəçi yükləyir.
+- Mərhələ 1 / Modul 01 (#195): şikayət statusları (yeni → yoxlanılır → məlumat gözlənilir → təsdiqlənib/rədd/bağlanıb),
+  moderatora təyin, sahibdən izahat, yenidən baxış, 15 səbəbdən çoxlu seçim, prioritet, növbə göstəriciləri, R2
+  `private/` prefiksində sübut şəkilləri, şikayətçiyə nəticə bildirişi.
+- Mərhələ 1-də qalanlar: şikayət üzrə daxili qeydlər və «Şikayətlərim» kabinet səhifəsi, elanın tam həyat dövrü
+  statusları (dayandırılıb / müddəti bitib / rədd edilib / məlumat tələb olunur), apellyasiya, admin-redaktə xəbərdarlıq
+  mətni (Təhlükəsizlik → Xəbərdarlıq Mətnləri), Telegram əlaqə düyməsi.
