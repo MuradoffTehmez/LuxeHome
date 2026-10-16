@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { ArrowLeftRight, BarChart3, Bell, CalendarCheck, Crown, Flag, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, ScrollText, Search, Sparkles, UserRound, Users } from "lucide-react";
+import { ArrowLeftRight, BarChart3, Bell, CalendarCheck, Crown, Flag, Gauge, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, ScrollText, Search, Sparkles, UserRound, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
@@ -27,6 +27,7 @@ type CabinetNavProps = {
 
 const ICONS = {
   overview: LayoutGrid,
+  "agency-dashboard": Gauge,
   listings: ListChecks,
   "new-listing": Plus,
   leads: MessageSquare,
@@ -46,6 +47,7 @@ const ICONS = {
 
 const LABEL_KEYS = {
   overview: "overview",
+  "agency-dashboard": "agencyDashboard",
   listings: "listings",
   "new-listing": "newListing",
   leads: "leads",
