@@ -113,6 +113,14 @@ düymələr sizə görünmür. **Qəbul et** elanı əvvəlki statusuna qaytarı
 rədd edilmiş elan moderasiya növbəsinə düşür); **Rədd et** qərarı qüvvədə saxlayır və səbəb tələb edir. Sahib nəticəni
 bildiriş və e-poçtla alır; hər qərar audit jurnalına və elanın status tarixçəsinə düşür.
 
+### Elan köçürmələri (`/admin/kocurmeler`)
+
+Bir agentlik başqa agentliyə aid elanı öz agentliyinə köçürmək istəyəndə əvvəl elanın agentliyi sorğunu kabinetdə
+təsdiqləyir, sonra sorğu bu növbəyə düşür. Elanın hüquqi və müqavilə statusunu, əmlak sahibinin razılığını yoxlayıb
+**Təsdiqlə** (qeyd istəyə bağlı) və ya **Rədd et** (səbəb məcburi) seçin. Təsdiqdə elan yeni agentliyə və seçilmiş agentə
+keçir; əvvəlki agentliyin müraciətləri köçürülmür. Elan arada silinib və ya başqa yerə keçibsə, sorğu avtomatik ləğv olunur.
+Hər qərar audit jurnalına yazılır, tərəflər bildiriş alır.
+
 ### Xəbərdarlıq mətnləri (`/admin/xeberdarliqlar`)
 
 Əlaqə panelinin beh xəbərdarlığı hər elanın və agentlik profilinin əlaqə panelində, telefon və WhatsApp düymələrinin

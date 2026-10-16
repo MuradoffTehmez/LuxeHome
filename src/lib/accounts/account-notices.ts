@@ -60,6 +60,16 @@ const COPY = {
     appealAccepted: (title: string) => `«${title}» elanı üzrə etirazınız qəbul edildi və moderasiya qərarı ləğv olundu.`,
     appealRejectedTitle: "Etirazınız rədd edildi",
     appealRejected: (title: string) => `«${title}» elanı üzrə etirazınız müstəqil yoxlamadan sonra rədd edildi. Elanı düzəldib yenidən göndərə bilərsiniz.`,
+    transferRequestedTitle: "Elanınız üçün köçürmə sorğusu",
+    transferRequested: (title: string, agency: string) => `«${agency}» agentliyi «${title}» elanını öz agentliyinə köçürmək istəyir. Sorğuya «Köçürmələr» bölməsində baxın.`,
+    transferSourceApprovedTitle: "Köçürmə sorğusu agentlik tərəfindən təsdiqləndi",
+    transferSourceApproved: (title: string) => `«${title}» elanının köçürülməsini elanın agentliyi təsdiqlədi. Son qərarı platforma administratoru verəcək.`,
+    transferRejectedTitle: "Köçürmə sorğusu rədd edildi",
+    transferRejected: (title: string) => `«${title}» elanının köçürmə sorğusu rədd edildi.`,
+    transferCompletedTitle: "Elan agentliyinizə köçürüldü",
+    transferCompleted: (title: string) => `«${title}» elanı agentliyinizə köçürüldü və «Elanlarım» bölməsindədir. Əvvəlki agentliyin müraciətləri köçürülmür.`,
+    transferMovedTitle: "Elan başqa agentliyə köçürüldü",
+    transferMoved: (title: string, agency: string) => `«${title}» elanı təsdiqlənmiş sorğu əsasında «${agency}» agentliyinə köçürüldü. Köhnə müraciətlər sizdə qalır.`,
     listingRejectedTitle: "Elanınız rədd edildi",
     listingRejected: (title: string) => `«${title}» elanı moderasiyadan keçmədi. Səbəbi oxuyub elanı düzəldin və yenidən göndərin.`,
     listingNeedsInfoTitle: "Elanınız üçün düzəliş tələb olunur",
@@ -114,6 +124,16 @@ const COPY = {
     appealAccepted: (title: string) => `Your appeal about the listing “${title}” was accepted and the moderation decision was reversed.`,
     appealRejectedTitle: "Your appeal was rejected",
     appealRejected: (title: string) => `Your appeal about the listing “${title}” was rejected after an independent review. You can correct the listing and submit it again.`,
+    transferRequestedTitle: "Transfer request for your listing",
+    transferRequested: (title: string, agency: string) => `The agency “${agency}” wants to transfer the listing “${title}” to itself. Review the request in the “Transfers” section.`,
+    transferSourceApprovedTitle: "The agency approved your transfer request",
+    transferSourceApproved: (title: string) => `The listing’s agency approved the transfer of “${title}”. A platform administrator will make the final decision.`,
+    transferRejectedTitle: "Transfer request rejected",
+    transferRejected: (title: string) => `The transfer request for the listing “${title}” was rejected.`,
+    transferCompletedTitle: "Listing transferred to your agency",
+    transferCompleted: (title: string) => `The listing “${title}” was transferred to your agency and is in “My listings”. Enquiries of the previous agency are not transferred.`,
+    transferMovedTitle: "Listing transferred to another agency",
+    transferMoved: (title: string, agency: string) => `The listing “${title}” was transferred to the agency “${agency}” under an approved request. Its previous enquiries stay with you.`,
     listingRejectedTitle: "Your listing was rejected",
     listingRejected: (title: string) => `The listing “${title}” did not pass moderation. Read the reason, correct the listing and submit it again.`,
     listingNeedsInfoTitle: "Your listing needs changes",
@@ -168,6 +188,16 @@ const COPY = {
     appealAccepted: (title: string) => `Ваша апелляция по объявлению «${title}» принята, решение модерации отменено.`,
     appealRejectedTitle: "Ваша апелляция отклонена",
     appealRejected: (title: string) => `Ваша апелляция по объявлению «${title}» отклонена после независимой проверки. Вы можете исправить объявление и отправить его снова.`,
+    transferRequestedTitle: "Запрос на передачу вашего объявления",
+    transferRequested: (title: string, agency: string) => `Агентство «${agency}» хочет передать себе объявление «${title}». Рассмотрите запрос в разделе «Передачи».`,
+    transferSourceApprovedTitle: "Агентство одобрило запрос на передачу",
+    transferSourceApproved: (title: string) => `Агентство объявления одобрило передачу «${title}». Окончательное решение примет администратор платформы.`,
+    transferRejectedTitle: "Запрос на передачу отклонён",
+    transferRejected: (title: string) => `Запрос на передачу объявления «${title}» отклонён.`,
+    transferCompletedTitle: "Объявление передано вашему агентству",
+    transferCompleted: (title: string) => `Объявление «${title}» передано вашему агентству и находится в разделе «Мои объявления». Заявки прежнего агентства не передаются.`,
+    transferMovedTitle: "Объявление передано другому агентству",
+    transferMoved: (title: string, agency: string) => `Объявление «${title}» по одобренному запросу передано агентству «${agency}». Прежние заявки остаются у вас.`,
     listingRejectedTitle: "Ваше объявление отклонено",
     listingRejected: (title: string) => `Объявление «${title}» не прошло модерацию. Ознакомьтесь с причиной, исправьте объявление и отправьте его снова.`,
     listingNeedsInfoTitle: "Объявление требует исправлений",
@@ -542,5 +572,47 @@ export async function noticeListingsHandedOver(input: {
     "/kabinet/elanlar",
     `listings-handed:${input.employeeId}:${attemptKey(input.handedAt)}`,
     (copy) => ({ title: copy.listingsHandedTitle, content: copy.listingsHanded(input.count, input.fromName, input.agencyName) }),
+  );
+}
+
+/** A agentliyinin sahibinə: B agentliyi elanını köçürmək istəyir (#212). */
+export async function noticeTransferRequested(input: {
+  userId: string;
+  transferId: string;
+  propertyTitle: string;
+  toAgencyName: string;
+}): Promise<boolean> {
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_TRANSFER,
+    "/kabinet/kocurmeler",
+    `listing-transfer:${input.transferId}:requested`,
+    (copy) => ({ title: copy.transferRequestedTitle, content: copy.transferRequested(input.propertyTitle, input.toAgencyName) }),
+  );
+}
+
+export type TransferNoticeStage = "sourceApproved" | "rejected" | "completed" | "moved";
+
+/** Köçürmə qərarı (#212): sorğunu yaradana/təhvil alana və elanın köhnə agentliyinə. */
+export async function noticeTransferDecision(input: {
+  userId: string;
+  transferId: string;
+  stage: TransferNoticeStage;
+  propertyTitle: string;
+  /** `moved` üçün yeni agentliyin adı. */
+  agencyName?: string;
+  note?: string | null;
+}): Promise<boolean> {
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_TRANSFER,
+    input.stage === "completed" ? "/kabinet/elanlar" : "/kabinet/kocurmeler",
+    `listing-transfer:${input.transferId}:${input.stage}:${input.userId}`,
+    (copy) => {
+      if (input.stage === "sourceApproved") return { title: copy.transferSourceApprovedTitle, content: copy.transferSourceApproved(input.propertyTitle) };
+      if (input.stage === "completed") return { title: copy.transferCompletedTitle, content: copy.transferCompleted(input.propertyTitle) };
+      if (input.stage === "moved") return { title: copy.transferMovedTitle, content: copy.transferMoved(input.propertyTitle, input.agencyName ?? "") };
+      return { title: copy.transferRejectedTitle, content: withReason(copy.transferRejected(input.propertyTitle), copy, input.note) };
+    },
   );
 }

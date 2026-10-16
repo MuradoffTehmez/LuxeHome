@@ -731,3 +731,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #210 (Mərhələ 2, Modul 04): `Property.agencyId`/`createdById`, agentlik elanı agentlə getmir (ayrılmada sahibə
   və ya agentə təhvil, şəxsi elan agentdə), agentlik təklif sayı `agencyId`-dən, `AgencyMembershipHistory`.
   Qalan Modul 04: agentliklər arası köçürmə sorğusu (6.4, A agentliyi + admin təsdiqi, əmlak sahibinin razılığı).
+- #212 (Modul 04, 6.4): `ListingTransfer` — B sorğu edir, A sahibi və admin təsdiqləyir, köhnə müraciətlər A-da qalır
+  (`leadScope` başqa agentliyin müraciətini elan müəllifinə göstərmir). Bununla Modul 04 bağlanır; növbəti — Modul 05
+  (agentlik idarəetmə paneli: dashboard, agentlərin idarəsi, daxili tapşırıqlar, fəaliyyət jurnalı).

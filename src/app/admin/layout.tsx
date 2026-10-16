@@ -10,6 +10,7 @@ import { getAdminI18n, getAdminMetadataT } from "@/lib/admin-i18n";
 import { prisma } from "@/lib/prisma";
 import { ACTIVE_REPORT_STATUSES, LEAD_STATUSES, PROPERTY_STATUSES } from "@/lib/constants";
 import { countOpenAppeals } from "@/lib/listing-appeals";
+import { countPendingAdminTransfers } from "@/lib/listing-transfers";
 import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 import { getApprovalCounts } from "@/lib/admin/approvals";
 
@@ -55,20 +56,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/admin/hesabim?parol=deyis");
   }
 
-  const [newLeads, draftProperties, pendingModeration, approvals, openReports, openAppeals] = await Promise.all([
+  const [newLeads, draftProperties, pendingModeration, approvals, openReports, openAppeals, pendingTransfers] = await Promise.all([
     prisma.lead.count({ where: { ...OFFICE_LEAD_WHERE, status: LEAD_STATUSES.NEW } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.DRAFT, deletedAt: null } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.PENDING, deletedAt: null } }),
     getApprovalCounts(),
     prisma.listingReport.count({ where: { status: { in: [...ACTIVE_REPORT_STATUSES] } } }),
     countOpenAppeals(),
+    countPendingAdminTransfers(),
   ]);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ToastProvider>
         <ThemeSync preference={user.themePreference} />
-        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration, pendingApprovals: approvals.total, openReports, openAppeals }}>
+        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration, pendingApprovals: approvals.total, openReports, openAppeals, pendingTransfers }}>
           {children}
         </AdminShell>
       </ToastProvider>

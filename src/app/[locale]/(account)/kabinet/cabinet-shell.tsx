@@ -12,10 +12,11 @@ type CabinetShellProps = {
   accountLabel: string;
   canList: boolean;
   canManageTeam?: boolean;
+  canTransfer?: boolean;
   children: React.ReactNode;
 };
 
-export function CabinetShell({ name, accountLabel, canList, canManageTeam = false, children }: CabinetShellProps) {
+export function CabinetShell({ name, accountLabel, canList, canManageTeam = false, canTransfer = false, children }: CabinetShellProps) {
   const [open, setOpen] = useState(false);
   const t = useTranslations("auth.cabinet");
 
@@ -40,7 +41,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
 
       <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block lg:self-start">
-          <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} />
+          <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} canTransfer={canTransfer} />
         </aside>
         <div className="min-w-0">
           <CabinetBreadcrumbs />
@@ -59,6 +60,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
           accountLabel={accountLabel}
           canList={canList}
           canManageTeam={canManageTeam}
+          canTransfer={canTransfer}
           variant="mobile"
           onNavigate={() => setOpen(false)}
         />

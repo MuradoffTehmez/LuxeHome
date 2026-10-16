@@ -122,6 +122,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/axtarislarim` | Saxlanmış axtarışlar və tezlik |
 | `/kabinet/bildirisler` | Bildirişlər, kanal seçimləri, sakit saatlar |
 | `/kabinet/sikayetlerim` | Göndərilmiş elan şikayətləri, mərhələ və nəticə (moderator qeydləri görünmür) |
+| `/kabinet/kocurmeler` | Agentliklər arası elan köçürmə sorğuları: göndərmə, gələn sorğuların təsdiqi (agentlik sahibi), geri çəkmə |
 | `/kabinet/son-baxilanlar`, `/kabinet/tovsiyeler` | Son baxılanlar və fərdi tövsiyələr |
 | `/kabinet/komanda` | Agentlik komandası (ən çox 50 üzv), e-poçtla dəvət, dəvət linki, çıxarılan agentin elanlarının təhvili |
 | `/qosul/<token>` | Agentliyin dəvət linki: agent birbaşa komandaya qoşulur, qonaq agent kimi qeydiyyata yönəlir |
@@ -177,6 +178,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/blog`, `/yeni`, `/[id]`, `/kateqoriyalar` | Bloq və kateqoriyalar | `blog:manage` |
 | `/admin/bilik-merkezi` (+ `/yeni`, `/[id]`, `/kateqoriyalar`, `/lugat`, `/suallar`) | Bilik Mərkəzi CMS-i | `knowledge:manage` |
 | `/admin/etirazlar` | Moderasiya qərarlarına etirazlar: müstəqil baxış (qərarverən öz qərarına baxa bilmir), qəbul/rədd | `property:manage` |
+| `/admin/kocurmeler` | Agentliklər arası elan köçürmələri: elanın agentliyi təsdiqləyəndən sonra son qərar | `property:manage` |
 | `/admin/xeberdarliqlar` | Əlaqə panelinin beh xəbərdarlığı (AZ/EN/RU) | `knowledge:manage` |
 | `/admin/muracietler`, `/[id]` | Müraciət filtri, status, məsul, qeyd | `lead:manage` |
 | `/admin/muracietler/lovhe` | Status sütunlu lövhə, SLA, «mənə təyin et» | `lead:manage` |

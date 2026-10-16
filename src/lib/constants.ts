@@ -555,6 +555,29 @@ export const MEMBERSHIP_END_REASONS = {
 
 export type MembershipEndReason = (typeof MEMBERSHIP_END_REASONS)[keyof typeof MEMBERSHIP_END_REASONS];
 
+/**
+ * Agentliklər arası elan köçürmə sorğusu (#212, PRD 6.4): əvvəl elanın agentliyi (A), sonra admin
+ * təsdiqləyir. `PENDING_*` açıq sayılır — elan başına bir açıq sorğu.
+ */
+export const TRANSFER_STATUSES = {
+  PENDING_SOURCE: "PENDING_SOURCE",
+  PENDING_ADMIN: "PENDING_ADMIN",
+  COMPLETED: "COMPLETED",
+  REJECTED: "REJECTED",
+  CANCELLED: "CANCELLED",
+} as const;
+
+export type TransferStatus = (typeof TRANSFER_STATUSES)[keyof typeof TRANSFER_STATUSES];
+
+export const OPEN_TRANSFER_STATUSES: readonly TransferStatus[] = [
+  TRANSFER_STATUSES.PENDING_SOURCE,
+  TRANSFER_STATUSES.PENDING_ADMIN,
+];
+
+/** Köçürmə səbəbinin uzunluğu (simvol). */
+export const TRANSFER_REASON_MIN = 10;
+export const TRANSFER_REASON_MAX = 1000;
+
 export const RENOVATIONS = {
   NEW_BUILDING: "NEW_BUILDING",
   DESIGNER: "DESIGNER",
@@ -818,6 +841,8 @@ export const NOTIFICATION_TYPES = {
   LISTING_MODERATION: "LISTING_MODERATION",
   /** Agentlik sahibinə: müraciət 30 dəqiqə cavabsız qaldı (#161). */
   LEAD_ESCALATION: "LEAD_ESCALATION",
+  /** Agentliklər arası elan köçürmə sorğusu və onun qərarları (#212). */
+  LISTING_TRANSFER: "LISTING_TRANSFER",
 } as const;
 
 export type NotificationType =
@@ -837,6 +862,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   LISTING_REPORT: "Elan şikayəti",
   LISTING_MODERATION: "Elan moderasiyası",
   LEAD_ESCALATION: "Cavabsız müraciət",
+  LISTING_TRANSFER: "Elan köçürməsi",
 };
 
 // ---------------------------------------------------------------------------

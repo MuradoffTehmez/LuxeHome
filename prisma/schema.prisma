@@ -81,6 +81,7 @@ model User {
   properties            Property[]                @relation("PropertyAuthor")
   createdProperties     Property[]                @relation("PropertyCreator")
   membershipHistory     AgencyMembershipHistory[] @relation("MembershipMember")
+  transferRequests      ListingTransfer[]         @relation("TransferRequester")
   posts                 BlogPost[]                @relation("PostAuthor")
   media                 Media[]                   @relation("MediaUploader")
   favorites             Favorite[]
@@ -212,6 +213,8 @@ model Agency {
   employees         AgencyEmployee[]
   properties        Property[]                @relation("PropertyAgency")
   membershipHistory AgencyMembershipHistory[]
+  transfersOut      ListingTransfer[]         @relation("TransferFrom")
+  transfersIn       ListingTransfer[]         @relation("TransferTo")
   partners          AgencyPartner[]
   agentProfiles     AgentProfile[]
   testimonials      Testimonial[]
@@ -295,6 +298,43 @@ model AgencyMembershipHistory {
 
   @@index([userId, joinedAt])
   @@index([agencyId, leftAt])
+}
+
+/// Agentliklər arası elan köçürmə sorğusu (#212, PRD 6.4): B agentliyi A-nın elanını istəyir,
+/// əvvəl A agentliyinin sahibi, sonra admin təsdiqləyir. Status keçidləri şərti `updateMany` ilədir.
+model ListingTransfer {
+  id                String    @id @default(cuid())
+  propertyId        String
+  fromAgencyId      String
+  toAgencyId        String
+  /// Sorğunu yaradan (B agentliyinin sahibi və ya təsdiqlənmiş agenti).
+  requestedById     String?
+  /// Təhvil alacaq istifadəçi — B sahibi və ya B-nin təsdiqlənmiş agenti; tamamlananda yenidən yoxlanılır.
+  targetUserId      String
+  reason            String
+  /// Əmlak sahibinin razılığı alınıb (sorğuda məcburi təsdiq) və onun izahı.
+  ownerConsent      Boolean   @default(false)
+  ownerConsentNote  String?
+  /// PENDING_SOURCE | PENDING_ADMIN | COMPLETED | REJECTED | CANCELLED
+  status            String    @default("PENDING_SOURCE")
+  sourceDecidedById String?
+  sourceDecidedAt   DateTime?
+  sourceNote        String?
+  adminDecidedById  String?
+  adminDecidedAt    DateTime?
+  adminNote         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  fromAgency  Agency   @relation("TransferFrom", fields: [fromAgencyId], references: [id], onDelete: Cascade)
+  toAgency    Agency   @relation("TransferTo", fields: [toAgencyId], references: [id], onDelete: Cascade)
+  requestedBy User?    @relation("TransferRequester", fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([propertyId, status])
+  @@index([fromAgencyId, status])
+  @@index([toAgencyId, status])
 }
 
 /// Aktiv giriş sessiyaları. Cookie yalnız bu sətrin id-sini daşıyır, beləliklə
@@ -668,6 +708,7 @@ model Property {
   priceHistory       PropertyPriceHistory[]
   statusHistory      PropertyStatusHistory[]
   appeals            ListingAppeal[]
+  transfers          ListingTransfer[]
   floorPlans         PropertyFloorPlan[]
   openHouses         OpenHouse[]
   packageOrders      PackageOrder[]

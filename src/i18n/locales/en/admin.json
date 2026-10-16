@@ -88,7 +88,8 @@
       "agencyHub": "Agencies and agents",
       "approvals": "Approval queue",
       "reports": "Reports",
-      "appeals": "Appeals"
+      "appeals": "Appeals",
+      "transfers": "Transfers"
     }
   },
   "actions": {
@@ -315,7 +316,8 @@
       "ACCOUNT_REVIEW": "Profile review",
       "LISTING_REPORT": "Listing report",
       "LISTING_MODERATION": "Listing moderation",
-      "LEAD_ESCALATION": "Unanswered enquiry"
+      "LEAD_ESCALATION": "Unanswered enquiry",
+      "LISTING_TRANSFER": "Listing transfer"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3013,6 +3015,33 @@
       "rejectTitle": "Reject the appeal",
       "rejectDescription": "The decision on “{title}” stays in force. The reason will be sent to the owner by notification and email.",
       "moderationReason": "Moderator's reason:"
+    },
+    "transfers": {
+      "title": "Listing transfers",
+      "description": "Transfer requests between agencies. After the listing’s agency approves, check the legal and contract status and make the final decision. Enquiries of the previous agency do not move to the new agency.",
+      "tabsLabel": "Transfer statuses",
+      "status": {
+        "PENDING_SOURCE": "Agency reviewing",
+        "PENDING_ADMIN": "Awaiting decision",
+        "COMPLETED": "Transferred",
+        "REJECTED": "Rejected",
+        "CANCELLED": "Cancelled"
+      },
+      "empty": "No requests with this status",
+      "emptyDescription": "New transfer requests appear here once the listing’s agency approves them.",
+      "requestedBy": "Requested by: {name}",
+      "target": "Recipient: {name}",
+      "unknown": "unknown",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approveTitle": "Approve the transfer",
+      "rejectTitle": "Reject the transfer",
+      "approveDescription": "The listing “{title}” will move from {from} to {to}. Enquiries of the previous agency are not transferred.",
+      "rejectDescription": "The transfer request for “{title}” will be rejected. The reason will be sent to both parties.",
+      "consentConfirmed": "Property owner’s consent confirmed",
+      "consentMissing": "Property owner’s consent not recorded",
+      "sourceDecision": "Listing agency decision: {date}",
+      "adminDecision": "Administrator decision: {date}"
     }
   },
   "server": {
@@ -3447,6 +3476,14 @@
       "kohnelib": "The appealed decision is no longer in force (the listing was edited or a new decision was made) — the appeal was closed.",
       "qebulEdildi": "The appeal was accepted and the listing returned to its previous status.",
       "reddEdildi": "The appeal was rejected and the reason sent to the owner."
+    },
+    "transfers": {
+      "completed": "The listing was transferred.",
+      "rejected": "The transfer request was rejected.",
+      "stale": "The request has changed. Refresh the page.",
+      "notFound": "Transfer request not found.",
+      "targetGone": "The recipient is no longer a member of the new agency — reject the request.",
+      "listingChanged": "The listing changed in the meantime (deleted or moved to another agency) — the request was cancelled."
     }
   }
 }

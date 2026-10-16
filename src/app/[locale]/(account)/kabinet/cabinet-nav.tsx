@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { BarChart3, Bell, CalendarCheck, Crown, Flag, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, Search, Sparkles, UserRound, Users } from "lucide-react";
+import { ArrowLeftRight, BarChart3, Bell, CalendarCheck, Crown, Flag, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, Search, Sparkles, UserRound, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
@@ -20,6 +20,7 @@ type CabinetNavProps = {
   accountLabel: string;
   canList: boolean;
   canManageTeam?: boolean;
+  canTransfer?: boolean;
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
 };
@@ -32,6 +33,7 @@ const ICONS = {
   analytics: BarChart3,
   packages: Crown,
   team: Users,
+  transfers: ArrowLeftRight,
   "saved-searches": Search,
   notifications: Bell,
   reports: Flag,
@@ -49,6 +51,7 @@ const LABEL_KEYS = {
   analytics: "analytics",
   packages: "packages",
   team: "team",
+  transfers: "transfers",
   "saved-searches": "savedSearches",
   notifications: "notifications",
   reports: "reports",
@@ -79,12 +82,13 @@ export function CabinetNav({
   accountLabel,
   canList,
   canManageTeam = false,
+  canTransfer = false,
   variant = "desktop",
   onNavigate,
 }: CabinetNavProps) {
   const pathname = usePathname();
   const t = useTranslations("auth.cabinet");
-  const items = getCabinetItems(canList, canManageTeam);
+  const items = getCabinetItems(canList, canManageTeam, canTransfer);
 
   return (
     <nav aria-label={t("menu")} className="flex flex-col gap-4">
