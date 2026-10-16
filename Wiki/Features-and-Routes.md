@@ -148,7 +148,8 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 - «Kənd» sahəsi seçilmiş rayonun kəndlərini tələb olunanda yükləyir (~3 600 kənd bir dəfədə göndərilmir).
 - «Küçə» sahəsi seçilmiş rəsmi vahidin (qəsəbə/kənd, yoxdursa şəhər rayonu və ya şəhər) Ünvan Reyestri küçələrini təklif edir (`public/data/kuceler/<kod>.json`), amma sərbəst mətn olaraq qalır.
 - Elan yazan hər action fonda `queuePropertyVectorSync()` və `queueListingEnrichment()` (AI SEO + ALT) çağırır.
-- Sahib/agentlik elanı 60 gün yaşayır: 7 gün qalmış xatırlatma, bitəndə `ARCHIVED` + `expiredAt`. Şirkət (STAFF) elanlarına toxunulmur.
+- Sahib/agentlik elanı 60 gün yaşayır: 7 gün qalmış xatırlatma, bitəndə `EXPIRED` + `expiredAt`. Şirkət (STAFF) elanlarına toxunulmur.
+- Sahib aktiv elanı kabinetdən «Satıldı / Kirayəyə verildi» kimi bağlayır; bağlanmış elan saytda qalır, amma müraciət qəbul etmir.
 
 ## Əməkdaş giriş axını
 
@@ -167,7 +168,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/emlaklar` | Siyahı, filtr, status, featured, toplu yeniləmə və seçim | Staff (baxış); yazma `property:manage` |
 | `/admin/emlaklar/yeni`, `/[id]` | 8 addımlı sehrbaz, iyerarxik ünvan, metro/nişangah, rəsmi küçə təklifi, AI SEO/ALT | `property:manage` |
 | `/admin/emlaklar/idxal` | CSV idxalı (həmişə DRAFT, 10-luq partiyalar, dublikat/davam etmə; `metro` və `landmark` sütunları şəhərin öz stansiya/nişangahları arasında axtarılır) | `property:manage` |
-| `/admin/moderation` | Pending elanlar, approve/reject, avtomatik risk balı və siqnallar | `property:manage` |
+| `/admin/moderation` | Pending elanlar: təsdiq, düzəliş tələbi, rədd (sahibə səbəblə bildiriş), avtomatik risk balı və siqnallar | `property:manage` |
 | `/admin/sikayetler` | Elan şikayətləri: mərhələ tabları, göstəricilər, moderatora təyin, sahibdən izahat, gizlət/bağla/düzəldilib/rədd/bağla, yenidən bax, sübut şəkilləri, daxili qeydlər | `property:manage` |
 | `/admin/layiheler`, `/yeni`, `/[id]` | Layihə CRUD və şəkillər | `project:manage` |
 | `/admin/layiheler/[id]/menziller` | Mənzil şahmatı generatoru (blok/mərtəbə/nömrə) | `project:manage` |
