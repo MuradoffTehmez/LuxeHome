@@ -183,7 +183,7 @@ export default async function AdminReportsPage({
               const active = isActiveReportStatus(group.status);
               const isPublic = !property.deletedAt
                 && ([PROPERTY_STATUSES.PUBLISHED, PROPERTY_STATUSES.RESERVED, PROPERTY_STATUSES.SOLD, PROPERTY_STATUSES.RENTED] as string[]).includes(property.status);
-              const decision = group.reports[0];
+              const { decision } = group;
               const closeLabel = property.listingType === LISTING_TYPES.RENT ? t("pages.reports.markRented") : t("pages.reports.markSold");
               return (
                 <li key={property.id} className="flex flex-col gap-4 px-4 py-4 sm:px-5">
@@ -266,10 +266,10 @@ export default async function AdminReportsPage({
                             <UserCheck className="size-4" aria-hidden="true" />
                           </ConfirmAction>
                         )}
-                        {!active && (
+                        {!active && decision && (
                           <ConfirmAction
                             action={reopenListingReports}
-                            id={property.id}
+                            id={decision.cycleId}
                             label={t("pages.reports.reopen")}
                             title={t("pages.reports.reopen")}
                             description={t("pages.reports.reopenDescription")}
@@ -337,9 +337,9 @@ export default async function AdminReportsPage({
                   {!active && decision && (
                     <p className="text-xs text-ink-muted">
                       {decision.resolution ? t(`labels.reportResolution.${decision.resolution as ReportResolution}`) : tabLabel(group.status)}
-                      {decision.resolvedBy ? ` · ${decision.resolvedBy.name}` : ""}
-                      {decision.resolvedAt ? ` · ${formatDateTime(decision.resolvedAt)}` : ""}
-                      {decision.resolutionNote ? ` · ${decision.resolutionNote}` : ""}
+                      {decision.by ? ` · ${decision.by}` : ""}
+                      {` · ${formatDateTime(decision.at)}`}
+                      {decision.note ? ` · ${decision.note}` : ""}
                     </p>
                   )}
 

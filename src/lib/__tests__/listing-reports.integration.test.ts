@@ -1,15 +1,19 @@
 import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { LOCATION_KINDS, PROPERTY_STATUSES, REPORT_REASONS, REPORT_STATUSES } from "@/lib/constants";
+import { LOCATION_KINDS, NOTIFICATION_TYPES, PROPERTY_STATUSES, REPORT_REASONS, REPORT_STATUSES } from "@/lib/constants";
 import {
   assignActiveReports,
   getReportGroups,
   getReportQueueStats,
+  parseReportCycleId,
   parseReportReasons,
   reopenDecidedReports,
+  reportCycleId,
   requestReportInfo,
+  revertReportInfoRequest,
   submitListingReport,
 } from "@/lib/listing-reports";
+import { noticeReportOutcome } from "@/lib/accounts/account-notices";
 import { mediaKeyFromPath } from "@/lib/media-response";
 import { countOwnListings, handOverListings } from "@/lib/accounts/agency-listings";
 import { activeOfferWhere, getClosedDeals } from "@/lib/agency-profile";
@@ -122,21 +126,82 @@ describe("elan şikayəti", () => {
     expect(rows).toHaveLength(3);
     expect(rows.every((row) => row.status === REPORT_STATUSES.IN_REVIEW && row.assigneeId === "rep-moderator")).toBe(true);
 
-    await expect(requestReportInfo({ propertyId: "rep-flow", actorId: "rep-moderator", note: "Sənədi təsdiqləyin." })).resolves.toBe(3);
+    const first = await requestReportInfo({ propertyId: "rep-flow", actorId: "rep-moderator", note: "Sənədi təsdiqləyin." });
+    expect(first).toEqual({ count: 3, previous: null });
     const group = (await getReportGroups([REPORT_STATUSES.NEEDS_INFO])).find((item) => item.property.id === "rep-flow");
     expect(group?.infoRequest?.note).toBe("Sənədi təsdiqləyin.");
     expect(group?.assignee?.id).toBe("rep-moderator");
     expect(group?.evidenceCount).toBe(2);
 
     // Admin qərarı: aktiv şikayətlər birlikdə rədd edilir (action-dakı şərti `updateMany`).
+    const decidedAt = new Date();
     await prisma.listingReport.updateMany({
       where: { propertyId: "rep-flow", status: REPORT_STATUSES.NEEDS_INFO },
-      data: { status: REPORT_STATUSES.DISMISSED, resolution: "NO_ACTION", resolvedById: "rep-moderator", resolvedAt: new Date() },
+      data: { status: REPORT_STATUSES.DISMISSED, resolution: "NO_ACTION", resolvedById: "rep-moderator", resolvedAt: decidedAt },
     });
-    await expect(reopenDecidedReports("rep-flow", "rep-moderator")).resolves.toBe(3);
+    const [dismissed] = (await getReportGroups([REPORT_STATUSES.DISMISSED])).filter((item) => item.property.id === "rep-flow");
+    expect(dismissed?.decision?.cycleId).toBe(reportCycleId("rep-flow", decidedAt));
+    expect(parseReportCycleId(dismissed?.decision?.cycleId)).toEqual({ propertyId: "rep-flow", decidedAt });
+    await expect(reopenDecidedReports("rep-flow", decidedAt, "rep-moderator")).resolves.toBe(3);
     rows = await prisma.listingReport.findMany({ where: { propertyId: "rep-flow" }, select: { status: true, assigneeId: true } });
     expect(rows.every((row) => row.status === REPORT_STATUSES.IN_REVIEW)).toBe(true);
-    await expect(reopenDecidedReports("rep-flow", "rep-moderator")).resolves.toBe(0);
+    await expect(reopenDecidedReports("rep-flow", decidedAt, "rep-moderator")).resolves.toBe(0);
+  });
+
+  it("yenidən baxış yalnız göstərilən qərar dövrünü açır, köhnə dövr yenisinə toxunmur", async () => {
+    const older = new Date(Date.now() - 2 * DAY);
+    const newer = new Date(Date.now() - DAY);
+    const base = { propertyId: "rep-flow", reason: "FAKE", reasons: '["FAKE"]', resolvedById: "rep-moderator" };
+    await prisma.listingReport.createMany({
+      data: [
+        { ...base, id: "cycle-old", reporterKey: "cycle-old", status: REPORT_STATUSES.DISMISSED, resolution: "NO_ACTION", resolvedAt: older },
+        { ...base, id: "cycle-new", reporterKey: "cycle-new", status: REPORT_STATUSES.RESOLVED, resolution: "LISTING_FIXED", resolvedAt: newer },
+      ],
+    });
+    await expect(reopenDecidedReports("rep-flow", older, "rep-moderator")).resolves.toBe(1);
+    const statuses = await prisma.listingReport.findMany({
+      where: { id: { in: ["cycle-old", "cycle-new"] } },
+      select: { id: true, status: true },
+      orderBy: { id: "asc" },
+    });
+    expect(statuses).toEqual([
+      { id: "cycle-new", status: REPORT_STATUSES.RESOLVED },
+      { id: "cycle-old", status: REPORT_STATUSES.IN_REVIEW },
+    ]);
+    expect(parseReportCycleId("rep-flow|tarix-deyil")).toBeNull();
+    expect(parseReportCycleId("a|b|c")).toBeNull();
+    await prisma.listingReport.deleteMany({ where: { id: { in: ["cycle-old", "cycle-new"] } } });
+  });
+
+  it("çatdırılmayan izahat istəyi geri qaytarılır: əvvəlki sual bərpa olunur, yoxdursa «Yoxlanılır»", async () => {
+    const firstAt = new Date(Date.now() - 60_000);
+    const first = await requestReportInfo({ propertyId: "rep-flow", actorId: "rep-moderator", note: "Birinci sual.", now: firstAt });
+    expect(first.previous).toBeNull();
+    const secondAt = new Date();
+    const second = await requestReportInfo({ propertyId: "rep-flow", actorId: "rep-moderator", note: "İkinci sual.", now: secondAt });
+    expect(second.previous).toEqual({ at: firstAt, note: "Birinci sual." });
+
+    // İkinci sual çatmadı — birinci (artıq çatdırılmış) istək bərpa olunur, qrup məlumat gözləməkdə qalır.
+    await expect(revertReportInfoRequest("rep-flow", secondAt, second.previous)).resolves.toBe(3);
+    let rows = await prisma.listingReport.findMany({ where: { propertyId: "rep-flow" }, select: { status: true, infoRequestNote: true } });
+    expect(rows.every((row) => row.status === REPORT_STATUSES.NEEDS_INFO && row.infoRequestNote === "Birinci sual.")).toBe(true);
+
+    // Heç bir sual çatmayıbsa qrup yoxlamaya qayıdır.
+    await expect(revertReportInfoRequest("rep-flow", firstAt, null)).resolves.toBe(3);
+    rows = await prisma.listingReport.findMany({ where: { propertyId: "rep-flow" }, select: { status: true, infoRequestNote: true } });
+    expect(rows.every((row) => row.status === REPORT_STATUSES.IN_REVIEW && row.infoRequestNote === null)).toBe(true);
+  });
+
+  it("eyni qərarın nəticəsi hər şikayətçiyə ayrıca bildiriş kimi yazılır", async () => {
+    const decidedAt = new Date();
+    for (const userId of ["rep-agent", "rep-owner"]) {
+      await noticeReportOutcome({ userId, propertyId: "rep-flow", propertyTitle: "Axın", decidedAt, outcome: "dismissed" });
+    }
+    const notices = await prisma.notification.findMany({
+      where: { type: NOTIFICATION_TYPES.LISTING_REPORT, dedupeKey: { startsWith: "report-outcome:rep-flow:" } },
+      select: { userId: true },
+    });
+    expect(notices.map((item) => item.userId).sort()).toEqual(["rep-agent", "rep-owner"]);
   });
 
   it("növbə göstəricilərini hesablayır", async () => {

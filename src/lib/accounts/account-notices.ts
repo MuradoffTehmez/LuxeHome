@@ -405,8 +405,10 @@ export async function noticeListingInfoRequested(input: {
   propertyTitle: string;
   requestedAt: Date;
   note: string;
-}): Promise<void> {
-  await notifyAccount(
+}): Promise<boolean> {
+  // `false` — bildiriş yazılmadı: çağıran statusu geri qaytarır, yoxsa növbə sahibin heç vaxt
+  // görmədiyi suala cavab gözləyərdi.
+  return notifyAccount(
     input.userId,
     NOTIFICATION_TYPES.LISTING_REPORT,
     "/kabinet/elanlar",
@@ -433,7 +435,8 @@ export async function noticeReportOutcome(input: {
     input.userId,
     NOTIFICATION_TYPES.LISTING_REPORT,
     "/kabinet/bildirisler",
-    `report-outcome:${input.propertyId}:${attemptKey(input.decidedAt)}`,
+    // `dedupeKey` qlobal unikaldır: eyni qərar bir neçə şikayətçiyə gedir, açar alıcını daşımalıdır.
+    `report-outcome:${input.propertyId}:${attemptKey(input.decidedAt)}:${input.userId}`,
     (copy) => ({ title: copy.reportOutcomeTitle, content: copy.reportOutcome(input.propertyTitle, input.outcome) }),
   );
 }

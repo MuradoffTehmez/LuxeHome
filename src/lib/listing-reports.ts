@@ -179,43 +179,70 @@ export async function assignActiveReports(propertyId: string, assigneeId: string
   return prisma.listingReport.count({ where: { propertyId, ...ACTIVE_WHERE } });
 }
 
-/** Elan sahibindən izahat istənildi — aktiv şikayətlər «Əlavə məlumat gözlənilir»-ə keçir. */
+/** Əvvəlki (artıq çatdırılmış) izahat istəyi — yenisi çatdırılmasa bərpa olunur. */
+export type PreviousInfoRequest = { at: Date; note: string } | null;
+
+/**
+ * Elan sahibindən izahat istənildi — bütün aktiv şikayətlər «Əlavə məlumat gözlənilir»-ə keçir.
+ * Artıq məlumat gözləyən qrupda yalnız sual və vaxt yenilənir; əvvəlki istək geri qaytarma üçün
+ * qaytarılır (`revertReportInfoRequest`).
+ */
 export async function requestReportInfo(input: {
   propertyId: string;
   actorId: string;
   note: string;
   now?: Date;
-}): Promise<number> {
+}): Promise<{ count: number; previous: PreviousInfoRequest }> {
   const now = input.now ?? new Date();
+  const earlier = await prisma.listingReport.findFirst({
+    where: { propertyId: input.propertyId, status: REPORT_STATUSES.NEEDS_INFO, infoRequestedAt: { not: null } },
+    select: { infoRequestedAt: true, infoRequestNote: true },
+    orderBy: { infoRequestedAt: "desc" },
+  });
   const { count } = await prisma.listingReport.updateMany({
-    where: { propertyId: input.propertyId, status: { in: [REPORT_STATUSES.OPEN, REPORT_STATUSES.IN_REVIEW] } },
+    where: { propertyId: input.propertyId, ...ACTIVE_WHERE },
     data: { status: REPORT_STATUSES.NEEDS_INFO, infoRequestedAt: now, infoRequestNote: input.note, assigneeId: input.actorId },
   });
-  // Artıq məlumat gözləyən qrupda yalnız mətn və vaxt yenilənir.
-  if (count === 0) {
-    const repeated = await prisma.listingReport.updateMany({
-      where: { propertyId: input.propertyId, status: REPORT_STATUSES.NEEDS_INFO },
-      data: { infoRequestedAt: now, infoRequestNote: input.note },
-    });
-    return repeated.count;
-  }
+  const previous = earlier?.infoRequestedAt && earlier.infoRequestNote
+    ? { at: earlier.infoRequestedAt, note: earlier.infoRequestNote }
+    : null;
+  return { count, previous };
+}
+
+/**
+ * Kompensasiya: sahibə bildiriş yazılmadısa bu istəyin keçirdiyi şikayətlər geri qayıdır —
+ * əks halda növbə sahibin heç vaxt görmədiyi suala cavab gözləyərdi. Əvvəlki çatdırılmış istək
+ * varsa o bərpa olunur, yoxdursa şikayətlər «Yoxlanılır»-a keçir. Yalnız `requestedAt` vaxtlı
+ * sətirlərə toxunur: arada verilmiş başqa qərar üzərinə yazılmır.
+ */
+export async function revertReportInfoRequest(
+  propertyId: string,
+  requestedAt: Date,
+  previous: PreviousInfoRequest,
+): Promise<number> {
+  const { count } = await prisma.listingReport.updateMany({
+    where: { propertyId, status: REPORT_STATUSES.NEEDS_INFO, infoRequestedAt: requestedAt },
+    data: previous
+      ? { infoRequestedAt: previous.at, infoRequestNote: previous.note }
+      : { status: REPORT_STATUSES.IN_REVIEW, infoRequestedAt: null, infoRequestNote: null },
+  });
   return count;
 }
 
 /**
  * Qərar verilmiş şikayətləri yenidən nəzərdən keçirməyə qaytarır. Elana tətbiq olunmuş tədbir
  * (dayandırma, bağlama) avtomatik geri alınmır — moderator yeni qərarı ayrıca verir.
- * Yalnız elanın **son** qərarının şikayətləri açılır, daha köhnə bağlanmış dövrlər qalır.
+ * Yalnız moderatorun gördüyü qərar dövrü (`decidedAt` — həmin qərarın `resolvedAt`-ı) açılır:
+ * elanın bir neçə qərarı olanda köhnə sətirdəki düymə başqa tabdakı yeni qərarı açmamalıdır.
  */
-export async function reopenDecidedReports(propertyId: string, actorId: string, now = new Date()): Promise<number> {
-  const latest = await prisma.listingReport.findFirst({
-    where: { propertyId, status: { notIn: [...ACTIVE_REPORT_STATUSES] }, resolvedAt: { not: null } },
-    select: { resolvedAt: true },
-    orderBy: { resolvedAt: "desc" },
-  });
-  if (!latest?.resolvedAt) return 0;
+export async function reopenDecidedReports(
+  propertyId: string,
+  decidedAt: Date,
+  actorId: string,
+  now = new Date(),
+): Promise<number> {
   const { count } = await prisma.listingReport.updateMany({
-    where: { propertyId, resolvedAt: latest.resolvedAt, status: { notIn: [...ACTIVE_REPORT_STATUSES] } },
+    where: { propertyId, resolvedAt: decidedAt, status: { notIn: [...ACTIVE_REPORT_STATUSES] } },
     data: {
       status: REPORT_STATUSES.IN_REVIEW,
       assigneeId: actorId,
@@ -227,6 +254,19 @@ export async function reopenDecidedReports(propertyId: string, actorId: string, 
     },
   });
   return count;
+}
+
+/** Qərar dövrünün identifikatoru: elan + həmin qərarın `resolvedAt`-ı (`<id>|<ISO>`). */
+export function reportCycleId(propertyId: string, decidedAt: Date): string {
+  return `${propertyId}|${decidedAt.toISOString()}`;
+}
+
+export function parseReportCycleId(value: unknown): { propertyId: string; decidedAt: Date } | null {
+  if (typeof value !== "string" || value.length > 80) return null;
+  const [propertyId, iso, ...rest] = value.split("|");
+  if (!propertyId || !iso || rest.length > 0) return null;
+  const decidedAt = new Date(iso);
+  return Number.isNaN(decidedAt.getTime()) ? null : { propertyId, decidedAt };
 }
 
 /** Aktiv şikayət yazan daxil olmuş istifadəçilər — qərar onlara bildirilir. */
@@ -319,6 +359,11 @@ export async function getReportGroups(
       });
       const reasonList = [...reasons.keys()];
       const withInfo = items.find((item) => item.infoRequestNote);
+      // Bağlanmış tabda qrupun qərarı — ən son `resolvedAt`; «Yenidən bax» məhz bu dövrü açır.
+      const decision = items.reduce<(typeof items)[number] | null>(
+        (latest, item) => (item.resolvedAt && (!latest?.resolvedAt || item.resolvedAt > latest.resolvedAt) ? item : latest),
+        null,
+      );
       return [{
         property,
         reports: enriched,
@@ -328,6 +373,15 @@ export async function getReportGroups(
         status: items[0].status as ReportStatus,
         assignee: items.find((item) => item.assignee)?.assignee ?? null,
         infoRequest: withInfo?.infoRequestNote ? { note: withInfo.infoRequestNote, at: withInfo.infoRequestedAt } : null,
+        decision: decision?.resolvedAt
+          ? {
+              at: decision.resolvedAt,
+              resolution: decision.resolution,
+              note: decision.resolutionNote,
+              by: decision.resolvedBy?.name ?? null,
+              cycleId: reportCycleId(propertyId, decision.resolvedAt),
+            }
+          : null,
         evidenceCount: enriched.reduce((sum, item) => sum + item.evidence.length, 0),
         priority: reportPriority(items.length, reasonList),
         reasons: [...reasons.entries()].sort((a, b) => b[1] - a[1]),

@@ -3336,7 +3336,8 @@
       "izahatQeydEdildi": "İzahat istəyi qeyd edildi (elanın ictimai sahibi yoxdur).",
       "qerarYoxdur": "Bu elan üzrə yenidən baxılacaq qərar yoxdur.",
       "yenidenAcildi": "Şikayətlər yenidən yoxlamaya qaytarıldı.",
-      "baglandi": "Şikayətlər bağlandı."
+      "baglandi": "Şikayətlər bağlandı.",
+      "izahatGonderilmedi": "Sual elan sahibinə çatdırılmadı, status dəyişmədi. Bir az sonra yenidən cəhd edin."
     }
   }
 }

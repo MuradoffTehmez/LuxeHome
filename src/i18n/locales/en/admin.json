@@ -3336,7 +3336,8 @@
       "izahatQeydEdildi": "The clarification request was recorded (the listing has no public owner).",
       "qerarYoxdur": "There is no decision to review for this listing.",
       "yenidenAcildi": "The reports were returned to review.",
-      "baglandi": "The reports were closed."
+      "baglandi": "The reports were closed.",
+      "izahatGonderilmedi": "The question could not be delivered to the listing owner; the status was not changed. Please try again shortly."
     }
   }
 }

@@ -32,8 +32,10 @@ import {
 import {
   activeReporterIds,
   assignActiveReports,
+  parseReportCycleId,
   reopenDecidedReports,
   requestReportInfo,
+  revertReportInfoRequest,
 } from "@/lib/listing-reports";
 import { reportModeratorWhere } from "@/lib/admin/report-moderators";
 import type { AuthUser } from "@/lib/auth/types";
@@ -209,34 +211,44 @@ export async function requestListingInfo(propertyId: string, question: string): 
     const property = await loadProperty(propertyId);
     if (!property) return failure(msg("server.reports.elanTapilmadi"));
     const requestedAt = new Date();
-    const count = await requestReportInfo({ propertyId: property.id, actorId: actor.id, note, now: requestedAt });
+    const { count, previous } = await requestReportInfo({ propertyId: property.id, actorId: actor.id, note, now: requestedAt });
     if (count === 0) return failure(msg("server.reports.acikSikayetYoxdur"));
-    const hasOwner = Boolean(property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF);
-    if (hasOwner && property.author) {
-      await noticeListingInfoRequested({
-        userId: property.author.id,
+    const owner = property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF ? property.author : null;
+    if (owner) {
+      const delivered = await noticeListingInfoRequested({
+        userId: owner.id,
         propertyId: property.id,
         propertyTitle: property.title,
         requestedAt,
         note,
       });
+      // Sual sahibə çatmadısa növbə ona cavab gözləməməlidir — keçid geri alınır, moderator təkrar cəhd edir.
+      if (!delivered) {
+        await revertReportInfoRequest(property.id, requestedAt, previous);
+        return failure(msg("server.reports.izahatGonderilmedi"));
+      }
     }
     await recordAudit(actor, "UPDATE", "Property", property.id, `${property.title} — şikayət üzrə sahibdən izahat istənildi: ${note}`);
     afterChange();
-    return success(hasOwner ? msg("server.reports.izahatIstenildi") : msg("server.reports.izahatQeydEdildi"));
+    return success(owner ? msg("server.reports.izahatIstenildi") : msg("server.reports.izahatQeydEdildi"));
   } catch (error) {
     return unexpected("şikayət üzrə izahat istənilmədi", error, msg("server.common.unexpected"));
   }
 }
 
-/** Qərar verilmiş şikayətləri yenidən nəzərdən keçirməyə qaytarır (elana görülmüş tədbir qalır). */
-export async function reopenListingReports(propertyId: string): Promise<ActionState> {
+/**
+ * Qərar verilmiş şikayətləri yenidən nəzərdən keçirməyə qaytarır (elana görülmüş tədbir qalır).
+ * `cycleId` = `reportCycleId(elan, qərar vaxtı)` — yalnız səhifədə göstərilən qərar dövrü açılır.
+ */
+export async function reopenListingReports(cycleId: string): Promise<ActionState> {
   const actor = await guard();
   if (isFailure(actor)) return actor;
+  const cycle = parseReportCycleId(cycleId);
+  if (!cycle) return failure(msg("server.reports.qerarYoxdur"));
   try {
-    const property = await prisma.property.findUnique({ where: { id: propertyId }, select: { id: true, title: true } });
+    const property = await prisma.property.findUnique({ where: { id: cycle.propertyId }, select: { id: true, title: true } });
     if (!property) return failure(msg("server.reports.elanTapilmadi"));
-    const count = await reopenDecidedReports(property.id, actor.id);
+    const count = await reopenDecidedReports(property.id, cycle.decidedAt, actor.id);
     if (count === 0) return failure(msg("server.reports.qerarYoxdur"));
     await recordAudit(actor, "UPDATE", "Property", property.id, `${property.title} — ${count} şikayət yenidən nəzərdən keçirməyə qaytarıldı`);
     afterChange();
