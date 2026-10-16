@@ -42,7 +42,7 @@ async function isAgencyParticipant(agencyId: string, userId: string): Promise<bo
   if (!agency) return false;
   if (agency.userId === userId) return true;
   const member = await prisma.agencyEmployee.findFirst({
-    where: { agencyId, userId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    where: { agencyId, userId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED, suspendedAt: null },
     select: { id: true },
   });
   return Boolean(member);

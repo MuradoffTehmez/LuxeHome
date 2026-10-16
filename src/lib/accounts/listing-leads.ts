@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, ACTIVE_OFFER_STATUSES, AGENCY_EMPLOYEE_STATUSES, PUBLIC_PROPERTY_STATUSES } from "@/lib/constants";
+import { ACCOUNT_TYPES, ACTIVE_OFFER_STATUSES, AGENCY_MEMBER_PERMISSIONS, PUBLIC_PROPERTY_STATUSES } from "@/lib/constants";
+import { ACTIVE_MEMBER_WHERE, effectivePermissions } from "@/lib/accounts/agency-access";
 
 /**
  * Elan səhifəsindən gələn müraciətin ünvanı.
@@ -69,7 +70,8 @@ export async function resolveLeadProperty(propertyId: string | null | undefined)
 function ownAgencyLeadWhere(userId: string): Prisma.LeadWhereInput[] {
   return [
     { agencyId: null },
-    { agency: { employees: { some: { userId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED } } } },
+    // Girişi dayandırılmış üzv (#218) agentlik müraciətlərini görmür.
+    { agency: { employees: { some: { userId, ...ACTIVE_MEMBER_WHERE } } } },
     { agency: { userId } },
   ];
 }
@@ -78,8 +80,28 @@ function currentHandlerWhere(userId: string): Prisma.LeadWhereInput {
   return { handlerId: userId, OR: ownAgencyLeadWhere(userId) };
 }
 
-export async function leadScope(userId: string): Promise<{ where: Prisma.LeadWhereInput; agency: { id: string; name: string } | null }> {
-  const agency = await prisma.agency.findUnique({ where: { userId }, select: { id: true, name: true } });
+export type ManagedLeadAgency = { id: string; name: string; ownerUserId: string };
+
+/**
+ * Agentliyin bütün müraciətlərini idarə edən: sahib və ya `LEADS_MANAGE` səlahiyyətli aktiv üzv (#218).
+ */
+async function managedLeadAgency(userId: string): Promise<ManagedLeadAgency | null> {
+  const [owned, membership] = await Promise.all([
+    prisma.agency.findUnique({ where: { userId }, select: { id: true, name: true, userId: true } }),
+    prisma.agencyEmployee.findFirst({
+      where: { userId, ...ACTIVE_MEMBER_WHERE },
+      select: { role: true, permissions: true, agency: { select: { id: true, name: true, userId: true } } },
+    }),
+  ]);
+  if (owned) return { id: owned.id, name: owned.name, ownerUserId: owned.userId };
+  if (membership && effectivePermissions(membership.role, membership.permissions).has(AGENCY_MEMBER_PERMISSIONS.LEADS_MANAGE)) {
+    return { id: membership.agency.id, name: membership.agency.name, ownerUserId: membership.agency.userId };
+  }
+  return null;
+}
+
+export async function leadScope(userId: string): Promise<{ where: Prisma.LeadWhereInput; agency: ManagedLeadAgency | null }> {
+  const agency = await managedLeadAgency(userId);
   // Elanın müəllifi olmaq başqa agentliyə bağlı müraciəti açmır (#212, PRD 6.4): agentliklər arası
   // köçürmədən sonra köhnə müştəri məlumatı əvvəlki agentlikdə qalır.
   const or: Prisma.LeadWhereInput[] = [
@@ -118,14 +140,17 @@ export async function getAccountLeads(userId: string, options: { unanswered?: bo
   return { leads, agency };
 }
 
-/** Agentlik sahibinin müraciəti verə biləcəyi şəxslər: özü + təsdiqlənmiş agentlər. */
-export async function getLeadAssignees(agency: { id: string }, ownerUserId: string, ownerName: string) {
-  const employees = await prisma.agencyEmployee.findMany({
-    where: { agencyId: agency.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED, user: { isActive: true } },
-    select: { userId: true, user: { select: { name: true } } },
-    orderBy: { approvedAt: "asc" },
-  });
-  return [{ userId: ownerUserId, name: ownerName }, ...employees.map((item) => ({ userId: item.userId, name: item.user.name }))];
+/** Müraciəti verə biləcəyi şəxslər: agentliyin sahibi + aktiv (dayandırılmamış) agentlər. */
+export async function getLeadAssignees(agency: ManagedLeadAgency) {
+  const [owner, employees] = await Promise.all([
+    prisma.user.findUnique({ where: { id: agency.ownerUserId }, select: { name: true } }),
+    prisma.agencyEmployee.findMany({
+      where: { agencyId: agency.id, ...ACTIVE_MEMBER_WHERE, user: { isActive: true } },
+      select: { userId: true, user: { select: { name: true } } },
+      orderBy: { approvedAt: "asc" },
+    }),
+  ]);
+  return [{ userId: agency.ownerUserId, name: owner?.name ?? agency.name }, ...employees.map((item) => ({ userId: item.userId, name: item.user.name }))];
 }
 
 /**
@@ -134,7 +159,7 @@ export async function getLeadAssignees(agency: { id: string }, ownerUserId: stri
  */
 export async function findManageableLead(userId: string, leadId: string) {
   if (!leadId || leadId.length > 64) return null;
-  const { where } = await leadScope(userId);
+  const { where, agency: managed } = await leadScope(userId);
   const lead = await prisma.lead.findFirst({
     where: { AND: [{ id: leadId }, where] },
     select: {
@@ -149,5 +174,10 @@ export async function findManageableLead(userId: string, leadId: string) {
     },
   });
   if (!lead) return null;
-  return { ...lead, isOwner: lead.agency?.userId === userId };
+  return {
+    ...lead,
+    isOwner: lead.agency?.userId === userId,
+    // Agentlik müraciətini başqa agentə vermək haqqı: sahib və ya `LEADS_MANAGE` (#218).
+    canManage: Boolean(lead.agency && managed && lead.agency.id === managed.id),
+  };
 }

@@ -66,7 +66,7 @@ export async function getAgencyDashboard(input: { agencyId: string; ownerUserId:
     }),
     prisma.agencyEmployee.findMany({
       where: { agencyId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
-      select: { userId: true, receivesLeads: true, user: { select: { name: true, isActive: true } } },
+      select: { userId: true, receivesLeads: true, suspendedAt: true, user: { select: { name: true, isActive: true } } },
       orderBy: { approvedAt: "asc" },
     }),
     prisma.lead.count({ where: { AND: [leadScope, { createdAt: { gte: start.at } }] } }),
@@ -109,9 +109,9 @@ export async function getAgencyDashboard(input: { agencyId: string; ownerUserId:
     agencyId,
     since: start.at,
     members: [
-      { userId: input.ownerUserId, name: null, receivesLeads: true, isOwner: true },
+      { userId: input.ownerUserId, name: null, receivesLeads: true, isOwner: true, suspended: false },
       ...employees.filter((employee) => employee.user.isActive).map((employee) => ({
-        userId: employee.userId, name: employee.user.name, receivesLeads: employee.receivesLeads, isOwner: false,
+        userId: employee.userId, name: employee.user.name, receivesLeads: employee.receivesLeads, isOwner: false, suspended: employee.suspendedAt != null,
       })),
     ],
   });
@@ -127,7 +127,8 @@ export async function getAgencyDashboard(input: { agencyId: string; ownerUserId:
       sold: countOf(closedByStatus, PROPERTY_STATUSES.SOLD),
       rented: countOf(closedByStatus, PROPERTY_STATUSES.RENTED),
     },
-    agents: { active: employees.filter((employee) => employee.user.isActive).length },
+    // Girişi dayandırılmış agent (#218) aktiv sayılmır, amma cədvəldə nişanla görünür.
+    agents: { active: employees.filter((employee) => employee.user.isActive && !employee.suspendedAt).length },
     leads: { new: newLeads, unanswered: unansweredLeads },
     engagement: {
       views: stats._sum.views ?? 0,
@@ -153,7 +154,7 @@ export async function getAgencyDashboard(input: { agencyId: string; ownerUserId:
   };
 }
 
-type TeamMember = { userId: string; name: string | null; receivesLeads: boolean; isOwner: boolean };
+type TeamMember = { userId: string; name: string | null; receivesLeads: boolean; isOwner: boolean; suspended: boolean };
 
 /** Agentlər üzrə aktivlik: aktiv elan, dövrdə yeni müraciət, cavabsız müraciət, son jurnal qeydi. */
 async function getTeamActivity(input: { agencyId: string; since: Date; members: TeamMember[] }) {

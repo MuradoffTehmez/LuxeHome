@@ -321,6 +321,44 @@
         "removed": "collaboration ended"
       },
       "handedOver": "{count} listings handed over"
+    },
+    "access": {
+      "openLabel": "{name} — role and permissions",
+      "title": "{name}: role and permissions",
+      "roleLegend": "Role",
+      "permissionsLegend": "Permissions",
+      "roles": {
+        "AGENT": "Agent",
+        "AGENTHint": "Works with their own listings and the enquiries assigned to them.",
+        "MANAGER": "Manager",
+        "MANAGERHint": "By default manages enquiries, listing assignments and tasks."
+      },
+      "permissions": {
+        "leads": "Enquiries",
+        "leadsHint": "Sees all agency enquiries and reassigns them.",
+        "listings": "Listing assignments",
+        "listingsHint": "Assigns agency listings between agents.",
+        "tasks": "Tasks",
+        "tasksHint": "Creates tasks for other members and manages all tasks."
+      },
+      "save": "Save",
+      "cancel": "Cancel",
+      "saved": "Role and permissions saved.",
+      "failed": "The action failed. Please try again.",
+      "suspendLabel": "{name} — suspend access",
+      "resumeLabel": "{name} — restore access",
+      "suspendTitle": "Suspend agent access",
+      "resumeTitle": "Restore agent access",
+      "suspendDescription": "{name} will lose access to agency enquiries, agency listings and the enquiry queue. Their open enquiries return to you, and you can reassign their listings under “Listing assignments”. Their personal account and personal listings are not affected.",
+      "resumeDescription": "{name} will regain access to the agency workspace.",
+      "reason": "Reason (optional, sent to the agent)",
+      "suspend": "Suspend",
+      "resume": "Restore",
+      "suspended": "Agent access suspended.",
+      "resumed": "Agent access restored.",
+      "alreadySuspended": "The agent’s access is already suspended.",
+      "notSuspended": "The agent’s access is not suspended.",
+      "suspendedBadge": "Access suspended"
     }
   },
   "actions": {
@@ -978,7 +1016,11 @@
       "LEAD_ROUTING_CHANGED": "changed enquiry routing",
       "PACKAGE_REQUESTED": "submitted “{entity}” for a premium package",
       "TRANSFER_REQUESTED": "created a transfer request for “{entity}”",
-      "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”"
+      "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”",
+      "LISTING_ASSIGNED": "changed the owner of “{entity}”",
+      "MEMBER_ROLE_CHANGED": "changed the role of {entity}",
+      "MEMBER_SUSPENDED": "suspended the access of {entity}",
+      "MEMBER_RESUMED": "restored the access of {entity}"
     },
     "details": {
       "price": "{from} → {to}",
@@ -993,7 +1035,13 @@
       "transferSourceRejected": "The listing’s agency rejected",
       "transferAdminApproved": "Transfer approved",
       "transferAdminRejected": "Transfer rejected",
-      "viaLink": "Joined via invite link"
+      "viaLink": "Joined via invite link",
+      "permissions": "Permissions: {list}",
+      "noPermissions": "No extra permissions",
+      "role": "{from} → {to}",
+      "releasedLeads": "{count} open enquiries returned to the owner",
+      "reason": "Reason: {reason}",
+      "assigned": "{from} → {to}"
     },
     "emptyTitle": "No entries yet",
     "emptyDescription": "Listing, enquiry and team changes will appear here.",
@@ -1001,7 +1049,16 @@
     "previous": "Previous",
     "next": "Next",
     "pageOf": "{page} / {pages}",
-    "privacy": "The log is visible only to the agency owner and platform administrators."
+    "privacy": "The log is visible only to the agency owner and platform administrators.",
+    "permissionNames": {
+      "LEADS_MANAGE": "enquiries",
+      "LISTINGS_ASSIGN": "listing assignments",
+      "TASKS_MANAGE": "tasks"
+    },
+    "roleNames": {
+      "AGENT": "Agent",
+      "MANAGER": "Manager"
+    }
   },
   "agencyDashboard": {
     "metaTitle": "Agency dashboard",
@@ -1055,7 +1112,31 @@
       "lastActivity": "Last activity",
       "owner": "Agency (you)",
       "outOfQueue": "out of queue",
-      "openLog": "Open the activity log →"
+      "openLog": "Open the activity log →",
+      "suspended": "access suspended"
     }
+  },
+  "assignments": {
+    "metaTitle": "Listing assignments",
+    "metaDescription": "Responsible agents for agency listings.",
+    "title": "Listing assignments",
+    "description": "Change the responsible agent of agency listings. The new owner sees the listing in “My listings” and gets a notification; earlier enquiries move with the listing.",
+    "agentFilter": "By owner",
+    "all": "All",
+    "agencyOption": "{name} (agency)",
+    "owner": "Owner: {name}",
+    "unassigned": "No owner — choose a new one",
+    "selectLabel": "Owner of “{title}”",
+    "noOwner": "Choose an owner",
+    "assign": "Assign",
+    "assigned": "Listing assigned.",
+    "invalidTarget": "The selected person is not an active member of the agency.",
+    "failed": "The action failed. Please try again.",
+    "emptyTitle": "No agency listings",
+    "emptyDescription": "Listings posted on behalf of the agency will appear here.",
+    "pagination": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "{page} / {pages}"
   }
 }

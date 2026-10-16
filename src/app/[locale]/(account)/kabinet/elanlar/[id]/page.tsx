@@ -6,6 +6,7 @@ import { requireLister } from "@/lib/auth/guard";
 import { getListingContact } from "@/lib/accounts/listing-contact";
 import { type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { notSuspendedAgencyListing } from "@/lib/accounts/agency-access";
 import { getPropertyFormOptions } from "@/lib/queries";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
@@ -35,7 +36,7 @@ export default async function EditPublicPropertyPage({ params }: { params: Promi
   const { id } = await params;
   const [property, sourceOptions, t, contact] = await Promise.all([
     prisma.property.findFirst({
-      where: { id, authorId: user.id, deletedAt: null },
+      where: { id, authorId: user.id, deletedAt: null, ...notSuspendedAgencyListing(user.id) },
       select: {
         title: true,
         description: true,

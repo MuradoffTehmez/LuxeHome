@@ -11,6 +11,7 @@ import { buildManagedMetadata } from "@/lib/seo";
 import { formatPrice, cn } from "@/lib/utils";
 import { getAgencyForOwner } from "@/lib/queries";
 import { getAgencyActivity, isAgencyActivityGroup } from "@/lib/accounts/agency-activity";
+import { isAgencyEmployeeRole, isAgencyMemberPermission } from "@/lib/accounts/agency-access";
 import {
   ACCOUNT_TYPES,
   AGENCY_ACTIVITY_ACTIONS,
@@ -91,6 +92,23 @@ export default async function AgencyActivityPage({
     }
     if (action === AGENCY_ACTIVITY_ACTIONS.MEMBER_RIGHTS_CHANGED && typeof details.receivesLeads === "boolean") {
       return details.receivesLeads ? t("details.leadsOn") : t("details.leadsOff");
+    }
+    if (action === AGENCY_ACTIVITY_ACTIONS.MEMBER_RIGHTS_CHANGED && typeof details.permissions === "string") {
+      const list = details.permissions.split(",").filter(isAgencyMemberPermission).map((permission) => t(`permissionNames.${permission}`));
+      return list.length ? t("details.permissions", { list: list.join(", ") }) : t("details.noPermissions");
+    }
+    if (action === AGENCY_ACTIVITY_ACTIONS.MEMBER_ROLE_CHANGED && isAgencyEmployeeRole(details.from) && isAgencyEmployeeRole(details.to)) {
+      return t("details.role", { from: t(`roleNames.${details.from}`), to: t(`roleNames.${details.to}`) });
+    }
+    if (action === AGENCY_ACTIVITY_ACTIONS.MEMBER_SUSPENDED) {
+      const parts = [
+        typeof details.releasedLeads === "number" && details.releasedLeads > 0 ? t("details.releasedLeads", { count: details.releasedLeads }) : null,
+        typeof details.reason === "string" ? t("details.reason", { reason: details.reason }) : null,
+      ].filter(Boolean);
+      return parts.length ? parts.join(" · ") : null;
+    }
+    if (action === AGENCY_ACTIVITY_ACTIONS.LISTING_ASSIGNED && typeof details.to === "string") {
+      return typeof details.from === "string" ? t("details.assigned", { from: details.from, to: details.to }) : t("details.to", { name: details.to });
     }
     if (action === AGENCY_ACTIVITY_ACTIONS.LEAD_ROUTING_CHANGED && typeof details.mode === "string" && Object.hasOwn(ROUTING_KEYS, details.mode)) {
       return t("details.routing", { mode: routingT(ROUTING_KEYS[details.mode as keyof typeof ROUTING_KEYS]) });

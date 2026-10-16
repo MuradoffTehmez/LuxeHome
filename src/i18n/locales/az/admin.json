@@ -2924,7 +2924,11 @@
         "LEAD_ROUTING_CHANGED": "müraciət bölgüsünü dəyişdi",
         "PACKAGE_REQUESTED": "«{entity}» elanını premium paketə təqdim etdi",
         "TRANSFER_REQUESTED": "«{entity}» elanı üçün köçürmə sorğusu yaratdı",
-        "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi"
+        "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi",
+        "LISTING_ASSIGNED": "«{entity}» elanının məsulunu dəyişdi",
+        "MEMBER_ROLE_CHANGED": "{entity} adlı üzvün rolunu dəyişdi",
+        "MEMBER_SUSPENDED": "{entity} adlı agentin girişini dayandırdı",
+        "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi"
       }
     },
     "reports": {

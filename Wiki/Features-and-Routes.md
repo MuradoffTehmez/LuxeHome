@@ -123,6 +123,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/bildirisler` | Bildirişlər, kanal seçimləri, sakit saatlar |
 | `/kabinet/sikayetlerim` | Göndərilmiş elan şikayətləri, mərhələ və nəticə (moderator qeydləri görünmür) |
 | `/kabinet/agentlik` | Agentlik paneli: elan, müraciət, baxış/klik göstəriciləri, moderasiya xəbərdarlıqları, rəylər, agentlərin aktivliyi (yalnız sahib) |
+| `/kabinet/agentlik/elanlar` | Elan təyinatları: agentlik elanının məsul agentini dəyişmək (sahib və `LISTINGS_ASSIGN`) |
 | `/kabinet/fealiyyet` | Agentlik daxili fəaliyyət jurnalı: kim elanı, qiyməti, müraciəti, komandanı dəyişdi (yalnız sahib) |
 | `/kabinet/kocurmeler` | Agentliklər arası elan köçürmə sorğuları: göndərmə, gələn sorğuların təsdiqi (agentlik sahibi), geri çəkmə |
 | `/kabinet/son-baxilanlar`, `/kabinet/tovsiyeler` | Son baxılanlar və fərdi tövsiyələr |

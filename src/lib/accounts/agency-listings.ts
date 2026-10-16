@@ -50,7 +50,7 @@ export async function resolveHandoverTarget(input: {
   if (input.handover !== LISTING_HANDOVER.AGENT) return { ok: true, userId: input.ownerUserId };
   if (!input.targetUserId || input.targetUserId === input.fromUserId) return { ok: false };
   const member = await prisma.agencyEmployee.findFirst({
-    where: { agencyId: input.agencyId, userId: input.targetUserId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    where: { agencyId: input.agencyId, userId: input.targetUserId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED, suspendedAt: null },
     select: { userId: true },
   });
   return member ? { ok: true, userId: member.userId } : { ok: false };

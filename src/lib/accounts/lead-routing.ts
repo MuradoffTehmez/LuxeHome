@@ -84,6 +84,8 @@ async function routeWithinAgency(
     where: {
       agencyId: agency.id,
       status: AGENCY_EMPLOYEE_STATUSES.APPROVED,
+      // Girişi dayandırılmış agent (#218) müraciət növbəsinə düşmür.
+      suspendedAt: null,
       receivesLeads: true,
       user: { isActive: true, deletionRequestedAt: null },
     },

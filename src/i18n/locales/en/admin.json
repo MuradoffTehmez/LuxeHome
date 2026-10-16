@@ -2924,7 +2924,11 @@
         "LEAD_ROUTING_CHANGED": "changed enquiry routing",
         "PACKAGE_REQUESTED": "submitted “{entity}” for a premium package",
         "TRANSFER_REQUESTED": "created a transfer request for “{entity}”",
-        "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”"
+        "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”",
+        "LISTING_ASSIGNED": "changed the owner of “{entity}”",
+        "MEMBER_ROLE_CHANGED": "changed the role of {entity}",
+        "MEMBER_SUSPENDED": "suspended the access of {entity}",
+        "MEMBER_RESUMED": "restored the access of {entity}"
       }
     },
     "reports": {

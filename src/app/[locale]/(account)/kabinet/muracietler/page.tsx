@@ -37,7 +37,7 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
     getTranslations("account.leads"),
     getAccountLeads(user.id, { unanswered }),
   ]);
-  const assignees = agency ? await getLeadAssignees(agency, user.id, user.name) : undefined;
+  const assignees = agency ? await getLeadAssignees(agency) : undefined;
 
   const tab = (active: boolean) =>
     cn(

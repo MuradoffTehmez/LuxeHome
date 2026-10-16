@@ -20,6 +20,8 @@ import {
   type PropertyStatus,
 } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
+import { LISTING_STATUS_KEYS } from "@/lib/accounts/listing-status-keys";
+import { notSuspendedAgencyListing } from "@/lib/accounts/agency-access";
 import { buildManagedMetadata } from "@/lib/seo";
 import { formatPrice, isUnoptimizedImage } from "@/lib/utils";
 import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
@@ -32,11 +34,7 @@ import { getListingExpiryConfig } from "@/lib/settings";
 import { getOwnerAppeals } from "@/lib/listing-appeals";
 import { AppealButton } from "./appeal-button";
 
-const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "needsInfo" | "published" | "reserved" | "suspended" | "expired" | "sold" | "rented" | "archived" | "rejected"> = {
-  DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
-  SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
-  NEEDS_INFO: "needsInfo", SUSPENDED: "suspended", EXPIRED: "expired", REJECTED: "rejected",
-};
+const STATUS_KEYS = LISTING_STATUS_KEYS;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -54,7 +52,8 @@ export default async function CabinetPropertiesPage({
   const t = await getTranslations("account.listings");
   const [properties, params, packageCount, expiryConfig] = await Promise.all([
     prisma.property.findMany({
-      where: { authorId: user.id, deletedAt: null },
+      // Girişi dayandırılmış agentin agentlik elanları (#218) siyahıda da görünmür — sahib onları təyin edir.
+      where: { authorId: user.id, deletedAt: null, ...notSuspendedAgencyListing(user.id) },
       select: {
         id: true,
         title: true,

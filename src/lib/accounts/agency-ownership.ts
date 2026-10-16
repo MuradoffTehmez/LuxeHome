@@ -31,7 +31,8 @@ export async function listingAgencyFor(user: { id: string; accountType: string }
     return agency ? { agencyId: agency.id, agencyName: agency.name, isOwner: true } : null;
   }
   const membership = await prisma.agencyEmployee.findFirst({
-    where: { userId: user.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
+    // Girişi dayandırılmış agent (#218) agentlik adından elan yaratmır — elanı şəxsi olur.
+    where: { userId: user.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED, suspendedAt: null },
     select: { agency: { select: { id: true, name: true } } },
   });
   return membership ? { agencyId: membership.agency.id, agencyName: membership.agency.name, isOwner: false } : null;

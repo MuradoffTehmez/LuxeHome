@@ -42,6 +42,7 @@ import { queueListingEnrichment } from "@/lib/listing-enrichment";
 import { publicationExpiryReset, renewedExpiry } from "@/lib/listing-expiry-policy";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
+import { notSuspendedAgencyListing } from "@/lib/accounts/agency-access";
 import { propertyRetentionDays } from "@/lib/property-publish-validation";
 
 const LIST_PATH = "/kabinet/elanlar";
@@ -49,7 +50,7 @@ const LIST_PATH = "/kabinet/elanlar";
 async function ownerAndGuard(id: string, locale: Locale) {
   const user = await requirePublicAction("property", locale);
   const property = await prisma.property.findFirst({
-    where: { id, authorId: user.id, deletedAt: null },
+    where: { id, authorId: user.id, deletedAt: null, ...notSuspendedAgencyListing(user.id) },
     select: {
       id: true,
       slug: true,
@@ -360,7 +361,7 @@ export async function closePublicProperty(id: string): Promise<ActionState> {
   try {
     // Şərti yazılış: arada moderator elanı dayandırıbsa, sahib onu «satıldı» ilə yenidən ictimai edə bilməz.
     const { count } = await prisma.property.updateMany({
-      where: { id: property.id, authorId: user.id, deletedAt: null, status: { in: [...ACTIVE_OFFER_STATUSES] } },
+      where: { id: property.id, authorId: user.id, deletedAt: null, status: { in: [...ACTIVE_OFFER_STATUSES] }, ...notSuspendedAgencyListing(user.id) },
       data: { status, ...propertyLifecycleData(status, property, await propertyRetentionDays()) },
     });
     if (count === 0) return failure(t("listings.closeUnavailable"));
