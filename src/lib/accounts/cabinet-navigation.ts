@@ -1,6 +1,7 @@
 export type CabinetNavItem = {
   id:
     | "overview"
+    | "agency-dashboard"
     | "listings"
     | "new-listing"
     | "leads"
@@ -34,6 +35,8 @@ const LISTING_ITEMS: readonly CabinetNavItem[] = [
 ];
 
 const TEAM_ITEM: CabinetNavItem = { id: "team", href: "/kabinet/komanda", label: "Komanda" };
+/** Agentlik idarəetmə paneli (#216) — yalnız sahib, «Ümumi baxış»dan dərhal sonra. */
+const AGENCY_DASHBOARD_ITEM: CabinetNavItem = { id: "agency-dashboard", href: "/kabinet/agentlik", label: "Agentlik paneli" };
 /** Agentlik daxili fəaliyyət jurnalı (#214) — yalnız sahib. */
 const ACTIVITY_ITEM: CabinetNavItem = { id: "activity", href: "/kabinet/fealiyyet", label: "Fəaliyyət jurnalı" };
 /** Agentliklər arası köçürmə (#212) — agentlik sahibi və agent. */
@@ -51,7 +54,10 @@ const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
 
 export function getCabinetItems(canList: boolean, canManageTeam = false, canTransfer = false): readonly CabinetNavItem[] {
   const items = canList ? [BASE_ITEMS[0], ...LISTING_ITEMS] : [BASE_ITEMS[0]];
-  if (canManageTeam) items.push(TEAM_ITEM, ACTIVITY_ITEM);
+  if (canManageTeam) {
+    items.splice(1, 0, AGENCY_DASHBOARD_ITEM);
+    items.push(TEAM_ITEM, ACTIVITY_ITEM);
+  }
   if (canTransfer) items.push(TRANSFERS_ITEM);
   items.push(...DISCOVERY_ITEMS, BASE_ITEMS[1]);
   return items;
@@ -65,6 +71,7 @@ export type CabinetCrumb = {
   href: string;
   labelKey:
     | "eyebrow"
+    | "agencyDashboard"
     | "listings"
     | "newListing"
     | "editListing"
@@ -89,6 +96,7 @@ const CRUMB_SEGMENTS: Record<string, CabinetCrumb["labelKey"]> = {
   analitika: "analytics",
   paketler: "packages",
   komanda: "team",
+  agentlik: "agencyDashboard",
   kocurmeler: "transfers",
   fealiyyet: "activity",
   axtarislarim: "savedSearches",

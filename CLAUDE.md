@@ -790,6 +790,12 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   Sahib `/kabinet/fealiyyet`-də (`?qrup=`, `?kim=`, `?sehife=`), admin agentlik səhifəsində son qeydləri görür.
   Agentlik mühitini dəyişən yeni action yazanda jurnalı da çağır; yeni əməliyyat üçün `AGENCY_ACTIVITY_ACTIONS`,
   `AGENCY_ACTIVITY_GROUPS` və hər iki kataloqu (`account.activity.actions`, `admin…activityActions`) yenilə.
+- **Agentlik paneli (#216, PRD 7.1)** `/kabinet/agentlik` (yalnız sahib, menyuda «Ümumi baxış»dan sonra), `getAgencyDashboard()`
+  (`lib/accounts/agency-dashboard.ts`), dövr `?dovr=7|30|90`: aktiv/yeni/satılmış/kirayəyə verilmiş elan, aktiv agent, yeni və
+  cavabsız müraciət, baxış və əlaqə klikləri, ən çox baxılan elanlar, reytinq və son rəylər, moderasiya xəbərdarlıqları
+  (düzəliş/rədd/dayandırma, açıq şikayət, 7 gün içində bitən elan) və agentlərin aktivliyi (son jurnal qeydi ilə). Hamısı
+  **yalnız `Property.agencyId`** üzrədir; agentlik müraciəti `Lead.agencyId` və ya elanın agentliyi ilə müəyyən olunur
+  (`agencyLeadWhere`). Cavabsız = `respondedAt` boş və status `NEW|CONTACTED|IN_PROGRESS`. Deaktiv agent cədvələ düşmür.
 - **Bağlanmış sövdələşmələr:** «təklif»/«elan» sayı yalnız `ACTIVE_OFFER_STATUSES` (PUBLISHED + RESERVED) —
   `activeOfferWhere()`. Satılmış/icarəyə verilmiş elan «Uğurlu sövdələşmələr» bölməsindədir (`getClosedDeals`,
   son `DEAL_STATS_WINDOW_DAYS` gün, **yalnız `closedAt`** — `updatedAt` baxış sayğacı ilə də dəyişir; köhnə

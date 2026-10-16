@@ -1002,5 +1002,60 @@
     "next": "Next",
     "pageOf": "{page} / {pages}",
     "privacy": "The log is visible only to the agency owner and platform administrators."
+  },
+  "agencyDashboard": {
+    "metaTitle": "Agency dashboard",
+    "metaDescription": "Key metrics for the agency’s listings, enquiries and team.",
+    "eyebrow": "Agency dashboard",
+    "title": "Agency dashboard",
+    "description": "Key metrics for the agency’s listings, enquiries and team. Agents’ personal listings are not counted.",
+    "noAgency": "No agency profile",
+    "noAgencyDescription": "The dashboard opens once the agency profile is created.",
+    "openProfile": "Go to profile",
+    "periodLabel": "Period",
+    "period": "Last {days} days",
+    "tiles": {
+      "active": "Active listings",
+      "new": "New listings",
+      "sold": "Sold",
+      "rented": "Rented",
+      "agents": "Active agents",
+      "leads": "New enquiries",
+      "unanswered": "Unanswered enquiries",
+      "views": "Listing views",
+      "clicks": "Contact clicks"
+    },
+    "moderation": {
+      "title": "Moderation alerts",
+      "clear": "No listings need attention.",
+      "needsInfo": "A moderator requested changes to {count} listings",
+      "rejected": "{count} listings did not pass moderation",
+      "suspended": "{count} listings are suspended",
+      "openReports": "{count} open reports are under review",
+      "expiringSoon": "{count} listings expire within 7 days"
+    },
+    "top": {
+      "title": "Most viewed listings",
+      "description": "By views in the last {days} days.",
+      "empty": "No views recorded in this period.",
+      "notPublic": "not currently public"
+    },
+    "reviews": {
+      "title": "Agency reviews",
+      "count": "({count} reviews)",
+      "none": "No approved reviews yet."
+    },
+    "team": {
+      "title": "Agent activity",
+      "description": "Active listings are current; enquiries cover the last {days} days.",
+      "member": "Member",
+      "activeListings": "Active listings",
+      "newLeads": "New enquiries",
+      "unanswered": "Unanswered",
+      "lastActivity": "Last activity",
+      "owner": "Agency (you)",
+      "outOfQueue": "out of queue",
+      "openLog": "Open the activity log →"
+    }
   }
 }

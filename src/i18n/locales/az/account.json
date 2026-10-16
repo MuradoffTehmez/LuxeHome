@@ -1002,5 +1002,60 @@
     "next": "Növbəti",
     "pageOf": "{page} / {pages}",
     "privacy": "Jurnal yalnız agentlik sahibinə və platforma administratoruna görünür."
+  },
+  "agencyDashboard": {
+    "metaTitle": "Agentlik paneli",
+    "metaDescription": "Agentliyin elanları, müraciətləri və komandası üzrə əsas göstəricilər.",
+    "eyebrow": "Agentlik paneli",
+    "title": "Agentlik paneli",
+    "description": "Agentliyin elanları, müraciətləri və komandası üzrə əsas göstəricilər. Agentlərin şəxsi elanları sayılmır.",
+    "noAgency": "Agentlik profili yoxdur",
+    "noAgencyDescription": "Panel agentlik profili yaradıldıqdan sonra açılır.",
+    "openProfile": "Profilə keç",
+    "periodLabel": "Dövr",
+    "period": "Son {days} gün",
+    "tiles": {
+      "active": "Aktiv elanlar",
+      "new": "Yeni elanlar",
+      "sold": "Satılıb",
+      "rented": "Kirayəyə verilib",
+      "agents": "Aktiv agentlər",
+      "leads": "Yeni müraciətlər",
+      "unanswered": "Cavabsız müraciətlər",
+      "views": "Elan baxışları",
+      "clicks": "Əlaqə klikləri"
+    },
+    "moderation": {
+      "title": "Moderasiya xəbərdarlıqları",
+      "clear": "Diqqət tələb edən elan yoxdur.",
+      "needsInfo": "{count} elan üçün moderator düzəliş istəyir",
+      "rejected": "{count} elan moderasiyadan keçməyib",
+      "suspended": "{count} elan dayandırılıb",
+      "openReports": "{count} açıq şikayət yoxlanılır",
+      "expiringSoon": "{count} elanın müddəti 7 gün içində bitir"
+    },
+    "top": {
+      "title": "Ən çox baxılan elanlar",
+      "description": "Son {days} gündə baxış sayına görə.",
+      "empty": "Bu dövrdə baxış qeydə alınmayıb.",
+      "notPublic": "hazırda saytda görünmür"
+    },
+    "reviews": {
+      "title": "Agentlik üzrə rəylər",
+      "count": "({count} rəy)",
+      "none": "Hələ təsdiqlənmiş rəy yoxdur."
+    },
+    "team": {
+      "title": "Agentlərin aktivliyi",
+      "description": "Aktiv elanlar indiki vəziyyətdir, müraciətlər son {days} gün üzrədir.",
+      "member": "Üzv",
+      "activeListings": "Aktiv elan",
+      "newLeads": "Yeni müraciət",
+      "unanswered": "Cavabsız",
+      "lastActivity": "Son fəaliyyət",
+      "owner": "Agentlik (siz)",
+      "outOfQueue": "növbədən kənar",
+      "openLog": "Fəaliyyət jurnalına keç →"
+    }
   }
 }

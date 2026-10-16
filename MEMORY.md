@@ -736,3 +736,4 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   (agentlik idarəetmə paneli: dashboard, agentlərin idarəsi, daxili tapşırıqlar, fəaliyyət jurnalı).
 - #214 (Modul 05, 7.4): `AgencyActivity` jurnalı + `/kabinet/fealiyyet`. Modul 05-in qalan sırası: dashboard (7.1),
   agentlərin idarəsi (7.2: rol, səlahiyyət, girişi dayandırma, elan təyini), tapşırıqlar (7.3).
+- #216 (Modul 05, 7.1): `/kabinet/agentlik` dashboard-u. Qalan: 7.2 agentlərin idarəsi, 7.3 tapşırıqlar.
