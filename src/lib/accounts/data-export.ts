@@ -15,7 +15,7 @@ import { findManyInChunks } from "@/lib/d1-chunks";
  *   `findManyInChunks` ilə (100 parametr limiti).
  */
 
-export const DATA_EXPORT_VERSION = 2;
+export const DATA_EXPORT_VERSION = 3;
 
 export async function buildAccountExport(userId: string) {
   const user = await prisma.user.findUnique({
@@ -27,6 +27,7 @@ export async function buildAccountExport(userId: string) {
       lastName: true,
       email: true,
       phone: true,
+      telegram: true,
       verifiedPhone: true,
       birthDate: true,
       avatarUrl: true,
@@ -74,6 +75,7 @@ export async function buildAccountExport(userId: string) {
         coverUrl: true,
         phone: true,
         whatsapp: true,
+        telegram: true,
         email: true,
         instagram: true,
         website: true,

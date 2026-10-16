@@ -150,7 +150,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
 
     // Profildəki nömrə təsdiqlənmiş nömrədən fərqlənirsə təsdiq ləğv olunur (#109):
     // telefonla giriş yalnız hazırda göstərilən və SMS ilə sübut olunmuş nömrə ilə işləyir.
-    const current = await prisma.user.findUnique({ where: { id: user.id }, select: { verifiedPhone: true, avatarUrl: true } });
+    const current = await prisma.user.findUnique({ where: { id: user.id }, select: { verifiedPhone: true, avatarUrl: true, telegram: true } });
     const keepsVerifiedPhone = current?.verifiedPhone != null && normalizeAzMobile(data.phone) === current.verifiedPhone;
     await prisma.user.update({
       where: { id: user.id },
@@ -257,6 +257,9 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
       }
     }
 
+    // Elan detalı yerləşdirənin Telegram bayrağını keşdən oxuyur (#208): dəyişəndə keş dərhal bitməlidir,
+    // yoxsa yeni ad 5 dəqiqə görünmür, silinən ad isə düyməni saxlayır. Agentlik qolu bunu özü edir.
+    if ((current?.telegram ?? null) !== telegram) revalidatePublicContent("property");
     revalidatePath(localizePath("/kabinet", locale));
     revalidatePath(localizePath("/kabinet/profil", locale));
     return success(t("actions.profileUpdated"));

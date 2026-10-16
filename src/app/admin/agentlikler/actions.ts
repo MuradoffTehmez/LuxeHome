@@ -585,7 +585,8 @@ export async function updateAgencyByAdmin(_previous: ActionState, formData: Form
         coverUrl: cover?.url ?? null,
       },
     });
-    await prisma.user.update({ where: { id: current.userId }, data: { companyTaxId } });
+    // Telegram sahibin hesabında da yazılır (#208): kabinet forması ondan oxuyur və növbəti saxlamada geri yazardı.
+    await prisma.user.update({ where: { id: current.userId }, data: { companyTaxId, telegram } });
     await recordAudit(actor, "UPDATE", "Agency", current.id, `${data.name} — profil redaktə edildi`);
     revalidatePath(LIST_PATH);
     revalidatePath(`${LIST_PATH}/${current.id}`);
