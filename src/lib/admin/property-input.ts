@@ -153,6 +153,8 @@ export function propertyLifecycleData(
   status: string,
   current: { publishedAt: Date | null; closedAt?: Date | null } & ExpiryFields,
   retentionDays = DEFAULT_EXPIRED_RETENTION_DAYS,
+  /** Paneldəki elan ömrü (#204) — yenidən dərcdə köhnəlmiş müddət bu qədər uzanır. */
+  lifetimeDays?: number,
 ) {
   const isClosed = [
     PROPERTY_STATUSES.SOLD,
@@ -169,6 +171,6 @@ export function propertyLifecycleData(
     closedAt,
     retentionUntil,
     // Yenidən dərcdə köhnəlmiş elan müddəti təzələnir (#109).
-    ...(status === PROPERTY_STATUSES.PUBLISHED ? publicationExpiryReset(current) : {}),
+    ...(status === PROPERTY_STATUSES.PUBLISHED ? publicationExpiryReset(current, new Date(), lifetimeDays) : {}),
   };
 }

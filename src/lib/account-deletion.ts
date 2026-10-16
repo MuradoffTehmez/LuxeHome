@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { PROPERTY_STATUSES } from "@/lib/constants";
+import { PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES } from "@/lib/constants";
+import { recordPropertyStatusChanges } from "@/lib/property-status-history";
 import { recordDomainEvent } from "@/lib/admin/events";
 
 /**
@@ -33,10 +34,19 @@ export async function finalizeAccountDeletion(userId: string, now = new Date()):
     throw new Error("Hesab silinmə üçün işarələnməyib.");
   }
 
+  const listings = await prisma.property.findMany({
+    where: { authorId: userId, deletedAt: null },
+    select: { id: true, status: true },
+  });
   await prisma.property.updateMany({
     where: { authorId: userId, deletedAt: null },
     data: { deletedAt: now, status: PROPERTY_STATUSES.ARCHIVED },
   });
+  // Tarixçə (#204) hesab silinməzdən əvvəl yazılır; icraçı göstərilmir — hesab birazdan silinir.
+  await recordPropertyStatusChanges(
+    listings.map((listing) => ({ propertyId: listing.id, from: listing.status })),
+    { to: PROPERTY_STATUSES.ARCHIVED, source: PROPERTY_STATUS_SOURCES.SYSTEM, note: "Hesab silindi" },
+  );
   await prisma.user.delete({ where: { id: userId } });
 }
 

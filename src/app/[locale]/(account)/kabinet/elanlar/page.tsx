@@ -25,7 +25,8 @@ import { localizePath } from "@/i18n/path-locale";
 import { formatLocalizedDate } from "@/i18n/date";
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { closePublicProperty, deletePublicProperty, renewPublicProperty } from "./actions";
-import { LISTING_LIFETIME_DAYS, expiryState } from "@/lib/listing-expiry-policy";
+import { expiryState } from "@/lib/listing-expiry-policy";
+import { getListingExpiryConfig } from "@/lib/settings";
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "needsInfo" | "published" | "reserved" | "suspended" | "expired" | "sold" | "rented" | "archived" | "rejected"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
@@ -47,7 +48,7 @@ export default async function CabinetPropertiesPage({
   const locale = await getLocale() as Locale;
   const user = await requireLister(locale);
   const t = await getTranslations("account.listings");
-  const [properties, params, packageCount] = await Promise.all([
+  const [properties, params, packageCount, expiryConfig] = await Promise.all([
     prisma.property.findMany({
       where: { authorId: user.id, deletedAt: null },
       select: {
@@ -68,6 +69,7 @@ export default async function CabinetPropertiesPage({
     }),
     searchParams,
     prisma.listingPackage.count({ where: { isActive: true } }),
+    getListingExpiryConfig(),
   ]);
 
   type CabinetProperty = (typeof properties)[number];
@@ -80,7 +82,7 @@ export default async function CabinetPropertiesPage({
 
   /** Müddət göstəricisi və «Yenilə» düyməsi (#109) — müddəti olmayan elanda heç nə. */
   function ExpiryControls({ property }: { property: CabinetProperty }) {
-    const expiry = expiryState(property, now);
+    const expiry = expiryState(property, now, expiryConfig.reminderDays);
     if (!expiry) return null;
     return (
       <span className="inline-flex flex-wrap items-center gap-2">
@@ -93,7 +95,7 @@ export default async function CabinetPropertiesPage({
             action={renewPublicProperty}
             id={property.id}
             title={t("renewTitle")}
-            description={t("renewDescription", { days: LISTING_LIFETIME_DAYS })}
+            description={t("renewDescription", { days: expiryConfig.lifetimeDays })}
             confirmLabel={t("renew")}
             label={t("renewLabel", { title: property.title })}
             tone="neutral"

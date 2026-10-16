@@ -6,7 +6,9 @@ const database = vi.hoisted(() => ({
   userFindMany: vi.fn(),
   userDelete: vi.fn(),
   propertyUpdateMany: vi.fn(),
+  propertyFindMany: vi.fn(),
 }));
+const history = vi.hoisted(() => ({ recordMany: vi.fn() }));
 const events = vi.hoisted(() => ({ record: vi.fn() }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -17,10 +19,11 @@ vi.mock("@/lib/prisma", () => ({
       findMany: database.userFindMany,
       delete: database.userDelete,
     },
-    property: { updateMany: database.propertyUpdateMany },
+    property: { updateMany: database.propertyUpdateMany, findMany: database.propertyFindMany },
   },
 }));
 vi.mock("@/lib/admin/events", () => ({ recordDomainEvent: events.record }));
+vi.mock("@/lib/property-status-history", () => ({ recordPropertyStatusChanges: history.recordMany }));
 
 import {
   processPendingAccountDeletions,
@@ -37,6 +40,8 @@ describe("D1 üçün davamlı hesab silmə axını", () => {
     database.userFindUnique.mockResolvedValue({ isActive: false, deletionRequestedAt: now });
     database.userFindMany.mockResolvedValue([]);
     database.propertyUpdateMany.mockResolvedValue({ count: 1 });
+    database.propertyFindMany.mockResolvedValue([{ id: "prop-1", status: "PUBLISHED" }]);
+    history.recordMany.mockResolvedValue(undefined);
     database.userDelete.mockResolvedValue({});
     events.record.mockResolvedValue(undefined);
   });

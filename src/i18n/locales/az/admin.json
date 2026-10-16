@@ -391,6 +391,13 @@
       "ARCHIVED": "Arxiv",
       "REJECTED": "Rədd edilib"
     },
+    "propertyStatusSource": {
+      "ADMIN": "Panel",
+      "OWNER": "Elan sahibi",
+      "MODERATION": "Moderasiya",
+      "SYSTEM": "Sistem",
+      "IMPORT": "İdxal"
+    },
     "renovation": {
       "NEW_BUILDING": "Yeni tikili",
       "DESIGNER": "Dizayner təmiri",
@@ -699,10 +706,6 @@
       "elanYenidenAktivSiyahiya": "Elan yenidən aktiv siyahıya qayıdacaq. Statusu dəyişmir.",
       "saytdaBax": "Saytda bax",
       "redakteEt": "Redaktə et",
-      "qiymetTarixcesi": "Qiymət tarixçəsi",
-      "qiymetTarixcesiTesviri": "Elanın əvvəlki qiymətləri və dəyişiklik mənbələri.",
-      "qiymetTarixcesiBosdur": "Bu elanın qiyməti hələ dəyişdirilməyib.",
-      "menbe": "Mənbə",
       "elaniSilmek": "Elanı silmək",
       "elanSaytdanCixarilacaqAmma": "Elan saytdan çıxarılacaq, amma zibil qutusunda qalacaq və bərpa edilə bilər.",
       "basliqUnvanVeYa": "Başlıq, ünvan və ya slug üzrə axtar…",
@@ -814,6 +817,12 @@
         "previewDescription": "Elanınız saytda təxminən belə görünəcək.",
         "confirm": "Təsdiq və yayım",
         "confirmDescription": "Son yoxlama və göndərmə."
+      },
+      "history": {
+        "title": "Status və qiymət tarixçəsi",
+        "description": "Elanın bütün status keçidləri və qiymət dəyişiklikləri: kim, nə vaxt, hansı mənbədən. Moderator müdaxilələri «Moderasiya» kimi işarələnir.",
+        "empty": "Hələ dəyişiklik qeydə alınmayıb.",
+        "created": "Yaradıldı"
       }
     },
     "leads": {
@@ -1215,6 +1224,14 @@
         "cta": "Səhifənin sonundakı müraciət bloku",
         "hint": "Üfüqi, ən azı 1600 px enində foto tövsiyə olunur.",
         "save": "Şəkilləri saxla"
+      },
+      "listingExpiry": {
+        "title": "Elan müddəti və aktuallıq",
+        "description": "Sahib və agentlik elanlarının nə qədər aktiv qaldığı və bitməyə nə qədər qalmış sahibdən «elan hələ aktualdırmı?» soruşulduğu. Şirkət elanlarına aid deyil. Yeni dəyər sonrakı dərc və yeniləmələrə tətbiq olunur.",
+        "lifetime": "Elanın ömrü (gün)",
+        "lifetimeHint": "{min}–{max} gün.",
+        "reminder": "Xatırlatma (bitməyə neçə gün qalmış)",
+        "reminderHint": "{min}–{max} gün, ömürdən qısa."
       }
     },
     "account": {
@@ -3383,6 +3400,10 @@
     "safety": {
       "saxlanildi": "Xəbərdarlıq mətni saxlanıldı.",
       "uzunluq": "Mətn {min}–{max} simvol olmalıdır."
+    },
+    "settings": {
+      "elanMuddetiSaxlanildi": "Elan müddəti saxlanıldı. Yeni dəyər sonrakı dərc və yeniləmələrə tətbiq olunacaq.",
+      "elanMuddetiHedleri": "Ömür {minLife}–{maxLife} gün, xatırlatma {minReminder}–{maxReminder} gün və ömürdən qısa olmalıdır."
     }
   }
 }

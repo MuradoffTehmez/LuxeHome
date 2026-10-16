@@ -5,9 +5,13 @@ import {
   LOCATION_KINDS,
   MODERATION_HOLD_STATUSES,
   PROPERTY_STATUSES,
+  PROPERTY_STATUS_SOURCES,
   PUBLIC_PROPERTY_STATUSES,
 } from "@/lib/constants";
 import { resolveLeadProperty } from "@/lib/accounts/listing-leads";
+import { runListingExpiry } from "@/lib/listing-expiry";
+import { finalizeAccountDeletion } from "@/lib/account-deletion";
+import { getPropertyHistory, recordPropertyStatusChange } from "@/lib/property-status-history";
 import { expiryState } from "@/lib/listing-expiry-policy";
 import { publicPropertyWhere } from "@/lib/queries";
 import { prisma } from "@/lib/prisma";
@@ -46,6 +50,71 @@ describe("elan statusları", () => {
     }
     // Gizli statuslu elana müraciət ümumiyyətlə bağlanmır.
     await expect(resolveLeadProperty(`lc-${PROPERTY_STATUSES.SUSPENDED}`)).resolves.toBeNull();
+  });
+
+  it("status tarixçəsi keçidləri yazır, eyni statusu atlayır, qiymətlə bir xətdə qaytarır (#204)", async () => {
+    const id = `lc-${PROPERTY_STATUSES.DRAFT}`;
+    await recordPropertyStatusChange({ propertyId: id, from: null, to: PROPERTY_STATUSES.DRAFT, source: PROPERTY_STATUS_SOURCES.ADMIN });
+    await recordPropertyStatusChange({ propertyId: id, from: PROPERTY_STATUSES.DRAFT, to: PROPERTY_STATUSES.DRAFT, source: PROPERTY_STATUS_SOURCES.ADMIN });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    await recordPropertyStatusChange({
+      propertyId: id, from: PROPERTY_STATUSES.PENDING, to: PROPERTY_STATUSES.NEEDS_INFO, source: PROPERTY_STATUS_SOURCES.MODERATION, note: "Şəkilləri yeniləyin",
+    });
+    await prisma.propertyPriceHistory.create({ data: { propertyId: id, oldPrice: 1000, newPrice: 900, source: "OWNER" } });
+    // Mövcud olmayan elan atmır — tarixçə əməliyyatı sındırmamalıdır.
+    await expect(recordPropertyStatusChange({ propertyId: "yoxdur", from: null, to: "DRAFT", source: PROPERTY_STATUS_SOURCES.SYSTEM }))
+      .resolves.toBeUndefined();
+
+    const history = await getPropertyHistory(id);
+    expect(history.map((entry) => entry.kind)).toEqual(["price", "status", "status"]);
+    expect(history[1]).toMatchObject({ kind: "status", from: "PENDING", to: "NEEDS_INFO", source: "MODERATION", note: "Şəkilləri yeniləyin" });
+    expect(history[2]).toMatchObject({ kind: "status", from: null, to: "DRAFT" });
+  });
+
+  it("gündəlik iş paneldəki xatırlatma intervalını işlədir və bitəni tarixçəyə yazır (#204)", async () => {
+    const now = new Date();
+    const day = 86_400_000;
+    await DB.batch([
+      DB.prepare('INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "accountType", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)')
+        .bind("lc-owner", "Sahib", "lc-owner@example.test", "disabled", "EDITOR", "OWNER"),
+      DB.prepare(
+        `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId",
+           "authorId", "listingExpiresAt", "publishedAt", "createdAt", "updatedAt")
+         VALUES (?, ?, ?, 'T', 'x', 'SALE', 'PUBLISHED', 1000, 'lc-type', 'lc-city', 'lc-owner', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      ).bind("lc-ten", "On gün", "lc-ten", new Date(now.getTime() + 10 * day).toISOString()),
+      DB.prepare(
+        `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId",
+           "authorId", "listingExpiresAt", "publishedAt", "createdAt", "updatedAt")
+         VALUES (?, ?, ?, 'T', 'x', 'SALE', 'PUBLISHED', 1000, 'lc-type', 'lc-city', 'lc-owner', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      ).bind("lc-gone", "Bitib", "lc-gone", new Date(now.getTime() - day).toISOString()),
+      DB.prepare('INSERT INTO "Setting" ("key", "value", "updatedAt") VALUES (?, ?, CURRENT_TIMESTAMP)')
+        .bind("listing.expiry_config", JSON.stringify({ lifetimeDays: 90, reminderDays: 14 })),
+    ]);
+
+    const result = await runListingExpiry(now);
+    // Defolt 7 gündə «10 gün qalıb» xatırlatma almazdı; paneldəki 14 gündə alır.
+    expect(result.reminded).toBeGreaterThanOrEqual(1);
+    const ten = await prisma.property.findUnique({ where: { id: "lc-ten" }, select: { expiryReminderSentAt: true } });
+    expect(ten?.expiryReminderSentAt).not.toBeNull();
+    expect(result.expiredIds).toContain("lc-gone");
+    const [entry] = await getPropertyHistory("lc-gone");
+    expect(entry).toMatchObject({ kind: "status", from: "PUBLISHED", to: "EXPIRED", source: "SYSTEM" });
+  });
+
+  it("hesab silinəndə arxivlənən elanlar tarixçəyə yazılır (#204)", async () => {
+    await DB.batch([
+      DB.prepare(
+        'INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "accountType", "isActive", "deletionRequestedAt", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+      ).bind("lc-leaving", "Gedən", "lc-leaving@example.test", "disabled", "EDITOR", "OWNER"),
+      DB.prepare(
+        `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId",
+           "authorId", "publishedAt", "createdAt", "updatedAt")
+         VALUES ('lc-leaving-1', 'Gedən', 'lc-leaving-1', 'T', 'x', 'SALE', 'PUBLISHED', 1000, 'lc-type', 'lc-city', 'lc-leaving', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      ),
+    ]);
+    await finalizeAccountDeletion("lc-leaving");
+    const [entry] = await getPropertyHistory("lc-leaving-1");
+    expect(entry).toMatchObject({ kind: "status", from: "PUBLISHED", to: "ARCHIVED", source: "SYSTEM", note: "Hesab silindi" });
   });
 
   it("müddəti bitmiş elan `EXPIRED` statusu ilə tanınır", () => {

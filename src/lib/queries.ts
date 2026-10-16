@@ -2009,7 +2009,6 @@ export async function getAdminPropertyById(id: string) {
     include: {
       images: { orderBy: [{ isCover: "desc" }, { order: "asc" }] },
       features: { select: { featureId: true } },
-      priceHistory: { orderBy: { changedAt: "desc" }, take: 50 },
       floorPlans: { orderBy: { order: "asc" } },
     },
   });

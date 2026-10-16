@@ -20,7 +20,8 @@ import {
   submissionPolicy,
   validatePublicPropertyRelations,
 } from "@/lib/accounts/property-submission";
-import { ACCOUNT_TYPES, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES, type Locale } from "@/lib/constants";
+import { recordPropertyStatusChange } from "@/lib/property-status-history";
 import { prisma } from "@/lib/prisma";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
@@ -175,6 +176,14 @@ export async function createPublicProperty(
       });
       heldForReview = true;
     }
+    await recordPropertyStatusChange({
+      propertyId: created.id,
+      from: null,
+      to: heldForReview || finalPolicy.status !== PROPERTY_STATUSES.PUBLISHED ? PROPERTY_STATUSES.PENDING : PROPERTY_STATUSES.PUBLISHED,
+      source: PROPERTY_STATUS_SOURCES.OWNER,
+      changedById: user.id,
+      note: heldForReview ? "Avtomatik moderasiya: yüksək risk" : null,
+    });
 
     if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED && !heldForReview) {
       await notifyMatchingSavedSearches(created.id);

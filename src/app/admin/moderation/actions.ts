@@ -6,6 +6,7 @@ import {
   ACCOUNT_TYPES,
   PERMISSIONS,
   PROPERTY_STATUSES,
+  PROPERTY_STATUS_SOURCES,
   REJECTION_REASON_MAX,
   REJECTION_REASON_MIN,
 } from "@/lib/constants";
@@ -26,6 +27,8 @@ import { propertyLifecycleData } from "@/lib/admin/property-input";
 import { msg } from "@/lib/admin/server-message";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
 import { noticeListingModeration } from "@/lib/accounts/account-notices";
+import { recordPropertyStatusChange } from "@/lib/property-status-history";
+import { getListingExpiryConfig } from "@/lib/settings";
 import type { AuthUser } from "@/lib/auth/types";
 
 const LIST_PATH = "/admin/moderation";
@@ -55,12 +58,17 @@ export async function approveModerationProperty(id: string): Promise<ActionState
       where: { id },
       data: {
         status: PROPERTY_STATUSES.PUBLISHED,
-        ...propertyLifecycleData(PROPERTY_STATUSES.PUBLISHED, property, await propertyRetentionDays()),
+        ...propertyLifecycleData(
+          PROPERTY_STATUSES.PUBLISHED, property, await propertyRetentionDays(), (await getListingExpiryConfig()).lifetimeDays,
+        ),
         contentFingerprint: publication.fingerprint,
         moderationNote: null,
       },
     });
 
+    await recordPropertyStatusChange({
+      propertyId: id, from: PROPERTY_STATUSES.PENDING, to: PROPERTY_STATUSES.PUBLISHED, source: PROPERTY_STATUS_SOURCES.MODERATION, changedById: actor.id,
+    });
     await recordAudit(actor, "PUBLISH", "Property", id, `${property.title} — moderasiyadan təsdiqləndi`);
     await recordDomainEvent("property.published", "Property", id, { title: property.title });
     queuePropertyVectorSync([id]);
@@ -172,6 +180,10 @@ async function decideModeration(
       return "notifyFailed";
     }
   }
+  // Tarixçə qərar qüvvədə qaldıqdan sonra yazılır — geri alınmış qərar tarixçəyə düşmür.
+  await recordPropertyStatusChange({
+    propertyId: id, from: PROPERTY_STATUSES.PENDING, to: status, source: PROPERTY_STATUS_SOURCES.MODERATION, changedById: actor.id, note: reason,
+  });
   await recordAudit(
     actor,
     "UPDATE",
