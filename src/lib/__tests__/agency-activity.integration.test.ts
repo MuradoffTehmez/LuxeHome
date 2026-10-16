@@ -64,5 +64,9 @@ describe("fəaliyyət jurnalı", () => {
     expect(first.items).toHaveLength(AGENCY_ACTIVITY_PAGE_SIZE);
     expect(second.items).toHaveLength(4);
     expect(new Set([...first.items, ...second.items].map((item) => item.id)).size).toBe(AGENCY_ACTIVITY_PAGE_SIZE + 4);
+    // Mövcud olmayan səhifə son səhifəyə sıxılır, sabit hədd yoxdur.
+    const beyond = await getAgencyActivity({ agencyId: "act-agency", page: 10_000 });
+    expect(beyond.page).toBe(2);
+    expect(beyond.items.map((item) => item.id)).toEqual(second.items.map((item) => item.id));
   });
 });

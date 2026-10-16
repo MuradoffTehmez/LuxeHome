@@ -68,13 +68,18 @@ export async function getAgencyActivity(input: {
   actorId?: string | null;
   page?: number;
 }) {
-  const page = Math.max(1, Math.min(input.page ?? 1, 500));
   const where = {
     agencyId: input.agencyId,
     ...(input.group ? { action: { in: [...AGENCY_ACTIVITY_GROUPS[input.group]] } } : {}),
     ...(input.actorId ? { actorId: input.actorId } : {}),
   };
-  const [items, total, actors] = await Promise.all([
+  // Səhifə sayı əvvəl hesablanır və istənilən səhifə yalnız ona sıxılır — sabit yuxarı hədd
+  // köhnə qeydləri əlçatmaz edərdi (hər səhifə linki son icazəli səhifəni qaytarardı).
+  const total = await prisma.agencyActivity.count({ where });
+  const pages = Math.max(1, Math.ceil(total / AGENCY_ACTIVITY_PAGE_SIZE));
+  const requested = Number.isFinite(input.page) ? Math.trunc(input.page ?? 1) : 1;
+  const page = Math.min(Math.max(1, requested), pages);
+  const [items, actors] = await Promise.all([
     prisma.agencyActivity.findMany({
       where,
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -82,7 +87,6 @@ export async function getAgencyActivity(input: {
       take: AGENCY_ACTIVITY_PAGE_SIZE,
       select: { id: true, actorId: true, actorName: true, action: true, entityType: true, entityId: true, entityLabel: true, details: true, createdAt: true },
     }),
-    prisma.agencyActivity.count({ where }),
     prisma.agencyActivity.groupBy({
       by: ["actorId", "actorName"],
       where: { agencyId: input.agencyId, actorId: { not: null } },
@@ -93,7 +97,7 @@ export async function getAgencyActivity(input: {
     items: items.map((item) => ({ ...item, details: parseDetails(item.details) })),
     total,
     page,
-    pages: Math.max(1, Math.ceil(total / AGENCY_ACTIVITY_PAGE_SIZE)),
+    pages,
     // Eyni icraçının adı dəyişibsə ən çox işlənən ad göstərilir.
     actors: [...new Map(actors.sort((a, b) => a._count._all - b._count._all).map((row) => [row.actorId!, row.actorName])).entries()]
       .map(([id, name]) => ({ id, name }))
