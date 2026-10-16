@@ -53,7 +53,24 @@
     "markedSold": "Elan satılmış kimi işarələndi.",
     "markedRented": "Elan kirayəyə verilmiş kimi işarələndi.",
     "closeUnavailable": "Yalnız dərcdə olan və ya beh alınmış elanı bağlamaq olar.",
-    "moderationNote": "Moderatorun qeydi:"
+    "moderationNote": "Moderatorun qeydi:",
+    "appeal": {
+      "button": "Etiraz et",
+      "label": "«{title}» üzrə qərara etiraz et",
+      "title": "Moderasiya qərarına etiraz",
+      "description": "«{title}» üzrə qərarla razı deyilsinizsə, səbəbini yazın. Etirazı qərarı verən moderatordan başqa şəxs yoxlayacaq.",
+      "messageLabel": "Etirazınız",
+      "messageHint": "Ən azı {min} simvol. Elanın niyə qaydalara uyğun olduğunu izah edin.",
+      "cancel": "Ləğv et",
+      "submit": "Göndər",
+      "length": "Etiraz {min}–{max} simvol olmalıdır.",
+      "failed": "Etiraz göndərilmədi. Bir az sonra yenidən cəhd edin.",
+      "notAllowed": "Bu elan üçün etiraz göndərmək mümkün deyil.",
+      "duplicate": "Bu elan üzrə etirazınız artıq baxılır.",
+      "sent": "Etirazınız göndərildi. Nəticə bildirişlərdə görünəcək.",
+      "pending": "Etirazınız baxılır.",
+      "rejectedNote": "Etiraz rədd edilib:"
+    }
   },
   "newProperty": {
     "metaTitle": "Elan göndər",

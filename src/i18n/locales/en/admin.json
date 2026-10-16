@@ -87,7 +87,8 @@
       "packages": "Packages & payments",
       "agencyHub": "Agencies and agents",
       "approvals": "Approval queue",
-      "reports": "Reports"
+      "reports": "Reports",
+      "appeals": "Appeals"
     }
   },
   "actions": {
@@ -484,6 +485,12 @@
       "MARKED_CLOSED": "Closed as sold/rented",
       "LISTING_FIXED": "Listing corrected",
       "NO_ACTION": "Listing unchanged"
+    },
+    "appealStatus": {
+      "OPEN": "Under review",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "CLOSED": "Closed"
     }
   },
   "profile": {
@@ -2978,6 +2985,26 @@
       "whereTitle": "Where it appears",
       "where": "In the contact panel of every listing and agency profile, directly above the phone and WhatsApp buttons. It does not hide the buttons.",
       "rules": "The text must be 20–400 characters. State the deposit and prepayment risk clearly — the notice cannot be removed; an empty language falls back to the default."
+    },
+    "appeals": {
+      "title": "Appeals",
+      "description": "Listing owners' appeals against moderation decisions. The moderator who made a decision cannot review it — another authorised person resolves the appeal.",
+      "tabsLabel": "Appeal status",
+      "empty": "No appeals",
+      "emptyDescription": "There are no appeals in this section yet.",
+      "nowStatus": "Now: {status}",
+      "deletedAuthor": "Deleted account",
+      "unknown": "unknown",
+      "decidedBy": "Decided by: {name}",
+      "restoreTo": "If accepted: {status}",
+      "ownDecision": "You made this decision — another moderator must resolve the appeal.",
+      "accept": "Accept",
+      "acceptTitle": "Accept the appeal",
+      "acceptDescription": "The moderation decision on “{title}” will be reversed and the listing will return to its previous status. The note is optional and is sent to the owner.",
+      "reject": "Reject",
+      "rejectTitle": "Reject the appeal",
+      "rejectDescription": "The decision on “{title}” stays in force. The reason will be sent to the owner by notification and email.",
+      "moderationReason": "Moderator's reason:"
     }
   },
   "server": {
@@ -3404,6 +3431,13 @@
     "settings": {
       "elanMuddetiSaxlanildi": "The listing lifetime was saved. It applies to later publications and renewals.",
       "elanMuddetiHedleri": "The lifetime must be {minLife}–{maxLife} days and the reminder {minReminder}–{maxReminder} days, shorter than the lifetime."
+    },
+    "appeals": {
+      "tapilmadi": "The appeal was not found or has already been resolved.",
+      "ozQerari": "You made this decision — another moderator must resolve the appeal.",
+      "kohnelib": "The appealed decision is no longer in force (the listing was edited or a new decision was made) — the appeal was closed.",
+      "qebulEdildi": "The appeal was accepted and the listing returned to its previous status.",
+      "reddEdildi": "The appeal was rejected and the reason sent to the owner."
     }
   }
 }

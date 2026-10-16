@@ -21,6 +21,8 @@ import {
   ACTIVE_OFFER_STATUSES,
   LISTING_TYPES,
   MAX_PROPERTY_IMAGES,
+  APPEAL_MESSAGE_MAX,
+  APPEAL_MESSAGE_MIN,
   MODERATION_HOLD_STATUSES,
   PROPERTY_STATUSES,
   PROPERTY_STATUS_SOURCES,
@@ -28,6 +30,7 @@ import {
 } from "@/lib/constants";
 import { recordPropertyStatusChange } from "@/lib/property-status-history";
 import { getListingExpiryConfig } from "@/lib/settings";
+import { submitListingAppeal } from "@/lib/listing-appeals";
 import { localizePath } from "@/i18n/path-locale";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
@@ -352,3 +355,35 @@ export async function closePublicProperty(id: string): Promise<ActionState> {
   revalidatePublicContent("property", property.slug);
   return success(status === PROPERTY_STATUSES.RENTED ? t("listings.markedRented") : t("listings.markedSold"));
 }
+
+/**
+ * Moderasiya qərarına etiraz (#206, PRD 20.4): yalnız sahibin öz rədd edilmiş/dayandırılmış elanı,
+ * elan başına bir açıq etiraz. Etirazı qərarı verən moderatordan başqa şəxs həll edir.
+ */
+export async function submitPropertyAppeal(id: string, message: string): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  let user;
+  try {
+    user = await requirePublicAction("property", locale);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(t("actions.actionUnavailable"));
+    throw error;
+  }
+  // Abzaslar saxlanılır — etiraz uzun izah ola bilər; yalnız sətirdaxili boşluqlar sıxılır.
+  const text = typeof message === "string" ? message.trim().replace(/[ \t]+/g, " ") : "";
+  if (text.length < APPEAL_MESSAGE_MIN || text.length > APPEAL_MESSAGE_MAX) {
+    return failure(t("listings.appeal.length", { min: APPEAL_MESSAGE_MIN, max: APPEAL_MESSAGE_MAX }));
+  }
+  try {
+    const result = await submitListingAppeal({ propertyId: String(id).slice(0, 40), userId: user.id, message: text });
+    if (result === "notAllowed") return failure(t("listings.appeal.notAllowed"));
+    if (result === "duplicate") return failure(t("listings.appeal.duplicate"));
+  } catch (error) {
+    return unexpected("etiraz göndərilmədi", error, t("actions.unexpected"));
+  }
+  revalidatePath(localizePath(LIST_PATH, locale));
+  revalidatePath("/admin/etirazlar");
+  return success(t("listings.appeal.sent"));
+}
+

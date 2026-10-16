@@ -115,6 +115,8 @@ model User {
   listingReportsAssigned ListingReport[]         @relation("ListingReportAssignee")
   listingReportNotes     ListingReportNote[]
   propertyStatusChanges  PropertyStatusHistory[] @relation("PropertyStatusChanger")
+  listingAppeals         ListingAppeal[]         @relation("ListingAppealAuthor")
+  listingAppealsReviewed ListingAppeal[]         @relation("ListingAppealReviewer")
 
   @@index([role])
   @@index([accountType])
@@ -628,6 +630,7 @@ model Property {
   partners           PropertyPartner[]
   priceHistory       PropertyPriceHistory[]
   statusHistory      PropertyStatusHistory[]
+  appeals            ListingAppeal[]
   floorPlans         PropertyFloorPlan[]
   openHouses         OpenHouse[]
   packageOrders      PackageOrder[]
@@ -1193,6 +1196,35 @@ model PropertyPriceHistory {
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId, changedAt])
+}
+
+/// Moderasiya qərarına etiraz (#206, PRD 20.4). Sahib rədd edilmiş/dayandırılmış elanına etiraz edir;
+/// qərarı verən moderatordan başqa səlahiyyətli şəxs baxır (`decidedById` ≠ `reviewerId`).
+model ListingAppeal {
+  id                String    @id @default(cuid())
+  propertyId        String
+  authorId          String?
+  /// Etiraz olunan status (REJECTED | SUSPENDED) və qərardan əvvəlki status — qəbulda elan ona qayıdır.
+  appealedStatus    String
+  previousStatus    String?
+  /// Qərarı verən moderator (status tarixçəsindən); etirazı o həll edə bilməz.
+  decidedById       String?
+  /// Etiraz olunan qərarın status tarixçəsi qeydi — elan başqa qərar dövrünə keçibsə etiraz bağlanır.
+  decisionHistoryId String?
+  message           String
+  /// APPEAL_STATUSES: OPEN | ACCEPTED | REJECTED | CLOSED (qərar dövrü dəyişib)
+  status            String    @default("OPEN")
+  reviewerId        String?
+  decisionNote      String?
+  decidedAt         DateTime?
+  createdAt         DateTime  @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  author   User?    @relation("ListingAppealAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  reviewer User?    @relation("ListingAppealReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([propertyId, status])
 }
 
 /// Elanın status tarixçəsi (#204, PRD 5.4): kim, nə vaxt, hansı statusdan hansına və niyə.

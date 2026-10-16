@@ -53,7 +53,24 @@
     "markedSold": "The listing was marked as sold.",
     "markedRented": "The listing was marked as rented.",
     "closeUnavailable": "Only a published or reserved listing can be closed.",
-    "moderationNote": "Moderator's note:"
+    "moderationNote": "Moderator's note:",
+    "appeal": {
+      "button": "Appeal",
+      "label": "Appeal the decision on “{title}”",
+      "title": "Appeal a moderation decision",
+      "description": "If you disagree with the decision on “{title}”, explain why. A person other than the deciding moderator will review the appeal.",
+      "messageLabel": "Your appeal",
+      "messageHint": "At least {min} characters. Explain why the listing complies with the rules.",
+      "cancel": "Cancel",
+      "submit": "Send",
+      "length": "The appeal must be {min}–{max} characters.",
+      "failed": "The appeal could not be sent. Please try again shortly.",
+      "notAllowed": "An appeal cannot be sent for this listing.",
+      "duplicate": "Your appeal for this listing is already under review.",
+      "sent": "Your appeal was sent. The result will appear in your notifications.",
+      "pending": "Your appeal is under review.",
+      "rejectedNote": "Appeal rejected:"
+    }
   },
   "newProperty": {
     "metaTitle": "Submit a listing",

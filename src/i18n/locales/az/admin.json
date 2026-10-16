@@ -87,7 +87,8 @@
       "packages": "Paketlər və ödənişlər",
       "agencyHub": "Agentliklər və agentlər",
       "approvals": "Təsdiq növbəsi",
-      "reports": "Şikayətlər"
+      "reports": "Şikayətlər",
+      "appeals": "Etirazlar"
     }
   },
   "actions": {
@@ -484,6 +485,12 @@
       "MARKED_CLOSED": "Satılmış/kirayəyə verilmiş kimi bağlanıb",
       "LISTING_FIXED": "Elan düzəldilib",
       "NO_ACTION": "Elan dəyişmədi"
+    },
+    "appealStatus": {
+      "OPEN": "Baxılır",
+      "ACCEPTED": "Qəbul edilib",
+      "REJECTED": "Rədd edilib",
+      "CLOSED": "Bağlanıb"
     }
   },
   "profile": {
@@ -2978,6 +2985,26 @@
       "whereTitle": "Harada göstərilir",
       "where": "Hər elanın və agentlik profilinin əlaqə panelində, telefon və WhatsApp düymələrinin bilavasitə üstündə. Düymələri gizlətmir.",
       "rules": "Mətn 20–400 simvol olmalıdır. Beh, depozit və əvvəlcədən ödəniş riskini açıq yazın — mətn tam silinə bilməz, boş dil defolta qayıdır."
+    },
+    "appeals": {
+      "title": "Etirazlar",
+      "description": "Elan sahiblərinin moderasiya qərarlarına etirazları. Qərarı verən moderator öz qərarına baxa bilməz — etirazı başqa səlahiyyətli şəxs həll edir.",
+      "tabsLabel": "Etiraz statusu",
+      "empty": "Etiraz yoxdur",
+      "emptyDescription": "Bu bölmədə hələ etiraz yoxdur.",
+      "nowStatus": "İndi: {status}",
+      "deletedAuthor": "Silinmiş hesab",
+      "unknown": "naməlum",
+      "decidedBy": "Qərarı verən: {name}",
+      "restoreTo": "Qəbulda: {status}",
+      "ownDecision": "Bu qərarı siz vermisiniz — etirazı başqa moderator həll etməlidir.",
+      "accept": "Qəbul et",
+      "acceptTitle": "Etirazı qəbul etmək",
+      "acceptDescription": "«{title}» üzrə moderasiya qərarı ləğv olunacaq və elan əvvəlki statusuna qayıdacaq. Qeyd istəyə bağlıdır və sahibə göndərilir.",
+      "reject": "Rədd et",
+      "rejectTitle": "Etirazı rədd etmək",
+      "rejectDescription": "«{title}» üzrə qərar qüvvədə qalacaq. Səbəb sahibə bildiriş və e-poçt kimi göndəriləcək.",
+      "moderationReason": "Moderatorun səbəbi:"
     }
   },
   "server": {
@@ -3404,6 +3431,13 @@
     "settings": {
       "elanMuddetiSaxlanildi": "Elan müddəti saxlanıldı. Yeni dəyər sonrakı dərc və yeniləmələrə tətbiq olunacaq.",
       "elanMuddetiHedleri": "Ömür {minLife}–{maxLife} gün, xatırlatma {minReminder}–{maxReminder} gün və ömürdən qısa olmalıdır."
+    },
+    "appeals": {
+      "tapilmadi": "Etiraz tapılmadı və ya artıq həll edilib.",
+      "ozQerari": "Bu qərarı siz vermisiniz — etirazı başqa moderator həll etməlidir.",
+      "kohnelib": "Etiraz olunan qərar artıq qüvvədə deyil (elan redaktə edilib və ya yeni qərar verilib) — etiraz bağlandı.",
+      "qebulEdildi": "Etiraz qəbul edildi, elan əvvəlki statusuna qaytarıldı.",
+      "reddEdildi": "Etiraz rədd edildi, sahibə səbəb göndərildi."
     }
   }
 }

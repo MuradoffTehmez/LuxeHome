@@ -176,6 +176,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/xidmetler`, `/yeni`, `/[id]` | Xidmət CRUD | `service:manage` |
 | `/admin/blog`, `/yeni`, `/[id]`, `/kateqoriyalar` | Bloq və kateqoriyalar | `blog:manage` |
 | `/admin/bilik-merkezi` (+ `/yeni`, `/[id]`, `/kateqoriyalar`, `/lugat`, `/suallar`) | Bilik Mərkəzi CMS-i | `knowledge:manage` |
+| `/admin/etirazlar` | Moderasiya qərarlarına etirazlar: müstəqil baxış (qərarverən öz qərarına baxa bilmir), qəbul/rədd | `property:manage` |
 | `/admin/xeberdarliqlar` | Əlaqə panelinin beh xəbərdarlığı (AZ/EN/RU) | `knowledge:manage` |
 | `/admin/muracietler`, `/[id]` | Müraciət filtri, status, məsul, qeyd | `lead:manage` |
 | `/admin/muracietler/lovhe` | Status sütunlu lövhə, SLA, «mənə təyin et» | `lead:manage` |

@@ -554,6 +554,15 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   (`SETTING_KEYS.LISTING_EXPIRY_CONFIG`, tək JSON, `getListingExpiryConfig()`; 7–365 / 1–30 gün, pozulmuş dəyər 60/7
   defoltudur). Saf funksiyalar (`renewedExpiry`, `publicationExpiryReset`, `expiryState`, `propertyLifecycleData`) günü
   istəyə bağlı parametr kimi alır — dərc edən yeni yolda konfiqurasiyanı ötür, sabiti birbaşa işlətmə.
+- **Etiraz (#206, PRD 20.4):** sahib `APPEALABLE_STATUSES` (`REJECTED`, `SUSPENDED`) elanına kabinetdən etiraz edir
+  (`ListingAppeal`, elan başına bir açıq etiraz). `/admin/etirazlar`-da etirazı **qərarı verən moderatordan başqa**
+  şəxs həll edir — qərarverən status tarixçəsinin son keçidindən (`decidedById`) götürülür, server `sameReviewer` qaytarır.
+  Qəbulda elan əvvəlki statusa (`PUBLISHED`/`RESERVED`) və ya moderasiya növbəsinə (`PENDING`) qayıdır, tarixçəyə yazılır;
+  rəddə status dəyişmir, səbəb məcburidir. **Etiraz konkret qərara bağlıdır** (`decisionHistoryId` — o keçidin tarixçə
+  qeydi): elan redaktə edilib yenidən rədd olunubsa köhnə etiraz `CLOSED` olur (`stale`), yoxsa yeni qərarverən onun
+  üzərindən öz qərarına baxa bilərdi. «Bir açıq etiraz» yazılışdan sonra yoxlanılır (ən köhnəsi qalır); növbə əlaqələri
+  iç-içə deyil, `findManyInChunks` ilə yüklənir. Bu axında status tarixçəsi qərarverənin mənbəyidir — moderasiya
+  yollarında tarixçəni yazmağı unutma.
 - **Açıq qapı** (`OpenHouse` + `OpenHouseRegistration`): qeydiyyat lead yaradır, tutum və
   qeydiyyatın bağlanma vaxtı `open-house-availability.ts`-dədir (client də işlədir — Prisma yoxdur).
 - **Təqvim** `/admin/rezervasiyalar/teqvim` (Bakı vaxtı, UTC+4) və şəxsi ICS abunəsi

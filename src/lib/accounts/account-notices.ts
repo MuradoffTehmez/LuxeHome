@@ -56,6 +56,10 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `«${agency}» komandasından çıxan ${from} adlı agentin ${count} elanı sizə təhvil verildi. Elanlar və onlara gələn müraciətlər kabinetinizdədir.`,
     listingClosedTitle: "Elanınız bağlandı",
     listingClosed: (title: string) => `«${title}» elanı satılmış və ya kirayəyə verilmiş kimi işarələndi. Səhvdirsə, bizimlə əlaqə saxlayın.`,
+    appealAcceptedTitle: "Etirazınız qəbul edildi",
+    appealAccepted: (title: string) => `«${title}» elanı üzrə etirazınız qəbul edildi və moderasiya qərarı ləğv olundu.`,
+    appealRejectedTitle: "Etirazınız rədd edildi",
+    appealRejected: (title: string) => `«${title}» elanı üzrə etirazınız müstəqil yoxlamadan sonra rədd edildi. Elanı düzəldib yenidən göndərə bilərsiniz.`,
     listingRejectedTitle: "Elanınız rədd edildi",
     listingRejected: (title: string) => `«${title}» elanı moderasiyadan keçmədi. Səbəbi oxuyub elanı düzəldin və yenidən göndərin.`,
     listingNeedsInfoTitle: "Elanınız üçün düzəliş tələb olunur",
@@ -106,6 +110,10 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `${count} listings of ${from}, who left the “${agency}” team, were handed over to you. The listings and their enquiries are in your account.`,
     listingClosedTitle: "Your listing was closed",
     listingClosed: (title: string) => `The listing “${title}” was marked as sold or rented. If this is a mistake, please contact us.`,
+    appealAcceptedTitle: "Your appeal was accepted",
+    appealAccepted: (title: string) => `Your appeal about the listing “${title}” was accepted and the moderation decision was reversed.`,
+    appealRejectedTitle: "Your appeal was rejected",
+    appealRejected: (title: string) => `Your appeal about the listing “${title}” was rejected after an independent review. You can correct the listing and submit it again.`,
     listingRejectedTitle: "Your listing was rejected",
     listingRejected: (title: string) => `The listing “${title}” did not pass moderation. Read the reason, correct the listing and submit it again.`,
     listingNeedsInfoTitle: "Your listing needs changes",
@@ -156,6 +164,10 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `Вам переданы объявления (${count}) агента ${from}, покинувшего команду «${agency}». Объявления и заявки по ним — в вашем кабинете.`,
     listingClosedTitle: "Ваше объявление закрыто",
     listingClosed: (title: string) => `Объявление «${title}» отмечено как проданное или сданное. Если это ошибка, свяжитесь с нами.`,
+    appealAcceptedTitle: "Ваша апелляция принята",
+    appealAccepted: (title: string) => `Ваша апелляция по объявлению «${title}» принята, решение модерации отменено.`,
+    appealRejectedTitle: "Ваша апелляция отклонена",
+    appealRejected: (title: string) => `Ваша апелляция по объявлению «${title}» отклонена после независимой проверки. Вы можете исправить объявление и отправить его снова.`,
     listingRejectedTitle: "Ваше объявление отклонено",
     listingRejected: (title: string) => `Объявление «${title}» не прошло модерацию. Ознакомьтесь с причиной, исправьте объявление и отправьте его снова.`,
     listingNeedsInfoTitle: "Объявление требует исправлений",
@@ -431,6 +443,26 @@ export async function noticeListingModeration(input: {
     (copy) => input.decision === "rejected"
       ? { title: copy.listingRejectedTitle, content: withReason(copy.listingRejected(input.propertyTitle), copy, input.reason) }
       : { title: copy.listingNeedsInfoTitle, content: withReason(copy.listingNeedsInfo(input.propertyTitle), copy, input.reason) },
+  );
+}
+
+/** Elan sahibinə: etirazın nəticəsi (#206) — müstəqil yoxlayanın qeydi ilə. */
+export async function noticeAppealDecision(input: {
+  userId: string;
+  propertyId: string;
+  propertyTitle: string;
+  accepted: boolean;
+  decidedAt: Date;
+  note?: string | null;
+}): Promise<boolean> {
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_MODERATION,
+    "/kabinet/elanlar",
+    `listing-appeal:${input.propertyId}:${attemptKey(input.decidedAt)}`,
+    (copy) => input.accepted
+      ? { title: copy.appealAcceptedTitle, content: withReason(copy.appealAccepted(input.propertyTitle), copy, input.note) }
+      : { title: copy.appealRejectedTitle, content: withReason(copy.appealRejected(input.propertyTitle), copy, input.note) },
   );
 }
 

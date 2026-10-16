@@ -10,6 +10,8 @@ import { EmptyState } from "@/components/ui/states";
 import { requireLister } from "@/lib/auth/guard";
 import {
   ACTIVE_OFFER_STATUSES,
+  APPEALABLE_STATUSES,
+  APPEAL_STATUSES,
   LISTING_TYPES,
   MODERATION_HOLD_STATUSES,
   PROPERTY_STATUSES,
@@ -27,6 +29,8 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { closePublicProperty, deletePublicProperty, renewPublicProperty } from "./actions";
 import { expiryState } from "@/lib/listing-expiry-policy";
 import { getListingExpiryConfig } from "@/lib/settings";
+import { getOwnerAppeals } from "@/lib/listing-appeals";
+import { AppealButton } from "./appeal-button";
 
 const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "needsInfo" | "published" | "reserved" | "suspended" | "expired" | "sold" | "rented" | "archived" | "rejected"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
@@ -73,6 +77,9 @@ export default async function CabinetPropertiesPage({
   ]);
 
   type CabinetProperty = (typeof properties)[number];
+  const appeals = await getOwnerAppeals(
+    properties.filter((property) => (APPEALABLE_STATUSES as readonly string[]).includes(property.status)).map((property) => property.id),
+  );
 
   function propertyStatus(property: CabinetProperty) {
     return property.status as PropertyStatus;
@@ -126,16 +133,38 @@ export default async function CabinetPropertiesPage({
     );
   }
 
-  /** Moderatorun səbəbi (#202): rədd, düzəliş istəyi və ya dayandırma — sahib nəyi düzəldəcəyini görsün. */
+  /**
+   * Moderatorun səbəbi (#202) və etiraz (#206): rədd edilmiş/dayandırılmış elanda sahib etiraz edə
+   * bilir; açıq etiraz varsa «baxılır», son etiraz rədd edilibsə müstəqil yoxlayanın qeydi görünür.
+   */
   function ModerationNote({ property }: { property: CabinetProperty }) {
-    if (!property.moderationNote || !(MODERATION_HOLD_STATUSES as readonly string[]).includes(property.status)) return null;
+    if (!(MODERATION_HOLD_STATUSES as readonly string[]).includes(property.status)) return null;
+    const appealable = (APPEALABLE_STATUSES as readonly string[]).includes(property.status);
+    const appeal = appealable ? appeals.get(property.id) : undefined;
+    const openAppeal = appeal?.status === APPEAL_STATUSES.OPEN;
+    if (!property.moderationNote && !appealable) return null;
     return (
-      <p className="mt-2 flex items-start gap-1.5 rounded-sm border border-warning/30 bg-warning-bg px-2.5 py-2 text-xs text-ink [overflow-wrap:anywhere]">
-        <MessageSquareWarning className="mt-0.5 size-3.5 shrink-0 text-warning" aria-hidden="true" />
-        <span>
-          <span className="font-medium">{t("moderationNote")}</span> {property.moderationNote}
-        </span>
-      </p>
+      <div className="mt-2 flex flex-col gap-1.5 rounded-sm border border-warning/30 bg-warning-bg px-2.5 py-2 text-xs text-ink [overflow-wrap:anywhere]">
+        {property.moderationNote && (
+          <p className="flex items-start gap-1.5">
+            <MessageSquareWarning className="mt-0.5 size-3.5 shrink-0 text-warning" aria-hidden="true" />
+            <span>
+              <span className="font-medium">{t("moderationNote")}</span> {property.moderationNote}
+            </span>
+          </p>
+        )}
+        {openAppeal && <p className="font-medium text-ink-soft">{t("appeal.pending")}</p>}
+        {appeal?.status === APPEAL_STATUSES.REJECTED && (
+          <p className="text-ink-soft">
+            <span className="font-medium">{t("appeal.rejectedNote")}</span> {appeal.decisionNote ?? ""}
+          </p>
+        )}
+        {appealable && !openAppeal && (
+          <div>
+            <AppealButton propertyId={property.id} title={property.title} />
+          </div>
+        )}
+      </div>
     );
   }
 
