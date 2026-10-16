@@ -99,7 +99,8 @@ export async function rejectModerationProperty(_prev: ActionState, formData: For
 
   try {
     const result = await decideModeration(actor, id, PROPERTY_STATUSES.REJECTED, reason ?? null);
-    if (!result) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
+    if (result === "notFound") return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
+    if (result === "notifyFailed") return failure(msg("server.moderation.bildirisGonderilmedi"));
     return success(msg("server.moderation.elanReddEdildi"));
   } catch (error) {
     return unexpected("elan rədd edilmədi", error, msg("server.common.unexpected"));
@@ -126,7 +127,8 @@ export async function requestModerationChanges(id: string, reason: string): Prom
 
   try {
     const result = await decideModeration(actor, String(id).slice(0, 40), PROPERTY_STATUSES.NEEDS_INFO, note);
-    if (!result) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
+    if (result === "notFound") return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
+    if (result === "notifyFailed") return failure(msg("server.moderation.bildirisGonderilmedi"));
     return success(msg("server.moderation.duzelisTelebEdildi"));
   } catch (error) {
     return unexpected("elan üçün düzəliş tələb edilmədi", error, msg("server.common.unexpected"));
@@ -137,31 +139,32 @@ export async function requestModerationChanges(id: string, reason: string): Prom
  * Moderasiya qərarı: yalnız hələ `PENDING` olan elanı şərti `updateMany` ilə dəyişir — eyni anda
  * baxan iki moderatordan yalnız biri qərar yazır, bildiriş də bir dəfə gedir. Şirkət (STAFF) elanının
  * sahibinə bildiriş getmir.
+ *
+ * Sahibə bildiriş yazılmasa (keçici D1 xətası) qərar geri alınır və elan `PENDING`-ə qayıdır:
+ * əks halda təkrar cəhd «artıq baxılıb» deyib dayanar, sahib isə elanının niyə gizləndiyini heç
+ * vaxt bilməzdi. Geri alma yalnız bu sorğunun yazdığı sətrə (`updatedAt` = qərar anı) toxunur.
  */
 async function decideModeration(
   actor: AuthUser,
   id: string,
   status: typeof PROPERTY_STATUSES.REJECTED | typeof PROPERTY_STATUSES.NEEDS_INFO,
   reason: string | null,
-): Promise<boolean> {
+): Promise<"ok" | "notFound" | "notifyFailed"> {
   const property = await prisma.property.findFirst({
     where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
     select: { title: true, author: { select: { id: true, accountType: true } } },
   });
-  if (!property) return false;
+  if (!property) return "notFound";
 
   const decidedAt = new Date();
   const { count } = await prisma.property.updateMany({
     where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
     data: { status, moderationNote: reason, updatedAt: decidedAt },
   });
-  if (count === 0) return false;
-  await recordPropertyStatusChange({
-    propertyId: id, from: PROPERTY_STATUSES.PENDING, to: status, source: PROPERTY_STATUS_SOURCES.MODERATION, changedById: actor.id, note: reason,
-  });
+  if (count === 0) return "notFound";
 
   if (property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF) {
-    await noticeListingModeration({
+    const delivered = await noticeListingModeration({
       userId: property.author.id,
       propertyId: id,
       propertyTitle: property.title,
@@ -169,7 +172,18 @@ async function decideModeration(
       decidedAt,
       reason,
     });
+    if (!delivered) {
+      await prisma.property.updateMany({
+        where: { id, status, updatedAt: decidedAt },
+        data: { status: PROPERTY_STATUSES.PENDING, moderationNote: null },
+      });
+      return "notifyFailed";
+    }
   }
+  // Tarixçə qərar qüvvədə qaldıqdan sonra yazılır — geri alınmış qərar tarixçəyə düşmür.
+  await recordPropertyStatusChange({
+    propertyId: id, from: PROPERTY_STATUSES.PENDING, to: status, source: PROPERTY_STATUS_SOURCES.MODERATION, changedById: actor.id, note: reason,
+  });
   await recordAudit(
     actor,
     "UPDATE",
@@ -179,5 +193,5 @@ async function decideModeration(
   );
   await recordDomainEvent("property.status_changed", "Property", id, { title: property.title, status, reason });
   revalidatePath(LIST_PATH);
-  return true;
+  return "ok";
 }

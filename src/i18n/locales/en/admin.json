@@ -3188,7 +3188,8 @@
       "elanTesdiqlendiVeDercOlundu": "Listing approved and published.",
       "elanTapilmadi": "Listing not found.",
       "elanReddEdildi": "The listing was rejected and the reason sent to the owner.",
-      "duzelisTelebEdildi": "The change request was sent to the owner."
+      "duzelisTelebEdildi": "The change request was sent to the owner.",
+      "bildirisGonderilmedi": "The notification to the owner could not be saved — the decision was reverted and the listing stays in the queue. Please try again shortly."
     },
     "muracietler": {
       "muracietTapilmadi": "Inquiry not found.",
