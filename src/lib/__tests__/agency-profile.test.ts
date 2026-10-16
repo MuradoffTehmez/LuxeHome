@@ -24,21 +24,22 @@ import { isPhoneLike } from "../accounts/profile-fields";
 describe("agentlik təklif sayı", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("sahibin və təsdiqlənmiş agentlərin elanlarını satış/kirayə üzrə toplayır", async () => {
-    db.employeeFindMany.mockResolvedValue([{ agencyId: "a1", userId: "agent-1" }]);
+  it("agentliyin mühitinə aid elanları (agencyId) satış/kirayə üzrə toplayır", async () => {
     db.propertyGroupBy.mockResolvedValue([
-      { authorId: "owner-1", listingType: "SALE", _count: { _all: 0 } },
-      { authorId: "agent-1", listingType: "SALE", _count: { _all: 1 } },
-      { authorId: "agent-1", listingType: "RENT", _count: { _all: 2 } },
+      { agencyId: "a1", listingType: "SALE", _count: { _all: 1 } },
+      { agencyId: "a1", listingType: "RENT", _count: { _all: 2 } },
+      { agencyId: "a2", listingType: "SALE", _count: { _all: 4 } },
     ]);
 
-    const stats = await countAgencyOffers([{ id: "a1", userId: "owner-1" }]);
+    const stats = await countAgencyOffers([{ id: "a1", userId: "owner-1" }, { id: "a2", userId: "owner-2" }]);
 
-    // Ekran görüntüsündəki hal: sahibin 0, agentin 1 elanı — kart «1 təklif» yazmalıdır.
+    // Agentin şəxsi elanı (agencyId = null) agentlikdə sayılmır (#210, PRD 6.3).
     expect(stats.get("a1")).toEqual({ total: 3, sale: 1, rent: 2 });
+    expect(stats.get("a2")).toEqual({ total: 4, sale: 4, rent: 0 });
     expect(db.propertyGroupBy).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ authorId: { in: ["owner-1", "agent-1"] } }),
+      where: expect.objectContaining({ agencyId: { in: ["a1", "a2"] } }),
     }));
+    expect(db.employeeFindMany).not.toHaveBeenCalled();
   });
 });
 

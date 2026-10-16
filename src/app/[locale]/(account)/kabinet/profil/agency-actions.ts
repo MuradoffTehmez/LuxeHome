@@ -7,9 +7,9 @@ import {
   ACCOUNT_TYPES,
   AGENCY_EMPLOYEE_SOURCES,
   AGENCY_EMPLOYEE_STATUSES,
-  LISTING_HANDOVER,
   MAX_PENDING_AGENCY_REQUESTS,
   type Locale,
+  MEMBERSHIP_END_REASONS,
 } from "@/lib/constants";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { recordDomainEvent } from "@/lib/admin/events";
@@ -20,6 +20,7 @@ import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { linkAgentProfileToAgency } from "@/lib/accounts/agency-membership";
 import { noticeAgencyJoinRequest, noticeAgentLeft } from "@/lib/accounts/account-notices";
 import { handOverListings } from "@/lib/accounts/agency-listings";
+import { closeMembershipPeriod } from "@/lib/accounts/agency-ownership";
 import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
 
 /**
@@ -113,10 +114,10 @@ export async function requestAgencyJoin(_prev: ActionState, formData: FormData):
 }
 
 /**
- * Gözləyən sorğunu ləğv edir və ya təsdiqlənmiş üzvlükdən çıxır. Çıxan agent elanlarını
- * özündə saxlaya (`KEEP`) və ya agentliyə təhvil verə bilər (`AGENCY`, #159).
+ * Gözləyən sorğunu ləğv edir və ya təsdiqlənmiş üzvlükdən çıxır. Agentlik elanları agentlə getmir
+ * (#210, PRD 6.2) — həmişə agentlik sahibinə təhvil verilir; şəxsi elanlar agentdə qalır.
  */
-export async function leaveAgency(id: string, handover: string = LISTING_HANDOVER.KEEP): Promise<ActionState> {
+export async function leaveAgency(id: string): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account");
   let user;
@@ -130,23 +131,31 @@ export async function leaveAgency(id: string, handover: string = LISTING_HANDOVE
   try {
     const membership = await prisma.agencyEmployee.findUnique({
       where: { id },
-      select: { id: true, userId: true, status: true, agency: { select: { id: true, slug: true, name: true, userId: true } } },
+      select: { id: true, userId: true, status: true, role: true, approvedAt: true, agency: { select: { id: true, slug: true, name: true, userId: true } } },
     });
     if (!membership || membership.userId !== user.id || membership.status === AGENCY_EMPLOYEE_STATUSES.REJECTED) {
       return failure(t("actions.requestNotFound"));
     }
 
     const wasMember = membership.status === AGENCY_EMPLOYEE_STATUSES.APPROVED;
-    // Agent yalnız agentliyin özünə təhvil verə bilər — başqa agenti sahib seçir. Təhvil
-    // üzvlük silinməzdən əvvəldir: alınmasa üzvlük qalır və agent təkrar cəhd edə bilir.
-    const handedOver = wasMember && handover === LISTING_HANDOVER.AGENCY
-      ? await handOverListings(user.id, membership.agency.userId)
+    // Agentlik elanları sahibə keçir — başqa agenti yalnız sahib seçə bilər. Təhvil üzvlük
+    // silinməzdən əvvəldir: alınmasa üzvlük qalır və agent təkrar cəhd edə bilir.
+    const handedOver = wasMember
+      ? await handOverListings(user.id, membership.agency.userId, membership.agency.id)
       : 0;
     // Agentlik müraciətləri sahibə qayıdır (#161); agentdə qalan elanlarına gələnlər onundur.
     if (wasMember) await releaseAgentLeads({ agencyId: membership.agency.id, userId: user.id, ownerUserId: membership.agency.userId });
     await prisma.agencyEmployee.delete({ where: { id } });
     if (wasMember) {
       await linkAgentProfileToAgency(user.id, membership.agency.id, false);
+      await closeMembershipPeriod({
+        userId: user.id,
+        agencyId: membership.agency.id,
+        reason: MEMBERSHIP_END_REASONS.LEFT,
+        handedOver,
+        role: membership.role,
+        joinedAt: membership.approvedAt,
+      });
       revalidatePublicContent("agency", membership.agency.slug);
       revalidatePublicContent("property");
       await noticeAgentLeft({

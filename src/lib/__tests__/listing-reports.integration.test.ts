@@ -17,13 +17,12 @@ import {
 } from "@/lib/listing-reports";
 import { noticeReportOutcome } from "@/lib/accounts/account-notices";
 import { mediaKeyFromPath } from "@/lib/media-response";
-import { countOwnListings, handOverListings } from "@/lib/accounts/agency-listings";
 import { activeOfferWhere, getClosedDeals } from "@/lib/agency-profile";
 import { prisma } from "@/lib/prisma";
 
 vi.mock("@/lib/revalidate-public", () => ({ revalidatePublicContent: vi.fn() }));
 
-/** Şikayət (#159, iş axını #195), elan təhvili və bağlanmış sövdələşmələr real D1-də. */
+/** Şikayət (#159, iş axını #195) və bağlanmış sövdələşmələr real D1-də (elan təhvili: agency-ownership.integration). */
 const DB = (env as unknown as { DB: D1Database }).DB;
 const MEDIA = (env as unknown as { MEDIA: R2Bucket }).MEDIA;
 /** PNG imzası — `sniffImageType()` yalnız ilk baytlara baxır; test mühitində `IMAGES` yoxdur, fayl olduğu kimi yazılır. */
@@ -254,18 +253,5 @@ describe("bağlanmış sövdələşmələr və aktiv təkliflər", () => {
 
     const active = await prisma.property.findMany({ where: { ...(await activeOfferWhere()), authorId: "rep-agent" }, select: { id: true } });
     expect(active.map((item) => item.id)).toEqual(["rep-live"]);
-  });
-});
-
-describe("agent komandadan çıxanda elan təhvili", () => {
-  it("silinməmiş bütün elanları yeni müəllifə keçirir", async () => {
-    const before = await countOwnListings(["rep-agent", "rep-owner"]);
-    expect(before.get("rep-agent")).toBe(6);
-    expect(before.get("rep-owner")).toBeUndefined();
-
-    await expect(handOverListings("rep-agent", "rep-owner")).resolves.toBe(6);
-    const after = await countOwnListings(["rep-agent", "rep-owner"]);
-    expect(after.get("rep-agent")).toBeUndefined();
-    expect(after.get("rep-owner")).toBe(6);
   });
 });

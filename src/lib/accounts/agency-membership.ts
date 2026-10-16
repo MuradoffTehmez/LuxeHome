@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, MAX_AGENCY_EMPLOYEES } from "@/lib/constants";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { openMembershipPeriod } from "@/lib/accounts/agency-ownership";
 
 /**
  * Agentlik komandasının ortaq qaydaları — kabinet (sahib), panel (admin) və qeydiyyat.
@@ -54,6 +55,7 @@ export async function commitMembershipDecision(input: {
 }): Promise<MembershipDecisionResult> {
   if (input.currentStatus === AGENCY_EMPLOYEE_STATUSES.APPROVED && input.approved) {
     await linkAgentProfileToAgency(input.userId, input.agencyId, true);
+    await openMembershipPeriod({ userId: input.userId, agencyId: input.agencyId });
     return "resumed";
   }
   const { count } = await prisma.agencyEmployee.updateMany({
@@ -76,6 +78,8 @@ export async function commitMembershipDecision(input: {
       .catch(() => undefined);
     throw error;
   }
+  // Üzvlük tarixçəsi (#210, PRD 6.6) — idempotent, xətası qərarı sındırmır.
+  await openMembershipPeriod({ userId: input.userId, agencyId: input.agencyId });
   return "done";
 }
 

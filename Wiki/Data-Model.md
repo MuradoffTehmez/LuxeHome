@@ -8,7 +8,7 @@
 
 | Domen | Modellər | Say |
 |---|---|---:|
-| İstifadəçi və auth | `User`, `Agency`, `AgencyEmployee`, `Session`, `BackupCode`, `Passkey`, `PhoneOtp`, `LoginAttempt`, `EmailVerificationToken`, `PasswordResetToken` | 10 |
+| İstifadəçi və auth | `User`, `Agency`, `AgencyEmployee`, `AgencyMembershipHistory`, `Session`, `BackupCode`, `Passkey`, `PhoneOtp`, `LoginAttempt`, `EmailVerificationToken`, `PasswordResetToken` | 11 |
 | Əmlak və taksonomiya | `PropertyType`, `Location`, `Feature`, `PropertyFeature`, `Property`, `PropertyImage`, `PropertyFloorPlan`, `PropertyPriceHistory`, `NearbyPlace`, `NeighborhoodProfile` | 10 |
 | Açıq qapı, rezervasiya, paketlər | `OpenHouse`, `OpenHouseRegistration`, `Reservation`, `ReservationEvent`, `ListingPackage`, `PackageOrder` | 6 |
 | Layihə və məzmun | `Project`, `ProjectUnit`, `ProjectImage`, `Service`, `BlogCategory`, `BlogPost`, `Testimonial` | 7 |
@@ -96,6 +96,10 @@ Həm staff, həm ictimai hesabların əsas modelidir.
 ### `AgencyEmployee`
 
 Agentlik sahibindən əlavə ən çox 50 komanda üzvünü (`MAX_AGENCY_EMPLOYEES`) saxlayır. `MANAGER`/`AGENT` rolu, `PENDING`/`APPROVED`/`REJECTED` statusu və `source` (`INVITE` — sahibin dəvəti, admin təsdiqləyir; `REQUEST` — agentin qoşulma sorğusu, sahib və ya admin təsdiqləyir, `0055`) var. Təsdiqdə agentin `AgentProfile.agencyId` sahəsi agentliyə bağlanır; təsdiqlənmiş əməkdaşın elanlarında agentliyin adı görünür.
+
+### Elan sahibliyi və `AgencyMembershipHistory` (#210)
+
+`Property.agencyId` elanın aid olduğu agentlikdir (agentlik adından yaradılıb, `null` — şəxsi və ya şirkət elanı), `Property.createdById` ilk yaradandır, `authorId` isə hazırkı idarəçi. Agent ayrılanda yalnız agentlik elanları sahibə və ya başqa agentə təhvil verilir; agentlik təklif sayı `agencyId`-dən hesablanır. `AgencyMembershipHistory` hər təsdiqlənmiş üzvlük dövrünü saxlayır: agentlik adı, rol, `joinedAt`/`leftAt`, `endReason` (`LEFT`/`REMOVED`), `handedOver` (miqrasiya `0066`).
 
 ### `Session`
 

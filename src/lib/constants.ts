@@ -523,9 +523,10 @@ export const REPORT_NOTE_MAX = 1000;
 export const REPORT_URGENT_THRESHOLD = 3;
 
 /**
- * Agent komandadan çıxanda onun elanlarının taleyi (#159): agentdə qalır, agentlik
- * sahibinə və ya başqa təsdiqlənmiş agentə təhvil verilir. Müraciətlər elana bağlıdır,
- * ona görə elanla birlikdə keçir.
+ * Agent komandadan çıxanda **agentlik elanlarının** taleyi (#159, #210): agentlik sahibinə və ya
+ * başqa təsdiqlənmiş agentə təhvil verilir. PRD 6.2-yə görə agentlik elanı agentlə getmir — `KEEP`
+ * yalnız köhnə client-lərdən gələ bilər və server onu `AGENCY` kimi qəbul edir. Agentin şəxsi
+ * elanları (`Property.agencyId = null`) həmişə onda qalır. Müraciətlər elanla birlikdə keçir.
  */
 export const LISTING_HANDOVER = {
   KEEP: "KEEP",
@@ -534,6 +535,25 @@ export const LISTING_HANDOVER = {
 } as const;
 
 export type ListingHandover = (typeof LISTING_HANDOVER)[keyof typeof LISTING_HANDOVER];
+
+/**
+ * Elanın sahibliyi (#210, PRD 6.2–6.3): agentlik adından (agentliyin mühitinə aid) və ya şəxsi.
+ * Agentlik sahibinin elanı həmişə agentlikdir; təsdiqlənmiş agent yaradanda seçir (defolt agentlik).
+ */
+export const LISTING_OWNERSHIP = {
+  AGENCY: "AGENCY",
+  PERSONAL: "PERSONAL",
+} as const;
+
+export type ListingOwnership = (typeof LISTING_OWNERSHIP)[keyof typeof LISTING_OWNERSHIP];
+
+/** Üzvlük dövrünün bitmə səbəbi (#210, PRD 6.6): agent özü çıxıb və ya sahib əməkdaşlığı dayandırıb. */
+export const MEMBERSHIP_END_REASONS = {
+  LEFT: "LEFT",
+  REMOVED: "REMOVED",
+} as const;
+
+export type MembershipEndReason = (typeof MEMBERSHIP_END_REASONS)[keyof typeof MEMBERSHIP_END_REASONS];
 
 export const RENOVATIONS = {
   NEW_BUILDING: "NEW_BUILDING",

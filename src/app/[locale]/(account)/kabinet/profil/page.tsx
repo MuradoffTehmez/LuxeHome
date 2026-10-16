@@ -19,6 +19,7 @@ import { isSmsConfigured } from "@/lib/sms";
 import { OfficeManager } from "./office-manager";
 import { ProfileCompletenessCard } from "./profile-completeness-card";
 import { getAgencyOffices, getOfficeCityOptions } from "@/lib/accounts/agency-offices";
+import { getUserMembershipHistory } from "@/lib/accounts/agency-ownership";
 import { agencyCompleteness, agentCompleteness } from "@/lib/accounts/profile-completeness";
 import { AlertTriangle } from "lucide-react";
 
@@ -104,11 +105,21 @@ export default async function CabinetProfilePage() {
       ? prisma.agencyEmployee.findFirst({
           where: { userId: user.id },
           orderBy: [{ approvedAt: { sort: "desc", nulls: "last" } }, { invitedAt: "desc" }],
-          select: { id: true, status: true, agency: { select: { name: true } } },
+          select: { id: true, status: true, agency: { select: { id: true, name: true } } },
         })
       : null,
     isAgent ? getAgencyDirectory() : [],
   ]);
+
+  // Agentlik elanları çıxanda agentlikdə qalır (#210) — dialoq onların sayını göstərir.
+  const [agencyListingCount, membershipHistory] = isAgent
+    ? await Promise.all([
+        membership?.status === "APPROVED"
+          ? prisma.property.count({ where: { authorId: user.id, deletedAt: null, agencyId: membership.agency.id } })
+          : 0,
+        getUserMembershipHistory(user.id),
+      ])
+    : [0, []];
 
   // Filiallar və şəhər siyahısı yalnız agentlik profili olanda (#157).
   const [offices, cities] = agency
@@ -286,8 +297,26 @@ export default async function CabinetProfilePage() {
                 }
               : null}
             agencies={agencyDirectory}
-            listingCount={listingCount}
+            listingCount={agencyListingCount}
           />
+          {membershipHistory.length > 0 && (
+            <div className="mt-6 border-t border-line pt-5">
+              <h3 className="text-sm font-semibold text-ink">{t("membershipHistory.title")}</h3>
+              <ul className="mt-3 flex flex-col gap-2">
+                {membershipHistory.map((period) => (
+                  <li key={period.id} className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-line px-3 py-2 text-sm">
+                    <span className="min-w-0 font-medium text-ink">{period.agencyName}</span>
+                    <span className="text-xs text-ink-muted">
+                      {formatLocalizedDate(period.joinedAt, locale)}
+                      {" — "}
+                      {period.leftAt ? formatLocalizedDate(period.leftAt, locale) : t("membershipHistory.current")}
+                      {period.endReason && ` · ${t(`membershipHistory.reason.${period.endReason === "REMOVED" ? "removed" : "left"}`)}`}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
       )}
 

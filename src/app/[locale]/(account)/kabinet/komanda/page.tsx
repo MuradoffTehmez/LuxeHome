@@ -10,8 +10,9 @@ import { InviteEmployeeForm, InviteLinkCard, LeadRoutingForm, ReceivesLeadsToggl
 import { forbidden } from "next/navigation";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
-import { formatLocalizedDateTime } from "@/i18n/date";
+import { formatLocalizedDate, formatLocalizedDateTime } from "@/i18n/date";
 import { countOwnListings } from "@/lib/accounts/agency-listings";
+import { getAgencyMembershipHistory } from "@/lib/accounts/agency-ownership";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -38,7 +39,13 @@ export default async function CabinetTeamPage() {
   const t = await getTranslations("account.team");
   // Çıxarılan agentin elanlarının taleyi üçün (#159): elan sayı və təhvil ala biləcək həmkarlar.
   const approved = employees.filter((employee) => employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED);
-  const listingCounts = await countOwnListings(approved.map((employee) => employee.user.id));
+  // Yalnız agentlik elanları — agentin şəxsi elanları ayrılmada onda qalır (#210).
+  const [listingCounts, history] = await Promise.all([
+    countOwnListings(approved.map((employee) => employee.user.id), agency?.id),
+    agency ? getAgencyMembershipHistory(agency.id) : [],
+  ]);
+  // Üzvlük tarixçəsi (#210, PRD 6.6): hazırkı üzvlər yuxarıda görünür, burada keçmiş dövrlər.
+  const pastMembers = history.filter((period) => period.leftAt);
 
   return (
     <div className="flex flex-col gap-8">
@@ -134,6 +141,26 @@ export default async function CabinetTeamPage() {
               </ul>
             )}
           </section>
+
+          {pastMembers.length > 0 && (
+            <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+              <h2 className="font-sans text-lg font-semibold text-ink">{t("history.title")}</h2>
+              <p className="mt-1 mb-4 max-w-2xl text-sm leading-6 text-ink-soft">{t("history.description")}</p>
+              <ul className="flex flex-col gap-2">
+                {pastMembers.map((period) => (
+                  <li key={period.id} className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-line px-3 py-2 text-sm">
+                    <span className="min-w-0 font-medium text-ink">{period.user.name}</span>
+                    <span className="text-xs text-ink-muted">
+                      {formatLocalizedDate(period.joinedAt, locale)} — {period.leftAt ? formatLocalizedDate(period.leftAt, locale) : ""}
+                      {" · "}
+                      {t(`history.reason.${period.endReason === "REMOVED" ? "removed" : "left"}`)}
+                      {period.handedOver > 0 && ` · ${t("history.handedOver", { count: period.handedOver })}`}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </>
       )}
     </div>

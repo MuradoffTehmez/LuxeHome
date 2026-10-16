@@ -1,18 +1,13 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { AlertCircle, Building2, CheckCircle2, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { ConfirmAction } from "@/components/admin/confirm-action";
-import { Modal } from "@/components/ui/modal";
-import { useToast } from "@/components/ui/toast";
 import { IDLE_STATE } from "@/lib/admin/action-state";
-import { LISTING_HANDOVER } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import { leaveAgency, requestAgencyJoin } from "./agency-actions";
 
 export type AgentMembership = {
@@ -32,7 +27,7 @@ export function AgencyMembershipCard({
 }: {
   membership: AgentMembership | null;
   agencies: { name: string; slug: string }[];
-  /** Agentin öz elanları — çıxanda agentliyə təhvil verilə bilər (#159). */
+  /** Agentin bu agentlikdəki elanları — çıxanda agentlikdə qalır (#210, PRD 6.2). */
   listingCount?: number;
 }) {
   const t = useTranslations("account.profile");
@@ -51,18 +46,20 @@ export function AgencyMembershipCard({
               {membership.status === "APPROVED" ? t("agencyApproved") : membership.status === "PENDING" ? t("agencyPending") : t("agencyRejected")}
             </Badge>
           </div>
-          {active && active.status === "APPROVED" && listingCount > 0 ? (
-            <LeaveWithListings id={active.id} agencyName={active.agencyName} listingCount={listingCount} />
-          ) : active && (
+          {active && (
             <ConfirmAction
               action={(id) => leaveAgency(id)}
               id={active.id}
               label={active.status === "APPROVED" ? t("agencyLeave") : t("agencyCancel")}
               title={active.status === "APPROVED" ? t("agencyLeave") : t("agencyCancel")}
-              description={t("agencyLeaveDescription", { name: active.agencyName })}
+              description={
+                active.status === "APPROVED" && listingCount > 0
+                  ? t("agencyLeaveWithListings", { name: active.agencyName, count: listingCount })
+                  : t("agencyLeaveDescription", { name: active.agencyName })
+              }
               confirmLabel={active.status === "APPROVED" ? t("agencyLeave") : t("agencyCancel")}
               tone="danger"
-              className="min-h-11 px-3 text-sm"
+              className="size-auto min-h-11 grid-flow-col gap-1.5 px-3 text-sm whitespace-nowrap"
             >
               <LogOut className="size-4" aria-hidden="true" />
               {active.status === "APPROVED" ? t("agencyLeave") : t("agencyCancel")}
@@ -109,90 +106,5 @@ export function AgencyMembershipCard({
         </p>
       )}
     </div>
-  );
-}
-
-/**
- * Elanı olan agentin agentlikdən çıxması (#159): elanlar agentdə qalır və ya agentliyə
- * təhvil verilir. Müraciətlər elana bağlıdır — elanla birlikdə keçir.
- */
-function LeaveWithListings({ id, agencyName, listingCount }: { id: string; agencyName: string; listingCount: number }) {
-  const t = useTranslations("account.profile");
-  const team = useTranslations("account.team.handover");
-  const { toast } = useToast();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [handOver, setHandOver] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
-
-  function submit() {
-    startTransition(async () => {
-      const result = await leaveAgency(id, handOver ? LISTING_HANDOVER.AGENCY : LISTING_HANDOVER.KEEP);
-      if (result.status !== "success") {
-        setError(result.message ?? team("failed"));
-        return;
-      }
-      if (result.message) toast(result.message, "success");
-      setOpen(false);
-      router.refresh();
-    });
-  }
-
-  const options = [
-    { value: false, label: team("keepOwn"), hint: team("keepOwnHint") },
-    { value: true, label: team("giveAgency", { name: agencyName }), hint: team("giveAgencyHint") },
-  ];
-
-  return (
-    <>
-      <Button type="button" variant="ghost" onClick={() => setOpen(true)} className="min-h-11 px-3 text-sm text-danger hover:bg-danger-bg">
-        <LogOut className="size-4" aria-hidden="true" />
-        {t("agencyLeave")}
-      </Button>
-      <Modal
-        open={open}
-        onClose={() => (pending ? undefined : setOpen(false))}
-        title={t("agencyLeave")}
-        description={t("agencyLeaveDescription", { name: agencyName })}
-        size="sm"
-        footer={
-          <>
-            <Button variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={pending}>
-              {team("cancel")}
-            </Button>
-            <Button variant="danger" size="sm" onClick={submit} loading={pending}>
-              {t("agencyLeave")}
-            </Button>
-          </>
-        }
-      >
-        <fieldset className="flex flex-col gap-2">
-          <legend className="mb-2 text-sm font-medium text-ink">{team("question", { count: listingCount })}</legend>
-          {options.map((option) => (
-            <label
-              key={String(option.value)}
-              className={cn(
-                "flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors",
-                handOver === option.value ? "border-gold bg-gold/10" : "border-line hover:border-gold",
-              )}
-            >
-              <input
-                type="radio"
-                name={`leave-${id}`}
-                checked={handOver === option.value}
-                onChange={() => setHandOver(option.value)}
-                className="mt-0.5 size-4 accent-gold"
-              />
-              <span className="min-w-0">
-                <span className="block text-sm font-medium text-ink">{option.label}</span>
-                <span className="block text-xs text-ink-muted">{option.hint}</span>
-              </span>
-            </label>
-          ))}
-          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-        </fieldset>
-      </Modal>
-    </>
   );
 }

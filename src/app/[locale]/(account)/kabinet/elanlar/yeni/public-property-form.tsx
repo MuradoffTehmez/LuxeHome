@@ -25,6 +25,7 @@ import {
   CURRENCY_LABELS,
   DOCUMENT_STATUSES,
   FEATURE_GROUPS,
+  LISTING_OWNERSHIP,
   LISTING_TYPES,
   MAX_PROPERTY_IMAGES,
   PRICE_PERIODS,
@@ -156,6 +157,7 @@ export function PublicPropertyForm({
   initial: sourceInitial,
   submitLabel,
   contact,
+  ownershipAgency = null,
   draftKey,
   editing = false,
 }: {
@@ -164,6 +166,8 @@ export function PublicPropertyForm({
   initial?: PublicPropertyFormInitial;
   submitLabel?: string;
   contact: ListingContact;
+  /** Təsdiqlənmiş agentin agentliyi (#210) — yeni elanda «agentlik adından / şəxsi» seçimi üçün. */
+  ownershipAgency?: string | null;
   /** Yalnız yeni elanda verilir — redaktədə qaralama saxlanmır. */
   draftKey?: string;
   editing?: boolean;
@@ -179,6 +183,7 @@ export function PublicPropertyForm({
       initial={initial}
       submitLabel={submitLabel}
       contact={contact}
+      ownershipAgency={ownershipAgency}
       draftKey={draftKey}
       editing={editing}
       restoredStep={version > 0 ? restoredStep : null}
@@ -197,6 +202,7 @@ function PublicPropertyWizard({
   initial,
   submitLabel,
   contact,
+  ownershipAgency,
   draftKey,
   editing,
   restoredStep,
@@ -207,6 +213,7 @@ function PublicPropertyWizard({
   initial?: PublicPropertyFormInitial;
   submitLabel?: string;
   contact: ListingContact;
+  ownershipAgency: string | null;
   draftKey?: string;
   editing: boolean;
   /** Qaralamadan bərpa olunubsa — həmin addımdan davam edilir. */
@@ -534,6 +541,25 @@ function PublicPropertyWizard({
                 </div>
               </dl>
             </FullWidth>
+            {ownershipAgency && !editing && (
+              <FullWidth>
+                <fieldset className="flex flex-col gap-2">
+                  <legend className="mb-1 text-sm font-medium text-ink">{t("ownership.legend")}</legend>
+                  {([
+                    [LISTING_OWNERSHIP.AGENCY, t("ownership.agency", { name: ownershipAgency }), t("ownership.agencyHint")],
+                    [LISTING_OWNERSHIP.PERSONAL, t("ownership.personal"), t("ownership.personalHint")],
+                  ] as const).map(([value, label, hint]) => (
+                    <label key={value} className="flex cursor-pointer items-start gap-3 rounded-sm border border-line p-3 transition-colors has-[:checked]:border-gold has-[:checked]:bg-gold/10 hover:border-gold">
+                      <input type="radio" name="ownership" value={value} defaultChecked={value === LISTING_OWNERSHIP.AGENCY} className="mt-0.5 size-4 accent-gold" />
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium text-ink">{label}</span>
+                        <span className="block text-xs text-ink-muted">{hint}</span>
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
+              </FullWidth>
+            )}
             <FullWidth>
               {!contact.phone && (
                 <p role="note" className="mb-2 rounded-sm border border-warning/30 bg-warning-bg px-3 py-2 text-sm text-ink">
