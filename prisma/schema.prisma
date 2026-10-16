@@ -110,9 +110,10 @@ model User {
 
   knowledgeArticles KnowledgeArticle[] @relation("KnowledgeArticleAuthor")
 
-  listingReports         ListingReport[] @relation("ListingReportReporter")
-  listingReportsResolved ListingReport[] @relation("ListingReportResolver")
-  listingReportsAssigned ListingReport[] @relation("ListingReportAssignee")
+  listingReports         ListingReport[]     @relation("ListingReportReporter")
+  listingReportsResolved ListingReport[]     @relation("ListingReportResolver")
+  listingReportsAssigned ListingReport[]     @relation("ListingReportAssignee")
+  listingReportNotes     ListingReportNote[]
 
   @@index([role])
   @@index([accountType])
@@ -632,6 +633,7 @@ model Property {
   nearbyPlaces       NearbyPlace[]
   aiContentDrafts    AiContentDraft[]
   reports            ListingReport[]
+  reportNotes        ListingReportNote[]
   dailyStats         PropertyDailyStat[]
 
   projectId String?
@@ -2084,6 +2086,21 @@ model ListingReportEvidence {
   report ListingReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
   @@index([reportId])
+}
+
+/// Şikayət qrupu (elan) üzrə moderatorun daxili qeydi (#197). Yalnız paneldə görünür —
+/// şikayətçiyə, elan sahibinə və «Şikayətlərim» səhifəsinə heç vaxt çıxmır.
+model ListingReportNote {
+  id         String   @id @default(cuid())
+  propertyId String
+  authorId   String?
+  body       String
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  author   User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([propertyId, createdAt])
 }
 
 /// Elanın gündəlik statistikası (#161, kabinet analitikası). Gün Bakı vaxtı ilə «YYYY-MM-DD».

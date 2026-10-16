@@ -10,6 +10,8 @@ import {
   PROPERTY_STATUSES,
   REJECTION_REASON_MAX,
   REJECTION_REASON_MIN,
+  REPORT_NOTE_MAX,
+  REPORT_NOTE_MIN,
   REPORT_RESOLUTIONS,
   REPORT_STATUSES,
   type ReportResolution,
@@ -31,6 +33,7 @@ import {
 } from "@/lib/accounts/account-notices";
 import {
   activeReporterIds,
+  addReportNote,
   assignActiveReports,
   parseReportCycleId,
   reopenDecidedReports,
@@ -255,6 +258,25 @@ export async function reopenListingReports(cycleId: string): Promise<ActionState
     return success(msg("server.reports.yenidenAcildi"));
   } catch (error) {
     return unexpected("şikayət yenidən açılmadı", error, msg("server.common.unexpected"));
+  }
+}
+
+/** Moderatorun daxili qeydi (#197) — şikayətçiyə və elan sahibinə göstərilmir, audit jurnalına düşür. */
+export async function addListingReportNote(propertyId: string, body: string): Promise<ActionState> {
+  const actor = await guard();
+  if (isFailure(actor)) return actor;
+  const text = typeof body === "string" ? body.trim() : "";
+  if (text.length < REPORT_NOTE_MIN || text.length > REPORT_NOTE_MAX) {
+    return failure(msg("server.reports.qeydUzunlugu", { min: REPORT_NOTE_MIN, max: REPORT_NOTE_MAX }));
+  }
+  try {
+    const property = await addReportNote({ propertyId: String(propertyId).slice(0, 40), authorId: actor.id, body: text });
+    if (!property) return failure(msg("server.reports.elanTapilmadi"));
+    await recordAudit(actor, "UPDATE", "Property", property.id, `${property.title} — şikayət üzrə daxili qeyd əlavə edildi`);
+    afterChange();
+    return success(msg("server.reports.qeydElaveEdildi"));
+  } catch (error) {
+    return unexpected("şikayət qeydi yazılmadı", error, msg("server.common.unexpected"));
   }
 }
 

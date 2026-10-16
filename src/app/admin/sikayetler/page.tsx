@@ -7,6 +7,7 @@ import {
   Flag,
   UserCheck,
   MessageCircleQuestion,
+  NotebookPen,
   Pencil,
   RotateCcw,
   ShieldOff,
@@ -37,7 +38,9 @@ import {
 import { cn, formatDateTime } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { AssignReportsSelect } from "./assign-select";
+import { ReportNoteForm } from "./note-form";
 import {
+  addListingReportNote,
   archiveReportedListing,
   assignListingReports,
   closeListingReports,
@@ -266,7 +269,28 @@ export default async function AdminReportsPage({
                             <UserCheck className="size-4" aria-hidden="true" />
                           </ConfirmAction>
                         )}
-                        {!active && decision && (
+                        <section aria-label={t("pages.reports.notesTitle")} className="flex flex-col gap-2 rounded-sm border border-dashed border-line-strong px-3 py-3">
+                    <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+                      <NotebookPen className="size-3.5" aria-hidden="true" />
+                      {t("pages.reports.notesTitle")}
+                      <span className="font-normal normal-case tracking-normal">· {t("pages.reports.notesPrivate")}</span>
+                    </h3>
+                    {group.notes.length > 0 && (
+                      <ul className="flex flex-col gap-1.5">
+                        {group.notes.map((note) => (
+                          <li key={note.id} className="text-sm text-ink-soft [overflow-wrap:anywhere]">
+                            <span className="whitespace-pre-line">{note.body}</span>
+                            <span className="ml-2 text-xs text-ink-muted">
+                              {note.author?.name ?? t("pages.reports.noteDeletedAuthor")} · {formatDateTime(note.createdAt)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <ReportNoteForm propertyId={property.id} action={addListingReportNote} />
+                  </section>
+
+                  {!active && decision && (
                           <ConfirmAction
                             action={reopenListingReports}
                             id={decision.cycleId}

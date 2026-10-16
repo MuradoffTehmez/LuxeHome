@@ -442,6 +442,10 @@ export const REPORT_EVIDENCE_MAX_BYTES = 300 * 1024;
 
 export const REPORT_MESSAGE_MAX = 1000;
 
+/** Moderatorun daxili qeydi (#197) — yalnız paneldə görünür. */
+export const REPORT_NOTE_MIN = 2;
+export const REPORT_NOTE_MAX = 1000;
+
 /** Bu sayda açıq şikayəti olan elan növbədə «təcili» nişanı alır. */
 export const REPORT_URGENT_THRESHOLD = 3;
 
