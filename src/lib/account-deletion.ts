@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES } from "@/lib/constants";
 import { recordPropertyStatusChanges } from "@/lib/property-status-history";
 import { recordDomainEvent } from "@/lib/admin/events";
+import { handOverListings } from "@/lib/accounts/agency-listings";
 
 /**
  * D1 transaction dəstəkləmir. Ona görə silinmənin ilk atomik addımı hesabı
@@ -36,15 +37,28 @@ export async function finalizeAccountDeletion(userId: string, now = new Date()):
 
   const listings = await prisma.property.findMany({
     where: { authorId: userId, deletedAt: null },
-    select: { id: true, status: true },
+    select: { id: true, status: true, agencyId: true },
   });
+  // Agentlik elanı agentin hesabı ilə silinmir (#210, PRD 6.2): sahibinə keçir. Agentlik sahibinin
+  // öz hesabı silinəndə isə agentlik də gedir — onun elanları adi qaydada arxivlənir.
+  const agencyIds = [...new Set(listings.flatMap((listing) => (listing.agencyId ? [listing.agencyId] : [])))];
+  const handedAgencies = new Set<string>();
+  if (agencyIds.length > 0) {
+    const agencies = await prisma.agency.findMany({ where: { id: { in: agencyIds } }, select: { id: true, userId: true } });
+    for (const agency of agencies) {
+      if (agency.userId === userId) continue;
+      await handOverListings(userId, agency.userId, agency.id);
+      handedAgencies.add(agency.id);
+    }
+  }
+  const archived = listings.filter((listing) => !listing.agencyId || !handedAgencies.has(listing.agencyId));
   await prisma.property.updateMany({
     where: { authorId: userId, deletedAt: null },
     data: { deletedAt: now, status: PROPERTY_STATUSES.ARCHIVED },
   });
   // Tarixçə (#204) hesab silinməzdən əvvəl yazılır; icraçı göstərilmir — hesab birazdan silinir.
   await recordPropertyStatusChanges(
-    listings.map((listing) => ({ propertyId: listing.id, from: listing.status })),
+    archived.map((listing) => ({ propertyId: listing.id, from: listing.status })),
     { to: PROPERTY_STATUSES.ARCHIVED, source: PROPERTY_STATUS_SOURCES.SYSTEM, note: "Hesab silindi" },
   );
   await prisma.user.delete({ where: { id: userId } });

@@ -96,6 +96,8 @@ export type PublicPropertyFormInitial = {
   virtualTourUrl?: string | null;
   featureIds: string[];
   images: DropzoneImage[];
+  /** Qaralamadan bərpa olunan sahiblik seçimi (#210) — «Şəxsi» seçimi səssizcə agentliyə dönməsin. */
+  ownership?: string | null;
 };
 
 export type ListingContact = {
@@ -140,6 +142,7 @@ function initialFromDraft(draft: FormDraft): PublicPropertyFormInitial {
     virtualTourUrl: optional("virtualTourUrl"),
     featureIds: read.all("featureIds"),
     images: read.json<DropzoneImage>("images"),
+    ownership: optional("ownership"),
   };
 }
 
@@ -550,7 +553,7 @@ function PublicPropertyWizard({
                     [LISTING_OWNERSHIP.PERSONAL, t("ownership.personal"), t("ownership.personalHint")],
                   ] as const).map(([value, label, hint]) => (
                     <label key={value} className="flex cursor-pointer items-start gap-3 rounded-sm border border-line p-3 transition-colors has-[:checked]:border-gold has-[:checked]:bg-gold/10 hover:border-gold">
-                      <input type="radio" name="ownership" value={value} defaultChecked={value === LISTING_OWNERSHIP.AGENCY} className="mt-0.5 size-4 accent-gold" />
+                      <input type="radio" name="ownership" value={value} defaultChecked={value === (initial?.ownership === LISTING_OWNERSHIP.PERSONAL ? LISTING_OWNERSHIP.PERSONAL : LISTING_OWNERSHIP.AGENCY)} className="mt-0.5 size-4 accent-gold" />
                       <span className="min-w-0">
                         <span className="block text-sm font-medium text-ink">{label}</span>
                         <span className="block text-xs text-ink-muted">{hint}</span>

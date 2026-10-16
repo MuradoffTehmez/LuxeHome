@@ -10,6 +10,7 @@ import {
   resolveNewListingAgencyId,
 } from "@/lib/accounts/agency-ownership";
 import { countAgencyOffers } from "@/lib/agency-profile";
+import { requestAccountDeletion } from "@/lib/account-deletion";
 import { prisma } from "@/lib/prisma";
 
 vi.mock("@/lib/revalidate-public", () => ({ revalidatePublicContent: vi.fn() }));
@@ -34,14 +35,18 @@ beforeAll(async () => {
     user.bind("own-agent", "Agent", "own-agent@example.test", "disabled", "EDITOR", "AGENT"),
     user.bind("own-agent2", "Agent 2", "own-agent2@example.test", "disabled", "EDITOR", "AGENT"),
     user.bind("own-solo", "Müstəqil", "own-solo@example.test", "disabled", "EDITOR", "AGENT"),
+    user.bind("own-leaver", "Silinən agent", "own-leaver@example.test", "disabled", "EDITOR", "AGENT"),
     DB.prepare('INSERT INTO "Agency" ("id", "userId", "name", "slug", "isVerified", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)').bind("own-agency", "own-owner", "Ev Agentliyi", "own-ev"),
     DB.prepare('INSERT INTO "Agency" ("id", "userId", "name", "slug", "isVerified", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)').bind("own-other", "own-solo", "Başqa", "own-basqa"),
     employee.bind("own-emp", "own-agency", "own-agent", AGENCY_EMPLOYEE_STATUSES.APPROVED),
     employee.bind("own-emp2", "own-agency", "own-agent2", AGENCY_EMPLOYEE_STATUSES.APPROVED),
+    employee.bind("own-emp3", "own-agency", "own-leaver", AGENCY_EMPLOYEE_STATUSES.APPROVED),
     DB.prepare('INSERT INTO "AgentProfile" ("id", "userId", "slug", "name", "agencyId", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)').bind("own-profile", "own-agent", "own-agent", "Agent", "own-agency"),
     property.bind("own-p-agency", "Agentlik elanı", "own-p-agency", PROPERTY_STATUSES.PUBLISHED, "own-agent", "own-agency", null),
     property.bind("own-p-draft", "Agentlik qaralaması", "own-p-draft", PROPERTY_STATUSES.DRAFT, "own-agent", "own-agency", null),
     property.bind("own-p-personal", "Şəxsi elan", "own-p-personal", PROPERTY_STATUSES.PUBLISHED, "own-agent", null, null),
+    property.bind("own-p-leaver-agency", "Silinənin agentlik elanı", "own-p-leaver-agency", PROPERTY_STATUSES.PUBLISHED, "own-leaver", "own-agency", null),
+    property.bind("own-p-leaver-own", "Silinənin şəxsi elanı", "own-p-leaver-own", PROPERTY_STATUSES.PUBLISHED, "own-leaver", null, null),
     property.bind("own-p-assigned", "Sahibin elanı", "own-p-assigned", PROPERTY_STATUSES.PUBLISHED, "own-owner", "own-agency", "own-profile"),
   ]);
 });
@@ -61,7 +66,7 @@ describe("yeni elanın sahibliyi", () => {
 describe("agentlik təklifləri", () => {
   it("yalnız agentliyin mühitinə aid aktiv elanları sayır, agentin şəxsi elanını yox", async () => {
     const stats = await countAgencyOffers([{ id: "own-agency", userId: "own-owner" }]);
-    expect(stats.get("own-agency")).toEqual({ total: 2, sale: 2, rent: 0 });
+    expect(stats.get("own-agency")).toEqual({ total: 3, sale: 3, rent: 0 });
   });
 });
 
@@ -108,5 +113,20 @@ describe("üzvlük tarixçəsi", () => {
     const agencyHistory = await getAgencyMembershipHistory("own-agency");
     expect(agencyHistory.map((item) => item.user.id).sort()).toEqual(["own-agent", "own-agent2"]);
     expect(await getAgencyMembershipHistory("own-other")).toEqual([]);
+  });
+});
+
+describe("agentin hesabı silinəndə", () => {
+  it("agentlik elanı sahibə keçir, yalnız şəxsi elan arxivlənir", async () => {
+    await expect(requestAccountDeletion("own-leaver")).resolves.toEqual({ finalized: true });
+    const rows = await prisma.property.findMany({
+      where: { id: { in: ["own-p-leaver-agency", "own-p-leaver-own"] } },
+      select: { id: true, authorId: true, deletedAt: true, status: true },
+    });
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    expect(byId.get("own-p-leaver-agency")).toMatchObject({ authorId: "own-owner", deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED });
+    expect(byId.get("own-p-leaver-own")?.deletedAt).toBeInstanceOf(Date);
+    expect(byId.get("own-p-leaver-own")?.status).toBe(PROPERTY_STATUSES.ARCHIVED);
+    await expect(prisma.user.findUnique({ where: { id: "own-leaver" } })).resolves.toBeNull();
   });
 });

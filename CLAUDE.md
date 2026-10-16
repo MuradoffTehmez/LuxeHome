@@ -765,7 +765,8 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   köhnə `KEEP` `AGENCY` sayılır; agentə təyinat (`assignedAgentId`) da götürülür. Şəxsi elanlar agentdə qalır. Təhvil
   üzvlük silinməzdən **əvvəl** gedir (alınmasa üzvlük qalır, təkrar cəhd mümkündür); agent özü çıxanda agentlik elanları
   avtomatik sahibə keçir. Hədəf `resolveHandoverTarget()` ilə yoxlanır — kənar id qəbul olunmur. Müraciət, şəkil, paket
-  elana bağlıdır, elanla keçir. Sahibin analitikası da yalnız agentlik elanlarını göstərir. Mövcud elanlar `0066`-da
+  elana bağlıdır, elanla keçir. Agentin hesabı silinəndə də (`finalizeAccountDeletion`) agentlik elanları sahibə keçir,
+  yalnız şəxsi elanlar arxivlənir. Sahibin analitikası da yalnız agentlik elanlarını göstərir. Mövcud elanlar `0066`-da
   agentlik sayılıb (sahibin və təsdiqlənmiş agentin elanı) — əvvəl fərq saxlanmırdı.
 - **Üzvlük tarixçəsi** `AgencyMembershipHistory` (PRD 6.6): hər təsdiqlənmiş üzvlük dövrü bir sətir — agentlik adı
   (snapshot), rol, qoşulma/ayrılma, səbəb (`MEMBERSHIP_END_REASONS`: `LEFT`/`REMOVED`), təhvil sayı. Təsdiqdə
