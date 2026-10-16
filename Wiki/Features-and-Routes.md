@@ -92,7 +92,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
   - «Uğurlu sövdələşmələr» — son 12 ayın satış/icarəsi və son bağlanmış elanlar (təklif sayına yalnız aktiv elanlar düşür).
 - Paylaşım kartı `/api/og/agency/<slug>?l=az` — loqo, ad və təklif/agent sayı ilə 1200×630.
 - Agentin elan sayı və səhifəsi öz yerləşdirdiyi və ona təyin edilmiş aktiv elanları birlikdə göstərir; bağlanmışlar «Uğurlu sövdələşmələr»dədir.
-- Elan detalında «Elandan şikayət et» (səbəb + izah, Turnstile) və ictimai hesabın elanında təhlükəsizlik məsləhətləri.
+- Elan detalında «Elandan şikayət et» (15 səbəbdən bir neçəsi, izah, Turnstile; daxil olmuş istifadəçi 3-ə qədər sübut şəkli əlavə edir və qərar barədə bildiriş alır; şikayətlərini `/kabinet/sikayetlerim`-də izləyir) və ictimai hesabın elanında təhlükəsizlik məsləhətləri.
 - Elan səhifəsindən gələn müraciət elana bağlanır və ictimai hesabın elanında sahibin `/kabinet/muracietler` bölməsinə düşür.
 - Agentliyin elanına və agentlik profilindəki «Agentliyə müraciət» formasına gələn müraciət bölgü ilə agentə düşür (növbə ilə / ərazi üzrə / söndürülü); 30 dəqiqə cavabsız qalan sahibə bildirilir.
 - Agentlik profilində reytinq (agentlərin və agentliyin rəyləri), son rəylər və «Tez cavab verir» nişanı; agent kartında da eyni nişan.
@@ -121,6 +121,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/rezervasiyalar` | Rezervasiyalar |
 | `/kabinet/axtarislarim` | Saxlanmış axtarışlar və tezlik |
 | `/kabinet/bildirisler` | Bildirişlər, kanal seçimləri, sakit saatlar |
+| `/kabinet/sikayetlerim` | Göndərilmiş elan şikayətləri, mərhələ və nəticə (moderator qeydləri görünmür) |
 | `/kabinet/son-baxilanlar`, `/kabinet/tovsiyeler` | Son baxılanlar və fərdi tövsiyələr |
 | `/kabinet/komanda` | Agentlik komandası (ən çox 50 üzv), e-poçtla dəvət, dəvət linki, çıxarılan agentin elanlarının təhvili |
 | `/qosul/<token>` | Agentliyin dəvət linki: agent birbaşa komandaya qoşulur, qonaq agent kimi qeydiyyata yönəlir |
@@ -167,7 +168,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/emlaklar/yeni`, `/[id]` | 8 addımlı sehrbaz, iyerarxik ünvan, metro/nişangah, rəsmi küçə təklifi, AI SEO/ALT | `property:manage` |
 | `/admin/emlaklar/idxal` | CSV idxalı (həmişə DRAFT, 10-luq partiyalar, dublikat/davam etmə; `metro` və `landmark` sütunları şəhərin öz stansiya/nişangahları arasında axtarılır) | `property:manage` |
 | `/admin/moderation` | Pending elanlar, approve/reject, avtomatik risk balı və siqnallar | `property:manage` |
-| `/admin/sikayetler` | Elan şikayətləri: dayandır, bağla, həll et, əsassız say | `property:manage` |
+| `/admin/sikayetler` | Elan şikayətləri: mərhələ tabları, göstəricilər, moderatora təyin, sahibdən izahat, gizlət/bağla/düzəldilib/rədd/bağla, yenidən bax, sübut şəkilləri, daxili qeydlər | `property:manage` |
 | `/admin/layiheler`, `/yeni`, `/[id]` | Layihə CRUD və şəkillər | `project:manage` |
 | `/admin/layiheler/[id]/menziller` | Mənzil şahmatı generatoru (blok/mərtəbə/nömrə) | `project:manage` |
 | `/admin/xidmetler`, `/yeni`, `/[id]` | Xidmət CRUD | `service:manage` |

@@ -8,7 +8,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { requireStaff } from "@/lib/auth/guard";
 import { getAdminI18n, getAdminMetadataT } from "@/lib/admin-i18n";
 import { prisma } from "@/lib/prisma";
-import { LEAD_STATUSES, PROPERTY_STATUSES, REPORT_STATUSES } from "@/lib/constants";
+import { ACTIVE_REPORT_STATUSES, LEAD_STATUSES, PROPERTY_STATUSES } from "@/lib/constants";
 import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 import { getApprovalCounts } from "@/lib/admin/approvals";
 
@@ -59,7 +59,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     prisma.property.count({ where: { status: PROPERTY_STATUSES.DRAFT, deletedAt: null } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.PENDING, deletedAt: null } }),
     getApprovalCounts(),
-    prisma.listingReport.count({ where: { status: REPORT_STATUSES.OPEN } }),
+    prisma.listingReport.count({ where: { status: { in: [...ACTIVE_REPORT_STATUSES] } } }),
   ]);
 
   return (

@@ -74,11 +74,15 @@ export async function purgeMediaCache(pathnames: string[]): Promise<void> {
 // olduğunu yoxlamaq gələcək dəyişikliklərdə də qorunma verir.
 const MEDIA_KEY = /^[a-z0-9/_-]+\.(jpg|png|webp|avif)$/i;
 const MEDIA_PREFIX = "/media/";
+/** `storage.ts`-dəki `PRIVATE_MEDIA_PREFIX` ilə eynidir — worker bundle-ı Images/R2 yükləmə qatını idxal etməsin deyə burada təkrarlanır. */
+const PRIVATE_KEY_PREFIX = "private/";
 
 /** `/media/emlaklar/2026/10/x.webp` → `emlaklar/2026/10/x.webp`; uyğun deyilsə `null`. */
 export function mediaKeyFromPath(pathname: string): string | null {
   if (!pathname.startsWith(MEDIA_PREFIX)) return null;
   const key = pathname.slice(MEDIA_PREFIX.length);
+  // `private/` — şikayət sübutları kimi məxfi fayllar (#195): ictimai marşrut onları vermir.
+  if (key.toLowerCase().startsWith(PRIVATE_KEY_PREFIX)) return null;
   return MEDIA_KEY.test(key) ? key : null;
 }
 

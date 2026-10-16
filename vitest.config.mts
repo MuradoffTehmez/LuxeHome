@@ -69,6 +69,8 @@ export default defineConfig({
               compatibilityDate: "2026-08-20",
               compatibilityFlags: ["nodejs_compat"],
               d1Databases: ["DB"],
+              // Şikayət sübutları (#195) R2-nin məxfi prefiksinə yazılır.
+              r2Buckets: ["MEDIA"],
               bindings: { TEST_MIGRATIONS: await readD1Migrations(fileURLToPath(new URL("./migrations", import.meta.url))) },
             },
           })),

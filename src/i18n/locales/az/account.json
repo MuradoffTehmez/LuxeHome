@@ -776,5 +776,44 @@
       "reserved": "Rezerv",
       "inactive": "Dərcdə deyil"
     }
+  },
+  "reports": {
+    "metaTitle": "Şikayətlərim",
+    "metaDescription": "Göndərdiyiniz elan şikayətləri və onların vəziyyəti.",
+    "eyebrow": "Kabinet",
+    "title": "Şikayətlərim",
+    "count": "{count, plural, =0 {Hələ şikayət göndərməmisiniz} other {# şikayət, {active} hələ baxılır}}",
+    "emptyTitle": "Şikayət yoxdur",
+    "emptyDescription": "Şübhəli elan görsəniz, elan səhifəsindəki «Elandan şikayət et» düyməsi ilə bildirin. Şikayətin vəziyyətini burada izləyəcəksiniz.",
+    "emptyAction": "Elanlara bax",
+    "sentAt": "Göndərilib: {date}",
+    "decidedAt": "Qərar tarixi: {date}.",
+    "listingRemoved": "Elan silinib",
+    "listingNotPublic": "elan artıq saytda deyil",
+    "reasons": "Səbəblər",
+    "evidence": "{count, plural, one {# sübut şəkli} other {# sübut şəkli}}",
+    "legacyReasons": {
+      "WRONG_INFO": "Ünvan, foto və ya məlumat yanlışdır",
+      "NOT_OWNER": "Vasitəçi özünü mülkiyyətçi kimi təqdim edir"
+    },
+    "status": {
+      "OPEN": "Qəbul olunub",
+      "IN_REVIEW": "Yoxlanılır",
+      "NEEDS_INFO": "Yoxlanılır",
+      "RESOLVED": "Təsdiqlənib",
+      "DISMISSED": "Təsdiqlənmədi",
+      "CLOSED": "Bağlanıb"
+    },
+    "stage": {
+      "OPEN": "Şikayətiniz qəbul olunub və moderator növbəsindədir.",
+      "IN_REVIEW": "Moderator şikayəti yoxlayır.",
+      "NEEDS_INFO": "Moderator elan sahibindən əlavə məlumat gözləyir."
+    },
+    "outcome": {
+      "RESOLVED": "Şikayətiniz təsdiqləndi və elana tədbir görüldü. Təşəkkür edirik.",
+      "DISMISSED": "Şikayət yoxlanıldı, amma pozuntu təsdiqlənmədi.",
+      "CLOSED": "Şikayət bağlandı — elan artıq aktual deyil."
+    },
+    "privacy": "Elan sahibi şikayət edəni görmür. Moderatorun daxili qeydləri və elan sahibi ilə yazışma burada göstərilmir."
   }
 }

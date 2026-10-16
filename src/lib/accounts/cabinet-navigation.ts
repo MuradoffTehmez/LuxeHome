@@ -9,6 +9,7 @@ export type CabinetNavItem = {
     | "team"
     | "saved-searches"
     | "notifications"
+    | "reports"
     | "reservations"
     | "recommendations"
     | "recently-viewed"
@@ -36,6 +37,7 @@ const TEAM_ITEM: CabinetNavItem = { id: "team", href: "/kabinet/komanda", label:
 const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
   { id: "saved-searches", href: "/kabinet/axtarislarim", label: "Saxlanmış axtarışlarım" },
   { id: "notifications", href: "/kabinet/bildirisler", label: "Bildirişlər" },
+  { id: "reports", href: "/kabinet/sikayetlerim", label: "Şikayətlərim" },
   { id: "reservations", href: "/kabinet/rezervasiyalar", label: "Rezervasiyalarım" },
   { id: "recommendations", href: "/kabinet/tovsiyeler", label: "Sizin üçün" },
   { id: "recently-viewed", href: "/kabinet/son-baxilanlar", label: "Son baxılanlar" },
@@ -65,6 +67,7 @@ export type CabinetCrumb = {
     | "team"
     | "savedSearches"
     | "notifications"
+    | "reports"
     | "reservations"
     | "recommendations"
     | "recentlyViewed"
@@ -79,6 +82,7 @@ const CRUMB_SEGMENTS: Record<string, CabinetCrumb["labelKey"]> = {
   komanda: "team",
   axtarislarim: "savedSearches",
   bildirisler: "notifications",
+  sikayetlerim: "reports",
   rezervasiyalar: "reservations",
   tovsiyeler: "recommendations",
   "son-baxilanlar": "recentlyViewed",

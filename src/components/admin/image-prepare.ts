@@ -45,10 +45,14 @@ function isServerType(type: string): boolean {
 }
 
 /** Yenidən kodlaşdırma lazımdırmı? `dims` yoxdursa yalnız format və ölçüyə baxılır. */
-export function needsReencode(file: FileLike, dims?: { width: number; height: number }): boolean {
+export function needsReencode(
+  file: FileLike,
+  dims?: { width: number; height: number },
+  maxDimension = PREPARE_MAX_DIMENSION,
+): boolean {
   if (!isServerType(file.type)) return true;
   if (file.size > PREPARE_PASSTHROUGH_BYTES) return true;
-  return Boolean(dims && Math.max(dims.width, dims.height) > PREPARE_MAX_DIMENSION);
+  return Boolean(dims && Math.max(dims.width, dims.height) > maxDimension);
 }
 
 /** Nisbəti qoruyaraq uzun tərəfi `max`-a endirir; kiçik şəkli böyütmür. */
@@ -95,8 +99,14 @@ function encode(canvas: Canvas, type: string, quality: number): Promise<Blob | n
  *
  * Brauzer şəkli aça bilmirsə (məsələn, Chrome-da HEIC) və format server
  * allowlist-indədirsə, fayl olduğu kimi göndərilir — son qərarı server verir.
+ * `maxDimension` kiçik limitli yükləmələr üçündür (şikayət sübutu, #195): 300 KB-a
+ * 2400 px-lik şəkil sığmır, uzun tərəf əvvəlcədən kiçildilir.
  */
-export async function prepareImageForUpload(file: File, maxBytes: number): Promise<File> {
+export async function prepareImageForUpload(
+  file: File,
+  maxBytes: number,
+  { maxDimension = PREPARE_MAX_DIMENSION }: { maxDimension?: number } = {},
+): Promise<File> {
   if (typeof createImageBitmap !== "function") return file;
 
   let bitmap: ImageBitmap;
@@ -108,9 +118,10 @@ export async function prepareImageForUpload(file: File, maxBytes: number): Promi
   }
 
   try {
-    if (!needsReencode(file, bitmap)) return file;
+    // Keçid həddindən kiçik, amma bu yükləmənin limitindən böyük fayl da kodlaşdırılmalıdır.
+    if (!needsReencode(file, bitmap, maxDimension) && file.size <= maxBytes) return file;
 
-    const size = fitWithin(bitmap.width, bitmap.height);
+    const size = fitWithin(bitmap.width, bitmap.height, maxDimension);
     const canvas = createCanvas(size.width, size.height);
     const context = canvas.getContext("2d") as
       | CanvasRenderingContext2D

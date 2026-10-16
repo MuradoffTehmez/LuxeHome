@@ -14,6 +14,9 @@ import { localizePath } from "@/i18n/path-locale";
  * bildiriş xətası onu uğursuz göstərməməlidir.
  */
 
+/** Şikayətçiyə bildirilən nəticə (#195). */
+export type ReportOutcome = "confirmed" | "dismissed" | "closed";
+
 const localeOf = (value: string | null | undefined): Locale => (value === "en" || value === "ru" ? value : "az");
 
 const COPY = {
@@ -53,6 +56,14 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `«${agency}» komandasından çıxan ${from} adlı agentin ${count} elanı sizə təhvil verildi. Elanlar və onlara gələn müraciətlər kabinetinizdədir.`,
     listingClosedTitle: "Elanınız bağlandı",
     listingClosed: (title: string) => `«${title}» elanı satılmış və ya kirayəyə verilmiş kimi işarələndi. Səhvdirsə, bizimlə əlaqə saxlayın.`,
+    listingInfoRequestedTitle: "Elanınız barədə izahat istənilir",
+    listingInfoRequested: (title: string) => `«${title}» elanı barədə ziyarətçi şikayəti yoxlanılır. Moderatorların sualını oxuyun və elanı düzəldin və ya bizimlə əlaqə saxlayın.`,
+    reportOutcomeTitle: "Şikayətinizə baxıldı",
+    reportOutcome: (title: string, outcome: ReportOutcome) => outcome === "confirmed"
+      ? `«${title}» elanı barədə şikayətiniz təsdiqləndi və elana tədbir görüldü. Təşəkkür edirik.`
+      : outcome === "dismissed"
+        ? `«${title}» elanı barədə şikayətiniz yoxlanıldı, amma pozuntu təsdiqlənmədi.`
+        : `«${title}» elanı barədə şikayətiniz bağlandı — elan artıq aktual deyil.`,
     open: "Kabinetdə aç",
   },
   en: {
@@ -91,6 +102,14 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `${count} listings of ${from}, who left the “${agency}” team, were handed over to you. The listings and their enquiries are in your account.`,
     listingClosedTitle: "Your listing was closed",
     listingClosed: (title: string) => `The listing “${title}” was marked as sold or rented. If this is a mistake, please contact us.`,
+    listingInfoRequestedTitle: "Clarification requested for your listing",
+    listingInfoRequested: (title: string) => `A visitor report about the listing “${title}” is being reviewed. Please read the moderators' question and correct the listing or contact us.`,
+    reportOutcomeTitle: "Your report was reviewed",
+    reportOutcome: (title: string, outcome: ReportOutcome) => outcome === "confirmed"
+      ? `Your report about the listing “${title}” was confirmed and action was taken. Thank you.`
+      : outcome === "dismissed"
+        ? `Your report about the listing “${title}” was reviewed, but no violation was confirmed.`
+        : `Your report about the listing “${title}” was closed — the listing is no longer relevant.`,
     open: "Open in your account",
   },
   ru: {
@@ -129,6 +148,14 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `Вам переданы объявления (${count}) агента ${from}, покинувшего команду «${agency}». Объявления и заявки по ним — в вашем кабинете.`,
     listingClosedTitle: "Ваше объявление закрыто",
     listingClosed: (title: string) => `Объявление «${title}» отмечено как проданное или сданное. Если это ошибка, свяжитесь с нами.`,
+    listingInfoRequestedTitle: "По вашему объявлению запрошены пояснения",
+    listingInfoRequested: (title: string) => `Проверяется жалоба посетителя на объявление «${title}». Прочитайте вопрос модераторов и исправьте объявление или свяжитесь с нами.`,
+    reportOutcomeTitle: "Ваша жалоба рассмотрена",
+    reportOutcome: (title: string, outcome: ReportOutcome) => outcome === "confirmed"
+      ? `Ваша жалоба на объявление «${title}» подтверждена, меры приняты. Спасибо.`
+      : outcome === "dismissed"
+        ? `Ваша жалоба на объявление «${title}» проверена, но нарушение не подтвердилось.`
+        : `Ваша жалоба на объявление «${title}» закрыта — объявление больше не актуально.`,
     open: "Открыть в кабинете",
   },
 } as const;
@@ -368,6 +395,49 @@ export async function noticeListingReportDecision(input: {
     (copy) => input.decision === "archived"
       ? { title: copy.listingArchivedTitle, content: withReason(copy.listingArchived(input.propertyTitle), copy, input.reason) }
       : { title: copy.listingClosedTitle, content: copy.listingClosed(input.propertyTitle) },
+  );
+}
+
+/** Elan sahibinə: şikayət üzrə moderator izahat istəyir (#195) — sual mətni ilə. */
+export async function noticeListingInfoRequested(input: {
+  userId: string;
+  propertyId: string;
+  propertyTitle: string;
+  requestedAt: Date;
+  note: string;
+}): Promise<boolean> {
+  // `false` — bildiriş yazılmadı: çağıran statusu geri qaytarır, yoxsa növbə sahibin heç vaxt
+  // görmədiyi suala cavab gözləyərdi.
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_REPORT,
+    "/kabinet/elanlar",
+    `listing-report-info:${input.propertyId}:${attemptKey(input.requestedAt)}`,
+    (copy) => ({
+      title: copy.listingInfoRequestedTitle,
+      content: withReason(copy.listingInfoRequested(input.propertyTitle), copy, input.note),
+    }),
+  );
+}
+
+/**
+ * Daxil olmuş şikayətçiyə: şikayətin nəticəsi (#195). Elan sahibinin kimliyi və moderatorun
+ * daxili qeydi göndərilmir — yalnız nəticə.
+ */
+export async function noticeReportOutcome(input: {
+  userId: string;
+  propertyId: string;
+  propertyTitle: string;
+  decidedAt: Date;
+  outcome: ReportOutcome;
+}): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_REPORT,
+    "/kabinet/sikayetlerim",
+    // `dedupeKey` qlobal unikaldır: eyni qərar bir neçə şikayətçiyə gedir, açar alıcını daşımalıdır.
+    `report-outcome:${input.propertyId}:${attemptKey(input.decidedAt)}:${input.userId}`,
+    (copy) => ({ title: copy.reportOutcomeTitle, content: copy.reportOutcome(input.propertyTitle, input.outcome) }),
   );
 }
 

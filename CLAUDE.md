@@ -695,13 +695,32 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 ### Şikayət, avtomatik moderasiya, elan təhvili və bağlanmış sövdələşmələr (#159)
 
 - **Elan şikayəti** (`lib/listing-reports.ts`, `ListingReport`): ictimai elanın detalında «Elandan şikayət et»
-  (səbəb `REPORT_REASONS`, «Digər»də izah məcburi). Same-origin + honeypot + `checkReportLimit` (IP) + Turnstile;
+  — PRD-nin 15 səbəbindən bir neçəsi birlikdə seçilir (`REPORT_REASONS`; `reason` əsas səbəb, `reasons` JSON
+  siyahı; köhnə `WRONG_INFO`/`NOT_OWNER` yalnız `LEGACY_REPORT_REASONS`-dadır və göstərilir, qəbul olunmur),
+  «Digər səbəb»də izah məcburi. Same-origin + honeypot + `checkReportLimit` (IP) + Turnstile;
   xam IP saxlanmır — `reporterKey` = `AUTH_SECRET` ilə duzlanmış IP + elan heşi, yalnız 24 saatlıq təkrarı süzür.
-  Admin növbəsi `/admin/sikayetler` şikayətləri elan üzrə qruplaşdırır (`REPORT_URGENT_THRESHOLD` = təcili):
-  elanı səbəblə dayandır (arxiv + sahibə bildiriş), satılıb/icarəyə verilib kimi bağla, həll edildi, əsassız.
-  Elanı dəyişən qərar əvvəl açıq şikayətləri şərti `updateMany` ilə **götürür**; heç nə götürməyən (gecikmiş,
-  eyni anda gələn) sorğu elana toxunmur, elan yazılmasa götürülən şikayətlər yenidən açılır.
-  Hər qərar audit + `noticeListingReportDecision()`; sayğac menyuda `openReports`.
+- **Şikayət iş axını (#195):** `OPEN` (yeni) → `IN_REVIEW` (moderator götürüb, `assigneeId`) → `NEEDS_INFO`
+  (sahibdən izahat, `noticeListingInfoRequested`) → qərar `RESOLVED` | `DISMISSED` | `CLOSED`; elana təsiri ayrıca
+  `resolution`-dadır (`ARCHIVED`, `MARKED_CLOSED`, `LISTING_FIXED`, `NO_ACTION`). **«Açıq» = `ACTIVE_REPORT_STATUSES`**
+  (üç mərhələ) — risk siqnalı, menyu sayğacı, moderasiya növbəsi və qərarın «götürmə» şərti bu dəstə baxır, yalnız
+  `OPEN`-ə baxmaq yoxlanılan şikayəti itirərdi. Yoxlanılan elana gələn yeni şikayət mərhələ və moderatoru miras alır.
+  Admin növbəsi `/admin/sikayetler` elan üzrə qruplaşdırır; beh tələbi/dələduzluq (`HIGH_PRIORITY_REPORT_REASONS`) və
+  `REPORT_URGENT_THRESHOLD`+ şikayət yüksək prioritetdir; göstəricilər `getReportQueueStats()`. Elanı dəyişən qərar
+  əvvəl aktiv şikayətləri şərti `updateMany` ilə **götürür**; heç nə götürməyən (gecikmiş, eyni anda gələn) sorğu
+  elana toxunmur, elan yazılmasa götürülən şikayətlər `IN_REVIEW`-a qaytarılır. «Yenidən bax» son qərarı açır, elana
+  görülmüş tədbiri geri almır. Hər qərar audit + sahibə `noticeListingReportDecision()` + daxil olmuş şikayətçiyə
+  `noticeReportOutcome()`; sayğac menyuda `openReports`.
+- **Şikayət sübutu (#195):** yalnız daxil olmuş istifadəçidən, ən çox `REPORT_EVIDENCE_MAX_FILES` şəkil; brauzer
+  `prepareImageForUpload(…, { maxDimension })` ilə ≤ `REPORT_EVIDENCE_MAX_BYTES` WebP-yə kiçildir (action gövdəsi 1 MB).
+  Elan səhifəsi kənar keşdədir — forma giriş vəziyyətini dialoq açılanda `/api/hesab/elaqe`-dən oxuyur. Fayl
+  `putPrivateImage()` ilə R2-nin **`private/`** prefiksinə yazılır (`ListingReportEvidence`); `mediaKeyFromPath()`
+  bu prefiksi rədd edir, ona görə ictimai `/media/...` və worker keşi onu vermir. Moderator faylı yalnız
+  `/api/admin/sikayetler/subut/<id>`-dən görür (`property:manage`, `no-store`, icazəsizə 404). Məxfi fayla ictimai
+  URL qurma və onu `next/image`-dən keçirmə.
+- **Daxili qeydlər və «Şikayətlərim» (#197):** moderator qrupa (elan üzrə) `ListingReportNote` yazır — yalnız
+  paneldə görünür, audit jurnalına düşür. `/kabinet/sikayetlerim` istifadəçinin öz şikayətlərini `getUserReports()` ilə
+  göstərir; o funksiya moderatoru, izahat mətnini, qeydləri və `reporterKey`-i **seçmir** (test açar dəstini yoxlayır) —
+  səhifəyə yeni sahə əlavə edəndə məxfilik qaydasını saxla. Şikayətçiyə nəticə bildirişi bu səhifəyə aparır.
 - **Avtomatik risk siqnalları** (`lib/moderation/risk-signals.ts` saf, `listing-risk.ts` D1): bazardan
   ≥35% ucuz qiymət, mətndə telefon/e-poçt/link, başqa müəllifin elanındakı eyni foto (`Media.checksum`),
   köçürülmüş mətn, 3 gündən təzə hesab, açıq şikayət. Bal `Property.riskScore` (0–100) + `riskFlags` (JSON).
