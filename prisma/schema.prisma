@@ -112,6 +112,7 @@ model User {
 
   listingReports         ListingReport[] @relation("ListingReportReporter")
   listingReportsResolved ListingReport[] @relation("ListingReportResolver")
+  listingReportsAssigned ListingReport[] @relation("ListingReportAssignee")
 
   @@index([role])
   @@index([accountType])
@@ -2033,29 +2034,56 @@ model KnowledgeFaq {
 /// Ziyarətçinin elan şikayəti (#159). `reporterKey` IP + elan üzrə heşdir (xam IP saxlanmır) —
 /// eyni şəxsin eyni elana 24 saatda ikinci şikayəti yeni qeyd yaratmır.
 model ListingReport {
-  id             String    @id @default(cuid())
-  propertyId     String
-  /// REPORT_REASONS (`constants.ts`).
-  reason         String
-  message        String?
-  reporterUserId String?
-  reporterKey    String
-  /// OPEN | RESOLVED | DISMISSED
-  status         String    @default("OPEN")
-  /// ARCHIVED | MARKED_CLOSED | NO_ACTION — admin qərarı.
-  resolution     String?
-  resolutionNote String?
-  resolvedById   String?
-  resolvedAt     DateTime?
-  createdAt      DateTime  @default(now())
+  id              String    @id @default(cuid())
+  propertyId      String
+  /// Əsas səbəb — `reasons`-un birincisi. Köhnə qeydlərdə (#159) yeganə səbəbdir.
+  reason          String
+  /// Seçilmiş bütün səbəblər, JSON massivi (`REPORT_REASONS`, #195). Boşdursa `reason` işlənir.
+  reasons         String    @default("[]")
+  message         String?
+  reporterUserId  String?
+  reporterKey     String
+  /// REPORT_STATUSES: OPEN | IN_REVIEW | NEEDS_INFO | RESOLVED | DISMISSED | CLOSED
+  status          String    @default("OPEN")
+  /// Şikayəti yoxlayan moderator (#195).
+  assigneeId      String?
+  reviewStartedAt DateTime?
+  /// Elan sahibindən izahat istənən an və istəyin mətni.
+  infoRequestedAt DateTime?
+  infoRequestNote String?
+  /// REPORT_RESOLUTIONS: ARCHIVED | MARKED_CLOSED | LISTING_FIXED | NO_ACTION — admin qərarı.
+  resolution      String?
+  resolutionNote  String?
+  resolvedById    String?
+  resolvedAt      DateTime?
+  createdAt       DateTime  @default(now())
 
-  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  reporter   User?    @relation("ListingReportReporter", fields: [reporterUserId], references: [id], onDelete: SetNull)
-  resolvedBy User?    @relation("ListingReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  property   Property                @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  reporter   User?                   @relation("ListingReportReporter", fields: [reporterUserId], references: [id], onDelete: SetNull)
+  resolvedBy User?                   @relation("ListingReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  assignee   User?                   @relation("ListingReportAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  evidence   ListingReportEvidence[]
 
   @@index([status, createdAt])
   @@index([propertyId, status])
   @@index([reporterKey, createdAt])
+  @@index([assigneeId, status])
+}
+
+/// Şikayətin sübut şəkli (#195). Fayl R2-nin məxfi `private/` prefiksindədir: ictimai
+/// `/media/...` marşrutu onu vermir, yalnız admin marşrutu (`/api/admin/sikayetler/subut/<id>`).
+model ListingReportEvidence {
+  id          String   @id @default(cuid())
+  reportId    String
+  /// R2 açarı — server tərəfdə təsadüfi qurulur, istifadəçi adı daşımır.
+  key         String   @unique
+  contentType String
+  size        Int
+  createdAt   DateTime @default(now())
+
+  report ListingReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
 }
 
 /// Elanın gündəlik statistikası (#161, kabinet analitikası). Gün Bakı vaxtı ilə «YYYY-MM-DD».

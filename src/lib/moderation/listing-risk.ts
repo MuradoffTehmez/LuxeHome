@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, REPORT_STATUSES } from "@/lib/constants";
+import { ACCOUNT_TYPES, ACTIVE_REPORT_STATUSES } from "@/lib/constants";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { assessPropertyPrice } from "@/lib/price-benchmark";
 import {
@@ -88,7 +88,7 @@ export async function assessListingRisk(propertyId: string, now = new Date()): P
   if (now.getTime() - property.author.createdAt.getTime() < NEW_ACCOUNT_DAYS * DAY) flags.push({ code: "NEW_ACCOUNT" });
 
   // 6. Ziyarətçi şikayətləri.
-  const reports = await prisma.listingReport.count({ where: { propertyId, status: REPORT_STATUSES.OPEN } });
+  const reports = await prisma.listingReport.count({ where: { propertyId, status: { in: [...ACTIVE_REPORT_STATUSES] } } });
   if (reports > 0) flags.push({ code: "OPEN_REPORTS", value: reports });
 
   const score = scoreRisk(flags);
