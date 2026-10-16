@@ -6,6 +6,7 @@ import { LOCALES, PERMISSIONS } from "@/lib/constants";
 import { getAdminT } from "@/lib/admin-i18n";
 import { PROJECTS_SECTION_ENABLED_VALUE } from "@/lib/site-sections";
 import { SETTING_KEYS, setSettings } from "@/lib/settings";
+import { LIFETIME_DAYS_RANGE, REMINDER_DAYS_RANGE, validateExpiryConfig } from "@/lib/listing-expiry-policy";
 import { type ActionState, failure, invalid, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
@@ -158,5 +159,50 @@ export async function saveSiteImages(_prev: ActionState, formData: FormData): Pr
     return success(msg("server.parametrler.parametrlerYaddaSaxlanildi"));
   } catch (error) {
     return unexpected("sayt şəkilləri saxlanılmadı", error, msg("server.common.unexpected"));
+  }
+}
+
+/**
+ * Elanın ömrü və aktuallıq xatırlatması (#204, PRD 5.2). Tək JSON parametrdir — ömür və
+ * xatırlatma bir-birindən asılıdır (xatırlatma ömürdən qısa olmalıdır), ayrı yazılsa yarımçıq
+ * yazılış uyğunsuz cüt saxlaya bilərdi. Yeni dəyər yalnız sonrakı dərc və yeniləmələrə aiddir:
+ * artıq qoyulmuş `listingExpiresAt` dəyişmir.
+ */
+export async function saveListingExpiry(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  let user;
+  try {
+    user = await requireAdminAction(PERMISSIONS.SETTINGS_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+
+  const config = validateExpiryConfig({
+    lifetimeDays: form.text(formData, "lifetimeDays"),
+    reminderDays: form.text(formData, "reminderDays"),
+  });
+  if (!config) {
+    const message = msg("server.settings.elanMuddetiHedleri", {
+      minLife: LIFETIME_DAYS_RANGE.min,
+      maxLife: LIFETIME_DAYS_RANGE.max,
+      minReminder: REMINDER_DAYS_RANGE.min,
+      maxReminder: REMINDER_DAYS_RANGE.max,
+    });
+    return failure(message, { lifetimeDays: message, reminderDays: message });
+  }
+
+  try {
+    await setSettings({ [SETTING_KEYS.LISTING_EXPIRY_CONFIG]: JSON.stringify(config) });
+    await recordAudit(
+      user,
+      "UPDATE",
+      "Setting",
+      SETTING_KEYS.LISTING_EXPIRY_CONFIG,
+      `Elan müddəti: ${config.lifetimeDays} gün, xatırlatma: ${config.reminderDays} gün qalmış`,
+    );
+    revalidatePath("/admin/parametrler");
+    return success(msg("server.settings.elanMuddetiSaxlanildi"));
+  } catch (error) {
+    return unexpected("elan müddəti saxlanmadı", error, msg("server.common.unexpected"));
   }
 }

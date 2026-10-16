@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
 import { SYSTEM_MODE_SETTING_KEY } from "@/lib/system-mode";
+import { parseExpiryConfig, type ListingExpiryConfig } from "@/lib/listing-expiry-policy";
 
 /**
  * Paneldən idarə olunan parametrlər.
@@ -55,6 +56,11 @@ export const SETTING_KEYS = {
    * Boş dil kataloqdakı defolt mətnə qayıdır; oxuma/təmizləmə `src/lib/safety-warning.ts`-dədir.
    */
   SAFETY_CONTACT_WARNING: "safety.contact_warning",
+  /**
+   * Elanın ömrü və aktuallıq xatırlatması (#204, PRD 5.2) — `{ lifetimeDays, reminderDays }` tək JSON.
+   * Təhlil və hədlər `listing-expiry-policy.ts`-dədir; boş/pozulmuş dəyər 60/7 gün defoltudur.
+   */
+  LISTING_EXPIRY_CONFIG: "listing.expiry_config",
   /**
    * Sistem rejimi (`NORMAL` | `MAINTENANCE` | `READ_ONLY`) və texniki xidmət
    * səhifəsinin mətnləri — **tək JSON dəyər**.
@@ -170,4 +176,9 @@ export async function getSiteImages(): Promise<SiteImages> {
     about: mediaUrl(settings[SETTING_KEYS.SITE_IMAGE_ABOUT]) ?? SITE_IMAGE_DEFAULTS.about,
     cta: mediaUrl(settings[SETTING_KEYS.SITE_IMAGE_CTA]) ?? SITE_IMAGE_DEFAULTS.cta,
   };
+}
+
+/** Elan müddəti konfiqurasiyası (#204). Oxuma xətası defolta qayıdır — `getSetting` atmır. */
+export async function getListingExpiryConfig(): Promise<ListingExpiryConfig> {
+  return parseExpiryConfig(await getSetting(SETTING_KEYS.LISTING_EXPIRY_CONFIG));
 }

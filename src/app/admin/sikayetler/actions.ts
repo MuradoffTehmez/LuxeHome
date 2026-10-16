@@ -8,6 +8,7 @@ import {
   LISTING_TYPES,
   PERMISSIONS,
   PROPERTY_STATUSES,
+  PROPERTY_STATUS_SOURCES,
   REJECTION_REASON_MAX,
   REJECTION_REASON_MIN,
   REPORT_NOTE_MAX,
@@ -41,6 +42,7 @@ import {
   revertReportInfoRequest,
 } from "@/lib/listing-reports";
 import { reportModeratorWhere } from "@/lib/admin/report-moderators";
+import { recordPropertyStatusChange } from "@/lib/property-status-history";
 import type { AuthUser } from "@/lib/auth/types";
 
 /**
@@ -308,6 +310,9 @@ export async function archiveReportedListing(propertyId: string, reason: string)
       }),
     );
     if (!applied) return failure(msg("server.reports.acikSikayetYoxdur"));
+    await recordPropertyStatusChange({
+      propertyId: property.id, from: property.status, to: PROPERTY_STATUSES.SUSPENDED, source: PROPERTY_STATUS_SOURCES.MODERATION, changedById: actor.id, note,
+    });
     if (property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF) {
       await noticeListingReportDecision({
         userId: property.author.id,
@@ -353,6 +358,9 @@ export async function closeReportedListing(propertyId: string): Promise<ActionSt
       }),
     );
     if (!applied) return failure(msg("server.reports.acikSikayetYoxdur"));
+    await recordPropertyStatusChange({
+      propertyId: property.id, from: property.status, to: status, source: PROPERTY_STATUS_SOURCES.MODERATION, changedById: actor.id,
+    });
     if (property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF) {
       await noticeListingReportDecision({
         userId: property.author.id,

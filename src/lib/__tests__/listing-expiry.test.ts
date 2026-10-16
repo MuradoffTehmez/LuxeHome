@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { BACKFILL_GRACE_DAYS, LISTING_LIFETIME_DAYS, backfillExpiry, expiryState, publicationExpiryReset, renewedExpiry } from "@/lib/listing-expiry-policy";
+import {
+  BACKFILL_GRACE_DAYS,
+  DEFAULT_LISTING_EXPIRY,
+  LISTING_LIFETIME_DAYS,
+  backfillExpiry,
+  expiryState,
+  parseExpiryConfig,
+  publicationExpiryReset,
+  renewedExpiry,
+  validateExpiryConfig,
+} from "@/lib/listing-expiry-policy";
 
 const DAY = 86_400_000;
 const now = new Date("2026-09-27T12:00:00Z");
@@ -31,5 +41,32 @@ describe("elan müddəti", () => {
     // Qüvvədə olan müddətə toxunulmur, müddəti olmayana da (gündəlik iş təyin edir)
     expect(publicationExpiryReset({ listingExpiresAt: new Date(now.getTime() + 10 * DAY), expiredAt: null }, now)).toEqual({});
     expect(publicationExpiryReset({ listingExpiresAt: null, expiredAt: null }, now)).toEqual({});
+  });
+});
+
+describe("aktuallıq intervalı konfiqurasiyası (#204)", () => {
+  it("hədlər daxilində dəyəri qəbul edir, xatırlatma ömürdən qısa olmalıdır", () => {
+    expect(validateExpiryConfig({ lifetimeDays: "90", reminderDays: "10" })).toEqual({ lifetimeDays: 90, reminderDays: 10 });
+    expect(validateExpiryConfig({ lifetimeDays: 6, reminderDays: 1 })).toBeNull();
+    expect(validateExpiryConfig({ lifetimeDays: 366, reminderDays: 7 })).toBeNull();
+    expect(validateExpiryConfig({ lifetimeDays: 10, reminderDays: 10 })).toBeNull();
+    expect(validateExpiryConfig({ lifetimeDays: 30, reminderDays: 31 })).toBeNull();
+    expect(validateExpiryConfig({ lifetimeDays: "60.5", reminderDays: 7 })).toBeNull();
+  });
+
+  it("boş və ya pozulmuş parametr defolta qayıdır", () => {
+    expect(parseExpiryConfig(null)).toEqual(DEFAULT_LISTING_EXPIRY);
+    expect(parseExpiryConfig("{pozuq")).toEqual(DEFAULT_LISTING_EXPIRY);
+    expect(parseExpiryConfig(JSON.stringify({ lifetimeDays: 5, reminderDays: 1 }))).toEqual(DEFAULT_LISTING_EXPIRY);
+    expect(parseExpiryConfig(JSON.stringify({ lifetimeDays: 30, reminderDays: 3 }))).toEqual({ lifetimeDays: 30, reminderDays: 3 });
+  });
+
+  it("ömür və xatırlatma parametr kimi ötürülür", () => {
+    expect(renewedExpiry(now, 30).getTime()).toBe(now.getTime() + 30 * DAY);
+    const tenDays = { status: "PUBLISHED", listingExpiresAt: new Date(now.getTime() + 10 * DAY), expiredAt: null };
+    expect(expiryState(tenDays, now.getTime())?.state).toBe("active");
+    expect(expiryState(tenDays, now.getTime(), 14)?.state).toBe("expiring");
+    expect(publicationExpiryReset({ listingExpiresAt: new Date(now.getTime() - DAY), expiredAt: null }, now, 30).listingExpiresAt?.getTime())
+      .toBe(now.getTime() + 30 * DAY);
   });
 });

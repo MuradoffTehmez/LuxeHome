@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { PERMISSIONS, PROPERTY_STATUSES } from "@/lib/constants";
+import { PERMISSIONS, PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES } from "@/lib/constants";
 import { type ActionState, failure, invalid, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
@@ -21,6 +21,8 @@ import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
 import * as form from "@/lib/admin/form";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
+import { recordPropertyStatusChange } from "@/lib/property-status-history";
+import { getListingExpiryConfig } from "@/lib/settings";
 import { recordPropertyPriceChange } from "@/lib/price-drop";
 import {
   propertyRetentionDays,
@@ -198,6 +200,9 @@ export async function createProperty(
       },
       select: { id: true },
     });
+    await recordPropertyStatusChange({
+      propertyId: property.id, from: null, to: parsed.data.status, source: PROPERTY_STATUS_SOURCES.ADMIN, changedById: user.id,
+    });
     propertyId = property.id;
 
     await replaceRelations(propertyId, parsed.data.featureIds, images);
@@ -267,7 +272,9 @@ export async function updateProperty(
         return failure(msg("server.emlaklar.elanDercTelebleriniOdemir"), publication.errors);
       }
     }
-    const lifecycle = propertyLifecycleData(parsed.data.status, existing, await propertyRetentionDays());
+    const lifecycle = propertyLifecycleData(
+      parsed.data.status, existing, await propertyRetentionDays(), (await getListingExpiryConfig()).lifetimeDays,
+    );
 
     const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
 
@@ -292,6 +299,9 @@ export async function updateProperty(
       currency: existing.currency,
       changedById: user.id,
       source: "ADMIN",
+    });
+    await recordPropertyStatusChange({
+      propertyId: id, from: existing.status, to: parsed.data.status, source: PROPERTY_STATUS_SOURCES.ADMIN, changedById: user.id,
     });
 
     await replaceRelations(id, parsed.data.featureIds, images);
@@ -411,11 +421,12 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
 
   let done = 0;
   const retentionDays = await propertyRetentionDays();
+  const { lifetimeDays } = await getListingExpiryConfig();
   for (const id of ids) {
     try {
       const current = await prisma.property.findUnique({
         where: { id },
-        select: { publishedAt: true, closedAt: true, listingExpiresAt: true, expiredAt: true },
+        select: { status: true, publishedAt: true, closedAt: true, listingExpiresAt: true, expiredAt: true },
       });
       if (!current) continue;
       let data: Record<string, unknown>;
@@ -424,7 +435,7 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
         if (Object.keys(publication.errors).length > 0) continue;
         data = {
           status: PROPERTY_STATUSES.PUBLISHED,
-          ...propertyLifecycleData(PROPERTY_STATUSES.PUBLISHED, current, retentionDays),
+          ...propertyLifecycleData(PROPERTY_STATUSES.PUBLISHED, current, retentionDays, lifetimeDays),
           contentFingerprint: publication.fingerprint,
         };
       } else if (intent === "archive") {
@@ -432,6 +443,11 @@ export async function bulkUpdateProperties(_prev: ActionState, formData: FormDat
       } else if (intent === "delete") data = { deletedAt: new Date() };
       else data = { deletedAt: null };
       await prisma.property.update({ where: { id }, data });
+      if (typeof data.status === "string") {
+        await recordPropertyStatusChange({
+          propertyId: id, from: current.status, to: data.status, source: PROPERTY_STATUS_SOURCES.ADMIN, changedById: user.id,
+        });
+      }
       done += 1;
       if (previouslyUnpublished?.has(id)) {
         await notifyMatchingSavedSearches(id);

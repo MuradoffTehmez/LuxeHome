@@ -59,7 +59,11 @@ Yadda saxlanandan sonra fonda:
 | `ARCHIVED` | ❌ | Arxiv |
 | `REJECTED` | ❌ | Moderasiyadan rədd edilib; sahib düzəldib yenidən göndərə bilər |
 
-Sahib/agentlik elanı 60 gün yaşayır, 7 gün qalmış sahibinə xatırlatma gedir, bitəndə `EXPIRED` olur; sahib kabinetdən «Yenilə» ilə +60 gün uzadır. Şirkət (staff) elanlarına müddət tətbiq olunmur. Sahib aktiv elanı kabinetdən «Satıldı / Kirayəyə verildi» kimi bağlaya bilir.
+Sahib/agentlik elanı defolt 60 gün yaşayır, 7 gün qalmış sahibinə «hələ aktualdırmı?» xatırlatması gedir (hər ikisi
+**Parametrlər → Elan müddəti və aktuallıq**-dan dəyişir; yeni dəyər sonrakı dərc və yeniləmələrə aiddir), bitəndə `EXPIRED` olur; sahib kabinetdən «Yenilə» ilə +60 gün uzadır. Şirkət (staff) elanlarına müddət tətbiq olunmur. Sahib aktiv elanı kabinetdən «Satıldı / Kirayəyə verildi» kimi bağlaya bilir.
+
+Elanın redaktə səhifəsinin sonunda **Status və qiymət tarixçəsi** var: hər status keçidi və qiymət dəyişikliyi kimin
+etdiyi, vaxtı və mənbəyi (Panel / Elan sahibi / Moderasiya / Sistem / İdxal) ilə; moderatorun səbəbi də görünür.
 
 ### Moderasiya (`/admin/moderation`)
 

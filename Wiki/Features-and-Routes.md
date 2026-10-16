@@ -148,7 +148,8 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 - «Kənd» sahəsi seçilmiş rayonun kəndlərini tələb olunanda yükləyir (~3 600 kənd bir dəfədə göndərilmir).
 - «Küçə» sahəsi seçilmiş rəsmi vahidin (qəsəbə/kənd, yoxdursa şəhər rayonu və ya şəhər) Ünvan Reyestri küçələrini təklif edir (`public/data/kuceler/<kod>.json`), amma sərbəst mətn olaraq qalır.
 - Elan yazan hər action fonda `queuePropertyVectorSync()` və `queueListingEnrichment()` (AI SEO + ALT) çağırır.
-- Sahib/agentlik elanı 60 gün yaşayır: 7 gün qalmış xatırlatma, bitəndə `EXPIRED` + `expiredAt`. Şirkət (STAFF) elanlarına toxunulmur.
+- Sahib/agentlik elanı defolt 60 gün yaşayır: 7 gün qalmış xatırlatma, bitəndə `EXPIRED` + `expiredAt` (hər iki dəyər paneldən dəyişir). Şirkət (STAFF) elanlarına toxunulmur.
+- Hər status keçidi tarixçəyə yazılır (`PropertyStatusHistory`) və admin elan səhifəsində qiymət dəyişiklikləri ilə birlikdə görünür.
 - Sahib aktiv elanı kabinetdən «Satıldı / Kirayəyə verildi» kimi bağlayır; bağlanmış elan saytda qalır, amma müraciət qəbul etmir.
 
 ## Əməkdaş giriş axını

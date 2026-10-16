@@ -391,6 +391,13 @@
       "ARCHIVED": "Archived",
       "REJECTED": "Rejected"
     },
+    "propertyStatusSource": {
+      "ADMIN": "Admin panel",
+      "OWNER": "Listing owner",
+      "MODERATION": "Moderation",
+      "SYSTEM": "System",
+      "IMPORT": "Import"
+    },
     "renovation": {
       "NEW_BUILDING": "New building",
       "DESIGNER": "Designer renovation",
@@ -699,10 +706,6 @@
       "elanYenidenAktivSiyahiya": "The listing returns to the active list. Its status does not change.",
       "saytdaBax": "View on site",
       "redakteEt": "Edit",
-      "qiymetTarixcesi": "Price history",
-      "qiymetTarixcesiTesviri": "Previous listing prices and their change sources.",
-      "qiymetTarixcesiBosdur": "This listing's price has not changed yet.",
-      "menbe": "Source",
       "elaniSilmek": "Delete the listing",
       "elanSaytdanCixarilacaqAmma": "The listing is removed from the site but stays in the bin and can be restored.",
       "basliqUnvanVeYa": "Search by title, address or slug…",
@@ -814,6 +817,12 @@
         "previewDescription": "This is roughly how your listing will look on the site.",
         "confirm": "Confirm and publish",
         "confirmDescription": "Final check and submission."
+      },
+      "history": {
+        "title": "Status and price history",
+        "description": "Every status transition and price change of the listing: who, when and from which source. Moderator interventions are marked “Moderation”.",
+        "empty": "No changes recorded yet.",
+        "created": "Created"
       }
     },
     "leads": {
@@ -1215,6 +1224,14 @@
         "cta": "Enquiry block at the end of the page",
         "hint": "A landscape photo at least 1600 px wide is recommended.",
         "save": "Save images"
+      },
+      "listingExpiry": {
+        "title": "Listing lifetime and freshness",
+        "description": "How long owner and agency listings stay active and how many days before expiry the owner is asked “is the listing still current?”. Does not apply to company listings. New values apply to later publications and renewals.",
+        "lifetime": "Listing lifetime (days)",
+        "lifetimeHint": "{min}–{max} days.",
+        "reminder": "Reminder (days before expiry)",
+        "reminderHint": "{min}–{max} days, shorter than the lifetime."
       }
     },
     "account": {
@@ -3382,6 +3399,10 @@
     "safety": {
       "saxlanildi": "The safety notice was saved.",
       "uzunluq": "The text must be {min}–{max} characters."
+    },
+    "settings": {
+      "elanMuddetiSaxlanildi": "The listing lifetime was saved. It applies to later publications and renewals.",
+      "elanMuddetiHedleri": "The lifetime must be {minLife}–{maxLife} days and the reminder {minReminder}–{maxReminder} days, shorter than the lifetime."
     }
   }
 }

@@ -2,10 +2,17 @@ import type { Metadata } from "next";
 import { OpenHouseManager } from "./open-house-manager";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, History, Trash2 } from "lucide-react";
+import { ArrowRightLeft, ExternalLink, History, Trash2 } from "lucide-react";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { ConfirmAction } from "@/components/admin/confirm-action";
-import { PERMISSIONS } from "@/lib/constants";
+import {
+  PERMISSIONS,
+  PROPERTY_STATUS_LABELS,
+  PROPERTY_STATUS_SOURCE_LABELS,
+  type PropertyStatus,
+  type PropertyStatusSource,
+} from "@/lib/constants";
+import { getPropertyHistory } from "@/lib/property-status-history";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { formatDateTime, formatPrice } from "@/lib/utils";
 import { formatLocalizedTime } from "@/i18n/date";
@@ -37,7 +44,7 @@ export default async function EditPropertyPage({
   await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
 
   const { id } = await params;
-  const [property, options, openHouses] = await Promise.all([
+  const [property, options, openHouses, history] = await Promise.all([
     getAdminPropertyById(id),
     getPropertyFormOptions({ propertyId: id }),
     prisma.openHouse.findMany({
@@ -45,9 +52,15 @@ export default async function EditPropertyPage({
       orderBy: { startsAt: "asc" },
       select: { id: true, startsAt: true, endsAt: true, capacity: true, note: true, _count: { select: { registrations: true } } },
     }),
+    getPropertyHistory(id),
   ]);
 
   if (!property) notFound();
+  // Tarixçə etiketləri panel dilindədir; naməlum dəyər (köhnə qeyd) xam göstərilir.
+  const statusLabel = (value: string) =>
+    Object.hasOwn(PROPERTY_STATUS_LABELS, value) ? t(`labels.propertyStatus.${value as PropertyStatus}`) : value;
+  const sourceLabel = (value: string) =>
+    Object.hasOwn(PROPERTY_STATUS_SOURCE_LABELS, value) ? t(`labels.propertyStatusSource.${value as PropertyStatusSource}`) : value;
 
   const initial: PropertyFormValues = {
     id: property.id,
@@ -168,24 +181,36 @@ export default async function EditPropertyPage({
       )}
 
       <AdminCard
-        title={t("pages.properties.qiymetTarixcesi")}
-        description={t("pages.properties.qiymetTarixcesiTesviri")}
+        title={t("pages.properties.history.title")}
+        description={t("pages.properties.history.description")}
         className="mt-6"
       >
-        {property.priceHistory.length === 0 ? (
-          <p className="text-sm text-ink-muted">{t("pages.properties.qiymetTarixcesiBosdur")}</p>
+        {history.length === 0 ? (
+          <p className="text-sm text-ink-muted">{t("pages.properties.history.empty")}</p>
         ) : (
           <ol className="divide-y divide-line">
-            {property.priceHistory.map((entry) => (
-              <li key={entry.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 first:pt-0 last:pb-0">
-                <History className="size-4 shrink-0 text-gold-deep" aria-hidden="true" />
-                <span className="font-medium text-ink">
-                  {formatPrice(entry.oldPrice, entry.currency)} → {formatPrice(entry.newPrice, entry.currency)}
-                </span>
-                <span className="text-xs text-ink-muted">{formatDateTime(entry.changedAt)}</span>
-                <span className="ml-auto rounded-xs bg-beige px-2 py-1 text-xs text-ink-soft">
-                  {t("pages.properties.menbe")}: {entry.source}
-                </span>
+            {history.map((entry) => (
+              <li key={`${entry.kind}-${entry.id}`} className="flex flex-wrap items-start gap-x-4 gap-y-1 py-3 first:pt-0 last:pb-0">
+                {entry.kind === "status" ? (
+                  <ArrowRightLeft className="mt-0.5 size-4 shrink-0 text-gold-deep" aria-hidden="true" />
+                ) : (
+                  <History className="mt-0.5 size-4 shrink-0 text-gold-deep" aria-hidden="true" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-ink">
+                    {entry.kind === "status"
+                      ? `${entry.from ? statusLabel(entry.from) : t("pages.properties.history.created")} → ${statusLabel(entry.to)}`
+                      : `${formatPrice(entry.oldPrice, entry.currency)} → ${formatPrice(entry.newPrice, entry.currency)}`}
+                  </p>
+                  {entry.kind === "status" && entry.note && (
+                    <p className="mt-0.5 text-sm text-ink-soft [overflow-wrap:anywhere]">{entry.note}</p>
+                  )}
+                  <p className="mt-0.5 text-xs text-ink-muted">
+                    {formatDateTime(entry.at)}
+                    {entry.by ? ` · ${entry.by}` : ""}
+                  </p>
+                </div>
+                <span className="rounded-xs bg-beige px-2 py-1 text-xs text-ink-soft">{sourceLabel(entry.source)}</span>
               </li>
             ))}
           </ol>

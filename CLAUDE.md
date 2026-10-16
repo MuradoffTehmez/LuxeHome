@@ -546,6 +546,14 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   Köhnə qeydlər `migrations/0062`-də köçürülüb (`ARCHIVED`+`expiredAt` → `EXPIRED`, `ARCHIVED`+qeyd → `SUSPENDED`,
   `DRAFT`+qeyd → `REJECTED`). Yeni status əlavə edəndə `Record<PropertyStatus, …>` xəritələri typecheck-də yıxılır —
   kataloqlarda (`property.status`, `account.listings.status`, `labels.propertyStatus`) da yaz.
+- **Status tarixçəsi və aktuallıq intervalı (#204, PRD 5.2/5.4):** hər status keçidi `recordPropertyStatusChange()`
+  (`lib/property-status-history.ts`, **heç vaxt atmır**) ilə `PropertyStatusHistory`-yə yazılır: mənbə
+  `PROPERTY_STATUS_SOURCES` (panel, sahib, moderasiya, sistem, idxal), moderatorun səbəbi `note`-da. Yeni status
+  dəyişdirən yol yazanda tarixçəni də çağır. Admin elan səhifəsi status və qiymət dəyişikliklərini `getPropertyHistory()`
+  ilə bir xətdə göstərir. Elanın ömrü və xatırlatma günü `Parametrlər → Elan müddəti`-dən gəlir
+  (`SETTING_KEYS.LISTING_EXPIRY_CONFIG`, tək JSON, `getListingExpiryConfig()`; 7–365 / 1–30 gün, pozulmuş dəyər 60/7
+  defoltudur). Saf funksiyalar (`renewedExpiry`, `publicationExpiryReset`, `expiryState`, `propertyLifecycleData`) günü
+  istəyə bağlı parametr kimi alır — dərc edən yeni yolda konfiqurasiyanı ötür, sabiti birbaşa işlətmə.
 - **Açıq qapı** (`OpenHouse` + `OpenHouseRegistration`): qeydiyyat lead yaradır, tutum və
   qeydiyyatın bağlanma vaxtı `open-house-availability.ts`-dədir (client də işlədir — Prisma yoxdur).
 - **Təqvim** `/admin/rezervasiyalar/teqvim` (Bakı vaxtı, UTC+4) və şəxsi ICS abunəsi

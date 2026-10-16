@@ -23,8 +23,11 @@ import {
   MAX_PROPERTY_IMAGES,
   MODERATION_HOLD_STATUSES,
   PROPERTY_STATUSES,
+  PROPERTY_STATUS_SOURCES,
   type Locale,
 } from "@/lib/constants";
+import { recordPropertyStatusChange } from "@/lib/property-status-history";
+import { getListingExpiryConfig } from "@/lib/settings";
 import { localizePath } from "@/i18n/path-locale";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
@@ -149,6 +152,7 @@ export async function updatePublicProperty(
     : policy.status;
 
   const paymentFlags = await paymentFlagsFromFeatures(parsed.data.featureIds);
+  const { lifetimeDays } = await getListingExpiryConfig();
 
   try {
     await prisma.property.update({
@@ -176,7 +180,7 @@ export async function updatePublicProperty(
         publishedAt: nextStatus === PROPERTY_STATUSES.PUBLISHED
           ? (property.publishedAt ?? policy.publishedAt)
           : property.publishedAt,
-        ...(nextStatus === PROPERTY_STATUSES.PUBLISHED ? publicationExpiryReset(property) : {}),
+        ...(nextStatus === PROPERTY_STATUSES.PUBLISHED ? publicationExpiryReset(property, new Date(), lifetimeDays) : {}),
       },
     });
 
@@ -216,6 +220,14 @@ export async function updatePublicProperty(
     }
   }
 
+  await recordPropertyStatusChange({
+    propertyId: id,
+    from: property.status,
+    to: heldForReview ? PROPERTY_STATUSES.PENDING : nextStatus,
+    source: PROPERTY_STATUS_SOURCES.OWNER,
+    changedById: user.id,
+    note: heldForReview ? "Avtomatik moderasiya: yüksək risk" : null,
+  });
   queuePropertyVectorSync([id]);
   queueListingEnrichment(id);
   revalidatePath(localizePath(LIST_PATH, locale));
@@ -279,10 +291,13 @@ export async function renewPublicProperty(id: string): Promise<ActionState> {
       where: { id },
       data: {
         status: PROPERTY_STATUSES.PUBLISHED,
-        listingExpiresAt: renewedExpiry(),
+        listingExpiresAt: renewedExpiry(new Date(), (await getListingExpiryConfig()).lifetimeDays),
         expiryReminderSentAt: null,
         expiredAt: null,
       },
+    });
+    await recordPropertyStatusChange({
+      propertyId: id, from: current?.status ?? null, to: PROPERTY_STATUSES.PUBLISHED, source: PROPERTY_STATUS_SOURCES.OWNER, changedById: guarded.user.id,
     });
     await recordDomainEvent("property.renewed", "Property", id, { by: guarded.user.id });
   } catch (error) {
@@ -321,6 +336,9 @@ export async function closePublicProperty(id: string): Promise<ActionState> {
       data: { status, ...propertyLifecycleData(status, property, await propertyRetentionDays()) },
     });
     if (count === 0) return failure(t("listings.closeUnavailable"));
+    await recordPropertyStatusChange({
+      propertyId: property.id, from: property.status, to: status, source: PROPERTY_STATUS_SOURCES.OWNER, changedById: user.id,
+    });
     await recordDomainEvent("property.status_changed", "Property", property.id, { status, by: user.id });
   } catch (error) {
     return unexpected("elan bağlanmadı", error, t("actions.unexpected"));

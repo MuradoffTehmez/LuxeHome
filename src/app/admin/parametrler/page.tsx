@@ -5,10 +5,12 @@ import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
 import { PERMISSIONS } from "@/lib/constants";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { SETTING_KEYS, getAllSettings } from "@/lib/settings";
+import { parseExpiryConfig } from "@/lib/listing-expiry-policy";
 import { siteConfig } from "@/config/site";
 import { SettingsForm } from "./settings-form";
 import { ProjectsSectionForm } from "./projects-section-form";
 import { SiteImagesForm } from "./site-images-form";
+import { ListingExpiryForm } from "./listing-expiry-form";
 import { PROJECTS_SECTION_ENABLED_VALUE } from "@/lib/site-sections";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -85,6 +87,14 @@ export default async function AdminSettingsPage() {
             enabled={settings[SETTING_KEYS.PROJECTS_SECTION_ENABLED] === PROJECTS_SECTION_ENABLED_VALUE}
           />
         </div>
+      </AdminCard>
+
+      <AdminCard
+        title={t("pages.settings.listingExpiry.title")}
+        description={t("pages.settings.listingExpiry.description")}
+        className="mt-6 min-w-0"
+      >
+        <ListingExpiryForm config={parseExpiryConfig(settings[SETTING_KEYS.LISTING_EXPIRY_CONFIG])} />
       </AdminCard>
 
       <AdminCard

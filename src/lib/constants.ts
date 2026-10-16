@@ -306,6 +306,25 @@ export const PROPERTY_STATUS_TONE: Record<
  * moderasiyaya (`PENDING`) gedir — təsdiqlənmiş agentliyin birbaşa dərc hüququ burada işləmir,
  * əks halda dayandırılmış elan bir redaktə ilə moderatoru yan keçərdi.
  */
+/** Status dəyişikliyinin mənbəyi (#204, `PropertyStatusHistory.source`). */
+export const PROPERTY_STATUS_SOURCES = {
+  ADMIN: "ADMIN",
+  OWNER: "OWNER",
+  MODERATION: "MODERATION",
+  SYSTEM: "SYSTEM",
+  IMPORT: "IMPORT",
+} as const;
+
+export type PropertyStatusSource = (typeof PROPERTY_STATUS_SOURCES)[keyof typeof PROPERTY_STATUS_SOURCES];
+
+export const PROPERTY_STATUS_SOURCE_LABELS: Record<PropertyStatusSource, string> = {
+  ADMIN: "Panel",
+  OWNER: "Elan sahibi",
+  MODERATION: "Moderasiya",
+  SYSTEM: "Sistem",
+  IMPORT: "İdxal",
+};
+
 export const MODERATION_HOLD_STATUSES: readonly PropertyStatus[] = [
   PROPERTY_STATUSES.NEEDS_INFO,
   PROPERTY_STATUSES.SUSPENDED,

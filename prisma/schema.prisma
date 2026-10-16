@@ -110,10 +110,11 @@ model User {
 
   knowledgeArticles KnowledgeArticle[] @relation("KnowledgeArticleAuthor")
 
-  listingReports         ListingReport[]     @relation("ListingReportReporter")
-  listingReportsResolved ListingReport[]     @relation("ListingReportResolver")
-  listingReportsAssigned ListingReport[]     @relation("ListingReportAssignee")
+  listingReports         ListingReport[]         @relation("ListingReportReporter")
+  listingReportsResolved ListingReport[]         @relation("ListingReportResolver")
+  listingReportsAssigned ListingReport[]         @relation("ListingReportAssignee")
   listingReportNotes     ListingReportNote[]
+  propertyStatusChanges  PropertyStatusHistory[] @relation("PropertyStatusChanger")
 
   @@index([role])
   @@index([accountType])
@@ -626,6 +627,7 @@ model Property {
   savedSearchMatches SavedSearchMatch[]
   partners           PropertyPartner[]
   priceHistory       PropertyPriceHistory[]
+  statusHistory      PropertyStatusHistory[]
   floorPlans         PropertyFloorPlan[]
   openHouses         OpenHouse[]
   packageOrders      PackageOrder[]
@@ -1189,6 +1191,27 @@ model PropertyPriceHistory {
   changedAt   DateTime @default(now())
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, changedAt])
+}
+
+/// Elanın status tarixçəsi (#204, PRD 5.4): kim, nə vaxt, hansı statusdan hansına və niyə.
+/// Moderator müdaxilələri `source = MODERATION` ilə ayrılır. Qiymət dəyişikliyi `PropertyPriceHistory`-dədir.
+model PropertyStatusHistory {
+  id          String   @id @default(cuid())
+  propertyId  String
+  /// Yeni elanda `null`.
+  fromStatus  String?
+  toStatus    String
+  /// PROPERTY_STATUS_SOURCES: ADMIN | OWNER | MODERATION | SYSTEM | IMPORT
+  source      String
+  changedById String?
+  /// Moderatorun səbəbi və ya sistem izahı (məs. müddət bitdi).
+  note        String?
+  changedAt   DateTime @default(now())
+
+  property  Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  changedBy User?    @relation("PropertyStatusChanger", fields: [changedById], references: [id], onDelete: SetNull)
 
   @@index([propertyId, changedAt])
 }

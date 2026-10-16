@@ -1,18 +1,21 @@
 import { prisma } from "@/lib/prisma";
-import { NOTIFICATION_TYPES, PROPERTY_STATUSES, PUBLIC_ACCOUNT_TYPES, type Locale } from "@/lib/constants";
+import { NOTIFICATION_TYPES, PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES, PUBLIC_ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
 import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { recordDomainEvent } from "@/lib/admin/events";
+import { recordPropertyStatusChange } from "@/lib/property-status-history";
 import { findManyInChunks } from "@/lib/d1-chunks";
-import { REMINDER_DAYS, backfillExpiry, renewedExpiry } from "@/lib/listing-expiry-policy";
+import { backfillExpiry, renewedExpiry } from "@/lib/listing-expiry-policy";
+import { getListingExpiryConfig } from "@/lib/settings";
 
 /**
  * Elan müddəti və yeniləmə (#109).
  *
- * Sahib və agentlik hesablarının elanları dərcdən sonra `LISTING_LIFETIME_DAYS` gün
- * aktiv qalır; bitməyə `REMINDER_DAYS` qalanda sahibə xatırlatma gedir, müddət bitəndə
+ * Sahib və agentlik hesablarının elanları dərcdən sonra panelin təyin etdiyi gün qədər (defolt
+ * `LISTING_LIFETIME_DAYS`) aktiv qalır; bitməyə `reminderDays` qalanda sahibə «hələ aktualdırmı?»
+ * xatırlatması gedir (#204, PRD 5.2), müddət bitəndə
  * elan `EXPIRED` statusuna keçir (`expiredAt` ilə — sahib bir kliklə bərpa edə bilsin, #202).
  * Şirkətin öz portfeli (STAFF müəllifli) vaxtsızdır.
  *
@@ -97,13 +100,15 @@ async function ownersById(authorIds: (string | null)[]): Promise<Map<string, Own
 /** Gündəlik iş: müddət təyini, xatırlatma və arxiv. İdempotentdir. */
 export async function runListingExpiry(now = new Date()) {
   const owners = { author: { accountType: { in: EXPIRING_ACCOUNT_TYPES } } };
+  // Ömür və xatırlatma paneldən gəlir (#204, PRD 5.2); oxuma xətası 60/7 gün defoltudur.
+  const config = await getListingExpiryConfig();
 
   // Müddəti bitib arxivlənmiş, sonra hansısa yolla yenidən dərc olunmuş elan köhnə
   // `expiredAt`/`listingExpiresAt` daşıyırsa, onu təkrar arxivləmək yox — təzə müddət
   // vermək lazımdır. Dərc yolları bunu özü edir; bu addım unudulmuş yol üçün sığortadır.
   const republished = await prisma.property.updateMany({
     where: { deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED, expiredAt: { not: null }, ...owners },
-    data: { listingExpiresAt: renewedExpiry(now), expiredAt: null, expiryReminderSentAt: null },
+    data: { listingExpiresAt: renewedExpiry(now, config.lifetimeDays), expiredAt: null, expiryReminderSentAt: null },
   });
 
   const missing = await prisma.property.findMany({
@@ -112,10 +117,10 @@ export async function runListingExpiry(now = new Date()) {
     take: 500,
   });
   for (const property of missing) {
-    await prisma.property.update({ where: { id: property.id }, data: { listingExpiresAt: backfillExpiry(property.publishedAt, now) } });
+    await prisma.property.update({ where: { id: property.id }, data: { listingExpiresAt: backfillExpiry(property.publishedAt, now, config.lifetimeDays) } });
   }
 
-  const reminderCutoff = new Date(now.getTime() + REMINDER_DAYS * DAY);
+  const reminderCutoff = new Date(now.getTime() + config.reminderDays * DAY);
   const expiring = await prisma.property.findMany({
     where: {
       deletedAt: null,
@@ -145,6 +150,9 @@ export async function runListingExpiry(now = new Date()) {
     await prisma.property.update({
       where: { id: property.id },
       data: { status: PROPERTY_STATUSES.EXPIRED, expiredAt: now },
+    });
+    await recordPropertyStatusChange({
+      propertyId: property.id, from: PROPERTY_STATUSES.PUBLISHED, to: PROPERTY_STATUSES.EXPIRED, source: PROPERTY_STATUS_SOURCES.SYSTEM,
     });
     await recordDomainEvent("property.expired", "Property", property.id, { title: property.title });
     const owner = property.authorId ? expiredOwners.get(property.authorId) : undefined;
