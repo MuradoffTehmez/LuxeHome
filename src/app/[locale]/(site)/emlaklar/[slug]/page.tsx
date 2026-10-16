@@ -66,6 +66,7 @@ import { maskPhone, resolveListingPublisher } from "@/lib/accounts/listing-publi
 import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
 import { PublisherContactButtons } from "@/components/site/publisher-contact";
 import { SafetyTips } from "@/components/site/safety-tips";
+import { ContactSafetyWarning } from "@/components/site/contact-safety-warning";
 import { ReportListingButton } from "@/components/site/report-listing";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
@@ -811,6 +812,8 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </div>
                 )}
 
+                {/* Beh xəbərdarlığı (#199) — hər elanda, əlaqə düymələrinin bilavasitə üstündə. */}
+                <ContactSafetyWarning className="mb-3" />
                 <div className="mb-6">
                   {publisher.kind === "company" ? (
                     <div className="flex flex-col gap-2">

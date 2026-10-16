@@ -239,6 +239,7 @@
     }
   },
   "safety": {
+    "contactWarning": "Diqqət! Əmlakı şəxsən görmədən, mülkiyyət sənədlərini yoxlamadan və qarşı tərəfin səlahiyyətlərinə əmin olmadan beh, depozit və ya hər hansı əvvəlcədən ödəniş etməyin.",
     "title": "Təhlükəsizlik məsləhətləri",
     "tipDeposit": "Əmlakı görmədən və sənədləri yoxlamadan beh və ya avans ödəməyin.",
     "tipDocuments": "Çıxarışı və satıcının şəxsiyyətini yoxlayın, müqaviləni notariusda bağlayın.",

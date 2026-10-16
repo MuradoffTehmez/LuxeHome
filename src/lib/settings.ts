@@ -51,6 +51,11 @@ export const SETTING_KEYS = {
   SITE_IMAGE_ABOUT: "site.image_about",
   SITE_IMAGE_CTA: "site.image_cta",
   /**
+   * Əlaqə panelinin beh xəbərdarlığı (#199) — `{ az, en, ru }` **tək JSON dəyər**.
+   * Boş dil kataloqdakı defolt mətnə qayıdır; oxuma/təmizləmə `src/lib/safety-warning.ts`-dədir.
+   */
+  SAFETY_CONTACT_WARNING: "safety.contact_warning",
+  /**
    * Sistem rejimi (`NORMAL` | `MAINTENANCE` | `READ_ONLY`) və texniki xidmət
    * səhifəsinin mətnləri — **tək JSON dəyər**.
    *

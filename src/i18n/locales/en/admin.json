@@ -40,6 +40,7 @@
       "projects": "Developments",
       "blog": "Blog",
       "knowledge": "Knowledge Hub",
+      "safetyTexts": "Safety notices",
       "translations": "Translations",
       "services": "Services",
       "media": "Media",
@@ -2872,6 +2873,21 @@
       "resolveDescription": "Reports will be marked as resolved without changing the listing.",
       "dismiss": "Unfounded",
       "dismissDescription": "Reports will be dismissed as unfounded; the listing does not change."
+    },
+    "safety": {
+      "title": "Safety notices",
+      "description": "Mandatory texts that protect visitors from fraud. Changes appear on the site immediately and are written to the audit log.",
+      "contactWarning": "Contact panel deposit warning",
+      "label": {
+        "az": "Azerbaijani",
+        "en": "English",
+        "ru": "Russian"
+      },
+      "defaultHint": "Empty — the site shows the default text (in the placeholder).",
+      "customHint": "Custom text. Clear the field to return to the default text.",
+      "whereTitle": "Where it appears",
+      "where": "In the contact panel of every listing and agency profile, directly above the phone and WhatsApp buttons. It does not hide the buttons.",
+      "rules": "The text must be 20–400 characters. State the deposit and prepayment risk clearly — the notice cannot be removed; an empty language falls back to the default."
     }
   },
   "server": {
@@ -3278,6 +3294,10 @@
       "acikSikayetYoxdur": "There are no open reports for this listing.",
       "esassizSayildi": "The reports were dismissed.",
       "hellEdildi": "The reports were resolved."
+    },
+    "safety": {
+      "saxlanildi": "The safety notice was saved.",
+      "uzunluq": "The text must be {min}–{max} characters."
     }
   }
 }

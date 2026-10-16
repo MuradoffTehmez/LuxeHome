@@ -40,6 +40,7 @@
       "projects": "Layihələr",
       "blog": "Bloq",
       "knowledge": "Bilik Mərkəzi",
+      "safetyTexts": "Xəbərdarlıq mətnləri",
       "translations": "Tərcümələr",
       "services": "Xidmətlər",
       "media": "Media",
@@ -2872,6 +2873,21 @@
       "resolveDescription": "Elan dəyişmədən şikayətlər həll edilmiş kimi qeyd olunacaq.",
       "dismiss": "Əsassızdır",
       "dismissDescription": "Şikayətlər əsassız sayılacaq, elan dəyişmir."
+    },
+    "safety": {
+      "title": "Xəbərdarlıq mətnləri",
+      "description": "Ziyarətçiləri dələduzluqdan qoruyan məcburi mətnlər. Dəyişiklik saytda dərhal görünür və audit jurnalına yazılır.",
+      "contactWarning": "Əlaqə panelinin beh xəbərdarlığı",
+      "label": {
+        "az": "Azərbaycan dili",
+        "en": "İngilis dili",
+        "ru": "Rus dili"
+      },
+      "defaultHint": "Boşdur — saytda defolt mətn göstərilir (yer tutucuda).",
+      "customHint": "Fərdi mətn. Sahəni boşaltsanız defolt mətnə qayıdılır.",
+      "whereTitle": "Harada göstərilir",
+      "where": "Hər elanın və agentlik profilinin əlaqə panelində, telefon və WhatsApp düymələrinin bilavasitə üstündə. Düymələri gizlətmir.",
+      "rules": "Mətn 20–400 simvol olmalıdır. Beh, depozit və əvvəlcədən ödəniş riskini açıq yazın — mətn tam silinə bilməz, boş dil defolta qayıdır."
     }
   },
   "server": {
@@ -3278,6 +3294,10 @@
       "acikSikayetYoxdur": "Bu elan üzrə açıq şikayət yoxdur.",
       "esassizSayildi": "Şikayətlər əsassız sayıldı.",
       "hellEdildi": "Şikayətlər həll edildi."
+    },
+    "safety": {
+      "saxlanildi": "Xəbərdarlıq mətni saxlanıldı.",
+      "uzunluq": "Mətn {min}–{max} simvol olmalıdır."
     }
   }
 }
