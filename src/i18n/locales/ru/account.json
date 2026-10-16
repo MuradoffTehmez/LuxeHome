@@ -940,5 +940,67 @@
       "stale": "Состояние запроса изменилось. Обновите страницу.",
       "failed": "Не удалось выполнить действие. Попробуйте ещё раз."
     }
+  },
+  "activity": {
+    "metaTitle": "Журнал действий",
+    "metaDescription": "Кто и что изменил в агентстве.",
+    "eyebrow": "Агентство",
+    "title": "Журнал действий",
+    "description": "Кто и что изменил в объявлениях, заявках и команде вашего агентства. Личные объявления агентов здесь не отображаются.",
+    "noAgency": "Нет профиля агентства",
+    "noAgencyDescription": "Журнал откроется после создания профиля агентства.",
+    "filters": "Группа действий",
+    "actorFilter": "Исполнитель",
+    "everyone": "Все",
+    "groups": {
+      "all": "Все",
+      "listings": "Объявления",
+      "leads": "Заявки",
+      "team": "Команда",
+      "packages": "Пакеты",
+      "transfers": "Передачи"
+    },
+    "platform": "Администратор платформы",
+    "actions": {
+      "LISTING_CREATED": "добавил(а) объявление «{entity}»",
+      "LISTING_UPDATED": "отредактировал(а) объявление «{entity}»",
+      "PRICE_CHANGED": "изменил(а) цену «{entity}»",
+      "LISTING_DELETED": "удалил(а) объявление «{entity}»",
+      "LISTING_CLOSED": "закрыл(а) «{entity}» как проданное/сданное",
+      "LISTING_RENEWED": "продлил(а) объявление «{entity}»",
+      "LEAD_REASSIGNED": "передал(а) заявку «{entity}» другому агенту",
+      "MEMBER_INVITED": "пригласил(а) {entity} в команду",
+      "MEMBER_APPROVED": "принял(а) {entity} в команду",
+      "MEMBER_REJECTED": "отклонил(а) запрос {entity}",
+      "MEMBER_REMOVED": "прекратил(а) сотрудничество с {entity}",
+      "MEMBER_LEFT": "покинул(а) агентство",
+      "MEMBER_RIGHTS_CHANGED": "изменил(а) права {entity}",
+      "LEAD_ROUTING_CHANGED": "изменил(а) распределение заявок",
+      "PACKAGE_REQUESTED": "подал(а) «{entity}» на премиум-пакет",
+      "TRANSFER_REQUESTED": "создал(а) запрос на передачу «{entity}»",
+      "TRANSFER_DECIDED": "принял(а) решение по запросу на передачу «{entity}»"
+    },
+    "details": {
+      "price": "{from} → {to}",
+      "handedOver": "передано объявлений агентства: {count}",
+      "leadsOn": "Включён в очередь заявок",
+      "leadsOff": "Исключён из очереди заявок",
+      "routing": "Новый режим: {mode}",
+      "to": "Новый ответственный: {name}",
+      "package": "Пакет: {name}",
+      "transfer": "{from} → {to}",
+      "transferSourceApproved": "Агентство объявления одобрило",
+      "transferSourceRejected": "Агентство объявления отклонило",
+      "transferAdminApproved": "Передача одобрена",
+      "transferAdminRejected": "Передача отклонена",
+      "viaLink": "Присоединился по ссылке-приглашению"
+    },
+    "emptyTitle": "Записей пока нет",
+    "emptyDescription": "Здесь появятся изменения объявлений, заявок и команды.",
+    "pagination": "Страницы",
+    "previous": "Назад",
+    "next": "Вперёд",
+    "pageOf": "{page} / {pages}",
+    "privacy": "Журнал виден только владельцу агентства и администраторам платформы."
   }
 }

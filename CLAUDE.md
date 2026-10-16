@@ -782,6 +782,14 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   (`authorId` = təhvil alan, təyinat götürülür); yazılmasa sorğu `CANCELLED` olur. **Məxfilik:** elanın köhnə müraciətləri
   `Lead.agencyId = A` ilə bağlanır və `leadScope()` elan müəllifinə başqa agentliyə bağlı müraciəti göstərmir — müştəri
   məlumatı yeni agentliyə keçmir. Bildirişlər `LISTING_TRANSFER` tipidir (`noticeTransferRequested/Decision`).
+- **Agentlik fəaliyyət jurnalı (#214, PRD 7.4)** `AgencyActivity` (`lib/accounts/agency-activity.ts`): elan əlavə/redaktə/
+  qiymət/silmə/bağlama/yeniləmə, müraciətin başqa agentə verilməsi, komanda (dəvət, qəbul, rədd, dayandırma, ayrılma,
+  hüquq və bölgü dəyişikliyi), premium paket təqdimatı və köçürmələr. `recordAgencyActivity()` **heç vaxt atmır** və
+  `agencyId` boşdursa yazmır — elan əməliyyatı yalnız agentlik elanında (`Property.agencyId`) jurnala düşür. İcraçı və
+  obyekt adı snapshot-dur; panel işçisinin qərarı `actor: null` ilə yazılır və «Platforma administratoru» görünür.
+  Sahib `/kabinet/fealiyyet`-də (`?qrup=`, `?kim=`, `?sehife=`), admin agentlik səhifəsində son qeydləri görür.
+  Agentlik mühitini dəyişən yeni action yazanda jurnalı da çağır; yeni əməliyyat üçün `AGENCY_ACTIVITY_ACTIONS`,
+  `AGENCY_ACTIVITY_GROUPS` və hər iki kataloqu (`account.activity.actions`, `admin…activityActions`) yenilə.
 - **Bağlanmış sövdələşmələr:** «təklif»/«elan» sayı yalnız `ACTIVE_OFFER_STATUSES` (PUBLISHED + RESERVED) —
   `activeOfferWhere()`. Satılmış/icarəyə verilmiş elan «Uğurlu sövdələşmələr» bölməsindədir (`getClosedDeals`,
   son `DEAL_STATS_WINDOW_DAYS` gün, **yalnız `closedAt`** — `updatedAt` baxış sayğacı ilə də dəyişir; köhnə

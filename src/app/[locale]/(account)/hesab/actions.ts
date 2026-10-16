@@ -293,7 +293,7 @@ export async function registerAccount(
       // söndürə və ya yeniləyə bilər — köhnə link ilə qoşulma olmamalıdır.
       const liveAgency = await findAgencyByInviteToken(inviteToken);
       const joined = liveAgency?.id === inviteAgency.id
-        ? await joinAgencyByLink(liveAgency, { id: userId, accountType: parsed.data.accountType })
+        ? await joinAgencyByLink(liveAgency, { id: userId, accountType: parsed.data.accountType, name: composeName(parsed.data.firstName, parsed.data.lastName) })
         : null;
       if (joined?.status === "joined") {
         await recordDomainEvent("agency.employee_joined_link", "AgencyEmployee", joined.employeeId, { agencyId: inviteAgency.id });

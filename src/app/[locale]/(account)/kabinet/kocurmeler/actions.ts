@@ -8,7 +8,8 @@ import { recordDomainEvent } from "@/lib/admin/events";
 import { noticeTransferDecision, noticeTransferRequested } from "@/lib/accounts/account-notices";
 import { cancelTransferRequest, createTransferRequest, decideTransferAsSource } from "@/lib/listing-transfers";
 import { localizePath } from "@/i18n/path-locale";
-import { REJECTION_REASON_MAX, REJECTION_REASON_MIN, TRANSFER_REASON_MAX, TRANSFER_REASON_MIN, type Locale } from "@/lib/constants";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
+import { AGENCY_ACTIVITY_ACTIONS, REJECTION_REASON_MAX, REJECTION_REASON_MIN, TRANSFER_REASON_MAX, TRANSFER_REASON_MIN, type Locale } from "@/lib/constants";
 import type { AuthUser } from "@/lib/auth/types";
 
 const PAGE = "/kabinet/kocurmeler";
@@ -50,6 +51,14 @@ export async function requestListingTransfer(_state: ActionState, formData: Form
       return failure(message, { [field]: message });
     }
     await recordDomainEvent("transfer.requested", "ListingTransfer", result.id, { fromAgencyId: result.fromAgencyId });
+    // Sorğu iki agentliyin jurnalına düşür: göndərən (B) və elanın agentliyi (A).
+    for (const agencyId of [result.toAgencyId, result.fromAgencyId]) {
+      await recordAgencyActivity({
+        agencyId, actor: user, action: AGENCY_ACTIVITY_ACTIONS.TRANSFER_REQUESTED,
+        entityType: "ListingTransfer", entityId: result.id, entityLabel: result.propertyTitle,
+        details: { from: result.fromAgencyName, to: result.toAgencyName },
+      });
+    }
     await noticeTransferRequested({
       userId: result.fromOwnerId,
       transferId: result.id,
@@ -86,6 +95,13 @@ export async function decideIncomingTransfer(id: string, approve: boolean, note:
     }
     const { transfer } = result;
     await recordDomainEvent("transfer.source_decided", "ListingTransfer", transfer.id, { approved: approve });
+    for (const agencyId of [transfer.fromAgencyId, transfer.toAgencyId]) {
+      await recordAgencyActivity({
+        agencyId, actor: user, action: AGENCY_ACTIVITY_ACTIONS.TRANSFER_DECIDED,
+        entityType: "ListingTransfer", entityId: transfer.id, entityLabel: transfer.property.title,
+        details: { stage: "source", approved: approve },
+      });
+    }
     const recipients = new Set([transfer.requestedById, transfer.targetUserId].filter((value): value is string => Boolean(value)));
     for (const recipient of recipients) {
       await noticeTransferDecision({

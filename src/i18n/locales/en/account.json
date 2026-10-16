@@ -940,5 +940,67 @@
       "stale": "The request has changed. Refresh the page.",
       "failed": "The action failed. Please try again."
     }
+  },
+  "activity": {
+    "metaTitle": "Activity log",
+    "metaDescription": "Who changed what inside the agency.",
+    "eyebrow": "Agency",
+    "title": "Activity log",
+    "description": "Who changed what in your agency’s listings, enquiries and team. Agents’ personal listings are not shown here.",
+    "noAgency": "No agency profile",
+    "noAgencyDescription": "The log opens once the agency profile is created.",
+    "filters": "Action group",
+    "actorFilter": "Performed by",
+    "everyone": "Everyone",
+    "groups": {
+      "all": "All",
+      "listings": "Listings",
+      "leads": "Enquiries",
+      "team": "Team",
+      "packages": "Packages",
+      "transfers": "Transfers"
+    },
+    "platform": "Platform administrator",
+    "actions": {
+      "LISTING_CREATED": "added the listing “{entity}”",
+      "LISTING_UPDATED": "edited the listing “{entity}”",
+      "PRICE_CHANGED": "changed the price of “{entity}”",
+      "LISTING_DELETED": "deleted the listing “{entity}”",
+      "LISTING_CLOSED": "closed “{entity}” as sold/rented",
+      "LISTING_RENEWED": "renewed the listing “{entity}”",
+      "LEAD_REASSIGNED": "reassigned the enquiry “{entity}”",
+      "MEMBER_INVITED": "invited {entity} to the team",
+      "MEMBER_APPROVED": "accepted {entity} into the team",
+      "MEMBER_REJECTED": "rejected the request of {entity}",
+      "MEMBER_REMOVED": "ended the collaboration with {entity}",
+      "MEMBER_LEFT": "left the agency",
+      "MEMBER_RIGHTS_CHANGED": "changed the rights of {entity}",
+      "LEAD_ROUTING_CHANGED": "changed enquiry routing",
+      "PACKAGE_REQUESTED": "submitted “{entity}” for a premium package",
+      "TRANSFER_REQUESTED": "created a transfer request for “{entity}”",
+      "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”"
+    },
+    "details": {
+      "price": "{from} → {to}",
+      "handedOver": "{count} agency listings handed over",
+      "leadsOn": "Added to the enquiry queue",
+      "leadsOff": "Removed from the enquiry queue",
+      "routing": "New mode: {mode}",
+      "to": "New owner: {name}",
+      "package": "Package: {name}",
+      "transfer": "{from} → {to}",
+      "transferSourceApproved": "The listing’s agency approved",
+      "transferSourceRejected": "The listing’s agency rejected",
+      "transferAdminApproved": "Transfer approved",
+      "transferAdminRejected": "Transfer rejected",
+      "viaLink": "Joined via invite link"
+    },
+    "emptyTitle": "No entries yet",
+    "emptyDescription": "Listing, enquiry and team changes will appear here.",
+    "pagination": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "{page} / {pages}",
+    "privacy": "The log is visible only to the agency owner and platform administrators."
   }
 }

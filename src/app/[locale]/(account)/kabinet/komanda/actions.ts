@@ -13,6 +13,7 @@ import {
   isLeadRoutingMode,
   type Locale,
   MEMBERSHIP_END_REASONS,
+  AGENCY_ACTIVITY_ACTIONS,
 } from "@/lib/constants";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { recordDomainEvent } from "@/lib/admin/events";
@@ -30,6 +31,7 @@ import {
 import { noticeAgencyDecision, noticeListingsHandedOver } from "@/lib/accounts/account-notices";
 import { handOverListings, isListingHandover, resolveHandoverTarget } from "@/lib/accounts/agency-listings";
 import { closeMembershipPeriod } from "@/lib/accounts/agency-ownership";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { generateInviteToken } from "@/lib/accounts/agency-invite";
 import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
 
@@ -96,7 +98,7 @@ export async function inviteAgencyEmployee(_prev: ActionState, formData: FormDat
 
     const invitee = await prisma.user.findUnique({
       where: { email: parsed.data.email },
-      select: { id: true, accountType: true },
+      select: { id: true, accountType: true, name: true },
     });
     if (!invitee) {
       return failure(t("actions.accountNotFound"), { email: t("actions.accountNotFoundField") });
@@ -134,6 +136,10 @@ export async function inviteAgencyEmployee(_prev: ActionState, formData: FormDat
     await recordDomainEvent("agency.employee_invited", "AgencyEmployee", employee.id, {
       agencyId: owner.agency.id,
       userEmail: parsed.data.email,
+    });
+    await recordAgencyActivity({
+      agencyId: owner.agency.id, actor: owner.user, action: AGENCY_ACTIVITY_ACTIONS.MEMBER_INVITED,
+      entityType: "AgencyEmployee", entityId: employee.id, entityLabel: invitee.name,
     });
 
     revalidatePath(localizePath("/kabinet/komanda", locale));
@@ -213,6 +219,10 @@ export async function removeAgencyEmployee(
       handover: target?.ok && handover === LISTING_HANDOVER.AGENT ? LISTING_HANDOVER.AGENT : LISTING_HANDOVER.AGENCY,
       handedOver,
     });
+    await recordAgencyActivity({
+      agencyId: owner.agency.id, actor: owner.user, action: AGENCY_ACTIVITY_ACTIONS.MEMBER_REMOVED,
+      entityType: "AgencyEmployee", entityId: id, entityLabel: employee.user.name, details: { handedOver },
+    });
     if (target?.ok && handedOver > 0 && target.userId !== owner.user.id) {
       await noticeListingsHandedOver({
         userId: target.userId,
@@ -262,7 +272,7 @@ async function reviewAgencyRequest(
   try {
     const request = await prisma.agencyEmployee.findUnique({
       where: { id },
-      select: { id: true, agencyId: true, userId: true, status: true, source: true, invitedAt: true },
+      select: { id: true, agencyId: true, userId: true, status: true, source: true, invitedAt: true, user: { select: { name: true } } },
     });
     const approved = decision === AGENCY_EMPLOYEE_STATUSES.APPROVED;
     // Artıq təsdiqlənmiş sorğunun təkrar təsdiqi qalan addımı (profil bağlantısı) tamamlayır.
@@ -304,6 +314,11 @@ async function reviewAgencyRequest(
       id,
       { agencyId: owner.agency.id, reviewer: "owner" },
     );
+    await recordAgencyActivity({
+      agencyId: owner.agency.id, actor: owner.user,
+      action: approved ? AGENCY_ACTIVITY_ACTIONS.MEMBER_APPROVED : AGENCY_ACTIVITY_ACTIONS.MEMBER_REJECTED,
+      entityType: "AgencyEmployee", entityId: id, entityLabel: request.user.name,
+    });
     await noticeAgencyDecision({
       userId: request.userId,
       employeeId: id,
@@ -382,6 +397,10 @@ export async function updateLeadRouting(mode: string): Promise<ActionState> {
   try {
     await prisma.agency.update({ where: { id: owner.agency.id }, data: { leadRouting: mode } });
     await recordDomainEvent("agency.lead_routing_changed", "Agency", owner.agency.id, { mode });
+    await recordAgencyActivity({
+      agencyId: owner.agency.id, actor: owner.user, action: AGENCY_ACTIVITY_ACTIONS.LEAD_ROUTING_CHANGED,
+      entityType: "Agency", entityId: owner.agency.id, entityLabel: owner.agency.name, details: { mode },
+    });
     revalidatePath(localizePath("/kabinet/komanda", locale));
     return success(t("team.routing.saved"));
   } catch (error) {
@@ -409,6 +428,11 @@ export async function setEmployeeReceivesLeads(id: string, receives: boolean): P
       data: { receivesLeads: receives === true },
     });
     if (count === 0) return failure(t("actions.employeeNotFound"));
+    const member = await prisma.agencyEmployee.findUnique({ where: { id }, select: { user: { select: { name: true } } } });
+    await recordAgencyActivity({
+      agencyId: owner.agency.id, actor: owner.user, action: AGENCY_ACTIVITY_ACTIONS.MEMBER_RIGHTS_CHANGED,
+      entityType: "AgencyEmployee", entityId: id, entityLabel: member?.user.name ?? null, details: { receivesLeads: receives === true },
+    });
     revalidatePath(localizePath("/kabinet/komanda", locale));
     return success(receives ? t("team.routing.memberOn") : t("team.routing.memberOff"));
   } catch (error) {

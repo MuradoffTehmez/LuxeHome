@@ -9,6 +9,7 @@ import {
   AGENCY_EMPLOYEE_STATUSES,
   MAX_PENDING_AGENCY_REQUESTS,
   type Locale,
+  AGENCY_ACTIVITY_ACTIONS,
   MEMBERSHIP_END_REASONS,
 } from "@/lib/constants";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
@@ -21,6 +22,7 @@ import { linkAgentProfileToAgency } from "@/lib/accounts/agency-membership";
 import { noticeAgencyJoinRequest, noticeAgentLeft } from "@/lib/accounts/account-notices";
 import { handOverListings } from "@/lib/accounts/agency-listings";
 import { closeMembershipPeriod } from "@/lib/accounts/agency-ownership";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
 
 /**
@@ -148,6 +150,10 @@ export async function leaveAgency(id: string): Promise<ActionState> {
     await prisma.agencyEmployee.delete({ where: { id } });
     if (wasMember) {
       await linkAgentProfileToAgency(user.id, membership.agency.id, false);
+      await recordAgencyActivity({
+        agencyId: membership.agency.id, actor: user, action: AGENCY_ACTIVITY_ACTIONS.MEMBER_LEFT,
+        entityType: "AgencyEmployee", entityId: id, entityLabel: user.name, details: { handedOver },
+      });
       await closeMembershipPeriod({
         userId: user.id,
         agencyId: membership.agency.id,

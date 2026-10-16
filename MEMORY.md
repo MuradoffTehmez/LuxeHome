@@ -734,3 +734,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #212 (Modul 04, 6.4): `ListingTransfer` — B sorğu edir, A sahibi və admin təsdiqləyir, köhnə müraciətlər A-da qalır
   (`leadScope` başqa agentliyin müraciətini elan müəllifinə göstərmir). Bununla Modul 04 bağlanır; növbəti — Modul 05
   (agentlik idarəetmə paneli: dashboard, agentlərin idarəsi, daxili tapşırıqlar, fəaliyyət jurnalı).
+- #214 (Modul 05, 7.4): `AgencyActivity` jurnalı + `/kabinet/fealiyyet`. Modul 05-in qalan sırası: dashboard (7.1),
+  agentlərin idarəsi (7.2: rol, səlahiyyət, girişi dayandırma, elan təyini), tapşırıqlar (7.3).

@@ -215,6 +215,7 @@ model Agency {
   membershipHistory AgencyMembershipHistory[]
   transfersOut      ListingTransfer[]         @relation("TransferFrom")
   transfersIn       ListingTransfer[]         @relation("TransferTo")
+  activities        AgencyActivity[]
   partners          AgencyPartner[]
   agentProfiles     AgentProfile[]
   testimonials      Testimonial[]
@@ -335,6 +336,30 @@ model ListingTransfer {
   @@index([propertyId, status])
   @@index([fromAgencyId, status])
   @@index([toAgencyId, status])
+}
+
+/// Agentlik daxili fəaliyyət jurnalı (#214, PRD 7.4): kim nəyi dəyişdi. İcraçının və obyektin adı
+/// snapshot kimi saxlanılır — hesab və ya elan silinsə də jurnal oxunaqlı qalır.
+model AgencyActivity {
+  id          String   @id @default(cuid())
+  agencyId    String
+  actorId     String?
+  actorName   String
+  /// `AGENCY_ACTIVITY_ACTIONS` — `constants.ts`.
+  action      String
+  /// Property | Lead | AgencyEmployee | PackageOrder | Agency | ListingTransfer
+  entityType  String
+  entityId    String?
+  entityLabel String?
+  /// Əlavə məlumat (JSON): məs. `{ "from": 120000, "to": 115000, "currency": "AZN" }`.
+  details     String?
+  createdAt   DateTime @default(now())
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, createdAt])
+  @@index([agencyId, action, createdAt])
+  @@index([agencyId, actorId, createdAt])
 }
 
 /// Aktiv giriş sessiyaları. Cookie yalnız bu sətrin id-sini daşıyır, beləliklə

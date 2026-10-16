@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { AGENCY_EMPLOYEE_STATUSES, LEAD_STATUSES, type Locale } from "@/lib/constants";
+import { AGENCY_ACTIVITY_ACTIONS, AGENCY_EMPLOYEE_STATUSES, LEAD_STATUSES, type Locale } from "@/lib/constants";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
 import { localizePath } from "@/i18n/path-locale";
@@ -91,6 +92,12 @@ export async function reassignLead(id: string, targetUserId: string): Promise<Ac
     if (lead.handlerId === targetUserId) return success(t("actions.reassigned"));
 
     await prisma.lead.update({ where: { id: lead.id }, data: { handlerId: targetUserId } });
+    const target = await prisma.user.findUnique({ where: { id: targetUserId }, select: { name: true } });
+    await recordAgencyActivity({
+      agencyId: lead.agency.id, actor: context.user, action: AGENCY_ACTIVITY_ACTIONS.LEAD_REASSIGNED,
+      entityType: "Lead", entityId: lead.id, entityLabel: lead.property?.title ?? lead.subject ?? lead.name,
+      details: { to: target?.name ?? null },
+    });
     if (member) {
       await prisma.agencyEmployee.update({ where: { id: member.id }, data: { lastLeadAt: new Date() } });
       await noticeLeadRouted({

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES } from "@/lib/constants";
+import { ACCOUNT_TYPES, AGENCY_ACTIVITY_ACTIONS, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES } from "@/lib/constants";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { toBase64Url } from "@/lib/auth/crypto";
 import {
   commitMembershipDecision,
@@ -56,7 +57,7 @@ export type LinkJoinResult =
  */
 export async function joinAgencyByLink(
   agency: Pick<InviteAgency, "id">,
-  user: { id: string; accountType: string },
+  user: { id: string; accountType: string; name?: string },
 ): Promise<LinkJoinResult> {
   if (user.accountType !== ACCOUNT_TYPES.AGENT) return { status: "notAgent" };
 
@@ -95,5 +96,9 @@ export async function joinAgencyByLink(
     currentStatus: AGENCY_EMPLOYEE_STATUSES.PENDING,
   });
   if (result === "conflict") return { status: "conflict" };
+  await recordAgencyActivity({
+    agencyId: agency.id, actor: { id: user.id, name: user.name ?? "—" }, action: AGENCY_ACTIVITY_ACTIONS.MEMBER_APPROVED,
+    entityType: "AgencyEmployee", entityId: employee.id, entityLabel: user.name ?? null, details: { source: "LINK" },
+  });
   return { status: "joined", employeeId: employee.id, attemptAt };
 }

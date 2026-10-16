@@ -2903,7 +2903,29 @@
       "officeAdd": "Add branch",
       "officeName": "Branch name",
       "officeCity": "City / district",
-      "officeCityPlaceholder": "Select"
+      "officeCityPlaceholder": "Select",
+      "activityTitle": "Recent activity",
+      "activityDescription": "Latest entries from the agency’s internal log ({count} in total).",
+      "activityPlatform": "Platform administrator",
+      "activityActions": {
+        "LISTING_CREATED": "added the listing “{entity}”",
+        "LISTING_UPDATED": "edited the listing “{entity}”",
+        "PRICE_CHANGED": "changed the price of “{entity}”",
+        "LISTING_DELETED": "deleted the listing “{entity}”",
+        "LISTING_CLOSED": "closed “{entity}” as sold/rented",
+        "LISTING_RENEWED": "renewed the listing “{entity}”",
+        "LEAD_REASSIGNED": "reassigned the enquiry “{entity}”",
+        "MEMBER_INVITED": "invited {entity} to the team",
+        "MEMBER_APPROVED": "accepted {entity} into the team",
+        "MEMBER_REJECTED": "rejected the request of {entity}",
+        "MEMBER_REMOVED": "ended the collaboration with {entity}",
+        "MEMBER_LEFT": "left the agency",
+        "MEMBER_RIGHTS_CHANGED": "changed the rights of {entity}",
+        "LEAD_ROUTING_CHANGED": "changed enquiry routing",
+        "PACKAGE_REQUESTED": "submitted “{entity}” for a premium package",
+        "TRANSFER_REQUESTED": "created a transfer request for “{entity}”",
+        "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”"
+      }
     },
     "reports": {
       "title": "Reports",

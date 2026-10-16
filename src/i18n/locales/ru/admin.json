@@ -2903,7 +2903,29 @@
       "officeAdd": "Добавить филиал",
       "officeName": "Название филиала",
       "officeCity": "Город / район",
-      "officeCityPlaceholder": "Выберите"
+      "officeCityPlaceholder": "Выберите",
+      "activityTitle": "Последние действия",
+      "activityDescription": "Последние записи внутреннего журнала агентства (всего {count}).",
+      "activityPlatform": "Администратор платформы",
+      "activityActions": {
+        "LISTING_CREATED": "добавил(а) объявление «{entity}»",
+        "LISTING_UPDATED": "отредактировал(а) объявление «{entity}»",
+        "PRICE_CHANGED": "изменил(а) цену «{entity}»",
+        "LISTING_DELETED": "удалил(а) объявление «{entity}»",
+        "LISTING_CLOSED": "закрыл(а) «{entity}» как проданное/сданное",
+        "LISTING_RENEWED": "продлил(а) объявление «{entity}»",
+        "LEAD_REASSIGNED": "передал(а) заявку «{entity}» другому агенту",
+        "MEMBER_INVITED": "пригласил(а) {entity} в команду",
+        "MEMBER_APPROVED": "принял(а) {entity} в команду",
+        "MEMBER_REJECTED": "отклонил(а) запрос {entity}",
+        "MEMBER_REMOVED": "прекратил(а) сотрудничество с {entity}",
+        "MEMBER_LEFT": "покинул(а) агентство",
+        "MEMBER_RIGHTS_CHANGED": "изменил(а) права {entity}",
+        "LEAD_ROUTING_CHANGED": "изменил(а) распределение заявок",
+        "PACKAGE_REQUESTED": "подал(а) «{entity}» на премиум-пакет",
+        "TRANSFER_REQUESTED": "создал(а) запрос на передачу «{entity}»",
+        "TRANSFER_DECIDED": "принял(а) решение по запросу на передачу «{entity}»"
+      }
     },
     "reports": {
       "title": "Жалобы",

@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { normalizeTelegramUsername } from "@/lib/accounts/telegram";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { prisma } from "@/lib/prisma";
 import {
+  AGENCY_ACTIVITY_ACTIONS,
   AGENCY_EMPLOYEE_STATUSES,
   MAX_AGENCY_EMPLOYEES,
   MAX_AGENCY_OFFICES,
@@ -271,6 +273,11 @@ async function reviewAgencyEmployeeAs(
       id,
       { agencyId: employee.agency.id, userEmail: employee.user.email },
     );
+    await recordAgencyActivity({
+      agencyId: employee.agency.id, actor: null,
+      action: approved ? AGENCY_ACTIVITY_ACTIONS.MEMBER_APPROVED : AGENCY_ACTIVITY_ACTIONS.MEMBER_REJECTED,
+      entityType: "AgencyEmployee", entityId: id, entityLabel: employee.user.name ?? employee.user.email,
+    });
 
     revalidatePath(LIST_PATH);
     revalidatePath(QUEUE_PATH);

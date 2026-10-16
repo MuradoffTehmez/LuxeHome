@@ -14,10 +14,11 @@ import { requireAdminRead } from "@/lib/admin/guard";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { prisma } from "@/lib/prisma";
 import { countAgencyOffers } from "@/lib/agency-profile";
-import { AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, PERMISSIONS } from "@/lib/constants";
+import { AGENCY_ACTIVITY_ACTIONS, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, PERMISSIONS, type AgencyActivityAction } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils";
 import { getAgencyOffices, getOfficeCityOptions } from "@/lib/accounts/agency-offices";
 import { getAgencyMembershipHistory } from "@/lib/accounts/agency-ownership";
+import { getAgencyActivity } from "@/lib/accounts/agency-activity";
 import { AgencyOfficeEditor } from "../agency-office-editor";
 import { localizePath } from "@/i18n/path-locale";
 import { AgencyLogoEditor } from "../agency-logo-editor";
@@ -60,11 +61,12 @@ export default async function AdminAgencyEditPage({ params }: Props) {
     },
   });
   if (!agency) notFound();
-  const [offerMap, offices, cities, history] = await Promise.all([
+  const [offerMap, offices, cities, history, activity] = await Promise.all([
     countAgencyOffers([agency]),
     getAgencyOffices(agency.id),
     getOfficeCityOptions(),
     getAgencyMembershipHistory(agency.id),
+    getAgencyActivity({ agencyId: agency.id }),
   ]);
   const offers = offerMap.get(agency.id) ?? { total: 0, sale: 0, rent: 0 };
   const sourceLabel = (source: string) =>
@@ -287,6 +289,24 @@ export default async function AdminAgencyEditPage({ params }: Props) {
           </ul>
         )}
       </AdminCard>
+
+      {activity.items.length > 0 && (
+        <AdminCard title={t("pages.agencyHub.activityTitle")} description={t("pages.agencyHub.activityDescription", { count: activity.total })} className="mt-6" bodyClassName="p-0">
+          <ul className="divide-y divide-line">
+            {activity.items.map((item) => (
+              <li key={item.id} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <p className="min-w-0 text-sm text-ink [overflow-wrap:anywhere]">
+                  <span className="font-medium">{item.actorId ? item.actorName : t("pages.agencyHub.activityPlatform")}</span>{" "}
+                  {(Object.values(AGENCY_ACTIVITY_ACTIONS) as string[]).includes(item.action)
+                    ? t(`pages.agencyHub.activityActions.${item.action as AgencyActivityAction}`, { entity: item.entityLabel ?? "—" })
+                    : item.action}
+                </p>
+                <p className="shrink-0 text-xs text-ink-muted">{formatDateTime(item.createdAt)}</p>
+              </li>
+            ))}
+          </ul>
+        </AdminCard>
+      )}
 
       {history.length > 0 && (
         <AdminCard title={t("pages.agencyHub.historyTitle")} description={t("pages.agencyHub.historyDescription")} className="mt-6" bodyClassName="p-0">

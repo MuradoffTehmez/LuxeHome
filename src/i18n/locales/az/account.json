@@ -940,5 +940,67 @@
       "stale": "Sorğunun vəziyyəti dəyişib. Səhifəni yeniləyin.",
       "failed": "Əməliyyat alınmadı. Yenidən cəhd edin."
     }
+  },
+  "activity": {
+    "metaTitle": "Fəaliyyət jurnalı",
+    "metaDescription": "Agentlik daxilində kim nəyi dəyişdi.",
+    "eyebrow": "Agentlik",
+    "title": "Fəaliyyət jurnalı",
+    "description": "Agentliyinizin elanları, müraciətləri və komandası üzrə kim nəyi dəyişdi. Agentlərin şəxsi elanları burada görünmür.",
+    "noAgency": "Agentlik profili yoxdur",
+    "noAgencyDescription": "Jurnal agentlik profili yaradıldıqdan sonra açılır.",
+    "filters": "Əməliyyat qrupu",
+    "actorFilter": "İcraçı",
+    "everyone": "Hamı",
+    "groups": {
+      "all": "Hamısı",
+      "listings": "Elanlar",
+      "leads": "Müraciətlər",
+      "team": "Komanda",
+      "packages": "Paketlər",
+      "transfers": "Köçürmələr"
+    },
+    "platform": "Platforma administratoru",
+    "actions": {
+      "LISTING_CREATED": "«{entity}» elanını əlavə etdi",
+      "LISTING_UPDATED": "«{entity}» elanını redaktə etdi",
+      "PRICE_CHANGED": "«{entity}» elanının qiymətini dəyişdi",
+      "LISTING_DELETED": "«{entity}» elanını sildi",
+      "LISTING_CLOSED": "«{entity}» elanını satılmış/kirayəyə verilmiş kimi bağladı",
+      "LISTING_RENEWED": "«{entity}» elanının müddətini yenilədi",
+      "LEAD_REASSIGNED": "«{entity}» müraciətini başqa agentə verdi",
+      "MEMBER_INVITED": "{entity} adlı agenti komandaya dəvət etdi",
+      "MEMBER_APPROVED": "{entity} adlı agenti komandaya qəbul etdi",
+      "MEMBER_REJECTED": "{entity} adlı agentin müraciətini rədd etdi",
+      "MEMBER_REMOVED": "{entity} adlı agentlə əməkdaşlığı dayandırdı",
+      "MEMBER_LEFT": "agentlikdən ayrıldı",
+      "MEMBER_RIGHTS_CHANGED": "{entity} adlı agentin hüquqlarını dəyişdi",
+      "LEAD_ROUTING_CHANGED": "müraciət bölgüsünü dəyişdi",
+      "PACKAGE_REQUESTED": "«{entity}» elanını premium paketə təqdim etdi",
+      "TRANSFER_REQUESTED": "«{entity}» elanı üçün köçürmə sorğusu yaratdı",
+      "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi"
+    },
+    "details": {
+      "price": "{from} → {to}",
+      "handedOver": "{count} agentlik elanı təhvil verildi",
+      "leadsOn": "Müraciət növbəsinə qatıldı",
+      "leadsOff": "Müraciət növbəsindən çıxarıldı",
+      "routing": "Yeni rejim: {mode}",
+      "to": "Yeni məsul: {name}",
+      "package": "Paket: {name}",
+      "transfer": "{from} → {to}",
+      "transferSourceApproved": "Elanın agentliyi təsdiqlədi",
+      "transferSourceRejected": "Elanın agentliyi rədd etdi",
+      "transferAdminApproved": "Köçürmə təsdiqləndi",
+      "transferAdminRejected": "Köçürmə rədd edildi",
+      "viaLink": "Dəvət linki ilə qoşuldu"
+    },
+    "emptyTitle": "Hələ qeyd yoxdur",
+    "emptyDescription": "Elan, müraciət və komanda dəyişiklikləri burada görünəcək.",
+    "pagination": "Səhifələr",
+    "previous": "Əvvəlki",
+    "next": "Növbəti",
+    "pageOf": "{page} / {pages}",
+    "privacy": "Jurnal yalnız agentlik sahibinə və platforma administratoruna görünür."
   }
 }

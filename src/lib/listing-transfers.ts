@@ -24,7 +24,7 @@ import { listingAgencyFor } from "@/lib/accounts/agency-ownership";
 type Requester = { id: string; accountType: string };
 
 export type CreateTransferResult =
-  | { result: "created"; id: string; fromAgencyId: string; fromOwnerId: string; propertyTitle: string; toAgencyName: string }
+  | { result: "created"; id: string; fromAgencyId: string; toAgencyId: string; fromAgencyName: string; fromOwnerId: string; propertyTitle: string; toAgencyName: string }
   | { result: "noAgency" | "notFound" | "sameAgency" | "notAgencyListing" | "duplicate" | "invalidTarget" | "invalidReason" | "noConsent" };
 
 /** `/az/emlaklar/<slug>`, tam link və ya sadəcə slug — elanın slug-ı. */
@@ -71,7 +71,7 @@ export async function createTransferRequest(input: {
   if (!slug) return { result: "notFound" };
   const property = await prisma.property.findFirst({
     where: { slug, deletedAt: null },
-    select: { id: true, title: true, agencyId: true, agency: { select: { userId: true } } },
+    select: { id: true, title: true, agencyId: true, agency: { select: { userId: true, name: true } } },
   });
   if (!property) return { result: "notFound" };
   if (!property.agencyId || !property.agency) return { result: "notAgencyListing" };
@@ -111,6 +111,8 @@ export async function createTransferRequest(input: {
     result: "created",
     id: created.id,
     fromAgencyId: property.agencyId,
+    toAgencyId: own.agencyId,
+    fromAgencyName: property.agency.name,
     fromOwnerId: property.agency.userId,
     propertyTitle: property.title,
     toAgencyName: own.agencyName,

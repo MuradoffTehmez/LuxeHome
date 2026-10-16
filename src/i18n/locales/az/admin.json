@@ -2903,7 +2903,29 @@
       "officeAdd": "Filial əlavə et",
       "officeName": "Filialın adı",
       "officeCity": "Şəhər / rayon",
-      "officeCityPlaceholder": "Seçin"
+      "officeCityPlaceholder": "Seçin",
+      "activityTitle": "Son fəaliyyət",
+      "activityDescription": "Agentliyin daxili jurnalından son qeydlər (cəmi {count}).",
+      "activityPlatform": "Platforma administratoru",
+      "activityActions": {
+        "LISTING_CREATED": "«{entity}» elanını əlavə etdi",
+        "LISTING_UPDATED": "«{entity}» elanını redaktə etdi",
+        "PRICE_CHANGED": "«{entity}» elanının qiymətini dəyişdi",
+        "LISTING_DELETED": "«{entity}» elanını sildi",
+        "LISTING_CLOSED": "«{entity}» elanını satılmış/kirayəyə verilmiş kimi bağladı",
+        "LISTING_RENEWED": "«{entity}» elanının müddətini yenilədi",
+        "LEAD_REASSIGNED": "«{entity}» müraciətini başqa agentə verdi",
+        "MEMBER_INVITED": "{entity} adlı agenti komandaya dəvət etdi",
+        "MEMBER_APPROVED": "{entity} adlı agenti komandaya qəbul etdi",
+        "MEMBER_REJECTED": "{entity} adlı agentin müraciətini rədd etdi",
+        "MEMBER_REMOVED": "{entity} adlı agentlə əməkdaşlığı dayandırdı",
+        "MEMBER_LEFT": "agentlikdən ayrıldı",
+        "MEMBER_RIGHTS_CHANGED": "{entity} adlı agentin hüquqlarını dəyişdi",
+        "LEAD_ROUTING_CHANGED": "müraciət bölgüsünü dəyişdi",
+        "PACKAGE_REQUESTED": "«{entity}» elanını premium paketə təqdim etdi",
+        "TRANSFER_REQUESTED": "«{entity}» elanı üçün köçürmə sorğusu yaratdı",
+        "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi"
+      }
     },
     "reports": {
       "title": "Şikayətlər",
