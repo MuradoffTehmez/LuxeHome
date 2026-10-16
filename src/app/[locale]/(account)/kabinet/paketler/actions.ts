@@ -5,7 +5,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
-import type { Locale } from "@/lib/constants";
+import { AGENCY_ACTIVITY_ACTIONS, type Locale } from "@/lib/constants";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { localizePath } from "@/i18n/path-locale";
 import { cancelOrder, createCabinetOrder, formatPackageOrderTelegram, type OrderFailure } from "@/lib/packages";
 import { prisma } from "@/lib/prisma";
@@ -49,6 +50,13 @@ export async function requestPackage(_previous: ActionState, formData: FormData)
       packageId: parsed.data.packageId,
     });
     if (!result.ok) return failure(t(`errors.${FAILURE_KEYS[result.reason]}`));
+    // VIP/premium təqdimatı agentlik elanındadırsa jurnala düşür (#214, PRD 7.4).
+    const listing = await prisma.property.findUnique({ where: { id: parsed.data.propertyId }, select: { agencyId: true } });
+    await recordAgencyActivity({
+      agencyId: listing?.agencyId, actor: user, action: AGENCY_ACTIVITY_ACTIONS.PACKAGE_REQUESTED,
+      entityType: "Property", entityId: parsed.data.propertyId, entityLabel: result.propertyTitle,
+      details: { packageName: result.packageName },
+    });
 
     await sendTelegramMessage(formatPackageOrderTelegram({
       packageName: result.packageName,

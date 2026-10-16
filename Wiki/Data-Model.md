@@ -8,7 +8,7 @@
 
 | Domen | Modellər | Say |
 |---|---|---:|
-| İstifadəçi və auth | `User`, `Agency`, `AgencyEmployee`, `AgencyMembershipHistory`, `Session`, `BackupCode`, `Passkey`, `PhoneOtp`, `LoginAttempt`, `EmailVerificationToken`, `PasswordResetToken` | 11 |
+| İstifadəçi və auth | `User`, `Agency`, `AgencyEmployee`, `AgencyMembershipHistory`, `AgencyActivity`, `Session`, `BackupCode`, `Passkey`, `PhoneOtp`, `LoginAttempt`, `EmailVerificationToken`, `PasswordResetToken` | 12 |
 | Əmlak və taksonomiya | `PropertyType`, `Location`, `Feature`, `PropertyFeature`, `Property`, `PropertyImage`, `PropertyFloorPlan`, `PropertyPriceHistory`, `NearbyPlace`, `NeighborhoodProfile` | 10 |
 | Açıq qapı, rezervasiya, paketlər | `OpenHouse`, `OpenHouseRegistration`, `Reservation`, `ReservationEvent`, `ListingPackage`, `PackageOrder` | 6 |
 | Layihə və məzmun | `Project`, `ProjectUnit`, `ProjectImage`, `Service`, `BlogCategory`, `BlogPost`, `Testimonial` | 7 |

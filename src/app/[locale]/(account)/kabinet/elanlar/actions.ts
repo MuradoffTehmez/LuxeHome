@@ -18,6 +18,7 @@ import {
 } from "@/lib/accounts/property-submission";
 import {
   ACCOUNT_TYPES,
+  AGENCY_ACTIVITY_ACTIONS,
   ACTIVE_OFFER_STATUSES,
   LISTING_TYPES,
   MAX_PROPERTY_IMAGES,
@@ -40,6 +41,7 @@ import { refreshListingRisk } from "@/lib/moderation/listing-risk";
 import { queueListingEnrichment } from "@/lib/listing-enrichment";
 import { publicationExpiryReset, renewedExpiry } from "@/lib/listing-expiry-policy";
 import { recordDomainEvent } from "@/lib/admin/events";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { propertyRetentionDays } from "@/lib/property-publish-validation";
 
 const LIST_PATH = "/kabinet/elanlar";
@@ -51,6 +53,8 @@ async function ownerAndGuard(id: string, locale: Locale) {
     select: {
       id: true,
       slug: true,
+      title: true,
+      agencyId: true,
       projectId: true,
       isFeatured: true,
       featuredUntil: true,
@@ -213,6 +217,16 @@ export async function updatePublicProperty(
   } catch (error) {
     return unexpected("istifadəçi elanı yenilənmədi", error, t("actions.unexpected"));
   }
+  // Agentlik jurnalı (#214): redaktə və qiymət dəyişikliyi ayrıca görünür.
+  const activity = { agencyId: property.agencyId, actor: user, entityType: "Property" as const, entityId: property.id, entityLabel: parsed.data.title };
+  await recordAgencyActivity({ ...activity, action: AGENCY_ACTIVITY_ACTIONS.LISTING_UPDATED });
+  if (property.price !== parsed.data.price) {
+    await recordAgencyActivity({
+      ...activity,
+      action: AGENCY_ACTIVITY_ACTIONS.PRICE_CHANGED,
+      details: { from: property.price, to: parsed.data.price, currency: property.currency },
+    });
+  }
 
   // Avtomatik moderasiya (#159): redaktədən sonra risk yenidən hesablanır; dərc olunmuş
   // elan yüksək riskə düşərsə yenidən moderatora gedir.
@@ -264,6 +278,10 @@ export async function deletePublicProperty(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("istifadəçi elanı silinmədi", error, t("actions.unexpected"));
   }
+  await recordAgencyActivity({
+    agencyId: guarded.property.agencyId, actor: guarded.user, action: AGENCY_ACTIVITY_ACTIONS.LISTING_DELETED,
+    entityType: "Property", entityId: guarded.property.id, entityLabel: guarded.property.title,
+  });
 
   queuePropertyVectorSync([id]);
   revalidatePath(localizePath(LIST_PATH, locale));
@@ -309,6 +327,10 @@ export async function renewPublicProperty(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("elan yenilənmədi", error, t("actions.unexpected"));
   }
+  await recordAgencyActivity({
+    agencyId: guarded.property.agencyId, actor: guarded.user, action: AGENCY_ACTIVITY_ACTIONS.LISTING_RENEWED,
+    entityType: "Property", entityId: id, entityLabel: guarded.property.title,
+  });
 
   queuePropertyVectorSync([id]);
   revalidatePath(localizePath(LIST_PATH, locale));
@@ -349,6 +371,10 @@ export async function closePublicProperty(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("elan bağlanmadı", error, t("actions.unexpected"));
   }
+  await recordAgencyActivity({
+    agencyId: property.agencyId, actor: user, action: AGENCY_ACTIVITY_ACTIONS.LISTING_CLOSED,
+    entityType: "Property", entityId: property.id, entityLabel: property.title, details: { status },
+  });
 
   queuePropertyVectorSync([property.id]);
   revalidatePath(localizePath(LIST_PATH, locale));

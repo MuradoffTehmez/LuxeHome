@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { PERMISSIONS, REJECTION_REASON_MAX, REJECTION_REASON_MIN } from "@/lib/constants";
+import { AGENCY_ACTIVITY_ACTIONS, PERMISSIONS, REJECTION_REASON_MAX, REJECTION_REASON_MIN } from "@/lib/constants";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
@@ -10,6 +10,7 @@ import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
 import { noticeTransferDecision } from "@/lib/accounts/account-notices";
 import { decideTransferAsAdmin } from "@/lib/listing-transfers";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import type { AuthUser } from "@/lib/auth/types";
 
 /**
@@ -88,6 +89,14 @@ async function decide(actor: AuthUser, id: string, approve: boolean, note: strin
       for (const recipient of recipients) {
         await noticeTransferDecision({ userId: recipient, transferId: transfer.id, stage: "rejected", propertyTitle: title, note });
       }
+    }
+    for (const agencyId of [transfer.fromAgencyId, transfer.toAgencyId]) {
+      await recordAgencyActivity({
+        // Panel işçisinin adı agentliyə göstərilmir — jurnalda «Platforma administratoru» yazılır.
+        agencyId, actor: null, action: AGENCY_ACTIVITY_ACTIONS.TRANSFER_DECIDED,
+        entityType: "ListingTransfer", entityId: transfer.id, entityLabel: title,
+        details: { stage: "admin", approved: approve },
+      });
     }
     await recordAudit(
       actor,

@@ -20,7 +20,7 @@ import {
   submissionPolicy,
   validatePublicPropertyRelations,
 } from "@/lib/accounts/property-submission";
-import { ACCOUNT_TYPES, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, AGENCY_ACTIVITY_ACTIONS, MAX_PROPERTY_IMAGES, PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES, type Locale } from "@/lib/constants";
 import { recordPropertyStatusChange } from "@/lib/property-status-history";
 import { prisma } from "@/lib/prisma";
 import { notifyMatchingSavedSearches } from "@/lib/queries";
@@ -29,6 +29,7 @@ import { localizePath } from "@/i18n/path-locale";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
 import { refreshListingRisk } from "@/lib/moderation/listing-risk";
 import { resolveNewListingAgencyId } from "@/lib/accounts/agency-ownership";
+import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { queueListingEnrichment } from "@/lib/listing-enrichment";
 
 const LIST_PATH = "/kabinet/elanlar";
@@ -195,6 +196,10 @@ export async function createPublicProperty(
       queuePropertyVectorSync([created.id]);
       queueListingEnrichment(created.id);
     }
+    await recordAgencyActivity({
+      agencyId: listingAgencyId, actor: user, action: AGENCY_ACTIVITY_ACTIONS.LISTING_CREATED,
+      entityType: "Property", entityId: created.id, entityLabel: parsed.data.title,
+    });
   } catch (error) {
     // Şəkil yükləmələri qəsdən silinmir: istifadəçi formadakı xətanı düzəldib yenidən göndərə bilər.
     return unexpected("elan göndərilə bilmədi", error, t("actions.unexpected"));
