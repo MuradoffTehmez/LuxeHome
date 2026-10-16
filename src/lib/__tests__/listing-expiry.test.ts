@@ -70,3 +70,13 @@ describe("aktuallıq intervalı konfiqurasiyası (#204)", () => {
       .toBe(now.getTime() + 30 * DAY);
   });
 });
+
+describe("qısa ömürdə güzəşt (#204)", () => {
+  it("güzəşt paneldəki ömürdən uzun olmur — 7 günlük ömür yeni elana 7 gün verir", () => {
+    expect(backfillExpiry(now, now, 7).getTime()).toBe(now.getTime() + 7 * DAY);
+    // Köhnə elan da ömürdən artıq güzəşt almır.
+    expect(backfillExpiry(new Date(now.getTime() - 200 * DAY), now, 10).getTime()).toBe(now.getTime() + 10 * DAY);
+    // Defolt ömürdə 14 günlük güzəşt qalır.
+    expect(backfillExpiry(new Date(now.getTime() - 200 * DAY), now).getTime()).toBe(now.getTime() + BACKFILL_GRACE_DAYS * DAY);
+  });
+});

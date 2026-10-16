@@ -63,7 +63,9 @@ export function renewedExpiry(now = new Date(), lifetimeDays = LISTING_LIFETIME_
 /** Köhnə elana müddət: dərc + 60 gün, amma bu gündən ən az 14 gün sonra (qəfil arxiv olmasın). */
 export function backfillExpiry(publishedAt: Date | null, now = new Date(), lifetimeDays = LISTING_LIFETIME_DAYS): Date {
   const natural = (publishedAt ?? now).getTime() + lifetimeDays * DAY;
-  return new Date(Math.max(natural, now.getTime() + BACKFILL_GRACE_DAYS * DAY));
+  // Güzəşt ömürdən uzun ola bilməz (#204): paneldə 7–13 gün seçiləndə yeni elan da 14 gün yaşayardı.
+  const grace = Math.min(BACKFILL_GRACE_DAYS, lifetimeDays);
+  return new Date(Math.max(natural, now.getTime() + grace * DAY));
 }
 
 export type ExpiryFields = { listingExpiresAt?: Date | null; expiredAt?: Date | null };

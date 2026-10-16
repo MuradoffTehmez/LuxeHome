@@ -184,6 +184,10 @@ export async function updatePublicProperty(
       },
     });
 
+    // Status yazılan kimi tarixçəyə düşür (#204) — sonrakı əlaqə yazılışları alınmasa da keçid itməsin.
+    await recordPropertyStatusChange({
+      propertyId: property.id, from: property.status, to: nextStatus, source: PROPERTY_STATUS_SOURCES.OWNER, changedById: user.id,
+    });
     await recordPropertyPriceChange({
       propertyId: property.id,
       oldPrice: property.price,
@@ -218,16 +222,11 @@ export async function updatePublicProperty(
     } catch (error) {
       return unexpected("riskli elan moderasiyaya göndərilmədi", error, t("actions.unexpected"));
     }
+    await recordPropertyStatusChange({
+      propertyId: id, from: nextStatus, to: PROPERTY_STATUSES.PENDING, source: PROPERTY_STATUS_SOURCES.SYSTEM,
+      note: "Avtomatik moderasiya: yüksək risk",
+    });
   }
-
-  await recordPropertyStatusChange({
-    propertyId: id,
-    from: property.status,
-    to: heldForReview ? PROPERTY_STATUSES.PENDING : nextStatus,
-    source: PROPERTY_STATUS_SOURCES.OWNER,
-    changedById: user.id,
-    note: heldForReview ? "Avtomatik moderasiya: yüksək risk" : null,
-  });
   queuePropertyVectorSync([id]);
   queueListingEnrichment(id);
   revalidatePath(localizePath(LIST_PATH, locale));
@@ -254,6 +253,10 @@ export async function deletePublicProperty(id: string): Promise<ActionState> {
     await prisma.property.update({
       where: { id: guarded.property.id },
       data: { deletedAt: new Date(), status: PROPERTY_STATUSES.ARCHIVED },
+    });
+    await recordPropertyStatusChange({
+      propertyId: guarded.property.id, from: guarded.property.status, to: PROPERTY_STATUSES.ARCHIVED,
+      source: PROPERTY_STATUS_SOURCES.OWNER, changedById: guarded.user.id, note: "Sahib elanı sildi",
     });
   } catch (error) {
     return unexpected("istifadəçi elanı silinmədi", error, t("actions.unexpected"));

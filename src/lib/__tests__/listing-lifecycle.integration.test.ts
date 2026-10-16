@@ -10,6 +10,7 @@ import {
 } from "@/lib/constants";
 import { resolveLeadProperty } from "@/lib/accounts/listing-leads";
 import { runListingExpiry } from "@/lib/listing-expiry";
+import { finalizeAccountDeletion } from "@/lib/account-deletion";
 import { getPropertyHistory, recordPropertyStatusChange } from "@/lib/property-status-history";
 import { expiryState } from "@/lib/listing-expiry-policy";
 import { publicPropertyWhere } from "@/lib/queries";
@@ -98,6 +99,22 @@ describe("elan statusları", () => {
     expect(result.expiredIds).toContain("lc-gone");
     const [entry] = await getPropertyHistory("lc-gone");
     expect(entry).toMatchObject({ kind: "status", from: "PUBLISHED", to: "EXPIRED", source: "SYSTEM" });
+  });
+
+  it("hesab silinəndə arxivlənən elanlar tarixçəyə yazılır (#204)", async () => {
+    await DB.batch([
+      DB.prepare(
+        'INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "accountType", "isActive", "deletionRequestedAt", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+      ).bind("lc-leaving", "Gedən", "lc-leaving@example.test", "disabled", "EDITOR", "OWNER"),
+      DB.prepare(
+        `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId",
+           "authorId", "publishedAt", "createdAt", "updatedAt")
+         VALUES ('lc-leaving-1', 'Gedən', 'lc-leaving-1', 'T', 'x', 'SALE', 'PUBLISHED', 1000, 'lc-type', 'lc-city', 'lc-leaving', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      ),
+    ]);
+    await finalizeAccountDeletion("lc-leaving");
+    const [entry] = await getPropertyHistory("lc-leaving-1");
+    expect(entry).toMatchObject({ kind: "status", from: "PUBLISHED", to: "ARCHIVED", source: "SYSTEM", note: "Hesab silindi" });
   });
 
   it("müddəti bitmiş elan `EXPIRED` statusu ilə tanınır", () => {

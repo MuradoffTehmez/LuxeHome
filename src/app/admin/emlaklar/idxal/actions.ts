@@ -4,7 +4,8 @@ import { isKnownWatermarkedChecksum } from "@/lib/media/known-watermark";
 import { enrichListing } from "@/lib/listing-enrichment";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { PERMISSIONS, PROPERTY_STATUSES } from "@/lib/constants";
+import { PERMISSIONS, PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES } from "@/lib/constants";
+import { recordPropertyStatusChange } from "@/lib/property-status-history";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
 import { recordAudit } from "@/lib/admin/audit";
 import { uniqueSlug } from "@/lib/admin/slug";
@@ -228,6 +229,11 @@ export async function commitPropertyImport(csv: string, lines: number[]): Promis
             },
             select: { id: true },
           })).id;
+      if (!resumed) {
+        await recordPropertyStatusChange({
+          propertyId, from: null, to: PROPERTY_STATUSES.DRAFT, source: PROPERTY_STATUS_SOURCES.IMPORT, changedById: user.id,
+        });
+      }
 
       // Davam etdirmədə əvvəlki cəhdin yarımçıq qalereyası atılır və yenidən qurulur —
       // hansı şəklin yazılıb-yazılmadığını təxmin etməkdən etibarlıdır. Media kitabxanası
