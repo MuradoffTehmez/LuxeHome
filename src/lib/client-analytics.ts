@@ -1,6 +1,7 @@
 export const ANALYTICS_EVENTS = [
   "phone_click",
   "whatsapp_click",
+  "telegram_click",
   "contact_submit",
   "form_submit",
   "property_view",

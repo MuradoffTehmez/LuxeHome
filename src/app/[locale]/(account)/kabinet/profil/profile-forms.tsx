@@ -35,6 +35,7 @@ export type ProfileFormValues = {
   firstName: string;
   lastName: string;
   phone: string;
+  telegram: string;
   birthDate: string;
   avatarUrl: string | null;
   companyName: string;
@@ -100,6 +101,16 @@ export function ProfileForm({
             defaultValue={values.phone}
             placeholder="+994 XX XXX XX XX"
             error={state.fieldErrors?.phone}
+          />
+          <Input
+            name="telegram"
+            label={t("telegram")}
+            defaultValue={values.telegram}
+            placeholder="@istifadeci_adi"
+            maxLength={60}
+            autoComplete="off"
+            hint={t("telegramHint")}
+            error={state.fieldErrors?.telegram}
           />
           <Input
             name="birthDate"

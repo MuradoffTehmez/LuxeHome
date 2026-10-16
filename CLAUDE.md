@@ -781,8 +781,11 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 ### Kabinet analitikası, müraciət bölgüsü, cavab nişanı, agentlik reytinqi və ərazi agentlikləri (#161)
 
 - **Gündəlik elan statistikası** `PropertyDailyStat` (elan + Bakı günü): baxış (`recordView("property")`),
-  «Nömrəni göstər» (`/api/emlaklar/<id>/elaqe`) və WhatsApp kliki (`POST /api/emlaklar/<id>/klik`, `keepalive`,
-  IP limiti, bot filtri). Artım `INSERT … ON CONFLICT DO UPDATE` ilə atomikdir (`lib/listing-stats.ts`) — oxu-yaz
+  «Nömrəni göstər» (`/api/emlaklar/<id>/elaqe`), WhatsApp və Telegram kliki (`POST /api/emlaklar/<id>/klik`,
+  Telegram `?kanal=telegram` ilə ayrıca `telegramClicks`-ə; `keepalive`, IP limiti, bot filtri).
+  **Telegram (#208):** `User.telegram` / `Agency.telegram` yalnız istifadəçi adıdır (`@`-sız) — `@ad`, `t.me/ad` və
+  tam link `normalizeTelegramUsername()` (`lib/accounts/telegram.ts`) ilə eyni dəyərə gəlir, telefon qəbul edilmir.
+  Ad nömrə kimi HTML-ə yazılmır — `.../elaqe` cavabındakı `telegram` ilə «Nömrəni göstər»dən sonra düymə çıxır. Artım `INSERT … ON CONFLICT DO UPDATE` ilə atomikdir (`lib/listing-stats.ts`) — oxu-yaz
   ilə yazma (D1-də tranzaksiya yoxdur). Müraciət və favorit öz cədvəllərindən sayılır, burada təkrarlanmır.
   `/kabinet/analitika` (`lib/accounts/listing-analytics.ts`): 7/30/90 gün, agentlik sahibi komandanın elanlarını agent
   filtri ilə görür; bazar müqayisəsi eyni növ + şəhərdə elan başına orta baxışdır (xam SQL, parametr sayı məhdud).

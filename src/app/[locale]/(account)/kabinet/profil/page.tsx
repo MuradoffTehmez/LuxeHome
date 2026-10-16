@@ -45,6 +45,7 @@ export default async function CabinetProfilePage() {
       select: {
         name: true,
         phone: true,
+        telegram: true,
         email: true,
         verifiedPhone: true,
         avatarUrl: true,
@@ -71,6 +72,7 @@ export default async function CabinetProfilePage() {
             isVerified: true,
             email: true,
             whatsapp: true,
+            telegram: true,
             instagram: true,
             workingHours: true,
             logoUrl: true,
@@ -229,6 +231,9 @@ export default async function CabinetProfilePage() {
           values={{
             ...names,
             phone: profile.phone ?? "",
+            // Agentlikdə panel yalnız `Agency.telegram`-ı dəyişə bilər — forma ondan başlayır ki, növbəti
+            // saxlama admin düzəlişini köhnə `User.telegram` ilə geri yazmasın.
+            telegram: (isAgency ? agency?.telegram : null) ?? profile.telegram ?? "",
             birthDate: profile.birthDate ? profile.birthDate.toISOString().slice(0, 10) : "",
             avatarUrl: profile.avatarUrl,
             companyName,

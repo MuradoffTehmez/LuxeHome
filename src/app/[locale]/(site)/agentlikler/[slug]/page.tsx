@@ -12,6 +12,7 @@ import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { PropertyCard } from "@/components/site/property-card";
 import { AgentCard } from "@/components/site/agent-card";
 import { PublisherContactButtons } from "@/components/site/publisher-contact";
+import { normalizeTelegramUsername } from "@/lib/accounts/telegram";
 import { SafetyTips } from "@/components/site/safety-tips";
 import { ContactSafetyWarning } from "@/components/site/contact-safety-warning";
 import { ClosedDeals } from "@/components/site/closed-deals";
@@ -504,10 +505,12 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                   endpoint={`/api/agentlikler/${encodeURIComponent(agency.slug)}/elaqe`}
                   maskedPhone={phone ? maskPhone(phone) : null}
                   hasEmail={Boolean(agency.email?.trim() || agency.phone?.includes("@"))}
+                  hasTelegram={Boolean(normalizeTelegramUsername(agency.telegram ?? ""))}
                   whatsappMessage={agency.name}
                   labels={{
                     showPhone: content("showPhone"),
                     showEmail: content("showEmail"),
+                    showTelegram: content("showTelegram"),
                     revealError: content("revealError"),
                     noPhone: content("publisherNoPhone"),
                   }}

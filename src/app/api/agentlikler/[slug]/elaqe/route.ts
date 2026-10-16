@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizeTelegramUsername } from "@/lib/accounts/telegram";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { demoWhere } from "@/lib/demo-content";
@@ -37,7 +38,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const agency = slug.length <= 200
     ? await prisma.agency.findFirst({
         where: { slug, isVerified: true, ...(await demoWhere()), user: { isActive: true } },
-        select: { id: true, phone: true, whatsapp: true, email: true },
+        select: { id: true, phone: true, whatsapp: true, telegram: true, email: true },
       })
     : null;
   if (!agency) return NextResponse.json({ error: "not_found" }, { status: 404, headers: NO_STORE });
@@ -61,6 +62,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
     {
       phone,
       whatsapp: isPhoneLike(agency.whatsapp) ? agency.whatsapp!.trim() : null,
+      telegram: normalizeTelegramUsername(agency.telegram ?? "") ?? null,
       email: agency.email?.trim() || misplacedEmail,
     },
     { headers: NO_STORE },

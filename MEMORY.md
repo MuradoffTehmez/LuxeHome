@@ -725,4 +725,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   bildirişləri, «Satıldı / Kirayəyə verildi». #204/#205: status tarixçəsi və paneldən aktuallıq intervalı.
 - #206: moderasiya qərarına etiraz — qərarverən öz qərarına baxa bilmir (müstəqil baxış, qərarverən status
   tarixçəsindən götürülür).
-- Mərhələ 1-də qalan: Telegram əlaqə düyməsi. Sonra Mərhələ 2 (agentlik idarəetməsi).
+- #208: Telegram əlaqə düyməsi (kabinet profili + admin agentlik redaktəsi, `normalizeTelegramUsername`), ayrıca
+  `telegramClicks` sayğacı və kabinet analitikasında sütun. Bununla Mərhələ 1 bağlanır; növbəti — Mərhələ 2
+  (agentlik idarəetməsi).

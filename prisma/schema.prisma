@@ -32,6 +32,8 @@ model User {
   /// `role` yalnız panel səlahiyyətini göstərir — iki ölçü qəsdən ayrıdır.
   accountType         String    @default("STAFF")
   phone               String?
+  /// Telegram istifadəçi adı (@-sız, #208) — elanın əlaqə panelində «Nömrəni göstər» ilə açılır.
+  telegram            String?
   avatarUrl           String?
   /// Ad və soyad ayrıca — `name` göstəriş üçün onlardan qurulur (köhnə hesablarda boşdur).
   firstName           String?
@@ -169,6 +171,7 @@ model Agency {
   /// («Hər gün: 10:00-20:00» kimi sərbəst mətn). Telefonla eyni «Nömrəni göstər» ilə açılır.
   email                String?
   whatsapp             String?
+  telegram             String?
   instagram            String?
   workingHours         String?
   /// Profil səhifəsinin baxış sayğacı (`recordView("agency")`), bot-lar sayılmır.
@@ -2167,6 +2170,8 @@ model PropertyDailyStat {
   views          Int    @default(0)
   contactReveals Int    @default(0)
   whatsappClicks Int    @default(0)
+  /// Telegram düyməsinin klikləri (#208) — WhatsApp kimi, faktiki əlaqə deyil, ayrıca sayılır.
+  telegramClicks Int    @default(0)
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 

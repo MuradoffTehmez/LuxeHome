@@ -1,5 +1,6 @@
 import { ACCOUNT_TYPES } from "@/lib/constants";
 import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
+import { normalizeTelegramUsername } from "@/lib/accounts/telegram";
 
 /**
  * Elanı kim yerləşdirib və ziyarətçi kimlə əlaqə saxlamalıdır.
@@ -44,9 +45,11 @@ export type PublisherContactSource = {
   isActive: boolean;
   name: string;
   phone: string | null;
+  /** Telegram istifadəçi adı (#208); köhnə sorğularda olmaya bilər. */
+  telegram?: string | null;
   email: string;
   companyName: string | null;
-  agency: (PublisherAgency & { phone: string | null }) | null;
+  agency: (PublisherAgency & { phone: string | null; telegram?: string | null }) | null;
   agencyEmployments: { agency: PublisherAgency & { phone: string | null } }[];
 } | null | undefined;
 
@@ -59,6 +62,8 @@ export type ListingPublisher =
       /** Əlaqə şəxsi — hesabın ad soyadı. */
       contactName: string;
       phone: string | null;
+      /** Telegram istifadəçi adı (#208), «Nömrəni göstər» ilə açılır. */
+      telegram: string | null;
       email: string | null;
       agency: PublisherAgency | null;
     };
@@ -101,6 +106,8 @@ export function resolveListingPublisher(author: PublisherContactSource): Listing
     contactName: author.name,
     // Agentlik profilindəki nömrə ofis nömrəsidir — hesabın şəxsi nömrəsindən üstündür.
     phone: (ownAgency?.phone || author.phone || null)?.trim() || null,
+    // Agentlik hesabında agentliyin Telegram-ı üstündür (nömrə kimi); etibarsız dəyər göstərilmir.
+    telegram: normalizeTelegramUsername(ownAgency?.telegram || author.telegram || "") ?? null,
     email: author.email || null,
     agency: agency
       ? { name: agency.name, slug: agency.slug, logoUrl: agency.logoUrl, isVerified: agency.isVerified }

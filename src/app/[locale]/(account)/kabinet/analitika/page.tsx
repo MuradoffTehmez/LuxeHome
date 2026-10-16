@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/field";
-import { WhatsAppIcon } from "@/components/site/brand-icons";
+import { TelegramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
 import { Link } from "@/i18n/navigation";
 import { requireLister } from "@/lib/auth/guard";
 import { getListingAnalytics, parsePeriod } from "@/lib/accounts/listing-analytics";
@@ -53,6 +53,7 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
     { key: "views", icon: Eye, label: t("views"), value: data.totals.views },
     { key: "reveals", icon: Phone, label: t("contactReveals"), value: data.totals.contactReveals },
     { key: "whatsapp", icon: WhatsAppIcon, label: t("whatsappClicks"), value: data.totals.whatsappClicks },
+    { key: "telegram", icon: TelegramIcon, label: t("telegramClicks"), value: data.totals.telegramClicks },
     { key: "leads", icon: MessageSquare, label: t("leads"), value: data.totals.leads },
     { key: "favorites", icon: Heart, label: t("favorites"), value: data.totals.favorites },
   ];
@@ -87,7 +88,7 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
         )}
       </div>
 
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {tiles.map((tile) => (
           <li key={tile.key} className="rounded-xl border border-line bg-paper p-4 shadow-xs">
             <p className="flex items-center gap-1.5 text-xs text-ink-muted">
@@ -132,6 +133,7 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("views")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("contactReveals")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("whatsappShort")}</th>
+                  <th scope="col" className="px-2 py-2 text-right font-medium">Telegram</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("leads")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("favorites")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("conversion")}</th>
@@ -156,9 +158,10 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.views)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.contactReveals)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.whatsappClicks)}</td>
+                      <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.telegramClicks)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.leads)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.favorites)}</td>
-                      <td className="tabular px-2 py-3 text-right text-ink-soft">{row.views > 0 ? `${percent(row.leads + row.contactReveals + row.whatsappClicks, row.views)}%` : "—"}</td>
+                      <td className="tabular px-2 py-3 text-right text-ink-soft">{row.views > 0 ? `${percent(row.leads + row.contactReveals + row.whatsappClicks + row.telegramClicks, row.views)}%` : "—"}</td>
                       <td className="px-4 py-3 text-right sm:px-5">
                         {ratio == null ? (
                           <span className="text-ink-muted">—</span>

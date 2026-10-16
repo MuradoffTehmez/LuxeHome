@@ -283,6 +283,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
       workingHours: true,
       phone: true,
       whatsapp: true,
+      telegram: true,
       email: true,
       viewCount: true,
       createdAt: true,

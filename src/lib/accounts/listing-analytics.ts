@@ -29,9 +29,9 @@ export function periodStart(period: AnalyticsPeriod, now = new Date()) {
   return { day, at: new Date(`${day}T00:00:00+04:00`) };
 }
 
-export type AnalyticsTotals = { views: number; contactReveals: number; whatsappClicks: number; leads: number; favorites: number };
+export type AnalyticsTotals = { views: number; contactReveals: number; whatsappClicks: number; telegramClicks: number; leads: number; favorites: number };
 
-const emptyTotals = (): AnalyticsTotals => ({ views: 0, contactReveals: 0, whatsappClicks: 0, leads: 0, favorites: 0 });
+const emptyTotals = (): AnalyticsTotals => ({ views: 0, contactReveals: 0, whatsappClicks: 0, telegramClicks: 0, leads: 0, favorites: 0 });
 
 async function analyticsAuthors(userId: string) {
   const agency = await prisma.agency.findUnique({ where: { userId }, select: { id: true } });
@@ -113,7 +113,7 @@ export async function getListingAnalytics(input: {
       prisma.propertyDailyStat.groupBy({
         by: ["propertyId"],
         where: { propertyId: { in: chunk }, day: { gte: start.day } },
-        _sum: { views: true, contactReveals: true, whatsappClicks: true },
+        _sum: { views: true, contactReveals: true, whatsappClicks: true, telegramClicks: true },
       })),
     findManyInChunks(ids, 1, (chunk) =>
       prisma.lead.groupBy({ by: ["propertyId"], where: { propertyId: { in: chunk }, createdAt: { gte: start.at } }, _count: { _all: true } })),
@@ -143,6 +143,7 @@ export async function getListingAnalytics(input: {
       views: sum?.views ?? 0,
       contactReveals: sum?.contactReveals ?? 0,
       whatsappClicks: sum?.whatsappClicks ?? 0,
+      telegramClicks: sum?.telegramClicks ?? 0,
       leads: leadOf.get(listing.id) ?? 0,
       favorites: favoriteOf.get(listing.id) ?? 0,
       marketViews: market.get(`${listing.typeId}:${listing.cityId}`) ?? null,
@@ -150,6 +151,7 @@ export async function getListingAnalytics(input: {
     totals.views += row.views;
     totals.contactReveals += row.contactReveals;
     totals.whatsappClicks += row.whatsappClicks;
+    totals.telegramClicks += row.telegramClicks;
     totals.leads += row.leads;
     totals.favorites += row.favorites;
     return row;

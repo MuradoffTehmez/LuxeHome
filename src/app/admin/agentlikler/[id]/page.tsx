@@ -167,6 +167,7 @@ export default async function AdminAgencyEditPage({ params }: Props) {
               </FullWidth>
               <AdminInput name="phone" label={t("pages.agencyHub.phone")} type="tel" defaultValue={agency.phone ?? ""} maxLength={30} hint={t("pages.agencyHub.phoneHint")} />
               <AdminInput name="whatsapp" label={t("pages.agencyHub.whatsapp")} type="tel" defaultValue={agency.whatsapp ?? ""} maxLength={30} />
+              <AdminInput name="telegram" label={t("pages.agencyHub.telegram")} defaultValue={agency.telegram ?? ""} maxLength={60} placeholder="@agentlik" hint={t("pages.agencyHub.telegramHint")} />
               <AdminInput name="email" label={t("pages.agencyHub.email")} type="email" defaultValue={agency.email ?? ""} maxLength={200} />
               <AdminInput name="workingHours" label={t("pages.agencyHub.hours")} defaultValue={agency.workingHours ?? ""} maxLength={120} hint={t("pages.agencyHub.hoursHint")} />
               <FullWidth>

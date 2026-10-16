@@ -121,6 +121,7 @@
     "publisherNoPhone": "The advertiser has not shared a phone number — please send an email.",
     "showPhone": "Show number",
     "showEmail": "Show email",
+    "showTelegram": "Show Telegram contact",
     "revealError": "Contact details could not be loaded. Please try again shortly.",
     "verifiedAgency": "Verified agency",
     "sellerListings": "All listings from this seller"

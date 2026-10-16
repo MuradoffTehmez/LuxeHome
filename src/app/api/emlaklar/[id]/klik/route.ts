@@ -10,8 +10,9 @@ import { isLikelyBot } from "@/lib/view-counter";
 export const dynamic = "force-dynamic";
 
 /**
- * Elanın WhatsApp klikini sahibin kabinet analitikasına yazır (#161). Cavab həmişə 204-dür —
- * klik istifadəçinin işini gözlətmir; same-origin, IP limiti və bot filtri sayğacı qoruyur.
+ * Elanın WhatsApp (#161) və Telegram (#208) klikini sahibin kabinet analitikasına yazır. Kanal
+ * `?kanal=telegram` ilə gəlir, yoxdursa WhatsApp. Cavab həmişə 204-dür — klik istifadəçinin işini
+ * gözlətmir; same-origin, IP limiti və bot filtri sayğacı qoruyur.
  */
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -25,6 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!(await checkListingClickLimit(clientIp(await headers())))) return new NextResponse(null, { status: 204 });
 
   const property = await prisma.property.findFirst({ where: { ...(await publicPropertyWhere()), id }, select: { id: true } });
-  if (property) recordListingStat(property.id, "whatsappClicks");
+  const channel = new URL(request.url).searchParams.get("kanal") === "telegram" ? "telegramClicks" : "whatsappClicks";
+  if (property) recordListingStat(property.id, channel);
   return new NextResponse(null, { status: 204 });
 }
