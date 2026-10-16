@@ -717,6 +717,9 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   moderatora təyin, sahibdən izahat, yenidən baxış, 15 səbəbdən çoxlu seçim, prioritet, növbə göstəriciləri, R2
   `private/` prefiksində sübut şəkilləri, şikayətçiyə nəticə bildirişi.
 - #197: şikayət üzrə daxili qeydlər (`ListingReportNote`) və «Şikayətlərim» kabinet səhifəsi (`/kabinet/sikayetlerim`).
-- Mərhələ 1-də qalanlar: elanın tam həyat dövrü
-  statusları (dayandırılıb / müddəti bitib / rədd edilib / məlumat tələb olunur), apellyasiya, admin-redaktə xəbərdarlıq
-  mətni (Təhlükəsizlik → Xəbərdarlıq Mətnləri), Telegram əlaqə düyməsi.
+- #199 (Modul 11): hər elanın və agentlik profilinin əlaqə panelində məcburi beh xəbərdarlığı; mətn
+  `/admin/xeberdarliqlar`-dan AZ/EN/RU (`knowledge:manage`). Dəyişiklik anonim ziyarətçiyə kənar HTML keşi səbəbindən
+  ~1 dəqiqə sonra çatır — ani yenilənmə qəsdən qurulmayıb (hər sorğuda əlavə yoxlama tələb edərdi).
+- #196, #198, #200 16 oktyabr 2026-da sıra ilə `main`-ə birləşdirildi; `main` CI-si (staging + production) uğurlu.
+- Mərhələ 1-də qalanlar: elanın tam həyat dövrü statusları (dayandırılıb / müddəti bitib / rədd edilib / məlumat
+  tələb olunur), apellyasiya, Telegram əlaqə düyməsi.
