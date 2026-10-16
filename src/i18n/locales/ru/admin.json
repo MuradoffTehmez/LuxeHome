@@ -2924,7 +2924,11 @@
         "LEAD_ROUTING_CHANGED": "изменил(а) распределение заявок",
         "PACKAGE_REQUESTED": "подал(а) «{entity}» на премиум-пакет",
         "TRANSFER_REQUESTED": "создал(а) запрос на передачу «{entity}»",
-        "TRANSFER_DECIDED": "принял(а) решение по запросу на передачу «{entity}»"
+        "TRANSFER_DECIDED": "принял(а) решение по запросу на передачу «{entity}»",
+        "LISTING_ASSIGNED": "сменил(а) ответственного за «{entity}»",
+        "MEMBER_ROLE_CHANGED": "изменил(а) роль {entity}",
+        "MEMBER_SUSPENDED": "приостановил(а) доступ {entity}",
+        "MEMBER_RESUMED": "восстановил(а) доступ {entity}"
       }
     },
     "reports": {

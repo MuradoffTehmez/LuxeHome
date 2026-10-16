@@ -597,15 +597,22 @@ export const AGENCY_ACTIVITY_ACTIONS = {
   PACKAGE_REQUESTED: "PACKAGE_REQUESTED",
   TRANSFER_REQUESTED: "TRANSFER_REQUESTED",
   TRANSFER_DECIDED: "TRANSFER_DECIDED",
+  LISTING_ASSIGNED: "LISTING_ASSIGNED",
+  MEMBER_ROLE_CHANGED: "MEMBER_ROLE_CHANGED",
+  MEMBER_SUSPENDED: "MEMBER_SUSPENDED",
+  MEMBER_RESUMED: "MEMBER_RESUMED",
 } as const;
 
 export type AgencyActivityAction = (typeof AGENCY_ACTIVITY_ACTIONS)[keyof typeof AGENCY_ACTIVITY_ACTIONS];
 
 /** Jurnal filtrinin qrupları — hər əməliyyat bir qrupa aiddir. */
 export const AGENCY_ACTIVITY_GROUPS = {
-  listings: ["LISTING_CREATED", "LISTING_UPDATED", "PRICE_CHANGED", "LISTING_DELETED", "LISTING_CLOSED", "LISTING_RENEWED"],
+  listings: ["LISTING_CREATED", "LISTING_UPDATED", "PRICE_CHANGED", "LISTING_DELETED", "LISTING_CLOSED", "LISTING_RENEWED", "LISTING_ASSIGNED"],
   leads: ["LEAD_REASSIGNED", "LEAD_ROUTING_CHANGED"],
-  team: ["MEMBER_INVITED", "MEMBER_APPROVED", "MEMBER_REJECTED", "MEMBER_REMOVED", "MEMBER_LEFT", "MEMBER_RIGHTS_CHANGED"],
+  team: [
+    "MEMBER_INVITED", "MEMBER_APPROVED", "MEMBER_REJECTED", "MEMBER_REMOVED", "MEMBER_LEFT", "MEMBER_RIGHTS_CHANGED",
+    "MEMBER_ROLE_CHANGED", "MEMBER_SUSPENDED", "MEMBER_RESUMED",
+  ],
   packages: ["PACKAGE_REQUESTED"],
   transfers: ["TRANSFER_REQUESTED", "TRANSFER_DECIDED"],
 } as const satisfies Record<string, readonly AgencyActivityAction[]>;
@@ -1422,6 +1429,29 @@ export const AGENCY_EMPLOYEE_ROLE_LABELS: Record<AgencyEmployeeRole, string> = {
   MANAGER: "Menecer",
   AGENT: "Agent",
 };
+
+/**
+ * Agentlik daxili səlahiyyətlər (#218, PRD 7.2). Sahib həmişə hamısına malikdir; menecerin defoltu
+ * hamısı, agentin heç biri — sahib hər üzv üçün defoltu dəyişə bilər (`AgencyEmployee.permissions`).
+ */
+export const AGENCY_MEMBER_PERMISSIONS = {
+  /** Agentliyin bütün müraciətlərini görmək və başqa agentə vermək. */
+  LEADS_MANAGE: "LEADS_MANAGE",
+  /** Agentlik elanlarını agentlər arasında təyin etmək. */
+  LISTINGS_ASSIGN: "LISTINGS_ASSIGN",
+  /** Başqa üzvlərə tapşırıq yaratmaq və bütün tapşırıqları idarə etmək (#7.3). */
+  TASKS_MANAGE: "TASKS_MANAGE",
+} as const;
+
+export type AgencyMemberPermission = (typeof AGENCY_MEMBER_PERMISSIONS)[keyof typeof AGENCY_MEMBER_PERMISSIONS];
+
+export const AGENCY_ROLE_DEFAULT_PERMISSIONS: Record<AgencyEmployeeRole, readonly AgencyMemberPermission[]> = {
+  MANAGER: ["LEADS_MANAGE", "LISTINGS_ASSIGN", "TASKS_MANAGE"],
+  AGENT: [],
+};
+
+/** Girişin dayandırılması səbəbinin ən çox uzunluğu. */
+export const SUSPENSION_REASON_MAX = 500;
 
 export const AGENCY_EMPLOYEE_STATUSES = {
   PENDING: "PENDING",

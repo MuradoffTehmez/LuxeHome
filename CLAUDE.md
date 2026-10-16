@@ -796,6 +796,16 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   (düzəliş/rədd/dayandırma, açıq şikayət, 7 gün içində bitən elan) və agentlərin aktivliyi (son jurnal qeydi ilə). Hamısı
   **yalnız `Property.agencyId`** üzrədir; agentlik müraciəti `Lead.agencyId` və ya elanın agentliyi ilə müəyyən olunur
   (`agencyLeadWhere`). Cavabsız = `respondedAt` boş və status `NEW|CONTACTED|IN_PROGRESS`. Deaktiv agent cədvələ düşmür.
+- **Agentlərin idarəsi (#218, PRD 7.2)** — `lib/accounts/agency-access.ts`: rol `AGENT`/`MANAGER`, səlahiyyətlər
+  `AGENCY_MEMBER_PERMISSIONS` (`LEADS_MANAGE`, `LISTINGS_ASSIGN`, `TASKS_MANAGE`); `AgencyEmployee.permissions` `null`-dursa
+  rolun defoltu (`AGENCY_ROLE_DEFAULT_PERMISSIONS`), defoltla eyni seçim `null` saxlanılır. Sahib həmişə hamısına malikdir;
+  yoxlama `getAgencyAccess()` + `hasAgencyPermission()`. `LEADS_MANAGE` `leadScope()`-da agentliyin bütün müraciətlərini açır,
+  `findManageableLead().canManage` müraciətin verilməsinə icazədir. **Girişin dayandırılması** (`suspendedAt`): üzvlük qalır,
+  amma agentlik adından elan (`listingAgencyFor`), müraciət növbəsi, agentlik müraciətləri (`ACTIVE_MEMBER_WHERE`), təyinat/
+  köçürmə hədəfi və agentlik elanının redaktəsi (`notSuspendedAgencyListing()` — kabinet siyahısı, redaktə səhifəsi və
+  action-lar) bağlanır; açıq agentlik müraciətləri sahibə qayıdır. Şəxsi hesab və şəxsi elanlar toxunulmazdır. Agentlik
+  mühitində "aktiv üzv" lazım olan yeni sorğu `ACTIVE_MEMBER_WHERE` işlətməlidir. Elan təyinatı `/kabinet/agentlik/elanlar`
+  (`assignAgencyListing`, şərti `updateMany` `agencyId` ilə). Action-lar `kabinet/komanda/member-actions.ts`-dədir.
 - **Bağlanmış sövdələşmələr:** «təklif»/«elan» sayı yalnız `ACTIVE_OFFER_STATUSES` (PUBLISHED + RESERVED) —
   `activeOfferWhere()`. Satılmış/icarəyə verilmiş elan «Uğurlu sövdələşmələr» bölməsindədir (`getClosedDeals`,
   son `DEAL_STATS_WINDOW_DAYS` gün, **yalnız `closedAt`** — `updatedAt` baxış sayğacı ilə də dəyişir; köhnə

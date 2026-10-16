@@ -321,6 +321,44 @@
         "removed": "əməkdaşlıq dayandırılıb"
       },
       "handedOver": "{count} elan təhvil verilib"
+    },
+    "access": {
+      "openLabel": "{name} — rol və səlahiyyətlər",
+      "title": "{name}: rol və səlahiyyətlər",
+      "roleLegend": "Rol",
+      "permissionsLegend": "Səlahiyyətlər",
+      "roles": {
+        "AGENT": "Agent",
+        "AGENTHint": "Öz elanları və ona verilən müraciətlərlə işləyir.",
+        "MANAGER": "Menecer",
+        "MANAGERHint": "Defolt olaraq müraciətləri, elan təyinatlarını və tapşırıqları idarə edir."
+      },
+      "permissions": {
+        "leads": "Müraciətlər",
+        "leadsHint": "Agentliyin bütün müraciətlərini görür və başqa agentə verir.",
+        "listings": "Elan təyinatları",
+        "listingsHint": "Agentlik elanlarını agentlər arasında təyin edir.",
+        "tasks": "Tapşırıqlar",
+        "tasksHint": "Başqa üzvlərə tapşırıq yaradır və bütün tapşırıqları idarə edir."
+      },
+      "save": "Yadda saxla",
+      "cancel": "Ləğv et",
+      "saved": "Rol və səlahiyyətlər yadda saxlanıldı.",
+      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin.",
+      "suspendLabel": "{name} — girişi dayandır",
+      "resumeLabel": "{name} — girişi bərpa et",
+      "suspendTitle": "Agentin girişini dayandırmaq",
+      "resumeTitle": "Agentin girişini bərpa etmək",
+      "suspendDescription": "{name} agentlik müraciətlərinə, agentlik elanlarına və müraciət növbəsinə girişini itirəcək. Açıq müraciətləri sizə qayıdacaq, elanlarını «Elan təyinatları» bölməsindən başqasına verə bilərsiniz. Şəxsi hesabı və şəxsi elanları toxunulmazdır.",
+      "resumeDescription": "{name} agentlik mühitinə girişini geri alacaq.",
+      "reason": "Səbəb (istəyə bağlı, agentə göndərilir)",
+      "suspend": "Dayandır",
+      "resume": "Bərpa et",
+      "suspended": "Agentin girişi dayandırıldı.",
+      "resumed": "Agentin girişi bərpa olundu.",
+      "alreadySuspended": "Agentin girişi artıq dayandırılıb.",
+      "notSuspended": "Agentin girişi dayandırılmayıb.",
+      "suspendedBadge": "Giriş dayandırılıb"
     }
   },
   "actions": {
@@ -978,7 +1016,11 @@
       "LEAD_ROUTING_CHANGED": "müraciət bölgüsünü dəyişdi",
       "PACKAGE_REQUESTED": "«{entity}» elanını premium paketə təqdim etdi",
       "TRANSFER_REQUESTED": "«{entity}» elanı üçün köçürmə sorğusu yaratdı",
-      "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi"
+      "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi",
+      "LISTING_ASSIGNED": "«{entity}» elanının məsulunu dəyişdi",
+      "MEMBER_ROLE_CHANGED": "{entity} adlı üzvün rolunu dəyişdi",
+      "MEMBER_SUSPENDED": "{entity} adlı agentin girişini dayandırdı",
+      "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi"
     },
     "details": {
       "price": "{from} → {to}",
@@ -993,7 +1035,13 @@
       "transferSourceRejected": "Elanın agentliyi rədd etdi",
       "transferAdminApproved": "Köçürmə təsdiqləndi",
       "transferAdminRejected": "Köçürmə rədd edildi",
-      "viaLink": "Dəvət linki ilə qoşuldu"
+      "viaLink": "Dəvət linki ilə qoşuldu",
+      "permissions": "Səlahiyyətlər: {list}",
+      "noPermissions": "Əlavə səlahiyyət yoxdur",
+      "role": "{from} → {to}",
+      "releasedLeads": "{count} açıq müraciət sahibə qaytarıldı",
+      "reason": "Səbəb: {reason}",
+      "assigned": "{from} → {to}"
     },
     "emptyTitle": "Hələ qeyd yoxdur",
     "emptyDescription": "Elan, müraciət və komanda dəyişiklikləri burada görünəcək.",
@@ -1001,7 +1049,16 @@
     "previous": "Əvvəlki",
     "next": "Növbəti",
     "pageOf": "{page} / {pages}",
-    "privacy": "Jurnal yalnız agentlik sahibinə və platforma administratoruna görünür."
+    "privacy": "Jurnal yalnız agentlik sahibinə və platforma administratoruna görünür.",
+    "permissionNames": {
+      "LEADS_MANAGE": "müraciətlər",
+      "LISTINGS_ASSIGN": "elan təyinatları",
+      "TASKS_MANAGE": "tapşırıqlar"
+    },
+    "roleNames": {
+      "AGENT": "Agent",
+      "MANAGER": "Menecer"
+    }
   },
   "agencyDashboard": {
     "metaTitle": "Agentlik paneli",
@@ -1055,7 +1112,31 @@
       "lastActivity": "Son fəaliyyət",
       "owner": "Agentlik (siz)",
       "outOfQueue": "növbədən kənar",
-      "openLog": "Fəaliyyət jurnalına keç →"
+      "openLog": "Fəaliyyət jurnalına keç →",
+      "suspended": "giriş dayandırılıb"
     }
+  },
+  "assignments": {
+    "metaTitle": "Elan təyinatları",
+    "metaDescription": "Agentlik elanlarının məsul agentləri.",
+    "title": "Elan təyinatları",
+    "description": "Agentlik elanlarının məsul agentini dəyişin. Yeni məsul elanı «Elanlarım» bölməsində görür və bildiriş alır; köhnə müraciətlər elanla birlikdə keçir.",
+    "agentFilter": "Məsul üzrə",
+    "all": "Hamısı",
+    "agencyOption": "{name} (agentlik)",
+    "owner": "Məsul: {name}",
+    "unassigned": "Məsul yoxdur — yeni məsul seçin",
+    "selectLabel": "«{title}» elanının məsulu",
+    "noOwner": "Məsul seçin",
+    "assign": "Təyin et",
+    "assigned": "Elan təyin edildi.",
+    "invalidTarget": "Seçilmiş şəxs agentliyin aktiv üzvü deyil.",
+    "failed": "Əməliyyat alınmadı. Yenidən cəhd edin.",
+    "emptyTitle": "Agentlik elanı yoxdur",
+    "emptyDescription": "Agentlik adından yerləşdirilən elanlar burada görünəcək.",
+    "pagination": "Səhifələr",
+    "previous": "Əvvəlki",
+    "next": "Növbəti",
+    "pageOf": "{page} / {pages}"
   }
 }

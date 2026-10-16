@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { AGENCY_ACTIVITY_ACTIONS, AGENCY_EMPLOYEE_STATUSES, LEAD_STATUSES, type Locale } from "@/lib/constants";
+import { AGENCY_ACTIVITY_ACTIONS, LEAD_STATUSES, type Locale } from "@/lib/constants";
 import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
+import { ACTIVE_MEMBER_WHERE } from "@/lib/accounts/agency-access";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
 import { localizePath } from "@/i18n/path-locale";
@@ -78,14 +79,14 @@ export async function reassignLead(id: string, targetUserId: string): Promise<Ac
   const t = await getTranslations("account.leads");
   try {
     const lead = await findManageableLead(context.user.id, id);
-    if (!lead || !lead.isOwner || !lead.agency) return failure(t("actions.notFound"));
+    if (!lead || !lead.canManage || !lead.agency) return failure(t("actions.notFound"));
     if (typeof targetUserId !== "string" || !targetUserId) return failure(t("actions.invalidAgent"));
 
     const isOwnerTarget = targetUserId === lead.agency.userId;
     const member = isOwnerTarget
       ? null
       : await prisma.agencyEmployee.findFirst({
-          where: { agencyId: lead.agency.id, userId: targetUserId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED, user: { isActive: true } },
+          where: { agencyId: lead.agency.id, userId: targetUserId, ...ACTIVE_MEMBER_WHERE, user: { isActive: true } },
           select: { id: true },
         });
     if (!isOwnerTarget && !member) return failure(t("actions.invalidAgent"));

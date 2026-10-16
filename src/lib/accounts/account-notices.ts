@@ -66,6 +66,14 @@ const COPY = {
     transferSourceApproved: (title: string) => `«${title}» elanının köçürülməsini elanın agentliyi təsdiqlədi. Son qərarı platforma administratoru verəcək.`,
     transferRejectedTitle: "Köçürmə sorğusu rədd edildi",
     transferRejected: (title: string) => `«${title}» elanının köçürmə sorğusu rədd edildi.`,
+    memberAccessTitle: "Agentlikdəki hüquqlarınız dəyişdi",
+    memberAccess: (agency: string) => `«${agency}» agentliyində rolunuz və ya səlahiyyətləriniz yeniləndi. Dəyişikliklər kabinetinizdə artıq qüvvədədir.`,
+    memberSuspendedTitle: "Agentlik mühitinə girişiniz dayandırıldı",
+    memberSuspended: (agency: string) => `«${agency}» agentliyi sizin agentlik elanlarına və müraciətlərinə girişinizi dayandırdı. Şəxsi hesabınız və şəxsi elanlarınız toxunulmazdır.`,
+    memberResumedTitle: "Agentlik mühitinə girişiniz bərpa olundu",
+    memberResumed: (agency: string) => `«${agency}» agentliyi agentlik elanlarına və müraciətlərinə girişinizi bərpa etdi.`,
+    listingAssignedTitle: "Sizə elan təyin edildi",
+    listingAssigned: (title: string, agency: string) => `«${agency}» agentliyi «${title}» elanını sizə təyin etdi. Elan «Elanlarım» bölməsindədir.`,
     transferCompletedTitle: "Elan agentliyinizə köçürüldü",
     transferCompleted: (title: string) => `«${title}» elanı agentliyinizə köçürüldü və «Elanlarım» bölməsindədir. Əvvəlki agentliyin müraciətləri köçürülmür.`,
     transferMovedTitle: "Elan başqa agentliyə köçürüldü",
@@ -130,6 +138,14 @@ const COPY = {
     transferSourceApproved: (title: string) => `The listing’s agency approved the transfer of “${title}”. A platform administrator will make the final decision.`,
     transferRejectedTitle: "Transfer request rejected",
     transferRejected: (title: string) => `The transfer request for the listing “${title}” was rejected.`,
+    memberAccessTitle: "Your agency rights changed",
+    memberAccess: (agency: string) => `Your role or permissions at “${agency}” were updated. The changes are already in effect in your account.`,
+    memberSuspendedTitle: "Your agency access was suspended",
+    memberSuspended: (agency: string) => `“${agency}” suspended your access to its listings and enquiries. Your personal account and personal listings are not affected.`,
+    memberResumedTitle: "Your agency access was restored",
+    memberResumed: (agency: string) => `“${agency}” restored your access to its listings and enquiries.`,
+    listingAssignedTitle: "A listing was assigned to you",
+    listingAssigned: (title: string, agency: string) => `“${agency}” assigned the listing “${title}” to you. It is in “My listings”.`,
     transferCompletedTitle: "Listing transferred to your agency",
     transferCompleted: (title: string) => `The listing “${title}” was transferred to your agency and is in “My listings”. Enquiries of the previous agency are not transferred.`,
     transferMovedTitle: "Listing transferred to another agency",
@@ -194,6 +210,14 @@ const COPY = {
     transferSourceApproved: (title: string) => `Агентство объявления одобрило передачу «${title}». Окончательное решение примет администратор платформы.`,
     transferRejectedTitle: "Запрос на передачу отклонён",
     transferRejected: (title: string) => `Запрос на передачу объявления «${title}» отклонён.`,
+    memberAccessTitle: "Ваши права в агентстве изменены",
+    memberAccess: (agency: string) => `Ваша роль или права в агентстве «${agency}» обновлены. Изменения уже действуют в кабинете.`,
+    memberSuspendedTitle: "Доступ к агентству приостановлен",
+    memberSuspended: (agency: string) => `Агентство «${agency}» приостановило ваш доступ к своим объявлениям и заявкам. Личный аккаунт и личные объявления не затронуты.`,
+    memberResumedTitle: "Доступ к агентству восстановлен",
+    memberResumed: (agency: string) => `Агентство «${agency}» восстановило ваш доступ к своим объявлениям и заявкам.`,
+    listingAssignedTitle: "Вам назначено объявление",
+    listingAssigned: (title: string, agency: string) => `Агентство «${agency}» назначило вам объявление «${title}». Оно в разделе «Мои объявления».`,
     transferCompletedTitle: "Объявление передано вашему агентству",
     transferCompleted: (title: string) => `Объявление «${title}» передано вашему агентству и находится в разделе «Мои объявления». Заявки прежнего агентства не передаются.`,
     transferMovedTitle: "Объявление передано другому агентству",
@@ -614,5 +638,46 @@ export async function noticeTransferDecision(input: {
       if (input.stage === "moved") return { title: copy.transferMovedTitle, content: copy.transferMoved(input.propertyTitle, input.agencyName ?? "") };
       return { title: copy.transferRejectedTitle, content: withReason(copy.transferRejected(input.propertyTitle), copy, input.note) };
     },
+  );
+}
+
+export type MemberAccessStage = "access" | "suspended" | "resumed";
+
+/** Agentə: sahib rolunu/səlahiyyətini dəyişdi, girişini dayandırdı və ya bərpa etdi (#218). */
+export async function noticeMemberAccess(input: {
+  userId: string;
+  employeeId: string;
+  stage: MemberAccessStage;
+  agencyName: string;
+  at: Date;
+  reason?: string | null;
+}): Promise<boolean> {
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.AGENCY_TEAM,
+    input.stage === "suspended" ? "/kabinet/profil" : "/kabinet",
+    `member-${input.stage}:${input.employeeId}:${attemptKey(input.at)}`,
+    (copy) => {
+      if (input.stage === "suspended") return { title: copy.memberSuspendedTitle, content: withReason(copy.memberSuspended(input.agencyName), copy, input.reason) };
+      if (input.stage === "resumed") return { title: copy.memberResumedTitle, content: copy.memberResumed(input.agencyName) };
+      return { title: copy.memberAccessTitle, content: copy.memberAccess(input.agencyName) };
+    },
+  );
+}
+
+/** Agentə: agentlik elanı ona təyin edildi (#218, PRD 7.2). */
+export async function noticeListingAssigned(input: {
+  userId: string;
+  propertyId: string;
+  propertyTitle: string;
+  agencyName: string;
+  at: Date;
+}): Promise<boolean> {
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.AGENCY_TEAM,
+    "/kabinet/elanlar",
+    `listing-assigned:${input.propertyId}:${input.userId}:${attemptKey(input.at)}`,
+    (copy) => ({ title: copy.listingAssignedTitle, content: copy.listingAssigned(input.propertyTitle, input.agencyName) }),
   );
 }

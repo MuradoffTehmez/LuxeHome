@@ -3,7 +3,8 @@ import { Container, Section } from "@/components/ui/container";
 import { ThemeSync } from "@/components/theme-sync";
 import { getLocale, getTranslations } from "next-intl/server";
 import { requireAccount } from "@/lib/auth/guard";
-import { accountTypeKey as accountTypeKeyOf, ACCOUNT_TYPES, type Locale } from "@/lib/constants";
+import { accountTypeKey as accountTypeKeyOf, ACCOUNT_TYPES, AGENCY_MEMBER_PERMISSIONS, type Locale } from "@/lib/constants";
+import { getAgencyAccess, hasAgencyPermission } from "@/lib/accounts/agency-access";
 import { CabinetShell } from "./cabinet-shell";
 
 export const metadata: Metadata = {
@@ -23,6 +24,9 @@ export default async function CabinetLayout({ children }: { children: React.Reac
   const user = await requireAccount(locale);
   const t = await getTranslations("auth.accountTypes");
   const accountTypeKey = accountTypeKeyOf(user.accountType);
+  // Agentin agentlik səlahiyyəti (#218) yalnız agent hesabında oxunur — digərlərində əlavə sorğu yoxdur.
+  const canAssignListings = user.accountType === ACCOUNT_TYPES.AGENT
+    && hasAgencyPermission(await getAgencyAccess(user), AGENCY_MEMBER_PERMISSIONS.LISTINGS_ASSIGN);
 
   return (
     <Section spacing="cozy">
@@ -34,6 +38,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
           canList={user.accountType !== ACCOUNT_TYPES.USER}
           canManageTeam={user.accountType === ACCOUNT_TYPES.AGENCY}
           canTransfer={user.accountType === ACCOUNT_TYPES.AGENCY || user.accountType === ACCOUNT_TYPES.AGENT}
+          canAssignListings={canAssignListings}
         >
           {children}
         </CabinetShell>

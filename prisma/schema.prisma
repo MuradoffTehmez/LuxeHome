@@ -263,13 +263,20 @@ model AgencyEmployee {
   /// Sorğunu agentlik sahibi də təsdiqləyə bilər; dəvəti yalnız admin.
   source String @default("INVITE")
 
-  invitedAt     DateTime  @default(now())
-  approvedAt    DateTime?
+  invitedAt       DateTime  @default(now())
+  approvedAt      DateTime?
   /// Müraciət bölgüsü (#161): agent növbəyə daxildirmi və sonuncu dəfə nə vaxt müraciət alıb.
-  receivesLeads Boolean   @default(true)
-  lastLeadAt    DateTime?
+  receivesLeads   Boolean   @default(true)
+  lastLeadAt      DateTime?
   /// Rədd səbəbi (#157) — agentə bildirişdə göstərilir.
-  decisionNote  String?
+  decisionNote    String?
+  /// Rolun defoltundan fərqli səlahiyyətlər (#218, PRD 7.2): JSON siyahı, məs. `["LEADS_MANAGE"]`.
+  /// `null` — rolun defoltu (`MANAGER` hamısı, `AGENT` heç biri). Dəyərlər `AGENCY_MEMBER_PERMISSIONS`-dədir.
+  permissions     String?
+  /// Sahib agentin agentlik mühitinə girişini dayandırıb (#218): üzvlük qalır, amma agentlik
+  /// müraciətləri, agentlik elanları və müraciət növbəsi bağlıdır. Şəxsi hesab toxunulmazdır.
+  suspendedAt     DateTime?
+  suspendedReason String?
 
   agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

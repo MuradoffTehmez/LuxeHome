@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireAccount } from "@/lib/auth/guard";
-import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, LEAD_ROUTING_MODES, MAX_AGENCY_EMPLOYEES, isLeadRoutingMode, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_ROLES, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, LEAD_ROUTING_MODES, MAX_AGENCY_EMPLOYEES, isLeadRoutingMode, type Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencyEmployees, getAgencyForOwner } from "@/lib/queries";
 import { InviteEmployeeForm, InviteLinkCard, LeadRoutingForm, ReceivesLeadsToggle, RemoveEmployeeButton, ReviewRequestButtons } from "./team-forms";
@@ -13,6 +13,9 @@ import { localizePath } from "@/i18n/path-locale";
 import { formatLocalizedDate, formatLocalizedDateTime } from "@/i18n/date";
 import { countOwnListings } from "@/lib/accounts/agency-listings";
 import { getAgencyMembershipHistory } from "@/lib/accounts/agency-ownership";
+import { effectivePermissions, isAgencyEmployeeRole } from "@/lib/accounts/agency-access";
+import { Badge } from "@/components/ui/badge";
+import { MemberAccessButton, MemberSuspendButton } from "./member-forms";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -117,7 +120,13 @@ export default async function CabinetTeamPage() {
                 {employees.map((employee) => (
                   <li key={employee.id} className="flex items-center justify-between gap-3 py-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-ink">{employee.user.name}</p>
+                      <p className="flex min-w-0 flex-wrap items-center gap-1.5 text-sm font-medium text-ink">
+                        <span className="truncate">{employee.user.name}</span>
+                        {employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED && (
+                          <Badge tone={employee.role === AGENCY_EMPLOYEE_ROLES.MANAGER ? "info" : "neutral"}>{t(`access.roles.${isAgencyEmployeeRole(employee.role) ? employee.role : "AGENT"}`)}</Badge>
+                        )}
+                        {employee.suspendedAt && <Badge tone="warning">{t("access.suspendedBadge")}</Badge>}
+                      </p>
                       <p className="truncate text-xs text-ink-muted">
                         {employee.user.email} · {t(`status.${employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED ? "approved" : employee.status === AGENCY_EMPLOYEE_STATUSES.REJECTED ? "rejected" : "pending"}`)}
                         {employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED && ` · ${t("listingCount", { count: listingCounts.get(employee.user.id) ?? 0 })}`}
@@ -125,7 +134,16 @@ export default async function CabinetTeamPage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-1">
                     {employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED && (
-                      <ReceivesLeadsToggle id={employee.id} name={employee.user.name} receives={employee.receivesLeads} />
+                      <>
+                        {!employee.suspendedAt && <ReceivesLeadsToggle id={employee.id} name={employee.user.name} receives={employee.receivesLeads} />}
+                        <MemberAccessButton
+                          id={employee.id}
+                          name={employee.user.name}
+                          role={isAgencyEmployeeRole(employee.role) ? employee.role : AGENCY_EMPLOYEE_ROLES.AGENT}
+                          permissions={[...effectivePermissions(employee.role, employee.permissions)]}
+                        />
+                        <MemberSuspendButton id={employee.id} name={employee.user.name} suspended={Boolean(employee.suspendedAt)} />
+                      </>
                     )}
                     <RemoveEmployeeButton
                       id={employee.id}

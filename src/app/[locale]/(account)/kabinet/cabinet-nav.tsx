@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { ArrowLeftRight, BarChart3, Bell, CalendarCheck, Crown, Flag, Gauge, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, ScrollText, Search, Sparkles, UserRound, Users } from "lucide-react";
+import { ArrowLeftRight, BarChart3, Bell, CalendarCheck, Crown, Flag, Gauge, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, ScrollText, Search, Sparkles, UserCog, UserRound, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
@@ -21,6 +21,7 @@ type CabinetNavProps = {
   canList: boolean;
   canManageTeam?: boolean;
   canTransfer?: boolean;
+  canAssignListings?: boolean;
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
 };
@@ -28,6 +29,7 @@ type CabinetNavProps = {
 const ICONS = {
   overview: LayoutGrid,
   "agency-dashboard": Gauge,
+  assignments: UserCog,
   listings: ListChecks,
   "new-listing": Plus,
   leads: MessageSquare,
@@ -48,6 +50,7 @@ const ICONS = {
 const LABEL_KEYS = {
   overview: "overview",
   "agency-dashboard": "agencyDashboard",
+  assignments: "assignments",
   listings: "listings",
   "new-listing": "newListing",
   leads: "leads",
@@ -87,12 +90,13 @@ export function CabinetNav({
   canList,
   canManageTeam = false,
   canTransfer = false,
+  canAssignListings = false,
   variant = "desktop",
   onNavigate,
 }: CabinetNavProps) {
   const pathname = usePathname();
   const t = useTranslations("auth.cabinet");
-  const items = getCabinetItems(canList, canManageTeam, canTransfer);
+  const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings);
 
   return (
     <nav aria-label={t("menu")} className="flex flex-col gap-4">

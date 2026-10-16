@@ -227,7 +227,11 @@ export default async function AgencyDashboardPage({
                 <tr key={member.userId}>
                   <td className="px-4 py-3 sm:px-5">
                     <span className="font-medium text-ink">{member.isOwner ? t("team.owner") : member.name}</span>
-                    {!member.isOwner && !member.receivesLeads && <span className="ml-2 text-xs text-ink-muted">{t("team.outOfQueue")}</span>}
+                    {member.suspended ? (
+                      <span className="ml-2 text-xs text-warning">{t("team.suspended")}</span>
+                    ) : (
+                      !member.isOwner && !member.receivesLeads && <span className="ml-2 text-xs text-ink-muted">{t("team.outOfQueue")}</span>
+                    )}
                   </td>
                   <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(member.activeListings)}</td>
                   <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(member.newLeads)}</td>
