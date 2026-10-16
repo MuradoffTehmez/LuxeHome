@@ -489,7 +489,8 @@
     "appealStatus": {
       "OPEN": "Under review",
       "ACCEPTED": "Accepted",
-      "REJECTED": "Rejected"
+      "REJECTED": "Rejected",
+      "CLOSED": "Closed"
     }
   },
   "profile": {
@@ -3434,7 +3435,7 @@
     "appeals": {
       "tapilmadi": "The appeal was not found or has already been resolved.",
       "ozQerari": "You made this decision — another moderator must resolve the appeal.",
-      "kohnelib": "The listing is no longer in the appealed status — the appeal stays open; check the listing.",
+      "kohnelib": "The appealed decision is no longer in force (the listing was edited or a new decision was made) — the appeal was closed.",
       "qebulEdildi": "The appeal was accepted and the listing returned to its previous status.",
       "reddEdildi": "The appeal was rejected and the reason sent to the owner."
     }

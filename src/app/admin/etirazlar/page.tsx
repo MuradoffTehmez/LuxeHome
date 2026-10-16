@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = "force-dynamic";
 
-const TABS: AppealStatus[] = [APPEAL_STATUSES.OPEN, APPEAL_STATUSES.ACCEPTED, APPEAL_STATUSES.REJECTED];
+const TABS: AppealStatus[] = [APPEAL_STATUSES.OPEN, APPEAL_STATUSES.ACCEPTED, APPEAL_STATUSES.REJECTED, APPEAL_STATUSES.CLOSED];
 
 /**
  * Etirazlar (#206, PRD 20.4). Hər etirazda qərarı verən moderator göstərilir; o, öz qərarına

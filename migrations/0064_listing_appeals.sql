@@ -7,6 +7,7 @@ CREATE TABLE "ListingAppeal" (
     "appealedStatus" TEXT NOT NULL,
     "previousStatus" TEXT,
     "decidedById" TEXT,
+    "decisionHistoryId" TEXT,
     "message" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'OPEN',
     "reviewerId" TEXT,

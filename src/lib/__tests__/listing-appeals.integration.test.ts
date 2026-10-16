@@ -74,18 +74,55 @@ describe("etirazın həlli", () => {
       .resolves.toEqual({ result: "notFound" });
   });
 
-  it("elan arada dəyişibsə etiraz köhnəlmiş sayılır və açıq qalır; rəddə status dəyişmir", async () => {
-    const appeal = await prisma.listingAppeal.findFirstOrThrow({ where: { propertyId: "ap-rejected" } });
+  it("yeni qərar dövründə köhnə etiraz bağlanır, yeni qərarverən öz qərarına baxa bilmir; rəddə status dəyişmir", async () => {
+    const old = await prisma.listingAppeal.findFirstOrThrow({ where: { propertyId: "ap-rejected", status: APPEAL_STATUSES.OPEN } });
+    // Sahib redaktə edir → PENDING, moderator B yenidən rədd edir → yeni qərar dövrü.
     await prisma.property.update({ where: { id: "ap-rejected" }, data: { status: PROPERTY_STATUSES.PENDING } });
-    await expect(decideListingAppeal({ appealId: appeal.id, reviewerId: "ap-mod-b", accept: true, note: null }))
-      .resolves.toEqual({ result: "stale" });
-    expect((await prisma.listingAppeal.findUniqueOrThrow({ where: { id: appeal.id } })).status).toBe(APPEAL_STATUSES.OPEN);
-
+    await new Promise((resolve) => setTimeout(resolve, 5));
     await prisma.property.update({ where: { id: "ap-rejected" }, data: { status: PROPERTY_STATUSES.REJECTED } });
-    const rejected = await decideListingAppeal({ appealId: appeal.id, reviewerId: "ap-mod-b", accept: false, note: "Sənəd təqdim edilməyib." });
+    await recordPropertyStatusChange({
+      propertyId: "ap-rejected", from: PROPERTY_STATUSES.PENDING, to: PROPERTY_STATUSES.REJECTED, source: PROPERTY_STATUS_SOURCES.MODERATION, changedById: "ap-mod-b",
+    });
+
+    // Köhnə etiraz yeni qərara aid deyil — moderator B onun üzərindən öz qərarına baxa bilməz.
+    await expect(decideListingAppeal({ appealId: old.id, reviewerId: "ap-mod-b", accept: true, note: null }))
+      .resolves.toEqual({ result: "stale" });
+    expect((await prisma.listingAppeal.findUniqueOrThrow({ where: { id: old.id } })).status).toBe(APPEAL_STATUSES.CLOSED);
+
+    // Sahib yeni qərara etiraz edir; qərarverən indi B-dir.
+    await expect(submitListingAppeal({ propertyId: "ap-rejected", userId: "ap-owner", message: MESSAGE })).resolves.toBe("created");
+    const fresh = await prisma.listingAppeal.findFirstOrThrow({ where: { propertyId: "ap-rejected", status: APPEAL_STATUSES.OPEN } });
+    expect(fresh.decidedById).toBe("ap-mod-b");
+    await expect(decideListingAppeal({ appealId: fresh.id, reviewerId: "ap-mod-b", accept: true, note: null }))
+      .resolves.toEqual({ result: "sameReviewer" });
+
+    const rejected = await decideListingAppeal({ appealId: fresh.id, reviewerId: "ap-mod-a", accept: false, note: "Sənəd təqdim edilməyib." });
     expect(rejected).toMatchObject({ result: "decided", accepted: false, restoredStatus: null });
     expect((await prisma.property.findUniqueOrThrow({ where: { id: "ap-rejected" } })).status).toBe(PROPERTY_STATUSES.REJECTED);
-    const stored = await prisma.listingAppeal.findUniqueOrThrow({ where: { id: appeal.id } });
-    expect(stored).toMatchObject({ status: "REJECTED", reviewerId: "ap-mod-b", decisionNote: "Sənəd təqdim edilməyib." });
+    expect(await prisma.listingAppeal.findUniqueOrThrow({ where: { id: fresh.id } }))
+      .toMatchObject({ status: "REJECTED", reviewerId: "ap-mod-a", decisionNote: "Sənəd təqdim edilməyib." });
+  });
+
+  it("eyni anda iki göndərişdən yalnız biri açıq qalır", async () => {
+    await DB.prepare(
+      `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId", "authorId", "createdAt", "updatedAt")
+       VALUES ('ap-race', 'Yarış', 'ap-race', 'T', 'x', 'SALE', 'SUSPENDED', 1000, 'ap-type', 'ap-city', 'ap-owner', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    ).run();
+    const results = await Promise.all([
+      submitListingAppeal({ propertyId: "ap-race", userId: "ap-owner", message: MESSAGE }),
+      submitListingAppeal({ propertyId: "ap-race", userId: "ap-owner", message: MESSAGE }),
+    ]);
+    expect(results.filter((result) => result === "created")).toHaveLength(1);
+    await expect(prisma.listingAppeal.count({ where: { propertyId: "ap-race", status: APPEAL_STATUSES.OPEN } })).resolves.toBe(1);
+  });
+
+  it("növbə 98-dən çox etirazda D1 parametr həddini aşmır", async () => {
+    const insert = DB.prepare(
+      `INSERT INTO "ListingAppeal" ("id", "propertyId", "authorId", "appealedStatus", "message", "status", "createdAt") VALUES (?, 'ap-race', 'ap-owner', 'SUSPENDED', 'x', 'REJECTED', CURRENT_TIMESTAMP)`,
+    );
+    await DB.batch(Array.from({ length: 110 }, (_, index) => insert.bind(`ap-bulk-${index}`)));
+    const queue = await getAppealQueue(APPEAL_STATUSES.REJECTED);
+    expect(queue.length).toBeGreaterThanOrEqual(110);
+    expect(queue.every((item) => item.property.title && item.author?.name === "Sahib")).toBe(true);
   });
 });

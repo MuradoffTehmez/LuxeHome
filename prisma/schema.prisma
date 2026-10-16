@@ -1201,21 +1201,23 @@ model PropertyPriceHistory {
 /// Moderasiya qərarına etiraz (#206, PRD 20.4). Sahib rədd edilmiş/dayandırılmış elanına etiraz edir;
 /// qərarı verən moderatordan başqa səlahiyyətli şəxs baxır (`decidedById` ≠ `reviewerId`).
 model ListingAppeal {
-  id             String    @id @default(cuid())
-  propertyId     String
-  authorId       String?
+  id                String    @id @default(cuid())
+  propertyId        String
+  authorId          String?
   /// Etiraz olunan status (REJECTED | SUSPENDED) və qərardan əvvəlki status — qəbulda elan ona qayıdır.
-  appealedStatus String
-  previousStatus String?
+  appealedStatus    String
+  previousStatus    String?
   /// Qərarı verən moderator (status tarixçəsindən); etirazı o həll edə bilməz.
-  decidedById    String?
-  message        String
-  /// APPEAL_STATUSES: OPEN | ACCEPTED | REJECTED
-  status         String    @default("OPEN")
-  reviewerId     String?
-  decisionNote   String?
-  decidedAt      DateTime?
-  createdAt      DateTime  @default(now())
+  decidedById       String?
+  /// Etiraz olunan qərarın status tarixçəsi qeydi — elan başqa qərar dövrünə keçibsə etiraz bağlanır.
+  decisionHistoryId String?
+  message           String
+  /// APPEAL_STATUSES: OPEN | ACCEPTED | REJECTED | CLOSED (qərar dövrü dəyişib)
+  status            String    @default("OPEN")
+  reviewerId        String?
+  decisionNote      String?
+  decidedAt         DateTime?
+  createdAt         DateTime  @default(now())
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   author   User?    @relation("ListingAppealAuthor", fields: [authorId], references: [id], onDelete: SetNull)

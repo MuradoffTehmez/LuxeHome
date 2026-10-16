@@ -558,8 +558,11 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   (`ListingAppeal`, elan başına bir açıq etiraz). `/admin/etirazlar`-da etirazı **qərarı verən moderatordan başqa**
   şəxs həll edir — qərarverən status tarixçəsinin son keçidindən (`decidedById`) götürülür, server `sameReviewer` qaytarır.
   Qəbulda elan əvvəlki statusa (`PUBLISHED`/`RESERVED`) və ya moderasiya növbəsinə (`PENDING`) qayıdır, tarixçəyə yazılır;
-  rəddə status dəyişmir, səbəb məcburidir. Qərar əvvəl etirazı şərti götürür, elan arada dəyişibsə (`stale`) etiraz
-  yenidən açılır. Bu axında status tarixçəsi qərarverənin mənbəyidir — moderasiya yollarında tarixçəni yazmağı unutma.
+  rəddə status dəyişmir, səbəb məcburidir. **Etiraz konkret qərara bağlıdır** (`decisionHistoryId` — o keçidin tarixçə
+  qeydi): elan redaktə edilib yenidən rədd olunubsa köhnə etiraz `CLOSED` olur (`stale`), yoxsa yeni qərarverən onun
+  üzərindən öz qərarına baxa bilərdi. «Bir açıq etiraz» yazılışdan sonra yoxlanılır (ən köhnəsi qalır); növbə əlaqələri
+  iç-içə deyil, `findManyInChunks` ilə yüklənir. Bu axında status tarixçəsi qərarverənin mənbəyidir — moderasiya
+  yollarında tarixçəni yazmağı unutma.
 - **Açıq qapı** (`OpenHouse` + `OpenHouseRegistration`): qeydiyyat lead yaradır, tutum və
   qeydiyyatın bağlanma vaxtı `open-house-availability.ts`-dədir (client də işlədir — Prisma yoxdur).
 - **Təqvim** `/admin/rezervasiyalar/teqvim` (Bakı vaxtı, UTC+4) və şəxsi ICS abunəsi

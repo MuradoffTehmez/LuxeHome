@@ -313,6 +313,8 @@ export const APPEAL_STATUSES = {
   OPEN: "OPEN",
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
+  /** Etiraz olunan qərar artıq qüvvədə deyil (sahib redaktə edib, yeni qərar verilib) — baxılmadan bağlanır. */
+  CLOSED: "CLOSED",
 } as const;
 
 export type AppealStatus = (typeof APPEAL_STATUSES)[keyof typeof APPEAL_STATUSES];
@@ -321,6 +323,7 @@ export const APPEAL_STATUS_LABELS: Record<AppealStatus, string> = {
   OPEN: "Baxılır",
   ACCEPTED: "Qəbul edilib",
   REJECTED: "Rədd edilib",
+  CLOSED: "Bağlanıb",
 };
 
 export const APPEAL_MESSAGE_MIN = 20;

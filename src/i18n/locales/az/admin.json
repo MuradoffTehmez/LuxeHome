@@ -489,7 +489,8 @@
     "appealStatus": {
       "OPEN": "Baxılır",
       "ACCEPTED": "Qəbul edilib",
-      "REJECTED": "Rədd edilib"
+      "REJECTED": "Rədd edilib",
+      "CLOSED": "Bağlanıb"
     }
   },
   "profile": {
@@ -3434,7 +3435,7 @@
     "appeals": {
       "tapilmadi": "Etiraz tapılmadı və ya artıq həll edilib.",
       "ozQerari": "Bu qərarı siz vermisiniz — etirazı başqa moderator həll etməlidir.",
-      "kohnelib": "Elan artıq etiraz olunan statusda deyil — etiraz açıq qalır, elanı yoxlayın.",
+      "kohnelib": "Etiraz olunan qərar artıq qüvvədə deyil (elan redaktə edilib və ya yeni qərar verilib) — etiraz bağlandı.",
       "qebulEdildi": "Etiraz qəbul edildi, elan əvvəlki statusuna qaytarıldı.",
       "reddEdildi": "Etiraz rədd edildi, sahibə səbəb göndərildi."
     }
