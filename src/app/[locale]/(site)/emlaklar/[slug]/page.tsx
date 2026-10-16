@@ -848,10 +848,12 @@ export default async function PropertyDetailPage({ params }: Props) {
                           propertyId={property.id}
                           maskedPhone={publisher.phone ? maskPhone(publisher.phone) : null}
                           hasEmail={Boolean(publisher.email)}
+                          hasTelegram={Boolean(publisher.telegram)}
                           whatsappMessage={whatsappMessage}
                           labels={{
                             showPhone: content("showPhone"),
                             showEmail: content("showEmail"),
+                            showTelegram: content("showTelegram"),
                             revealError: content("revealError"),
                             noPhone: content("publisherNoPhone"),
                           }}

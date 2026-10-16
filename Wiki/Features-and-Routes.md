@@ -232,7 +232,7 @@ Toplu seçim `components/admin/bulk-selection.tsx` + `lib/admin/bulk.ts`-dir: h�
 | `POST /api/security/turnstile` | Turnstile yoxlaması | Public |
 | `POST /api/cron/saved-search-digest` | Digest, maintenance (elan müddəti, silinmə retry), semantik reindeks | `CRON_SECRET` Bearer |
 | `POST /api/cron/leads?is=escalate\|response-stats` | Cavabsız agentlik müraciətinin eskalasiyası (10 dəq), cavab göstəriciləri (gündəlik) — `worker.ts` `scheduled()` çağırır | `AUTH_SECRET`-dən törədilən açar və ya `CRON_SECRET`; açarsız 404 |
-| `POST /api/emlaklar/[id]/klik` | Elanın WhatsApp klikini analitikaya yazır (həmişə 204) | Same-origin, IP limiti, bot filtri |
+| `POST /api/emlaklar/[id]/klik` | Elanın WhatsApp, `?kanal=telegram` ilə Telegram klikini analitikaya yazır (həmişə 204) | Same-origin, IP limiti, bot filtri |
 | `POST /api/webhooks/resend` | Resend/Svix event qəbulu | `RESEND_WEBHOOK_SECRET` imzası |
 | `GET /media/[...key]` | R2 obyektinin delivery-si | Key parser + cache metadata |
 | `GET /llms.txt`, `/sitemap-index.xml`, `/sitemaps/[feed]` | Maşın oxunaqlı xəritə və sitemap feed-ləri | Public |

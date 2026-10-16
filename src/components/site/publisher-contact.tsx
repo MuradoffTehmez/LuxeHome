@@ -3,12 +3,16 @@
 import { useState } from "react";
 import { Eye, Mail, Phone } from "lucide-react";
 import { Button, ButtonAnchor } from "@/components/ui/button";
-import { WhatsAppIcon } from "./brand-icons";
+import { TelegramIcon, WhatsAppIcon } from "./brand-icons";
 import { trackEvent } from "@/lib/client-analytics";
 import { phoneHref, publisherWhatsappHref } from "@/lib/accounts/listing-publisher";
+import { telegramHref } from "@/lib/accounts/telegram";
 
-/** `whatsapp` yalnız agentlik profilində ayrıca nömrə ola bilər; yoxdursa telefon işlədilir. */
-export type RevealedContact = { phone: string | null; email: string | null; whatsapp?: string | null };
+/**
+ * `whatsapp` yalnız agentlik profilində ayrıca nömrə ola bilər; yoxdursa telefon işlədilir.
+ * `telegram` — istifadəçi adı (#208), nömrə kimi yalnız klikdən sonra gəlir.
+ */
+export type RevealedContact = { phone: string | null; email: string | null; whatsapp?: string | null; telegram?: string | null };
 
 /**
  * Bir səhifədə sağ blok və mobil zolaq eyni əlaqəni istəyir — sorğu bir dəfə gedir.
@@ -47,9 +51,16 @@ export function trackWhatsappClick(propertyId: string): void {
   void fetch(`/api/emlaklar/${encodeURIComponent(propertyId)}/klik`, { method: "POST", keepalive: true }).catch(() => undefined);
 }
 
+/** Telegram klikini (#208) ayrıca sayğaca yazır — WhatsApp ilə qarışmasın (PRD 8.2, 11.3). */
+export function trackTelegramClick(propertyId: string): void {
+  void fetch(`/api/emlaklar/${encodeURIComponent(propertyId)}/klik?kanal=telegram`, { method: "POST", keepalive: true }).catch(() => undefined);
+}
+
 export type PublisherContactLabels = {
   showPhone: string;
   showEmail: string;
+  /** Nömrə və e-poçt yoxdursa, yalnız Telegram olanda açma düyməsi (#208). */
+  showTelegram?: string;
   revealError: string;
   noPhone: string;
 };
@@ -63,6 +74,7 @@ export function PublisherContactButtons({
   endpoint,
   maskedPhone,
   hasEmail,
+  hasTelegram = false,
   whatsappMessage,
   labels,
 }: {
@@ -72,6 +84,7 @@ export function PublisherContactButtons({
   endpoint?: string;
   maskedPhone: string | null;
   hasEmail: boolean;
+  hasTelegram?: boolean;
   whatsappMessage: string;
   labels: PublisherContactLabels;
 }) {
@@ -113,12 +126,19 @@ export function PublisherContactButtons({
             {labels.showEmail}
           </Button>
         )}
+        {!maskedPhone && !hasEmail && hasTelegram && labels.showTelegram && (
+          <Button type="button" variant="ghost" fullWidth loading={loading} onClick={reveal} className="border border-line hover:border-gold hover:text-gold-deep">
+            <TelegramIcon className="size-4" />
+            {labels.showTelegram}
+          </Button>
+        )}
         {failed && <p role="alert" className="text-xs text-danger">{labels.revealError}</p>}
       </div>
     );
   }
 
   const whatsapp = publisherWhatsappHref(contact.whatsapp || contact.phone, whatsappMessage);
+  const telegram = telegramHref(contact.telegram);
   return (
     <div className="flex flex-col gap-2" aria-live="polite">
       {contact.phone && (
@@ -149,6 +169,23 @@ export function PublisherContactButtons({
         >
           <WhatsAppIcon className="size-4 text-success" />
           WhatsApp
+        </ButtonAnchor>
+      )}
+      {telegram && (
+        <ButtonAnchor
+          href={telegram}
+          variant="ghost"
+          target="_blank"
+          rel="noopener noreferrer"
+          fullWidth
+          className="border border-info/30 bg-info-bg text-info hover:border-info hover:bg-info-bg/70"
+          onClick={() => {
+            trackEvent("telegram_click", { property_id: propertyId, placement: "contact_card" });
+            if (!endpoint) trackTelegramClick(propertyId);
+          }}
+        >
+          <TelegramIcon className="size-4" />
+          Telegram
         </ButtonAnchor>
       )}
       {contact.email && (

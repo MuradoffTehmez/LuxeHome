@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { normalizeTelegramUsername } from "@/lib/accounts/telegram";
 import { prisma } from "@/lib/prisma";
 import {
   AGENCY_EMPLOYEE_STATUSES,
@@ -541,6 +542,10 @@ export async function updateAgencyByAdmin(_previous: ActionState, formData: Form
   if (companyTaxId === false) {
     return failure(msg("server.common.formInvalid"), { companyTaxId: msg("server.agentlikler.voenFormati") });
   }
+  const telegram = normalizeTelegramUsername(form.optionalText(formData, "telegram") ?? "");
+  if (telegram === undefined) {
+    return failure(msg("server.common.formInvalid"), { telegram: msg("server.agentlikler.telegramFormati") });
+  }
   // Örtük şəkli paneldən yüklənir (`/media/umumi/...`) və ya kabinetdən gələn dəyər saxlanılır.
   const cover = parseSingleImage(formData, "cover");
 
@@ -571,6 +576,7 @@ export async function updateAgencyByAdmin(_previous: ActionState, formData: Form
         description: data.description,
         phone: data.phone,
         whatsapp: data.whatsapp,
+        telegram,
         email: data.email,
         address: data.address,
         workingHours: data.workingHours,

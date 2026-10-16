@@ -39,5 +39,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   // Kabinet analitikası (#161): sahib neçə nəfərin nömrəsini açdığını görür.
   if (!isLikelyBot(request.headers.get("user-agent"))) recordListingStat(property.id, "contactReveals");
-  return NextResponse.json({ phone: publisher.phone, email: publisher.email }, { headers: NO_STORE });
+  return NextResponse.json({ phone: publisher.phone, email: publisher.email, telegram: publisher.telegram }, { headers: NO_STORE });
 }

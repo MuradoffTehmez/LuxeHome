@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { normalizeAzMobile } from "@/lib/auth/phone-otp-policy";
+import { normalizeTelegramUsername } from "@/lib/accounts/telegram";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { composeName, isPhoneLike, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
 import { isAgencyTaxIdTaken } from "@/lib/accounts/agency-tax-id";
@@ -104,6 +105,11 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
       birthDate: birthDate.reason === "underage" ? t("actions.underage") : t("actions.invalidBirthDate"),
     });
   }
+  // Telegram istifadəçi adı (#208): `@ad`, `t.me/ad` və tam link eyni dəyərə gəlir.
+  const telegram = normalizeTelegramUsername(form.optionalText(formData, "telegram") ?? "");
+  if (telegram === undefined) {
+    return failure(t("actions.invalidForm"), { telegram: t("actions.invalidTelegram") });
+  }
   const companyTaxId = normalizeTaxId(form.optionalText(formData, "companyTaxId"));
   if (companyTaxId === false) {
     return failure(t("actions.invalidForm"), { companyTaxId: t("actions.invalidTaxId") });
@@ -154,6 +160,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
         lastName: data.lastName,
         birthDate: birthDate.value,
         phone: data.phone,
+        telegram,
         avatarUrl: data.avatarUrl,
         companyName: requirements.company ? data.companyName : null,
         companyTaxId: requirements.company ? companyTaxId : null,
@@ -188,6 +195,7 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
         website: data.companyWebsite,
         email: data.agencyEmail,
         whatsapp: data.agencyWhatsapp,
+        telegram,
         instagram: data.agencyInstagram,
         workingHours: data.agencyHours,
         coverUrl,

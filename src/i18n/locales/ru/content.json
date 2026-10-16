@@ -121,6 +121,7 @@
     "publisherNoPhone": "Автор не указал номер телефона — напишите на e-mail.",
     "showPhone": "Показать номер",
     "showEmail": "Показать e-mail",
+    "showTelegram": "Показать Telegram",
     "revealError": "Не удалось загрузить контакты. Попробуйте ещё раз чуть позже.",
     "verifiedAgency": "Проверенное агентство",
     "sellerListings": "Все объявления продавца"

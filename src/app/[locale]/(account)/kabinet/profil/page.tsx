@@ -45,6 +45,7 @@ export default async function CabinetProfilePage() {
       select: {
         name: true,
         phone: true,
+        telegram: true,
         email: true,
         verifiedPhone: true,
         avatarUrl: true,
@@ -229,6 +230,7 @@ export default async function CabinetProfilePage() {
           values={{
             ...names,
             phone: profile.phone ?? "",
+            telegram: profile.telegram ?? "",
             birthDate: profile.birthDate ? profile.birthDate.toISOString().slice(0, 10) : "",
             avatarUrl: profile.avatarUrl,
             companyName,

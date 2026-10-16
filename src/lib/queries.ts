@@ -63,9 +63,10 @@ const publisherContactSelect = {
   isActive: true,
   name: true,
   phone: true,
+  telegram: true,
   email: true,
   companyName: true,
-  agency: { select: { ...publisherAgencySelect, phone: true } },
+  agency: { select: { ...publisherAgencySelect, phone: true, telegram: true } },
   agencyEmployments: {
     where: { status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
     // Tək valideynli sorğular üçündür (detal, «Nömrəni göstər») — orderBy burada təhlükəsizdir.
