@@ -2876,7 +2876,7 @@
     },
     "safety": {
       "title": "Xəbərdarlıq mətnləri",
-      "description": "Ziyarətçiləri dələduzluqdan qoruyan məcburi mətnlər. Dəyişiklik saytda dərhal görünür və audit jurnalına yazılır.",
+      "description": "Ziyarətçiləri dələduzluqdan qoruyan məcburi mətnlər. Dəyişiklik audit jurnalına yazılır və saytda adətən bir dəqiqə ərzində görünür — ictimai səhifələrin kənar keşi o qədər yaşayır.",
       "contactWarning": "Əlaqə panelinin beh xəbərdarlığı",
       "label": {
         "az": "Azərbaycan dili",

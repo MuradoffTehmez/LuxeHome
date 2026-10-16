@@ -295,7 +295,8 @@ export const getCachedKnowledgeSitemapEntries = cachedQuery(
 
 /**
  * Əlaqə panelinin beh xəbərdarlığı (#199). Elan detalı hər render-də D1-ə əlavə gediş-gəliş
- * etməsin deyə keşlənir; panel saxlayanda `public:safety` teqi dərhal bitir.
+ * etməsin deyə keşlənir; panel saxlayanda `public:safety` teqi dərhal bitir (kənar HTML keşi isə
+ * öz TTL-i ilə yenilənir — `EDGE_HTML_CACHE_TTL`).
  */
 export const getCachedSafetyWarnings = cachedQuery(
   async () => parseSafetyWarnings(await getSetting(SETTING_KEYS.SAFETY_CONTACT_WARNING)),

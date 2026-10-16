@@ -82,8 +82,8 @@ Hər qərar audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
 
 Əlaqə panelinin beh xəbərdarlığı hər elanın və agentlik profilinin əlaqə panelində, telefon və WhatsApp düymələrinin
 üstündə göstərilir. Mətn Azərbaycan, ingilis və rus dillərində (20–400 simvol) redaktə olunur; boş saxlanan dil defolt
-mətnə qayıdır, yəni xəbərdarlıq tam silinə bilməz. Redaktor, Admin və Super Admin dəyişə bilir; dəyişiklik saytda
-dərhal görünür və audit jurnalına yazılır.
+mətnə qayıdır, yəni xəbərdarlıq tam silinə bilməz. Redaktor, Admin və Super Admin dəyişə bilir; dəyişiklik audit
+jurnalına yazılır və anonim ziyarətçilərə adətən bir dəqiqə ərzində çatır (ictimai səhifələrin kənar keşi).
 
 ### CSV idxalı (`/admin/emlaklar/idxal`)
 

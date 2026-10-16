@@ -49,7 +49,10 @@ export async function saveSafetyWarnings(_prev: ActionState, formData: FormData)
       oldValue: before,
       newValue: overrides,
     });
-    // Elan detalı və agentlik profili keşli mətni oxuyur — teq dərhal bitir.
+    // Elan detalı və agentlik profili keşli mətni oxuyur — Next data teqi dərhal bitir. Worker-in kənar
+    // HTML keşi (`worker.ts`, `EDGE_HTML_CACHE_TTL`) teqi görmür və qlobal təmizlənə bilmir (Cache API
+    // data mərkəzi üzrədir): artıq keşlənmiş anonim HTML təzə pəncərəsi bitənə qədər köhnə mətni verə
+    // bilər. Bütün admin dəyişiklikləri üçün qəbul edilmiş kompromisdir; panel mətni bunu belə yazır.
     revalidateTag(PUBLIC_CACHE_TAGS.safety, { expire: 0 });
     revalidatePath("/admin/xeberdarliqlar");
     return success(msg("server.safety.saxlanildi"));

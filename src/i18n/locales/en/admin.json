@@ -2876,7 +2876,7 @@
     },
     "safety": {
       "title": "Safety notices",
-      "description": "Mandatory texts that protect visitors from fraud. Changes appear on the site immediately and are written to the audit log.",
+      "description": "Mandatory texts that protect visitors from fraud. Changes are written to the audit log and usually appear on the site within a minute — that is how long the public pages' edge cache lives.",
       "contactWarning": "Contact panel deposit warning",
       "label": {
         "az": "Azerbaijani",
