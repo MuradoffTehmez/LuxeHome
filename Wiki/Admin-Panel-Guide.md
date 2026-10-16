@@ -67,16 +67,29 @@ sahib/agentlik elanı dərc olunmur, növbəyə düşür; riskli elanları əvv�
 
 ### Şikayətlər (`/admin/sikayetler`)
 
-Ziyarətçilərin elan şikayətləri elan üzrə qruplaşdırılır (3+ şikayət «Təcili»). Tablar: Açıq / Həll edilmiş / Əsassız.
+Ziyarətçilərin elan şikayətləri elan üzrə qruplaşdırılır. Bir şikayətdə bir neçə səbəb ola bilər; beh/əvvəlcədən
+ödəniş tələbi, dələduzluq şübhəsi və 3+ şikayət «Təcili» sayılır və yuxarıda durur. Səhifənin başında göstəricilər
+var: ümumi və yeni şikayət, yüksək prioritetli və təkrar şikayətli elanlar, son 90 günün təsdiq faizi və orta həll müddəti.
+
+Tablar: **Aktiv** (aşağıdakı üç mərhələ birlikdə) / Yeni / Yoxlanılır / Əlavə məlumat gözlənilir / Təsdiqlənib /
+Rədd edilib / Bağlanıb. «Mənə təyin edilənlər» yalnız sizin götürdüyünüz qrupları göstərir.
 
 | Əməliyyat | Nəticə |
 |---|---|
-| Elanı dayandır | Elan arxivə keçir, sahibə səbəb (hazır şablon və ya öz mətniniz) bildiriş + e-poçt ilə gedir |
-| Satılıb / İcarəyə verilib | Elan bağlanır, sahibə bildirilir |
-| Həll edildi | Elan dəyişmir, şikayətlər bağlanır |
-| Əsassızdır | Şikayətlər əsassız sayılır |
+| Mənə götür / Moderator seçimi | Aktiv şikayətlər moderatora təyin olunur, yenilər «Yoxlanılır»-a keçir |
+| İzahat istə | Sahibə sual (hazır şablon və ya öz mətniniz) bildiriş + e-poçt ilə gedir, şikayətlər «Əlavə məlumat gözlənilir» olur |
+| Elanı gizlət | Elan arxivə keçir, sahibə səbəb gedir; şikayət təsdiqlənir |
+| Satılıb / İcarəyə verilib | Elan bağlanır, sahibə bildirilir; şikayət təsdiqlənir |
+| Elan düzəldilib | Elanın statusu dəyişmir, şikayət təsdiqlənir |
+| Rədd et | Şikayət əsassız sayılır, elan dəyişmir |
+| Bağla | Şikayət qərarsız bağlanır (elan artıq aktual deyil, təkrar şikayət) |
+| Yenidən bax | Son qərar ləğv olunur, şikayət yenidən yoxlamaya qayıdır (elana görülmüş tədbir geri alınmır) |
 
-Hər qərar audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
+Daxil olmuş istifadəçinin əlavə etdiyi sübut şəkilləri (ən çox 3) şikayətin altında miniatür kimi görünür və yalnız
+`property:manage` icazəli əməkdaşa açılır. Daxil olmuş şikayətçi qərar barədə bildiriş alır. Çoxsaylı şikayət elanın
+saxta olduğunu avtomatik sübut etmir — qərarı sübutlar əsasında verin.
+
+Hər mərhələ dəyişikliyi və qərar audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
 
 ### CSV idxalı (`/admin/emlaklar/idxal`)
 
