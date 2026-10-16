@@ -2,9 +2,11 @@ import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { LOCATION_KINDS, NOTIFICATION_TYPES, PROPERTY_STATUSES, REPORT_REASONS, REPORT_STATUSES } from "@/lib/constants";
 import {
+  addReportNote,
   assignActiveReports,
   getReportGroups,
   getReportQueueStats,
+  getUserReports,
   parseReportCycleId,
   parseReportReasons,
   reopenDecidedReports,
@@ -202,6 +204,35 @@ describe("elan şikayəti", () => {
       select: { userId: true },
     });
     expect(notices.map((item) => item.userId).sort()).toEqual(["rep-agent", "rep-owner"]);
+  });
+
+  it("daxili qeyd elan üzrə yazılır və növbədə ən yenisi birinci görünür", async () => {
+    await expect(addReportNote({ propertyId: "yoxdur", authorId: "rep-moderator", body: "x" })).resolves.toBeNull();
+    await addReportNote({ propertyId: "rep-flow", authorId: "rep-moderator", body: "Sahibə zəng edildi." });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    await addReportNote({ propertyId: "rep-flow", authorId: "rep-moderator", body: "Sənəd göndərildi." });
+    const group = (await getReportGroups()).find((item) => item.property.id === "rep-flow");
+    expect(group?.notes.map((note) => note.body)).toEqual(["Sənəd göndərildi.", "Sahibə zəng edildi."]);
+    expect(group?.notes[0].author?.name).toBe("Moderator");
+    // Başqa elanın qrupuna qarışmır.
+    expect((await getReportGroups()).find((item) => item.property.id === "rep-live")?.notes).toEqual([]);
+  });
+
+  it("«Şikayətlərim» yalnız istifadəçinin öz şikayətlərini və məxfi olmayan sahələri qaytarır", async () => {
+    const mine = await getUserReports("rep-agent");
+    expect(mine).toHaveLength(1);
+    expect(mine[0]).toMatchObject({
+      propertyTitle: "Axın",
+      propertySlug: "rep-flow",
+      reasons: ["PHOTOS_MISMATCH"],
+      status: REPORT_STATUSES.IN_REVIEW,
+      evidenceCount: 2,
+    });
+    // Moderator, izahat mətni, daxili qeyd və reporterKey səhifəyə ötürülmür.
+    expect(Object.keys(mine[0]).sort()).toEqual(
+      ["createdAt", "evidenceCount", "id", "propertySlug", "propertyTitle", "reasons", "resolution", "resolvedAt", "status"],
+    );
+    await expect(getUserReports("rep-owner")).resolves.toEqual([]);
   });
 
   it("növbə göstəricilərini hesablayır", async () => {

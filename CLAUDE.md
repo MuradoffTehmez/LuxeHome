@@ -717,6 +717,10 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   bu prefiksi rədd edir, ona görə ictimai `/media/...` və worker keşi onu vermir. Moderator faylı yalnız
   `/api/admin/sikayetler/subut/<id>`-dən görür (`property:manage`, `no-store`, icazəsizə 404). Məxfi fayla ictimai
   URL qurma və onu `next/image`-dən keçirmə.
+- **Daxili qeydlər və «Şikayətlərim» (#197):** moderator qrupa (elan üzrə) `ListingReportNote` yazır — yalnız
+  paneldə görünür, audit jurnalına düşür. `/kabinet/sikayetlerim` istifadəçinin öz şikayətlərini `getUserReports()` ilə
+  göstərir; o funksiya moderatoru, izahat mətnini, qeydləri və `reporterKey`-i **seçmir** (test açar dəstini yoxlayır) —
+  səhifəyə yeni sahə əlavə edəndə məxfilik qaydasını saxla. Şikayətçiyə nəticə bildirişi bu səhifəyə aparır.
 - **Avtomatik risk siqnalları** (`lib/moderation/risk-signals.ts` saf, `listing-risk.ts` D1): bazardan
   ≥35% ucuz qiymət, mətndə telefon/e-poçt/link, başqa müəllifin elanındakı eyni foto (`Media.checksum`),
   köçürülmüş mətn, 3 gündən təzə hesab, açıq şikayət. Bal `Property.riskScore` (0–100) + `riskFlags` (JSON).

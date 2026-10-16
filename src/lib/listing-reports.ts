@@ -13,6 +13,7 @@ import {
   REPORT_STATUSES,
   REPORT_URGENT_THRESHOLD,
   type ReportReason,
+  type ReportResolution,
   type ReportStatus,
   type StoredReportReason,
 } from "@/lib/constants";
@@ -256,6 +257,60 @@ export async function reopenDecidedReports(
   return count;
 }
 
+/** Moderatorun daxili qeydini yazır (#197); elan yoxdursa `null`. */
+export async function addReportNote(input: { propertyId: string; authorId: string; body: string }) {
+  const property = await prisma.property.findUnique({ where: { id: input.propertyId }, select: { id: true, title: true } });
+  if (!property) return null;
+  await prisma.listingReportNote.create({ data: { propertyId: property.id, authorId: input.authorId, body: input.body } });
+  return property;
+}
+
+/**
+ * Daxil olmuş istifadəçinin öz şikayətləri (#197, «Şikayətlərim»). Yalnız şikayətçiyə aid sahələr
+ * seçilir: moderatorun adı, daxili qeydlər, izahat mətni və elan sahibinin məlumatı **seçilmir** —
+ * səhifə yanlışlıqla onları göstərə bilməsin. Elan yalnız ictimaidirsə keçid alır.
+ */
+export async function getUserReports(userId: string) {
+  const reports = await prisma.listingReport.findMany({
+    where: { reporterUserId: userId },
+    select: {
+      id: true,
+      propertyId: true,
+      reason: true,
+      reasons: true,
+      status: true,
+      resolution: true,
+      createdAt: true,
+      resolvedAt: true,
+      _count: { select: { evidence: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+  const publicWhere = await publicPropertyWhere();
+  const properties = await findManyInChunks([...new Set(reports.map((report) => report.propertyId))], 0, (chunk) =>
+    prisma.property.findMany({ where: { id: { in: chunk } }, select: { id: true, title: true } }),
+  );
+  const slugs = new Map(
+    (await findManyInChunks(properties.map((property) => property.id), 0, (chunk) =>
+      prisma.property.findMany({ where: { ...publicWhere, id: { in: chunk } }, select: { id: true, slug: true } }),
+    )).map((property) => [property.id, property.slug]),
+  );
+  const titles = new Map(properties.map((property) => [property.id, property.title]));
+
+  return reports.map((report) => ({
+    id: report.id,
+    propertyTitle: titles.get(report.propertyId) ?? null,
+    propertySlug: slugs.get(report.propertyId) ?? null,
+    reasons: parseReportReasons(report.reasons, report.reason),
+    status: report.status as ReportStatus,
+    resolution: report.resolution as ReportResolution | null,
+    createdAt: report.createdAt,
+    resolvedAt: report.resolvedAt,
+    evidenceCount: report._count.evidence,
+  }));
+}
+
 /** Qərar dövrünün identifikatoru: elan + həmin qərarın `resolvedAt`-ı (`<id>|<ISO>`). */
 export function reportCycleId(propertyId: string, decidedAt: Date): string {
   return `${propertyId}|${decidedAt.toISOString()}`;
@@ -343,6 +398,15 @@ export async function getReportGroups(
     }),
   );
 
+  // Daxili qeydlər (#197) elan üzrədir — qrupun bütün dövrlərində görünür, ən yenisi birinci.
+  const notes = await findManyInChunks([...byProperty.keys()], 0, (chunk) =>
+    prisma.listingReportNote.findMany({
+      where: { propertyId: { in: chunk } },
+      select: { id: true, propertyId: true, body: true, createdAt: true, author: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+  );
+
   return [...byProperty.entries()]
     .flatMap(([propertyId, items]) => {
       const property = properties.find((item) => item.id === propertyId);
@@ -383,6 +447,7 @@ export async function getReportGroups(
             }
           : null,
         evidenceCount: enriched.reduce((sum, item) => sum + item.evidence.length, 0),
+        notes: notes.filter((note) => note.propertyId === propertyId),
         priority: reportPriority(items.length, reasonList),
         reasons: [...reasons.entries()].sort((a, b) => b[1] - a[1]),
       }];

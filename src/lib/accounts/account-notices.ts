@@ -434,7 +434,7 @@ export async function noticeReportOutcome(input: {
   await notifyAccount(
     input.userId,
     NOTIFICATION_TYPES.LISTING_REPORT,
-    "/kabinet/bildirisler",
+    "/kabinet/sikayetlerim",
     // `dedupeKey` qlobal unikaldır: eyni qərar bir neçə şikayətçiyə gedir, açar alıcını daşımalıdır.
     `report-outcome:${input.propertyId}:${attemptKey(input.decidedAt)}:${input.userId}`,
     (copy) => ({ title: copy.reportOutcomeTitle, content: copy.reportOutcome(input.propertyTitle, input.outcome) }),

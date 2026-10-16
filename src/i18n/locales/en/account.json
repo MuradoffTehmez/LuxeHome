@@ -776,5 +776,44 @@
       "reserved": "Reserved",
       "inactive": "Not published"
     }
+  },
+  "reports": {
+    "metaTitle": "My reports",
+    "metaDescription": "Listing reports you sent and their status.",
+    "eyebrow": "Account",
+    "title": "My reports",
+    "count": "{count, plural, =0 {You have not sent any reports yet} one {# report, {active} still under review} other {# reports, {active} still under review}}",
+    "emptyTitle": "No reports",
+    "emptyDescription": "If you see a suspicious listing, use “Report this listing” on its page. You will follow the report's status here.",
+    "emptyAction": "Browse listings",
+    "sentAt": "Sent: {date}",
+    "decidedAt": "Decided on {date}.",
+    "listingRemoved": "Listing deleted",
+    "listingNotPublic": "the listing is no longer on the site",
+    "reasons": "Reasons",
+    "evidence": "{count, plural, one {# evidence image} other {# evidence images}}",
+    "legacyReasons": {
+      "WRONG_INFO": "Wrong address, photos or details",
+      "NOT_OWNER": "An intermediary poses as the owner"
+    },
+    "status": {
+      "OPEN": "Received",
+      "IN_REVIEW": "In review",
+      "NEEDS_INFO": "In review",
+      "RESOLVED": "Confirmed",
+      "DISMISSED": "Not confirmed",
+      "CLOSED": "Closed"
+    },
+    "stage": {
+      "OPEN": "Your report was received and is in the moderation queue.",
+      "IN_REVIEW": "A moderator is reviewing the report.",
+      "NEEDS_INFO": "The moderator is waiting for more information from the listing owner."
+    },
+    "outcome": {
+      "RESOLVED": "Your report was confirmed and action was taken on the listing. Thank you.",
+      "DISMISSED": "The report was reviewed, but no violation was confirmed.",
+      "CLOSED": "The report was closed — the listing is no longer relevant."
+    },
+    "privacy": "The listing owner does not see who reported. Moderators' internal notes and correspondence with the owner are not shown here."
   }
 }

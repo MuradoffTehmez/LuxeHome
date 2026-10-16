@@ -2923,7 +2923,14 @@
         "hours": "{value} h",
         "lessThanHour": "Under 1 h",
         "window": "Confirmation rate and average resolution time cover decisions from the last 90 days."
-      }
+      },
+      "notesTitle": "Internal notes",
+      "notesPrivate": "visible to moderators only",
+      "noteLabel": "Internal note",
+      "notePlaceholder": "Review progress, call outcome, notes on evidence…",
+      "noteAdd": "Add note",
+      "noteLength": "The note must be {min}–{max} characters.",
+      "noteDeletedAuthor": "Deleted user"
     }
   },
   "server": {
@@ -3337,7 +3344,9 @@
       "qerarYoxdur": "There is no decision to review for this listing.",
       "yenidenAcildi": "The reports were returned to review.",
       "baglandi": "The reports were closed.",
-      "izahatGonderilmedi": "The question could not be delivered to the listing owner; the status was not changed. Please try again shortly."
+      "izahatGonderilmedi": "The question could not be delivered to the listing owner; the status was not changed. Please try again shortly.",
+      "qeydElaveEdildi": "Note added.",
+      "qeydUzunlugu": "The note must be {min}–{max} characters."
     }
   }
 }

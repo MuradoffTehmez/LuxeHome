@@ -2923,7 +2923,14 @@
         "hours": "{value} saat",
         "lessThanHour": "1 saatdan az",
         "window": "Təsdiq faizi və orta həll müddəti son 90 günün qərarları üzrədir."
-      }
+      },
+      "notesTitle": "Daxili qeydlər",
+      "notesPrivate": "yalnız moderatorlar görür",
+      "noteLabel": "Daxili qeyd",
+      "notePlaceholder": "Yoxlama gedişi, zəng nəticəsi, sübut barədə qeyd…",
+      "noteAdd": "Qeyd əlavə et",
+      "noteLength": "Qeyd {min}–{max} simvol olmalıdır.",
+      "noteDeletedAuthor": "Silinmiş istifadəçi"
     }
   },
   "server": {
@@ -3337,7 +3344,9 @@
       "qerarYoxdur": "Bu elan üzrə yenidən baxılacaq qərar yoxdur.",
       "yenidenAcildi": "Şikayətlər yenidən yoxlamaya qaytarıldı.",
       "baglandi": "Şikayətlər bağlandı.",
-      "izahatGonderilmedi": "Sual elan sahibinə çatdırılmadı, status dəyişmədi. Bir az sonra yenidən cəhd edin."
+      "izahatGonderilmedi": "Sual elan sahibinə çatdırılmadı, status dəyişmədi. Bir az sonra yenidən cəhd edin.",
+      "qeydElaveEdildi": "Qeyd əlavə edildi.",
+      "qeydUzunlugu": "Qeyd {min}–{max} simvol olmalıdır."
     }
   }
 }

@@ -716,6 +716,7 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - Mərhələ 1 / Modul 01 (#195): şikayət statusları (yeni → yoxlanılır → məlumat gözlənilir → təsdiqlənib/rədd/bağlanıb),
   moderatora təyin, sahibdən izahat, yenidən baxış, 15 səbəbdən çoxlu seçim, prioritet, növbə göstəriciləri, R2
   `private/` prefiksində sübut şəkilləri, şikayətçiyə nəticə bildirişi.
-- Mərhələ 1-də qalanlar: şikayət üzrə daxili qeydlər və «Şikayətlərim» kabinet səhifəsi, elanın tam həyat dövrü
+- #197: şikayət üzrə daxili qeydlər (`ListingReportNote`) və «Şikayətlərim» kabinet səhifəsi (`/kabinet/sikayetlerim`).
+- Mərhələ 1-də qalanlar: elanın tam həyat dövrü
   statusları (dayandırılıb / müddəti bitib / rədd edilib / məlumat tələb olunur), apellyasiya, admin-redaktə xəbərdarlıq
   mətni (Təhlükəsizlik → Xəbərdarlıq Mətnləri), Telegram əlaqə düyməsi.
