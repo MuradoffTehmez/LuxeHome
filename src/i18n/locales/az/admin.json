@@ -313,6 +313,7 @@
       "LISTING_LEAD": "Elana müraciət",
       "ACCOUNT_REVIEW": "Profil təsdiqi",
       "LISTING_REPORT": "Elan şikayəti",
+      "LISTING_MODERATION": "Elan moderasiyası",
       "LEAD_ESCALATION": "Cavabsız müraciət"
     },
     "partnershipType": {
@@ -380,11 +381,15 @@
     "propertyStatus": {
       "DRAFT": "Qaralama",
       "PENDING": "Təsdiq gözləyir",
+      "NEEDS_INFO": "Əlavə məlumat tələb olunur",
       "PUBLISHED": "Dərc olunub",
       "RESERVED": "Beh alınıb",
+      "SUSPENDED": "Müvəqqəti dayandırılıb",
+      "EXPIRED": "Müddəti bitib",
       "SOLD": "Satılıb",
       "RENTED": "Kirayə verilib",
-      "ARCHIVED": "Arxiv"
+      "ARCHIVED": "Arxiv",
+      "REJECTED": "Rədd edilib"
     },
     "renovation": {
       "NEW_BUILDING": "Yeni tikili",
@@ -866,6 +871,16 @@
         "openReports": "Şikayət: {value}",
         "score": "Risk {score}",
         "summary": "Növbədə {count} elanda avtomatik risk siqnalı var. Onları əvvəlcə yoxlayın."
+      },
+      "rejectDescription": "«{title}» rədd ediləcək və sahibinə səbəb bildiriş və e-poçt kimi gedəcək. Sahib elanı düzəldib yenidən göndərə bilər.",
+      "requestChanges": "Düzəliş tələb et",
+      "requestChangesLabel": "«{title}» üçün düzəliş tələb et",
+      "requestChangesDescription": "«{title}» rədd edilmir: sahibə nəyi düzəltməli olduğu göndəriləcək. Sahib elanı redaktə edəndə o yenidən bu növbəyə düşəcək.",
+      "changePresets": {
+        "photos": "Şəkillər aydın deyil və ya əmlaka aid deyil — real, keyfiyyətli şəkillər yükləyin.",
+        "price": "Qiymət bazar səviyyəsindən çox fərqlənir — qiyməti yoxlayın və ya izah əlavə edin.",
+        "address": "Ünvan natamamdır — şəhər, rayon və küçəni dəqiqləşdirin.",
+        "description": "Təsvir natamamdır — sahə, mərtəbə, təmir və sənəd barədə məlumat əlavə edin."
       }
     },
     "projects": {
@@ -2162,7 +2177,6 @@
       "fayldanGosterilir": "{p0} fayldan {p1} göstərilir",
       "dercOlunacaqVeSaytda": "\"{p0}\" dərc olunacaq və saytda ictimai görünəcək.",
       "reddEt": "{p0} rədd et",
-      "qaralamayaQaytarilacaqSahibElanlarim": "\"{p0}\" qaralamaya qaytarılacaq. Sahib \"Elanlarım\"da səbəbi görəcək.",
       "muracietininStatusu": "{p0} müraciətinin statusu",
       "muracietiniAc": "«{p0}» müraciətini aç",
       "muracietiniSil": "«{p0}» müraciətini sil",
@@ -3156,7 +3170,9 @@
       "elanDercTelebleriniOdemir": "Elan dərc tələblərini ödəmir.",
       "elanTesdiqlendiVeDercOlundu": "Elan təsdiqləndi və dərc olundu.",
       "elanTapilmadi": "Elan tapılmadı.",
-      "elanReddEdildiVeQaralamaya": "Elan rədd edildi və qaralamaya qaytarıldı."
+      "elanReddEdildi": "Elan rədd edildi, sahibə səbəb göndərildi.",
+      "duzelisTelebEdildi": "Sahibə düzəliş istəyi göndərildi.",
+      "bildirisGonderilmedi": "Sahibə bildiriş yazılmadı — qərar geri alındı, elan növbədə qalır. Bir az sonra yenidən cəhd edin."
     },
     "muracietler": {
       "muracietTapilmadi": "Müraciət tapılmadı.",

@@ -71,7 +71,7 @@ export function PropertyActionToolbar({
 
       {reveal ? (
         <RevealStickyBar propertyId={propertyId} reveal={reveal} />
-      ) : (
+      ) : !phone && !whatsappHref ? null : (
         <StickyActionBar className={phone && whatsappHref ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
           {phone && (
             <ButtonAnchor href={phone} variant="outline" size="sm" fullWidth onClick={() => trackEvent("phone_click", { property_id: propertyId, placement: "sticky_toolbar" })}>

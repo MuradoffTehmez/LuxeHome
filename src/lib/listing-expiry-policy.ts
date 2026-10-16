@@ -17,7 +17,7 @@ export function expiryState(
   property: { status: string; listingExpiresAt: Date | null; expiredAt: Date | null },
   now = Date.now(),
 ): ExpiryState {
-  if (property.expiredAt && property.status === PROPERTY_STATUSES.ARCHIVED) return { state: "expired", daysLeft: 0 };
+  if (property.status === PROPERTY_STATUSES.EXPIRED) return { state: "expired", daysLeft: 0 };
   if (!property.listingExpiresAt || property.status !== PROPERTY_STATUSES.PUBLISHED) return null;
   const daysLeft = Math.max(0, Math.ceil((property.listingExpiresAt.getTime() - now) / DAY));
   return { state: daysLeft <= REMINDER_DAYS ? "expiring" : "active", daysLeft };

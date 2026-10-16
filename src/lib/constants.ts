@@ -243,15 +243,27 @@ export const LOCATION_KIND_SUFFIX: Record<LocationKind, string> = {
   LANDMARK: "",
 };
 
+/**
+ * Elanın həyat dövrü (PRD v2 Modul 03, #202). Silinmə status deyil — `deletedAt`-dır.
+ * Yalnız `PUBLIC_PROPERTY_STATUSES` saytda görünür; qalanları sahibə və panelə aiddir.
+ */
 export const PROPERTY_STATUSES = {
   DRAFT: "DRAFT",
   /** Kənar istifadəçi göndərib, admin təsdiqi gözlənilir. */
   PENDING: "PENDING",
+  /** Moderator düzəliş istəyib (`moderationNote`); sahib redaktə edəndə yenidən `PENDING`. */
+  NEEDS_INFO: "NEEDS_INFO",
   PUBLISHED: "PUBLISHED",
   RESERVED: "RESERVED",
+  /** Moderator müvəqqəti dayandırıb (məs. təsdiqlənmiş şikayət); səbəb `moderationNote`-dadır. */
+  SUSPENDED: "SUSPENDED",
+  /** Elan müddəti (`listingExpiresAt`) bitib, `expiredAt` yazılıb; sahib «Yenilə» ilə qaytarır. */
+  EXPIRED: "EXPIRED",
   SOLD: "SOLD",
   RENTED: "RENTED",
   ARCHIVED: "ARCHIVED",
+  /** Moderasiyadan rədd edilib (`moderationNote` — səbəb); sahib düzəldib yenidən göndərə bilər. */
+  REJECTED: "REJECTED",
 } as const;
 
 export type PropertyStatus =
@@ -260,11 +272,15 @@ export type PropertyStatus =
 export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
   DRAFT: "Qaralama",
   PENDING: "Təsdiq gözləyir",
+  NEEDS_INFO: "Əlavə məlumat tələb olunur",
   PUBLISHED: "Dərc olunub",
   RESERVED: "Beh alınıb",
+  SUSPENDED: "Müvəqqəti dayandırılıb",
+  EXPIRED: "Müddəti bitib",
   SOLD: "Satılıb",
   RENTED: "Kirayə verilib",
   ARCHIVED: "Arxiv",
+  REJECTED: "Rədd edilib",
 };
 
 /** Frontend-də badge rəngi üçün istifadə olunan variant adları. */
@@ -274,12 +290,27 @@ export const PROPERTY_STATUS_TONE: Record<
 > = {
   DRAFT: "neutral",
   PENDING: "warning",
+  NEEDS_INFO: "warning",
   PUBLISHED: "success",
   RESERVED: "warning",
+  SUSPENDED: "danger",
+  EXPIRED: "neutral",
   SOLD: "danger",
   RENTED: "danger",
   ARCHIVED: "neutral",
+  REJECTED: "danger",
 };
+
+/**
+ * Moderatorun saxladığı elanlar (#202): sahib bunları redaktə edəndə elan **həmişə** yenidən
+ * moderasiyaya (`PENDING`) gedir — təsdiqlənmiş agentliyin birbaşa dərc hüququ burada işləmir,
+ * əks halda dayandırılmış elan bir redaktə ilə moderatoru yan keçərdi.
+ */
+export const MODERATION_HOLD_STATUSES: readonly PropertyStatus[] = [
+  PROPERTY_STATUSES.NEEDS_INFO,
+  PROPERTY_STATUSES.SUSPENDED,
+  PROPERTY_STATUSES.REJECTED,
+];
 
 /** Saytda ictimai olaraq görünə bilən statuslar. */
 export const PUBLIC_PROPERTY_STATUSES: PropertyStatus[] = [
@@ -721,6 +752,8 @@ export const NOTIFICATION_TYPES = {
   ACCOUNT_REVIEW: "ACCOUNT_REVIEW",
   /** Elan şikayət əsasında dayandırıldı (#159). */
   LISTING_REPORT: "LISTING_REPORT",
+  /** Moderasiya qərarı: elan rədd edildi və ya düzəliş tələb olunur (#202). */
+  LISTING_MODERATION: "LISTING_MODERATION",
   /** Agentlik sahibinə: müraciət 30 dəqiqə cavabsız qaldı (#161). */
   LEAD_ESCALATION: "LEAD_ESCALATION",
 } as const;
@@ -740,6 +773,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   LISTING_LEAD: "Elana müraciət",
   ACCOUNT_REVIEW: "Profil təsdiqi",
   LISTING_REPORT: "Elan şikayəti",
+  LISTING_MODERATION: "Elan moderasiyası",
   LEAD_ESCALATION: "Cavabsız müraciət",
 };
 

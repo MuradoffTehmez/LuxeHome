@@ -8,7 +8,7 @@ describe("elan müddəti", () => {
   it("dərc olunmuş elan üçün qalan günü və xatırlatma pəncərəsini göstərir", () => {
     expect(expiryState({ status: "PUBLISHED", listingExpiresAt: new Date(now.getTime() + 20 * DAY), expiredAt: null }, now.getTime())).toEqual({ state: "active", daysLeft: 20 });
     expect(expiryState({ status: "PUBLISHED", listingExpiresAt: new Date(now.getTime() + 3 * DAY), expiredAt: null }, now.getTime())).toEqual({ state: "expiring", daysLeft: 3 });
-    expect(expiryState({ status: "ARCHIVED", listingExpiresAt: now, expiredAt: now }, now.getTime())).toEqual({ state: "expired", daysLeft: 0 });
+    expect(expiryState({ status: "EXPIRED", listingExpiresAt: now, expiredAt: now }, now.getTime())).toEqual({ state: "expired", daysLeft: 0 });
     // Müddətsiz (şirkət elanı) və ya əl ilə arxivlənmiş elan göstərici almır.
     expect(expiryState({ status: "PUBLISHED", listingExpiresAt: null, expiredAt: null }, now.getTime())).toBeNull();
     expect(expiryState({ status: "ARCHIVED", listingExpiresAt: now, expiredAt: null }, now.getTime())).toBeNull();

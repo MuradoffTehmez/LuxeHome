@@ -33,6 +33,7 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
   LISTING_LEAD: MessageSquare,
   ACCOUNT_REVIEW: ShieldCheck,
   LISTING_REPORT: Flag,
+  LISTING_MODERATION: ShieldCheck,
   LEAD_ESCALATION: AlarmClock,
 };
 

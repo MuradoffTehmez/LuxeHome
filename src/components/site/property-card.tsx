@@ -32,9 +32,10 @@ type PropertyCardProps = {
   priceBand?: PriceBand;
 };
 
-const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
+const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "needsInfo" | "published" | "reserved" | "suspended" | "expired" | "sold" | "rented" | "archived" | "rejected"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
   SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
+  NEEDS_INFO: "needsInfo", SUSPENDED: "suspended", EXPIRED: "expired", REJECTED: "rejected",
 };
 
 /**

@@ -216,6 +216,7 @@ describe("əlaqə forması — elan müraciəti", () => {
       id: "prop-1",
       title: "Yasamalda 3 otaqlı mənzil",
       authorId: "owner-1",
+      status: "PUBLISHED",
       author: { accountType: "OWNER", isActive: true },
     });
     const formData = validFormData();
@@ -236,6 +237,7 @@ describe("əlaqə forması — elan müraciəti", () => {
       id: "prop-2",
       title: "Villa",
       authorId: "staff-1",
+      status: "PUBLISHED",
       author: { accountType: "STAFF", isActive: true },
     });
     const formData = validFormData();
@@ -273,6 +275,23 @@ describe("əlaqə forması — elan müraciəti", () => {
       data: expect.objectContaining({ source: "CONTACT", agencyId: null, handlerId: null }),
     });
     expect(effects.telegram).toHaveBeenCalled();
+  });
+
+  it("satılmış elana müraciəti rədd edir — ofisə səssizcə yönəltmir (#202)", async () => {
+    database.propertyFindFirst.mockResolvedValue({
+      id: "prop-3",
+      title: "Satılmış mənzil",
+      authorId: "owner-1",
+      status: "SOLD",
+      author: { accountType: "OWNER", isActive: true },
+    });
+    const formData = validFormData();
+    formData.set("propertyId", "prop-3");
+
+    const result = await submitContactForm({ success: false }, formData);
+
+    expect(result.success).toBe(false);
+    expect(database.leadCreate).not.toHaveBeenCalled();
   });
 
   it("ictimai olmayan elan id-sini nəzərə almır", async () => {

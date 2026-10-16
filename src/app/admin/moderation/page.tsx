@@ -10,7 +10,7 @@ import { parseRiskFlags, riskLevel, type RiskFlag } from "@/lib/moderation/risk-
 import { AlertTriangle, Flag, ShieldAlert } from "lucide-react";
 import { requireAdminRead } from "@/lib/admin/guard";
 import { getModerationQueue } from "@/lib/queries";
-import { ApprovePropertyButton, RejectPropertyButton } from "./moderation-forms";
+import { ApprovePropertyButton, RejectPropertyButton, RequestChangesButton } from "./moderation-forms";
 import { getAdminT } from "@/lib/admin-i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -122,6 +122,7 @@ export default async function AdminModerationPage() {
 
                   <div className="flex shrink-0 items-center gap-1 self-end sm:self-auto">
                     <ApprovePropertyButton id={property.id} title={property.title} />
+                    <RequestChangesButton id={property.id} title={property.title} />
                     <RejectPropertyButton id={property.id} title={property.title} />
                   </div>
                 </li>

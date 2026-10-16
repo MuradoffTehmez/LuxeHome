@@ -533,8 +533,19 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 ### 4-cü mərhələ modulları (#109)
 
 - **Elan müddəti** (`listing-expiry.ts`): sahib/agentlik elanı 60 gün yaşayır, 7 gün qalmış
-  xatırlatma, bitəndə `ARCHIVED` + `expiredAt`. Şirkət (STAFF) elanlarına toxunulmur. Kabinetdə
-  «Yenilə» 60 gün əlavə edir. Gündəlik iş `runPhase2Maintenance()`-dədir və idempotentdir.
+  xatırlatma, bitəndə `EXPIRED` + `expiredAt` (#202-yə qədər `ARCHIVED` idi). Şirkət (STAFF) elanlarına
+  toxunulmur. Kabinetdə «Yenilə» 60 gün əlavə edir. Gündəlik iş `runPhase2Maintenance()`-dədir və idempotentdir.
+- **Elanın həyat dövrü (#202, PRD Modul 03):** `PROPERTY_STATUSES`-ə `NEEDS_INFO` (moderator düzəliş istəyib),
+  `SUSPENDED` (moderator dayandırıb — şikayət qərarı), `EXPIRED` və `REJECTED` əlavə olunub; hamısı qeyri-ictimaidir,
+  `PUBLIC_PROPERTY_STATUSES` dəyişməyib. Səbəb `moderationNote`-dadır və kabinetdə göstərilir. Moderasiya rəddi və
+  «Düzəliş tələb et» sahibə `noticeListingModeration()` (`LISTING_MODERATION`) göndərir; qərar şərti `updateMany` ilə
+  yalnız `PENDING` elana yazılır. **`MODERATION_HOLD_STATUSES`-dəki elanı sahib redaktə edəndə status həmişə
+  `PENDING` olur** — `submissionPolicy()` (təsdiqlənmiş agentliyin birbaşa dərci) burada işləmir. Sahib aktiv təklifi
+  «Satıldı / Kirayəyə verildi» ilə bağlayır (`closePublicProperty`); bağlanmış elan ictimai qalır, amma
+  `resolveLeadProperty().closed` müraciəti rədd edir (ofisə yönəltmir) və detal səhifəsi əlaqə/formanı gizlədir.
+  Köhnə qeydlər `migrations/0062`-də köçürülüb (`ARCHIVED`+`expiredAt` → `EXPIRED`, `ARCHIVED`+qeyd → `SUSPENDED`,
+  `DRAFT`+qeyd → `REJECTED`). Yeni status əlavə edəndə `Record<PropertyStatus, …>` xəritələri typecheck-də yıxılır —
+  kataloqlarda (`property.status`, `account.listings.status`, `labels.propertyStatus`) da yaz.
 - **Açıq qapı** (`OpenHouse` + `OpenHouseRegistration`): qeydiyyat lead yaradır, tutum və
   qeydiyyatın bağlanma vaxtı `open-house-availability.ts`-dədir (client də işlədir — Prisma yoxdur).
 - **Təqvim** `/admin/rezervasiyalar/teqvim` (Bakı vaxtı, UTC+4) və şəxsi ICS abunəsi

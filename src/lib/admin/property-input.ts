@@ -158,6 +158,7 @@ export function propertyLifecycleData(
     PROPERTY_STATUSES.SOLD,
     PROPERTY_STATUSES.RENTED,
     PROPERTY_STATUSES.ARCHIVED,
+    PROPERTY_STATUSES.EXPIRED,
   ].includes(status as never);
   const closedAt = isClosed ? (current.closedAt ?? new Date()) : current.closedAt ?? null;
   const retentionUntil = isClosed

@@ -99,11 +99,15 @@
   "status": {
     "draft": "Draft",
     "pending": "Pending approval",
+    "needsInfo": "More information needed",
     "published": "Published",
     "reserved": "Reserved",
+    "suspended": "Temporarily suspended",
+    "expired": "Expired",
     "sold": "Sold",
     "rented": "Rented",
-    "archived": "Archived"
+    "archived": "Archived",
+    "rejected": "Rejected"
   },
   "projectStatus": {
     "planned": "Planned",

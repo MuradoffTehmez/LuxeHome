@@ -13,7 +13,7 @@ import { REMINDER_DAYS, backfillExpiry, renewedExpiry } from "@/lib/listing-expi
  *
  * Sahib və agentlik hesablarının elanları dərcdən sonra `LISTING_LIFETIME_DAYS` gün
  * aktiv qalır; bitməyə `REMINDER_DAYS` qalanda sahibə xatırlatma gedir, müddət bitəndə
- * elan arxivlənir (`expiredAt` işarəsi ilə — sahib bir kliklə bərpa edə bilsin).
+ * elan `EXPIRED` statusuna keçir (`expiredAt` ilə — sahib bir kliklə bərpa edə bilsin, #202).
  * Şirkətin öz portfeli (STAFF müəllifli) vaxtsızdır.
  *
  * Müddət dərc yollarında deyil, gündəlik işdə təyin olunur: müddəti olmayan dərc edilmiş
@@ -144,7 +144,7 @@ export async function runListingExpiry(now = new Date()) {
   for (const property of expired) {
     await prisma.property.update({
       where: { id: property.id },
-      data: { status: PROPERTY_STATUSES.ARCHIVED, expiredAt: now },
+      data: { status: PROPERTY_STATUSES.EXPIRED, expiredAt: now },
     });
     await recordDomainEvent("property.expired", "Property", property.id, { title: property.title });
     const owner = property.authorId ? expiredOwners.get(property.authorId) : undefined;

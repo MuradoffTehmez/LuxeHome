@@ -50,16 +50,23 @@ Yadda saxlanandan sonra fonda:
 |---|:---:|---|
 | `DRAFT` | ❌ | Qaralama; CSV idxalı həmişə bununla yaradır |
 | `PENDING` | ❌ | Mülk sahibi və ya təsdiqlənməmiş agentliyin elanı — moderasiya gözləyir |
+| `NEEDS_INFO` | ❌ | Moderator düzəliş istəyib; sahib redaktə edəndə yenidən `PENDING` |
 | `PUBLISHED` | ✅ | Aktiv elan |
 | `RESERVED` | ✅ | Beh alınıb |
-| `SOLD` / `RENTED` | ✅ | Satılıb / kirayə verilib |
-| `ARCHIVED` | ❌ | Arxiv; müddəti bitmiş sahib/agentlik elanı da buraya düşür |
+| `SUSPENDED` | ❌ | Moderator müvəqqəti dayandırıb (məs. təsdiqlənmiş şikayət); redaktədən sonra yenidən moderasiya |
+| `EXPIRED` | ❌ | Müddəti bitib; sahib «Yenilə» ilə qaytarır |
+| `SOLD` / `RENTED` | ✅ | Satılıb / kirayə verilib — saytda qalır, amma müraciət qəbul etmir |
+| `ARCHIVED` | ❌ | Arxiv |
+| `REJECTED` | ❌ | Moderasiyadan rədd edilib; sahib düzəldib yenidən göndərə bilər |
 
-Sahib/agentlik elanı 60 gün yaşayır, 7 gün qalmış sahibinə xatırlatma gedir, bitəndə `ARCHIVED` olur; sahib kabinetdən «Yenilə» ilə +60 gün uzadır. Şirkət (staff) elanlarına müddət tətbiq olunmur.
+Sahib/agentlik elanı 60 gün yaşayır, 7 gün qalmış sahibinə xatırlatma gedir, bitəndə `EXPIRED` olur; sahib kabinetdən «Yenilə» ilə +60 gün uzadır. Şirkət (staff) elanlarına müddət tətbiq olunmur. Sahib aktiv elanı kabinetdən «Satıldı / Kirayəyə verildi» kimi bağlaya bilir.
 
 ### Moderasiya (`/admin/moderation`)
 
-`PENDING` elanlar burada təsdiqlənir və ya rədd edilir. Təsdiqlənmiş agentliyin elanı moderasiyadan keçmədən dərc olunur.
+`PENDING` elanlar burada təsdiqlənir, rədd edilir (`REJECTED`) və ya onlar üçün **düzəliş tələb olunur** (`NEEDS_INFO`,
+səbəb məcburidir). Hər iki halda sahibə səbəb bildiriş və e-poçt ilə gedir və kabinetdə elanın altında görünür.
+Təsdiqlənmiş agentliyin elanı moderasiyadan keçmədən dərc olunur — amma dayandırılmış, rədd edilmiş və ya düzəliş
+tələb olunmuş elan redaktədən sonra həmişə bu növbəyə qayıdır.
 
 Hər elanın yanında avtomatik **risk balı** (0–100) və siqnallar görünür: bazardan çox ucuz qiymət, mətndə
 telefon/e-poçt/link, başqa elanda eyni foto, köçürülmüş mətn, yeni hesab, açıq şikayət. Balı 50 və yuxarı olan
@@ -78,7 +85,7 @@ Rədd edilib / Bağlanıb. «Mənə təyin edilənlər» yalnız sizin götürd�
 |---|---|
 | Mənə götür / Moderator seçimi | Aktiv şikayətlər moderatora təyin olunur, yenilər «Yoxlanılır»-a keçir |
 | İzahat istə | Sahibə sual (hazır şablon və ya öz mətniniz) bildiriş + e-poçt ilə gedir, şikayətlər «Əlavə məlumat gözlənilir» olur |
-| Elanı gizlət | Elan arxivə keçir, sahibə səbəb gedir; şikayət təsdiqlənir |
+| Elanı gizlət | Elan müvəqqəti dayandırılır (`SUSPENDED`), sahibə səbəb gedir; şikayət təsdiqlənir |
 | Satılıb / İcarəyə verilib | Elan bağlanır, sahibə bildirilir; şikayət təsdiqlənir |
 | Elan düzəldilib | Elanın statusu dəyişmir, şikayət təsdiqlənir |
 | Rədd et | Şikayət əsassız sayılır, elan dəyişmir |

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { CalendarClock, Crown, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { CalendarClock, CircleCheckBig, Crown, MessageSquareWarning, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,9 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { requireLister } from "@/lib/auth/guard";
 import {
+  ACTIVE_OFFER_STATUSES,
+  LISTING_TYPES,
+  MODERATION_HOLD_STATUSES,
   PROPERTY_STATUSES,
   PROPERTY_STATUS_TONE,
   type Locale,
@@ -21,12 +24,13 @@ import { AnalyticsEventBeacon } from "@/components/analytics/analytics-event";
 import { localizePath } from "@/i18n/path-locale";
 import { formatLocalizedDate } from "@/i18n/date";
 import { ConfirmAction } from "@/components/admin/confirm-action";
-import { deletePublicProperty, renewPublicProperty } from "./actions";
+import { closePublicProperty, deletePublicProperty, renewPublicProperty } from "./actions";
 import { LISTING_LIFETIME_DAYS, expiryState } from "@/lib/listing-expiry-policy";
 
-const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
+const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "needsInfo" | "published" | "reserved" | "suspended" | "expired" | "sold" | "rented" | "archived" | "rejected"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved",
   SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
+  NEEDS_INFO: "needsInfo", SUSPENDED: "suspended", EXPIRED: "expired", REJECTED: "rejected",
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -52,6 +56,8 @@ export default async function CabinetPropertiesPage({
         price: true,
         currency: true,
         status: true,
+        listingType: true,
+        moderationNote: true,
         listingExpiresAt: true,
         expiredAt: true,
         isFeatured: true,
@@ -96,6 +102,38 @@ export default async function CabinetPropertiesPage({
           </ConfirmAction>
         ) : null}
       </span>
+    );
+  }
+
+  /** «Satıldı / Kirayəyə verildi» (#202, PRD 5.3) — yalnız aktiv təklifdə. */
+  function CloseControl({ property }: { property: CabinetProperty }) {
+    if (!(ACTIVE_OFFER_STATUSES as string[]).includes(property.status)) return null;
+    const rent = property.listingType === LISTING_TYPES.RENT;
+    return (
+      <ConfirmAction
+        action={closePublicProperty}
+        id={property.id}
+        title={rent ? t("markRentedTitle") : t("markSoldTitle")}
+        description={t("markClosedDescription", { title: property.title })}
+        confirmLabel={rent ? t("markRented") : t("markSold")}
+        label={rent ? t("markRentedLabel", { title: property.title }) : t("markSoldLabel", { title: property.title })}
+        tone="neutral"
+      >
+        <CircleCheckBig className="size-4" aria-hidden="true" />
+      </ConfirmAction>
+    );
+  }
+
+  /** Moderatorun səbəbi (#202): rədd, düzəliş istəyi və ya dayandırma — sahib nəyi düzəldəcəyini görsün. */
+  function ModerationNote({ property }: { property: CabinetProperty }) {
+    if (!property.moderationNote || !(MODERATION_HOLD_STATUSES as readonly string[]).includes(property.status)) return null;
+    return (
+      <p className="mt-2 flex items-start gap-1.5 rounded-sm border border-warning/30 bg-warning-bg px-2.5 py-2 text-xs text-ink [overflow-wrap:anywhere]">
+        <MessageSquareWarning className="mt-0.5 size-3.5 shrink-0 text-warning" aria-hidden="true" />
+        <span>
+          <span className="font-medium">{t("moderationNote")}</span> {property.moderationNote}
+        </span>
+      </p>
     );
   }
 
@@ -151,11 +189,13 @@ export default async function CabinetPropertiesPage({
               {formatPrice(property.price, property.currency)}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /></div>
+            <ModerationNote property={property} />
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
           <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>{t(`status.${STATUS_KEYS[status]}`)}</Badge>
           <div className="flex items-center gap-1">
+            <CloseControl property={property} />
             <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="ghost" size="sm" aria-label={t("editLabel", { title: property.title })}>
               <Pencil className="size-4" aria-hidden="true" />{t("edit")}
             </ButtonLink>
@@ -182,10 +222,12 @@ export default async function CabinetPropertiesPage({
                   {formatPrice(property.price, property.currency)}
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /></div>
+                <ModerationNote property={property} />
               </div>
               <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>
                 {t(`status.${STATUS_KEYS[status]}`)}
               </Badge>
+              <CloseControl property={property} />
               <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="outline" size="sm">
                 <Pencil className="size-4" aria-hidden="true" />{t("edit")}
               </ButtonLink>

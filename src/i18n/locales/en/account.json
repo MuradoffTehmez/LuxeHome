@@ -20,11 +20,15 @@
     "status": {
       "draft": "Draft",
       "pending": "Pending approval",
+      "needsInfo": "More information needed",
       "published": "Published",
       "reserved": "Reserved",
+      "suspended": "Temporarily suspended",
+      "expired": "Expired",
       "sold": "Sold",
       "rented": "Rented",
-      "archived": "Archived"
+      "archived": "Archived",
+      "rejected": "Rejected"
     },
     "renew": "Renew",
     "renewTitle": "Renew the listing",
@@ -38,7 +42,18 @@
     "premiumUntil": "Premium · until {date}",
     "promote": "Promote",
     "promoteLabel": "Promote “{title}”",
-    "heldForReview": "The listing was flagged by automatic checks and will be published after a moderator approves it. This usually takes a few hours."
+    "heldForReview": "The listing was flagged by automatic checks and will be published after a moderator approves it. This usually takes a few hours.",
+    "markSold": "Sold",
+    "markRented": "Rented",
+    "markSoldTitle": "Mark as sold",
+    "markRentedTitle": "Mark as rented",
+    "markSoldLabel": "Mark “{title}” as sold",
+    "markRentedLabel": "Mark “{title}” as rented",
+    "markClosedDescription": "“{title}” will leave active search and stop accepting enquiries. View statistics are kept and the listing will appear under “Successful deals”.",
+    "markedSold": "The listing was marked as sold.",
+    "markedRented": "The listing was marked as rented.",
+    "closeUnavailable": "Only a published or reserved listing can be closed.",
+    "moderationNote": "Moderator's note:"
   },
   "newProperty": {
     "metaTitle": "Submit a listing",

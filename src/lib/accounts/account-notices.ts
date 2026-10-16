@@ -56,6 +56,10 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `«${agency}» komandasından çıxan ${from} adlı agentin ${count} elanı sizə təhvil verildi. Elanlar və onlara gələn müraciətlər kabinetinizdədir.`,
     listingClosedTitle: "Elanınız bağlandı",
     listingClosed: (title: string) => `«${title}» elanı satılmış və ya kirayəyə verilmiş kimi işarələndi. Səhvdirsə, bizimlə əlaqə saxlayın.`,
+    listingRejectedTitle: "Elanınız rədd edildi",
+    listingRejected: (title: string) => `«${title}» elanı moderasiyadan keçmədi. Səbəbi oxuyub elanı düzəldin və yenidən göndərin.`,
+    listingNeedsInfoTitle: "Elanınız üçün düzəliş tələb olunur",
+    listingNeedsInfo: (title: string) => `«${title}» elanı dərc olunmazdan əvvəl moderator düzəliş istəyir. Elanı redaktə edib yadda saxlayın — o yenidən yoxlamaya düşəcək.`,
     listingInfoRequestedTitle: "Elanınız barədə izahat istənilir",
     listingInfoRequested: (title: string) => `«${title}» elanı barədə ziyarətçi şikayəti yoxlanılır. Moderatorların sualını oxuyun və elanı düzəldin və ya bizimlə əlaqə saxlayın.`,
     reportOutcomeTitle: "Şikayətinizə baxıldı",
@@ -102,6 +106,10 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `${count} listings of ${from}, who left the “${agency}” team, were handed over to you. The listings and their enquiries are in your account.`,
     listingClosedTitle: "Your listing was closed",
     listingClosed: (title: string) => `The listing “${title}” was marked as sold or rented. If this is a mistake, please contact us.`,
+    listingRejectedTitle: "Your listing was rejected",
+    listingRejected: (title: string) => `The listing “${title}” did not pass moderation. Read the reason, correct the listing and submit it again.`,
+    listingNeedsInfoTitle: "Your listing needs changes",
+    listingNeedsInfo: (title: string) => `A moderator has requested changes to the listing “${title}” before it can be published. Edit and save the listing — it will be reviewed again.`,
     listingInfoRequestedTitle: "Clarification requested for your listing",
     listingInfoRequested: (title: string) => `A visitor report about the listing “${title}” is being reviewed. Please read the moderators' question and correct the listing or contact us.`,
     reportOutcomeTitle: "Your report was reviewed",
@@ -148,6 +156,10 @@ const COPY = {
     listingsHanded: (count: number, from: string, agency: string) => `Вам переданы объявления (${count}) агента ${from}, покинувшего команду «${agency}». Объявления и заявки по ним — в вашем кабинете.`,
     listingClosedTitle: "Ваше объявление закрыто",
     listingClosed: (title: string) => `Объявление «${title}» отмечено как проданное или сданное. Если это ошибка, свяжитесь с нами.`,
+    listingRejectedTitle: "Ваше объявление отклонено",
+    listingRejected: (title: string) => `Объявление «${title}» не прошло модерацию. Ознакомьтесь с причиной, исправьте объявление и отправьте его снова.`,
+    listingNeedsInfoTitle: "Объявление требует исправлений",
+    listingNeedsInfo: (title: string) => `Модератор просит исправить объявление «${title}» перед публикацией. Отредактируйте и сохраните его — оно снова попадёт на проверку.`,
     listingInfoRequestedTitle: "По вашему объявлению запрошены пояснения",
     listingInfoRequested: (title: string) => `Проверяется жалоба посетителя на объявление «${title}». Прочитайте вопрос модераторов и исправьте объявление или свяжитесь с нами.`,
     reportOutcomeTitle: "Ваша жалоба рассмотрена",
@@ -395,6 +407,30 @@ export async function noticeListingReportDecision(input: {
     (copy) => input.decision === "archived"
       ? { title: copy.listingArchivedTitle, content: withReason(copy.listingArchived(input.propertyTitle), copy, input.reason) }
       : { title: copy.listingClosedTitle, content: copy.listingClosed(input.propertyTitle) },
+  );
+}
+
+/**
+ * Elan sahibinə: moderasiya qərarı (#202) — rədd edildi və ya düzəliş tələb olunur, moderatorun
+ * səbəbi ilə. Əvvəllər rədd sahibə heç bildirilmirdi və elan səssizcə qaralamaya düşürdü.
+ */
+export async function noticeListingModeration(input: {
+  userId: string;
+  propertyId: string;
+  propertyTitle: string;
+  decision: "rejected" | "needs_info";
+  decidedAt: Date;
+  reason?: string | null;
+}): Promise<boolean> {
+  // `false` — bildiriş yazılmadı: çağıran qərarı geri alır ki, sahib səbəbsiz gizlənmiş elanla qalmasın.
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.LISTING_MODERATION,
+    "/kabinet/elanlar",
+    `listing-moderation:${input.propertyId}:${attemptKey(input.decidedAt)}:${input.decision}`,
+    (copy) => input.decision === "rejected"
+      ? { title: copy.listingRejectedTitle, content: withReason(copy.listingRejected(input.propertyTitle), copy, input.reason) }
+      : { title: copy.listingNeedsInfoTitle, content: withReason(copy.listingNeedsInfo(input.propertyTitle), copy, input.reason) },
   );
 }
 
