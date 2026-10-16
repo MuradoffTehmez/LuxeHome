@@ -105,6 +105,14 @@ vaxtla saxlanılır. Qeydləri yalnız moderatorlar görür — şikayətçiyə 
 
 Hər mərhələ dəyişikliyi, qərar və qeyd audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
 
+### Etirazlar (`/admin/etirazlar`)
+
+Elan sahibi rədd edilmiş və ya dayandırılmış elanına kabinetdən əsaslandırılmış etiraz göndərə bilir (elan başına bir
+açıq etiraz). Etirazı **qərarı verən moderatordan başqa** səlahiyyətli şəxs həll edir — öz qərarınıza etiraz gəlibsə,
+düymələr sizə görünmür. **Qəbul et** elanı əvvəlki statusuna qaytarır (dayandırılmış dərc elanı yenidən dərc olunur,
+rədd edilmiş elan moderasiya növbəsinə düşür); **Rədd et** qərarı qüvvədə saxlayır və səbəb tələb edir. Sahib nəticəni
+bildiriş və e-poçtla alır; hər qərar audit jurnalına və elanın status tarixçəsinə düşür.
+
 ### Xəbərdarlıq mətnləri (`/admin/xeberdarliqlar`)
 
 Əlaqə panelinin beh xəbərdarlığı hər elanın və agentlik profilinin əlaqə panelində, telefon və WhatsApp düymələrinin
