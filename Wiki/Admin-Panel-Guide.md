@@ -89,7 +89,10 @@ Daxil olmuş istifadəçinin əlavə etdiyi sübut şəkilləri (ən çox 3) şi
 `property:manage` icazəli əməkdaşa açılır. Daxil olmuş şikayətçi qərar barədə bildiriş alır. Çoxsaylı şikayət elanın
 saxta olduğunu avtomatik sübut etmir — qərarı sübutlar əsasında verin.
 
-Hər mərhələ dəyişikliyi və qərar audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
+Hər qrupun altında **Daxili qeydlər** var: yoxlamanın gedişi, zəng nəticəsi və sübut barədə qeydlər müəllif və
+vaxtla saxlanılır. Qeydləri yalnız moderatorlar görür — şikayətçiyə və elan sahibinə heç vaxt göstərilmir.
+
+Hər mərhələ dəyişikliyi, qərar və qeyd audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
 
 ### CSV idxalı (`/admin/emlaklar/idxal`)
 
