@@ -721,5 +721,8 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   `/admin/xeberdarliqlar`-dan AZ/EN/RU (`knowledge:manage`). Dəyişiklik anonim ziyarətçiyə kənar HTML keşi səbəbindən
   ~1 dəqiqə sonra çatır — ani yenilənmə qəsdən qurulmayıb (hər sorğuda əlavə yoxlama tələb edərdi).
 - #196, #198, #200 16 oktyabr 2026-da sıra ilə `main`-ə birləşdirildi; `main` CI-si (staging + production) uğurlu.
-- Mərhələ 1-də qalanlar: elanın tam həyat dövrü statusları (dayandırılıb / müddəti bitib / rədd edilib / məlumat
-  tələb olunur), apellyasiya, Telegram əlaqə düyməsi.
+- #202/#203: elanın tam həyat dövrü statusları (NEEDS_INFO, SUSPENDED, EXPIRED, REJECTED), moderasiya qərarı
+  bildirişləri, «Satıldı / Kirayəyə verildi». #204/#205: status tarixçəsi və paneldən aktuallıq intervalı.
+- #206: moderasiya qərarına etiraz — qərarverən öz qərarına baxa bilmir (müstəqil baxış, qərarverən status
+  tarixçəsindən götürülür).
+- Mərhələ 1-də qalan: Telegram əlaqə düyməsi. Sonra Mərhələ 2 (agentlik idarəetməsi).
