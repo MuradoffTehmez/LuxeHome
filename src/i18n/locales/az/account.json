@@ -20,11 +20,15 @@
     "status": {
       "draft": "Qaralama",
       "pending": "Təsdiq gözləyir",
+      "needsInfo": "Əlavə məlumat tələb olunur",
       "published": "Dərc olunub",
       "reserved": "Bron edilib",
+      "suspended": "Müvəqqəti dayandırılıb",
+      "expired": "Müddəti bitib",
       "sold": "Satılıb",
       "rented": "Kirayə verilib",
-      "archived": "Arxivdə"
+      "archived": "Arxivdə",
+      "rejected": "Rədd edilib"
     },
     "renew": "Yenilə",
     "renewTitle": "Elanın müddətini yeniləmək",
@@ -38,7 +42,18 @@
     "premiumUntil": "Premium · {date}-dək",
     "promote": "Premium et",
     "promoteLabel": "«{title}» elanını premium et",
-    "heldForReview": "Elan avtomatik yoxlamaya düşdü və moderatorun təsdiqindən sonra dərc olunacaq. Bu, adətən bir neçə saat çəkir."
+    "heldForReview": "Elan avtomatik yoxlamaya düşdü və moderatorun təsdiqindən sonra dərc olunacaq. Bu, adətən bir neçə saat çəkir.",
+    "markSold": "Satıldı",
+    "markRented": "Kirayəyə verildi",
+    "markSoldTitle": "Satılmış kimi işarələmək",
+    "markRentedTitle": "Kirayəyə verilmiş kimi işarələmək",
+    "markSoldLabel": "«{title}» elanını satılmış kimi işarələ",
+    "markRentedLabel": "«{title}» elanını kirayəyə verilmiş kimi işarələ",
+    "markClosedDescription": "«{title}» aktiv axtarışdan çıxacaq və yeni müraciət qəbul etməyəcək. Baxış statistikası qalır, elan «Uğurlu sövdələşmələr»də görünəcək.",
+    "markedSold": "Elan satılmış kimi işarələndi.",
+    "markedRented": "Elan kirayəyə verilmiş kimi işarələndi.",
+    "closeUnavailable": "Yalnız dərcdə olan və ya beh alınmış elanı bağlamaq olar.",
+    "moderationNote": "Moderatorun qeydi:"
   },
   "newProperty": {
     "metaTitle": "Elan göndər",

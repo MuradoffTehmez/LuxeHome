@@ -282,7 +282,7 @@ export async function addListingReportNote(propertyId: string, body: string): Pr
 
 // ─── Qərarlar ────────────────────────────────────────────────────────────────────────
 
-/** Elanı gizlədir (ARCHIVED) — səbəb sahibə bildiriş və e-poçt kimi gedir. */
+/** Elanı müvəqqəti dayandırır (SUSPENDED, #202) — səbəb sahibə bildiriş və e-poçt kimi gedir. */
 export async function archiveReportedListing(propertyId: string, reason: string): Promise<ActionState> {
   const actor = await guard();
   if (isFailure(actor)) return actor;
@@ -301,8 +301,8 @@ export async function archiveReportedListing(propertyId: string, reason: string)
       prisma.property.update({
         where: { id: property.id },
         data: {
-          status: PROPERTY_STATUSES.ARCHIVED,
-          ...propertyLifecycleData(PROPERTY_STATUSES.ARCHIVED, property, retentionDays),
+          status: PROPERTY_STATUSES.SUSPENDED,
+          ...propertyLifecycleData(PROPERTY_STATUSES.SUSPENDED, property, retentionDays),
           moderationNote: note,
         },
       }),
@@ -322,7 +322,7 @@ export async function archiveReportedListing(propertyId: string, reason: string)
     await recordAudit(actor, "UPDATE", "Property", property.id, `${property.title} — şikayət əsasında gizlədildi: ${note}`);
     await recordDomainEvent("property.status_changed", "Property", property.id, {
       title: property.title,
-      status: PROPERTY_STATUSES.ARCHIVED,
+      status: PROPERTY_STATUSES.SUSPENDED,
       reason: note,
     });
     queuePropertyVectorSync([property.id]);

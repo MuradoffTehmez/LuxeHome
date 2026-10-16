@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_STATUSES, PUBLIC_PROPERTY_STATUSES } from "@/lib/constants";
+import { ACCOUNT_TYPES, ACTIVE_OFFER_STATUSES, AGENCY_EMPLOYEE_STATUSES, PUBLIC_PROPERTY_STATUSES } from "@/lib/constants";
 
 /**
  * Elan səhifəsindən gələn müraciətin ünvanı.
@@ -19,6 +19,11 @@ export type LeadProperty = {
   /** Agentlikdə ərazi üzrə bölgü üçün (#161). */
   districtId: string | null;
   cityId: string | null;
+  /**
+   * Satılıb və ya kirayəyə verilib (#202, PRD 5.3): elan ictimai qalır, amma müraciət qəbul etmir.
+   * Çağıran belə müraciəti rədd edir — `null` qaytarmaq onu səssizcə ofisə yönəldərdi.
+   */
+  closed: boolean;
 };
 
 /** Yalnız ictimai görünən elana müraciət bağlanır — gizli/silinmiş id qəbul olunmur. */
@@ -33,6 +38,7 @@ export async function resolveLeadProperty(propertyId: string | null | undefined)
       authorId: true,
       districtId: true,
       cityId: true,
+      status: true,
       author: { select: { accountType: true, isActive: true } },
     },
   });
@@ -41,7 +47,14 @@ export async function resolveLeadProperty(propertyId: string | null | undefined)
     property.authorId && property.author && property.author.isActive && property.author.accountType !== ACCOUNT_TYPES.STAFF
       ? property.authorId
       : null;
-  return { id: property.id, title: property.title, listerId, districtId: property.districtId ?? null, cityId: property.cityId ?? null };
+  return {
+    id: property.id,
+    title: property.title,
+    listerId,
+    districtId: property.districtId ?? null,
+    cityId: property.cityId ?? null,
+    closed: !(ACTIVE_OFFER_STATUSES as string[]).includes(property.status),
+  };
 }
 
 /**

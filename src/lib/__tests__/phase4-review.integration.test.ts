@@ -91,7 +91,7 @@ describe("elan müddəti", () => {
     expect(renewed?.expiredAt).toBeNull();
     expect(new Date(renewed!.listingExpiresAt).getTime()).toBeGreaterThan(now.getTime() + 59 * DAY);
 
-    const archived = await DB.prepare('SELECT COUNT(*) AS n FROM "Property" WHERE "id" LIKE ? AND "status" = ?').bind("rv-exp-%", PROPERTY_STATUSES.ARCHIVED).first<{ n: number }>();
+    const archived = await DB.prepare('SELECT COUNT(*) AS n FROM "Property" WHERE "id" LIKE ? AND "status" = ?').bind("rv-exp-%", PROPERTY_STATUSES.EXPIRED).first<{ n: number }>();
     expect(archived?.n).toBe(110);
   });
 });

@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, X } from "lucide-react";
+import { Check, MessageSquareWarning, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Textarea } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmAction } from "@/components/admin/confirm-action";
+import { ReasonAction } from "@/components/admin/reason-action";
 import { IDLE_STATE } from "@/lib/admin/action-state";
-import { approveModerationProperty, rejectModerationProperty } from "./actions";
+import { approveModerationProperty, rejectModerationProperty, requestModerationChanges } from "./actions";
 import { useTranslations } from "next-intl";
 import { useLocalizedActionState } from "@/components/admin/use-server-message";
 
@@ -65,7 +66,7 @@ export function RejectPropertyButton({ id, title }: { id: string; title: string 
         open={open}
         onClose={() => setOpen(false)}
         title={t("pages.moderation.elaniReddEtmek")}
-        description={t("pages.common.qaralamayaQaytarilacaqSahibElanlarim", { p0: title })}
+        description={t("pages.moderation.rejectDescription", { title })}
         size="sm"
         footer={
           <>
@@ -89,5 +90,28 @@ export function RejectPropertyButton({ id, title }: { id: string; title: string 
         </form>
       </Modal>
     </>
+  );
+}
+
+/** «Düzəliş tələb et» (#202): sahibə konkret düzəliş istəyi gedir, elan `NEEDS_INFO` olur. */
+export function RequestChangesButton({ id, title }: { id: string; title: string }) {
+  const t = useTranslations("admin");
+  return (
+    <ReasonAction
+      action={requestModerationChanges}
+      id={id}
+      label={t("pages.moderation.requestChangesLabel", { title })}
+      title={t("pages.moderation.requestChanges")}
+      description={t("pages.moderation.requestChangesDescription", { title })}
+      confirmLabel={t("pages.moderation.requestChanges")}
+      presets={[
+        t("pages.moderation.changePresets.photos"),
+        t("pages.moderation.changePresets.price"),
+        t("pages.moderation.changePresets.address"),
+        t("pages.moderation.changePresets.description"),
+      ]}
+    >
+      <MessageSquareWarning className="size-4" aria-hidden="true" />
+    </ReasonAction>
   );
 }

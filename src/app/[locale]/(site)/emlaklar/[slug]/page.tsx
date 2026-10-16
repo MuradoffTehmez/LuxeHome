@@ -78,8 +78,9 @@ type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "published" | "reserved" | "sold" | "rented" | "archived"> = {
+const STATUS_KEYS: Record<PropertyStatus, "draft" | "pending" | "needsInfo" | "published" | "reserved" | "suspended" | "expired" | "sold" | "rented" | "archived" | "rejected"> = {
   DRAFT: "draft", PENDING: "pending", PUBLISHED: "published", RESERVED: "reserved", SOLD: "sold", RENTED: "rented", ARCHIVED: "archived",
+  NEEDS_INFO: "needsInfo", SUSPENDED: "suspended", EXPIRED: "expired", REJECTED: "rejected",
 };
 const NEARBY_KEYS: Record<string, "metro" | "bus" | "school" | "university" | "kindergarten" | "hospital" | "clinic" | "pharmacy" | "supermarket" | "restaurant" | "park" | "shoppingCenter"> = {
   METRO: "metro", BUS: "bus", SCHOOL: "school", UNIVERSITY: "university",
@@ -812,47 +813,52 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </div>
                 )}
 
-                {/* Beh xəbərdarlığı (#199) — hər elanda, əlaqə düymələrinin bilavasitə üstündə. */}
-                <ContactSafetyWarning className="mb-3" />
-                <div className="mb-6">
-                  {publisher.kind === "company" ? (
-                    <div className="flex flex-col gap-2">
-                      <ButtonAnchor
-                        href={siteConfig.phoneHref}
-                        variant="ghost"
-                        fullWidth
-                        className="border border-line hover:border-gold hover:text-gold-deep"
-                      >
-                        <Phone className="size-4" aria-hidden="true" />
-                        {siteConfig.phone}
-                      </ButtonAnchor>
-                      <ButtonAnchor
-                        href={whatsappHref}
-                        variant="ghost"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        fullWidth
-                        className="border border-success/30 bg-success-bg text-success hover:border-success hover:bg-success-bg/70"
-                      >
-                        <WhatsAppIcon className="size-4 text-success" />
-                        WhatsApp
-                      </ButtonAnchor>
+                {/* Bağlanmış (satılmış/kirayəyə verilmiş) elan əlaqə və müraciət qəbul etmir (#202, PRD 5.3). */}
+                {!isClosed && (
+                  <>
+                    {/* Beh xəbərdarlığı (#199) — hər elanda, əlaqə düymələrinin bilavasitə üstündə. */}
+                    <ContactSafetyWarning className="mb-3" />
+                    <div className="mb-6">
+                      {publisher.kind === "company" ? (
+                        <div className="flex flex-col gap-2">
+                          <ButtonAnchor
+                            href={siteConfig.phoneHref}
+                            variant="ghost"
+                            fullWidth
+                            className="border border-line hover:border-gold hover:text-gold-deep"
+                          >
+                            <Phone className="size-4" aria-hidden="true" />
+                            {siteConfig.phone}
+                          </ButtonAnchor>
+                          <ButtonAnchor
+                            href={whatsappHref}
+                            variant="ghost"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            fullWidth
+                            className="border border-success/30 bg-success-bg text-success hover:border-success hover:bg-success-bg/70"
+                          >
+                            <WhatsAppIcon className="size-4 text-success" />
+                            WhatsApp
+                          </ButtonAnchor>
+                        </div>
+                      ) : (
+                        <PublisherContactButtons
+                          propertyId={property.id}
+                          maskedPhone={publisher.phone ? maskPhone(publisher.phone) : null}
+                          hasEmail={Boolean(publisher.email)}
+                          whatsappMessage={whatsappMessage}
+                          labels={{
+                            showPhone: content("showPhone"),
+                            showEmail: content("showEmail"),
+                            revealError: content("revealError"),
+                            noPhone: content("publisherNoPhone"),
+                          }}
+                        />
+                      )}
                     </div>
-                  ) : (
-                    <PublisherContactButtons
-                      propertyId={property.id}
-                      maskedPhone={publisher.phone ? maskPhone(publisher.phone) : null}
-                      hasEmail={Boolean(publisher.email)}
-                      whatsappMessage={whatsappMessage}
-                      labels={{
-                        showPhone: content("showPhone"),
-                        showEmail: content("showEmail"),
-                        revealError: content("revealError"),
-                        noPhone: content("publisherNoPhone"),
-                      }}
-                    />
-                  )}
-                </div>
+                  </>
+                )}
 
                 {/* Fırıldaqdan qorunma (#159): şirkət elanında da şikayət mümkündür (məs. «artıq satılıb»). */}
                 {publisher.kind !== "company" ? (
@@ -863,15 +869,19 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </div>
                 )}
 
-                <div className="relative mb-6 text-center">
-                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div className="w-full border-t border-line" />
-                  </div>
-                  <span className="relative bg-paper px-3 text-xs font-medium uppercase text-ink-muted">{content("orEnquiry")}</span>
-                </div>
+                {!isClosed && (
+                  <>
+                    <div className="relative mb-6 text-center">
+                      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div className="w-full border-t border-line" />
+                      </div>
+                      <span className="relative bg-paper px-3 text-xs font-medium uppercase text-ink-muted">{content("orEnquiry")}</span>
+                    </div>
 
-                {/* Müraciət elana bağlanır: şirkət elanında ofisə, digərlərində elan sahibinin kabinetinə gedir. */}
-                <ContactForm propertyId={property.id} placement="property_detail" />
+                    {/* Müraciət elana bağlanır: şirkət elanında ofisə, digərlərində elan sahibinin kabinetinə gedir. */}
+                    <ContactForm propertyId={property.id} placement="property_detail" />
+                  </>
+                )}
               </div>
             </div>
           </div>

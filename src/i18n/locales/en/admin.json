@@ -313,6 +313,7 @@
       "LISTING_LEAD": "Listing enquiry",
       "ACCOUNT_REVIEW": "Profile review",
       "LISTING_REPORT": "Listing report",
+      "LISTING_MODERATION": "Listing moderation",
       "LEAD_ESCALATION": "Unanswered enquiry"
     },
     "partnershipType": {
@@ -380,11 +381,15 @@
     "propertyStatus": {
       "DRAFT": "Draft",
       "PENDING": "Awaiting approval",
+      "NEEDS_INFO": "More information needed",
       "PUBLISHED": "Published",
       "RESERVED": "Reserved",
+      "SUSPENDED": "Temporarily suspended",
+      "EXPIRED": "Expired",
       "SOLD": "Sold",
       "RENTED": "Rented",
-      "ARCHIVED": "Archived"
+      "ARCHIVED": "Archived",
+      "REJECTED": "Rejected"
     },
     "renovation": {
       "NEW_BUILDING": "New building",
@@ -866,6 +871,16 @@
         "openReports": "Reports: {value}",
         "score": "Risk {score}",
         "summary": "{count, plural, one {# listing} other {# listings}} in the queue {count, plural, one {has} other {have}} automatic risk signals. Review {count, plural, one {it} other {them}} first."
+      },
+      "rejectDescription": "“{title}” will be rejected and the owner will receive the reason by notification and email. The owner can correct the listing and submit it again.",
+      "requestChanges": "Request changes",
+      "requestChangesLabel": "Request changes for “{title}”",
+      "requestChangesDescription": "“{title}” is not rejected: the owner is told what to correct. When the owner edits the listing, it returns to this queue.",
+      "changePresets": {
+        "photos": "The photos are unclear or not of this property — upload real, good-quality photos.",
+        "price": "The price differs greatly from the market — check the price or add an explanation.",
+        "address": "The address is incomplete — specify the city, district and street.",
+        "description": "The description is incomplete — add the area, floor, renovation and document details."
       }
     },
     "projects": {
@@ -2162,7 +2177,6 @@
       "fayldanGosterilir": "showing {p1} of {p0} files",
       "dercOlunacaqVeSaytda": "“{p0}” will be published and visible to the public on the site.",
       "reddEt": "Reject {p0}",
-      "qaralamayaQaytarilacaqSahibElanlarim": "“{p0}” goes back to draft. The owner sees the reason under “My listings”.",
       "muracietininStatusu": "Status of the enquiry from {p0}",
       "muracietiniAc": "Open the enquiry from «{p0}»",
       "muracietiniSil": "Delete the enquiry from «{p0}»",
@@ -3156,7 +3170,8 @@
       "elanDercTelebleriniOdemir": "The listing does not meet the publishing requirements.",
       "elanTesdiqlendiVeDercOlundu": "Listing approved and published.",
       "elanTapilmadi": "Listing not found.",
-      "elanReddEdildiVeQaralamaya": "Listing rejected and returned to draft."
+      "elanReddEdildi": "The listing was rejected and the reason sent to the owner.",
+      "duzelisTelebEdildi": "The change request was sent to the owner."
     },
     "muracietler": {
       "muracietTapilmadi": "Inquiry not found.",

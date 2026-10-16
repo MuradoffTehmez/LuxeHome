@@ -99,11 +99,15 @@
   "status": {
     "draft": "Qaralama",
     "pending": "Təsdiq gözləyir",
+    "needsInfo": "Əlavə məlumat tələb olunur",
     "published": "Dərc olunub",
     "reserved": "Rezerv edilib",
+    "suspended": "Müvəqqəti dayandırılıb",
+    "expired": "Müddəti bitib",
     "sold": "Satılıb",
     "rented": "Kirayə verilib",
-    "archived": "Arxivdə"
+    "archived": "Arxivdə",
+    "rejected": "Rədd edilib"
   },
   "projectStatus": {
     "planned": "Planlaşdırılır",

@@ -2,7 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { PERMISSIONS, PROPERTY_STATUSES } from "@/lib/constants";
+import {
+  ACCOUNT_TYPES,
+  PERMISSIONS,
+  PROPERTY_STATUSES,
+  REJECTION_REASON_MAX,
+  REJECTION_REASON_MIN,
+} from "@/lib/constants";
 import {
   type ActionState,
   failure,
@@ -19,6 +25,8 @@ import { propertyRetentionDays, validateStoredPropertyForPublication } from "@/l
 import { propertyLifecycleData } from "@/lib/admin/property-input";
 import { msg } from "@/lib/admin/server-message";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
+import { noticeListingModeration } from "@/lib/accounts/account-notices";
+import type { AuthUser } from "@/lib/auth/types";
 
 const LIST_PATH = "/admin/moderation";
 
@@ -82,27 +90,83 @@ export async function rejectModerationProperty(_prev: ActionState, formData: For
   if (!id) return failure(msg("server.moderation.elanTapilmadi"));
 
   try {
-    const property = await prisma.property.findFirst({
-      where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
-      select: { title: true },
-    });
-    if (!property) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
-
-    await prisma.property.update({
-      where: { id },
-      data: { status: PROPERTY_STATUSES.DRAFT, moderationNote: reason },
-    });
-
-    await recordAudit(actor, "UPDATE", "Property", id, `${property.title} — moderasiyadan rədd edildi`);
-    await recordDomainEvent("property.status_changed", "Property", id, {
-      title: property.title,
-      status: PROPERTY_STATUSES.DRAFT,
-      reason,
-    });
-
-    revalidatePath(LIST_PATH);
-    return success(msg("server.moderation.elanReddEdildiVeQaralamaya"));
+    const result = await decideModeration(actor, id, PROPERTY_STATUSES.REJECTED, reason ?? null);
+    if (!result) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
+    return success(msg("server.moderation.elanReddEdildi"));
   } catch (error) {
     return unexpected("elan rədd edilmədi", error, msg("server.common.unexpected"));
   }
+}
+
+/**
+ * «Düzəliş tələb et» (#202): elan rədd edilmir, sahibdən konkret dəyişiklik istənilir
+ * (`NEEDS_INFO`). Sahib redaktə edəndə elan yenidən növbəyə (`PENDING`) düşür. Səbəb məcburidir —
+ * sahib nəyi düzəltməli olduğunu bilməlidir.
+ */
+export async function requestModerationChanges(id: string, reason: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.PROPERTY_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  const note = typeof reason === "string" ? reason.trim().replace(/\s+/g, " ") : "";
+  if (note.length < REJECTION_REASON_MIN || note.length > REJECTION_REASON_MAX) {
+    return failure(msg("server.agentlikler.reddSebebiUzunlugu", { min: REJECTION_REASON_MIN, max: REJECTION_REASON_MAX }));
+  }
+
+  try {
+    const result = await decideModeration(actor, String(id).slice(0, 40), PROPERTY_STATUSES.NEEDS_INFO, note);
+    if (!result) return failure(msg("server.moderation.elanTapilmadiVeYaArtiq"));
+    return success(msg("server.moderation.duzelisTelebEdildi"));
+  } catch (error) {
+    return unexpected("elan üçün düzəliş tələb edilmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+/**
+ * Moderasiya qərarı: yalnız hələ `PENDING` olan elanı şərti `updateMany` ilə dəyişir — eyni anda
+ * baxan iki moderatordan yalnız biri qərar yazır, bildiriş də bir dəfə gedir. Şirkət (STAFF) elanının
+ * sahibinə bildiriş getmir.
+ */
+async function decideModeration(
+  actor: AuthUser,
+  id: string,
+  status: typeof PROPERTY_STATUSES.REJECTED | typeof PROPERTY_STATUSES.NEEDS_INFO,
+  reason: string | null,
+): Promise<boolean> {
+  const property = await prisma.property.findFirst({
+    where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
+    select: { title: true, author: { select: { id: true, accountType: true } } },
+  });
+  if (!property) return false;
+
+  const decidedAt = new Date();
+  const { count } = await prisma.property.updateMany({
+    where: { id, status: PROPERTY_STATUSES.PENDING, deletedAt: null },
+    data: { status, moderationNote: reason, updatedAt: decidedAt },
+  });
+  if (count === 0) return false;
+
+  if (property.author && property.author.accountType !== ACCOUNT_TYPES.STAFF) {
+    await noticeListingModeration({
+      userId: property.author.id,
+      propertyId: id,
+      propertyTitle: property.title,
+      decision: status === PROPERTY_STATUSES.REJECTED ? "rejected" : "needs_info",
+      decidedAt,
+      reason,
+    });
+  }
+  await recordAudit(
+    actor,
+    "UPDATE",
+    "Property",
+    id,
+    `${property.title} — ${status === PROPERTY_STATUSES.REJECTED ? "moderasiyadan rədd edildi" : "düzəliş tələb edildi"}${reason ? `: ${reason}` : ""}`,
+  );
+  await recordDomainEvent("property.status_changed", "Property", id, { title: property.title, status, reason });
+  revalidatePath(LIST_PATH);
+  return true;
 }

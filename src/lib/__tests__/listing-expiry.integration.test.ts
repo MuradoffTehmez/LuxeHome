@@ -39,7 +39,7 @@ describe("gündəlik elan müddəti işi", () => {
 
     expect((await row("exp-new"))?.listingExpiresAt).not.toBeNull();
     expect((await row("exp-soon"))?.expiryReminderSentAt).not.toBeNull();
-    expect(await row("exp-over")).toMatchObject({ status: PROPERTY_STATUSES.ARCHIVED });
+    expect(await row("exp-over")).toMatchObject({ status: PROPERTY_STATUSES.EXPIRED });
     expect((await row("exp-over"))?.expiredAt).not.toBeNull();
     expect(await row("exp-staff")).toMatchObject({ status: PROPERTY_STATUSES.PUBLISHED, listingExpiresAt: null });
 

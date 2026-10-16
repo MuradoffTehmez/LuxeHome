@@ -53,7 +53,8 @@ export async function validatePropertyForPublication(
     where: {
       id: excludeId ? { not: excludeId } : undefined,
       deletedAt: null,
-      status: { notIn: [PROPERTY_STATUSES.DRAFT, PROPERTY_STATUSES.ARCHIVED] },
+      // Dayandırılmış (SUSPENDED) elan namizəddir: onu yeni elan kimi təkrar yerləşdirmək dublikatdır.
+      status: { notIn: [PROPERTY_STATUSES.DRAFT, PROPERTY_STATUSES.ARCHIVED, PROPERTY_STATUSES.EXPIRED, PROPERTY_STATUSES.REJECTED] },
       OR: [
         { contentFingerprint: fingerprint },
         ...(checksums.length > 0 ? [{ images: { some: { checksum: { in: checksums } } } }] : []),

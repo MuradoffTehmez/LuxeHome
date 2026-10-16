@@ -53,13 +53,15 @@ export type ContactFormState = {
 };
 
 /** Spam qapısının rədd mesajları — tərcümə yoxdursa azərbaycancaya düşür. */
-async function rejectionMessage(kind: "origin" | "rateLimited" | "turnstile"): Promise<string> {
+async function rejectionMessage(kind: "origin" | "rateLimited" | "turnstile" | "listingClosed"): Promise<string> {
   const fallback =
     kind === "origin"
       ? "Müraciət qəbul edilmədi. Səhifəni yeniləyib yenidən cəhd edin."
       : kind === "rateLimited"
         ? "Çox sayda müraciət göndərildi. Bir dəqiqə gözləyin."
-        : "Təhlükəsizlik yoxlaması tamamlanmadı. Yenidən cəhd edin.";
+        : kind === "listingClosed"
+          ? "Bu elan artıq bağlanıb və müraciət qəbul etmir."
+          : "Təhlükəsizlik yoxlaması tamamlanmadı. Yenidən cəhd edin.";
   try {
     return (await getTranslations("validation"))(kind);
   } catch {
@@ -135,6 +137,8 @@ export async function submitContactForm(
     // Elan səhifəsindən gələn müraciət elana bağlanır; id yalnız ictimai elana uyğun gəlsə qəbul olunur.
     const rawPropertyId = formData.get("propertyId");
     const property = typeof rawPropertyId === "string" ? await resolveLeadProperty(rawPropertyId) : null;
+    // Satılmış/kirayəyə verilmiş elan müraciət qəbul etmir (#202) — ofisə yönəltmək əvəzinə rədd edilir.
+    if (property?.closed) return { success: false, error: await rejectionMessage("listingClosed") };
     // Ünvan (#161): ictimai hesabın elanı müəllifə, agentliyin elanı/profil forması bölgü ilə agentə.
     // Agentlik profilindəki forma `agency` slug-ı daşıyır; yalnız təsdiqlənmiş agentlik qəbul olunur.
     const rawAgency = formData.get("agency");
