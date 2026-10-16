@@ -306,6 +306,26 @@ export const PROPERTY_STATUS_TONE: Record<
  * moderasiyaya (`PENDING`) gedir — təsdiqlənmiş agentliyin birbaşa dərc hüququ burada işləmir,
  * əks halda dayandırılmış elan bir redaktə ilə moderatoru yan keçərdi.
  */
+/** Sahibin etiraz edə bildiyi moderasiya qərarları (#206, PRD 20.4). */
+export const APPEALABLE_STATUSES: readonly PropertyStatus[] = [PROPERTY_STATUSES.REJECTED, PROPERTY_STATUSES.SUSPENDED];
+
+export const APPEAL_STATUSES = {
+  OPEN: "OPEN",
+  ACCEPTED: "ACCEPTED",
+  REJECTED: "REJECTED",
+} as const;
+
+export type AppealStatus = (typeof APPEAL_STATUSES)[keyof typeof APPEAL_STATUSES];
+
+export const APPEAL_STATUS_LABELS: Record<AppealStatus, string> = {
+  OPEN: "Baxılır",
+  ACCEPTED: "Qəbul edilib",
+  REJECTED: "Rədd edilib",
+};
+
+export const APPEAL_MESSAGE_MIN = 20;
+export const APPEAL_MESSAGE_MAX = 1500;
+
 /** Status dəyişikliyinin mənbəyi (#204, `PropertyStatusHistory.source`). */
 export const PROPERTY_STATUS_SOURCES = {
   ADMIN: "ADMIN",
