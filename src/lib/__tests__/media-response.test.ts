@@ -31,6 +31,9 @@ describe("media cavabı", () => {
     expect(mediaKeyFromPath("/media/x.svg")).toBeNull();
     expect(mediaKeyFromPath("/media/x.html")).toBeNull();
     expect(mediaKeyFromPath("/az/media/x.webp")).toBeNull();
+    // Şikayət sübutları (#195) məxfi prefiksdədir — ictimai marşrut onları heç vaxt vermir.
+    expect(mediaKeyFromPath("/media/private/sikayet-subutlari/a.webp")).toBeNull();
+    expect(mediaKeyFromPath("/media/PRIVATE/sikayet-subutlari/a.webp")).toBeNull();
   });
 
   it("şəkli dəyişməz keş və təhlükəsiz başlıqlarla verir", async () => {

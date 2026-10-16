@@ -405,6 +405,51 @@ export async function putImage(
   };
 }
 
+/**
+ * Məxfi fayllar üçün R2 prefiksi (#195, şikayət sübutları). `mediaKeyFromPath()` bu prefiksi
+ * rədd edir, ona görə ictimai `/media/...` marşrutu və worker keşi onu heç vaxt vermir —
+ * fayl yalnız icazə yoxlayan admin marşrutundan oxunur.
+ */
+export const PRIVATE_MEDIA_PREFIX = "private/";
+
+/** Məxfi sübutun maksimum eni — ekran görüntüsünü oxumaq üçün kifayətdir. */
+const PRIVATE_WIDTH = 1600;
+const PRIVATE_QUALITY = 80;
+
+export type PrivateUploadResult =
+  | { ok: true; key: string; contentType: string; size: number }
+  | { ok: false; reason: UploadFailureReason };
+
+/**
+ * Şəkli su nişanısız, kiçik nüsxəsiz WebP kimi məxfi prefiksə yazır. Açar server tərəfdə
+ * təsadüfi qurulur (`private/<qovluq>/<uuid>.webp`); `Cache-Control: private` ilə saxlanılır.
+ */
+export async function putPrivateImage(file: File, folder: string, maxSize: number): Promise<PrivateUploadResult> {
+  if (file.size === 0) return { ok: false, reason: "empty" };
+  if (file.size > maxSize) return { ok: false, reason: "tooLarge" };
+  if (!/^[a-z0-9-]+$/.test(folder)) throw new Error("Məxfi qovluq adı etibarsızdır.");
+
+  const buffer = await file.arrayBuffer();
+  const sourceType = sniffImageType(new Uint8Array(buffer.slice(0, 16)));
+  if (!sourceType) return { ok: false, reason: "unsupported" };
+
+  const bucket = getCloudflareContext().env.MEDIA;
+  if (!bucket) return { ok: false, reason: "storage" };
+
+  const converted = await toWebp(buffer, sourceType, PRIVATE_WIDTH, PRIVATE_QUALITY, false, null);
+  const key = `${PRIVATE_MEDIA_PREFIX}${folder}/${crypto.randomUUID()}.${converted.extension}`;
+  await bucket.put(key, converted.bytes, {
+    httpMetadata: { contentType: converted.contentType, cacheControl: "private, no-store" },
+  });
+  return { ok: true, key, contentType: converted.contentType, size: converted.bytes.byteLength };
+}
+
+/** Məxfi faylı silir; açar məxfi prefiksdən deyilsə heç nə etmir. */
+export async function deletePrivateImage(key: string): Promise<void> {
+  if (!key.startsWith(PRIVATE_MEDIA_PREFIX)) return;
+  await getCloudflareContext().env.MEDIA?.delete(key);
+}
+
 /** Master və kiçik nüsxəni birlikdə silir. */
 export async function deleteImage(url: string): Promise<void> {
   const key = keyFromUrl(url);
