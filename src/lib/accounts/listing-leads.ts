@@ -66,20 +66,26 @@ export async function resolveLeadProperty(propertyId: string | null | undefined)
  * agentliyin hələ də təsdiqlənmiş üzvüdür. Komandadan çıxan agent agentlik müraciətlərinin
  * (müştərinin adı, nömrəsi, mesajı) sahibi olaraq qalmamalıdır — onlar agentliyindir.
  */
+function ownAgencyLeadWhere(userId: string): Prisma.LeadWhereInput[] {
+  return [
+    { agencyId: null },
+    { agency: { employees: { some: { userId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED } } } },
+    { agency: { userId } },
+  ];
+}
+
 function currentHandlerWhere(userId: string): Prisma.LeadWhereInput {
-  return {
-    handlerId: userId,
-    OR: [
-      { agencyId: null },
-      { agency: { employees: { some: { userId, status: AGENCY_EMPLOYEE_STATUSES.APPROVED } } } },
-      { agency: { userId } },
-    ],
-  };
+  return { handlerId: userId, OR: ownAgencyLeadWhere(userId) };
 }
 
 export async function leadScope(userId: string): Promise<{ where: Prisma.LeadWhereInput; agency: { id: string; name: string } | null }> {
   const agency = await prisma.agency.findUnique({ where: { userId }, select: { id: true, name: true } });
-  const or: Prisma.LeadWhereInput[] = [currentHandlerWhere(userId), { property: { authorId: userId } }];
+  // Elanın müəllifi olmaq başqa agentliyə bağlı müraciəti açmır (#212, PRD 6.4): agentliklər arası
+  // köçürmədən sonra köhnə müştəri məlumatı əvvəlki agentlikdə qalır.
+  const or: Prisma.LeadWhereInput[] = [
+    currentHandlerWhere(userId),
+    { property: { authorId: userId }, OR: ownAgencyLeadWhere(userId) },
+  ];
   if (agency) or.push({ agencyId: agency.id });
   return { where: { OR: or }, agency };
 }

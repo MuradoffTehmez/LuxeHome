@@ -27,6 +27,9 @@ export type DomainEventType =
   | "agency.application_rejected"
   | "agency.invite_link_changed"
   | "agency.lead_routing_changed"
+  | "transfer.requested"
+  | "transfer.source_decided"
+  | "transfer.cancelled"
   | "agent.application_rejected"
   | "reservation.requested"
   | "reservation.status_changed"
@@ -44,7 +47,8 @@ export type DomainEventEntityType =
   | "Reservation"
   | "Partner"
   | "User"
-  | "PackageOrder";
+  | "PackageOrder"
+  | "ListingTransfer";
 
 export async function recordDomainEvent(
   type: DomainEventType,

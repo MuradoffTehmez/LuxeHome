@@ -7,6 +7,7 @@ export type CabinetNavItem = {
     | "analytics"
     | "packages"
     | "team"
+    | "transfers"
     | "saved-searches"
     | "notifications"
     | "reports"
@@ -32,6 +33,8 @@ const LISTING_ITEMS: readonly CabinetNavItem[] = [
 ];
 
 const TEAM_ITEM: CabinetNavItem = { id: "team", href: "/kabinet/komanda", label: "Komanda" };
+/** Agentliklər arası köçürmə (#212) — agentlik sahibi və agent. */
+const TRANSFERS_ITEM: CabinetNavItem = { id: "transfers", href: "/kabinet/kocurmeler", label: "Köçürmələr" };
 
 /** Hər hesab növünə görünən yeni bölmələr — elan yerləşdirmə icazəsindən asılı deyil. */
 const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
@@ -43,9 +46,10 @@ const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
   { id: "recently-viewed", href: "/kabinet/son-baxilanlar", label: "Son baxılanlar" },
 ];
 
-export function getCabinetItems(canList: boolean, canManageTeam = false): readonly CabinetNavItem[] {
+export function getCabinetItems(canList: boolean, canManageTeam = false, canTransfer = false): readonly CabinetNavItem[] {
   const items = canList ? [BASE_ITEMS[0], ...LISTING_ITEMS] : [BASE_ITEMS[0]];
   if (canManageTeam) items.push(TEAM_ITEM);
+  if (canTransfer) items.push(TRANSFERS_ITEM);
   items.push(...DISCOVERY_ITEMS, BASE_ITEMS[1]);
   return items;
 }
@@ -65,6 +69,7 @@ export type CabinetCrumb = {
     | "analytics"
     | "packages"
     | "team"
+    | "transfers"
     | "savedSearches"
     | "notifications"
     | "reports"
@@ -80,6 +85,7 @@ const CRUMB_SEGMENTS: Record<string, CabinetCrumb["labelKey"]> = {
   analitika: "analytics",
   paketler: "packages",
   komanda: "team",
+  kocurmeler: "transfers",
   axtarislarim: "savedSearches",
   bildirisler: "notifications",
   sikayetlerim: "reports",

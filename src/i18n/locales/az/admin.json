@@ -88,7 +88,8 @@
       "agencyHub": "Agentliklər və agentlər",
       "approvals": "Təsdiq növbəsi",
       "reports": "Şikayətlər",
-      "appeals": "Etirazlar"
+      "appeals": "Etirazlar",
+      "transfers": "Köçürmələr"
     }
   },
   "actions": {
@@ -315,7 +316,8 @@
       "ACCOUNT_REVIEW": "Profil təsdiqi",
       "LISTING_REPORT": "Elan şikayəti",
       "LISTING_MODERATION": "Elan moderasiyası",
-      "LEAD_ESCALATION": "Cavabsız müraciət"
+      "LEAD_ESCALATION": "Cavabsız müraciət",
+      "LISTING_TRANSFER": "Elan köçürməsi"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3013,6 +3015,33 @@
       "rejectTitle": "Etirazı rədd etmək",
       "rejectDescription": "«{title}» üzrə qərar qüvvədə qalacaq. Səbəb sahibə bildiriş və e-poçt kimi göndəriləcək.",
       "moderationReason": "Moderatorun səbəbi:"
+    },
+    "transfers": {
+      "title": "Elan köçürmələri",
+      "description": "Agentliklər arası köçürmə sorğuları. Elanın agentliyi təsdiqləyəndən sonra hüquqi və müqavilə statusunu yoxlayıb son qərarı verin. Əvvəlki agentliyin müraciətləri yeni agentliyə keçmir.",
+      "tabsLabel": "Köçürmə statusları",
+      "status": {
+        "PENDING_SOURCE": "Agentlik baxır",
+        "PENDING_ADMIN": "Qərar gözləyir",
+        "COMPLETED": "Köçürülüb",
+        "REJECTED": "Rədd edilib",
+        "CANCELLED": "Ləğv edilib"
+      },
+      "empty": "Bu statusda sorğu yoxdur",
+      "emptyDescription": "Yeni köçürmə sorğuları elanın agentliyi təsdiqləyəndə burada görünəcək.",
+      "requestedBy": "Sorğu edən: {name}",
+      "target": "Təhvil alan: {name}",
+      "unknown": "naməlum",
+      "approve": "Təsdiqlə",
+      "reject": "Rədd et",
+      "approveTitle": "Köçürməni təsdiqləmək",
+      "rejectTitle": "Köçürməni rədd etmək",
+      "approveDescription": "«{title}» elanı {from} agentliyindən {to} agentliyinə keçəcək. Əvvəlki agentliyin müraciətləri köçürülmür.",
+      "rejectDescription": "«{title}» elanının köçürmə sorğusu rədd ediləcək. Səbəb tərəflərə göndəriləcək.",
+      "consentConfirmed": "Əmlak sahibinin razılığı təsdiqlənib",
+      "consentMissing": "Əmlak sahibinin razılığı qeyd olunmayıb",
+      "sourceDecision": "Elanın agentliyinin qərarı: {date}",
+      "adminDecision": "Administrator qərarı: {date}"
     }
   },
   "server": {
@@ -3447,6 +3476,14 @@
       "kohnelib": "Etiraz olunan qərar artıq qüvvədə deyil (elan redaktə edilib və ya yeni qərar verilib) — etiraz bağlandı.",
       "qebulEdildi": "Etiraz qəbul edildi, elan əvvəlki statusuna qaytarıldı.",
       "reddEdildi": "Etiraz rədd edildi, sahibə səbəb göndərildi."
+    },
+    "transfers": {
+      "completed": "Elan köçürüldü.",
+      "rejected": "Köçürmə sorğusu rədd edildi.",
+      "stale": "Sorğunun vəziyyəti dəyişib. Səhifəni yeniləyin.",
+      "notFound": "Köçürmə sorğusu tapılmadı.",
+      "targetGone": "Təhvil alan artıq yeni agentliyin üzvü deyil — sorğunu rədd edin.",
+      "listingChanged": "Elan arada dəyişib (silinib və ya başqa agentliyə keçib) — sorğu ləğv edildi."
     }
   }
 }

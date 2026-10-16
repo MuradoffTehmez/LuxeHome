@@ -158,7 +158,7 @@ export async function requireAdminAction(
 
 /** İctimai kabinet yazıları üçün CSRF, hesab növü və ayrıca sürət limiti qapısı. */
 export async function requirePublicAction(
-  scope: "media" | "avatar" | "property" | "review" | "reservation" | "preferences" | "push" | "team" | "lead",
+  scope: "media" | "avatar" | "property" | "review" | "reservation" | "preferences" | "push" | "team" | "lead" | "transfer",
   locale: Locale = DEFAULT_LOCALE,
 ): Promise<AuthUser> {
   await assertSameOrigin();

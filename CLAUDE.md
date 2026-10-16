@@ -774,6 +774,14 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   çağırır; ikisi də heç vaxt atmır. Agent özününkünü (kabinet profili, data ixracı), sahib öz agentliyininkini
   (`/kabinet/komanda` → «Keçmiş üzvlər»), admin agentlik səhifəsində görür — agentin başqa agentlikdəki dövrləri
   sahibə göstərilmir. Üzvlüyü bitirən yeni axın da dövrü bağlamalıdır.
+- **Agentliklər arası köçürmə (#212, PRD 6.4)** `ListingTransfer` (`lib/listing-transfers.ts`): B agentliyinin sahibi və ya
+  təsdiqlənmiş agenti A-nın elanını elan linki, səbəb və **məcburi** əmlak sahibi razılığı ilə istəyir (`/kabinet/kocurmeler`;
+  agent yalnız özünə istəyir). Axın `PENDING_SOURCE` (A sahibi) → `PENDING_ADMIN` (`/admin/kocurmeler`, `property:manage`)
+  → `COMPLETED`; rədd `REJECTED`, geri çəkmə `CANCELLED`. Elan başına bir açıq sorğu (yazılışdan sonra yoxlanılır), hər keçid
+  şərti `updateMany`. Təsdiqdə təhvil alanın hələ B-də olması yoxlanılır, sonra elan **yalnız `agencyId = A` olduqca** B-yə keçir
+  (`authorId` = təhvil alan, təyinat götürülür); yazılmasa sorğu `CANCELLED` olur. **Məxfilik:** elanın köhnə müraciətləri
+  `Lead.agencyId = A` ilə bağlanır və `leadScope()` elan müəllifinə başqa agentliyə bağlı müraciəti göstərmir — müştəri
+  məlumatı yeni agentliyə keçmir. Bildirişlər `LISTING_TRANSFER` tipidir (`noticeTransferRequested/Decision`).
 - **Bağlanmış sövdələşmələr:** «təklif»/«elan» sayı yalnız `ACTIVE_OFFER_STATUSES` (PUBLISHED + RESERVED) —
   `activeOfferWhere()`. Satılmış/icarəyə verilmiş elan «Uğurlu sövdələşmələr» bölməsindədir (`getClosedDeals`,
   son `DEAL_STATS_WINDOW_DAYS` gün, **yalnız `closedAt`** — `updatedAt` baxış sayğacı ilə də dəyişir; köhnə

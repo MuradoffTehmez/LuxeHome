@@ -33,6 +33,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
           accountLabel={t(accountTypeKey)}
           canList={user.accountType !== ACCOUNT_TYPES.USER}
           canManageTeam={user.accountType === ACCOUNT_TYPES.AGENCY}
+          canTransfer={user.accountType === ACCOUNT_TYPES.AGENCY || user.accountType === ACCOUNT_TYPES.AGENT}
         >
           {children}
         </CabinetShell>
