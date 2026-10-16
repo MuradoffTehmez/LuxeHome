@@ -259,6 +259,7 @@
     "signIn": "Sign in"
   },
   "safety": {
+    "contactWarning": "Warning! Do not pay a deposit, advance or any prepayment before seeing the property in person, checking the ownership documents and making sure the other party is authorised to act.",
     "title": "Safety tips",
     "tipDeposit": "Never pay a deposit or advance before seeing the property and checking the documents.",
     "tipDocuments": "Check the title extract and the seller's identity, and sign the contract at a notary.",

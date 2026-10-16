@@ -94,6 +94,13 @@ vaxtla saxlanılır. Qeydləri yalnız moderatorlar görür — şikayətçiyə 
 
 Hər mərhələ dəyişikliyi, qərar və qeyd audit jurnalına düşür. Şikayətçinin IP ünvanı saxlanmır.
 
+### Xəbərdarlıq mətnləri (`/admin/xeberdarliqlar`)
+
+Əlaqə panelinin beh xəbərdarlığı hər elanın və agentlik profilinin əlaqə panelində, telefon və WhatsApp düymələrinin
+üstündə göstərilir. Mətn Azərbaycan, ingilis və rus dillərində (20–400 simvol) redaktə olunur; boş saxlanan dil defolt
+mətnə qayıdır, yəni xəbərdarlıq tam silinə bilməz. Redaktor, Admin və Super Admin dəyişə bilir; dəyişiklik audit
+jurnalına yazılır və anonim ziyarətçilərə adətən bir dəqiqə ərzində çatır (ictimai səhifələrin kənar keşi).
+
 ### CSV idxalı (`/admin/emlaklar/idxal`)
 
 | Sütun | Məcburi |

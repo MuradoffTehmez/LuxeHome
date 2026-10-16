@@ -740,6 +740,13 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   `soldCount`/`rentedCount` ayrıca ömürlük göstəricidir və toxunulmur.
 - **Təhlükəsizlik məsləhətləri** (`components/site/safety-tips.tsx`): ictimai hesabın elanında və agentlik
   profilində; Bilik Mərkəzinin saxta elan bələdçisinə keçid (`SCAM_GUIDE_PATH`).
+- **Beh xəbərdarlığı (#199, PRD Modul 11):** `ContactSafetyWarning` hər elanın (şirkət elanı daxil) və agentlik
+  profilinin əlaqə panelində, telefon/WhatsApp düymələrinin **bilavasitə üstündədir** və onları gizlətmir. Mətn
+  `/admin/xeberdarliqlar`-dan AZ/EN/RU dəyişir (`knowledge:manage` — PRD-yə görə Redaktor), tək JSON parametrdə
+  (`SETTING_KEYS.SAFETY_CONTACT_WARNING`) saxlanılır və `getCachedSafetyWarnings()` ilə `public:safety` teqi altında
+  keşlənir — saxlananda teq dərhal bitir, amma kənar HTML keşi teqi görmür: anonim ziyarətçi dəyişikliyi
+  `EDGE_HTML_CACHE_TTL` (60 s) + bir köhnə cavab sonra görür, panel mətni də «dərhal» vəd etmir. Boş dil və ya oxuma xətası kataloqdakı `property.safety.contactWarning`-ə
+  qayıdır: xəbərdarlıq heç vaxt itməməlidir. Komponent sessiya oxumur (elan detalının kənar keşi).
 - next-intl tipli açarlarında namespace birliyi çox böyükdür: `getTranslations("property.safety")` kimi yeni
   dərin namespace tip xətası verə bilər — üst namespace + nöqtəli açar (`t("safety.title")`) işlət.
 

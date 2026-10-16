@@ -10,6 +10,8 @@ export const PUBLIC_CACHE_TAGS = {
   taxonomy: "public:taxonomy",
   knowledge: "public:knowledge",
   sitemap: "public:sitemap",
+  /** Əlaqə panelinin xəbərdarlıq mətni (#199) — paneldən dəyişəndə bitir (kənar HTML keşi öz TTL-i ilə). */
+  safety: "public:safety",
 } as const;
 
 export type PublicContentKind =

@@ -66,6 +66,8 @@ export const adminNav: AdminNavGroup[] = [
         children: [
           { labelKey: "blog", href: "/admin/blog" },
           { labelKey: "knowledge", href: "/admin/bilik-merkezi" },
+          // Əlaqə panelinin beh xəbərdarlığı (#199) — təhlükəsizlik məzmunu, Redaktor idarə edir.
+          { labelKey: "safetyTexts", href: "/admin/xeberdarliqlar" },
           { labelKey: "translations", href: "/admin/tercumeler" },
           { labelKey: "services", href: "/admin/xidmetler" },
           { labelKey: "media", href: "/admin/media" },

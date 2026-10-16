@@ -40,6 +40,7 @@
       "projects": "Layihələr",
       "blog": "Bloq",
       "knowledge": "Bilik Mərkəzi",
+      "safetyTexts": "Xəbərdarlıq mətnləri",
       "translations": "Tərcümələr",
       "services": "Xidmətlər",
       "media": "Media",
@@ -2931,6 +2932,21 @@
       "noteAdd": "Qeyd əlavə et",
       "noteLength": "Qeyd {min}–{max} simvol olmalıdır.",
       "noteDeletedAuthor": "Silinmiş istifadəçi"
+    },
+    "safety": {
+      "title": "Xəbərdarlıq mətnləri",
+      "description": "Ziyarətçiləri dələduzluqdan qoruyan məcburi mətnlər. Dəyişiklik audit jurnalına yazılır və saytda adətən bir dəqiqə ərzində görünür — ictimai səhifələrin kənar keşi o qədər yaşayır.",
+      "contactWarning": "Əlaqə panelinin beh xəbərdarlığı",
+      "label": {
+        "az": "Azərbaycan dili",
+        "en": "İngilis dili",
+        "ru": "Rus dili"
+      },
+      "defaultHint": "Boşdur — saytda defolt mətn göstərilir (yer tutucuda).",
+      "customHint": "Fərdi mətn. Sahəni boşaltsanız defolt mətnə qayıdılır.",
+      "whereTitle": "Harada göstərilir",
+      "where": "Hər elanın və agentlik profilinin əlaqə panelində, telefon və WhatsApp düymələrinin bilavasitə üstündə. Düymələri gizlətmir.",
+      "rules": "Mətn 20–400 simvol olmalıdır. Beh, depozit və əvvəlcədən ödəniş riskini açıq yazın — mətn tam silinə bilməz, boş dil defolta qayıdır."
     }
   },
   "server": {
@@ -3347,6 +3363,10 @@
       "izahatGonderilmedi": "Sual elan sahibinə çatdırılmadı, status dəyişmədi. Bir az sonra yenidən cəhd edin.",
       "qeydElaveEdildi": "Qeyd əlavə edildi.",
       "qeydUzunlugu": "Qeyd {min}–{max} simvol olmalıdır."
+    },
+    "safety": {
+      "saxlanildi": "Xəbərdarlıq mətni saxlanıldı.",
+      "uzunluq": "Mətn {min}–{max} simvol olmalıdır."
     }
   }
 }

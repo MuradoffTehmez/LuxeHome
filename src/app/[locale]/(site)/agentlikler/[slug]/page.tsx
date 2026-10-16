@@ -13,6 +13,7 @@ import { PropertyCard } from "@/components/site/property-card";
 import { AgentCard } from "@/components/site/agent-card";
 import { PublisherContactButtons } from "@/components/site/publisher-contact";
 import { SafetyTips } from "@/components/site/safety-tips";
+import { ContactSafetyWarning } from "@/components/site/contact-safety-warning";
 import { ClosedDeals } from "@/components/site/closed-deals";
 import { ContactForm } from "@/app/[locale]/(site)/elaqe/contact-form";
 import { Link } from "@/i18n/navigation";
@@ -497,6 +498,7 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                   <MessageSquare className="size-4" aria-hidden="true" />
                   {t("enquiryButton")}
                 </a>
+                <ContactSafetyWarning className="mb-3" />
                 <PublisherContactButtons
                   propertyId={agency.slug}
                   endpoint={`/api/agentlikler/${encodeURIComponent(agency.slug)}/elaqe`}

@@ -40,6 +40,7 @@
       "projects": "Developments",
       "blog": "Blog",
       "knowledge": "Knowledge Hub",
+      "safetyTexts": "Safety notices",
       "translations": "Translations",
       "services": "Services",
       "media": "Media",
@@ -2931,6 +2932,21 @@
       "noteAdd": "Add note",
       "noteLength": "The note must be {min}–{max} characters.",
       "noteDeletedAuthor": "Deleted user"
+    },
+    "safety": {
+      "title": "Safety notices",
+      "description": "Mandatory texts that protect visitors from fraud. Changes are written to the audit log and usually appear on the site within a minute — that is how long the public pages' edge cache lives.",
+      "contactWarning": "Contact panel deposit warning",
+      "label": {
+        "az": "Azerbaijani",
+        "en": "English",
+        "ru": "Russian"
+      },
+      "defaultHint": "Empty — the site shows the default text (in the placeholder).",
+      "customHint": "Custom text. Clear the field to return to the default text.",
+      "whereTitle": "Where it appears",
+      "where": "In the contact panel of every listing and agency profile, directly above the phone and WhatsApp buttons. It does not hide the buttons.",
+      "rules": "The text must be 20–400 characters. State the deposit and prepayment risk clearly — the notice cannot be removed; an empty language falls back to the default."
     }
   },
   "server": {
@@ -3347,6 +3363,10 @@
       "izahatGonderilmedi": "The question could not be delivered to the listing owner; the status was not changed. Please try again shortly.",
       "qeydElaveEdildi": "Note added.",
       "qeydUzunlugu": "The note must be {min}–{max} characters."
+    },
+    "safety": {
+      "saxlanildi": "The safety notice was saved.",
+      "uzunluq": "The text must be {min}–{max} characters."
     }
   }
 }

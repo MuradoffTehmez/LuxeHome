@@ -1,6 +1,8 @@
 import { unstable_cache } from "next/cache";
 import { reviveDates } from "@/lib/revive-dates";
 import { PUBLIC_CACHE_TAGS } from "@/lib/cache-tags";
+import { SETTING_KEYS, getSetting } from "@/lib/settings";
+import { parseSafetyWarnings } from "@/lib/safety-warning";
 import { startOfBakuToday } from "@/lib/partners";
 import {
   getBlogCategories,
@@ -289,4 +291,15 @@ export const getCachedKnowledgeSitemapEntries = cachedQuery(
   getKnowledgeSitemapEntries,
   ["public-knowledge-sitemap-v1"],
   { tags: [PUBLIC_CACHE_TAGS.knowledge, PUBLIC_CACHE_TAGS.sitemap], revalidate: FIVE_MINUTES },
+);
+
+/**
+ * Əlaqə panelinin beh xəbərdarlığı (#199). Elan detalı hər render-də D1-ə əlavə gediş-gəliş
+ * etməsin deyə keşlənir; panel saxlayanda `public:safety` teqi dərhal bitir (kənar HTML keşi isə
+ * öz TTL-i ilə yenilənir — `EDGE_HTML_CACHE_TTL`).
+ */
+export const getCachedSafetyWarnings = cachedQuery(
+  async () => parseSafetyWarnings(await getSetting(SETTING_KEYS.SAFETY_CONTACT_WARNING)),
+  ["safety-contact-warning"],
+  { tags: [PUBLIC_CACHE_TAGS.safety], revalidate: FIVE_MINUTES },
 );
