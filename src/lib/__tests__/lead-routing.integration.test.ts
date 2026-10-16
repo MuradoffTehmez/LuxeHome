@@ -24,8 +24,8 @@ beforeAll(async () => {
   const user = DB.prepare('INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "accountType", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');
   const property = DB.prepare(
     `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId", "districtId",
-       "authorId", "publishedAt", "createdAt", "updatedAt")
-     VALUES (?, ?, ?, 'Təsvir', 'x', 'SALE', ?, 1000, 'rt-type', 'rt-city', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+       "authorId", "agencyId", "publishedAt", "createdAt", "updatedAt")
+     VALUES (?, ?, ?, 'Təsvir', 'x', 'SALE', ?, 1000, 'rt-type', 'rt-city', ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
   );
   const employee = DB.prepare('INSERT INTO "AgencyEmployee" ("id", "agencyId", "userId", "status", "approvedAt", "receivesLeads") VALUES (?, ?, ?, ?, ?, ?)');
   await DB.batch([
@@ -47,9 +47,11 @@ beforeAll(async () => {
     employee.bind("rt-e3", "rt-agency", "rt-agent3", "APPROVED", "2025-12-01T00:00:00.000Z", 0),
     DB.prepare('INSERT INTO "AgentProfile" ("id", "userId", "agencyId", "slug", "name", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)')
       .bind("rt-ap1", "rt-agent1", "rt-agency", "rt-birinci", "Birinci agent"),
-    property.bind("rt-p-owner", "Agentliyin elanı", "rt-p-owner", PROPERTY_STATUSES.PUBLISHED, "rt-district", "rt-owner"),
-    property.bind("rt-p-agent1", "Agentin elanı", "rt-p-agent1", PROPERTY_STATUSES.PUBLISHED, "rt-district", "rt-agent1"),
-    property.bind("rt-p-solo", "Sahibin elanı", "rt-p-solo", PROPERTY_STATUSES.PUBLISHED, null, "rt-solo"),
+    property.bind("rt-p-owner", "Agentliyin elanı", "rt-p-owner", PROPERTY_STATUSES.PUBLISHED, "rt-district", "rt-owner", "rt-agency"),
+    property.bind("rt-p-agent1", "Agentin elanı", "rt-p-agent1", PROPERTY_STATUSES.PUBLISHED, "rt-district", "rt-agent1", "rt-agency"),
+    // Agentin şəxsi elanı (#210) — sahibin analitikasına düşmür.
+    property.bind("rt-p-agent1-own", "Agentin şəxsi elanı", "rt-p-agent1-own", PROPERTY_STATUSES.PUBLISHED, null, "rt-agent1", null),
+    property.bind("rt-p-solo", "Sahibin elanı", "rt-p-solo", PROPERTY_STATUSES.PUBLISHED, null, "rt-solo", null),
   ]);
 });
 

@@ -226,6 +226,13 @@
       "accept": "I confirm that the information is accurate and that I have the right to list this property.",
       "moderation": "After you submit, the listing is reviewed according to your account type. SEO details and photo ALT texts are generated automatically — you do not need to write them.",
       "checklist": "Check the preview before submitting: the address, price and photos must be correct."
+    },
+    "ownership": {
+      "legend": "Who is this listing on behalf of?",
+      "agency": "On behalf of {name}",
+      "agencyHint": "The listing belongs to the agency: if you leave, it stays with the agency and is reassigned to another agent.",
+      "personal": "Personal listing",
+      "personalHint": "The listing belongs to your personal account, is not counted on the agency profile and stays with you if you leave."
     }
   },
   "team": {
@@ -277,22 +284,16 @@
       "done": "The employee was removed and {count, plural, one {# listing was} other {# listings were}} handed over.",
       "invalidTarget": "The selected agent is not on the team. Refresh the list and choose again.",
       "leftHanded": "You left the agency and {count, plural, one {# listing was} other {# listings were}} handed over to it.",
-      "description": "{name} has {count, plural, one {# listing} other {# listings}}. Choose what happens to them before removing.",
-      "question": "Who should keep {count, plural, one {the listing} other {the # listings}}?",
+      "description": "{name} has {count} listings posted on behalf of the agency. They do not stay with the agent — choose who takes over. The agent keeps their personal listings.",
+      "question": "Who should take over {count} agency listings?",
       "agency": "Hand over to the agency",
       "agencyHint": "Listings and their enquiries move to the agency account.",
       "agent": "Hand over to another agent",
       "agentHint": "Listings move to the agent you choose, who gets a notification.",
-      "keep": "Agent keeps them",
-      "keepHint": "Listings stay on {name}'s personal account and leave the agency profile.",
       "agentSelect": "Agent",
       "chooseAgent": "Choose an agent",
       "cancel": "Cancel",
-      "failed": "Something went wrong. Please try again.",
-      "keepOwn": "Keep the listings",
-      "keepOwnHint": "Listings stay on your personal account and are no longer shown on the agency profile.",
-      "giveAgency": "Hand over to {name}",
-      "giveAgencyHint": "Listings and their enquiries stay with the agency."
+      "failed": "Something went wrong. Please try again."
     },
     "routing": {
       "title": "Enquiry routing",
@@ -311,6 +312,15 @@
       "memberOff": "The agent no longer receives enquiries.",
       "memberOnShort": "Receives enquiries",
       "memberOffShort": "Paused"
+    },
+    "history": {
+      "title": "Former members",
+      "description": "Agents who have left the agency and their membership periods. Visible only to you and platform administrators.",
+      "reason": {
+        "left": "left",
+        "removed": "collaboration ended"
+      },
+      "handedOver": "{count} listings handed over"
     }
   },
   "actions": {
@@ -486,7 +496,16 @@
     "rejectedReason": "Reason: {reason}",
     "rejectedHint": "Correct the details and save your profile — the application will be reviewed again automatically.",
     "officesSection": "Branches",
-    "officesSectionDescription": "Your head office is the Address field above. Add any other offices here — they appear in the “Our offices” section of your agency profile."
+    "officesSectionDescription": "Your head office is the Address field above. Add any other offices here — they appear in the “Our offices” section of your agency profile.",
+    "agencyLeaveWithListings": "You are leaving {name}. The {count} listings you posted on behalf of the agency stay with the agency and are handed over to its owner; your personal listings stay with you.",
+    "membershipHistory": {
+      "title": "Membership history",
+      "current": "present",
+      "reason": {
+        "left": "left",
+        "removed": "collaboration ended"
+      }
+    }
   },
   "savedSearches": {
     "metaTitle": "My saved searches",

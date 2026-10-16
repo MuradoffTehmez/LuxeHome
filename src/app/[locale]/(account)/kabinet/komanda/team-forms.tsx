@@ -113,7 +113,6 @@ export function RemoveEmployeeButton({
   const options: { value: ListingHandover; label: string; hint: string }[] = [
     { value: LISTING_HANDOVER.AGENCY, label: t("handover.agency"), hint: t("handover.agencyHint") },
     ...(teammates.length > 0 ? [{ value: LISTING_HANDOVER.AGENT, label: t("handover.agent"), hint: t("handover.agentHint") }] : []),
-    { value: LISTING_HANDOVER.KEEP, label: t("handover.keep"), hint: t("handover.keepHint", { name }) },
   ];
 
   function submit() {

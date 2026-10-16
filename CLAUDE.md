@@ -667,7 +667,8 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 ### Agentlik profili, sayma qaydası və admin təsdiq mərkəzi (#155)
 
 - **Sayma qaydası `lib/agency-profile.ts`-dədir — başqa yerdə yenidən yazma.** Agentliyin **təklifi**
-  = sahibin + təsdiqlənmiş əməkdaşların ictimai elanları (`countAgencyOffers`); agentin **elanı** =
+  = agentliyin mühitinə aid ictimai elanlar (`Property.agencyId`, #210 — `countAgencyOffers`, profil, ərazi,
+  sövdələşmələr); agentin şəxsi elanı agentlikdə sayılmır. Agentin **elanı** =
   öz yerləşdirdiyi (`authorId = userId`) + ona təyin edilmiş (`assignedAgentId`), təkrarsız
   (`countAgentListings`, `agentListingWhere`). Əlaqənin `_count.properties`-i yalnız təyin
   edilmişləri sayırdı: kartda «0 elan», səhifədə 1 elan görünürdü. UI-da agentlik üçün «təklif»,
@@ -756,11 +757,23 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   (STAFF) elanı yoxlanmır. `refreshListingRisk()` heç vaxt atmır — siqnal xətası elan yazmasını sındırmamalıdır,
   amma nəticəsi bilinməyən yoxlama `hold` sayılır (keçici D1 xətası moderasiyanı yan keçməsin).
   Moderasiya növbəsi riskli elanları rozetlə göstərir.
-- **Elan təhvili** (`lib/accounts/agency-listings.ts`): sahib əməkdaşı çıxaranda elanları (silinməmiş, bütün
-  statuslar) agentliyə, başqa təsdiqlənmiş agentə və ya agentdə saxlamağı seçir (təhvil üzvlük silinməzdən
-  **əvvəl** gedir — alınmasa üzvlük qalır və təkrar cəhd mümkündür); agent özü çıxanda yalnız
-  «məndə qalsın» və «agentliyə ver» var. Hədəf `resolveHandoverTarget()` ilə yoxlanır — kənar id qəbul olunmur.
-  Müraciət, şəkil, paket elana bağlıdır, elanla keçir.
+- **Elan sahibliyi və təhvil (#210, PRD Modul 04):** agentlik adından yaradılan elan agentliyin mühitinə aiddir
+  (`Property.agencyId`), `createdById` ilk yaradandır, `authorId` hazırkı idarəçi. Sahibin elanı həmişə agentlikdir;
+  təsdiqlənmiş agent sehrbazın «Əlaqə» addımında «agentlik adından» (defolt) və ya «şəxsi» seçir
+  (`resolveNewListingAgencyId()`, `lib/accounts/agency-ownership.ts`; redaktədə dəyişmir). Agent ayrılanda **yalnız
+  agentlik elanları** (silinməmiş, bütün statuslar) sahibə və ya başqa təsdiqlənmiş agentə keçir — agentdə qala bilməz,
+  köhnə `KEEP` `AGENCY` sayılır; agentə təyinat (`assignedAgentId`) da götürülür. Şəxsi elanlar agentdə qalır. Təhvil
+  üzvlük silinməzdən **əvvəl** gedir (alınmasa üzvlük qalır, təkrar cəhd mümkündür); agent özü çıxanda agentlik elanları
+  avtomatik sahibə keçir. Hədəf `resolveHandoverTarget()` ilə yoxlanır — kənar id qəbul olunmur. Müraciət, şəkil, paket
+  elana bağlıdır, elanla keçir. Agentin hesabı silinəndə də (`finalizeAccountDeletion`) agentlik elanları sahibə keçir,
+  yalnız şəxsi elanlar arxivlənir. Sahibin analitikası da yalnız agentlik elanlarını göstərir. Mövcud elanlar `0066`-da
+  agentlik sayılıb (sahibin və təsdiqlənmiş agentin elanı) — əvvəl fərq saxlanmırdı.
+- **Üzvlük tarixçəsi** `AgencyMembershipHistory` (PRD 6.6): hər təsdiqlənmiş üzvlük dövrü bir sətir — agentlik adı
+  (snapshot), rol, qoşulma/ayrılma, səbəb (`MEMBERSHIP_END_REASONS`: `LEFT`/`REMOVED`), təhvil sayı. Təsdiqdə
+  `commitMembershipDecision()` `openMembershipPeriod()`-u (idempotent), ayrılmada action-lar `closeMembershipPeriod()`-u
+  çağırır; ikisi də heç vaxt atmır. Agent özününkünü (kabinet profili, data ixracı), sahib öz agentliyininkini
+  (`/kabinet/komanda` → «Keçmiş üzvlər»), admin agentlik səhifəsində görür — agentin başqa agentlikdəki dövrləri
+  sahibə göstərilmir. Üzvlüyü bitirən yeni axın da dövrü bağlamalıdır.
 - **Bağlanmış sövdələşmələr:** «təklif»/«elan» sayı yalnız `ACTIVE_OFFER_STATUSES` (PUBLISHED + RESERVED) —
   `activeOfferWhere()`. Satılmış/icarəyə verilmiş elan «Uğurlu sövdələşmələr» bölməsindədir (`getClosedDeals`,
   son `DEAL_STATS_WINDOW_DAYS` gün, **yalnız `closedAt`** — `updatedAt` baxış sayğacı ilə də dəyişir; köhnə

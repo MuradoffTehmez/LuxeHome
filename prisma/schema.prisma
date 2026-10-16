@@ -78,15 +78,17 @@ model User {
   failedAttempts     Int       @default(0)
   lockedUntil        DateTime?
 
-  properties            Property[]     @relation("PropertyAuthor")
-  posts                 BlogPost[]     @relation("PostAuthor")
-  media                 Media[]        @relation("MediaUploader")
+  properties            Property[]                @relation("PropertyAuthor")
+  createdProperties     Property[]                @relation("PropertyCreator")
+  membershipHistory     AgencyMembershipHistory[] @relation("MembershipMember")
+  posts                 BlogPost[]                @relation("PostAuthor")
+  media                 Media[]                   @relation("MediaUploader")
   favorites             Favorite[]
-  leadNotes             Lead[]         @relation("LeadAssignee")
+  leadNotes             Lead[]                    @relation("LeadAssignee")
   /// İctimai hesabın baxdığı müraciətlər (#161) — agent və ya elan sahibi.
-  handledLeads          Lead[]         @relation("LeadHandler")
-  packageOrders         PackageOrder[] @relation("PackageOrderCustomer")
-  packageOrdersRecorded PackageOrder[] @relation("PackageOrderRecorder")
+  handledLeads          Lead[]                    @relation("LeadHandler")
+  packageOrders         PackageOrder[]            @relation("PackageOrderCustomer")
+  packageOrdersRecorded PackageOrder[]            @relation("PackageOrderRecorder")
 
   sessions                Session[]
   backupCodes             BackupCode[]
@@ -205,13 +207,15 @@ model Agency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  leads         Lead[]
-  employees     AgencyEmployee[]
-  partners      AgencyPartner[]
-  agentProfiles AgentProfile[]
-  testimonials  Testimonial[]
-  offices       AgencyOffice[]
+  user              User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leads             Lead[]
+  employees         AgencyEmployee[]
+  properties        Property[]                @relation("PropertyAgency")
+  membershipHistory AgencyMembershipHistory[]
+  partners          AgencyPartner[]
+  agentProfiles     AgentProfile[]
+  testimonials      Testimonial[]
+  offices           AgencyOffice[]
 
   @@index([isVerified])
   @@index([isDemo])
@@ -268,6 +272,29 @@ model AgencyEmployee {
 
   @@unique([agencyId, userId])
   @@index([agencyId, status])
+}
+
+/// Agentlik üzvlüyünün tarixçəsi (#210, PRD 6.6): hər təsdiqlənmiş üzvlük dövrü bir sətirdir.
+/// `AgencyEmployee` ayrılanda silinir, tarixçə isə qalır. Agentlik silinsə də ad saxlanılır.
+model AgencyMembershipHistory {
+  id         String    @id @default(cuid())
+  agencyId   String?
+  agencyName String
+  userId     String
+  /// MANAGER | AGENT — üzvlük dövründəki daxili rol.
+  role       String    @default("AGENT")
+  joinedAt   DateTime
+  leftAt     DateTime?
+  /// LEFT (agent özü çıxıb) | REMOVED (sahib dayandırıb); açıq dövrdə `null`.
+  endReason  String?
+  /// Neçə agentlik elanı təhvil verilib (ayrılma anında).
+  handedOver Int       @default(0)
+
+  agency Agency? @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  user   User    @relation("MembershipMember", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, joinedAt])
+  @@index([agencyId, leftAt])
 }
 
 /// Aktiv giriş sessiyaları. Cookie yalnız bu sətrin id-sini daşıyır, beləliklə
@@ -624,6 +651,13 @@ model Property {
   authorId        String?
   assignedAgent   AgentProfile? @relation(fields: [assignedAgentId], references: [id], onDelete: SetNull)
   assignedAgentId String?
+  /// Elan sahibliyi (#210, PRD Modul 04): agentlik adından yaradılan elan həmin agentliyin mühitinə
+  /// aiddir və agent ayrılanda onunla getmir. `null` — şəxsi və ya şirkət (STAFF) elanı.
+  agency          Agency?       @relation("PropertyAgency", fields: [agencyId], references: [id], onDelete: SetNull)
+  agencyId        String?
+  /// Elanı ilk yaradan istifadəçi — `authorId` (hazırkı idarəçi) təhvildə dəyişir, bu dəyişmir.
+  createdBy       User?         @relation("PropertyCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById     String?
 
   images             PropertyImage[]
   features           PropertyFeature[]
@@ -666,6 +700,7 @@ model Property {
   @@index([contentFingerprint])
   @@index([riskScore])
   @@index([authorId])
+  @@index([agencyId, authorId])
 }
 
 /// Mərtəbə planı (#107). Qalereyadan ayrı saxlanılır: kart və qalereya sorğuları

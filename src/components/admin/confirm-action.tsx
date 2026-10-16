@@ -104,7 +104,7 @@ export function ConfirmAction({
         open={open}
         onClose={close}
         title={secret ? t("components.confirm.done") : title}
-        description={secret ? undefined : description}
+        // Təsvir yalnız gövdədədir — başlığa da ötürüləndə dialoqda iki dəfə görünürdü.
         size="sm"
         footer={
           secret ? (

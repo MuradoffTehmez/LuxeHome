@@ -8,7 +8,6 @@ import { getAgencyOffices } from "@/lib/accounts/agency-offices";
 import { propertyCardSelect, publicPropertyWhere } from "@/lib/queries";
 import {
   ACTIVE_OFFER_STATUSES,
-  AGENCY_EMPLOYEE_STATUSES,
   CLOSED_DEAL_STATUSES,
   DEAL_STATS_WINDOW_DAYS,
   LISTING_TYPES,
@@ -82,37 +81,22 @@ export async function getClosedDeals(scope: Prisma.PropertyWhereInput, take = 6)
 
 const EMPTY_STATS: OfferStats = { total: 0, sale: 0, rent: 0 };
 
-/** Agentliyin elan müəllifləri: sahib + təsdiqlənmiş əməkdaşlar. */
-export async function agencyMemberIds(agencies: { id: string; userId: string }[]): Promise<Map<string, string[]>> {
-  const members = new Map(agencies.map((agency) => [agency.id, [agency.userId]]));
-  if (agencies.length === 0) return members;
-  const employees = await findManyInChunks(agencies.map((agency) => agency.id), 1, (ids) =>
-    prisma.agencyEmployee.findMany({
-      where: { agencyId: { in: ids }, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
-      select: { agencyId: true, userId: true },
-    }),
-  );
-  for (const employee of employees) members.get(employee.agencyId)?.push(employee.userId);
-  return members;
-}
-
-/** Hər agentlik üçün satış/kirayə təklif sayı (bir `groupBy`, hissələrlə). */
+/**
+ * Hər agentlik üçün satış/kirayə təklif sayı (bir `groupBy`, hissələrlə). Təklif = agentliyin
+ * mühitinə aid elan (`Property.agencyId`, #210) — agentin şəxsi elanı agentlikdə sayılmır (PRD 6.3).
+ */
 export async function countAgencyOffers(agencies: { id: string; userId: string }[]): Promise<Map<string, OfferStats>> {
-  const members = await agencyMemberIds(agencies);
-  const owner = new Map<string, string>();
-  for (const [agencyId, userIds] of members) for (const userId of userIds) owner.set(userId, agencyId);
   const where = await activeOfferWhere();
-  const rows = await findManyInChunks([...owner.keys()], RESERVED_PARAMS, (ids) =>
+  const rows = await findManyInChunks(agencies.map((agency) => agency.id), RESERVED_PARAMS, (ids) =>
     prisma.property.groupBy({
-      by: ["authorId", "listingType"],
-      where: { ...where, authorId: { in: ids } },
+      by: ["agencyId", "listingType"],
+      where: { ...where, agencyId: { in: ids } },
       _count: { _all: true },
     }),
   );
   const stats = new Map(agencies.map((agency) => [agency.id, { ...EMPTY_STATS }]));
   for (const row of rows) {
-    const agencyId = row.authorId ? owner.get(row.authorId) : undefined;
-    const entry = agencyId ? stats.get(agencyId) : undefined;
+    const entry = row.agencyId ? stats.get(row.agencyId) : undefined;
     if (!entry) continue;
     entry.total += row._count._all;
     if (row.listingType === LISTING_TYPES.SALE) entry.sale += row._count._all;
@@ -162,25 +146,19 @@ export async function countAgentListings(agents: { id: string; userId: string | 
 }
 
 /**
- * Ərazidə fəal agentliklər (#161, C6): sahib + təsdiqlənmiş agentlərin həmin ərazidəki aktiv
+ * Ərazidə fəal agentliklər (#161, C6): agentlik elanlarının (`agencyId`, #210) həmin ərazidəki aktiv
  * təklif sayı. Ərazi `/rayon/<slug>` ilə eyni qaydadır — yerin özü və onun birbaşa uşaqları.
  */
 async function countAreaOffers(agencies: { id: string; userId: string }[], areaSlug: string): Promise<Map<string, number>> {
-  const members = await agencyMemberIds(agencies);
-  const owner = new Map<string, string>();
-  for (const [agencyId, userIds] of members) for (const userId of userIds) owner.set(userId, agencyId);
   const where: Prisma.PropertyWhereInput = {
     ...(await activeOfferWhere()),
     district: { OR: [{ slug: areaSlug }, { parent: { slug: areaSlug } }] },
   };
-  const rows = await findManyInChunks([...owner.keys()], RESERVED_PARAMS + 2, (ids) =>
-    prisma.property.groupBy({ by: ["authorId"], where: { ...where, authorId: { in: ids } }, _count: { _all: true } }),
+  const rows = await findManyInChunks(agencies.map((agency) => agency.id), RESERVED_PARAMS + 2, (ids) =>
+    prisma.property.groupBy({ by: ["agencyId"], where: { ...where, agencyId: { in: ids } }, _count: { _all: true } }),
   );
   const counts = new Map<string, number>();
-  for (const row of rows) {
-    const agencyId = row.authorId ? owner.get(row.authorId) : undefined;
-    if (agencyId) counts.set(agencyId, (counts.get(agencyId) ?? 0) + row._count._all);
-  }
+  for (const row of rows) if (row.agencyId) counts.set(row.agencyId, row._count._all);
   return counts;
 }
 
@@ -296,8 +274,8 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
   });
   if (!agency) return null;
 
-  const members = (await agencyMemberIds([agency])).get(agency.id) ?? [agency.userId];
-  const base: Prisma.PropertyWhereInput = { ...(await activeOfferWhere()), authorId: { in: members } };
+  // Agentliyin təklifləri — onun mühitinə aid elanlar (#210); agentlərin şəxsi elanları düşmür.
+  const base: Prisma.PropertyWhereInput = { ...(await activeOfferWhere()), agencyId: agency.id };
   const listingType = filters.listingType === LISTING_TYPES.SALE || filters.listingType === LISTING_TYPES.RENT
     ? filters.listingType
     : undefined;
@@ -336,7 +314,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
     // Filiallar (#157) — nömrə səhifədə maskalanır, tam dəyər `elaqe?ofis=` ilə açılır.
     getAgencyOffices(agency.id),
     // Uğurlu sövdələşmələr (#159) — sahib + təsdiqlənmiş agentlərin son 12 ayı.
-    getClosedDeals({ authorId: { in: members } }),
+    getClosedDeals({ agencyId: agency.id }),
     // Agentlik reytinqi və son rəylər (#161).
     getAgencyRatings([agency.id]),
     getAgencyReviews(agency.id),

@@ -15,7 +15,7 @@ import { findManyInChunks } from "@/lib/d1-chunks";
  *   `findManyInChunks` ilə (100 parametr limiti).
  */
 
-export const DATA_EXPORT_VERSION = 3;
+export const DATA_EXPORT_VERSION = 4;
 
 export async function buildAccountExport(userId: string) {
   const user = await prisma.user.findUnique({
@@ -231,6 +231,13 @@ export async function buildAccountExport(userId: string) {
     }),
   ]);
 
+  // Üzvlük tarixçəsi (#210) — yalnız şəxsin öz dövrləri.
+  const membershipHistory = await prisma.agencyMembershipHistory.findMany({
+    where: { userId },
+    select: { agencyName: true, role: true, joinedAt: true, leftAt: true, endReason: true, handedOver: true },
+    orderBy: { joinedAt: "desc" },
+  });
+
   const favoriteProperties = await findManyInChunks(
     favorites.map((favorite) => favorite.propertyId),
     0,
@@ -265,6 +272,7 @@ export async function buildAccountExport(userId: string) {
       : null,
     agentProfile,
     agencyMemberships: memberships,
+    agencyMembershipHistory: membershipHistory,
     properties,
     favorites: favorites.map((favorite) => ({
       createdAt: favorite.createdAt,

@@ -28,6 +28,7 @@ import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { localizePath } from "@/i18n/path-locale";
 import { queuePropertyVectorSync } from "@/lib/semantic-search";
 import { refreshListingRisk } from "@/lib/moderation/listing-risk";
+import { resolveNewListingAgencyId } from "@/lib/accounts/agency-ownership";
 import { queueListingEnrichment } from "@/lib/listing-enrichment";
 
 const LIST_PATH = "/kabinet/elanlar";
@@ -122,6 +123,8 @@ export async function createPublicProperty(
       ? await prisma.agency.findUnique({ where: { userId: user.id }, select: { isVerified: true } })
       : null;
   const finalPolicy = submissionPolicy(user.accountType, agency?.isVerified ?? false);
+  // Elan sahibliyi (#210, PRD 6.2–6.3): sahibin və (defolt) agentin elanı agentliyin mühitinə aiddir.
+  const listingAgencyId = await resolveNewListingAgencyId(user, formData.get("ownership"));
   // Avtomatik moderasiya (#159): yüksək riskli elan təsdiqlənmiş agentlikdən gəlsə də dərc olunmur.
   let heldForReview = false;
   try {
@@ -145,6 +148,8 @@ export async function createPublicProperty(
               ...propertyData(propertyInput, paymentFlags),
               slug: propertyInput.slug,
               authorId: propertyInput.authorId,
+              createdById: user.id,
+              agencyId: listingAgencyId,
               isDemo: propertyInput.isDemo,
               publishedAt: propertyInput.publishedAt,
             },

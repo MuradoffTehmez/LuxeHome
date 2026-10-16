@@ -35,13 +35,13 @@ const emptyTotals = (): AnalyticsTotals => ({ views: 0, contactReveals: 0, whats
 
 async function analyticsAuthors(userId: string) {
   const agency = await prisma.agency.findUnique({ where: { userId }, select: { id: true } });
-  if (!agency) return { isAgency: false, members: [] as { userId: string; name: string }[] };
+  if (!agency) return { isAgency: false, agencyId: null, members: [] as { userId: string; name: string }[] };
   const employees = await prisma.agencyEmployee.findMany({
     where: { agencyId: agency.id, status: AGENCY_EMPLOYEE_STATUSES.APPROVED },
     select: { userId: true, user: { select: { name: true } } },
     orderBy: { approvedAt: "asc" },
   });
-  return { isAgency: true, members: employees.map((item) => ({ userId: item.userId, name: item.user.name })) };
+  return { isAgency: true, agencyId: agency.id, members: employees.map((item) => ({ userId: item.userId, name: item.user.name })) };
 }
 
 type MarketRow = { typeId: string; cityId: string; listings: number; views: number };
@@ -83,15 +83,16 @@ export async function getListingAnalytics(input: {
 }) {
   const now = input.now ?? new Date();
   const start = periodStart(input.period, now);
-  const { isAgency, members } = await analyticsAuthors(input.userId);
+  const { isAgency, agencyId, members } = await analyticsAuthors(input.userId);
   const team = isAgency ? [{ userId: input.userId, name: input.userName }, ...members] : [];
   const authorIds = isAgency
     ? team.some((member) => member.userId === input.agentUserId) ? [input.agentUserId!] : team.map((member) => member.userId)
     : [input.userId];
 
-  const listings = (await findManyInChunks(authorIds, 1, (chunk) =>
+  const listings = (await findManyInChunks(authorIds, 2, (chunk) =>
     prisma.property.findMany({
-      where: { authorId: { in: chunk }, deletedAt: null },
+      // Sahib yalnız agentlik elanlarını görür — agentin şəxsi elanı ona aiddir (#210, PRD 6.3).
+      where: { authorId: { in: chunk }, deletedAt: null, ...(agencyId ? { agencyId } : {}) },
       select: {
         id: true,
         title: true,

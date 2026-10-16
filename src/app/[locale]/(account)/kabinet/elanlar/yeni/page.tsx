@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { getPropertyFormOptions } from "@/lib/queries";
 import { requireLister } from "@/lib/auth/guard";
 import { getListingContact } from "@/lib/accounts/listing-contact";
+import { listingAgencyFor } from "@/lib/accounts/agency-ownership";
 import { buildManagedMetadata } from "@/lib/seo";
 import { createPublicProperty } from "./actions";
 import { PublicPropertyForm } from "./public-property-form";
@@ -20,10 +21,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function NewPropertyPage() {
   const locale = await getLocale() as Locale;
   const user = await requireLister(locale);
-  const [t, sourceOptions, contact] = await Promise.all([
+  const [t, sourceOptions, contact, listingAgency] = await Promise.all([
     getTranslations("account.newProperty"),
     getPropertyFormOptions(),
     getListingContact(user.id),
+    listingAgencyFor(user),
   ]);
   const options = {
     ...sourceOptions,
@@ -50,6 +52,7 @@ export default async function NewPropertyPage() {
           action={createPublicProperty}
           options={options}
           contact={contact}
+          ownershipAgency={listingAgency && !listingAgency.isOwner ? listingAgency.agencyName : null}
           draftKey={`lhe:property-draft:${user.id}`}
         />
         </div>

@@ -12,6 +12,7 @@ import {
   MAX_AGENCY_EMPLOYEES,
   isLeadRoutingMode,
   type Locale,
+  MEMBERSHIP_END_REASONS,
 } from "@/lib/constants";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { recordDomainEvent } from "@/lib/admin/events";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/accounts/agency-membership";
 import { noticeAgencyDecision, noticeListingsHandedOver } from "@/lib/accounts/account-notices";
 import { handOverListings, isListingHandover, resolveHandoverTarget } from "@/lib/accounts/agency-listings";
+import { closeMembershipPeriod } from "@/lib/accounts/agency-ownership";
 import { generateInviteToken } from "@/lib/accounts/agency-invite";
 import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
 
@@ -147,7 +149,7 @@ export async function inviteAgencyEmployee(_prev: ActionState, formData: FormDat
  */
 export async function removeAgencyEmployee(
   id: string,
-  handover: string = LISTING_HANDOVER.KEEP,
+  handover: string = LISTING_HANDOVER.AGENCY,
   targetUserId: string | null = null,
 ): Promise<ActionState> {
   const locale = await getLocale() as Locale;
@@ -169,14 +171,14 @@ export async function removeAgencyEmployee(
   try {
     const employee = await prisma.agencyEmployee.findUnique({
       where: { id },
-      select: { id: true, agencyId: true, userId: true, status: true, user: { select: { name: true } } },
+      select: { id: true, agencyId: true, userId: true, status: true, role: true, approvedAt: true, user: { select: { name: true } } },
     });
     if (!employee || employee.agencyId !== owner.agency.id) {
       return failure(t("actions.employeeNotFound"));
     }
     if (!isListingHandover(handover)) return failure(t("actions.invalidForm"));
 
-    // Təhvil yalnız təsdiqlənmiş üzvün elanlarına aiddir — gözləyən dəvətin elanları agentlikdə sayılmırdı.
+    // Təhvil yalnız təsdiqlənmiş üzvün agentlik elanlarına aiddir (#210) — onlar agentdə qalmır.
     const target = employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED
       ? await resolveHandoverTarget({
           handover,
@@ -191,14 +193,24 @@ export async function removeAgencyEmployee(
     // Əvvəl təhvil, sonra üzvlüyün silinməsi (D1-də tranzaksiya yoxdur): təhvil alınmasa
     // üzvlük qalır və sahib təkrar cəhd edə bilir; silmə alınmasa elanlar artıq keçib,
     // təkrar cəhd elansız üzvü adi qaydada çıxarır.
-    const handedOver = target?.ok ? await handOverListings(employee.userId, target.userId) : 0;
+    const handedOver = target?.ok ? await handOverListings(employee.userId, target.userId, owner.agency.id) : 0;
     // Agentlik müraciətləri sahibə qayıdır (#161) — elan təhvilindən sonra, elanla keçənlər də daxil.
     await releaseAgentLeads({ agencyId: owner.agency.id, userId: employee.userId, ownerUserId: owner.user.id });
     await prisma.agencyEmployee.delete({ where: { id } });
     await linkAgentProfileToAgency(employee.userId, owner.agency.id, false);
+    if (employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED) {
+      await closeMembershipPeriod({
+        userId: employee.userId,
+        agencyId: owner.agency.id,
+        reason: MEMBERSHIP_END_REASONS.REMOVED,
+        handedOver,
+        role: employee.role,
+        joinedAt: employee.approvedAt,
+      });
+    }
     await recordDomainEvent("agency.employee_removed", "AgencyEmployee", id, {
       agencyId: owner.agency.id,
-      handover: target?.ok ? handover : LISTING_HANDOVER.KEEP,
+      handover: target?.ok && handover === LISTING_HANDOVER.AGENT ? LISTING_HANDOVER.AGENT : LISTING_HANDOVER.AGENCY,
       handedOver,
     });
     if (target?.ok && handedOver > 0 && target.userId !== owner.user.id) {

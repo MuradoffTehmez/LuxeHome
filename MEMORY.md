@@ -728,3 +728,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #208: Telegram əlaqə düyməsi (kabinet profili + admin agentlik redaktəsi, `normalizeTelegramUsername`), ayrıca
   `telegramClicks` sayğacı və kabinet analitikasında sütun. Bununla Mərhələ 1 bağlanır; növbəti — Mərhələ 2
   (agentlik idarəetməsi).
+- #210 (Mərhələ 2, Modul 04): `Property.agencyId`/`createdById`, agentlik elanı agentlə getmir (ayrılmada sahibə
+  və ya agentə təhvil, şəxsi elan agentdə), agentlik təklif sayı `agencyId`-dən, `AgencyMembershipHistory`.
+  Qalan Modul 04: agentliklər arası köçürmə sorğusu (6.4, A agentliyi + admin təsdiqi, əmlak sahibinin razılığı).

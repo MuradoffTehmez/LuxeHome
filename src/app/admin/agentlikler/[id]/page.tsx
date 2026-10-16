@@ -17,6 +17,7 @@ import { countAgencyOffers } from "@/lib/agency-profile";
 import { AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, PERMISSIONS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils";
 import { getAgencyOffices, getOfficeCityOptions } from "@/lib/accounts/agency-offices";
+import { getAgencyMembershipHistory } from "@/lib/accounts/agency-ownership";
 import { AgencyOfficeEditor } from "../agency-office-editor";
 import { localizePath } from "@/i18n/path-locale";
 import { AgencyLogoEditor } from "../agency-logo-editor";
@@ -59,10 +60,11 @@ export default async function AdminAgencyEditPage({ params }: Props) {
     },
   });
   if (!agency) notFound();
-  const [offerMap, offices, cities] = await Promise.all([
+  const [offerMap, offices, cities, history] = await Promise.all([
     countAgencyOffers([agency]),
     getAgencyOffices(agency.id),
     getOfficeCityOptions(),
+    getAgencyMembershipHistory(agency.id),
   ]);
   const offers = offerMap.get(agency.id) ?? { total: 0, sale: 0, rent: 0 };
   const sourceLabel = (source: string) =>
@@ -285,6 +287,23 @@ export default async function AdminAgencyEditPage({ params }: Props) {
           </ul>
         )}
       </AdminCard>
+
+      {history.length > 0 && (
+        <AdminCard title={t("pages.agencyHub.historyTitle")} description={t("pages.agencyHub.historyDescription")} className="mt-6" bodyClassName="p-0">
+          <ul className="divide-y divide-line">
+            {history.map((period) => (
+              <li key={period.id} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <p className="truncate text-sm font-medium text-ink">{period.user.name}</p>
+                <p className="text-xs text-ink-muted">
+                  {formatDateTime(period.joinedAt)} — {period.leftAt ? formatDateTime(period.leftAt) : t("pages.agencyHub.historyCurrent")}
+                  {period.endReason && ` · ${t(period.endReason === "REMOVED" ? "pages.agencyHub.historyRemoved" : "pages.agencyHub.historyLeft")}`}
+                  {period.handedOver > 0 && ` · ${t("pages.agencyHub.historyHandedOver", { count: period.handedOver })}`}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </AdminCard>
+      )}
 
       <p className="mt-6 text-sm">
         <Link href="/admin/agentlikler" className="font-medium text-gold-deep hover:underline">{t("pages.agencyHub.backToList")}</Link>
