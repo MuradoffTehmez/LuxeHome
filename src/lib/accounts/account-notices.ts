@@ -421,8 +421,9 @@ export async function noticeListingModeration(input: {
   decision: "rejected" | "needs_info";
   decidedAt: Date;
   reason?: string | null;
-}): Promise<void> {
-  await notifyAccount(
+}): Promise<boolean> {
+  // `false` — bildiriş yazılmadı: çağıran qərarı geri alır ki, sahib səbəbsiz gizlənmiş elanla qalmasın.
+  return notifyAccount(
     input.userId,
     NOTIFICATION_TYPES.LISTING_MODERATION,
     "/kabinet/elanlar",

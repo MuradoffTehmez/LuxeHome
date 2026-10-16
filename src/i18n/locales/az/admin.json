@@ -3171,7 +3171,8 @@
       "elanTesdiqlendiVeDercOlundu": "Elan təsdiqləndi və dərc olundu.",
       "elanTapilmadi": "Elan tapılmadı.",
       "elanReddEdildi": "Elan rədd edildi, sahibə səbəb göndərildi.",
-      "duzelisTelebEdildi": "Sahibə düzəliş istəyi göndərildi."
+      "duzelisTelebEdildi": "Sahibə düzəliş istəyi göndərildi.",
+      "bildirisGonderilmedi": "Sahibə bildiriş yazılmadı — qərar geri alındı, elan növbədə qalır. Bir az sonra yenidən cəhd edin."
     },
     "muracietler": {
       "muracietTapilmadi": "Müraciət tapılmadı.",

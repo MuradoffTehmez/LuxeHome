@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import {
   ACCOUNT_TYPES,
+  ACTIVE_OFFER_STATUSES,
   SELLER_FILTERS,
   ADMIN_PAGE_SIZE,
   AGENCY_EMPLOYEE_STATUSES,
@@ -804,7 +805,8 @@ export async function getPropertyBySlug(slug: string): Promise<PropertyDetail | 
 /** «Nömrəni göstər» — yalnız ictimai elanın müəllif əlaqəsi. */
 export async function getPropertyPublisherContact(propertyId: string) {
   return prisma.property.findFirst({
-    where: { ...(await publicPropertyWhere()), id: propertyId },
+    // Satılmış/kirayəyə verilmiş elan ictimai qalır, amma əlaqə açmır (#202, PRD 5.3).
+    where: { ...(await publicPropertyWhere()), id: propertyId, status: { in: [...ACTIVE_OFFER_STATUSES] } },
     select: { id: true, author: { select: publisherContactSelect } },
   });
 }

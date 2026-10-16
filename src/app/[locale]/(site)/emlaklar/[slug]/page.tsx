@@ -420,9 +420,10 @@ export default async function PropertyDetailPage({ params }: Props) {
             propertyId={property.id}
             path={propertyPath}
             title={property.title}
-            phone={siteConfig.phoneHref}
-            whatsappHref={whatsappHref}
-            reveal={reveal}
+            // Bağlanmış elan mobil yapışqan zolaqda da əlaqə vermir (#202, PRD 5.3).
+            phone={isClosed ? null : siteConfig.phoneHref}
+            whatsappHref={isClosed ? null : whatsappHref}
+            reveal={isClosed ? null : reveal}
             qrSvg={propertyQrSvg(propertyPath)}
             slug={property.slug}
           />
