@@ -119,6 +119,17 @@ describe("köçürmə sorğusu", () => {
     await expect(prisma.property.findUniqueOrThrow({ where: { id: "tr-p2" }, select: { agencyId: true } })).resolves.toEqual({ agencyId: "tr-agency-a" });
 
     await prisma.property.update({ where: { id: "tr-p2" }, data: { deletedAt: null } });
+    // Keçici yazı xətası: sorğu admin növbəsinə qayıdır, elan yerində qalır, təkrar cəhd işləyir.
+    const retry = await createTransferRequest({ ...base, requester: ownerB, listingReference: "tr-p2" });
+    const retryId = retry.result === "created" ? retry.id : "";
+    await decideTransferAsSource({ transferId: retryId, ownerUserId: "tr-a-owner", approve: true, note: null });
+    const spy = vi.spyOn(prisma.property, "updateMany").mockRejectedValueOnce(new Error("D1 keçici xəta"));
+    await expect(decideTransferAsAdmin({ transferId: retryId, adminId: "tr-admin", approve: true, note: null })).rejects.toThrow("D1 keçici xəta");
+    spy.mockRestore();
+    await expect(prisma.listingTransfer.findUniqueOrThrow({ where: { id: retryId } })).resolves.toMatchObject({ status: TRANSFER_STATUSES.PENDING_ADMIN, adminDecidedById: null });
+    await expect(prisma.property.findUniqueOrThrow({ where: { id: "tr-p2" }, select: { agencyId: true } })).resolves.toEqual({ agencyId: "tr-agency-a" });
+    await expect(decideTransferAsAdmin({ transferId: retryId, adminId: "tr-admin", approve: false, note: "Müqavilə yoxlanılmadı" })).resolves.toMatchObject({ result: "rejected" });
+
     const again = await createTransferRequest({ ...base, requester: agentB, listingReference: "tr-p2" });
     const againId = again.result === "created" ? again.id : "";
     await expect(cancelTransferRequest({ transferId: againId, userId: "tr-a-owner" })).resolves.toBe(false);

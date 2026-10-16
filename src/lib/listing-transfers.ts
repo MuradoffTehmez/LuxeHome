@@ -206,15 +206,28 @@ export async function decideTransferAsAdmin(input: {
   });
   if (count === 0) return { result: "stale" };
 
-  // Köhnə müraciətlər A agentliyində qalır — yeni müəllif onları görməməlidir.
-  await prisma.lead.updateMany({
-    where: { propertyId: transfer.propertyId, agencyId: null },
-    data: { agencyId: transfer.fromAgencyId },
-  });
-  const moved = await prisma.property.updateMany({
-    where: { id: transfer.propertyId, agencyId: transfer.fromAgencyId, deletedAt: null },
-    data: { agencyId: transfer.toAgencyId, authorId: transfer.targetUserId, assignedAgentId: null },
-  });
+  let moved: { count: number };
+  try {
+    // Köhnə müraciətlər A agentliyində qalır — yeni müəllif onları görməməlidir.
+    await prisma.lead.updateMany({
+      where: { propertyId: transfer.propertyId, agencyId: null },
+      data: { agencyId: transfer.fromAgencyId },
+    });
+    moved = await prisma.property.updateMany({
+      where: { id: transfer.propertyId, agencyId: transfer.fromAgencyId, deletedAt: null },
+      data: { agencyId: transfer.toAgencyId, authorId: transfer.targetUserId, assignedAgentId: null },
+    });
+  } catch (error) {
+    // Keçici xətada sorğu admin növbəsinə qaytarılır — təkrar cəhd mümkün qalsın, tarixçə isə
+    // köçmədiyi halda «köçürülüb» göstərməsin. Müraciətlərin A-ya bağlanması idempotentdir.
+    await prisma.listingTransfer
+      .updateMany({
+        where: { id: transfer.id, status: TRANSFER_STATUSES.COMPLETED },
+        data: { status: TRANSFER_STATUSES.PENDING_ADMIN, adminDecidedById: null, adminDecidedAt: null, adminNote: null },
+      })
+      .catch(() => undefined);
+    throw error;
+  }
   if (moved.count === 0) {
     await prisma.listingTransfer.updateMany({
       where: { id: transfer.id, status: TRANSFER_STATUSES.COMPLETED },
@@ -244,11 +257,32 @@ const listSelect = {
 
 const LIST_LIMIT = 50;
 
-/** Kabinet: agentliyin gələn (A kimi) və göndərdiyi (B kimi) sorğuları. */
+/**
+ * Açıq sorğular tarixçədən ayrıca və həmişə tam oxunur — köhnə gözləyən sorğu yeni qərarlar
+ * arxasında limitdən kənarda qalıb itməsin (sahib onu təsdiqləyə bilməzdi).
+ */
+async function transferList(where: { fromAgencyId: string } | { toAgencyId: string }) {
+  const [open, history] = await Promise.all([
+    prisma.listingTransfer.findMany({
+      where: { ...where, status: { in: [...OPEN_TRANSFER_STATUSES] } },
+      select: listSelect,
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.listingTransfer.findMany({
+      where: { ...where, status: { notIn: [...OPEN_TRANSFER_STATUSES] } },
+      select: listSelect,
+      orderBy: { createdAt: "desc" },
+      take: LIST_LIMIT,
+    }),
+  ]);
+  return [...open, ...history];
+}
+
+/** Kabinet: agentliyin gələn (A kimi) və göndərdiyi (B kimi) sorğuları — açıqlar əvvəldə. */
 export async function getAgencyTransfers(agencyId: string) {
   const [incoming, outgoing] = await Promise.all([
-    prisma.listingTransfer.findMany({ where: { fromAgencyId: agencyId }, select: listSelect, orderBy: { createdAt: "desc" }, take: LIST_LIMIT }),
-    prisma.listingTransfer.findMany({ where: { toAgencyId: agencyId }, select: listSelect, orderBy: { createdAt: "desc" }, take: LIST_LIMIT }),
+    transferList({ fromAgencyId: agencyId }),
+    transferList({ toAgencyId: agencyId }),
   ]);
   return { incoming, outgoing };
 }
