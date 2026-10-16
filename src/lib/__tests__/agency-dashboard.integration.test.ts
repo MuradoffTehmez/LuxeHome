@@ -31,6 +31,8 @@ beforeAll(async () => {
     user.bind("dash-agent", "Agent", "dash-agent@example.test", "disabled", "EDITOR", "AGENT", 1),
     user.bind("dash-gone", "Deaktiv agent", "dash-gone@example.test", "disabled", "EDITOR", "AGENT", 0),
     DB.prepare('INSERT INTO "Agency" ("id", "userId", "name", "slug", "isVerified", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)').bind("dash-agency", "dash-owner", "Alfa", "dash-alfa"),
+    user.bind("dash-old-owner", "Köhnə", "dash-old@example.test", "disabled", "EDITOR", "AGENCY", 1),
+    DB.prepare('INSERT INTO "Agency" ("id", "userId", "name", "slug", "isVerified", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)').bind("dash-agency-old", "dash-old-owner", "Köhnə", "dash-kohne"),
     DB.prepare('INSERT INTO "AgencyEmployee" ("id", "agencyId", "userId", "role", "status", "source", "invitedAt", "approvedAt", "receivesLeads") VALUES (?, ?, ?, \'AGENT\', ?, \'INVITE\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)').bind("dash-e1", "dash-agency", "dash-agent", AGENCY_EMPLOYEE_STATUSES.APPROVED, 0),
     DB.prepare('INSERT INTO "AgencyEmployee" ("id", "agencyId", "userId", "role", "status", "source", "invitedAt", "approvedAt", "receivesLeads") VALUES (?, ?, ?, \'AGENT\', ?, \'INVITE\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)').bind("dash-e2", "dash-agency", "dash-gone", AGENCY_EMPLOYEE_STATUSES.APPROVED, 1),
     property.bind("dash-p1", "Aktiv mənzil", "dash-p1", PROPERTY_STATUSES.PUBLISHED, "dash-agent", "dash-agency", null, soon, nowIso),
@@ -43,6 +45,8 @@ beforeAll(async () => {
     lead.bind("dash-l2", "CONTACTED", "dash-p1", "dash-agent", "dash-agency", nowIso),
     lead.bind("dash-l3", "NEW", "dash-p2", "dash-owner", null, null),
     lead.bind("dash-l-personal", "NEW", "dash-personal", "dash-agent", null, null),
+    // Köçürmədən qalan, başqa agentliyə bağlı müraciət — bu agentliyin elanında olsa da sayılmır.
+    lead.bind("dash-l-foreign", "NEW", "dash-p1", "dash-agent", "dash-agency-old", null),
     stat.bind("dash-p1", today, 40, 3, 2, 1),
     stat.bind("dash-p2", today, 10, 1, 0, 0),
     stat.bind("dash-personal", today, 500, 50, 0, 0),

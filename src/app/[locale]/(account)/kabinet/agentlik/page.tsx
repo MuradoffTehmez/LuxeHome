@@ -24,7 +24,7 @@ import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencyForOwner } from "@/lib/queries";
 import { getAgencyDashboard } from "@/lib/accounts/agency-dashboard";
 import { parsePeriod } from "@/lib/accounts/listing-analytics";
-import { ACCOUNT_TYPES, ANALYTICS_PERIODS, type Locale } from "@/lib/constants";
+import { ACCOUNT_TYPES, ANALYTICS_PERIODS, PUBLIC_PROPERTY_STATUSES, type Locale } from "@/lib/constants";
 import { cn, formatNumber } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -157,8 +157,16 @@ export default async function AgencyDashboardPage({
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="tabular w-5 shrink-0 text-sm text-ink-muted">{index + 1}</span>
                     <div className="min-w-0">
-                      <Link href={`/emlaklar/${item.slug}`} className="line-clamp-1 text-sm font-medium text-ink hover:text-gold-deep">{item.title}</Link>
-                      {item.author && <p className="text-xs text-ink-muted">{item.author.name}</p>}
+                      {(PUBLIC_PROPERTY_STATUSES as readonly string[]).includes(item.status) ? (
+                        <Link href={`/emlaklar/${item.slug}`} className="line-clamp-1 text-sm font-medium text-ink hover:text-gold-deep">{item.title}</Link>
+                      ) : (
+                        // Qeyri-ictimai elanın səhifəsi 404 verir — ad link olmadan, vəziyyəti ilə göstərilir.
+                        <p className="line-clamp-1 text-sm font-medium text-ink">{item.title}</p>
+                      )}
+                      <p className="text-xs text-ink-muted">
+                        {item.author?.name}
+                        {!(PUBLIC_PROPERTY_STATUSES as readonly string[]).includes(item.status) && ` · ${t("top.notPublic")}`}
+                      </p>
                     </div>
                   </div>
                   <span className="tabular flex shrink-0 items-center gap-1 text-sm text-ink-soft">

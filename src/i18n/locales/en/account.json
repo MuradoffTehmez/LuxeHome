@@ -1037,7 +1037,8 @@
     "top": {
       "title": "Most viewed listings",
       "description": "By views in the last {days} days.",
-      "empty": "No views recorded in this period."
+      "empty": "No views recorded in this period.",
+      "notPublic": "not currently public"
     },
     "reviews": {
       "title": "Agency reviews",

@@ -1037,7 +1037,8 @@
     "top": {
       "title": "Ən çox baxılan elanlar",
       "description": "Son {days} gündə baxış sayına görə.",
-      "empty": "Bu dövrdə baxış qeydə alınmayıb."
+      "empty": "Bu dövrdə baxış qeydə alınmayıb.",
+      "notPublic": "hazırda saytda görünmür"
     },
     "reviews": {
       "title": "Agentlik üzrə rəylər",

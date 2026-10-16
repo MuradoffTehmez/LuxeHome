@@ -25,8 +25,13 @@ const TOP_LISTINGS = 5;
 /** Cavabı gözlənilən müraciət: bağlanmayıb və ilk cavab yazılmayıb. */
 const OPEN_LEAD_STATUSES = [LEAD_STATUSES.NEW, LEAD_STATUSES.CONTACTED, LEAD_STATUSES.IN_PROGRESS];
 
+/**
+ * Agentliyin müraciəti: birbaşa ona bağlı (`Lead.agencyId`) və ya agentliyə bağlanmamış köhnə müraciət
+ * agentlik elanında. Elanın agentliyinə baxış yalnız `agencyId = null` üçündür — köçürmədən (#212) sonra
+ * A-ya bağlı köhnə müraciətlər B-nin panelinə keçməməlidir.
+ */
 function agencyLeadWhere(agencyId: string): Prisma.LeadWhereInput {
-  return { OR: [{ agencyId }, { property: { agencyId } }] };
+  return { OR: [{ agencyId }, { agencyId: null, property: { agencyId } }] };
 }
 
 export async function getAgencyDashboard(input: { agencyId: string; ownerUserId: string; period: AnalyticsPeriod; now?: Date }) {
