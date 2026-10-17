@@ -607,6 +607,7 @@ export const AGENCY_ACTIVITY_ACTIONS = {
   CLIENT_CREATED: "CLIENT_CREATED",
   CLIENT_REASSIGNED: "CLIENT_REASSIGNED",
   CLIENT_DELETED: "CLIENT_DELETED",
+  CLIENT_MERGED: "CLIENT_MERGED",
 } as const;
 
 export type AgencyActivityAction = (typeof AGENCY_ACTIVITY_ACTIONS)[keyof typeof AGENCY_ACTIVITY_ACTIONS];
@@ -622,7 +623,7 @@ export const AGENCY_ACTIVITY_GROUPS = {
   packages: ["PACKAGE_REQUESTED"],
   transfers: ["TRANSFER_REQUESTED", "TRANSFER_DECIDED"],
   tasks: ["TASK_CREATED", "TASK_STATUS_CHANGED"],
-  clients: ["CLIENT_CREATED", "CLIENT_REASSIGNED", "CLIENT_DELETED"],
+  clients: ["CLIENT_CREATED", "CLIENT_REASSIGNED", "CLIENT_DELETED", "CLIENT_MERGED"],
 } as const satisfies Record<string, readonly AgencyActivityAction[]>;
 
 export type AgencyActivityGroup = keyof typeof AGENCY_ACTIVITY_GROUPS;

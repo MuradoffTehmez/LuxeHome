@@ -747,3 +747,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   (Mini CRM).
 - #226 (Modul 07, 9.1/9.2): `CrmClient` + `CrmClientNote` + `Lead.clientId`, `/kabinet/musteriler`. Qalan Modul 07: 9.3 uyğun
   elanlar (`buildPropertyWhere` ilə ehtiyacdan) və 9.4 təkrar müraciətin aşkarlanması (`phoneKey`/`emailKey`, təsdiqli bağlama).
+- #228 (Modul 07, 9.3/9.4): `crm-matching.ts` — uyğun elanlar, dublikat ehtimalı, təsdiqli bağlama/birləşdirmə.
+  **Modul 07 tamamlandı.** Növbəti — Modul 08 (agent və agentlik reytinqi).

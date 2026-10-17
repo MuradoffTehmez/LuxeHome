@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Building2, History, Mail, MessageSquare, Phone, StickyNote, UserRound } from "lucide-react";
+import { Building2, Copy, History, Home, Mail, MessageSquare, Phone, StickyNote, UserRound } from "lucide-react";
+import { PropertyCard } from "@/components/site/property-card";
+import { crmMatchesHref, findDuplicateClients, getCrmMatches, hasCrmNeeds } from "@/lib/accounts/crm-matching";
 import { Badge } from "@/components/ui/badge";
-import { ButtonAnchor } from "@/components/ui/button";
+import { ButtonAnchor, buttonClassName } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { Link } from "@/i18n/navigation";
 import { formatLocalizedDate, formatLocalizedDateTime } from "@/i18n/date";
@@ -13,7 +15,7 @@ import { phoneHref } from "@/lib/accounts/listing-publisher";
 import { getCrmClient, getCrmContext, getCrmFormOptions } from "@/lib/accounts/crm";
 import { isClosedLeadStage, isLeadStage } from "@/lib/accounts/lead-pipeline";
 import type { Locale } from "@/lib/constants";
-import { ClientForm, ClientNoteForm, ClientOwnerSelect, DeleteClientButton } from "../client-forms";
+import { ClientForm, ClientNoteForm, ClientOwnerSelect, DeleteClientButton, MergeClientButton } from "../client-forms";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +42,15 @@ export default async function ClientCardPage({ params }: { params: Promise<{ id:
   const leadsT = await getTranslations("account.leads");
   const { client } = card;
   const str = (value: number | null) => (value == null ? "" : String(value));
+  const needs = {
+    listingType: client.listingType, typeSlug: card.typeSlug, citySlug: card.citySlug, districtSlug: card.districtSlug,
+    priceMin: client.priceMin, priceMax: client.priceMax, areaMin: client.areaMin, areaMax: client.areaMax,
+    rooms: client.rooms, renovation: client.renovation,
+  };
+  const [matches, duplicates] = await Promise.all([
+    getCrmMatches(needs),
+    findDuplicateClients(context, client, client.id),
+  ]);
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
@@ -76,6 +87,55 @@ export default async function ClientCardPage({ params }: { params: Promise<{ id:
               }}
             />
           </section>
+
+          {/* Uyğun elanlar (#228, PRD 9.3) — ictimai axtarışla eyni filtr. */}
+          <section aria-labelledby="client-matches-title" className="rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h2 id="client-matches-title" className="flex items-center gap-2 font-sans text-base font-semibold text-ink">
+                <Home className="size-4 text-gold-deep" aria-hidden="true" />
+                {t("matches.title")}
+              </h2>
+              {matches.total > 0 && (
+                <Link href={crmMatchesHref(needs)} className={buttonClassName("outline", "sm")}>{t("matches.all", { count: matches.total })}</Link>
+              )}
+            </div>
+            {!hasCrmNeeds(needs) ? (
+              <p className="text-sm text-ink-muted">{t("matches.noNeeds")}</p>
+            ) : matches.items.length === 0 ? (
+              <p className="text-sm text-ink-muted">{t("matches.empty")}</p>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {matches.items.map((property) => <PropertyCard key={property.id} property={property} />)}
+              </div>
+            )}
+          </section>
+
+          {duplicates.length > 0 && (
+            <section aria-labelledby="client-duplicates-title" className="rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5">
+              <h2 id="client-duplicates-title" className="mb-1 flex items-center gap-2 font-sans text-base font-semibold text-ink">
+                <Copy className="size-4 text-gold-deep" aria-hidden="true" />
+                {t("duplicates.title")}
+              </h2>
+              <p className="mb-3 text-sm text-ink-muted">{t("duplicates.hint")}</p>
+              <ul className="flex flex-col divide-y divide-line">
+                {duplicates.map((item) => (
+                  <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 py-2.5 text-sm">
+                    <div className="min-w-0">
+                      <Link href={`/kabinet/musteriler/${item.id}`} className="font-medium text-ink underline-offset-4 hover:text-gold-deep hover:underline">{item.name}</Link>
+                      <p className="text-ink-soft [overflow-wrap:anywhere]">{[item.phone, item.email].filter(Boolean).join(" · ")}</p>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        <Badge tone={item.score >= 85 ? "danger" : "warning"}>{t("duplicates.score", { score: item.score })}</Badge>
+                        {item.signals.phone && <Badge tone="neutral">{t("duplicates.signals.phone")}</Badge>}
+                        {item.signals.email && <Badge tone="neutral">{t("duplicates.signals.email")}</Badge>}
+                        {item.signals.name && <Badge tone="neutral">{t("duplicates.signals.name")}</Badge>}
+                      </div>
+                    </div>
+                    {item.agencyId === client.agencyId && <MergeClientButton targetId={client.id} sourceId={item.id} sourceName={item.name} />}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section aria-labelledby="client-leads-title" className="rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5">
             <h2 id="client-leads-title" className="mb-3 flex items-center gap-2 font-sans text-base font-semibold text-ink">

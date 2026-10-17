@@ -21,6 +21,7 @@ import {
   parseCrmClientForm,
   type CrmContext,
 } from "@/lib/accounts/crm";
+import { mergeCrmClientRecords } from "@/lib/accounts/crm-matching";
 
 /**
  * Mini CRM əməliyyatları (#226, PRD 9.1, 9.2). Hər action öz guard-ını çağırır (layout server
@@ -251,5 +252,65 @@ export async function createClientFromLead(leadId: string): Promise<CrmActionSta
     return { ...success(t("created")), clientId: client.id };
   } catch (error) {
     return unexpected("müraciətdən müştəri kartı yaradılmadı", error, t("errors.failed"));
+  }
+}
+
+/**
+ * Təkrar müraciət (#228, PRD 9.4): məsul şəxs müraciəti mövcud karta təsdiqlə bağlayır — sistem
+ * özü bağlamır. Müraciət artıq baxanın görə bildiyi başqa karta bağlıdırsa üzərinə yazılmır.
+ */
+export async function linkLeadToClient(leadId: string, clientId: string): Promise<CrmActionState> {
+  const ctx = await guard();
+  if (isFailure(ctx)) return ctx;
+  const t = await getTranslations("account.clients");
+  try {
+    const [lead, client] = await Promise.all([findManageableLead(ctx.user.id, String(leadId)), findClient(ctx.context, String(clientId))]);
+    if (!lead || !client) return failure(t("errors.notFound"));
+    const current = await prisma.lead.findUnique({ where: { id: lead.id }, select: { clientId: true } });
+    if (current?.clientId && current.clientId !== client.id && (await findClient(ctx.context, current.clientId))) {
+      return failure(t("errors.alreadyLinked"));
+    }
+    await prisma.lead.update({ where: { id: lead.id }, data: { clientId: client.id } });
+    await prisma.crmClient.update({ where: { id: client.id }, data: { updatedAt: new Date() } });
+    revalidatePath(localizePath(`/kabinet/muracietler/${lead.id}`, ctx.locale));
+    revalidatePath(localizePath(`${LIST_PATH}/${client.id}`, ctx.locale));
+    return { ...success(t("linked")), clientId: client.id };
+  } catch (error) {
+    return unexpected("müraciət müştəri kartına bağlanmadı", error, t("errors.failed"));
+  }
+}
+
+/**
+ * Dublikat kartların birləşdirilməsi (#228, PRD 9.4) — yalnız təsdiq dialoqundan. Mənbənin qeydləri
+ * və müraciətləri hədəfə keçir, hədəfin boş sahələri mənbədən doldurulur, sonra mənbə silinir.
+ * D1-də tranzaksiya yoxdur: addımlar təkrar edilə bilər (yarımçıq qalsa ikinci cəhd qalanı köçürür).
+ */
+export async function mergeClients(targetId: string, sourceId: string): Promise<CrmActionState> {
+  const ctx = await guard();
+  if (isFailure(ctx)) return ctx;
+  const t = await getTranslations("account.clients");
+  if (String(targetId) === String(sourceId)) return failure(t("errors.invalid"));
+  try {
+    const scope = crmScope(ctx.context);
+    const [target, source] = await Promise.all([
+      prisma.crmClient.findFirst({ where: { AND: [{ id: String(targetId).slice(0, 40) }, scope] } }),
+      prisma.crmClient.findFirst({ where: { AND: [{ id: String(sourceId).slice(0, 40) }, scope] } }),
+    ]);
+    if (!target || !source) return failure(t("errors.notFound"));
+    // Fərqli mühitlərin (şəxsi və agentlik, iki agentlik) kartı birləşmir — müştəri məlumatı mühitdən çıxmasın.
+    if (target.agencyId !== source.agencyId) return failure(t("errors.differentScope"));
+
+    await mergeCrmClientRecords(target, source);
+    if (target.agencyId) {
+      await recordAgencyActivity({
+        agencyId: target.agencyId, actor: ctx.user, action: AGENCY_ACTIVITY_ACTIONS.CLIENT_MERGED,
+        entityType: "CrmClient", entityId: target.id, entityLabel: target.name, details: { from: source.name },
+      });
+    }
+    revalidatePath(localizePath(`${LIST_PATH}/${target.id}`, ctx.locale));
+    revalidatePath(localizePath(LIST_PATH, ctx.locale));
+    return { ...success(t("merged")), clientId: target.id };
+  } catch (error) {
+    return unexpected("müştəri kartları birləşdirilmədi", error, t("errors.failed"));
   }
 }

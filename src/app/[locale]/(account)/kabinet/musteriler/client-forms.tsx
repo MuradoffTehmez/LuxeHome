@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState, useTransition } from "react";
+import { useActionState, useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Contact, Trash2 } from "lucide-react";
+import { Contact, GitMerge, Link2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
@@ -16,6 +16,8 @@ import {
   createClient,
   createClientFromLead,
   deleteClient,
+  linkLeadToClient,
+  mergeClients,
   reassignClient,
   updateClient,
   type CrmActionState,
@@ -276,5 +278,78 @@ export function CreateClientFromLeadButton({ leadId }: { leadId: string }) {
       <Contact className="size-4" aria-hidden="true" />
       {t("fromLead")}
     </Button>
+  );
+}
+
+/** Təsdiq dialoqlu əməliyyat düyməsi — 9.4: sistem özü bağlamır/birləşdirmir. */
+function ConfirmAction({
+  label, icon, title, description, confirm, action, onDone,
+}: {
+  label: string;
+  icon: ReactNode;
+  title: string;
+  description: string;
+  confirm: string;
+  action: () => Promise<ActionState>;
+  onDone: (result: ActionState) => void;
+}) {
+  const t = useTranslations("account.clients");
+  const { pending, run } = useRun();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+        {icon}
+        {label}
+      </Button>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={title}
+        description={description}
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setOpen(false)}>{t("card.cancel")}</Button>
+            <Button loading={pending} onClick={() => run(action, (result) => { setOpen(false); onDone(result); })}>{confirm}</Button>
+          </div>
+        }
+      >
+        <span className="sr-only">{description}</span>
+      </Modal>
+    </>
+  );
+}
+
+/** Müraciəti ehtimal olunan karta bağlamaq (#228). */
+export function LinkLeadButton({ leadId, clientId, name }: { leadId: string; clientId: string; name: string }) {
+  const t = useTranslations("account.clients");
+  const router = useRouter();
+  return (
+    <ConfirmAction
+      label={t("duplicates.link")}
+      icon={<Link2 className="size-4" aria-hidden="true" />}
+      title={t("duplicates.linkTitle")}
+      description={t("duplicates.linkDescription", { name })}
+      confirm={t("duplicates.linkConfirm")}
+      action={() => linkLeadToClient(leadId, clientId)}
+      onDone={() => router.refresh()}
+    />
+  );
+}
+
+/** Dublikat kartı bu karta birləşdirmək (#228). */
+export function MergeClientButton({ targetId, sourceId, sourceName }: { targetId: string; sourceId: string; sourceName: string }) {
+  const t = useTranslations("account.clients");
+  const router = useRouter();
+  return (
+    <ConfirmAction
+      label={t("duplicates.merge")}
+      icon={<GitMerge className="size-4" aria-hidden="true" />}
+      title={t("duplicates.mergeTitle")}
+      description={t("duplicates.mergeDescription", { name: sourceName })}
+      confirm={t("duplicates.mergeConfirm")}
+      action={() => mergeClients(targetId, sourceId)}
+      onDone={() => router.refresh()}
+    />
   );
 }

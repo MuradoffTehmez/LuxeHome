@@ -126,6 +126,7 @@ export default async function AgencyActivityPage({
     if (action === AGENCY_ACTIVITY_ACTIONS.LEAD_ALERTS_CHANGED && typeof details.reminder === "number" && typeof details.alert === "number" && typeof details.reassign === "number") {
       return t("details.alerts", { reminder: details.reminder, alert: details.alert, reassign: Math.round(details.reassign / 60) });
     }
+    if (action === AGENCY_ACTIVITY_ACTIONS.CLIENT_MERGED && typeof details.from === "string") return t("details.mergedFrom", { name: details.from });
     if ((action === AGENCY_ACTIVITY_ACTIONS.LEAD_REASSIGNED || action === AGENCY_ACTIVITY_ACTIONS.CLIENT_REASSIGNED) && typeof details.to === "string") return t("details.to", { name: details.to });
     if (action === AGENCY_ACTIVITY_ACTIONS.PACKAGE_REQUESTED && typeof details.packageName === "string") return t("details.package", { name: details.packageName });
     if (action === AGENCY_ACTIVITY_ACTIONS.TRANSFER_REQUESTED && typeof details.from === "string" && typeof details.to === "string") {

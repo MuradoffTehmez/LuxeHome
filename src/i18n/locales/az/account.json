@@ -903,7 +903,9 @@
       "noteEmpty": "Qeyd boş ola bilməz.",
       "forbidden": "Bu əməliyyat üçün səlahiyyətiniz yoxdur.",
       "invalidAssignee": "Seçilmiş şəxs agentliyin aktiv üzvü deyil.",
-      "linkedElsewhere": "Bu müraciət başqa müştəri kartına bağlıdır."
+      "linkedElsewhere": "Bu müraciət başqa müştəri kartına bağlıdır.",
+      "alreadyLinked": "Müraciət artıq başqa müştəri kartına bağlıdır.",
+      "differentScope": "Fərqli mühitlərin (şəxsi və agentlik) kartları birləşdirilə bilməz."
     },
     "form": {
       "contactTitle": "Əlaqə məlumatı",
@@ -963,6 +965,33 @@
       "title": "Müştəri kartı",
       "open": "Kartı aç: {name}",
       "hint": "Müştərinin ehtiyaclarını və qeydlərini bir kartda saxlayın."
+    },
+    "linked": "Müraciət müştəri kartına bağlandı.",
+    "merged": "Kartlar birləşdirildi.",
+    "matches": {
+      "title": "Uyğun elanlar",
+      "all": "{count, plural, other {Hamısı (#)}}",
+      "noNeeds": "Uyğun elanları görmək üçün müştərinin ehtiyaclarını qeyd edin.",
+      "empty": "Bu ehtiyaclara uyğun aktiv elan tapılmadı."
+    },
+    "duplicates": {
+      "title": "Ehtimal olunan dublikatlar",
+      "hint": "Bu kartlar eyni şəxsə aid ola bilər. Sistem kartları özü birləşdirmir.",
+      "leadHint": "Bu müraciət mövcud müştəriyə aid ola bilər:",
+      "score": "Uyğunluq {score}%",
+      "signals": {
+        "phone": "Eyni telefon",
+        "email": "Eyni e-poçt",
+        "name": "Eyni ad"
+      },
+      "link": "Karta bağla",
+      "linkTitle": "Müraciət bu karta bağlansın?",
+      "linkDescription": "Müraciət «{name}» kartının tarixçəsinə əlavə olunacaq.",
+      "linkConfirm": "Karta bağla",
+      "merge": "Bu karta birləşdir",
+      "mergeTitle": "Kartlar birləşdirilsin?",
+      "mergeDescription": "«{name}» kartının qeydləri və müraciətləri bu karta keçəcək, boş sahələr ondan doldurulacaq, sonra o kart silinəcək.",
+      "mergeConfirm": "Birləşdir"
     }
   },
   "offices": {
@@ -1239,7 +1268,8 @@
       "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi",
       "CLIENT_CREATED": "«{entity}» müştəri kartını yaratdı",
       "CLIENT_REASSIGNED": "«{entity}» müştəri kartının məsulunu dəyişdi",
-      "CLIENT_DELETED": "«{entity}» müştəri kartını sildi"
+      "CLIENT_DELETED": "«{entity}» müştəri kartını sildi",
+      "CLIENT_MERGED": "«{entity}» müştəri kartına başqa kartı birləşdirdi"
     },
     "details": {
       "price": "{from} → {to}",
@@ -1262,7 +1292,8 @@
       "reason": "Səbəb: {reason}",
       "assigned": "{from} → {to}",
       "taskStatus": "{from} → {to}",
-      "alerts": "Xatırlatma {reminder} dəq · bildiriş {alert} dəq · təkrar təyinat {reassign} saat"
+      "alerts": "Xatırlatma {reminder} dəq · bildiriş {alert} dəq · təkrar təyinat {reassign} saat",
+      "mergedFrom": "Birləşdirilən kart: {name}"
     },
     "emptyTitle": "Hələ qeyd yoxdur",
     "emptyDescription": "Elan, müraciət və komanda dəyişiklikləri burada görünəcək.",

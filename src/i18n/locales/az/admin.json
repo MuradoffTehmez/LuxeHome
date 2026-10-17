@@ -2937,7 +2937,8 @@
         "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi",
         "CLIENT_CREATED": "«{entity}» müştəri kartını yaratdı",
         "CLIENT_REASSIGNED": "«{entity}» müştəri kartının məsulunu dəyişdi",
-        "CLIENT_DELETED": "«{entity}» müştəri kartını sildi"
+        "CLIENT_DELETED": "«{entity}» müştəri kartını sildi",
+        "CLIENT_MERGED": "«{entity}» müştəri kartına başqa kartı birləşdirdi"
       }
     },
     "reports": {
