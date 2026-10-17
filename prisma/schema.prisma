@@ -2469,6 +2469,17 @@ model ListingReportNote {
 /// Elanın gündəlik statistikası (#161, kabinet analitikası). Gün Bakı vaxtı ilə «YYYY-MM-DD».
 /// Baxış botsuz sayılır; «Nömrəni göstər» və WhatsApp klikləri əlaqə marşrutlarından artırılır.
 /// Müraciət və favorit öz cədvəllərindən sayılır, burada təkrar saxlanmır.
+/// Unikal baxış açarı (#236): elan + Bakı günü + ziyarətçi heşi (sirrlə duzlanmış IP + brauzer).
+/// Xam IP saxlanmır; sətirlər `UNIQUE_VIEW_RETENTION_DAYS`-dan sonra gündəlik təmizlənir.
+model PropertyUniqueView {
+  propertyId String
+  day        String
+  visitorKey String
+
+  @@id([propertyId, day, visitorKey])
+  @@index([day])
+}
+
 model PropertyDailyStat {
   propertyId     String
   day            String
@@ -2477,6 +2488,8 @@ model PropertyDailyStat {
   whatsappClicks Int    @default(0)
   /// Telegram düyməsinin klikləri (#208) — WhatsApp kimi, faktiki əlaqə deyil, ayrıca sayılır.
   telegramClicks Int    @default(0)
+  /// Gün ərzində təkrarsız ziyarətçi (#236, PRD 11.3) — `PropertyUniqueView` açarı ilə.
+  uniqueViews    Int    @default(0)
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 

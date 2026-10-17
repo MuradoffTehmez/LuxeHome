@@ -755,3 +755,4 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   Növbəti — Modul 09 (agentlik analitikası, agent performansı).
 - #234 (Modul 09, 11.1/11.2/11.4/11.5): `/kabinet/agentlik/analitika`. Qalan Modul 09: 11.3 elan performansı (unikal baxış,
   qiymət dəyişikliyi) və 11.6 hesabat ixracı (PDF/Excel/CSV).
+- #236 (Modul 09, 11.3): unikal baxış (`PropertyUniqueView`), qiymət dəyişikliyi, `/kabinet/analitika/<id>`. Qalan: 11.6 ixrac.

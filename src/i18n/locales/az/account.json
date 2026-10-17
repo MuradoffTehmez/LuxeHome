@@ -1108,7 +1108,22 @@
       "closed": "Bağlanıb",
       "reserved": "Rezerv",
       "inactive": "Dərcdə deyil"
-    }
+    },
+    "uniqueViews": "Unikal baxış",
+    "priceChanges": "Qiymət dəyişikliyi",
+    "uniqueShort": "Unikal",
+    "priceChangesShort": "Qiymət",
+    "details": "Ətraflı",
+    "listingMetaTitle": "Elan performansı",
+    "listingEyebrow": "Elan performansı",
+    "listingDescription": "Bütün dövr üzrə {views} baxış",
+    "periodDays": "Son {days} gün",
+    "openListing": "Elanı aç",
+    "listingTrend": "Son {days} günün dinamikası",
+    "uniqueNote": "Unikal baxış — eyni ziyarətçi gün ərzində bir dəfə sayılır; botlar sayılmır.",
+    "priceHistory": "Qiymət tarixçəsi",
+    "priceHistoryEmpty": "Qiymət dəyişməyib — cari qiymət {price}.",
+    "backToAnalytics": "Analitikaya qayıt"
   },
   "reports": {
     "metaTitle": "Şikayətlərim",

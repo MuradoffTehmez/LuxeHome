@@ -814,6 +814,12 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   (`createdById`), aktiv, aldığı/cavablandırdığı müraciət, median cavab, görüş (`LeadActivity` → `VIEWING_SCHEDULED`),
   əməliyyat, təsdiqlənmiş rəylər. Ərazi = `districtId ?? cityId`; qiymət marağı `PRICE_BUCKETS` (satış/kirayə ayrı).
   Qrafiklər asılılıqsız SVG-dir (`components/charts/simple-charts.tsx`, ekran oxuyucu üçün gizli cədvəl ilə).
+- **Elan performansı (#236, PRD 11.3):** unikal baxış baxış beacon-unda (`/api/emlaklar/<id>/baxis`, bot süzgəci və IP
+  limitindən sonra) `recordUniqueView()` ilə yazılır — açar `AUTH_SECRET` ilə duzlanmış IP + brauzer + elan + gün heşidir
+  (xam IP yoxdur), `PropertyUniqueView`-ə `INSERT OR IGNORE`, yalnız yeni sətirdə `PropertyDailyStat.uniqueViews` artır;
+  açarlar `UNIQUE_VIEW_RETENTION_DAYS` sonra `runPhase2Maintenance()`-də silinir. `/kabinet/analitika` unikal baxış və qiymət
+  dəyişikliyini (`PropertyPriceHistory`) göstərir; `/kabinet/analitika/<id>` (`getListingPerformance`, giriş siyahı ilə eyni)
+  7/30/90 günlük dinamika və qiymət tarixçəsidir.
 - **Daxili tapşırıqlar (#220, PRD 7.3)** `AgencyTask` (`lib/accounts/agency-tasks.ts`), `/kabinet/tapsiriqlar` (sahib və agent):
   növ `AGENCY_TASK_TYPES`, status `AGENCY_TASK_STATUSES` (açıq = `OPEN_AGENCY_TASK_STATUSES`). Sahib və `TASKS_MANAGE`
   hər aktiv üzvə yaradır və hamısını görür (`?icraci=`), digər üzv yalnız özünə yaradır və ona təyin olunanı/özünün
