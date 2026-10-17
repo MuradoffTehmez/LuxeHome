@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { ArrowRight, Map as MapIcon } from "lucide-react";
-import { Container } from "@/components/ui/container";
+import { Container, Section } from "@/components/ui/container";
 import { buttonClassName } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { localizeLocation } from "@/i18n/dynamic-content";
+import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import type { AreaInsights as AreaInsightsData, AreaKind } from "@/lib/area-insights";
 import { LISTING_TYPES, type Locale } from "@/lib/constants";
 
@@ -34,7 +34,7 @@ export async function AreaInsights({
   if (data.total === 0) return null;
 
   return (
-    <section aria-labelledby="area-insights-title" className="border-t border-line bg-paper py-10 sm:py-12">
+    <Section aria-labelledby="area-insights-title" tone="paper" spacing="compact" className="border-t border-line">
       <Container>
         <h2 id="area-insights-title" className="font-display text-3xl tracking-[-0.02em] text-ink">{t("title", { place: placeName })}</h2>
         <p className="mt-1 max-w-2xl text-sm text-ink-soft">{t("description")}</p>
@@ -63,7 +63,7 @@ export async function AreaInsights({
             {data.rent > 0 && <Link href={search({ elan: LISTING_TYPES.RENT })} className={buttonClassName("outline", "sm")}>{t("rentLink", { count: data.rent })}</Link>}
             {data.types.map((type) => (
               <Link key={type.id} href={search({ tip: type.slug })} className={buttonClassName("ghost", "sm", false, "border border-line")}>
-                {type.name} <span className="text-ink-muted">({type.count})</span>
+                {localizeKnownContent("propertyType", type, locale).name} <span className="text-ink-muted">({type.count})</span>
               </Link>
             ))}
             <Link href={search({ gorunus: "xerite" })} className={buttonClassName("primary", "sm")}>
@@ -89,6 +89,6 @@ export async function AreaInsights({
           </div>
         )}
       </Container>
-    </section>
+    </Section>
   );
 }

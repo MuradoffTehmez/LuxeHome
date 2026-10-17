@@ -2,13 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { buildPropertyWhere } from "@/lib/queries";
 import { MIN_COMPARABLES, medianOf } from "@/lib/stats";
-import { LISTING_TYPES, LOCATION_CHILD_KINDS, PRICE_PERIODS } from "@/lib/constants";
+import { ACTIVE_OFFER_STATUSES, LISTING_TYPES, LOCATION_CHILD_KINDS, PRICE_PERIODS } from "@/lib/constants";
 import { compareAzerbaijani } from "@/lib/az-collation";
 
 /**
  * Ərazi səhifəsinin məlumat bloku (#240, PRD 12.4): aktiv/satış/kirayə sayı, elanlardan hesablanan
  * qiymət statistikası (median; `MIN_COMPARABLES`-dən az nümunədə göstərilmir — uydurulmuş rəqəm
- * yoxdur), növ üzrə bölgü və əlaqəli ərazilər. Hamısı ictimai elan şərtindəndir (`buildPropertyWhere`).
+ * yoxdur), növ üzrə bölgü və əlaqəli ərazilər. Hamısı ictimai elan şərtindəndir (`buildPropertyWhere`) və
+ * yalnız aktiv təkliflərdir (`ACTIVE_OFFER_STATUSES`) — landing siyahısı kimi satılmış/kirayəyə verilmiş elan sayılmır.
  */
 
 const PRICE_SAMPLE = 500;
@@ -18,7 +19,8 @@ export type AreaKind = "DISTRICT" | "CITY";
 
 export async function getAreaInsights(input: { kind: AreaKind; location: { id: string; slug: string; parentId?: string | null } }) {
   const { kind, location } = input;
-  const where = await buildPropertyWhere(kind === "CITY" ? { citySlug: location.slug } : { districtSlug: location.slug });
+  const active = { status: { in: ACTIVE_OFFER_STATUSES } };
+  const where = { AND: [await buildPropertyWhere(kind === "CITY" ? { citySlug: location.slug } : { districtSlug: location.slug }), active] };
 
   const [byListingType, byType, sales, rents, relatedCandidates] = await Promise.all([
     prisma.property.groupBy({ by: ["listingType"], where, _count: { _all: true } }),
@@ -53,10 +55,21 @@ export async function getAreaInsights(input: { kind: AreaKind; location: { id: s
   const typeOf = new Map(types.map((type) => [type.id, type]));
 
   // Əlaqəli ərazilərin aktiv elan sayı (ictimai şərtlə); elanı olmayan ərazi linklənmir (boş səhifə).
-  const publicWhere = await buildPropertyWhere({});
-  const relatedCounts = await findManyInChunks(relatedCandidates.map((item) => item.id), 20, (chunk) =>
+  // Elan ən dərin seçilmiş yerdə saxlanılır: rayonun sayına birbaşa uşaqları (qəsəbə, massiv) da daxildir —
+  // `/rayon/<slug>` filtri (`districtSlug`) eyni bir pilləni əhatə edir.
+  const candidateIds = relatedCandidates.map((item) => item.id);
+  const children = await findManyInChunks(candidateIds, 1, (chunk) =>
+    prisma.location.findMany({ where: { parentId: { in: chunk }, kind: { in: LOCATION_CHILD_KINDS } }, select: { id: true, parentId: true } }));
+  const rollup = new Map<string, string>(candidateIds.map((id) => [id, id]));
+  for (const child of children) if (child.parentId && !rollup.has(child.id)) rollup.set(child.id, child.parentId);
+  const publicWhere = { AND: [await buildPropertyWhere({}), active] };
+  const relatedCounts = await findManyInChunks([...rollup.keys()], 20, (chunk) =>
     prisma.property.groupBy({ by: ["districtId"], where: { AND: [publicWhere, { districtId: { in: chunk } }] }, _count: { _all: true } }));
-  const relatedCount = new Map(relatedCounts.map((row) => [row.districtId, row._count._all]));
+  const relatedCount = new Map<string, number>();
+  for (const row of relatedCounts) {
+    const target = row.districtId ? rollup.get(row.districtId) : undefined;
+    if (target) relatedCount.set(target, (relatedCount.get(target) ?? 0) + row._count._all);
+  }
 
   const pricePerSqm = medianOf(sales.map((item) => item.price / item.area!));
   const monthlyRent = medianOf(rents.map((item) => item.price));
