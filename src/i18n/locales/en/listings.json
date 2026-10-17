@@ -272,5 +272,22 @@
     "emptyTitle": "No agencies in this area yet",
     "emptyDescription": "No verified agency has active offers in {place}.",
     "allAgencies": "All agencies"
+  },
+  "areaInsights": {
+    "title": "About {place}",
+    "description": "Figures are calculated only from current public listings on the site; they are not general market statistics.",
+    "total": "Active listings",
+    "sale": "For sale",
+    "rent": "For rent",
+    "pricePerSqm": "Sale: median per m²",
+    "monthlyRent": "Rent: monthly median",
+    "sample": "Based on {count} listings",
+    "notEnough": "Not enough listings",
+    "medianNote": "Median — the middle value of listings; calculated from AZN listings with a stated area.",
+    "filtersTitle": "Search this area",
+    "saleLink": "For sale ({count})",
+    "rentLink": "For rent ({count})",
+    "map": "View on map",
+    "relatedTitle": "Related areas"
   }
 }

@@ -465,6 +465,14 @@ Qaydalar:
 
 Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 
+**Ərazi səhifələri (#240, PRD 12.4/12.5):** `/rayon/<slug>` (rayon, qəsəbə, kənd, massiv), `/metro/<slug>` və
+`/seher/<slug>` (`CITY` — şəhər və rayon; etiket neytral «X üzrə», çünki səviyyə ikisini də əhatə edir) eyni
+`getTaxonomyLandingProperties()` + `buildTaxonomyLandingDescriptor()` kontraktındadır: meta, canonical, breadcrumb, FAQ və
+ItemList JSON-LD, az məzmunda `seoLandingIndexPolicy` noindex, sitemap `getIndexableTaxonomyLandings(kind)`. İlk səhifədə
+«Ərazi haqqında» bloku (`getAreaInsights`, `components/site/area-insights.tsx`): yalnız aktiv təkliflər (`ACTIVE_OFFER_STATUSES`) üzrə satış/kirayə sayı, median
+(satış m², aylıq kirayə; `MIN_COMPARABLES`-dən az nümunədə «—»), növ/elan tipi filtr keçidləri, xəritə (`?gorunus=xerite`)
+və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da düşür, `districtSlug` filtri kimi). Uydurulmuş bazar rəqəmi göstərilmir — say və median yalnız saytdakı ictimai elanlardandır.
+
 ### Toplu idxal və sayt şəkilləri
 
 - `/admin/emlaklar/idxal` CSV-dən elan yaradır (#103). Hər sətir `propertySchema`-dan keçir,

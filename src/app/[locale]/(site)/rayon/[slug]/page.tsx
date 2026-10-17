@@ -5,6 +5,8 @@ import { hasLocale } from "next-intl";
 import { NeighborhoodAnalytics } from "@/components/site/neighborhood-analytics";
 import { SeoLandingPage } from "@/components/site/seo-landing-page";
 import { AreaAgencies } from "@/components/site/area-agencies";
+import { AreaInsights } from "@/components/site/area-insights";
+import { getAreaInsights } from "@/lib/area-insights";
 import { localizeLocation } from "@/i18n/dynamic-content";
 import { routing } from "@/i18n/routing";
 import { type Locale } from "@/lib/constants";
@@ -70,6 +72,16 @@ export default async function DistrictLandingPage({ params, searchParams }: Prop
         <NeighborhoodAnalytics
           name={landing.h1}
           profile={result.location.neighborhoodProfile}
+          locale={localeValue}
+        />
+      )}
+      {/* Ərazi haqqında (#240, PRD 12.4) — yalnız ilk səhifədə. */}
+      {page === 1 && (
+        <AreaInsights
+          data={await getAreaInsights({ kind: "DISTRICT", location: result.location })}
+          kind="DISTRICT"
+          slug={result.location.slug}
+          placeName={localizeLocation(result.location, localeValue).name}
           locale={localeValue}
         />
       )}

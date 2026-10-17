@@ -130,6 +130,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/fealiyyet` | Agentlik daxili fəaliyyət jurnalı: kim elanı, qiyməti, müraciəti, komandanı dəyişdi (yalnız sahib) |
 | `/kabinet/kocurmeler` | Agentliklər arası elan köçürmə sorğuları: göndərmə, gələn sorğuların təsdiqi (agentlik sahibi), geri çəkmə |
 | `/kabinet/son-baxilanlar`, `/kabinet/tovsiyeler` | Son baxılanlar və fərdi tövsiyələr |
+| `/seher/[slug]` | Şəhər/rayon landing-i: elanlar, «Ərazi haqqında» (satış/kirayə, median qiymət, filtrlər, xəritə, əlaqəli ərazilər) |
 | `/kabinet/analitika/[id]` | Elan performansı: 7/30/90 gün dinamikası, unikal baxış, favorit, müraciət, qiymət tarixçəsi |
 | `/kabinet/agentlik/analitika` | Agentlik analitikası: ümumi göstəricilər, agent performansı, ərazilər, qrafiklər, tarix intervalı |
 | `/kabinet/reyler` | Agent və agentlik sahibi: təsdiqlənmiş rəylər və ictimai cavab |
