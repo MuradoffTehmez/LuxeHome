@@ -216,6 +216,7 @@ model Agency {
   transfersOut      ListingTransfer[]         @relation("TransferFrom")
   transfersIn       ListingTransfer[]         @relation("TransferTo")
   activities        AgencyActivity[]
+  tasks             AgencyTask[]
   partners          AgencyPartner[]
   agentProfiles     AgentProfile[]
   testimonials      Testimonial[]
@@ -367,6 +368,32 @@ model AgencyActivity {
   @@index([agencyId, createdAt])
   @@index([agencyId, action, createdAt])
   @@index([agencyId, actorId, createdAt])
+}
+
+/// Agentlik daxili tapşırıqları (#220, PRD 7.3). İcraçı/yaradan/elan/müraciət əlaqələri açıq FK deyil —
+/// istifadəçi və ya elan silinəndə tapşırıq tarixçə kimi qalır, adlar oxunarkən ayrıca yüklənir.
+model AgencyTask {
+  id          String    @id @default(cuid())
+  agencyId    String
+  title       String
+  description String?
+  /// GENERAL | LEAD_RESPONSE | CLIENT_CONTACT | PHOTO_UPDATE | LISTING_CHECK — `AGENCY_TASK_TYPES`.
+  type        String    @default("GENERAL")
+  /// NEW | IN_PROGRESS | ON_HOLD | DONE | CANCELLED — `AGENCY_TASK_STATUSES`.
+  status      String    @default("NEW")
+  assigneeId  String
+  createdById String?
+  propertyId  String?
+  leadId      String?
+  dueAt       DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, status, dueAt])
+  @@index([agencyId, assigneeId, status])
 }
 
 /// Aktiv giriş sessiyaları. Cookie yalnız bu sətrin id-sini daşıyır, beləliklə

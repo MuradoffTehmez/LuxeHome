@@ -601,6 +601,8 @@ export const AGENCY_ACTIVITY_ACTIONS = {
   MEMBER_ROLE_CHANGED: "MEMBER_ROLE_CHANGED",
   MEMBER_SUSPENDED: "MEMBER_SUSPENDED",
   MEMBER_RESUMED: "MEMBER_RESUMED",
+  TASK_CREATED: "TASK_CREATED",
+  TASK_STATUS_CHANGED: "TASK_STATUS_CHANGED",
 } as const;
 
 export type AgencyActivityAction = (typeof AGENCY_ACTIVITY_ACTIONS)[keyof typeof AGENCY_ACTIVITY_ACTIONS];
@@ -615,6 +617,7 @@ export const AGENCY_ACTIVITY_GROUPS = {
   ],
   packages: ["PACKAGE_REQUESTED"],
   transfers: ["TRANSFER_REQUESTED", "TRANSFER_DECIDED"],
+  tasks: ["TASK_CREATED", "TASK_STATUS_CHANGED"],
 } as const satisfies Record<string, readonly AgencyActivityAction[]>;
 
 export type AgencyActivityGroup = keyof typeof AGENCY_ACTIVITY_GROUPS;
@@ -884,6 +887,8 @@ export const NOTIFICATION_TYPES = {
   LEAD_ESCALATION: "LEAD_ESCALATION",
   /** Agentliklər arası elan köçürmə sorğusu və onun qərarları (#212). */
   LISTING_TRANSFER: "LISTING_TRANSFER",
+  /** Agentlik daxili tapşırığı: təyin olundu və ya tamamlandı (#220). */
+  AGENCY_TASK: "AGENCY_TASK",
 } as const;
 
 export type NotificationType =
@@ -904,6 +909,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   LISTING_MODERATION: "Elan moderasiyası",
   LEAD_ESCALATION: "Cavabsız müraciət",
   LISTING_TRANSFER: "Elan köçürməsi",
+  AGENCY_TASK: "Agentlik tapşırığı",
 };
 
 // ---------------------------------------------------------------------------
@@ -1452,6 +1458,34 @@ export const AGENCY_ROLE_DEFAULT_PERMISSIONS: Record<AgencyEmployeeRole, readonl
 
 /** Girişin dayandırılması səbəbinin ən çox uzunluğu. */
 export const SUSPENSION_REASON_MAX = 500;
+
+/** Agentlik daxili tapşırıqlarının növü (#220, PRD 7.3). */
+export const AGENCY_TASK_TYPES = {
+  GENERAL: "GENERAL",
+  LEAD_RESPONSE: "LEAD_RESPONSE",
+  CLIENT_CONTACT: "CLIENT_CONTACT",
+  PHOTO_UPDATE: "PHOTO_UPDATE",
+  LISTING_CHECK: "LISTING_CHECK",
+} as const;
+
+export type AgencyTaskType = (typeof AGENCY_TASK_TYPES)[keyof typeof AGENCY_TASK_TYPES];
+
+/** Tapşırıq statusları (PRD 7.3): Yeni, İcradadır, Gözləmədə, Tamamlanıb, Ləğv edilib. */
+export const AGENCY_TASK_STATUSES = {
+  NEW: "NEW",
+  IN_PROGRESS: "IN_PROGRESS",
+  ON_HOLD: "ON_HOLD",
+  DONE: "DONE",
+  CANCELLED: "CANCELLED",
+} as const;
+
+export type AgencyTaskStatus = (typeof AGENCY_TASK_STATUSES)[keyof typeof AGENCY_TASK_STATUSES];
+
+/** İcrası davam edən (açıq) statuslar — gecikmə yalnız bunlar üçün hesablanır. */
+export const OPEN_AGENCY_TASK_STATUSES: readonly AgencyTaskStatus[] = ["NEW", "IN_PROGRESS", "ON_HOLD"];
+
+export const AGENCY_TASK_TITLE_MAX = 160;
+export const AGENCY_TASK_DESCRIPTION_MAX = 2000;
 
 export const AGENCY_EMPLOYEE_STATUSES = {
   PENDING: "PENDING",

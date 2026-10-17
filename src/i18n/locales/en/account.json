@@ -996,7 +996,8 @@
       "leads": "Enquiries",
       "team": "Team",
       "packages": "Packages",
-      "transfers": "Transfers"
+      "transfers": "Transfers",
+      "tasks": "Tasks"
     },
     "platform": "Platform administrator",
     "actions": {
@@ -1020,7 +1021,9 @@
       "LISTING_ASSIGNED": "changed the owner of “{entity}”",
       "MEMBER_ROLE_CHANGED": "changed the role of {entity}",
       "MEMBER_SUSPENDED": "suspended the access of {entity}",
-      "MEMBER_RESUMED": "restored the access of {entity}"
+      "MEMBER_RESUMED": "restored the access of {entity}",
+      "TASK_CREATED": "created the task “{entity}”",
+      "TASK_STATUS_CHANGED": "changed the status of “{entity}”"
     },
     "details": {
       "price": "{from} → {to}",
@@ -1041,7 +1044,8 @@
       "role": "{from} → {to}",
       "releasedLeads": "{count} open enquiries returned to the owner",
       "reason": "Reason: {reason}",
-      "assigned": "{from} → {to}"
+      "assigned": "{from} → {to}",
+      "taskStatus": "{from} → {to}"
     },
     "emptyTitle": "No entries yet",
     "emptyDescription": "Listing, enquiry and team changes will appear here.",
@@ -1058,6 +1062,13 @@
     "roleNames": {
       "AGENT": "Agent",
       "MANAGER": "Manager"
+    },
+    "taskStatusNames": {
+      "NEW": "New",
+      "IN_PROGRESS": "In progress",
+      "ON_HOLD": "On hold",
+      "DONE": "Done",
+      "CANCELLED": "Cancelled"
     }
   },
   "agencyDashboard": {
@@ -1089,7 +1100,8 @@
       "rejected": "{count} listings did not pass moderation",
       "suspended": "{count} listings are suspended",
       "openReports": "{count} open reports are under review",
-      "expiringSoon": "{count} listings expire within 7 days"
+      "expiringSoon": "{count} listings expire within 7 days",
+      "overdueTasks": "{count} tasks are overdue"
     },
     "top": {
       "title": "Most viewed listings",
@@ -1138,5 +1150,77 @@
     "previous": "Previous",
     "next": "Next",
     "pageOf": "{page} / {pages}"
+  },
+  "tasks": {
+    "metaTitle": "Tasks",
+    "metaDescription": "Internal agency tasks.",
+    "eyebrow": "Agency",
+    "title": "Tasks",
+    "description": "Tasks assigned to you and the ones you created. Track progress by changing the status.",
+    "descriptionManager": "Give agents tasks, set due dates and track their status. Overdue tasks are highlighted in red.",
+    "noAgencyTitle": "No agency membership",
+    "noAgencyDescription": "Tasks are for agency owners and approved agents.",
+    "suspendedTitle": "Your agency access is suspended",
+    "suspendedDescription": "Your tasks will reappear once the agency restores your access.",
+    "form": {
+      "heading": "New task",
+      "title": "Task",
+      "type": "Type",
+      "assignee": "Assignee",
+      "selfOnly": "The task will be assigned to you.",
+      "due": "Due date",
+      "dueHint": "Optional.",
+      "property": "Listing",
+      "lead": "Enquiry",
+      "none": "Not selected",
+      "description": "Details",
+      "submit": "Create task"
+    },
+    "viewLabel": "View",
+    "views": {
+      "open": "Open",
+      "done": "Done",
+      "cancelled": "Cancelled",
+      "all": "All"
+    },
+    "assigneeFilter": "Assignee",
+    "everyone": "Everyone",
+    "statusLabel": "Status",
+    "statuses": {
+      "NEW": "New",
+      "IN_PROGRESS": "In progress",
+      "ON_HOLD": "On hold",
+      "DONE": "Done",
+      "CANCELLED": "Cancelled"
+    },
+    "types": {
+      "GENERAL": "General",
+      "LEAD_RESPONSE": "Reply to enquiry",
+      "CLIENT_CONTACT": "Contact client",
+      "PHOTO_UPDATE": "Update photos",
+      "LISTING_CHECK": "Check listing is current"
+    },
+    "overdue": "Overdue",
+    "assignee": "Assignee: {name}",
+    "creator": "Given by: {name}",
+    "due": "Due: {date}",
+    "completed": "Completed: {date}",
+    "emptyTitle": "No tasks",
+    "emptyDescription": "No tasks found in this view.",
+    "created": "Task created.",
+    "statusChanged": "Task status updated.",
+    "errors": {
+      "forbidden": "You do not have permission for this action.",
+      "invalidTitle": "The task name must be 3–160 characters.",
+      "invalidType": "Choose a task type.",
+      "invalidAssignee": "The assignee must be an active member of the agency.",
+      "invalidDue": "The due date cannot be in the past.",
+      "invalidProperty": "The listing does not belong to the agency.",
+      "invalidLead": "The enquiry does not belong to the agency.",
+      "notFound": "Task not found.",
+      "stale": "The task status has already changed. Refresh the page.",
+      "invalidStatus": "Invalid status.",
+      "failed": "The action failed. Please try again."
+    }
   }
 }

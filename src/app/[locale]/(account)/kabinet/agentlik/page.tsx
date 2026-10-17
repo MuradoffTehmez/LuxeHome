@@ -86,6 +86,7 @@ export default async function AgencyDashboardPage({
     { key: "suspended", value: data.moderation.suspended },
     { key: "openReports", value: data.moderation.openReports },
     { key: "expiringSoon", value: data.moderation.expiringSoon },
+    { key: "overdueTasks", value: data.moderation.overdueTasks },
   ] as const;
   const activeAlerts = alerts.filter((alert) => alert.value > 0);
 
@@ -135,7 +136,7 @@ export default async function AgencyDashboardPage({
           <ul className="mt-3 flex flex-col gap-1.5 text-sm text-ink">
             {activeAlerts.map((alert) => (
               <li key={alert.key}>
-                <Link href="/kabinet/elanlar" className="underline-offset-4 hover:text-gold-deep hover:underline">
+                <Link href={alert.key === "overdueTasks" ? "/kabinet/tapsiriqlar" : "/kabinet/elanlar"} className="underline-offset-4 hover:text-gold-deep hover:underline">
                   {t(`moderation.${alert.key}`, { count: alert.value })}
                 </Link>
               </li>

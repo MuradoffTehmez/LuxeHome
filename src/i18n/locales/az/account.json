@@ -996,7 +996,8 @@
       "leads": "Müraciətlər",
       "team": "Komanda",
       "packages": "Paketlər",
-      "transfers": "Köçürmələr"
+      "transfers": "Köçürmələr",
+      "tasks": "Tapşırıqlar"
     },
     "platform": "Platforma administratoru",
     "actions": {
@@ -1020,7 +1021,9 @@
       "LISTING_ASSIGNED": "«{entity}» elanının məsulunu dəyişdi",
       "MEMBER_ROLE_CHANGED": "{entity} adlı üzvün rolunu dəyişdi",
       "MEMBER_SUSPENDED": "{entity} adlı agentin girişini dayandırdı",
-      "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi"
+      "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi",
+      "TASK_CREATED": "«{entity}» tapşırığını yaratdı",
+      "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi"
     },
     "details": {
       "price": "{from} → {to}",
@@ -1041,7 +1044,8 @@
       "role": "{from} → {to}",
       "releasedLeads": "{count} açıq müraciət sahibə qaytarıldı",
       "reason": "Səbəb: {reason}",
-      "assigned": "{from} → {to}"
+      "assigned": "{from} → {to}",
+      "taskStatus": "{from} → {to}"
     },
     "emptyTitle": "Hələ qeyd yoxdur",
     "emptyDescription": "Elan, müraciət və komanda dəyişiklikləri burada görünəcək.",
@@ -1058,6 +1062,13 @@
     "roleNames": {
       "AGENT": "Agent",
       "MANAGER": "Menecer"
+    },
+    "taskStatusNames": {
+      "NEW": "Yeni",
+      "IN_PROGRESS": "İcradadır",
+      "ON_HOLD": "Gözləmədə",
+      "DONE": "Tamamlanıb",
+      "CANCELLED": "Ləğv edilib"
     }
   },
   "agencyDashboard": {
@@ -1089,7 +1100,8 @@
       "rejected": "{count} elan moderasiyadan keçməyib",
       "suspended": "{count} elan dayandırılıb",
       "openReports": "{count} açıq şikayət yoxlanılır",
-      "expiringSoon": "{count} elanın müddəti 7 gün içində bitir"
+      "expiringSoon": "{count} elanın müddəti 7 gün içində bitir",
+      "overdueTasks": "{count} tapşırığın son tarixi keçib"
     },
     "top": {
       "title": "Ən çox baxılan elanlar",
@@ -1138,5 +1150,77 @@
     "previous": "Əvvəlki",
     "next": "Növbəti",
     "pageOf": "{page} / {pages}"
+  },
+  "tasks": {
+    "metaTitle": "Tapşırıqlar",
+    "metaDescription": "Agentlik daxili tapşırıqları.",
+    "eyebrow": "Agentlik",
+    "title": "Tapşırıqlar",
+    "description": "Sizə verilən və özünüzün yaratdığı tapşırıqlar. Statusu dəyişərək icranı izləyin.",
+    "descriptionManager": "Agentlərə tapşırıq verin, son icra tarixini təyin edin və statusu izləyin. Gecikən tapşırıqlar qırmızı ilə vurğulanır.",
+    "noAgencyTitle": "Agentlik üzvlüyü yoxdur",
+    "noAgencyDescription": "Tapşırıqlar agentlik sahibi və təsdiqlənmiş agentlər üçündür.",
+    "suspendedTitle": "Agentlik mühitinə girişiniz dayandırılıb",
+    "suspendedDescription": "Agentlik girişi bərpa edəndə tapşırıqlarınız yenidən görünəcək.",
+    "form": {
+      "heading": "Yeni tapşırıq",
+      "title": "Tapşırıq",
+      "type": "Növ",
+      "assignee": "İcraçı",
+      "selfOnly": "Tapşırıq sizin adınıza yazılacaq.",
+      "due": "Son icra tarixi",
+      "dueHint": "İstəyə bağlı.",
+      "property": "Elan",
+      "lead": "Müraciət",
+      "none": "Seçilməyib",
+      "description": "Təfərrüat",
+      "submit": "Tapşırıq yarat"
+    },
+    "viewLabel": "Görünüş",
+    "views": {
+      "open": "Açıq",
+      "done": "Tamamlanmış",
+      "cancelled": "Ləğv edilmiş",
+      "all": "Hamısı"
+    },
+    "assigneeFilter": "İcraçı",
+    "everyone": "Hamı",
+    "statusLabel": "Status",
+    "statuses": {
+      "NEW": "Yeni",
+      "IN_PROGRESS": "İcradadır",
+      "ON_HOLD": "Gözləmədə",
+      "DONE": "Tamamlanıb",
+      "CANCELLED": "Ləğv edilib"
+    },
+    "types": {
+      "GENERAL": "Ümumi",
+      "LEAD_RESPONSE": "Müraciətə cavab",
+      "CLIENT_CONTACT": "Müştəri ilə əlaqə",
+      "PHOTO_UPDATE": "Şəkilləri yeniləmək",
+      "LISTING_CHECK": "Elanın aktuallığı"
+    },
+    "overdue": "Gecikir",
+    "assignee": "İcraçı: {name}",
+    "creator": "Verən: {name}",
+    "due": "Son tarix: {date}",
+    "completed": "Tamamlandı: {date}",
+    "emptyTitle": "Tapşırıq yoxdur",
+    "emptyDescription": "Bu görünüşdə tapşırıq tapılmadı.",
+    "created": "Tapşırıq yaradıldı.",
+    "statusChanged": "Tapşırığın statusu yeniləndi.",
+    "errors": {
+      "forbidden": "Bu əməliyyat üçün icazəniz yoxdur.",
+      "invalidTitle": "Tapşırığın adı 3–160 simvol olmalıdır.",
+      "invalidType": "Tapşırığın növünü seçin.",
+      "invalidAssignee": "İcraçı agentliyin aktiv üzvü olmalıdır.",
+      "invalidDue": "Son tarix bu gündən əvvəl ola bilməz.",
+      "invalidProperty": "Elan agentliyə aid deyil.",
+      "invalidLead": "Müraciət agentliyə aid deyil.",
+      "notFound": "Tapşırıq tapılmadı.",
+      "stale": "Tapşırığın statusu artıq dəyişib. Səhifəni yeniləyin.",
+      "invalidStatus": "Status düzgün deyil.",
+      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin."
+    }
   }
 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { getAgencyRatings, getAgencyReviews } from "@/lib/agency-ratings";
 import { periodStart } from "@/lib/accounts/listing-analytics";
+import { countOverdueAgencyTasks } from "@/lib/accounts/agency-tasks";
 import {
   ACTIVE_OFFER_STATUSES,
   ACTIVE_REPORT_STATUSES,
@@ -56,6 +57,7 @@ export async function getAgencyDashboard(input: { agencyId: string; ownerUserId:
     expiringSoon,
     ratings,
     reviews,
+    overdueTasks,
   ] = await Promise.all([
     prisma.property.count({ where: { ...listing, status: { in: [...ACTIVE_OFFER_STATUSES] } } }),
     prisma.property.count({ where: { ...listing, createdAt: { gte: start.at } } }),
@@ -97,6 +99,7 @@ export async function getAgencyDashboard(input: { agencyId: string; ownerUserId:
     }),
     getAgencyRatings([agencyId]),
     getAgencyReviews(agencyId, 3),
+    countOverdueAgencyTasks(agencyId, now),
   ]);
 
   const topIds = topRows.filter((row) => (row._sum.views ?? 0) > 0).map((row) => row.propertyId);
@@ -147,6 +150,7 @@ export async function getAgencyDashboard(input: { agencyId: string; ownerUserId:
       rejected: countOf(holdByStatus, PROPERTY_STATUSES.REJECTED),
       openReports,
       expiringSoon,
+      overdueTasks,
     },
     rating: ratings.get(agencyId) ?? null,
     reviews,

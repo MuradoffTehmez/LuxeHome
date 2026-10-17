@@ -74,6 +74,10 @@ const COPY = {
     memberResumed: (agency: string) => `«${agency}» agentliyi agentlik elanlarına və müraciətlərinə girişinizi bərpa etdi.`,
     listingAssignedTitle: "Sizə elan təyin edildi",
     listingAssigned: (title: string, agency: string) => `«${agency}» agentliyi «${title}» elanını sizə təyin etdi. Elan «Elanlarım» bölməsindədir.`,
+    taskAssignedTitle: "Sizə yeni tapşırıq verildi",
+    taskAssigned: (title: string, agency: string) => `«${agency}» agentliyində sizə «${title}» tapşırığı verildi. Tapşırıqlara kabinetdə baxın.`,
+    taskCompletedTitle: "Tapşırıq tamamlandı",
+    taskCompleted: (title: string, name: string) => `${name} «${title}» tapşırığını tamamladı.`,
     transferCompletedTitle: "Elan agentliyinizə köçürüldü",
     transferCompleted: (title: string) => `«${title}» elanı agentliyinizə köçürüldü və «Elanlarım» bölməsindədir. Əvvəlki agentliyin müraciətləri köçürülmür.`,
     transferMovedTitle: "Elan başqa agentliyə köçürüldü",
@@ -146,6 +150,10 @@ const COPY = {
     memberResumed: (agency: string) => `“${agency}” restored your access to its listings and enquiries.`,
     listingAssignedTitle: "A listing was assigned to you",
     listingAssigned: (title: string, agency: string) => `“${agency}” assigned the listing “${title}” to you. It is in “My listings”.`,
+    taskAssignedTitle: "You have a new task",
+    taskAssigned: (title: string, agency: string) => `You were given the task “${title}” at “${agency}”. See your tasks in the account.`,
+    taskCompletedTitle: "Task completed",
+    taskCompleted: (title: string, name: string) => `${name} completed the task “${title}”.`,
     transferCompletedTitle: "Listing transferred to your agency",
     transferCompleted: (title: string) => `The listing “${title}” was transferred to your agency and is in “My listings”. Enquiries of the previous agency are not transferred.`,
     transferMovedTitle: "Listing transferred to another agency",
@@ -218,6 +226,10 @@ const COPY = {
     memberResumed: (agency: string) => `Агентство «${agency}» восстановило ваш доступ к своим объявлениям и заявкам.`,
     listingAssignedTitle: "Вам назначено объявление",
     listingAssigned: (title: string, agency: string) => `Агентство «${agency}» назначило вам объявление «${title}». Оно в разделе «Мои объявления».`,
+    taskAssignedTitle: "Вам поставлена новая задача",
+    taskAssigned: (title: string, agency: string) => `В агентстве «${agency}» вам поставлена задача «${title}». Задачи — в кабинете.`,
+    taskCompletedTitle: "Задача выполнена",
+    taskCompleted: (title: string, name: string) => `${name} выполнил(а) задачу «${title}».`,
     transferCompletedTitle: "Объявление передано вашему агентству",
     transferCompleted: (title: string) => `Объявление «${title}» передано вашему агентству и находится в разделе «Мои объявления». Заявки прежнего агентства не передаются.`,
     transferMovedTitle: "Объявление передано другому агентству",
@@ -679,5 +691,25 @@ export async function noticeListingAssigned(input: {
     "/kabinet/elanlar",
     `listing-assigned:${input.propertyId}:${input.userId}:${attemptKey(input.at)}`,
     (copy) => ({ title: copy.listingAssignedTitle, content: copy.listingAssigned(input.propertyTitle, input.agencyName) }),
+  );
+}
+
+/** Agentlik tapşırığı (#220): icraçıya təyinat, yaradana tamamlanma. */
+export async function noticeAgencyTask(input: {
+  userId: string;
+  taskId: string;
+  stage: "assigned" | "completed";
+  taskTitle: string;
+  agencyName: string;
+  actorName: string;
+}): Promise<boolean> {
+  return notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.AGENCY_TASK,
+    "/kabinet/tapsiriqlar",
+    `agency-task:${input.taskId}:${input.stage}`,
+    (copy) => input.stage === "assigned"
+      ? { title: copy.taskAssignedTitle, content: copy.taskAssigned(input.taskTitle, input.agencyName) }
+      : { title: copy.taskCompletedTitle, content: copy.taskCompleted(input.taskTitle, input.actorName) },
   );
 }
