@@ -44,7 +44,13 @@ export async function recordUniqueView(input: { propertyId: string; ip: string; 
       visitorKey,
     );
     if (inserted === 0) return false;
-    await incrementListingStat(input.propertyId, "uniqueViews", input.now);
+    try {
+      await incrementListingStat(input.propertyId, "uniqueViews", input.now);
+    } catch (error) {
+      // Sayğac yazılmadı — marker geri götürülür ki, təkrar cəhd ziyarətçini yenə saysın (D1-də tranzaksiya yoxdur).
+      await prisma.propertyUniqueView.deleteMany({ where: { propertyId: input.propertyId, day, visitorKey } }).catch(() => undefined);
+      throw error;
+    }
     return true;
   } catch (error) {
     console.error("[stats] unikal baxış yazılmadı:", error instanceof Error ? error.message : error);
@@ -54,7 +60,8 @@ export async function recordUniqueView(input: { propertyId: string; ip: string; 
 
 /** Gündəlik təmizlik: köhnə unikal baxış açarları (sayğac `PropertyDailyStat`-da qalır). */
 export async function pruneUniqueViews(now = new Date()): Promise<number> {
-  const cutoff = bakuDay(new Date(now.getTime() - UNIQUE_VIEW_RETENTION_DAYS * 86_400_000));
+  // Saxlanılan günlər: bu gün + (RETENTION − 1) əvvəlki gün; ondan köhnələr silinir.
+  const cutoff = bakuDay(new Date(now.getTime() - (UNIQUE_VIEW_RETENTION_DAYS - 1) * 86_400_000));
   const { count } = await prisma.propertyUniqueView.deleteMany({ where: { day: { lt: cutoff } } });
   return count;
 }
