@@ -96,7 +96,8 @@
       "subscriptions": "Abunə hesabatları",
       "discounts": "Endirim kodları",
       "campaigns": "Tanıtım kampaniyaları",
-      "payments": "Ödəniş əməliyyatları"
+      "payments": "Ödəniş əməliyyatları",
+      "vip": "VIP elanlar"
     }
   },
   "actions": {
@@ -328,7 +329,8 @@
       "LEAD_ESCALATION": "Cavabsız müraciət",
       "LISTING_TRANSFER": "Elan köçürməsi",
       "AGENCY_TASK": "Agentlik tapşırığı",
-      "REVIEW_REPORT": "Rəydən şikayət"
+      "REVIEW_REPORT": "Rəydən şikayət",
+      "VIP": "VIP elan"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3357,6 +3359,62 @@
         "invoice": "Faktura"
       },
       "descriptionLabelLocale": "Təsvir — {locale} (istəyə bağlı)"
+    },
+    "vip": {
+      "title": "VIP elanlar",
+      "description": "VIP sorğuları, aktiv və bitmiş VIP elanlar, performans və qərar tarixçəsi. Tanıtım mərhələsində VIP ödənişsizdir.",
+      "pending": "Gözləyən sorğular",
+      "pendingDescription": "Elanı yoxlayın, müddət təyin edib təsdiqləyin və ya səbəblə rədd edin.",
+      "active": "Aktiv VIP elanlar",
+      "past": "Bitmiş və rədd edilmiş",
+      "pastDescription": "Son 50 qeyd: bitən, dayandırılan və rədd edilən sorğular.",
+      "emptyPending": "Gözləyən sorğu yoxdur.",
+      "emptyActive": "Aktiv VIP elan yoxdur.",
+      "emptyPast": "Hələ tarixçə yoxdur.",
+      "grantTitle": "Sorğusuz VIP ver",
+      "grantDescription": "Dərc olunmuş elanın linki və ya slug-ı ilə.",
+      "listing": "Elan linki və ya slug",
+      "listingHint": "Məs.: https://luxehomeestate.az/az/emlaklar/<slug>",
+      "duration": "Müddət",
+      "extendBy": "Uzatma müddəti",
+      "days": "{count} gün",
+      "note": "Qeyd (istəyə bağlı)",
+      "approve": "Təsdiqlə",
+      "grant": "VIP ver",
+      "extend": "Uzat",
+      "reject": "Rədd et",
+      "revoke": "Dayandır",
+      "rejectTitle": "VIP sorğusu rədd edilsin?",
+      "rejectDescription": "Səbəb elan sahibinə bildiriş kimi göndəriləcək.",
+      "revokeTitle": "VIP statusu dayandırılsın?",
+      "revokeDescription": "Elanın VIP görünüşü dərhal söndürülür; səbəb sahibə bildirilir.",
+      "presets": {
+        "quality": "Elanın foto və təsviri VIP keyfiyyət tələblərinə uyğun deyil.",
+        "info": "Elanda məlumat natamamdır — düzəldib yenidən sorğu göndərin.",
+        "rules": "Elan platforma qaydalarına uyğun deyil."
+      },
+      "decidedBy": "Qərar: {name}",
+      "system": "avtomatik",
+      "extendedCount": "{count} dəfə uzadılıb",
+      "metrics": {
+        "views": "Baxış",
+        "uniqueViews": "Unikal baxış",
+        "contactReveals": "Nömrə açılması",
+        "leads": "Müraciət"
+      },
+      "source": {
+        "OWNER": "Sahibin sorğusu",
+        "ADMIN": "Administrator",
+        "SELF_SERVICE": "Özünəxidmət"
+      },
+      "status": {
+        "PENDING": "Gözləyir",
+        "APPROVED": "Aktiv",
+        "REJECTED": "Rədd edilib",
+        "CANCELLED": "Ləğv edilib",
+        "REVOKED": "Dayandırılıb",
+        "EXPIRED": "Bitib"
+      }
     }
   },
   "server": {
@@ -3831,6 +3889,16 @@
         "required": "Ad və AZ mesajı məcburidir."
       },
       "recordSaved": "Yadda saxlanıldı."
+    },
+    "vip": {
+      "approved": "VIP təsdiqləndi.",
+      "rejected": "VIP sorğusu rədd edildi.",
+      "extended": "VIP müddəti uzadıldı.",
+      "revoked": "VIP statusu dayandırıldı.",
+      "notFound": "Sorğu tapılmadı və ya artıq baxılıb.",
+      "duration": "Müddət düzgün deyil.",
+      "note": "Səbəb ən azı 5 simvol olmalıdır.",
+      "listing": "Dərc olunmuş elan tapılmadı."
     }
   }
 }

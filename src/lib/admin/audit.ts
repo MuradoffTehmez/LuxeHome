@@ -66,7 +66,8 @@ export type AuditEntity =
   | "SubscriptionPlan"
   | "Subscription"
   | "DiscountCode"
-  | "PromoCampaign";
+  | "PromoCampaign"
+  | "VipRequest";
 
 export async function recordAudit(
   user: Pick<AuthUser, "id" | "email">,

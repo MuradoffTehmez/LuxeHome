@@ -113,5 +113,11 @@
     "primary": "Müraciət göndər",
     "whatsapp": "WhatsApp-da yazın",
     "whatsappMessage": "Salam, əmlakımı Luxe Home Estate vasitəsilə satmaq/kirayə vermək istəyirəm."
+  },
+  "vip": {
+    "overline": "VIP",
+    "title": "VIP elanlar",
+    "description": "Administrator tərəfindən təsdiqlənmiş VIP elanlar.",
+    "all": "Bütün elanlar"
   }
 }

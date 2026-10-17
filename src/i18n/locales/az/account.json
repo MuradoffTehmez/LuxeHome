@@ -38,8 +38,8 @@
     "renewUnavailable": "Bu elanı yeniləmək mümkün deyil.",
     "expiresIn": "{days, plural, other {# gün qalıb}}",
     "expired": "Müddəti bitib — bərpa edin",
-    "premium": "Premium",
-    "premiumUntil": "Premium · {date}-dək",
+    "premium": "VIP",
+    "premiumUntil": "VIP · {date}-dək",
     "promote": "Premium et",
     "promoteLabel": "«{title}» elanını premium et",
     "heldForReview": "Elan avtomatik yoxlamaya düşdü və moderatorun təsdiqindən sonra dərc olunacaq. Bu, adətən bir neçə saat çəkir.",
@@ -70,6 +70,30 @@
       "sent": "Etirazınız göndərildi. Nəticə bildirişlərdə görünəcək.",
       "pending": "Etirazınız baxılır.",
       "rejectedNote": "Etiraz rədd edilib:"
+    },
+    "vip": {
+      "button": "VIP et",
+      "label": "«{title}» elanı üçün VIP sorğusu",
+      "title": "VIP sorğusu",
+      "description": "«{title}» elanı VIP nişanı ilə siyahıların əvvəlində və ana səhifənin VIP bölməsində göstəriləcək.",
+      "duration": "Müddət",
+      "days": "{count} gün",
+      "messageLabel": "Qeyd (istəyə bağlı)",
+      "free": "Tanıtım mərhələsində VIP ödənişsizdir; sorğunu administrator yoxlayıb təsdiqləyir.",
+      "cancel": "Bağla",
+      "submit": "Sorğu göndər",
+      "sent": "VIP sorğusu göndərildi — administrator yoxlayacaq.",
+      "approvedNow": "Elan VIP oldu.",
+      "pending": "VIP sorğusu yoxlanılır",
+      "rejectedNote": "Əvvəlki sorğu rədd edildi: {note}",
+      "errors": {
+        "disabled": "VIP sorğuları hazırda qəbul edilmir.",
+        "duration": "Müddət düzgün deyil.",
+        "listing": "VIP yalnız dərc olunmuş öz elanınız üçün istənilə bilər.",
+        "active": "Bu elan artıq VIP-dir.",
+        "pending": "Bu elan üçün sorğu artıq yoxlanılır.",
+        "failed": "Sorğu göndərilmədi. Bir az sonra yenidən cəhd edin."
+      }
     }
   },
   "newProperty": {

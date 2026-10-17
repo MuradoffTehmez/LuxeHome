@@ -113,5 +113,11 @@
     "primary": "Оставить заявку",
     "whatsapp": "Написать в WhatsApp",
     "whatsappMessage": "Здравствуйте, хочу продать/сдать недвижимость через Luxe Home Estate."
+  },
+  "vip": {
+    "overline": "VIP",
+    "title": "VIP-объявления",
+    "description": "VIP-объявления, одобренные администратором.",
+    "all": "Все объявления"
   }
 }

@@ -217,6 +217,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/hesabim` | Profil, avatar, panel dili, tema, parol, backup kod, passkey, ICS tokeni, sessiyalar | Hər staff |
 | `/admin/parametrler` | Əlaqə, bildiriş, sayt şəkilləri, tema | `settings:manage` |
 | `/admin/maliyye` | Maliyyə və Monetizasiya: abunə planları, tariflər, imkanlar, limitlər (#244) | `billing:manage` |
+| `/admin/vip` | VIP sorğuları: təsdiq/rədd (səbəb), uzatma, dayandırma, sorğusuz verilmə, performans (#248) | `property:manage` |
 | `/admin/maliyye/abuneler` | Abunə hesabatı və ödənişsiz təyin (#246) | `billing:manage` |
 | `/admin/maliyye/endirimler` | Endirim kodları (#246) | `billing:manage` |
 | `/admin/maliyye/kampaniyalar` | Tanıtım kampaniyaları — `/paketler`-də göstərilir (#246) | `billing:manage` |

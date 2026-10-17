@@ -16,6 +16,7 @@ import {
   MODERATION_HOLD_STATUSES,
   PROPERTY_STATUSES,
   PROPERTY_STATUS_TONE,
+  VIP_REQUEST_STATUSES,
   type Locale,
   type PropertyStatus,
 } from "@/lib/constants";
@@ -33,6 +34,9 @@ import { expiryState } from "@/lib/listing-expiry-policy";
 import { getListingExpiryConfig } from "@/lib/settings";
 import { getOwnerAppeals } from "@/lib/listing-appeals";
 import { AppealButton } from "./appeal-button";
+import { VipRequestButton } from "./vip-request-button";
+import { getOwnerVipState } from "@/lib/vip";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 const STATUS_KEYS = LISTING_STATUS_KEYS;
 
@@ -76,6 +80,11 @@ export default async function CabinetPropertiesPage({
   ]);
 
   type CabinetProperty = (typeof properties)[number];
+  // VIP sorğuları (#248): modul bayrağı və elanların son sorğu/dövr vəziyyəti.
+  const [vipEnabled, vipState] = await Promise.all([
+    isFeatureEnabled("VIP_REQUESTS"),
+    getOwnerVipState(properties.map((property) => property.id)),
+  ]);
   const appeals = await getOwnerAppeals(
     properties.filter((property) => (APPEALABLE_STATUSES as readonly string[]).includes(property.status)).map((property) => property.id),
   );
@@ -180,11 +189,24 @@ export default async function CabinetPropertiesPage({
         </Badge>
       );
     }
-    if (packageCount === 0 || property.status !== PROPERTY_STATUSES.PUBLISHED) return null;
+    if (property.status !== PROPERTY_STATUSES.PUBLISHED) return null;
+    const vip = vipState.get(property.id);
+    const vipControl = !vipEnabled ? null : vip?.status === VIP_REQUEST_STATUSES.PENDING ? (
+      <Badge tone="warning"><Crown className="size-3.5 shrink-0" aria-hidden="true" />{t("vip.pending")}</Badge>
+    ) : (
+      <span className="inline-flex flex-wrap items-center gap-2">
+        <VipRequestButton propertyId={property.id} title={property.title} />
+        {vip?.status === VIP_REQUEST_STATUSES.REJECTED && vip.note && <span className="text-xs text-ink-muted">{t("vip.rejectedNote", { note: vip.note })}</span>}
+      </span>
+    );
+    if (packageCount === 0) return vipControl;
     return (
+      <span className="inline-flex flex-wrap items-center gap-2">
+      {vipControl}
       <ButtonLink href={localizePath(`/kabinet/paketler?elan=${property.id}`, locale)} variant="ghost" size="sm" aria-label={t("promoteLabel", { title: property.title })}>
         <Crown className="size-4" aria-hidden="true" />{t("promote")}
       </ButtonLink>
+      </span>
     );
   }
 

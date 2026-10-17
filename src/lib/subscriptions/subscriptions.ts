@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client/wasm.js";
 import { prisma } from "@/lib/prisma";
 import { ACCOUNT_TYPES, SUBSCRIPTION_SOURCES, SUBSCRIPTION_STATUSES, type SubscriptionStatus } from "@/lib/constants";
 import { findManyInChunks } from "@/lib/d1-chunks";
@@ -35,10 +36,6 @@ export async function grantSubscription(input: {
   // Agentlik planı yalnız agentlik hesabına (agentlik mühitinə bağlanır).
   if (plan.audience === "AGENCY" && !user.agency) return { ok: false, reason: "audience" };
 
-  await prisma.subscription.updateMany({
-    where: { userId: user.id, status: { in: [SUBSCRIPTION_STATUSES.TRIALING, SUBSCRIPTION_STATUSES.ACTIVE, SUBSCRIPTION_STATUSES.PAST_DUE] } },
-    data: { status: SUBSCRIPTION_STATUSES.CANCELLED, cancelledAt: now },
-  });
   const trialEnd = input.withTrial ? trialEndsAt(now, plan.trialDays) : null;
   const subscription = await prisma.subscription.create({
     data: {
@@ -58,6 +55,11 @@ export async function grantSubscription(input: {
     },
     select: { id: true },
   });
+  // Yeni abunə yazılandan sonra köhnə aktivlər ləğv olunur — yaratma alınmasa hesab abunəsiz qalmır.
+  await prisma.subscription.updateMany({
+    where: { userId: user.id, id: { not: subscription.id }, status: { in: [SUBSCRIPTION_STATUSES.TRIALING, SUBSCRIPTION_STATUSES.ACTIVE, SUBSCRIPTION_STATUSES.PAST_DUE] } },
+    data: { status: SUBSCRIPTION_STATUSES.CANCELLED, cancelledAt: now },
+  });
   return { ok: true, subscriptionId: subscription.id };
 }
 
@@ -69,31 +71,45 @@ export async function cancelSubscription(id: string, now = new Date()): Promise<
   return count > 0;
 }
 
-/** Abunə hesabatı: statuslar (vaxta görə effektiv), plan × auditoriya üzrə aktivlər, son abunələr. */
+/**
+ * Abunə hesabatı: statuslar (vaxta görə effektiv), plan × auditoriya üzrə aktivlər, son abunələr. Saylar bazada
+ * aqreqat edilir — siyahı limiti ümumi göstəriciləri kəsməsin; yalnız «son abunələr» cədvəli 50 sətirdir.
+ */
 export async function getSubscriptionReport(now = new Date()) {
-  const rows = await prisma.subscription.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 1000,
-    select: { id: true, userId: true, planCode: true, audience: true, months: true, status: true, source: true, startsAt: true, endsAt: true, trialEndsAt: true },
-  });
-  const byStatus = Object.fromEntries(Object.values(SUBSCRIPTION_STATUSES).map((status) => [status, 0])) as Record<SubscriptionStatus, number>;
-  const byPlan = new Map<string, number>();
-  const withStatus = rows.map((row) => ({ ...row, effectiveStatus: effectiveSubscriptionStatus(row, now) }));
-  for (const row of withStatus) {
-    byStatus[row.effectiveStatus] += 1;
-    if (row.effectiveStatus === SUBSCRIPTION_STATUSES.ACTIVE || row.effectiveStatus === SUBSCRIPTION_STATUSES.TRIALING) {
-      const key = `${row.audience}:${row.planCode}`;
-      byPlan.set(key, (byPlan.get(key) ?? 0) + 1);
-    }
-  }
-  const recent = withStatus.slice(0, 50);
+  const live = { endsAt: { gt: now } };
+  const trialOver = { trialEndsAt: { lte: now } };
+  const where: Record<SubscriptionStatus, Prisma.SubscriptionWhereInput> = {
+    TRIALING: { status: SUBSCRIPTION_STATUSES.TRIALING, ...live, OR: [{ trialEndsAt: null }, { trialEndsAt: { gt: now } }] },
+    ACTIVE: { status: SUBSCRIPTION_STATUSES.ACTIVE, ...live },
+    PAST_DUE: { ...live, OR: [{ status: SUBSCRIPTION_STATUSES.PAST_DUE }, { status: SUBSCRIPTION_STATUSES.TRIALING, ...trialOver }] },
+    CANCELLED: { status: SUBSCRIPTION_STATUSES.CANCELLED },
+    EXPIRED: {
+      OR: [
+        { status: SUBSCRIPTION_STATUSES.EXPIRED },
+        { status: { in: [SUBSCRIPTION_STATUSES.TRIALING, SUBSCRIPTION_STATUSES.ACTIVE, SUBSCRIPTION_STATUSES.PAST_DUE] }, endsAt: { lte: now } },
+      ],
+    },
+  };
+  const statuses = Object.values(SUBSCRIPTION_STATUSES) as SubscriptionStatus[];
+  const [total, counts, planRows, recentRows] = await Promise.all([
+    prisma.subscription.count(),
+    Promise.all(statuses.map((status) => prisma.subscription.count({ where: where[status] }))),
+    prisma.subscription.groupBy({ by: ["audience", "planCode"], where: { OR: [where.ACTIVE, where.TRIALING] }, _count: { _all: true } }),
+    prisma.subscription.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      select: { id: true, userId: true, planCode: true, audience: true, months: true, status: true, source: true, startsAt: true, endsAt: true, trialEndsAt: true },
+    }),
+  ]);
+  const byStatus = Object.fromEntries(statuses.map((status, index) => [status, counts[index]])) as Record<SubscriptionStatus, number>;
+  const recent = recentRows.map((row) => ({ ...row, effectiveStatus: effectiveSubscriptionStatus(row, now) }));
   const users = await findManyInChunks([...new Set(recent.map((row) => row.userId))], 0, (chunk) =>
     prisma.user.findMany({ where: { id: { in: chunk } }, select: { id: true, name: true, email: true } }));
   const userOf = new Map(users.map((user) => [user.id, user]));
   return {
-    total: rows.length,
+    total,
     byStatus,
-    byPlan: [...byPlan.entries()].map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count),
+    byPlan: planRows.map((row) => ({ key: `${row.audience}:${row.planCode}`, count: row._count._all })).sort((a, b) => b.count - a.count),
     recent: recent.map((row) => ({ ...row, user: userOf.get(row.userId) ?? null })),
   };
 }
