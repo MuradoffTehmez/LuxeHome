@@ -497,7 +497,9 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   mesajını çıxarır və heç bir ödəniş düyməsi yoxdur; ödənişli rejimdə tariflər görünür, checkout hələ yoxdur (provayder
   adapteri ayrıca hissədir). Kabinet paket səhifəsi də tanıtım mesajını göstərir. Panel «Maliyyə və Monetizasiya»
   `/admin/maliyye` (`billing:manage`): plan başına imkan, limit, tarif, sınaq günləri, aktivlik; audit olunur. Limitlər
-  tanıtım mərhələsində tətbiq olunmur.
+  tanıtım mərhələsində tətbiq olunmur. Plan təsviri dil üzrə JSON-dur (`parsePlanDescription`; boş dil kataloq şüarına
+  qalır). `SUBSCRIPTIONS` söndürüləndə `/paketler` 404 verir, menyu/footer (`getHiddenPublicPaths`) və sitemap onu göstərmir.
+  Plan saxlaması yarımçıq qalsa plan və tariflər əvvəlki vəziyyətə bərpa olunur (`restorePlan`).
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 
