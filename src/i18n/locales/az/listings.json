@@ -272,5 +272,22 @@
     "emptyTitle": "Bu ərazidə hələ agentlik yoxdur",
     "emptyDescription": "{place} üzrə aktiv təklifi olan təsdiqlənmiş agentlik tapılmadı.",
     "allAgencies": "Bütün agentliklər"
+  },
+  "areaInsights": {
+    "title": "{place} haqqında qısa məlumat",
+    "description": "Göstəricilər yalnız saytdakı cari ictimai elanlardan hesablanır; ümumi bazar statistikası deyil.",
+    "total": "Aktiv elan",
+    "sale": "Satış",
+    "rent": "Kirayə",
+    "pricePerSqm": "Satış: m² medianı",
+    "monthlyRent": "Kirayə: aylıq median",
+    "sample": "{count} elan əsasında",
+    "notEnough": "Kifayət qədər elan yoxdur",
+    "medianNote": "Median — elanların ortadakı dəyəri; AZN ilə və sahəsi göstərilmiş elanlardan hesablanır.",
+    "filtersTitle": "Bu ərazidə axtarın",
+    "saleLink": "Satış elanları ({count})",
+    "rentLink": "Kirayə elanları ({count})",
+    "map": "Xəritədə bax",
+    "relatedTitle": "Əlaqəli ərazilər"
   }
 }

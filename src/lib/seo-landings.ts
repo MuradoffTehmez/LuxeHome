@@ -302,6 +302,8 @@ type TaxonomyLocation = {
 /** Yer adına uyğun azərbaycanca yerlik hal etiketi. */
 function placeLabelAz(location: TaxonomyLocation, isDistrict: boolean): string {
   if (!isDistrict) return `${location.name} metrosu yaxınlığında`;
+  // Şəhər/rayon səviyyəsi (#240) həm şəhəri, həm rayonu əhatə edir — neytral «üzrə» forması.
+  if (location.kind === LOCATION_KINDS.CITY) return `${location.name} üzrə`;
   switch (location.kind) {
     case LOCATION_KINDS.SETTLEMENT:
       return `${location.name} qəsəbəsində`;
@@ -335,6 +337,7 @@ function placeLabelForeign(
     NEIGHBORHOOD: `в массиве ${place}`,
   };
   const kind = location.kind ?? "";
+  if (kind === LOCATION_KINDS.CITY) return locale === "en" ? `in ${place}` : `— ${place}`;
   if (locale === "en") return en[kind] ?? `in ${place} district`;
   return ru[kind] ?? `в районе ${place}`;
 }
@@ -345,13 +348,14 @@ function placeLabelForeign(
  * nəqliyyat vaxtı və ya bazar iddiası yaratmır.
  */
 export function buildTaxonomyLandingDescriptor(
-  kind: "DISTRICT" | "METRO",
+  kind: "DISTRICT" | "METRO" | "CITY",
   location: TaxonomyLocation,
   locale: Locale = "az",
 ): SeoLanding {
+  const filters = kind === "DISTRICT" ? { districtSlug: location.slug } : kind === "CITY" ? { citySlug: location.slug } : { metroSlug: location.slug };
   if (locale !== "az") {
-    const isDistrict = kind === "DISTRICT";
-    const prefix = isDistrict ? "rayon" : "metro";
+    const isDistrict = kind !== "METRO";
+    const prefix = kind === "CITY" ? "seher" : isDistrict ? "rayon" : "metro";
     const place = localizeLocation(location, locale).name;
     const where = placeLabelForeign(location, place, isDistrict, locale);
     const heading = locale === "en" ? `Property ${where}` : `Недвижимость ${where}`;
@@ -364,7 +368,7 @@ export function buildTaxonomyLandingDescriptor(
         : `Сравнивайте активные предложения о продаже и аренде ${where} по цене, площади, комнатам и типу недвижимости.`,
       h1: heading,
       overline: locale === "en" ? (isDistrict ? "Search by area" : "Search near metro") : (isDistrict ? "Поиск по территории" : "Поиск у метро"),
-      filters: isDistrict ? { districtSlug: location.slug } : { metroSlug: location.slug },
+      filters,
       content: locale === "en"
         ? [
             `This page groups current public Luxe Home Estate listings ${where}. Available property types depend on the active portfolio, and listing cards show only information entered for each property.`,
@@ -386,8 +390,8 @@ export function buildTaxonomyLandingDescriptor(
       relatedPaths: ["/satilan-emlaklar", "/kiraye-emlaklar", "/bakida-satilan-menziller"],
     };
   }
-  const isDistrict = kind === "DISTRICT";
-  const prefix = isDistrict ? "rayon" : "metro";
+  const isDistrict = kind !== "METRO";
+  const prefix = kind === "CITY" ? "seher" : isDistrict ? "rayon" : "metro";
   const placeLabel = placeLabelAz(location, isDistrict);
   const areaContext = location.parent?.name ? `${location.parent.name} şəhərinin ${location.name} ərazisi` : location.name;
 
@@ -398,7 +402,7 @@ export function buildTaxonomyLandingDescriptor(
     description: `${placeLabel} satılan və kirayə mənzil, ev, ofis və obyektləri qiymət, sahə, otaq və əmlak növünə görə müqayisə edin.`,
     h1: `${placeLabel} daşınmaz əmlaklar`,
     overline: isDistrict ? "Ərazi üzrə seçim" : "Metro yaxınlığında seçim",
-    filters: isDistrict ? { districtSlug: location.slug } : { metroSlug: location.slug },
+    filters,
     content: content(
       `${areaContext} üzrə əmlak axtarışı yaşayış, investisiya və ya biznes məqsədinə uyğun meyarların əvvəlcədən müəyyənləşdirilməsi ilə daha səmərəli olur. Bu səhifə yalnız cari bazada ${placeLabel.toLocaleLowerCase("az-AZ")} qeyd edilmiş, ictimai statusda olan real elanları bir siyahıda göstərir. Mənzil, villa, həyət evi, torpaq, ofis və kommersiya obyekti kimi fərqli əmlak növləri mövcud portfeldən asılı olaraq nəticələrə daxil ola bilər. Kartlarda qiymət, sahə, otaq və ünvan göstəriciləri yalnız elan üçün daxil edilmiş həddə görünür və həmin məlumatlar seçimləri müqayisə etmək üçün ilkin əsas yaradır.`,
       `${placeLabel} variantları nəzərdən keçirərkən konkret binanın və ya küçənin gündəlik ehtiyaclara uyğunluğu yerində qiymətləndirilməlidir. İctimai nəqliyyat, avtomobil girişi, parklanma, məktəb, iş yeri və xidmət nöqtələrinə münasibət hər istifadəçinin marşrutuna görə dəyişir; buna görə səhifə ümumi üstünlük və ya zəmanətli çatma vaxtı iddiası vermir. Satış elanında mülkiyyət və sənəd məlumatı, kirayədə isə müddət, depozit, kommunal və təhvil şərtləri müqavilədən əvvəl ayrıca dəqiqləşdirilməlidir. Dəqiq ünvan paylaşılmayıbsa baxış təyin edilərkən lokasiya məsul şəxsdən təsdiqlənə bilər.`,
