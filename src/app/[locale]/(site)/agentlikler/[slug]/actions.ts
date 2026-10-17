@@ -17,8 +17,6 @@ import { hasVerifiedInteraction, isVerifiedReviewer, parseReviewForm, reviewRati
 export async function submitAgencyReview(_previous: ActionState, formData: FormData): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("phase2.agents");
-  const disabled = await featureDisabledFailure("RATINGS");
-  if (disabled) return disabled;
   let user;
   try {
     user = await requirePublicAction("review", locale);
@@ -26,6 +24,9 @@ export async function submitAgencyReview(_previous: ActionState, formData: FormD
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
+  // Bayraq guard-dan sonra yoxlanılır — anonim/kənar sorğu əvvəlcə same-origin və giriş yoxlamasından keçir.
+  const disabled = await featureDisabledFailure("RATINGS");
+  if (disabled) return disabled;
 
   const agencyId = String(formData.get("agencyId") ?? "").slice(0, 40);
   const parsed = parseReviewForm(formData);

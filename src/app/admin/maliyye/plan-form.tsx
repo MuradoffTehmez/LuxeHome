@@ -18,7 +18,7 @@ import { saveSubscriptionPlan } from "./actions";
 
 type PlanFormData = {
   id: string;
-  description: string | null;
+  description: { az?: string; en?: string; ru?: string };
   isActive: boolean;
   trialDays: number;
   capabilities: PlanCapabilities;
@@ -52,9 +52,17 @@ export function PlanForm({ plan }: { plan: PlanFormData }) {
           max={TRIAL_DAYS_MAX}
           required
         />
-        <div className="sm:col-span-2">
-          <AdminTextarea name="description" label={t("pages.finance.descriptionLabel")} defaultValue={plan.description ?? ""} maxLength={PLAN_DESCRIPTION_MAX} rows={2} />
-        </div>
+        {(["az", "en", "ru"] as const).map((locale) => (
+          <div key={locale} className="sm:col-span-2">
+            <AdminTextarea
+              name={`description_${locale}`}
+              label={t("pages.finance.descriptionLabelLocale", { locale: locale.toUpperCase() })}
+              defaultValue={plan.description[locale] ?? ""}
+              maxLength={PLAN_DESCRIPTION_MAX}
+              rows={2}
+            />
+          </div>
+        ))}
       </div>
 
       <fieldset className="mt-6">

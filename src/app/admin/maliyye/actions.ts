@@ -38,7 +38,10 @@ export async function saveSubscriptionPlan(_state: ActionState, formData: FormDa
   try {
     const plan = await prisma.subscriptionPlan.findUnique({
       where: { id },
-      select: { id: true, code: true, audience: true, capabilities: true, prices: { select: { months: true, priceMinor: true } } },
+      select: {
+        id: true, code: true, audience: true, description: true, isActive: true, trialDays: true, capabilities: true, limits: true,
+        prices: { select: { months: true, priceMinor: true, currency: true, isActive: true } },
+      },
     });
     if (!plan || !isPlanCode(plan.code)) return failure(msg("server.finance.notFound"));
 
@@ -68,25 +71,36 @@ export async function saveSubscriptionPlan(_state: ActionState, formData: FormDa
       prices.push({ months, priceMinor: value });
     }
 
-    const description = String(formData.get("description") ?? "").trim().slice(0, PLAN_DESCRIPTION_MAX) || null;
+    const descriptions: Record<string, string> = {};
+    for (const locale of ["az", "en", "ru"] as const) {
+      const text = String(formData.get(`description_${locale}`) ?? "").trim().slice(0, PLAN_DESCRIPTION_MAX);
+      if (text) descriptions[locale] = text;
+    }
+    const description = Object.keys(descriptions).length ? JSON.stringify(descriptions) : null;
     const isActive = formData.get("isActive") === "on";
     const hasLimits = PLAN_LIMITS.some((limit) => limits[limit] != null);
 
-    await prisma.subscriptionPlan.update({
-      where: { id: plan.id },
-      data: { description, isActive, trialDays, capabilities: JSON.stringify(capabilities), limits: hasLimits ? JSON.stringify(limits) : null },
-    });
-    // D1-də tranzaksiya yoxdur: hər tarif ayrıca, idempotent yazılır (təkrar saxlama eyni nəticəni verir).
-    for (const price of prices) {
-      if (price.priceMinor == null) {
-        await prisma.subscriptionPlanPrice.deleteMany({ where: { planId: plan.id, months: price.months } });
-      } else {
-        await prisma.subscriptionPlanPrice.upsert({
-          where: { planId_months: { planId: plan.id, months: price.months } },
-          create: { planId: plan.id, months: price.months, priceMinor: price.priceMinor },
-          update: { priceMinor: price.priceMinor, isActive: true },
-        });
+    // D1-də tranzaksiya yoxdur: plan və tariflər ardıcıl yazılır, hər hansı addım alınmasa əvvəlki vəziyyət
+    // (planın sahələri və bütün tariflər) bərpa olunur — yarımçıq qiymət cədvəli ictimai səhifəyə düşməsin.
+    try {
+      await prisma.subscriptionPlan.update({
+        where: { id: plan.id },
+        data: { description, isActive, trialDays, capabilities: JSON.stringify(capabilities), limits: hasLimits ? JSON.stringify(limits) : null },
+      });
+      for (const price of prices) {
+        if (price.priceMinor == null) {
+          await prisma.subscriptionPlanPrice.deleteMany({ where: { planId: plan.id, months: price.months } });
+        } else {
+          await prisma.subscriptionPlanPrice.upsert({
+            where: { planId_months: { planId: plan.id, months: price.months } },
+            create: { planId: plan.id, months: price.months, priceMinor: price.priceMinor },
+            update: { priceMinor: price.priceMinor, isActive: true },
+          });
+        }
       }
+    } catch (error) {
+      await restorePlan(plan).catch((restoreError: unknown) => console.error("[finance] plan bərpa olunmadı:", restoreError));
+      throw error;
     }
 
     await recordAudit(user, "UPDATE", "SubscriptionPlan", plan.id, `${plan.code} · ${plan.audience}`, {
@@ -98,5 +112,32 @@ export async function saveSubscriptionPlan(_state: ActionState, formData: FormDa
     return success(msg("server.finance.saved"));
   } catch (error) {
     return unexpected("abunə planı saxlanmadı", error, msg("server.common.unexpected"));
+  }
+}
+
+type PlanSnapshot = {
+  id: string;
+  description: string | null;
+  isActive: boolean;
+  trialDays: number;
+  capabilities: string;
+  limits: string | null;
+  prices: { months: number; priceMinor: number; currency: string; isActive: boolean }[];
+};
+
+/** Uğursuz saxlamadan sonra planı və tarifləri saxlamadan əvvəlki vəziyyətə qaytarır (idempotent). */
+async function restorePlan(snapshot: PlanSnapshot): Promise<void> {
+  await prisma.subscriptionPlan.update({
+    where: { id: snapshot.id },
+    data: { description: snapshot.description, isActive: snapshot.isActive, trialDays: snapshot.trialDays, capabilities: snapshot.capabilities, limits: snapshot.limits },
+  });
+  const keep = snapshot.prices.map((price) => price.months);
+  await prisma.subscriptionPlanPrice.deleteMany({ where: { planId: snapshot.id, months: { notIn: keep } } });
+  for (const price of snapshot.prices) {
+    await prisma.subscriptionPlanPrice.upsert({
+      where: { planId_months: { planId: snapshot.id, months: price.months } },
+      create: { planId: snapshot.id, months: price.months, priceMinor: price.priceMinor, currency: price.currency, isActive: price.isActive },
+      update: { priceMinor: price.priceMinor, currency: price.currency, isActive: price.isActive },
+    });
   }
 }

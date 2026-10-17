@@ -3215,7 +3215,6 @@
       "active": "Active",
       "inactive": "Inactive",
       "trialDays": "Trial days",
-      "descriptionLabel": "Description (optional)",
       "capabilities": "Plan features",
       "limits": "Service limits",
       "limitHint": "Empty — unlimited. Not enforced during the launch phase.",
@@ -3261,7 +3260,8 @@
         "agents": "Agents",
         "crmClients": "CRM clients",
         "exportsPerMonth": "Exports per month"
-      }
+      },
+      "descriptionLabelLocale": "Description — {locale} (optional)"
     }
   },
   "server": {

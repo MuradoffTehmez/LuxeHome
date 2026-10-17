@@ -3215,7 +3215,6 @@
       "active": "Aktiv",
       "inactive": "Deaktiv",
       "trialDays": "Sınaq günləri",
-      "descriptionLabel": "Təsvir (istəyə bağlı)",
       "capabilities": "Plan imkanları",
       "limits": "Xidmət limitləri",
       "limitHint": "Boş — limitsiz. Tanıtım mərhələsində tətbiq olunmur.",
@@ -3261,7 +3260,8 @@
         "agents": "Agent",
         "crmClients": "CRM müştərisi",
         "exportsPerMonth": "Aylıq ixrac"
-      }
+      },
+      "descriptionLabelLocale": "Təsvir — {locale} (istəyə bağlı)"
     }
   },
   "server": {

@@ -5,10 +5,12 @@ import {
   isPlanCode,
   isPlanDuration,
   parsePlanCapabilities,
+  parsePlanDescription,
   parsePlanLimits,
   type PlanAudience,
   type PlanCapabilities,
   type PlanCode,
+  type PlanDescription,
   type PlanDuration,
   type PlanLimits,
 } from "@/lib/subscriptions/plan-policy";
@@ -22,7 +24,7 @@ export type SubscriptionPlanView = {
   id: string;
   code: PlanCode;
   audience: PlanAudience;
-  description: string | null;
+  description: Partial<PlanDescription>;
   capabilities: PlanCapabilities;
   limits: PlanLimits;
   trialDays: number;
@@ -45,7 +47,7 @@ export async function getSubscriptionPlans(input: { audience?: PlanAudience; inc
       id: row.id,
       code: row.code,
       audience: row.audience,
-      description: row.description,
+      description: parsePlanDescription(row.description),
       capabilities: parsePlanCapabilities(row.capabilities, row.code),
       limits: parsePlanLimits(row.limits),
       trialDays: row.trialDays,

@@ -3215,7 +3215,6 @@
       "active": "Активен",
       "inactive": "Неактивен",
       "trialDays": "Дней пробного периода",
-      "descriptionLabel": "Описание (необязательно)",
       "capabilities": "Возможности плана",
       "limits": "Лимиты услуг",
       "limitHint": "Пусто — без лимита. На этапе запуска не применяется.",
@@ -3261,7 +3260,8 @@
         "agents": "Агенты",
         "crmClients": "Клиенты CRM",
         "exportsPerMonth": "Экспортов в месяц"
-      }
+      },
+      "descriptionLabelLocale": "Описание — {locale} (необязательно)"
     }
   },
   "server": {

@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
-import { PROJECTS_SECTION_PATH } from "@/lib/site-section-paths";
+import { PLANS_PAGE_PATH, PROJECTS_SECTION_PATH } from "@/lib/site-section-paths";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 /**
  * Paneldən açılıb-bağlanan ictimai sayt bölmələri.
@@ -21,5 +22,6 @@ export const isProjectsSectionEnabled = cache(async (): Promise<boolean> => {
 
 /** Naviqasiya və keçid siyahılarından çıxarılacaq marşrutlar. */
 export async function getHiddenPublicPaths(): Promise<string[]> {
-  return (await isProjectsSectionEnabled()) ? [] : [PROJECTS_SECTION_PATH];
+  const [projects, plans] = await Promise.all([isProjectsSectionEnabled(), isFeatureEnabled("SUBSCRIPTIONS")]);
+  return [...(projects ? [] : [PROJECTS_SECTION_PATH]), ...(plans ? [] : [PLANS_PAGE_PATH])];
 }

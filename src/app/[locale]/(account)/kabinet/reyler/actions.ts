@@ -14,8 +14,6 @@ import { featureDisabledFailure } from "@/lib/feature-guard";
 export async function replyToReview(kind: string, reviewId: string, text: string): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account.reviews");
-  const disabled = await featureDisabledFailure("RATINGS");
-  if (disabled) return disabled;
   let user;
   try {
     user = await requirePublicAction("review", locale);
@@ -23,6 +21,8 @@ export async function replyToReview(kind: string, reviewId: string, text: string
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
+  const disabled = await featureDisabledFailure("RATINGS");
+  if (disabled) return disabled;
   if (kind !== "agent" && kind !== "agency") return failure(t("notFound"));
   try {
     const result = await saveReviewReply({

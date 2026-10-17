@@ -4,6 +4,7 @@ import { LOCALES, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
 import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib/public-cache";
 import { isProjectsSectionEnabled } from "@/lib/site-sections";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 // Sitemap D1-dən oxuyur — build zamanı deyil, sorğu anında qurulur.
 export const dynamic = "force-dynamic";
@@ -30,6 +31,8 @@ export type SitemapSource = {
   dbLandings?: Array<{ path: string; locale: Locale; updatedAt: Date }>;
   /** `false` — «Yaşayış kompleksləri» paneldən bağlıdır, `/layiheler*` sitemap-a düşmür (#83). */
   projectsEnabled?: boolean;
+  /** `false` — abunə modulu söndürülüb (#242), `/paketler` 404 verir və sitemap-a düşmür. */
+  plansEnabled?: boolean;
 };
 
 function absoluteUrl(path: string): string {
@@ -67,7 +70,7 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
     ...localizedEntries("/lugat", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/kalkulyator", { changeFrequency: "monthly", priority: 0.6 }),
     ...localizedEntries("/emlakimi-sat", { changeFrequency: "monthly", priority: 0.7 }),
-    ...localizedEntries("/paketler", { changeFrequency: "monthly", priority: 0.5 }),
+    ...(source.plansEnabled === false ? [] : localizedEntries("/paketler", { changeFrequency: "monthly", priority: 0.5 })),
     ...localizedEntries("/investisiya", { changeFrequency: "weekly", priority: 0.6 }),
     ...localizedEntries("/elaqe", { changeFrequency: "yearly", priority: 0.5 }),
     ...localizedEntries("/mexfilik-siyaseti", { changeFrequency: "yearly", priority: 0.2 }),
@@ -143,10 +146,11 @@ export function buildSitemap(source: SitemapSource): MetadataRoute.Sitemap {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [source, knowledge, projectsEnabled] = await Promise.all([
+  const [source, knowledge, projectsEnabled, plansEnabled] = await Promise.all([
     getCachedSitemapEntries(),
     getCachedKnowledgeSitemapEntries(),
     isProjectsSectionEnabled(),
+    isFeatureEnabled("SUBSCRIPTIONS"),
   ]);
-  return buildSitemap({ ...source, knowledge, projectsEnabled });
+  return buildSitemap({ ...source, knowledge, projectsEnabled, plansEnabled });
 }

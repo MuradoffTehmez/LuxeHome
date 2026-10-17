@@ -7,7 +7,8 @@ import { getCachedKnowledgeSitemapEntries, getCachedSitemapEntries } from "@/lib
 import { getMarketReportIndex } from "@/lib/market-intelligence";
 import { parseSitemapFeed, urlsetXml, type SitemapEntry } from "@/lib/sitemap-xml";
 import { isProjectsSectionEnabled } from "@/lib/site-sections";
-import { PROJECTS_SECTION_PATH } from "@/lib/site-section-paths";
+import { PLANS_PAGE_PATH, PROJECTS_SECTION_PATH } from "@/lib/site-section-paths";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 export const dynamic = "force-dynamic";
 const absolute = (path: string, locale: Locale) => new URL(localizePath(path, locale), `${PRODUCTION_SITE_URL}/`).toString();
@@ -25,14 +26,15 @@ async function translatedIds(entityType: string, ids: string[], locale: Locale) 
 export async function GET(_request: Request, { params }: { params: Promise<{ feed: string }> }) {
   const descriptor = parseSitemapFeed((await params).feed);
   if (!descriptor) return new Response("Sitemap tapılmadı", { status: 404 });
-  const [cachedSource, knowledge, projectsEnabled] = await Promise.all([
+  const [cachedSource, knowledge, projectsEnabled, plansEnabled] = await Promise.all([
     getCachedSitemapEntries(),
     getCachedKnowledgeSitemapEntries(),
     isProjectsSectionEnabled(),
+    isFeatureEnabled("SUBSCRIPTIONS"),
   ]);
   // «Yaşayış kompleksləri» paneldən bağlıdırsa (#83) 404 verən URL-lər sitemap-a düşmür.
   const source = projectsEnabled ? cachedSource : { ...cachedSource, projects: [] };
-  const visibleStaticPaths = projectsEnabled ? staticPaths : staticPaths.filter((path) => path !== PROJECTS_SECTION_PATH);
+  const visibleStaticPaths = staticPaths.filter((path) => (projectsEnabled || path !== PROJECTS_SECTION_PATH) && (plansEnabled || path !== PLANS_PAGE_PATH));
   const { kind, locale, page } = descriptor;
   let entries: SitemapEntry[] = [];
   if (kind === "pages") {
