@@ -144,6 +144,30 @@ export function parsePriceInput(value: FormDataEntryValue | null): number | null
   return minor <= PLAN_PRICE_MAX_MINOR ? minor : undefined;
 }
 
+export type PlanDescription = { az: string; en: string; ru: string };
+
+/**
+ * Admin təsviri dil üzrə JSON-dur (`{ az, en, ru }`). Köhnə düz mətn AZ sayılır; boş dil `null` verir —
+ * ictimai səhifə onda kataloqdakı tərcümə olunmuş şüarı göstərir (başqa dildə AZ mətni çıxmasın).
+ */
+export function parsePlanDescription(raw: string | null | undefined): Partial<PlanDescription> {
+  if (!raw) return {};
+  try {
+    const value = JSON.parse(raw) as unknown;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      const result: Partial<PlanDescription> = {};
+      for (const locale of ["az", "en", "ru"] as const) {
+        const text = (value as Record<string, unknown>)[locale];
+        if (typeof text === "string" && text.trim()) result[locale] = text.trim();
+      }
+      return result;
+    }
+  } catch {
+    // Düz mətn — köhnə format.
+  }
+  return { az: raw };
+}
+
 /** Bir aylıq ekvivalentə görə endirim faizi (uzun müddətli tarifin üstünlüyü). */
 export function durationSavingsPercent(monthlyMinor: number | null, priceMinor: number, months: number): number | null {
   if (!monthlyMinor || months <= 1) return null;

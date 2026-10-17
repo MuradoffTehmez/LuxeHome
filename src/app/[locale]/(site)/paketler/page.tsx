@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { Check, Info, Megaphone, Minus } from "lucide-react";
+import { notFound } from "next/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { buttonClassName } from "@/components/ui/button";
@@ -51,6 +52,8 @@ export default async function PlansPage({ params }: Props) {
     getSubscriptionPlans(),
     getActivePromoCampaign(),
   ]);
+  // Abunə modulu söndürülübsə (#242) paket səhifəsi yoxdur — menyu, footer və sitemap da onu göstərmir.
+  if (!flags.SUBSCRIPTIONS) notFound();
   const mode = pricingMode(flags);
 
   const audienceSection = (audience: PlanAudience) => {
@@ -106,7 +109,7 @@ export default async function PlansPage({ params }: Props) {
       <article key={plan.id} className={cn("card-surface flex flex-col gap-4 rounded-xl border bg-paper p-6", plan.code === "PRO" ? "border-gold" : "border-line")}>
         <div>
           <h3 className="text-xl font-semibold text-ink">{t(`plans.${plan.code}.name`)}</h3>
-          <p className="mt-1 text-sm text-ink-soft">{plan.description || t(`plans.${plan.code}.tagline`)}</p>
+          <p className="mt-1 text-sm text-ink-soft">{plan.description[resolved] || t(`plans.${plan.code}.tagline`)}</p>
         </div>
         {mode.showPrices && (
           plan.prices.length > 0 ? (

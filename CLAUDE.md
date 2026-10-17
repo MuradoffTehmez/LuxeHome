@@ -497,7 +497,9 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   mesajını çıxarır və heç bir ödəniş düyməsi yoxdur; ödənişli rejimdə tariflər görünür, checkout hələ yoxdur (provayder
   adapteri ayrıca hissədir). Kabinet paket səhifəsi də tanıtım mesajını göstərir. Panel «Maliyyə və Monetizasiya»
   `/admin/maliyye` (`billing:manage`): plan başına imkan, limit, tarif, sınaq günləri, aktivlik; audit olunur. Limitlər
-  tanıtım mərhələsində tətbiq olunmur.
+  tanıtım mərhələsində tətbiq olunmur. Plan təsviri dil üzrə JSON-dur (`parsePlanDescription`; boş dil kataloq şüarına
+  qalır). `SUBSCRIPTIONS` söndürüləndə `/paketler` 404 verir, menyu/footer (`getHiddenPublicPaths`) və sitemap onu göstərmir.
+  Plan saxlaması yarımçıq qalsa plan və tariflər əvvəlki vəziyyətə bərpa olunur (`restorePlan`).
 - **Abunə və ödəniş arxitekturası (#246, PRD 16.5/16.7):** `Subscription` (statuslar `SUBSCRIPTION_STATUSES`, effektiv status
   vaxtdan hesablanır — `effectiveSubscriptionStatus`; plan kodu/müddət kopyalanır), `PaymentTransaction` (`idempotencyKey`
   unikal, faktura nömrəsi, uğursuz səbəb, geri ödəniş), `DiscountCode`, `PromoCampaign` (`0078`). Saf qaydalar

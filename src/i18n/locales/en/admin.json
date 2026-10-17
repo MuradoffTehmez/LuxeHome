@@ -3221,7 +3221,6 @@
       "active": "Active",
       "inactive": "Inactive",
       "trialDays": "Trial days",
-      "descriptionLabel": "Description (optional)",
       "capabilities": "Plan features",
       "limits": "Service limits",
       "limitHint": "Empty — unlimited. Not enforced during the launch phase.",
@@ -3358,7 +3357,8 @@
         "date": "Date",
         "amount": "Amount",
         "invoice": "Invoice"
-      }
+      },
+      "descriptionLabelLocale": "Description — {locale} (optional)"
     },
     "vip": {
       "title": "VIP listings",
