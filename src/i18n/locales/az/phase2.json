@@ -40,7 +40,32 @@
       "professionalism": "Peşəkarlıq",
       "overall": "Ümumi məmnunluq"
     },
-    "reviewDuplicateAgency": "Bu agentlik üçün artıq rəy göndərmisiniz."
+    "reviewDuplicateAgency": "Bu agentlik üçün artıq rəy göndərmisiniz.",
+    "report": {
+      "open": "Şikayət et",
+      "title": "Rəydən şikayət",
+      "description": "Moderator rəyi yoxlayacaq. Şikayət rəyi avtomatik gizlətmir.",
+      "reason": "Səbəb",
+      "comment": "İzah (istəyə bağlı, «Digər səbəb»də məcburi)",
+      "submit": "Şikayəti göndər",
+      "cancel": "Ləğv et",
+      "sent": "Şikayətiniz moderatora göndərildi.",
+      "errors": {
+        "login": "Şikayət etmək üçün hesabınıza daxil olun.",
+        "duplicate": "Bu rəydən artıq şikayət etmisiniz.",
+        "notFound": "Rəy tapılmadı.",
+        "invalid": "Səbəbi seçin; «Digər səbəb» üçün qısa izah yazın.",
+        "own": "Öz rəyinizdən şikayət edə bilməzsiniz."
+      },
+      "reasons": {
+        "FAKE": "Saxta rəy (real təcrübəyə əsaslanmır)",
+        "OFFENSIVE": "Təhqiramiz və ya nifrət dili",
+        "PERSONAL_DATA": "Şəxsi məlumat paylaşılıb",
+        "IRRELEVANT": "Agent/agentliklə əlaqəsi yoxdur",
+        "CONFLICT": "Maraqlar toqquşması (rəqib və ya əməkdaş yazıb)",
+        "OTHER": "Digər səbəb"
+      }
+    }
   },
   "reservation": {
     "title": "Əmlakı rezervasiya et",

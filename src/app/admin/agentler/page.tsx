@@ -15,9 +15,12 @@ import { PERMISSIONS, REVIEW_STATUSES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { AgentForm, EMPTY_AGENT_FORM } from "./agent-form";
-import { ReviewModerationList } from "./review-moderation";
+import { ReviewModerationList, ReviewReportQueue } from "./review-moderation";
+import { getReviewReportQueue } from "@/lib/review-reports";
 import {
   approveAgencyReview,
+  dismissReviewReports,
+  hideReportedReview,
   approveAgentReview,
   approveAndPublishAgent,
   createTestimonial,
@@ -48,7 +51,7 @@ export default async function AdminAgentsPage({
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
   const params = await searchParams;
   const status: AgentStatus = AGENT_STATUSES.includes(params.status as AgentStatus) ? (params.status as AgentStatus) : "all";
-  const [allAgents, reviews, testimonials, users, agencies, agencyReviews] = await Promise.all([
+  const [allAgents, reviews, testimonials, users, agencies, agencyReviews, reviewReports] = await Promise.all([
     prisma.agentProfile.findMany({
       include: { agency: { select: { name: true } }, _count: { select: { properties: true, reviews: true } } },
       orderBy: { name: "asc" },
@@ -59,6 +62,8 @@ export default async function AdminAgentsPage({
     prisma.agency.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     // Agentliyə birbaşa rəylər (#230) — eyni növbə qaydası.
     prisma.agencyReview.findMany({ where: { status: REVIEW_STATUSES.PENDING }, include: { agency: { select: { name: true } } }, orderBy: { createdAt: "asc" } }),
+    // Rəydən şikayətlər (#232).
+    getReviewReportQueue(),
   ]);
 
   // Təsdiq gözləyən = heç təsdiqlənməmiş və rədd edilməmiş profil (təsdiq növbəsi ilə eyni
@@ -184,6 +189,10 @@ export default async function AdminAgentsPage({
           reject={rejectAgentReview}
           publicDescription={t("pages.agents.reyAgentProfilindeIctimai")}
         />
+      </AdminCard>
+
+      <AdminCard id="rey-sikayetleri" title={t("pages.agents.reviewReports.title")} description={t("pages.agents.reviewReports.description")} className="mt-6" bodyClassName="p-0">
+        <ReviewReportQueue groups={reviewReports} hide={hideReportedReview} dismiss={dismissReviewReports} />
       </AdminCard>
 
       <AdminCard id="agentlik-reyleri" title={t("pages.agents.reviewModeration.agencyTitle")} className="mt-6" bodyClassName="p-0">

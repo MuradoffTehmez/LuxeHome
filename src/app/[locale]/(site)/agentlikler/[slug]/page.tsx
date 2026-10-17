@@ -464,6 +464,7 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                       <ReviewCard
                         key={review.id}
                         review={review}
+                        report={review.kind}
                         footer={review.agentName && review.agentSlug ? (
                           <>
                             {" · "}

@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { countOpenReviewReports } from "@/lib/review-reports";
 import { AGENCY_EMPLOYEE_STATUSES, REVIEW_STATUSES } from "@/lib/constants";
 
 /**
@@ -40,14 +41,16 @@ export type ApprovalCounts = {
 };
 
 export async function getApprovalCounts(): Promise<ApprovalCounts> {
-  const [agencies, agents, employees, agentReviews, agencyReviews] = await Promise.all([
+  const [agencies, agents, employees, agentReviews, agencyReviews, reviewReports] = await Promise.all([
     prisma.agency.count({ where: PENDING_AGENCY_WHERE }),
     prisma.agentProfile.count({ where: PENDING_AGENT_WHERE }),
     prisma.agencyEmployee.count({ where: { status: AGENCY_EMPLOYEE_STATUSES.PENDING } }),
     prisma.agentReview.count({ where: { status: REVIEW_STATUSES.PENDING } }),
     // Agentliyə birbaşa rəylər (#230) eyni növbədədir.
     prisma.agencyReview.count({ where: { status: REVIEW_STATUSES.PENDING } }),
+    // Açıq rəy şikayətləri (#232) də moderatorun işidir.
+    countOpenReviewReports(),
   ]);
-  const reviews = agentReviews + agencyReviews;
+  const reviews = agentReviews + agencyReviews + reviewReports;
   return { agencies, agents, employees, reviews, total: agencies + agents + employees + reviews };
 }

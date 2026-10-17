@@ -1605,6 +1605,28 @@ model AgencyReview {
   @@index([status, createdAt])
 }
 
+/// Rəydən şikayət (#232, PRD 10.5): agent və ya agentlik rəyi (`reviewKind` + `reviewId`, FK-sız —
+/// iki cədvələ işarə edir). İstifadəçinin rəy başına bir şikayəti var; moderator rəyi gizlədir və ya
+/// şikayəti rədd edir, qərar şikayətçiyə bildirilir.
+model ReviewReport {
+  id           String    @id @default(cuid())
+  /// `agent` | `agency` (`REVIEW_REPORT_KINDS`).
+  reviewKind   String
+  reviewId     String
+  reporterId   String
+  /// `REVIEW_REPORT_REASONS`.
+  reason       String
+  comment      String?
+  /// `OPEN` | `RESOLVED` (rəy gizlədildi) | `DISMISSED` (`REVIEW_REPORT_STATUSES`).
+  status       String    @default("OPEN")
+  resolvedById String?
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@unique([reviewKind, reviewId, reporterId])
+  @@index([status, createdAt])
+}
+
 /// Şirkət rəyi admin təsdiqindən sonra home/haqqımızda səthlərində göstərilə bilər.
 model Testimonial {
   id           String    @id @default(cuid())

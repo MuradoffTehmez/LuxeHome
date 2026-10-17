@@ -93,6 +93,10 @@ const COPY = {
     listingNeedsInfo: (title: string) => `«${title}» elanı dərc olunmazdan əvvəl moderator düzəliş istəyir. Elanı redaktə edib yadda saxlayın — o yenidən yoxlamaya düşəcək.`,
     listingInfoRequestedTitle: "Elanınız barədə izahat istənilir",
     listingInfoRequested: (title: string) => `«${title}» elanı barədə ziyarətçi şikayəti yoxlanılır. Moderatorların sualını oxuyun və elanı düzəldin və ya bizimlə əlaqə saxlayın.`,
+    reviewReportTitle: "Rəydən şikayətinizə baxıldı",
+    reviewReport: (target: string, hidden: boolean) => hidden
+      ? `«${target}» haqqındakı rəydən şikayətiniz təsdiqləndi: rəy gizlədildi və reytinqdən çıxarıldı.`
+      : `«${target}» haqqındakı rəyə baxıldı: rəy qaydaları pozmur və saytda qalır.`,
     reportOutcomeTitle: "Şikayətinizə baxıldı",
     reportOutcome: (title: string, outcome: ReportOutcome) => outcome === "confirmed"
       ? `«${title}» elanı barədə şikayətiniz təsdiqləndi və elana tədbir görüldü. Təşəkkür edirik.`
@@ -174,6 +178,10 @@ const COPY = {
     listingNeedsInfo: (title: string) => `A moderator has requested changes to the listing “${title}” before it can be published. Edit and save the listing — it will be reviewed again.`,
     listingInfoRequestedTitle: "Clarification requested for your listing",
     listingInfoRequested: (title: string) => `A visitor report about the listing “${title}” is being reviewed. Please read the moderators' question and correct the listing or contact us.`,
+    reviewReportTitle: "Your review report was reviewed",
+    reviewReport: (target: string, hidden: boolean) => hidden
+      ? `Your report about a review of “${target}” was upheld: the review was hidden and removed from the rating.`
+      : `The review of “${target}” was checked: it does not break the rules and stays on the site.`,
     reportOutcomeTitle: "Your report was reviewed",
     reportOutcome: (title: string, outcome: ReportOutcome) => outcome === "confirmed"
       ? `Your report about the listing “${title}” was confirmed and action was taken. Thank you.`
@@ -255,6 +263,10 @@ const COPY = {
     listingNeedsInfo: (title: string) => `Модератор просит исправить объявление «${title}» перед публикацией. Отредактируйте и сохраните его — оно снова попадёт на проверку.`,
     listingInfoRequestedTitle: "По вашему объявлению запрошены пояснения",
     listingInfoRequested: (title: string) => `Проверяется жалоба посетителя на объявление «${title}». Прочитайте вопрос модераторов и исправьте объявление или свяжитесь с нами.`,
+    reviewReportTitle: "Ваша жалоба на отзыв рассмотрена",
+    reviewReport: (target: string, hidden: boolean) => hidden
+      ? `Ваша жалоба на отзыв о «${target}» подтверждена: отзыв скрыт и исключён из рейтинга.`
+      : `Отзыв о «${target}» проверен: он не нарушает правила и остаётся на сайте.`,
     reportOutcomeTitle: "Ваша жалоба рассмотрена",
     reportOutcome: (title: string, outcome: ReportOutcome) => outcome === "confirmed"
       ? `Ваша жалоба на объявление «${title}» подтверждена, меры приняты. Спасибо.`
@@ -733,5 +745,21 @@ export async function noticeAgencyTask(input: {
     (copy) => input.stage === "assigned"
       ? { title: copy.taskAssignedTitle, content: copy.taskAssigned(input.taskTitle, input.agencyName) }
       : { title: copy.taskCompletedTitle, content: copy.taskCompleted(input.taskTitle, input.actorName) },
+  );
+}
+
+/** Rəydən şikayət edənə: moderator qərarı (#232). Açar alıcını daşıyır — qərar bir neçə şikayətçiyə gedir. */
+export async function noticeReviewReportOutcome(input: {
+  userId: string;
+  reviewId: string;
+  targetName: string;
+  hidden: boolean;
+}): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.REVIEW_REPORT,
+    "/kabinet/bildirisler",
+    `review-report:${input.reviewId}:${input.userId}`,
+    (copy) => ({ title: copy.reviewReportTitle, content: copy.reviewReport(input.targetName, input.hidden) }),
   );
 }

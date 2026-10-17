@@ -37,6 +37,7 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
   LEAD_ESCALATION: AlarmClock,
   LISTING_TRANSFER: ArrowLeftRight,
   AGENCY_TASK: ClipboardList,
+  REVIEW_REPORT: Flag,
 };
 
 function NotificationRow({ item }: { item: NotificationListItem }) {

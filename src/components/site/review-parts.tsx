@@ -1,7 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { BadgeCheck, MessageSquareReply, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { ReviewCriterion } from "@/lib/constants";
+import { REVIEW_REPORT_REASONS, type ReviewCriterion, type ReviewReportKind } from "@/lib/constants";
+import { ReviewReportButton } from "@/components/site/review-report-button";
 
 /**
  * Rəy göstərişinin ortaq hissələri (#230, PRD 10.2–10.5): meyar ortalamaları, «Təsdiqlənmiş əlaqə»
@@ -39,7 +40,18 @@ export type PublicReview = {
   replyAuthorName: string | null;
 };
 
-export async function ReviewCard({ review, footer, className }: { review: PublicReview; footer?: React.ReactNode; className?: string }) {
+export async function ReviewCard({
+  review,
+  footer,
+  className,
+  report,
+}: {
+  review: PublicReview;
+  footer?: React.ReactNode;
+  className?: string;
+  /** Rəydən şikayət (#232) — admin daxil etdiyi müştəri rəyində (`Testimonial`) yoxdur. */
+  report?: ReviewReportKind | null;
+}) {
   const t = await getTranslations("phase2");
   return (
     <li className={cn("flex flex-col gap-2 rounded-xl border border-line bg-paper p-4 shadow-xs", className)}>
@@ -58,6 +70,22 @@ export async function ReviewCard({ review, footer, className }: { review: Public
       </div>
       <p className="text-sm leading-relaxed text-ink-soft [overflow-wrap:anywhere]">{review.comment}</p>
       <p className="mt-auto text-xs text-ink-muted">{review.customerName}{footer}</p>
+      {report && (
+        <ReviewReportButton
+          kind={report}
+          reviewId={review.id}
+          labels={{
+            open: t("agents.report.open"),
+            title: t("agents.report.title"),
+            description: t("agents.report.description"),
+            reason: t("agents.report.reason"),
+            reasons: Object.fromEntries(REVIEW_REPORT_REASONS.map((value) => [value, t(`agents.report.reasons.${value}`)])) as Record<(typeof REVIEW_REPORT_REASONS)[number], string>,
+            comment: t("agents.report.comment"),
+            submit: t("agents.report.submit"),
+            cancel: t("agents.report.cancel"),
+          }}
+        />
+      )}
       {review.replyText && (
         <div className="mt-1 rounded-sm border-l-2 border-gold bg-ivory px-3 py-2 text-sm">
           <p className="flex items-center gap-1.5 text-xs font-medium text-ink">

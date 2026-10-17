@@ -904,6 +904,13 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   rədd etmir. Agent öz rəylərinə, agentlik sahibi agentlik rəylərinə `/kabinet/reyler`-də ictimai cavab yazır (yalnız təsdiqlənmiş
   rəy, `saveReviewReply` şərti `updateMany`). İctimai reytinq yalnız `APPROVED` rəylərdən qurulur; admin növbəsi
   `/admin/agentler#reyler` və `#agentlik-reyleri`, menyu sayğacı hər ikisini sayır.
+- **Rəydən şikayət (#232, PRD 10.5)** `ReviewReport` (`lib/review-reports.ts`): rəy kartındakı «Şikayət et»
+  (`ReviewReportButton`, mətnlər server komponentindən prop kimi — ictimai client kataloqu məhduddur) → `reportReview`
+  action. Hədəf FK-sızdır (`reviewKind` `agent`|`agency` + `reviewId`), yalnız `APPROVED` rəyə, istifadəçi başına bir dəfə
+  (unikal indeks), öz rəyinə yox, `OTHER` izahsız yox. Admin `/admin/agentler#rey-sikayetleri` rəy üzrə qruplaşdırır:
+  «Rəyi gizlət» → `HIDDEN` (reytinqdən çıxır), «Şikayəti rədd et» → rəy qalır; qərar açıq şikayətləri şərti `updateMany`
+  ilə götürür (təkrar qərar heç nə etmir), rəy yazılmasa geri `OPEN` olur, şikayətçilərə `REVIEW_REPORT` bildirişi gedir.
+  Menyu sayğacı açıq şikayətləri də sayır.
 - **Ərazi agentlikləri:** `/rayon/<slug>` altında blok və `/rayon/<slug>/agentlikler` landing-i
   (`getPublicAgencyCatalog({ area })`, ərazi qaydası rayon səhifəsi ilə eynidir). 2-dən az agentlik varsa noindex.
 

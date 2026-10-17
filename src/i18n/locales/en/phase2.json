@@ -40,7 +40,32 @@
       "professionalism": "Professionalism",
       "overall": "Overall satisfaction"
     },
-    "reviewDuplicateAgency": "You have already reviewed this agency."
+    "reviewDuplicateAgency": "You have already reviewed this agency.",
+    "report": {
+      "open": "Report",
+      "title": "Report a review",
+      "description": "A moderator will check the review. Reporting does not hide it automatically.",
+      "reason": "Reason",
+      "comment": "Details (optional, required for “Other reason”)",
+      "submit": "Send report",
+      "cancel": "Cancel",
+      "sent": "Your report was sent to a moderator.",
+      "errors": {
+        "login": "Sign in to report a review.",
+        "duplicate": "You have already reported this review.",
+        "notFound": "Review not found.",
+        "invalid": "Choose a reason; add a short explanation for “Other reason”.",
+        "own": "You cannot report your own review."
+      },
+      "reasons": {
+        "FAKE": "Fake review (not based on real experience)",
+        "OFFENSIVE": "Offensive or hateful language",
+        "PERSONAL_DATA": "Shares personal data",
+        "IRRELEVANT": "Not about this agent/agency",
+        "CONFLICT": "Conflict of interest (competitor or employee)",
+        "OTHER": "Other reason"
+      }
+    }
   },
   "reservation": {
     "title": "Reserve this property",
