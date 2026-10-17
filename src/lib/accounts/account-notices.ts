@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { isUniqueViolation } from "@/lib/media/upload-record";
 import { NOTIFICATION_TYPES, type Locale, type NotificationType } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
+import { channelsForType, parseCategoryChannels } from "@/lib/notification-categories";
 import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
@@ -103,6 +104,12 @@ const COPY = {
       : `«${title}» elanı üçün VIP sorğusu rədd edildi${note ? `: ${note}` : "."}`,
     vipRevokedTitle: "VIP statusu dayandırıldı",
     vipRevoked: (title: string, note: string | null) => `«${title}» elanının VIP statusu dayandırıldı${note ? `: ${note}` : "."}`,
+    newReviewTitle: "Sizə yeni rəy yazıldı",
+    newReview: (target: string, rating: number) => `«${target}» haqqında ${rating} ulduzlu yeni rəy dərc olundu.`,
+    subscriptionTitle: "Abunə statusu dəyişdi",
+    subscription: (plan: string, active: boolean, until: string) => active ? `${plan} abunəsi aktivdir (${until}-dək).` : `${plan} abunəsi dayandırıldı.`,
+    securityPasswordTitle: "Parolunuz dəyişdirildi",
+    securityPassword: "Hesabınızın parolu dəyişdirildi və digər cihazlardakı sessiyalar bağlandı. Bunu siz etməmisinizsə, dərhal bizimlə əlaqə saxlayın.",
     reviewReportTitle: "Rəydən şikayətinizə baxıldı",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `«${target}» haqqındakı rəydən şikayətiniz təsdiqləndi: rəy gizlədildi və reytinqdən çıxarıldı.`
@@ -198,6 +205,12 @@ const COPY = {
       : `The VIP request for «${title}» was declined${note ? `: ${note}` : "."}`,
     vipRevokedTitle: "VIP status ended",
     vipRevoked: (title: string, note: string | null) => `VIP status for «${title}» was ended${note ? `: ${note}` : "."}`,
+    newReviewTitle: "You received a new review",
+    newReview: (target: string, rating: number) => `A new ${rating}-star review about «${target}» was published.`,
+    subscriptionTitle: "Subscription status changed",
+    subscription: (plan: string, active: boolean, until: string) => active ? `Your ${plan} subscription is active (until ${until}).` : `Your ${plan} subscription was stopped.`,
+    securityPasswordTitle: "Your password was changed",
+    securityPassword: "Your account password was changed and sessions on other devices were signed out. If this was not you, contact us immediately.",
     reviewReportTitle: "Your review report was reviewed",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `Your report about a review of “${target}” was upheld: the review was hidden and removed from the rating.`
@@ -293,6 +306,12 @@ const COPY = {
       : `VIP-запрос для «${title}» отклонён${note ? `: ${note}` : "."}`,
     vipRevokedTitle: "VIP-статус прекращён",
     vipRevoked: (title: string, note: string | null) => `VIP-статус объявления «${title}» прекращён${note ? `: ${note}` : "."}`,
+    newReviewTitle: "Вам оставили новый отзыв",
+    newReview: (target: string, rating: number) => `Опубликован новый отзыв о «${target}» с оценкой ${rating}.`,
+    subscriptionTitle: "Статус подписки изменился",
+    subscription: (plan: string, active: boolean, until: string) => active ? `Подписка ${plan} активна (до ${until}).` : `Подписка ${plan} остановлена.`,
+    securityPasswordTitle: "Пароль изменён",
+    securityPassword: "Пароль аккаунта изменён, сессии на других устройствах завершены. Если это были не вы, срочно свяжитесь с нами.",
     reviewReportTitle: "Ваша жалоба на отзыв рассмотрена",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `Ваша жалоба на отзыв о «${target}» подтверждена: отзыв скрыт и исключён из рейтинга.`
@@ -323,22 +342,28 @@ async function notifyAccount(
   build: (copy: NoticeCopy) => { title: string; content: string },
 ): Promise<boolean> {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { email: true, locale: true, isActive: true },
-    });
+    const [user, preference] = await Promise.all([
+      prisma.user.findUnique({ where: { id: userId }, select: { email: true, locale: true, isActive: true } }),
+      prisma.notificationPreference.findUnique({ where: { userId }, select: { categoryChannels: true } }),
+    ]);
     if (!user?.isActive) return true;
+    // İstifadəçinin kateqoriya × kanal seçimi (#252, PRD 17.4); təhlükəsizlik bildirişi həmişə gedir.
+    const channels = channelsForType(type, parseCategoryChannels(preference?.categoryChannels));
     const locale = localeOf(user.locale);
     const copy = COPY[locale];
     const { title, content } = build(copy);
-    let stored = true;
-    await prisma.notification.create({
-      data: { userId, type, title, content, actionUrl: path, dedupeKey },
-    }).catch((error: unknown) => {
-      // Eyni açarla bildiriş artıq var — təkrar cəhd sayılır, çatdırılıb.
-      stored = isUniqueViolation(error);
-    });
-    if (!stored) return false;
+    if (channels.inApp) {
+      let stored = true;
+      await prisma.notification.create({
+        data: { userId, type, title, content, actionUrl: path, dedupeKey },
+      }).catch((error: unknown) => {
+        // Eyni açarla bildiriş artıq var — təkrar cəhd sayılır, çatdırılıb.
+        stored = isUniqueViolation(error);
+      });
+      if (!stored) return false;
+    }
+    // Saytdaxili kanal söndürülübsə e-poçtun təkrarını `dedupeKey` qoruya bilmir — e-poçt yalnız seçilibsə gedir.
+    if (!channels.email) return true;
     const url = siteUrl(localizePath(path, locale));
     // E-poçt bildirişləri söndürülübsə (#242) `sendEmail` buraxır; kabinet bildirişi yenə yazılır.
     await sendEmail({
@@ -826,5 +851,38 @@ export async function noticePromotionDecision(input: { userId: string; campaignI
     "/kabinet/elanlar",
     `promotion:${input.campaignId}:${input.approved ? "approved" : "rejected"}`,
     (copy) => ({ title: copy.promotionDecisionTitle, content: copy.promotionDecision(input.title, input.approved, input.days, input.note) }),
+  );
+}
+
+/** Agentə və ya agentlik sahibinə: rəyi təsdiqləndi və dərc olundu (#252, PRD 17.3 «Yeni rəy»). */
+export async function noticeNewReview(input: { userId: string; reviewId: string; targetName: string; rating: number }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.REVIEW,
+    "/kabinet/reyler",
+    `review:${input.reviewId}`,
+    (copy) => ({ title: copy.newReviewTitle, content: copy.newReview(input.targetName, input.rating) }),
+  );
+}
+
+/** Abunəçiyə: abunə təyin edildi və ya dayandırıldı (#252, PRD 17.3 «Abunə statusu»). */
+export async function noticeSubscriptionStatus(input: { userId: string; subscriptionId: string; plan: string; active: boolean; until: string }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.SUBSCRIPTION,
+    "/paketler",
+    `subscription:${input.subscriptionId}:${input.active ? "active" : "stopped"}`,
+    (copy) => ({ title: copy.subscriptionTitle, content: copy.subscription(input.plan, input.active, input.until) }),
+  );
+}
+
+/** Kritik təhlükəsizlik xəbərdarlığı (#252): parol dəyişdi — istifadəçi bu bildirişi söndürə bilmir. */
+export async function noticePasswordChanged(input: { userId: string; changedAt: Date }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.SECURITY,
+    "/kabinet/profil",
+    `security:password:${input.userId}:${input.changedAt.getTime()}`,
+    (copy) => ({ title: copy.securityPasswordTitle, content: copy.securityPassword }),
   );
 }

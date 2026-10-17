@@ -332,7 +332,10 @@
       "AGENCY_TASK": "Agentlik tapşırığı",
       "REVIEW_REPORT": "Rəydən şikayət",
       "VIP": "VIP elan",
-      "PROMOTION": "İrəli çəkmə"
+      "PROMOTION": "İrəli çəkmə",
+      "REVIEW": "Yeni rəy",
+      "SUBSCRIPTION": "Abunə",
+      "SECURITY": "Təhlükəsizlik"
     },
     "partnershipType": {
       "BROKER": "Broker",

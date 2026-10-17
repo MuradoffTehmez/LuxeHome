@@ -13,7 +13,7 @@ import { recordDomainEvent } from "@/lib/admin/events";
 import { parseSingleImage } from "@/lib/admin/images";
 import { prisma } from "@/lib/prisma";
 import { isReviewReportKind, resolveReviewReports } from "@/lib/review-reports";
-import { noticeReviewReportOutcome } from "@/lib/accounts/account-notices";
+import { noticeNewReview, noticeReviewReportOutcome } from "@/lib/accounts/account-notices";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { slugify } from "@/lib/utils";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
@@ -183,9 +183,13 @@ async function moderateReview(id: string, status: string): Promise<ActionState> 
     const review = await prisma.agentReview.update({
       where: { id },
       data: { status, moderatedAt: new Date() },
-      select: { id: true, customerName: true, agent: { select: { slug: true } } },
+      select: { id: true, customerName: true, rating: true, agent: { select: { slug: true, name: true, userId: true } } },
     });
     await recordAudit(actor, "STATUS_CHANGE", "AgentReview", id, `${review.customerName} — ${status}`);
+    // «Yeni rəy» (#252): təsdiqlənən rəy agentə bildirilir (açar rəy üzrədir — təkrar təsdiq təkrarlamır).
+    if (status === REVIEW_STATUSES.APPROVED && review.agent.userId) {
+      await noticeNewReview({ userId: review.agent.userId, reviewId: review.id, targetName: review.agent.name, rating: review.rating });
+    }
     revalidatePath("/admin/agentler");
     revalidatePublicContent("agent", review.agent.slug);
     revalidatePublicContent("property");
@@ -218,9 +222,12 @@ async function moderateAgencyReview(id: string, status: string): Promise<ActionS
     const review = await prisma.agencyReview.update({
       where: { id },
       data: { status, moderatedAt: new Date() },
-      select: { id: true, customerName: true, agency: { select: { slug: true } } },
+      select: { id: true, customerName: true, rating: true, agency: { select: { slug: true, name: true, userId: true } } },
     });
     await recordAudit(actor, "STATUS_CHANGE", "AgencyReview", id, `${review.customerName} — ${status}`);
+    if (status === REVIEW_STATUSES.APPROVED) {
+      await noticeNewReview({ userId: review.agency.userId, reviewId: review.id, targetName: review.agency.name, rating: review.rating });
+    }
     revalidatePath("/admin/agentler");
     revalidatePublicContent("agency", review.agency.slug);
     return success(status === REVIEW_STATUSES.APPROVED ? msg("server.agentler.reyTesdiqlendi") : msg("server.agentler.reyReddEdildi"));

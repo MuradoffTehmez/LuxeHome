@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { AlarmClock, ArrowLeftRight, Bookmark, ClipboardList, CalendarClock, CheckCheck, Crown, Flag, MessageSquare, ShieldCheck, Sparkles, Trash2, TrendingDown, TrendingUp, Users } from "lucide-react";
+import { AlarmClock, ArrowLeftRight, Bookmark, ClipboardList, CalendarClock, CheckCheck, Crown, Flag, Layers, MessageSquare, ShieldAlert, ShieldCheck, Star, Sparkles, Trash2, TrendingDown, TrendingUp, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Locale, NotificationType } from "@/lib/constants";
@@ -40,6 +40,9 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
   REVIEW_REPORT: Flag,
   VIP: Crown,
   PROMOTION: TrendingUp,
+  REVIEW: Star,
+  SUBSCRIPTION: Layers,
+  SECURITY: ShieldAlert,
 };
 
 function NotificationRow({ item }: { item: NotificationListItem }) {

@@ -1412,6 +1412,8 @@ model NotificationPreference {
   reservationWeb        Boolean  @default(true)
   reservationPush       Boolean  @default(false)
   recommendationEnabled Boolean  @default(true)
+  /// Kateqoriya × kanal seçimi (#252, PRD 17.4) — JSON (`lib/notification-categories.ts`); boş — hamısı açıq.
+  categoryChannels      String?
   quietHoursStart       String?
   quietHoursEnd         String?
   updatedAt             DateTime @updatedAt

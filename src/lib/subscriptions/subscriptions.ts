@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ACCOUNT_TYPES, SUBSCRIPTION_SOURCES, SUBSCRIPTION_STATUSES, type SubscriptionStatus } from "@/lib/constants";
 import { findManyInChunks } from "@/lib/d1-chunks";
+import { noticeSubscriptionStatus } from "@/lib/accounts/account-notices";
 import { isPlanDuration } from "@/lib/subscriptions/plan-policy";
 import { effectiveSubscriptionStatus, parseCampaignMessage, subscriptionEndsAt, trialEndsAt, type CampaignMessage } from "@/lib/subscriptions/subscription-policy";
 
@@ -56,8 +57,10 @@ export async function grantSubscription(input: {
       note: input.note?.trim().slice(0, 300) || null,
       createdById: input.actorId,
     },
-    select: { id: true },
+    select: { id: true, endsAt: true },
   });
+  // «Abunə statusu» (#252) bildirişi — tarix ISO gün formatındadır (dildən asılı olmayan).
+  await noticeSubscriptionStatus({ userId: user.id, subscriptionId: subscription.id, plan: plan.code, active: true, until: subscription.endsAt.toISOString().slice(0, 10) });
   return { ok: true, subscriptionId: subscription.id };
 }
 
@@ -66,6 +69,10 @@ export async function cancelSubscription(id: string, now = new Date()): Promise<
     where: { id, status: { notIn: [SUBSCRIPTION_STATUSES.CANCELLED, SUBSCRIPTION_STATUSES.EXPIRED] } },
     data: { status: SUBSCRIPTION_STATUSES.CANCELLED, cancelledAt: now },
   });
+  if (count > 0) {
+    const row = await prisma.subscription.findUnique({ where: { id }, select: { userId: true, planCode: true } });
+    if (row) await noticeSubscriptionStatus({ userId: row.userId, subscriptionId: id, plan: row.planCode, active: false, until: "" });
+  }
   return count > 0;
 }
 

@@ -526,6 +526,13 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   başladır; `PROMOTION_SELF_SERVICE_ENABLED` açıqdırsa sorğu dərhal başlayır. Təkrar qaydası: elan başına bir açıq
   sorğu/aktiv kampaniya, bitəndən sonra `PROMOTION_COOLDOWN_DAYS` fasilə. Bitmə 10 dəqiqəlik cron-dadır (`expirePromotions`
   — `escalate` işi) ki, sıralama üstünlüyü gecikməsin. Statistika VIP kimi dövr günləri üzrə toplu oxunur.
+- **Bildiriş mərkəzi (#252, PRD Modul 15):** hər `NotificationType` PRD 17.3 kateqoriyasına düşür
+  (`NOTIFICATION_TYPE_CATEGORY`, `lib/notification-categories.ts` — `Record` olduğu üçün yeni tip typecheck-də yıxılır).
+  İstifadəçi `/kabinet/bildirisler`-də kateqoriya × kanal (sayt, e-poçt; SMS/Telegram «tezliklə», deaktiv) seçir —
+  `NotificationPreference.categoryChannels` JSON (`0081`). `notifyAccount()` seçimə tabedir: saytdaxili söndürülübsə sətir
+  yazılmır, e-poçt söndürülübsə məktub getmir. **`SECURITY` kritikdir** — seçim ona tətbiq olunmur və saxlanmır
+  (`noticePasswordChanged` — kabinetdə parol dəyişəndə). Yeni hadisələr: `noticeNewReview` (agent/agentlik rəyi təsdiqlənəndə),
+  `noticeSubscriptionStatus` (abunə təyini/ləğvi). Köhnə saxlanmış axtarış/qiymət/rezervasiya matrisi ayrıca qalır.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 
