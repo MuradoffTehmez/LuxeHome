@@ -1123,7 +1123,17 @@
     "uniqueNote": "Unique views count the same visitor once per day; bots are excluded.",
     "priceHistory": "Price history",
     "priceHistoryEmpty": "The price has not changed — current price {price}.",
-    "backToAnalytics": "Back to analytics"
+    "backToAnalytics": "Back to analytics",
+    "export": {
+      "title": "Report:",
+      "csv": "CSV",
+      "xlsx": "Excel",
+      "pdf": "PDF",
+      "pdfHint": "Choose “Save as PDF” in the print dialog",
+      "day": "Day",
+      "min": "Min (₼)",
+      "max": "Max (₼)"
+    }
   },
   "reports": {
     "metaTitle": "My reports",
@@ -1449,7 +1459,17 @@
     "sale": "Sale",
     "rent": "Rent",
     "priceFrom": "{from} ₼ and above",
-    "empty": "No data for this period."
+    "empty": "No data for this period.",
+    "export": {
+      "title": "Report:",
+      "csv": "CSV",
+      "xlsx": "Excel",
+      "pdf": "PDF",
+      "pdfHint": "Choose “Save as PDF” in the print dialog",
+      "day": "Day",
+      "min": "Min (₼)",
+      "max": "Max (₼)"
+    }
   },
   "assignments": {
     "metaTitle": "Listing assignments",

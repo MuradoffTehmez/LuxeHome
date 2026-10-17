@@ -262,7 +262,7 @@ export async function Footer() {
   }));
 
   return (
-    <footer className="on-dark relative border-t border-line-dark bg-navy text-ink-invert">
+    <footer className="no-print on-dark relative border-t border-line-dark bg-navy text-ink-invert">
       <div
         aria-hidden="true"
         className="h-px w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent"
