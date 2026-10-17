@@ -92,7 +92,11 @@
       "transfers": "Köçürmələr",
       "featureFlags": "Funksiyalar",
       "finance": "Maliyyə və Monetizasiya",
-      "subscriptionPlans": "Abunə planları"
+      "subscriptionPlans": "Abunə planları",
+      "subscriptions": "Abunə hesabatları",
+      "discounts": "Endirim kodları",
+      "campaigns": "Tanıtım kampaniyaları",
+      "payments": "Ödəniş əməliyyatları"
     }
   },
   "actions": {
@@ -3261,6 +3265,97 @@
         "agents": "Agent",
         "crmClients": "CRM müştərisi",
         "exportsPerMonth": "Aylıq ixrac"
+      },
+      "toggle": "Aktivliyi dəyiş",
+      "activateTitle": "Aktivləşdirilsin?",
+      "deactivateTitle": "Deaktiv edilsin?",
+      "subscriptionStatus": {
+        "TRIALING": "Sınaq",
+        "ACTIVE": "Aktiv",
+        "PAST_DUE": "Ödəniş gözlənilir",
+        "CANCELLED": "Ləğv edilib",
+        "EXPIRED": "Bitib"
+      },
+      "subscriptionSource": {
+        "ADMIN": "Panel",
+        "PROMO": "Tanıtım",
+        "PAYMENT": "Ödəniş"
+      },
+      "paymentStatus": {
+        "PENDING": "Gözləyir",
+        "SUCCEEDED": "Uğurlu",
+        "FAILED": "Uğursuz",
+        "REFUNDED": "Geri qaytarılıb"
+      },
+      "subscriptions": {
+        "title": "Abunə hesabatları",
+        "description": "Abunələrin statusları, planlar üzrə bölgü və panel tərəfindən təyin.",
+        "total": "Cəmi abunə",
+        "grantTitle": "Abunə təyin et",
+        "grantDescription": "Tanıtım mərhələsində abunə ödənişsiz təyin olunur; hesabın əvvəlki aktiv abunəsi ləğv edilir.",
+        "email": "Hesabın e-poçtu",
+        "plan": "Plan",
+        "duration": "Müddət",
+        "withTrial": "Sınaq müddəti ilə",
+        "note": "Qeyd (istəyə bağlı)",
+        "byPlan": "Aktiv abunələr — plan üzrə",
+        "recent": "Son abunələr",
+        "empty": "Hələ abunə yoxdur.",
+        "account": "Hesab",
+        "statusLabel": "Status",
+        "period": "Dövr",
+        "source": "Mənbə",
+        "actions": "Əməliyyatlar",
+        "cancel": "Ləğv et",
+        "cancelTitle": "Abunə ləğv edilsin?",
+        "cancelDescription": "Abunə dərhal bitir; ödəniş qaytarılması ayrıca aparılır."
+      },
+      "discounts": {
+        "title": "Endirim kodları",
+        "description": "Gələcək ödənişli abunələr üçün faiz və ya sabit məbləğli endirim kodları.",
+        "formTitle": "Kod yarat və ya yenilə",
+        "listTitle": "Kodlar",
+        "empty": "Hələ endirim kodu yoxdur.",
+        "code": "Kod",
+        "codeHint": "Böyük hərf, rəqəm, «-» və «_»; 3–32 simvol. Mövcud kod yenilənir.",
+        "percentOff": "Faiz (%)",
+        "amountOff": "Sabit məbləğ (AZN)",
+        "oneOf": "Faiz və ya məbləğdən yalnız birini yazın.",
+        "validFrom": "Başlanğıc",
+        "validUntil": "Son tarix",
+        "maxRedemptions": "İstifadə limiti",
+        "plans": "Planlar",
+        "plansHint": "Heç biri seçilməsə bütün planlara aiddir.",
+        "allPlans": "Bütün planlar",
+        "value": "Endirim",
+        "validity": "Müddət",
+        "usage": "İstifadə"
+      },
+      "campaigns": {
+        "title": "Tanıtım kampaniyaları",
+        "description": "Paket səhifəsində müddətli göstərilən elanlar.",
+        "formTitle": "Yeni kampaniya",
+        "listTitle": "Kampaniyalar",
+        "empty": "Hələ kampaniya yoxdur.",
+        "name": "Ad",
+        "startsAt": "Başlanğıc",
+        "endsAt": "Son tarix",
+        "messageAz": "Mesaj (AZ)",
+        "messageEn": "Mesaj (EN, istəyə bağlı)",
+        "messageRu": "Mesaj (RU, istəyə bağlı)",
+        "live": "Yayımda",
+        "scheduled": "Planlaşdırılıb"
+      },
+      "payments": {
+        "title": "Ödəniş əməliyyatları",
+        "description": "Gələcək ödəniş inteqrasiyası üçün əməliyyat tarixçəsi, faktura və uğursuz ödənişlər.",
+        "noProvider": "Ödəniş provayderi qoşulmayıb — heç bir real ödəniş qəbul edilmir. Aktivləşdirmə ayrıca təsdiq və test tələb edir.",
+        "provider": "Qoşulmuş provayder: {id}",
+        "listTitle": "Əməliyyatlar",
+        "empty": "Hələ ödəniş əməliyyatı yoxdur.",
+        "date": "Tarix",
+        "amount": "Məbləğ",
+        "invoice": "Faktura"
       }
     }
   },
@@ -3719,7 +3814,23 @@
       "invalidPrice": "Qiymət düzgün deyil.",
       "invalidLimit": "Limit düzgün deyil.",
       "invalidTrial": "Sınaq günləri 0–90 arasında olmalıdır.",
-      "notFound": "Plan tapılmadı."
+      "notFound": "Plan tapılmadı.",
+      "cancelled": "Abunə ləğv edildi.",
+      "grant": {
+        "saved": "Abunə təyin edildi.",
+        "user": "Bu e-poçtla aktiv ictimai hesab tapılmadı.",
+        "plan": "Plan və ya müddət düzgün deyil.",
+        "audience": "Agentlik planı yalnız agentlik hesabına təyin olunur."
+      },
+      "discount": {
+        "code": "Kod formatı düzgün deyil.",
+        "value": "Endirim dəyəri düzgün deyil.",
+        "dates": "Tarixlər düzgün deyil."
+      },
+      "campaign": {
+        "required": "Ad və AZ mesajı məcburidir."
+      },
+      "recordSaved": "Yadda saxlanıldı."
     }
   }
 }

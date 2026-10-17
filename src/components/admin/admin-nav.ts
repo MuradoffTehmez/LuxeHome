@@ -146,7 +146,13 @@ export const adminNav: AdminNavGroup[] = [
         labelKey: "finance",
         href: "/admin/maliyye",
         icon: "Wallet",
-        children: [{ labelKey: "subscriptionPlans", href: "/admin/maliyye" }],
+        children: [
+          { labelKey: "subscriptionPlans", href: "/admin/maliyye" },
+          { labelKey: "subscriptions", href: "/admin/maliyye/abuneler" },
+          { labelKey: "discounts", href: "/admin/maliyye/endirimler" },
+          { labelKey: "campaigns", href: "/admin/maliyye/kampaniyalar" },
+          { labelKey: "payments", href: "/admin/maliyye/odenisler" },
+        ],
       },
       {
         labelKey: "administration",

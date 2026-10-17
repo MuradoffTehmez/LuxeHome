@@ -765,3 +765,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #244 (Modul 14, 16.1–16.5): abunə planları və tarifləri, `/paketler` (tanıtım mesajı, ödəniş yox), `/admin/maliyye`.
   Qalan Modul 14: 16.5-in endirim kodları, tanıtım kampaniyaları, abunə hesabatları və 16.7 ödəniş adapteri arxitekturası
   (abunə statusları, ödəniş tarixçəsi, faktura, idempotentlik, geri ödəniş) — real ödəniş yoxdur.
+- #246 (Modul 14, 16.5/16.7): `Subscription`, `PaymentTransaction`, `DiscountCode`, `PromoCampaign`, provayder adapteri
+  (provayder yoxdur), checkout axını, admin abunə hesabatı/təyini, endirim kodları, kampaniyalar, ödənişlər.
+  **Modul 14 tamamlandı.** Növbəti — Modul 12 (VIP elanlar), sonra Modul 13 (irəli çəkmə).

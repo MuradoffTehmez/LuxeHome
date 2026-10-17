@@ -498,6 +498,16 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   adapteri ayrıca hissədir). Kabinet paket səhifəsi də tanıtım mesajını göstərir. Panel «Maliyyə və Monetizasiya»
   `/admin/maliyye` (`billing:manage`): plan başına imkan, limit, tarif, sınaq günləri, aktivlik; audit olunur. Limitlər
   tanıtım mərhələsində tətbiq olunmur.
+- **Abunə və ödəniş arxitekturası (#246, PRD 16.5/16.7):** `Subscription` (statuslar `SUBSCRIPTION_STATUSES`, effektiv status
+  vaxtdan hesablanır — `effectiveSubscriptionStatus`; plan kodu/müddət kopyalanır), `PaymentTransaction` (`idempotencyKey`
+  unikal, faktura nömrəsi, uğursuz səbəb, geri ödəniş), `DiscountCode`, `PromoCampaign` (`0078`). Saf qaydalar
+  `lib/subscriptions/subscription-policy.ts`. **Real ödəniş yoxdur:** `lib/payments/provider.ts`-də `getPaymentProvider()`
+  `null` qaytarır; `startSubscriptionCheckout()` (`lib/payments/checkout.ts`) bayraq (`pricingMode().checkout`) və provayder
+  olmadan heç nə yazmır. Provayder nəticəsi `recordPaymentResult()` ilə — keçid şərti `updateMany` (`canTransitionPayment`),
+  uğurlu ödəniş abunəni aktivləşdirir və endirim istifadəsini artırır, geri ödəniş abunəni ləğv edir. Provayder qoşmaq
+  ayrıca təsdiq və test tələb edir. Panel: `/admin/maliyye/abuneler` (hesabat + ödənişsiz təyin, köhnə aktiv abunə ləğv
+  olunur; agentlik planı yalnız agentlik hesabına), `/endirimler`, `/kampaniyalar` (aktiv kampaniya `/paketler`-də göstərilir),
+  `/odenisler` (yalnız oxu).
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 
