@@ -147,7 +147,7 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
                   <li key={item.id} className="py-2.5">
                     <p className="flex flex-wrap items-baseline justify-between gap-2 text-sm text-ink">
                       <span>
-                        <span className="font-medium">{item.actorId ? item.actorName : t("history.system")}</span>{" "}
+                        <span className="font-medium">{item.actorId ? item.actorName : item.details.source === "admin" ? t("history.admin") : t("history.system")}</span>{" "}
                         {activityText(item)}
                       </span>
                       <time dateTime={item.createdAt.toISOString()} className="text-xs text-ink-muted">{formatLocalizedDateTime(item.createdAt, locale, "short")}</time>

@@ -4,7 +4,7 @@ import { LEAD_ROUTING_MODES, LOCATION_KINDS, PROPERTY_STATUSES } from "@/lib/con
 
 
 import { releaseAgentLeads, routeAgencyLead, routePropertyLead } from "@/lib/accounts/lead-routing";
-import { findManageableLead, getAccountLeads } from "@/lib/accounts/listing-leads";
+import { findManageableLead, getAccountLeads, resolveLeadProperty } from "@/lib/accounts/listing-leads";
 import { refreshResponseStats } from "@/lib/accounts/lead-jobs";
 import { incrementListingStat } from "@/lib/listing-stats";
 import { getListingAnalytics } from "@/lib/accounts/listing-analytics";
@@ -78,11 +78,18 @@ describe("müraciət bölgüsü", () => {
 
   it("birbaşa rejimdə elana təyin edilmiş aktiv agentə gedir (növbədən kənar olsa da), yoxsa sahibə", async () => {
     await setRouting(LEAD_ROUTING_MODES.DIRECT);
-    await expect(routePropertyLead({ listerId: "rt-owner", assignedAgentId: "rt-agent3" })).resolves.toMatchObject({ handlerId: "rt-agent3", routed: true });
+    await expect(routePropertyLead({ listerId: "rt-owner", assignedAgentUserId: "rt-agent3" })).resolves.toMatchObject({ handlerId: "rt-agent3", routed: true });
     // Komandada olmayan şəxs və təyinatsız elan — müraciət sahibdə qalır.
-    await expect(routePropertyLead({ listerId: "rt-owner", assignedAgentId: "rt-solo" })).resolves.toMatchObject({ handlerId: "rt-owner", routed: false });
+    await expect(routePropertyLead({ listerId: "rt-owner", assignedAgentUserId: "rt-solo" })).resolves.toMatchObject({ handlerId: "rt-owner", routed: false });
     await expect(routePropertyLead({ listerId: "rt-owner" })).resolves.toMatchObject({ handlerId: "rt-owner", routed: false });
     await expect(routeAgencyLead("rt-alfa")).resolves.toMatchObject({ handlerId: "rt-owner", routed: false });
+
+    // Elanın `assignedAgentId`-si `AgentProfile.id`-dir: `resolveLeadProperty` onu istifadəçi id-sinə çevirir.
+    await DB.prepare('UPDATE "Property" SET "assignedAgentId" = ? WHERE "id" = ?').bind("rt-ap1", "rt-p-owner").run();
+    const property = await resolveLeadProperty("rt-p-owner");
+    expect(property?.assignedAgentUserId).toBe("rt-agent1");
+    await expect(routePropertyLead(property!)).resolves.toMatchObject({ handlerId: "rt-agent1", routed: true });
+    await DB.prepare('UPDATE "Property" SET "assignedAgentId" = NULL WHERE "id" = ?').bind("rt-p-owner").run();
   });
 
   it("yüklənmə rejimində ən az açıq müraciəti olan agent seçilir; bağlanmış müraciət sayılmır", async () => {

@@ -849,7 +849,8 @@
       "alertMinutes": "menecerə bildiriş göndərildi ({minutes} dəq cavabsız)",
       "alertHours": "menecerə bildiriş göndərildi ({hours} saat cavabsız)",
       "reassignMinutes": "təkrar təyinat təklif olundu ({minutes} dəq cavabsız)",
-      "reassignHours": "təkrar təyinat təklif olundu ({hours} saat cavabsız)"
+      "reassignHours": "təkrar təyinat təklif olundu ({hours} saat cavabsız)",
+      "admin": "Platforma administratoru"
     }
   },
   "offices": {

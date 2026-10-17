@@ -849,7 +849,8 @@
       "alertMinutes": "alerted the managers ({minutes} min unanswered)",
       "alertHours": "alerted the managers ({hours} h unanswered)",
       "reassignMinutes": "suggested reassignment ({minutes} min unanswered)",
-      "reassignHours": "suggested reassignment ({hours} h unanswered)"
+      "reassignHours": "suggested reassignment ({hours} h unanswered)",
+      "admin": "Platform administrator"
     }
   },
   "offices": {

@@ -107,8 +107,8 @@ const ACTIVE_AGENT_WHERE = {
 type RouteTarget = {
   districtId?: string | null;
   cityId?: string | null;
-  /** Elanı idarə edən agent (`Property.assignedAgentId`) — birbaşa rejim üçün. */
-  assignedAgentId?: string | null;
+  /** Elanı idarə edən agentin istifadəçi id-si (`Property.assignedAgent.userId`) — birbaşa rejim üçün. */
+  assignedAgentUserId?: string | null;
 };
 
 /** Agentliyin müraciəti üçün agent seçir; uyğun agent yoxdursa sahib. */
@@ -124,7 +124,7 @@ async function routeWithinAgency(
   if (mode === LEAD_ROUTING_MODES.DIRECT) {
     // Elanı idarə edən agent: «müraciət növbəsində» olub-olmamasından asılı deyil — elan onundur.
     // Təyinat yoxdursa və ya agent artıq aktiv üzv deyilsə müraciət sahibə düşür (manual kimi).
-    const agentId = target.assignedAgentId;
+    const agentId = target.assignedAgentUserId;
     if (!agentId || agentId === agency.userId) return ownerRoute;
     const member = await prisma.agencyEmployee.findFirst({
       where: { agencyId: agency.id, userId: agentId, ...ACTIVE_AGENT_WHERE },

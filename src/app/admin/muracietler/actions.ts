@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { PERMISSIONS, type LeadStatus } from "@/lib/constants";
+import { LEAD_ACTIVITY_TYPES, PERMISSIONS, type LeadStage, type LeadStatus } from "@/lib/constants";
 import { type ActionState, failure, invalid, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
@@ -10,7 +10,7 @@ import { leadUpdateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
 import { msg } from "@/lib/admin/server-message";
 import { guardedBulk } from "@/lib/admin/bulk";
-import { stageForStatus } from "@/lib/accounts/lead-pipeline";
+import { recordLeadActivity, stageForStatus } from "@/lib/accounts/lead-pipeline";
 
 /**
  * Müraciətlərin idarəsi.
@@ -23,10 +23,16 @@ import { stageForStatus } from "@/lib/accounts/lead-pipeline";
  * paneldə tamamlanmış müraciət kabinet kartında aktiv görünərdi.
  */
 
-async function stageFor(id: string, status: string) {
+async function stageFor(id: string, status: string): Promise<{ from: string; to: LeadStage } | null> {
   // Status `leadUpdateSchema`-nın allowlist-indən (`LEAD_STATUSES`) keçib.
   const current = await prisma.lead.findUnique({ where: { id }, select: { stage: true, property: { select: { listingType: true } } } });
-  return current ? stageForStatus(status as LeadStatus, current.stage, current.property?.listingType) : undefined;
+  return current ? { from: current.stage, to: stageForStatus(status as LeadStatus, current.stage, current.property?.listingType) } : null;
+}
+
+/** Panelin dəyişdirdiyi mərhələ kabinet kartının tarixçəsinə də düşür — kart səbəbsiz «tullanmasın». */
+async function recordAdminStage(id: string, stage: { from: string; to: LeadStage } | null) {
+  if (!stage || stage.from === stage.to) return;
+  await recordLeadActivity({ leadId: id, actor: null, type: LEAD_ACTIVITY_TYPES.STAGE, details: { from: stage.from, to: stage.to, source: "admin" } });
 }
 
 const LIST_PATH = "/admin/muracietler";
@@ -61,11 +67,13 @@ export async function updateLead(_prev: ActionState, formData: FormData): Promis
       }
     }
 
+    const stage = await stageFor(id, parsed.data.status);
     const lead = await prisma.lead.update({
       where: { id },
-      data: { ...parsed.data, stage: await stageFor(id, parsed.data.status) },
+      data: { ...parsed.data, ...(stage ? { stage: stage.to } : {}) },
       select: { name: true, status: true },
     });
+    await recordAdminStage(id, stage);
 
     await recordAudit(user, "UPDATE", "Lead", id, `${lead.name} → ${lead.status}`);
     revalidatePath(LIST_PATH);
@@ -119,11 +127,13 @@ export async function setLeadStatus(id: string, status: string): Promise<ActionS
   if (!parsed.success) return failure(msg("server.muracietler.statusDeyeriDuzgunDeyil"));
 
   try {
+    const stage = await stageFor(id, parsed.data.status);
     const lead = await prisma.lead.update({
       where: { id },
-      data: { status: parsed.data.status, stage: await stageFor(id, parsed.data.status) },
+      data: { status: parsed.data.status, ...(stage ? { stage: stage.to } : {}) },
       select: { name: true },
     });
+    await recordAdminStage(id, stage);
 
     await recordAudit(user, "UPDATE", "Lead", id, `${lead.name} → ${status}`);
     revalidatePath(LIST_PATH);
