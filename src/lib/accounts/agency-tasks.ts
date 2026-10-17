@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { bakuDay } from "@/lib/listing-stats";
 import { ACTIVE_MEMBER_WHERE, hasAgencyPermission, type AgencyAccess } from "@/lib/accounts/agency-access";
+import { leadScope } from "@/lib/accounts/listing-leads";
 import {
   AGENCY_MEMBER_PERMISSIONS,
   AGENCY_TASK_DESCRIPTION_MAX,
@@ -42,7 +43,8 @@ export function parseTaskDueDate(value: string | null | undefined, now = new Dat
   if (!value) return null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
   const due = new Date(`${value}T23:59:59+04:00`);
-  if (Number.isNaN(due.getTime()) || value < bakuDay(now)) return undefined;
+  // Mövcud olmayan gün (məs. 2026-02-30) JS-də növbəti aya sürüşür — tarix geri çevrilmədə eyni qalmalıdır.
+  if (Number.isNaN(due.getTime()) || bakuDay(due) !== value || value < bakuDay(now)) return undefined;
   return due;
 }
 
@@ -93,8 +95,11 @@ export async function createAgencyTask(input: {
     if (!property) return { result: "invalidProperty" };
   }
   if (input.leadId) {
+    // Yalnız yaradanın görə bildiyi müraciət (#218 `leadScope`): `LEADS_MANAGE` olmayan agent
+    // başqasının müraciətini tapşırığa bağlaya bilməz.
+    const { where: visible } = await leadScope(input.actorId);
     const lead = await prisma.lead.findFirst({
-      where: { id: input.leadId, OR: [{ agencyId: access.agencyId }, { agencyId: null, property: { agencyId: access.agencyId } }] },
+      where: { AND: [{ id: input.leadId }, agencyTaskLeadWhere(access.agencyId), visible] },
       select: { id: true },
     });
     if (!lead) return { result: "invalidLead" };
@@ -207,8 +212,16 @@ export async function listAgencyTasks(input: { access: AgencyAccess; userId: str
   }));
 }
 
-/** Tapşırıq formasının seçimləri: icraçılar, agentlik elanları və açıq agentlik müraciətləri. */
-export async function getTaskFormOptions(access: AgencyAccess) {
+function agencyTaskLeadWhere(agencyId: string): Prisma.LeadWhereInput {
+  return { OR: [{ agencyId }, { agencyId: null, property: { agencyId } }] };
+}
+
+/**
+ * Tapşırıq formasının seçimləri: icraçılar, agentlik elanları və istifadəçinin görə bildiyi açıq agentlik
+ * müraciətləri — `LEADS_MANAGE` olmayan agentə başqasının müştəri adı göndərilmir.
+ */
+export async function getTaskFormOptions(access: AgencyAccess, userId: string) {
+  const { where: visibleLeads } = await leadScope(userId);
   const [owner, members, properties, leads] = await Promise.all([
     prisma.user.findUnique({ where: { id: access.ownerUserId }, select: { name: true } }),
     prisma.agencyEmployee.findMany({
@@ -224,7 +237,7 @@ export async function getTaskFormOptions(access: AgencyAccess) {
     }),
     prisma.lead.findMany({
       where: {
-        OR: [{ agencyId: access.agencyId }, { agencyId: null, property: { agencyId: access.agencyId } }],
+        AND: [agencyTaskLeadWhere(access.agencyId), visibleLeads],
         status: { in: [LEAD_STATUSES.NEW, LEAD_STATUSES.CONTACTED, LEAD_STATUSES.IN_PROGRESS] },
       },
       select: { id: true, name: true, subject: true, property: { select: { title: true } } },

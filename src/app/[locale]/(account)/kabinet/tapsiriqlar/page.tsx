@@ -72,7 +72,7 @@ export default async function AgencyTasksPage({
   const now = new Date();
   const [tasks, options] = await Promise.all([
     listAgencyTasks({ access, userId: user.id, view, assigneeId: assigneeFilter }),
-    getTaskFormOptions(access),
+    getTaskFormOptions(access, user.id),
   ]);
 
   const href = (next: { gorunus?: TaskView; icraci?: string | null }) => {

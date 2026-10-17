@@ -5,6 +5,7 @@ import { getAgencyAccess } from "@/lib/accounts/agency-access";
 import {
   countOverdueAgencyTasks,
   createAgencyTask,
+  getTaskFormOptions,
   isTaskOverdue,
   listAgencyTasks,
   parseTaskDueDate,
@@ -37,6 +38,14 @@ beforeAll(async () => {
     employee.bind("task-e2", "task-agency", "task-agent", "AGENT", AGENCY_EMPLOYEE_STATUSES.APPROVED, null),
     employee.bind("task-e3", "task-agency", "task-suspended", "AGENT", AGENCY_EMPLOYEE_STATUSES.APPROVED, now.toISOString()),
     DB.prepare(
+      `INSERT INTO "Lead" ("id", "name", "phone", "message", "source", "status", "handlerId", "agencyId", "createdAt", "updatedAt")
+       VALUES (?, ?, '+994501112233', 'Salam', 'AGENCY', 'NEW', ?, 'task-agency', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    ).bind("task-l-manager", "Menecerin müştərisi", "task-manager"),
+    DB.prepare(
+      `INSERT INTO "Lead" ("id", "name", "phone", "message", "source", "status", "handlerId", "agencyId", "createdAt", "updatedAt")
+       VALUES (?, ?, '+994501112233', 'Salam', 'AGENCY', 'NEW', ?, 'task-agency', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    ).bind("task-l-agent", "Agentin müştərisi", "task-agent"),
+    DB.prepare(
       `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId", "authorId", "agencyId", "createdAt", "updatedAt")
        VALUES (?, ?, ?, 'Təsvir', 'x', 'SALE', ?, 1000, 'task-type', 'task-city', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
     ).bind("task-p-foreign", "Başqa agentliyin elanı", "task-p-foreign", PROPERTY_STATUSES.PUBLISHED, "task-other-owner", "task-agency-2"),
@@ -50,6 +59,7 @@ describe("tapşırıq yaratmaq", () => {
     expect(parseTaskDueDate("2026-10-16", now)).toBeUndefined();
     expect(parseTaskDueDate("2026-10-17", now)?.toISOString()).toBe("2026-10-17T19:59:59.000Z");
     expect(parseTaskDueDate("17.10.2026", now)).toBeUndefined();
+    expect(parseTaskDueDate("2026-02-30", new Date("2026-01-01T00:00:00.000Z"))).toBeUndefined();
     expect(parseTaskDueDate(null, now)).toBeNull();
   });
 
@@ -103,5 +113,18 @@ describe("görünüş və statuslar", () => {
     await expect(countOverdueAgencyTasks("task-agency", later)).resolves.toBe(1);
     expect(isTaskOverdue({ status: AGENCY_TASK_STATUSES.DONE, dueAt: now }, later)).toBe(false);
     expect(isTaskOverdue({ status: AGENCY_TASK_STATUSES.ON_HOLD, dueAt: now }, later)).toBe(true);
+  });
+});
+
+describe("müraciət bağlantısı", () => {
+  it("agent yalnız öz müraciətini görür və bağlayır, idarəçi agentliyin hamısını", async () => {
+    const agent = (await access("task-agent"))!;
+    const manager = (await access("task-manager"))!;
+    expect((await getTaskFormOptions(agent, "task-agent")).leads.map((lead) => lead.value)).toEqual(["task-l-agent"]);
+    expect((await getTaskFormOptions(manager, "task-manager")).leads.map((lead) => lead.value).sort()).toEqual(["task-l-agent", "task-l-manager"]);
+    await expect(createAgencyTask({ ...base, access: agent, actorId: "task-agent", title: "Başqasının müştərisi", type: AGENCY_TASK_TYPES.LEAD_RESPONSE, assigneeId: null, leadId: "task-l-manager" }))
+      .resolves.toEqual({ result: "invalidLead" });
+    await expect(createAgencyTask({ ...base, access: agent, actorId: "task-agent", title: "Öz müştərim", type: AGENCY_TASK_TYPES.LEAD_RESPONSE, assigneeId: null, leadId: "task-l-agent" }))
+      .resolves.toMatchObject({ result: "created" });
   });
 });
