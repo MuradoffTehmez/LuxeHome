@@ -7,6 +7,7 @@ import { getAgencyAnalytics, parseAnalyticsRange } from "@/lib/accounts/agency-a
 import { agencyReportSheets } from "@/lib/export/analytics-reports";
 import { exportResponse, isExportFormat } from "@/lib/export/tabular";
 import { isPublicApiBlocked, maintenanceApiResponse } from "@/lib/system-mode";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,8 @@ const NOT_FOUND = () => new NextResponse(null, { status: 404, headers: { "Cache-
  */
 export async function GET(request: Request) {
   if (await isPublicApiBlocked()) return maintenanceApiResponse();
+  // Söndürülmüş modul (#242) — UI ilə yanaşı API də bağlanır.
+  if (!(await isFeatureEnabled("AGENCY_ANALYTICS"))) return NOT_FOUND();
   const user = await getOptionalUser(AUTH_KINDS.PUBLIC);
   if (!user) return NOT_FOUND();
   const access = await getAgencyAccess(user);

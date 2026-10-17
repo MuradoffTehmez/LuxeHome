@@ -65,5 +65,6 @@
     "errorDescription": "Please try again shortly. If the problem continues, contact us.",
     "retry": "Try again",
     "contact": "Contact us"
-  }
+  },
+  "featureDisabled": "This feature is currently disabled."
 }

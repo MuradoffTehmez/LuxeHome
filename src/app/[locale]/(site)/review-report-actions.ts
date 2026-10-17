@@ -2,6 +2,7 @@
 
 import { getLocale, getTranslations } from "next-intl/server";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
+import { featureDisabledFailure } from "@/lib/feature-guard";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { createReviewReport } from "@/lib/review-reports";
 import { getOptionalUser } from "@/lib/auth/guard";
@@ -14,6 +15,8 @@ import { AUTH_KINDS, type Locale } from "@/lib/constants";
 export async function reportReview(kind: string, reviewId: string, reason: string, comment: string): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("phase2");
+  const disabled = await featureDisabledFailure("REPORTS");
+  if (disabled) return disabled;
   // Anonim ziyarətçi: `requireAccount` `redirect()` atardı və dialoq əvəzinə bütün səhifə giriş
   // səhifəsinə keçərdi (və ya istisna aşağıdakı `catch`-də udulardı) — aydın mesaj qaytarılır.
   if (!(await getOptionalUser(AUTH_KINDS.PUBLIC))) return failure(t("agents.report.errors.login"));

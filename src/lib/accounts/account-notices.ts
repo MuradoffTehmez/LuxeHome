@@ -310,7 +310,9 @@ async function notifyAccount(
     });
     if (!stored) return false;
     const url = siteUrl(localizePath(path, locale));
+    // E-poçt bildirişləri söndürülübsə (#242) `sendEmail` buraxır; kabinet bildirişi yenə yazılır.
     await sendEmail({
+      notification: true,
       to: user.email,
       subject: title,
       html: `<p>${escapeHtml(content)}</p><p><a href="${emailHref(url)}">${copy.open}</a></p>`,

@@ -152,6 +152,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "audit", href: "/admin/audit" },
           { labelKey: "settings", href: "/admin/parametrler" },
           { labelKey: "systemMode", href: "/admin/sistem" },
+          { labelKey: "featureFlags", href: "/admin/funksiyalar" },
           { labelKey: "demoContent", href: "/admin/demo-mezmun" },
         ],
       },

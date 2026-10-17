@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { forbidden } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { getLocale, getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
@@ -31,6 +32,7 @@ const number = new Intl.NumberFormat("en-US");
 export default async function AgencyAnalyticsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const locale = (await getLocale()) as Locale;
   const user = await requireAccount(locale);
+  if (!(await isFeatureEnabled("AGENCY_ANALYTICS"))) notFound();
   if (user.accountType !== ACCOUNT_TYPES.AGENCY && user.accountType !== ACCOUNT_TYPES.AGENT) forbidden();
   const t = await getTranslations("account.agencyAnalytics");
   const access = await getAgencyAccess(user);

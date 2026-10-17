@@ -74,6 +74,8 @@ export function getCabinetItems(
   canAssignListings = false,
   /** `LEADS_MANAGE` səlahiyyətli agent (#234) — agentlik analitikasını görür. */
   canViewAnalytics = false,
+  /** Funksiya bayrağı ilə söndürülmüş modulların bəndləri (#242). */
+  hiddenItems: readonly CabinetNavItem["id"][] = [],
 ): readonly CabinetNavItem[] {
   const items = canList ? [BASE_ITEMS[0], ...LISTING_ITEMS] : [BASE_ITEMS[0]];
   if (canManageTeam) {
@@ -87,7 +89,7 @@ export function getCabinetItems(
   if (canManageTeam || canAssignListings) items.push(ASSIGNMENTS_ITEM);
   if (canTransfer) items.push(TASKS_ITEM, TRANSFERS_ITEM, REVIEWS_ITEM);
   items.push(...DISCOVERY_ITEMS, BASE_ITEMS[1]);
-  return items;
+  return hiddenItems.length ? items.filter((item) => !hiddenItems.includes(item.id)) : items;
 }
 
 export function isCabinetItemActive(pathname: string, href: string): boolean {

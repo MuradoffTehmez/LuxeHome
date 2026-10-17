@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ACCOUNT_TYPES, ACTIVE_REPORT_STATUSES } from "@/lib/constants";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { assessPropertyPrice } from "@/lib/price-benchmark";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import {
   DUPLICATE_TEXT_MIN_LENGTH,
   LOW_PRICE_PERCENT,
@@ -140,9 +141,19 @@ export async function refreshListingRisk(propertyId: string): Promise<ListingRis
         riskCheckedAt: new Date(),
       },
     });
-    return risk;
+    return withModerationFlag(risk);
   } catch (error) {
     console.error("[moderation] risk hesablanmadı:", error instanceof Error ? error.message : error);
-    return UNKNOWN_RISK;
+    return withModerationFlag(UNKNOWN_RISK);
   }
+}
+
+/**
+ * Avtomatik moderasiya söndürülübsə (#242) siqnallar yazılır və növbədə görünür, amma elan
+ * saxlanmır: `hold` → `review`. Bayraq oxunmasa (`getSetting` atmır, defolt açıqdır) qayda dəyişmir.
+ */
+async function withModerationFlag(risk: ListingRisk): Promise<ListingRisk> {
+  if (risk.level !== "hold") return risk;
+  const enabled = await isFeatureEnabled("AUTO_MODERATION").catch(() => true);
+  return enabled ? risk : { ...risk, level: "review" };
 }

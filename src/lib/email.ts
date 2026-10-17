@@ -7,6 +7,7 @@ import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/constants";
 import { recordEmailActivity } from "@/lib/email-activity";
 import { runtimeEnv } from "@/lib/runtime-env";
 import { emailHref, escapeHtml, telHref } from "@/lib/email-html";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 /**
  * E-poçt mətnləri.
@@ -132,6 +133,11 @@ export type SendEmailOptions = {
   html: string;
   from?: string;
   replyTo?: string;
+  /**
+   * Bildiriş e-poçtu (xatırlatma, uyğun elan, qiymət düşməsi, hesab bildirişi) — `NOTIFICATIONS`
+   * bayrağı söndürüləndə göndərilmir (#242). Tranzaksion məktub (giriş, təsdiq kodu, rezervasiya) bunu vermir.
+   */
+  notification?: boolean;
 };
 
 export type LeadEmailPayload = {
@@ -153,7 +159,12 @@ export async function sendEmail({
   html,
   from,
   replyTo,
+  notification = false,
 }: SendEmailOptions) {
+  // Söndürülmüş bildiriş kanalı qəsdən buraxılır — çağıran təkrar cəhd etməsin deyə uğur sayılır.
+  if (notification && !(await isFeatureEnabled("NOTIFICATIONS").catch(() => true))) {
+    return { success: true, skipped: true as const };
+  }
   const resend = getResend();
   const resolvedTo = to ?? (await notificationEmail());
   const resolvedFrom = from ?? fromEmail();
@@ -731,6 +742,7 @@ export async function sendSavedSearchMatchEmail(
   `;
 
   return sendEmail({
+    notification: true,
     to: userEmail,
     subject,
     html,
@@ -893,6 +905,7 @@ ${moreRow}
   `;
 
   return sendEmail({
+    notification: true,
     to: input.userEmail,
     subject,
     html,

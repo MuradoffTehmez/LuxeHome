@@ -108,6 +108,7 @@ export async function recordPropertyPriceChange(input: PriceChangeInput): Promis
     if (preferences?.priceDropEmail !== false) {
       const propertyUrl = siteUrl(localizePath(`/emlaklar/${history.property.slug}`, locale));
       await sendEmail({
+        notification: true,
         to: user.email,
         subject: copy.subject(history.property.title),
         // `content` elanın başlığını daşıyır — onu elan sahibi yazır, məktub isə

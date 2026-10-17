@@ -473,6 +473,25 @@ ItemList JSON-LD, az məzmunda `seoLandingIndexPolicy` noindex, sitemap `getInde
 (satış m², aylıq kirayə; `MIN_COMPARABLES`-dən az nümunədə «—»), növ/elan tipi filtr keçidləri, xəritə (`?gorunus=xerite`)
 və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da düşür, `districtSlug` filtri kimi). Uydurulmuş bazar rəqəmi göstərilmir — say və median yalnız saytdakı ictimai elanlardandır.
 
+### Funksiya bayraqları (#242, PRD 23, 16.6)
+
+- Açarlar `src/lib/feature-flags-policy.ts`-dədir (saf modul): modul bayraqları (`REPORTS`, `AUTO_MODERATION`,
+  `AGENCY_ANALYTICS`, `RATINGS`, `CRM`, `VIP_REQUESTS`, `PROMOTION`, `SUBSCRIPTIONS`, `PAYMENTS`, `NOTIFICATIONS`,
+  `LISTING_FRESHNESS`, `EXTRA_VERIFICATION`) və PRD 16.6 monetizasiya açarları. Hamısı tək JSON parametrdə
+  (`SETTING_KEYS.FEATURE_FLAGS`); pozulmuş dəyər və naməlum açar defolta qayıdır. Defolt: modullar açıq, ödəniş/monetizasiya/
+  özünəxidmət bağlı, `ADMIN_APPROVAL_FOR_VIP` açıq. Asılı açar (`effectiveFeatureFlags`) öz modulu olmadan işləmir.
+- Oxu `getFeatureFlags()` / `isFeatureEnabled()` (`lib/feature-flags.ts`, sorğu başına bir dəfə); action üçün hazır xəta
+  `featureDisabledFailure()` (`lib/feature-guard.ts` — domen modulları next-intl yükləməsin deyə ayrıdır).
+- **Söndürülmüş modul yalnız UI-da gizlənmir:** action, səhifə (404) və API də bağlanır. Hazırda: şikayət (elan + rəy
+  action-ları, düymələr), reytinq (rəy yazma/cavab, forma, `/kabinet/reyler`), CRM (`/kabinet/musteriler` layout-u + bütün
+  action-lar), agentlik analitikası (səhifə + ixrac API), avtomatik moderasiya (`hold` → `review`, siqnallar yazılır),
+  e-poçt bildirişləri (`sendEmail({ notification: true })` — hesab bildirişi, uyğun elan, qiymət düşməsi, elan müddəti və
+  açıq qapı xatırlatması; tranzaksion məktub buraxılmır, kabinet bildirişi yenə yazılır), elan aktuallığı (gündəlik müddət işi dayanır). Kabinet menyusu
+  `hiddenItems` ilə süzülür. Yeni modul yazanda bayrağını da yoxla.
+- Mövcud premium paket sifarişi (ofisdə ödəniş) monetizasiya bayrağına bağlanmayıb — Basic/Pro/Premium (Modul 14) onu üstələyəcək.
+- Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
+  təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
+
 ### Toplu idxal və sayt şəkilləri
 
 - `/admin/emlaklar/idxal` CSV-dən elan yaradır (#103). Hər sətir `propertySchema`-dan keçir,
