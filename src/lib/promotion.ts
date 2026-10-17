@@ -96,12 +96,14 @@ export async function requestPromotion(input: { userId: string; propertyId: stri
   return { ok: true, campaignId: created.id, started: false };
 }
 
-export type PromotionDecisionResult = { ok: true; title: string } | { ok: false; reason: "notFound" | "duration" | "note" | "listing" };
+export type PromotionDecisionResult = { ok: true; title: string } | { ok: false; reason: "notFound" | "duration" | "note" | "listing" | "disabled" };
 
 /** Təsdiq: kampaniya dərhal başlayır, elan `promotedUntil` alır. `actorId: null` — özünəxidmət. */
 export async function approvePromotion(input: { actorId: string | null; campaignId: string; days: number; note: string | null; now?: Date }): Promise<PromotionDecisionResult> {
   const now = input.now ?? new Date();
   if (!isPromotionDuration(input.days)) return { ok: false, reason: "duration" };
+  // Modul söndürülübsə (#242) heç bir aktivləşdirmə yolu kampaniya başlatmır — admin də daxil.
+  if (!(await getFeatureFlags()).PROMOTION) return { ok: false, reason: "disabled" };
   const campaign = await prisma.promotionCampaign.findUnique({ where: { id: input.campaignId }, select: { id: true, propertyId: true, requesterId: true, status: true } });
   if (!campaign || campaign.status !== PROMOTION_STATUSES.PENDING) return { ok: false, reason: "notFound" };
   const property = await prisma.property.findFirst({
@@ -151,11 +153,16 @@ export async function rejectPromotion(input: { actorId: string; campaignId: stri
 }
 
 /** Admin sorğusuz başladır — təkrar qaydası admin üçün də keçərlidir (aktiv kampaniya ikiqat olmasın). */
-export async function grantPromotion(input: { actorId: string; propertyId: string; days: number; note: string | null; now?: Date }): Promise<PromotionDecisionResult & { campaignId?: string; activeAlready?: boolean }> {
+export async function grantPromotion(input: { actorId: string; propertyId: string; days: number; note: string | null; now?: Date }): Promise<PromotionDecisionResult & { campaignId?: string; blocked?: "active" | "pending" | "cooldown" }> {
   const now = input.now ?? new Date();
   if (!isPromotionDuration(input.days)) return { ok: false, reason: "duration" };
-  const active = await prisma.promotionCampaign.count({ where: { propertyId: input.propertyId, status: PROMOTION_STATUSES.ACTIVE, endsAt: { gt: now } } });
-  if (active > 0) return { ok: false, reason: "notFound", activeAlready: true };
+  if (!(await getFeatureFlags()).PROMOTION) return { ok: false, reason: "disabled" };
+  // Təkrar qaydası birbaşa verilməyə də aiddir: gözləyən sorğu, aktiv kampaniya və fasilə.
+  const blocked = await repeatBlock(input.propertyId, now);
+  if (blocked && !blocked.ok) {
+    const reason = blocked.reason === "active" || blocked.reason === "pending" || blocked.reason === "cooldown" ? blocked.reason : "active";
+    return { ok: false, reason: "notFound", blocked: reason };
+  }
   const created = await prisma.promotionCampaign.create({
     data: { propertyId: input.propertyId, source: PROMOTION_SOURCES.ADMIN, days: input.days },
     select: { id: true },

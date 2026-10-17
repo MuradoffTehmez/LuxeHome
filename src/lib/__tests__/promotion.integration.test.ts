@@ -89,9 +89,14 @@ describe("irəli çəkmə", () => {
 
     const granted = await grantPromotion({ actorId: "staff", propertyId: "pr-mid", days: 1, note: null, now });
     expect(granted.ok).toBe(true);
-    await expect(grantPromotion({ actorId: "staff", propertyId: "pr-mid", days: 1, note: null, now })).resolves.toMatchObject({ ok: false, activeAlready: true });
+    await expect(grantPromotion({ actorId: "staff", propertyId: "pr-mid", days: 1, note: null, now })).resolves.toMatchObject({ ok: false, blocked: "active" });
     await expect(revokePromotion({ actorId: "staff", campaignId: granted.campaignId!, note: "Qaydalara zidd", now })).resolves.toMatchObject({ ok: true });
     expect((await prisma.property.findUniqueOrThrow({ where: { id: "pr-mid" } })).promotedUntil).toBeNull();
+    // Dayandırılmış kampaniyadan sonra fasilə birbaşa verilməyə də aiddir; modul bağlıdırsa admin də başlada bilmir.
+    await expect(grantPromotion({ actorId: "staff", propertyId: "pr-mid", days: 1, note: null, now })).resolves.toMatchObject({ ok: false, blocked: "cooldown" });
+    await setFlags({ PROMOTION: false });
+    await expect(grantPromotion({ actorId: "staff", propertyId: "pr-new", days: 1, note: null, now })).resolves.toEqual({ ok: false, reason: "disabled" });
+    await setFlags(null);
 
     await setFlags({ PROMOTION_SELF_SERVICE_ENABLED: true });
     const self = await requestPromotion({ userId: "pr-owner", propertyId: "pr-new", days: 1, now });
