@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { CalendarClock, CircleCheckBig, Crown, MessageSquareWarning, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { CalendarClock, CircleCheckBig, Crown, MessageSquareWarning, Pencil, Plus, RefreshCw, Trash2, TrendingUp } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import {
   MODERATION_HOLD_STATUSES,
   PROPERTY_STATUSES,
   PROPERTY_STATUS_TONE,
+  PROMOTION_STATUSES,
   VIP_REQUEST_STATUSES,
   type Locale,
   type PropertyStatus,
@@ -35,6 +36,8 @@ import { getListingExpiryConfig } from "@/lib/settings";
 import { getOwnerAppeals } from "@/lib/listing-appeals";
 import { AppealButton } from "./appeal-button";
 import { VipRequestButton } from "./vip-request-button";
+import { PromotionRequestButton } from "./promotion-request-button";
+import { getOwnerPromotionState } from "@/lib/promotion";
 import { getOwnerVipState } from "@/lib/vip";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 
@@ -81,10 +84,31 @@ export default async function CabinetPropertiesPage({
 
   type CabinetProperty = (typeof properties)[number];
   // VIP sorğuları (#248): modul bayrağı və elanların son sorğu/dövr vəziyyəti.
-  const [vipEnabled, vipState] = await Promise.all([
+  const [vipEnabled, vipState, promotionEnabled, promotionState] = await Promise.all([
     isFeatureEnabled("VIP_REQUESTS"),
     getOwnerVipState(properties.map((property) => property.id)),
+    isFeatureEnabled("PROMOTION"),
+    getOwnerPromotionState(properties.map((property) => property.id)),
   ]);
+
+  /** İrəli çəkmə (#250, PRD Modul 13): aktiv kampaniya, gözləyən sorğu, fasilə və ya «İrəli çək» düyməsi. */
+  function PromotionControl({ property }: { property: CabinetProperty }) {
+    if (!promotionEnabled || property.status !== PROPERTY_STATUSES.PUBLISHED) return null;
+    const state = promotionState.get(property.id);
+    if (state?.status === PROMOTION_STATUSES.ACTIVE && state.endsAt) {
+      return <Badge tone="info"><TrendingUp className="size-3.5 shrink-0" aria-hidden="true" />{t("promotion.activeUntil", { date: formatLocalizedDate(state.endsAt, locale as Locale, "numeric") ?? "" })}</Badge>;
+    }
+    if (state?.status === PROMOTION_STATUSES.PENDING) return <Badge tone="warning">{t("promotion.pending")}</Badge>;
+    if (state?.availableAt) {
+      return <span className="text-xs text-ink-muted">{t("promotion.cooldown", { date: formatLocalizedDate(state.availableAt, locale as Locale, "numeric") ?? "" })}</span>;
+    }
+    return (
+      <span className="inline-flex flex-wrap items-center gap-2">
+        <PromotionRequestButton propertyId={property.id} title={property.title} />
+        {state?.status === PROMOTION_STATUSES.REJECTED && state.note && <span className="text-xs text-ink-muted">{t("promotion.rejectedNote", { note: state.note })}</span>}
+      </span>
+    );
+  }
   const appeals = await getOwnerAppeals(
     properties.filter((property) => (APPEALABLE_STATUSES as readonly string[]).includes(property.status)).map((property) => property.id),
   );
@@ -240,7 +264,7 @@ export default async function CabinetPropertiesPage({
             <p className="mt-2 text-sm font-medium text-ink-soft tabular-nums">
               {formatPrice(property.price, property.currency)}
             </p>
-            <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /></div>
+            <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /><PromotionControl property={property} /></div>
             <ModerationNote property={property} />
           </div>
         </div>
@@ -273,7 +297,7 @@ export default async function CabinetPropertiesPage({
                 <p className="mt-1 text-sm text-ink-soft tabular-nums">
                   {formatPrice(property.price, property.currency)}
                 </p>
-                <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /></div>
+                <div className="mt-2 flex flex-wrap items-center gap-2"><ExpiryControls property={property} /><PremiumControl property={property} /><PromotionControl property={property} /></div>
                 <ModerationNote property={property} />
               </div>
               <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>

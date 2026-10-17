@@ -68,7 +68,8 @@
       "restaurant": "Restoran",
       "park": "Park",
       "shoppingCenter": "Ticarət mərkəzi"
-    }
+    },
+    "promoted": "İrəli çəkilib"
   },
   "propertyDetail": {
     "notFound": "Əmlak tapılmadı",

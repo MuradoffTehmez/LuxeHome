@@ -93,6 +93,10 @@ const COPY = {
     listingNeedsInfo: (title: string) => `«${title}» elanı dərc olunmazdan əvvəl moderator düzəliş istəyir. Elanı redaktə edib yadda saxlayın — o yenidən yoxlamaya düşəcək.`,
     listingInfoRequestedTitle: "Elanınız barədə izahat istənilir",
     listingInfoRequested: (title: string) => `«${title}» elanı barədə ziyarətçi şikayəti yoxlanılır. Moderatorların sualını oxuyun və elanı düzəldin və ya bizimlə əlaqə saxlayın.`,
+    promotionDecisionTitle: "İrəli çəkmə sorğunuza baxıldı",
+    promotionDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
+      ? `«${title}» elanı ${days} gün siyahılarda irəli çəkiləcək.`
+      : `«${title}» elanının irəli çəkmə sorğusu rədd edildi${note ? `: ${note}` : "."}`,
     vipDecisionTitle: "VIP sorğunuza baxıldı",
     vipDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
       ? `«${title}» elanı ${days} günlük VIP statusu aldı.`
@@ -184,6 +188,10 @@ const COPY = {
     listingNeedsInfo: (title: string) => `A moderator has requested changes to the listing “${title}” before it can be published. Edit and save the listing — it will be reviewed again.`,
     listingInfoRequestedTitle: "Clarification requested for your listing",
     listingInfoRequested: (title: string) => `A visitor report about the listing “${title}” is being reviewed. Please read the moderators' question and correct the listing or contact us.`,
+    promotionDecisionTitle: "Your promotion request was reviewed",
+    promotionDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
+      ? `«${title}» will be promoted in listings for ${days} days.`
+      : `The promotion request for «${title}» was declined${note ? `: ${note}` : "."}`,
     vipDecisionTitle: "Your VIP request was reviewed",
     vipDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
       ? `«${title}» received VIP status for ${days} days.`
@@ -275,6 +283,10 @@ const COPY = {
     listingNeedsInfo: (title: string) => `Модератор просит исправить объявление «${title}» перед публикацией. Отредактируйте и сохраните его — оно снова попадёт на проверку.`,
     listingInfoRequestedTitle: "По вашему объявлению запрошены пояснения",
     listingInfoRequested: (title: string) => `Проверяется жалоба посетителя на объявление «${title}». Прочитайте вопрос модераторов и исправьте объявление или свяжитесь с нами.`,
+    promotionDecisionTitle: "Ваш запрос на поднятие рассмотрен",
+    promotionDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
+      ? `Объявление «${title}» будет поднято в списках на ${days} дн.`
+      : `Запрос на поднятие «${title}» отклонён${note ? `: ${note}` : "."}`,
     vipDecisionTitle: "Ваш VIP-запрос рассмотрен",
     vipDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
       ? `Объявление «${title}» получило VIP-статус на ${days} дн.`
@@ -803,5 +815,16 @@ export async function noticeVipRevoked(input: { userId: string; requestId: strin
     "/kabinet/elanlar",
     `vip:${input.requestId}:revoked`,
     (copy) => ({ title: copy.vipRevokedTitle, content: copy.vipRevoked(input.title, input.note) }),
+  );
+}
+
+/** Elan sahibinə: irəli çəkmə sorğusunun qərarı (#250). */
+export async function noticePromotionDecision(input: { userId: string; campaignId: string; title: string; approved: boolean; days: number; note: string | null }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.PROMOTION,
+    "/kabinet/elanlar",
+    `promotion:${input.campaignId}:${input.approved ? "approved" : "rejected"}`,
+    (copy) => ({ title: copy.promotionDecisionTitle, content: copy.promotionDecision(input.title, input.approved, input.days, input.note) }),
   );
 }

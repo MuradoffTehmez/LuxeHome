@@ -68,7 +68,8 @@
       "restaurant": "Ресторан",
       "park": "Парк",
       "shoppingCenter": "Торговый центр"
-    }
+    },
+    "promoted": "Поднято"
   },
   "propertyDetail": {
     "notFound": "Объект не найден",

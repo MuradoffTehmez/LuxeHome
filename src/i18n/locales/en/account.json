@@ -94,6 +94,33 @@
         "pending": "A request for this listing is already under review.",
         "failed": "The request was not sent. Please try again later."
       }
+    },
+    "promotion": {
+      "button": "Promote",
+      "label": "Promote «{title}»",
+      "title": "Promote listing",
+      "description": "«{title}» will be shown higher in listings for the chosen period and marked as “Promoted”.",
+      "duration": "Duration",
+      "days": "{count} days",
+      "messageLabel": "Note (optional)",
+      "free": "Promotion is free during the launch phase and no card details are required; an administrator approves the request.",
+      "cancel": "Close",
+      "submit": "Send request",
+      "sent": "Promotion request sent.",
+      "startedNow": "The listing has been promoted.",
+      "pending": "Promotion under review",
+      "activeUntil": "Promoted · until {date}",
+      "cooldown": "Next promotion available from {date}",
+      "rejectedNote": "Previous request was declined: {note}",
+      "errors": {
+        "disabled": "Promotion is not available right now.",
+        "duration": "Invalid duration.",
+        "listing": "You can only promote your own published listing.",
+        "active": "The listing is already promoted.",
+        "pending": "A request for this listing is already under review.",
+        "cooldown": "The cooldown before another promotion has not ended yet.",
+        "failed": "The request was not sent. Please try again later."
+      }
     }
   },
   "newProperty": {
