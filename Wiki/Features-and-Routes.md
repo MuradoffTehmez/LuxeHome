@@ -121,6 +121,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/rezervasiyalar` | Rezervasiyalar |
 | `/kabinet/axtarislarim` | Saxlanmış axtarışlar və tezlik |
 | `/kabinet/bildirisler` | Bildirişlər, kanal seçimləri, sakit saatlar |
+| `/kabinet/musteriler`, `/yeni`, `/[id]` | Mini CRM: müştəri kartları, ehtiyaclar, daxili qeydlər, müraciət tarixçəsi; agentlikdə sahib/menecer hamısını görür |
 | `/kabinet/muracietler/[id]` | Müraciət kartı: mərhələ, növbəti əlaqə, qeydlər, fəaliyyət tarixçəsi (yalnız aidiyyəti olan şəxs) |
 | `/kabinet/sikayetlerim` | Göndərilmiş elan şikayətləri, mərhələ və nəticə (moderator qeydləri görünmür) |
 | `/kabinet/agentlik` | Agentlik paneli: elan, müraciət, baxış/klik göstəriciləri, moderasiya xəbərdarlıqları, rəylər, agentlərin aktivliyi (yalnız sahib) |

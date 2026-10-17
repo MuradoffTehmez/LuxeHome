@@ -852,6 +852,119 @@
       "reassignHours": "təkrar təyinat təklif olundu ({hours} saat cavabsız)"
     }
   },
+  "clients": {
+    "metaTitle": "Müştərilər",
+    "metaDescription": "Müştəri kartları, ehtiyaclar və daxili qeydlər.",
+    "eyebrow": "Mini CRM",
+    "title": "Müştərilər",
+    "description": "Müştərilərinizin əlaqə məlumatlarını, ehtiyaclarını və müraciət tarixçəsini bir yerdə saxlayın.",
+    "descriptionManager": "Agentliyin bütün müştəri kartları: məsulu dəyişə, ehtiyacları və müraciət tarixçəsini izləyə bilərsiniz.",
+    "search": "Axtarış",
+    "searchPlaceholder": "Ad, telefon və ya e-poçt",
+    "ownerFilter": "Məsul",
+    "allOwners": "Hamısı",
+    "searchButton": "Axtar",
+    "new": "Yeni müştəri",
+    "emptyTitle": "Hələ müştəri kartı yoxdur",
+    "emptyDescription": "Yeni kart yaradın və ya müraciət kartından «Müştəri kartı yarat» düyməsini işlədin.",
+    "emptySearchTitle": "Heç nə tapılmadı",
+    "emptySearchDescription": "Axtarışı və ya filtri dəyişin.",
+    "count": "{count, plural, other {# müştəri}}",
+    "listingTypes": {
+      "SALE": "Alış",
+      "RENT": "Kirayə"
+    },
+    "roomsShort": "{rooms} otaq",
+    "leadCount": "{count, plural, other {# müraciət}}",
+    "budgetFrom": "{value} ₼-dən",
+    "budgetTo": "{value} ₼-dək",
+    "pagination": "Səhifələr",
+    "previous": "Əvvəlki",
+    "next": "Növbəti",
+    "pageOf": "{page} / {pages}",
+    "newTitle": "Yeni müştəri",
+    "newDescription": "Əlaqə məlumatını və müştərinin nə axtardığını qeyd edin.",
+    "created": "Müştəri kartı yaradıldı.",
+    "saved": "Müştəri kartı yadda saxlanıldı.",
+    "noteSaved": "Qeyd əlavə olundu.",
+    "reassigned": "Məsul dəyişdirildi.",
+    "deleted": "Müştəri kartı silindi.",
+    "alreadyLinked": "Bu müraciət artıq müştəri kartına bağlıdır.",
+    "fromLead": "Müştəri kartı yarat",
+    "errors": {
+      "name": "Ad 2–120 simvol olmalıdır.",
+      "phone": "Telefon nömrəsi düzgün deyil.",
+      "email": "E-poçt ünvanı düzgün deyil.",
+      "contact": "Telefon və ya e-poçtdan ən azı birini yazın.",
+      "range": "Minimum maksimumdan böyük ola bilməz.",
+      "invalid": "Sahə düzgün doldurulmayıb.",
+      "failed": "Əməliyyat alınmadı. Bir az sonra yenidən cəhd edin.",
+      "notFound": "Müştəri kartı tapılmadı.",
+      "noteEmpty": "Qeyd boş ola bilməz.",
+      "forbidden": "Bu əməliyyat üçün səlahiyyətiniz yoxdur.",
+      "invalidAssignee": "Seçilmiş şəxs agentliyin aktiv üzvü deyil.",
+      "linkedElsewhere": "Bu müraciət başqa müştəri kartına bağlıdır."
+    },
+    "form": {
+      "contactTitle": "Əlaqə məlumatı",
+      "name": "Ad, soyad",
+      "phone": "Telefon",
+      "email": "E-poçt",
+      "needsTitle": "Ehtiyaclar",
+      "listingType": "Alış və ya kirayə",
+      "any": "Fərq etməz",
+      "type": "Əmlak növü",
+      "rooms": "Otaq sayı",
+      "city": "Şəhər / rayon",
+      "district": "Ərazi",
+      "cityFirst": "Əvvəlcə şəhəri seçin",
+      "renovation": "Təmir vəziyyəti",
+      "priceMin": "Qiymət, min (₼)",
+      "priceMax": "Qiymət, maks (₼)",
+      "areaMin": "Sahə, min (m²)",
+      "areaMax": "Sahə, maks (m²)",
+      "preferences": "Digər üstünlüklər",
+      "preferencesHint": "Məsələn: metroya yaxın, yüksək mərtəbə, parkinq.",
+      "save": "Yadda saxla",
+      "create": "Kartı yarat"
+    },
+    "renovations": {
+      "NEW_BUILDING": "Yeni tikili (təmirsiz)",
+      "DESIGNER": "Dizayner təmiri",
+      "RENOVATED": "Təmirli",
+      "COSMETIC": "Kosmetik təmir",
+      "UNRENOVATED": "Təmirsiz"
+    },
+    "notes": {
+      "title": "Daxili qeydlər",
+      "new": "Yeni qeyd",
+      "hint": "Qeyd müştəriyə göstərilmir.",
+      "add": "Qeyd əlavə et"
+    },
+    "card": {
+      "metaTitle": "Müştəri kartı",
+      "eyebrow": "Müştəri kartı",
+      "createdAt": "{date} yaradılıb",
+      "editTitle": "Əlaqə və ehtiyaclar",
+      "leadsTitle": "Müraciət tarixçəsi",
+      "leadsEmpty": "Karta bağlı müraciət yoxdur.",
+      "interested": "Maraqlandığı əmlak",
+      "owner": "Məsul",
+      "reassign": "Dəyiş",
+      "delete": "Kartı sil",
+      "deleteTitle": "Müştəri kartı silinsin?",
+      "deleteDescription": "«{name}» kartı və onun qeydləri silinəcək. Bağlı müraciətlər qalır.",
+      "cancel": "Ləğv et",
+      "confirmDelete": "Sil",
+      "privacy": "Kartı yalnız məsul şəxs və agentliyin səlahiyyətli idarəçiləri görür.",
+      "back": "Müştərilərə qayıt"
+    },
+    "leadCard": {
+      "title": "Müştəri kartı",
+      "open": "Kartı aç: {name}",
+      "hint": "Müştərinin ehtiyaclarını və qeydlərini bir kartda saxlayın."
+    }
+  },
   "offices": {
     "name": "Filialın adı",
     "namePlaceholder": "məs. Nərimanov filialı",
@@ -1095,7 +1208,8 @@
       "team": "Komanda",
       "packages": "Paketlər",
       "transfers": "Köçürmələr",
-      "tasks": "Tapşırıqlar"
+      "tasks": "Tapşırıqlar",
+      "clients": "Müştərilər"
     },
     "platform": "Platforma administratoru",
     "actions": {
@@ -1122,7 +1236,10 @@
       "MEMBER_SUSPENDED": "{entity} adlı agentin girişini dayandırdı",
       "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi",
       "TASK_CREATED": "«{entity}» tapşırığını yaratdı",
-      "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi"
+      "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi",
+      "CLIENT_CREATED": "«{entity}» müştəri kartını yaratdı",
+      "CLIENT_REASSIGNED": "«{entity}» müştəri kartının məsulunu dəyişdi",
+      "CLIENT_DELETED": "«{entity}» müştəri kartını sildi"
     },
     "details": {
       "price": "{from} → {to}",

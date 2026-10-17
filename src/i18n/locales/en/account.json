@@ -852,6 +852,119 @@
       "reassignHours": "suggested reassignment ({hours} h unanswered)"
     }
   },
+  "clients": {
+    "metaTitle": "Clients",
+    "metaDescription": "Client cards, requirements and internal notes.",
+    "eyebrow": "Mini CRM",
+    "title": "Clients",
+    "description": "Keep your clients' contact details, requirements and enquiry history in one place.",
+    "descriptionManager": "All agency client cards: reassign owners and follow requirements and enquiry history.",
+    "search": "Search",
+    "searchPlaceholder": "Name, phone or email",
+    "ownerFilter": "Owner",
+    "allOwners": "All",
+    "searchButton": "Search",
+    "new": "New client",
+    "emptyTitle": "No client cards yet",
+    "emptyDescription": "Create a card or use “Create client card” on an enquiry card.",
+    "emptySearchTitle": "Nothing found",
+    "emptySearchDescription": "Change the search or the filter.",
+    "count": "{count, plural, one {# client} other {# clients}}",
+    "listingTypes": {
+      "SALE": "Buy",
+      "RENT": "Rent"
+    },
+    "roomsShort": "{rooms} rooms",
+    "leadCount": "{count, plural, one {# enquiry} other {# enquiries}}",
+    "budgetFrom": "from {value} ₼",
+    "budgetTo": "up to {value} ₼",
+    "pagination": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "{page} / {pages}",
+    "newTitle": "New client",
+    "newDescription": "Record the contact details and what the client is looking for.",
+    "created": "Client card created.",
+    "saved": "Client card saved.",
+    "noteSaved": "Note added.",
+    "reassigned": "Owner changed.",
+    "deleted": "Client card deleted.",
+    "alreadyLinked": "This enquiry is already linked to a client card.",
+    "fromLead": "Create client card",
+    "errors": {
+      "name": "The name must be 2–120 characters.",
+      "phone": "The phone number is invalid.",
+      "email": "The email address is invalid.",
+      "contact": "Enter at least a phone number or an email.",
+      "range": "The minimum cannot exceed the maximum.",
+      "invalid": "A field is filled in incorrectly.",
+      "failed": "The action failed. Try again shortly.",
+      "notFound": "Client card not found.",
+      "noteEmpty": "The note cannot be empty.",
+      "forbidden": "You are not allowed to do this.",
+      "invalidAssignee": "The selected person is not an active agency member.",
+      "linkedElsewhere": "This enquiry is linked to another client card."
+    },
+    "form": {
+      "contactTitle": "Contact details",
+      "name": "Full name",
+      "phone": "Phone",
+      "email": "Email",
+      "needsTitle": "Requirements",
+      "listingType": "Buy or rent",
+      "any": "Any",
+      "type": "Property type",
+      "rooms": "Rooms",
+      "city": "City / district",
+      "district": "Area",
+      "cityFirst": "Choose a city first",
+      "renovation": "Condition",
+      "priceMin": "Price, min (₼)",
+      "priceMax": "Price, max (₼)",
+      "areaMin": "Area, min (m²)",
+      "areaMax": "Area, max (m²)",
+      "preferences": "Other preferences",
+      "preferencesHint": "For example: near the metro, high floor, parking.",
+      "save": "Save",
+      "create": "Create card"
+    },
+    "renovations": {
+      "NEW_BUILDING": "New building (shell)",
+      "DESIGNER": "Designer renovation",
+      "RENOVATED": "Renovated",
+      "COSMETIC": "Cosmetic repair",
+      "UNRENOVATED": "Needs renovation"
+    },
+    "notes": {
+      "title": "Internal notes",
+      "new": "New note",
+      "hint": "Notes are not shown to the client.",
+      "add": "Add note"
+    },
+    "card": {
+      "metaTitle": "Client card",
+      "eyebrow": "Client card",
+      "createdAt": "Created on {date}",
+      "editTitle": "Contact and requirements",
+      "leadsTitle": "Enquiry history",
+      "leadsEmpty": "No enquiries are linked to this card.",
+      "interested": "Interested in",
+      "owner": "Owner",
+      "reassign": "Change",
+      "delete": "Delete card",
+      "deleteTitle": "Delete the client card?",
+      "deleteDescription": "The “{name}” card and its notes will be deleted. Linked enquiries remain.",
+      "cancel": "Cancel",
+      "confirmDelete": "Delete",
+      "privacy": "Only the owner and authorised agency managers can see this card.",
+      "back": "Back to clients"
+    },
+    "leadCard": {
+      "title": "Client card",
+      "open": "Open card: {name}",
+      "hint": "Keep the client's requirements and notes on one card."
+    }
+  },
   "offices": {
     "name": "Branch name",
     "namePlaceholder": "e.g. Narimanov branch",
@@ -1095,7 +1208,8 @@
       "team": "Team",
       "packages": "Packages",
       "transfers": "Transfers",
-      "tasks": "Tasks"
+      "tasks": "Tasks",
+      "clients": "Clients"
     },
     "platform": "Platform administrator",
     "actions": {
@@ -1122,7 +1236,10 @@
       "MEMBER_SUSPENDED": "suspended the access of {entity}",
       "MEMBER_RESUMED": "restored the access of {entity}",
       "TASK_CREATED": "created the task “{entity}”",
-      "TASK_STATUS_CHANGED": "changed the status of “{entity}”"
+      "TASK_STATUS_CHANGED": "changed the status of “{entity}”",
+      "CLIENT_CREATED": "created the client card “{entity}”",
+      "CLIENT_REASSIGNED": "changed the owner of the client card “{entity}”",
+      "CLIENT_DELETED": "deleted the client card “{entity}”"
     },
     "details": {
       "price": "{from} → {to}",

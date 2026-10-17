@@ -35,6 +35,7 @@ import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { generateInviteToken } from "@/lib/accounts/agency-invite";
 import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
 import { validateLeadAlertConfig } from "@/lib/accounts/lead-alerts";
+import { releaseAgentClients } from "@/lib/accounts/crm";
 
 /**
  * Agentlik komandası — sahib (owner) idarə edir.
@@ -203,6 +204,8 @@ export async function removeAgencyEmployee(
     const handedOver = target?.ok ? await handOverListings(employee.userId, target.userId, owner.agency.id) : 0;
     // Agentlik müraciətləri sahibə qayıdır (#161) — elan təhvilindən sonra, elanla keçənlər də daxil.
     await releaseAgentLeads({ agencyId: owner.agency.id, userId: employee.userId, ownerUserId: owner.user.id });
+    // Agentlik mühitindəki müştəri kartları da sahibə keçir (#226).
+    await releaseAgentClients({ agencyId: owner.agency.id, userId: employee.userId, ownerUserId: owner.user.id });
     await prisma.agencyEmployee.delete({ where: { id } });
     await linkAgentProfileToAgency(employee.userId, owner.agency.id, false);
     if (employee.status === AGENCY_EMPLOYEE_STATUSES.APPROVED) {

@@ -20,7 +20,7 @@ export type AgencyActivityInput = {
   agencyId: string | null | undefined;
   actor: Actor | null;
   action: AgencyActivityAction;
-  entityType: "Property" | "Lead" | "AgencyEmployee" | "PackageOrder" | "Agency" | "ListingTransfer" | "AgencyTask";
+  entityType: "Property" | "Lead" | "AgencyEmployee" | "PackageOrder" | "Agency" | "ListingTransfer" | "AgencyTask" | "CrmClient";
   entityId?: string | null;
   entityLabel?: string | null;
   details?: Record<string, string | number | boolean | null>;

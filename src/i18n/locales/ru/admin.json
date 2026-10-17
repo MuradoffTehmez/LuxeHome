@@ -2934,7 +2934,10 @@
         "MEMBER_SUSPENDED": "приостановил(а) доступ {entity}",
         "MEMBER_RESUMED": "восстановил(а) доступ {entity}",
         "TASK_CREATED": "создал(а) задачу «{entity}»",
-        "TASK_STATUS_CHANGED": "изменил(а) статус задачи «{entity}»"
+        "TASK_STATUS_CHANGED": "изменил(а) статус задачи «{entity}»",
+        "CLIENT_CREATED": "создал(а) карточку клиента «{entity}»",
+        "CLIENT_REASSIGNED": "сменил(а) ответственного по карточке «{entity}»",
+        "CLIENT_DELETED": "удалил(а) карточку клиента «{entity}»"
       }
     },
     "reports": {

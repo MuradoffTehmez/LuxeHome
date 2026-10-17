@@ -222,6 +222,7 @@ model Agency {
   transfersIn       ListingTransfer[]         @relation("TransferTo")
   activities        AgencyActivity[]
   tasks             AgencyTask[]
+  crmClients        CrmClient[]
   partners          AgencyPartner[]
   agentProfiles     AgentProfile[]
   testimonials      Testimonial[]
@@ -399,6 +400,63 @@ model AgencyTask {
 
   @@index([agencyId, status, dueAt])
   @@index([agencyId, assigneeId, status])
+}
+
+/// Mini CRM müştəri kartı (#226, PRD 9.1, 9.2). Agentlik üzvünün kartı agentliyin mühitinə aiddir
+/// (`agencyId`): sahib və `LEADS_MANAGE` menecerlər hamısını, agent yalnız özününkünü (`ownerId`) görür.
+/// Şəxsi hesabın kartında `agencyId` boşdur. `phoneKey`/`emailKey` təkrarlanan müraciətin tapılması üçündür.
+/// Taksonomiya və elan id-ləri FK-sız saxlanılır (`AgencyTask` kimi) — silinmiş qeyd kartı sındırmır.
+model CrmClient {
+  id                   String    @id @default(cuid())
+  agencyId             String?
+  ownerId              String
+  createdById          String?
+  name                 String
+  phone                String?
+  /// Telefonun son 9 rəqəmi (`crmPhoneKey`) — «+994 50…» və «050…» eyni açara düşür.
+  phoneKey             String?
+  email                String?
+  emailKey             String?
+  /// Ad + telefon rəqəmləri + e-poçt, diakritikasız (`crmSearchText`) — D1-də registrsiz axtarış yoxdur.
+  searchText           String    @default("")
+  /// Maraqlandığı əmlak (adətən müraciətin elanı).
+  interestedPropertyId String?
+  /// Ehtiyaclar (PRD 9.2): `LISTING_TYPES`, `RENOVATIONS`; qiymət AZN.
+  listingType          String?
+  typeId               String?
+  cityId               String?
+  districtId           String?
+  priceMin             Int?
+  priceMax             Int?
+  areaMin              Int?
+  areaMax              Int?
+  rooms                Int?
+  renovation           String?
+  preferences          String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  agency Agency?         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  notes  CrmClientNote[]
+
+  @@index([agencyId, updatedAt])
+  @@index([ownerId, updatedAt])
+  @@index([phoneKey])
+  @@index([emailKey])
+}
+
+/// Agentin müştəri haqqında daxili qeydi (PRD 9.1) — müştəriyə görünmür. Müəllifin adı snapshot-dur.
+model CrmClientNote {
+  id         String   @id @default(cuid())
+  clientId   String
+  authorId   String?
+  authorName String
+  text       String
+  createdAt  DateTime @default(now())
+
+  client CrmClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, createdAt])
 }
 
 /// Müraciətin fəaliyyət tarixçəsi və qeydləri (#222, PRD 8.6): yaradılma, təyinat, mərhələ, növbəti əlaqə
@@ -1198,6 +1256,8 @@ model Lead {
   stage         String    @default("NEW")
   /// Növbəti əlaqə tarixi (PRD 8.6).
   nextContactAt DateTime?
+  /// Bağlı müştəri kartı (#226, PRD 9.1) — FK-sız; kart silinəndə boşaldılır.
+  clientId      String?
 
   /// Organic/paid/direct atribusiyası `source` domen sahəsindən qəsdən ayrıdır.
   acquisitionSource String?
@@ -1228,6 +1288,7 @@ model Lead {
   @@index([handlerId, createdAt])
   @@index([agencyId, createdAt])
   @@index([respondedAt, escalatedAt, createdAt])
+  @@index([clientId])
 }
 
 // ---------------------------------------------------------------------------

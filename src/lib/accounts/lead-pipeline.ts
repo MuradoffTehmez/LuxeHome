@@ -135,6 +135,7 @@ export async function getLeadCard(userId: string, leadId: string) {
         respondedAt: true,
         nextContactAt: true,
         reassignSuggestedAt: true,
+        clientId: true,
         handlerId: true,
         handler: { select: { name: true } },
         agency: { select: { id: true, name: true, userId: true } },
