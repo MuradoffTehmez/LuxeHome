@@ -67,9 +67,9 @@ beforeAll(async () => {
   await DB.batch([
     user.bind("bl-owner", "Sahib", "owner@bl.test", "OWNER"),
     user.bind("bl-agency", "Agentlik", "agency@bl.test", "AGENCY"),
-    DB.prepare('INSERT INTO "Agency" ("id", "userId", "name", "slug", "createdAt", "updatedAt") VALUES (\'bl-ag\', \'bl-agency\', \'Agentlik\', \'bl-agentlik\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'),
-    DB.prepare('INSERT INTO "SubscriptionPlanPrice" ("id", "planId", "months", "priceMinor", "updatedAt") VALUES (\'bl-price\', \'plan_pro_individual\', 1, 5000, CURRENT_TIMESTAMP)'),
-    DB.prepare('INSERT INTO "DiscountCode" ("id", "code", "percentOff", "updatedAt") VALUES (\'bl-dc\', \'YAY10\', 10, CURRENT_TIMESTAMP)'),
+    DB.prepare(`INSERT INTO "Agency" ("id", "userId", "name", "slug", "createdAt", "updatedAt") VALUES (\'bl-ag\', \'bl-agency\', \'Agentlik\', \'bl-agentlik\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`),
+    DB.prepare(`INSERT INTO "SubscriptionPlanPrice" ("id", "planId", "months", "priceMinor", "updatedAt") VALUES (\'bl-price\', \'plan_pro_individual\', 1, 5000, CURRENT_TIMESTAMP)`),
+    DB.prepare(`INSERT INTO "DiscountCode" ("id", "code", "percentOff", "updatedAt") VALUES (\'bl-dc\', \'YAY10\', 10, CURRENT_TIMESTAMP)`),
   ]);
 });
 
@@ -120,6 +120,21 @@ describe("ödəniş axını", () => {
 
     await expect(recordPaymentResult({ transactionId, status: PAYMENT_STATUSES.REFUNDED, now })).resolves.toBe(true);
     expect((await prisma.subscription.findUniqueOrThrow({ where: { id: paid.subscriptionId! } })).status).toBe(SUBSCRIPTION_STATUSES.CANCELLED);
+  });
+
+  it("icra yarımçıq qalsa uğurlu nəticənin təkrarı abunəni tamamlayır; agentlik planı fərdi hesaba satılmır", async () => {
+    await setFlags(paidFlags);
+    const started = await startSubscriptionCheckout({ ...checkoutInput, idempotencyKey: "k-retry" }, fakeProvider());
+    const transactionId = started.ok ? started.transactionId : "";
+    // İcrasız «uğurlu» vəziyyəti simulyasiya et (status yazılıb, abunə yaranmayıb).
+    await DB.prepare(`UPDATE "PaymentTransaction" SET "status" = 'SUCCEEDED' WHERE "id" = ?`).bind(transactionId).run();
+    await expect(recordPaymentResult({ transactionId, status: PAYMENT_STATUSES.SUCCEEDED, now })).resolves.toBe(true);
+    await expect(recordPaymentResult({ transactionId, status: PAYMENT_STATUSES.SUCCEEDED, now })).resolves.toBe(false);
+    expect(await prisma.subscription.count({ where: { id: `sub_${transactionId}` } })).toBe(1);
+    expect((await prisma.paymentTransaction.findUniqueOrThrow({ where: { id: transactionId } })).subscriptionId).toBe(`sub_${transactionId}`);
+
+    await DB.prepare(`INSERT INTO "SubscriptionPlanPrice" ("id", "planId", "months", "priceMinor", "updatedAt") VALUES ('bl-agency-price', 'plan_pro_agency', 1, 9000, CURRENT_TIMESTAMP)`).run();
+    await expect(startSubscriptionCheckout({ ...checkoutInput, planId: "plan_pro_agency", idempotencyKey: "k-agency" }, fakeProvider())).resolves.toEqual({ ok: false, reason: "plan" });
   });
 
   it("provayder xətası uğursuz ödəniş kimi səbəblə yazılır; səhv endirim kodu ödəniş yaratmır", async () => {
