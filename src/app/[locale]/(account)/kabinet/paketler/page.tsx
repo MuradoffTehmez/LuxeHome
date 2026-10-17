@@ -78,7 +78,7 @@ export default async function CabinetPackagesPage({ searchParams }: { searchPara
       <PageHeader contained compact eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
       {/* Tanıtım mərhələsi (#244, PRD 16.4): aktiv xidmətlər ödənişsizdir. */}
-      {pricingMode(flags).promo && (
+      {flags.SUBSCRIPTIONS && pricingMode(flags).promo && (
         <div role="note" className="mt-6 flex gap-3 rounded-xl border border-gold/40 bg-gold/10 p-4">
           <Info className="mt-0.5 size-5 shrink-0 text-gold-deep" aria-hidden="true" />
           <div className="min-w-0 text-sm">

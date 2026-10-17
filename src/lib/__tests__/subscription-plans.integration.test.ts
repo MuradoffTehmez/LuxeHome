@@ -8,6 +8,7 @@ import {
   PLAN_CODES,
   durationSavingsPercent,
   parseLimitInput,
+  parsePlanDescription,
   parsePlanCapabilities,
   parsePlanLimits,
   parsePriceInput,
@@ -52,6 +53,12 @@ describe("plan qaydaları", () => {
     expect(durationSavingsPercent(1000, 2700, 3)).toBe(10);
     expect(durationSavingsPercent(1000, 3000, 3)).toBeNull();
     expect(durationSavingsPercent(null, 2700, 3)).toBeNull();
+  });
+
+  it("plan təsviri dil üzrədir; köhnə düz mətn AZ sayılır, boş dil kataloq şüarına qalır", () => {
+    expect(parsePlanDescription(JSON.stringify({ az: "Əsas", en: " ", ru: "Базовый" }))).toEqual({ az: "Əsas", ru: "Базовый" });
+    expect(parsePlanDescription("Köhnə mətn")).toEqual({ az: "Köhnə mətn" });
+    expect(parsePlanDescription(null)).toEqual({});
   });
 
   it("tanıtım mərhələsi: defolt bayraqlarda qiymət yox, ödəniş yox", () => {

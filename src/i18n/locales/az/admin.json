@@ -3219,7 +3219,6 @@
       "active": "Aktiv",
       "inactive": "Deaktiv",
       "trialDays": "Sınaq günləri",
-      "descriptionLabel": "Təsvir (istəyə bağlı)",
       "capabilities": "Plan imkanları",
       "limits": "Xidmət limitləri",
       "limitHint": "Boş — limitsiz. Tanıtım mərhələsində tətbiq olunmur.",
@@ -3356,7 +3355,8 @@
         "date": "Tarix",
         "amount": "Məbləğ",
         "invoice": "Faktura"
-      }
+      },
+      "descriptionLabelLocale": "Təsvir — {locale} (istəyə bağlı)"
     }
   },
   "server": {
