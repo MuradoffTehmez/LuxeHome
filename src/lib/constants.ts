@@ -796,6 +796,10 @@ export const LEAD_SOURCES = {
   OWNER: "OWNER",
   /** Agentlik profilindəki əlaqə forması (#161) — agentliyin özünə gedir, ofisə yox. */
   AGENCY: "AGENCY",
+  /** Elan formasında «baxış görüşü» məqsədi (#222, PRD 8.2). */
+  VIEWING: "VIEWING",
+  /** Elan formasında «əlavə məlumat» məqsədi (#222, PRD 8.2). */
+  INFO: "INFO",
 } as const;
 
 export type LeadSource = (typeof LEAD_SOURCES)[keyof typeof LEAD_SOURCES];
@@ -807,7 +811,46 @@ export const LEAD_SOURCE_LABELS: Record<LeadSource, string> = {
   PROJECT: "Layihə səhifəsi",
   OWNER: "Sahib müraciəti",
   AGENCY: "Agentlik profili",
+  VIEWING: "Baxış görüşü sorğusu",
+  INFO: "Əlavə məlumat sorğusu",
 };
+
+/**
+ * Kabinetdəki müraciətin satış mərhələsi (#222, PRD 8.3). Ofisin qaba statusu (`LEAD_STATUSES`) mərhələdən
+ * çıxarılır — `leadStatusForStage()`; ofis lövhəsi və huni dəyişmir.
+ */
+export const LEAD_STAGES = {
+  NEW: "NEW",
+  ASSIGNED: "ASSIGNED",
+  CONTACTED: "CONTACTED",
+  VIEWING_SCHEDULED: "VIEWING_SCHEDULED",
+  VIEWING_DONE: "VIEWING_DONE",
+  NEGOTIATING: "NEGOTIATING",
+  AGREED: "AGREED",
+  SOLD: "SOLD",
+  RENTED: "RENTED",
+  REJECTED: "REJECTED",
+  CLOSED: "CLOSED",
+} as const;
+
+export type LeadStage = (typeof LEAD_STAGES)[keyof typeof LEAD_STAGES];
+
+/** Bağlanmış mərhələlər — cavabsız/açıq sayılmır. */
+export const CLOSED_LEAD_STAGES: readonly LeadStage[] = ["SOLD", "RENTED", "REJECTED", "CLOSED"];
+
+/** Müraciət kartının fəaliyyət tarixçəsinin növləri (#222, PRD 8.6). */
+export const LEAD_ACTIVITY_TYPES = {
+  CREATED: "CREATED",
+  ASSIGNED: "ASSIGNED",
+  STAGE: "STAGE",
+  RESPONDED: "RESPONDED",
+  NEXT_CONTACT: "NEXT_CONTACT",
+  NOTE: "NOTE",
+} as const;
+
+export type LeadActivityType = (typeof LEAD_ACTIVITY_TYPES)[keyof typeof LEAD_ACTIVITY_TYPES];
+
+export const LEAD_NOTE_MAX = 2000;
 
 /**
  * Agentliyə gələn müraciətin agentlər arasında bölünməsi (#161):

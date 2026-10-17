@@ -266,7 +266,9 @@
       "SERVICE": "Xidmət səhifəsi",
       "PROJECT": "Layihə səhifəsi",
       "OWNER": "Sahib müraciəti",
-      "AGENCY": "Agentlik profili"
+      "AGENCY": "Agentlik profili",
+      "VIEWING": "Baxış görüşü sorğusu",
+      "INFO": "Əlavə məlumat sorğusu"
     },
     "leadStatus": {
       "NEW": "Yeni",

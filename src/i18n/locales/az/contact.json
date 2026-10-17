@@ -106,5 +106,11 @@
       "noEstimate": "hesablanmadı",
       "messageTemplate": "Məqsəd: {listing}\nƏmlak növü: {type}\nYer: {place}\nSahə: {area} m²\nSaytdakı təxmini qiymət: {estimate}\n\nƏlavə məlumat: "
     }
+  },
+  "intent": {
+    "legend": "Müraciətin məqsədi",
+    "PROPERTY": "Sual",
+    "VIEWING": "Baxış görüşü",
+    "INFO": "Əlavə məlumat"
   }
 }

@@ -266,7 +266,9 @@
       "SERVICE": "Service page",
       "PROJECT": "Development page",
       "OWNER": "Owner request",
-      "AGENCY": "Agency profile"
+      "AGENCY": "Agency profile",
+      "VIEWING": "Viewing request",
+      "INFO": "Information request"
     },
     "leadStatus": {
       "NEW": "New",

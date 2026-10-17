@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { AGENCY_ACTIVITY_ACTIONS, LEAD_STATUSES, type Locale } from "@/lib/constants";
+import { AGENCY_ACTIVITY_ACTIONS, LEAD_ACTIVITY_TYPES, LEAD_NOTE_MAX, LEAD_STAGES, type Locale } from "@/lib/constants";
+import { isLeadStage, recordLeadActivity, stageData } from "@/lib/accounts/lead-pipeline";
 import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { ACTIVE_MEMBER_WHERE } from "@/lib/accounts/agency-access";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
@@ -42,9 +43,15 @@ export async function markLeadResponded(id: string): Promise<ActionState> {
     const lead = await findManageableLead(context.user.id, id);
     if (!lead) return failure(t("actions.notFound"));
     const now = new Date();
-    await prisma.lead.updateMany({ where: { id: lead.id, respondedAt: null }, data: { respondedAt: now } });
-    await prisma.lead.updateMany({ where: { id: lead.id, status: LEAD_STATUSES.NEW }, data: { status: LEAD_STATUSES.CONTACTED } });
+    const first = await prisma.lead.updateMany({ where: { id: lead.id, respondedAt: null }, data: { respondedAt: now } });
+    // Yeni və ya təyin edilmiş müraciət «əlaqə saxlanılıb» mərhələsinə keçir (#222).
+    await prisma.lead.updateMany({
+      where: { id: lead.id, stage: { in: [LEAD_STAGES.NEW, LEAD_STAGES.ASSIGNED] } },
+      data: stageData(LEAD_STAGES.CONTACTED),
+    });
+    if (first.count > 0) await recordLeadActivity({ leadId: lead.id, actor: context.user, type: LEAD_ACTIVITY_TYPES.RESPONDED });
     revalidatePath(localizePath(LIST_PATH, context.locale));
+    revalidatePath(localizePath(`${LIST_PATH}/${lead.id}`, context.locale));
     return success(t("actions.responded"));
   } catch (error) {
     return unexpected("müraciət cavablandırılmadı", error, t("actions.failed"));
@@ -64,8 +71,10 @@ export async function closeLead(id: string): Promise<ActionState> {
     if (!lead) return failure(t("actions.notFound"));
     const now = new Date();
     await prisma.lead.updateMany({ where: { id: lead.id, respondedAt: null }, data: { respondedAt: now } });
-    await prisma.lead.update({ where: { id: lead.id }, data: { status: LEAD_STATUSES.CLOSED } });
+    await prisma.lead.update({ where: { id: lead.id }, data: stageData(LEAD_STAGES.CLOSED) });
+    await recordLeadActivity({ leadId: lead.id, actor: context.user, type: LEAD_ACTIVITY_TYPES.STAGE, details: { to: LEAD_STAGES.CLOSED } });
     revalidatePath(localizePath(LIST_PATH, context.locale));
+    revalidatePath(localizePath(`${LIST_PATH}/${lead.id}`, context.locale));
     return success(t("actions.closed"));
   } catch (error) {
     return unexpected("müraciət bağlanmadı", error, t("actions.failed"));
@@ -93,7 +102,9 @@ export async function reassignLead(id: string, targetUserId: string): Promise<Ac
     if (lead.handlerId === targetUserId) return success(t("actions.reassigned"));
 
     await prisma.lead.update({ where: { id: lead.id }, data: { handlerId: targetUserId } });
+    await prisma.lead.updateMany({ where: { id: lead.id, stage: LEAD_STAGES.NEW }, data: stageData(LEAD_STAGES.ASSIGNED) });
     const target = await prisma.user.findUnique({ where: { id: targetUserId }, select: { name: true } });
+    await recordLeadActivity({ leadId: lead.id, actor: context.user, type: LEAD_ACTIVITY_TYPES.ASSIGNED, details: { to: target?.name ?? null } });
     await recordAgencyActivity({
       agencyId: lead.agency.id, actor: context.user, action: AGENCY_ACTIVITY_ACTIONS.LEAD_REASSIGNED,
       entityType: "Lead", entityId: lead.id, entityLabel: lead.property?.title ?? lead.subject ?? lead.name,
@@ -110,8 +121,78 @@ export async function reassignLead(id: string, targetUserId: string): Promise<Ac
       });
     }
     revalidatePath(localizePath(LIST_PATH, context.locale));
+    revalidatePath(localizePath(`${LIST_PATH}/${lead.id}`, context.locale));
     return success(t("actions.reassigned"));
   } catch (error) {
     return unexpected("müraciət başqa agentə verilmədi", error, t("actions.failed"));
   }
+}
+
+/** Mərhələni dəyişir (#222, PRD 8.3): müraciətə baxa bilən hər kəs; ilk mərhələ dəyişikliyi cavab sayılır. */
+export async function changeLeadStage(id: string, stage: string): Promise<ActionState> {
+  const context = await guard();
+  if (isFailure(context)) return context;
+  const t = await getTranslations("account.leads");
+  if (!isLeadStage(stage)) return failure(t("actions.failed"));
+  try {
+    const lead = await findManageableLead(context.user.id, id);
+    if (!lead) return failure(t("actions.notFound"));
+    const current = await prisma.lead.findUnique({ where: { id: lead.id }, select: { stage: true } });
+    if (!current || current.stage === stage) return success(t("actions.stageSaved"));
+    // Şərti yazılış: eyni anda iki dəyişiklik bir-birinin üzərinə səssizcə yazılmır.
+    const { count } = await prisma.lead.updateMany({ where: { id: lead.id, stage: current.stage }, data: stageData(stage) });
+    if (count === 0) return failure(t("actions.stale"));
+    if (stage !== LEAD_STAGES.NEW && stage !== LEAD_STAGES.ASSIGNED) {
+      await prisma.lead.updateMany({ where: { id: lead.id, respondedAt: null }, data: { respondedAt: new Date() } });
+    }
+    await recordLeadActivity({ leadId: lead.id, actor: context.user, type: LEAD_ACTIVITY_TYPES.STAGE, details: { from: current.stage, to: stage } });
+  } catch (error) {
+    return unexpected("müraciətin mərhələsi dəyişmədi", error, t("actions.failed"));
+  }
+  revalidatePath(localizePath(LIST_PATH, context.locale));
+  revalidatePath(localizePath(`${LIST_PATH}/${id}`, context.locale));
+  return success(t("actions.stageSaved"));
+}
+
+/** Daxili qeyd (PRD 8.6) — yalnız müraciətə baxa bilənlərə görünür. */
+export async function addLeadNote(id: string, text: string): Promise<ActionState> {
+  const context = await guard();
+  if (isFailure(context)) return context;
+  const t = await getTranslations("account.leads");
+  const note = typeof text === "string" ? text.trim().slice(0, LEAD_NOTE_MAX) : "";
+  if (note.length < 2) return failure(t("actions.noteEmpty"));
+  try {
+    const lead = await findManageableLead(context.user.id, id);
+    if (!lead) return failure(t("actions.notFound"));
+    await recordLeadActivity({ leadId: lead.id, actor: context.user, type: LEAD_ACTIVITY_TYPES.NOTE, text: note });
+  } catch (error) {
+    return unexpected("müraciət qeydi yazılmadı", error, t("actions.failed"));
+  }
+  revalidatePath(localizePath(`${LIST_PATH}/${id}`, context.locale));
+  return success(t("actions.noteSaved"));
+}
+
+/** Növbəti əlaqə tarixi (`YYYY-MM-DDTHH:mm`, Bakı vaxtı) və ya boş — təmizləmək. */
+export async function setLeadNextContact(id: string, value: string): Promise<ActionState> {
+  const context = await guard();
+  if (isFailure(context)) return context;
+  const t = await getTranslations("account.leads");
+  let next: Date | null = null;
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (raw) {
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(raw)) return failure(t("actions.invalidDate"));
+    next = new Date(`${raw}:00+04:00`);
+    if (Number.isNaN(next.getTime())) return failure(t("actions.invalidDate"));
+  }
+  try {
+    const lead = await findManageableLead(context.user.id, id);
+    if (!lead) return failure(t("actions.notFound"));
+    await prisma.lead.update({ where: { id: lead.id }, data: { nextContactAt: next } });
+    await recordLeadActivity({ leadId: lead.id, actor: context.user, type: LEAD_ACTIVITY_TYPES.NEXT_CONTACT, details: { at: next ? next.toISOString() : null } });
+  } catch (error) {
+    return unexpected("növbəti əlaqə tarixi saxlanmadı", error, t("actions.failed"));
+  }
+  revalidatePath(localizePath(LIST_PATH, context.locale));
+  revalidatePath(localizePath(`${LIST_PATH}/${id}`, context.locale));
+  return success(t("actions.nextSaved"));
 }
