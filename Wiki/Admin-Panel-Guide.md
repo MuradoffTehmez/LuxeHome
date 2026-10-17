@@ -221,6 +221,7 @@ Paketin adı, müddəti və qiyməti sifarişə kopyalanır (sonrakı qiymət d�
 | `/admin/sistem` | Sistem rejimi və 11 inteqrasiyanın hazırlığı: Search Console, Cloudflare analitikası, e-poçt (Resend), e-poçt webhook-u, geokod (Geoapify), Turnstile, saved-search cron, Web Push, Telegram, Google girişi, telefon girişi | Hər rejim dəyişikliyi audit qeydi yaradır |
 | `/admin/demo-mezmun` | Nümunə məzmun açarı | Production-da bağlı saxlanılır |
 | `/admin/parametrler` | Əlaqə məlumatı, bildiriş, saytın şəkilləri (hero, «Haqqımızda», CTA — yalnız `/media/...`), tema | Boş şəkil sahəsində stok foto göstərilir |
+| `/admin/funksiyalar` | Modulları (şikayət, reytinq, CRM, analitika, avtomatik moderasiya, bildiriş, elan aktuallığı…) və monetizasiya açarlarını söndürüb-yandırma | Söndürülmüş modulun forması, action-u və API-si də bağlanır; kritik açar təsdiq tələb edir və audit qeydi yaradır |
 | `/admin/ictimai-imkanlar` | İctimai imkanların açarları | — |
 | `/admin/analitika` | Cloudflare trafik metrikləri | `CLOUDFLARE_ANALYTICS_TOKEN` tələb edir |
 | `/admin/e-poct` | Resend çatdırılma/qəbul metadata jurnalı (məzmun saxlanmır) | Webhook secret qurulmalıdır |

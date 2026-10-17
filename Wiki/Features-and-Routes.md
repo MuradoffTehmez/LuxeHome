@@ -130,6 +130,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/fealiyyet` | Agentlik daxili fəaliyyət jurnalı: kim elanı, qiyməti, müraciəti, komandanı dəyişdi (yalnız sahib) |
 | `/kabinet/kocurmeler` | Agentliklər arası elan köçürmə sorğuları: göndərmə, gələn sorğuların təsdiqi (agentlik sahibi), geri çəkmə |
 | `/kabinet/son-baxilanlar`, `/kabinet/tovsiyeler` | Son baxılanlar və fərdi tövsiyələr |
+| `/seher/[slug]` | Şəhər/rayon landing-i: elanlar, «Ərazi haqqında» (satış/kirayə, median qiymət, filtrlər, xəritə, əlaqəli ərazilər) |
 | `/kabinet/analitika/[id]` | Elan performansı: 7/30/90 gün dinamikası, unikal baxış, favorit, müraciət, qiymət tarixçəsi |
 | `/kabinet/agentlik/analitika` | Agentlik analitikası: ümumi göstəricilər, agent performansı, ərazilər, qrafiklər, tarix intervalı |
 | `/kabinet/reyler` | Agent və agentlik sahibi: təsdiqlənmiş rəylər və ictimai cavab |
@@ -214,6 +215,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/audit` | Audit jurnalı; sıfırlama yalnız Super Admin | `settings:manage` |
 | `/admin/hesabim` | Profil, avatar, panel dili, tema, parol, backup kod, passkey, ICS tokeni, sessiyalar | Hər staff |
 | `/admin/parametrler` | Əlaqə, bildiriş, sayt şəkilləri, tema | `settings:manage` |
+| `/admin/funksiyalar` | Modul və monetizasiya bayraqları; kritik açarda təsdiq, audit (#242) | `settings:manage` |
 
 Toplu seçim `components/admin/bulk-selection.tsx` + `lib/admin/bulk.ts`-dir: hər id mövcud tək action-dan keçir (guard, audit, keş onun içindədir), bir sorğuda ən çox 100 id, silmə həmişə təsdiq dialoqu ilə.
 

@@ -3,6 +3,7 @@ import { BadgeCheck, MessageSquareReply, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { REVIEW_REPORT_REASONS, type ReviewCriterion, type ReviewReportKind } from "@/lib/constants";
 import { ReviewReportButton } from "@/components/site/review-report-button";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 /**
  * Rəy göstərişinin ortaq hissələri (#230, PRD 10.2–10.5): meyar ortalamaları, «Təsdiqlənmiş əlaqə»
@@ -52,7 +53,7 @@ export async function ReviewCard({
   /** Rəydən şikayət (#232) — admin daxil etdiyi müştəri rəyində (`Testimonial`) yoxdur. */
   report?: ReviewReportKind | null;
 }) {
-  const t = await getTranslations("phase2");
+  const [t, reportsEnabled] = await Promise.all([getTranslations("phase2"), isFeatureEnabled("REPORTS")]);
   return (
     <li className={cn("flex flex-col gap-2 rounded-xl border border-line bg-paper p-4 shadow-xs", className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -70,7 +71,7 @@ export async function ReviewCard({
       </div>
       <p className="text-sm leading-relaxed text-ink-soft [overflow-wrap:anywhere]">{review.comment}</p>
       <p className="mt-auto text-xs text-ink-muted">{review.customerName}{footer}</p>
-      {report && (
+      {report && reportsEnabled && (
         <ReviewReportButton
           kind={report}
           reviewId={review.id}

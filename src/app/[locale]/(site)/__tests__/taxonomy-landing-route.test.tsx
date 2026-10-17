@@ -15,6 +15,14 @@ vi.mock("@/components/site/area-agencies", () => ({
   AreaAgencies: () => null,
 }));
 
+// «Ərazi haqqında» bloku (#240) öz testindədir (`area-insights.integration.test.ts`).
+vi.mock("@/components/site/area-insights", () => ({
+  AreaInsights: () => null,
+}));
+vi.mock("@/lib/area-insights", () => ({
+  getAreaInsights: async () => ({ total: 0, sale: 0, rent: 0, salePricePerSqm: null, saleSample: 0, monthlyRent: null, rentSample: 0, types: [], related: [] }),
+}));
+
 vi.mock("@/lib/queries", () => ({
   getTaxonomyLandingProperties: vi.fn(async (kind: "DISTRICT" | "METRO") => ({
     location: {

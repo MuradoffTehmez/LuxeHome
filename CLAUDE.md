@@ -465,6 +465,32 @@ Qaydalar:
 
 Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 
+**Ərazi səhifələri (#240, PRD 12.4/12.5):** `/rayon/<slug>` (rayon, qəsəbə, kənd, massiv), `/metro/<slug>` və
+`/seher/<slug>` (`CITY` — şəhər və rayon; etiket neytral «X üzrə», çünki səviyyə ikisini də əhatə edir) eyni
+`getTaxonomyLandingProperties()` + `buildTaxonomyLandingDescriptor()` kontraktındadır: meta, canonical, breadcrumb, FAQ və
+ItemList JSON-LD, az məzmunda `seoLandingIndexPolicy` noindex, sitemap `getIndexableTaxonomyLandings(kind)`. İlk səhifədə
+«Ərazi haqqında» bloku (`getAreaInsights`, `components/site/area-insights.tsx`): yalnız aktiv təkliflər (`ACTIVE_OFFER_STATUSES`) üzrə satış/kirayə sayı, median
+(satış m², aylıq kirayə; `MIN_COMPARABLES`-dən az nümunədə «—»), növ/elan tipi filtr keçidləri, xəritə (`?gorunus=xerite`)
+və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da düşür, `districtSlug` filtri kimi). Uydurulmuş bazar rəqəmi göstərilmir — say və median yalnız saytdakı ictimai elanlardandır.
+
+### Funksiya bayraqları (#242, PRD 23, 16.6)
+
+- Açarlar `src/lib/feature-flags-policy.ts`-dədir (saf modul): modul bayraqları (`REPORTS`, `AUTO_MODERATION`,
+  `AGENCY_ANALYTICS`, `RATINGS`, `CRM`, `VIP_REQUESTS`, `PROMOTION`, `SUBSCRIPTIONS`, `PAYMENTS`, `NOTIFICATIONS`,
+  `LISTING_FRESHNESS`, `EXTRA_VERIFICATION`) və PRD 16.6 monetizasiya açarları. Hamısı tək JSON parametrdə
+  (`SETTING_KEYS.FEATURE_FLAGS`); pozulmuş dəyər və naməlum açar defolta qayıdır. Defolt: modullar açıq, ödəniş/monetizasiya/
+  özünəxidmət bağlı, `ADMIN_APPROVAL_FOR_VIP` açıq. Asılı açar (`effectiveFeatureFlags`) öz modulu olmadan işləmir.
+- Oxu `getFeatureFlags()` / `isFeatureEnabled()` (`lib/feature-flags.ts`, sorğu başına bir dəfə); action üçün hazır xəta
+  `featureDisabledFailure()` (`lib/feature-guard.ts` — domen modulları next-intl yükləməsin deyə ayrıdır).
+- **Söndürülmüş modul yalnız UI-da gizlənmir:** action, səhifə (404) və API də bağlanır. Hazırda: şikayət (elan + rəy
+  action-ları, düymələr), reytinq (rəy yazma/cavab, forma, `/kabinet/reyler`), CRM (`/kabinet/musteriler` layout-u + bütün
+  action-lar), agentlik analitikası (səhifə + ixrac API), avtomatik moderasiya (`hold` → `review`, siqnallar yazılır),
+  e-poçt bildirişləri (kabinet bildirişi yenə yazılır), elan aktuallığı (gündəlik müddət işi dayanır). Kabinet menyusu
+  `hiddenItems` ilə süzülür. Yeni modul yazanda bayrağını da yoxla.
+- Mövcud premium paket sifarişi (ofisdə ödəniş) monetizasiya bayrağına bağlanmayıb — Basic/Pro/Premium (Modul 14) onu üstələyəcək.
+- Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
+  təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
+
 ### Toplu idxal və sayt şəkilləri
 
 - `/admin/emlaklar/idxal` CSV-dən elan yaradır (#103). Hər sətir `propertySchema`-dan keçir,
@@ -820,6 +846,12 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   açarlar `UNIQUE_VIEW_RETENTION_DAYS` sonra `runPhase2Maintenance()`-də silinir. `/kabinet/analitika` unikal baxış və qiymət
   dəyişikliyini (`PropertyPriceHistory`) göstərir; `/kabinet/analitika/<id>` (`getListingPerformance`, giriş siyahı ilə eyni)
   7/30/90 günlük dinamika və qiymət tarixçəsidir.
+- **Hesabat ixracı (#238, PRD 11.6):** `/api/hesab/hesabat/agentlik` (sahib və `LEADS_MANAGE`) və `/api/hesab/hesabat/elanlar`
+  (elan yerləşdirən hesab) — `?format=csv|xlsx`, interval/dövr və `?l=` dil; giriş səhifə ilə eynidir, icazəsizə 404,
+  `no-store`. Yazıcılar asılılıqsızdır (`lib/export/tabular.ts`): CSV UTF-8 BOM ilə və düstur inyeksiyasına qarşı (`=+-@`
+  ilə başlayan mətn `'` alır), XLSX sıxılmamış ZIP + OOXML (`inlineStr`, CRC32). Cədvəllər `lib/export/analytics-reports.ts`.
+  PDF — səhifənin çap üslubu ilə brauzerin «PDF kimi saxla» funksiyası: başlıq, footer, kabinet menyusu və alt naviqasiya
+  `.no-print`-dir; yeni sabit səth əlavə edəndə onu da çapdan gizlət.
 - **Daxili tapşırıqlar (#220, PRD 7.3)** `AgencyTask` (`lib/accounts/agency-tasks.ts`), `/kabinet/tapsiriqlar` (sahib və agent):
   növ `AGENCY_TASK_TYPES`, status `AGENCY_TASK_STATUSES` (açıq = `OPEN_AGENCY_TASK_STATUSES`). Sahib və `TASKS_MANAGE`
   hər aktiv üzvə yaradır və hamısını görür (`?icraci=`), digər üzv yalnız özünə yaradır və ona təyin olunanı/özünün

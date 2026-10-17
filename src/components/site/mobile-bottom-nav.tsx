@@ -51,7 +51,7 @@ export function MobileBottomNav() {
     <nav
       data-bottom-nav
       aria-label={t("label")}
-      className="fixed inset-x-0 bottom-0 z-[calc(var(--z-sticky)+1)] border-t border-line bg-paper/95 pb-[var(--safe-bottom)] backdrop-blur-md lg:hidden"
+      className="no-print fixed inset-x-0 bottom-0 z-[calc(var(--z-sticky)+1)] border-t border-line bg-paper/95 pb-[var(--safe-bottom)] backdrop-blur-md lg:hidden"
     >
       <Suspense fallback={null}>
         <MapViewWatcher onChange={setMapView} />

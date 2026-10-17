@@ -2,6 +2,7 @@
 
 import { getLocale, getTranslations } from "next-intl/server";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
+import { featureDisabledFailure } from "@/lib/feature-guard";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/lib/constants";
@@ -15,6 +16,8 @@ import { hasVerifiedInteraction, isVerifiedReviewer, parseReviewForm, reviewRati
 export async function submitAgentReview(_previous: ActionState, formData: FormData): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("phase2.agents");
+  const disabled = await featureDisabledFailure("RATINGS");
+  if (disabled) return disabled;
   let user;
   try {
     user = await requirePublicAction("review", locale);

@@ -5,6 +5,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { requireAccount } from "@/lib/auth/guard";
 import { accountTypeKey as accountTypeKeyOf, ACCOUNT_TYPES, AGENCY_MEMBER_PERMISSIONS, type Locale } from "@/lib/constants";
 import { getAgencyAccess, hasAgencyPermission } from "@/lib/accounts/agency-access";
+import { getFeatureFlags } from "@/lib/feature-flags";
+import type { CabinetNavItem } from "@/lib/accounts/cabinet-navigation";
 import { CabinetShell } from "./cabinet-shell";
 
 export const metadata: Metadata = {
@@ -29,6 +31,12 @@ export default async function CabinetLayout({ children }: { children: React.Reac
   const canAssignListings = hasAgencyPermission(agentAccess, AGENCY_MEMBER_PERMISSIONS.LISTINGS_ASSIGN);
   // Agentlik analitikası (#234) `LEADS_MANAGE` səlahiyyətli agentə də açıqdır.
   const canViewAnalytics = hasAgencyPermission(agentAccess, AGENCY_MEMBER_PERMISSIONS.LEADS_MANAGE);
+  // Söndürülmüş modulların menyu bəndləri (#242); səhifə və action-lar bayrağı özləri də yoxlayır.
+  const flags = await getFeatureFlags();
+  const hiddenItems: CabinetNavItem["id"][] = [];
+  if (!flags.CRM) hiddenItems.push("clients");
+  if (!flags.AGENCY_ANALYTICS) hiddenItems.push("agency-analytics");
+  if (!flags.RATINGS) hiddenItems.push("reviews");
 
   return (
     <Section spacing="cozy">
@@ -42,6 +50,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
           canTransfer={user.accountType === ACCOUNT_TYPES.AGENCY || user.accountType === ACCOUNT_TYPES.AGENT}
           canAssignListings={canAssignListings}
           canViewAnalytics={canViewAnalytics}
+          hiddenItems={hiddenItems}
         >
           {children}
         </CabinetShell>

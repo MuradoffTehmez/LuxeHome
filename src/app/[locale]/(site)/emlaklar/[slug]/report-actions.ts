@@ -20,6 +20,7 @@ import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
 import { isSystemWriteBlocked } from "@/lib/system-mode";
 import { submitListingReport } from "@/lib/listing-reports";
 import { sniffImageType } from "@/lib/media/storage";
+import { featureDisabledFailure } from "@/lib/feature-guard";
 
 /**
  * «Elanı şikayət et» (#159, #195). Əlaqə forması ilə eyni qoruma: honeypot, same-origin,
@@ -30,6 +31,8 @@ import { sniffImageType } from "@/lib/media/storage";
 export async function reportListing(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const t = await getTranslations("property.report");
   if (isHoneypotFilled(formData.get(HONEYPOT_FIELD))) return success(t("thanks"));
+  const disabled = await featureDisabledFailure("REPORTS");
+  if (disabled) return disabled;
 
   try {
     await assertSameOrigin();
