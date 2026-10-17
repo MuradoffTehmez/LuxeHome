@@ -1470,5 +1470,28 @@
       "invalidStatus": "Invalid status.",
       "failed": "The action failed. Please try again."
     }
+  },
+  "reviews": {
+    "metaTitle": "Reviews",
+    "metaDescription": "Approved reviews of your profile and your replies.",
+    "eyebrow": "Rating",
+    "title": "Reviews",
+    "description": "Approved reviews of your profile and agency. Your reply is shown publicly under the review.",
+    "emptyTitle": "No approved reviews yet",
+    "emptyDescription": "Client reviews will appear here after moderation.",
+    "stars": "{rating} out of 5 stars",
+    "aboutAgent": "Agent: {name}",
+    "aboutAgency": "Agency: {name}",
+    "verified": "Verified interaction",
+    "replyLabel": "Your reply",
+    "replyHint": "The reply is public under the review. Keep it polite and factual.",
+    "publish": "Publish reply",
+    "update": "Update reply",
+    "remove": "Remove reply",
+    "saved": "Reply published.",
+    "cleared": "Reply removed.",
+    "notFound": "Review not found.",
+    "invalid": "The reply must be 2–1000 characters.",
+    "failed": "The action failed. Try again shortly."
   }
 }

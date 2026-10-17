@@ -893,8 +893,17 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - **«Tez cavab verir»** (`lib/accounts/response-stats.ts`, saf): son 90 gün, ≥3 müraciət, median ≤60 dəq, ≥80%
   cavab. Hələ 30 dəqiqəsi keçməmiş cavabsız müraciət nümunəyə düşmür. Ölçülmüş göstərici `AgentProfile.measured*` və
   `Agency.response*`-dədir; admin yazdığı `AgentProfile.responseMinutes` yalnız ehtiyatdır və nişan vermir.
-- **Agentlik reytinqi** `lib/agency-ratings.ts`: ictimai agentlərin təsdiqlənmiş rəyləri + `Testimonial.agencyId`,
-  rəy sayı ilə çəkili; profil, kart və `agencySchema` `aggregateRating`-ində.
+- **Agentlik reytinqi** `lib/agency-ratings.ts`: ictimai agentlərin təsdiqlənmiş rəyləri + agentliyə birbaşa rəylər
+  (`AgencyReview`, #230) + `Testimonial.agencyId`, rəy sayı ilə çəkili; profil, kart və `agencySchema` `aggregateRating`-ində.
+- **Rəylər (#230, PRD 10.2–10.5)** — ortaq qaydalar `lib/reviews.ts`-dədir (agent və agentlik action-ları eyni yolu işlədir):
+  beş meyar (`REVIEW_CRITERIA`; `rating` = ümumi məmnunluq, ictimai orta ondan, meyarlar `ratingCommunication…` profildə
+  `ReviewCriteriaSummary` ilə), hesab yoxlanışı (`isVerifiedReviewer` — e-poçt və ya telefon təsdiqli), hədəf başına bir rəy,
+  agent/agentlik özünü qiymətləndirmir, «Təsdiqlənmiş əlaqə» (`hasVerifiedInteraction` — rəy yazanın e-poçtu/təsdiqli
+  telefonu ilə bu agentə və ya agentliyə müraciət). Şübhə siqnalları (`REVIEW_SUSPICION_FLAGS`: təzə hesab, 24 saatda çox rəy,
+  təkrar mətn, müraciətsiz ifrat qiymət) `suspicionFlags`-a yazılır və **yalnız moderatora** göstərilir — rəyi avtomatik
+  rədd etmir. Agent öz rəylərinə, agentlik sahibi agentlik rəylərinə `/kabinet/reyler`-də ictimai cavab yazır (yalnız təsdiqlənmiş
+  rəy, `saveReviewReply` şərti `updateMany`). İctimai reytinq yalnız `APPROVED` rəylərdən qurulur; admin növbəsi
+  `/admin/agentler#reyler` və `#agentlik-reyleri`, menyu sayğacı hər ikisini sayır.
 - **Ərazi agentlikləri:** `/rayon/<slug>` altında blok və `/rayon/<slug>/agentlikler` landing-i
   (`getPublicAgencyCatalog({ area })`, ərazi qaydası rayon səhifəsi ilə eynidir). 2-dən az agentlik varsa noindex.
 

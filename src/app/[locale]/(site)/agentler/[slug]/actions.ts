@@ -1,23 +1,18 @@
 "use server";
 
 import { getLocale, getTranslations } from "next-intl/server";
-import { z } from "zod";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/lib/constants";
+import { hasVerifiedInteraction, isVerifiedReviewer, parseReviewForm, reviewRatingData, reviewSuspicionFlags } from "@/lib/reviews";
 
-const reviewSchema = z.object({
-  agentId: z.string().min(1),
-  rating: z.coerce.number().int().min(1).max(5),
-  comment: z.string().trim().min(20).max(2000),
-  serviceType: z.string().trim().max(80).optional(),
-});
-
-export async function submitAgentReview(
-  _previous: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
+/**
+ * Agentə rəy (#230, PRD 10.4, 10.5): beş meyar, hesab yoxlanışı, təkrar rəy limiti, özünü və öz
+ * agentliyinin agentini qiymətləndirmə qadağası. Rəy moderasiyaya düşür; real müraciəti olan
+ * istifadəçinin rəyi «təsdiqlənmiş əlaqə» kimi işarələnir, şübhə siqnalları moderatora yazılır.
+ */
+export async function submitAgentReview(_previous: ActionState, formData: FormData): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("phase2.agents");
   let user;
@@ -28,50 +23,40 @@ export async function submitAgentReview(
     throw error;
   }
 
-  const parsed = reviewSchema.safeParse({
-    agentId: formData.get("agentId"),
-    rating: formData.get("rating"),
-    comment: formData.get("comment"),
-    serviceType: formData.get("serviceType") || undefined,
-  });
-  if (!parsed.success) return failure(t("loginHint"));
+  const agentId = String(formData.get("agentId") ?? "").slice(0, 40);
+  const parsed = parseReviewForm(formData);
+  if (!agentId || !parsed.success) return failure(t("reviewInvalid"));
 
   try {
+    if (!(await isVerifiedReviewer(user.id))) return failure(t("reviewUnverified"));
     const [agent, duplicate] = await Promise.all([
-      prisma.agentProfile.findFirst({
-        where: { id: parsed.data.agentId, isPublic: true },
-        select: { id: true, userId: true, agencyId: true },
-      }),
-      prisma.agentReview.findFirst({
-        where: { agentId: parsed.data.agentId, customerId: user.id },
-        select: { id: true },
-      }),
+      prisma.agentProfile.findFirst({ where: { id: agentId, isPublic: true }, select: { id: true, userId: true, agencyId: true } }),
+      prisma.agentReview.findFirst({ where: { agentId, customerId: user.id }, select: { id: true } }),
     ]);
     if (!agent) return failure(t("notFound"));
     if (duplicate) return failure(t("reviewDuplicate"));
 
-    // PRD bölmə 166 — agent özünə, agentlik əməkdaşı isə öz agentliyinin agentinə
-    // rəy yaza bilməz. Yoxlama serverdədir: forma gizlədilsə də POST açıq qalır.
+    // PRD 10.5 — agent özünə, agentlik əməkdaşı isə öz agentliyinin agentinə rəy yaza bilməz.
+    // Yoxlama serverdədir: forma gizlədilsə də POST açıq qalır.
     if (agent.userId && agent.userId === user.id) return failure(t("reviewSelf"));
     if (agent.agencyId) {
       const insider = await prisma.agency.findFirst({
-        where: {
-          id: agent.agencyId,
-          OR: [{ userId: user.id }, { employees: { some: { userId: user.id } } }],
-        },
+        where: { id: agent.agencyId, OR: [{ userId: user.id }, { employees: { some: { userId: user.id } } }] },
         select: { id: true },
       });
       if (insider) return failure(t("reviewSelf"));
     }
 
+    const verifiedInteraction = await hasVerifiedInteraction({ userId: user.id, agentUserId: agent.userId, agencyId: agent.agencyId });
+    const flags = await reviewSuspicionFlags({ userId: user.id, comment: parsed.data.comment, overall: parsed.data.overall, verifiedInteraction });
     await prisma.agentReview.create({
       data: {
         agentId: agent.id,
         customerId: user.id,
         customerName: user.name,
-        rating: parsed.data.rating,
-        comment: parsed.data.comment,
-        serviceType: parsed.data.serviceType || null,
+        ...reviewRatingData(parsed.data),
+        verifiedInteraction,
+        suspicionFlags: flags.length ? JSON.stringify(flags) : null,
       },
     });
     return success(t("reviewSuccess"));

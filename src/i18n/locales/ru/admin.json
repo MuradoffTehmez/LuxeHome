@@ -1707,7 +1707,24 @@
       "loqoSehv": "Выберите изображение JPEG, PNG, WebP или AVIF.",
       "loqoBoyuk": "Логотип слишком большой.",
       "qosulmaSorgusu": "Запрос на присоединение",
-      "devet": "Приглашение"
+      "devet": "Приглашение",
+      "reviewModeration": {
+        "verified": "Подтверждённое взаимодействие",
+        "agencyTitle": "Отзывы об агентствах на модерации",
+        "agencyPublic": "Отзыв появится в профиле агентства и войдёт в рейтинг.",
+        "flags": {
+          "NEW_ACCOUNT": "Новый аккаунт",
+          "BURST": "Много отзывов за короткое время",
+          "DUPLICATE_TEXT": "Повтор текста",
+          "NO_INTERACTION": "Крайняя оценка без заявки"
+        },
+        "criteria": {
+          "communication": "Качество общения",
+          "accuracy": "Достоверность информации",
+          "responsiveness": "Оперативность",
+          "professionalism": "Профессионализм"
+        }
+      }
     },
     "amenities": {
       "analitikaniYaddaSaxla": "Сохранить аналитику",

@@ -1470,5 +1470,28 @@
       "invalidStatus": "Status düzgün deyil.",
       "failed": "Əməliyyat alınmadı. Yenidən cəhd edin."
     }
+  },
+  "reviews": {
+    "metaTitle": "Rəylər",
+    "metaDescription": "Profilinizə yazılmış təsdiqlənmiş rəylər və cavablar.",
+    "eyebrow": "Reytinq",
+    "title": "Rəylər",
+    "description": "Profilinizə və agentliyinizə yazılmış təsdiqlənmiş rəylər. Cavabınız rəyin altında ictimai görünür.",
+    "emptyTitle": "Hələ təsdiqlənmiş rəy yoxdur",
+    "emptyDescription": "Müştərilərin rəyləri moderasiyadan sonra burada görünəcək.",
+    "stars": "5 üzərindən {rating} ulduz",
+    "aboutAgent": "Agent: {name}",
+    "aboutAgency": "Agentlik: {name}",
+    "verified": "Təsdiqlənmiş əlaqə",
+    "replyLabel": "Cavabınız",
+    "replyHint": "Cavab rəyin altında ictimai görünür. Nəzakətli və faktlara əsaslanan olun.",
+    "publish": "Cavabı dərc et",
+    "update": "Cavabı yenilə",
+    "remove": "Cavabı sil",
+    "saved": "Cavab dərc olundu.",
+    "cleared": "Cavab silindi.",
+    "notFound": "Rəy tapılmadı.",
+    "invalid": "Cavab 2–1000 simvol olmalıdır.",
+    "failed": "Əməliyyat alınmadı. Bir az sonra yenidən cəhd edin."
   }
 }

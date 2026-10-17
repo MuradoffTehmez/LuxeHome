@@ -130,6 +130,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/fealiyyet` | Agentlik daxili fəaliyyət jurnalı: kim elanı, qiyməti, müraciəti, komandanı dəyişdi (yalnız sahib) |
 | `/kabinet/kocurmeler` | Agentliklər arası elan köçürmə sorğuları: göndərmə, gələn sorğuların təsdiqi (agentlik sahibi), geri çəkmə |
 | `/kabinet/son-baxilanlar`, `/kabinet/tovsiyeler` | Son baxılanlar və fərdi tövsiyələr |
+| `/kabinet/reyler` | Agent və agentlik sahibi: təsdiqlənmiş rəylər və ictimai cavab |
 | `/kabinet/komanda` | Agentlik komandası (ən çox 50 üzv), e-poçtla dəvət, dəvət linki, çıxarılan agentin elanlarının təhvili; müraciət bölgüsü (birbaşa, növbə, yüklənmə, manual, ərazi) və cavabsız müraciət pillələri |
 | `/qosul/<token>` | Agentliyin dəvət linki: agent birbaşa komandaya qoşulur, qonaq agent kimi qeydiyyata yönəlir |
 | `/elan-yerlesdir`, `/elanlarim`, `/profilim` | Qısa ünvanlar (`accounts/short-links.ts`) |

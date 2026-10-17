@@ -15,7 +15,11 @@ import { buttonClassName } from "@/components/ui/button";
 import { PropertyCard } from "@/components/site/property-card";
 import { ClosedDeals } from "@/components/site/closed-deals";
 import type { Locale } from "@/lib/constants";
-import { AgentReviewForm } from "./review-form";
+import { ReviewForm } from "@/components/site/review-form";
+import { ReviewCard, ReviewCriteriaSummary } from "@/components/site/review-parts";
+import { reviewCriteriaAverages } from "@/lib/reviews";
+import { REVIEW_CRITERIA } from "@/lib/constants";
+import { submitAgentReview } from "./actions";
 import { TrackedAnchor } from "@/components/analytics/analytics-event";
 
 export const dynamic = "force-dynamic";
@@ -170,9 +174,23 @@ export default async function AgentPage({ params, searchParams }: Props) {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <section>
               <h2 className="font-display text-3xl tracking-[-0.02em] text-ink">{t("reviews")}</h2>
-              {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <li key={review.id} className="rounded-xl border border-line bg-paper p-4 shadow-xs"><p className="flex items-center gap-1 text-gold-deep">{Array.from({ length: review.rating }, (_, index) => <Star key={index} className="size-4 fill-current" aria-hidden="true" />)}</p><p className="mt-2 text-ink-soft">{review.comment}</p><p className="mt-2 text-xs text-ink-muted">{review.customerName}</p></li>)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}
+              {/* Meyar ortalamaları (#230, PRD 10.4) — yalnız təsdiqlənmiş rəylərdən. */}
+              <ReviewCriteriaSummary averages={reviewCriteriaAverages(agent.reviews)} />
+              {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <ReviewCard key={review.id} review={review} />)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}
             </section>
-            <AgentReviewForm agentId={agent.id} labels={{ title: t("reviewTitle"), rating: t("rating"), comment: t("comment"), serviceType: t("serviceType"), submit: t("submitReview") }} />
+            <ReviewForm
+              action={submitAgentReview}
+              targetField="agentId"
+              targetId={agent.id}
+              labels={{
+                title: t("reviewTitle"),
+                hint: t("reviewHint"),
+                criteria: Object.fromEntries(REVIEW_CRITERIA.map((criterion) => [criterion, t(`criteria.${criterion}`)])) as Record<(typeof REVIEW_CRITERIA)[number], string>,
+                comment: t("comment"),
+                serviceType: t("serviceType"),
+                submit: t("submitReview"),
+              }}
+            />
           </div>
         </Container>
       </Section>
