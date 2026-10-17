@@ -202,7 +202,12 @@ export async function createClientFromLead(leadId: string): Promise<CrmActionSta
       },
     });
     if (!full) return failure(t("errors.notFound"));
-    if (full.clientId && (await findClient(ctx.context, full.clientId))) return { ...success(t("alreadyLinked")), clientId: full.clientId };
+    if (full.clientId) {
+      if (await findClient(ctx.context, full.clientId)) return { ...success(t("alreadyLinked")), clientId: full.clientId };
+      // Müraciət başqa agentin kartına bağlıdır (məs. müraciət sonradan bu agentə verilib): bağlantının
+      // üzərinə yazılmır və dublikat yaradılmır — müştəri tarixçəsi köhnə kartda qalır.
+      if (await prisma.crmClient.findUnique({ where: { id: full.clientId }, select: { id: true } })) return failure(t("errors.linkedElsewhere"));
+    }
 
     const client = await prisma.crmClient.create({
       data: {
@@ -223,7 +228,18 @@ export async function createClientFromLead(leadId: string): Promise<CrmActionSta
       },
       select: { id: true, name: true },
     });
-    await prisma.lead.update({ where: { id: lead.id }, data: { clientId: client.id } });
+    // Bağlantı şərti yazılır (müraciət hələ eyni vəziyyətdədir); alınmasa yeni kart silinir — təkrar
+    // cəhd yetim kart və dublikat yaratmasın (D1-də tranzaksiya yoxdur).
+    const linked = await prisma.lead
+      .updateMany({ where: { id: lead.id, clientId: full.clientId }, data: { clientId: client.id } })
+      .catch(async (error: unknown) => {
+        await prisma.crmClient.delete({ where: { id: client.id } }).catch(() => undefined);
+        throw error;
+      });
+    if (linked.count === 0) {
+      await prisma.crmClient.delete({ where: { id: client.id } });
+      return failure(t("errors.linkedElsewhere"));
+    }
     if (ctx.context.agencyId) {
       await recordAgencyActivity({
         agencyId: ctx.context.agencyId, actor: ctx.user, action: AGENCY_ACTIVITY_ACTIONS.CLIENT_CREATED,

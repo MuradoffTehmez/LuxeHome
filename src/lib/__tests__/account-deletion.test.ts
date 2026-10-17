@@ -22,6 +22,7 @@ vi.mock("@/lib/prisma", () => ({
     property: { updateMany: database.propertyUpdateMany, findMany: database.propertyFindMany },
     // Mini CRM kartları (#226): bu testdə hesabın kartı yoxdur.
     crmClient: { findMany: async () => [], deleteMany: async () => ({ count: 0 }), updateMany: async () => ({ count: 0 }) },
+    lead: { updateMany: async () => ({ count: 0 }) },
   },
 }));
 vi.mock("@/lib/admin/events", () => ({ recordDomainEvent: events.record }));

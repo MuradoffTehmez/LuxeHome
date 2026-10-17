@@ -4,6 +4,7 @@ import { recordPropertyStatusChanges } from "@/lib/property-status-history";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { handOverListings } from "@/lib/accounts/agency-listings";
 import { releaseAgentClients } from "@/lib/accounts/crm";
+import { chunkForD1 } from "@/lib/d1-chunks";
 
 /**
  * D1 transaction dəstəkləmir. Ona görə silinmənin ilk atomik addımı hesabı
@@ -71,6 +72,15 @@ export async function finalizeAccountDeletion(userId: string, now = new Date()):
   });
   for (const { agency } of clientAgencies) {
     if (agency && agency.userId !== userId) await releaseAgentClients({ agencyId: agency.id, userId, ownerUserId: agency.userId });
+  }
+  // Silinən kartlara (şəxsi kartlar və hesab agentlik sahibidirsə agentliklə kaskadla gedən kartlar)
+  // bağlı müraciətlərin FK-sız `clientId`-si boşaldılır — `deleteClient()` ilə eyni qayda.
+  const removed = await prisma.crmClient.findMany({
+    where: { OR: [{ ownerId: userId }, { agency: { userId } }] },
+    select: { id: true },
+  });
+  for (const chunk of chunkForD1(removed.map((item) => item.id), 0)) {
+    await prisma.lead.updateMany({ where: { clientId: { in: chunk } }, data: { clientId: null } });
   }
   await prisma.crmClient.deleteMany({ where: { ownerId: userId } });
   await prisma.user.delete({ where: { id: userId } });

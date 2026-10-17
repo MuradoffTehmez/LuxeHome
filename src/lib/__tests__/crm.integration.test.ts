@@ -118,7 +118,10 @@ describe("komandadan çıxma və hesab silinməsi", () => {
   it("hesab silinəndə agentlik kartı sahibə keçir, şəxsi kart silinir", async () => {
     await prisma.user.update({ where: { id: "crm-manager" }, data: { isActive: false, deletionRequestedAt: new Date() } });
     await DB.prepare('INSERT INTO "CrmClient" ("id", "agencyId", "ownerId", "name", "searchText", "createdAt", "updatedAt") VALUES (\'crm-c-manager-own\', NULL, \'crm-manager\', \'Şəxsi\', \'sexsi\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)').run();
+    await DB.prepare('INSERT INTO "Lead" ("id", "name", "phone", "message", "source", "status", "clientId", "createdAt", "updatedAt") VALUES (\'crm-l-own\', \'Şəxsi\', \'0500000000\', \'Salam\', \'CONTACT\', \'NEW\', \'crm-c-manager-own\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)').run();
     await finalizeAccountDeletion("crm-manager");
+    // Silinən karta bağlı müraciətin bağlantısı boşaldılır.
+    await expect(prisma.lead.findUniqueOrThrow({ where: { id: "crm-l-own" }, select: { clientId: true } })).resolves.toEqual({ clientId: null });
     await expect(prisma.crmClient.findUnique({ where: { id: "crm-c-manager" }, select: { ownerId: true } })).resolves.toEqual({ ownerId: "crm-owner" });
     await expect(prisma.crmClient.findUnique({ where: { id: "crm-c-manager-own" } })).resolves.toBeNull();
   });

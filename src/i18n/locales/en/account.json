@@ -902,7 +902,8 @@
       "notFound": "Client card not found.",
       "noteEmpty": "The note cannot be empty.",
       "forbidden": "You are not allowed to do this.",
-      "invalidAssignee": "The selected person is not an active agency member."
+      "invalidAssignee": "The selected person is not an active agency member.",
+      "linkedElsewhere": "This enquiry is linked to another client card."
     },
     "form": {
       "contactTitle": "Contact details",
