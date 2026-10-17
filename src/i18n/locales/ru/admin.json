@@ -2937,7 +2937,8 @@
         "TASK_STATUS_CHANGED": "изменил(а) статус задачи «{entity}»",
         "CLIENT_CREATED": "создал(а) карточку клиента «{entity}»",
         "CLIENT_REASSIGNED": "сменил(а) ответственного по карточке «{entity}»",
-        "CLIENT_DELETED": "удалил(а) карточку клиента «{entity}»"
+        "CLIENT_DELETED": "удалил(а) карточку клиента «{entity}»",
+        "CLIENT_MERGED": "объединил(а) другую карточку с карточкой «{entity}»"
       }
     },
     "reports": {

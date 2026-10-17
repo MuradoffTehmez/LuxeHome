@@ -14,7 +14,8 @@ import { getLeadCard, isClosedLeadStage, isLeadStage } from "@/lib/accounts/lead
 import { LEAD_ACTIVITY_TYPES, PUBLIC_PROPERTY_STATUSES, type LeadSource, type LeadStage, type Locale } from "@/lib/constants";
 import { LeadActions } from "../lead-actions";
 import { LeadNextContactForm, LeadNoteForm, LeadStageSelect } from "./card-forms";
-import { CreateClientFromLeadButton } from "../../musteriler/client-forms";
+import { CreateClientFromLeadButton, LinkLeadButton } from "../../musteriler/client-forms";
+import { findDuplicateClients } from "@/lib/accounts/crm-matching";
 import { crmScope, getCrmContext } from "@/lib/accounts/crm";
 import { prisma } from "@/lib/prisma";
 
@@ -49,9 +50,12 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
   const clientsT = await getTranslations("account.clients");
   const { lead, activities } = card;
   // Bağlı müştəri kartı (#226) — yalnız baxan şəxsin görə bildiyi kart göstərilir.
+  const crmContext = await getCrmContext(user);
   const client = lead.clientId
-    ? await prisma.crmClient.findFirst({ where: { AND: [{ id: lead.clientId }, crmScope(await getCrmContext(user))] }, select: { id: true, name: true } })
+    ? await prisma.crmClient.findFirst({ where: { AND: [{ id: lead.clientId }, crmScope(crmContext)] }, select: { id: true, name: true } })
     : null;
+  // Təkrar müraciət (#228, PRD 9.4): bağlı kart yoxdursa eyni şəxsə aid ola biləcək kartlar təklif olunur.
+  const suggestions = client ? [] : await findDuplicateClients(crmContext, lead);
   const closed = isClosedLeadStage(lead.stage);
   const sourceKey = (SOURCE_KEYS as readonly string[]).includes(lead.source) ? (lead.source as LeadSource) : "CONTACT";
   const propertyPublic = lead.property && !lead.property.deletedAt && (PUBLIC_PROPERTY_STATUSES as readonly string[]).includes(lead.property.status);
@@ -203,7 +207,24 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
               </Link>
             ) : (
               <>
-                <p className="text-xs text-ink-muted">{clientsT("leadCard.hint")}</p>
+                {suggestions.length > 0 ? (
+                  <>
+                    <p className="text-xs text-ink-muted">{clientsT("duplicates.leadHint")}</p>
+                    <ul className="flex flex-col gap-2">
+                      {suggestions.map((item) => (
+                        <li key={item.id} className="flex flex-col gap-1.5 rounded-sm border border-line p-2.5 text-sm">
+                          <span className="flex flex-wrap items-center justify-between gap-2">
+                            <Link href={`/kabinet/musteriler/${item.id}`} className="font-medium text-ink underline-offset-4 hover:underline">{item.name}</Link>
+                            <Badge tone={item.score >= 85 ? "danger" : "warning"}>{clientsT("duplicates.score", { score: item.score })}</Badge>
+                          </span>
+                          <div><LinkLeadButton leadId={lead.id} clientId={item.id} name={item.name} /></div>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p className="text-xs text-ink-muted">{clientsT("leadCard.hint")}</p>
+                )}
                 <div><CreateClientFromLeadButton leadId={lead.id} /></div>
               </>
             )}

@@ -883,6 +883,13 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   hesabla silinir. `phoneKey` (son 9 rəqəm) / `emailKey` təkrar aşkarlanması üçündür, axtarış `searchText`-dədir.
   Müraciət kartından «Müştəri kartı yarat» (`createClientFromLead`) kartı müraciətdən və elandan doldurur və `Lead.clientId`
   bağlayır. Kart məlumatı üçüncü şəxsin əlaqəsidir — data ixracına düşmür.
+- **Uyğun elanlar və təkrar müraciətlər (#228, PRD 9.3/9.4)** — `lib/accounts/crm-matching.ts`: ehtiyacdan
+  `PropertyFilters` qurulur və ictimai axtarışın `buildPropertyWhere()`-dən keçir (`getCrmMatches`, ən çox
+  `CRM_MATCH_LIMIT`, «Hamısı» eyni filtrli `/emlaklar` linkidir); meyar yoxdursa təklif göstərilmir. Dublikat
+  `findDuplicateClients()` — yalnız baxanın `crmScope()`-u daxilində, telefon açarı / e-poçt / diakritikasız eyni ad;
+  ehtimal `duplicateScore()` = `1 − Π(1 − p)` (telefon 0,9, e-poçt 0,85, ad 0,5), `DUPLICATE_MIN_SCORE` 50.
+  **Heç vaxt avtomatik birləşdirilmir:** müraciət kartında «Karta bağla» (`linkLeadToClient`), müştəri kartında
+  «Birləşdir» (`mergeClients` → `mergeCrmClientRecords`) təsdiq dialoqundandır; fərqli mühitlərin kartı birləşmir.
 - **«Tez cavab verir»** (`lib/accounts/response-stats.ts`, saf): son 90 gün, ≥3 müraciət, median ≤60 dəq, ≥80%
   cavab. Hələ 30 dəqiqəsi keçməmiş cavabsız müraciət nümunəyə düşmür. Ölçülmüş göstərici `AgentProfile.measured*` və
   `Agency.response*`-dədir; admin yazdığı `AgentProfile.responseMinutes` yalnız ehtiyatdır və nişan vermir.

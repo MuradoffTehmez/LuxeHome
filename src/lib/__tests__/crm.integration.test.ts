@@ -126,3 +126,17 @@ describe("komandadan çıxma və hesab silinməsi", () => {
     await expect(prisma.crmClient.findUnique({ where: { id: "crm-c-manager-own" } })).resolves.toBeNull();
   });
 });
+
+describe("müraciət tarixçəsinin məxfiliyi", () => {
+  it("kartda yalnız baxanın görə bildiyi müraciətlər göstərilir", async () => {
+    await DB.batch([
+      DB.prepare('INSERT INTO "Agency" ("id", "userId", "name", "slug", "isVerified", "createdAt", "updatedAt") VALUES (\'crm-agency2\', \'crm-solo\', \'Beta\', \'crm-beta\', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'),
+      DB.prepare('INSERT INTO "CrmClient" ("id", "agencyId", "ownerId", "name", "searchText", "createdAt", "updatedAt") VALUES (\'crm-c-private\', NULL, \'crm-agent\', \'Keçmiş müştəri\', \'kecmis musteri\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'),
+      // Başqa agentliyin müraciəti agentin şəxsi kartına bağlanıb — agent onu görməməlidir.
+      DB.prepare('INSERT INTO "Lead" ("id", "name", "phone", "message", "source", "status", "agencyId", "clientId", "createdAt", "updatedAt") VALUES (\'crm-l-foreign\', \'X\', \'0500000001\', \'Məxfi mesaj\', \'AGENCY\', \'NEW\', \'crm-agency2\', \'crm-c-private\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'),
+      DB.prepare('INSERT INTO "Lead" ("id", "name", "phone", "message", "source", "status", "handlerId", "clientId", "createdAt", "updatedAt") VALUES (\'crm-l-own2\', \'Y\', \'0500000002\', \'Öz müraciəti\', \'PROPERTY\', \'NEW\', \'crm-agent\', \'crm-c-private\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'),
+    ]);
+    const card = await getCrmClient(await getCrmContext(agent), "crm-c-private");
+    expect(card?.leads.map((lead) => lead.id)).toEqual(["crm-l-own2"]);
+  });
+});

@@ -903,7 +903,9 @@
       "noteEmpty": "The note cannot be empty.",
       "forbidden": "You are not allowed to do this.",
       "invalidAssignee": "The selected person is not an active agency member.",
-      "linkedElsewhere": "This enquiry is linked to another client card."
+      "linkedElsewhere": "This enquiry is linked to another client card.",
+      "alreadyLinked": "The enquiry is already linked to another client card.",
+      "differentScope": "Cards from different scopes (personal and agency) cannot be merged."
     },
     "form": {
       "contactTitle": "Contact details",
@@ -963,6 +965,33 @@
       "title": "Client card",
       "open": "Open card: {name}",
       "hint": "Keep the client's requirements and notes on one card."
+    },
+    "linked": "The enquiry was linked to the client card.",
+    "merged": "The cards were merged.",
+    "matches": {
+      "title": "Matching listings",
+      "all": "{count, plural, other {View all (#)}}",
+      "noNeeds": "Record the client's requirements to see matching listings.",
+      "empty": "No active listings match these requirements."
+    },
+    "duplicates": {
+      "title": "Possible duplicates",
+      "hint": "These cards may belong to the same person. The system never merges them on its own.",
+      "leadHint": "This enquiry may belong to an existing client:",
+      "score": "Match {score}%",
+      "signals": {
+        "phone": "Same phone",
+        "email": "Same email",
+        "name": "Same name"
+      },
+      "link": "Link to card",
+      "linkTitle": "Link the enquiry to this card?",
+      "linkDescription": "The enquiry will be added to the history of the “{name}” card.",
+      "linkConfirm": "Link to card",
+      "merge": "Merge into this card",
+      "mergeTitle": "Merge the cards?",
+      "mergeDescription": "Notes and enquiries of “{name}” will move to this card, empty fields will be filled from it, and that card will be deleted.",
+      "mergeConfirm": "Merge"
     }
   },
   "offices": {
@@ -1239,7 +1268,8 @@
       "TASK_STATUS_CHANGED": "changed the status of “{entity}”",
       "CLIENT_CREATED": "created the client card “{entity}”",
       "CLIENT_REASSIGNED": "changed the owner of the client card “{entity}”",
-      "CLIENT_DELETED": "deleted the client card “{entity}”"
+      "CLIENT_DELETED": "deleted the client card “{entity}”",
+      "CLIENT_MERGED": "merged another card into the client card “{entity}”"
     },
     "details": {
       "price": "{from} → {to}",
@@ -1262,7 +1292,8 @@
       "reason": "Reason: {reason}",
       "assigned": "{from} → {to}",
       "taskStatus": "{from} → {to}",
-      "alerts": "Reminder {reminder} min · alert {alert} min · reassignment {reassign} h"
+      "alerts": "Reminder {reminder} min · alert {alert} min · reassignment {reassign} h",
+      "mergedFrom": "Merged card: {name}"
     },
     "emptyTitle": "No entries yet",
     "emptyDescription": "Listing, enquiry and team changes will appear here.",
