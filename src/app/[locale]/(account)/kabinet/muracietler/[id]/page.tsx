@@ -65,6 +65,15 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
           : t("history.stagePlain");
       case LEAD_ACTIVITY_TYPES.RESPONDED:
         return t("history.responded");
+      case LEAD_ACTIVITY_TYPES.REMINDER:
+      case LEAD_ACTIVITY_TYPES.ALERT:
+      case LEAD_ACTIVITY_TYPES.REASSIGN_SUGGESTED: {
+        const key = item.type === LEAD_ACTIVITY_TYPES.REMINDER ? "reminder" : item.type === LEAD_ACTIVITY_TYPES.ALERT ? "alert" : "reassign";
+        const minutes = typeof d.minutes === "number" ? d.minutes : 0;
+        return minutes >= 120
+          ? t(`history.${key}Hours`, { hours: Math.round(minutes / 60) })
+          : t(`history.${key}Minutes`, { minutes });
+      }
       case LEAD_ACTIVITY_TYPES.NEXT_CONTACT:
         return typeof d.at === "string"
           ? t("history.next", { date: formatLocalizedDateTime(d.at, locale, "short") ?? "" })
@@ -85,6 +94,7 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
               <Badge tone={closed ? "neutral" : "info"}>{t(`stages.${lead.stage as LeadStage}`)}</Badge>
               <Badge tone="neutral">{t(`sources.${sourceKey}`)}</Badge>
               {lead.respondedAt ? <Badge tone="success">{t("statusResponded")}</Badge> : !closed && <Badge tone="warning">{t("statusWaiting")}</Badge>}
+              {lead.reassignSuggestedAt && !lead.respondedAt && !closed && <Badge tone="danger">{t("reassignSuggested")}</Badge>}
             </div>
             {lead.property ? (
               <p className="mt-3 flex items-center gap-2 text-sm text-ink">

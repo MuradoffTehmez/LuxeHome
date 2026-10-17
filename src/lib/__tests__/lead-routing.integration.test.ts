@@ -1,17 +1,15 @@
 import { env } from "cloudflare:test";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { LEAD_ROUTING_MODES, LOCATION_KINDS, PROPERTY_STATUSES } from "@/lib/constants";
 
-const notices = vi.hoisted(() => ({ escalation: vi.fn() }));
-vi.mock("@/lib/accounts/account-notices", () => ({ noticeLeadEscalation: notices.escalation }));
 
 import { releaseAgentLeads, routeAgencyLead, routePropertyLead } from "@/lib/accounts/lead-routing";
 import { findManageableLead, getAccountLeads } from "@/lib/accounts/listing-leads";
-import { escalateStaleLeads, refreshResponseStats } from "@/lib/accounts/lead-jobs";
+import { refreshResponseStats } from "@/lib/accounts/lead-jobs";
 import { incrementListingStat } from "@/lib/listing-stats";
 import { getListingAnalytics } from "@/lib/accounts/listing-analytics";
 
-/** Müraciət bölgüsü, eskalasiya, cavab göstəriciləri və elan analitikası real D1-də (#161). */
+/** Müraciət bölgüsü, cavab göstəriciləri və elan analitikası real D1-də (#161, #224). Pillələr: `lead-alerts.integration.test.ts`. */
 const DB = (env as unknown as { DB: D1Database }).DB;
 const now = new Date();
 const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000).toISOString();
@@ -78,6 +76,33 @@ describe("müraciət bölgüsü", () => {
     await setRouting(LEAD_ROUTING_MODES.ROUND_ROBIN);
   });
 
+  it("birbaşa rejimdə elana təyin edilmiş aktiv agentə gedir (növbədən kənar olsa da), yoxsa sahibə", async () => {
+    await setRouting(LEAD_ROUTING_MODES.DIRECT);
+    await expect(routePropertyLead({ listerId: "rt-owner", assignedAgentId: "rt-agent3" })).resolves.toMatchObject({ handlerId: "rt-agent3", routed: true });
+    // Komandada olmayan şəxs və təyinatsız elan — müraciət sahibdə qalır.
+    await expect(routePropertyLead({ listerId: "rt-owner", assignedAgentId: "rt-solo" })).resolves.toMatchObject({ handlerId: "rt-owner", routed: false });
+    await expect(routePropertyLead({ listerId: "rt-owner" })).resolves.toMatchObject({ handlerId: "rt-owner", routed: false });
+    await expect(routeAgencyLead("rt-alfa")).resolves.toMatchObject({ handlerId: "rt-owner", routed: false });
+  });
+
+  it("yüklənmə rejimində ən az açıq müraciəti olan agent seçilir; bağlanmış müraciət sayılmır", async () => {
+    await setRouting(LEAD_ROUTING_MODES.LOAD);
+    const lead = DB.prepare(
+      `INSERT INTO "Lead" ("id", "name", "phone", "message", "source", "status", "stage", "handlerId", "agencyId", "createdAt", "updatedAt")
+       VALUES (?, 'Yük', '+994501234567', 'Salam', 'PROPERTY', 'NEW', ?, ?, 'rt-agency', '2025-01-01T00:00:00.000Z', CURRENT_TIMESTAMP)`,
+    );
+    await DB.batch([
+      lead.bind("rt-load-1", "ASSIGNED", "rt-agent1"),
+      lead.bind("rt-load-2", "NEGOTIATING", "rt-agent1"),
+      lead.bind("rt-load-3", "ASSIGNED", "rt-agent2"),
+      lead.bind("rt-load-4", "SOLD", "rt-agent2"),
+      lead.bind("rt-load-5", "CLOSED", "rt-agent2"),
+    ]);
+    await expect(routePropertyLead({ listerId: "rt-owner" })).resolves.toMatchObject({ handlerId: "rt-agent2", routed: true });
+    await DB.prepare(`DELETE FROM "Lead" WHERE "id" LIKE 'rt-load-%'`).run();
+    await setRouting(LEAD_ROUTING_MODES.ROUND_ROBIN);
+  });
+
   it("agentin öz elanı agentə gedir, amma agentliyə bağlanır; adi sahibdə agentlik yoxdur", async () => {
     await expect(routePropertyLead({ listerId: "rt-agent2" })).resolves.toMatchObject({ handlerId: "rt-agent2", agencyId: "rt-agency", routed: false });
     await expect(routePropertyLead({ listerId: "rt-solo" })).resolves.toMatchObject({ handlerId: "rt-solo", agencyId: null });
@@ -105,22 +130,6 @@ describe("müraciət işləri", () => {
       lead.bind("rt-l-r2", "Cavab 2", "rt-agent1", "rt-agency", ago(470), ago(500)),
       lead.bind("rt-l-r3", "Cavab 3", "rt-agent1", "rt-agency", ago(380), ago(400)),
     ]);
-  });
-
-  it("bildiriş yazılmasa eskalasiya markeri geri qaytarılır və növbəti cəhddə təkrarlanır", async () => {
-    notices.escalation.mockResolvedValueOnce(false);
-    await expect(escalateStaleLeads(now)).resolves.toEqual({ escalated: 0 });
-    const lead = await DB.prepare('SELECT "escalatedAt" FROM "Lead" WHERE "id" = ?').bind("rt-l-stale").first<{ escalatedAt: string | null }>();
-    expect(lead?.escalatedAt).toBeNull();
-    notices.escalation.mockClear();
-  });
-
-  it("30 dəqiqə cavabsız agent müraciətini sahibə bir dəfə eskalasiya edir", async () => {
-    notices.escalation.mockResolvedValue(true);
-    await expect(escalateStaleLeads(now)).resolves.toEqual({ escalated: 1 });
-    expect(notices.escalation).toHaveBeenCalledOnce();
-    expect(notices.escalation).toHaveBeenCalledWith(expect.objectContaining({ userId: "rt-owner", leadId: "rt-l-stale", handlerName: "Birinci agent" }));
-    await expect(escalateStaleLeads(now)).resolves.toEqual({ escalated: 0 });
   });
 
   it("agent və agentlik üzrə cavab göstəricilərini yazır", async () => {

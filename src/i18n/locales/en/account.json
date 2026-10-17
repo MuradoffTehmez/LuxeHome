@@ -297,21 +297,41 @@
     },
     "routing": {
       "title": "Enquiry routing",
-      "description": "Who receives enquiries for the agency’s listings and profile form. Enquiries for an agent’s own listing always go to that agent. You are notified when an enquiry stays unanswered for 30 minutes.",
+      "description": "Who should receive enquiries sent to agency listings and the profile form. Enquiries about an agent's own listing always go to that agent.",
       "legend": "Routing mode",
       "roundRobin": "Round robin",
       "roundRobinHint": "Goes to the agent who has waited longest for an enquiry.",
       "area": "By area",
       "areaHint": "Goes to the agent with the most listings in the listing’s district; otherwise round robin.",
-      "off": "Off",
-      "offHint": "All enquiries go to the agency account.",
+      "off": "Manual",
+      "offHint": "All enquiries come to the agency account and you or a manager assign them.",
       "save": "Save",
       "saved": "Enquiry routing saved.",
       "memberToggle": "{name} receives enquiries",
       "memberOn": "The agent now receives enquiries.",
       "memberOff": "The agent no longer receives enquiries.",
       "memberOnShort": "Receives enquiries",
-      "memberOffShort": "Paused"
+      "memberOffShort": "Paused",
+      "direct": "Direct to agent",
+      "directHint": "To the agent managing (assigned to) the listing; to you if none is assigned.",
+      "load": "By workload",
+      "loadHint": "To the agent with the fewest open enquiries; ties go in turn."
+    },
+    "alerts": {
+      "title": "Unanswered enquiries",
+      "description": "Choose who is alerted, and when, if an enquiry goes unanswered. New timings also apply to enquiries already waiting.",
+      "reminder": "First reminder",
+      "reminderHint": "The assigned agent gets a reminder.",
+      "alert": "Manager alert",
+      "alertHint": "You and managers who handle enquiries are notified.",
+      "reassign": "Reassignment suggestion",
+      "reassignHint": "Reassigning the enquiry is suggested and the card is flagged.",
+      "minutes": "minutes",
+      "hours": "hours",
+      "save": "Save",
+      "saved": "Alert timings saved.",
+      "range": "A timing is out of range: reminder 5–240 min, alert 15–1440 min, reassignment 1–72 hours.",
+      "order": "Timings must increase: reminder → alert → reassignment."
     },
     "history": {
       "title": "Former members",
@@ -739,6 +759,7 @@
     "statusClosed": "Closed",
     "respondedIn": "Replied in {minutes} min",
     "escalated": "Overdue",
+    "reassignSuggested": "Reassign suggested",
     "handledBy": "Assigned: {name}",
     "markResponded": "I contacted them",
     "close": "Close",
@@ -822,7 +843,13 @@
       "responded": "contacted the client",
       "next": "scheduled the next contact for {date}",
       "nextCleared": "cleared the next contact date",
-      "note": "added a note"
+      "note": "added a note",
+      "reminderMinutes": "sent a reminder to the assignee ({minutes} min unanswered)",
+      "reminderHours": "sent a reminder to the assignee ({hours} h unanswered)",
+      "alertMinutes": "alerted the managers ({minutes} min unanswered)",
+      "alertHours": "alerted the managers ({hours} h unanswered)",
+      "reassignMinutes": "suggested reassignment ({minutes} min unanswered)",
+      "reassignHours": "suggested reassignment ({hours} h unanswered)"
     }
   },
   "offices": {
@@ -1086,6 +1113,7 @@
       "MEMBER_LEFT": "left the agency",
       "MEMBER_RIGHTS_CHANGED": "changed the rights of {entity}",
       "LEAD_ROUTING_CHANGED": "changed enquiry routing",
+      "LEAD_ALERTS_CHANGED": "changed unanswered enquiry alerts",
       "PACKAGE_REQUESTED": "submitted “{entity}” for a premium package",
       "TRANSFER_REQUESTED": "created a transfer request for “{entity}”",
       "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”",
@@ -1116,7 +1144,8 @@
       "releasedLeads": "{count} open enquiries returned to the owner",
       "reason": "Reason: {reason}",
       "assigned": "{from} → {to}",
-      "taskStatus": "{from} → {to}"
+      "taskStatus": "{from} → {to}",
+      "alerts": "Reminder {reminder} min · alert {alert} min · reassignment {reassign} h"
     },
     "emptyTitle": "No entries yet",
     "emptyDescription": "Listing, enquiry and team changes will appear here.",

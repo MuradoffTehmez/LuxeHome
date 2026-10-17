@@ -2925,6 +2925,7 @@
         "MEMBER_LEFT": "покинул(а) агентство",
         "MEMBER_RIGHTS_CHANGED": "изменил(а) права {entity}",
         "LEAD_ROUTING_CHANGED": "изменил(а) распределение заявок",
+        "LEAD_ALERTS_CHANGED": "изменил(а) уведомления о заявках без ответа",
         "PACKAGE_REQUESTED": "подал(а) «{entity}» на премиум-пакет",
         "TRANSFER_REQUESTED": "создал(а) запрос на передачу «{entity}»",
         "TRANSFER_DECIDED": "принял(а) решение по запросу на передачу «{entity}»",

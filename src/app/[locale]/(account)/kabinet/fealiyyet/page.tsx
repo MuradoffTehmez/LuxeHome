@@ -33,7 +33,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const GROUPS = Object.keys(AGENCY_ACTIVITY_GROUPS) as AgencyActivityGroup[];
 const ACTIONS = new Set<string>(Object.values(AGENCY_ACTIVITY_ACTIONS));
-const ROUTING_KEYS = { [LEAD_ROUTING_MODES.ROUND_ROBIN]: "roundRobin", [LEAD_ROUTING_MODES.AREA]: "area", [LEAD_ROUTING_MODES.OFF]: "off" } as const;
+const ROUTING_KEYS = {
+  [LEAD_ROUTING_MODES.DIRECT]: "direct",
+  [LEAD_ROUTING_MODES.ROUND_ROBIN]: "roundRobin",
+  [LEAD_ROUTING_MODES.LOAD]: "load",
+  [LEAD_ROUTING_MODES.OFF]: "off",
+  [LEAD_ROUTING_MODES.AREA]: "area",
+} as const;
 
 type Details = Record<string, string | number | boolean | null>;
 
@@ -116,6 +122,9 @@ export default async function AgencyActivityPage({
     }
     if (action === AGENCY_ACTIVITY_ACTIONS.LEAD_ROUTING_CHANGED && typeof details.mode === "string" && Object.hasOwn(ROUTING_KEYS, details.mode)) {
       return t("details.routing", { mode: routingT(ROUTING_KEYS[details.mode as keyof typeof ROUTING_KEYS]) });
+    }
+    if (action === AGENCY_ACTIVITY_ACTIONS.LEAD_ALERTS_CHANGED && typeof details.reminder === "number" && typeof details.alert === "number" && typeof details.reassign === "number") {
+      return t("details.alerts", { reminder: details.reminder, alert: details.alert, reassign: Math.round(details.reassign / 60) });
     }
     if (action === AGENCY_ACTIVITY_ACTIONS.LEAD_REASSIGNED && typeof details.to === "string") return t("details.to", { name: details.to });
     if (action === AGENCY_ACTIVITY_ACTIONS.PACKAGE_REQUESTED && typeof details.packageName === "string") return t("details.package", { name: details.packageName });

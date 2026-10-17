@@ -196,8 +196,13 @@ model Agency {
   verifiedAt           DateTime?
   /// Nümunə/demo qeydi — `Property.isDemo` ilə eyni semantika.
   isDemo               Boolean   @default(false)
-  /// Müraciət bölgüsü (#161): OFF | ROUND_ROBIN | AREA (`LEAD_ROUTING_MODES`).
+  /// Müraciət bölgüsü (#161, #224): OFF (manual) | DIRECT | ROUND_ROBIN | LOAD | AREA (`LEAD_ROUTING_MODES`).
   leadRouting          String    @default("ROUND_ROBIN")
+  /// Cavabsız müraciət pillələri (#224, PRD 8.5), dəqiqə: məsula xatırlatma, menecerə bildiriş,
+  /// təkrar təyinat təklifi. Hədlər `LEAD_ALERT_LIMITS`-dədir.
+  leadReminderMinutes  Int       @default(30)
+  leadAlertMinutes     Int       @default(120)
+  leadReassignMinutes  Int       @default(1440)
   /// Ölçülmüş cavab göstəriciləri (#161, gündəlik hesablanır): median dəqiqə, nümunə sayı,
   /// cavab verilən müraciət payı (%). Nümunə azdırsa `responseMinutes` boşdur.
   responseMinutes      Int?
@@ -1183,8 +1188,11 @@ model Lead {
   agencyId      String?
   /// İlk cavab vaxtı (kabinetdə «Əlaqə saxladım») — «Tez cavab verir» nişanı buradan ölçülür.
   respondedAt   DateTime?
-  /// 30 dəqiqə cavabsız qalan müraciətin sahibə eskalasiya vaxtı — təkrar bildirişi kəsir.
-  escalatedAt   DateTime?
+  /// Cavabsız müraciət pillələri (#224): məsula xatırlatma, menecerə bildiriş (`escalatedAt`, #161-dən),
+  /// təkrar təyinat təklifi. Hər marker şərti `updateMany` ilə götürülür — bildiriş bir dəfə gedir.
+  reminderSentAt      DateTime?
+  escalatedAt         DateTime?
+  reassignSuggestedAt DateTime?
   /// Kabinet satış mərhələsi (#222, PRD 8.3) — `LEAD_STAGES`. `status` ondan çıxarılır (`leadStatusForStage`),
   /// ofis lövhəsi və huni köhnə qaba statusla işləməyə davam edir.
   stage         String    @default("NEW")

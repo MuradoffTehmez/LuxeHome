@@ -843,8 +843,10 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   filtri ilə görür; bazar müqayisəsi eyni növ + şəhərdə elan başına orta baxışdır (xam SQL, parametr sayı məhdud).
 - **Müraciət ünvanı** `Lead.handlerId` (ictimai hesab; ofis işçisi `assigneeId` ilə qarışdırma) + `Lead.agencyId`.
   `lib/accounts/lead-routing.ts`: agentliyin (sahibin) elanına və agentlik profilindəki formaya (`ContactForm
-  agencySlug`, `source = AGENCY`) gələn müraciət `Agency.leadRouting` ilə agentə düşür — `ROUND_ROBIN`
-  (`AgencyEmployee.lastLeadAt`), `AREA` (rayonda ən çox elanı olan agent), `OFF` (sahibə). Agentin öz elanı həmişə
+  agencySlug`, `source = AGENCY`) gələn müraciət `Agency.leadRouting` ilə agentə düşür (PRD 8.4, #224) — `DIRECT`
+  (elanın `assignedAgentId`-si, aktiv üzvdürsə; «növbədən kənar» olsa da, yoxsa sahibə), `ROUND_ROBIN`
+  (`AgencyEmployee.lastLeadAt`), `LOAD` (ən az açıq — bağlanmamış mərhələdə — müraciəti olan agent, bərabərlikdə növbə),
+  `OFF` (manual: sahibə, sahib/menecer özü təyin edir), `AREA` (rayonda ən çox elanı olan agent). Agentin öz elanı həmişə
   agentə gedir, amma agentliyə bağlanır. `receivesLeads = false` agent növbədən kənardır. Elansız agentlik
   müraciəti ofis sayğaclarına düşmür (`OFFICE_LEAD_WHERE`). Kabinetdə «Əlaqə saxladım» ilk cavabı (`respondedAt`,
   bir dəfə) yazır, sahib müraciəti agentə verə bilir. Agentlik müraciəti yalnız agentliyin hazırkı təsdiqlənmiş
@@ -852,8 +854,7 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 - **Cron `worker.ts`-dədir:** `wrangler.jsonc` → `triggers.crons` + `scheduled()` işi `openNext.fetch` ilə
   `/api/cron/leads?is=…` marşrutuna ötürür; açar `AUTH_SECRET`-dən törədilir (`lib/cron-auth.ts`), `CRON_SECRET`
   lazım deyil. İfadələr `CRON_JOBS` ilə eyni olmalıdır (`scripts/__tests__/cron-triggers.test.ts`). İşlər:
-  10 dəqiqədən bir eskalasiya (30 dəq cavabsız agent müraciəti sahibə, `escalatedAt` şərti götürülür; sahibdəki
-  müraciət `take`-dən əvvəl süzülür; bildiriş yazılmasa — `notifyAccount` `false` — marker geri qaytarılır) və gündəlik
+  10 dəqiqədən bir cavabsız müraciət pillələri (`processUnansweredLeads`, #224 — aşağıya bax) və gündəlik
   cavab göstəriciləri (`refreshResponseStats`). Lokal yoxlama: `wrangler dev --test-scheduled` + `/__scheduled?cron=…`.
 - **Müraciət mərhələləri və kartı (#222, PRD 8.2/8.3/8.6)** — `lib/accounts/lead-pipeline.ts`: kabinet `Lead.stage` ilə
   işləyir (`LEAD_STAGES`, 11 mərhələ), ofis lövhəsi və huni `Lead.status` ilə qalır; mərhələ **həmişə** `stageData()` ilə
@@ -862,6 +863,16 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   Bakı vaxtı), qeydlər və tarixçə `LeadActivity`-dədir (`recordLeadActivity()` heç vaxt atmır). Elan formasında məqsəd
   `intent` → `LEAD_SOURCES.PROPERTY|VIEWING|INFO` (`leadIntentSource`). Kliklər təsdiqlənmiş müraciətlərdən ayrıca
   göstərilir (`getLeadEngagementSummary`). Müraciəti dəyişən yeni axın da tarixçəni yazmalıdır.
+- **Cavabsız müraciət pillələri (#224, PRD 8.5)** — müddətlər agentlikdədir (`leadReminderMinutes` /
+  `leadAlertMinutes` / `leadReassignMinutes`, defolt 30 dəq / 2 saat / 24 saat, hədlər `LEAD_ALERT_LIMITS`, artan
+  sıra), `/kabinet/komanda`-da yalnız sahib dəyişir. Saf qaydalar `lib/accounts/lead-alerts.ts`-dədir. Pillələr:
+  xatırlatma məsula (`reminderSentAt`), bildiriş sahibə + `LEADS_MANAGE` menecerlərə məsulun özündən başqa
+  (`escalatedAt`), təkrar təyinat təklifi eyni alıcılara (`reassignSuggestedAt`; kartda/siyahıda nişan). Marker şərti
+  `updateMany` ilə götürülür, heç bir alıcıya yazılmasa geri qaytarılır; `dedupeKey` pillə + müraciət + alıcıdır.
+  Bir neçə pillə birdən çatanda yalnız sonuncusu göndərilir; həddən `LEAD_ALERT_GRACE_HOURS` sonra pillə bildirişsiz
+  bağlanır (köhnə müraciət hər cron-da taranmasın). Tarama kursorla səhifələnir (`SCAN_PAGE` × `SCAN_PAGES`), çağırış
+  başına ən çox `ALERT_BATCH` pillə. «Tez cavab verir» ölçüsünün 30 dəqiqəlik güzəşti (`LEAD_ESCALATION_MINUTES`) bu
+  parametrlərdən asılı deyil.
 - **«Tez cavab verir»** (`lib/accounts/response-stats.ts`, saf): son 90 gün, ≥3 müraciət, median ≤60 dəq, ≥80%
   cavab. Hələ 30 dəqiqəsi keçməmiş cavabsız müraciət nümunəyə düşmür. Ölçülmüş göstərici `AgentProfile.measured*` və
   `Agency.response*`-dədir; admin yazdığı `AgentProfile.responseMinutes` yalnız ehtiyatdır və nişan vermir.

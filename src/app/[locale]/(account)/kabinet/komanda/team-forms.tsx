@@ -9,7 +9,7 @@ import { Input, Select } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
 import { ConfirmAction } from "@/components/admin/confirm-action";
-import { LEAD_ROUTING_MODES, LISTING_HANDOVER, type LeadRoutingMode, type ListingHandover } from "@/lib/constants";
+import { LEAD_ALERT_LIMITS, LEAD_ROUTING_MODES, LISTING_HANDOVER, type LeadRoutingMode, type ListingHandover } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { IDLE_STATE, type ActionState } from "@/lib/admin/action-state";
 import {
@@ -20,6 +20,7 @@ import {
   rejectAgencyRequest,
   removeAgencyEmployee,
   setEmployeeReceivesLeads,
+  updateLeadAlerts,
   updateLeadRouting,
 } from "./actions";
 
@@ -328,7 +329,7 @@ export function InviteLinkCard({
   );
 }
 
-/** Müraciət bölgüsü rejimi (#161): agentliyə gələn müraciət kimə düşsün. */
+/** Müraciət bölgüsü rejimi (#161, #224 — PRD 8.4): agentliyə gələn müraciət kimə düşsün. */
 export function LeadRoutingForm({ mode }: { mode: LeadRoutingMode }) {
   const t = useTranslations("account.team.routing");
   const { toast } = useToast();
@@ -336,9 +337,11 @@ export function LeadRoutingForm({ mode }: { mode: LeadRoutingMode }) {
   const [value, setValue] = useState<LeadRoutingMode>(mode);
   const [pending, startTransition] = useTransition();
   const options: { value: LeadRoutingMode; label: string; hint: string }[] = [
+    { value: LEAD_ROUTING_MODES.DIRECT, label: t("direct"), hint: t("directHint") },
     { value: LEAD_ROUTING_MODES.ROUND_ROBIN, label: t("roundRobin"), hint: t("roundRobinHint") },
-    { value: LEAD_ROUTING_MODES.AREA, label: t("area"), hint: t("areaHint") },
+    { value: LEAD_ROUTING_MODES.LOAD, label: t("load"), hint: t("loadHint") },
     { value: LEAD_ROUTING_MODES.OFF, label: t("off"), hint: t("offHint") },
+    { value: LEAD_ROUTING_MODES.AREA, label: t("area"), hint: t("areaHint") },
   ];
 
   function save() {
@@ -351,7 +354,7 @@ export function LeadRoutingForm({ mode }: { mode: LeadRoutingMode }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <fieldset className="grid grid-cols-1 gap-2 md:grid-cols-3">
+      <fieldset className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
         <legend className="sr-only">{t("legend")}</legend>
         {options.map((option) => (
           <label
@@ -378,6 +381,67 @@ export function LeadRoutingForm({ mode }: { mode: LeadRoutingMode }) {
       </fieldset>
       <div>
         <Button type="button" size="sm" onClick={save} loading={pending} disabled={value === mode}>
+          {t("save")}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Cavabsız müraciət pillələri (#224, PRD 8.5). Xatırlatma və bildiriş dəqiqə, təkrar təyinat saatla
+ * daxil edilir; server hər üçünü dəqiqə kimi yoxlayıb saxlayır.
+ */
+export function LeadAlertsForm({ reminder, alert, reassign }: { reminder: number; alert: number; reassign: number }) {
+  const t = useTranslations("account.team.alerts");
+  const { toast } = useToast();
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [values, setValues] = useState({ reminder: String(reminder), alert: String(alert), reassign: String(Math.round(reassign / 60)) });
+  const fields = [
+    { key: "reminder", label: t("reminder"), hint: t("reminderHint"), unit: t("minutes"), min: LEAD_ALERT_LIMITS.reminder.min, max: LEAD_ALERT_LIMITS.reminder.max },
+    { key: "alert", label: t("alert"), hint: t("alertHint"), unit: t("minutes"), min: LEAD_ALERT_LIMITS.alert.min, max: LEAD_ALERT_LIMITS.alert.max },
+    { key: "reassign", label: t("reassign"), hint: t("reassignHint"), unit: t("hours"), min: LEAD_ALERT_LIMITS.reassign.min / 60, max: LEAD_ALERT_LIMITS.reassign.max / 60 },
+  ] as const;
+  const changed = values.reminder !== String(reminder) || values.alert !== String(alert) || values.reassign !== String(Math.round(reassign / 60));
+
+  function save() {
+    startTransition(async () => {
+      const result = await updateLeadAlerts({
+        reminder: Number(values.reminder),
+        alert: Number(values.alert),
+        reassign: Number(values.reassign) * 60,
+      });
+      toast(result.message ?? t("saved"), result.status === "success" ? "success" : "error");
+      if (result.status === "success") router.refresh();
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {fields.map((field) => (
+          <label key={field.key} className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+            {field.label}
+            <span className="flex items-center gap-2">
+              <input
+                type="number"
+                inputMode="numeric"
+                min={field.min}
+                max={field.max}
+                step={1}
+                value={values[field.key]}
+                onChange={(event) => setValues((current) => ({ ...current, [field.key]: event.target.value }))}
+                className="min-h-11 w-28 rounded-sm border border-line bg-paper px-3 text-sm font-normal text-ink focus:border-gold focus:outline-none"
+              />
+              <span className="text-sm font-normal text-ink-muted">{field.unit}</span>
+            </span>
+            <span className="text-xs font-normal text-ink-muted">{field.hint}</span>
+          </label>
+        ))}
+      </div>
+      <div>
+        <Button type="button" size="sm" onClick={save} loading={pending} disabled={!changed}>
           {t("save")}
         </Button>
       </div>

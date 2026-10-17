@@ -6,7 +6,7 @@ import { requireAccount } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, AGENCY_EMPLOYEE_ROLES, AGENCY_EMPLOYEE_SOURCES, AGENCY_EMPLOYEE_STATUSES, LEAD_ROUTING_MODES, MAX_AGENCY_EMPLOYEES, isLeadRoutingMode, type Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
 import { getAgencyEmployees, getAgencyForOwner } from "@/lib/queries";
-import { InviteEmployeeForm, InviteLinkCard, LeadRoutingForm, ReceivesLeadsToggle, RemoveEmployeeButton, ReviewRequestButtons } from "./team-forms";
+import { InviteEmployeeForm, InviteLinkCard, LeadAlertsForm, LeadRoutingForm, ReceivesLeadsToggle, RemoveEmployeeButton, ReviewRequestButtons } from "./team-forms";
 import { forbidden } from "next/navigation";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
@@ -14,6 +14,7 @@ import { formatLocalizedDate, formatLocalizedDateTime } from "@/i18n/date";
 import { countOwnListings } from "@/lib/accounts/agency-listings";
 import { getAgencyMembershipHistory } from "@/lib/accounts/agency-ownership";
 import { effectivePermissions, isAgencyEmployeeRole } from "@/lib/accounts/agency-access";
+import { leadAlertConfigOf } from "@/lib/accounts/lead-alerts";
 import { Badge } from "@/components/ui/badge";
 import { MemberAccessButton, MemberSuspendButton } from "./member-forms";
 
@@ -99,11 +100,18 @@ export default async function CabinetTeamPage() {
             />
           </section>
 
-          {/* Müraciət bölgüsü (#161): agentliyə gələn müraciət agentlərə növbə ilə və ya ərazi üzrə düşür. */}
+          {/* Müraciət bölgüsü (#161, #224 — PRD 8.4): agentliyə gələn müraciət kimə düşsün. */}
           <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
             <h2 className="font-display text-lg text-ink">{t("routing.title")}</h2>
             <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">{t("routing.description")}</p>
             <LeadRoutingForm mode={isLeadRoutingMode(agency.leadRouting) ? agency.leadRouting : LEAD_ROUTING_MODES.ROUND_ROBIN} />
+          </section>
+
+          {/* Cavabsız müraciət pillələri (#224, PRD 8.5). */}
+          <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+            <h2 className="font-display text-lg text-ink">{t("alerts.title")}</h2>
+            <p className="mt-1 mb-5 max-w-2xl text-sm leading-6 text-ink-soft">{t("alerts.description")}</p>
+            <LeadAlertsForm {...leadAlertConfigOf(agency)} />
           </section>
 
           <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">

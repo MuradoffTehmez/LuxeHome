@@ -17,6 +17,8 @@ export type LeadProperty = {
   title: string;
   /** Müraciəti alacaq ictimai hesab; şirkət (STAFF) elanında null — ofis baxır. */
   listerId: string | null;
+  /** Elanı idarə edən agent — agentlikdə birbaşa bölgü üçün (#224). */
+  assignedAgentId: string | null;
   /** Agentlikdə ərazi üzrə bölgü üçün (#161). */
   districtId: string | null;
   cityId: string | null;
@@ -37,6 +39,7 @@ export async function resolveLeadProperty(propertyId: string | null | undefined)
       id: true,
       title: true,
       authorId: true,
+      assignedAgentId: true,
       districtId: true,
       cityId: true,
       status: true,
@@ -52,6 +55,7 @@ export async function resolveLeadProperty(propertyId: string | null | undefined)
     id: property.id,
     title: property.title,
     listerId,
+    assignedAgentId: property.assignedAgentId ?? null,
     districtId: property.districtId ?? null,
     cityId: property.cityId ?? null,
     closed: !(ACTIVE_OFFER_STATUSES as string[]).includes(property.status),
@@ -129,6 +133,7 @@ export async function getAccountLeads(userId: string, options: { unanswered?: bo
       createdAt: true,
       respondedAt: true,
       escalatedAt: true,
+      reassignSuggestedAt: true,
       handlerId: true,
       agencyId: true,
       stage: true,

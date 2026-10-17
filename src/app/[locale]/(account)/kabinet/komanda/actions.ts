@@ -34,6 +34,7 @@ import { closeMembershipPeriod } from "@/lib/accounts/agency-ownership";
 import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { generateInviteToken } from "@/lib/accounts/agency-invite";
 import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
+import { validateLeadAlertConfig } from "@/lib/accounts/lead-alerts";
 
 /**
  * Agentlik komandası — sahib (owner) idarə edir.
@@ -379,7 +380,7 @@ async function setInviteLink(enabled: boolean): Promise<ActionState> {
   }
 }
 
-/** Müraciət bölgüsü rejimi (#161): söndürülü, növbə ilə və ya ərazi üzrə. */
+/** Müraciət bölgüsü rejimi (#161, #224 — PRD 8.4): birbaşa, növbə, yüklənmə, manual və ya ərazi. */
 export async function updateLeadRouting(mode: string): Promise<ActionState> {
   const locale = await getLocale() as Locale;
   const t = await getTranslations("account");
@@ -405,6 +406,42 @@ export async function updateLeadRouting(mode: string): Promise<ActionState> {
     return success(t("team.routing.saved"));
   } catch (error) {
     return unexpected("müraciət bölgüsü saxlanmadı", error, t("actions.unexpected"));
+  }
+}
+
+/**
+ * Cavabsız müraciət pillələri (#224, PRD 8.5): xatırlatma, menecerə bildiriş və təkrar təyinat
+ * təklifi (dəqiqə). Yalnız sahib dəyişir; yeni müddət artıq gözləyən müraciətlərə də aiddir.
+ */
+export async function updateLeadAlerts(input: { reminder: unknown; alert: unknown; reassign: unknown }): Promise<ActionState> {
+  const locale = await getLocale() as Locale;
+  const t = await getTranslations("account");
+  let owner;
+  try {
+    owner = await requireAgencyOwner(locale, {
+      agencyOnly: t("actions.agencyOnly"),
+      agencyProfileRequired: t("actions.agencyProfileRequired"),
+    });
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  const result = validateLeadAlertConfig(input);
+  if (!result.ok) return failure(t(result.error === "order" ? "team.alerts.order" : "team.alerts.range"));
+  const { config } = result;
+  try {
+    await prisma.agency.update({
+      where: { id: owner.agency.id },
+      data: { leadReminderMinutes: config.reminder, leadAlertMinutes: config.alert, leadReassignMinutes: config.reassign },
+    });
+    await recordAgencyActivity({
+      agencyId: owner.agency.id, actor: owner.user, action: AGENCY_ACTIVITY_ACTIONS.LEAD_ALERTS_CHANGED,
+      entityType: "Agency", entityId: owner.agency.id, entityLabel: owner.agency.name, details: { ...config },
+    });
+    revalidatePath(localizePath("/kabinet/komanda", locale));
+    return success(t("team.alerts.saved"));
+  } catch (error) {
+    return unexpected("müraciət xəbərdarlıqları saxlanmadı", error, t("actions.unexpected"));
   }
 }
 
