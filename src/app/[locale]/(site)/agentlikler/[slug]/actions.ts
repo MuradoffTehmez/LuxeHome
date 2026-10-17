@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { failure, success, unexpected, type ActionState } from "@/lib/admin/action-state";
 import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { prisma } from "@/lib/prisma";
+import { isUniqueViolation } from "@/lib/media/upload-record";
 import type { Locale } from "@/lib/constants";
 import { hasVerifiedInteraction, isVerifiedReviewer, parseReviewForm, reviewRatingData, reviewSuspicionFlags } from "@/lib/reviews";
 
@@ -42,7 +43,7 @@ export async function submitAgencyReview(_previous: ActionState, formData: FormD
 
     const verifiedInteraction = await hasVerifiedInteraction({ userId: user.id, agencyId: agency.id });
     const flags = await reviewSuspicionFlags({ userId: user.id, comment: parsed.data.comment, overall: parsed.data.overall, verifiedInteraction });
-    await prisma.agencyReview.create({
+    const created = await prisma.agencyReview.create({
       data: {
         agencyId: agency.id,
         customerId: user.id,
@@ -51,7 +52,12 @@ export async function submitAgencyReview(_previous: ActionState, formData: FormD
         verifiedInteraction,
         suspicionFlags: flags.length ? JSON.stringify(flags) : null,
       },
+    }).then(() => true).catch((error: unknown) => {
+      // Eyni anda ikinci göndəriş unikal indeksə dəyir (`@@unique([agencyId, customerId])`).
+      if (isUniqueViolation(error)) return false;
+      throw error;
     });
+    if (!created) return failure(t("reviewDuplicateAgency"));
     return success(t("reviewSuccess"));
   } catch (error) {
     return unexpected("agentlik rəyi yaradıla bilmədi", error, t("reviewFailed"));

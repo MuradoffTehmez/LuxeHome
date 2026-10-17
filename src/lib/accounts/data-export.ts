@@ -224,7 +224,10 @@ export async function buildAccountExport(userId: string) {
     }),
     prisma.agentReview.findMany({
       where: { customerId: userId },
-      select: { rating: true, comment: true, serviceType: true, status: true, createdAt: true, agent: { select: { name: true } } },
+      select: {
+        rating: true, ratingCommunication: true, ratingAccuracy: true, ratingResponsiveness: true, ratingProfessionalism: true,
+        comment: true, serviceType: true, status: true, createdAt: true, agent: { select: { name: true } },
+      },
     }),
     // Agentliyə yazdığı rəylər (#230) — rəyin özü şəxsin məlumatıdır; moderasiya qeydi və şübhə siqnalları daxil deyil.
     prisma.agencyReview.findMany({

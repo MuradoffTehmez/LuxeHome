@@ -33,5 +33,6 @@ CREATE TABLE "AgencyReview" (
     CONSTRAINT "AgencyReview_agencyId_fkey" FOREIGN KEY ("agencyId") REFERENCES "Agency" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE INDEX "AgencyReview_agencyId_status_createdAt_idx" ON "AgencyReview"("agencyId", "status", "createdAt");
+CREATE UNIQUE INDEX "AgencyReview_agencyId_customerId_key" ON "AgencyReview"("agencyId", "customerId");
 CREATE INDEX "AgencyReview_customerId_idx" ON "AgencyReview"("customerId");
 CREATE INDEX "AgencyReview_status_createdAt_idx" ON "AgencyReview"("status", "createdAt");

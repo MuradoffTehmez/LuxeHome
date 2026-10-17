@@ -1598,6 +1598,8 @@ model AgencyReview {
 
   agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
 
+  /// Müştəri başına bir rəy — tranzaksiyasız D1-də eyni anda iki göndərişi də kəsir.
+  @@unique([agencyId, customerId])
   @@index([agencyId, status, createdAt])
   @@index([customerId])
   @@index([status, createdAt])

@@ -94,7 +94,7 @@ describe("saxta rəydən qorunma", () => {
     // Son 24 saatda iki rəy + yazılan üçüncü = `REVIEW_BURST_LIMIT`.
     await DB.batch([
       DB.prepare('INSERT INTO "AgentReview" ("id", "agentId", "customerId", "customerName", "rating", "comment", "createdAt") VALUES (\'rv-burst\', \'rv-ap\', \'rv-client\', \'Müştəri\', 4, \'Başqa rəy\', ?)').bind(now.toISOString()),
-      DB.prepare('INSERT INTO "AgencyReview" ("id", "agencyId", "customerId", "customerName", "rating", "comment", "status", "createdAt") VALUES (\'rv-burst2\', \'rv-agency\', \'rv-client\', \'Müştəri\', 4, \'İkinci rəy\', \'PENDING\', ?)').bind(now.toISOString()),
+      DB.prepare('INSERT INTO "AgentReview" ("id", "agentId", "customerId", "customerName", "rating", "comment", "createdAt") VALUES (\'rv-burst2\', \'rv-ap\', \'rv-client\', \'Müştəri\', 4, \'İkinci rəy\', ?)').bind(now.toISOString()),
     ]);
     await expect(reviewSuspicionFlags({ userId: "rv-client", comment: "Üçüncü fərqli rəy mətni burada.", overall: 4, verifiedInteraction: true, now }))
       .resolves.toEqual([REVIEW_SUSPICION_FLAGS.BURST]);
@@ -113,5 +113,12 @@ describe("rəyə cavab", () => {
     const respondable = await getRespondableReviews("rv-owner");
     expect(respondable.map((item) => item.id)).toEqual(["rv-r1", "rv-r2"]);
     await expect(saveReviewReply({ userId: "rv-owner", authorName: "Alfa", kind: "agency", reviewId: "rv-r1", text: "" })).resolves.toBe("cleared");
+  });
+});
+
+describe("bazada unikallıq", () => {
+  it("eyni müştərinin eyni agentliyə ikinci rəyi indeksə dəyir (eyni anda iki göndəriş)", async () => {
+    await expect(DB.prepare('INSERT INTO "AgencyReview" ("id", "agencyId", "customerId", "customerName", "rating", "comment") VALUES (\'rv-dup\', \'rv-agency\', \'rv-client\', \'Müştəri\', 5, \'Təkrar\')').run())
+      .rejects.toThrow(/UNIQUE/);
   });
 });
