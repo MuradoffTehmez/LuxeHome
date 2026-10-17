@@ -2633,3 +2633,30 @@ model PromoCampaign {
 
   @@index([isActive, startsAt, endsAt])
 }
+
+/// VIP sorğusu və VIP dövrü (#248, PRD Modul 12). Tanıtım mərhələsində VIP ödənişsizdir, amma yalnız
+/// admin təsdiqi ilə verilir. Təsdiqlənmiş sətir VIP dövrüdür (`startsAt`–`endsAt`) və elanın
+/// `isFeatured` + `featuredUntil` sahələrinə yazılır — ictimai VIP görünüşü onlardan oxunur.
+model VipRequest {
+  id            String    @id @default(cuid())
+  propertyId    String
+  requesterId   String?
+  /// `PENDING` | `APPROVED` | `REJECTED` | `CANCELLED` | `REVOKED` | `EXPIRED` (`VIP_REQUEST_STATUSES`).
+  status        String    @default("PENDING")
+  /// `OWNER` | `ADMIN` | `SELF_SERVICE` (`VIP_REQUEST_SOURCES`).
+  source        String
+  requestedDays Int
+  message       String?
+  decidedById   String?
+  decidedAt     DateTime?
+  decisionNote  String?
+  startsAt      DateTime?
+  endsAt        DateTime?
+  extendedCount Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([propertyId, status])
+  @@index([requesterId, createdAt])
+}

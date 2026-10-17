@@ -7,6 +7,7 @@ import { startOfBakuToday } from "@/lib/partners";
 import { runListingExpiry } from "@/lib/listing-expiry";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { sendOpenHouseReminders } from "@/lib/open-house";
+import { expireVipGrants } from "@/lib/vip";
 
 const DOMAIN_EVENT_RETENTION_DAYS = 180;
 
@@ -16,6 +17,8 @@ export async function runPhase2Maintenance(now = new Date()) {
     where: { isFeatured: true, featuredUntil: { lt: now } },
     data: { isFeatured: false },
   });
+  // VIP dövrləri (#248): müddəti bitən təsdiqlənmiş dövr `EXPIRED` olur (elan yuxarıda söndürüldü).
+  const expiredVip = await expireVipGrants(now);
   const expiring = await prisma.reservation.findMany({
     where: {
       expiresAt: { lt: now },
@@ -54,6 +57,7 @@ export async function runPhase2Maintenance(now = new Date()) {
 
   return {
     expiredPremium: premium.count,
+    expiredVip,
     expiredReservations: expiring.length,
     expiredPartners: partners.count,
     listingExpiry,

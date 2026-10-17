@@ -96,7 +96,8 @@
       "subscriptions": "Subscription reports",
       "discounts": "Discount codes",
       "campaigns": "Promo campaigns",
-      "payments": "Payment transactions"
+      "payments": "Payment transactions",
+      "vip": "VIP listings"
     }
   },
   "actions": {
@@ -328,7 +329,8 @@
       "LEAD_ESCALATION": "Unanswered enquiry",
       "LISTING_TRANSFER": "Listing transfer",
       "AGENCY_TASK": "Agency task",
-      "REVIEW_REPORT": "Review report"
+      "REVIEW_REPORT": "Review report",
+      "VIP": "VIP listing"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3357,6 +3359,62 @@
         "amount": "Amount",
         "invoice": "Invoice"
       }
+    },
+    "vip": {
+      "title": "VIP listings",
+      "description": "VIP requests, active and past VIP listings, performance and decision history. VIP is free during the launch phase.",
+      "pending": "Pending requests",
+      "pendingDescription": "Review the listing, set a duration and approve, or decline with a reason.",
+      "active": "Active VIP listings",
+      "past": "Ended and declined",
+      "pastDescription": "Last 50 records: ended, revoked and declined requests.",
+      "emptyPending": "No pending requests.",
+      "emptyActive": "No active VIP listings.",
+      "emptyPast": "No history yet.",
+      "grantTitle": "Grant VIP without a request",
+      "grantDescription": "Using the link or slug of a published listing.",
+      "listing": "Listing link or slug",
+      "listingHint": "E.g.: https://luxehomeestate.az/en/emlaklar/<slug>",
+      "duration": "Duration",
+      "extendBy": "Extend by",
+      "days": "{count} days",
+      "note": "Note (optional)",
+      "approve": "Approve",
+      "grant": "Grant VIP",
+      "extend": "Extend",
+      "reject": "Decline",
+      "revoke": "End",
+      "rejectTitle": "Decline the VIP request?",
+      "rejectDescription": "The reason will be sent to the listing owner as a notification.",
+      "revokeTitle": "End VIP status?",
+      "revokeDescription": "The listing's VIP display is turned off immediately; the owner is notified of the reason.",
+      "presets": {
+        "quality": "The listing's photos and description do not meet VIP quality requirements.",
+        "info": "The listing is incomplete — please fix it and request again.",
+        "rules": "The listing does not comply with platform rules."
+      },
+      "decidedBy": "Decision: {name}",
+      "system": "automatic",
+      "extendedCount": "extended {count} times",
+      "metrics": {
+        "views": "Views",
+        "uniqueViews": "Unique views",
+        "contactReveals": "Phone reveals",
+        "leads": "Inquiries"
+      },
+      "source": {
+        "OWNER": "Owner request",
+        "ADMIN": "Administrator",
+        "SELF_SERVICE": "Self-service"
+      },
+      "status": {
+        "PENDING": "Pending",
+        "APPROVED": "Active",
+        "REJECTED": "Declined",
+        "CANCELLED": "Cancelled",
+        "REVOKED": "Ended",
+        "EXPIRED": "Expired"
+      }
     }
   },
   "server": {
@@ -3831,6 +3889,16 @@
         "required": "Name and the AZ message are required."
       },
       "recordSaved": "Saved."
+    },
+    "vip": {
+      "approved": "VIP approved.",
+      "rejected": "VIP request declined.",
+      "extended": "VIP period extended.",
+      "revoked": "VIP status ended.",
+      "notFound": "Request not found or already reviewed.",
+      "duration": "Invalid duration.",
+      "note": "The reason must be at least 5 characters.",
+      "listing": "Published listing not found."
     }
   }
 }

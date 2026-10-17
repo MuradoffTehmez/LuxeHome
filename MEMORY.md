@@ -768,3 +768,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #246 (Modul 14, 16.5/16.7): `Subscription`, `PaymentTransaction`, `DiscountCode`, `PromoCampaign`, provayder adapteri
   (provayder yoxdur), checkout axını, admin abunə hesabatı/təyini, endirim kodları, kampaniyalar, ödənişlər.
   **Modul 14 tamamlandı.** Növbəti — Modul 12 (VIP elanlar), sonra Modul 13 (irəli çəkmə).
+- #248 (Modul 12): `VipRequest`, kabinet «VIP et», `/admin/vip` (gözləyən/aktiv/tarixçə, performans, uzatma, ləğv),
+  ana səhifə VIP bölməsi, «Premium» nişanı «VIP» oldu. **Modul 12 tamamlandı.** Növbəti — Modul 13 (irəli çəkmə).

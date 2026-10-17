@@ -7,6 +7,7 @@ import { startOfBakuToday } from "@/lib/partners";
 import {
   getBlogCategories,
   getHomeShowcaseProperties,
+  getHomeVipProperties,
   countProperties,
   getFilterOptions,
   getPostBySlug,
@@ -149,9 +150,10 @@ export const getCachedServiceBySlug = cachedQuery(
 
 export const getCachedHomePageData = cachedQuery(
   async () => {
+    const vip = await getHomeVipProperties(6);
     const [featured, propertyTypes, services, projects, posts, filterOptions, categories, partners] =
       await Promise.all([
-        getHomeShowcaseProperties(6),
+        getHomeShowcaseProperties(6, vip.map((property) => property.id)),
         getPropertyTypesWithCounts(),
         getServices(),
         getProjects(),
@@ -160,9 +162,9 @@ export const getCachedHomePageData = cachedQuery(
         getBlogCategories(),
         getHomepagePartners(),
       ]);
-    return { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners };
+    return { vip, featured, propertyTypes, services, projects, posts, filterOptions, categories, partners };
   },
-  ["public-home-discovery-v2"],
+  ["public-home-discovery-v3"],
   {
     tags: [
       PUBLIC_CACHE_TAGS.home,

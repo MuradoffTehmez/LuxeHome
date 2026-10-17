@@ -968,6 +968,8 @@ export const NOTIFICATION_TYPES = {
   AGENCY_TASK: "AGENCY_TASK",
   /** Rəydən şikayətin nəticəsi (#232). */
   REVIEW_REPORT: "REVIEW_REPORT",
+  /** VIP sorğusunun qərarı və VIP dövrünün dəyişməsi (#248). */
+  VIP: "VIP",
 } as const;
 
 export type NotificationType =
@@ -990,6 +992,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   LISTING_TRANSFER: "Elan köçürməsi",
   AGENCY_TASK: "Agentlik tapşırığı",
   REVIEW_REPORT: "Rəydən şikayət",
+  VIP: "VIP elan",
 };
 
 // ---------------------------------------------------------------------------
@@ -1898,3 +1901,18 @@ export type SubscriptionSource = (typeof SUBSCRIPTION_SOURCES)[keyof typeof SUBS
 export const PAYMENT_STATUSES = { PENDING: "PENDING", SUCCEEDED: "SUCCEEDED", FAILED: "FAILED", REFUNDED: "REFUNDED" } as const;
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[keyof typeof PAYMENT_STATUSES];
 export const PAYMENT_KINDS = { CHARGE: "CHARGE", REFUND: "REFUND" } as const;
+
+/** VIP sorğusu və dövrü (#248, PRD Modul 12). */
+export const VIP_REQUEST_STATUSES = {
+  PENDING: "PENDING",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  CANCELLED: "CANCELLED",
+  REVOKED: "REVOKED",
+  EXPIRED: "EXPIRED",
+} as const;
+export type VipRequestStatus = (typeof VIP_REQUEST_STATUSES)[keyof typeof VIP_REQUEST_STATUSES];
+export const VIP_REQUEST_SOURCES = { OWNER: "OWNER", ADMIN: "ADMIN", SELF_SERVICE: "SELF_SERVICE" } as const;
+/** VIP müddətləri (gün). Self-service və sorğu bu dəstdən seçir; admin uzadanda da. */
+export const VIP_DURATIONS_DAYS = [7, 14, 30, 60, 90] as const;
+export const VIP_DECISION_NOTE_MAX = 500;

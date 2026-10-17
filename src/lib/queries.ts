@@ -731,19 +731,21 @@ async function getFeaturedProperties(take = 6) {
   });
 }
 
+/** Ana səhifənin VIP bölməsi (#248, PRD 14.2): aktiv VIP (seçilmiş) elanlar. */
+export async function getHomeVipProperties(take = 6) {
+  return getFeaturedProperties(take);
+}
+
 /**
- * Ana səhifə vitrini: əvvəl aktiv premium (seçilmiş) elanlar, çatmayan yer isə ən son
- * dərc olunanlarla doldurulur. Portfel kiçik olanda bölmə boş qalmasın deyə (#103).
+ * Ana səhifə vitrini: VIP bölməsində göstərilənlərdən başqa ən son dərc olunan elanlar (#103, #248).
+ * VIP elanlar ayrıca bölmədədir — vitrində təkrarlanmır.
  */
-export async function getHomeShowcaseProperties(take = 6) {
-  const featured = await getFeaturedProperties(take);
-  if (featured.length >= take) return featured;
-  const latest = await findPropertyCards({
-    where: { ...(await publicPropertyWhere()), id: { notIn: featured.map((property) => property.id) } },
+export async function getHomeShowcaseProperties(take = 6, excludeIds: string[] = []) {
+  return findPropertyCards({
+    where: { ...(await publicPropertyWhere()), ...(excludeIds.length ? { id: { notIn: excludeIds } } : {}) },
     orderBy: [{ publishedAt: "desc" }],
-    take: take - featured.length,
+    take,
   });
-  return [...featured, ...latest];
 }
 
 /**

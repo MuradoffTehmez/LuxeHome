@@ -508,6 +508,15 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   ayrıca təsdiq və test tələb edir. Panel: `/admin/maliyye/abuneler` (hesabat + ödənişsiz təyin, köhnə aktiv abunə ləğv
   olunur; agentlik planı yalnız agentlik hesabına), `/endirimler`, `/kampaniyalar` (aktiv kampaniya `/paketler`-də göstərilir),
   `/odenisler` (yalnız oxu).
+- **VIP elanlar (#248, PRD Modul 12):** ictimai VIP görünüşü mövcud `Property.isFeatured` + `featuredUntil`-dir (kartda
+  «VIP» nişanı, ana səhifənin ayrıca VIP bölməsi — `getHomeVipProperties()`, vitrin VIP-ləri təkrarlamır). Dövr və qərar
+  tarixçəsi `VipRequest`-dədir (`0079`, `lib/vip.ts`): sahib kabinetdən dərc olunmuş elanı üçün sorğu göndərir (elan başına
+  bir açıq sorğu, yazılışdan sonra yoxlanılır), admin `/admin/vip`-də (`property:manage`) müddətlə təsdiqləyir, səbəblə rədd
+  edir, uzadır, dayandırır və ya sorğusuz verir; hamısı audit olunur və sahibə `VIP` bildirişi gedir. Təsdiq şərti
+  `updateMany`-dir, elan yazılmasa sorğu `PENDING`-ə qayıdır; hələ aktiv dövr varsa yenisi onun sonundan başlayır.
+  `VIP_REQUESTS` bağlıdırsa sorğu qəbul olunmur; `VIP_SELF_SERVICE_ENABLED` açıq və `ADMIN_APPROVAL_FOR_VIP` bağlıdırsa
+  dərhal təsdiqlənir. Bitən dövr gündəlik baxımda `EXPIRED` olur (`expireVipGrants`). Panel performansı dövr günləri üzrə
+  `PropertyDailyStat` + müraciətlərdən toplu oxuyur (dövr başına sorğu yazma — subrequest limiti).
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 

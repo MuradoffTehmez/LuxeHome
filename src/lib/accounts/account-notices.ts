@@ -93,6 +93,12 @@ const COPY = {
     listingNeedsInfo: (title: string) => `«${title}» elanı dərc olunmazdan əvvəl moderator düzəliş istəyir. Elanı redaktə edib yadda saxlayın — o yenidən yoxlamaya düşəcək.`,
     listingInfoRequestedTitle: "Elanınız barədə izahat istənilir",
     listingInfoRequested: (title: string) => `«${title}» elanı barədə ziyarətçi şikayəti yoxlanılır. Moderatorların sualını oxuyun və elanı düzəldin və ya bizimlə əlaqə saxlayın.`,
+    vipDecisionTitle: "VIP sorğunuza baxıldı",
+    vipDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
+      ? `«${title}» elanı ${days} günlük VIP statusu aldı.`
+      : `«${title}» elanı üçün VIP sorğusu rədd edildi${note ? `: ${note}` : "."}`,
+    vipRevokedTitle: "VIP statusu dayandırıldı",
+    vipRevoked: (title: string, note: string | null) => `«${title}» elanının VIP statusu dayandırıldı${note ? `: ${note}` : "."}`,
     reviewReportTitle: "Rəydən şikayətinizə baxıldı",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `«${target}» haqqındakı rəydən şikayətiniz təsdiqləndi: rəy gizlədildi və reytinqdən çıxarıldı.`
@@ -178,6 +184,12 @@ const COPY = {
     listingNeedsInfo: (title: string) => `A moderator has requested changes to the listing “${title}” before it can be published. Edit and save the listing — it will be reviewed again.`,
     listingInfoRequestedTitle: "Clarification requested for your listing",
     listingInfoRequested: (title: string) => `A visitor report about the listing “${title}” is being reviewed. Please read the moderators' question and correct the listing or contact us.`,
+    vipDecisionTitle: "Your VIP request was reviewed",
+    vipDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
+      ? `«${title}» received VIP status for ${days} days.`
+      : `The VIP request for «${title}» was declined${note ? `: ${note}` : "."}`,
+    vipRevokedTitle: "VIP status ended",
+    vipRevoked: (title: string, note: string | null) => `VIP status for «${title}» was ended${note ? `: ${note}` : "."}`,
     reviewReportTitle: "Your review report was reviewed",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `Your report about a review of “${target}” was upheld: the review was hidden and removed from the rating.`
@@ -263,6 +275,12 @@ const COPY = {
     listingNeedsInfo: (title: string) => `Модератор просит исправить объявление «${title}» перед публикацией. Отредактируйте и сохраните его — оно снова попадёт на проверку.`,
     listingInfoRequestedTitle: "По вашему объявлению запрошены пояснения",
     listingInfoRequested: (title: string) => `Проверяется жалоба посетителя на объявление «${title}». Прочитайте вопрос модераторов и исправьте объявление или свяжитесь с нами.`,
+    vipDecisionTitle: "Ваш VIP-запрос рассмотрен",
+    vipDecision: (title: string, approved: boolean, days: number, note: string | null) => approved
+      ? `Объявление «${title}» получило VIP-статус на ${days} дн.`
+      : `VIP-запрос для «${title}» отклонён${note ? `: ${note}` : "."}`,
+    vipRevokedTitle: "VIP-статус прекращён",
+    vipRevoked: (title: string, note: string | null) => `VIP-статус объявления «${title}» прекращён${note ? `: ${note}` : "."}`,
     reviewReportTitle: "Ваша жалоба на отзыв рассмотрена",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `Ваша жалоба на отзыв о «${target}» подтверждена: отзыв скрыт и исключён из рейтинга.`
@@ -763,5 +781,27 @@ export async function noticeReviewReportOutcome(input: {
     "/kabinet/bildirisler",
     `review-report:${input.reviewId}:${input.userId}`,
     (copy) => ({ title: copy.reviewReportTitle, content: copy.reviewReport(input.targetName, input.hidden) }),
+  );
+}
+
+/** Elan sahibinə: VIP sorğusunun qərarı (#248). Açar qərarı daşıyır — rədd edilib yenidən göndərilən sorğu ayrıca bildirilir. */
+export async function noticeVipDecision(input: { userId: string; requestId: string; title: string; approved: boolean; days: number; note: string | null }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.VIP,
+    "/kabinet/elanlar",
+    `vip:${input.requestId}:${input.approved ? "approved" : "rejected"}`,
+    (copy) => ({ title: copy.vipDecisionTitle, content: copy.vipDecision(input.title, input.approved, input.days, input.note) }),
+  );
+}
+
+/** Elan sahibinə: admin VIP dövrünü vaxtından əvvəl dayandırdı (#248). */
+export async function noticeVipRevoked(input: { userId: string; requestId: string; title: string; note: string | null }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.VIP,
+    "/kabinet/elanlar",
+    `vip:${input.requestId}:revoked`,
+    (copy) => ({ title: copy.vipRevokedTitle, content: copy.vipRevoked(input.title, input.note) }),
   );
 }

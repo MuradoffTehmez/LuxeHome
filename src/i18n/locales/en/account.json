@@ -38,8 +38,8 @@
     "renewUnavailable": "This listing cannot be renewed.",
     "expiresIn": "{days, plural, one {# day left} other {# days left}}",
     "expired": "Expired — restore it",
-    "premium": "Premium",
-    "premiumUntil": "Premium · until {date}",
+    "premium": "VIP",
+    "premiumUntil": "VIP · until {date}",
     "promote": "Promote",
     "promoteLabel": "Promote “{title}”",
     "heldForReview": "The listing was flagged by automatic checks and will be published after a moderator approves it. This usually takes a few hours.",
@@ -70,6 +70,30 @@
       "sent": "Your appeal was sent. The result will appear in your notifications.",
       "pending": "Your appeal is under review.",
       "rejectedNote": "Appeal rejected:"
+    },
+    "vip": {
+      "button": "Make VIP",
+      "label": "VIP request for «{title}»",
+      "title": "VIP request",
+      "description": "«{title}» will be shown with a VIP badge at the top of listings and in the homepage VIP section.",
+      "duration": "Duration",
+      "days": "{count} days",
+      "messageLabel": "Note (optional)",
+      "free": "VIP is free during the launch phase; an administrator reviews and approves the request.",
+      "cancel": "Close",
+      "submit": "Send request",
+      "sent": "VIP request sent — an administrator will review it.",
+      "approvedNow": "The listing is now VIP.",
+      "pending": "VIP request under review",
+      "rejectedNote": "Previous request was declined: {note}",
+      "errors": {
+        "disabled": "VIP requests are not accepted right now.",
+        "duration": "Invalid duration.",
+        "listing": "VIP can only be requested for your own published listing.",
+        "active": "This listing is already VIP.",
+        "pending": "A request for this listing is already under review.",
+        "failed": "The request was not sent. Please try again later."
+      }
     }
   },
   "newProperty": {

@@ -90,7 +90,7 @@ export default async function HomePage({ params }: HomePageProps) {
     agentsT,
     aiSearchT,
     listingSearchT,
-    { featured, propertyTypes, services, projects, posts, filterOptions, categories, partners },
+    { vip, featured, propertyTypes, services, projects, posts, filterOptions, categories, partners },
     { testimonials, agents },
     projectsEnabled,
     siteImages,
@@ -107,7 +107,7 @@ export default async function HomePage({ params }: HomePageProps) {
     isProjectsSectionEnabled(),
     getSiteImages(),
   ]);
-  const priceBands = await assessPriceBands(featured);
+  const priceBands = await assessPriceBands([...vip, ...featured]);
   const localizedServices = services.map((service) => localizeService(service, resolvedLocale));
   const localizedPropertyTypes = propertyTypes.map((type) => localizeKnownContent("propertyType", type, resolvedLocale));
 
@@ -173,6 +173,29 @@ export default async function HomePage({ params }: HomePageProps) {
       <div className="home-deferred-content">
 
       {/* ------------------------------------------------------------------ */}
+      {/* VIP ELANLAR (#248, PRD 14.2) — yalnız aktiv VIP varsa                */}
+      {/* ------------------------------------------------------------------ */}
+      {vip.length > 0 ? (
+        <Section tone="beige">
+          <Container size="wide">
+            <SectionHeader
+              overline={t("vip.overline")}
+              title={t("vip.title")}
+              description={t("vip.description")}
+              action={{ label: t("vip.all"), href: "/emlaklar" }}
+            />
+            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {vip.map((property, index) => (
+                <Reveal key={property.id} delay={index * 60}>
+                  <PropertyCard property={property} priceBand={priceBands[property.id]} />
+                </Reveal>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      ) : null}
+
+      {/* ------------------------------------------------------------------ */}
       {/* SEÇİLMİŞ ƏMLAKLAR — portfel boşdursa sahib müraciəti bloku (#103)  */}
       {/* ------------------------------------------------------------------ */}
       {featured.length > 0 ? (
@@ -196,7 +219,7 @@ export default async function HomePage({ params }: HomePageProps) {
         </Section>
       ) : null}
 
-      {featured.length < 3 ? (
+      {vip.length + featured.length < 3 ? (
         <OwnerLeadBanner
           labels={{
             overline: t("ownerLead.overline"),

@@ -113,5 +113,11 @@
     "primary": "Send a request",
     "whatsapp": "Message on WhatsApp",
     "whatsappMessage": "Hello, I would like to sell/rent out my property with Luxe Home Estate."
+  },
+  "vip": {
+    "overline": "VIP",
+    "title": "VIP listings",
+    "description": "VIP listings approved by our administrators.",
+    "all": "All listings"
   }
 }
