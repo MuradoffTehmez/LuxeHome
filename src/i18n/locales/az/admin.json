@@ -3959,7 +3959,10 @@
       "duration": "Müddət düzgün deyil.",
       "note": "Səbəb ən azı 5 simvol olmalıdır.",
       "listing": "Dərc olunmuş elan tapılmadı.",
-      "active": "Elanın artıq aktiv kampaniyası var."
+      "active": "Elanın artıq aktiv kampaniyası var.",
+      "pending": "Bu elan üçün sorğu yoxlanılır.",
+      "cooldown": "Təkrar irəli çəkmə fasiləsi hələ bitməyib.",
+      "disabled": "İrəli çəkmə modulu söndürülüb."
     }
   }
 }

@@ -88,7 +88,7 @@ export async function grantPromotionAction(_state: ActionState, formData: FormDa
     const property = slug ? await prisma.property.findFirst({ where: { OR: [{ slug }, { id: slug }], deletedAt: null }, select: { id: true } }) : null;
     if (!property) return failure(msg("server.promotion.listing"), { listing: msg("server.promotion.listing") });
     const result = await grantPromotion({ actorId: user.id, propertyId: property.id, days, note: String(formData.get("note") ?? "") });
-    if (!result.ok) return failure(msg(result.activeAlready ? "server.promotion.active" : `server.promotion.${result.reason}`));
+    if (!result.ok) return failure(msg(result.blocked ? `server.promotion.${result.blocked}` : `server.promotion.${result.reason}`));
     await recordAudit(user, "CREATE", "PromotionCampaign", result.campaignId ?? property.id, `İrəli çəkmə verildi · ${result.title} · ${days} gün`);
     refresh();
     return success(msg("server.promotion.approved"));

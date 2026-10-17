@@ -3959,7 +3959,10 @@
       "duration": "Invalid duration.",
       "note": "The reason must be at least 5 characters.",
       "listing": "Published listing not found.",
-      "active": "The listing already has an active campaign."
+      "active": "The listing already has an active campaign.",
+      "pending": "A request for this listing is pending.",
+      "cooldown": "The repeat-promotion cooldown has not ended yet.",
+      "disabled": "The promotion module is disabled."
     }
   }
 }

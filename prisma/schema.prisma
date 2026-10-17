@@ -2658,6 +2658,8 @@ model VipRequest {
   startsAt      DateTime?
   endsAt        DateTime?
   extendedCount Int       @default(0)
+  /// Təsdiq anında elanın mövcud premium sonu (paket) — VIP ləğv olunanda bərpa olunur.
+  featuredBefore DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
