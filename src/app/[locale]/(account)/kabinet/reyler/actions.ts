@@ -8,11 +8,14 @@ import { localizePath } from "@/i18n/path-locale";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { saveReviewReply } from "@/lib/reviews";
 import type { Locale } from "@/lib/constants";
+import { featureDisabledFailure } from "@/lib/feature-guard";
 
 /** Agentin/agentliyin təsdiqlənmiş rəyə cavabı (#230, PRD 10.5); boş mətn cavabı silir. */
 export async function replyToReview(kind: string, reviewId: string, text: string): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account.reviews");
+  const disabled = await featureDisabledFailure("RATINGS");
+  if (disabled) return disabled;
   let user;
   try {
     user = await requirePublicAction("review", locale);

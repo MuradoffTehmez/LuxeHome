@@ -19,6 +19,7 @@ import { ReviewForm } from "@/components/site/review-form";
 import { ReviewCard, ReviewCriteriaSummary } from "@/components/site/review-parts";
 import { reviewCriteriaAverages } from "@/lib/reviews";
 import { REVIEW_CRITERIA } from "@/lib/constants";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { submitAgentReview } from "./actions";
 import { TrackedAnchor } from "@/components/analytics/analytics-event";
 
@@ -47,6 +48,7 @@ export default async function AgentPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
   const rawPage = (await searchParams).sehife;
   const t = await getTranslations({ locale, namespace: "phase2.agents" });
+  const ratingsEnabled = await isFeatureEnabled("RATINGS");
   const agent = await getPublicAgentBySlug(slug, Number(typeof rawPage === "string" ? rawPage : 1));
   if (!agent) notFound();
   const rating = agent.reviews.length
@@ -178,19 +180,21 @@ export default async function AgentPage({ params, searchParams }: Props) {
               <ReviewCriteriaSummary averages={reviewCriteriaAverages(agent.reviews)} />
               {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <ReviewCard key={review.id} review={review} report="agent" />)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}
             </section>
-            <ReviewForm
-              action={submitAgentReview}
-              targetField="agentId"
-              targetId={agent.id}
-              labels={{
-                title: t("reviewTitle"),
-                hint: t("reviewHint"),
-                criteria: Object.fromEntries(REVIEW_CRITERIA.map((criterion) => [criterion, t(`criteria.${criterion}`)])) as Record<(typeof REVIEW_CRITERIA)[number], string>,
-                comment: t("comment"),
-                serviceType: t("serviceType"),
-                submit: t("submitReview"),
-              }}
-            />
+            {ratingsEnabled && (
+              <ReviewForm
+                action={submitAgentReview}
+                targetField="agentId"
+                targetId={agent.id}
+                labels={{
+                  title: t("reviewTitle"),
+                  hint: t("reviewHint"),
+                  criteria: Object.fromEntries(REVIEW_CRITERIA.map((criterion) => [criterion, t(`criteria.${criterion}`)])) as Record<(typeof REVIEW_CRITERIA)[number], string>,
+                  comment: t("comment"),
+                  serviceType: t("serviceType"),
+                  submit: t("submitReview"),
+                }}
+              />
+            )}
           </div>
         </Container>
       </Section>

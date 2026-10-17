@@ -759,3 +759,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #238 (Modul 09, 11.6): CSV/XLSX endpoint-ləri + çap (PDF). **Modul 09 tamamlandı.** Növbəti — Modul 10 (ərazi səhifələri).
 - #240 (Modul 10): `/seher/<slug>` + «Ərazi haqqında» bloku. **Modul 10 tamamlandı** (12.2–12.3 iyerarxiya və seçim,
   admin `/admin/taksonomiya` əvvəldən var). Növbəti — Faza 4 monetizasiya (Modul 12 VIP, 13 irəli çək, 14 paketlər, 23 bayraqlar).
+- #242 (Modul 23, PRD 23 + 16.6): funksiya bayraqları, `/admin/funksiyalar`, kritik açar təsdiqi + audit; şikayət, reytinq,
+  CRM, agentlik analitikası, avtomatik moderasiya, e-poçt bildirişi və elan aktuallığında backend tətbiqi. VIP/irəli çəkmə/
+  abunə/ödəniş bayraqları Modul 12–14-də istifadə olunacaq. Növbəti — Modul 14 (Basic/Pro/Premium).

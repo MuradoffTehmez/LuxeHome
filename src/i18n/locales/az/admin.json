@@ -89,7 +89,8 @@
       "approvals": "Təsdiq növbəsi",
       "reports": "Şikayətlər",
       "appeals": "Etirazlar",
-      "transfers": "Köçürmələr"
+      "transfers": "Köçürmələr",
+      "featureFlags": "Funksiyalar"
     }
   },
   "actions": {
@@ -3116,6 +3117,90 @@
       "consentMissing": "Əmlak sahibinin razılığı qeyd olunmayıb",
       "sourceDecision": "Elanın agentliyinin qərarı: {date}",
       "adminDecision": "Administrator qərarı: {date}"
+    },
+    "featureFlags": {
+      "title": "Modullar və funksiyalar",
+      "description": "Platforma modullarını və monetizasiya açarlarını idarə edin.",
+      "cardTitle": "Funksiya bayraqları",
+      "cardDescription": "Söndürülən modulun formaları, action-ları və API-si də bağlanır. Asılı açar öz modulu olmadan işləmir.",
+      "modules": "Modullar",
+      "monetization": "Monetizasiya",
+      "critical": "Kritik",
+      "confirmCritical": "Kritik açarı dəyişdiyimi təsdiqləyirəm — dəyişiklik audit jurnalına yazılır.",
+      "flags": {
+        "REPORTS": {
+          "label": "Şikayətlər",
+          "hint": "Elan və rəy şikayəti formaları və göndərişi."
+        },
+        "AUTO_MODERATION": {
+          "label": "Avtomatik moderasiya",
+          "hint": "Risk balı yüksək elan dərcdən əvvəl növbəyə düşür. Söndürüləndə siqnallar hesablanır, amma elan saxlanmır."
+        },
+        "AGENCY_ANALYTICS": {
+          "label": "Agentlik analitikası",
+          "hint": "Kabinetdə agentlik analitikası və hesabat ixracı."
+        },
+        "RATINGS": {
+          "label": "Reytinq və rəylər",
+          "hint": "Agent və agentlik haqqında yeni rəy yazılması."
+        },
+        "CRM": {
+          "label": "CRM",
+          "hint": "Kabinetdə müştəri bazası və uyğunlaşdırma."
+        },
+        "VIP_REQUESTS": {
+          "label": "VIP sorğuları",
+          "hint": "VIP elan sorğuları modulu."
+        },
+        "PROMOTION": {
+          "label": "İrəli çəkmə",
+          "hint": "Elanı siyahıda irəli çəkmə modulu."
+        },
+        "SUBSCRIPTIONS": {
+          "label": "Abunəliklər",
+          "hint": "Agentlik abunə planları modulu."
+        },
+        "PAYMENTS": {
+          "label": "Ödənişlər",
+          "hint": "Ödəniş provayderi inteqrasiyası. Hazırda real ödəniş yoxdur."
+        },
+        "NOTIFICATIONS": {
+          "label": "E-poçt bildirişləri",
+          "hint": "Hesab bildirişlərinin e-poçtla göndərilməsi. Kabinet bildirişləri həmişə yazılır."
+        },
+        "LISTING_FRESHNESS": {
+          "label": "Elan aktuallığı",
+          "hint": "Elan müddətinin avtomatik bitməsi və xatırlatmalar."
+        },
+        "EXTRA_VERIFICATION": {
+          "label": "Əlavə doğrulama",
+          "hint": "Hesab üçün əlavə doğrulama addımları."
+        },
+        "MONETIZATION_ENABLED": {
+          "label": "Monetizasiya",
+          "hint": "Ödənişli xidmətlərin ümumi açarı. Bağlı olanda tanıtım mesajı göstərilir."
+        },
+        "PAID_SUBSCRIPTIONS_ENABLED": {
+          "label": "Ödənişli abunə",
+          "hint": "Abunəlik modulu və monetizasiya açıq olanda işləyir."
+        },
+        "PAYMENT_CHECKOUT_ENABLED": {
+          "label": "Ödəniş səhifəsi",
+          "hint": "Ödəniş modulu və monetizasiya açıq olanda işləyir."
+        },
+        "VIP_SELF_SERVICE_ENABLED": {
+          "label": "VIP özünəxidmət",
+          "hint": "İstifadəçi VIP-i özü aktivləşdirir (VIP modulu açıq olmalıdır)."
+        },
+        "PROMOTION_SELF_SERVICE_ENABLED": {
+          "label": "İrəli çəkmə özünəxidmət",
+          "hint": "İstifadəçi elanı özü irəli çəkir (modul açıq olmalıdır)."
+        },
+        "ADMIN_APPROVAL_FOR_VIP": {
+          "label": "VIP üçün admin təsdiqi",
+          "hint": "VIP sorğusu administrator təsdiqindən keçir."
+        }
+      }
     }
   },
   "server": {
@@ -3561,6 +3646,12 @@
       "notFound": "Köçürmə sorğusu tapılmadı.",
       "targetGone": "Təhvil alan artıq yeni agentliyin üzvü deyil — sorğunu rədd edin.",
       "listingChanged": "Elan arada dəyişib (silinib və ya başqa agentliyə keçib) — sorğu ləğv edildi."
+    },
+    "featureFlags": {
+      "unchanged": "Dəyişiklik yoxdur.",
+      "confirmRequired": "Kritik açar dəyişikliyini təsdiqləyin.",
+      "saved": "Funksiya bayraqları saxlanıldı.",
+      "disabled": "Bu funksiya hazırda söndürülüb."
     }
   }
 }

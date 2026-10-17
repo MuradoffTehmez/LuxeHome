@@ -22,6 +22,7 @@ import {
   type CrmContext,
 } from "@/lib/accounts/crm";
 import { mergeCrmClientRecords } from "@/lib/accounts/crm-matching";
+import { featureDisabledFailure } from "@/lib/feature-guard";
 
 /**
  * Mini CRM əməliyyatları (#226, PRD 9.1, 9.2). Hər action öz guard-ını çağırır (layout server
@@ -35,6 +36,8 @@ export type CrmActionState = ActionState & { clientId?: string };
 
 async function guard(): Promise<{ user: AuthUser; locale: Locale; context: CrmContext } | ActionState> {
   const locale = (await getLocale()) as Locale;
+  const disabled = await featureDisabledFailure("CRM");
+  if (disabled) return disabled;
   try {
     const user = await requirePublicAction("lead", locale);
     return { user, locale, context: await getCrmContext(user) };

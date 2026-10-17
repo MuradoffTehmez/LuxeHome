@@ -65,5 +65,6 @@
     "errorDescription": "Bir qədər sonra yenidən cəhd edin. Problem davam edərsə, bizimlə əlaqə saxlayın.",
     "retry": "Yenidən cəhd et",
     "contact": "Bizimlə əlaqə"
-  }
+  },
+  "featureDisabled": "Bu funksiya hazırda söndürülüb."
 }

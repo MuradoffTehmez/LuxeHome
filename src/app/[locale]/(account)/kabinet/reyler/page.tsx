@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { forbidden } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BadgeCheck, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ReviewsPage() {
   const locale = (await getLocale()) as Locale;
   const user = await requireAccount(locale);
+  if (!(await isFeatureEnabled("RATINGS"))) notFound();
   if (user.accountType !== ACCOUNT_TYPES.AGENCY && user.accountType !== ACCOUNT_TYPES.AGENT) forbidden();
   const t = await getTranslations("account.reviews");
   const reviews = await getRespondableReviews(user.id);

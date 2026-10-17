@@ -5,6 +5,7 @@ import { recordDomainEvent } from "@/lib/admin/events";
 import { processPendingAccountDeletions } from "@/lib/account-deletion";
 import { startOfBakuToday } from "@/lib/partners";
 import { runListingExpiry } from "@/lib/listing-expiry";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { sendOpenHouseReminders } from "@/lib/open-house";
 
 const DOMAIN_EVENT_RETENTION_DAYS = 180;
@@ -39,7 +40,10 @@ export async function runPhase2Maintenance(now = new Date()) {
   }
 
   const accountDeletions = await processPendingAccountDeletions(now);
-  const listingExpiry = await runListingExpiry(now);
+  // Elan aktuallığı söndürülübsə (#242) müddət, xatırlatma və avtomatik bitmə dayanır.
+  const listingExpiry = (await isFeatureEnabled("LISTING_FRESHNESS"))
+    ? await runListingExpiry(now)
+    : { renewed: 0, backfilled: 0, reminded: 0, expired: 0, expiredIds: [] as string[], disabled: true };
   const openHouseReminders = await sendOpenHouseReminders(now);
   const retentionCutoff = new Date(now.getTime() - DOMAIN_EVENT_RETENTION_DAYS * 86_400_000);
   const domainEvents = await prisma.domainEvent.deleteMany({

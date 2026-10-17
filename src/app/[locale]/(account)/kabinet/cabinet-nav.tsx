@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { ArrowLeftRight, BarChart3, Bell, CalendarCheck, ClipboardList, Contact, Crown, Flag, Gauge, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, ScrollText, Search, Sparkles, Star, UserCog, UserRound, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { getCabinetItems, isCabinetItemActive } from "@/lib/accounts/cabinet-navigation";
+import { getCabinetItems, isCabinetItemActive, type CabinetNavItem } from "@/lib/accounts/cabinet-navigation";
 import { signOutAccount } from "../hesab/actions";
 
 /**
@@ -23,6 +23,7 @@ type CabinetNavProps = {
   canTransfer?: boolean;
   canAssignListings?: boolean;
   canViewAnalytics?: boolean;
+  hiddenItems?: readonly CabinetNavItem["id"][];
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
 };
@@ -101,12 +102,13 @@ export function CabinetNav({
   canTransfer = false,
   canAssignListings = false,
   canViewAnalytics = false,
+  hiddenItems = [],
   variant = "desktop",
   onNavigate,
 }: CabinetNavProps) {
   const pathname = usePathname();
   const t = useTranslations("auth.cabinet");
-  const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings, canViewAnalytics);
+  const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings, canViewAnalytics, hiddenItems);
 
   return (
     <nav aria-label={t("menu")} className="flex flex-col gap-4">

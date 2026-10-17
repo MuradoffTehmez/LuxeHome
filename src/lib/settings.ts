@@ -62,6 +62,11 @@ export const SETTING_KEYS = {
    */
   LISTING_EXPIRY_CONFIG: "listing.expiry_config",
   /**
+   * Funksiya bayraqları (#242, PRD 23, 16.6) — `{ FLAG: boolean }` **tək JSON dəyər** (atomik yazılır).
+   * Təhlil və defoltlar `feature-flags-policy.ts`-dədir; oxuma `feature-flags.ts`.
+   */
+  FEATURE_FLAGS: "features.flags",
+  /**
    * Sistem rejimi (`NORMAL` | `MAINTENANCE` | `READ_ONLY`) və texniki xidmət
    * səhifəsinin mətnləri — **tək JSON dəyər**.
    *

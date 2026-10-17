@@ -31,6 +31,7 @@ import { cn, isUnoptimizedImage } from "@/lib/utils";
 import { formatLocalizedDate } from "@/i18n/date";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
 import { LISTING_TYPES, LOCATION_KINDS, type Locale, type SortOption } from "@/lib/constants";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -86,12 +87,13 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
   const { agency, stats } = data;
   recordView("agency", agency.id, (await headers()).get("user-agent"));
 
-  const [t, detail, navigation, content, reviewT] = await Promise.all([
+  const [t, detail, navigation, content, reviewT, ratingsEnabled] = await Promise.all([
     getTranslations({ locale, namespace: "listings.agencyProfile" }),
     getTranslations({ locale, namespace: "listings.detail" }),
     getTranslations({ locale, namespace: "navigation" }),
     getTranslations({ locale, namespace: "content.propertyDetail" }),
     getTranslations({ locale, namespace: "phase2.agents" }),
+    isFeatureEnabled("RATINGS"),
   ]);
 
   const basePath = `/agentlikler/${agency.slug}`;
@@ -480,19 +482,21 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
               )}
 
               {/* Agentliyə birbaşa rəy (#230, PRD 10.3) — moderasiyadan sonra görünür. */}
-              <ReviewForm
-                action={submitAgencyReview}
-                targetField="agencyId"
-                targetId={agency.id}
-                labels={{
-                  title: reviewT("agencyReviewTitle"),
-                  hint: reviewT("reviewHint"),
-                  criteria: Object.fromEntries(REVIEW_CRITERIA.map((criterion) => [criterion, reviewT(`criteria.${criterion}`)])) as Record<(typeof REVIEW_CRITERIA)[number], string>,
-                  comment: reviewT("comment"),
-                  serviceType: reviewT("serviceType"),
-                  submit: reviewT("submitReview"),
-                }}
-              />
+              {ratingsEnabled && (
+                <ReviewForm
+                  action={submitAgencyReview}
+                  targetField="agencyId"
+                  targetId={agency.id}
+                  labels={{
+                    title: reviewT("agencyReviewTitle"),
+                    hint: reviewT("reviewHint"),
+                    criteria: Object.fromEntries(REVIEW_CRITERIA.map((criterion) => [criterion, reviewT(`criteria.${criterion}`)])) as Record<(typeof REVIEW_CRITERIA)[number], string>,
+                    comment: reviewT("comment"),
+                    serviceType: reviewT("serviceType"),
+                    submit: reviewT("submitReview"),
+                  }}
+                />
+              )}
 
               {/* Agentliyə müraciət (#161): bölgü açıqdırsa agentlərdən birinə düşür. */}
               <section id="muraciet" aria-labelledby="muraciet-title" className="scroll-mt-28 rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">

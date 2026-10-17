@@ -215,6 +215,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/audit` | Audit jurnalı; sıfırlama yalnız Super Admin | `settings:manage` |
 | `/admin/hesabim` | Profil, avatar, panel dili, tema, parol, backup kod, passkey, ICS tokeni, sessiyalar | Hər staff |
 | `/admin/parametrler` | Əlaqə, bildiriş, sayt şəkilləri, tema | `settings:manage` |
+| `/admin/funksiyalar` | Modul və monetizasiya bayraqları; kritik açarda təsdiq, audit (#242) | `settings:manage` |
 
 Toplu seçim `components/admin/bulk-selection.tsx` + `lib/admin/bulk.ts`-dir: hər id mövcud tək action-dan keçir (guard, audit, keş onun içindədir), bir sorğuda ən çox 100 id, silmə həmişə təsdiq dialoqu ilə.
 

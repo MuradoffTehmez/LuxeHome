@@ -89,7 +89,8 @@
       "approvals": "Approval queue",
       "reports": "Reports",
       "appeals": "Appeals",
-      "transfers": "Transfers"
+      "transfers": "Transfers",
+      "featureFlags": "Features"
     }
   },
   "actions": {
@@ -3116,6 +3117,90 @@
       "consentMissing": "Property owner’s consent not recorded",
       "sourceDecision": "Listing agency decision: {date}",
       "adminDecision": "Administrator decision: {date}"
+    },
+    "featureFlags": {
+      "title": "Modules and features",
+      "description": "Manage platform modules and monetization switches.",
+      "cardTitle": "Feature flags",
+      "cardDescription": "Disabling a module also closes its forms, actions and API. Dependent switches do not work without their module.",
+      "modules": "Modules",
+      "monetization": "Monetization",
+      "critical": "Critical",
+      "confirmCritical": "I confirm changing a critical switch — the change is recorded in the audit log.",
+      "flags": {
+        "REPORTS": {
+          "label": "Reports",
+          "hint": "Listing and review report forms and submissions."
+        },
+        "AUTO_MODERATION": {
+          "label": "Auto-moderation",
+          "hint": "High-risk listings are held for review. When off, signals are still computed but listings are not held."
+        },
+        "AGENCY_ANALYTICS": {
+          "label": "Agency analytics",
+          "hint": "Agency analytics and report export in the cabinet."
+        },
+        "RATINGS": {
+          "label": "Ratings and reviews",
+          "hint": "Submitting new reviews for agents and agencies."
+        },
+        "CRM": {
+          "label": "CRM",
+          "hint": "Client base and matching in the cabinet."
+        },
+        "VIP_REQUESTS": {
+          "label": "VIP requests",
+          "hint": "VIP listing request module."
+        },
+        "PROMOTION": {
+          "label": "Promotion",
+          "hint": "Listing promotion (bump) module."
+        },
+        "SUBSCRIPTIONS": {
+          "label": "Subscriptions",
+          "hint": "Agency subscription plans module."
+        },
+        "PAYMENTS": {
+          "label": "Payments",
+          "hint": "Payment provider integration. No real payments yet."
+        },
+        "NOTIFICATIONS": {
+          "label": "Email notifications",
+          "hint": "Sending account notifications by email. In-app notifications are always stored."
+        },
+        "LISTING_FRESHNESS": {
+          "label": "Listing freshness",
+          "hint": "Automatic listing expiry and reminders."
+        },
+        "EXTRA_VERIFICATION": {
+          "label": "Extra verification",
+          "hint": "Additional account verification steps."
+        },
+        "MONETIZATION_ENABLED": {
+          "label": "Monetization",
+          "hint": "Master switch for paid services. When off, the promo message is shown."
+        },
+        "PAID_SUBSCRIPTIONS_ENABLED": {
+          "label": "Paid subscriptions",
+          "hint": "Works only when subscriptions and monetization are on."
+        },
+        "PAYMENT_CHECKOUT_ENABLED": {
+          "label": "Payment checkout",
+          "hint": "Works only when payments and monetization are on."
+        },
+        "VIP_SELF_SERVICE_ENABLED": {
+          "label": "VIP self-service",
+          "hint": "Users activate VIP themselves (VIP module must be on)."
+        },
+        "PROMOTION_SELF_SERVICE_ENABLED": {
+          "label": "Promotion self-service",
+          "hint": "Users promote listings themselves (module must be on)."
+        },
+        "ADMIN_APPROVAL_FOR_VIP": {
+          "label": "Admin approval for VIP",
+          "hint": "VIP requests require administrator approval."
+        }
+      }
     }
   },
   "server": {
@@ -3561,6 +3646,12 @@
       "notFound": "Transfer request not found.",
       "targetGone": "The recipient is no longer a member of the new agency — reject the request.",
       "listingChanged": "The listing changed in the meantime (deleted or moved to another agency) — the request was cancelled."
+    },
+    "featureFlags": {
+      "unchanged": "No changes.",
+      "confirmRequired": "Confirm the critical switch change.",
+      "saved": "Feature flags saved.",
+      "disabled": "This feature is currently disabled."
     }
   }
 }

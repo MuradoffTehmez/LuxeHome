@@ -68,6 +68,7 @@ import { PublisherContactButtons } from "@/components/site/publisher-contact";
 import { SafetyTips } from "@/components/site/safety-tips";
 import { ContactSafetyWarning } from "@/components/site/contact-safety-warning";
 import { ReportListingButton } from "@/components/site/report-listing";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -174,7 +175,7 @@ export default async function PropertyDetailPage({ params }: Props) {
     },
     4,
   );
-  const [translation, similarProperties, similarBands, partnerLinks, projectsEnabled, priceAssessment, insightText, openHouses] = await Promise.all([
+  const [translation, similarProperties, similarBands, partnerLinks, projectsEnabled, priceAssessment, insightText, openHouses, reportsEnabled] = await Promise.all([
     loadTranslation(sourceProperty.id, locale as Locale),
     similarPromise,
     similarPromise.then(assessPriceBands),
@@ -183,6 +184,7 @@ export default async function PropertyDetailPage({ params }: Props) {
     isClosed ? Promise.resolve(null) : assessPropertyPrice(sourceProperty),
     getTranslations({ locale, namespace: "property.priceInsight" }),
     isClosed ? Promise.resolve([]) : getUpcomingOpenHouses(sourceProperty.id),
+    isFeatureEnabled("REPORTS"),
   ]);
 
   const knownProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
@@ -864,9 +866,10 @@ export default async function PropertyDetailPage({ params }: Props) {
                 )}
 
                 {/* Fırıldaqdan qorunma (#159): şirkət elanında da şikayət mümkündür (məs. «artıq satılıb»). */}
+                {/* Şikayət modulu söndürülübsə (#242) düymə çıxmır, məsləhətlər qalır. */}
                 {publisher.kind !== "company" ? (
-                  <SafetyTips className="mb-6" footer={<ReportListingButton propertyId={property.id} />} />
-                ) : (
+                  <SafetyTips className="mb-6" footer={reportsEnabled ? <ReportListingButton propertyId={property.id} /> : undefined} />
+                ) : reportsEnabled && (
                   <div className="mb-6 flex justify-end">
                     <ReportListingButton propertyId={property.id} />
                   </div>

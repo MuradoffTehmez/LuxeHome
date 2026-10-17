@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Menu } from "lucide-react";
 import { Overlay } from "@/components/ui/overlay";
+import type { CabinetNavItem } from "@/lib/accounts/cabinet-navigation";
 import { CabinetNav } from "./cabinet-nav";
 import { CabinetBreadcrumbs } from "./cabinet-breadcrumbs";
 
@@ -15,10 +16,11 @@ type CabinetShellProps = {
   canTransfer?: boolean;
   canAssignListings?: boolean;
   canViewAnalytics?: boolean;
+  hiddenItems?: readonly CabinetNavItem["id"][];
   children: React.ReactNode;
 };
 
-export function CabinetShell({ name, accountLabel, canList, canManageTeam = false, canTransfer = false, canAssignListings = false, canViewAnalytics = false, children }: CabinetShellProps) {
+export function CabinetShell({ name, accountLabel, canList, canManageTeam = false, canTransfer = false, canAssignListings = false, canViewAnalytics = false, hiddenItems = [], children }: CabinetShellProps) {
   const [open, setOpen] = useState(false);
   const t = useTranslations("auth.cabinet");
 
@@ -44,7 +46,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
       {/* Çap (#238): menyu gizlənir, məzmun tam enə keçir — analitika hesabatı «PDF kimi saxla» ilə çıxarılır. */}
       <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)] print:block">
         <aside className="no-print hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block lg:self-start">
-          <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} canTransfer={canTransfer} canAssignListings={canAssignListings} canViewAnalytics={canViewAnalytics} />
+          <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} canTransfer={canTransfer} canAssignListings={canAssignListings} canViewAnalytics={canViewAnalytics} hiddenItems={hiddenItems} />
         </aside>
         <div className="min-w-0">
           <CabinetBreadcrumbs />
@@ -66,6 +68,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
           canTransfer={canTransfer}
           canAssignListings={canAssignListings}
           canViewAnalytics={canViewAnalytics}
+          hiddenItems={hiddenItems}
           variant="mobile"
           onNavigate={() => setOpen(false)}
         />
