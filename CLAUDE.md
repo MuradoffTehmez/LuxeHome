@@ -465,6 +465,14 @@ Qaydalar:
 
 Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
 
+**Ərazi səhifələri (#240, PRD 12.4/12.5):** `/rayon/<slug>` (rayon, qəsəbə, kənd, massiv), `/metro/<slug>` və
+`/seher/<slug>` (`CITY` — şəhər və rayon; etiket neytral «X üzrə», çünki səviyyə ikisini də əhatə edir) eyni
+`getTaxonomyLandingProperties()` + `buildTaxonomyLandingDescriptor()` kontraktındadır: meta, canonical, breadcrumb, FAQ və
+ItemList JSON-LD, az məzmunda `seoLandingIndexPolicy` noindex, sitemap `getIndexableTaxonomyLandings(kind)`. İlk səhifədə
+«Ərazi haqqında» bloku (`getAreaInsights`, `components/site/area-insights.tsx`): yalnız aktiv təkliflər (`ACTIVE_OFFER_STATUSES`) üzrə satış/kirayə sayı, median
+(satış m², aylıq kirayə; `MIN_COMPARABLES`-dən az nümunədə «—»), növ/elan tipi filtr keçidləri, xəritə (`?gorunus=xerite`)
+və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da düşür, `districtSlug` filtri kimi). Uydurulmuş bazar rəqəmi göstərilmir — say və median yalnız saytdakı ictimai elanlardandır.
+
 ### Toplu idxal və sayt şəkilləri
 
 - `/admin/emlaklar/idxal` CSV-dən elan yaradır (#103). Hər sətir `propertySchema`-dan keçir,
@@ -820,6 +828,12 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   açarlar `UNIQUE_VIEW_RETENTION_DAYS` sonra `runPhase2Maintenance()`-də silinir. `/kabinet/analitika` unikal baxış və qiymət
   dəyişikliyini (`PropertyPriceHistory`) göstərir; `/kabinet/analitika/<id>` (`getListingPerformance`, giriş siyahı ilə eyni)
   7/30/90 günlük dinamika və qiymət tarixçəsidir.
+- **Hesabat ixracı (#238, PRD 11.6):** `/api/hesab/hesabat/agentlik` (sahib və `LEADS_MANAGE`) və `/api/hesab/hesabat/elanlar`
+  (elan yerləşdirən hesab) — `?format=csv|xlsx`, interval/dövr və `?l=` dil; giriş səhifə ilə eynidir, icazəsizə 404,
+  `no-store`. Yazıcılar asılılıqsızdır (`lib/export/tabular.ts`): CSV UTF-8 BOM ilə və düstur inyeksiyasına qarşı (`=+-@`
+  ilə başlayan mətn `'` alır), XLSX sıxılmamış ZIP + OOXML (`inlineStr`, CRC32). Cədvəllər `lib/export/analytics-reports.ts`.
+  PDF — səhifənin çap üslubu ilə brauzerin «PDF kimi saxla» funksiyası: başlıq, footer, kabinet menyusu və alt naviqasiya
+  `.no-print`-dir; yeni sabit səth əlavə edəndə onu da çapdan gizlət.
 - **Daxili tapşırıqlar (#220, PRD 7.3)** `AgencyTask` (`lib/accounts/agency-tasks.ts`), `/kabinet/tapsiriqlar` (sahib və agent):
   növ `AGENCY_TASK_TYPES`, status `AGENCY_TASK_STATUSES` (açıq = `OPEN_AGENCY_TASK_STATUSES`). Sahib və `TASKS_MANAGE`
   hər aktiv üzvə yaradır və hamısını görür (`?icraci=`), digər üzv yalnız özünə yaradır və ona təyin olunanı/özünün

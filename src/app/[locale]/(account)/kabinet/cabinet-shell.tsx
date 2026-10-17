@@ -24,7 +24,7 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
 
   return (
     <>
-      <div className="mb-6 flex min-w-0 items-center justify-between gap-4 rounded-xl border border-line bg-paper p-4 shadow-sm lg:hidden">
+      <div className="no-print mb-6 flex min-w-0 items-center justify-between gap-4 rounded-xl border border-line bg-paper p-4 shadow-sm lg:hidden">
         <div className="min-w-0">
           <p className="text-xs font-semibold text-gold-deep">{accountLabel}</p>
           <p className="mt-1 truncate font-medium text-ink">{name}</p>
@@ -41,8 +41,9 @@ export function CabinetShell({ name, accountLabel, canList, canManageTeam = fals
         </button>
       </div>
 
-      <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className="hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block lg:self-start">
+      {/* Çap (#238): menyu gizlənir, məzmun tam enə keçir — analitika hesabatı «PDF kimi saxla» ilə çıxarılır. */}
+      <div className="grid grid-cols-1 min-w-0 gap-8 lg:grid-cols-[240px_minmax(0,1fr)] print:block">
+        <aside className="no-print hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block lg:self-start">
           <CabinetNav name={name} accountLabel={accountLabel} canList={canList} canManageTeam={canManageTeam} canTransfer={canTransfer} canAssignListings={canAssignListings} canViewAnalytics={canViewAnalytics} />
         </aside>
         <div className="min-w-0">

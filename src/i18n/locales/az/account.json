@@ -1123,7 +1123,17 @@
     "uniqueNote": "Unikal baxış — eyni ziyarətçi gün ərzində bir dəfə sayılır; botlar sayılmır.",
     "priceHistory": "Qiymət tarixçəsi",
     "priceHistoryEmpty": "Qiymət dəyişməyib — cari qiymət {price}.",
-    "backToAnalytics": "Analitikaya qayıt"
+    "backToAnalytics": "Analitikaya qayıt",
+    "export": {
+      "title": "Hesabat:",
+      "csv": "CSV",
+      "xlsx": "Excel",
+      "pdf": "PDF",
+      "pdfHint": "Çap pəncərəsində «PDF kimi saxla» seçin",
+      "day": "Gün",
+      "min": "Min (₼)",
+      "max": "Maks (₼)"
+    }
   },
   "reports": {
     "metaTitle": "Şikayətlərim",
@@ -1449,7 +1459,17 @@
     "sale": "Satış",
     "rent": "Kirayə",
     "priceFrom": "{from} ₼ və yuxarı",
-    "empty": "Bu dövrdə məlumat yoxdur."
+    "empty": "Bu dövrdə məlumat yoxdur.",
+    "export": {
+      "title": "Hesabat:",
+      "csv": "CSV",
+      "xlsx": "Excel",
+      "pdf": "PDF",
+      "pdfHint": "Çap pəncərəsində «PDF kimi saxla» seçin",
+      "day": "Gün",
+      "min": "Min (₼)",
+      "max": "Maks (₼)"
+    }
   },
   "assignments": {
     "metaTitle": "Elan təyinatları",

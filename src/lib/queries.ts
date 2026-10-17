@@ -1419,7 +1419,7 @@ export async function getBlogCategories() {
 // ---------------------------------------------------------------------------
 
 export async function getSitemapEntries() {
-  const [properties, projects, services, posts, agencies, agents, partners, seoLandings, dbLandings, districts, metros] = await Promise.all([
+  const [properties, projects, services, posts, agencies, agents, partners, seoLandings, dbLandings, districts, metros, cities] = await Promise.all([
     prisma.property.findMany({
       where: {
         ...indexablePropertyWhere(),
@@ -1467,6 +1467,7 @@ export async function getSitemapEntries() {
     }),
     getIndexableTaxonomyLandings("DISTRICT"),
     getIndexableTaxonomyLandings("METRO"),
+    getIndexableTaxonomyLandings("CITY"),
   ]);
 
   const indexableDbLandings: Array<{ path: string; locale: Locale; updatedAt: Date }> = [];
@@ -1491,6 +1492,7 @@ export async function getSitemapEntries() {
       ...seoLandings,
       ...districts.map((item) => ({ path: `/rayon/${item.slug}`, updatedAt: item.updatedAt })),
       ...metros.map((item) => ({ path: `/metro/${item.slug}`, updatedAt: item.updatedAt })),
+      ...cities.map((item) => ({ path: `/seher/${item.slug}`, updatedAt: item.updatedAt })),
     ],
     dbLandings: indexableDbLandings,
   };
@@ -1512,13 +1514,14 @@ export async function getSeoLandingProperties(landing: SeoLanding, page = 1) {
 }
 
 export async function getTaxonomyLandingProperties(
-  kind: "DISTRICT" | "METRO",
+  kind: "DISTRICT" | "METRO" | "CITY",
   slug: string,
   page = 1,
 ) {
   // `/rayon/<slug>` yalnız inzibati rayonu deyil, qəsəbə, kənd və massivi də
   // açır — «Maştağa» üçün ayrıca marşrut yaratmaq əvəzinə eyni səhifə işlədilir.
   // `districtId` bu səviyyələrin hamısını saxlayır.
+  // `/seher/<slug>` (#240) şəhər/rayon səviyyəsidir (`CITY` — 11 şəhər və 64 rayon).
   const where =
     kind === LOCATION_KINDS.DISTRICT
       ? { slug, kind: { in: LOCATION_CHILD_KINDS } }
@@ -1530,6 +1533,7 @@ export async function getTaxonomyLandingProperties(
       name: true,
       slug: true,
       kind: true,
+      parentId: true,
       parent: { select: { name: true } },
       // Rayon analitikası (PRD bölmə 49-50) paneldən idarə olunur, lakin rayon
       // səhifəsində göstərilmirdi — məlumat yalnız əmlak detalına düşürdü.
@@ -1539,7 +1543,7 @@ export async function getTaxonomyLandingProperties(
   if (!location) return null;
 
   const result = await getProperties({
-    ...(kind === LOCATION_KINDS.DISTRICT ? { districtSlug: slug } : { metroSlug: slug }),
+    ...(kind === LOCATION_KINDS.DISTRICT ? { districtSlug: slug } : kind === LOCATION_KINDS.CITY ? { citySlug: slug } : { metroSlug: slug }),
     statuses: INDEXABLE_LISTING_STATUSES,
     page,
     pageSize: 12,
@@ -1572,7 +1576,7 @@ async function getIndexableSeoLandingEntries() {
   return rows.filter((row): row is NonNullable<typeof row> => row !== null);
 }
 
-export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
+export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO" | "CITY") {
   const baseWhere = {
     ...(await buildPropertyWhere({ statuses: INDEXABLE_LISTING_STATUSES })),
     isDemo: false,
@@ -1595,6 +1599,19 @@ export async function getIndexableTaxonomyLandings(kind: "DISTRICT" | "METRO") {
           count: row._count._all,
           updatedAt: row._max.updatedAt ?? undefined,
         }))
+      : kind === LOCATION_KINDS.CITY
+        ? (
+            await prisma.property.groupBy({
+              by: ["cityId"],
+              where: baseWhere,
+              _count: { _all: true },
+              _max: { updatedAt: true },
+            })
+          ).map((row) => ({
+            locationId: row.cityId,
+            count: row._count._all,
+            updatedAt: row._max.updatedAt ?? undefined,
+          }))
       : (
           await prisma.property.groupBy({
             by: ["metroId"],
