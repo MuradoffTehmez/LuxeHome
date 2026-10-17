@@ -1878,3 +1878,23 @@ export const SYSTEM_MODE_TONE: Record<
   MAINTENANCE: "danger",
   READ_ONLY: "warning",
 };
+
+/** Abunə statusları (#246, PRD 16.7). Aktiv sayılan: `ACTIVE_SUBSCRIPTION_STATUSES`. */
+export const SUBSCRIPTION_STATUSES = {
+  TRIALING: "TRIALING",
+  ACTIVE: "ACTIVE",
+  PAST_DUE: "PAST_DUE",
+  CANCELLED: "CANCELLED",
+  EXPIRED: "EXPIRED",
+} as const;
+export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[keyof typeof SUBSCRIPTION_STATUSES];
+export const ACTIVE_SUBSCRIPTION_STATUSES: SubscriptionStatus[] = [SUBSCRIPTION_STATUSES.TRIALING, SUBSCRIPTION_STATUSES.ACTIVE, SUBSCRIPTION_STATUSES.PAST_DUE];
+
+/** Abunənin mənbəyi: panel təyini, tanıtım və ya ödəniş. */
+export const SUBSCRIPTION_SOURCES = { ADMIN: "ADMIN", PROMO: "PROMO", PAYMENT: "PAYMENT" } as const;
+export type SubscriptionSource = (typeof SUBSCRIPTION_SOURCES)[keyof typeof SUBSCRIPTION_SOURCES];
+
+/** Ödəniş əməliyyatı (#246, PRD 16.7). */
+export const PAYMENT_STATUSES = { PENDING: "PENDING", SUCCEEDED: "SUCCEEDED", FAILED: "FAILED", REFUNDED: "REFUNDED" } as const;
+export type PaymentStatus = (typeof PAYMENT_STATUSES)[keyof typeof PAYMENT_STATUSES];
+export const PAYMENT_KINDS = { CHARGE: "CHARGE", REFUND: "REFUND" } as const;

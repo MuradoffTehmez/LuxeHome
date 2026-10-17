@@ -63,7 +63,10 @@ export type AuditEntity =
   | "SeoSearchMetric"
   | "ListingPackage"
   | "PackageOrder"
-  | "SubscriptionPlan";
+  | "SubscriptionPlan"
+  | "Subscription"
+  | "DiscountCode"
+  | "PromoCampaign";
 
 export async function recordAudit(
   user: Pick<AuthUser, "id" | "email">,

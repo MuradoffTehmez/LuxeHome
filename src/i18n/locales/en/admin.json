@@ -92,7 +92,11 @@
       "transfers": "Transfers",
       "featureFlags": "Features",
       "finance": "Finance and monetization",
-      "subscriptionPlans": "Subscription plans"
+      "subscriptionPlans": "Subscription plans",
+      "subscriptions": "Subscription reports",
+      "discounts": "Discount codes",
+      "campaigns": "Promo campaigns",
+      "payments": "Payment transactions"
     }
   },
   "actions": {
@@ -3261,6 +3265,97 @@
         "crmClients": "CRM clients",
         "exportsPerMonth": "Exports per month"
       },
+      "toggle": "Toggle active",
+      "activateTitle": "Activate?",
+      "deactivateTitle": "Deactivate?",
+      "subscriptionStatus": {
+        "TRIALING": "Trial",
+        "ACTIVE": "Active",
+        "PAST_DUE": "Payment due",
+        "CANCELLED": "Cancelled",
+        "EXPIRED": "Expired"
+      },
+      "subscriptionSource": {
+        "ADMIN": "Panel",
+        "PROMO": "Promo",
+        "PAYMENT": "Payment"
+      },
+      "paymentStatus": {
+        "PENDING": "Pending",
+        "SUCCEEDED": "Succeeded",
+        "FAILED": "Failed",
+        "REFUNDED": "Refunded"
+      },
+      "subscriptions": {
+        "title": "Subscription reports",
+        "description": "Subscription statuses, breakdown by plan and assignment from the panel.",
+        "total": "Total subscriptions",
+        "grantTitle": "Assign subscription",
+        "grantDescription": "During the launch phase subscriptions are assigned free of charge; the account's previous active subscription is cancelled.",
+        "email": "Account email",
+        "plan": "Plan",
+        "duration": "Duration",
+        "withTrial": "With trial period",
+        "note": "Note (optional)",
+        "byPlan": "Active subscriptions by plan",
+        "recent": "Recent subscriptions",
+        "empty": "No subscriptions yet.",
+        "account": "Account",
+        "statusLabel": "Status",
+        "period": "Period",
+        "source": "Source",
+        "actions": "Actions",
+        "cancel": "Cancel",
+        "cancelTitle": "Cancel subscription?",
+        "cancelDescription": "The subscription ends immediately; refunds are handled separately."
+      },
+      "discounts": {
+        "title": "Discount codes",
+        "description": "Percentage or fixed-amount discount codes for future paid subscriptions.",
+        "formTitle": "Create or update a code",
+        "listTitle": "Codes",
+        "empty": "No discount codes yet.",
+        "code": "Code",
+        "codeHint": "Uppercase letters, digits, “-” and “_”; 3–32 characters. An existing code is updated.",
+        "percentOff": "Percent (%)",
+        "amountOff": "Fixed amount (AZN)",
+        "oneOf": "Fill in either percent or amount, not both.",
+        "validFrom": "Starts",
+        "validUntil": "Ends",
+        "maxRedemptions": "Usage limit",
+        "plans": "Plans",
+        "plansHint": "If none is selected, the code applies to all plans.",
+        "allPlans": "All plans",
+        "value": "Discount",
+        "validity": "Validity",
+        "usage": "Usage"
+      },
+      "campaigns": {
+        "title": "Promo campaigns",
+        "description": "Time-limited announcements shown on the plans page.",
+        "formTitle": "New campaign",
+        "listTitle": "Campaigns",
+        "empty": "No campaigns yet.",
+        "name": "Name",
+        "startsAt": "Starts",
+        "endsAt": "Ends",
+        "messageAz": "Message (AZ)",
+        "messageEn": "Message (EN, optional)",
+        "messageRu": "Message (RU, optional)",
+        "live": "Live",
+        "scheduled": "Scheduled"
+      },
+      "payments": {
+        "title": "Payment transactions",
+        "description": "Transaction history, invoices and failed payments for the future payment integration.",
+        "noProvider": "No payment provider is connected — no real payments are accepted. Activation requires separate approval and testing.",
+        "provider": "Connected provider: {id}",
+        "listTitle": "Transactions",
+        "empty": "No payment transactions yet.",
+        "date": "Date",
+        "amount": "Amount",
+        "invoice": "Invoice"
+      },
       "descriptionLabelLocale": "Description — {locale} (optional)"
     }
   },
@@ -3719,7 +3814,23 @@
       "invalidPrice": "Invalid price.",
       "invalidLimit": "Invalid limit.",
       "invalidTrial": "Trial days must be between 0 and 90.",
-      "notFound": "Plan not found."
+      "notFound": "Plan not found.",
+      "cancelled": "Subscription cancelled.",
+      "grant": {
+        "saved": "Subscription assigned.",
+        "user": "No active public account with this email.",
+        "plan": "Invalid plan or duration.",
+        "audience": "Agency plans can only be assigned to agency accounts."
+      },
+      "discount": {
+        "code": "Invalid code format.",
+        "value": "Invalid discount value.",
+        "dates": "Invalid dates."
+      },
+      "campaign": {
+        "required": "Name and the AZ message are required."
+      },
+      "recordSaved": "Saved."
     }
   }
 }

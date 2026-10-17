@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { Check, Info, Minus } from "lucide-react";
+import { Check, Info, Megaphone, Minus } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
@@ -12,6 +12,7 @@ import { breadcrumbSchema, buildManagedMetadata, jsonLd } from "@/lib/seo";
 import type { Locale } from "@/lib/constants";
 import { getFeatureFlags } from "@/lib/feature-flags";
 import { getSubscriptionPlans, type SubscriptionPlanView } from "@/lib/subscriptions/plans";
+import { getActivePromoCampaign } from "@/lib/subscriptions/subscriptions";
 import {
   PLAN_AUDIENCES,
   PLAN_CAPABILITIES,
@@ -44,11 +45,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PlansPage({ params }: Props) {
   const { locale } = await params;
   const resolved = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
-  const [t, navigation, flags, plans] = await Promise.all([
+  const [t, navigation, flags, plans, campaign] = await Promise.all([
     getTranslations({ locale: resolved, namespace: "phase3.plans" }),
     getTranslations({ locale: resolved, namespace: "navigation" }),
     getFeatureFlags(),
     getSubscriptionPlans(),
+    getActivePromoCampaign(),
   ]);
   // Abunə modulu söndürülübsə (#242) paket səhifəsi yoxdur — menyu, footer və sitemap da onu göstərmir.
   if (!flags.SUBSCRIPTIONS) notFound();
@@ -165,6 +167,13 @@ export default async function PlansPage({ params }: Props) {
                 <p className="font-medium text-ink">{t("promo")}</p>
                 <p className="mt-1 text-sm text-ink-soft">{t("promoHint")}</p>
               </div>
+            </div>
+          )}
+          {/* Tanıtım kampaniyası (#246) — paneldən müddətli mesaj. */}
+          {campaign && (
+            <div role="note" className="flex gap-3 rounded-xl border border-line bg-paper p-5">
+              <Megaphone className="mt-0.5 size-5 shrink-0 text-gold-deep" aria-hidden="true" />
+              <p className="text-sm font-medium text-ink">{campaign.message[resolved]}</p>
             </div>
           )}
           {plans.length === 0 ? <p className="text-ink-muted">{t("empty")}</p> : PLAN_AUDIENCES.map(audienceSection)}

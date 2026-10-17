@@ -2540,3 +2540,96 @@ model SubscriptionPlanPrice {
 
   @@unique([planId, months])
 }
+
+/// Abunə (#246, PRD 16.3/16.7): istifadəçinin və ya agentliyin planı. Plan kodu, auditoriya və müddət
+/// yaranma anında kopyalanır — plan sonradan dəyişəndə keçmiş abunə sürüşmür. Tanıtım mərhələsində
+/// abunəni yalnız panel təyin edir (`source = ADMIN|PROMO`); ödənişli abunə provayder qoşulanda yaranır.
+model Subscription {
+  id           String    @id @default(cuid())
+  userId       String
+  /// Agentlik planında agentlik (`audience = AGENCY`); fərdi planda boşdur.
+  agencyId     String?
+  planId       String
+  planCode     String
+  audience     String
+  months       Int
+  /// `TRIALING` | `ACTIVE` | `PAST_DUE` | `CANCELLED` | `EXPIRED` (`SUBSCRIPTION_STATUSES`).
+  status       String
+  /// `ADMIN` | `PROMO` | `PAYMENT` (`SUBSCRIPTION_SOURCES`).
+  source       String
+  startsAt     DateTime
+  endsAt       DateTime
+  trialEndsAt  DateTime?
+  cancelledAt  DateTime?
+  discountCode String?
+  note         String?
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  transactions PaymentTransaction[]
+
+  @@index([userId, status])
+  @@index([status, endsAt])
+}
+
+/// Ödəniş əməliyyatı (#246, PRD 16.7). Provayder adapteri (`lib/payments/provider.ts`) yazır; hazırda
+/// real provayder yoxdur. `idempotencyKey` unikal — eyni sifarişin ikinci cəhdi yeni əməliyyat yaratmır.
+model PaymentTransaction {
+  id             String    @id @default(cuid())
+  subscriptionId String?
+  userId         String
+  provider       String
+  providerRef    String?
+  idempotencyKey String    @unique
+  /// `CHARGE` | `REFUND` (`PAYMENT_KINDS`).
+  kind           String    @default("CHARGE")
+  amountMinor    Int
+  currency       String    @default("AZN")
+  /// `PENDING` | `SUCCEEDED` | `FAILED` | `REFUNDED` (`PAYMENT_STATUSES`).
+  status         String    @default("PENDING")
+  failureReason  String?
+  /// Faktura nömrəsi və rekvizitlər (JSON) — uğurlu ödənişdə doldurulur.
+  invoiceNumber  String?   @unique
+  invoiceData    String?
+  refundedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+/// Endirim kodu (#246, PRD 16.5). Kod böyük hərflə saxlanılır; faiz və ya sabit məbləğ (biri).
+model DiscountCode {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  percentOff     Int?
+  amountOffMinor Int?
+  /// İcazəli plan kodları (JSON siyahı); boş — bütün planlar.
+  planCodes      String?
+  validFrom      DateTime?
+  validUntil     DateTime?
+  maxRedemptions Int?
+  redemptions    Int       @default(0)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+/// Tanıtım kampaniyası (#246, PRD 16.5): paket səhifəsində göstərilən müddətli elan (AZ/EN/RU mətn).
+model PromoCampaign {
+  id        String   @id @default(cuid())
+  name      String
+  /// `{ az, en, ru }` mətnləri (JSON).
+  message   String
+  startsAt  DateTime
+  endsAt    DateTime
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, startsAt, endsAt])
+}
