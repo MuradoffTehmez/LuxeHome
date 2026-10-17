@@ -29,9 +29,18 @@ export function periodStart(period: AnalyticsPeriod, now = new Date()) {
   return { day, at: new Date(`${day}T00:00:00+04:00`) };
 }
 
-export type AnalyticsTotals = { views: number; contactReveals: number; whatsappClicks: number; telegramClicks: number; leads: number; favorites: number };
+export type AnalyticsTotals = {
+  views: number;
+  uniqueViews: number;
+  contactReveals: number;
+  whatsappClicks: number;
+  telegramClicks: number;
+  leads: number;
+  favorites: number;
+  priceChanges: number;
+};
 
-const emptyTotals = (): AnalyticsTotals => ({ views: 0, contactReveals: 0, whatsappClicks: 0, telegramClicks: 0, leads: 0, favorites: 0 });
+const emptyTotals = (): AnalyticsTotals => ({ views: 0, uniqueViews: 0, contactReveals: 0, whatsappClicks: 0, telegramClicks: 0, leads: 0, favorites: 0, priceChanges: 0 });
 
 async function analyticsAuthors(userId: string) {
   const agency = await prisma.agency.findUnique({ where: { userId }, select: { id: true } });
@@ -109,12 +118,12 @@ export async function getListingAnalytics(input: {
   )).slice(0, MAX_LISTINGS);
   const ids = listings.map((listing) => listing.id);
 
-  const [stats, leads, favorites, daily, market] = await Promise.all([
+  const [stats, leads, favorites, daily, market, priceChanges] = await Promise.all([
     findManyInChunks(ids, 1, (chunk) =>
       prisma.propertyDailyStat.groupBy({
         by: ["propertyId"],
         where: { propertyId: { in: chunk }, day: { gte: start.day } },
-        _sum: { views: true, contactReveals: true, whatsappClicks: true, telegramClicks: true },
+        _sum: { views: true, uniqueViews: true, contactReveals: true, whatsappClicks: true, telegramClicks: true },
       })),
     findManyInChunks(ids, 1, (chunk) =>
       prisma.lead.groupBy({ by: ["propertyId"], where: { propertyId: { in: chunk }, createdAt: { gte: start.at } }, _count: { _all: true } })),
@@ -130,11 +139,15 @@ export async function getListingAnalytics(input: {
       listings.filter((listing) => (PUBLIC_PROPERTY_STATUSES as readonly string[]).includes(listing.status)),
       start.day,
     ),
+    // Qiymət dəyişiklikləri (#236, PRD 11.3).
+    findManyInChunks(ids, 1, (chunk) =>
+      prisma.propertyPriceHistory.groupBy({ by: ["propertyId"], where: { propertyId: { in: chunk }, changedAt: { gte: start.at } }, _count: { _all: true } })),
   ]);
 
   const statOf = new Map(stats.map((row) => [row.propertyId, row._sum]));
   const leadOf = new Map(leads.flatMap((row) => (row.propertyId ? [[row.propertyId, row._count._all] as const] : [])));
   const favoriteOf = new Map(favorites.map((row) => [row.propertyId, row._count._all]));
+  const priceChangeOf = new Map(priceChanges.map((row) => [row.propertyId, row._count._all]));
 
   const totals = emptyTotals();
   const rows = listings.map((listing) => {
@@ -142,14 +155,18 @@ export async function getListingAnalytics(input: {
     const row = {
       ...listing,
       views: sum?.views ?? 0,
+      uniqueViews: sum?.uniqueViews ?? 0,
       contactReveals: sum?.contactReveals ?? 0,
       whatsappClicks: sum?.whatsappClicks ?? 0,
       telegramClicks: sum?.telegramClicks ?? 0,
       leads: leadOf.get(listing.id) ?? 0,
       favorites: favoriteOf.get(listing.id) ?? 0,
+      priceChanges: priceChangeOf.get(listing.id) ?? 0,
       marketViews: market.get(`${listing.typeId}:${listing.cityId}`) ?? null,
     };
     totals.views += row.views;
+    totals.uniqueViews += row.uniqueViews;
+    totals.priceChanges += row.priceChanges;
     totals.contactReveals += row.contactReveals;
     totals.whatsappClicks += row.whatsappClicks;
     totals.telegramClicks += row.telegramClicks;
@@ -173,4 +190,55 @@ export async function getListingAnalytics(input: {
   });
 
   return { period: input.period, isAgency, team, agentUserId: authorIds.length === 1 && isAgency ? authorIds[0] : null, totals, rows, series };
+}
+
+/**
+ * Bir elanın performansı (#236, PRD 11.3): gün üzrə baxış, unikal baxış, nömrə açılması, WhatsApp və
+ * Telegram; dövrdə favorit və müraciət sayı; qiymət tarixçəsi. Giriş analitika siyahısı ilə eynidir:
+ * öz elanı, agentlik sahibinə isə agentliyin elanı. Başqasının elanı `null`.
+ */
+export async function getListingPerformance(input: { userId: string; propertyId: string; period: AnalyticsPeriod; now?: Date }) {
+  const now = input.now ?? new Date();
+  const start = periodStart(input.period, now);
+  const { agencyId } = await analyticsAuthors(input.userId);
+  const listing = await prisma.property.findFirst({
+    where: {
+      id: input.propertyId,
+      deletedAt: null,
+      OR: [{ authorId: input.userId, ...(agencyId ? { agencyId } : {}) }, ...(agencyId ? [{ agencyId }] : [])],
+    },
+    select: { id: true, title: true, slug: true, status: true, price: true, currency: true, viewCount: true, publishedAt: true },
+  });
+  if (!listing) return null;
+  const [daily, favorites, leads, prices] = await Promise.all([
+    prisma.propertyDailyStat.findMany({
+      where: { propertyId: listing.id, day: { gte: start.day } },
+      select: { day: true, views: true, uniqueViews: true, contactReveals: true, whatsappClicks: true, telegramClicks: true },
+    }),
+    prisma.favorite.count({ where: { propertyId: listing.id, createdAt: { gte: start.at } } }),
+    prisma.lead.count({ where: { propertyId: listing.id, createdAt: { gte: start.at } } }),
+    prisma.propertyPriceHistory.findMany({
+      where: { propertyId: listing.id },
+      select: { oldPrice: true, newPrice: true, currency: true, changedAt: true },
+      orderBy: { changedAt: "desc" },
+      take: 20,
+    }),
+  ]);
+  const byDay = new Map(daily.map((row) => [row.day, row]));
+  const totals = { views: 0, uniqueViews: 0, contactReveals: 0, whatsappClicks: 0, telegramClicks: 0 };
+  const series = Array.from({ length: input.period }, (_, index) => {
+    const day = bakuDay(new Date(start.at.getTime() + index * 86_400_000 + 12 * 3_600_000));
+    const row = byDay.get(day);
+    const point = {
+      day,
+      views: row?.views ?? 0,
+      uniqueViews: row?.uniqueViews ?? 0,
+      contactReveals: row?.contactReveals ?? 0,
+      whatsappClicks: row?.whatsappClicks ?? 0,
+      telegramClicks: row?.telegramClicks ?? 0,
+    };
+    for (const key of Object.keys(totals) as (keyof typeof totals)[]) totals[key] += point[key];
+    return point;
+  });
+  return { listing, period: input.period, totals: { ...totals, favorites, leads, priceChanges: prices.filter((item) => item.changedAt >= start.at).length }, series, prices };
 }

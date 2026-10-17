@@ -1108,7 +1108,22 @@
       "closed": "Closed",
       "reserved": "Reserved",
       "inactive": "Not published"
-    }
+    },
+    "uniqueViews": "Unique views",
+    "priceChanges": "Price changes",
+    "uniqueShort": "Unique",
+    "priceChangesShort": "Price",
+    "details": "Details",
+    "listingMetaTitle": "Listing performance",
+    "listingEyebrow": "Listing performance",
+    "listingDescription": "{views} views in total",
+    "periodDays": "Last {days} days",
+    "openListing": "Open listing",
+    "listingTrend": "Trend over the last {days} days",
+    "uniqueNote": "Unique views count the same visitor once per day; bots are excluded.",
+    "priceHistory": "Price history",
+    "priceHistoryEmpty": "The price has not changed — current price {price}.",
+    "backToAnalytics": "Back to analytics"
   },
   "reports": {
     "metaTitle": "My reports",

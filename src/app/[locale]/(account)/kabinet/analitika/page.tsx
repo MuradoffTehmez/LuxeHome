@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Eye, Heart, MessageSquare, Phone, TrendingDown, TrendingUp } from "lucide-react";
+import { Eye, Heart, MessageSquare, Phone, Tag, TrendingDown, TrendingUp, Users } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Badge } from "@/components/ui/badge";
@@ -51,11 +51,13 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
     );
   const tiles = [
     { key: "views", icon: Eye, label: t("views"), value: data.totals.views },
+    { key: "unique", icon: Users, label: t("uniqueViews"), value: data.totals.uniqueViews },
     { key: "reveals", icon: Phone, label: t("contactReveals"), value: data.totals.contactReveals },
     { key: "whatsapp", icon: WhatsAppIcon, label: t("whatsappClicks"), value: data.totals.whatsappClicks },
     { key: "telegram", icon: TelegramIcon, label: t("telegramClicks"), value: data.totals.telegramClicks },
     { key: "leads", icon: MessageSquare, label: t("leads"), value: data.totals.leads },
     { key: "favorites", icon: Heart, label: t("favorites"), value: data.totals.favorites },
+    { key: "prices", icon: Tag, label: t("priceChanges"), value: data.totals.priceChanges },
   ];
   const peak = Math.max(1, ...data.series.map((point) => point.views));
   const percent = (part: number, whole: number) => (whole > 0 ? Math.round((part / whole) * 1000) / 10 : 0);
@@ -126,16 +128,18 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
           <h2 id="listings-title" className="px-4 pt-4 font-sans text-base font-semibold text-ink sm:px-5">{t("listingsTitle")}</h2>
           <p className="px-4 pt-1 text-xs text-ink-muted sm:px-5">{t("listingsDescription")}</p>
           <div className="relative mt-3 overflow-x-auto">
-            <table className="w-full min-w-[46rem] text-sm">
+            <table className="w-full min-w-[54rem] text-sm">
               <thead>
                 <tr className="border-y border-line text-left text-xs text-ink-muted">
                   <th scope="col" className="px-4 py-2 font-medium sm:px-5">{t("listing")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("views")}</th>
+                  <th scope="col" className="px-2 py-2 text-right font-medium">{t("uniqueShort")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("contactReveals")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("whatsappShort")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">Telegram</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("leads")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("favorites")}</th>
+                  <th scope="col" className="px-2 py-2 text-right font-medium">{t("priceChangesShort")}</th>
                   <th scope="col" className="px-2 py-2 text-right font-medium">{t("conversion")}</th>
                   <th scope="col" className="px-4 py-2 text-right font-medium sm:px-5">{t("market")}</th>
                 </tr>
@@ -153,14 +157,17 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
                           {row.status !== PROPERTY_STATUSES.PUBLISHED && <Badge tone="neutral">{t(`status.${row.status === PROPERTY_STATUSES.PENDING ? "pending" : row.status === PROPERTY_STATUSES.SOLD || row.status === PROPERTY_STATUSES.RENTED ? "closed" : row.status === PROPERTY_STATUSES.RESERVED ? "reserved" : "inactive"}`)}</Badge>}
                           {data.isAgency && row.author && <span>{row.author.name}</span>}
                           <span>{t("allTimeViews", { count: row.viewCount })}</span>
+                          <Link href={`/kabinet/analitika/${row.id}?dovr=${period}`} className="font-medium text-gold-deep underline-offset-4 hover:underline">{t("details")}</Link>
                         </p>
                       </td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.views)}</td>
+                      <td className="tabular px-2 py-3 text-right text-ink-soft">{formatNumber(row.uniqueViews)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.contactReveals)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.whatsappClicks)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.telegramClicks)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.leads)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.favorites)}</td>
+                      <td className="tabular px-2 py-3 text-right text-ink">{formatNumber(row.priceChanges)}</td>
                       <td className="tabular px-2 py-3 text-right text-ink-soft">{row.views > 0 ? `${percent(row.leads + row.contactReveals + row.whatsappClicks + row.telegramClicks, row.views)}%` : "—"}</td>
                       <td className="px-4 py-3 text-right sm:px-5">
                         {ratio == null ? (

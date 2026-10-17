@@ -1108,7 +1108,22 @@
       "closed": "Закрыто",
       "reserved": "Резерв",
       "inactive": "Не опубликовано"
-    }
+    },
+    "uniqueViews": "Уникальные просмотры",
+    "priceChanges": "Изменения цены",
+    "uniqueShort": "Уник.",
+    "priceChangesShort": "Цена",
+    "details": "Подробнее",
+    "listingMetaTitle": "Эффективность объявления",
+    "listingEyebrow": "Эффективность объявления",
+    "listingDescription": "Всего просмотров: {views}",
+    "periodDays": "Последние {days} дн.",
+    "openListing": "Открыть объявление",
+    "listingTrend": "Динамика за {days} дн.",
+    "uniqueNote": "Уникальный просмотр — один посетитель учитывается раз в день; боты не учитываются.",
+    "priceHistory": "История цены",
+    "priceHistoryEmpty": "Цена не менялась — текущая цена {price}.",
+    "backToAnalytics": "К аналитике"
   },
   "reports": {
     "metaTitle": "Мои жалобы",

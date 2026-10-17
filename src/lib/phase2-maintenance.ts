@@ -1,3 +1,4 @@
+import { pruneUniqueViews } from "@/lib/listing-stats";
 import { prisma } from "@/lib/prisma";
 import { PARTNER_STATUSES, RESERVATION_STATUSES } from "@/lib/constants";
 import { recordDomainEvent } from "@/lib/admin/events";
@@ -44,6 +45,8 @@ export async function runPhase2Maintenance(now = new Date()) {
   const domainEvents = await prisma.domainEvent.deleteMany({
     where: { createdAt: { lt: retentionCutoff } },
   });
+  // Unikal baxış açarları (#236) yalnız gün ərzində lazımdır — sayğac `PropertyDailyStat`-da qalır.
+  const uniqueViewKeys = await pruneUniqueViews(now);
 
   return {
     expiredPremium: premium.count,
@@ -53,5 +56,6 @@ export async function runPhase2Maintenance(now = new Date()) {
     openHouseReminders,
     accountDeletions,
     deletedDomainEvents: domainEvents.count,
+    prunedUniqueViews: uniqueViewKeys,
   };
 }
