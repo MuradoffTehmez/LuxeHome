@@ -56,3 +56,14 @@ describe("şikayət", () => {
     await expect(countOpenReviewReports()).resolves.toBe(0);
   });
 });
+
+describe("çox şikayət olunan rəy", () => {
+  it("120 açıq şikayət bir qərarla bağlanır (D1 parametr həddi)", async () => {
+    await DB.prepare('INSERT INTO "AgencyReview" ("id", "agencyId", "customerId", "customerName", "rating", "comment", "status") VALUES (\'rr-many\', \'rr-agency\', NULL, \'Anonim\', 1, \'Çox şikayət\', ?)').bind(REVIEW_STATUSES.APPROVED).run();
+    const insert = DB.prepare('INSERT INTO "ReviewReport" ("id", "reviewKind", "reviewId", "reporterId", "reason") VALUES (?, \'agency\', \'rr-many\', ?, \'FAKE\')');
+    await DB.batch(Array.from({ length: 120 }, (_, index) => insert.bind(`rr-many-${index}`, `rr-reporter-${index}`)));
+    const result = await resolveReviewReports({ kind: "agency", reviewId: "rr-many", decision: "hide", actorId: "admin" });
+    expect(result?.reporters).toHaveLength(120);
+    await expect(countOpenReviewReports()).resolves.toBe(0);
+  });
+});

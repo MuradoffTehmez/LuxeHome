@@ -105,6 +105,9 @@ export async function countOpenReviewReports(): Promise<number> {
  * Moderator qərarı. Əvvəl açıq şikayətlər şərti `updateMany` ilə götürülür (eyni anda iki moderator
  * eyni rəyə baxsa ikincisi heç nə götürmür və rəyə toxunmur), sonra rəy gizlədilir. Rəy yazılmasa
  * şikayətlər yenidən `OPEN` olur. Nəticədə bildiriş göndəriləcək şikayətçilər qaytarılır.
+ *
+ * Götürmə və geri qaytarma `id IN (…)` siyahısı ilə deyil, rəy + `resolvedAt` markeri ilə gedir: çox
+ * şikayət olunan rəydə uzun siyahı D1-in 100 parametr həddini keçərdi.
  */
 export async function resolveReviewReports(input: {
   kind: ReviewReportKind;
@@ -115,16 +118,15 @@ export async function resolveReviewReports(input: {
 }): Promise<{ reporters: string[]; slug: string | null } | null> {
   const now = input.now ?? new Date();
   const status = input.decision === "hide" ? REVIEW_REPORT_STATUSES.RESOLVED : REVIEW_REPORT_STATUSES.DISMISSED;
-  const open = await prisma.reviewReport.findMany({
-    where: { reviewKind: input.kind, reviewId: input.reviewId, status: REVIEW_REPORT_STATUSES.OPEN },
-    select: { id: true, reporterId: true },
-  });
-  if (open.length === 0) return null;
+  const target = { reviewKind: input.kind, reviewId: input.reviewId };
   const claimed = await prisma.reviewReport.updateMany({
-    where: { id: { in: open.map((item) => item.id) }, status: REVIEW_REPORT_STATUSES.OPEN },
+    where: { ...target, status: REVIEW_REPORT_STATUSES.OPEN },
     data: { status, resolvedById: input.actorId, resolvedAt: now },
   });
   if (claimed.count === 0) return null;
+  // Bu qərarın götürdüyü şikayətlər — marker (`resolvedAt` + moderator) ilə, siyahısız.
+  const mine = { ...target, status, resolvedById: input.actorId, resolvedAt: now };
+  const open = await prisma.reviewReport.findMany({ where: mine, select: { reporterId: true } });
 
   let slug: string | null = null;
   try {
@@ -141,7 +143,7 @@ export async function resolveReviewReports(input: {
     }
   } catch (error) {
     await prisma.reviewReport.updateMany({
-      where: { id: { in: open.map((item) => item.id) }, resolvedAt: now },
+      where: mine,
       data: { status: REVIEW_REPORT_STATUSES.OPEN, resolvedById: null, resolvedAt: null },
     });
     throw error;
