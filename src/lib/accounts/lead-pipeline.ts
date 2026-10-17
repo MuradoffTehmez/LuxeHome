@@ -139,7 +139,7 @@ export async function getLeadCard(userId: string, leadId: string) {
         handlerId: true,
         handler: { select: { name: true } },
         agency: { select: { id: true, name: true, userId: true } },
-        property: { select: { id: true, title: true, slug: true, status: true, deletedAt: true } },
+        property: { select: { id: true, title: true, slug: true, status: true, deletedAt: true, agencyId: true } },
       },
     }),
     prisma.leadActivity.findMany({

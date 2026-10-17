@@ -22,6 +22,7 @@ type CabinetNavProps = {
   canManageTeam?: boolean;
   canTransfer?: boolean;
   canAssignListings?: boolean;
+  canViewAnalytics?: boolean;
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
 };
@@ -99,12 +100,13 @@ export function CabinetNav({
   canManageTeam = false,
   canTransfer = false,
   canAssignListings = false,
+  canViewAnalytics = false,
   variant = "desktop",
   onNavigate,
 }: CabinetNavProps) {
   const pathname = usePathname();
   const t = useTranslations("auth.cabinet");
-  const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings);
+  const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings, canViewAnalytics);
 
   return (
     <nav aria-label={t("menu")} className="flex flex-col gap-4">

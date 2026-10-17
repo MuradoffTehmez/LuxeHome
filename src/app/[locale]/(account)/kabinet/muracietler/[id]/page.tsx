@@ -58,7 +58,7 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
   // Yalnız müraciətlə eyni mühitdəki (agentlik və ya şəxsi) kartlar təklif olunur — bağlantı da bunu tələb edir.
   const suggestions = client
     ? []
-    : (await findDuplicateClients(crmContext, lead)).filter((item) => item.agencyId === (lead.agency?.id ?? null));
+    : (await findDuplicateClients(crmContext, lead)).filter((item) => item.agencyId === (lead.agency?.id ?? lead.property?.agencyId ?? null));
   const closed = isClosedLeadStage(lead.stage);
   const sourceKey = (SOURCE_KEYS as readonly string[]).includes(lead.source) ? (lead.source as LeadSource) : "CONTACT";
   const propertyPublic = lead.property && !lead.property.deletedAt && (PUBLIC_PROPERTY_STATUSES as readonly string[]).includes(lead.property.status);

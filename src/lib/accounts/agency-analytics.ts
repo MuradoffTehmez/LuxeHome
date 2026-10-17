@@ -172,7 +172,17 @@ export async function getAgencyAnalytics(input: { agencyId: string; ownerUserId:
   const averageActiveDays = durations.length ? Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length) : null;
 
   // 11.5 — gün üzrə seriya (boş günlər sıfırla)
-  const byDay = new Map(daily.map((row) => [row.day, row._sum]));
+  // `findManyInChunks` hər hissə üçün ayrıca `groupBy(["day"])` qaytarır — eyni günün sətirləri toplanır,
+  // yoxsa 88+ elanlı agentlikdə qrafik yalnız son hissəni göstərərdi.
+  const byDay = new Map<string, { views: number; contactReveals: number; whatsappClicks: number; telegramClicks: number }>();
+  for (const row of daily) {
+    const current = byDay.get(row.day) ?? { views: 0, contactReveals: 0, whatsappClicks: 0, telegramClicks: 0 };
+    current.views += row._sum.views ?? 0;
+    current.contactReveals += row._sum.contactReveals ?? 0;
+    current.whatsappClicks += row._sum.whatsappClicks ?? 0;
+    current.telegramClicks += row._sum.telegramClicks ?? 0;
+    byDay.set(row.day, current);
+  }
   const leadsByDay = new Map<string, number>();
   for (const lead of leads) {
     const day = bakuDay(lead.createdAt);

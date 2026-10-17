@@ -75,3 +75,19 @@ describe("agentlik analitikası", () => {
     expect(data.series.at(-1)).toMatchObject({ views: 40, clicks: 7 });
   });
 });
+
+describe("çox elanlı agentlik", () => {
+  it("günlük seriya D1 hissələri üzrə toplanır (100 elan)", async () => {
+    const property = DB.prepare(
+      `INSERT INTO "Property" ("id", "title", "slug", "description", "searchText", "listingType", "status", "price", "typeId", "cityId", "authorId", "agencyId", "createdAt", "updatedAt")
+       VALUES (?, 'Elan', ?, 'Təsvir', 'x', 'SALE', 'PUBLISHED', 1000, 'aa-type', 'aa-city', 'aa-owner', 'aa-big', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    );
+    const stat = DB.prepare('INSERT INTO "PropertyDailyStat" ("propertyId", "day", "views") VALUES (?, ?, 1)');
+    await DB.prepare(`INSERT INTO "Agency" ("id", "userId", "name", "slug", "isVerified", "createdAt", "updatedAt") VALUES ('aa-big', 'aa-agent', 'Böyük', 'aa-big', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`).run();
+    await DB.batch(Array.from({ length: 100 }, (_, index) => property.bind(`aa-big-${index}`, `aa-big-${index}`)));
+    await DB.batch(Array.from({ length: 100 }, (_, index) => stat.bind(`aa-big-${index}`, bakuDay(now))));
+    const data = await getAgencyAnalytics({ agencyId: "aa-big", ownerUserId: "aa-agent", range: parseAnalyticsRange({ dovr: "7" }, now), now });
+    expect(data.totals.views).toBe(100);
+    expect(data.series.at(-1)?.views).toBe(100);
+  });
+});

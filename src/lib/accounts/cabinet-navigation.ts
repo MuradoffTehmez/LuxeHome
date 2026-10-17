@@ -67,10 +67,21 @@ const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
   { id: "recently-viewed", href: "/kabinet/son-baxilanlar", label: "Son baxılanlar" },
 ];
 
-export function getCabinetItems(canList: boolean, canManageTeam = false, canTransfer = false, canAssignListings = false): readonly CabinetNavItem[] {
+export function getCabinetItems(
+  canList: boolean,
+  canManageTeam = false,
+  canTransfer = false,
+  canAssignListings = false,
+  /** `LEADS_MANAGE` səlahiyyətli agent (#234) — agentlik analitikasını görür. */
+  canViewAnalytics = false,
+): readonly CabinetNavItem[] {
   const items = canList ? [BASE_ITEMS[0], ...LISTING_ITEMS] : [BASE_ITEMS[0]];
   if (canManageTeam) {
     items.splice(1, 0, AGENCY_DASHBOARD_ITEM, AGENCY_ANALYTICS_ITEM);
+  } else if (canViewAnalytics) {
+    items.splice(1, 0, AGENCY_ANALYTICS_ITEM);
+  }
+  if (canManageTeam) {
     items.push(TEAM_ITEM, ACTIVITY_ITEM);
   }
   if (canManageTeam || canAssignListings) items.push(ASSIGNMENTS_ITEM);

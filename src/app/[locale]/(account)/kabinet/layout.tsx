@@ -25,8 +25,10 @@ export default async function CabinetLayout({ children }: { children: React.Reac
   const t = await getTranslations("auth.accountTypes");
   const accountTypeKey = accountTypeKeyOf(user.accountType);
   // Agentin agentlik səlahiyyəti (#218) yalnız agent hesabında oxunur — digərlərində əlavə sorğu yoxdur.
-  const canAssignListings = user.accountType === ACCOUNT_TYPES.AGENT
-    && hasAgencyPermission(await getAgencyAccess(user), AGENCY_MEMBER_PERMISSIONS.LISTINGS_ASSIGN);
+  const agentAccess = user.accountType === ACCOUNT_TYPES.AGENT ? await getAgencyAccess(user) : null;
+  const canAssignListings = hasAgencyPermission(agentAccess, AGENCY_MEMBER_PERMISSIONS.LISTINGS_ASSIGN);
+  // Agentlik analitikası (#234) `LEADS_MANAGE` səlahiyyətli agentə də açıqdır.
+  const canViewAnalytics = hasAgencyPermission(agentAccess, AGENCY_MEMBER_PERMISSIONS.LEADS_MANAGE);
 
   return (
     <Section spacing="cozy">
@@ -39,6 +41,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
           canManageTeam={user.accountType === ACCOUNT_TYPES.AGENCY}
           canTransfer={user.accountType === ACCOUNT_TYPES.AGENCY || user.accountType === ACCOUNT_TYPES.AGENT}
           canAssignListings={canAssignListings}
+          canViewAnalytics={canViewAnalytics}
         >
           {children}
         </CabinetShell>

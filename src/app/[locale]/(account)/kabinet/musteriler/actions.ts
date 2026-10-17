@@ -267,10 +267,11 @@ export async function linkLeadToClient(leadId: string, clientId: string): Promis
   try {
     const [lead, client] = await Promise.all([findManageableLead(ctx.user.id, String(leadId)), findClient(ctx.context, String(clientId))]);
     if (!lead || !client) return failure(t("errors.notFound"));
-    const current = await prisma.lead.findUnique({ where: { id: lead.id }, select: { clientId: true, agencyId: true } });
+    const current = await prisma.lead.findUnique({ where: { id: lead.id }, select: { clientId: true, agencyId: true, property: { select: { agencyId: true } } } });
     // Müraciət və kart eyni mühitdə olmalıdır: agentlik müraciəti şəxsi karta bağlansa, komandanın
     // qalanı (`crmScope` kartı görmür) müraciəti bağlanmamış sayıb ikinci karta bağlayardı.
-    if ((current?.agencyId ?? null) !== client.agencyId) return failure(t("errors.differentScope"));
+    // Faktiki agentlik: köhnə müraciətdə `Lead.agencyId` boşdur, agentlik elanın üzərindən gəlir (`leadScope` qaydası).
+    if ((current?.agencyId ?? current?.property?.agencyId ?? null) !== client.agencyId) return failure(t("errors.differentScope"));
     // Başqa (baxanın görmədiyi kartı da daxil olmaqla) mövcud bağlantının üzərinə yazılmır.
     if (current?.clientId && current.clientId !== client.id && (await prisma.crmClient.findUnique({ where: { id: current.clientId }, select: { id: true } }))) {
       return failure(t("errors.alreadyLinked"));
