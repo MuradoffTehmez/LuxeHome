@@ -29,6 +29,7 @@ type CabinetNavProps = {
 const ICONS = {
   overview: LayoutGrid,
   "agency-dashboard": Gauge,
+  "agency-analytics": BarChart3,
   assignments: UserCog,
   listings: ListChecks,
   "new-listing": Plus,
@@ -53,6 +54,7 @@ const ICONS = {
 const LABEL_KEYS = {
   overview: "overview",
   "agency-dashboard": "agencyDashboard",
+  "agency-analytics": "agencyAnalytics",
   assignments: "assignments",
   listings: "listings",
   "new-listing": "newListing",

@@ -753,3 +753,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   Qalan Modul 08: rəydən şikayət (PRD 10.5 «şikayət edilə bilən rəylər») + moderator həlli.
 - #232 (Modul 08, 10.5): `ReviewReport`, «Şikayət et», admin gizlət/rədd et, bildiriş. **Modul 08 tamamlandı.**
   Növbəti — Modul 09 (agentlik analitikası, agent performansı).
+- #234 (Modul 09, 11.1/11.2/11.4/11.5): `/kabinet/agentlik/analitika`. Qalan Modul 09: 11.3 elan performansı (unikal baxış,
+  qiymət dəyişikliyi) və 11.6 hesabat ixracı (PDF/Excel/CSV).
