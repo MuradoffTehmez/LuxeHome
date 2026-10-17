@@ -13,6 +13,7 @@ CREATE TABLE "VipRequest" (
     "startsAt" DATETIME,
     "endsAt" DATETIME,
     "extendedCount" INTEGER NOT NULL DEFAULT 0,
+    "featuredBefore" DATETIME,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
 );

@@ -16,14 +16,14 @@ beforeAll(async () => {
      VALUES (?, ?, ?, 'Təsvir', 'x', 'SALE', ?, 1000, 'vip-type', 'vip-city', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
   );
   await DB.batch([
-    DB.prepare('INSERT INTO "PropertyType" ("id", "name", "searchName", "slug") VALUES (\'vip-type\', \'Mənzil\', \'menzil\', \'vip-menzil\')'),
-    DB.prepare('INSERT INTO "Location" ("id", "name", "searchName", "slug", "kind", "parentId", "order") VALUES (\'vip-city\', \'Bakı\', \'baki\', \'vip-baki\', \'CITY\', NULL, 0)'),
-    DB.prepare('INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "accountType", "createdAt", "updatedAt") VALUES (\'vip-owner\', \'Sahib\', \'vip@example.test\', \'disabled\', \'EDITOR\', \'OWNER\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (\'vip-admin\', \'Admin\', \'admin@example.test\', \'disabled\', \'ADMIN\', \'STAFF\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'),
+    DB.prepare(`INSERT INTO "PropertyType" ("id", "name", "searchName", "slug") VALUES (\'vip-type\', \'Mənzil\', \'menzil\', \'vip-menzil\')`),
+    DB.prepare(`INSERT INTO "Location" ("id", "name", "searchName", "slug", "kind", "parentId", "order") VALUES (\'vip-city\', \'Bakı\', \'baki\', \'vip-baki\', \'CITY\', NULL, 0)`),
+    DB.prepare(`INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "accountType", "createdAt", "updatedAt") VALUES (\'vip-owner\', \'Sahib\', \'vip@example.test\', \'disabled\', \'EDITOR\', \'OWNER\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (\'vip-admin\', \'Admin\', \'admin@example.test\', \'disabled\', \'ADMIN\', \'STAFF\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`),
     property.bind("vip-p1", "Birinci", "vip-p1", PROPERTY_STATUSES.PUBLISHED, "vip-owner"),
     property.bind("vip-p2", "İkinci", "vip-p2", PROPERTY_STATUSES.PUBLISHED, "vip-owner"),
     property.bind("vip-p3", "Qaralama", "vip-p3", PROPERTY_STATUSES.DRAFT, "vip-owner"),
     property.bind("vip-p4", "Dördüncü", "vip-p4", PROPERTY_STATUSES.PUBLISHED, "vip-owner"),
-    DB.prepare('INSERT INTO "PropertyDailyStat" ("propertyId", "day", "views", "uniqueViews", "contactReveals") VALUES (\'vip-p1\', \'2026-10-19\', 40, 25, 3), (\'vip-p1\', \'2026-10-01\', 999, 999, 999)'),
+    DB.prepare(`INSERT INTO "PropertyDailyStat" ("propertyId", "day", "views", "uniqueViews", "contactReveals") VALUES (\'vip-p1\', \'2026-10-19\', 40, 25, 3), (\'vip-p1\', \'2026-10-01\', 999, 999, 999)`),
   ]);
 });
 
@@ -88,6 +88,28 @@ describe("VIP sorğusu", () => {
     expect(sent).toMatchObject({ ok: true, approved: true });
     const row = await prisma.vipRequest.findUniqueOrThrow({ where: { id: sent.ok ? sent.requestId : "" } });
     expect(row).toMatchObject({ status: "APPROVED", source: "SELF_SERVICE", decidedById: null });
+  });
+
+  it("ləğv ödənilmiş paket premiumunu saxlayır; bağlanmış elanın sorğusu təsdiqlənmir", async () => {
+    const packageEnd = new Date(now.getTime() + 20 * DAY);
+    await DB.batch([
+      DB.prepare(`INSERT INTO "ListingPackage" ("id", "name", "durationDays", "priceMinor", "updatedAt") VALUES ('vip-pkg', 'Premium', 20, 1000, CURRENT_TIMESTAMP)`),
+      DB.prepare(`INSERT INTO "PackageOrder" ("id", "packageId", "packageName", "durationDays", "amountMinor", "propertyId", "customerName", "status", "source", "activatedAt", "updatedAt") VALUES ('vip-order', 'vip-pkg', 'Premium', 20, 1000, 'vip-p4', 'Sahib', 'PAID', 'ADMIN', ?, CURRENT_TIMESTAMP)`).bind(now.toISOString()),
+      DB.prepare(`UPDATE "Property" SET "isFeatured" = 1, "featuredUntil" = ? WHERE "id" = 'vip-p4'`).bind(packageEnd.toISOString()),
+    ]);
+    const granted = await grantVip({ actorId: "vip-admin", propertyId: "vip-p4", days: 30, note: null, now });
+    expect((await featured("vip-p4")).featuredUntil?.getTime()).toBe(now.getTime() + 30 * DAY);
+    await revokeVip({ actorId: "vip-admin", requestId: granted.requestId!, note: "Qaydalara zidd məzmun", now });
+    expect(await featured("vip-p4")).toEqual({ isFeatured: true, featuredUntil: packageEnd });
+    await DB.prepare(`UPDATE "Property" SET "isFeatured" = 0, "featuredUntil" = NULL WHERE "id" = 'vip-p4'`).run();
+    await DB.prepare(`DELETE FROM "PackageOrder" WHERE "id" = 'vip-order'`).run();
+
+    // Sorğu göndərildikdən sonra elan qaralamaya qaytarılıb — təsdiq rədd olunur.
+    const sent = await requestVip({ userId: "vip-owner", propertyId: "vip-p4", days: 7, now });
+    await DB.prepare(`UPDATE "Property" SET "status" = 'DRAFT' WHERE "id" = 'vip-p4'`).run();
+    await expect(approveVip({ actorId: "vip-admin", requestId: sent.ok ? sent.requestId : "", days: 7, note: null, now })).resolves.toEqual({ ok: false, reason: "listing" });
+    await DB.prepare(`UPDATE "Property" SET "status" = 'PUBLISHED' WHERE "id" = 'vip-p4'`).run();
+    await rejectVip({ actorId: "vip-admin", requestId: sent.ok ? sent.requestId : "", note: "Test üçün rədd", now });
   });
 
   it("birbaşa verilmə, ləğv elanı söndürür, bitmiş dövr EXPIRED olur", async () => {

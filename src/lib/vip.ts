@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import {
+  PACKAGE_ORDER_STATUSES,
   PROPERTY_STATUSES,
   VIP_DECISION_NOTE_MAX,
   VIP_DURATIONS_DAYS,
@@ -49,6 +50,23 @@ async function applyToProperty(propertyId: string, endsAt: Date): Promise<boolea
   const until = property.isFeatured && property.featuredUntil && property.featuredUntil > endsAt ? property.featuredUntil : endsAt;
   await prisma.property.update({ where: { id: propertyId }, data: { isFeatured: true, featuredUntil: until } });
   return true;
+}
+
+/**
+ * VIP-dən kənar premium sonu: ödənilmiş paket sifarişləri (`activatedAt + durationDays`) və VIP təsdiqi anında
+ * elanda olan premium (`featuredBefore`). VIP ləğv olunanda bu tarix bərpa olunur — ödənilmiş premium itmir.
+ */
+async function nonVipFeaturedUntil(propertyId: string, featuredBefore: Date | null, now: Date): Promise<Date | null> {
+  const orders = await prisma.packageOrder.findMany({
+    where: { propertyId, status: PACKAGE_ORDER_STATUSES.PAID, activatedAt: { not: null } },
+    select: { activatedAt: true, durationDays: true },
+  });
+  const ends = [
+    ...orders.map((order) => order.activatedAt!.getTime() + order.durationDays * DAY),
+    featuredBefore?.getTime() ?? 0,
+  ];
+  const latest = Math.max(0, ...ends);
+  return latest > now.getTime() ? new Date(latest) : null;
 }
 
 export type VipRequestResult =
@@ -106,8 +124,13 @@ export async function approveVip(input: { actorId: string | null; requestId: str
   if (!isVipDuration(input.days)) return { ok: false, reason: "duration" };
   const request = await prisma.vipRequest.findUnique({ where: { id: input.requestId }, select: { id: true, propertyId: true, requesterId: true, status: true } });
   if (!request || request.status !== VIP_REQUEST_STATUSES.PENDING) return { ok: false, reason: "notFound" };
-  const property = await prisma.property.findFirst({ where: { id: request.propertyId, deletedAt: null }, select: { id: true, title: true, authorId: true } });
+  // Sorğudan sonra elan bağlana, arxivlənə və ya qaralamaya qayıda bilər — təsdiq yalnız dərc olunmuş elana.
+  const property = await prisma.property.findFirst({
+    where: { id: request.propertyId, deletedAt: null, status: PROPERTY_STATUSES.PUBLISHED },
+    select: { id: true, title: true, authorId: true, isFeatured: true, featuredUntil: true },
+  });
   if (!property) return { ok: false, reason: "listing" };
+  const featuredBefore = property.isFeatured && property.featuredUntil && property.featuredUntil > now ? property.featuredUntil : null;
 
   // Elanın hələ aktiv dövrü varsa yeni dövr onun sonundan başlayır — müddət itmir.
   const current = await activeGrant(property.id, now);
@@ -116,7 +139,7 @@ export async function approveVip(input: { actorId: string | null; requestId: str
   const note = cleanNote(input.note);
   const claimed = await prisma.vipRequest.updateMany({
     where: { id: request.id, status: VIP_REQUEST_STATUSES.PENDING },
-    data: { status: VIP_REQUEST_STATUSES.APPROVED, decidedById: input.actorId, decidedAt: now, decisionNote: note, startsAt, endsAt, requestedDays: input.days },
+    data: { status: VIP_REQUEST_STATUSES.APPROVED, decidedById: input.actorId, decidedAt: now, decisionNote: note, startsAt, endsAt, requestedDays: input.days, featuredBefore },
   });
   if (claimed.count === 0) return { ok: false, reason: "notFound" };
   try {
@@ -191,18 +214,20 @@ export async function revokeVip(input: { actorId: string; requestId: string; not
   const now = input.now ?? new Date();
   const note = cleanNote(input.note);
   if (!note || note.length < 5) return { ok: false, reason: "note" };
-  const request = await prisma.vipRequest.findUnique({ where: { id: input.requestId }, select: { id: true, propertyId: true, requesterId: true } });
+  const request = await prisma.vipRequest.findUnique({ where: { id: input.requestId }, select: { id: true, propertyId: true, requesterId: true, featuredBefore: true } });
   if (!request) return { ok: false, reason: "notFound" };
   const claimed = await prisma.vipRequest.updateMany({
     where: { id: request.id, status: VIP_REQUEST_STATUSES.APPROVED },
     data: { status: VIP_REQUEST_STATUSES.REVOKED, decisionNote: note, decidedById: input.actorId, endsAt: now },
   });
   if (claimed.count === 0) return { ok: false, reason: "notFound" };
-  // Başqa aktiv dövr yoxdursa elanın VIP görünüşü söndürülür.
+  // Başqa aktiv VIP dövrü və ya ödənilmiş premium varsa elan onunla qalır; heç biri yoxdursa söndürülür.
   const other = await activeGrant(request.propertyId, now);
+  const premium = await nonVipFeaturedUntil(request.propertyId, request.featuredBefore, now);
+  const until = [other?.endsAt ?? null, premium].filter((value): value is Date => Boolean(value)).sort((a, b) => b.getTime() - a.getTime())[0] ?? null;
   await prisma.property.update({
     where: { id: request.propertyId },
-    data: other?.endsAt ? { isFeatured: true, featuredUntil: other.endsAt } : { isFeatured: false, featuredUntil: null },
+    data: until ? { isFeatured: true, featuredUntil: until } : { isFeatured: false, featuredUntil: null },
   });
   const property = await prisma.property.findUnique({ where: { id: request.propertyId }, select: { title: true, authorId: true } });
   const recipient = request.requesterId ?? property?.authorId;
