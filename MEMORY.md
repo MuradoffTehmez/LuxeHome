@@ -762,3 +762,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #242 (Modul 23, PRD 23 + 16.6): funksiya bayraqları, `/admin/funksiyalar`, kritik açar təsdiqi + audit; şikayət, reytinq,
   CRM, agentlik analitikası, avtomatik moderasiya, e-poçt bildirişi və elan aktuallığında backend tətbiqi. VIP/irəli çəkmə/
   abunə/ödəniş bayraqları Modul 12–14-də istifadə olunacaq. Növbəti — Modul 14 (Basic/Pro/Premium).
+- #244 (Modul 14, 16.1–16.5): abunə planları və tarifləri, `/paketler` (tanıtım mesajı, ödəniş yox), `/admin/maliyye`.
+  Qalan Modul 14: 16.5-in endirim kodları, tanıtım kampaniyaları, abunə hesabatları və 16.7 ödəniş adapteri arxitekturası
+  (abunə statusları, ödəniş tarixçəsi, faktura, idempotentlik, geri ödəniş) — real ödəniş yoxdur.

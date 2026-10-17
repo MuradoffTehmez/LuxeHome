@@ -31,8 +31,6 @@ import { featureDisabledFailure } from "@/lib/feature-guard";
 export async function reportListing(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const t = await getTranslations("property.report");
   if (isHoneypotFilled(formData.get(HONEYPOT_FIELD))) return success(t("thanks"));
-  const disabled = await featureDisabledFailure("REPORTS");
-  if (disabled) return disabled;
 
   try {
     await assertSameOrigin();
@@ -41,6 +39,8 @@ export async function reportListing(_prev: ActionState, formData: FormData): Pro
     throw error;
   }
   if (await isSystemWriteBlocked()) return failure(t("errors.generic"));
+  const disabled = await featureDisabledFailure("REPORTS");
+  if (disabled) return disabled;
 
   const ip = clientIp(await headers());
   if (!(await checkReportLimit(ip))) return failure(t("errors.rateLimited"));

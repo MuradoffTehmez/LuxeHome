@@ -90,7 +90,9 @@
       "reports": "Şikayətlər",
       "appeals": "Etirazlar",
       "transfers": "Köçürmələr",
-      "featureFlags": "Funksiyalar"
+      "featureFlags": "Funksiyalar",
+      "finance": "Maliyyə və Monetizasiya",
+      "subscriptionPlans": "Abunə planları"
     }
   },
   "actions": {
@@ -3201,6 +3203,65 @@
           "hint": "VIP sorğusu administrator təsdiqindən keçir."
         }
       }
+    },
+    "finance": {
+      "title": "Maliyyə və Monetizasiya",
+      "description": "Abunə planları, tariflər, plan imkanları və xidmət limitləri.",
+      "promoOn": "Tanıtım mərhələsi aktivdir: qiymətlər ictimai səhifədə göstərilmir və ödəniş yaranmır.",
+      "promoOff": "Ödənişli abunə açıqdır: tariflər ictimai səhifədə görünür.",
+      "flagsLink": "Funksiya bayraqları",
+      "publicLink": "İctimai səhifə",
+      "audience": "Auditoriya",
+      "active": "Aktiv",
+      "inactive": "Deaktiv",
+      "trialDays": "Sınaq günləri",
+      "capabilities": "Plan imkanları",
+      "limits": "Xidmət limitləri",
+      "limitHint": "Boş — limitsiz. Tanıtım mərhələsində tətbiq olunmur.",
+      "prices": "Tariflər (AZN)",
+      "priceHint": "Boş — bu müddət təklif olunmur.",
+      "months": "{count} ay",
+      "audiences": {
+        "INDIVIDUAL": "Fərdi istifadəçilər",
+        "AGENCY": "Agentliklər"
+      },
+      "capabilityNames": {
+        "LISTINGS": "Elan yerləşdirmək",
+        "LISTING_STATS": "Elan statistikası",
+        "FEATURED": "Seçilmiş elanlar",
+        "REPORTS": "Şikayət göndərmək",
+        "NOTIFICATIONS": "Bildirişlər",
+        "ANALYTICS": "Analitika",
+        "EXPORT": "Hesabat ixracı",
+        "AGENCY_MANAGEMENT": "Agentlik idarəetməsi",
+        "CRM": "CRM",
+        "AUTOMATION": "Əlavə avtomatlaşdırma",
+        "SUPPORT": "Prioritet dəstək"
+      },
+      "levels": {
+        "NONE": "Yox",
+        "LIMITED": "Məhdud",
+        "BASIC": "Əsas",
+        "STANDARD": "Standart",
+        "INCLUDED": "Var",
+        "EXTENDED": "Geniş",
+        "PRIORITY": "Üstün",
+        "FULL": "Tam",
+        "PROFESSIONAL": "Peşəkar",
+        "HIGH": "Yüksək"
+      },
+      "planNames": {
+        "BASIC": "Basic",
+        "PRO": "Pro",
+        "PREMIUM": "Premium"
+      },
+      "limitNames": {
+        "activeListings": "Aktiv elan",
+        "agents": "Agent",
+        "crmClients": "CRM müştərisi",
+        "exportsPerMonth": "Aylıq ixrac"
+      },
+      "descriptionLabelLocale": "Təsvir — {locale} (istəyə bağlı)"
     }
   },
   "server": {
@@ -3652,6 +3713,13 @@
       "confirmRequired": "Kritik açar dəyişikliyini təsdiqləyin.",
       "saved": "Funksiya bayraqları saxlanıldı.",
       "disabled": "Bu funksiya hazırda söndürülüb."
+    },
+    "finance": {
+      "saved": "Plan saxlanıldı.",
+      "invalidPrice": "Qiymət düzgün deyil.",
+      "invalidLimit": "Limit düzgün deyil.",
+      "invalidTrial": "Sınaq günləri 0–90 arasında olmalıdır.",
+      "notFound": "Plan tapılmadı."
     }
   }
 }

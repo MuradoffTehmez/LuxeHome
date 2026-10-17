@@ -6,6 +6,8 @@
  */
 
 export const PROJECTS_SECTION_PATH = "/layiheler";
+/** Abunə paketləri (#244) — `SUBSCRIPTIONS` modulu söndürüləndə gizlənir. */
+export const PLANS_PAGE_PATH = "/paketler";
 
 /** `href` gizli bölməyə (özünə və ya alt marşrutuna) aiddirmi? */
 export function isHiddenPath(href: string, hiddenPaths: readonly string[]): boolean {

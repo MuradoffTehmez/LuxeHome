@@ -36,15 +36,17 @@ export type CrmActionState = ActionState & { clientId?: string };
 
 async function guard(): Promise<{ user: AuthUser; locale: Locale; context: CrmContext } | ActionState> {
   const locale = (await getLocale()) as Locale;
-  const disabled = await featureDisabledFailure("CRM");
-  if (disabled) return disabled;
+  let user;
   try {
-    const user = await requirePublicAction("lead", locale);
-    return { user, locale, context: await getCrmContext(user) };
+    user = await requirePublicAction("lead", locale);
   } catch (error) {
     if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
+  // Modul bayrağı guard-dan sonra — anonim sorğu modulun vəziyyətini öyrənməsin.
+  const disabled = await featureDisabledFailure("CRM");
+  if (disabled) return disabled;
+  return { user, locale, context: await getCrmContext(user) };
 }
 
 const isFailure = (value: unknown): value is ActionState => typeof value === "object" && value !== null && "status" in value;

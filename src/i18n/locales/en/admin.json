@@ -90,7 +90,9 @@
       "reports": "Reports",
       "appeals": "Appeals",
       "transfers": "Transfers",
-      "featureFlags": "Features"
+      "featureFlags": "Features",
+      "finance": "Finance and monetization",
+      "subscriptionPlans": "Subscription plans"
     }
   },
   "actions": {
@@ -3201,6 +3203,65 @@
           "hint": "VIP requests require administrator approval."
         }
       }
+    },
+    "finance": {
+      "title": "Finance and monetization",
+      "description": "Subscription plans, tariffs, plan features and service limits.",
+      "promoOn": "Launch phase is active: prices are hidden on the public page and no payment is created.",
+      "promoOff": "Paid subscriptions are on: tariffs are visible on the public page.",
+      "flagsLink": "Feature flags",
+      "publicLink": "Public page",
+      "audience": "Audience",
+      "active": "Active",
+      "inactive": "Inactive",
+      "trialDays": "Trial days",
+      "capabilities": "Plan features",
+      "limits": "Service limits",
+      "limitHint": "Empty — unlimited. Not enforced during the launch phase.",
+      "prices": "Tariffs (AZN)",
+      "priceHint": "Empty — this duration is not offered.",
+      "months": "{count} mo",
+      "audiences": {
+        "INDIVIDUAL": "Individuals",
+        "AGENCY": "Agencies"
+      },
+      "capabilityNames": {
+        "LISTINGS": "Listing properties",
+        "LISTING_STATS": "Listing statistics",
+        "FEATURED": "Saved listings",
+        "REPORTS": "Submitting reports",
+        "NOTIFICATIONS": "Notifications",
+        "ANALYTICS": "Analytics",
+        "EXPORT": "Report export",
+        "AGENCY_MANAGEMENT": "Agency management",
+        "CRM": "CRM",
+        "AUTOMATION": "Extra automation",
+        "SUPPORT": "Priority support"
+      },
+      "levels": {
+        "NONE": "No",
+        "LIMITED": "Limited",
+        "BASIC": "Basic",
+        "STANDARD": "Standard",
+        "INCLUDED": "Included",
+        "EXTENDED": "Extended",
+        "PRIORITY": "Priority",
+        "FULL": "Full",
+        "PROFESSIONAL": "Professional",
+        "HIGH": "High"
+      },
+      "planNames": {
+        "BASIC": "Basic",
+        "PRO": "Pro",
+        "PREMIUM": "Premium"
+      },
+      "limitNames": {
+        "activeListings": "Active listings",
+        "agents": "Agents",
+        "crmClients": "CRM clients",
+        "exportsPerMonth": "Exports per month"
+      },
+      "descriptionLabelLocale": "Description — {locale} (optional)"
     }
   },
   "server": {
@@ -3652,6 +3713,13 @@
       "confirmRequired": "Confirm the critical switch change.",
       "saved": "Feature flags saved.",
       "disabled": "This feature is currently disabled."
+    },
+    "finance": {
+      "saved": "Plan saved.",
+      "invalidPrice": "Invalid price.",
+      "invalidLimit": "Invalid limit.",
+      "invalidTrial": "Trial days must be between 0 and 90.",
+      "notFound": "Plan not found."
     }
   }
 }

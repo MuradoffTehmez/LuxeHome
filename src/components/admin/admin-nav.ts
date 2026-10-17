@@ -143,6 +143,12 @@ export const adminNav: AdminNavGroup[] = [
     titleKey: "system",
     items: [
       {
+        labelKey: "finance",
+        href: "/admin/maliyye",
+        icon: "Wallet",
+        children: [{ labelKey: "subscriptionPlans", href: "/admin/maliyye" }],
+      },
+      {
         labelKey: "administration",
         href: "/admin/istifadeciler",
         icon: "Settings",

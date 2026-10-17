@@ -408,7 +408,7 @@ model AgencyTask {
 /// Şəxsi hesabın kartında `agencyId` boşdur. `phoneKey`/`emailKey` təkrarlanan müraciətin tapılması üçündür.
 /// Taksonomiya və elan id-ləri FK-sız saxlanılır (`AgencyTask` kimi) — silinmiş qeyd kartı sındırmır.
 model CrmClient {
-  id                   String    @id @default(cuid())
+  id                   String   @id @default(cuid())
   agencyId             String?
   ownerId              String
   createdById          String?
@@ -419,7 +419,7 @@ model CrmClient {
   email                String?
   emailKey             String?
   /// Ad + telefon rəqəmləri + e-poçt, diakritikasız (`crmSearchText`) — D1-də registrsiz axtarış yoxdur.
-  searchText           String    @default("")
+  searchText           String   @default("")
   /// Maraqlandığı əmlak (adətən müraciətin elanı).
   interestedPropertyId String?
   /// Ehtiyaclar (PRD 9.2): `LISTING_TYPES`, `RENOVATIONS`; qiymət AZN.
@@ -434,8 +434,8 @@ model CrmClient {
   rooms                Int?
   renovation           String?
   preferences          String?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   agency Agency?         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   notes  CrmClientNote[]
@@ -1241,12 +1241,12 @@ model Lead {
 
   /// Müraciətə baxan ictimai hesab (#161): elanın sahibi və ya agentliyin bölgü ilə seçdiyi
   /// agent. Ofisin işçisi (`assigneeId`) ilə qarışdırılmamalıdır.
-  handlerId     String?
+  handlerId           String?
   /// Agentliyə aid müraciət (agentliyin/agentinin elanı və ya agentlik profilindəki forma) —
   /// sahib hamısını görür, cavabsız qalanı ona eskalasiya olunur.
-  agencyId      String?
+  agencyId            String?
   /// İlk cavab vaxtı (kabinetdə «Əlaqə saxladım») — «Tez cavab verir» nişanı buradan ölçülür.
-  respondedAt   DateTime?
+  respondedAt         DateTime?
   /// Cavabsız müraciət pillələri (#224): məsula xatırlatma, menecerə bildiriş (`escalatedAt`, #161-dən),
   /// təkrar təyinat təklifi. Hər marker şərti `updateMany` ilə götürülür — bildiriş bir dəfə gedir.
   reminderSentAt      DateTime?
@@ -1254,11 +1254,11 @@ model Lead {
   reassignSuggestedAt DateTime?
   /// Kabinet satış mərhələsi (#222, PRD 8.3) — `LEAD_STAGES`. `status` ondan çıxarılır (`leadStatusForStage`),
   /// ofis lövhəsi və huni köhnə qaba statusla işləməyə davam edir.
-  stage         String    @default("NEW")
+  stage               String    @default("NEW")
   /// Növbəti əlaqə tarixi (PRD 8.6).
-  nextContactAt DateTime?
+  nextContactAt       DateTime?
   /// Bağlı müştəri kartı (#226, PRD 9.1) — FK-sız; kart silinəndə boşaldılır.
-  clientId      String?
+  clientId            String?
 
   /// Organic/paid/direct atribusiyası `source` domen sahəsindən qəsdən ayrıdır.
   acquisitionSource String?
@@ -1534,17 +1534,17 @@ model AgentProfile {
 
 /// Agent rəyi yalnız APPROVED statusunda ictimai görünür.
 model AgentReview {
-  id             String    @id @default(cuid())
-  agentId        String
-  customerId     String?
-  customerName   String
-  rating         Int
-  comment        String
-  serviceType    String?
-  status         String    @default("PENDING") // PENDING | APPROVED | REJECTED | HIDDEN
-  moderationNote String?
-  createdAt      DateTime  @default(now())
-  moderatedAt    DateTime?
+  id                    String    @id @default(cuid())
+  agentId               String
+  customerId            String?
+  customerName          String
+  rating                Int
+  comment               String
+  serviceType           String?
+  status                String    @default("PENDING") // PENDING | APPROVED | REJECTED | HIDDEN
+  moderationNote        String?
+  createdAt             DateTime  @default(now())
+  moderatedAt           DateTime?
   /// Meyarlar (#230, PRD 10.4), 1–5: ünsiyyət, məlumatın düzgünlüyü, operativlik, peşəkarlıq.
   /// `rating` ümumi məmnunluqdur və ictimai orta qiymət ondan hesablanır.
   ratingCommunication   Int?
@@ -1570,17 +1570,17 @@ model AgentReview {
 /// İstifadəçinin agentliyə birbaşa rəyi (#230, PRD 10.3) — `AgentReview` ilə eyni qaydalar: moderasiya,
 /// təkrar rəy limiti, özünü qiymətləndirmə qadağası, meyarlar, təsdiqlənmiş əlaqə və cavab.
 model AgencyReview {
-  id             String    @id @default(cuid())
-  agencyId       String
-  customerId     String?
-  customerName   String
-  rating         Int
-  comment        String
-  serviceType    String?
-  status         String    @default("PENDING")
-  moderationNote String?
-  createdAt      DateTime  @default(now())
-  moderatedAt    DateTime?
+  id                    String    @id @default(cuid())
+  agencyId              String
+  customerId            String?
+  customerName          String
+  rating                Int
+  comment               String
+  serviceType           String?
+  status                String    @default("PENDING")
+  moderationNote        String?
+  createdAt             DateTime  @default(now())
+  moderatedAt           DateTime?
   /// Meyarlar (#230, PRD 10.4), 1–5: ünsiyyət, məlumatın düzgünlüyü, operativlik, peşəkarlıq.
   /// `rating` ümumi məmnunluqdur və ictimai orta qiymət ondan hesablanır.
   ratingCommunication   Int?
@@ -2495,4 +2495,48 @@ model PropertyDailyStat {
 
   @@id([propertyId, day])
   @@index([day])
+}
+
+/// Abunə planı (#244, PRD 16.1–16.2): Basic/Pro/Premium, fərdi və agentlik auditoriyası üçün ayrıca.
+/// Plan adı kataloqdan (`code`) gəlir; imkanlar və limitlər JSON-dur (`lib/subscriptions/plan-policy.ts`).
+/// Tanıtım mərhələsində (monetizasiya bağlı) planlar yalnız məlumat üçündür — ödəniş yaranmır.
+model SubscriptionPlan {
+  id           String   @id @default(cuid())
+  /// `BASIC` | `PRO` | `PREMIUM` (`PLAN_CODES`).
+  code         String
+  /// `INDIVIDUAL` | `AGENCY` (`PLAN_AUDIENCES`).
+  audience     String
+  description  String?
+  /// İmkan → səviyyə JSON-u (`PLAN_CAPABILITIES`, `CAPABILITY_LEVELS`).
+  capabilities String
+  /// Xidmət limitləri JSON-u (`PLAN_LIMITS`); boş sahə — limitsiz.
+  limits       String?
+  /// Gələcək ödənişli model üçün sınaq günləri (PRD 16.3).
+  trialDays    Int      @default(15)
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  prices SubscriptionPlanPrice[]
+
+  @@unique([code, audience])
+  @@index([audience, isActive, sortOrder])
+}
+
+/// Plan tarifi (#244, PRD 16.3): 1/3/6/12 ay; məbləğ qəpiklə.
+model SubscriptionPlanPrice {
+  id         String   @id @default(cuid())
+  planId     String
+  /// `PLAN_DURATIONS` — 1, 3, 6, 12.
+  months     Int
+  priceMinor Int
+  currency   String   @default("AZN")
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  plan SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, months])
 }

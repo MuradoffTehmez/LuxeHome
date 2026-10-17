@@ -489,6 +489,17 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   açıq qapı xatırlatması; tranzaksion məktub buraxılmır, kabinet bildirişi yenə yazılır), elan aktuallığı (gündəlik müddət işi dayanır). Kabinet menyusu
   `hiddenItems` ilə süzülür. Yeni modul yazanda bayrağını da yoxla.
 - Mövcud premium paket sifarişi (ofisdə ödəniş) monetizasiya bayrağına bağlanmayıb — Basic/Pro/Premium (Modul 14) onu üstələyəcək.
+- **Abunə planları (#244, PRD 16.1–16.5):** `SubscriptionPlan` (kod `BASIC|PRO|PREMIUM` × auditoriya
+  `INDIVIDUAL|AGENCY`, unikal) + `SubscriptionPlanPrice` (1/3/6/12 ay, qəpiklə). Planlar `0077`-də PRD 16.2 imkan cədvəli ilə
+  yaradılır, qiymət yazılmır. Saf qaydalar `lib/subscriptions/plan-policy.ts` (imkan səviyyələri `CAPABILITY_LEVELS`,
+  limitlər `PLAN_LIMITS`, `pricingMode()`), oxu `lib/subscriptions/plans.ts`. Plan adı kataloqdan (kod) gəlir — bazada ad
+  yoxdur. İctimai `/paketler` tanıtım mərhələsində (monetizasiya və ya ödənişli abunə bağlı) qiymət göstərmir, PRD 16.4
+  mesajını çıxarır və heç bir ödəniş düyməsi yoxdur; ödənişli rejimdə tariflər görünür, checkout hələ yoxdur (provayder
+  adapteri ayrıca hissədir). Kabinet paket səhifəsi də tanıtım mesajını göstərir. Panel «Maliyyə və Monetizasiya»
+  `/admin/maliyye` (`billing:manage`): plan başına imkan, limit, tarif, sınaq günləri, aktivlik; audit olunur. Limitlər
+  tanıtım mərhələsində tətbiq olunmur. Plan təsviri dil üzrə JSON-dur (`parsePlanDescription`; boş dil kataloq şüarına
+  qalır). `SUBSCRIPTIONS` söndürüləndə `/paketler` 404 verir, menyu/footer (`getHiddenPublicPaths`) və sitemap onu göstərmir.
+  Plan saxlaması yarımçıq qalsa plan və tariflər əvvəlki vəziyyətə bərpa olunur (`restorePlan`).
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 

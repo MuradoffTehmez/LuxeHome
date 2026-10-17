@@ -62,7 +62,8 @@ export type AuditEntity =
   | "SeoAuditIssue"
   | "SeoSearchMetric"
   | "ListingPackage"
-  | "PackageOrder";
+  | "PackageOrder"
+  | "SubscriptionPlan";
 
 export async function recordAudit(
   user: Pick<AuthUser, "id" | "email">,

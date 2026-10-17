@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { BadgeCheck, Crown } from "lucide-react";
+import { BadgeCheck, Crown, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
@@ -18,6 +18,9 @@ import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
 import { formatLocalizedDate } from "@/i18n/date";
+import { Link } from "@/i18n/navigation";
+import { getFeatureFlags } from "@/lib/feature-flags";
+import { pricingMode } from "@/lib/subscriptions/plan-policy";
 import { CancelOrderButton } from "./cancel-order-button";
 import { PackageRequestForm } from "./package-request-form";
 
@@ -41,6 +44,7 @@ export default async function CabinetPackagesPage({ searchParams }: { searchPara
   const locale = await getLocale() as Locale;
   const user = await requireLister(locale);
   const t = await getTranslations("account.packages");
+  const [plansT, flags] = await Promise.all([getTranslations("phase3.plans"), getFeatureFlags()]);
   const [packages, properties, orders, params] = await Promise.all([
     getActivePackages(),
     prisma.property.findMany({
@@ -72,6 +76,17 @@ export default async function CabinetPackagesPage({ searchParams }: { searchPara
   return (
     <div className="min-w-0">
       <PageHeader contained compact eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
+
+      {/* Tanıtım mərhələsi (#244, PRD 16.4): aktiv xidmətlər ödənişsizdir. */}
+      {flags.SUBSCRIPTIONS && pricingMode(flags).promo && (
+        <div role="note" className="mt-6 flex gap-3 rounded-xl border border-gold/40 bg-gold/10 p-4">
+          <Info className="mt-0.5 size-5 shrink-0 text-gold-deep" aria-hidden="true" />
+          <div className="min-w-0 text-sm">
+            <p className="font-medium text-ink">{plansT("promo")}</p>
+            <Link href="/paketler" className="mt-1 inline-block font-medium text-gold-deep underline-offset-4 hover:underline">{t("subscriptionPlans")}</Link>
+          </div>
+        </div>
+      )}
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <section className="min-w-0 rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">

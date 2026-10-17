@@ -26,6 +26,7 @@ import {
   UserCog,
   UserRoundCheck,
   Users,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -47,6 +48,7 @@ const ICONS: Record<string, LucideIcon> = {
   Inbox,
   Users,
   UserCog,
+  Wallet,
   Settings,
   Route,
   SearchCheck,
