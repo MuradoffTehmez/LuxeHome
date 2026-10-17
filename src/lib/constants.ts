@@ -966,6 +966,8 @@ export const NOTIFICATION_TYPES = {
   LISTING_TRANSFER: "LISTING_TRANSFER",
   /** Agentlik daxili tapşırığı: təyin olundu və ya tamamlandı (#220). */
   AGENCY_TASK: "AGENCY_TASK",
+  /** Rəydən şikayətin nəticəsi (#232). */
+  REVIEW_REPORT: "REVIEW_REPORT",
 } as const;
 
 export type NotificationType =
@@ -987,6 +989,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   LEAD_ESCALATION: "Cavabsız müraciət",
   LISTING_TRANSFER: "Elan köçürməsi",
   AGENCY_TASK: "Agentlik tapşırığı",
+  REVIEW_REPORT: "Rəydən şikayət",
 };
 
 // ---------------------------------------------------------------------------
@@ -1062,6 +1065,14 @@ export type ReviewSuspicionFlag = (typeof REVIEW_SUSPICION_FLAGS)[keyof typeof R
 export const REVIEW_NEW_ACCOUNT_DAYS = 3;
 export const REVIEW_BURST_LIMIT = 3;
 export const REVIEW_REPLY_MAX = 1000;
+
+/** Rəydən şikayət (#232, PRD 10.5). */
+export const REVIEW_REPORT_KINDS = ["agent", "agency"] as const;
+export type ReviewReportKind = (typeof REVIEW_REPORT_KINDS)[number];
+export const REVIEW_REPORT_REASONS = ["FAKE", "OFFENSIVE", "PERSONAL_DATA", "IRRELEVANT", "CONFLICT", "OTHER"] as const;
+export type ReviewReportReason = (typeof REVIEW_REPORT_REASONS)[number];
+export const REVIEW_REPORT_STATUSES = { OPEN: "OPEN", RESOLVED: "RESOLVED", DISMISSED: "DISMISSED" } as const;
+export const REVIEW_REPORT_COMMENT_MAX = 500;
 
 export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
   PENDING: "Moderasiya gözləyir",

@@ -751,3 +751,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   **Modul 07 tamamlandı.** Növbəti — Modul 08 (agent və agentlik reytinqi).
 - #230 (Modul 08, 10.2–10.5): meyarlar, `AgencyReview`, təsdiqlənmiş əlaqə, şübhə siqnalları, `/kabinet/reyler` cavabı.
   Qalan Modul 08: rəydən şikayət (PRD 10.5 «şikayət edilə bilən rəylər») + moderator həlli.
+- #232 (Modul 08, 10.5): `ReviewReport`, «Şikayət et», admin gizlət/rədd et, bildiriş. **Modul 08 tamamlandı.**
+  Növbəti — Modul 09 (agentlik analitikası, agent performansı).

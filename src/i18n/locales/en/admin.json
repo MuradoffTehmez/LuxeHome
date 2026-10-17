@@ -320,7 +320,8 @@
       "LISTING_MODERATION": "Listing moderation",
       "LEAD_ESCALATION": "Unanswered enquiry",
       "LISTING_TRANSFER": "Listing transfer",
-      "AGENCY_TASK": "Agency task"
+      "AGENCY_TASK": "Agency task",
+      "REVIEW_REPORT": "Review report"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -1724,6 +1725,26 @@
           "responsiveness": "Responsiveness",
           "professionalism": "Professionalism"
         }
+      },
+      "reviewReports": {
+        "title": "Review reports",
+        "description": "Reports about approved reviews. A decision closes all reports on the review and notifies the reporters.",
+        "empty": "No open reports",
+        "count": "{count, plural, one {# report} other {# reports}}",
+        "hide": "Hide review",
+        "hideTitle": "Hide the review?",
+        "hideDescription": "The review will be removed from the profile and the rating; reporters will be notified.",
+        "dismiss": "Dismiss reports",
+        "dismissTitle": "Dismiss the reports?",
+        "dismissDescription": "The review stays on the site; reporters will be notified.",
+        "reasons": {
+          "FAKE": "Fake review (not based on real experience)",
+          "OFFENSIVE": "Offensive or hateful language",
+          "PERSONAL_DATA": "Shares personal data",
+          "IRRELEVANT": "Not about this agent/agency",
+          "CONFLICT": "Conflict of interest (competitor or employee)",
+          "OTHER": "Other reason"
+        }
       }
     },
     "amenities": {
@@ -3122,7 +3143,10 @@
       "musteriReyiSilindi": "Client review deleted.",
       "tesdiqlendiVeDercEdildi": "The agent was approved and published in the public directory.",
       "artiqTesdiqlenib": "The agent profile is already verified.",
-      "profilReddEdildi": "Profile rejected; the reason was sent to the agent."
+      "profilReddEdildi": "Profile rejected; the reason was sent to the agent.",
+      "reviewReportsAlreadyResolved": "There are no open reports for this review — it has already been decided.",
+      "reviewHidden": "The review was hidden.",
+      "reviewReportsDismissed": "The reports were dismissed."
     },
     "agentlikler": {
       "agentlikTapilmadi": "Agency not found.",

@@ -320,7 +320,8 @@
       "LISTING_MODERATION": "Elan moderasiyası",
       "LEAD_ESCALATION": "Cavabsız müraciət",
       "LISTING_TRANSFER": "Elan köçürməsi",
-      "AGENCY_TASK": "Agentlik tapşırığı"
+      "AGENCY_TASK": "Agentlik tapşırığı",
+      "REVIEW_REPORT": "Rəydən şikayət"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -1724,6 +1725,26 @@
           "responsiveness": "Operativ cavab",
           "professionalism": "Peşəkarlıq"
         }
+      },
+      "reviewReports": {
+        "title": "Rəydən şikayətlər",
+        "description": "İstifadəçilərin təsdiqlənmiş rəylərdən şikayətləri. Qərar rəydəki bütün şikayətləri bağlayır və şikayətçilərə bildirilir.",
+        "empty": "Açıq şikayət yoxdur",
+        "count": "{count, plural, other {# şikayət}}",
+        "hide": "Rəyi gizlət",
+        "hideTitle": "Rəy gizlədilsin?",
+        "hideDescription": "Rəy profildən və reytinqdən çıxarılacaq, şikayətçilərə bildiriş gedəcək.",
+        "dismiss": "Şikayəti rədd et",
+        "dismissTitle": "Şikayətlər rədd edilsin?",
+        "dismissDescription": "Rəy saytda qalacaq, şikayətçilərə bildiriş gedəcək.",
+        "reasons": {
+          "FAKE": "Saxta rəy (real təcrübəyə əsaslanmır)",
+          "OFFENSIVE": "Təhqiramiz və ya nifrət dili",
+          "PERSONAL_DATA": "Şəxsi məlumat paylaşılıb",
+          "IRRELEVANT": "Agent/agentliklə əlaqəsi yoxdur",
+          "CONFLICT": "Maraqlar toqquşması (rəqib və ya əməkdaş yazıb)",
+          "OTHER": "Digər səbəb"
+        }
       }
     },
     "amenities": {
@@ -3122,7 +3143,10 @@
       "musteriReyiSilindi": "Müştəri rəyi silindi.",
       "tesdiqlendiVeDercEdildi": "Agent təsdiqləndi və ictimai kataloqda dərc edildi.",
       "artiqTesdiqlenib": "Agent profili artıq təsdiqlənib.",
-      "profilReddEdildi": "Profil rədd edildi, agentə səbəb göndərildi."
+      "profilReddEdildi": "Profil rədd edildi, agentə səbəb göndərildi.",
+      "reviewReportsAlreadyResolved": "Bu rəy üzrə açıq şikayət yoxdur — artıq qərar verilib.",
+      "reviewHidden": "Rəy gizlədildi.",
+      "reviewReportsDismissed": "Şikayətlər rədd edildi."
     },
     "agentlikler": {
       "agentlikTapilmadi": "Agentlik tapılmadı.",

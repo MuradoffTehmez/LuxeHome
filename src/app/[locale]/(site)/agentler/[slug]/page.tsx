@@ -176,7 +176,7 @@ export default async function AgentPage({ params, searchParams }: Props) {
               <h2 className="font-display text-3xl tracking-[-0.02em] text-ink">{t("reviews")}</h2>
               {/* Meyar ortalamaları (#230, PRD 10.4) — yalnız təsdiqlənmiş rəylərdən. */}
               <ReviewCriteriaSummary averages={reviewCriteriaAverages(agent.reviews)} />
-              {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <ReviewCard key={review.id} review={review} />)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}
+              {agent.reviews.length ? <ul className="mt-5 space-y-4">{agent.reviews.map((review) => <ReviewCard key={review.id} review={review} report="agent" />)}</ul> : <p className="mt-4 text-ink-muted">{t("noReviews")}</p>}
             </section>
             <ReviewForm
               action={submitAgentReview}

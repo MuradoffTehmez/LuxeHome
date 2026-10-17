@@ -12,6 +12,8 @@ import { approveAndPublishAgentAs } from "@/lib/admin/agent-approval";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { parseSingleImage } from "@/lib/admin/images";
 import { prisma } from "@/lib/prisma";
+import { isReviewReportKind, resolveReviewReports } from "@/lib/review-reports";
+import { noticeReviewReportOutcome } from "@/lib/accounts/account-notices";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { slugify } from "@/lib/utils";
 import { ensureSlugRedirect } from "@/lib/admin/slug-redirect";
@@ -384,4 +386,44 @@ export async function deleteTestimonial(id: string): Promise<ActionState> {
   } catch (error) {
     return unexpected("müştəri rəyi silinmədi", error, msg("server.common.unexpected"));
   }
+}
+
+/**
+ * Rəydən şikayət üzrə qərar (#232, PRD 10.5). `ConfirmAction` tək id ötürür — `növ:rəyId` formatında.
+ * Rəydəki bütün açıq şikayətlər birlikdə bağlanır və şikayətçilərə bildirilir.
+ */
+async function decideReviewReports(token: string, decision: "hide" | "dismiss"): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  const [kind, reviewId] = String(token).split(":", 2);
+  if (!isReviewReportKind(kind) || !reviewId) return failure(msg("server.common.formInvalid"));
+  try {
+    const result = await resolveReviewReports({ kind, reviewId, decision, actorId: actor.id });
+    if (!result) return failure(msg("server.agentler.reviewReportsAlreadyResolved"));
+    const target = kind === "agent"
+      ? (await prisma.agentReview.findUnique({ where: { id: reviewId }, select: { agent: { select: { name: true } } } }))?.agent.name
+      : (await prisma.agencyReview.findUnique({ where: { id: reviewId }, select: { agency: { select: { name: true } } } }))?.agency.name;
+    for (const userId of result.reporters) {
+      await noticeReviewReportOutcome({ userId, reviewId, targetName: target ?? "—", hidden: decision === "hide" });
+    }
+    await recordAudit(actor, "STATUS_CHANGE", kind === "agent" ? "AgentReview" : "AgencyReview", reviewId, decision === "hide" ? "şikayət: rəy gizlədildi" : "şikayət rədd edildi");
+    revalidatePath("/admin/agentler");
+    if (result.slug) revalidatePublicContent(kind === "agent" ? "agent" : "agency", result.slug);
+    return success(decision === "hide" ? msg("server.agentler.reviewHidden") : msg("server.agentler.reviewReportsDismissed"));
+  } catch (error) {
+    return unexpected("rəy şikayəti üzrə qərar yazılmadı", error, msg("server.common.unexpected"));
+  }
+}
+
+export async function hideReportedReview(token: string): Promise<ActionState> {
+  return decideReviewReports(token, "hide");
+}
+
+export async function dismissReviewReports(token: string): Promise<ActionState> {
+  return decideReviewReports(token, "dismiss");
 }

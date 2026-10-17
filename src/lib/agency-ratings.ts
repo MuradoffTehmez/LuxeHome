@@ -75,6 +75,8 @@ export type AgencyReview = {
   createdAt: Date;
   agentName: string | null;
   agentSlug: string | null;
+  /** Şikayət hədəfi (#232): agent və ya agentlik rəyi; admin daxil etdiyi müştəri rəyində `null`. */
+  kind: "agent" | "agency" | null;
   /** Rəy yazanın real müraciəti var (#230). Admin daxil etdiyi müştəri rəyində (`Testimonial`) yoxdur. */
   verifiedInteraction: boolean;
   replyText: string | null;
@@ -109,14 +111,15 @@ export async function getAgencyReviews(agencyId: string, take = 6): Promise<Agen
     }),
   ]);
   return [
-    ...agentReviews.map(({ agent, ...review }) => ({ ...review, agentName: agent.name, agentSlug: agent.slug })),
-    ...agencyReviews.map((review) => ({ ...review, agentName: null, agentSlug: null })),
+    ...agentReviews.map(({ agent, ...review }) => ({ ...review, kind: "agent" as const, agentName: agent.name, agentSlug: agent.slug })),
+    ...agencyReviews.map((review) => ({ ...review, kind: "agency" as const, agentName: null, agentSlug: null })),
     ...testimonials.map((item) => ({
       id: item.id,
       rating: item.rating,
       comment: item.review,
       customerName: item.customerName,
       createdAt: item.occurredAt ?? item.createdAt,
+      kind: null,
       agentName: null,
       agentSlug: null,
       verifiedInteraction: false,
