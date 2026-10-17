@@ -9,6 +9,7 @@ import {
   leadStatusForStage,
   recordLeadActivity,
   stageData,
+  stageForStatus,
 } from "@/lib/accounts/lead-pipeline";
 import { bakuDay } from "@/lib/listing-stats";
 import { prisma } from "@/lib/prisma";
@@ -48,6 +49,16 @@ describe("mərhələ və status", () => {
     expect(stageData(LEAD_STAGES.CONTACTED)).toEqual({ stage: "CONTACTED", status: "CONTACTED" });
     expect(isClosedLeadStage(LEAD_STAGES.SOLD)).toBe(true);
     expect(isClosedLeadStage(LEAD_STAGES.NEGOTIATING)).toBe(false);
+  });
+
+  it("ofis panelinin statusu mərhələyə uyğunlaşdırılır, uyğun mərhələ saxlanılır", () => {
+    expect(stageForStatus(LEAD_STATUSES.IN_PROGRESS, LEAD_STAGES.VIEWING_SCHEDULED)).toBe(LEAD_STAGES.VIEWING_SCHEDULED);
+    expect(stageForStatus(LEAD_STATUSES.IN_PROGRESS, LEAD_STAGES.NEW)).toBe(LEAD_STAGES.NEGOTIATING);
+    expect(stageForStatus(LEAD_STATUSES.COMPLETED, LEAD_STAGES.AGREED, "RENT")).toBe(LEAD_STAGES.RENTED);
+    expect(stageForStatus(LEAD_STATUSES.COMPLETED, LEAD_STAGES.AGREED, null)).toBe(LEAD_STAGES.SOLD);
+    expect(stageForStatus(LEAD_STATUSES.CLOSED, LEAD_STAGES.ASSIGNED)).toBe(LEAD_STAGES.CLOSED);
+    expect(stageForStatus(LEAD_STATUSES.NEW, LEAD_STAGES.ASSIGNED)).toBe(LEAD_STAGES.ASSIGNED);
+    expect(stageForStatus(LEAD_STATUSES.NEW, "yoxdur")).toBe(LEAD_STAGES.NEW);
   });
 
   it("formadakı məqsəd allowlist-dən keçir", () => {

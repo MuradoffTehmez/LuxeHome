@@ -6,6 +6,7 @@ import {
   LEAD_SOURCES,
   LEAD_STAGES,
   LEAD_STATUSES,
+  LISTING_TYPES,
   type LeadActivityType,
   type LeadSource,
   type LeadStage,
@@ -49,6 +50,27 @@ export function isClosedLeadStage(stage: string): boolean {
 /** Elan formasındakı məqsəd (#222, PRD 8.2) — allowlist-dən kənar dəyər adi elan sualıdır. */
 export function leadIntentSource(value: unknown): LeadSource {
   return value === LEAD_SOURCES.VIEWING || value === LEAD_SOURCES.INFO ? value : LEAD_SOURCES.PROPERTY;
+}
+
+/**
+ * Ofis paneli yalnız qaba statusu dəyişir (#222): mərhələ ona uyğunlaşdırılır. Cari mərhələ artıq
+ * həmin statusa uyğundursa saxlanılır (məs. «Görüş planlaşdırılıb» → `IN_PROGRESS` dəyişmir).
+ * Tamamlanma kirayə elanında «Kirayə müqaviləsi bağlanıb», qalanlarında «Satış tamamlanıb» olur.
+ */
+export function stageForStatus(status: LeadStatus, currentStage: string, listingType?: string | null): LeadStage {
+  if (isLeadStage(currentStage) && leadStatusForStage(currentStage) === status) return currentStage;
+  switch (status) {
+    case LEAD_STATUSES.CONTACTED:
+      return LEAD_STAGES.CONTACTED;
+    case LEAD_STATUSES.IN_PROGRESS:
+      return LEAD_STAGES.NEGOTIATING;
+    case LEAD_STATUSES.COMPLETED:
+      return listingType === LISTING_TYPES.RENT ? LEAD_STAGES.RENTED : LEAD_STAGES.SOLD;
+    case LEAD_STATUSES.CLOSED:
+      return LEAD_STAGES.CLOSED;
+    default:
+      return LEAD_STAGES.NEW;
+  }
 }
 
 /** Mərhələ dəyişikliyi + uyğun qaba status bir yazıda. */

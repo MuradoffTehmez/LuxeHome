@@ -15,16 +15,18 @@ function useRun() {
   const { toast } = useToast();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const run = (action: () => Promise<ActionState>, onSuccess?: () => void) =>
+  const run = (action: () => Promise<ActionState>, onSuccess?: () => void, onFailure?: () => void) =>
     startTransition(async () => {
-      const result = await action();
+      const result = await action().catch((): ActionState => ({ status: "error", message: t("actions.failed") }));
       toast(result.message ?? t("actions.failed"), result.status === "success" ? "success" : "error");
       if (result.status === "success") {
         onSuccess?.();
         router.refresh();
+      } else {
+        onFailure?.();
       }
     });
-  return { pending, run };
+  return { pending, run, router };
 }
 
 const STAGES = Object.values(LEAD_STAGES) as LeadStage[];
@@ -32,7 +34,7 @@ const STAGES = Object.values(LEAD_STAGES) as LeadStage[];
 /** Mərhələ seçimi (#222, PRD 8.3) — dəyişiklik dərhal yazılır və tarixçəyə düşür. */
 export function LeadStageSelect({ id, stage }: { id: string; stage: LeadStage }) {
   const t = useTranslations("account.leads");
-  const { pending, run } = useRun();
+  const { pending, run, router } = useRun();
   const [value, setValue] = useState<LeadStage>(stage);
   return (
     <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
@@ -42,8 +44,14 @@ export function LeadStageSelect({ id, stage }: { id: string; stage: LeadStage })
         disabled={pending}
         onChange={(event) => {
           const next = event.target.value as LeadStage;
+          const previous = value;
           setValue(next);
-          run(() => changeLeadStage(id, next));
+          // Rədd edilən (məs. eyni anda dəyişdirilmiş) mərhələ ekranda qalmasın: əvvəlkinə qayıdılır
+          // və server vəziyyəti yenidən oxunur.
+          run(() => changeLeadStage(id, next), undefined, () => {
+            setValue(previous);
+            router.refresh();
+          });
         }}
         className="min-h-11 rounded-sm border border-line bg-paper px-3 text-sm font-normal text-ink focus:border-gold focus:outline-none"
       >

@@ -164,7 +164,10 @@ export async function addLeadNote(id: string, text: string): Promise<ActionState
   try {
     const lead = await findManageableLead(context.user.id, id);
     if (!lead) return failure(t("actions.notFound"));
-    await recordLeadActivity({ leadId: lead.id, actor: context.user, type: LEAD_ACTIVITY_TYPES.NOTE, text: note });
+    // Qeydin yeganə nüsxəsi tarixçə sətridir — xətanı udan `recordLeadActivity()` burada işlədilmir.
+    await prisma.leadActivity.create({
+      data: { leadId: lead.id, actorId: context.user.id, actorName: context.user.name.slice(0, 200), type: LEAD_ACTIVITY_TYPES.NOTE, text: note },
+    });
   } catch (error) {
     return unexpected("müraciət qeydi yazılmadı", error, t("actions.failed"));
   }
