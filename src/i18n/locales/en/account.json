@@ -712,7 +712,8 @@
       "tooManyPending": "You have too many orders awaiting payment. Complete or cancel them first.",
       "duplicatePending": "This package has already been ordered for this listing and is awaiting payment.",
       "unavailable": "The action could not be completed. Please try again shortly."
-    }
+    },
+    "subscriptionPlans": "View subscription plans"
   },
   "phoneVerification": {
     "description": "With a verified number you can sign in with an SMS code instead of a password.",

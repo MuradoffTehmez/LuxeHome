@@ -71,5 +71,73 @@
     "enquire": "Bu mənzil haqqında soruş",
     "hint": "Ətraflı məlumat üçün mənzilə toxunun.",
     "whatsappMessage": "Salam, {project} layihəsində {block} bloku, {number} nömrəli mənzil haqqında məlumat almaq istəyirəm."
+  },
+  "plans": {
+    "metaTitle": "Abunə paketləri — Basic, Pro, Premium",
+    "metaDescription": "LuxeHomeEstate abunə paketləri: fərdi istifadəçilər və agentliklər üçün Basic, Pro və Premium imkanları.",
+    "eyebrow": "Paketlər",
+    "title": "Abunə paketləri",
+    "description": "Fərdi istifadəçilər və agentliklər üçün Basic, Pro və Premium imkanlarını müqayisə edin.",
+    "promo": "LuxeHomeEstate hazırda tanıtım mərhələsindədir. Aktiv xidmətlər müvəqqəti olaraq ödənişsiz təqdim edilir.",
+    "promoHint": "Pro və Premium imkanları gələcək ödənişli model üçün izah olunur — indi heç bir ödəniş alınmır.",
+    "individual": "Fərdi istifadəçilər",
+    "agency": "Agentliklər",
+    "feature": "İmkan",
+    "limits": "Limitlər",
+    "unlimited": "Limitsiz",
+    "months": "{count, plural, one {# ay} other {# ay}}",
+    "perPeriod": "{price} / {months}",
+    "priceOnRequest": "Qiymət təsdiqlənəcək",
+    "trial": "{days} günlük sınaq",
+    "save": "{percent}% qənaət",
+    "freeCta": "Pulsuz başlayın",
+    "checkoutSoon": "Onlayn ödəniş tezliklə",
+    "note": "Cədvəl təklif olunan plan strukturudur; dəqiq limit və qiymətlər ayrıca elan olunacaq.",
+    "empty": "Paketlər hələ əlavə edilməyib.",
+    "capabilities": {
+      "LISTINGS": "Elan yerləşdirmək",
+      "LISTING_STATS": "Elan statistikası",
+      "FEATURED": "Seçilmiş elanlar",
+      "REPORTS": "Şikayət göndərmək",
+      "NOTIFICATIONS": "Bildirişlər",
+      "ANALYTICS": "Analitika",
+      "EXPORT": "Hesabat ixracı",
+      "AGENCY_MANAGEMENT": "Agentlik idarəetməsi",
+      "CRM": "CRM",
+      "AUTOMATION": "Əlavə avtomatlaşdırma",
+      "SUPPORT": "Prioritet dəstək"
+    },
+    "levels": {
+      "NONE": "Yox",
+      "LIMITED": "Məhdud",
+      "BASIC": "Əsas",
+      "STANDARD": "Standart",
+      "INCLUDED": "Var",
+      "EXTENDED": "Geniş",
+      "PRIORITY": "Üstün",
+      "FULL": "Tam",
+      "PROFESSIONAL": "Peşəkar",
+      "HIGH": "Yüksək"
+    },
+    "plans": {
+      "BASIC": {
+        "name": "Basic",
+        "tagline": "Başlanğıc üçün əsas imkanlar."
+      },
+      "PRO": {
+        "name": "Pro",
+        "tagline": "Fəal satıcı və agentlər üçün geniş imkanlar."
+      },
+      "PREMIUM": {
+        "name": "Premium",
+        "tagline": "Agentliklər üçün tam peşəkar dəst."
+      }
+    },
+    "limitNames": {
+      "activeListings": "Aktiv elan",
+      "agents": "Agent",
+      "crmClients": "CRM müştərisi",
+      "exportsPerMonth": "Aylıq ixrac"
+    }
   }
 }

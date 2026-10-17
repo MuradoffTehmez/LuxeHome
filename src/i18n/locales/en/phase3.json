@@ -71,5 +71,73 @@
     "enquire": "Ask about this unit",
     "hint": "Tap a unit for details.",
     "whatsappMessage": "Hello, I would like information about unit {number} in block {block} of {project}."
+  },
+  "plans": {
+    "metaTitle": "Subscription plans — Basic, Pro, Premium",
+    "metaDescription": "LuxeHomeEstate subscription plans: Basic, Pro and Premium features for individuals and agencies.",
+    "eyebrow": "Plans",
+    "title": "Subscription plans",
+    "description": "Compare Basic, Pro and Premium features for individuals and agencies.",
+    "promo": "LuxeHomeEstate is currently in its launch phase. Active services are temporarily provided free of charge.",
+    "promoHint": "Pro and Premium features are described for the future paid model — no payment is taken now.",
+    "individual": "Individuals",
+    "agency": "Agencies",
+    "feature": "Feature",
+    "limits": "Limits",
+    "unlimited": "Unlimited",
+    "months": "{count, plural, one {# month} other {# months}}",
+    "perPeriod": "{price} / {months}",
+    "priceOnRequest": "Price to be confirmed",
+    "trial": "{days}-day trial",
+    "save": "Save {percent}%",
+    "freeCta": "Start for free",
+    "checkoutSoon": "Online payment coming soon",
+    "note": "The table is the proposed plan structure; exact limits and prices will be announced separately.",
+    "empty": "No plans have been added yet.",
+    "capabilities": {
+      "LISTINGS": "Listing properties",
+      "LISTING_STATS": "Listing statistics",
+      "FEATURED": "Saved listings",
+      "REPORTS": "Submitting reports",
+      "NOTIFICATIONS": "Notifications",
+      "ANALYTICS": "Analytics",
+      "EXPORT": "Report export",
+      "AGENCY_MANAGEMENT": "Agency management",
+      "CRM": "CRM",
+      "AUTOMATION": "Extra automation",
+      "SUPPORT": "Priority support"
+    },
+    "levels": {
+      "NONE": "No",
+      "LIMITED": "Limited",
+      "BASIC": "Basic",
+      "STANDARD": "Standard",
+      "INCLUDED": "Included",
+      "EXTENDED": "Extended",
+      "PRIORITY": "Priority",
+      "FULL": "Full",
+      "PROFESSIONAL": "Professional",
+      "HIGH": "High"
+    },
+    "plans": {
+      "BASIC": {
+        "name": "Basic",
+        "tagline": "Essential tools to get started."
+      },
+      "PRO": {
+        "name": "Pro",
+        "tagline": "Extended tools for active sellers and agents."
+      },
+      "PREMIUM": {
+        "name": "Premium",
+        "tagline": "The full professional toolkit for agencies."
+      }
+    },
+    "limitNames": {
+      "activeListings": "Active listings",
+      "agents": "Agents",
+      "crmClients": "CRM clients",
+      "exportsPerMonth": "Exports per month"
+    }
   }
 }

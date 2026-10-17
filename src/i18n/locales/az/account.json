@@ -712,7 +712,8 @@
       "tooManyPending": "Ödəniş gözləyən sifarişləriniz çoxdur. Əvvəlcə onları tamamlayın və ya ləğv edin.",
       "duplicatePending": "Bu elan üçün eyni paket artıq sifariş olunub və ödəniş gözləyir.",
       "unavailable": "Əməliyyat tamamlanmadı. Bir az sonra yenidən cəhd edin."
-    }
+    },
+    "subscriptionPlans": "Abunə paketlərinə bax"
   },
   "phoneVerification": {
     "description": "Təsdiqlənmiş nömrə ilə parol yazmadan, SMS kodu ilə daxil ola bilərsiniz.",

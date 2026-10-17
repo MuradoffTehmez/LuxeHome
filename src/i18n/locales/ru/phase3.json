@@ -71,5 +71,73 @@
     "enquire": "Спросить об этой квартире",
     "hint": "Нажмите на квартиру, чтобы увидеть детали.",
     "whatsappMessage": "Здравствуйте, хочу узнать о квартире {number} в блоке {block} проекта {project}."
+  },
+  "plans": {
+    "metaTitle": "Тарифы подписки — Basic, Pro, Premium",
+    "metaDescription": "Тарифы LuxeHomeEstate: возможности Basic, Pro и Premium для частных лиц и агентств.",
+    "eyebrow": "Тарифы",
+    "title": "Тарифы подписки",
+    "description": "Сравните возможности Basic, Pro и Premium для частных лиц и агентств.",
+    "promo": "LuxeHomeEstate сейчас на этапе запуска. Активные услуги временно предоставляются бесплатно.",
+    "promoHint": "Возможности Pro и Premium описаны для будущей платной модели — сейчас оплата не взимается.",
+    "individual": "Частные лица",
+    "agency": "Агентства",
+    "feature": "Возможность",
+    "limits": "Лимиты",
+    "unlimited": "Без лимита",
+    "months": "{count, plural, one {# месяц} few {# месяца} many {# месяцев} other {# месяца}}",
+    "perPeriod": "{price} / {months}",
+    "priceOnRequest": "Цена будет утверждена",
+    "trial": "Пробный период {days} дн.",
+    "save": "Экономия {percent}%",
+    "freeCta": "Начать бесплатно",
+    "checkoutSoon": "Онлайн-оплата скоро",
+    "note": "Таблица — предлагаемая структура тарифов; точные лимиты и цены будут объявлены отдельно.",
+    "empty": "Тарифы ещё не добавлены.",
+    "capabilities": {
+      "LISTINGS": "Размещение объявлений",
+      "LISTING_STATS": "Статистика объявлений",
+      "FEATURED": "Избранные объявления",
+      "REPORTS": "Отправка жалоб",
+      "NOTIFICATIONS": "Уведомления",
+      "ANALYTICS": "Аналитика",
+      "EXPORT": "Экспорт отчётов",
+      "AGENCY_MANAGEMENT": "Управление агентством",
+      "CRM": "CRM",
+      "AUTOMATION": "Доп. автоматизация",
+      "SUPPORT": "Приоритетная поддержка"
+    },
+    "levels": {
+      "NONE": "Нет",
+      "LIMITED": "Ограничено",
+      "BASIC": "Базовая",
+      "STANDARD": "Стандартная",
+      "INCLUDED": "Есть",
+      "EXTENDED": "Расширенная",
+      "PRIORITY": "Повышенная",
+      "FULL": "Полная",
+      "PROFESSIONAL": "Профессиональная",
+      "HIGH": "Высокая"
+    },
+    "plans": {
+      "BASIC": {
+        "name": "Basic",
+        "tagline": "Базовые возможности для старта."
+      },
+      "PRO": {
+        "name": "Pro",
+        "tagline": "Расширенные возможности для активных продавцов и агентов."
+      },
+      "PREMIUM": {
+        "name": "Premium",
+        "tagline": "Полный профессиональный набор для агентств."
+      }
+    },
+    "limitNames": {
+      "activeListings": "Активные объявления",
+      "agents": "Агенты",
+      "crmClients": "Клиенты CRM",
+      "exportsPerMonth": "Экспортов в месяц"
+    }
   }
 }

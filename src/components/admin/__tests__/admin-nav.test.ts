@@ -13,6 +13,7 @@ describe("adminNav", () => {
       "serp",
       "analytics",
       "aiAssistant",
+      "finance",
       "administration",
       "profile",
     ]);
