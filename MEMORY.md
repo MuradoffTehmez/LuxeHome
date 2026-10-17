@@ -745,3 +745,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #224 (Modul 06, 8.4/8.5): `DIRECT`/`LOAD` bölgü rejimləri, `OFF` = manual; agentliyin dəyişə bildiyi üç pilləli
   cavabsız müraciət xəbərdarlığı (`lead-alerts.ts`, `processUnansweredLeads`). **Modul 06 tamamlandı.** Növbəti — Modul 07
   (Mini CRM).
+- #226 (Modul 07, 9.1/9.2): `CrmClient` + `CrmClientNote` + `Lead.clientId`, `/kabinet/musteriler`. Qalan Modul 07: 9.3 uyğun
+  elanlar (`buildPropertyWhere` ilə ehtiyacdan) və 9.4 təkrar müraciətin aşkarlanması (`phoneKey`/`emailKey`, təsdiqli bağlama).

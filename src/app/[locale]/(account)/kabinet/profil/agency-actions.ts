@@ -24,6 +24,7 @@ import { handOverListings } from "@/lib/accounts/agency-listings";
 import { closeMembershipPeriod } from "@/lib/accounts/agency-ownership";
 import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { releaseAgentLeads } from "@/lib/accounts/lead-routing";
+import { releaseAgentClients } from "@/lib/accounts/crm";
 
 /**
  * Agentin özü: agentliyə qoşulma sorğusu (qeydiyyatda seçməyibsə), sorğunu ləğv
@@ -147,6 +148,8 @@ export async function leaveAgency(id: string): Promise<ActionState> {
       : 0;
     // Agentlik müraciətləri sahibə qayıdır (#161); agentdə qalan elanlarına gələnlər onundur.
     if (wasMember) await releaseAgentLeads({ agencyId: membership.agency.id, userId: user.id, ownerUserId: membership.agency.userId });
+    // Agentlik mühitindəki müştəri kartları da sahibə keçir (#226).
+    if (wasMember) await releaseAgentClients({ agencyId: membership.agency.id, userId: user.id, ownerUserId: membership.agency.userId });
     await prisma.agencyEmployee.delete({ where: { id } });
     if (wasMember) {
       await linkAgentProfileToAgency(user.id, membership.agency.id, false);

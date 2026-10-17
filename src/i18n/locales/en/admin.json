@@ -2934,7 +2934,10 @@
         "MEMBER_SUSPENDED": "suspended the access of {entity}",
         "MEMBER_RESUMED": "restored the access of {entity}",
         "TASK_CREATED": "created the task “{entity}”",
-        "TASK_STATUS_CHANGED": "changed the status of “{entity}”"
+        "TASK_STATUS_CHANGED": "changed the status of “{entity}”",
+        "CLIENT_CREATED": "created the client card “{entity}”",
+        "CLIENT_REASSIGNED": "changed the owner of the client card “{entity}”",
+        "CLIENT_DELETED": "deleted the client card “{entity}”"
       }
     },
     "reports": {

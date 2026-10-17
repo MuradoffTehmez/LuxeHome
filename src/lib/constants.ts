@@ -604,6 +604,9 @@ export const AGENCY_ACTIVITY_ACTIONS = {
   MEMBER_RESUMED: "MEMBER_RESUMED",
   TASK_CREATED: "TASK_CREATED",
   TASK_STATUS_CHANGED: "TASK_STATUS_CHANGED",
+  CLIENT_CREATED: "CLIENT_CREATED",
+  CLIENT_REASSIGNED: "CLIENT_REASSIGNED",
+  CLIENT_DELETED: "CLIENT_DELETED",
 } as const;
 
 export type AgencyActivityAction = (typeof AGENCY_ACTIVITY_ACTIONS)[keyof typeof AGENCY_ACTIVITY_ACTIONS];
@@ -619,6 +622,7 @@ export const AGENCY_ACTIVITY_GROUPS = {
   packages: ["PACKAGE_REQUESTED"],
   transfers: ["TRANSFER_REQUESTED", "TRANSFER_DECIDED"],
   tasks: ["TASK_CREATED", "TASK_STATUS_CHANGED"],
+  clients: ["CLIENT_CREATED", "CLIENT_REASSIGNED", "CLIENT_DELETED"],
 } as const satisfies Record<string, readonly AgencyActivityAction[]>;
 
 export type AgencyActivityGroup = keyof typeof AGENCY_ACTIVITY_GROUPS;
@@ -856,6 +860,10 @@ export const LEAD_ACTIVITY_TYPES = {
 export type LeadActivityType = (typeof LEAD_ACTIVITY_TYPES)[keyof typeof LEAD_ACTIVITY_TYPES];
 
 export const LEAD_NOTE_MAX = 2000;
+
+/** Mini CRM (#226): siyahının səhifə ölçüsü və müştəri qeydinin uzunluğu. */
+export const CRM_PAGE_SIZE = 20;
+export const CRM_NOTE_MAX = 2000;
 
 /**
  * Agentliyə gələn müraciətin agentlər arasında bölünməsi (#161, #224 — PRD 8.4 rejimləri):

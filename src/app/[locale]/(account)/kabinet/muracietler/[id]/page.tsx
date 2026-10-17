@@ -14,6 +14,9 @@ import { getLeadCard, isClosedLeadStage, isLeadStage } from "@/lib/accounts/lead
 import { LEAD_ACTIVITY_TYPES, PUBLIC_PROPERTY_STATUSES, type LeadSource, type LeadStage, type Locale } from "@/lib/constants";
 import { LeadActions } from "../lead-actions";
 import { LeadNextContactForm, LeadNoteForm, LeadStageSelect } from "./card-forms";
+import { CreateClientFromLeadButton } from "../../musteriler/client-forms";
+import { crmScope, getCrmContext } from "@/lib/accounts/crm";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +46,12 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
   const card = await getLeadCard(user.id, String(id).slice(0, 64));
   if (!card) notFound();
   const t = await getTranslations("account.leads");
+  const clientsT = await getTranslations("account.clients");
   const { lead, activities } = card;
+  // Bağlı müştəri kartı (#226) — yalnız baxan şəxsin görə bildiyi kart göstərilir.
+  const client = lead.clientId
+    ? await prisma.crmClient.findFirst({ where: { AND: [{ id: lead.clientId }, crmScope(await getCrmContext(user))] }, select: { id: true, name: true } })
+    : null;
   const closed = isClosedLeadStage(lead.stage);
   const sourceKey = (SOURCE_KEYS as readonly string[]).includes(lead.source) ? (lead.source as LeadSource) : "CONTACT";
   const propertyPublic = lead.property && !lead.property.deletedAt && (PUBLIC_PROPERTY_STATUSES as readonly string[]).includes(lead.property.status);
@@ -186,6 +194,19 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
               handlerId={lead.handlerId}
               assignees={card.assignees ?? undefined}
             />
+          </section>
+          <section aria-labelledby="lead-client-title" className="flex flex-col gap-2 rounded-xl border border-line bg-paper p-4 shadow-xs">
+            <h2 id="lead-client-title" className="font-sans text-sm font-semibold text-ink">{clientsT("leadCard.title")}</h2>
+            {client ? (
+              <Link href={`/kabinet/musteriler/${client.id}`} className="text-sm font-medium text-gold-deep underline-offset-4 hover:underline">
+                {clientsT("leadCard.open", { name: client.name })}
+              </Link>
+            ) : (
+              <>
+                <p className="text-xs text-ink-muted">{clientsT("leadCard.hint")}</p>
+                <div><CreateClientFromLeadButton leadId={lead.id} /></div>
+              </>
+            )}
           </section>
           <p className="text-xs leading-5 text-ink-muted">{t("card.privacy")}</p>
           <Link href="/kabinet/muracietler" className="text-sm font-medium text-gold-deep underline-offset-4 hover:underline">← {t("card.back")}</Link>

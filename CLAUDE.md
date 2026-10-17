@@ -873,6 +873,16 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   bağlanır (köhnə müraciət hər cron-da taranmasın). Tarama kursorla səhifələnir (`SCAN_PAGE` × `SCAN_PAGES`), çağırış
   başına ən çox `ALERT_BATCH` pillə. «Tez cavab verir» ölçüsünün 30 dəqiqəlik güzəşti (`LEAD_ESCALATION_MINUTES`) bu
   parametrlərdən asılı deyil.
+- **Mini CRM (#226, PRD 9.1/9.2)** — `lib/accounts/crm.ts`, `/kabinet/musteriler` (siyahı, `?q=`/`?mesul=`/`?sehife=`),
+  `/yeni`, `/<id>`. `CrmClient`: ad, əlaqə, maraqlandığı elan, ehtiyaclar (alış/kirayə, növ, şəhər/ərazi, qiymət və sahə
+  intervalı, otaq, təmir, üstünlüklər) + `CrmClientNote`; taksonomiya/elan id-ləri FK-sızdır (`AgencyTask` kimi), forma
+  slug göndərir və `resolveCrmTaxonomy()` ərazinin seçilmiş şəhərin ağacında olduğunu yoxlayır. **Görünmə `crmScope()`-dadır:**
+  agentlik üzvünün kartı agentliyin mühitinə aiddir (`agencyId`); sahib və `LEADS_MANAGE` hamısını görür və məsulu dəyişir,
+  agent yalnız özününkünü, dayandırılmış üzv agentlik kartlarını görmür; şəxsi kartda `agencyId` boşdur. Agent komandadan
+  çıxanda kartları sahibə keçir (`releaseAgentClients` — hər iki çıxış action-unda), hesab silinəndə də; şəxsi kartlar
+  hesabla silinir. `phoneKey` (son 9 rəqəm) / `emailKey` təkrar aşkarlanması üçündür, axtarış `searchText`-dədir.
+  Müraciət kartından «Müştəri kartı yarat» (`createClientFromLead`) kartı müraciətdən və elandan doldurur və `Lead.clientId`
+  bağlayır. Kart məlumatı üçüncü şəxsin əlaqəsidir — data ixracına düşmür.
 - **«Tez cavab verir»** (`lib/accounts/response-stats.ts`, saf): son 90 gün, ≥3 müraciət, median ≤60 dəq, ≥80%
   cavab. Hələ 30 dəqiqəsi keçməmiş cavabsız müraciət nümunəyə düşmür. Ölçülmüş göstərici `AgentProfile.measured*` və
   `Agency.response*`-dədir; admin yazdığı `AgentProfile.responseMinutes` yalnız ehtiyatdır və nişan vermir.

@@ -6,6 +6,7 @@ export type CabinetNavItem = {
     | "listings"
     | "new-listing"
     | "leads"
+    | "clients"
     | "analytics"
     | "packages"
     | "team"
@@ -32,6 +33,8 @@ const LISTING_ITEMS: readonly CabinetNavItem[] = [
   { id: "listings", href: "/kabinet/elanlar", label: "Elanlarım" },
   { id: "new-listing", href: "/kabinet/elanlar/yeni", label: "Yeni elan" },
   { id: "leads", href: "/kabinet/muracietler", label: "Müraciətlər" },
+  /** Mini CRM (#226) — elan yerləşdirən hər hesab. */
+  { id: "clients", href: "/kabinet/musteriler", label: "Müştərilər" },
   { id: "analytics", href: "/kabinet/analitika", label: "Analitika" },
   { id: "packages", href: "/kabinet/paketler", label: "Premium paketlər" },
 ];
@@ -84,6 +87,7 @@ export type CabinetCrumb = {
     | "newListing"
     | "editListing"
     | "leads"
+    | "clients"
     | "analytics"
     | "packages"
     | "team"
@@ -102,6 +106,7 @@ export type CabinetCrumb = {
 const CRUMB_SEGMENTS: Record<string, CabinetCrumb["labelKey"]> = {
   elanlar: "listings",
   muracietler: "leads",
+  musteriler: "clients",
   analitika: "analytics",
   paketler: "packages",
   komanda: "team",

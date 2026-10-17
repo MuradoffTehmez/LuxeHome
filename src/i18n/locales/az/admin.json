@@ -2934,7 +2934,10 @@
         "MEMBER_SUSPENDED": "{entity} adlı agentin girişini dayandırdı",
         "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi",
         "TASK_CREATED": "«{entity}» tapşırığını yaratdı",
-        "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi"
+        "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi",
+        "CLIENT_CREATED": "«{entity}» müştəri kartını yaratdı",
+        "CLIENT_REASSIGNED": "«{entity}» müştəri kartının məsulunu dəyişdi",
+        "CLIENT_DELETED": "«{entity}» müştəri kartını sildi"
       }
     },
     "reports": {

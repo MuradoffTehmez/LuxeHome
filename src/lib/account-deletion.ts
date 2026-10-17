@@ -3,6 +3,7 @@ import { PROPERTY_STATUSES, PROPERTY_STATUS_SOURCES } from "@/lib/constants";
 import { recordPropertyStatusChanges } from "@/lib/property-status-history";
 import { recordDomainEvent } from "@/lib/admin/events";
 import { handOverListings } from "@/lib/accounts/agency-listings";
+import { releaseAgentClients } from "@/lib/accounts/crm";
 
 /**
  * D1 transaction dəstəkləmir. Ona görə silinmənin ilk atomik addımı hesabı
@@ -61,6 +62,17 @@ export async function finalizeAccountDeletion(userId: string, now = new Date()):
     archived.map((listing) => ({ propertyId: listing.id, from: listing.status })),
     { to: PROPERTY_STATUSES.ARCHIVED, source: PROPERTY_STATUS_SOURCES.SYSTEM, note: "Hesab silindi" },
   );
+  // Mini CRM (#226): başqa agentliyin mühitindəki kartlar o agentliyin sahibinə keçir; qalanlar
+  // (şəxsi kartlar — üçüncü şəxslərin əlaqə məlumatı) hesabla birlikdə silinir.
+  const clientAgencies = await prisma.crmClient.findMany({
+    where: { ownerId: userId, agencyId: { not: null } },
+    distinct: ["agencyId"],
+    select: { agency: { select: { id: true, userId: true } } },
+  });
+  for (const { agency } of clientAgencies) {
+    if (agency && agency.userId !== userId) await releaseAgentClients({ agencyId: agency.id, userId, ownerUserId: agency.userId });
+  }
+  await prisma.crmClient.deleteMany({ where: { ownerId: userId } });
   await prisma.user.delete({ where: { id: userId } });
 }
 
