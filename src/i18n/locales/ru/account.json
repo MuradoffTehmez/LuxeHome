@@ -996,7 +996,8 @@
       "leads": "Заявки",
       "team": "Команда",
       "packages": "Пакеты",
-      "transfers": "Передачи"
+      "transfers": "Передачи",
+      "tasks": "Задачи"
     },
     "platform": "Администратор платформы",
     "actions": {
@@ -1020,7 +1021,9 @@
       "LISTING_ASSIGNED": "сменил(а) ответственного за «{entity}»",
       "MEMBER_ROLE_CHANGED": "изменил(а) роль {entity}",
       "MEMBER_SUSPENDED": "приостановил(а) доступ {entity}",
-      "MEMBER_RESUMED": "восстановил(а) доступ {entity}"
+      "MEMBER_RESUMED": "восстановил(а) доступ {entity}",
+      "TASK_CREATED": "создал(а) задачу «{entity}»",
+      "TASK_STATUS_CHANGED": "изменил(а) статус задачи «{entity}»"
     },
     "details": {
       "price": "{from} → {to}",
@@ -1041,7 +1044,8 @@
       "role": "{from} → {to}",
       "releasedLeads": "открытых заявок возвращено владельцу: {count}",
       "reason": "Причина: {reason}",
-      "assigned": "{from} → {to}"
+      "assigned": "{from} → {to}",
+      "taskStatus": "{from} → {to}"
     },
     "emptyTitle": "Записей пока нет",
     "emptyDescription": "Здесь появятся изменения объявлений, заявок и команды.",
@@ -1058,6 +1062,13 @@
     "roleNames": {
       "AGENT": "Агент",
       "MANAGER": "Менеджер"
+    },
+    "taskStatusNames": {
+      "NEW": "Новая",
+      "IN_PROGRESS": "В работе",
+      "ON_HOLD": "В ожидании",
+      "DONE": "Выполнена",
+      "CANCELLED": "Отменена"
     }
   },
   "agencyDashboard": {
@@ -1089,7 +1100,8 @@
       "rejected": "Не прошли модерацию: {count}",
       "suspended": "Приостановлено объявлений: {count}",
       "openReports": "Открытых жалоб на проверке: {count}",
-      "expiringSoon": "Срок истекает в течение 7 дней: {count}"
+      "expiringSoon": "Срок истекает в течение 7 дней: {count}",
+      "overdueTasks": "Просрочено задач: {count}"
     },
     "top": {
       "title": "Самые просматриваемые объявления",
@@ -1138,5 +1150,77 @@
     "previous": "Назад",
     "next": "Вперёд",
     "pageOf": "{page} / {pages}"
+  },
+  "tasks": {
+    "metaTitle": "Задачи",
+    "metaDescription": "Внутренние задачи агентства.",
+    "eyebrow": "Агентство",
+    "title": "Задачи",
+    "description": "Задачи, назначенные вам, и созданные вами. Отслеживайте выполнение, меняя статус.",
+    "descriptionManager": "Ставьте задачи агентам, назначайте сроки и следите за статусом. Просроченные задачи выделены красным.",
+    "noAgencyTitle": "Нет членства в агентстве",
+    "noAgencyDescription": "Задачи доступны владельцам агентств и подтверждённым агентам.",
+    "suspendedTitle": "Доступ к агентству приостановлен",
+    "suspendedDescription": "Задачи снова появятся, когда агентство восстановит доступ.",
+    "form": {
+      "heading": "Новая задача",
+      "title": "Задача",
+      "type": "Тип",
+      "assignee": "Исполнитель",
+      "selfOnly": "Задача будет назначена вам.",
+      "due": "Срок",
+      "dueHint": "Необязательно.",
+      "property": "Объявление",
+      "lead": "Заявка",
+      "none": "Не выбрано",
+      "description": "Подробности",
+      "submit": "Создать задачу"
+    },
+    "viewLabel": "Вид",
+    "views": {
+      "open": "Открытые",
+      "done": "Выполненные",
+      "cancelled": "Отменённые",
+      "all": "Все"
+    },
+    "assigneeFilter": "Исполнитель",
+    "everyone": "Все",
+    "statusLabel": "Статус",
+    "statuses": {
+      "NEW": "Новая",
+      "IN_PROGRESS": "В работе",
+      "ON_HOLD": "В ожидании",
+      "DONE": "Выполнена",
+      "CANCELLED": "Отменена"
+    },
+    "types": {
+      "GENERAL": "Общая",
+      "LEAD_RESPONSE": "Ответить на заявку",
+      "CLIENT_CONTACT": "Связаться с клиентом",
+      "PHOTO_UPDATE": "Обновить фото",
+      "LISTING_CHECK": "Проверить актуальность"
+    },
+    "overdue": "Просрочена",
+    "assignee": "Исполнитель: {name}",
+    "creator": "Поставил(а): {name}",
+    "due": "Срок: {date}",
+    "completed": "Выполнена: {date}",
+    "emptyTitle": "Задач нет",
+    "emptyDescription": "В этом виде задач не найдено.",
+    "created": "Задача создана.",
+    "statusChanged": "Статус задачи обновлён.",
+    "errors": {
+      "forbidden": "У вас нет прав на это действие.",
+      "invalidTitle": "Название задачи — 3–160 символов.",
+      "invalidType": "Выберите тип задачи.",
+      "invalidAssignee": "Исполнитель должен быть активным участником агентства.",
+      "invalidDue": "Срок не может быть в прошлом.",
+      "invalidProperty": "Объявление не принадлежит агентству.",
+      "invalidLead": "Заявка не принадлежит агентству.",
+      "notFound": "Задача не найдена.",
+      "stale": "Статус задачи уже изменился. Обновите страницу.",
+      "invalidStatus": "Неверный статус.",
+      "failed": "Не удалось выполнить действие. Попробуйте ещё раз."
+    }
   }
 }

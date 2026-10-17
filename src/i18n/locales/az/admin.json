@@ -317,7 +317,8 @@
       "LISTING_REPORT": "Elan şikayəti",
       "LISTING_MODERATION": "Elan moderasiyası",
       "LEAD_ESCALATION": "Cavabsız müraciət",
-      "LISTING_TRANSFER": "Elan köçürməsi"
+      "LISTING_TRANSFER": "Elan köçürməsi",
+      "AGENCY_TASK": "Agentlik tapşırığı"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -2928,7 +2929,9 @@
         "LISTING_ASSIGNED": "«{entity}» elanının məsulunu dəyişdi",
         "MEMBER_ROLE_CHANGED": "{entity} adlı üzvün rolunu dəyişdi",
         "MEMBER_SUSPENDED": "{entity} adlı agentin girişini dayandırdı",
-        "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi"
+        "MEMBER_RESUMED": "{entity} adlı agentin girişini bərpa etdi",
+        "TASK_CREATED": "«{entity}» tapşırığını yaratdı",
+        "TASK_STATUS_CHANGED": "«{entity}» tapşırığının statusunu dəyişdi"
       }
     },
     "reports": {

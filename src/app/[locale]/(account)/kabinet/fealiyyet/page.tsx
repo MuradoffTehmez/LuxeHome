@@ -12,6 +12,7 @@ import { formatPrice, cn } from "@/lib/utils";
 import { getAgencyForOwner } from "@/lib/queries";
 import { getAgencyActivity, isAgencyActivityGroup } from "@/lib/accounts/agency-activity";
 import { isAgencyEmployeeRole, isAgencyMemberPermission } from "@/lib/accounts/agency-access";
+import { isAgencyTaskStatus } from "@/lib/accounts/agency-tasks";
 import {
   ACCOUNT_TYPES,
   AGENCY_ACTIVITY_ACTIONS,
@@ -106,6 +107,9 @@ export default async function AgencyActivityPage({
         typeof details.reason === "string" ? t("details.reason", { reason: details.reason }) : null,
       ].filter(Boolean);
       return parts.length ? parts.join(" · ") : null;
+    }
+    if (action === AGENCY_ACTIVITY_ACTIONS.TASK_STATUS_CHANGED && isAgencyTaskStatus(details.from) && isAgencyTaskStatus(details.to)) {
+      return t("details.taskStatus", { from: t(`taskStatusNames.${details.from}`), to: t(`taskStatusNames.${details.to}`) });
     }
     if (action === AGENCY_ACTIVITY_ACTIONS.LISTING_ASSIGNED && typeof details.to === "string") {
       return typeof details.from === "string" ? t("details.assigned", { from: details.from, to: details.to }) : t("details.to", { name: details.to });

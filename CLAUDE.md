@@ -806,6 +806,13 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   action-lar) bağlanır; açıq agentlik müraciətləri sahibə qayıdır. Şəxsi hesab və şəxsi elanlar toxunulmazdır. Agentlik
   mühitində "aktiv üzv" lazım olan yeni sorğu `ACTIVE_MEMBER_WHERE` işlətməlidir. Elan təyinatı `/kabinet/agentlik/elanlar`
   (`assignAgencyListing`, şərti `updateMany` `agencyId` ilə). Action-lar `kabinet/komanda/member-actions.ts`-dədir.
+- **Daxili tapşırıqlar (#220, PRD 7.3)** `AgencyTask` (`lib/accounts/agency-tasks.ts`), `/kabinet/tapsiriqlar` (sahib və agent):
+  növ `AGENCY_TASK_TYPES`, status `AGENCY_TASK_STATUSES` (açıq = `OPEN_AGENCY_TASK_STATUSES`). Sahib və `TASKS_MANAGE`
+  hər aktiv üzvə yaradır və hamısını görür (`?icraci=`), digər üzv yalnız özünə yaradır və ona təyin olunanı/özünün
+  yaratdığını görür. İcraçı icra statuslarını, idarəçi və ya yaradan ləğvi dəyişir; keçid şərti `updateMany` (cari status).
+  Elan/müraciət bağlantısı eyni agentlikdə yoxlanılır; son tarix `YYYY-MM-DD` → Bakı günü sonu, keçmiş qəbul olunmur.
+  Gecikən açıq tapşırıqlar paneldə (#216) xəbərdarlıqdır. Təyin olunanda icraçıya, tamamlananda yaradana bildiriş
+  (`AGENCY_TASK`); yaratma və status jurnala yazılır. Dayandırılmış üzv tapşırıqlara daxil olmur. Bununla Modul 05 bağlanır.
 - **Bağlanmış sövdələşmələr:** «təklif»/«elan» sayı yalnız `ACTIVE_OFFER_STATUSES` (PUBLISHED + RESERVED) —
   `activeOfferWhere()`. Satılmış/icarəyə verilmiş elan «Uğurlu sövdələşmələr» bölməsindədir (`getClosedDeals`,
   son `DEAL_STATS_WINDOW_DAYS` gün, **yalnız `closedAt`** — `updatedAt` baxış sayğacı ilə də dəyişir; köhnə

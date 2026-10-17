@@ -317,7 +317,8 @@
       "LISTING_REPORT": "Жалоба на объявление",
       "LISTING_MODERATION": "Модерация объявления",
       "LEAD_ESCALATION": "Заявка без ответа",
-      "LISTING_TRANSFER": "Передача объявления"
+      "LISTING_TRANSFER": "Передача объявления",
+      "AGENCY_TASK": "Задача агентства"
     },
     "partnershipType": {
       "BROKER": "Брокер",
@@ -2928,7 +2929,9 @@
         "LISTING_ASSIGNED": "сменил(а) ответственного за «{entity}»",
         "MEMBER_ROLE_CHANGED": "изменил(а) роль {entity}",
         "MEMBER_SUSPENDED": "приостановил(а) доступ {entity}",
-        "MEMBER_RESUMED": "восстановил(а) доступ {entity}"
+        "MEMBER_RESUMED": "восстановил(а) доступ {entity}",
+        "TASK_CREATED": "создал(а) задачу «{entity}»",
+        "TASK_STATUS_CHANGED": "изменил(а) статус задачи «{entity}»"
       }
     },
     "reports": {

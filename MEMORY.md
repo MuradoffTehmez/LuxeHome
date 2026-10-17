@@ -739,3 +739,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #216 (Modul 05, 7.1): `/kabinet/agentlik` dashboard-u. Qalan: 7.2 agentlərin idarəsi, 7.3 tapşırıqlar.
 - #218 (Modul 05, 7.2): rol/səlahiyyət (`agency-access.ts`), girişin dayandırılması, `/kabinet/agentlik/elanlar` təyinatı.
   Qalan: 7.3 daxili tapşırıqlar (`TASKS_MANAGE` artıq var).
+- #220 (Modul 05, 7.3): `AgencyTask` + `/kabinet/tapsiriqlar`. **Modul 05 tamamlandı** (7.1 #216, 7.2 #218, 7.3 #220,
+  7.4 #214). Növbəti — Modul 06 (Lead management: mənbələr, statuslar, avtomatik bölgü, cavabsız müraciətlər, müraciət kartı).
