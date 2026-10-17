@@ -2,6 +2,7 @@ export type CabinetNavItem = {
   id:
     | "overview"
     | "agency-dashboard"
+    | "agency-analytics"
     | "assignments"
     | "listings"
     | "new-listing"
@@ -43,6 +44,8 @@ const LISTING_ITEMS: readonly CabinetNavItem[] = [
 const TEAM_ITEM: CabinetNavItem = { id: "team", href: "/kabinet/komanda", label: "Komanda" };
 /** Agentlik idarəetmə paneli (#216) — yalnız sahib, «Ümumi baxış»dan dərhal sonra. */
 const AGENCY_DASHBOARD_ITEM: CabinetNavItem = { id: "agency-dashboard", href: "/kabinet/agentlik", label: "Agentlik paneli" };
+/** Agentlik analitikası (#234) — sahib (səhifə `LEADS_MANAGE` menecerə də açıqdır). */
+const AGENCY_ANALYTICS_ITEM: CabinetNavItem = { id: "agency-analytics", href: "/kabinet/agentlik/analitika", label: "Agentlik analitikası" };
 /** Elan təyinatları (#218) — sahib və `LISTINGS_ASSIGN` səlahiyyətli agent. */
 const ASSIGNMENTS_ITEM: CabinetNavItem = { id: "assignments", href: "/kabinet/agentlik/elanlar", label: "Elan təyinatları" };
 /** Agentlik daxili fəaliyyət jurnalı (#214) — yalnız sahib. */
@@ -64,10 +67,21 @@ const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
   { id: "recently-viewed", href: "/kabinet/son-baxilanlar", label: "Son baxılanlar" },
 ];
 
-export function getCabinetItems(canList: boolean, canManageTeam = false, canTransfer = false, canAssignListings = false): readonly CabinetNavItem[] {
+export function getCabinetItems(
+  canList: boolean,
+  canManageTeam = false,
+  canTransfer = false,
+  canAssignListings = false,
+  /** `LEADS_MANAGE` səlahiyyətli agent (#234) — agentlik analitikasını görür. */
+  canViewAnalytics = false,
+): readonly CabinetNavItem[] {
   const items = canList ? [BASE_ITEMS[0], ...LISTING_ITEMS] : [BASE_ITEMS[0]];
   if (canManageTeam) {
-    items.splice(1, 0, AGENCY_DASHBOARD_ITEM);
+    items.splice(1, 0, AGENCY_DASHBOARD_ITEM, AGENCY_ANALYTICS_ITEM);
+  } else if (canViewAnalytics) {
+    items.splice(1, 0, AGENCY_ANALYTICS_ITEM);
+  }
+  if (canManageTeam) {
     items.push(TEAM_ITEM, ACTIVITY_ITEM);
   }
   if (canManageTeam || canAssignListings) items.push(ASSIGNMENTS_ITEM);
@@ -85,6 +99,7 @@ export type CabinetCrumb = {
   labelKey:
     | "eyebrow"
     | "agencyDashboard"
+    | "agencyAnalytics"
     | "assignments"
     | "listings"
     | "newListing"
@@ -147,5 +162,6 @@ export function cabinetBreadcrumbTrail(pathname: string): CabinetCrumb[] {
     trail.push({ href: pathname, labelKey: child === "yeni" ? "newListing" : "editListing" });
   }
   if (section === "agentlik" && child === "elanlar") trail.push({ href: pathname, labelKey: "assignments" });
+  if (section === "agentlik" && child === "analitika") trail.push({ href: pathname, labelKey: "agencyAnalytics" });
   return trail;
 }

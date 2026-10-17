@@ -806,6 +806,14 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   action-lar) bağlanır; açıq agentlik müraciətləri sahibə qayıdır. Şəxsi hesab və şəxsi elanlar toxunulmazdır. Agentlik
   mühitində "aktiv üzv" lazım olan yeni sorğu `ACTIVE_MEMBER_WHERE` işlətməlidir. Elan təyinatı `/kabinet/agentlik/elanlar`
   (`assignAgencyListing`, şərti `updateMany` `agencyId` ilə). Action-lar `kabinet/komanda/member-actions.ts`-dədir.
+- **Agentlik analitikası (#234, PRD 11.1/11.2/11.4/11.5)** `/kabinet/agentlik/analitika` (sahib və `LEADS_MANAGE`),
+  `getAgencyAnalytics()` (`lib/accounts/agency-analytics.ts`): interval `?dovr=7|30|90` və ya `?dan=&ad=` (`parseAnalyticsRange`,
+  ən çox `ANALYTICS_MAX_RANGE_DAYS`, mövcud olmayan tarix defolta düşür). Metriklər ayrıdır (PRD 11.7): baxış/klik
+  `PropertyDailyStat`, müraciət `Lead` (agentlik qaydası `agencyLeadWhere` panel ilə eyni), **tamamlanmış əməliyyat yalnız
+  `closedAt` + `SOLD`/`RENTED`** — statusu admin yazıb bağlanma tarixi olmayan elan sayılmır. Agent performansı: yerləşdirdiyi
+  (`createdById`), aktiv, aldığı/cavablandırdığı müraciət, median cavab, görüş (`LeadActivity` → `VIEWING_SCHEDULED`),
+  əməliyyat, təsdiqlənmiş rəylər. Ərazi = `districtId ?? cityId`; qiymət marağı `PRICE_BUCKETS` (satış/kirayə ayrı).
+  Qrafiklər asılılıqsız SVG-dir (`components/charts/simple-charts.tsx`, ekran oxuyucu üçün gizli cədvəl ilə).
 - **Daxili tapşırıqlar (#220, PRD 7.3)** `AgencyTask` (`lib/accounts/agency-tasks.ts`), `/kabinet/tapsiriqlar` (sahib və agent):
   növ `AGENCY_TASK_TYPES`, status `AGENCY_TASK_STATUSES` (açıq = `OPEN_AGENCY_TASK_STATUSES`). Sahib və `TASKS_MANAGE`
   hər aktiv üzvə yaradır və hamısını görür (`?icraci=`), digər üzv yalnız özünə yaradır və ona təyin olunanı/özünün

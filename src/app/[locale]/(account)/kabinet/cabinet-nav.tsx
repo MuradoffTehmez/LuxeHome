@@ -22,6 +22,7 @@ type CabinetNavProps = {
   canManageTeam?: boolean;
   canTransfer?: boolean;
   canAssignListings?: boolean;
+  canViewAnalytics?: boolean;
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
 };
@@ -29,6 +30,7 @@ type CabinetNavProps = {
 const ICONS = {
   overview: LayoutGrid,
   "agency-dashboard": Gauge,
+  "agency-analytics": BarChart3,
   assignments: UserCog,
   listings: ListChecks,
   "new-listing": Plus,
@@ -53,6 +55,7 @@ const ICONS = {
 const LABEL_KEYS = {
   overview: "overview",
   "agency-dashboard": "agencyDashboard",
+  "agency-analytics": "agencyAnalytics",
   assignments: "assignments",
   listings: "listings",
   "new-listing": "newListing",
@@ -97,12 +100,13 @@ export function CabinetNav({
   canManageTeam = false,
   canTransfer = false,
   canAssignListings = false,
+  canViewAnalytics = false,
   variant = "desktop",
   onNavigate,
 }: CabinetNavProps) {
   const pathname = usePathname();
   const t = useTranslations("auth.cabinet");
-  const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings);
+  const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings, canViewAnalytics);
 
   return (
     <nav aria-label={t("menu")} className="flex flex-col gap-4">

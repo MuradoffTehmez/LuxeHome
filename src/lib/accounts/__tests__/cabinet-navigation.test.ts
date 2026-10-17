@@ -22,4 +22,11 @@ describe("kabinet naviqasiyası", () => {
     ]);
     expect(items.some((item) => item.href.includes("elanlar"))).toBe(false);
   });
+
+  it("LEADS_MANAGE səlahiyyətli agentə agentlik analitikasını göstərir (#234)", () => {
+    const hrefs = (flag: boolean) => getCabinetItems(true, false, true, false, flag).map((item) => item.href);
+    expect(hrefs(true)).toContain("/kabinet/agentlik/analitika");
+    expect(hrefs(true)).not.toContain("/kabinet/agentlik");
+    expect(hrefs(false)).not.toContain("/kabinet/agentlik/analitika");
+  });
 });
