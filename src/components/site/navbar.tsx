@@ -114,7 +114,7 @@ export function Navbar({
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-[var(--z-header)] border-b transition-[background-color,box-shadow] duration-300",
+        "no-print fixed inset-x-0 top-0 z-[var(--z-header)] border-b transition-[background-color,box-shadow] duration-300",
         isOverlay
           ? "border-white/15 bg-charcoal/[0.66] backdrop-blur-md"
           : "border-line bg-paper/95 shadow-[0_10px_30px_rgba(24,29,39,0.06)] backdrop-blur-xl",

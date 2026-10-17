@@ -210,7 +210,7 @@ export async function getListingPerformance(input: { userId: string; propertyId:
     select: { id: true, title: true, slug: true, status: true, price: true, currency: true, viewCount: true, publishedAt: true },
   });
   if (!listing) return null;
-  const [daily, favorites, leads, prices] = await Promise.all([
+  const [daily, favorites, leads, prices, priceChanges] = await Promise.all([
     prisma.propertyDailyStat.findMany({
       where: { propertyId: listing.id, day: { gte: start.day } },
       select: { day: true, views: true, uniqueViews: true, contactReveals: true, whatsappClicks: true, telegramClicks: true },
@@ -223,6 +223,8 @@ export async function getListingPerformance(input: { userId: string; propertyId:
       orderBy: { changedAt: "desc" },
       take: 20,
     }),
+    // Dövrdəki bütün dəyişikliklər — tarixçə 20 sətirlə kəsilir, say kəsilməməlidir (siyahı ilə eyni olsun).
+    prisma.propertyPriceHistory.count({ where: { propertyId: listing.id, changedAt: { gte: start.at } } }),
   ]);
   const byDay = new Map(daily.map((row) => [row.day, row]));
   const totals = { views: 0, uniqueViews: 0, contactReveals: 0, whatsappClicks: 0, telegramClicks: 0 };
@@ -240,5 +242,5 @@ export async function getListingPerformance(input: { userId: string; propertyId:
     for (const key of Object.keys(totals) as (keyof typeof totals)[]) totals[key] += point[key];
     return point;
   });
-  return { listing, period: input.period, totals: { ...totals, favorites, leads, priceChanges: prices.filter((item) => item.changedAt >= start.at).length }, series, prices };
+  return { listing, period: input.period, totals: { ...totals, favorites, leads, priceChanges }, series, prices };
 }

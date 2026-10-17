@@ -39,8 +39,12 @@ describe("unikal baxış", () => {
 
   it("köhnə açarlar təmizlənir, sayğac qalır", async () => {
     await DB.prepare('INSERT INTO "PropertyUniqueView" ("propertyId", "day", "visitorKey") VALUES (\'lpf-p1\', \'2020-01-01\', \'old\')').run();
-    await expect(pruneUniqueViews(now)).resolves.toBe(1);
-    await expect(prisma.propertyUniqueView.count({ where: { propertyId: "lpf-p1" } })).resolves.toBe(2);
+    // Srağagünkü açar da gedir — yalnız bu gün və dünən saxlanılır.
+    const insert = DB.prepare('INSERT INTO "PropertyUniqueView" ("propertyId", "day", "visitorKey") VALUES (?, ?, ?)');
+    await insert.bind("lpf-p1", bakuDay(new Date(now.getTime() - 2 * 86_400_000)), "two-days").run();
+    await insert.bind("lpf-p1", bakuDay(new Date(now.getTime() - 86_400_000)), "yesterday").run();
+    await expect(pruneUniqueViews(now)).resolves.toBe(2);
+    await expect(prisma.propertyUniqueView.count({ where: { propertyId: "lpf-p1" } })).resolves.toBe(3);
   });
 });
 

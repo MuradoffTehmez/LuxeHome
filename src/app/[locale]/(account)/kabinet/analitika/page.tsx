@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/field";
 import { TelegramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
 import { Link } from "@/i18n/navigation";
 import { requireLister } from "@/lib/auth/guard";
+import { ExportControls } from "@/components/charts/export-controls";
 import { getListingAnalytics, parsePeriod } from "@/lib/accounts/listing-analytics";
 import { buildManagedMetadata } from "@/lib/seo";
 import { ANALYTICS_PERIODS, PROPERTY_STATUSES, type Locale } from "@/lib/constants";
@@ -44,6 +45,11 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
     const text = params.toString();
     return text ? `/kabinet/analitika?${text}` : "/kabinet/analitika";
   };
+  const exportHref = (format: "csv" | "xlsx") => {
+    const params = new URLSearchParams({ format, dovr: String(period), l: locale });
+    if (data.agentUserId) params.set("agent", data.agentUserId);
+    return `/api/hesab/hesabat/elanlar?${params.toString()}`;
+  };
   const chip = (active: boolean) =>
     cn(
       "inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors",
@@ -65,6 +71,12 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <PageHeader contained compact eyebrow={t("eyebrow")} title={t("title")} description={data.isAgency ? t("agencyDescription") : t("description")} />
+      {/* Hesabat ixracı (#238, PRD 11.6) — eyni dövr və agent filtri ilə. */}
+      <ExportControls
+        csvHref={exportHref("csv")}
+        xlsxHref={exportHref("xlsx")}
+        labels={{ title: t("export.title"), csv: t("export.csv"), xlsx: t("export.xlsx"), pdf: t("export.pdf"), pdfHint: t("export.pdfHint") }}
+      />
 
       <div className="flex flex-wrap items-end justify-between gap-3">
         <nav aria-label={t("periodLabel")} className="flex flex-wrap gap-2">

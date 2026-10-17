@@ -820,6 +820,12 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   açarlar `UNIQUE_VIEW_RETENTION_DAYS` sonra `runPhase2Maintenance()`-də silinir. `/kabinet/analitika` unikal baxış və qiymət
   dəyişikliyini (`PropertyPriceHistory`) göstərir; `/kabinet/analitika/<id>` (`getListingPerformance`, giriş siyahı ilə eyni)
   7/30/90 günlük dinamika və qiymət tarixçəsidir.
+- **Hesabat ixracı (#238, PRD 11.6):** `/api/hesab/hesabat/agentlik` (sahib və `LEADS_MANAGE`) və `/api/hesab/hesabat/elanlar`
+  (elan yerləşdirən hesab) — `?format=csv|xlsx`, interval/dövr və `?l=` dil; giriş səhifə ilə eynidir, icazəsizə 404,
+  `no-store`. Yazıcılar asılılıqsızdır (`lib/export/tabular.ts`): CSV UTF-8 BOM ilə və düstur inyeksiyasına qarşı (`=+-@`
+  ilə başlayan mətn `'` alır), XLSX sıxılmamış ZIP + OOXML (`inlineStr`, CRC32). Cədvəllər `lib/export/analytics-reports.ts`.
+  PDF — səhifənin çap üslubu ilə brauzerin «PDF kimi saxla» funksiyası: başlıq, footer, kabinet menyusu və alt naviqasiya
+  `.no-print`-dir; yeni sabit səth əlavə edəndə onu da çapdan gizlət.
 - **Daxili tapşırıqlar (#220, PRD 7.3)** `AgencyTask` (`lib/accounts/agency-tasks.ts`), `/kabinet/tapsiriqlar` (sahib və agent):
   növ `AGENCY_TASK_TYPES`, status `AGENCY_TASK_STATUSES` (açıq = `OPEN_AGENCY_TASK_STATUSES`). Sahib və `TASKS_MANAGE`
   hər aktiv üzvə yaradır və hamısını görür (`?icraci=`), digər üzv yalnız özünə yaradır və ona təyin olunanı/özünün

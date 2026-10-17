@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { buttonClassName } from "@/components/ui/button";
 import { BarList, LineChart } from "@/components/charts/simple-charts";
+import { ExportControls } from "@/components/charts/export-controls";
 import { Link } from "@/i18n/navigation";
 import { requireAccount } from "@/lib/auth/guard";
 import { buildManagedMetadata } from "@/lib/seo";
@@ -47,6 +48,16 @@ export default async function AgencyAnalyticsPage({ searchParams }: { searchPara
   const range = parseAnalyticsRange({ dovr: value("dovr"), dan: value("dan"), ad: value("ad") });
   const data = await getAgencyAnalytics({ agencyId: access.agencyId, ownerUserId: access.ownerUserId, range });
   const formatDay = (day: string) => `${day.slice(8, 10)}.${day.slice(5, 7)}`;
+  // İxrac (#238, PRD 11.6) səhifə ilə eyni interval və giriş qaydası ilə.
+  const exportHref = (format: "csv" | "xlsx") => {
+    const params = new URLSearchParams({ format, l: locale });
+    if (range.preset) params.set("dovr", String(range.preset));
+    else {
+      params.set("dan", range.fromDay);
+      params.set("ad", range.toDay);
+    }
+    return `/api/hesab/hesabat/agentlik?${params.toString()}`;
+  };
   const money = (amount: number) => number.format(amount);
 
   const cards = [
@@ -66,7 +77,12 @@ export default async function AgencyAnalyticsPage({ searchParams }: { searchPara
       <PageHeader contained compact eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
       {/* İnterval (11.5): hazır dövrlər və ixtiyari tarix aralığı. */}
-      <section aria-label={t("rangeLabel")} className="flex flex-col gap-3 rounded-xl border border-line bg-paper p-4 shadow-xs sm:flex-row sm:items-end sm:justify-between">
+      <ExportControls
+        csvHref={exportHref("csv")}
+        xlsxHref={exportHref("xlsx")}
+        labels={{ title: t("export.title"), csv: t("export.csv"), xlsx: t("export.xlsx"), pdf: t("export.pdf"), pdfHint: t("export.pdfHint") }}
+      />
+      <section aria-label={t("rangeLabel")} className="no-print flex flex-col gap-3 rounded-xl border border-line bg-paper p-4 shadow-xs sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-wrap gap-2">
           {ANALYTICS_PERIODS.map((days) => (
             <Link key={days} href={`/kabinet/agentlik/analitika?dovr=${days}`} className={buttonClassName(range.preset === days ? "primary" : "outline", "sm")} aria-current={range.preset === days ? "page" : undefined}>
