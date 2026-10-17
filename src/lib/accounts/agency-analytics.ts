@@ -6,6 +6,7 @@ import { ACTIVE_MEMBER_WHERE } from "@/lib/accounts/agency-access";
 import {
   ACTIVE_OFFER_STATUSES,
   ANALYTICS_PERIODS,
+  CLOSED_DEAL_STATUSES,
   LEAD_STAGES,
   LISTING_TYPES,
   PROPERTY_STATUSES,
@@ -214,7 +215,8 @@ export async function getAgencyAnalytics(input: { agencyId: string; ownerUserId:
     const handled = leads.filter((lead) => lead.handlerId === member.userId);
     const responded = handled.filter((lead) => lead.respondedAt);
     const responseMinutes = median(responded.map((lead) => Math.max(0, Math.round((lead.respondedAt!.getTime() - lead.createdAt.getTime()) / 60_000))));
-    const deals = closedInRange.filter((listing) => listing.authorId === member.userId).length;
+    // Yalnız satılmış/kirayəyə verilmiş — arxiv/müddət bitməsi də `closedAt` yazır (cəmi kartlarla eyni qayda).
+    const deals = closedInRange.filter((listing) => listing.authorId === member.userId && (CLOSED_DEAL_STATUSES as readonly string[]).includes(listing.status)).length;
     const reviews = member.profileId ? reviewsByProfile.get(member.profileId) : undefined;
     return {
       userId: member.userId,

@@ -12,6 +12,7 @@ import { compareAzerbaijani } from "@/lib/az-collation";
  * yalnız aktiv təkliflərdir (`ACTIVE_OFFER_STATUSES`) — landing siyahısı kimi satılmış/kirayəyə verilmiş elan sayılmır.
  */
 
+/** Median nümunəsi: ərazinin ən təzə 500 aktiv elanı — böyük şəhərdə sorğu yüngül və nəticə sabit qalır. */
 const PRICE_SAMPLE = 500;
 const RELATED_LIMIT = 8;
 
@@ -28,11 +29,14 @@ export async function getAreaInsights(input: { kind: AreaKind; location: { id: s
     prisma.property.findMany({
       where: { AND: [where, { listingType: LISTING_TYPES.SALE, currency: "AZN", area: { gt: 0 } }] },
       select: { price: true, area: true },
+      // Müəyyən nümunə: ən təzə `PRICE_SAMPLE` aktiv elan (sırasız `take` sorğu planından asılı olardı).
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
       take: PRICE_SAMPLE,
     }),
     prisma.property.findMany({
       where: { AND: [where, { listingType: LISTING_TYPES.RENT, currency: "AZN", OR: [{ pricePeriod: PRICE_PERIODS.MONTH }, { pricePeriod: null }] }] },
       select: { price: true },
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
       take: PRICE_SAMPLE,
     }),
     // Əlaqəli ərazilər: şəhər üçün alt ərazilər; rayon/qəsəbə üçün qonşular (eyni valideyn) və alt ərazilər.
