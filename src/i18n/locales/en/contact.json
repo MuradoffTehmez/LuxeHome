@@ -106,5 +106,11 @@
       "noEstimate": "not calculated",
       "messageTemplate": "Goal: {listing}\nProperty type: {type}\nLocation: {place}\nArea: {area} m²\nSite estimate: {estimate}\n\nAdditional details: "
     }
+  },
+  "intent": {
+    "legend": "Purpose of the enquiry",
+    "PROPERTY": "Question",
+    "VIEWING": "Viewing appointment",
+    "INFO": "More information"
   }
 }

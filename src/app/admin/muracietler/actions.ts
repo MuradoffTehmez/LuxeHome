@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { PERMISSIONS } from "@/lib/constants";
+import { PERMISSIONS, type LeadStatus } from "@/lib/constants";
 import { type ActionState, failure, invalid, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
 import { AdminGuardError, requireAdminAction } from "@/lib/admin/guard";
@@ -10,6 +10,7 @@ import { leadUpdateSchema } from "@/lib/admin/schemas";
 import * as form from "@/lib/admin/form";
 import { msg } from "@/lib/admin/server-message";
 import { guardedBulk } from "@/lib/admin/bulk";
+import { stageForStatus } from "@/lib/accounts/lead-pipeline";
 
 /**
  * Müraciətlərin idarəsi.
@@ -17,7 +18,16 @@ import { guardedBulk } from "@/lib/admin/bulk";
  * Müraciət mətni müştəri tərəfindən yazılır və heç vaxt redaktə edilmir — dəyişən
  * yalnız status, daxili qeyd və məsul şəxsdir. Orijinal mətnin toxunulmaz qalması
  * mübahisəli halda vacibdir.
+ *
+ * Status dəyişəndə kabinetin mərhələsi (`Lead.stage`, #222) də uyğunlaşdırılır — əks halda
+ * paneldə tamamlanmış müraciət kabinet kartında aktiv görünərdi.
  */
+
+async function stageFor(id: string, status: string) {
+  // Status `leadUpdateSchema`-nın allowlist-indən (`LEAD_STATUSES`) keçib.
+  const current = await prisma.lead.findUnique({ where: { id }, select: { stage: true, property: { select: { listingType: true } } } });
+  return current ? stageForStatus(status as LeadStatus, current.stage, current.property?.listingType) : undefined;
+}
 
 const LIST_PATH = "/admin/muracietler";
 
@@ -53,7 +63,7 @@ export async function updateLead(_prev: ActionState, formData: FormData): Promis
 
     const lead = await prisma.lead.update({
       where: { id },
-      data: parsed.data,
+      data: { ...parsed.data, stage: await stageFor(id, parsed.data.status) },
       select: { name: true, status: true },
     });
 
@@ -111,7 +121,7 @@ export async function setLeadStatus(id: string, status: string): Promise<ActionS
   try {
     const lead = await prisma.lead.update({
       where: { id },
-      data: { status: parsed.data.status },
+      data: { status: parsed.data.status, stage: await stageFor(id, parsed.data.status) },
       select: { name: true },
     });
 

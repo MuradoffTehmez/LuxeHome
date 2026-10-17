@@ -855,6 +855,13 @@ Struktur qaydalarını `src/lib/__tests__/locations-tree.test.ts` qoruyur.
   10 dəqiqədən bir eskalasiya (30 dəq cavabsız agent müraciəti sahibə, `escalatedAt` şərti götürülür; sahibdəki
   müraciət `take`-dən əvvəl süzülür; bildiriş yazılmasa — `notifyAccount` `false` — marker geri qaytarılır) və gündəlik
   cavab göstəriciləri (`refreshResponseStats`). Lokal yoxlama: `wrangler dev --test-scheduled` + `/__scheduled?cron=…`.
+- **Müraciət mərhələləri və kartı (#222, PRD 8.2/8.3/8.6)** — `lib/accounts/lead-pipeline.ts`: kabinet `Lead.stage` ilə
+  işləyir (`LEAD_STAGES`, 11 mərhələ), ofis lövhəsi və huni `Lead.status` ilə qalır; mərhələ **həmişə** `stageData()` ilə
+  yazılır ki, qaba status da uyğunlaşsın (`leadStatusForStage`). Bölgü ilə agentə düşən müraciət `ASSIGNED` başlayır.
+  Kart `/kabinet/muracietler/<id>` (`getLeadCard`, giriş `findManageableLead`): mərhələ, növbəti əlaqə (`nextContactAt`,
+  Bakı vaxtı), qeydlər və tarixçə `LeadActivity`-dədir (`recordLeadActivity()` heç vaxt atmır). Elan formasında məqsəd
+  `intent` → `LEAD_SOURCES.PROPERTY|VIEWING|INFO` (`leadIntentSource`). Kliklər təsdiqlənmiş müraciətlərdən ayrıca
+  göstərilir (`getLeadEngagementSummary`). Müraciəti dəyişən yeni axın da tarixçəni yazmalıdır.
 - **«Tez cavab verir»** (`lib/accounts/response-stats.ts`, saf): son 90 gün, ≥3 müraciət, median ≤60 dəq, ≥80%
   cavab. Hələ 30 dəqiqəsi keçməmiş cavabsız müraciət nümunəyə düşmür. Ölçülmüş göstərici `AgentProfile.measured*` və
   `Agency.response*`-dədir; admin yazdığı `AgentProfile.responseMinutes` yalnız ehtiyatdır və nişan vermir.

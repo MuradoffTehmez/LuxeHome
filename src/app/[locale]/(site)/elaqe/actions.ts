@@ -11,7 +11,8 @@ import { HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/spam";
 import { z } from "zod";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
 import { readLeadAttribution } from "@/lib/lead-attribution";
-import { LEAD_SOURCES, LEAD_STATUSES } from "@/lib/constants";
+import { LEAD_ACTIVITY_TYPES, LEAD_SOURCES, LEAD_STAGES } from "@/lib/constants";
+import { leadIntentSource, recordLeadActivity, stageData } from "@/lib/accounts/lead-pipeline";
 import { SYSTEM_READ_ONLY_MESSAGE, isSystemWriteBlocked } from "@/lib/system-mode";
 import { resolveLeadProperty } from "@/lib/accounts/listing-leads";
 import { noticeAgencyLead, noticeLeadRouted, noticeListingLead } from "@/lib/accounts/account-notices";
@@ -158,16 +159,24 @@ export async function submitContactForm(
         message: result.data.message,
         // Forma yalnız iki mənbə daşıya bilər — client-in göndərdiyi dəyər allowlist-dən keçir.
         source: property
-          ? LEAD_SOURCES.PROPERTY
+          ? leadIntentSource(formData.get("intent"))
           : toAgency
             ? LEAD_SOURCES.AGENCY
             : formData.get("source") === LEAD_SOURCES.OWNER ? LEAD_SOURCES.OWNER : LEAD_SOURCES.CONTACT,
         propertyId: property?.id ?? null,
         handlerId: route?.handlerId ?? null,
         agencyId: route?.agencyId ?? null,
-        status: LEAD_STATUSES.NEW,
+        // Bölgü ilə agentə düşən müraciət dərhal «agentə təyin edilib» mərhələsindədir (#222).
+        ...stageData(route?.routed ? LEAD_STAGES.ASSIGNED : LEAD_STAGES.NEW),
         ...readLeadAttribution(formData),
       },
+    });
+
+    await recordLeadActivity({
+      leadId: lead.id,
+      actor: null,
+      type: LEAD_ACTIVITY_TYPES.CREATED,
+      details: { source: lead.source, routed: Boolean(route?.routed) },
     });
 
     // İctimai hesabın elanı: müraciət sahibinə gedir (kabinet + e-poçt). Ofis kanallarına

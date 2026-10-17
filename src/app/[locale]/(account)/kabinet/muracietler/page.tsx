@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { AlarmClock, Building2, Mail, Phone, UserRound } from "lucide-react";
+import { AlarmClock, Building2, ClipboardList, Mail, Phone, UserRound } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,8 @@ import { ButtonAnchor } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { requireLister } from "@/lib/auth/guard";
 import { getAccountLeads, getLeadAssignees } from "@/lib/accounts/listing-leads";
+import { getLeadEngagementSummary, isClosedLeadStage, isLeadStage } from "@/lib/accounts/lead-pipeline";
+import { localizePath } from "@/i18n/path-locale";
 import { phoneHref } from "@/lib/accounts/listing-publisher";
 import { formatLocalizedDateTime } from "@/i18n/date";
 import { buildManagedMetadata } from "@/lib/seo";
@@ -37,7 +39,10 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
     getTranslations("account.leads"),
     getAccountLeads(user.id, { unanswered }),
   ]);
-  const assignees = agency ? await getLeadAssignees(agency) : undefined;
+  const [assignees, engagement] = await Promise.all([
+    agency ? getLeadAssignees(agency) : undefined,
+    getLeadEngagementSummary(user.id, agency?.id ?? null),
+  ]);
 
   const tab = (active: boolean) =>
     cn(
@@ -54,6 +59,25 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
         title={t("title")}
         description={agency ? t("agencyDescription") : t("description")}
       />
+
+      {/* PRD 8.2: kliklər faktiki əlaqəni sübut etmir — təsdiqlənmiş müraciətlərdən ayrıca göstərilir. */}
+      <section aria-labelledby="engagement-title" className="rounded-xl border border-line bg-paper p-4 shadow-xs">
+        <h2 id="engagement-title" className="font-sans text-sm font-semibold text-ink">{t("engagement.title", { days: engagement.days })}</h2>
+        <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {([
+            ["leads", engagement.leads],
+            ["phone", engagement.phone],
+            ["whatsapp", engagement.whatsapp],
+            ["telegram", engagement.telegram],
+          ] as const).map(([key, value]) => (
+            <div key={key} className={cn("rounded-lg border p-3", key === "leads" ? "border-gold/40 bg-gold/5" : "border-line")}>
+              <dt className="text-xs text-ink-muted">{t(`engagement.${key}`)}</dt>
+              <dd className="tabular mt-0.5 text-xl font-semibold text-ink">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-2 text-xs text-ink-muted">{t("engagement.note")}</p>
+      </section>
 
       <nav aria-label={t("filterLabel")} className="flex flex-wrap gap-2">
         <Link href="/kabinet/muracietler" className={tab(!unanswered)} aria-current={!unanswered ? "page" : undefined}>
@@ -98,6 +122,12 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
                 </div>
 
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <Badge tone={isClosedLeadStage(lead.stage) ? "neutral" : "info"}>{t(`stages.${isLeadStage(lead.stage) ? lead.stage : "NEW"}`)}</Badge>
+                  {lead.nextContactAt && (
+                    <Badge tone={lead.nextContactAt < new Date() && !closed ? "danger" : "neutral"}>
+                      {t("nextContact", { date: formatLocalizedDateTime(lead.nextContactAt, locale, "short") ?? "" })}
+                    </Badge>
+                  )}
                   {closed ? (
                     <Badge tone="neutral">{t("statusClosed")}</Badge>
                   ) : lead.respondedAt ? (
@@ -123,6 +153,10 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
                 <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-ink-soft [overflow-wrap:anywhere]">{lead.message}</p>
                 <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
                   <div className="flex flex-wrap gap-2">
+                    <ButtonAnchor href={localizePath(`/kabinet/muracietler/${lead.id}`, locale)} variant="primary" size="sm">
+                      <ClipboardList className="size-4" aria-hidden="true" />
+                      {t("openCard")}
+                    </ButtonAnchor>
                     <ButtonAnchor href={phoneHref(lead.phone)} variant="outline" size="sm">
                       <Phone className="size-4" aria-hidden="true" />
                       {lead.phone}

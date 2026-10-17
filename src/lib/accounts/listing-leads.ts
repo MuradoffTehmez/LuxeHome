@@ -131,6 +131,8 @@ export async function getAccountLeads(userId: string, options: { unanswered?: bo
       escalatedAt: true,
       handlerId: true,
       agencyId: true,
+      stage: true,
+      nextContactAt: true,
       handler: { select: { name: true } },
       property: { select: { title: true, slug: true } },
     },

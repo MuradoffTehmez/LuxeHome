@@ -88,6 +88,24 @@ export function ContactForm({ source = "CONTACT", defaultSubject, defaultMessage
         </div>
       )}
 
+      {propertyId && (
+        // Müraciətin məqsədi (#222, PRD 8.2): baxış görüşü və əlavə məlumat ayrıca mənbədir.
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-1 text-sm font-medium text-ink">{t("intent.legend")}</legend>
+          <div className="flex flex-wrap gap-2">
+            {(["PROPERTY", "VIEWING", "INFO"] as const).map((value) => (
+              <label
+                key={value}
+                className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-line px-4 text-sm text-ink-soft transition-colors has-[:checked]:border-gold has-[:checked]:bg-gold/10 has-[:checked]:text-ink hover:border-gold"
+              >
+                <input type="radio" name="intent" value={value} defaultChecked={value === "PROPERTY"} className="size-4 accent-gold" />
+                {t(`intent.${value}`)}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Input
           name="name"
