@@ -749,3 +749,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   elanlar (`buildPropertyWhere` ilə ehtiyacdan) və 9.4 təkrar müraciətin aşkarlanması (`phoneKey`/`emailKey`, təsdiqli bağlama).
 - #228 (Modul 07, 9.3/9.4): `crm-matching.ts` — uyğun elanlar, dublikat ehtimalı, təsdiqli bağlama/birləşdirmə.
   **Modul 07 tamamlandı.** Növbəti — Modul 08 (agent və agentlik reytinqi).
+- #230 (Modul 08, 10.2–10.5): meyarlar, `AgencyReview`, təsdiqlənmiş əlaqə, şübhə siqnalları, `/kabinet/reyler` cavabı.
+  Qalan Modul 08: rəydən şikayət (PRD 10.5 «şikayət edilə bilən rəylər») + moderator həlli.

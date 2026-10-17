@@ -25,7 +25,22 @@
     "homeTitle": "Sizə kömək edəcək mütəxəssislər",
     "homeAll": "Bütün agentlər",
     "emptyDescription": "Yeni agentlər təsdiqləndikcə burada görünəcək.",
-    "fastResponse": "Tez cavab verir"
+    "fastResponse": "Tez cavab verir",
+    "reviewInvalid": "Bütün meyarları qiymətləndirin və ən azı 20 simvollu rəy yazın.",
+    "reviewUnverified": "Rəy yazmaq üçün e-poçtunuzu və ya telefon nömrənizi təsdiqləyin.",
+    "reviewHint": "Rəy moderasiyadan sonra görünür. Real müraciətiniz varsa rəy «Təsdiqlənmiş əlaqə» kimi işarələnir.",
+    "agencyReviewTitle": "Agentlik haqqında rəy yazın",
+    "verifiedInteraction": "Təsdiqlənmiş əlaqə",
+    "replyFrom": "{name} cavab verib",
+    "reviewStars": "5 üzərindən {rating} ulduz",
+    "criteria": {
+      "communication": "Ünsiyyət keyfiyyəti",
+      "accuracy": "Məlumatın düzgünlüyü",
+      "responsiveness": "Operativ cavab",
+      "professionalism": "Peşəkarlıq",
+      "overall": "Ümumi məmnunluq"
+    },
+    "reviewDuplicateAgency": "Bu agentlik üçün artıq rəy göndərmisiniz."
   },
   "reservation": {
     "title": "Əmlakı rezervasiya et",

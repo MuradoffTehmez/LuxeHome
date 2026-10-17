@@ -3,6 +3,10 @@ import { headers } from "next/headers";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import { ReviewForm } from "@/components/site/review-form";
+import { ReviewCard, ReviewCriteriaSummary } from "@/components/site/review-parts";
+import { REVIEW_CRITERIA } from "@/lib/constants";
+import { submitAgencyReview } from "./actions";
 import { Building2, Clock, Eye, FileBadge, Globe, KeyRound, MapPin, MessageSquare, ShieldCheck, Star, Tag, Users, Zap } from "lucide-react";
 import { InstagramIcon } from "@/components/site/brand-icons";
 import { Container, Section } from "@/components/ui/container";
@@ -82,11 +86,12 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
   const { agency, stats } = data;
   recordView("agency", agency.id, (await headers()).get("user-agent"));
 
-  const [t, detail, navigation, content] = await Promise.all([
+  const [t, detail, navigation, content, reviewT] = await Promise.all([
     getTranslations({ locale, namespace: "listings.agencyProfile" }),
     getTranslations({ locale, namespace: "listings.detail" }),
     getTranslations({ locale, namespace: "navigation" }),
     getTranslations({ locale, namespace: "content.propertyDetail" }),
+    getTranslations({ locale, namespace: "phase2.agents" }),
   ]);
 
   const basePath = `/agentlikler/${agency.slug}`;
@@ -453,31 +458,40 @@ export default async function AgencyProfilePage({ params, searchParams }: Props)
                       {t("reviewsSummary", { rating: data.rating.average.toFixed(1), count: data.rating.count })}
                     </p>
                   )}
+                  <ReviewCriteriaSummary averages={data.criteria} />
                   <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {data.reviews.map((review) => (
-                      <li key={review.id} className="flex flex-col gap-2 rounded-lg border border-line bg-paper p-4 shadow-xs">
-                        <p className="flex items-center gap-0.5 text-gold-deep" aria-label={t("reviewStars", { rating: review.rating })}>
-                          {Array.from({ length: 5 }, (_, index) => (
-                            <Star key={index} className={cn("size-4", index < review.rating ? "fill-current" : "text-line-strong")} aria-hidden="true" />
-                          ))}
-                        </p>
-                        <p className="text-sm leading-relaxed text-ink-soft [overflow-wrap:anywhere]">{review.comment}</p>
-                        <p className="mt-auto text-xs text-ink-muted">
-                          {review.customerName}
-                          {review.agentName && review.agentSlug && (
-                            <>
-                              {" · "}
-                              <Link href={`/agentler/${review.agentSlug}`} className="text-gold-deep underline-offset-4 hover:underline">
-                                {t("reviewAgent", { name: review.agentName })}
-                              </Link>
-                            </>
-                          )}
-                        </p>
-                      </li>
+                      <ReviewCard
+                        key={review.id}
+                        review={review}
+                        footer={review.agentName && review.agentSlug ? (
+                          <>
+                            {" · "}
+                            <Link href={`/agentler/${review.agentSlug}`} className="text-gold-deep underline-offset-4 hover:underline">
+                              {t("reviewAgent", { name: review.agentName })}
+                            </Link>
+                          </>
+                        ) : null}
+                      />
                     ))}
                   </ul>
                 </section>
               )}
+
+              {/* Agentliyə birbaşa rəy (#230, PRD 10.3) — moderasiyadan sonra görünür. */}
+              <ReviewForm
+                action={submitAgencyReview}
+                targetField="agencyId"
+                targetId={agency.id}
+                labels={{
+                  title: reviewT("agencyReviewTitle"),
+                  hint: reviewT("reviewHint"),
+                  criteria: Object.fromEntries(REVIEW_CRITERIA.map((criterion) => [criterion, reviewT(`criteria.${criterion}`)])) as Record<(typeof REVIEW_CRITERIA)[number], string>,
+                  comment: reviewT("comment"),
+                  serviceType: reviewT("serviceType"),
+                  submit: reviewT("submitReview"),
+                }}
+              />
 
               {/* Agentliyə müraciət (#161): bölgü açıqdırsa agentlərdən birinə düşür. */}
               <section id="muraciet" aria-labelledby="muraciet-title" className="scroll-mt-28 rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">

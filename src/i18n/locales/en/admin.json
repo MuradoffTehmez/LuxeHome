@@ -1707,7 +1707,24 @@
       "loqoSehv": "Please choose a JPEG, PNG, WebP or AVIF image.",
       "loqoBoyuk": "The logo is too large.",
       "qosulmaSorgusu": "Join request",
-      "devet": "Invitation"
+      "devet": "Invitation",
+      "reviewModeration": {
+        "verified": "Verified interaction",
+        "agencyTitle": "Agency reviews awaiting moderation",
+        "agencyPublic": "The review will appear on the agency profile and count towards its rating.",
+        "flags": {
+          "NEW_ACCOUNT": "New account",
+          "BURST": "Many reviews in a short time",
+          "DUPLICATE_TEXT": "Duplicate text",
+          "NO_INTERACTION": "Extreme rating without an enquiry"
+        },
+        "criteria": {
+          "communication": "Communication",
+          "accuracy": "Accuracy of information",
+          "responsiveness": "Responsiveness",
+          "professionalism": "Professionalism"
+        }
+      }
     },
     "amenities": {
       "analitikaniYaddaSaxla": "Save analytics",

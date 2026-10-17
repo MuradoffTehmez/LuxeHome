@@ -15,7 +15,7 @@ import { findManyInChunks } from "@/lib/d1-chunks";
  *   `findManyInChunks` ilə (100 parametr limiti).
  */
 
-export const DATA_EXPORT_VERSION = 4;
+export const DATA_EXPORT_VERSION = 5;
 
 export async function buildAccountExport(userId: string) {
   const user = await prisma.user.findUnique({
@@ -62,6 +62,7 @@ export async function buildAccountExport(userId: string) {
     reservations,
     packageOrders,
     reviewsWritten,
+    agencyReviewsWritten,
     media,
   ] = await Promise.all([
     prisma.agency.findUnique({
@@ -223,7 +224,18 @@ export async function buildAccountExport(userId: string) {
     }),
     prisma.agentReview.findMany({
       where: { customerId: userId },
-      select: { rating: true, comment: true, serviceType: true, status: true, createdAt: true, agent: { select: { name: true } } },
+      select: {
+        rating: true, ratingCommunication: true, ratingAccuracy: true, ratingResponsiveness: true, ratingProfessionalism: true,
+        comment: true, serviceType: true, status: true, createdAt: true, agent: { select: { name: true } },
+      },
+    }),
+    // Agentliyə yazdığı rəylər (#230) — rəyin özü şəxsin məlumatıdır; moderasiya qeydi və şübhə siqnalları daxil deyil.
+    prisma.agencyReview.findMany({
+      where: { customerId: userId },
+      select: {
+        rating: true, ratingCommunication: true, ratingAccuracy: true, ratingResponsiveness: true, ratingProfessionalism: true,
+        comment: true, serviceType: true, status: true, createdAt: true, agency: { select: { name: true } },
+      },
     }),
     prisma.media.findMany({
       where: { uploaderId: userId },
@@ -289,6 +301,7 @@ export async function buildAccountExport(userId: string) {
     reservations,
     packageOrders,
     reviewsWritten,
+    agencyReviewsWritten,
     media,
   };
 }

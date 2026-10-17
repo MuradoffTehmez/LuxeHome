@@ -1707,7 +1707,24 @@
       "loqoSehv": "Yalnız JPEG, PNG, WebP və ya AVIF şəkli seçin.",
       "loqoBoyuk": "Loqo çox böyükdür.",
       "qosulmaSorgusu": "Qoşulma sorğusu",
-      "devet": "Dəvət"
+      "devet": "Dəvət",
+      "reviewModeration": {
+        "verified": "Təsdiqlənmiş əlaqə",
+        "agencyTitle": "Moderasiya gözləyən agentlik rəyləri",
+        "agencyPublic": "Rəy agentliyin profilində ictimai görünəcək və reytinqə daxil olacaq.",
+        "flags": {
+          "NEW_ACCOUNT": "Təzə hesab",
+          "BURST": "Qısa müddətdə çox rəy",
+          "DUPLICATE_TEXT": "Təkrar mətn",
+          "NO_INTERACTION": "Müraciətsiz ifrat qiymət"
+        },
+        "criteria": {
+          "communication": "Ünsiyyət keyfiyyəti",
+          "accuracy": "Məlumatın düzgünlüyü",
+          "responsiveness": "Operativ cavab",
+          "professionalism": "Peşəkarlıq"
+        }
+      }
     },
     "amenities": {
       "analitikaniYaddaSaxla": "Analitikanı yadda saxla",

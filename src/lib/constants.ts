@@ -1040,6 +1040,29 @@ export const REVIEW_STATUSES = {
 
 export type ReviewStatus = (typeof REVIEW_STATUSES)[keyof typeof REVIEW_STATUSES];
 
+/**
+ * Qiymətləndirmə meyarları (#230, PRD 10.4), hər biri 1–5. `overall` (ümumi məmnunluq) `rating`
+ * sütunudur və ictimai orta qiymət ondan hesablanır; qalanlar profildə ayrıca göstərilir.
+ */
+export const REVIEW_CRITERIA = ["communication", "accuracy", "responsiveness", "professionalism", "overall"] as const;
+export type ReviewCriterion = (typeof REVIEW_CRITERIA)[number];
+
+/** Moderatora göstərilən şübhə siqnalları (PRD 10.5) — rəyi avtomatik rədd etmir. */
+export const REVIEW_SUSPICION_FLAGS = {
+  /** Hesab `REVIEW_NEW_ACCOUNT_DAYS` gündən təzədir. */
+  NEW_ACCOUNT: "NEW_ACCOUNT",
+  /** Hesab son 24 saatda `REVIEW_BURST_LIMIT` və daha çox rəy yazıb. */
+  BURST: "BURST",
+  /** Eyni mətn başqa rəydə də var. */
+  DUPLICATE_TEXT: "DUPLICATE_TEXT",
+  /** Real müraciət yoxdur və qiymət ifrat (1 və ya 5) — təkbaşına şübhəli deyil, digər siqnallarla birlikdə baxılır. */
+  NO_INTERACTION: "NO_INTERACTION",
+} as const;
+export type ReviewSuspicionFlag = (typeof REVIEW_SUSPICION_FLAGS)[keyof typeof REVIEW_SUSPICION_FLAGS];
+export const REVIEW_NEW_ACCOUNT_DAYS = 3;
+export const REVIEW_BURST_LIMIT = 3;
+export const REVIEW_REPLY_MAX = 1000;
+
 export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
   PENDING: "Moderasiya gözləyir",
   APPROVED: "Təsdiqlənib",

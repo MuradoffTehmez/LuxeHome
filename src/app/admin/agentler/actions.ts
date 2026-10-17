@@ -203,6 +203,38 @@ export async function rejectAgentReview(id: string): Promise<ActionState> {
   return moderateReview(id, REVIEW_STATUSES.REJECTED);
 }
 
+/** Agentliyə birbaşa rəyin moderasiyası (#230) — agent rəyi ilə eyni qayda. */
+async function moderateAgencyReview(id: string, status: string): Promise<ActionState> {
+  let actor;
+  try {
+    actor = await requireAdminAction(PERMISSIONS.USER_MANAGE);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  try {
+    const review = await prisma.agencyReview.update({
+      where: { id },
+      data: { status, moderatedAt: new Date() },
+      select: { id: true, customerName: true, agency: { select: { slug: true } } },
+    });
+    await recordAudit(actor, "STATUS_CHANGE", "AgencyReview", id, `${review.customerName} — ${status}`);
+    revalidatePath("/admin/agentler");
+    revalidatePublicContent("agency", review.agency.slug);
+    return success(status === REVIEW_STATUSES.APPROVED ? msg("server.agentler.reyTesdiqlendi") : msg("server.agentler.reyReddEdildi"));
+  } catch (error) {
+    return unexpected("agentlik rəyi moderasiya edilmədi", error, msg("server.common.unexpected"));
+  }
+}
+
+export async function approveAgencyReview(id: string): Promise<ActionState> {
+  return moderateAgencyReview(id, REVIEW_STATUSES.APPROVED);
+}
+
+export async function rejectAgencyReview(id: string): Promise<ActionState> {
+  return moderateAgencyReview(id, REVIEW_STATUSES.REJECTED);
+}
+
 export async function toggleAgentVisibility(id: string): Promise<ActionState> {
   let actor;
   try {

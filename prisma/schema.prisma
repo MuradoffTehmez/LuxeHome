@@ -222,6 +222,7 @@ model Agency {
   transfersIn       ListingTransfer[]         @relation("TransferTo")
   activities        AgencyActivity[]
   tasks             AgencyTask[]
+  reviews           AgencyReview[]
   crmClients        CrmClient[]
   partners          AgencyPartner[]
   agentProfiles     AgentProfile[]
@@ -1544,12 +1545,64 @@ model AgentReview {
   moderationNote String?
   createdAt      DateTime  @default(now())
   moderatedAt    DateTime?
+  /// Meyarlar (#230, PRD 10.4), 1–5: ünsiyyət, məlumatın düzgünlüyü, operativlik, peşəkarlıq.
+  /// `rating` ümumi məmnunluqdur və ictimai orta qiymət ondan hesablanır.
+  ratingCommunication   Int?
+  ratingAccuracy        Int?
+  ratingResponsiveness  Int?
+  ratingProfessionalism Int?
+  /// Rəy yazanın bu agentə/agentliyə real müraciəti var (PRD 10.5) — ictimai səhifədə ayrıca nişan.
+  verifiedInteraction   Boolean   @default(false)
+  /// Moderatora göstərilən şübhə siqnalları (JSON siyahı, `REVIEW_SUSPICION_FLAGS`) — ictimai deyil.
+  suspicionFlags        String?
+  /// Agentin/agentliyin cavabı (PRD 10.5) — müəllifin adı snapshot-dur.
+  replyText             String?
+  replyAuthorName       String?
+  repliedAt             DateTime?
 
   agent    AgentProfile @relation(fields: [agentId], references: [id], onDelete: Cascade)
   customer User?        @relation("AgentReviewCustomer", fields: [customerId], references: [id], onDelete: SetNull)
 
   @@index([agentId, status, createdAt])
   @@index([customerId])
+}
+
+/// İstifadəçinin agentliyə birbaşa rəyi (#230, PRD 10.3) — `AgentReview` ilə eyni qaydalar: moderasiya,
+/// təkrar rəy limiti, özünü qiymətləndirmə qadağası, meyarlar, təsdiqlənmiş əlaqə və cavab.
+model AgencyReview {
+  id             String    @id @default(cuid())
+  agencyId       String
+  customerId     String?
+  customerName   String
+  rating         Int
+  comment        String
+  serviceType    String?
+  status         String    @default("PENDING")
+  moderationNote String?
+  createdAt      DateTime  @default(now())
+  moderatedAt    DateTime?
+  /// Meyarlar (#230, PRD 10.4), 1–5: ünsiyyət, məlumatın düzgünlüyü, operativlik, peşəkarlıq.
+  /// `rating` ümumi məmnunluqdur və ictimai orta qiymət ondan hesablanır.
+  ratingCommunication   Int?
+  ratingAccuracy        Int?
+  ratingResponsiveness  Int?
+  ratingProfessionalism Int?
+  /// Rəy yazanın bu agentə/agentliyə real müraciəti var (PRD 10.5) — ictimai səhifədə ayrıca nişan.
+  verifiedInteraction   Boolean   @default(false)
+  /// Moderatora göstərilən şübhə siqnalları (JSON siyahı, `REVIEW_SUSPICION_FLAGS`) — ictimai deyil.
+  suspicionFlags        String?
+  /// Agentin/agentliyin cavabı (PRD 10.5) — müəllifin adı snapshot-dur.
+  replyText             String?
+  replyAuthorName       String?
+  repliedAt             DateTime?
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  /// Müştəri başına bir rəy — tranzaksiyasız D1-də eyni anda iki göndərişi də kəsir.
+  @@unique([agencyId, customerId])
+  @@index([agencyId, status, createdAt])
+  @@index([customerId])
+  @@index([status, createdAt])
 }
 
 /// Şirkət rəyi admin təsdiqindən sonra home/haqqımızda səthlərində göstərilə bilər.

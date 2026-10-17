@@ -55,7 +55,10 @@ export default async function LeadCardPage({ params }: { params: Promise<{ id: s
     ? await prisma.crmClient.findFirst({ where: { AND: [{ id: lead.clientId }, crmScope(crmContext)] }, select: { id: true, name: true } })
     : null;
   // Təkrar müraciət (#228, PRD 9.4): bağlı kart yoxdursa eyni şəxsə aid ola biləcək kartlar təklif olunur.
-  const suggestions = client ? [] : await findDuplicateClients(crmContext, lead);
+  // Yalnız müraciətlə eyni mühitdəki (agentlik və ya şəxsi) kartlar təklif olunur — bağlantı da bunu tələb edir.
+  const suggestions = client
+    ? []
+    : (await findDuplicateClients(crmContext, lead)).filter((item) => item.agencyId === (lead.agency?.id ?? null));
   const closed = isClosedLeadStage(lead.stage);
   const sourceKey = (SOURCE_KEYS as readonly string[]).includes(lead.source) ? (lead.source as LeadSource) : "CONTACT";
   const propertyPublic = lead.property && !lead.property.deletedAt && (PUBLIC_PROPERTY_STATUSES as readonly string[]).includes(lead.property.status);

@@ -2,7 +2,7 @@ import { getAdminT } from "@/lib/admin-i18n";
 import { Select } from "@/components/ui/field";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BadgeCheck, Check, Eye, EyeOff, Pencil, Star, Trash2, X } from "lucide-react";
+import { BadgeCheck, Eye, EyeOff, Pencil, Star, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { countAgentListings } from "@/lib/agency-profile";
 import { AdminCard, AdminPageHeader } from "@/components/admin/admin-ui";
@@ -15,12 +15,15 @@ import { PERMISSIONS, REVIEW_STATUSES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, parseJsonArray } from "@/lib/utils";
 import { AgentForm, EMPTY_AGENT_FORM } from "./agent-form";
+import { ReviewModerationList } from "./review-moderation";
 import {
+  approveAgencyReview,
   approveAgentReview,
   approveAndPublishAgent,
   createTestimonial,
   deleteAgentProfile,
   deleteTestimonial,
+  rejectAgencyReview,
   rejectAgentReview,
   toggleAgentVisibility,
 } from "./actions";
@@ -45,7 +48,7 @@ export default async function AdminAgentsPage({
   await requireAdminRead(PERMISSIONS.USER_MANAGE);
   const params = await searchParams;
   const status: AgentStatus = AGENT_STATUSES.includes(params.status as AgentStatus) ? (params.status as AgentStatus) : "all";
-  const [allAgents, reviews, testimonials, users, agencies] = await Promise.all([
+  const [allAgents, reviews, testimonials, users, agencies, agencyReviews] = await Promise.all([
     prisma.agentProfile.findMany({
       include: { agency: { select: { name: true } }, _count: { select: { properties: true, reviews: true } } },
       orderBy: { name: "asc" },
@@ -54,6 +57,8 @@ export default async function AdminAgentsPage({
     prisma.testimonial.findMany({ include: { agent: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 50 }),
     prisma.user.findMany({ where: { isActive: true, agentProfile: null }, select: { id: true, name: true, email: true }, orderBy: { name: "asc" } }),
     prisma.agency.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    // Agentliyə birbaşa rəylər (#230) — eyni növbə qaydası.
+    prisma.agencyReview.findMany({ where: { status: REVIEW_STATUSES.PENDING }, include: { agency: { select: { name: true } } }, orderBy: { createdAt: "asc" } }),
   ]);
 
   // Təsdiq gözləyən = heç təsdiqlənməmiş və rədd edilməmiş profil (təsdiq növbəsi ilə eyni
@@ -173,9 +178,21 @@ export default async function AdminAgentsPage({
       </AdminCard>
 
       <AdminCard id="reyler" title={t("pages.agents.moderasiyaGozleyenAgentReyleri")} className="mt-6" bodyClassName="p-0">
-        {reviews.length === 0 ? <div className="p-5"><EmptyState title={t("pages.agents.moderasiyaNovbesiBosdur")} /></div> : <ul className="divide-y divide-line">{reviews.map((review) => (
-          <li key={review.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"><div><div className="flex items-center gap-2"><p className="font-medium text-ink">{review.customerName} → {review.agent.name}</p><span className="flex items-center gap-1 text-sm text-gold-deep"><Star className="size-4 fill-current" /> {review.rating}</span></div><p className="mt-1 max-w-3xl text-sm text-ink-soft">{review.comment}</p><p className="mt-1 text-xs text-ink-muted">{formatDateTime(review.createdAt)}</p></div><div className="flex shrink-0"><ConfirmAction action={approveAgentReview} id={review.id} label={t("pages.agents.reyiTesdiqle")} title={t("pages.agents.reyTesdiqlensin")} description={t("pages.agents.reyAgentProfilindeIctimai")} confirmLabel={t("pages.agents.tesdiqle")} tone="neutral"><Check className="size-4" /></ConfirmAction><ConfirmAction action={rejectAgentReview} id={review.id} label={t("pages.agents.reyiReddEt")} title={t("pages.agents.reyReddEdilsin")} description={t("pages.agents.reyIctimaiGosterilmeyecek")} confirmLabel={t("pages.agents.reddEt")}><X className="size-4" /></ConfirmAction></div></li>
-        ))}</ul>}
+        <ReviewModerationList
+          reviews={reviews.map(({ agent, ...review }) => ({ ...review, targetName: agent.name }))}
+          approve={approveAgentReview}
+          reject={rejectAgentReview}
+          publicDescription={t("pages.agents.reyAgentProfilindeIctimai")}
+        />
+      </AdminCard>
+
+      <AdminCard id="agentlik-reyleri" title={t("pages.agents.reviewModeration.agencyTitle")} className="mt-6" bodyClassName="p-0">
+        <ReviewModerationList
+          reviews={agencyReviews.map(({ agency, ...review }) => ({ ...review, targetName: agency.name }))}
+          approve={approveAgencyReview}
+          reject={rejectAgencyReview}
+          publicDescription={t("pages.agents.reviewModeration.agencyPublic")}
+        />
       </AdminCard>
 
       <AdminCard title={t("pages.agents.musteriReyleri")} description={t("pages.agents.anaSehifedeGosterilenSirket")} className="mt-6" bodyClassName="p-0">

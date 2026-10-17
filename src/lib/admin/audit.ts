@@ -47,6 +47,7 @@ export type AuditEntity =
   | "Reservation"
   | "AgentProfile"
   | "AgentReview"
+  | "AgencyReview"
   | "Testimonial"
   | "KnowledgeArticle"
   | "KnowledgeCategory"

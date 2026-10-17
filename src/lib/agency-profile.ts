@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getAgencyRatings, getAgencyReviews } from "@/lib/agency-ratings";
+import { getAgencyCriteria, getAgencyRatings, getAgencyReviews } from "@/lib/agency-ratings";
 import { isFastResponder } from "@/lib/accounts/response-stats";
 import { demoWhere } from "@/lib/demo-content";
 import { findManyInChunks } from "@/lib/d1-chunks";
@@ -286,7 +286,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
   };
   const page = Math.max(1, filters.page ?? 1);
 
-  const [properties, filteredCount, byListingType, byType, byDistrict, agents, offices, deals, ratings, reviews] = await Promise.all([
+  const [properties, filteredCount, byListingType, byType, byDistrict, agents, offices, deals, ratings, reviews, criteria] = await Promise.all([
     prisma.property.findMany({
       where,
       select: propertyCardSelect,
@@ -318,6 +318,8 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
     // Agentlik reytinqi və son rəylər (#161).
     getAgencyRatings([agency.id]),
     getAgencyReviews(agency.id),
+    // Agentliyə birbaşa rəylərin meyar ortalamaları (#230).
+    getAgencyCriteria(agency.id),
   ]);
 
   const stats: OfferStats = { ...EMPTY_STATS };
@@ -367,6 +369,7 @@ export async function getAgencyProfile(slug: string, filters: AgencyOfferFilters
     deals,
     rating: ratings.get(agency.id) ?? null,
     reviews,
+    criteria,
     fastResponse: isFastResponder({ minutes: agency.responseMinutes, sample: agency.responseSample, rate: agency.responseRate }),
   };
 }

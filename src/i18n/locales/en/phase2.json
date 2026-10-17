@@ -25,7 +25,22 @@
     "homeTitle": "The specialists who will help you",
     "homeAll": "All agents",
     "emptyDescription": "New agents will appear here as they are verified.",
-    "fastResponse": "Responds fast"
+    "fastResponse": "Responds fast",
+    "reviewInvalid": "Rate every criterion and write a review of at least 20 characters.",
+    "reviewUnverified": "Verify your email or phone number to write a review.",
+    "reviewHint": "Reviews appear after moderation. If you have a real enquiry, the review is marked as a verified interaction.",
+    "agencyReviewTitle": "Review this agency",
+    "verifiedInteraction": "Verified interaction",
+    "replyFrom": "{name} replied",
+    "reviewStars": "{rating} out of 5 stars",
+    "criteria": {
+      "communication": "Communication",
+      "accuracy": "Accuracy of information",
+      "responsiveness": "Responsiveness",
+      "professionalism": "Professionalism",
+      "overall": "Overall satisfaction"
+    },
+    "reviewDuplicateAgency": "You have already reviewed this agency."
   },
   "reservation": {
     "title": "Reserve this property",
