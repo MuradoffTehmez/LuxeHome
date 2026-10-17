@@ -120,11 +120,12 @@ export async function addClientNote(id: string, text: string): Promise<ActionSta
   try {
     const client = await findClient(ctx.context, String(id));
     if (!client) return failure(t("errors.notFound"));
+    // Siyahı «son yenilənən» üzrə düzülür — qeyd də kartı yuxarı qaldırır. Sıra qəsdəndir: əvvəl zərərsiz
+    // tarix yeniləməsi, sonra qeyd — qeyd yazılıb tarix alınmasaydı, təkrar cəhd ikinci qeyd yaradardı.
+    await prisma.crmClient.update({ where: { id: client.id }, data: { updatedAt: new Date() } });
     await prisma.crmClientNote.create({
       data: { clientId: client.id, authorId: ctx.user.id, authorName: ctx.user.name.slice(0, 200), text: note },
     });
-    // Siyahı «son yenilənən» üzrə düzülür — qeyd də kartı yuxarı qaldırır.
-    await prisma.crmClient.update({ where: { id: client.id }, data: { updatedAt: new Date() } });
     revalidatePath(localizePath(`${LIST_PATH}/${client.id}`, ctx.locale));
     return success(t("noteSaved"));
   } catch (error) {

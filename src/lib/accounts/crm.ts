@@ -14,7 +14,7 @@ import {
   RENOVATIONS,
 } from "@/lib/constants";
 import { getAgencyAccess, hasAgencyPermission, type AgencyAccess } from "@/lib/accounts/agency-access";
-import { getLeadAssignees, type ManagedLeadAgency } from "@/lib/accounts/listing-leads";
+import { getLeadAssignees, leadScope, type ManagedLeadAgency } from "@/lib/accounts/listing-leads";
 import { isPhoneLike } from "@/lib/accounts/profile-fields";
 
 /**
@@ -269,8 +269,10 @@ export async function getCrmClient(context: CrmContext, id: string) {
   const [names, type, leads, property] = await Promise.all([
     crmLookupNames([client]),
     client.typeId ? prisma.propertyType.findUnique({ where: { id: client.typeId }, select: { slug: true } }) : null,
+    // Tarixçə baxanın müraciət sahəsi ilə süzülür (`leadScope`): agentlikdən çıxmış və ya girişi
+    // dayandırılmış üzv köhnə agentlik müraciətini şəxsi kartı üzərindən oxuya bilməsin.
     prisma.lead.findMany({
-      where: { clientId: client.id },
+      where: { AND: [{ clientId: client.id }, (await leadScope(context.userId)).where] },
       orderBy: { createdAt: "desc" },
       take: 50,
       select: { id: true, createdAt: true, source: true, stage: true, message: true, property: { select: { title: true } } },

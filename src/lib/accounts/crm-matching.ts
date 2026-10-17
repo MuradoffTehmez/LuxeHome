@@ -105,18 +105,17 @@ export async function findDuplicateClients(
   const phoneKey = crmPhoneKey(person.phone);
   const emailKey = crmEmailKey(person.email);
   const name = nameKey(person.name);
-  const signals = [
-    ...(phoneKey ? [{ phoneKey }] : []),
-    ...(emailKey ? [{ emailKey }] : []),
-    ...(name.length >= 3 ? [{ searchText: { contains: name } }] : []),
-  ];
-  if (signals.length === 0) return [];
-  const rows = await prisma.crmClient.findMany({
-    where: { AND: [crmScope(context), { OR: signals }, ...(excludeId ? [{ id: { not: excludeId } }] : [])] },
-    select: { id: true, name: true, phone: true, email: true, phoneKey: true, emailKey: true, ownerId: true, agencyId: true, updatedAt: true },
-    orderBy: { updatedAt: "desc" },
-    take: 20,
-  });
+  const keyed = [...(phoneKey ? [{ phoneKey }] : []), ...(emailKey ? [{ emailKey }] : [])];
+  if (keyed.length === 0 && name.length < 3) return [];
+  const base = [crmScope(context), ...(excludeId ? [{ id: { not: excludeId } }] : [])];
+  const select = { id: true, name: true, phone: true, email: true, phoneKey: true, emailKey: true, ownerId: true, agencyId: true, updatedAt: true } as const;
+  // Güclü siqnallar (telefon/e-poçt) ad namizədlərindən ayrıca oxunur: çoxlu yeni adaş limiti
+  // doldurub köhnə dəqiq uyğunluğu sıxışdırıb çıxarmasın.
+  const [keyedRows, nameRows] = await Promise.all([
+    keyed.length ? prisma.crmClient.findMany({ where: { AND: [...base, { OR: keyed }] }, select, orderBy: { updatedAt: "desc" }, take: 20 }) : [],
+    name.length >= 3 ? prisma.crmClient.findMany({ where: { AND: [...base, { searchText: { contains: name } }] }, select, orderBy: { updatedAt: "desc" }, take: 20 }) : [],
+  ]);
+  const rows = [...new Map([...keyedRows, ...nameRows].map((row) => [row.id, row])).values()];
   return rows
     .map((row) => {
       const match: DuplicateSignals = {

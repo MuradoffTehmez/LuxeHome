@@ -94,3 +94,18 @@ describe("birləşdirmə", () => {
     await expect(prisma.crmClientNote.findUniqueOrThrow({ where: { id: "cm-note" }, select: { clientId: true } })).resolves.toEqual({ clientId: "cm-a" });
   });
 });
+
+describe("geniş ad uyğunluğu", () => {
+  it("21 yeni adaş köhnə dəqiq telefon uyğunluğunu sıxışdırıb çıxarmır", async () => {
+    const insert = DB.prepare('INSERT INTO "CrmClient" ("id", "agencyId", "ownerId", "name", "phone", "phoneKey", "searchText", "createdAt", "updatedAt") VALUES (?, \'cm-agency\', \'cm-owner\', ?, ?, ?, ?, ?, ?)');
+    const old = new Date(Date.now() - 30 * 86_400_000).toISOString();
+    await DB.batch([
+      insert.bind("cm-old-phone", "Rəşad Quliyev", "0507776655", "507776655", "resad quliyev 0507776655", old, old),
+      ...Array.from({ length: 21 }, (_, index) =>
+        insert.bind(`cm-namesake-${index}`, "Nigar Səfərova", null, null, "nigar seferova", new Date().toISOString(), new Date().toISOString())),
+    ]);
+    const owner = await getCrmContext({ id: "cm-owner", accountType: "AGENCY" });
+    const found = await findDuplicateClients(owner, { name: "Nigar Səfərova", phone: "+994 50 777 66 55" });
+    expect(found[0]).toMatchObject({ id: "cm-old-phone", score: 90 });
+  });
+});
