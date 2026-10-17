@@ -142,6 +142,7 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
                       {t("escalated")}
                     </Badge>
                   )}
+                  {lead.reassignSuggestedAt && !lead.respondedAt && !closed && <Badge tone="danger">{t("reassignSuggested")}</Badge>}
                   {agency && lead.agencyId === agency.id && lead.handler && lead.handlerId !== user.id && (
                     <Badge tone="info" className="gap-1">
                       <UserRound className="size-3" aria-hidden="true" />

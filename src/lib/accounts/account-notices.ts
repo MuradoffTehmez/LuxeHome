@@ -33,8 +33,13 @@ const COPY = {
     agencyLead: (name: string) => `${name} agentlik profilinizdən müraciət göndərdi. Əlaqə məlumatı kabinetdəki «Müraciətlər» bölməsindədir.`,
     leadRoutedTitle: "Sizə yeni müraciət yönləndirildi",
     leadRouted: (agency: string, subject: string, name: string) => `«${agency}» agentliyinə gələn müraciət sizə yönləndirildi: ${name} — ${subject}. Əlaqə məlumatı kabinetdəki «Müraciətlər» bölməsindədir.`,
+    leadReminderTitle: "Müraciətə cavab gözlənilir",
+    leadReminder: (name: string, duration: string) => `${name} adlı müştərinin müraciəti artıq ${duration} cavabsızdır. Müştəri ilə əlaqə saxlayın və kartda «Əlaqə saxladım» qeyd edin.`,
     leadEscalationTitle: "Müraciət cavabsız qalıb",
-    leadEscalation: (name: string, handler: string, minutes: number) => `${name} adlı müştərinin müraciətinə ${minutes} dəqiqədir cavab verilməyib (məsul: ${handler}). Müraciəti başqa agentə verə və ya özünüz əlaqə saxlaya bilərsiniz.`,
+    leadEscalation: (name: string, handler: string, duration: string) => `${name} adlı müştərinin müraciəti artıq ${duration} cavabsızdır (məsul: ${handler}). Müraciəti başqa agentə verə və ya özünüz əlaqə saxlaya bilərsiniz.`,
+    leadReassignTitle: "Müraciəti başqa agentə verin",
+    leadReassign: (name: string, handler: string, duration: string) => `${name} adlı müştərinin müraciəti artıq ${duration} cavabsızdır (məsul: ${handler}). Müraciəti başqa agentə verməyi tövsiyə edirik.`,
+    duration: (minutes: number) => minutes < 120 ? `${minutes} dəqiqə` : `${Math.round(minutes / 60)} saat`,
     reason: (text: string) => `Səbəb: ${text}`,
     agencyLinkJoinedTitle: "Komandaya yeni agent qoşuldu",
     agencyLinkJoined: (name: string, agency: string) => `${name} dəvət linki ilə «${agency}» komandasına qoşuldu. Komandanı «Komanda» bölməsində idarə edə bilərsiniz.`,
@@ -109,8 +114,13 @@ const COPY = {
     agencyLead: (name: string) => `${name} sent an enquiry from your agency profile. Contact details are in the Enquiries section of your account.`,
     leadRoutedTitle: "A new enquiry was assigned to you",
     leadRouted: (agency: string, subject: string, name: string) => `An enquiry to “${agency}” was assigned to you: ${name} — ${subject}. Contact details are in the Enquiries section of your account.`,
+    leadReminderTitle: "An enquiry is waiting for your reply",
+    leadReminder: (name: string, duration: string) => `The enquiry from ${name} has been unanswered for ${duration}. Contact the client and mark it as contacted on the enquiry card.`,
     leadEscalationTitle: "An enquiry is still unanswered",
-    leadEscalation: (name: string, handler: string, minutes: number) => `The enquiry from ${name} has not been answered for ${minutes} minutes (assigned to ${handler}). You can reassign it to another agent or contact the client yourself.`,
+    leadEscalation: (name: string, handler: string, duration: string) => `The enquiry from ${name} has been unanswered for ${duration} (assigned to ${handler}). You can reassign it to another agent or contact the client yourself.`,
+    leadReassignTitle: "Reassign the enquiry",
+    leadReassign: (name: string, handler: string, duration: string) => `The enquiry from ${name} has been unanswered for ${duration} (assigned to ${handler}). We recommend reassigning it to another agent.`,
+    duration: (minutes: number) => minutes < 120 ? `${minutes} minutes` : `${Math.round(minutes / 60)} hours`,
     reason: (text: string) => `Reason: ${text}`,
     agencyLinkJoinedTitle: "A new agent joined your team",
     agencyLinkJoined: (name: string, agency: string) => `${name} joined the “${agency}” team using your invite link. You can manage the team in the Team section.`,
@@ -185,8 +195,13 @@ const COPY = {
     agencyLead: (name: string) => `${name} отправил(а) заявку из профиля вашего агентства. Контакты — в разделе «Заявки» личного кабинета.`,
     leadRoutedTitle: "Вам передана новая заявка",
     leadRouted: (agency: string, subject: string, name: string) => `Заявка в агентство «${agency}» передана вам: ${name} — ${subject}. Контакты — в разделе «Заявки» личного кабинета.`,
+    leadReminderTitle: "Заявка ждёт ответа",
+    leadReminder: (name: string, duration: string) => `На заявку клиента ${name} нет ответа уже ${duration} Свяжитесь с клиентом и отметьте это в карточке заявки.`,
     leadEscalationTitle: "Заявка остаётся без ответа",
-    leadEscalation: (name: string, handler: string, minutes: number) => `На заявку клиента ${name} нет ответа уже ${minutes} мин. (ответственный: ${handler}). Передайте её другому агенту или свяжитесь с клиентом сами.`,
+    leadEscalation: (name: string, handler: string, duration: string) => `На заявку клиента ${name} нет ответа уже ${duration} (ответственный: ${handler}). Передайте её другому агенту или свяжитесь с клиентом сами.`,
+    leadReassignTitle: "Передайте заявку другому агенту",
+    leadReassign: (name: string, handler: string, duration: string) => `На заявку клиента ${name} нет ответа уже ${duration} (ответственный: ${handler}). Рекомендуем передать её другому агенту.`,
+    duration: (minutes: number) => minutes < 120 ? `${minutes} мин.` : `${Math.round(minutes / 60)} ч.`,
     reason: (text: string) => `Причина: ${text}`,
     agencyLinkJoinedTitle: "В команду вступил новый агент",
     agencyLinkJoined: (name: string, agency: string) => `${name} присоединился к команде «${agency}» по ссылке-приглашению. Управлять командой можно в разделе «Команда».`,
@@ -446,11 +461,13 @@ export async function noticeLeadRouted(input: {
 }
 
 /**
- * Agentlik sahibinə: müraciət `LEAD_ESCALATION_MINUTES` dəqiqə cavabsız qaldı (#161).
- * `false` — bildiriş yazılmadı, eskalasiya növbəti cron-da təkrarlanmalıdır.
+ * Cavabsız müraciət pilləsi (#161, #224): `reminder` — məsul şəxsə, `alert` — sahib/menecerə,
+ * `reassign` — təkrar təyinat təklifi. Keçid müraciət kartınadır. `false` — bildiriş yazılmadı,
+ * pillə növbəti cron-da təkrarlanmalıdır; açar pillə + müraciət + alıcıdır, təkrar ikiqat yazmır.
  */
-export async function noticeLeadEscalation(input: {
+export async function noticeUnansweredLead(input: {
   userId: string;
+  step: "reminder" | "alert" | "reassign";
   leadId: string;
   visitorName: string;
   handlerName: string;
@@ -459,9 +476,14 @@ export async function noticeLeadEscalation(input: {
   return notifyAccount(
     input.userId,
     NOTIFICATION_TYPES.LEAD_ESCALATION,
-    "/kabinet/muracietler",
-    `lead-escalation:${input.leadId}`,
-    (copy) => ({ title: copy.leadEscalationTitle, content: copy.leadEscalation(input.visitorName, input.handlerName, input.minutes) }),
+    `/kabinet/muracietler/${input.leadId}`,
+    `lead-${input.step}:${input.leadId}:${input.userId}`,
+    (copy) => {
+      const duration = copy.duration(input.minutes);
+      if (input.step === "reminder") return { title: copy.leadReminderTitle, content: copy.leadReminder(input.visitorName, duration) };
+      if (input.step === "reassign") return { title: copy.leadReassignTitle, content: copy.leadReassign(input.visitorName, input.handlerName, duration) };
+      return { title: copy.leadEscalationTitle, content: copy.leadEscalation(input.visitorName, input.handlerName, duration) };
+    },
   );
 }
 

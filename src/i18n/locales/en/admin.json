@@ -2925,6 +2925,7 @@
         "MEMBER_LEFT": "left the agency",
         "MEMBER_RIGHTS_CHANGED": "changed the rights of {entity}",
         "LEAD_ROUTING_CHANGED": "changed enquiry routing",
+        "LEAD_ALERTS_CHANGED": "changed unanswered enquiry alerts",
         "PACKAGE_REQUESTED": "submitted “{entity}” for a premium package",
         "TRANSFER_REQUESTED": "created a transfer request for “{entity}”",
         "TRANSFER_DECIDED": "decided on the transfer request for “{entity}”",

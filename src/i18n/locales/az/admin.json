@@ -2925,6 +2925,7 @@
         "MEMBER_LEFT": "agentlikdən ayrıldı",
         "MEMBER_RIGHTS_CHANGED": "{entity} adlı agentin hüquqlarını dəyişdi",
         "LEAD_ROUTING_CHANGED": "müraciət bölgüsünü dəyişdi",
+        "LEAD_ALERTS_CHANGED": "cavabsız müraciət xəbərdarlıqlarını dəyişdi",
         "PACKAGE_REQUESTED": "«{entity}» elanını premium paketə təqdim etdi",
         "TRANSFER_REQUESTED": "«{entity}» elanı üçün köçürmə sorğusu yaratdı",
         "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi",

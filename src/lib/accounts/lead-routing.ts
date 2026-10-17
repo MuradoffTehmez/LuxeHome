@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import {
   AGENCY_EMPLOYEE_STATUSES,
+  CLOSED_LEAD_STAGES,
   LEAD_ROUTING_MODES,
   PUBLIC_PROPERTY_STATUSES,
   isLeadRoutingMode,
@@ -15,6 +16,9 @@ import {
  * - Agentliyin agentinin öz elanına gələn müraciət həmişə agentə gedir, amma agentliyə də
  *   bağlanır — sahib görür və cavabsız qalanda eskalasiya alır.
  * - Digər ictimai hesabın elanı — müraciət müəllifindir.
+ *
+ * Rejimlər (PRD 8.4) `LEAD_ROUTING_MODES`-dədir: birbaşa (elana təyin edilmiş agent), növbə,
+ * yüklənmə (ən az açıq müraciət), manual (sahibə) və ərazi.
  *
  * Seçim deterministikdir və `AgencyEmployee.lastLeadAt` ilə növbə saxlanır. Yarış halında
  * iki müraciət eyni agentə düşə bilər — bu, ədalətsizlik deyil, sadəcə növbənin bir addım
@@ -56,6 +60,29 @@ export function pickByArea<T extends Pick<Candidate, "lastLeadAt" | "approvedAt"
   return pickRoundRobin(candidates.filter((item) => (listingsInArea.get(item.userId) ?? 0) === best));
 }
 
+/** Yüklənmə: ən az açıq müraciəti olan agent; bərabərlikdə növbə. */
+export function pickByLoad<T extends Pick<Candidate, "lastLeadAt" | "approvedAt" | "userId">>(
+  candidates: T[],
+  openLeads: Map<string, number>,
+): T | null {
+  if (candidates.length === 0) return null;
+  const least = Math.min(...candidates.map((item) => openLeads.get(item.userId) ?? 0));
+  return pickRoundRobin(candidates.filter((item) => (openLeads.get(item.userId) ?? 0) === least));
+}
+
+/** Agentliyin hər agentdəki açıq (bağlanmamış mərhələdə) müraciət sayı. */
+async function countOpenLeads(agencyId: string, userIds: string[]) {
+  const counts = new Map<string, number>();
+  if (userIds.length === 0) return counts;
+  const rows = await prisma.lead.groupBy({
+    by: ["handlerId"],
+    where: { agencyId, handlerId: { in: userIds }, stage: { notIn: [...CLOSED_LEAD_STAGES] } },
+    _count: { _all: true },
+  });
+  for (const row of rows) if (row.handlerId) counts.set(row.handlerId, row._count._all);
+  return counts;
+}
+
 async function countListingsInArea(userIds: string[], area: { districtId?: string | null; cityId?: string | null }) {
   const counts = new Map<string, number>();
   const where = area.districtId ? { districtId: area.districtId } : area.cityId ? { cityId: area.cityId } : null;
@@ -70,25 +97,46 @@ async function countListingsInArea(userIds: string[], area: { districtId?: strin
   return counts;
 }
 
+const ACTIVE_AGENT_WHERE = {
+  status: AGENCY_EMPLOYEE_STATUSES.APPROVED,
+  // Girişi dayandırılmış agent (#218) müraciət almır.
+  suspendedAt: null,
+  user: { isActive: true, deletionRequestedAt: null },
+} as const;
+
+type RouteTarget = {
+  districtId?: string | null;
+  cityId?: string | null;
+  /** Elanı idarə edən agent (`Property.assignedAgentId`) — birbaşa rejim üçün. */
+  assignedAgentId?: string | null;
+};
+
 /** Agentliyin müraciəti üçün agent seçir; uyğun agent yoxdursa sahib. */
 async function routeWithinAgency(
   agency: { id: string; name: string; userId: string; leadRouting: string },
-  area: { districtId?: string | null; cityId?: string | null },
+  target: RouteTarget,
   now: Date,
 ): Promise<LeadRoute> {
   const ownerRoute: LeadRoute = { handlerId: agency.userId, agencyId: agency.id, agencyName: agency.name, routed: false };
   const mode: LeadRoutingMode = isLeadRoutingMode(agency.leadRouting) ? agency.leadRouting : LEAD_ROUTING_MODES.ROUND_ROBIN;
   if (mode === LEAD_ROUTING_MODES.OFF) return ownerRoute;
 
+  if (mode === LEAD_ROUTING_MODES.DIRECT) {
+    // Elanı idarə edən agent: «müraciət növbəsində» olub-olmamasından asılı deyil — elan onundur.
+    // Təyinat yoxdursa və ya agent artıq aktiv üzv deyilsə müraciət sahibə düşür (manual kimi).
+    const agentId = target.assignedAgentId;
+    if (!agentId || agentId === agency.userId) return ownerRoute;
+    const member = await prisma.agencyEmployee.findFirst({
+      where: { agencyId: agency.id, userId: agentId, ...ACTIVE_AGENT_WHERE },
+      select: { id: true },
+    });
+    if (!member) return ownerRoute;
+    await prisma.agencyEmployee.update({ where: { id: member.id }, data: { lastLeadAt: now } });
+    return { handlerId: agentId, agencyId: agency.id, agencyName: agency.name, routed: true };
+  }
+
   const employees = await prisma.agencyEmployee.findMany({
-    where: {
-      agencyId: agency.id,
-      status: AGENCY_EMPLOYEE_STATUSES.APPROVED,
-      // Girişi dayandırılmış agent (#218) müraciət növbəsinə düşmür.
-      suspendedAt: null,
-      receivesLeads: true,
-      user: { isActive: true, deletionRequestedAt: null },
-    },
+    where: { agencyId: agency.id, ...ACTIVE_AGENT_WHERE, receivesLeads: true },
     select: { id: true, userId: true, lastLeadAt: true, approvedAt: true },
   });
   const candidates: Candidate[] = employees.map((item) => ({
@@ -97,9 +145,12 @@ async function routeWithinAgency(
     lastLeadAt: item.lastLeadAt,
     approvedAt: item.approvedAt,
   }));
+  const userIds = candidates.map((item) => item.userId);
   const chosen = mode === LEAD_ROUTING_MODES.AREA
-    ? pickByArea(candidates, await countListingsInArea(candidates.map((item) => item.userId), area))
-    : pickRoundRobin(candidates);
+    ? pickByArea(candidates, await countListingsInArea(userIds, target))
+    : mode === LEAD_ROUTING_MODES.LOAD
+      ? pickByLoad(candidates, await countOpenLeads(agency.id, userIds))
+      : pickRoundRobin(candidates);
   if (!chosen) return ownerRoute;
 
   await prisma.agencyEmployee.update({ where: { id: chosen.employeeId }, data: { lastLeadAt: now } });
@@ -110,7 +161,7 @@ const AGENCY_SELECT = { id: true, name: true, userId: true, leadRouting: true } 
 
 /** Elan səhifəsindən gələn müraciət: `listerId` — `resolveLeadProperty()`-nin ictimai müəllifi. */
 export async function routePropertyLead(
-  property: { listerId: string | null; districtId?: string | null; cityId?: string | null },
+  property: { listerId: string | null } & RouteTarget,
   now = new Date(),
 ): Promise<LeadRoute> {
   if (!property.listerId) return OFFICE;

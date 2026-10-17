@@ -297,21 +297,41 @@
     },
     "routing": {
       "title": "Müraciət bölgüsü",
-      "description": "Agentliyin elanlarına və profil formasına gələn müraciət kimə düşsün. Agentin öz elanına gələn müraciət həmişə ona gedir. 30 dəqiqə cavabsız qalan müraciət barədə sizə bildiriş gəlir.",
+      "description": "Agentliyin elanlarına və profil formasına gələn müraciət kimə düşsün. Agentin öz elanına gələn müraciət həmişə ona gedir.",
       "legend": "Bölgü rejimi",
       "roundRobin": "Növbə ilə",
       "roundRobinHint": "Ən çoxdan müraciət almayan agentə düşür.",
       "area": "Ərazi üzrə",
       "areaHint": "Elanın rayonunda ən çox elanı olan agentə; uyğun agent yoxdursa növbə ilə.",
-      "off": "Söndürülü",
-      "offHint": "Bütün müraciətlər agentliyin hesabına gəlir.",
+      "off": "Manual",
+      "offHint": "Bütün müraciətlər agentliyin hesabına gəlir, siz və ya menecer özünüz təyin edirsiniz.",
       "save": "Yadda saxla",
       "saved": "Müraciət bölgüsü yadda saxlanıldı.",
       "memberToggle": "{name} müraciət növbəsindədir",
       "memberOn": "Agent müraciət növbəsinə qatıldı.",
       "memberOff": "Agent müraciət növbəsindən çıxarıldı.",
       "memberOnShort": "Müraciət alır",
-      "memberOffShort": "Növbədən kənar"
+      "memberOffShort": "Növbədən kənar",
+      "direct": "Birbaşa agentə",
+      "directHint": "Elanı idarə edən (təyin edilmiş) agentə; təyinat yoxdursa sizə.",
+      "load": "Yüklənməyə görə",
+      "loadHint": "Ən az açıq müraciəti olan agentə; bərabərlikdə növbə ilə."
+    },
+    "alerts": {
+      "title": "Cavabsız müraciətlər",
+      "description": "Müraciətə cavab verilməyəndə kimin və nə vaxt xəbərdar olunacağını seçin. Yeni müddət gözləyən müraciətlərə də aiddir.",
+      "reminder": "İlkin xatırlatma",
+      "reminderHint": "Məsul agentə xatırlatma gedir.",
+      "alert": "Menecerə bildiriş",
+      "alertHint": "Sizə və müraciətləri idarə edən menecerlərə bildiriş gedir.",
+      "reassign": "Təkrar təyinat təklifi",
+      "reassignHint": "Müraciəti başqa agentə vermək təklif olunur, kartda nişan görünür.",
+      "minutes": "dəqiqə",
+      "hours": "saat",
+      "save": "Yadda saxla",
+      "saved": "Xəbərdarlıq müddətləri yadda saxlanıldı.",
+      "range": "Müddət icazə verilən həddən kənardır: xatırlatma 5–240 dəq, bildiriş 15–1440 dəq, təkrar təyinat 1–72 saat.",
+      "order": "Müddətlər artan sırada olmalıdır: xatırlatma → bildiriş → təkrar təyinat."
     },
     "history": {
       "title": "Keçmiş üzvlər",
@@ -739,6 +759,7 @@
     "statusClosed": "Bağlanıb",
     "respondedIn": "{minutes} dəq-də cavab",
     "escalated": "Gecikir",
+    "reassignSuggested": "Başqa agentə verin",
     "handledBy": "Məsul: {name}",
     "markResponded": "Əlaqə saxladım",
     "close": "Bağla",
@@ -822,7 +843,13 @@
       "responded": "müştəri ilə əlaqə saxladı",
       "next": "növbəti əlaqəni {date} üçün planlaşdırdı",
       "nextCleared": "növbəti əlaqə tarixini təmizlədi",
-      "note": "qeyd yazdı"
+      "note": "qeyd yazdı",
+      "reminderMinutes": "məsula xatırlatma göndərildi ({minutes} dəq cavabsız)",
+      "reminderHours": "məsula xatırlatma göndərildi ({hours} saat cavabsız)",
+      "alertMinutes": "menecerə bildiriş göndərildi ({minutes} dəq cavabsız)",
+      "alertHours": "menecerə bildiriş göndərildi ({hours} saat cavabsız)",
+      "reassignMinutes": "təkrar təyinat təklif olundu ({minutes} dəq cavabsız)",
+      "reassignHours": "təkrar təyinat təklif olundu ({hours} saat cavabsız)"
     }
   },
   "offices": {
@@ -1086,6 +1113,7 @@
       "MEMBER_LEFT": "agentlikdən ayrıldı",
       "MEMBER_RIGHTS_CHANGED": "{entity} adlı agentin hüquqlarını dəyişdi",
       "LEAD_ROUTING_CHANGED": "müraciət bölgüsünü dəyişdi",
+      "LEAD_ALERTS_CHANGED": "cavabsız müraciət xəbərdarlıqlarını dəyişdi",
       "PACKAGE_REQUESTED": "«{entity}» elanını premium paketə təqdim etdi",
       "TRANSFER_REQUESTED": "«{entity}» elanı üçün köçürmə sorğusu yaratdı",
       "TRANSFER_DECIDED": "«{entity}» elanının köçürmə sorğusu üzrə qərar verdi",
@@ -1116,7 +1144,8 @@
       "releasedLeads": "{count} açıq müraciət sahibə qaytarıldı",
       "reason": "Səbəb: {reason}",
       "assigned": "{from} → {to}",
-      "taskStatus": "{from} → {to}"
+      "taskStatus": "{from} → {to}",
+      "alerts": "Xatırlatma {reminder} dəq · bildiriş {alert} dəq · təkrar təyinat {reassign} saat"
     },
     "emptyTitle": "Hələ qeyd yoxdur",
     "emptyDescription": "Elan, müraciət və komanda dəyişiklikləri burada görünəcək.",

@@ -594,6 +594,7 @@ export const AGENCY_ACTIVITY_ACTIONS = {
   MEMBER_LEFT: "MEMBER_LEFT",
   MEMBER_RIGHTS_CHANGED: "MEMBER_RIGHTS_CHANGED",
   LEAD_ROUTING_CHANGED: "LEAD_ROUTING_CHANGED",
+  LEAD_ALERTS_CHANGED: "LEAD_ALERTS_CHANGED",
   PACKAGE_REQUESTED: "PACKAGE_REQUESTED",
   TRANSFER_REQUESTED: "TRANSFER_REQUESTED",
   TRANSFER_DECIDED: "TRANSFER_DECIDED",
@@ -610,7 +611,7 @@ export type AgencyActivityAction = (typeof AGENCY_ACTIVITY_ACTIONS)[keyof typeof
 /** Jurnal filtrinin qrupları — hər əməliyyat bir qrupa aiddir. */
 export const AGENCY_ACTIVITY_GROUPS = {
   listings: ["LISTING_CREATED", "LISTING_UPDATED", "PRICE_CHANGED", "LISTING_DELETED", "LISTING_CLOSED", "LISTING_RENEWED", "LISTING_ASSIGNED"],
-  leads: ["LEAD_REASSIGNED", "LEAD_ROUTING_CHANGED"],
+  leads: ["LEAD_REASSIGNED", "LEAD_ROUTING_CHANGED", "LEAD_ALERTS_CHANGED"],
   team: [
     "MEMBER_INVITED", "MEMBER_APPROVED", "MEMBER_REJECTED", "MEMBER_REMOVED", "MEMBER_LEFT", "MEMBER_RIGHTS_CHANGED",
     "MEMBER_ROLE_CHANGED", "MEMBER_SUSPENDED", "MEMBER_RESUMED",
@@ -846,6 +847,10 @@ export const LEAD_ACTIVITY_TYPES = {
   RESPONDED: "RESPONDED",
   NEXT_CONTACT: "NEXT_CONTACT",
   NOTE: "NOTE",
+  /** Cavabsız müraciət pillələri (#224) — sistem yazır. */
+  REMINDER: "REMINDER",
+  ALERT: "ALERT",
+  REASSIGN_SUGGESTED: "REASSIGN_SUGGESTED",
 } as const;
 
 export type LeadActivityType = (typeof LEAD_ACTIVITY_TYPES)[keyof typeof LEAD_ACTIVITY_TYPES];
@@ -853,15 +858,19 @@ export type LeadActivityType = (typeof LEAD_ACTIVITY_TYPES)[keyof typeof LEAD_AC
 export const LEAD_NOTE_MAX = 2000;
 
 /**
- * Agentliyə gələn müraciətin agentlər arasında bölünməsi (#161):
- * - `OFF` — hamısı sahibə (agentliyin hesabına) gedir;
- * - `ROUND_ROBIN` — növbə ilə: ən çoxdan müraciət almayan agent;
- * - `AREA` — elanın rayonunda (yoxdursa şəhərində) ən çox aktiv elanı olan agent, bərabərlikdə növbə.
+ * Agentliyə gələn müraciətin agentlər arasında bölünməsi (#161, #224 — PRD 8.4 rejimləri):
+ * - `DIRECT` (A) — elana təyin edilmiş (idarə edən) agent; yoxdursa sahib;
+ * - `ROUND_ROBIN` (B) — növbə ilə: ən çoxdan müraciət almayan agent;
+ * - `LOAD` (C) — ən az açıq müraciəti olan agent, bərabərlikdə növbə;
+ * - `OFF` (D, manual) — hamısı sahibə (agentliyin hesabına) gedir, sahib/menecer özü təyin edir;
+ * - `AREA` (E) — elanın rayonunda (yoxdursa şəhərində) ən çox aktiv elanı olan agent, bərabərlikdə növbə.
  * Agentin öz elanına gələn müraciət həmişə ona gedir.
  */
 export const LEAD_ROUTING_MODES = {
-  OFF: "OFF",
+  DIRECT: "DIRECT",
   ROUND_ROBIN: "ROUND_ROBIN",
+  LOAD: "LOAD",
+  OFF: "OFF",
   AREA: "AREA",
 } as const;
 
@@ -871,10 +880,26 @@ export function isLeadRoutingMode(value: unknown): value is LeadRoutingMode {
   return typeof value === "string" && (Object.values(LEAD_ROUTING_MODES) as string[]).includes(value);
 }
 
-/** Cavabsız agentlik müraciəti bu qədər dəqiqədən sonra sahibə eskalasiya olunur. */
+/**
+ * «Tez cavab verir» ölçüsündə cavabsız müraciətin güzəşt müddəti (#161). Agentliyin xəbərdarlıq
+ * pillələrindən (#224) asılı deyil — nişan bütün hesablar üçün eyni qayda ilə ölçülür.
+ */
 export const LEAD_ESCALATION_MINUTES = 30;
-/** Eskalasiya yalnız son bir gündəki müraciətlərə aiddir — köhnə yığın bir anda bildiriş yağdırmasın. */
-export const LEAD_ESCALATION_MAX_AGE_HOURS = 24;
+
+/**
+ * Cavabsız müraciət pillələri (#224, PRD 8.5), dəqiqə: defolt, alt və üst hədd. Pillələr artan
+ * sırada olmalıdır (xatırlatma < bildiriş < təkrar təyinat).
+ */
+export const LEAD_ALERT_LIMITS = {
+  reminder: { default: 30, min: 5, max: 240 },
+  alert: { default: 120, min: 15, max: 1440 },
+  reassign: { default: 1440, min: 60, max: 4320 },
+} as const;
+/**
+ * Pillə həddi keçəndən sonra bu qədər saat ərzində işlənir. Daha köhnə müraciət (məs. cron
+ * dayanmışdı və ya parametr sonradan qısaldıldı) bir anda bildiriş yağdırmasın.
+ */
+export const LEAD_ALERT_GRACE_HOURS = 24;
 
 /**
  * «Tez cavab verir» nişanı (#161): son `windowDays` gündə ən azı `minSample` müraciət,
@@ -926,7 +951,7 @@ export const NOTIFICATION_TYPES = {
   LISTING_REPORT: "LISTING_REPORT",
   /** Moderasiya qərarı: elan rədd edildi və ya düzəliş tələb olunur (#202). */
   LISTING_MODERATION: "LISTING_MODERATION",
-  /** Agentlik sahibinə: müraciət 30 dəqiqə cavabsız qaldı (#161). */
+  /** Cavabsız müraciət (#161, #224): məsula xatırlatma, menecerə bildiriş, təkrar təyinat təklifi. */
   LEAD_ESCALATION: "LEAD_ESCALATION",
   /** Agentliklər arası elan köçürmə sorğusu və onun qərarları (#212). */
   LISTING_TRANSFER: "LISTING_TRANSFER",

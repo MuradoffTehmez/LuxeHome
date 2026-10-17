@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { timingSafeEqual } from "@/lib/auth/crypto";
 import { CRON_JOBS, internalCronToken, type CronJob } from "@/lib/cron-auth";
 import { runtimeEnv } from "@/lib/runtime-env";
-import { escalateStaleLeads, refreshResponseStats } from "@/lib/accounts/lead-jobs";
+import { processUnansweredLeads, refreshResponseStats } from "@/lib/accounts/lead-jobs";
 
 /**
- * Müraciət işləri (#161): `?is=escalate` — 30 dəqiqə cavabsız agentlik müraciətini sahibə
- * bildirir; `?is=response-stats` — «Tez cavab verir» göstəricilərini yenidən hesablayır.
+ * Müraciət işləri (#161): `?is=escalate` — cavabsız agentlik müraciətləri üçün xəbərdarlıq
+ * pillələri (#224: xatırlatma, menecerə bildiriş, təkrar təyinat təklifi); `?is=response-stats` — «Tez cavab verir» göstəricilərini yenidən hesablayır.
  *
  * `worker.ts`-dəki `scheduled()` handler-i (Cloudflare cron trigger, `wrangler.jsonc`) bu
  * marşrutu özü çağırır. Açar `CRON_SECRET` və ya `AUTH_SECRET`-dən törədilən daxili açardır;
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   const job = (Object.values(CRON_JOBS) as CronJob[]).find((name) => name === requested);
   if (!job) return NextResponse.json({ error: "unknown_job" }, { status: 400 });
   try {
-    return NextResponse.json(job === "escalate" ? await escalateStaleLeads() : await refreshResponseStats());
+    return NextResponse.json(job === "escalate" ? await processUnansweredLeads() : await refreshResponseStats());
   } catch (error) {
     console.error("[cron] müraciət işi alınmadı:", job, error);
     return NextResponse.json({ error: "failed" }, { status: 500 });
