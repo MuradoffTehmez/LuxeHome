@@ -485,7 +485,8 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
 - **Söndürülmüş modul yalnız UI-da gizlənmir:** action, səhifə (404) və API də bağlanır. Hazırda: şikayət (elan + rəy
   action-ları, düymələr), reytinq (rəy yazma/cavab, forma, `/kabinet/reyler`), CRM (`/kabinet/musteriler` layout-u + bütün
   action-lar), agentlik analitikası (səhifə + ixrac API), avtomatik moderasiya (`hold` → `review`, siqnallar yazılır),
-  e-poçt bildirişləri (kabinet bildirişi yenə yazılır), elan aktuallığı (gündəlik müddət işi dayanır). Kabinet menyusu
+  e-poçt bildirişləri (`sendEmail({ notification: true })` — hesab bildirişi, uyğun elan, qiymət düşməsi, elan müddəti və
+  açıq qapı xatırlatması; tranzaksion məktub buraxılmır, kabinet bildirişi yenə yazılır), elan aktuallığı (gündəlik müddət işi dayanır). Kabinet menyusu
   `hiddenItems` ilə süzülür. Yeni modul yazanda bayrağını da yoxla.
 - Mövcud premium paket sifarişi (ofisdə ödəniş) monetizasiya bayrağına bağlanmayıb — Basic/Pro/Premium (Modul 14) onu üstələyəcək.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə

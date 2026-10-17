@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { isUniqueViolation } from "@/lib/media/upload-record";
 import { NOTIFICATION_TYPES, type Locale, type NotificationType } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
-import { isFeatureEnabled } from "@/lib/feature-flags";
 import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
@@ -310,10 +309,10 @@ async function notifyAccount(
       stored = isUniqueViolation(error);
     });
     if (!stored) return false;
-    // E-poçt bildirişləri söndürülübsə (#242) kabinet bildirişi yenə yazılır.
-    if (!(await isFeatureEnabled("NOTIFICATIONS").catch(() => true))) return true;
     const url = siteUrl(localizePath(path, locale));
+    // E-poçt bildirişləri söndürülübsə (#242) `sendEmail` buraxır; kabinet bildirişi yenə yazılır.
     await sendEmail({
+      notification: true,
       to: user.email,
       subject: title,
       html: `<p>${escapeHtml(content)}</p><p><a href="${emailHref(url)}">${copy.open}</a></p>`,

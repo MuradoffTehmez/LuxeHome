@@ -78,6 +78,7 @@ async function notifyOwner(
   }).catch(() => undefined);
   const url = siteUrl(localizePath("/kabinet/elanlar", locale));
   await sendEmail({
+    notification: true,
     to: owner.email,
     subject: heading,
     html: `<p>${escapeHtml(content)}</p><p><a href="${emailHref(url)}">${copy.link}</a></p>`,

@@ -101,6 +101,7 @@ export async function sendOpenHouseReminders(now = new Date()) {
     const when = formatLocalizedDateTime(slot.startsAt, "az", "full") ?? "";
     const place = [property.title, property.address].filter(Boolean).join(" — ");
     await sendEmail({
+      notification: true,
       to: registration.email as string,
       subject: `Açıq qapı xatırlatması — ${property.title}`,
       html: `<p>${escapeHtml(registration.name)}, sizi gözləyirik.</p><p><strong>${escapeHtml(when)}</strong><br>${escapeHtml(place)}</p>`,

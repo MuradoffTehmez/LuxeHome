@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { getFeatureFlags, isFeatureEnabled } from "@/lib/feature-flags";
 import { SETTING_KEYS } from "@/lib/settings";
 import { refreshListingRisk } from "@/lib/moderation/listing-risk";
+import { sendEmail } from "@/lib/email";
 
 /** Funksiya bayraqları real D1-də (#242): parametrdən oxunma və avtomatik moderasiyanın söndürülməsi. */
 const DB = (env as unknown as { DB: D1Database }).DB;
@@ -33,5 +34,12 @@ describe("funksiya bayraqları", () => {
     expect((await refreshListingRisk("ff-missing")).level).toBe("hold");
     await saveFlags(JSON.stringify({ AUTO_MODERATION: false }));
     expect((await refreshListingRisk("ff-missing")).level).toBe("review");
+  });
+
+  it("e-poçt bildirişləri söndürüləndə bildiriş məktubu buraxılır, tranzaksion məktub yox", async () => {
+    await saveFlags(JSON.stringify({ NOTIFICATIONS: false }));
+    await expect(sendEmail({ to: "a@example.test", subject: "x", html: "x", notification: true })).resolves.toMatchObject({ success: true, skipped: true });
+    // Tranzaksion məktub bayraqdan asılı deyil (testdə Resend açarı yoxdur — göndərmə cəhdi olur).
+    await expect(sendEmail({ to: "a@example.test", subject: "x", html: "x" })).resolves.not.toHaveProperty("skipped");
   });
 });
