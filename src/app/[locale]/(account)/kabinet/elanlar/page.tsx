@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { CalendarClock, CircleCheckBig, Crown, MessageSquareWarning, Pencil, Plus, RefreshCw, Trash2, TrendingUp } from "lucide-react";
+import { CalendarClock, CircleCheckBig, Crown, FileCheck2, MessageSquareWarning, Pencil, Plus, RefreshCw, Trash2, TrendingUp } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdaptiveDataList } from "@/components/ui/adaptive-data-list";
 import { Badge } from "@/components/ui/badge";
@@ -272,6 +272,9 @@ export default async function CabinetPropertiesPage({
           <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>{t(`status.${STATUS_KEYS[status]}`)}</Badge>
           <div className="flex items-center gap-1">
             <CloseControl property={property} />
+            <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}/senedler`, locale)} variant="ghost" size="sm" aria-label={t("documentsLabel", { title: property.title })}>
+              <FileCheck2 className="size-4" aria-hidden="true" />
+            </ButtonLink>
             <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="ghost" size="sm" aria-label={t("editLabel", { title: property.title })}>
               <Pencil className="size-4" aria-hidden="true" />{t("edit")}
             </ButtonLink>
@@ -304,6 +307,9 @@ export default async function CabinetPropertiesPage({
                 {t(`status.${STATUS_KEYS[status]}`)}
               </Badge>
               <CloseControl property={property} />
+              <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}/senedler`, locale)} variant="outline" size="sm">
+                <FileCheck2 className="size-4" aria-hidden="true" />{t("documentsButton")}
+              </ButtonLink>
               <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="outline" size="sm">
                 <Pencil className="size-4" aria-hidden="true" />{t("edit")}
               </ButtonLink>

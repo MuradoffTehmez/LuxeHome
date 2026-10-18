@@ -98,7 +98,8 @@
       "campaigns": "Promo campaigns",
       "payments": "Payment transactions",
       "vip": "VIP listings",
-      "promotion": "Promotion"
+      "promotion": "Promotion",
+      "verification": "Document check"
     }
   },
   "actions": {
@@ -3466,6 +3467,40 @@
         "REVOKED": "Stopped",
         "EXPIRED": "Ended"
       }
+    },
+    "verification": {
+      "title": "Document check",
+      "description": "Document images submitted by listing owners. Every view is logged; files are deleted {days} days after the decision.",
+      "queue": "Pending documents",
+      "empty": "No pending documents.",
+      "open": "Open image",
+      "approve": "Approve",
+      "reject": "Reject",
+      "toggleData": "Details check",
+      "approveTitle": "Approve the documents?",
+      "approveDescription": "The listing will show a “Documents checked” badge. This is not legal advice.",
+      "rejectTitle": "Reject the documents?",
+      "rejectDescription": "The reason is shown to the owner; the badge is removed.",
+      "toggleDataDescription": "Turns the “Details checked” badge on or off.",
+      "documentsVerified": "Documents checked",
+      "dataVerified": "Details checked",
+      "log": "Access log",
+      "logDescription": "Last 30 actions: view, decision and delete.",
+      "emptyLog": "No access yet.",
+      "owner": "Owner",
+      "actions": {
+        "VIEW": "view",
+        "DECISION": "decision",
+        "DELETE": "delete"
+      },
+      "kinds": {
+        "TITLE_DEED": "Title deed (extract)",
+        "CONTRACT": "Contract",
+        "MUNICIPAL": "Municipal document",
+        "DECREE": "Decree",
+        "POWER_OF_ATTORNEY": "Power of attorney",
+        "EXTRACT_COMMERCIAL": "Commercial extract"
+      }
     }
   },
   "server": {
@@ -3963,6 +3998,13 @@
       "pending": "A request for this listing is pending.",
       "cooldown": "The repeat-promotion cooldown has not ended yet.",
       "disabled": "The promotion module is disabled."
+    },
+    "verification": {
+      "approved": "Documents approved.",
+      "rejected": "Documents rejected.",
+      "dataToggled": "Details check changed.",
+      "notFound": "No pending documents found.",
+      "note": "The reason must be at least 5 characters."
     }
   }
 }

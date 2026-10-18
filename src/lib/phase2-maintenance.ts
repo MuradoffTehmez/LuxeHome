@@ -8,6 +8,7 @@ import { runListingExpiry } from "@/lib/listing-expiry";
 import { isFeatureEnabled } from "@/lib/feature-flags";
 import { sendOpenHouseReminders } from "@/lib/open-house";
 import { expireVipGrants } from "@/lib/vip";
+import { purgeReviewedDocuments } from "@/lib/property-verification";
 
 const DOMAIN_EVENT_RETENTION_DAYS = 180;
 
@@ -54,6 +55,8 @@ export async function runPhase2Maintenance(now = new Date()) {
   });
   // Unikal baxış açarları (#236) yalnız gün ərzində lazımdır — sayğac `PropertyDailyStat`-da qalır.
   const uniqueViewKeys = await pruneUniqueViews(now);
+  // Saxlama müddəti bitmiş sənəd faylları (#256, PRD 19.4).
+  const purgedDocuments = await purgeReviewedDocuments(now);
 
   return {
     expiredPremium: premium.count,
@@ -65,5 +68,6 @@ export async function runPhase2Maintenance(now = new Date()) {
     accountDeletions,
     deletedDomainEvents: domainEvents.count,
     prunedUniqueViews: uniqueViewKeys,
+    purgedDocuments,
   };
 }

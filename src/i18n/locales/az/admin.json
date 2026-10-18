@@ -98,7 +98,8 @@
       "campaigns": "Tanıtım kampaniyaları",
       "payments": "Ödəniş əməliyyatları",
       "vip": "VIP elanlar",
-      "promotion": "İrəli çəkmə"
+      "promotion": "İrəli çəkmə",
+      "verification": "Sənəd yoxlaması"
     }
   },
   "actions": {
@@ -3466,6 +3467,40 @@
         "REVOKED": "Dayandırılıb",
         "EXPIRED": "Bitib"
       }
+    },
+    "verification": {
+      "title": "Sənəd yoxlaması",
+      "description": "Elan sahiblərinin göndərdiyi sənəd şəkilləri. Hər baxış tarixçəyə yazılır; qərardan {days} gün sonra fayllar silinir.",
+      "queue": "Gözləyən sənədlər",
+      "empty": "Gözləyən sənəd yoxdur.",
+      "open": "Şəkli aç",
+      "approve": "Təsdiqlə",
+      "reject": "Rədd et",
+      "toggleData": "Məlumat yoxlaması",
+      "approveTitle": "Sənədlər təsdiqlənsin?",
+      "approveDescription": "Elanda «Sənədlər yoxlanılıb» nişanı görünəcək. Bu, hüquqi rəy deyil.",
+      "rejectTitle": "Sənədlər rədd edilsin?",
+      "rejectDescription": "Səbəb sahibə göstəriləcək; nişan götürülür.",
+      "toggleDataDescription": "«Məlumatlar yoxlanılıb» nişanını açır və ya söndürür.",
+      "documentsVerified": "Sənədlər yoxlanılıb",
+      "dataVerified": "Məlumatlar yoxlanılıb",
+      "log": "Giriş tarixçəsi",
+      "logDescription": "Son 30 əməliyyat: baxış, qərar və silmə.",
+      "emptyLog": "Hələ giriş yoxdur.",
+      "owner": "Sahib",
+      "actions": {
+        "VIEW": "baxış",
+        "DECISION": "qərar",
+        "DELETE": "silmə"
+      },
+      "kinds": {
+        "TITLE_DEED": "Kupça (çıxarış)",
+        "CONTRACT": "Müqavilə",
+        "MUNICIPAL": "Bələdiyyə sənədi",
+        "DECREE": "Sərəncam",
+        "POWER_OF_ATTORNEY": "Etibarnamə",
+        "EXTRACT_COMMERCIAL": "Kommersiya çıxarışı"
+      }
     }
   },
   "server": {
@@ -3963,6 +3998,13 @@
       "pending": "Bu elan üçün sorğu yoxlanılır.",
       "cooldown": "Təkrar irəli çəkmə fasiləsi hələ bitməyib.",
       "disabled": "İrəli çəkmə modulu söndürülüb."
+    },
+    "verification": {
+      "approved": "Sənədlər təsdiqləndi.",
+      "rejected": "Sənədlər rədd edildi.",
+      "dataToggled": "Məlumat yoxlaması dəyişdi.",
+      "notFound": "Gözləyən sənəd tapılmadı.",
+      "note": "Səbəb ən azı 5 simvol olmalıdır."
     }
   }
 }

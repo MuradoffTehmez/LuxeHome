@@ -69,6 +69,8 @@ import { SafetyTips } from "@/components/site/safety-tips";
 import { ContactSafetyWarning } from "@/components/site/contact-safety-warning";
 import { ReportListingButton } from "@/components/site/report-listing";
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { VerificationBadges } from "@/components/site/verification-badges";
+import { getListingVerification } from "@/lib/property-verification";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -181,7 +183,7 @@ export default async function PropertyDetailPage({ params }: Props) {
     },
     4,
   );
-  const [translation, similarProperties, similarBands, partnerLinks, projectsEnabled, priceAssessment, insightText, openHouses, reportsEnabled] = await Promise.all([
+  const [translation, similarProperties, similarBands, partnerLinks, projectsEnabled, priceAssessment, insightText, openHouses, reportsEnabled, verification] = await Promise.all([
     loadTranslation(sourceProperty.id, locale as Locale),
     similarPromise,
     similarPromise.then(assessPriceBands),
@@ -191,6 +193,7 @@ export default async function PropertyDetailPage({ params }: Props) {
     getTranslations({ locale, namespace: "property.priceInsight" }),
     isClosed ? Promise.resolve([]) : getUpcomingOpenHouses(sourceProperty.id),
     isFeatureEnabled("REPORTS"),
+    getListingVerification(sourceProperty.id),
   ]);
 
   const knownProperty = localizeKnownContent("property", sourceProperty, locale as Locale);
@@ -870,6 +873,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </div>
                   </>
                 )}
+
+                {/* Doğrulama nişanları (#256, PRD 19.3) — hər biri ayrı yoxlama səviyyəsi, sənədin özü göstərilmir. */}
+                <VerificationBadges badges={verification} />
 
                 {/* Fırıldaqdan qorunma (#159): şirkət elanında da şikayət mümkündür (məs. «artıq satılıb»). */}
                 {/* Şikayət modulu söndürülübsə (#242) düymə çıxmır, məsləhətlər qalır. */}
