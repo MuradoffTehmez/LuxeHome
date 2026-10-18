@@ -23,10 +23,13 @@ export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 
 export const CRITICAL_NOTIFICATION_CATEGORIES: readonly NotificationCategory[] = ["SECURITY"];
 
-/** Aktiv kanallar; `FUTURE_NOTIFICATION_CHANNELS` UI-da deaktiv göstərilir. */
-export const NOTIFICATION_CHANNELS = ["inApp", "email"] as const;
+/**
+ * Aktiv kanallar; `FUTURE_NOTIFICATION_CHANNELS` UI-da deaktiv göstərilir. Telegram yalnız bot konfiqurasiya
+ * olunub hesab ona bağlananda işləyir (`telegram-notifications.ts`) — seçim əvvəlcədən saxlanıla bilər.
+ */
+export const NOTIFICATION_CHANNELS = ["inApp", "email", "telegram"] as const;
 export type NotificationChannel = (typeof NOTIFICATION_CHANNELS)[number];
-export const FUTURE_NOTIFICATION_CHANNELS = ["sms", "telegram"] as const;
+export const FUTURE_NOTIFICATION_CHANNELS = ["sms"] as const;
 
 /** Tip → kateqoriya. Yeni bildiriş tipi əlavə edəndə buraya da yaz — `Record` typecheck-də yıxılır. */
 export const NOTIFICATION_TYPE_CATEGORY: Record<NotificationType, NotificationCategory> = {
@@ -57,7 +60,7 @@ export const NOTIFICATION_TYPE_CATEGORY: Record<NotificationType, NotificationCa
 export type CategoryChannels = Record<NotificationCategory, Record<NotificationChannel, boolean>>;
 
 export function defaultCategoryChannels(): CategoryChannels {
-  return Object.fromEntries(NOTIFICATION_CATEGORIES.map((category) => [category, { inApp: true, email: true }])) as CategoryChannels;
+  return Object.fromEntries(NOTIFICATION_CATEGORIES.map((category) => [category, { inApp: true, email: true, telegram: true }])) as CategoryChannels;
 }
 
 /** Bazadakı JSON → tam seçim; naməlum açar atılır, pozulmuş dəyər defolta (hamısı açıq) qayıdır. */
@@ -79,14 +82,14 @@ export function parseCategoryChannels(raw: string | null | undefined): CategoryC
   } catch {
     // Pozulmuş dəyər — defolt.
   }
-  for (const category of CRITICAL_NOTIFICATION_CATEGORIES) result[category] = { inApp: true, email: true };
+  for (const category of CRITICAL_NOTIFICATION_CATEGORIES) result[category] = { inApp: true, email: true, telegram: true };
   return result;
 }
 
 /** Bu tip üçün kanallar: kritik kateqoriya həmişə açıqdır. */
 export function channelsForType(type: NotificationType, preferences: CategoryChannels): Record<NotificationChannel, boolean> {
   const category = NOTIFICATION_TYPE_CATEGORY[type];
-  if (CRITICAL_NOTIFICATION_CATEGORIES.includes(category)) return { inApp: true, email: true };
+  if (CRITICAL_NOTIFICATION_CATEGORIES.includes(category)) return { inApp: true, email: true, telegram: true };
   return preferences[category];
 }
 

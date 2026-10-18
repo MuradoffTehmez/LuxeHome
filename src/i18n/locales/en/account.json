@@ -805,7 +805,8 @@
           "label": "Security",
           "hint": "Critical alerts about your account"
         }
-      }
+      },
+      "notLinked": "not connected"
     },
     "summaryUnread": "{count} notifications · {unread} unread",
     "tabs": {
@@ -825,7 +826,23 @@
       "reset": "Reset filters"
     },
     "filteredEmptyTitle": "No notifications match this filter",
-    "filteredEmptyDescription": "Choose another category or status."
+    "filteredEmptyDescription": "Choose another category or status.",
+    "telegram": {
+      "title": "Telegram notifications",
+      "description": "Connect your account to our bot — notifications for the categories you choose will also arrive in Telegram.",
+      "linkedDescription": "Telegram is connected. Choose which notifications to receive in the table below.",
+      "unavailableDescription": "The Telegram channel is not active yet.",
+      "connect": "Connect Telegram",
+      "disconnect": "Disconnect",
+      "check": "Check",
+      "soon": "Coming soon",
+      "openHint": "If Telegram did not open:",
+      "openLink": "open the bot",
+      "linkReady": "Press «Start» in Telegram, then «Check».",
+      "disconnected": "Telegram disconnected.",
+      "unavailable": "The Telegram channel is not active yet.",
+      "failed": "Something went wrong. Please try again."
+    }
   },
   "recentlyViewed": {
     "metaTitle": "Recently viewed",

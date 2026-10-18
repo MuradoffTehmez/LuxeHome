@@ -18,7 +18,10 @@ import { saveCategoryChannels } from "./preference-actions";
  * Bildiriş mərkəzi (#252, PRD 17.4): hadisə kateqoriyası × kanal. SMS və Telegram gələcək kanallardır —
  * deaktiv göstərilir. Təhlükəsizlik bildirişləri kilidlidir (həmişə gedir).
  */
-export function CategoryPreferences({ values }: { values: CategoryChannels }) {
+/** `unavailable` — bot konfiqurasiya olunmayıb; `unlinked` — hesab bota bağlanmayıb; `linked` — işləyir. */
+export type TelegramChannelState = "unavailable" | "unlinked" | "linked";
+
+export function CategoryPreferences({ values, telegram }: { values: CategoryChannels; telegram: TelegramChannelState }) {
   const t = useTranslations("account.notifications.center");
   const [state, action, pending] = useActionState(saveCategoryChannels, IDLE_STATE);
 
@@ -35,7 +38,15 @@ export function CategoryPreferences({ values }: { values: CategoryChannels }) {
         <div className="min-w-0">
           <div aria-hidden="true" className="hidden grid-cols-[minmax(0,1fr)_repeat(4,4.5rem)] items-end gap-1 border-b border-line pb-2 text-sm sm:grid">
             <span className="pr-3 font-medium text-ink-muted">{t("category")}</span>
-            {NOTIFICATION_CHANNELS.map((channel) => <span key={channel} className="text-center font-medium text-ink">{t(`channels.${channel}`)}</span>)}
+            {NOTIFICATION_CHANNELS.map((channel) => {
+              const inactive = channel === "telegram" && telegram !== "linked";
+              return (
+                <span key={channel} className={inactive ? "text-center font-medium text-ink-muted" : "text-center font-medium text-ink"}>
+                  {t(`channels.${channel}`)}
+                  {inactive && <span className="block text-[0.7rem] font-normal">{t(telegram === "unavailable" ? "soon" : "notLinked")}</span>}
+                </span>
+              );
+            })}
             {FUTURE_NOTIFICATION_CHANNELS.map((channel) => (
               <span key={channel} className="text-center font-medium text-ink-muted">
                 {t(`channels.${channel}`)}
@@ -64,7 +75,8 @@ export function CategoryPreferences({ values }: { values: CategoryChannels }) {
                           type="checkbox"
                           name={`${category}.${channel}`}
                           defaultChecked={values[category][channel]}
-                          disabled={locked}
+                          // Bağlanmamış Telegram sütunu deaktivdir; server saxlanmış seçimi qoruyur.
+                          disabled={locked || (channel === "telegram" && telegram !== "linked")}
                           aria-label={`${label} — ${t(`channels.${channel}`)}`}
                           className="size-5 accent-gold disabled:opacity-60"
                         />

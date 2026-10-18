@@ -805,7 +805,8 @@
           "label": "Təhlükəsizlik",
           "hint": "Hesabınızla bağlı kritik xəbərdarlıqlar"
         }
-      }
+      },
+      "notLinked": "qoşulmayıb"
     },
     "summaryUnread": "{count} bildiriş · {unread} oxunmamış",
     "tabs": {
@@ -825,7 +826,23 @@
       "reset": "Filtrləri sıfırla"
     },
     "filteredEmptyTitle": "Bu filtrə uyğun bildiriş yoxdur",
-    "filteredEmptyDescription": "Başqa kateqoriya və ya vəziyyət seçin."
+    "filteredEmptyDescription": "Başqa kateqoriya və ya vəziyyət seçin.",
+    "telegram": {
+      "title": "Telegram bildirişləri",
+      "description": "Hesabınızı botumuza qoşun — seçdiyiniz kateqoriyalar üzrə bildirişlər Telegram-a da gələcək.",
+      "linkedDescription": "Telegram qoşulub. Hansı bildirişlərin gələcəyini aşağıdakı cədvəldə seçin.",
+      "unavailableDescription": "Telegram kanalı hələ aktiv deyil.",
+      "connect": "Telegram-ı qoş",
+      "disconnect": "Ayır",
+      "check": "Yoxla",
+      "soon": "Tezliklə",
+      "openHint": "Telegram açılmadısa:",
+      "openLink": "botu aç",
+      "linkReady": "Telegram-da «Start» düyməsini basın, sonra «Yoxla».",
+      "disconnected": "Telegram ayrıldı.",
+      "unavailable": "Telegram kanalı hələ aktiv deyil.",
+      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin."
+    }
   },
   "recentlyViewed": {
     "metaTitle": "Son baxılanlar",

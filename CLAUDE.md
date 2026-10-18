@@ -301,6 +301,14 @@ Panel öz yolunu işlədir:
   səhifəsindədir — VIP/irəli çəkmə/paket məntiqini birləşdirmə.
 - **Kabinet menyusu** bölmələrdədir (`groupCabinetItems()` → `CABINET_ITEM_SECTION`); yeni bənd əlavə edəndə bölməsini də yaz
   (`Record` typecheck-də yıxılır). Aktiv bənd ən uzun prefiksdir (`activeCabinetHref`). «Bildirişlər»də oxunmamış sayğac var.
+- **Telegram bildiriş kanalı** (`lib/telegram-notifications.ts`, saf qaydalar `telegram-link-policy.ts`): istifadəçi kabinetdə
+  «Telegram-ı qoş» → birdəfəlik 15 dəqiqəlik token (bazada yalnız SHA-256) → `t.me/<bot>?start=<token>` → bot
+  `POST /api/telegram/webhook`-a `/start <token>` göndərir (başlıq `X-Telegram-Bot-Api-Secret-Token` yoxlanır, yalnız
+  şəxsi çat) → `User.telegramChatId` (`0087`). `notifyAccount` kateqoriyada `telegram` seçilibsə və çat bağlıdırsa göndərir;
+  bot bloklananda (403) bağlantı silinir. Üç dəyərdən biri (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`,
+  `TELEGRAM_WEBHOOK_SECRET`) yoxdursa kanal «tezliklə» qalır. Webhook bir dəfə qurulur:
+  `https://api.telegram.org/bot<TOKEN>/setWebhook?url=<SITE_URL>/api/telegram/webhook&secret_token=<SECRET>`.
+  Bağlanmamış hesabda Telegram sütunu deaktivdir və saxlanmış seçim üzərinə yazılmır.
 - **Bildiriş mərkəzi** `/kabinet/bildirisler`: əsas görünüş siyahıdır, seçimlər `?gorunus=parametrler` tabındadır; filtr
   vəziyyəti URL-dədir (`lib/notification-filters.ts`, saf). Link əsaslı tab/seqment üçün `components/ui/segmented-tabs.tsx`.
 
@@ -1356,7 +1364,8 @@ uyğun Wiki səhifəsi, README, AGENTS.md və MEMORY.md eyni PR-da yenilənir. Q
 - Gizli dəyərlər `.env`-də deyil, Cloudflare secret-lərindədir:
   `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`,
   `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; istəyə bağlı `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
-  `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` (#109). Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
+  `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` (#109); şəxsi Telegram bildirişləri üçün `TELEGRAM_BOT_USERNAME`
+  və `TELEGRAM_WEBHOOK_SECRET`. Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
 - **Telegram lead bildirişi** (`src/lib/telegram.ts`, #103): əlaqə müraciəti və baxış
   sorğusu ofis çatına gedir. Secret yoxdursa səssizcə buraxılır, `notifyLeadOnTelegram()`
   heç vaxt atmır — müraciət artıq yazılıb, bildiriş xətası onu uğursuz göstərməməlidir.
