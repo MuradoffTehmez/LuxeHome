@@ -3228,7 +3228,7 @@
         },
         "EXTRA_VERIFICATION": {
           "label": "Əlavə doğrulama",
-          "hint": "Hesab üçün əlavə doğrulama addımları."
+          "hint": "Elan sənədlərinin yüklənməsi və moderator yoxlaması, «Sənədlər yoxlanılıb» və «Məlumatlar yoxlanılıb» nişanları. Söndürüləndə yeni sənəd qəbul olunmur və bu nişanlar gizlənir."
         },
         "MONETIZATION_ENABLED": {
           "label": "Monetizasiya",
