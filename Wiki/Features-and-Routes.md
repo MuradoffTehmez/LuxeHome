@@ -219,6 +219,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/maliyye` | Maliyyə və Monetizasiya: abunə planları, tariflər, imkanlar, limitlər (#244) | `billing:manage` |
 | `/admin/vip` | VIP sorğuları: təsdiq/rədd (səbəb), uzatma, dayandırma, sorğusuz verilmə, performans (#248) | `property:manage` |
 | `/admin/irelicekme` | İrəli çəkmə kampaniyaları: başlatma/rədd/dayandırma, statistika, fasilə qaydası (#250) | `property:manage` |
+| `/admin/tehlukesizlik` | Təhlükəsizlik mərkəzi: 24 saatlıq giriş göstəriciləri, uğursuz cəhdlərin IP-ləri, hadisə jurnalı (növ filtri), saxlama siyasəti (#264) | `user:manage` |
 | `/admin/hesabatlar` | Hesabatlar və biznes analitikası: DAU/WAU/MAU, 6 aylıq dinamika, plan üzrə abunə, konversiya/yenilənmə, gəlir və MRR/ARR (ödəniş söndürülüdürsə «aktiv deyil»), coğrafi hesabatlar (#262) | `billing:manage` |
 | `/admin/maliyye/abuneler` | Abunə hesabatı və ödənişsiz təyin (#246) | `billing:manage` |
 | `/admin/maliyye/endirimler` | Endirim kodları (#246) | `billing:manage` |

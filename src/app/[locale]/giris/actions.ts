@@ -48,6 +48,7 @@ import { escapeHtml } from "@/lib/email-html";
 import { ACCOUNT_TYPES, AUTH_KINDS, type AccountType, type Locale } from "@/lib/constants";
 import { localizePath } from "@/i18n/path-locale";
 import { verifyTurnstile } from "@/lib/auth/turnstile";
+import { alertOnNewDevice } from "@/lib/security/login-alerts";
 import { PasskeyError, passkeyLoginOptions, verifyPasskeyLogin } from "@/lib/auth/passkey";
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/server";
 
@@ -137,6 +138,8 @@ async function startSession(
   );
   await clearStageCookie();
   await registerSuccess(userId, user.email, ip);
+  // Şübhəli giriş xəbərdarlığı (#264) — tanınmayan cihaz və IP; heç vaxt atmır.
+  await alertOnNewDevice({ userId, sessionId: session.id, ip, userAgent: requestHeaders.get("user-agent") });
   await pruneExpiredSessions();
 
   redirect(target ?? DEFAULT_TARGET);

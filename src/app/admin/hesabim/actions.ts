@@ -14,6 +14,7 @@ import { type ActionState, failure, invalid, success, successWithSecret, unexpec
 import * as form from "@/lib/admin/form";
 import { STAFF_PASSWORD_MIN } from "@/lib/constants";
 import { msg } from "@/lib/admin/server-message";
+import { recordSecurityEvent, SECURITY_EVENT_KINDS } from "@/lib/security/security-events";
 
 /**
  * Hesab əməliyyatları.
@@ -137,6 +138,7 @@ export async function changePassword(
   // Parol dəyişəndə digər cihazlardakı sessiyalar bağlanır — oğurlanmış cookie
   // parol dəyişdikdən sonra da işləməməlidir
   await revokeAllSessions(user.id, (await currentSessionId()) ?? undefined);
+  await recordSecurityEvent(SECURITY_EVENT_KINDS.PASSWORD_CHANGED, { userId: user.id });
 
   revalidatePath("/admin/hesabim");
   return { success: msg("server.hesabim.parolDeyisdirildiVeDigerCihazlardaki") };

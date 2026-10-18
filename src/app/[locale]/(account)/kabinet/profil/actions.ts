@@ -23,6 +23,7 @@ import { redirect } from "next/navigation";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { requestAccountDeletion } from "@/lib/account-deletion";
 import { noticePasswordChanged } from "@/lib/accounts/account-notices";
+import { recordSecurityEvent, SECURITY_EVENT_KINDS } from "@/lib/security/security-events";
 
 /**
  * Kabinet profili.
@@ -338,6 +339,7 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
     await revokeAllSessions(user.id, (await currentSessionId()) ?? undefined);
     // Kritik təhlükəsizlik bildirişi (#252) — istifadəçi söndürə bilmir, heç vaxt atmır.
     await noticePasswordChanged({ userId: user.id, changedAt: new Date() });
+    await recordSecurityEvent(SECURITY_EVENT_KINDS.PASSWORD_CHANGED, { userId: user.id });
 
     return success(t("actions.passwordChanged"));
   } catch (error) {

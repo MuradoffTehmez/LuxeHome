@@ -1,4 +1,5 @@
 import { forbidden, redirect } from "next/navigation";
+import { recordSecurityEvent, SECURITY_EVENT_KINDS } from "@/lib/security/security-events";
 import {
   AUTH_KINDS,
   DEFAULT_LOCALE,
@@ -46,7 +47,11 @@ export async function requireUser(): Promise<AuthUser> {
 
 export async function requirePermission(permission: Permission): Promise<AuthUser> {
   const user = await requireStaff();
-  if (!hasPermission(user.role, permission)) forbidden();
+  if (!hasPermission(user.role, permission)) {
+    // İcazəsiz panel müraciəti (#264, PRD 23.1) — təhlükəsizlik jurnalına düşür.
+    await recordSecurityEvent(SECURITY_EVENT_KINDS.FORBIDDEN, { userId: user.id, detail: { permission } });
+    forbidden();
+  }
   return user;
 }
 

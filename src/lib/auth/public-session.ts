@@ -5,6 +5,7 @@ import { setSessionCookie, signSessionToken } from "./cookies";
 import { clientIp, registerSuccess } from "./rate-limit";
 import { createSession } from "./session";
 import { canUsePublicSignIn } from "./public-account-policy";
+import { alertOnNewDevice } from "@/lib/security/login-alerts";
 
 /**
  * İctimai hesab üçün sessiya açır (parol girişi və Google callback eyni yoldan keçir, #109).
@@ -42,5 +43,7 @@ export async function openPublicSession(userId: string): Promise<boolean> {
     session.expiresAt,
   );
   await registerSuccess(userId, user.email, ip);
+  // Şübhəli giriş xəbərdarlığı (#264) — tanınmayan cihaz və IP; heç vaxt atmır.
+  await alertOnNewDevice({ userId, sessionId: session.id, ip, userAgent: requestHeaders.get("user-agent") });
   return true;
 }
