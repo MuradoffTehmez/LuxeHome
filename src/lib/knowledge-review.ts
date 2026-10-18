@@ -14,7 +14,7 @@ import {
  * dərcdə qalır — yenidən təsdiq tələb etmir (ilk təsdiq və yoxlama tarixi saxlanılır).
  */
 export type KnowledgeTransition =
-  | { ok: true; submit: boolean; approve: boolean }
+  | { ok: true; submit: boolean; approve: boolean; refresh?: boolean }
   | { ok: false; reason: "needsReview" | "sameReviewer" | "legalReview" };
 
 export function knowledgeTransition(input: {
@@ -28,7 +28,8 @@ export function knowledgeTransition(input: {
 }): KnowledgeTransition {
   if (input.to === KNOWLEDGE_STATUSES.PUBLISHED) {
     if (input.riskLevel === KNOWLEDGE_RISK_LEVELS.LEGAL_REVIEW && !input.legalReviewedAt) return { ok: false, reason: "legalReview" };
-    if (input.from === KNOWLEDGE_STATUSES.PUBLISHED) return { ok: true, submit: false, approve: false };
+    // Dərc olunmuş məqalənin redaktəsi: yenidən təsdiq yoxdur, amma keçmiş yoxlama müddəti yenilənir (redaktor məzmunu baxıb).
+    if (input.from === KNOWLEDGE_STATUSES.PUBLISHED) return { ok: true, submit: false, approve: false, refresh: true };
     if (input.actorRole === ROLES.SUPER_ADMIN) return { ok: true, submit: false, approve: true };
     if (input.from !== KNOWLEDGE_STATUSES.IN_REVIEW) return { ok: false, reason: "needsReview" };
     if (input.submittedById === input.actorId) return { ok: false, reason: "sameReviewer" };

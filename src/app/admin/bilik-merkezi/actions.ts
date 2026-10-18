@@ -104,6 +104,7 @@ function reviewFields(
     data: {
       ...(transition.submit ? { submittedById: actorId, submittedAt: now } : {}),
       ...(transition.approve ? { approvedById: actorId, approvedAt: now, reviewAfter: nextReviewAfter(reviewAfter, now) } : {}),
+      ...(transition.refresh ? { reviewAfter: nextReviewAfter(reviewAfter, now) } : {}),
     },
   };
 }
