@@ -127,6 +127,11 @@ model User {
   listingAppeals         ListingAppeal[]         @relation("ListingAppealAuthor")
   listingAppealsReviewed ListingAppeal[]         @relation("ListingAppealReviewer")
 
+  telegramAccount    TelegramAccount?
+  authIdentities     AuthIdentity[]
+  telegramLinkTokens TelegramLinkToken[]
+  supportTickets     SupportTicket[]     @relation("SupportTicketUser")
+
   @@index([role])
   @@index([accountType])
   @@index([approvedAt])
@@ -2814,4 +2819,187 @@ model KnownLoginDevice {
 
   @@unique([userId, kind, value])
   @@index([lastSeenAt])
+}
+
+// ---------------------------------------------------------------------------
+// TELEGRAM İNTEQRASİYASI
+// ---------------------------------------------------------------------------
+
+/// Hesabın təsdiqlənmiş Telegram kimliyi. `User.telegram` profil əlaqəsidir (istifadəçi adı), bu isə dəyişməz
+/// Telegram ID-dir — webhook-dakı `from.id` və ya OIDC `id`/`sub`. ID 2^53-ə yaxınlaşa bildiyi üçün mətn kimi saxlanılır.
+model TelegramAccount {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  telegramUserId       String    @unique
+  /// OIDC `sub` (Telegram Login) — ilk OIDC girişində yazılır.
+  oidcSub              String?   @unique
+  username             String?
+  firstName            String?
+  /// Şəxsi çatın ID-si (botla yazışma). Bot yalnız istifadəçi `/start` yazandan və ya OIDC `telegram:bot_access` verəndən sonra yaza bilər.
+  chatId               String?
+  botAccess            Boolean   @default(false)
+  /// Telegram bildirişlərinə açıq razılıq — Telegram ilə giriş özü-özlüyündə razılıq deyil.
+  notificationsEnabled Boolean   @default(false)
+  /// Bot bloklanıb (403) — göndəriş avtomatik dayanır, istifadəçi `/start` yazanda bərpa olunur.
+  blockedAt            DateTime?
+  lastDeliveryAt       DateTime?
+  lastDeliveryStatus   String?
+  linkedAt             DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Qısaömürlü, birdəfəlik token: `LINK` (kabinetdən deep-link ilə bağlama) və ya `SIGNUP` (Telegram ilə yeni hesab — e-poçt
+/// təsdiqi). Yalnız SHA-256 heşi saxlanılır. `SIGNUP` sətrində istifadəçi hələ yoxdur — Telegram kimliyi və forma dəyərləri `payload` JSON-dadır.
+model TelegramLinkToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  purpose   String
+  userId    String?
+  payload   String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+/// Bot ilə əlaqəsi olan çat: şəxsi çat (dil, dəstək vəziyyəti) və ya qrup/kanal (admin təsdiqi ilə göndəriş hədəfi).
+model TelegramChat {
+  id                 String    @id @default(cuid())
+  chatId             String    @unique
+  /// private | group | supergroup | channel
+  type               String
+  title              String?
+  /// Qrup/kanal: PENDING | APPROVED | DISABLED; şəxsi çat: PRIVATE.
+  status             String    @default("PENDING")
+  /// Botun çatdakı vəziyyəti (`my_chat_member`): member | administrator | left | kicked ...
+  botStatus          String?
+  canPost            Boolean   @default(false)
+  /// Qrup/kanalın kateqoriyaları (JSON siyahı): ADMIN_ALERTS, LISTINGS, BROADCAST.
+  categories         String?
+  locale             String?
+  /// `/support` yazıldıqdan sonra növbəti mesaj dəstək müraciətidir — bu vaxta qədər.
+  supportAwaitUntil  DateTime?
+  approvedById       String?
+  approvedAt         DateTime?
+  lastError          String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([type, status])
+}
+
+/// Webhook idempotentliyi: emal olunmuş `update_id`. Saxlama müddəti qısadır (baxım işi təmizləyir).
+model TelegramUpdate {
+  updateId   Int      @id
+  receivedAt DateTime @default(now())
+
+  @@index([receivedAt])
+}
+
+/// Telegram çatdırılma jurnalı və təkrar cəhd növbəsi. Mətn yalnız göndəriş gözləyən sətirdə saxlanılır — göndəriləndən
+/// və ya qəti uğursuzluqdan sonra silinir (data minimizasiyası).
+model TelegramDelivery {
+  id            String    @id @default(cuid())
+  /// USER | ADMIN | CHAT | SUPPORT
+  audience      String
+  userId        String?
+  chatId        String
+  /// Bildiriş tipi və ya admin xəbərdarlığı növü.
+  kind          String
+  dedupeKey     String?   @unique
+  text          String?
+  buttons       String?
+  silent        Boolean   @default(false)
+  /// PENDING | SENT | FAILED | SKIPPED
+  status        String    @default("PENDING")
+  attempts      Int       @default(0)
+  nextAttemptAt DateTime?
+  /// Telegram xəta kodu və ya qısa səbəb (`429`, `403`, `network`) — mətn/token yazılmır.
+  lastError     String?
+  createdAt     DateTime  @default(now())
+  sentAt        DateTime?
+
+  @@index([status, nextAttemptAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+/// Dəstək müraciəti (Telegram `/support`). Hesab bağlıdırsa `userId` yazılır; mesajlar `SupportMessage`-dədir.
+model SupportTicket {
+  id        String    @id @default(cuid())
+  /// TELEGRAM
+  channel   String    @default("TELEGRAM")
+  chatId    String?
+  userId    String?
+  /// Bağlanmamış hesabda göstəriş adı (Telegram adı) — əlaqə məlumatı deyil.
+  name      String?
+  /// OPEN | ANSWERED | CLOSED
+  status    String    @default("OPEN")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+
+  user     User?            @relation("SupportTicketUser", fields: [userId], references: [id], onDelete: SetNull)
+  messages SupportMessage[]
+
+  @@index([status, updatedAt])
+  @@index([chatId, status])
+  @@index([userId])
+}
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  /// IN (istifadəçi) | OUT (operator)
+  direction String
+  body      String
+  authorId  String?
+  createdAt DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// SOSİAL GİRİŞ (Apple, Facebook)
+// ---------------------------------------------------------------------------
+
+/// Kənar provayder kimliyi: `APPLE` | `FACEBOOK`. Kimlik provayderin dəyişməz `sub`/ID-sidir — e-poçt dəyişsə də bağlantı
+/// qalır. Google tarixi səbəbdən `User.googleSub`-dadır. `emailVerified` — provayder e-poçtu təsdiqlənmiş kimi verib.
+model AuthIdentity {
+  id            String    @id @default(cuid())
+  userId        String
+  provider      String
+  subject       String
+  email         String?
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  lastUsedAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, subject])
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+/// Təsdiqlənməmiş e-poçtla gələn provayderdə (Facebook) yeni hesab yalnız e-poçt linkindən sonra yaranır — birdəfəlik
+/// token, yalnız SHA-256 heşi; kimlik və forma dəyərləri `payload` JSON-dadır, istifadədən sonra silinir.
+model OAuthSignupToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  provider  String
+  payload   String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([expiresAt])
 }

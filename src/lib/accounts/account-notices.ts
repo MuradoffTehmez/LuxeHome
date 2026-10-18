@@ -6,9 +6,10 @@ import { channelsForType, parseCategoryChannels } from "@/lib/notification-categ
 import { emailHref, escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
+import { notifyTelegramUser } from "@/lib/telegram-bot/delivery";
 
 /**
- * İctimai hesaba gedən bildirişlər: kabinetdəki bildiriş + e-poçt.
+ * İctimai hesaba gedən bildirişlər: kabinetdəki bildiriş + e-poçt + Telegram (bağlı hesab və açıq razılıq olduqda).
  *
  * Bildiriş mətni bazaya yazılır, ona görə alıcının dilində qurulur (`User.locale`).
  * Göndəriş heç vaxt atmır — əsas yazı (sorğu, müraciət) artıq saxlanılıb və
@@ -376,6 +377,10 @@ async function notifyAccount(
         stored = isUniqueViolation(error);
       });
       if (!stored) return false;
+    }
+    // Telegram kanalı müstəqildir: öz razılığı, kateqoriya seçimi və `dedupeKey` ilə təkrar qorunması var.
+    if (channels.telegram) {
+      await notifyTelegramUser({ userId, type, title, content, path, dedupeKey }).catch(() => undefined);
     }
     // Saytdaxili kanal söndürülübsə e-poçtun təkrarını `dedupeKey` qoruya bilmir — e-poçt yalnız seçilibsə gedir.
     if (!channels.email) return true;

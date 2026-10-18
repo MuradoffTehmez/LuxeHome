@@ -18,6 +18,12 @@ const SECRETS = [
   "failedAttempts",
   "lockedUntil",
   "passkeys",
+  // Telegram/sosial giriş: ID və tokenlər ixraca düşmür (yalnız status və istifadəçi adı).
+  "telegramUserId",
+  "oidcSub",
+  "chatId: true",
+  "subject: true",
+  "tokenHash",
 ];
 
 describe("hesab məlumatı ixracı (#157)", () => {

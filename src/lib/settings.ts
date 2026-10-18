@@ -67,6 +67,11 @@ export const SETTING_KEYS = {
    */
   FEATURE_FLAGS: "features.flags",
   /**
+   * Telegram inteqrasiyası — admin xəbərdarlıq növləri və müraciət xəbərdarlığında əlaqə məlumatının göstərilməsi,
+   * **tək JSON dəyər**. Təhlil və defoltlar `telegram-bot/policy.ts` → `parseTelegramConfig()`.
+   */
+  TELEGRAM_CONFIG: "telegram.config",
+  /**
    * Sistem rejimi (`NORMAL` | `MAINTENANCE` | `READ_ONLY`) və texniki xidmət
    * səhifəsinin mətnləri — **tək JSON dəyər**.
    *

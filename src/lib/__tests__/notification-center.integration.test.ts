@@ -32,9 +32,10 @@ describe("kateqoriya qaydaları", () => {
   it("pozulmuş JSON defolta qayıdır; təhlükəsizlik söndürülə bilmir və saxlanmır", () => {
     expect(parseCategoryChannels("{pozuq")).toEqual(defaultCategoryChannels());
     const parsed = parseCategoryChannels(JSON.stringify({ LEADS: { inApp: false, email: true }, SECURITY: { inApp: false, email: false }, NAMELUM: { inApp: false } }));
-    expect(parsed.LEADS).toEqual({ inApp: false, email: true });
-    expect(parsed.SECURITY).toEqual({ inApp: true, email: true });
-    expect(channelsForType("SECURITY", { ...parsed, SECURITY: { inApp: false, email: false } })).toEqual({ inApp: true, email: true });
+    // Köhnə JSON-da Telegram açarı yoxdur — defolt (açıq) qalır; göndəriş yenə hesab razılığına tabedir.
+    expect(parsed.LEADS).toEqual({ inApp: false, email: true, telegram: true });
+    expect(parsed.SECURITY).toEqual({ inApp: true, email: true, telegram: true });
+    expect(channelsForType("SECURITY", { ...parsed, SECURITY: { inApp: false, email: false, telegram: false } })).toEqual({ inApp: true, email: true, telegram: true });
     expect(JSON.parse(serializeCategoryChannels(parsed))).not.toHaveProperty("SECURITY");
   });
 });
@@ -46,15 +47,15 @@ beforeAll(async () => {
 describe("göndərmə seçimə tabedir", () => {
   it("söndürülmüş kateqoriya saytdaxili bildiriş yaratmır; təhlükəsizlik bildirişi yenə yaranır", async () => {
     const values = defaultCategoryChannels();
-    values.VIP_PROMOTION = { inApp: false, email: false };
+    values.VIP_PROMOTION = { inApp: false, email: false, telegram: false };
     await prisma.notificationPreference.create({ data: { userId: "nc-user", categoryChannels: serializeCategoryChannels(values) } });
 
     await noticeVipDecision({ userId: "nc-user", requestId: "nc-vip", title: "Elan", approved: true, days: 7, note: null });
     expect(await prisma.notification.count({ where: { userId: "nc-user", type: "VIP" } })).toBe(0);
     // Köhnə yazanlar (qiymət endirimi, elan müddəti, saxlanmış axtarış) eyni köməkçi ilə yoxlayır.
-    await expect(categoryChannelsFor("nc-user", "PROMOTION")).resolves.toEqual({ inApp: false, email: false });
-    await expect(categoryChannelsForEmail("nc@example.test", "VIP")).resolves.toEqual({ inApp: false, email: false });
-    await expect(categoryChannelsFor("nc-user", "PRICE_DROP")).resolves.toEqual({ inApp: true, email: true });
+    await expect(categoryChannelsFor("nc-user", "PROMOTION")).resolves.toEqual({ inApp: false, email: false, telegram: false });
+    await expect(categoryChannelsForEmail("nc@example.test", "VIP")).resolves.toEqual({ inApp: false, email: false, telegram: false });
+    await expect(categoryChannelsFor("nc-user", "PRICE_DROP")).resolves.toEqual({ inApp: true, email: true, telegram: true });
 
     await noticePasswordChanged({ userId: "nc-user", changedAt: new Date("2026-10-18T10:00:00Z") });
     expect(await prisma.notification.count({ where: { userId: "nc-user", type: "SECURITY" } })).toBe(1);

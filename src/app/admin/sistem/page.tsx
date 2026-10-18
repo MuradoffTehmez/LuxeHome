@@ -26,6 +26,10 @@ const INTEGRATION_LABEL_KEYS = {
   push: "pages.systemMode.integrationPush",
   telegram: "pages.systemMode.integrationTelegram",
   googleLogin: "pages.systemMode.integrationGoogleLogin",
+  telegramBot: "pages.systemMode.integrationTelegramBot",
+  telegramLogin: "pages.systemMode.integrationTelegramLogin",
+  appleLogin: "pages.systemMode.integrationAppleLogin",
+  facebookLogin: "pages.systemMode.integrationFacebookLogin",
   phoneLogin: "pages.systemMode.integrationPhoneLogin",
 } as const satisfies Record<IntegrationHealthId, string>;
 

@@ -103,6 +103,8 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "reservations", href: "/admin/rezervasiyalar" },
           { labelKey: "calendar", href: "/admin/rezervasiyalar/teqvim" },
           { labelKey: "email", href: "/admin/e-poct" },
+          // Telegram `/support` müraciətləri — operator cavabı Telegram-a gedir.
+          { labelKey: "support", href: "/admin/destek" },
           { labelKey: "accounts", href: "/admin/hesablar" },
         ],
       },
@@ -189,6 +191,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "settings", href: "/admin/parametrler" },
           { labelKey: "systemMode", href: "/admin/sistem" },
           { labelKey: "featureFlags", href: "/admin/funksiyalar" },
+          { labelKey: "telegram", href: "/admin/telegram" },
           { labelKey: "demoContent", href: "/admin/demo-mezmun" },
         ],
       },

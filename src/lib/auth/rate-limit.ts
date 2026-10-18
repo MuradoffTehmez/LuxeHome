@@ -117,6 +117,27 @@ export async function checkReportLimit(ip: string): Promise<boolean> {
   return success;
 }
 
+/**
+ * Telegram webhook-u: göndərənin Telegram ID-si üzrə (IP Telegram serverinindir). `VALUATION_LIMIT` (20/dəq) öz açar
+ * prefiksi ilə — botu spamla dolduran istifadəçinin mesajları emal olunmur.
+ */
+export async function checkTelegramActorLimit(actorKey: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `telegram:${actorKey}` });
+  return success;
+}
+
+/** Kabinetdən Telegram bağlama linki və test bildirişi — hesab üzrə. */
+export async function checkTelegramAccountLimit(userId: string): Promise<boolean> {
+  const limiter = getCloudflareContext().env.VALUATION_LIMIT;
+  if (!limiter) return true;
+
+  const { success } = await limiter.limit({ key: `telegram-account:${userId}` });
+  return success;
+}
+
 /** Brauzer monitorinq hadisələri üçün ayrıca, daha geniş büdcə. */
 export async function checkMonitoringLimit(ip: string): Promise<boolean> {
   const limiter = getCloudflareContext().env.MONITORING_LIMIT;

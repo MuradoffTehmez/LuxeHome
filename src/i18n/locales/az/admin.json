@@ -104,7 +104,9 @@
       "moderationHistory": "Moderasiya tarixçəsi",
       "traffic": "Trafik analitikası",
       "businessReports": "Hesabatlar",
-      "securityCenter": "Təhlükəsizlik mərkəzi"
+      "securityCenter": "Təhlükəsizlik mərkəzi",
+      "telegram": "Telegram",
+      "support": "Dəstək (Telegram)"
     }
   },
   "actions": {
@@ -2646,7 +2648,11 @@
       "integrationTelegram": "Telegram lead bildirişi",
       "integrationPush": "Push bildirişləri",
       "integrationGoogleLogin": "Google ilə giriş",
-      "integrationPhoneLogin": "Telefonla OTP girişi (SMS)"
+      "integrationPhoneLogin": "Telefonla OTP girişi (SMS)",
+      "integrationTelegramBot": "Telegram bot (webhook)",
+      "integrationTelegramLogin": "Telegram ilə giriş",
+      "integrationAppleLogin": "Apple ilə giriş",
+      "integrationFacebookLogin": "Facebook ilə giriş"
     },
     "propertyImport": {
       "title": "CSV ilə toplu idxal",
@@ -3714,8 +3720,150 @@
         "FORBIDDEN": "İcazəsiz müraciət",
         "CSRF_BLOCKED": "Kənar sorğu rədd edildi",
         "RATE_LIMITED": "Yazma limiti",
-        "PASSWORD_CHANGED": "Parol dəyişdi"
+        "PASSWORD_CHANGED": "Parol dəyişdi",
+        "TELEGRAM_LINKED": "Telegram bağlandı",
+        "TELEGRAM_UNLINKED": "Telegram ayrıldı"
       }
+    },
+    "telegram": {
+      "title": "Telegram inteqrasiyası",
+      "description": "Bot, webhook, admin xəbərdarlıqları, qrup/kanallar və çatdırılma statistikası. Secret dəyərləri burada göstərilmir.",
+      "configured": "Qurulub",
+      "missing": "Qurulmayıb",
+      "envTitle": "Mühit dəyişənləri",
+      "envDescription": "Cloudflare secret-ləri — yalnız mövcudluğu göstərilir.",
+      "botUsername": "Bot istifadəçi adı",
+      "secretInvalid": "TELEGRAM_WEBHOOK_SECRET formatı düzgün deyil: 16–256 simvol, yalnız A–Z, a–z, 0–9, «_» və «-».",
+      "healthTitle": "Bot və webhook vəziyyəti",
+      "notConfigured": "TELEGRAM_BOT_TOKEN qurulmayıb.",
+      "bot": "Bot",
+      "apiError": "Telegram xətası {code}",
+      "privacyModeOff": "Botun Privacy Mode-u söndürülüb — qruplarda bütün mesajları alır. Lazım deyilsə BotFather-də yenidən açın.",
+      "webhookUrl": "Webhook ünvanı",
+      "webhookNone": "Webhook qurulmayıb",
+      "expectedUrl": "Bu mühitin ünvanı: {url}",
+      "webhookOk": "Bu mühitə yönəlib",
+      "webhookMismatch": "Başqa ünvana yönəlib",
+      "pending": "Gözləyən update-lər",
+      "lastError": "Son xəta",
+      "noErrors": "Xəta yoxdur",
+      "setupTitle": "Quraşdırma",
+      "setupDescription": "Webhook-u yalnız bu mühitin ünvanına qurun. Eyni bot tokeni ilə iki mühit webhook-u paylaşa bilməz.",
+      "setWebhook": "Webhook-u qur",
+      "setWebhookHint": "setWebhook: secret_token, allowed_updates (message, callback_query, my_chat_member); gözləyən update-lər silinmir.",
+      "overrideOther": "Bot hazırda başqa ünvana yönəlib. Onu əvəz etməyi təsdiqləyirəm.",
+      "syncCommands": "Komandaları sinxronlaşdır",
+      "syncCommandsHint": "setMyCommands: /start, /help, /account, /notifications, /settings, /stop, /support, /language — AZ (defolt), EN, RU.",
+      "deleteWebhook": "Webhook-u sil",
+      "deleteWebhookHint": "Geri qaytarma: webhook silinir, gözləyən update-lər Telegram-da 24 saat qalır.",
+      "deleteConfirm": "Webhook-un silinməsini təsdiqləyirəm",
+      "configTitle": "Admin xəbərdarlıqları",
+      "alertsLegend": "Ofis çatına və təsdiqlənmiş qruplara göndərilən xəbərdarlıqlar",
+      "alerts": {
+        "LEAD": {
+          "label": "Yeni müraciət",
+          "hint": "Əlaqə forması və elan müraciətləri."
+        },
+        "RESERVATION": {
+          "label": "Baxış sorğusu",
+          "hint": "Rezervasiya və açıq qapı qeydiyyatı."
+        },
+        "MODERATION": {
+          "label": "Moderasiya növbəsi",
+          "hint": "Yeni və ya yenidən yoxlamaya düşən elan."
+        },
+        "REPORT": {
+          "label": "Elan şikayəti",
+          "hint": "Yalnız səbəb və elan başlığı — şikayətçi məlumatı yoxdur."
+        },
+        "SUPPORT": {
+          "label": "Dəstək müraciəti",
+          "hint": "Telegram /support mesajları."
+        },
+        "SYSTEM": {
+          "label": "Sistem xətası",
+          "hint": "Cron işi alınmadıqda (saatda bir dəfə)."
+        }
+      },
+      "leadContact": "Müraciət xəbərdarlığında ad, telefon və e-poçtu göstər",
+      "leadContactHint": "Söndürüləndə çata yalnız maskalı nömrə və panel linki gedir; tam məlumat paneldə, rol yoxlamasından sonra açılır.",
+      "stats": {
+        "linked": "Bağlı hesablar",
+        "consenting": "Bildiriş alanlar",
+        "sent": "Göndərilib",
+        "failed": "Uğursuz / növbədə",
+        "last7": "Son 7 gün",
+        "failedHint": "Növbədə: {pending}"
+      },
+      "failuresTitle": "Son uğursuz çatdırılmalar",
+      "noFailures": "Son 7 gündə uğursuz çatdırılma yoxdur.",
+      "failureLine": "Xəta {error} · {attempts} cəhd · {date}",
+      "chatsTitle": "Qruplar və kanallar",
+      "chatsDescription": "Botu qrupa və ya kanala (admin kimi) əlavə edəndə burada «Gözləyir» statusu ilə görünür. Təsdiq etmədən oraya heç nə göndərilmir.",
+      "noChats": "Hələ qrup və ya kanal yoxdur.",
+      "cannotPost": "Yaza bilmir",
+      "chatTypes": {
+        "group": "Qrup",
+        "channel": "Kanal"
+      },
+      "chatStatus": {
+        "PENDING": "Gözləyir",
+        "APPROVED": "Təsdiqlənib",
+        "DISABLED": "Söndürülüb"
+      },
+      "categories": {
+        "ADMIN_ALERTS": "Admin xəbərdarlıqları",
+        "LISTINGS": "Elan paylaşımı",
+        "BROADCAST": "Yayım"
+      },
+      "broadcastTitle": "Yayım və elan paylaşımı",
+      "broadcastDescription": "Yalnız təsdiqlənmiş və uyğun kateqoriyalı hədəflərə göndərilir. İstifadəçilərin şəxsi bildirişləri qruplara getmir.",
+      "targets": "Hədəflər",
+      "noBroadcastTargets": "«Yayım» kateqoriyalı təsdiqlənmiş hədəf yoxdur.",
+      "noListingTargets": "«Elan paylaşımı» kateqoriyalı təsdiqlənmiş hədəf yoxdur.",
+      "broadcastText": "Mesaj mətni",
+      "send": "Göndər",
+      "listing": "Elan (slug, ID və ya link)",
+      "listingHint": "Yalnız dərc olunmuş elan paylaşıla bilər.",
+      "share": "Paylaş"
+    },
+    "support": {
+      "title": "Dəstək müraciətləri",
+      "description": "Telegram /support vasitəsilə gələn müraciətlər. Açıq: {open}.",
+      "filter": "Status filtri",
+      "tabs": {
+        "active": "Aktiv"
+      },
+      "status": {
+        "OPEN": "Açıq",
+        "ANSWERED": "Cavablandırılıb",
+        "CLOSED": "Bağlanıb"
+      },
+      "empty": "Müraciət yoxdur.",
+      "columns": {
+        "who": "Müraciət edən",
+        "status": "Status",
+        "messages": "Mesaj",
+        "updated": "Yenilənib"
+      },
+      "anonymous": "Telegram istifadəçisi",
+      "linked": "Hesaba bağlı",
+      "notLinked": "Hesaba bağlı deyil",
+      "pagination": "Səhifələr",
+      "prev": "← Əvvəlki",
+      "next": "Növbəti →",
+      "ticketTitle": "Müraciət № {id}",
+      "thread": "Yazışma",
+      "operator": "Operator",
+      "customer": "İstifadəçi",
+      "replyTitle": "Cavab",
+      "closedHint": "Müraciət bağlanıb.",
+      "send": "Cavabı göndər",
+      "reply": "Cavab mətni",
+      "replyHint": "Cavab istifadəçiyə Telegram-da göndəriləcək.",
+      "noChat": "Bu müraciətin Telegram çatı yoxdur — cavab yalnız saxlanılacaq.",
+      "close": "Müraciəti bağla",
+      "closeHint": "İstifadəçiyə müraciətin bağlandığı bildirilir. Bağlanmış müraciətin mesajları 90 gün sonra silinir."
     }
   },
   "server": {
@@ -4240,6 +4388,33 @@
       "sameReviewer": "Tədbiri tətbiq edən əməkdaş etirazı həll edə bilməz.",
       "note": "Səbəb ən azı 5 simvol olmalıdır.",
       "blockPermission": "Bloklama yalnız istifadəçi idarəetmə icazəsi olan administratora açıqdır."
+    },
+    "telegram": {
+      "saved": "Telegram parametrləri saxlanıldı.",
+      "otherUrl": "Bot hazırda başqa ünvana yönəlib ({url}). Əvəz etmək üçün təsdiq qutusunu işarələyin.",
+      "invalidSecret": "TELEGRAM_WEBHOOK_SECRET qurulmayıb və ya formatı düzgün deyil.",
+      "notHttps": "Webhook yalnız HTTPS ünvanına qurula bilər.",
+      "notConfigured": "TELEGRAM_BOT_TOKEN qurulmayıb.",
+      "apiError": "Telegram API xətası: {code}.",
+      "webhookSet": "Webhook quraşdırıldı.",
+      "webhookDeleted": "Webhook silindi.",
+      "confirmRequired": "Təsdiq qutusunu işarələyin.",
+      "commandsSynced": "Bot komandaları yeniləndi.",
+      "commandsFailed": "Bəzi komanda dəstləri yenilənmədi: {list}.",
+      "chatNotFound": "Çat tapılmadı.",
+      "chatSaved": "Çat yeniləndi.",
+      "broadcastInvalid": "Hədəf və mətn seçin.",
+      "broadcastSent": "{count} hədəfə göndərildi.",
+      "noTargets": "Göndəriş alınmadı — təsdiqlənmiş hədəf yoxdur və ya Telegram cavab vermədi.",
+      "listingNotFound": "Dərc olunmuş elan tapılmadı."
+    },
+    "support": {
+      "closed": "Müraciət bağlanıb.",
+      "notFound": "Müraciət tapılmadı.",
+      "invalid": "Cavab mətni boşdur və ya çox uzundur.",
+      "sent": "Cavab göndərildi.",
+      "savedNotDelivered": "Cavab saxlanıldı, lakin Telegram-a çatdırılmadı.",
+      "closedDone": "Müraciət bağlandı."
     }
   }
 }

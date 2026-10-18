@@ -7,6 +7,7 @@ import { localizePath } from "@/i18n/path-locale";
 import { sendPushToUser } from "@/lib/push";
 import { emailHref, escapeHtml } from "@/lib/email-html";
 import { categoryChannelsFor } from "@/lib/notification-channels";
+import { notifyTelegramUser } from "@/lib/telegram-bot/delivery";
 
 type PriceChangeInput = {
   propertyId: string;
@@ -119,6 +120,16 @@ export async function recordPropertyPriceChange(input: PriceChangeInput): Promis
         html: `<p>${escapeHtml(content)}</p><p><a href="${emailHref(propertyUrl)}">${copy.link}</a></p>`,
       });
     }
+
+    // Telegram kanalı müstəqildir — razılıq və «Uyğun elanlar» kateqoriyası `notifyTelegramUser`-də yoxlanılır.
+    await notifyTelegramUser({
+      userId: user.id,
+      type: NOTIFICATION_TYPES.PRICE_DROP,
+      title: copy.title,
+      content,
+      path: `/emlaklar/${history.property.slug}`,
+      dedupeKey: `price-drop:${history.id}:${user.id}`,
+    });
 
     if (preferences?.priceDropPush) {
       await sendPushToUser(user.id, { title: copy.title, body: content, url: localizePath(`/emlaklar/${history.property.slug}`, locale), tag: `price-drop-${history.id}` });

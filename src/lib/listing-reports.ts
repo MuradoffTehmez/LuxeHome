@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { alertListingReport } from "@/lib/telegram-bot/admin-alerts";
 import { sha256Hex } from "@/lib/auth/crypto";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { publicPropertyWhere } from "@/lib/queries";
@@ -120,6 +121,9 @@ export async function submitListingReport(input: {
   });
 
   await storeEvidence(report.id, evidence);
+  // Admin Telegram xəbərdarlığı: yalnız elan başlığı və səbəb kodları — şikayətçi barədə heç nə (heç vaxt atmır).
+  const title = await prisma.property.findUnique({ where: { id: property.id }, select: { title: true } }).catch(() => null);
+  await alertListingReport({ reportId: report.id, propertyTitle: title?.title ?? "", reasons, urgent: reportPriority(1, reasons) === "high" }).catch(() => undefined);
   return "created";
 }
 

@@ -805,7 +805,49 @@
           "label": "Təhlükəsizlik",
           "hint": "Hesabınızla bağlı kritik xəbərdarlıqlar"
         }
-      }
+      },
+      "telegramNote": "Telegram sütunu yalnız Telegram hesabı bağlı və bildirişlər aktiv olduqda işləyir."
+    },
+    "telegram": {
+      "title": "Telegram",
+      "description": "Hesabınızı Telegram botuna (@luxehomeestatebot) bağlayın — müraciət, elan və təhlükəsizlik bildirişləri Telegram-a da gəlsin.",
+      "linkedDescription": "Telegram hesabınız bağlıdır. Hansı bildirişlərin gələcəyini aşağıdakı cədvəldə seçin.",
+      "link": "Telegram-ı bağla",
+      "linkPending": "Botda «Start» düyməsini seçin. Link 10 dəqiqə etibarlıdır və yalnız bir dəfə işləyir. Sonra bu səhifəyə qayıdın.",
+      "openBot": "Botu aç",
+      "refresh": "Statusu yenilə",
+      "unlink": "Ayır",
+      "unlinkTitle": "Telegram ayrılsın?",
+      "unlinkDescription": "Bu Telegram hesabına bildiriş getməyəcək və Telegram ilə giriş bu hesabda işləməyəcək. İstənilən vaxt yenidən bağlaya bilərsiniz.",
+      "unlinkConfirm": "Telegram-ı ayır",
+      "cancel": "Ləğv et",
+      "account": "Telegram hesabı",
+      "unnamed": "Adsız hesab",
+      "linkedAt": "Bağlanıb: {date}",
+      "lastDelivery": "Son çatdırılma",
+      "never": "Hələ göndərilməyib",
+      "deliveryStatus": {
+        "SENT": "Çatdırıldı",
+        "FAILED": "Alınmadı",
+        "BLOCKED": "Bot bloklanıb"
+      },
+      "consent": "Telegram bildirişlərini al",
+      "consentHint": "Telegram ilə giriş özü-özlüyündə razılıq deyil. Sakit saatlarda mesajlar səssiz gəlir; təhlükəsizlik bildirişləri istisnadır.",
+      "test": "Test bildirişi göndər",
+      "activeHint": "Telegram bildirişləri aktivdir.",
+      "blockedHint": "Bot sizə yaza bilmir — botu bloklamısınız və ya hələ başlatmamısınız. Botu açıb «Start» seçin.",
+      "unavailable": "Telegram inteqrasiyası hazırda aktiv deyil.",
+      "rateLimited": "Çox tez-tez cəhd edildi. Bir az sonra yenidən yoxlayın.",
+      "failed": "Əməliyyat alınmadı. Bir az sonra yenidən cəhd edin.",
+      "unlinked": "Telegram hesabı ayrıldı.",
+      "notLinked": "Telegram hesabı bağlı deyil.",
+      "enabled": "Telegram bildirişləri aktivləşdirildi.",
+      "disabled": "Telegram bildirişləri söndürüldü.",
+      "testSent": "Test bildirişi göndərildi.",
+      "testQueued": "Telegram hazırda cavab vermir — bildiriş növbəyə alındı.",
+      "testFailed": "Test bildirişi göndərilmədi.",
+      "testUnavailable": "Əvvəlcə Telegram bildirişlərini aktivləşdirin.",
+      "blocked": "Bot bloklanıb — botda «Start» seçin."
     }
   },
   "recentlyViewed": {

@@ -11,5 +11,8 @@ export const SECURITY_EVENT_KINDS = {
   /** Panel/kabinet yazma limiti aşıldı. */
   RATE_LIMITED: "RATE_LIMITED",
   PASSWORD_CHANGED: "PASSWORD_CHANGED",
+  /** Telegram hesabı bağlandı və ya başqası ilə əvəzləndi. */
+  TELEGRAM_LINKED: "TELEGRAM_LINKED",
+  TELEGRAM_UNLINKED: "TELEGRAM_UNLINKED",
 } as const;
 export type SecurityEventKind = (typeof SECURITY_EVENT_KINDS)[keyof typeof SECURITY_EVENT_KINDS];

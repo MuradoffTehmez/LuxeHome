@@ -15,8 +15,9 @@ import {
 import { saveCategoryChannels } from "./preference-actions";
 
 /**
- * Bildiriş mərkəzi (#252, PRD 17.4): hadisə kateqoriyası × kanal. SMS və Telegram gələcək kanallardır —
- * deaktiv göstərilir. Təhlükəsizlik bildirişləri kilidlidir (həmişə gedir).
+ * Bildiriş mərkəzi (#252, PRD 17.4): hadisə kateqoriyası × kanal. SMS gələcək kanaldır — deaktiv göstərilir.
+ * Telegram sütunu yalnız bağlı hesab və açıq razılıqla işləyir (yuxarıdakı Telegram bölməsi). Təhlükəsizlik
+ * bildirişləri kilidlidir (həmişə gedir).
  */
 export function CategoryPreferences({ values }: { values: CategoryChannels }) {
   const t = useTranslations("account.notifications.center");
@@ -83,6 +84,7 @@ export function CategoryPreferences({ values }: { values: CategoryChannels }) {
           </table>
         </div>
         <p className="mt-3 text-xs text-ink-muted">{t("securityNote")}</p>
+        <p className="mt-1 text-xs text-ink-muted">{t("telegramNote")}</p>
         {state.status !== "idle" && state.message && (
           <p role={state.status === "error" ? "alert" : "status"} className={`mt-3 flex items-start gap-2 text-sm ${state.status === "error" ? "text-danger" : "text-success"}`}>
             {state.status === "error" ? <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" /> : <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
