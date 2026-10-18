@@ -10,6 +10,7 @@ import {
 import { recordDomainEvent } from "@/lib/admin/events";
 import { escapeHtml } from "@/lib/email-html";
 import { siteUrl } from "@/config/site";
+import { categoryChannelsFor } from "@/lib/notification-channels";
 import {
   MAX_PENDING_ORDERS_PER_USER,
   bakuMonthStart,
@@ -287,6 +288,7 @@ const COPY = {
 async function notifyCustomer(userId: string, title: string, days: number, dedupeKey: string) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { locale: true } });
   const locale: Locale = user?.locale === "en" || user?.locale === "ru" ? user.locale : "az";
+  if (!(await categoryChannelsFor(userId, NOTIFICATION_TYPES.PACKAGE)).inApp) return;
   await prisma.notification.create({
     data: {
       userId,

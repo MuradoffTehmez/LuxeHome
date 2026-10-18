@@ -11,6 +11,7 @@ import {
   serializeCategoryChannels,
 } from "@/lib/notification-categories";
 import { noticePasswordChanged, noticeVipDecision } from "@/lib/accounts/account-notices";
+import { categoryChannelsFor, categoryChannelsForEmail } from "@/lib/notification-channels";
 import az from "@/i18n/locales/az/account.json";
 import en from "@/i18n/locales/en/account.json";
 import ru from "@/i18n/locales/ru/account.json";
@@ -50,6 +51,10 @@ describe("göndərmə seçimə tabedir", () => {
 
     await noticeVipDecision({ userId: "nc-user", requestId: "nc-vip", title: "Elan", approved: true, days: 7, note: null });
     expect(await prisma.notification.count({ where: { userId: "nc-user", type: "VIP" } })).toBe(0);
+    // Köhnə yazanlar (qiymət endirimi, elan müddəti, saxlanmış axtarış) eyni köməkçi ilə yoxlayır.
+    await expect(categoryChannelsFor("nc-user", "PROMOTION")).resolves.toEqual({ inApp: false, email: false });
+    await expect(categoryChannelsForEmail("nc@example.test", "VIP")).resolves.toEqual({ inApp: false, email: false });
+    await expect(categoryChannelsFor("nc-user", "PRICE_DROP")).resolves.toEqual({ inApp: true, email: true });
 
     await noticePasswordChanged({ userId: "nc-user", changedAt: new Date("2026-10-18T10:00:00Z") });
     expect(await prisma.notification.count({ where: { userId: "nc-user", type: "SECURITY" } })).toBe(1);

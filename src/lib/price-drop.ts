@@ -6,6 +6,7 @@ import { siteUrl } from "@/config/site";
 import { localizePath } from "@/i18n/path-locale";
 import { sendPushToUser } from "@/lib/push";
 import { emailHref, escapeHtml } from "@/lib/email-html";
+import { categoryChannelsFor } from "@/lib/notification-channels";
 
 type PriceChangeInput = {
   propertyId: string;
@@ -91,8 +92,10 @@ export async function recordPropertyPriceChange(input: PriceChangeInput): Promis
     const newPrice = formatPrice(input.newPrice, input.currency);
     const content = copy.content(history.property.title, oldPrice, newPrice);
     const preferences = user.notificationPreference;
+    // Bildiriş mərkəzinin «Uyğun elanlar» kateqoriyası (#252) köhnə hadisə seçimindən əlavə yoxlanılır.
+    const category = await categoryChannelsFor(user.id, NOTIFICATION_TYPES.PRICE_DROP);
 
-    if (preferences?.priceDropWeb !== false) {
+    if (preferences?.priceDropWeb !== false && category.inApp) {
       await prisma.notification.create({
         data: {
           userId: user.id,
@@ -105,7 +108,7 @@ export async function recordPropertyPriceChange(input: PriceChangeInput): Promis
       }).catch(() => undefined);
     }
 
-    if (preferences?.priceDropEmail !== false) {
+    if (preferences?.priceDropEmail !== false && category.email) {
       const propertyUrl = siteUrl(localizePath(`/emlaklar/${history.property.slug}`, locale));
       await sendEmail({
         notification: true,

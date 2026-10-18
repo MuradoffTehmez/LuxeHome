@@ -9,6 +9,7 @@ import { recordPropertyStatusChange } from "@/lib/property-status-history";
 import { findManyInChunks } from "@/lib/d1-chunks";
 import { backfillExpiry, renewedExpiry } from "@/lib/listing-expiry-policy";
 import { getListingExpiryConfig } from "@/lib/settings";
+import { categoryChannelsFor } from "@/lib/notification-channels";
 
 /**
  * Elan müddəti və yeniləmə (#109).
@@ -66,7 +67,9 @@ async function notifyOwner(
   const copy = COPY[locale];
   const content = kind === "reminder" ? copy.reminder(title, days) : copy.expired(title);
   const heading = kind === "reminder" ? copy.reminderTitle : copy.expiredTitle;
-  await prisma.notification.create({
+  // «Elan aktuallığı» kateqoriyası (#252) — istifadəçi söndürübsə nə kabinet, nə e-poçt.
+  const category = await categoryChannelsFor(owner.id, NOTIFICATION_TYPES.LISTING_EXPIRY);
+  if (category.inApp) await prisma.notification.create({
     data: {
       userId: owner.id,
       type: NOTIFICATION_TYPES.LISTING_EXPIRY,
@@ -76,6 +79,7 @@ async function notifyOwner(
       dedupeKey: `listing-${kind}:${propertyId}:${days}`,
     },
   }).catch(() => undefined);
+  if (!category.email) return;
   const url = siteUrl(localizePath("/kabinet/elanlar", locale));
   await sendEmail({
     notification: true,

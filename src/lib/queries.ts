@@ -46,6 +46,8 @@ import { evaluateSeoAudit, type SeoAuditContent } from "@/lib/seo-audit";
 import { landingCanBeIndexed } from "@/lib/serp";
 import { parseJsonArray } from "@/lib/utils";
 import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
+import { categoryChannelsFor, categoryChannelsForEmail } from "@/lib/notification-channels";
+import type { NotificationType } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // SEÇİM (SELECT) TƏRİFLƏRİ — kart və detal görünüşləri üçün
@@ -2741,6 +2743,8 @@ export const savedSearchMatchStore: SavedSearchMatchStore = {
   },
 
   async createNotification(input) {
+    // Bildiriş mərkəzinin «Uyğun elanlar» kateqoriyası (#252).
+    if (!(await categoryChannelsFor(input.userId, input.type as NotificationType)).inApp) return;
     await prisma.notification.create({
       data: {
         userId: input.userId,
@@ -2780,6 +2784,7 @@ export const savedSearchMatchStore: SavedSearchMatchStore = {
   async sendImmediateEmail(userEmail, locale, property, searchName) {
     // Dinamik import qəsdən: `resend` paketi statik idxal olunsaydı, bu modulu
     // yükləyən hər domen testi (unit test) onu da yükləməyə məcbur olardı.
+    if (!(await categoryChannelsForEmail(userEmail, NOTIFICATION_TYPES.SAVED_SEARCH_MATCH)).email) return;
     const { sendSavedSearchMatchEmail } = await import("@/lib/email");
     await sendSavedSearchMatchEmail(userEmail, locale, property, searchName);
   },
@@ -2884,6 +2889,7 @@ export const savedSearchDigestStore: DigestStore = {
 
   async sendDigestEmail({ email, locale, searchName, frequency, properties, totalCount }) {
     // Dinamik import: `resend` paketi bu modulu yükləyən unit testlərə düşməsin
+    if (!(await categoryChannelsForEmail(email, NOTIFICATION_TYPES.SAVED_SEARCH_MATCH)).email) return;
     const { sendSavedSearchDigestEmail } = await import("@/lib/email");
     await sendSavedSearchDigestEmail({
       userEmail: email,
