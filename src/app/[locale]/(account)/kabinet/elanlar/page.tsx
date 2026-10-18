@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { SegmentedTabs } from "@/components/ui/segmented-tabs";
+import { countListingStatusGroups, inListingStatusGroup, LISTING_STATUS_GROUPS, listingStatusGroupHref, parseListingStatusGroup } from "@/lib/accounts/listing-status-groups";
 import Image from "next/image";
 import { CalendarClock, CircleCheckBig, Crown, FileCheck2, MessageSquareWarning, Pencil, Plus, RefreshCw, Trash2, TrendingUp } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -52,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CabinetPropertiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ yeni?: string; yoxlama?: string }>;
+  searchParams: Promise<{ yeni?: string; yoxlama?: string; status?: string }>;
 }) {
   const locale = await getLocale() as Locale;
   const user = await requireLister(locale);
@@ -83,6 +85,10 @@ export default async function CabinetPropertiesPage({
   ]);
 
   type CabinetProperty = (typeof properties)[number];
+  // Status tabları (UX auditi): sayları bütün elanlardan, siyahı seçilmiş qrupdan.
+  const statusGroup = parseListingStatusGroup(params.status);
+  const groupCounts = countListingStatusGroups(properties.map((property) => property.status));
+  const visibleProperties = properties.filter((property) => inListingStatusGroup(property.status, statusGroup));
   // VIP sorğuları (#248): modul bayrağı və elanların son sorğu/dövr vəziyyəti.
   const [vipEnabled, vipState, promotionEnabled, promotionState, documentsEnabled] = await Promise.all([
     isFeatureEnabled("VIP_REQUESTS"),
@@ -296,7 +302,7 @@ export default async function CabinetPropertiesPage({
         {items.map((property) => {
           const status = propertyStatus(property);
           return (
-            <li key={property.id} className="flex min-w-0 items-center gap-4 p-5">
+            <li key={property.id} className="flex min-w-0 items-center gap-4 p-4">
               <PropertyThumbnail property={property} />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium text-ink">{property.title}</p>
@@ -358,13 +364,28 @@ export default async function CabinetPropertiesPage({
           )
         )}
 
-        <div className="mt-8">
+        {properties.length > 0 && (
+          <SegmentedTabs
+            label={t("groups.label")}
+            className="mt-6"
+            items={LISTING_STATUS_GROUPS.map((group) => ({
+              href: listingStatusGroupHref(group),
+              label: t(`groups.${group}`),
+              active: statusGroup === group,
+              count: groupCounts[group],
+            }))}
+          />
+        )}
+
+        <div className="mt-6">
           <AdaptiveDataList
-            items={properties}
+            items={visibleProperties}
             getKey={(property) => property.id}
             renderCard={renderPropertyCard}
             renderTable={renderPropertyList}
-            empty={
+            empty={properties.length > 0 ? (
+              <EmptyState title={t("groups.emptyTitle")} description={t("groups.emptyDescription")} action={{ label: t("groups.showAll"), href: localizePath("/kabinet/elanlar", locale), localized: false }} />
+            ) :
               <EmptyState
                 title={t("emptyTitle")}
                 description={t("emptyDescription")}

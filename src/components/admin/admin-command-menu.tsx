@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Overlay } from "@/components/ui/overlay";
 import { cn } from "@/lib/utils";
-import { adminNav } from "./admin-nav";
+import { adminNavForRole } from "./admin-nav";
+import type { Role } from "@/lib/constants";
 import { AdminIcon } from "./admin-icon";
 
 type SearchItem = {
@@ -16,7 +17,7 @@ type SearchItem = {
   icon: string;
 };
 
-export function AdminCommandMenu() {
+export function AdminCommandMenu({ role }: { role: Role }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -24,7 +25,7 @@ export function AdminCommandMenu() {
 
   const items = useMemo<SearchItem[]>(
     () =>
-      adminNav.flatMap((group) =>
+      adminNavForRole(role).flatMap((group) =>
         group.items.flatMap((item) => {
           const parent = {
             href: item.href,
@@ -41,7 +42,7 @@ export function AdminCommandMenu() {
           return [parent, ...children];
         }),
       ),
-    [t],
+    [role, t],
   );
 
   const results = useMemo(() => {

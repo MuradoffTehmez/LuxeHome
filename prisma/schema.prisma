@@ -34,6 +34,9 @@ model User {
   phone               String?
   /// Telegram istifadəçi adı (@-sız, #208) — elanın əlaqə panelində «Nömrəni göstər» ilə açılır.
   telegram            String?
+  /// Bildiriş botuna bağlanmış şəxsi çatın ID-si (`/start <token>` ilə). İctimai səhifəyə çıxmır.
+  telegramChatId      String?   @unique
+  telegramLinkedAt    DateTime?
   avatarUrl           String?
   /// Ad və soyad ayrıca — `name` göstəriş üçün onlardan qurulur (köhnə hesablarda boşdur).
   firstName           String?
@@ -2814,4 +2817,17 @@ model KnownLoginDevice {
 
   @@unique([userId, kind, value])
   @@index([lastSeenAt])
+}
+
+/// Telegram bildiriş botunu hesaba bağlamaq üçün birdəfəlik token (`t.me/<bot>?start=<token>`).
+/// Xam token saxlanmır — yalnız SHA-256 heşi; müddəti qısadır və istifadədə silinir.
+model TelegramLinkToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }

@@ -28,3 +28,19 @@ describe("qısa ünvanlar", () => {
     }
   });
 });
+
+describe("kabinetin detal səhifələri", () => {
+  const labels = (path: string) => cabinetBreadcrumbTrail(path).map((item) => item.labelKey);
+
+  it("sənəd səhifəsini «Redaktə» kimi deyil, öz adı ilə göstərir", () => {
+    expect(labels("/kabinet/elanlar/abc/senedler")).toEqual(["eyebrow", "listings", "editListing", "listingDocuments"]);
+    expect(cabinetBreadcrumbTrail("/kabinet/elanlar/abc/senedler")[2].href).toBe("/kabinet/elanlar/abc");
+  });
+
+  it("müraciət, müştəri və elan performansı kartlarını zəncirə əlavə edir", () => {
+    expect(labels("/kabinet/muracietler/l1").at(-1)).toBe("leadCard");
+    expect(labels("/kabinet/musteriler/yeni").at(-1)).toBe("newClient");
+    expect(labels("/kabinet/musteriler/c1").at(-1)).toBe("clientCard");
+    expect(labels("/kabinet/analitika/p1").at(-1)).toBe("listingPerformance");
+  });
+});

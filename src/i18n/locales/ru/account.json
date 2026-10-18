@@ -157,6 +157,17 @@
         "storage": "Файл не сохранён. Попробуйте позже.",
         "disabled": "Проверка документов сейчас отключена."
       }
+    },
+    "groups": {
+      "label": "Статус объявлений",
+      "all": "Все",
+      "active": "Активные",
+      "review": "На проверке",
+      "attention": "Требуют внимания",
+      "closed": "Закрытые",
+      "emptyTitle": "Нет объявлений с этим статусом",
+      "emptyDescription": "Выберите другую вкладку.",
+      "showAll": "Все объявления"
     }
   },
   "newProperty": {
@@ -805,7 +816,8 @@
           "label": "Безопасность",
           "hint": "Критические предупреждения об аккаунте"
         }
-      }
+      },
+      "notLinked": "не подключён"
     },
     "summaryUnread": "Уведомлений: {count} · непрочитанных: {unread}",
     "tabs": {
@@ -825,7 +837,23 @@
       "reset": "Сбросить фильтры"
     },
     "filteredEmptyTitle": "Нет уведомлений по этому фильтру",
-    "filteredEmptyDescription": "Выберите другую категорию или статус."
+    "filteredEmptyDescription": "Выберите другую категорию или статус.",
+    "telegram": {
+      "title": "Уведомления в Telegram",
+      "description": "Подключите аккаунт к нашему боту — уведомления по выбранным категориям будут приходить и в Telegram.",
+      "linkedDescription": "Telegram подключён. Выберите в таблице ниже, какие уведомления получать.",
+      "unavailableDescription": "Канал Telegram пока не активен.",
+      "connect": "Подключить Telegram",
+      "disconnect": "Отключить",
+      "check": "Проверить",
+      "soon": "Скоро",
+      "openHint": "Если Telegram не открылся:",
+      "openLink": "откройте бота",
+      "linkReady": "Нажмите «Start» в Telegram, затем «Проверить».",
+      "disconnected": "Telegram отключён.",
+      "unavailable": "Канал Telegram пока не активен.",
+      "failed": "Не удалось. Попробуйте ещё раз."
+    }
   },
   "recentlyViewed": {
     "metaTitle": "Недавно просмотренные",

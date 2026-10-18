@@ -35,6 +35,10 @@ Səhifənin yuxarısındakı breadcrumb («Qrup › Modul › Səhifə») menyud
 | | Sistem parametrləri | Ümumi parametrlər, Funksiyalar, Sistem ayarları, Bot müdafiəsi (`/admin/security`), Nümunə məzmun |
 | | Hesabım | — |
 
+Menyu rola görə süzülür: Redaktor yalnız Məzmun idarəetməsi, Marketinq və SEO (baxış) və Hesabım bölmələrini, Admin isə
+parametrlər, istifadəçilər və trafik analitikası xaric qalanları görür. «Marketinq və SEO» və «Maliyyə» modullarının
+səhifələrində yuxarıda tab zolağı var (SERP-də əvvəlcə bölmə seçilir: Monitorinq · Məzmun SEO-su · Texniki konfiqurasiya).
+
 Marşrutlar dəyişməyib — yalnız qruplaşma; köhnə linklər və əlfəcinlər işləyir. «Elanların təşviqi → Ümumi baxış» yalnız
 oxuyur: növbə sayları, aktiv təşviqlər və VIP/irəli çəkmə qərarlarının birgə tarixçəsi; qərar hər modulun öz səhifəsindədir
 (VIP, irəli çəkmə və paket qaydaları backend-də ayrı qalır). Paket bloku yalnız `billing:manage` icazəsi ilə görünür.

@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { sendTelegramToChat } from "@/lib/telegram-notifications";
+import { formatTelegramNotice } from "@/lib/telegram-link-policy";
 import { isUniqueViolation } from "@/lib/media/upload-record";
 import { NOTIFICATION_TYPES, type Locale, type NotificationType } from "@/lib/constants";
 import { sendEmail } from "@/lib/email";
@@ -358,7 +360,7 @@ async function notifyAccount(
 ): Promise<boolean> {
   try {
     const [user, preference] = await Promise.all([
-      prisma.user.findUnique({ where: { id: userId }, select: { email: true, locale: true, isActive: true } }),
+      prisma.user.findUnique({ where: { id: userId }, select: { email: true, locale: true, isActive: true, telegramChatId: true } }),
       prisma.notificationPreference.findUnique({ where: { userId }, select: { categoryChannels: true } }),
     ]);
     if (!user?.isActive) return true;
@@ -377,9 +379,13 @@ async function notifyAccount(
       });
       if (!stored) return false;
     }
+    const url = siteUrl(localizePath(path, locale));
+    // Telegram (şəxsi çat) — yalnız hesab bota bağlanıbsa və kateqoriyada seçilibsə; ən yaxşı cəhddir.
+    if (channels.telegram && user.telegramChatId) {
+      await sendTelegramToChat(user.telegramChatId, formatTelegramNotice({ title, content, url, open: copy.open }));
+    }
     // Saytdaxili kanal söndürülübsə e-poçtun təkrarını `dedupeKey` qoruya bilmir — e-poçt yalnız seçilibsə gedir.
     if (!channels.email) return true;
-    const url = siteUrl(localizePath(path, locale));
     // E-poçt bildirişləri söndürülübsə (#242) `sendEmail` buraxır; kabinet bildirişi yenə yazılır.
     await sendEmail({
       notification: true,

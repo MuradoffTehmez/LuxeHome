@@ -19,7 +19,9 @@
     "searchEmpty": "Uyğun bölmə tapılmadı",
     "expandSection": "{section} alt menyusunu aç",
     "collapseSection": "{section} alt menyusunu bağla",
-    "breadcrumbs": "Naviqasiya yolu"
+    "breadcrumbs": "Naviqasiya yolu",
+    "sectionTabs": "{section} bölmələri",
+    "moduleTools": "{section} alətləri"
   },
   "nav": {
     "groups": {

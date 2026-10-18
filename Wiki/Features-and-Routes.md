@@ -245,6 +245,7 @@ Toplu seçim `components/admin/bulk-selection.tsx` + `lib/admin/bulk.ts`-dir: h�
 | `POST /api/admin/media` | Admin şəkil yükləmə (su nişanı, Images) | `media:manage`, origin, rate limit |
 | `POST /api/hesab/media` | Kabinet elan şəkli yükləmə | Lister hesabı, ownership, origin, rate limit |
 | `GET /api/hesab/menu` | Header hesab menyusu | Optional public session |
+| `POST /api/telegram/webhook` | Telegram bildiriş botu: `/start <token>` ilə hesabı şəxsi çata bağlayır | `X-Telegram-Bot-Api-Secret-Token` başlığı |
 | `GET/POST /api/hesab/favoritler` | Favoritlərin hesabla sinxronu | Public session |
 | `GET /api/hesab/export` | Şəxsi data ixracı | Public session |
 | `GET /api/auth/google/start`, `/callback` | Google OIDC + PKCE | Secret yoxdursa 404 |

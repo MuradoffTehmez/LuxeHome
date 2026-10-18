@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SegmentedTabs } from "@/components/ui/segmented-tabs";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AlarmClock, Building2, ClipboardList, Mail, Phone, UserRound } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
@@ -44,12 +45,6 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
     getLeadEngagementSummary(user.id, agency?.id ?? null),
   ]);
 
-  const tab = (active: boolean) =>
-    cn(
-      "inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors",
-      active ? "border-gold bg-gold/10 font-medium text-ink" : "border-line bg-paper text-ink-soft hover:border-gold",
-    );
-
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <PageHeader
@@ -70,23 +65,24 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
             ["whatsapp", engagement.whatsapp],
             ["telegram", engagement.telegram],
           ] as const).map(([key, value]) => (
-            <div key={key} className={cn("rounded-lg border p-3", key === "leads" ? "border-gold/40 bg-gold/5" : "border-line")}>
+            <div key={key} className={cn("rounded-lg border px-3 py-2", key === "leads" ? "border-gold/40 bg-gold/5" : "border-line")}>
               <dt className="text-xs text-ink-muted">{t(`engagement.${key}`)}</dt>
-              <dd className="tabular mt-0.5 text-xl font-semibold text-ink">{value}</dd>
+              <dd className="tabular text-lg font-semibold text-ink">{value}</dd>
             </div>
           ))}
         </dl>
         <p className="mt-2 text-xs text-ink-muted">{t("engagement.note")}</p>
       </section>
 
-      <nav aria-label={t("filterLabel")} className="flex flex-wrap gap-2">
-        <Link href="/kabinet/muracietler" className={tab(!unanswered)} aria-current={!unanswered ? "page" : undefined}>
-          {t("filterAll")}
-        </Link>
-        <Link href="/kabinet/muracietler?filtr=cavabsiz" className={tab(unanswered)} aria-current={unanswered ? "page" : undefined}>
-          {t("filterUnanswered")}
-        </Link>
-      </nav>
+      <SegmentedTabs
+        label={t("filterLabel")}
+        variant="pills"
+        className="sm:w-fit"
+        items={[
+          { href: "/kabinet/muracietler", label: t("filterAll"), active: !unanswered },
+          { href: "/kabinet/muracietler?filtr=cavabsiz", label: t("filterUnanswered"), active: unanswered },
+        ]}
+      />
 
       {leads.length === 0 ? (
         <EmptyState title={unanswered ? t("emptyUnanswered") : t("empty")} description={unanswered ? undefined : t("emptyDescription")} />
@@ -98,7 +94,7 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
               ? Math.max(1, Math.round((lead.respondedAt.getTime() - lead.createdAt.getTime()) / 60_000))
               : null;
             return (
-              <li key={lead.id} className="rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5">
+              <li key={lead.id} className="rounded-xl border border-line bg-paper p-4 shadow-xs">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-medium text-ink">{lead.name}</p>
@@ -151,7 +147,8 @@ export default async function CabinetLeadsPage({ searchParams }: Props) {
                   )}
                 </div>
 
-                <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-ink-soft [overflow-wrap:anywhere]">{lead.message}</p>
+                {/* Siyahıda qısa önizləmə — tam mətn müraciət kartındadır. */}
+                <p className="mt-3 line-clamp-3 text-sm leading-relaxed whitespace-pre-line text-ink-soft [overflow-wrap:anywhere]">{lead.message}</p>
                 <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
                   <div className="flex flex-wrap gap-2">
                     <ButtonAnchor href={localizePath(`/kabinet/muracietler/${lead.id}`, locale)} variant="primary" size="sm">

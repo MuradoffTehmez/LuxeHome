@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { getAdminT } from "@/lib/admin-i18n";
+import { getAdminI18n, getAdminT } from "@/lib/admin-i18n";
 import { headers } from "next/headers";
 import { adminNavBreadcrumbs } from "./admin-nav";
 
@@ -28,7 +28,8 @@ export async function AdminPageHeader({
   // breadcrumb və başlıq eyni terminologiyanı işlədir. Marşrut middleware-in `x-pathname` başlığındandır.
   if (breadcrumbs.length === 0) {
     const pathname = (await headers()).get("x-pathname") ?? "";
-    breadcrumbs = adminNavBreadcrumbs(pathname).map((crumb) => ({
+    const { role } = await getAdminI18n();
+    breadcrumbs = adminNavBreadcrumbs(pathname, role).map((crumb) => ({
       label: crumb.kind === "group" ? t(`nav.groups.${crumb.key}`) : t(`nav.items.${crumb.key}`),
       href: crumb.href,
     }));

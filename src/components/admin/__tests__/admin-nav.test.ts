@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adminNav, adminNavBreadcrumbs, findAdminNavLocation } from "../admin-nav";
+import { adminNav, adminNavBreadcrumbs, adminNavForRole, findAdminNavLocation } from "../admin-nav";
 
 const allHrefs = () =>
   adminNav.flatMap((group) => group.items.flatMap((item) => (item.children?.length ? item.children.map((child) => child.href) : [item.href])));
@@ -94,5 +94,47 @@ describe("adminNavBreadcrumbs", () => {
     expect(adminNavBreadcrumbs("/admin/emlaklar/abc/redakte").at(-1)).toEqual({ kind: "item", key: "portfolio", href: "/admin/emlaklar" });
     expect(adminNavBreadcrumbs("/admin/hesabim")).toEqual([{ kind: "group", key: "system" }, { kind: "item", key: "profile", href: undefined }]);
     expect(adminNavBreadcrumbs("/admin")).toEqual([]);
+  });
+});
+
+describe("adminNavForRole", () => {
+  const hrefs = (role: Parameters<typeof adminNavForRole>[0]) =>
+    adminNavForRole(role).flatMap((group) => group.items.flatMap((item) => [item.href, ...(item.children ?? []).map((child) => child.href)]));
+
+  it("Super Admin bütün menyunu görür", () => {
+    expect(adminNavForRole("SUPER_ADMIN")).toEqual(adminNav);
+  });
+
+  it("Redaktor yalnız məzmun, media, tərcümə, tərəfdaş və SEO baxışını görür", () => {
+    const nav = adminNavForRole("EDITOR");
+    expect(nav.flatMap((group) => group.items.map((item) => item.labelKey))).toEqual(["dashboard", "contentHub", "serp", "profile"]);
+    const editor = hrefs("EDITOR");
+    expect(editor).not.toContain("/admin/emlaklar");
+    expect(editor).not.toContain("/admin/xidmetler");
+    expect(editor).not.toContain("/admin/ai-komekci");
+    expect(editor).not.toContain("/admin/seo");
+    expect(editor).toContain("/admin/redirects");
+  });
+
+  it("Admin parametrləri, analitikanı və istifadəçiləri görmür, modul linki ilk icazəli bəndə yönəlir", () => {
+    const nav = adminNavForRole("ADMIN");
+    const labels = nav.flatMap((group) => group.items.map((item) => item.labelKey));
+    expect(labels).not.toContain("administration");
+    expect(labels).not.toContain("agencyHub");
+    const admin = hrefs("ADMIN");
+    expect(admin).not.toContain("/admin/audit");
+    expect(admin).not.toContain("/admin/analitika");
+    const analytics = nav.flatMap((group) => group.items).find((item) => item.labelKey === "analytics");
+    expect(analytics?.href).toBe("/admin/hesabatlar");
+  });
+});
+
+describe("rol üzrə breadcrumb", () => {
+  it("modul linki icazəli ilk alt bəndə aparır", () => {
+    expect(adminNavBreadcrumbs("/admin/hesabatlar", "ADMIN")).toEqual([
+      { kind: "group", key: "growth" },
+      { kind: "item", key: "analytics", href: undefined },
+    ]);
+    expect(adminNavBreadcrumbs("/admin/hesabatlar", "SUPER_ADMIN")[1]).toEqual({ kind: "item", key: "analytics", href: "/admin/analitika" });
   });
 });

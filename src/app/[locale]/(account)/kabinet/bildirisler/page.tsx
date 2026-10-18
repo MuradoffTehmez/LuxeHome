@@ -23,7 +23,9 @@ import {
 import { MarkAllReadButton, NotificationList, type NotificationListItem } from "./notification-list";
 import { NotificationPreferences } from "./notification-preferences";
 import { PushPreferences } from "./push-preferences";
-import { CategoryPreferences } from "./category-preferences";
+import { CategoryPreferences, type TelegramChannelState } from "./category-preferences";
+import { TelegramConnect } from "./telegram-connect";
+import { isTelegramNotificationsConfigured } from "@/lib/telegram-notifications";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -152,12 +154,17 @@ async function ListView({ userId, filters, locale, unread, total }: { userId: st
 }
 
 async function SettingsView({ userId }: { userId: string }) {
-  const storedPreference = await prisma.notificationPreference.findUnique({ where: { userId } });
+  const [storedPreference, account] = await Promise.all([
+    prisma.notificationPreference.findUnique({ where: { userId } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { telegramChatId: true } }),
+  ]);
   const preferences = resolveNotificationPreferences(storedPreference);
+  const telegram: TelegramChannelState = !isTelegramNotificationsConfigured() ? "unavailable" : account?.telegramChatId ? "linked" : "unlinked";
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <PushPreferences />
-      <CategoryPreferences values={parseCategoryChannels(storedPreference?.categoryChannels)} />
+      <TelegramConnect state={telegram} />
+      <CategoryPreferences values={parseCategoryChannels(storedPreference?.categoryChannels)} telegram={telegram} />
       <NotificationPreferences values={preferences} />
     </div>
   );
