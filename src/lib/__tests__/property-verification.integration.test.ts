@@ -2,6 +2,7 @@ import { env } from "cloudflare:test";
 import { beforeAll, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { PROPERTY_STATUSES } from "@/lib/constants";
+import { SETTING_KEYS } from "@/lib/settings";
 import {
   decideDocuments,
   deletePendingDocument,
@@ -10,6 +11,7 @@ import {
   openDocumentForStaff,
   purgeReviewedDocuments,
   setDataVerified,
+  uploadPropertyDocuments,
   verificationBadges,
 } from "@/lib/property-verification";
 
@@ -64,5 +66,17 @@ describe("sənəd axını", () => {
     expect(await prisma.propertyDocument.count({ where: { propertyId: "pv-p1" } })).toBe(0);
     // Giriş tarixçəsi sənəd silinəndən sonra da qalır.
     expect(await prisma.documentAccessLog.count({ where: { propertyId: "pv-p1" } })).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("«Əlavə doğrulamalar» açarı (#268)", () => {
+  it("söndürüləndə sənəd qəbul olunmur, sənəd/məlumat nişanları gizlənir; açılanda qayıdır", async () => {
+    await setDataVerified({ staffId: "pv-staff", propertyId: "pv-p1", verified: true, now });
+    await DB.prepare('INSERT OR REPLACE INTO "Setting" ("key", "value", "updatedAt") VALUES (?, ?, CURRENT_TIMESTAMP)').bind(SETTING_KEYS.FEATURE_FLAGS, JSON.stringify({ EXTRA_VERIFICATION: false })).run();
+    const file = new File([new Uint8Array([1, 2, 3])], "a.webp", { type: "image/webp" });
+    expect(await uploadPropertyDocuments({ userId: "pv-owner", propertyId: "pv-p1", kind: "TITLE_DEED", files: [file] })).toEqual({ ok: false, reason: "disabled" });
+    expect(await getListingVerification("pv-p1")).not.toContain("DATA");
+    await DB.prepare('DELETE FROM "Setting" WHERE "key" = ?').bind(SETTING_KEYS.FEATURE_FLAGS).run();
+    expect(await getListingVerification("pv-p1")).toContain("DATA");
   });
 });

@@ -11,6 +11,7 @@ import {
   KNOWLEDGE_LEVELS,
   KNOWLEDGE_RISK_LEVELS,
   KNOWLEDGE_STATUSES,
+  KNOWLEDGE_SIMPLE_STATUSES,
   LEGAL_CONTENT_STATUSES,
   POST_STATUSES,
   PRICE_PERIODS,
@@ -302,7 +303,7 @@ export const knowledgeTermSchema = z.object({
   shortDefinition: requiredText("Qısa tərif", 10, 400),
   definition: optionalText(40000),
   categoryId: cuid.nullable(),
-  status: enumOf(KNOWLEDGE_STATUSES),
+  status: enumOf(KNOWLEDGE_SIMPLE_STATUSES),
   order: z.number().int().min(0).max(9999),
   relatedSlugs: z.array(z.string().trim().max(90)).max(10),
 });
@@ -311,7 +312,7 @@ export const knowledgeFaqSchema = z.object({
   question: requiredText("Sual", 8, 300),
   answer: requiredText("Cavab", 10, 8000),
   category: enumOf(FAQ_CATEGORIES),
-  status: enumOf(KNOWLEDGE_STATUSES),
+  status: enumOf(KNOWLEDGE_SIMPLE_STATUSES),
   order: z.number().int().min(0).max(9999),
 });
 

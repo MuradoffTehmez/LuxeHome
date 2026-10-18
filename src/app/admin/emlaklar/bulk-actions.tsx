@@ -115,14 +115,16 @@ export function BulkActionsForm({
 export function RowCheckbox({ id }: { id: string }) {
   const t = useTranslations("admin");
 
+  // Label 44px toxunma sahəsi verir (PRD 26.4); mənfi kənar boşluq vizual yeri 16px checkbox qədər saxlayır.
   return (
-    <input
-      type="checkbox"
-      name="ids"
-      value={id}
-      aria-label={t("pages.properties.sec")}
-      onClick={(event) => event.stopPropagation()}
-      className="size-4 shrink-0 rounded-sm border-line-strong accent-gold"
-    />
+    <label className="-m-3.5 inline-grid size-11 shrink-0 cursor-pointer place-items-center" onClick={(event) => event.stopPropagation()}>
+      <input
+        type="checkbox"
+        name="ids"
+        value={id}
+        aria-label={t("pages.properties.sec")}
+        className="size-4 shrink-0 rounded-sm border-line-strong accent-gold"
+      />
+    </label>
   );
 }

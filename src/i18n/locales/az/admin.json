@@ -290,6 +290,7 @@
     },
     "knowledgeStatus": {
       "DRAFT": "Qaralama",
+      "IN_REVIEW": "Təsdiq gözləyir",
       "PUBLISHED": "Dərc edilib"
     },
     "leadSource": {
@@ -1446,7 +1447,15 @@
       "beledciniYenile": "Bələdçini yenilə",
       "beledciniSil": "Bələdçini sil",
       "beledciIctimaiSaytdanCixarilacaq": "Bələdçi ictimai saytdan çıxarılacaq; audit izi saxlanacaq.",
-      "beledciniRedakteEt": "Bələdçini redaktə et"
+      "beledciniRedakteEt": "Bələdçini redaktə et",
+      "review": {
+        "label": "Redaktor növbələri",
+        "all": "Hamısı",
+        "inReview": "Təsdiq gözləyir ({count})",
+        "stale": "Yenilənməli ({count})",
+        "due": "Yenilənməli",
+        "hint": "Qaralamanı «Təsdiq gözləyir»-ə keçirin — başqa redaktor dərc edir. Hüquqi yoxlama tələb edən məqalə hüquqi yoxlama tarixi olmadan dərc olunmur."
+      }
     },
     "translations": {
       "strukturlasdirilmisTercumeler": "Strukturlaşdırılmış tərcümələr",
@@ -3219,7 +3228,7 @@
         },
         "EXTRA_VERIFICATION": {
           "label": "Əlavə doğrulama",
-          "hint": "Hesab üçün əlavə doğrulama addımları."
+          "hint": "Elan sənədlərinin yüklənməsi və moderator yoxlaması, «Sənədlər yoxlanılıb» və «Məlumatlar yoxlanılıb» nişanları. Söndürüləndə yeni sənəd qəbul olunmur və bu nişanlar gizlənir."
         },
         "MONETIZATION_ENABLED": {
           "label": "Monetizasiya",
@@ -3813,7 +3822,12 @@
       "terminTapilmadi": "Termin tapılmadı.",
       "sualYenilendi": "Sual yeniləndi.",
       "sualElaveOlundu": "Sual əlavə olundu.",
-      "sualTapilmadi": "Sual tapılmadı."
+      "sualTapilmadi": "Sual tapılmadı.",
+      "review": {
+        "needsReview": "Məqalə əvvəlcə redaktor təsdiqinə göndərilməlidir («Təsdiq gözləyir»).",
+        "sameReviewer": "Təsdiqə göndərdiyiniz məqaləni başqa redaktor dərc etməlidir.",
+        "legalReview": "Hüquqi yoxlama tələb edən məqalə hüquqşünas yoxlama tarixi olmadan dərc olunmur."
+      }
     },
     "blog": {
       "meqaleTapilmadi": "Məqalə tapılmadı.",

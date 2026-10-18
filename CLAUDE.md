@@ -198,6 +198,14 @@ Modulun public sorğuları `src/lib/knowledge.ts`, admin yazmaları
   düzəlişinin üzərinə yazmır. Mənbə URL-ləri yalnız `src/lib/official-sources.ts`-dəki yoxlanmış
   siyahıdan olmalıdır; daxili keçidlərin 404 verməməsini `prisma/__tests__/knowledge-guides.test.ts`
   yoxlayır. Məzmun HTML-i sanitizer-in ağ siyahısına uyğun olmalıdır (məs. `<ol start>` atılır).
+- **Redaktor təsdiq axını (#266, PRD 24.2):** məqalə `DRAFT` → `IN_REVIEW` («Təsdiq gözləyir», `submittedById`) →
+  `PUBLISHED` (`approvedById`). Qaydalar saf `lib/knowledge-review.ts`-dədir (`knowledgeTransition`): təsdiqə göndərən özü dərc
+  edə bilməz (Super Admin istisnadır — tək işçili rejim, yenə `approvedById` yazılır); `riskLevel = LEGAL_REVIEW` məqalə
+  `legalReviewedAt` olmadan **heç kim** tərəfindən dərc olunmur; dərc olunmuş məqalənin redaktəsi yenidən təsdiq tələb etmir.
+  Təsdiqdə `reviewAfter` `KNOWLEDGE_REVIEW_INTERVAL_DAYS` (180) sonraya qoyulur (gələcəkdədirsə saxlanılır); admin siyahısında
+  «Təsdiq gözləyir» və «Yenilənməli» (`KNOWLEDGE_STALE_FILTER`) növbələri. Termin və FAQ təsdiq mərhələsiz işləyir
+  (`KNOWLEDGE_SIMPLE_STATUSES`). «Beh və ilkin ödəniş» bölməsi və bələdçisi `0085`-dədir — bələdçi hüquqi yoxlamadan keçmədiyi
+  üçün `IN_REVIEW` + `LEGAL_REVIEW` yaranır; hub dərc olunmuş məzmunu olmayan bölməni göstərmir.
 - `docs/Real Estate Knowledge Hub/Real Estate Knowledge Hub.md` hüquqi mənbə materialıdır,
   avtomatik dərc müqaviləsi deyil. `prisma/build-knowledge-hub-sql.ts` qeydləri DRAFT yaradır;
   hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilməməlidir.
@@ -351,7 +359,11 @@ qradiyent/modal fonu üçün sabit `black/<opacity>` işlət.
   ilə fırlanma/split-screen-də yenidən render olunur; kök `overflow-hidden` saxlanmalıdır —
   əks halda 300px-lik widget öz konteynerini genişləndirir və keçid heç vaxt baş vermir.
 - Interaktiv element mobil ekranda ≥44px; mətn linkini böyütmək lazımdırsa layout-u
-  dəyişməyən `after:absolute after:-inset-y-3` toxunma sahəsi işlət.
+  dəyişməyən `after:absolute after:-inset-y-3` toxunma sahəsi işlət. Kiçik checkbox (16–20px) `<label className="inline-grid
+  size-11 place-items-center">` ilə sarılır; sıx siyahıda vizual yeri saxlamaq üçün `-m-3.5` (#271 — toplu seçim, bildiriş matrisi).
+- **Mobil audit (#271, PRD Modul 24):** yeni modul səhifələri 375/768/1280/1440 px-də üfüqi daşmasız; `e2e/specs/mobile.spec.ts`
+  yeni ictimai səhifələri, elan səhifəsinin PRD 26.2 elementlərini (qiymət, əlaqə, şikayət, seçilmişlər) və mobil kabinet
+  bölmələrini (auth fixture ilə) yoxlayır. Yeni ictimai səhifəni oradakı `paths` siyahısına əlavə et.
 
 **Seçim sahələri vahid `Combobox`-dur** (`components/ui/combobox.tsx`, #136): ARIA 1.2 combobox +
 listbox, diakritikasız axtarış («seki» → «Şəki»), klaviatura (↑↓, PageUp/Down, Enter, Esc, Tab),
@@ -488,7 +500,8 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
 - **Söndürülmüş modul yalnız UI-da gizlənmir:** action, səhifə (404) və API də bağlanır. Hazırda: şikayət (elan + rəy
   action-ları, düymələr), reytinq (rəy yazma/cavab, forma, `/kabinet/reyler`), CRM (`/kabinet/musteriler` layout-u + bütün
   action-lar), agentlik analitikası (səhifə + ixrac API), avtomatik moderasiya (`hold` → `review`, siqnallar yazılır),
-  e-poçt bildirişləri (`sendEmail({ notification: true })` — hesab bildirişi, uyğun elan, qiymət düşməsi, elan müddəti və
+  əlavə doğrulamalar (`EXTRA_VERIFICATION`, #268 — sənəd yükləmə action-u və kabinet səhifəsi 404, siyahıdakı «Sənədlər» düyməsi,
+  ictimai «Sənədlər/Məlumatlar yoxlanılıb» nişanları; hesab nişanları qalır), e-poçt bildirişləri (`sendEmail({ notification: true })` — hesab bildirişi, uyğun elan, qiymət düşməsi, elan müddəti və
   açıq qapı xatırlatması; tranzaksion məktub buraxılmır, kabinet bildirişi yenə yazılır), elan aktuallığı (gündəlik müddət işi dayanır). Kabinet menyusu
   `hiddenItems` ilə süzülür. Yeni modul yazanda bayrağını da yoxla.
 - Mövcud premium paket sifarişi (ofisdə ödəniş) monetizasiya bayrağına bağlanmayıb — Basic/Pro/Premium (Modul 14) onu üstələyəcək.

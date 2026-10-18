@@ -154,7 +154,8 @@
         "limit": "Gözləyən sənəd limiti aşılır.",
         "tooLarge": "Şəkil çox böyükdür.",
         "unsupported": "Yalnız JPEG, PNG və ya WebP şəkil.",
-        "storage": "Fayl saxlanılmadı. Bir az sonra yenidən cəhd edin."
+        "storage": "Fayl saxlanılmadı. Bir az sonra yenidən cəhd edin.",
+        "disabled": "Sənəd yoxlaması hazırda söndürülüb."
       }
     }
   },

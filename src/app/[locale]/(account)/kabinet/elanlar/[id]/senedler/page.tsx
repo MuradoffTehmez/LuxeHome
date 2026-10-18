@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
@@ -25,6 +26,8 @@ const TONE = { PENDING: "warning", VERIFIED: "success", REJECTED: "danger" } as 
 export default async function ListingDocumentsPage({ params }: { params: Promise<{ id: string }> }) {
   const locale = (await getLocale()) as Locale;
   const user = await requireLister(locale);
+  // «Əlavə doğrulamalar» açarı söndürülübsə bölmə yoxdur (#268).
+  if (!(await isFeatureEnabled("EXTRA_VERIFICATION"))) notFound();
   const { id } = await params;
   const t = await getTranslations("account.listings.documents");
   const property = await prisma.property.findFirst({

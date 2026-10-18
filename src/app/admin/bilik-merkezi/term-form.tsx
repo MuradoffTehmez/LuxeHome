@@ -3,7 +3,7 @@
 import { ContentEditor } from "@/components/admin/content-editor";
 import { AdminInput, AdminSelect, AdminTextarea, FullWidth } from "@/components/admin/form-fields";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
-import { KNOWLEDGE_STATUSES } from "@/lib/constants";
+import { KNOWLEDGE_SIMPLE_STATUSES } from "@/lib/constants";
 import { saveKnowledgeTerm } from "./actions";
 import type { KnowledgeTermFormValues } from "./form-values";
 import { useTranslations } from "next-intl";
@@ -17,7 +17,7 @@ export function KnowledgeTermForm({ initial, categories }: { initial: KnowledgeT
         <AdminInput name="term" label={t("pages.knowledge.termin")} required maxLength={120} defaultValue={initial.term} />
         <AdminInput name="slug" label={t("pages.knowledge.slug")} maxLength={90} defaultValue={initial.slug} hint={t("pages.knowledge.bosBuraxsanizTermindenYaradilir")} />
         <AdminSelect name="categoryId" label={t("pages.knowledge.movzu")} defaultValue={initial.categoryId} placeholder={t("pages.knowledge.movzusuz")} options={categories.map(({ id, name }) => ({ value: id, label: name }))} />
-        <AdminSelect name="status" label={t("pages.knowledge.status")} required defaultValue={initial.status} options={Object.values(KNOWLEDGE_STATUSES).map((value) => ({ value, label: t(`labels.knowledgeStatus.${value}`) }))} />
+        <AdminSelect name="status" label={t("pages.knowledge.status")} required defaultValue={initial.status} options={Object.values(KNOWLEDGE_SIMPLE_STATUSES).map((value) => ({ value, label: t(`labels.knowledgeStatus.${value}`) }))} />
         <AdminInput name="order" label={t("pages.knowledge.sira")} type="number" min={0} max={9999} defaultValue={String(initial.order)} />
         <FullWidth><AdminTextarea name="shortDefinition" label={t("pages.knowledge.qisaTerif")} required rows={3} maxLength={400} defaultValue={initial.shortDefinition} /></FullWidth>
         <FullWidth><ContentEditor name="definition" label={t("pages.knowledge.etrafliIzah")} defaultValue={initial.definition} /></FullWidth>

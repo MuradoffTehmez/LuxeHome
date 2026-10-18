@@ -290,6 +290,7 @@
     },
     "knowledgeStatus": {
       "DRAFT": "Draft",
+      "IN_REVIEW": "Awaiting approval",
       "PUBLISHED": "Published"
     },
     "leadSource": {
@@ -1446,7 +1447,15 @@
       "beledciniYenile": "Update guide",
       "beledciniSil": "Delete guide",
       "beledciIctimaiSaytdanCixarilacaq": "The guide is removed from the public site; the audit trail is kept.",
-      "beledciniRedakteEt": "Edit guide"
+      "beledciniRedakteEt": "Edit guide",
+      "review": {
+        "label": "Editorial queues",
+        "all": "All",
+        "inReview": "Awaiting approval ({count})",
+        "stale": "Needs update ({count})",
+        "due": "Needs update",
+        "hint": "Move the draft to «Awaiting approval» — another editor publishes it. An article that requires legal review cannot be published without a legal review date."
+      }
     },
     "translations": {
       "strukturlasdirilmisTercumeler": "Structured translations",
@@ -3219,7 +3228,7 @@
         },
         "EXTRA_VERIFICATION": {
           "label": "Extra verification",
-          "hint": "Additional account verification steps."
+          "hint": "Listing document uploads and moderator review, the «Documents verified» and «Data verified» badges. When off, new documents are not accepted and these badges are hidden."
         },
         "MONETIZATION_ENABLED": {
           "label": "Monetization",
@@ -3813,7 +3822,12 @@
       "terminTapilmadi": "Term not found.",
       "sualYenilendi": "Question updated.",
       "sualElaveOlundu": "Question added.",
-      "sualTapilmadi": "Question not found."
+      "sualTapilmadi": "Question not found.",
+      "review": {
+        "needsReview": "The article must first be sent for editorial approval («Awaiting approval»).",
+        "sameReviewer": "An article you submitted must be published by another editor.",
+        "legalReview": "An article that requires legal review cannot be published without a legal review date."
+      }
     },
     "blog": {
       "meqaleTapilmadi": "Article not found.",
