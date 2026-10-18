@@ -103,7 +103,8 @@
       "trust": "Account trust",
       "moderationHistory": "Moderation history",
       "traffic": "Traffic analytics",
-      "businessReports": "Reports"
+      "businessReports": "Reports",
+      "securityCenter": "Security center"
     }
   },
   "actions": {
@@ -3647,6 +3648,63 @@
         "priceTrend": "Approximate price trend",
         "priceTrendHint": "Median price per m² of sale listings (AZN, by month created); months with fewer than 5 listings show «—».",
         "samples": "{count} listings"
+      }
+    },
+    "securityCenter": {
+      "title": "Security center",
+      "description": "Sign-in indicators, security events and the data retention policy.",
+      "stats": {
+        "title": "Last 24 hours",
+        "description": "Sign-in attempts and security events.",
+        "failedLogins": "Failed sign-ins",
+        "successfulLogins": "Successful sign-ins",
+        "rateLimited": "Rate-limited attempts",
+        "lockedAccounts": "Locked accounts (now)",
+        "newDevice": "New-device sign-ins",
+        "forbidden": "Forbidden requests",
+        "csrf": "Rejected cross-site requests"
+      },
+      "topIps": {
+        "title": "IPs of failed attempts",
+        "description": "Addresses with the most failed sign-ins in the last 24 hours.",
+        "empty": "No failed sign-in attempts.",
+        "attempts": "{count} attempts"
+      },
+      "retention": {
+        "title": "Data retention policy",
+        "description": "The daily maintenance job deletes expired records.",
+        "hours": "{count} hours",
+        "days": "{count} days",
+        "forever": "not deleted",
+        "items": {
+          "sessionSliding": "Session (inactivity)",
+          "sessionAbsolute": "Session (absolute)",
+          "loginAttempts": "Sign-in attempts",
+          "securityEvents": "Security events",
+          "domainEvents": "System events",
+          "uniqueViews": "Unique view keys",
+          "propertyDocuments": "Document images (after decision)",
+          "auditLog": "Audit log"
+        },
+        "backups": "Backups: D1 Time Travel restores the database to any point in the last 7–30 days depending on the plan (wrangler d1 time-travel restore). The recovery procedure is on the «Deployment and Operations» Wiki page."
+      },
+      "events": {
+        "title": "Event log",
+        "total": "{count} events in total",
+        "filter": "Event type",
+        "all": "All",
+        "empty": "No events.",
+        "anonymous": "Unknown user",
+        "prev": "← Previous",
+        "next": "Next →"
+      },
+      "kinds": {
+        "NEW_DEVICE_LOGIN": "New-device sign-in",
+        "ACCOUNT_LOCKED": "Account locked",
+        "FORBIDDEN": "Forbidden request",
+        "CSRF_BLOCKED": "Cross-site request rejected",
+        "RATE_LIMITED": "Write rate limit",
+        "PASSWORD_CHANGED": "Password changed"
       }
     }
   },

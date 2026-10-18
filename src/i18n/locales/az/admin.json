@@ -103,7 +103,8 @@
       "trust": "Hesab etibarlılığı",
       "moderationHistory": "Moderasiya tarixçəsi",
       "traffic": "Trafik analitikası",
-      "businessReports": "Hesabatlar"
+      "businessReports": "Hesabatlar",
+      "securityCenter": "Təhlükəsizlik mərkəzi"
     }
   },
   "actions": {
@@ -3647,6 +3648,63 @@
         "priceTrend": "Təxmini qiymət trendi",
         "priceTrendHint": "Satış elanlarının m² median qiyməti (AZN, yaradıldığı ay); azı 5 elan olmayan ay «—».",
         "samples": "{count} elan"
+      }
+    },
+    "securityCenter": {
+      "title": "Təhlükəsizlik mərkəzi",
+      "description": "Giriş göstəriciləri, təhlükəsizlik hadisələri və məlumat saxlama siyasəti.",
+      "stats": {
+        "title": "Son 24 saat",
+        "description": "Giriş cəhdləri və təhlükəsizlik hadisələri.",
+        "failedLogins": "Uğursuz giriş",
+        "successfulLogins": "Uğurlu giriş",
+        "rateLimited": "Limitə düşən cəhd",
+        "lockedAccounts": "Kilidli hesab (indi)",
+        "newDevice": "Yeni cihazdan giriş",
+        "forbidden": "İcazəsiz müraciət",
+        "csrf": "Rədd edilmiş kənar sorğu"
+      },
+      "topIps": {
+        "title": "Uğursuz cəhdlərin IP-ləri",
+        "description": "Son 24 saatda ən çox uğursuz giriş gələn ünvanlar.",
+        "empty": "Uğursuz giriş cəhdi yoxdur.",
+        "attempts": "{count} cəhd"
+      },
+      "retention": {
+        "title": "Məlumat saxlama siyasəti",
+        "description": "Gündəlik baxım işi müddəti bitmiş qeydləri silir.",
+        "hours": "{count} saat",
+        "days": "{count} gün",
+        "forever": "silinmir",
+        "items": {
+          "sessionSliding": "Sessiya (fəaliyyətsizlik)",
+          "sessionAbsolute": "Sessiya (mütləq)",
+          "loginAttempts": "Giriş cəhdləri",
+          "securityEvents": "Təhlükəsizlik hadisələri",
+          "domainEvents": "Sistem hadisələri",
+          "uniqueViews": "Unikal baxış açarları",
+          "propertyDocuments": "Sənəd şəkilləri (qərardan sonra)",
+          "auditLog": "Audit jurnalı"
+        },
+        "backups": "Ehtiyat nüsxə: D1 Time Travel bazanı plana görə son 7–30 gün ərzində istənilən ana bərpa edir (wrangler d1 time-travel restore). Bərpa proseduru Wiki-də «Deployment and Operations» səhifəsindədir."
+      },
+      "events": {
+        "title": "Hadisə jurnalı",
+        "total": "Cəmi {count} hadisə",
+        "filter": "Hadisə növü",
+        "all": "Hamısı",
+        "empty": "Hadisə yoxdur.",
+        "anonymous": "Naməlum istifadəçi",
+        "prev": "← Əvvəlki",
+        "next": "Növbəti →"
+      },
+      "kinds": {
+        "NEW_DEVICE_LOGIN": "Yeni cihazdan giriş",
+        "ACCOUNT_LOCKED": "Hesab kilidləndi",
+        "FORBIDDEN": "İcazəsiz müraciət",
+        "CSRF_BLOCKED": "Kənar sorğu rədd edildi",
+        "RATE_LIMITED": "Yazma limiti",
+        "PASSWORD_CHANGED": "Parol dəyişdi"
       }
     }
   },

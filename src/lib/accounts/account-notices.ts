@@ -113,6 +113,8 @@ const COPY = {
     subscription: (plan: string, active: boolean, until: string) => active ? `${plan} abunəsi aktivdir (${until}-dək).` : `${plan} abunəsi dayandırıldı.`,
     securityPasswordTitle: "Parolunuz dəyişdirildi",
     securityPassword: "Hesabınızın parolu dəyişdirildi və digər cihazlardakı sessiyalar bağlandı. Bunu siz etməmisinizsə, dərhal bizimlə əlaqə saxlayın.",
+    securityLoginTitle: "Hesabınıza yeni cihazdan giriş edildi",
+    securityLogin: (device: string, ip: string, at: string) => `${at} tarixində hesabınıza tanınmayan cihazdan giriş edildi (${device}, IP ${ip}). Bu siz deyilsinizsə, dərhal parolunuzu dəyişin və «Profil» bölməsində digər sessiyaları bağlayın.`,
     reviewReportTitle: "Rəydən şikayətinizə baxıldı",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `«${target}» haqqındakı rəydən şikayətiniz təsdiqləndi: rəy gizlədildi və reytinqdən çıxarıldı.`
@@ -217,6 +219,8 @@ const COPY = {
     subscription: (plan: string, active: boolean, until: string) => active ? `Your ${plan} subscription is active (until ${until}).` : `Your ${plan} subscription was stopped.`,
     securityPasswordTitle: "Your password was changed",
     securityPassword: "Your account password was changed and sessions on other devices were signed out. If this was not you, contact us immediately.",
+    securityLoginTitle: "New sign-in to your account",
+    securityLogin: (device: string, ip: string, at: string) => `Your account was signed in from an unrecognised device on ${at} (${device}, IP ${ip}). If this was not you, change your password immediately and sign out other sessions in your profile.`,
     reviewReportTitle: "Your review report was reviewed",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `Your report about a review of “${target}” was upheld: the review was hidden and removed from the rating.`
@@ -321,6 +325,8 @@ const COPY = {
     subscription: (plan: string, active: boolean, until: string) => active ? `Подписка ${plan} активна (до ${until}).` : `Подписка ${plan} остановлена.`,
     securityPasswordTitle: "Пароль изменён",
     securityPassword: "Пароль аккаунта изменён, сессии на других устройствах завершены. Если это были не вы, срочно свяжитесь с нами.",
+    securityLoginTitle: "Вход в аккаунт с нового устройства",
+    securityLogin: (device: string, ip: string, at: string) => `${at} в ваш аккаунт выполнен вход с незнакомого устройства (${device}, IP ${ip}). Если это были не вы, срочно смените пароль и завершите другие сессии в профиле.`,
     reviewReportTitle: "Ваша жалоба на отзыв рассмотрена",
     reviewReport: (target: string, hidden: boolean) => hidden
       ? `Ваша жалоба на отзыв о «${target}» подтверждена: отзыв скрыт и исключён из рейтинга.`
@@ -893,6 +899,17 @@ export async function noticePasswordChanged(input: { userId: string; changedAt: 
     "/kabinet/profil",
     `security:password:${input.userId}:${input.changedAt.getTime()}`,
     (copy) => ({ title: copy.securityPasswordTitle, content: copy.securityPassword }),
+  );
+}
+
+/** Kritik təhlükəsizlik xəbərdarlığı (#264, PRD 23.1): tanınmayan cihazdan giriş — istifadəçi söndürə bilmir. */
+export async function noticeNewDeviceLogin(input: { userId: string; sessionId: string; device: string; ip: string; at: string }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.SECURITY,
+    "/kabinet/profil",
+    `security:login:${input.sessionId}`,
+    (copy) => ({ title: copy.securityLoginTitle, content: copy.securityLogin(input.device, input.ip, input.at) }),
   );
 }
 

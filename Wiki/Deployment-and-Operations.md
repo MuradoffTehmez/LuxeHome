@@ -375,7 +375,19 @@ ardıcıllığı ilə hazırlanır.
 
 ## Backup və bərpa
 
-Repo hazırda avtomatlaşdırılmış D1 backup/restore job-u saxlamır. Production əməliyyatı üçün ayrıca:
+**D1 Time Travel (#264):** Cloudflare D1 hər bazanın dəyişiklik tarixçəsini saxlayır — Workers Paid planında son 30 gün,
+Free planda 7 gün. Bərpa proseduru:
+
+1. Hadisənin vaxtını müəyyən edin (audit jurnalı, `/admin/tehlukesizlik`, Workers Logs).
+2. Bərpa nöqtəsini yoxlayın: `npx wrangler d1 time-travel info luxehome-db --timestamp=<RFC3339>`.
+3. Əvvəlcə staging-də sınayın (`luxehome-db-staging`), sonra production-da:
+   `npx wrangler d1 time-travel restore luxehome-db --timestamp=<RFC3339>` — əmr cari vəziyyətin bookmark-ını çap edir;
+   onu saxlayın, bərpanı geri almaq üçün `--bookmark=<əvvəlki>` ilə təkrar işlədilir.
+4. Bərpadan sonra miqrasiya cədvəlini (`d1_migrations`) və son tətbiq olunmuş miqrasiyanı yoxlayın; lazımdırsa
+   `db:migrate:remote` yenidən işlədilir (idempotentdir).
+
+R2 media (`luxehome-media`) avtomatik ehtiyatlanmır. Saxlama müddətləri `src/lib/security/retention-policy.ts`-dədir və
+`/admin/tehlukesizlik`-də göstərilir. Production əməliyyatı üçün ayrıca:
 
 - planlı D1 export;
 - R2 inventory və lifecycle;

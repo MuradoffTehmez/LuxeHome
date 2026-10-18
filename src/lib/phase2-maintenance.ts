@@ -10,8 +10,9 @@ import { sendOpenHouseReminders } from "@/lib/open-house";
 import { expireVipGrants } from "@/lib/vip";
 import { purgeReviewedDocuments } from "@/lib/property-verification";
 import { refreshActiveAccountsTrust } from "@/lib/account-trust";
+import { purgeSecurityLogs } from "@/lib/security/security-events";
+import { DOMAIN_EVENT_RETENTION_DAYS } from "@/lib/security/retention-policy";
 
-const DOMAIN_EVENT_RETENTION_DAYS = 180;
 
 /** Gündəlik cron üçün idempotent premium və rezervasiya müddəti təmizliyi. */
 export async function runPhase2Maintenance(now = new Date()) {
@@ -60,6 +61,8 @@ export async function runPhase2Maintenance(now = new Date()) {
   const purgedDocuments = await purgeReviewedDocuments(now);
   // Hesab etibarlılığı (#258): son 7 gündə fəal hesabların davranış balı yenilənir.
   const trustRefreshed = await refreshActiveAccountsTrust(now).catch(() => 0);
+  // Saxlama müddəti (#264, PRD 23.4): köhnə təhlükəsizlik hadisələri və giriş cəhdləri silinir.
+  const securityLogs = await purgeSecurityLogs(now).catch(() => ({ events: 0, loginAttempts: 0 }));
 
   return {
     expiredPremium: premium.count,
@@ -73,5 +76,6 @@ export async function runPhase2Maintenance(now = new Date()) {
     prunedUniqueViews: uniqueViewKeys,
     purgedDocuments,
     trustRefreshed,
+    securityLogs,
   };
 }

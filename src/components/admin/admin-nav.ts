@@ -73,6 +73,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "verification", href: "/admin/senedler" },
           { labelKey: "appeals", href: "/admin/etirazlar", badgeKey: "openAppeals" },
           { labelKey: "moderationHistory", href: "/admin/moderasiya-tarixcesi" },
+          { labelKey: "securityCenter", href: "/admin/tehlukesizlik" },
         ],
       },
       {

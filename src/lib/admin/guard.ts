@@ -13,6 +13,7 @@ import type { Permission, SystemMode } from "@/lib/constants";
 import { DEFAULT_LOCALE, ROLES, type Locale } from "@/lib/constants";
 import { msg } from "@/lib/admin/server-message";
 import { accountWriteBlock } from "@/lib/account-trust";
+import { recordSecurityEvent, SECURITY_EVENT_KINDS } from "@/lib/security/security-events";
 
 /**
  * Paneldəki hər yazma əməliyyatının giriş qapısı.
@@ -95,7 +96,10 @@ export async function assertSameOrigin(): Promise<void> {
   try {
     await assertRequestSameOrigin();
   } catch (error) {
-    if (error instanceof SameOriginError) throw new AdminGuardError(error.message);
+    if (error instanceof SameOriginError) {
+      await recordSecurityEvent(SECURITY_EVENT_KINDS.CSRF_BLOCKED);
+      throw new AdminGuardError(error.message);
+    }
     throw error;
   }
 }
@@ -117,6 +121,7 @@ async function assertWriteLimit(userId: string, scope: string): Promise<void> {
 
   const { success } = await limiter.limit({ key: `${scope}:${userId}` });
   if (!success) {
+    await recordSecurityEvent(SECURITY_EVENT_KINDS.RATE_LIMITED, { userId, detail: { scope } });
     throw new RateLimitGuardError("Çox sayda əməliyyat oldu. Bir dəqiqə gözləyin.");
   }
 }

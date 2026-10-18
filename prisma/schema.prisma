@@ -2778,3 +2778,20 @@ model AccountRestrictionAppeal {
   @@index([status, createdAt])
   @@index([restrictionId])
 }
+
+/// Təhlükəsizlik hadisəsi (#264, PRD 23.1/23.4): yeni cihazdan giriş, hesab kilidi, icazəsiz sorğu, CSRF, limit,
+/// parol dəyişikliyi. `SECURITY_EVENT_KINDS`; saxlama müddəti `SECURITY_EVENT_RETENTION_DAYS`. Gizli dəyər yazılmır.
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  kind      String
+  userId    String?
+  ip        String?
+  userAgent String?
+  /// Qısa JSON təfsilat (icazə, yol, cihaz etiketi) — parol, token və ya cookie yazılmır.
+  detail    String?
+  createdAt DateTime @default(now())
+
+  @@index([kind, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}

@@ -785,3 +785,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   **Modul 19 tamamlandı.** Növbəti — Modul 20 (hesabatlar və biznes analitikası).
 - #262 (Modul 20): `/admin/hesabatlar` — platforma analitikası (DAU/WAU/MAU, 6 aylıq dinamika), biznes göstəriciləri
   (ödəniş söndürülüdürsə gəlir «aktiv deyil»), coğrafi hesabatlar. **Modul 20 tamamlandı.** Növbəti — Modul 21 (təhlükəsizlik/audit).
+- #264 (Modul 21): `SecurityEvent` jurnalı, yeni cihaz xəbərdarlığı, saxlama siyasəti + təmizlik, `/admin/tehlukesizlik`,
+  D1 Time Travel bərpa proseduru (Wiki). RBAC, admin 2FA, sessiya, limit, audit, CSRF/XSS əvvəldən var.
+  **Modul 21 tamamlandı.** Növbəti — Modul 22 (Bilik Mərkəzi və maarifləndirmə).

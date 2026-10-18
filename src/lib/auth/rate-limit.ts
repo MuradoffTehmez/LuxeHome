@@ -1,6 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { prisma } from "@/lib/prisma";
 import { isLockActive, lockUntil, shouldLock } from "./lockout";
+import { SECURITY_EVENT_KINDS } from "@/lib/security/security-event-kinds";
 
 /**
  * İki qatlı müdafiə.
@@ -173,6 +174,15 @@ export async function registerFailure(
         data: { lockedUntil: lockUntil(new Date()) },
       });
       locked = true;
+      // Təhlükəsizlik hadisəsi (#264). Jurnal `security-events.ts`-dən çağırılmır — o modul bu fayldan
+      // `clientIp`-ni idxal edir; yazılış xətası kilidi sındırmamalıdır.
+      try {
+        await prisma.securityEvent.create({
+          data: { kind: SECURITY_EVENT_KINDS.ACCOUNT_LOCKED, userId, ip, detail: JSON.stringify({ reason }) },
+        });
+      } catch {
+        // jurnal kritik yol deyil
+      }
     }
   }
 

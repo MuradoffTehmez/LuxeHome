@@ -279,6 +279,18 @@ Secret-lər:
 - `AUTH_SECRET` dəyişməsi mövcud session JWT-lərini və TOTP şifrələməsini təsir edir;
 - rotasiya versiyalı açar və keçid planı olmadan aparılmamalıdır.
 
+## Təhlükəsizlik hadisələri və şübhəli giriş (#264)
+
+- `SecurityEvent` jurnalı (`lib/security/security-events.ts`, heç vaxt atmır): yeni cihazdan giriş, hesab kilidi
+  (`registerFailure`), icazəsiz panel müraciəti (`requirePermission`), rədd edilmiş kənar sorğu (`assertSameOrigin`),
+  yazma limiti və parol dəyişikliyi. Təfsilat ≤500 simvoldur, parol/token/cookie yazılmır.
+- **Yeni cihaz xəbərdarlığı** (`alertOnNewDevice`): sessiya açılandan sonra son 90 günün sessiyaları ilə müqayisə —
+  cihaz (brauzer ailəsi + OS, versiyasız) və IP ikisi də tanınmırsa xəbərdarlıq. İlk giriş xəbərdarlıq vermir.
+  İctimai hesaba `SECURITY` bildirişi (söndürülmür), əməkdaşa birbaşa e-poçt.
+- Saxlama: hadisələr 180, giriş cəhdləri 90 gün (`runPhase2Maintenance` → `purgeSecurityLogs`); audit jurnalı silinmir.
+- `/admin/tehlukesizlik` (`user:manage`): son 24 saatın göstəriciləri, uğursuz cəhdlərin IP-ləri, hadisə jurnalı,
+  saxlama siyasəti.
+
 ## Məlum təhlükəsizlik boşluqları
 
 | Prioritet | Boşluq | Risk |

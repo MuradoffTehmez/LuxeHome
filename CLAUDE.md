@@ -565,6 +565,15 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   hələ ödənişsizdir, gəliri `0`. Axtarılan ərazilər saxlanılmış axtarışların `citySlug`/`districtSlug`-ındandır, növ marağı
   `PropertyDailyStat` baxışlarından, qiymət trendi satış (AZN) elanlarının yaradıldığı ay üzrə m² medianıdır
   (`PRICE_TREND_MIN_SAMPLES`-dən az nümunədə «—»). Kataloq namespace-i `pages.businessReports`-dur (`pages.reports` şikayətlərdir).
+- **Təhlükəsizlik və audit (#264, PRD Modul 21):** `SecurityEvent` (`0084`) — `recordSecurityEvent()` (`lib/security/
+  security-events.ts`) **heç vaxt atmır**; növlər saf `security-event-kinds.ts`-dədir (auth qatı dövri asılılıqsız yazsın deyə
+  `registerFailure` kilidi birbaşa yazır). Yazılan hadisələr: yeni cihazdan giriş, hesab kilidi, `requirePermission` rəddi,
+  `assertSameOrigin` rəddi, yazma limiti, parol dəyişikliyi. **Yeni cihaz xəbərdarlığı** `alertOnNewDevice()` hər sessiya
+  açan axında (`openPublicSession`, əməkdaşın 2FA addımı) çağırılır: son `KNOWN_DEVICE_WINDOW_DAYS` günün sessiyaları ilə
+  cihaz (brauzer + OS, `deviceLabel`) və IP müqayisəsi, ikisi də yenidirsə hadisə + ictimai hesaba `SECURITY` bildirişi
+  (`noticeNewDeviceLogin`), əməkdaşa birbaşa e-poçt. Sessiya açan yeni axın da onu çağırmalıdır. Saxlama müddətləri
+  `lib/security/retention-policy.ts`-dədir (panel cədvəli də oradan qurulur); `purgeSecurityLogs()` gündəlik baxımdadır.
+  `/admin/tehlukesizlik` (`user:manage`, «Təhlükəsizlik» qrupu). D1 Time Travel bərpa proseduru Wiki-dədir.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 
