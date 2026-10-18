@@ -55,7 +55,10 @@ export async function startTelegramSignup(_previous: ActionState, formData: Form
     if (!result.ok) {
       return failure(result.reason === "email-taken" ? t("signup.emailTaken") : t("signup.telegramTaken"), result.reason === "email-taken" ? { email: t("signup.emailTaken") } : undefined);
     }
-    await sendTelegramSignupEmail(parsed.data.email, result.token, locale);
+    // `sendEmail` xətada atmır, `{ success: false }` qaytarır — məktub getməyibsə kimlik cookie-si saxlanılır ki,
+    // istifadəçi OAuth axınını yenidən başlatmadan təkrar cəhd edə bilsin.
+    const delivery = await sendTelegramSignupEmail(parsed.data.email, result.token, locale);
+    if (!delivery.success) return failure(t("signup.emailFailed"));
     await clearPendingTelegramSignup();
   } catch (error) {
     return unexpected("telegram qeydiyyatı başlamadı", error, t("signup.failed"));

@@ -11,6 +11,7 @@ import {
   parseCommand,
   parseStartPayload,
   parseTelegramConfig,
+  safeCutIndex,
   splitMessage,
   supportRateAllowed,
   SUPPORT_MESSAGES_PER_HOUR,
@@ -65,6 +66,18 @@ describe("mesaj formatı", () => {
     expect(parts.length).toBeGreaterThan(2);
     for (const part of parts) expect(part.length).toBeLessThanOrEqual(4000);
     expect(parts.join("")).toContain("b".repeat(3000));
+  });
+
+  it("bölmə HTML entity-ni və teqi ortadan kəsmir", () => {
+    const escaped = escapeTelegramHtml(`x${"&".repeat(2000)}`);
+    const parts = splitMessage(escaped);
+    expect(parts.length).toBeGreaterThan(1);
+    for (const part of parts) {
+      expect(part.length).toBeLessThanOrEqual(4000);
+      expect(part).toMatch(/^(?:x|&amp;)+$/);
+    }
+    expect(parts.join("")).toBe(escaped);
+    expect(safeCutIndex("abc<b>def", 5)).toBe(3);
   });
 
   it("nömrə maskalanır", () => {

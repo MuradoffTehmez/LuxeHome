@@ -107,13 +107,28 @@ export function splitMessage(html: string, limit = TELEGRAM_MESSAGE_LIMIT): stri
     if (current) parts.push(current);
     let rest = line;
     while (rest.length > limit) {
-      parts.push(rest.slice(0, limit));
-      rest = rest.slice(limit);
+      const cut = safeCutIndex(rest, limit);
+      parts.push(rest.slice(0, cut));
+      rest = rest.slice(cut);
     }
     current = rest;
   }
   if (current) parts.push(current);
   return parts;
+}
+
+/**
+ * Sərt kəsik HTML entity-ni (`&amp;`) və ya teqi (`<b>`) ortadan bölməsin — Telegram yarımçıq entity-li hissəni 400 ilə
+ * rədd edir. Kəsik açıq qalmış `&`/`<`-dan əvvələ çəkilir; belə simvol yoxdursa limitdə kəsilir.
+ */
+export function safeCutIndex(text: string, limit: number): number {
+  const head = text.slice(0, limit);
+  const amp = head.lastIndexOf("&");
+  const lt = head.lastIndexOf("<");
+  let cut = limit;
+  if (amp > 0 && !head.slice(amp).includes(";")) cut = Math.min(cut, amp);
+  if (lt > 0 && !head.slice(lt).includes(">")) cut = Math.min(cut, lt);
+  return cut;
 }
 
 /** Nömrənin son 4 rəqəmi qalır: `+994 50 *** ** 67`-yə bənzər qısa forma. */
