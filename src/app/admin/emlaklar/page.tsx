@@ -21,6 +21,7 @@ import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatArea, formatNumber, formatPrice, formatRelative } from "@/lib/utils";
 import {
   LISTING_TYPES,
+  PERMISSIONS,
   PROPERTY_STATUSES,
   type ListingType,
   type PropertyStatus,
@@ -31,6 +32,7 @@ import { BulkActionsForm, RowCheckbox } from "./bulk-actions";
 import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
+import { requireAdminRead } from "@/lib/admin/guard";
 
 const ADMIN_PROPERTY_VIEWS = ["subheli", "vip", "irelicekilmis", "arxiv"] as const;
 
@@ -54,6 +56,9 @@ export default async function AdminPropertiesPage({
 }: {
   searchParams: SearchParams;
 }) {
+  // Siyahı da detal səhifəsi kimi `property:manage` tələb edir — əvvəl yalnız layout-un
+  // `requireStaff()` qoruması var idi və Redaktor rolu qaralama elanları görə bilirdi.
+  await requireAdminRead(PERMISSIONS.PROPERTY_MANAGE);
   const t = await getAdminT();
   const { locale } = await getAdminI18n();
   const params = await searchParams;

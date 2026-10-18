@@ -30,10 +30,14 @@ import {
 } from "@/components/admin/admin-responsive-list";
 import { formatPrice, formatRelative } from "@/lib/utils";
 import {
+  PERMISSIONS,
   type LeadSource,
   type LeadStatus,
+  type Permission,
   type PropertyStatus,
 } from "@/lib/constants";
+import { requireStaff } from "@/lib/auth/guard";
+import { hasPermission } from "@/lib/auth/permissions";
 import { getAdminT } from "@/lib/admin-i18n";
 import {
   getAdminAlerts,
@@ -47,28 +51,34 @@ import { SETTING_KEYS, getSetting } from "@/lib/settings";
 import { PlatformIndicatorsCard } from "./platform-indicators-card";
 
 export default async function AdminDashboardPage() {
-  const t = await getAdminT();
+  const [t, actor] = await Promise.all([getAdminT(), requireStaff()]);
+  // Dashboard bölmələri səhifələrin öz icazələrinə tabedir: əvvəl Redaktor müraciətlərin adını və
+  // əlaqəsini, qaralama elanları burada görürdü, halbuki həmin siyahıların səhifəsi ona bağlıdır.
+  const can = (permission: Permission) => hasPermission(actor.role, permission);
+  const canProperty = can(PERMISSIONS.PROPERTY_MANAGE);
+  const canLead = can(PERMISSIONS.LEAD_MANAGE);
+  const canUsers = can(PERMISSIONS.USER_MANAGE);
   const [stats, recentLeads, recentProperties, announcement, alerts, topViewed, leadBreakdown] =
     await Promise.all([
       getDashboardStats(),
-      getRecentAdminLeads(),
-      getRecentAdminProperties(),
+      canLead ? getRecentAdminLeads() : Promise.resolve([] as Awaited<ReturnType<typeof getRecentAdminLeads>>),
+      canProperty ? getRecentAdminProperties() : Promise.resolve([] as Awaited<ReturnType<typeof getRecentAdminProperties>>),
       getSetting(SETTING_KEYS.ADMIN_ANNOUNCEMENT),
       getAdminAlerts(),
-      getTopViewedProperties(),
-      getLeadStatusBreakdown(),
+      canProperty ? getTopViewedProperties() : Promise.resolve([] as Awaited<ReturnType<typeof getTopViewedProperties>>),
+      canLead ? getLeadStatusBreakdown() : Promise.resolve([] as Awaited<ReturnType<typeof getLeadStatusBreakdown>>),
     ]);
 
   const alertItems = [
-    alerts.pendingProperties > 0 && {
+    canProperty && alerts.pendingProperties > 0 && {
       label: t("dashboard.alerts.pendingProperties", { count: alerts.pendingProperties }),
       href: "/admin/emlaklar?status=PENDING",
     },
-    alerts.unverifiedAgencies > 0 && {
+    canUsers && alerts.unverifiedAgencies > 0 && {
       label: t("dashboard.alerts.unverifiedAgencies", { count: alerts.unverifiedAgencies }),
       href: "/admin/agentlikler",
     },
-    alerts.lockedUsers > 0 && {
+    canUsers && alerts.lockedUsers > 0 && {
       label: t("dashboard.alerts.lockedUsers", { count: alerts.lockedUsers }),
       href: "/admin/istifadeciler",
     },
@@ -83,14 +93,18 @@ export default async function AdminDashboardPage() {
         description={t("dashboard.description")}
         actions={
           <>
-            <ButtonLink href="/admin/emlaklar/yeni" variant="primary" size="sm">
-              <Plus className="size-4" aria-hidden="true" />
-              {t("dashboard.newProperty")}
-            </ButtonLink>
-            <ButtonLink href="/admin/blog/yeni" variant="outline" size="sm">
-              <FileEdit className="size-4" aria-hidden="true" />
-              {t("dashboard.writePost")}
-            </ButtonLink>
+            {canProperty && (
+              <ButtonLink href="/admin/emlaklar/yeni" variant="primary" size="sm">
+                <Plus className="size-4" aria-hidden="true" />
+                {t("dashboard.newProperty")}
+              </ButtonLink>
+            )}
+            {can(PERMISSIONS.BLOG_MANAGE) && (
+              <ButtonLink href="/admin/blog/yeni" variant="outline" size="sm">
+                <FileEdit className="size-4" aria-hidden="true" />
+                {t("dashboard.writePost")}
+              </ButtonLink>
+            )}
           </>
         }
       />
@@ -121,30 +135,30 @@ export default async function AdminDashboardPage() {
 
       {/* --- Sayğaclar --- */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
+        {canProperty && <StatCard
           label={t("dashboard.stats.activeProperties")}
           value={stats.activeProperties}
           hint={t("dashboard.stats.activePropertiesHint", { count: stats.draftProperties })}
           icon={Building2}
           tone="gold"
           href="/admin/emlaklar"
-        />
-        <StatCard
+        />}
+        {canLead && <StatCard
           label={t("dashboard.stats.newLeads")}
           value={stats.newLeads}
           hint={t("dashboard.stats.newLeadsHint", { count: stats.totalLeads })}
           icon={Inbox}
           tone="warning"
           href="/admin/muracietler"
-        />
-        <StatCard
+        />}
+        {can(PERMISSIONS.PROJECT_MANAGE) && <StatCard
           label={t("dashboard.stats.activeProjects")}
           value={stats.activeProjects}
           hint={t("dashboard.stats.activeProjectsHint")}
           icon={Blocks}
           tone="neutral"
           href="/admin/layiheler"
-        />
+        />}
         <StatCard
           label={t("dashboard.stats.publishedPosts")}
           value={stats.publishedPosts}
@@ -155,10 +169,11 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Platforma və risk göstəriciləri (#260, PRD Modul 19). */}
-      <PlatformIndicatorsCard />
+      {canProperty && <PlatformIndicatorsCard />}
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_1fr]">
+      {(canLead || canProperty) && <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_1fr]">
         {/* --- Son müraciətlər --- */}
+        {canLead && (
         <AdminCard
           title={t("dashboard.recentLeads.title")}
           description={t("dashboard.recentLeads.description")}
@@ -241,8 +256,10 @@ export default async function AdminDashboardPage() {
             )}
           />
         </AdminCard>
+        )}
 
         {/* --- Son əmlaklar --- */}
+        {canProperty && (
         <AdminCard
           title={t("dashboard.recentProperties.title")}
           bodyClassName="p-0"
@@ -283,10 +300,12 @@ export default async function AdminDashboardPage() {
             ))}
           </ul>
         </AdminCard>
-      </div>
+        )}
+      </div>}
 
       {/* --- Analitika --- */}
-      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_1fr]">
+      {(canLead || canProperty) && <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_1fr]">
+        {canProperty && (
         <AdminCard title={t("dashboard.topViewed.title")} description={t("dashboard.topViewed.description")} bodyClassName="p-0">
           <ul className="divide-y divide-line">
             {topViewed.length === 0 && (
@@ -318,7 +337,9 @@ export default async function AdminDashboardPage() {
             ))}
           </ul>
         </AdminCard>
+        )}
 
+        {canLead && (
         <AdminCard title={t("dashboard.leadBreakdown.title")} description={t("dashboard.leadBreakdown.description")} bodyClassName="p-5">
           {leadBreakdown.length === 0 ? (
             <p className="py-8 text-center text-sm text-ink-muted">{t("dashboard.leadBreakdown.empty")}</p>
@@ -341,20 +362,21 @@ export default async function AdminDashboardPage() {
             </ul>
           )}
         </AdminCard>
-      </div>
+        )}
+      </div>}
 
       {/* --- Sürətli keçidlər --- */}
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: t("dashboard.quickActions.newProperty"), href: "/admin/emlaklar/yeni", icon: Building2 },
-          { label: t("dashboard.quickActions.newProject"), href: "/admin/layiheler/yeni", icon: Blocks },
-          { label: t("dashboard.quickActions.newPost"), href: "/admin/blog/yeni", icon: Newspaper },
-          { label: t("dashboard.quickActions.viewLeads"), href: "/admin/muracietler", icon: Inbox },
-          { label: t("dashboard.quickActions.moderation"), href: "/admin/moderation", icon: ShieldCheck },
-          { label: t("dashboard.quickActions.leadBoard"), href: "/admin/muracietler/lovhe", icon: KanbanSquare },
-          { label: t("dashboard.quickActions.aiAssistant"), href: "/admin/ai-komekci", icon: Sparkles },
-          { label: t("dashboard.quickActions.importListings"), href: "/admin/emlaklar/idxal", icon: FileUp },
-        ].map((action) => (
+          { label: t("dashboard.quickActions.newProperty"), href: "/admin/emlaklar/yeni", icon: Building2, permission: PERMISSIONS.PROPERTY_MANAGE },
+          { label: t("dashboard.quickActions.newProject"), href: "/admin/layiheler/yeni", icon: Blocks, permission: PERMISSIONS.PROJECT_MANAGE },
+          { label: t("dashboard.quickActions.newPost"), href: "/admin/blog/yeni", icon: Newspaper, permission: PERMISSIONS.BLOG_MANAGE },
+          { label: t("dashboard.quickActions.viewLeads"), href: "/admin/muracietler", icon: Inbox, permission: PERMISSIONS.LEAD_MANAGE },
+          { label: t("dashboard.quickActions.moderation"), href: "/admin/moderation", icon: ShieldCheck, permission: PERMISSIONS.PROPERTY_MANAGE },
+          { label: t("dashboard.quickActions.leadBoard"), href: "/admin/muracietler/lovhe", icon: KanbanSquare, permission: PERMISSIONS.LEAD_MANAGE },
+          { label: t("dashboard.quickActions.aiAssistant"), href: "/admin/ai-komekci", icon: Sparkles, permission: PERMISSIONS.PROPERTY_MANAGE },
+          { label: t("dashboard.quickActions.importListings"), href: "/admin/emlaklar/idxal", icon: FileUp, permission: PERMISSIONS.PROPERTY_MANAGE },
+        ].filter((action) => can(action.permission)).map((action) => (
           <Link
             key={action.href}
             href={action.href}

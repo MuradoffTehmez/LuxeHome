@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,7 +13,7 @@ import type { Locale } from "@/lib/constants";
 import { siteConfig } from "@/config/site";
 import type { AuthUser } from "@/lib/auth/types";
 import { signOut } from "@/app/[locale]/giris/actions";
-import { adminNav, adminRouteIsActive, type AdminNavBadgeKey } from "./admin-nav";
+import { adminNavForRole, adminRouteIsActive, type AdminNavBadgeKey } from "./admin-nav";
 import { AdminIcon } from "./admin-icon";
 import { AdminCommandMenu } from "./admin-command-menu";
 
@@ -87,7 +87,7 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
           </button>
 
           <div className="flex min-w-0 flex-1 justify-end px-0 md:justify-center md:px-4">
-            <AdminCommandMenu />
+            <AdminCommandMenu role={user.role} />
           </div>
 
           <div className="ml-auto flex items-center gap-2 md:ml-0">
@@ -133,6 +133,8 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
 
 function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarContentProps) {
   const t = useTranslations("admin");
+  // Yalnız rolun açdığı bəndlər — icazəsiz menyu linki 403 səhifəsinə aparırdı.
+  const adminNav = useMemo(() => adminNavForRole(user.role), [user.role]);
   const dark = tone === "dark";
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(
@@ -153,7 +155,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
       ...current,
       ...Object.fromEntries(activeParents.map((item) => [item.href, true])),
     }));
-  }, [pathname]);
+  }, [adminNav, pathname]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">

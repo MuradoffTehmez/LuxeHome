@@ -8,6 +8,7 @@
  */
 
 import type { AdminNavGroupKey, AdminNavItemKey, AdminNavSectionKey as AdminNavSectionKeyFromCatalog } from "@/i18n/admin";
+import { PERMISSIONS, ROLE_PERMISSIONS, type Permission, type Role } from "@/lib/constants";
 
 export type AdminNavItem = {
   /** `admin.nav.items` altındakı açar. */
@@ -17,6 +18,8 @@ export type AdminNavItem = {
   icon: string;
   /** Yan paneldə göstərilən sayğac açarı. */
   badgeKey?: AdminNavBadgeKey;
+  /** Səhifənin guard-ı ilə eyni icazə; yoxdursa hər əməkdaş görür. Alt menyulu modulda uşaqlarda yazılır. */
+  permission?: Permission;
   /** Böyük modulların sidebar daxilində açılan ikinci səviyyə keçidləri. */
   children?: AdminNavChild[];
 };
@@ -28,6 +31,8 @@ export type AdminNavChild = {
   href: string;
   /** Alt bənddə kiçik sayğac (#159) — məs. moderasiya növbəsi, açıq şikayətlər. */
   badgeKey?: AdminNavBadgeKey;
+  /** Səhifənin guard-ı ilə eyni icazə (`admin-nav-permissions.test.ts` mənbə ilə tutuşdurur). */
+  permission: Permission;
   /**
    * Uzun alt menyuda bölmə başlığı (`admin.nav.sections`). Ardıcıl eyni dəyərli bəndlər bir başlıq
    * altında göstərilir — məs. SERP-in gündəlik monitorinqi texniki konfiqurasiyadan ayrılır.
@@ -62,12 +67,12 @@ export const adminNav: AdminNavGroup[] = [
         icon: "Building2",
         badgeKey: "draftProperties",
         children: [
-          { labelKey: "properties", href: "/admin/emlaklar" },
-          { labelKey: "moderation", href: "/admin/moderation", badgeKey: "pendingModeration" },
-          { labelKey: "transfers", href: "/admin/kocurmeler", badgeKey: "pendingTransfers" },
-          { labelKey: "projects", href: "/admin/layiheler" },
-          { labelKey: "taxonomy", href: "/admin/taksonomiya" },
-          { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar" },
+          { labelKey: "properties", href: "/admin/emlaklar", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "moderation", href: "/admin/moderation", badgeKey: "pendingModeration", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "transfers", href: "/admin/kocurmeler", badgeKey: "pendingTransfers", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "projects", href: "/admin/layiheler", permission: PERMISSIONS.PROJECT_MANAGE },
+          { labelKey: "taxonomy", href: "/admin/taksonomiya", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar", permission: PERMISSIONS.PROPERTY_MANAGE },
         ],
       },
       {
@@ -78,10 +83,10 @@ export const adminNav: AdminNavGroup[] = [
         icon: "Megaphone",
         badgeKey: "pendingPromotionHub",
         children: [
-          { labelKey: "promotionOverview", href: "/admin/tesviq" },
-          { labelKey: "vip", href: "/admin/vip", badgeKey: "pendingVip" },
-          { labelKey: "promotion", href: "/admin/irelicekme", badgeKey: "pendingPromotions" },
-          { labelKey: "packages", href: "/admin/paketler" },
+          { labelKey: "promotionOverview", href: "/admin/tesviq", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "vip", href: "/admin/vip", badgeKey: "pendingVip", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "promotion", href: "/admin/irelicekme", badgeKey: "pendingPromotions", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "packages", href: "/admin/paketler", permission: PERMISSIONS.BILLING_MANAGE },
         ],
       },
       {
@@ -91,11 +96,11 @@ export const adminNav: AdminNavGroup[] = [
         icon: "UserRoundCheck",
         badgeKey: "pendingApprovals",
         children: [
-          { labelKey: "approvals", href: "/admin/agentlikler/tesdiq", badgeKey: "pendingApprovals" },
-          { labelKey: "agencies", href: "/admin/agentlikler" },
-          { labelKey: "agents", href: "/admin/agentler" },
-          { labelKey: "accounts", href: "/admin/hesablar" },
-          { labelKey: "users", href: "/admin/istifadeciler" },
+          { labelKey: "approvals", href: "/admin/agentlikler/tesdiq", badgeKey: "pendingApprovals", permission: PERMISSIONS.USER_MANAGE },
+          { labelKey: "agencies", href: "/admin/agentlikler", permission: PERMISSIONS.USER_MANAGE },
+          { labelKey: "agents", href: "/admin/agentler", permission: PERMISSIONS.USER_MANAGE },
+          { labelKey: "accounts", href: "/admin/hesablar", permission: PERMISSIONS.USER_MANAGE },
+          { labelKey: "users", href: "/admin/istifadeciler", permission: PERMISSIONS.USER_MANAGE },
         ],
       },
       {
@@ -104,12 +109,12 @@ export const adminNav: AdminNavGroup[] = [
         icon: "Inbox",
         badgeKey: "newLeads",
         children: [
-          { labelKey: "leads", href: "/admin/muracietler", badgeKey: "newLeads" },
-          { labelKey: "leadBoard", href: "/admin/muracietler/lovhe" },
-          { labelKey: "funnel", href: "/admin/huni" },
-          { labelKey: "reservations", href: "/admin/rezervasiyalar" },
-          { labelKey: "calendar", href: "/admin/rezervasiyalar/teqvim" },
-          { labelKey: "email", href: "/admin/e-poct" },
+          { labelKey: "leads", href: "/admin/muracietler", badgeKey: "newLeads", permission: PERMISSIONS.LEAD_MANAGE },
+          { labelKey: "leadBoard", href: "/admin/muracietler/lovhe", permission: PERMISSIONS.LEAD_MANAGE },
+          { labelKey: "funnel", href: "/admin/huni", permission: PERMISSIONS.LEAD_MANAGE },
+          { labelKey: "reservations", href: "/admin/rezervasiyalar", permission: PERMISSIONS.LEAD_MANAGE },
+          { labelKey: "calendar", href: "/admin/rezervasiyalar/teqvim", permission: PERMISSIONS.LEAD_MANAGE },
+          { labelKey: "email", href: "/admin/e-poct", permission: PERMISSIONS.LEAD_MANAGE },
         ],
       },
       {
@@ -120,13 +125,13 @@ export const adminNav: AdminNavGroup[] = [
         icon: "ShieldAlert",
         badgeKey: "openReports",
         children: [
-          { labelKey: "reports", href: "/admin/sikayetler", badgeKey: "openReports" },
-          { labelKey: "appeals", href: "/admin/etirazlar", badgeKey: "openAppeals" },
-          { labelKey: "trust", href: "/admin/etibarliliq" },
-          { labelKey: "verification", href: "/admin/senedler" },
-          { labelKey: "moderationHistory", href: "/admin/moderasiya-tarixcesi" },
-          { labelKey: "securityCenter", href: "/admin/tehlukesizlik" },
-          { labelKey: "audit", href: "/admin/audit" },
+          { labelKey: "reports", href: "/admin/sikayetler", badgeKey: "openReports", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "appeals", href: "/admin/etirazlar", badgeKey: "openAppeals", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "trust", href: "/admin/etibarliliq", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "verification", href: "/admin/senedler", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "moderationHistory", href: "/admin/moderasiya-tarixcesi", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "securityCenter", href: "/admin/tehlukesizlik", permission: PERMISSIONS.USER_MANAGE },
+          { labelKey: "audit", href: "/admin/audit", permission: PERMISSIONS.SETTINGS_MANAGE },
         ],
       },
     ],
@@ -139,15 +144,15 @@ export const adminNav: AdminNavGroup[] = [
         href: "/admin/blog",
         icon: "Newspaper",
         children: [
-          { labelKey: "blog", href: "/admin/blog" },
-          { labelKey: "knowledge", href: "/admin/bilik-merkezi" },
-          { labelKey: "services", href: "/admin/xidmetler" },
-          { labelKey: "partners", href: "/admin/terefdaslar" },
-          { labelKey: "media", href: "/admin/media" },
-          { labelKey: "translations", href: "/admin/tercumeler" },
+          { labelKey: "blog", href: "/admin/blog", permission: PERMISSIONS.BLOG_MANAGE },
+          { labelKey: "knowledge", href: "/admin/bilik-merkezi", permission: PERMISSIONS.KNOWLEDGE_MANAGE },
+          { labelKey: "services", href: "/admin/xidmetler", permission: PERMISSIONS.SERVICE_MANAGE },
+          { labelKey: "partners", href: "/admin/terefdaslar", permission: PERMISSIONS.PARTNER_VIEW },
+          { labelKey: "media", href: "/admin/media", permission: PERMISSIONS.MEDIA_MANAGE },
+          { labelKey: "translations", href: "/admin/tercumeler", permission: PERMISSIONS.TRANSLATION_MANAGE },
           // Əlaqə panelinin beh xəbərdarlığı (#199) — təhlükəsizlik məzmunu, Redaktor idarə edir.
-          { labelKey: "safetyTexts", href: "/admin/xeberdarliqlar" },
-          { labelKey: "aiAssistant", href: "/admin/ai-komekci" },
+          { labelKey: "safetyTexts", href: "/admin/xeberdarliqlar", permission: PERMISSIONS.KNOWLEDGE_MANAGE },
+          { labelKey: "aiAssistant", href: "/admin/ai-komekci", permission: PERMISSIONS.PROPERTY_MANAGE },
         ],
       },
       {
@@ -155,25 +160,25 @@ export const adminNav: AdminNavGroup[] = [
         href: "/admin/serp",
         icon: "SearchCheck",
         children: [
-          { labelKey: "seoOverview", href: "/admin/serp", section: "seoDaily" },
-          { labelKey: "seoMonitoring", href: "/admin/serp/monitorinq", section: "seoDaily" },
-          { labelKey: "seoAudit", href: "/admin/serp/audit", section: "seoDaily" },
-          { labelKey: "seoLiveAudit", href: "/admin/seo", section: "seoDaily" },
-          { labelKey: "seoSearchConsole", href: "/admin/serp/search-console", section: "seoDaily" },
-          { labelKey: "seoIndexing", href: "/admin/serp/indexing", section: "seoDaily" },
-          { labelKey: "seoLinks", href: "/admin/serp/links", section: "seoDaily" },
-          { labelKey: "seoNotFound", href: "/admin/redirects#not-found", section: "seoDaily" },
-          { labelKey: "seoKeywords", href: "/admin/serp/acar-sozler", section: "seoContentGroup" },
-          { labelKey: "seoContent", href: "/admin/serp/content", section: "seoContentGroup" },
-          { labelKey: "seoMedia", href: "/admin/serp/media", section: "seoContentGroup" },
-          { labelKey: "seoLandings", href: "/admin/serp/landingler", section: "seoContentGroup" },
-          { labelKey: "seoSettings", href: "/admin/serp/parametrler", section: "seoTechnical" },
-          { labelKey: "seoMetadata", href: "/admin/serp/metadata", section: "seoTechnical" },
-          { labelKey: "seoStructuredData", href: "/admin/serp/schema", section: "seoTechnical" },
-          { labelKey: "seoEntities", href: "/admin/serp/entities", section: "seoTechnical" },
-          { labelKey: "seoSitemap", href: "/admin/serp/sitemap", section: "seoTechnical" },
-          { labelKey: "seoRobots", href: "/admin/serp/robots", section: "seoTechnical" },
-          { labelKey: "redirects", href: "/admin/redirects", section: "seoTechnical" },
+          { labelKey: "seoOverview", href: "/admin/serp", section: "seoDaily", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoMonitoring", href: "/admin/serp/monitorinq", section: "seoDaily", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoAudit", href: "/admin/serp/audit", section: "seoDaily", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoLiveAudit", href: "/admin/seo", section: "seoDaily", permission: PERMISSIONS.PROPERTY_MANAGE },
+          { labelKey: "seoSearchConsole", href: "/admin/serp/search-console", section: "seoDaily", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoIndexing", href: "/admin/serp/indexing", section: "seoDaily", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoLinks", href: "/admin/serp/links", section: "seoDaily", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoNotFound", href: "/admin/redirects#not-found", section: "seoDaily", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoKeywords", href: "/admin/serp/acar-sozler", section: "seoContentGroup", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoContent", href: "/admin/serp/content", section: "seoContentGroup", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoMedia", href: "/admin/serp/media", section: "seoContentGroup", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoLandings", href: "/admin/serp/landingler", section: "seoContentGroup", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoSettings", href: "/admin/serp/parametrler", section: "seoTechnical", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoMetadata", href: "/admin/serp/metadata", section: "seoTechnical", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoStructuredData", href: "/admin/serp/schema", section: "seoTechnical", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoEntities", href: "/admin/serp/entities", section: "seoTechnical", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoSitemap", href: "/admin/serp/sitemap", section: "seoTechnical", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "seoRobots", href: "/admin/serp/robots", section: "seoTechnical", permission: PERMISSIONS.SEO_VIEW },
+          { labelKey: "redirects", href: "/admin/redirects", section: "seoTechnical", permission: PERMISSIONS.SEO_VIEW },
         ],
       },
       {
@@ -182,8 +187,8 @@ export const adminNav: AdminNavGroup[] = [
         href: "/admin/analitika",
         icon: "BarChart3",
         children: [
-          { labelKey: "traffic", href: "/admin/analitika" },
-          { labelKey: "businessReports", href: "/admin/hesabatlar" },
+          { labelKey: "traffic", href: "/admin/analitika", permission: PERMISSIONS.SETTINGS_MANAGE },
+          { labelKey: "businessReports", href: "/admin/hesabatlar", permission: PERMISSIONS.BILLING_MANAGE },
         ],
       },
     ],
@@ -196,11 +201,11 @@ export const adminNav: AdminNavGroup[] = [
         href: "/admin/maliyye",
         icon: "Wallet",
         children: [
-          { labelKey: "subscriptionPlans", href: "/admin/maliyye" },
-          { labelKey: "subscriptions", href: "/admin/maliyye/abuneler" },
-          { labelKey: "discounts", href: "/admin/maliyye/endirimler" },
-          { labelKey: "campaigns", href: "/admin/maliyye/kampaniyalar" },
-          { labelKey: "payments", href: "/admin/maliyye/odenisler" },
+          { labelKey: "subscriptionPlans", href: "/admin/maliyye", permission: PERMISSIONS.BILLING_MANAGE },
+          { labelKey: "subscriptions", href: "/admin/maliyye/abuneler", permission: PERMISSIONS.BILLING_MANAGE },
+          { labelKey: "discounts", href: "/admin/maliyye/endirimler", permission: PERMISSIONS.BILLING_MANAGE },
+          { labelKey: "campaigns", href: "/admin/maliyye/kampaniyalar", permission: PERMISSIONS.BILLING_MANAGE },
+          { labelKey: "payments", href: "/admin/maliyye/odenisler", permission: PERMISSIONS.BILLING_MANAGE },
         ],
       },
       {
@@ -209,11 +214,11 @@ export const adminNav: AdminNavGroup[] = [
         href: "/admin/parametrler",
         icon: "Settings",
         children: [
-          { labelKey: "settings", href: "/admin/parametrler" },
-          { labelKey: "featureFlags", href: "/admin/funksiyalar" },
-          { labelKey: "systemMode", href: "/admin/sistem" },
-          { labelKey: "botProtection", href: "/admin/security" },
-          { labelKey: "demoContent", href: "/admin/demo-mezmun" },
+          { labelKey: "settings", href: "/admin/parametrler", permission: PERMISSIONS.SETTINGS_MANAGE },
+          { labelKey: "featureFlags", href: "/admin/funksiyalar", permission: PERMISSIONS.SETTINGS_MANAGE },
+          { labelKey: "systemMode", href: "/admin/sistem", permission: PERMISSIONS.SETTINGS_MANAGE },
+          { labelKey: "botProtection", href: "/admin/security", permission: PERMISSIONS.USER_MANAGE },
+          { labelKey: "demoContent", href: "/admin/demo-mezmun", permission: PERMISSIONS.SETTINGS_MANAGE },
         ],
       },
       { labelKey: "profile", href: "/admin/hesabim", icon: "UserCog" },
@@ -276,4 +281,26 @@ export function adminNavBreadcrumbs(pathname: string): AdminNavCrumb[] {
     crumbs.push({ kind: "item", key: item.labelKey, href: pathname === item.href ? undefined : item.href });
   }
   return crumbs;
+}
+
+/**
+ * Rola görə menyu: icazəsi olmayan alt bənd göstərilmir, uşaqsız qalan modul atılır, modulun öz linki
+ * ilk görünən alt bəndə yönəlir (məs. Redaktor «Məzmun idarəetməsi»ndə Bloqdan başlayır). Səhifə guard-ları
+ * dəyişmir — bu yalnız əlçatmaz bəndləri gizlədir ki, menyu 403-ə aparmasın.
+ */
+export function adminNavForRole(role: Role): AdminNavGroup[] {
+  const granted = new Set<Permission>(ROLE_PERMISSIONS[role] ?? []);
+  const allowed = (permission?: Permission) => !permission || granted.has(permission);
+  return adminNav
+    .map((group) => ({
+      ...group,
+      items: group.items.flatMap((item): AdminNavItem[] => {
+        if (!item.children?.length) return allowed(item.permission) ? [item] : [];
+        const children = item.children.filter((child) => allowed(child.permission));
+        if (children.length === 0) return [];
+        const keepsHref = children.some((child) => child.href === item.href);
+        return [{ ...item, href: keepsHref ? item.href : children[0].href.split("#", 1)[0], children }];
+      }),
+    }))
+    .filter((group) => group.items.length > 0);
 }

@@ -160,6 +160,11 @@ export type CabinetCrumb = {
     | "listings"
     | "newListing"
     | "editListing"
+    | "listingDocuments"
+    | "leadCard"
+    | "newClient"
+    | "clientCard"
+    | "listingPerformance"
     | "leads"
     | "clients"
     | "analytics"
@@ -217,8 +222,14 @@ export function cabinetBreadcrumbTrail(pathname: string): CabinetCrumb[] {
   trail.push({ href: `/kabinet/${section}`, labelKey: sectionKey });
   const child = segments[2];
   if (section === "elanlar" && child) {
-    trail.push({ href: pathname, labelKey: child === "yeni" ? "newListing" : "editListing" });
+    trail.push({ href: `/kabinet/elanlar/${child}`, labelKey: child === "yeni" ? "newListing" : "editListing" });
+    // Sənəd yükləmə səhifəsi (#256) əvvəl «Redaktə» kimi görünürdü.
+    if (child !== "yeni" && segments[3] === "senedler") trail.push({ href: pathname, labelKey: "listingDocuments" });
   }
+  // Detal səhifələri: müraciət kartı (#222), müştəri kartı (#226), elan performansı (#236).
+  if (section === "muracietler" && child) trail.push({ href: pathname, labelKey: "leadCard" });
+  if (section === "musteriler" && child) trail.push({ href: pathname, labelKey: child === "yeni" ? "newClient" : "clientCard" });
+  if (section === "analitika" && child) trail.push({ href: pathname, labelKey: "listingPerformance" });
   if (section === "agentlik" && child === "elanlar") trail.push({ href: pathname, labelKey: "assignments" });
   if (section === "agentlik" && child === "analitika") trail.push({ href: pathname, labelKey: "agencyAnalytics" });
   return trail;
