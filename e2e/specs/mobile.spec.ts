@@ -144,15 +144,26 @@ test.describe("Mobil elan səhifəsinin əsas elementləri (PRD 26.2)", () => {
   test("qiymət, əlaqə, şikayət, seçilmişlər və təhlükəsizlik xəbərdarlığı görünür", async ({ page }) => {
     const listings = new ListingsPage(page);
     await listings.open();
-    const href = await listings.firstPropertyHref();
-    test.skip(!href, "kataloqda elan yoxdur");
-
-    await visit(page, href!);
     await page.waitForLoadState("load");
+    // Kataloqda satılmış/kirayəyə verilmiş elanlar da var və onların detalında əlaqə paneli qəsdən yoxdur —
+    // ilk kartlardan əlaqə paneli (təhlükəsizlik xəbərdarlığı ilə) olan aktiv elan seçilir.
+    const hrefs = (await propertyCardLinks(page).evaluateAll((links) => links.map((link) => link.getAttribute("href")))).filter(Boolean).slice(0, 6) as string[];
+    test.skip(hrefs.length === 0, "kataloqda elan yoxdur");
+    let active: string | null = null;
+    for (const href of hrefs) {
+      await visit(page, href);
+      await page.waitForLoadState("load");
+      if ((await page.getByRole("note").filter({ has: page.locator("svg") }).count()) > 0) {
+        active = href;
+        break;
+      }
+    }
+    test.skip(!active, "ilk kartlar arasında aktiv (əlaqəsi açıq) elan yoxdur");
 
     await expect(page.locator("h1")).toBeVisible();
     await expect(page.getByText(/₼|AZN|USD|EUR/).first()).toBeVisible();
-    // Əlaqə paneli: zəng / nömrəni göstər düyməsi (şirkət elanında birbaşa zəng).
+    // Təhlükəsizlik xəbərdarlığı (ContactSafetyWarning, role="note") əlaqə düymələrinin üstündədir.
+    await expect(page.getByRole("note").first()).toBeAttached();
     await expect(page.getByRole("link", { name: /Zəng et/ }).or(page.getByRole("button", { name: /Nömrəni göstər|Zəng et/ })).first()).toBeAttached();
     await expect(page.getByRole("button", { name: /Elandan şikayət et/ })).toBeAttached();
     await expect(page.locator("[aria-label*='eçilmiş'], [aria-label*='avorit']").first()).toBeAttached();
