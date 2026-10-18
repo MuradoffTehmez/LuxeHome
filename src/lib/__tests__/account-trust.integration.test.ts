@@ -7,6 +7,7 @@ import {
   applyRestriction,
   assessAccountTrust,
   decideAppeal,
+  liftRestriction,
   postingGate,
   refreshAccountTrust,
 } from "@/lib/account-trust";
@@ -43,9 +44,9 @@ beforeAll(async () => {
 describe("hesab tədbirləri", () => {
   it("eyni elanlar siqnal verir və bal yazılır", async () => {
     const flags = await assessAccountTrust("tr-user");
-    expect(flags.map((flag) => flag.code)).toContain("DUPLICATE_BURST");
-    const { score } = await refreshAccountTrust("tr-user");
-    expect((await prisma.user.findUniqueOrThrow({ where: { id: "tr-user" } })).trustScore).toBe(score);
+    expect(flags?.map((flag) => flag.code)).toContain("DUPLICATE_BURST");
+    const refreshed = await refreshAccountTrust("tr-user");
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: "tr-user" } })).trustScore).toBe(refreshed?.score);
   });
 
   it("paylaşım limiti, əlavə təsdiq və moderator yoxlaması yeni elan qapısında işləyir", async () => {
@@ -75,5 +76,15 @@ describe("hesab tədbirləri", () => {
     const lifted = await prisma.accountRestriction.findUniqueOrThrow({ where: { id } });
     expect(lifted.liftedById).toBe("mod-b");
     expect(lifted.evidence).not.toBeNull();
+
+    // Bloku yalnız `user:manage` götürür; etiraz qəbulu da eyni qaydaya tabedir.
+    const block = await applyRestriction({ staffId: "mod-a", userId: "tr-user", kind: "BLOCK", reason: "Ağır qayda pozuntusu səbəbilə" });
+    const blockId = block.ok ? block.id : "";
+    await expect(liftRestriction({ staffId: "mod-b", restrictionId: blockId, reason: "Səhv qərar" })).resolves.toEqual({ ok: false, reason: "blockPermission" });
+    await appealRestriction({ userId: "tr-user", restrictionId: blockId, message: "Bloka etiraz edirəm, səhv qərardır" });
+    const blockAppeal = await prisma.accountRestrictionAppeal.findFirstOrThrow({ where: { restrictionId: blockId } });
+    await expect(decideAppeal({ staffId: "mod-b", appealId: blockAppeal.id, accept: true, note: "Haqlıdır" })).resolves.toEqual({ ok: false, reason: "blockPermission" });
+    expect((await prisma.accountRestrictionAppeal.findUniqueOrThrow({ where: { id: blockAppeal.id } })).status).toBe("OPEN");
+    await expect(decideAppeal({ staffId: "mod-b", appealId: blockAppeal.id, accept: true, note: "Haqlıdır", canLiftBlock: true })).resolves.toEqual({ ok: true });
   });
 });
