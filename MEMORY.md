@@ -792,3 +792,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   «Yenilənməli» növbəsi), «Beh və ilkin ödəniş» bölməsi + təsdiq gözləyən bələdçi (`0085`). Qalan PRD 24 bəndləri əvvəldən var.
   **Gözləyən insan addımı:** beh bələdçisini hüquqşünas yoxlayıb `legalReviewedAt` yazmalı, sonra başqa redaktor dərc etməlidir.
   **Modul 22 tamamlandı.** Növbəti — Modul 23 (modul idarəetmə və konfiqurasiya).
+- #268 (Modul 23): mərkəzi açarlar #242-də idi; çatışmayan `EXTRA_VERIFICATION` tətbiqi əlavə olundu (sənəd yükləmə, kabinet səhifəsi,
+  sənəd/məlumat nişanları). `PAYMENTS` asılı checkout açarı ilə tətbiq olunur. **Modul 23 tamamlandı.** Növbəti — Modul 24 (mobil).

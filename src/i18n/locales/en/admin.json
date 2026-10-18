@@ -3228,7 +3228,7 @@
         },
         "EXTRA_VERIFICATION": {
           "label": "Extra verification",
-          "hint": "Additional account verification steps."
+          "hint": "Listing document uploads and moderator review, the «Documents verified» and «Data verified» badges. When off, new documents are not accepted and these badges are hidden."
         },
         "MONETIZATION_ENABLED": {
           "label": "Monetization",

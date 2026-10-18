@@ -154,7 +154,8 @@
         "limit": "The pending document limit would be exceeded.",
         "tooLarge": "The image is too large.",
         "unsupported": "Only JPEG, PNG or WebP images.",
-        "storage": "The file was not saved. Please try again later."
+        "storage": "The file was not saved. Please try again later.",
+        "disabled": "Document verification is currently turned off."
       }
     }
   },

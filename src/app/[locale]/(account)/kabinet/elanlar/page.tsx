@@ -84,11 +84,12 @@ export default async function CabinetPropertiesPage({
 
   type CabinetProperty = (typeof properties)[number];
   // VIP sorğuları (#248): modul bayrağı və elanların son sorğu/dövr vəziyyəti.
-  const [vipEnabled, vipState, promotionEnabled, promotionState] = await Promise.all([
+  const [vipEnabled, vipState, promotionEnabled, promotionState, documentsEnabled] = await Promise.all([
     isFeatureEnabled("VIP_REQUESTS"),
     getOwnerVipState(properties.map((property) => property.id)),
     isFeatureEnabled("PROMOTION"),
     getOwnerPromotionState(properties.map((property) => property.id)),
+    isFeatureEnabled("EXTRA_VERIFICATION"),
   ]);
 
   /** İrəli çəkmə (#250, PRD Modul 13): aktiv kampaniya, gözləyən sorğu, fasilə və ya «İrəli çək» düyməsi. */
@@ -272,9 +273,11 @@ export default async function CabinetPropertiesPage({
           <Badge tone={PROPERTY_STATUS_TONE[status] ?? "neutral"}>{t(`status.${STATUS_KEYS[status]}`)}</Badge>
           <div className="flex items-center gap-1">
             <CloseControl property={property} />
-            <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}/senedler`, locale)} variant="ghost" size="sm" aria-label={t("documentsLabel", { title: property.title })}>
-              <FileCheck2 className="size-4" aria-hidden="true" />
-            </ButtonLink>
+            {documentsEnabled && (
+              <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}/senedler`, locale)} variant="ghost" size="sm" aria-label={t("documentsLabel", { title: property.title })}>
+                <FileCheck2 className="size-4" aria-hidden="true" />
+              </ButtonLink>
+            )}
             <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="ghost" size="sm" aria-label={t("editLabel", { title: property.title })}>
               <Pencil className="size-4" aria-hidden="true" />{t("edit")}
             </ButtonLink>
@@ -307,9 +310,11 @@ export default async function CabinetPropertiesPage({
                 {t(`status.${STATUS_KEYS[status]}`)}
               </Badge>
               <CloseControl property={property} />
-              <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}/senedler`, locale)} variant="outline" size="sm">
-                <FileCheck2 className="size-4" aria-hidden="true" />{t("documentsButton")}
-              </ButtonLink>
+              {documentsEnabled && (
+                <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}/senedler`, locale)} variant="outline" size="sm">
+                  <FileCheck2 className="size-4" aria-hidden="true" />{t("documentsButton")}
+                </ButtonLink>
+              )}
               <ButtonLink href={localizePath(`/kabinet/elanlar/${property.id}`, locale)} variant="outline" size="sm">
                 <Pencil className="size-4" aria-hidden="true" />{t("edit")}
               </ButtonLink>

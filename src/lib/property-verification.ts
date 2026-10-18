@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import {
   ACCOUNT_TYPES,
   DOCUMENT_STATUSES,
@@ -52,6 +53,8 @@ export async function getListingVerification(propertyId: string): Promise<Verifi
     },
   });
   if (!property) return [];
+  // Açar söndürülübsə moderatorun əlavə yoxlama nişanları (sənəd, məlumat) göstərilmir; hesab nişanları qalır.
+  const extra = await isFeatureEnabled("EXTRA_VERIFICATION");
   const author = property.author;
   // Şirkət (STAFF) elanında hesab nişanları göstərilmir — elanı ofis yerləşdirib.
   const personal = author && author.accountType !== ACCOUNT_TYPES.STAFF;
@@ -59,8 +62,8 @@ export async function getListingVerification(propertyId: string): Promise<Verifi
     phoneVerified: Boolean(personal && author?.verifiedPhone),
     emailVerified: Boolean(personal && author?.emailVerifiedAt),
     agencyVerified: Boolean(personal && author?.agency?.isVerified),
-    documentsVerified: Boolean(property.documentsVerifiedAt),
-    dataVerified: Boolean(property.dataVerifiedAt),
+    documentsVerified: extra && Boolean(property.documentsVerifiedAt),
+    dataVerified: extra && Boolean(property.dataVerifiedAt),
   });
 }
 
@@ -70,10 +73,12 @@ export function isDocumentKind(value: unknown): value is string {
 
 export type UploadDocumentResult =
   | { ok: true; count: number }
-  | { ok: false; reason: "listing" | "kind" | "empty" | "limit" | "tooLarge" | "unsupported" | "storage" };
+  | { ok: false; reason: "disabled" | "listing" | "kind" | "empty" | "limit" | "tooLarge" | "unsupported" | "storage" };
 
 /** Sahib öz elanına sənəd şəkli yükləyir (gözləyən sənədlərlə birlikdə ən çox `PROPERTY_DOCUMENT_MAX_FILES`). */
 export async function uploadPropertyDocuments(input: { userId: string; propertyId: string; kind: string; files: File[] }): Promise<UploadDocumentResult> {
+  // «Əlavə doğrulamalar» açarı (#268, PRD 25) söndürülübsə yeni sənəd qəbul olunmur.
+  if (!(await isFeatureEnabled("EXTRA_VERIFICATION"))) return { ok: false, reason: "disabled" };
   const property = await prisma.property.findFirst({ where: { id: input.propertyId, authorId: input.userId, deletedAt: null }, select: { id: true } });
   if (!property) return { ok: false, reason: "listing" };
   if (!isDocumentKind(input.kind)) return { ok: false, reason: "kind" };
