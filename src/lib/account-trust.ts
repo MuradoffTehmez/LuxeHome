@@ -42,7 +42,7 @@ export function isRestrictionKind(value: unknown): value is AccountRestrictionKi
 }
 
 /** Davranış siqnalları (PRD 20.2). Heç vaxt atmır — xəta siqnalsız nəticə verir. */
-export async function assessAccountTrust(userId: string, now = new Date()): Promise<TrustFlag[]> {
+export async function assessAccountTrust(userId: string, now = new Date()): Promise<TrustFlag[] | null> {
   try {
     const [recentListings, rejections, ownListingIds, reviewsDay, suspiciousAgent, suspiciousAgency] = await Promise.all([
       prisma.property.findMany({ where: { authorId: userId, createdAt: { gte: new Date(now.getTime() - DAY) } }, select: { title: true, createdAt: true } }),
@@ -50,7 +50,10 @@ export async function assessAccountTrust(userId: string, now = new Date()): Prom
         where: { property: { authorId: userId }, toStatus: { in: [PROPERTY_STATUSES.REJECTED, PROPERTY_STATUSES.SUSPENDED] }, changedAt: { gte: new Date(now.getTime() - 30 * DAY) } },
       }),
       prisma.property.findMany({ where: { authorId: userId }, select: { id: true, description: true }, take: 300 }),
-      prisma.agentReview.count({ where: { customerId: userId, createdAt: { gte: new Date(now.getTime() - DAY) } } }),
+      Promise.all([
+        prisma.agentReview.count({ where: { customerId: userId, createdAt: { gte: new Date(now.getTime() - DAY) } } }),
+        prisma.agencyReview.count({ where: { customerId: userId, createdAt: { gte: new Date(now.getTime() - DAY) } } }),
+      ]).then(([agent, agency]) => agent + agency),
       prisma.agentReview.count({ where: { customerId: userId, suspicionFlags: { not: null } } }),
       prisma.agencyReview.count({ where: { customerId: userId, suspicionFlags: { not: null } } }),
     ]);
@@ -93,12 +96,14 @@ export async function assessAccountTrust(userId: string, now = new Date()): Prom
     return flags;
   } catch (error) {
     console.error("[trust] siqnallar hesablanmadı:", error instanceof Error ? error.message : error);
-    return [];
+    // `null` — nəticə bilinmir; çağıran köhnə balı saxlayır (keçici xəta riskli hesabı «təmiz» göstərməsin).
+    return null;
   }
 }
 
 export async function refreshAccountTrust(userId: string, now = new Date()) {
   const flags = await assessAccountTrust(userId, now);
+  if (flags === null) return null;
   const score = scoreTrust(flags);
   await prisma.user.update({ where: { id: userId }, data: { trustScore: score, trustFlags: flags.length ? JSON.stringify(flags) : null, trustCheckedAt: now } }).catch(() => undefined);
   return { score, flags };
@@ -110,7 +115,8 @@ export async function refreshActiveAccountsTrust(now = new Date()): Promise<numb
   const [authors, reviewers] = await Promise.all([
     prisma.property.findMany({ where: { createdAt: { gte: since }, authorId: { not: null } }, select: { authorId: true }, distinct: ["authorId"], take: 200 }),
     prisma.agentReview.findMany({ where: { createdAt: { gte: since }, customerId: { not: null } }, select: { customerId: true }, distinct: ["customerId"], take: 100 }),
-  ]);
+    prisma.agencyReview.findMany({ where: { createdAt: { gte: since }, customerId: { not: null } }, select: { customerId: true }, distinct: ["customerId"], take: 100 }),
+  ]).then(([a, b, c]) => [a, [...b, ...c]] as const);
   const ids = [...new Set([...authors.map((row) => row.authorId!), ...reviewers.map((row) => row.customerId!)])].slice(0, 200);
   for (const id of ids) await refreshAccountTrust(id, now);
   return ids.length;
@@ -133,7 +139,8 @@ const BLOCKED_MESSAGE: Record<Locale, string> = {
 
 /** Yazma qapısı: müvəqqəti məhdudiyyət və ya blok varsa mesaj qaytarır (`null` — icazə var). */
 export async function accountWriteBlock(userId: string, locale: Locale, now = new Date()): Promise<string | null> {
-  const active = await activeRestrictions(userId, now).catch(() => []);
+  // Oxuma xətası yazmanı bağlayır (fail-closed) — keçici D1 xətası bloku yan keçməsin.
+  const active = await activeRestrictions(userId, now);
   return active.some((row) => row.kind === "TEMP_SUSPENSION" || row.kind === "BLOCK") ? BLOCKED_MESSAGE[locale] : null;
 }
 
@@ -141,7 +148,7 @@ export type PostingGate = { ok: true; review: boolean } | { ok: false; reason: "
 
 /** Yeni elan qapısı (PRD 20.3): paylaşım limiti, əlavə təsdiq və moderator yoxlaması. */
 export async function postingGate(userId: string, now = new Date()): Promise<PostingGate> {
-  const active = await activeRestrictions(userId, now).catch(() => []);
+  const active = await activeRestrictions(userId, now);
   const kinds = new Set(active.map((row) => row.kind));
   if (kinds.has("TEMP_SUSPENSION") || kinds.has("BLOCK")) return { ok: false, reason: "blocked" };
   if (kinds.has("EXTRA_VERIFICATION")) {
@@ -183,11 +190,13 @@ export async function applyRestriction(input: {
   return { ok: true, id: created.id };
 }
 
-export async function liftRestriction(input: { staffId: string; restrictionId: string; reason: string; now?: Date }): Promise<{ ok: boolean; reason?: "reason" | "notFound" }> {
+export async function liftRestriction(input: { staffId: string; restrictionId: string; reason: string; canLiftBlock?: boolean; now?: Date }): Promise<{ ok: boolean; reason?: "reason" | "notFound" | "blockPermission" }> {
   const reason = input.reason.trim().slice(0, TRUST_REASON_MAX);
   if (reason.length < 5) return { ok: false, reason: "reason" };
   const row = await prisma.accountRestriction.findUnique({ where: { id: input.restrictionId }, select: { id: true, userId: true, kind: true } });
   if (!row) return { ok: false, reason: "notFound" };
+  // Bloku yalnız onu qoya bilən (`user:manage`) götürür.
+  if (row.kind === "BLOCK" && !input.canLiftBlock) return { ok: false, reason: "blockPermission" };
   const { count } = await prisma.accountRestriction.updateMany({
     where: { id: row.id, liftedAt: null },
     data: { liftedAt: input.now ?? new Date(), liftedById: input.staffId, liftReason: reason },
@@ -211,22 +220,27 @@ export async function appealRestriction(input: { userId: string; restrictionId: 
   return { ok: true };
 }
 
-export type AppealDecision = { ok: true } | { ok: false; reason: "notFound" | "sameReviewer" | "note" };
+export type AppealDecision = { ok: true } | { ok: false; reason: "notFound" | "sameReviewer" | "note" | "blockPermission" };
 
 /** Etirazın həlli (PRD 20.4): tədbiri tətbiq edən əməkdaş öz qərarına baxa bilməz. Qəbul tədbiri götürür. */
-export async function decideAppeal(input: { staffId: string; appealId: string; accept: boolean; note: string; now?: Date }): Promise<AppealDecision> {
+export async function decideAppeal(input: { staffId: string; appealId: string; accept: boolean; note: string; canLiftBlock?: boolean; now?: Date }): Promise<AppealDecision> {
   const now = input.now ?? new Date();
   const note = input.note.trim().slice(0, TRUST_REASON_MAX);
   if (note.length < 5) return { ok: false, reason: "note" };
   const appeal = await prisma.accountRestrictionAppeal.findUnique({ where: { id: input.appealId }, select: { id: true, restrictionId: true, status: true } });
   if (!appeal || appeal.status !== "OPEN") return { ok: false, reason: "notFound" };
-  const restriction = await prisma.accountRestriction.findUnique({ where: { id: appeal.restrictionId }, select: { createdById: true } });
+  const restriction = await prisma.accountRestriction.findUnique({ where: { id: appeal.restrictionId }, select: { createdById: true, kind: true } });
   if (restriction?.createdById === input.staffId) return { ok: false, reason: "sameReviewer" };
+  if (input.accept && restriction?.kind === "BLOCK" && !input.canLiftBlock) return { ok: false, reason: "blockPermission" };
+  // Qəbulda əvvəl tədbir götürülür: o alınmasa etiraz açıq qalır və yenidən cəhd mümkündür.
+  if (input.accept) {
+    const lifted = await liftRestriction({ staffId: input.staffId, restrictionId: appeal.restrictionId, reason: note, now, canLiftBlock: input.canLiftBlock });
+    if (!lifted.ok && lifted.reason !== "notFound") return { ok: false, reason: "note" };
+  }
   const { count } = await prisma.accountRestrictionAppeal.updateMany({
     where: { id: appeal.id, status: "OPEN" },
     data: { status: input.accept ? "ACCEPTED" : "REJECTED", decidedById: input.staffId, decidedAt: now, decisionNote: note },
   });
   if (count === 0) return { ok: false, reason: "notFound" };
-  if (input.accept) await liftRestriction({ staffId: input.staffId, restrictionId: appeal.restrictionId, reason: note, now });
   return { ok: true };
 }

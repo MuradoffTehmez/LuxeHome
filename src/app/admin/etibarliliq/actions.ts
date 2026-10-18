@@ -48,7 +48,7 @@ export async function liftRestrictionAction(id: string, reason: string): Promise
   const user = await guard();
   if (isState(user)) return user;
   try {
-    const result = await liftRestriction({ staffId: user.id, restrictionId: String(id).slice(0, 60), reason });
+    const result = await liftRestriction({ staffId: user.id, restrictionId: String(id).slice(0, 60), reason, canLiftBlock: hasPermission(user.role, PERMISSIONS.USER_MANAGE) });
     if (!result.ok) return failure(msg(`server.trust.${result.reason ?? "notFound"}`));
     await recordAudit(user, "UPDATE", "AccountRestriction", id, "götürüldü");
     revalidatePath("/admin/etibarliliq");
@@ -70,7 +70,7 @@ async function decide(id: string, note: string, accept: boolean): Promise<Action
   const user = await guard();
   if (isState(user)) return user;
   try {
-    const result = await decideAppeal({ staffId: user.id, appealId: String(id).slice(0, 60), accept, note });
+    const result = await decideAppeal({ staffId: user.id, appealId: String(id).slice(0, 60), accept, note, canLiftBlock: hasPermission(user.role, PERMISSIONS.USER_MANAGE) });
     if (!result.ok) return failure(msg(`server.trust.${result.reason}`));
     await recordAudit(user, "UPDATE", "AccountRestriction", id, accept ? "etiraz qəbul" : "etiraz rədd");
     revalidatePath("/admin/etibarliliq");
