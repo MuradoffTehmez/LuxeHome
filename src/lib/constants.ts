@@ -1949,3 +1949,15 @@ export const POSTED_WITHIN_DAYS = [1, 3, 7, 30] as const;
 export function isPostedWithinDays(value: unknown): value is (typeof POSTED_WITHIN_DAYS)[number] {
   return typeof value === "number" && (POSTED_WITHIN_DAYS as readonly number[]).includes(value);
 }
+
+/** Əmlak sənədi yoxlaması (#256, PRD Modul 17). */
+export const PROPERTY_DOCUMENT_STATUSES = { PENDING: "PENDING", VERIFIED: "VERIFIED", REJECTED: "REJECTED" } as const;
+/** Bir elana ən çox bu qədər gözləyən sənəd şəkli. */
+export const PROPERTY_DOCUMENT_MAX_FILES = 5;
+/** Brauzer şəkli bu ölçüyə kiçildir (action gövdəsi 1 MB). */
+export const PROPERTY_DOCUMENT_MAX_BYTES = 400 * 1024;
+/** Qərardan sonra faylın saxlanma müddəti (gün) — sonra gündəlik baxım silir. */
+export const PROPERTY_DOCUMENT_RETENTION_DAYS = 30;
+/** Doğrulama nişanları — hər biri ayrı yoxlama səviyyəsidir (PRD 19.3). */
+export const VERIFICATION_BADGES = ["PHONE", "EMAIL", "AGENCY", "DOCUMENTS", "DATA"] as const;
+export type VerificationBadge = (typeof VERIFICATION_BADGES)[number];

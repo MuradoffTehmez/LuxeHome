@@ -269,5 +269,31 @@
     "tipDocuments": "Çıxarışı və satıcının şəxsiyyətini yoxlayın, müqaviləni notariusda bağlayın.",
     "tipPlatform": "Ünsiyyəti və ödənişi saytdan kənara çəkməyə tələsdirən satıcıya ehtiyatla yanaşın.",
     "guideLink": "Saxta elanı necə tanımaq olar"
+  },
+  "verification": {
+    "title": "Doğrulama",
+    "disclaimer": "Nişanlar platformanın yoxlamasıdır, hüquqi rəy və ya rəsmi təsdiq deyil. Əqddən əvvəl sənədləri notariusla yoxlayın.",
+    "badges": {
+      "PHONE": {
+        "label": "Telefon təsdiqlənib",
+        "hint": "Elanı yerləşdirənin nömrəsi SMS ilə təsdiqlənib — əmlakın hüquqi vəziyyətini təsdiqləmir."
+      },
+      "EMAIL": {
+        "label": "E-poçt təsdiqlənib",
+        "hint": "Hesabın e-poçt ünvanı təsdiqlənib."
+      },
+      "AGENCY": {
+        "label": "Agentlik yoxlanılıb",
+        "hint": "Agentliyin məlumatları platforma tərəfindən yoxlanılıb."
+      },
+      "DOCUMENTS": {
+        "label": "Sənədlər yoxlanılıb",
+        "hint": "Moderator əmlak sənədlərinin şəkillərini yoxlayıb."
+      },
+      "DATA": {
+        "label": "Məlumatlar yoxlanılıb",
+        "hint": "Elan məlumatları əlavə yoxlamadan keçib."
+      }
+    }
   }
 }

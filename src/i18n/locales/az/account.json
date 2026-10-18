@@ -121,6 +121,41 @@
         "cooldown": "Təkrar irəli çəkmə üçün fasilə hələ bitməyib.",
         "failed": "Sorğu göndərilmədi. Bir az sonra yenidən cəhd edin."
       }
+    },
+    "documentsLabel": "«{title}» elanının sənədləri",
+    "documentsButton": "Sənədlər",
+    "documents": {
+      "title": "Sənəd yoxlaması",
+      "description": "Sənəd şəkillərini yükləyin — moderator yoxladıqdan sonra elanda «Sənədlər yoxlanılıb» nişanı görünür. Fayllar ictimai göstərilmir.",
+      "kind": "Sənədin növü",
+      "files": "Şəkillər (ən çox {count})",
+      "privacyHint": "Şəxsiyyət vəsiqəsi nömrəsi, FİN kimi lazımsız şəxsi məlumatları örtün. Fayllar yalnız moderatora görünür və qərardan sonra silinir.",
+      "upload": "Yüklə",
+      "uploaded": "{count} şəkil yükləndi — yoxlamaya göndərildi.",
+      "deleted": "Sənəd silindi.",
+      "verified": "Sənədlər yoxlanılıb",
+      "notVerified": "Sənədlər hələ yoxlanılmayıb",
+      "dataVerified": "Məlumatlar yoxlanılıb",
+      "history": "Göndərilən sənədlər",
+      "empty": "Hələ sənəd göndərilməyib.",
+      "note": "Moderator qeydi: {note}",
+      "delete": "Sil",
+      "deleteTitle": "Sənəd silinsin?",
+      "deleteDescription": "Yoxlanılmamış sənəd şəkli birdəfəlik silinir.",
+      "status": {
+        "PENDING": "Yoxlanılır",
+        "VERIFIED": "Təsdiqlənib",
+        "REJECTED": "Rədd edilib"
+      },
+      "errors": {
+        "listing": "Elan tapılmadı.",
+        "kind": "Sənədin növünü seçin.",
+        "empty": "Şəkil seçin.",
+        "limit": "Gözləyən sənəd limiti aşılır.",
+        "tooLarge": "Şəkil çox böyükdür.",
+        "unsupported": "Yalnız JPEG, PNG və ya WebP şəkil.",
+        "storage": "Fayl saxlanılmadı. Bir az sonra yenidən cəhd edin."
+      }
     }
   },
   "newProperty": {

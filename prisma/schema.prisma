@@ -770,15 +770,21 @@ model Property {
   /// Tikinti şirkətinin daxili taksiti mövcuddur
   installmentAvailable Boolean @default(false)
 
-  isFeatured         Boolean   @default(false)
+  isFeatured            Boolean   @default(false)
   /// Premium boost yalnız bu tarix gələcəkdədirsə aktivdir; null köhnə müddətsiz featured qeydlər üçündür.
-  featuredUntil      DateTime?
+  featuredUntil         DateTime?
   /// İrəli çəkmə kampaniyası (#250, PRD Modul 13) aktivdirsə bitmə anı — defolt siyahı sıralamasında üstündür.
-  promotedUntil      DateTime?
+  promotedUntil         DateTime?
+  /// Sənəd yoxlaması (#256, PRD 19.2): moderator sənəd şəkillərini yoxlayıb təsdiqləyib. Hüquqi rəy deyil.
+  documentsVerifiedAt   DateTime?
+  documentsVerifiedById String?
+  /// Əmlak məlumatları əlavə yoxlamadan keçib (#256) — moderatorun ayrıca qərarı.
+  dataVerifiedAt        DateTime?
+  dataVerifiedById      String?
   /// Rezervasiya CTA-sı yalnız açıq şəkildə aktiv edilən elanlarda göstərilir.
-  reservationEnabled Boolean   @default(false)
+  reservationEnabled    Boolean   @default(false)
   /// Nümunə/demo qeydi — real məlumatla əvəzlənəndə false olur.
-  isDemo             Boolean   @default(false)
+  isDemo                Boolean   @default(false)
 
   viewCount            Int       @default(0)
   publishedAt          DateTime?
@@ -2643,25 +2649,25 @@ model PromoCampaign {
 /// admin təsdiqi ilə verilir. Təsdiqlənmiş sətir VIP dövrüdür (`startsAt`–`endsAt`) və elanın
 /// `isFeatured` + `featuredUntil` sahələrinə yazılır — ictimai VIP görünüşü onlardan oxunur.
 model VipRequest {
-  id            String    @id @default(cuid())
-  propertyId    String
-  requesterId   String?
+  id             String    @id @default(cuid())
+  propertyId     String
+  requesterId    String?
   /// `PENDING` | `APPROVED` | `REJECTED` | `CANCELLED` | `REVOKED` | `EXPIRED` (`VIP_REQUEST_STATUSES`).
-  status        String    @default("PENDING")
+  status         String    @default("PENDING")
   /// `OWNER` | `ADMIN` | `SELF_SERVICE` (`VIP_REQUEST_SOURCES`).
-  source        String
-  requestedDays Int
-  message       String?
-  decidedById   String?
-  decidedAt     DateTime?
-  decisionNote  String?
-  startsAt      DateTime?
-  endsAt        DateTime?
-  extendedCount Int       @default(0)
+  source         String
+  requestedDays  Int
+  message        String?
+  decidedById    String?
+  decidedAt      DateTime?
+  decisionNote   String?
+  startsAt       DateTime?
+  endsAt         DateTime?
+  extendedCount  Int       @default(0)
   /// Təsdiq anında elanın mövcud premium sonu (paket) — VIP ləğv olunanda bərpa olunur.
   featuredBefore DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([status, createdAt])
   @@index([propertyId, status])
@@ -2690,4 +2696,43 @@ model PromotionCampaign {
 
   @@index([status, createdAt])
   @@index([propertyId, status])
+}
+
+/// Əmlak sənədinin şəkli (#256, PRD 19.4). Fayl R2-nin `private/` prefiksindədir — ictimai `/media` vermir;
+/// yalnız `property:manage` moderator `/api/admin/senedler/<id>`-dən görür və hər baxış `DocumentAccessLog`-a yazılır.
+/// Qərardan sonra `purgeAfter` gəlir və gündəlik baxım faylı silir (saxlama qaydası).
+model PropertyDocument {
+  id           String    @id @default(cuid())
+  propertyId   String
+  uploaderId   String
+  /// `DOCUMENT_STATUSES` (kupça, müqavilə…) — sahibin seçdiyi növ.
+  kind         String
+  key          String
+  contentType  String
+  size         Int
+  /// `PENDING` | `VERIFIED` | `REJECTED` (`PROPERTY_DOCUMENT_STATUSES`).
+  status       String    @default("PENDING")
+  reviewedById String?
+  reviewedAt   DateTime?
+  note         String?
+  purgeAfter   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([propertyId, status])
+  @@index([status, createdAt])
+  @@index([purgeAfter])
+}
+
+/// Məxfi sənədə giriş tarixçəsi (#256, PRD 19.4) — kim, nə vaxt, hansı əməliyyat.
+model DocumentAccessLog {
+  id         String   @id @default(cuid())
+  documentId String
+  propertyId String
+  userId     String
+  /// `VIEW` | `DECISION` | `DELETE`.
+  action     String
+  createdAt  DateTime @default(now())
+
+  @@index([documentId, createdAt])
+  @@index([propertyId, createdAt])
 }

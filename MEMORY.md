@@ -777,3 +777,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
 - #254 (Modul 16): `?tarix=` filtri (çip, saxlanmış axtarış, boş nəticə təklifi), balla oxşar elanlar. Qabaqcıl filtrlərin qalanı,
   saxlanmış axtarış bildirişi və qiymət müqayisəsi («rəsmi qiymətləndirmə deyil») əvvəldən var. **Modul 16 tamamlandı.**
   Növbəti — Modul 17 (əmlak və profil doğrulaması).
+- #256 (Modul 17): doğrulama nişanları, məxfi sənəd yükləmə, `/admin/senedler`, giriş tarixçəsi, saxlama/silinmə.
+  **Modul 17 tamamlandı.** Növbəti — Modul 18 (istifadəçi etibarlılığı və davranış analizi).

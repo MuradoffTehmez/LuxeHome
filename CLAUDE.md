@@ -533,6 +533,14 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   yazılmır, e-poçt söndürülübsə məktub getmir. **`SECURITY` kritikdir** — seçim ona tətbiq olunmur və saxlanmır
   (`noticePasswordChanged` — kabinetdə parol dəyişəndə). Yeni hadisələr: `noticeNewReview` (agent/agentlik rəyi təsdiqlənəndə),
   `noticeSubscriptionStatus` (abunə təyini/ləğvi). Köhnə saxlanmış axtarış/qiymət/rezervasiya matrisi ayrıca qalır.
+- **Əmlak və profil doğrulaması (#256, PRD Modul 17):** nişanlar ayrı səviyyələrdir (`VERIFICATION_BADGES`:
+  telefon, e-poçt, agentlik, sənədlər, məlumatlar; `getListingVerification()` yalnız boolean oxuyur, nömrə/e-poçt seçmir)
+  və elan detalında mənası ilə göstərilir — telefon təsdiqi hüquqi status demək deyil. Sahib `/kabinet/elanlar/<id>/senedler`-dən
+  sənəd şəkli yükləyir (`putPrivateImage`, R2 `private/`, `PropertyDocument`); yalnız `property:manage` moderator
+  `/admin/senedler`-də görür, fayl `/api/admin/senedler/<id>`-dən verilir və hər baxış/qərar/silmə `DocumentAccessLog`-a
+  yazılır. Qərar elanın `documentsVerifiedAt`-ını qoyur/götürür; «Məlumatlar yoxlanılıb» (`dataVerifiedAt`) ayrıca açardır.
+  Qərardan `PROPERTY_DOCUMENT_RETENTION_DAYS` sonra gündəlik baxım faylı və sətri silir (tarixçə qalır). İctimai səhifəyə
+  sənədin özü və növü çıxmır.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 

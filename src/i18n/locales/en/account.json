@@ -121,6 +121,41 @@
         "cooldown": "The cooldown before another promotion has not ended yet.",
         "failed": "The request was not sent. Please try again later."
       }
+    },
+    "documentsLabel": "Documents for «{title}»",
+    "documentsButton": "Documents",
+    "documents": {
+      "title": "Document check",
+      "description": "Upload images of the documents — once a moderator reviews them, the listing shows a “Documents checked” badge. Files are never public.",
+      "kind": "Document type",
+      "files": "Images (up to {count})",
+      "privacyHint": "Cover unnecessary personal data such as ID or PIN numbers. Files are visible only to moderators and are deleted after the decision.",
+      "upload": "Upload",
+      "uploaded": "{count} image(s) uploaded — sent for review.",
+      "deleted": "Document deleted.",
+      "verified": "Documents checked",
+      "notVerified": "Documents not checked yet",
+      "dataVerified": "Details checked",
+      "history": "Submitted documents",
+      "empty": "No documents submitted yet.",
+      "note": "Moderator note: {note}",
+      "delete": "Delete",
+      "deleteTitle": "Delete document?",
+      "deleteDescription": "The unreviewed document image is deleted permanently.",
+      "status": {
+        "PENDING": "Under review",
+        "VERIFIED": "Approved",
+        "REJECTED": "Rejected"
+      },
+      "errors": {
+        "listing": "Listing not found.",
+        "kind": "Choose the document type.",
+        "empty": "Choose an image.",
+        "limit": "The pending document limit would be exceeded.",
+        "tooLarge": "The image is too large.",
+        "unsupported": "Only JPEG, PNG or WebP images.",
+        "storage": "The file was not saved. Please try again later."
+      }
     }
   },
   "newProperty": {

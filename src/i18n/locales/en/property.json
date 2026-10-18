@@ -269,5 +269,31 @@
     "tipDocuments": "Check the title extract and the seller's identity, and sign the contract at a notary.",
     "tipPlatform": "Be cautious of sellers who rush you to move communication or payment off the site.",
     "guideLink": "How to spot a fake listing"
+  },
+  "verification": {
+    "title": "Verification",
+    "disclaimer": "Badges reflect platform checks, not legal advice or official certification. Verify documents with a notary before any deal.",
+    "badges": {
+      "PHONE": {
+        "label": "Phone verified",
+        "hint": "The lister's number was confirmed by SMS — this does not confirm the property's legal status."
+      },
+      "EMAIL": {
+        "label": "Email verified",
+        "hint": "The account's email address is confirmed."
+      },
+      "AGENCY": {
+        "label": "Agency verified",
+        "hint": "The agency's details were checked by the platform."
+      },
+      "DOCUMENTS": {
+        "label": "Documents checked",
+        "hint": "A moderator reviewed images of the property documents."
+      },
+      "DATA": {
+        "label": "Details checked",
+        "hint": "The listing details passed an additional review."
+      }
+    }
   }
 }
