@@ -22,6 +22,7 @@ import {
 } from "./src/lib/edge-html-cache";
 import { cronJobFor, internalCronToken } from "./src/lib/cron-auth";
 import { rootRedirect } from "./src/lib/root-redirect";
+import { trackRequestLifetime } from "./src/lib/request-lifetime";
 import {
   MEDIA_CLIENT_CACHE_CONTROL,
   MEDIA_EDGE_TTL,
@@ -205,54 +206,70 @@ async function refreshEdgeCopy(request: Request, key: string, env: Env, ctx: Exe
   }
 }
 
-const worker = {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    // `/` həmişə `/az`-a gedir — OpenNext və middleware-i işə salmadan, keşlənə bilən cavabla (#169).
-    const redirect = rootRedirect(request);
-    if (redirect) return redirect;
+async function handleFetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  // `/` həmişə `/az`-a gedir — OpenNext və middleware-i işə salmadan, keşlənə bilən cavabla (#169).
+  const redirect = rootRedirect(request);
+  if (redirect) return redirect;
 
-    const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname.startsWith("/media/")) {
-      return serveMedia(request, url, env, ctx);
-    }
-    if (request.method === "GET" && url.pathname === "/_next/image") {
-      return serveOptimizedImage(request, url, env, ctx);
-    }
+  const url = new URL(request.url);
+  if (request.method === "GET" && url.pathname.startsWith("/media/")) {
+    return serveMedia(request, url, env, ctx);
+  }
+  if (request.method === "GET" && url.pathname === "/_next/image") {
+    return serveOptimizedImage(request, url, env, ctx);
+  }
 
-    const ttl = edgeCacheTtl(env);
-    // Texniki xidmət rejimində keş həm oxunmur, həm yazılmır — middleware qapısı işləsin.
-    if (ttl === 0 || !isEdgeCacheableRequest(request) || !(await systemModeAllowsCache(env))) {
-      const { response, ms } = await timedOpenNext(request, env, ctx);
-      return withServerTiming(response, [`app;dur=${ms}`, 'edge;desc="BYPASS"']);
-    }
-
-    const cache = (caches as unknown as { default: Cache }).default;
-    const key = await edgeCacheKey(request, edgeCacheVersion(env));
-    const staleTtl = edgeStaleTtl(env);
-    const cached = await cache.match(key);
-    const freshness = cached ? edgeFreshness(cached.headers.get(EDGE_CACHED_AT_HEADER), Date.now(), ttl, staleTtl) : "expired";
-    if (cached && freshness !== "expired") {
-      // Köhnə nüsxə dərhal verilir, yenisi fonda qurulur (#175).
-      if (freshness === "stale") ctx.waitUntil(refreshEdgeCopy(request, key, env, ctx, ttl + staleTtl));
-      const status = freshness === "fresh" ? "HIT" : "STALE";
-      const hit = new Response(cached.body, cached);
-      hit.headers.delete(EDGE_CACHED_AT_HEADER);
-      hit.headers.set(EDGE_CACHE_HEADER, status);
-      // Brauzer öz keşində saxlamasın — yeniləmə kənarda idarə olunur.
-      hit.headers.set("cache-control", "private, no-cache");
-      hit.headers.set("server-timing", `edge;desc="${status}"`);
-      return hit;
-    }
-
+  const ttl = edgeCacheTtl(env);
+  // Texniki xidmət rejimində keş həm oxunmur, həm yazılmır — middleware qapısı işləsin.
+  if (ttl === 0 || !isEdgeCacheableRequest(request) || !(await systemModeAllowsCache(env))) {
     const { response, ms } = await timedOpenNext(request, env, ctx);
-    if (!isStorableResponse(response)) return withServerTiming(response, [`app;dur=${ms}`, 'edge;desc="MISS"']);
+    return withServerTiming(response, [`app;dur=${ms}`, 'edge;desc="BYPASS"']);
+  }
 
-    const [forClient, forCache] = response.body ? response.body.tee() : [null, null];
-    ctx.waitUntil(storeEdgeCopy(cache, key, new Response(forCache, response), ttl + staleTtl));
-    const miss = new Response(forClient, response);
-    miss.headers.set(EDGE_CACHE_HEADER, "MISS");
-    miss.headers.append("server-timing", `app;dur=${ms}, edge;desc="MISS"`);
-    return miss;
+  const cache = (caches as unknown as { default: Cache }).default;
+  const key = await edgeCacheKey(request, edgeCacheVersion(env));
+  const staleTtl = edgeStaleTtl(env);
+  const cached = await cache.match(key);
+  const freshness = cached ? edgeFreshness(cached.headers.get(EDGE_CACHED_AT_HEADER), Date.now(), ttl, staleTtl) : "expired";
+  if (cached && freshness !== "expired") {
+    // Köhnə nüsxə dərhal verilir, yenisi fonda qurulur (#175).
+    if (freshness === "stale") ctx.waitUntil(refreshEdgeCopy(request, key, env, ctx, ttl + staleTtl));
+    const status = freshness === "fresh" ? "HIT" : "STALE";
+    const hit = new Response(cached.body, cached);
+    hit.headers.delete(EDGE_CACHED_AT_HEADER);
+    hit.headers.set(EDGE_CACHE_HEADER, status);
+    // Brauzer öz keşində saxlamasın — yeniləmə kənarda idarə olunur.
+    hit.headers.set("cache-control", "private, no-cache");
+    hit.headers.set("server-timing", `edge;desc="${status}"`);
+    return hit;
+  }
+
+  const { response, ms } = await timedOpenNext(request, env, ctx);
+  if (!isStorableResponse(response)) return withServerTiming(response, [`app;dur=${ms}`, 'edge;desc="MISS"']);
+
+  const [forClient, forCache] = response.body ? response.body.tee() : [null, null];
+  ctx.waitUntil(storeEdgeCopy(cache, key, new Response(forCache, response), ttl + staleTtl));
+  const miss = new Response(forClient, response);
+  miss.headers.set(EDGE_CACHE_HEADER, "MISS");
+  miss.headers.append("server-timing", `app;dur=${ms}, edge;desc="MISS"`);
+  return miss;
+}
+
+const worker = {
+  /**
+   * Sorğunun ömrü izlənir (#270): cavab gövdəsi və bütün `waitUntil` işləri bitəndə sorğu başına
+   * Prisma klienti bağlanır — əks halda hər klientin wasm yaddaşı izolyatda qalır.
+   */
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const lifetime = trackRequestLifetime(ctx);
+    let response: Response;
+    try {
+      response = await handleFetch(request, env, lifetime.ctx);
+    } catch (error) {
+      lifetime.finish(null);
+      throw error;
+    }
+    return lifetime.finish(response);
   },
 
   /**
@@ -268,8 +285,15 @@ const worker = {
       method: "POST",
       headers: { authorization: `Bearer ${await internalCronToken(env.AUTH_SECRET)}` },
     });
-    const response: Response = await openNext.fetch(request, env, ctx);
-    if (!response.ok) console.error(`[cron] «${job}» ${response.status}`);
+    const lifetime = trackRequestLifetime(ctx);
+    try {
+      const response: Response = await openNext.fetch(request, env, lifetime.ctx);
+      // Gövdə oxunur ki, iş tam bitsin — ömür yalnız fon işlərini gözləyir.
+      await response.text();
+      if (!response.ok) console.error(`[cron] «${job}» ${response.status}`);
+    } finally {
+      lifetime.finish(null);
+    }
   },
 };
 

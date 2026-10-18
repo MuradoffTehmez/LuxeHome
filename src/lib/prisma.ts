@@ -5,6 +5,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 // Node binary engine-i seçirdi (Workers-də mövcud olmayan .so faylı).
 // Wasm engine birbaşa göstərilir — D1 driver adapter yalnız bununla işləyir.
 import { PrismaClient } from "@prisma/client/wasm.js";
+import { registerRequestCleanup } from "@/lib/request-lifetime";
 
 /**
  * Prisma klienti Cloudflare D1 binding (`env.DB`) üzərindən işləyir.
@@ -22,6 +23,13 @@ import { PrismaClient } from "@prisma/client/wasm.js";
  * klienti görür, sorğu bitəndə isə `WeakMap` qeydi zibil toplayıcıya qalır.
  * Binding yalnız sorğu kontekstində əlçatandır, buna görə klient ilk istifadədə
  * (lazy) qurulur; modul yüklənərkən deyil.
+ *
+ * **Sorğu bitəndə klient bağlanır** (#270). Wasm query engine izolyat boyu bir
+ * `WebAssembly.Instance`-dır və hər klient onun yaddaşında öz engine-ini (~1,6 MB)
+ * qurur; workerd o yaddaşı `$disconnect()`-siz geri vermir. Bağlanmasa izolyat
+ * yaşadıqca yaddaş böyüyür (production-da 128 MB limiti, lokalda GB-larla) və
+ * yeni engine yaradıla bilmir. Sorğunun sonunu `worker.ts` müəyyən edir
+ * (`trackRequestLifetime`) — klient yalnız qeydiyyatdan keçir.
  */
 const requestClients = new WeakMap<object, PrismaClient>();
 
@@ -69,8 +77,14 @@ function getClient(): PrismaClient {
 
   let client = requestClients.get(ctx);
   if (!client) {
-    client = createClient(db);
-    requestClients.set(ctx, client);
+    const created = createClient(db);
+    requestClients.set(ctx, created);
+    // Engine-in wasm yaddaşı yalnız `$disconnect()` ilə azad olur (#270) — sorğu bitəndə bağlanır.
+    registerRequestCleanup(ctx, () => {
+      requestClients.delete(ctx);
+      return created.$disconnect();
+    });
+    client = created;
   }
   return client;
 }
