@@ -12,6 +12,7 @@ import type { AuthUser } from "@/lib/auth/types";
 import type { Permission, SystemMode } from "@/lib/constants";
 import { DEFAULT_LOCALE, ROLES, type Locale } from "@/lib/constants";
 import { msg } from "@/lib/admin/server-message";
+import { accountWriteBlock } from "@/lib/account-trust";
 
 /**
  * Paneldəki hər yazma əməliyyatının giriş qapısı.
@@ -170,6 +171,11 @@ export async function requirePublicAction(
   // İctimai hesab heç vaxt super admin deyil — rejim bağlıdırsa yazma da bağlıdır.
   await assertWritableMode(user.role);
   await assertWriteLimit(user.id, `public:${scope}`);
+  // Hesab tədbiri (#258, PRD 20.3): müvəqqəti məhdudiyyət və ya blok yazmanı bağlayır (bildiriş seçimi açıq qalır).
+  if (scope !== "preferences") {
+    const blocked = await accountWriteBlock(user.id, locale);
+    if (blocked) throw new AdminGuardError(blocked);
+  }
   return user;
 }
 

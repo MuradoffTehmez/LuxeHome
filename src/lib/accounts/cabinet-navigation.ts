@@ -18,6 +18,7 @@ export type CabinetNavItem = {
     | "saved-searches"
     | "notifications"
     | "reports"
+    | "restrictions"
     | "reservations"
     | "recommendations"
     | "recently-viewed"
@@ -62,6 +63,7 @@ const DISCOVERY_ITEMS: readonly CabinetNavItem[] = [
   { id: "saved-searches", href: "/kabinet/axtarislarim", label: "Saxlanmış axtarışlarım" },
   { id: "notifications", href: "/kabinet/bildirisler", label: "Bildirişlər" },
   { id: "reports", href: "/kabinet/sikayetlerim", label: "Şikayətlərim" },
+  { id: "restrictions", href: "/kabinet/mehdudiyyetler", label: "Məhdudiyyətlər" },
   { id: "reservations", href: "/kabinet/rezervasiyalar", label: "Rezervasiyalarım" },
   { id: "recommendations", href: "/kabinet/tovsiyeler", label: "Sizin üçün" },
   { id: "recently-viewed", href: "/kabinet/son-baxilanlar", label: "Son baxılanlar" },
@@ -118,6 +120,7 @@ export type CabinetCrumb = {
     | "savedSearches"
     | "notifications"
     | "reports"
+    | "restrictions"
     | "reservations"
     | "recommendations"
     | "recentlyViewed"
@@ -139,6 +142,7 @@ const CRUMB_SEGMENTS: Record<string, CabinetCrumb["labelKey"]> = {
   axtarislarim: "savedSearches",
   bildirisler: "notifications",
   sikayetlerim: "reports",
+  mehdudiyyetler: "restrictions",
   rezervasiyalar: "reservations",
   tovsiyeler: "recommendations",
   "son-baxilanlar": "recentlyViewed",

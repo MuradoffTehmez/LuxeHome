@@ -99,7 +99,8 @@
       "payments": "Payment transactions",
       "vip": "VIP listings",
       "promotion": "Promotion",
-      "verification": "Document check"
+      "verification": "Document check",
+      "trust": "Account trust"
     }
   },
   "actions": {
@@ -336,7 +337,8 @@
       "PROMOTION": "Promotion",
       "REVIEW": "New review",
       "SUBSCRIPTION": "Subscription",
-      "SECURITY": "Security"
+      "SECURITY": "Security",
+      "ACCOUNT_RESTRICTION": "Account restriction"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3501,6 +3503,54 @@
         "POWER_OF_ATTORNEY": "Power of attorney",
         "EXTRACT_COMMERCIAL": "Commercial extract"
       }
+    },
+    "trust": {
+      "title": "Account trust",
+      "description": "Risky accounts by behaviour signals, measures and appeals. A human always applies and justifies a measure.",
+      "appeals": "Appeals",
+      "appealsDescription": "The staff member who applied a measure cannot review their own decision.",
+      "emptyAppeals": "No open appeals.",
+      "risky": "Risky accounts",
+      "riskyDescription": "Score ≥ 30; signals refresh daily. The suggested measure is preselected.",
+      "emptyRisky": "No risky accounts.",
+      "history": "Measure history",
+      "historyDescription": "Last 50 measures; lifted measures stay in history.",
+      "emptyHistory": "No measures yet.",
+      "score": "Score: {score}",
+      "recalculate": "Recalculate",
+      "apply": "Apply",
+      "kind": "Measure",
+      "endsAt": "End date (optional)",
+      "reason": "Justification",
+      "appliedBy": "Applied by: {name}",
+      "liftedBy": "Lifted by: {name}",
+      "active": "Active",
+      "inactive": "Ended",
+      "lift": "Lift",
+      "liftTitle": "Lift the measure?",
+      "liftDescription": "The reason will be sent to the user.",
+      "accept": "Accept",
+      "acceptTitle": "Accept the appeal?",
+      "acceptDescription": "The measure will be lifted; the note is shown to the user.",
+      "reject": "Reject",
+      "rejectTitle": "Reject the appeal?",
+      "rejectDescription": "The measure stays in force; the reason is shown to the user.",
+      "kinds": {
+        "WARNING": "Warning",
+        "EXTRA_VERIFICATION": "Extra verification",
+        "POSTING_LIMIT": "Posting limit",
+        "MODERATION_REVIEW": "Moderator review",
+        "TEMP_SUSPENSION": "Temporary restriction",
+        "BLOCK": "Block"
+      },
+      "signals": {
+        "DUPLICATE_BURST": "Duplicate listings: {value}",
+        "REJECTION_STREAK": "Rejected listings: {value}",
+        "CONFIRMED_REPORTS": "Confirmed reports: {value}",
+        "AUTOMATION": "Listings per hour: {value}",
+        "CROSS_PROFILE_CONTENT": "Same content as other profiles: {value}",
+        "REVIEW_BURST": "Suspicious reviews: {value}"
+      }
     }
   },
   "server": {
@@ -4005,6 +4055,21 @@
       "dataToggled": "Details check changed.",
       "notFound": "No pending documents found.",
       "note": "The reason must be at least 5 characters."
+    },
+    "trust": {
+      "applied": "Measure applied.",
+      "lifted": "Measure lifted.",
+      "appealAccepted": "Appeal accepted.",
+      "appealRejected": "Appeal rejected.",
+      "recalculated": "Score updated.",
+      "user": "Account not found.",
+      "kind": "Invalid measure type.",
+      "reason": "The justification must be at least 10 characters.",
+      "dates": "The end date must be in the future.",
+      "notFound": "Record not found or already reviewed.",
+      "sameReviewer": "The staff member who applied the measure cannot resolve the appeal.",
+      "note": "The reason must be at least 5 characters.",
+      "blockPermission": "Blocking is only available to administrators with user management permission."
     }
   }
 }

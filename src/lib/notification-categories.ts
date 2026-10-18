@@ -51,6 +51,7 @@ export const NOTIFICATION_TYPE_CATEGORY: Record<NotificationType, NotificationCa
   LISTING_EXPIRY: "LISTING_EXPIRY",
   REVIEW: "REVIEWS",
   SECURITY: "SECURITY",
+  ACCOUNT_RESTRICTION: "SECURITY",
 };
 
 export type CategoryChannels = Record<NotificationCategory, Record<NotificationChannel, boolean>>;

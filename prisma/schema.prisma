@@ -47,6 +47,10 @@ model User {
   /// Şirkətdəki vəzifə — korporativ və agentlik hesablarında.
   position            String?
   emailVerifiedAt     DateTime?
+  /// Hesab etibarlılığı (#258, PRD Modul 18): davranış siqnallarından risk balı (0–100) və siqnallar (JSON).
+  trustScore          Int?
+  trustFlags          String?
+  trustCheckedAt      DateTime?
   /// İdarə panelində hesabın biznes baxımından yoxlanılıb təsdiqləndiyi vaxt.
   /// E-poçt doğrulamasından və bloklama (`isActive`) statusundan qəsdən ayrıdır.
   approvedAt          DateTime?
@@ -2735,4 +2739,42 @@ model DocumentAccessLog {
 
   @@index([documentId, createdAt])
   @@index([propertyId, createdAt])
+}
+
+/// Hesaba tətbiq olunan tədbir (#258, PRD 20.3). Sətir silinmir — götürülən tədbir `liftedAt` alır, tarixçə qalır.
+model AccountRestriction {
+  id          String    @id @default(cuid())
+  userId      String
+  /// `WARNING` | `EXTRA_VERIFICATION` | `POSTING_LIMIT` | `MODERATION_REVIEW` | `TEMP_SUSPENSION` | `BLOCK` (`ACCOUNT_RESTRICTION_KINDS`).
+  kind        String
+  reason      String
+  /// Qərarın əsası olan siqnallar (JSON snapshot).
+  evidence    String?
+  startsAt    DateTime  @default(now())
+  endsAt      DateTime?
+  createdById String
+  liftedAt    DateTime?
+  liftedById  String?
+  liftReason  String?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, liftedAt])
+  @@index([kind, liftedAt])
+}
+
+/// Tədbirə etiraz (#258, PRD 20.4): tədbiri tətbiq edəndən başqa səlahiyyətli şəxs baxır.
+model AccountRestrictionAppeal {
+  id            String    @id @default(cuid())
+  restrictionId String
+  userId        String
+  message       String
+  /// `OPEN` | `ACCEPTED` | `REJECTED`.
+  status        String    @default("OPEN")
+  decidedById   String?
+  decidedAt     DateTime?
+  decisionNote  String?
+  createdAt     DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([restrictionId])
 }

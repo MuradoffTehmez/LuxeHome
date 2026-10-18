@@ -553,7 +553,12 @@
     "agencyRequestCancelled": "Request cancelled.",
     "employeeOtherAgency": "This person already works for another agency or is an agency account.",
     "invalidInstagram": "Enter an Instagram username (letters, digits, dot, underscore).",
-    "taxIdTaken": "An agency with this tax ID is already registered. If you think this is a mistake, please contact us."
+    "taxIdTaken": "An agency with this tax ID is already registered. If you think this is a mistake, please contact us.",
+    "posting": {
+      "limit": "Posting limit: at most 2 new listings per 24 hours.",
+      "verification": "Verify your phone number before posting a listing.",
+      "blocked": "A restriction has been applied to your account."
+    }
   },
   "profile": {
     "metaTitle": "Profile",
@@ -1732,5 +1737,57 @@
     "notFound": "Review not found.",
     "invalid": "The reply must be 2–1000 characters.",
     "failed": "The action failed. Try again shortly."
+  },
+  "restrictions": {
+    "eyebrow": "Account",
+    "title": "Restrictions",
+    "description": "Measures applied to your account, their reasons and how to appeal.",
+    "emptyTitle": "No restrictions",
+    "emptyDescription": "No measures have been applied to your account.",
+    "active": "Active",
+    "inactive": "Ended",
+    "reason": "Reason: {reason}",
+    "lifted": "Lifted: {reason}",
+    "appealLabel": "Appeal",
+    "appealHint": "If you disagree, explain why — the appeal is reviewed by a different authorized staff member.",
+    "appealSubmit": "Send appeal",
+    "appealSent": "Appeal sent.",
+    "appeal": {
+      "OPEN": "Your appeal is under review",
+      "ACCEPTED": "Your appeal was accepted",
+      "REJECTED": "Your appeal was rejected"
+    },
+    "errors": {
+      "notFound": "Measure not found.",
+      "message": "The appeal must be at least 10 characters.",
+      "open": "Your appeal for this measure is already under review.",
+      "failed": "The appeal was not sent."
+    },
+    "kinds": {
+      "WARNING": {
+        "label": "Warning",
+        "hint": "Please follow the rules; your account activity is not limited."
+      },
+      "EXTRA_VERIFICATION": {
+        "label": "Extra verification",
+        "hint": "Verify your phone number to post listings."
+      },
+      "POSTING_LIMIT": {
+        "label": "Posting limit",
+        "hint": "You can post at most 2 new listings per 24 hours."
+      },
+      "MODERATION_REVIEW": {
+        "label": "Moderator review",
+        "hint": "Your new listings are published after moderator approval."
+      },
+      "TEMP_SUSPENSION": {
+        "label": "Temporary restriction",
+        "hint": "Listings, inquiries and other write actions are disabled until it ends."
+      },
+      "BLOCK": {
+        "label": "Block",
+        "hint": "Write actions on the account were disabled by an administrator decision."
+      }
+    }
   }
 }

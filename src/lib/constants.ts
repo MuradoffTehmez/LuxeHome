@@ -978,6 +978,8 @@ export const NOTIFICATION_TYPES = {
   SUBSCRIPTION: "SUBSCRIPTION",
   /** Kritik təhlükəsizlik xəbərdarlığı (#252) — istifadəçi söndürə bilmir. */
   SECURITY: "SECURITY",
+  /** Hesaba tədbir tətbiq olundu və ya götürüldü (#258) — təhlükəsizlik kateqoriyası, söndürülmür. */
+  ACCOUNT_RESTRICTION: "ACCOUNT_RESTRICTION",
 } as const;
 
 export type NotificationType =
@@ -1005,6 +1007,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   REVIEW: "Yeni rəy",
   SUBSCRIPTION: "Abunə",
   SECURITY: "Təhlükəsizlik",
+  ACCOUNT_RESTRICTION: "Hesab məhdudiyyəti",
 };
 
 // ---------------------------------------------------------------------------
@@ -1961,3 +1964,11 @@ export const PROPERTY_DOCUMENT_RETENTION_DAYS = 30;
 /** Doğrulama nişanları — hər biri ayrı yoxlama səviyyəsidir (PRD 19.3). */
 export const VERIFICATION_BADGES = ["PHONE", "EMAIL", "AGENCY", "DOCUMENTS", "DATA"] as const;
 export type VerificationBadge = (typeof VERIFICATION_BADGES)[number];
+
+/** Hesab tədbirləri (#258, PRD 20.3) — yüngüldən ağıra. `BLOCK` yalnız `user:manage` icazəli admin tərəfindən. */
+export const ACCOUNT_RESTRICTION_KINDS = ["WARNING", "EXTRA_VERIFICATION", "POSTING_LIMIT", "MODERATION_REVIEW", "TEMP_SUSPENSION", "BLOCK"] as const;
+export type AccountRestrictionKind = (typeof ACCOUNT_RESTRICTION_KINDS)[number];
+/** Paylaşım limiti tədbirində 24 saatda ən çox yeni elan. */
+export const POSTING_LIMIT_PER_DAY = 2;
+export const TRUST_REASON_MIN = 10;
+export const TRUST_REASON_MAX = 500;
