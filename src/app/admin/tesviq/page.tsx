@@ -83,7 +83,7 @@ export default async function PromotionHubPage() {
     <>
       <AdminPageHeader title={t("pages.promotionHub.title")} description={t("pages.promotionHub.description")} />
 
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard icon={Clock} tone="warning" label={t("pages.promotionHub.stats.pending")} value={pendingVip + pendingPromotions} hint={t("pages.promotionHub.stats.pendingHint")} />
         <StatCard icon={Crown} tone="gold" label={t("pages.promotionHub.stats.activeVip")} value={activeVip} href="/admin/vip" />
         <StatCard icon={TrendingUp} tone="success" label={t("pages.promotionHub.stats.activePromotions")} value={activePromotions} href="/admin/irelicekme" />

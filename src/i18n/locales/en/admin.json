@@ -3730,12 +3730,12 @@
     },
     "promotionHub": {
       "title": "Listing promotion",
-      "description": "Queues, active promotions and recent decisions for VIP, boosts and premium packages in one place. Each module keeps its own rules and approval flow.",
+      "description": "Queues, active promotions and recent decisions for VIP, promotion and premium packages in one place. Each module keeps its own rules and approval flow.",
       "stats": {
         "pending": "Requests awaiting approval",
-        "pendingHint": "VIP + boosts",
+        "pendingHint": "VIP + promotion",
         "activeVip": "Active VIP listings",
-        "activePromotions": "Active boosts",
+        "activePromotions": "Active promotions",
         "pendingOrders": "Pending package orders"
       },
       "modulesTitle": "Promotion modules",
@@ -3748,7 +3748,7 @@
           "active": "{count} active"
         },
         "promotion": {
-          "title": "Boosts",
+          "title": "Promotion",
           "hint": "Campaigns, cooldown rule and statistics",
           "pending": "{count} pending",
           "active": "{count} active"
@@ -3763,11 +3763,11 @@
       "settingsHint": "Self-service and admin approval switches:",
       "settingsLink": "Features",
       "historyTitle": "Promotion history",
-      "historyDescription": "Recent VIP and boost decisions.",
+      "historyDescription": "Recent VIP and promotion decisions.",
       "historyEmpty": "No decisions yet.",
       "kind": {
         "vip": "VIP",
-        "promotion": "Boost"
+        "promotion": "Promotion"
       }
     }
   },

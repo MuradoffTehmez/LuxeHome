@@ -125,11 +125,11 @@ function NotificationRow({ item }: { item: NotificationListItem }) {
   );
 }
 
-export function NotificationList({ items, hasUnread: anyUnread }: { items: NotificationListItem[]; /** Filtrdən asılı olmayaraq oxunmamış bildiriş varmı. */ hasUnread?: boolean }) {
+/** «Hamısını oxu» — filtr sətrində göstərilir ki, siyahının üstündə ayrıca boş sətir tutmasın. */
+export function MarkAllReadButton() {
   const t = useTranslations("account.notifications");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const hasUnread = anyUnread ?? items.some((item) => !item.isRead);
 
   function handleMarkAll() {
     startTransition(async () => {
@@ -139,20 +139,19 @@ export function NotificationList({ items, hasUnread: anyUnread }: { items: Notif
   }
 
   return (
-    <div className="min-w-0">
-      {hasUnread && (
-        <div className="mb-3 flex justify-end">
-          <Button type="button" variant="ghost" size="sm" onClick={handleMarkAll} loading={pending}>
-            <CheckCheck className="size-4" aria-hidden="true" />
-            {t("markAllRead")}
-          </Button>
-        </div>
-      )}
-      <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
-        {items.map((item) => (
-          <NotificationRow key={item.id} item={item} />
-        ))}
-      </ul>
-    </div>
+    <Button type="button" variant="ghost" size="sm" onClick={handleMarkAll} loading={pending}>
+      <CheckCheck className="size-4" aria-hidden="true" />
+      {t("markAllRead")}
+    </Button>
+  );
+}
+
+export function NotificationList({ items }: { items: NotificationListItem[] }) {
+  return (
+    <ul className="min-w-0 divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper shadow-xs">
+      {items.map((item) => (
+        <NotificationRow key={item.id} item={item} />
+      ))}
+    </ul>
   );
 }

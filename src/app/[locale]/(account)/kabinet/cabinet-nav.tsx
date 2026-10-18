@@ -117,13 +117,13 @@ export function CabinetNav({
   const activeHref = activeCabinetHref(pathname, items);
 
   return (
-    <nav aria-label={t("menu")} className="flex flex-col gap-5">
-      <div className={cn("rounded-xl border border-line bg-paper p-4 shadow-xs", variant === "mobile" && "bg-beige/45")}>
+    <nav aria-label={t("menu")} className="flex flex-col gap-4">
+      <div className={cn("rounded-xl border border-line bg-paper px-4 py-3 shadow-xs", variant === "mobile" && "bg-beige/45")}>
         <p className="text-xs font-semibold text-gold-deep">{accountLabel}</p>
         <p className="mt-1 truncate font-medium text-ink">{name}</p>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         {groupCabinetItems(items).map((group) => (
           <div key={group.section} role="group" aria-labelledby={`cabinet-nav-${variant}-${group.section}`}>
             <p id={`cabinet-nav-${variant}-${group.section}`} className="px-3 pb-1 text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
@@ -141,7 +141,7 @@ export function CabinetNav({
                       onClick={onNavigate}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "group/nav inline-flex min-h-11 w-full items-center gap-2.5 rounded-md border px-3 text-sm transition-colors lg:min-h-10",
+                        "group/nav inline-flex min-h-11 w-full items-center gap-2.5 rounded-md border px-3 text-sm transition-colors lg:min-h-9",
                         active
                           ? "border-line bg-paper font-semibold text-ink shadow-xs"
                           : "border-transparent text-ink-soft hover:bg-beige/60 hover:text-ink",

@@ -20,7 +20,7 @@ import {
   parseNotificationFilters,
   type NotificationFilterState,
 } from "@/lib/notification-filters";
-import { NotificationList, type NotificationListItem } from "./notification-list";
+import { MarkAllReadButton, NotificationList, type NotificationListItem } from "./notification-list";
 import { NotificationPreferences } from "./notification-preferences";
 import { PushPreferences } from "./push-preferences";
 import { CategoryPreferences } from "./category-preferences";
@@ -123,6 +123,7 @@ async function ListView({ userId, filters, locale, unread, total }: { userId: st
             count: read === "unread" ? unread : undefined,
           }))}
         />
+        {unread > 0 && <MarkAllReadButton />}
       </div>
       {categories.length > 1 && (
         <FilterChipRow label={t("filters.categoryLabel")}>
@@ -138,7 +139,7 @@ async function ListView({ userId, filters, locale, unread, total }: { userId: st
         </FilterChipRow>
       )}
       {items.length > 0 ? (
-        <NotificationList items={items} hasUnread={unread > 0} />
+        <NotificationList items={items} />
       ) : (
         <EmptyState
           title={t("filteredEmptyTitle")}
