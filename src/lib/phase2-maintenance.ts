@@ -11,6 +11,7 @@ import { expireVipGrants } from "@/lib/vip";
 import { purgeReviewedDocuments } from "@/lib/property-verification";
 import { refreshActiveAccountsTrust } from "@/lib/account-trust";
 import { purgeSecurityLogs } from "@/lib/security/security-events";
+import { purgeKnownDevices } from "@/lib/security/login-alerts";
 import { DOMAIN_EVENT_RETENTION_DAYS } from "@/lib/security/retention-policy";
 
 
@@ -63,6 +64,7 @@ export async function runPhase2Maintenance(now = new Date()) {
   const trustRefreshed = await refreshActiveAccountsTrust(now).catch(() => 0);
   // Saxlama müddəti (#264, PRD 23.4): köhnə təhlükəsizlik hadisələri və giriş cəhdləri silinir.
   const securityLogs = await purgeSecurityLogs(now).catch(() => ({ events: 0, loginAttempts: 0 }));
+  const knownDevices = await purgeKnownDevices(now).catch(() => 0);
 
   return {
     expiredPremium: premium.count,
@@ -77,5 +79,6 @@ export async function runPhase2Maintenance(now = new Date()) {
     purgedDocuments,
     trustRefreshed,
     securityLogs,
+    knownDevices,
   };
 }

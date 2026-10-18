@@ -3690,6 +3690,7 @@
           "sessionAbsolute": "Сессия (абсолютный срок)",
           "loginAttempts": "Попытки входа",
           "securityEvents": "События безопасности",
+          "knownDevices": "Известные устройства входа",
           "domainEvents": "Системные события",
           "uniqueViews": "Ключи уникальных просмотров",
           "propertyDocuments": "Изображения документов (после решения)",

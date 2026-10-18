@@ -1,6 +1,7 @@
 import { ABSOLUTE_LIFETIME_MS, SLIDING_LIFETIME_MS } from "@/lib/auth/session-policy";
 import { PROPERTY_DOCUMENT_RETENTION_DAYS } from "@/lib/constants";
 import { UNIQUE_VIEW_RETENTION_DAYS } from "@/lib/listing-stats";
+import { KNOWN_DEVICE_RETENTION_DAYS } from "./login-device";
 
 /** Domen hadisələri (`DomainEvent`) — gündəlik baxım bundan köhnəsini silir. */
 export const DOMAIN_EVENT_RETENTION_DAYS = 180;
@@ -19,6 +20,7 @@ export const RETENTION_POLICY: RetentionItem[] = [
   { key: "sessionAbsolute", value: ABSOLUTE_LIFETIME_MS / 86_400_000, unit: "days" },
   { key: "loginAttempts", value: LOGIN_ATTEMPT_RETENTION_DAYS, unit: "days" },
   { key: "securityEvents", value: SECURITY_EVENT_RETENTION_DAYS, unit: "days" },
+  { key: "knownDevices", value: KNOWN_DEVICE_RETENTION_DAYS, unit: "days" },
   { key: "domainEvents", value: DOMAIN_EVENT_RETENTION_DAYS, unit: "days" },
   { key: "uniqueViews", value: UNIQUE_VIEW_RETENTION_DAYS, unit: "days" },
   { key: "propertyDocuments", value: PROPERTY_DOCUMENT_RETENTION_DAYS, unit: "days" },
