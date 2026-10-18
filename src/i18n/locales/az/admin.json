@@ -69,7 +69,7 @@
       "seoLinks": "Daxili və qırıq linklər",
       "seoNotFound": "404 jurnalı",
       "redirects": "Yönləndirmələr",
-      "analytics": "Trafik analitikası",
+      "analytics": "Analitika",
       "leads": "Müraciətlər",
       "reservations": "Rezervasiyalar",
       "email": "Korporativ e-poçt",
@@ -101,7 +101,9 @@
       "promotion": "İrəli çəkmə",
       "verification": "Sənəd yoxlaması",
       "trust": "Hesab etibarlılığı",
-      "moderationHistory": "Moderasiya tarixçəsi"
+      "moderationHistory": "Moderasiya tarixçəsi",
+      "traffic": "Trafik analitikası",
+      "businessReports": "Hesabatlar"
     }
   },
   "actions": {
@@ -3588,6 +3590,64 @@
       "system": "sistem",
       "prev": "← Əvvəlki",
       "next": "Növbəti →"
+    },
+    "businessReports": {
+      "title": "Hesabatlar və biznes analitikası",
+      "description": "Platforma aktivliyi, abunə və gəlir göstəriciləri, coğrafi bazar marağı — yalnız saytın öz qeydlərindən.",
+      "empty": "Hələ məlumat yoxdur.",
+      "platform": {
+        "title": "Platforma analitikası",
+        "description": "Aktiv istifadəçilər və son 6 ayın dinamikası (Bakı vaxtı).",
+        "dau": "Gündəlik aktiv (DAU)",
+        "wau": "Həftəlik aktiv (WAU)",
+        "mau": "Aylıq aktiv (MAU)",
+        "stickiness": "DAU/MAU: {value}",
+        "totalUsers": "İstifadəçi (cəmi)",
+        "activeListings": "Aktiv elan",
+        "verifiedAgencies": "Təsdiqlənmiş agentlik",
+        "chart": "Aylıq qeydiyyat, yeni elan və müraciət",
+        "table": "Aylıq göstəricilər",
+        "month": "Ay",
+        "metrics": {
+          "registrations": "Qeydiyyat",
+          "newListings": "Yeni elan",
+          "leads": "Müraciət",
+          "reports": "Şikayət",
+          "confirmedFakes": "Təsdiqlənmiş saxta elan",
+          "newAgencies": "Yeni agentlik",
+          "vipGrants": "VIP istifadəsi"
+        }
+      },
+      "business": {
+        "title": "Biznes göstəriciləri",
+        "description": "Plan üzrə aktiv abunələr, ödənişliyə keçid, yenilənmə və gəlir.",
+        "inactive": "aktiv deyil",
+        "promoNote": "Tanıtım mərhələsi: ödənişli abunə açılmayıb, gəlir göstəriciləri hesablanmır.",
+        "checkoutNote": "Onlayn ödəniş (checkout) söndürülüdür — gəlir göstəriciləri hesablanmır.",
+        "trialing": "Sınaq dövründə",
+        "conversion": "Ödənişliyə keçid",
+        "renewal": "Yenilənmə",
+        "activeVip": "Aktiv VIP",
+        "activePromotions": "Aktiv irəli çəkmə",
+        "revenueMonth": "Bu ayın gəliri",
+        "vipRevenue": "VIP və irəli çəkmə gəliri"
+      },
+      "geo": {
+        "title": "Coğrafi hesabatlar",
+        "description": "Aktiv elanlar, axtarış marağı və təxmini qiymət trendi.",
+        "cities": "Ən aktiv şəhər/rayonlar",
+        "districts": "Ən çox elan olan ərazilər",
+        "searched": "Ən çox axtarılan ərazilər",
+        "searchedHint": "Saxlanılmış axtarışlar üzrə ({count} axtarış).",
+        "typeInterest": "Əmlak növlərinə maraq",
+        "typeInterestHint": "Son 30 gündə elan baxışları.",
+        "saleRent": "Satış / kirayə nisbəti",
+        "sale": "Satış",
+        "rent": "Kirayə",
+        "priceTrend": "Təxmini qiymət trendi",
+        "priceTrendHint": "Satış elanlarının m² median qiyməti (AZN, yaradıldığı ay); azı 5 elan olmayan ay «—».",
+        "samples": "{count} elan"
+      }
     }
   },
   "server": {
