@@ -37,6 +37,8 @@ const eslintConfig = defineConfig([
       // xətaları həmin siyahıda itir. CI-də bu qovluqlar olmadığı üçün problem
       // yalnız lokal işdə görünürdü.
       "tmp/**",
+      // Claude Code-un paralel sessiya worktree-ləri — öz build artefaktları və generasiya faylları ilə.
+      ".claude/**",
       "archive-*/**",
   ]),
 ]);
