@@ -356,7 +356,11 @@ qradiyent/modal fonu üçün sabit `black/<opacity>` işlət.
   ilə fırlanma/split-screen-də yenidən render olunur; kök `overflow-hidden` saxlanmalıdır —
   əks halda 300px-lik widget öz konteynerini genişləndirir və keçid heç vaxt baş vermir.
 - Interaktiv element mobil ekranda ≥44px; mətn linkini böyütmək lazımdırsa layout-u
-  dəyişməyən `after:absolute after:-inset-y-3` toxunma sahəsi işlət.
+  dəyişməyən `after:absolute after:-inset-y-3` toxunma sahəsi işlət. Kiçik checkbox (16–20px) `<label className="inline-grid
+  size-11 place-items-center">` ilə sarılır; sıx siyahıda vizual yeri saxlamaq üçün `-m-3.5` (#271 — toplu seçim, bildiriş matrisi).
+- **Mobil audit (#271, PRD Modul 24):** yeni modul səhifələri 375/768/1280/1440 px-də üfüqi daşmasız; `e2e/specs/mobile.spec.ts`
+  yeni ictimai səhifələri, elan səhifəsinin PRD 26.2 elementlərini (qiymət, əlaqə, şikayət, seçilmişlər) və mobil kabinet
+  bölmələrini (auth fixture ilə) yoxlayır. Yeni ictimai səhifəni oradakı `paths` siyahısına əlavə et.
 
 **Seçim sahələri vahid `Combobox`-dur** (`components/ui/combobox.tsx`, #136): ARIA 1.2 combobox +
 listbox, diakritikasız axtarış («seki» → «Şəki»), klaviatura (↑↓, PageUp/Down, Enter, Esc, Tab),

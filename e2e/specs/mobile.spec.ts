@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { ListingsPage } from "../pages/listings.page";
 import { propertyCardLinks, visit } from "../support/helpers";
+import { authFixturesEnabled, signInAsLister } from "../support/auth";
 
 /**
  * Mobil axınlar.
@@ -29,7 +30,8 @@ test.describe("Mobil naviqasiya", () => {
 });
 
 test.describe("Mobil layout", () => {
-  const paths = ["/az", "/az/emlaklar", "/az/blog", "/az/elaqe"];
+  // PRD Modul 24 (#270): yeni modulların ictimai səhifələri də daxildir.
+  const paths = ["/az", "/az/emlaklar", "/az/blog", "/az/elaqe", "/az/bilik-merkezi", "/az/agentlikler", "/az/paketler"];
 
   for (const path of paths) {
     /**
@@ -135,5 +137,39 @@ test.describe("Mobil detal səhifəsi", () => {
       clientWidth: document.documentElement.clientWidth,
     }));
     expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 2);
+  });
+});
+
+test.describe("Mobil elan səhifəsinin əsas elementləri (PRD 26.2)", () => {
+  test("qiymət, əlaqə, şikayət, seçilmişlər və təhlükəsizlik xəbərdarlığı görünür", async ({ page }) => {
+    const listings = new ListingsPage(page);
+    await listings.open();
+    const href = await listings.firstPropertyHref();
+    test.skip(!href, "kataloqda elan yoxdur");
+
+    await visit(page, href!);
+    await page.waitForLoadState("load");
+
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.getByText(/₼|AZN|USD|EUR/).first()).toBeVisible();
+    // Əlaqə paneli: zəng / nömrəni göstər düyməsi (şirkət elanında birbaşa zəng).
+    await expect(page.getByRole("link", { name: /Zəng et/ }).or(page.getByRole("button", { name: /Nömrəni göstər|Zəng et/ })).first()).toBeAttached();
+    await expect(page.getByRole("button", { name: /Elandan şikayət et/ })).toBeAttached();
+    await expect(page.locator("[aria-label*='eçilmiş'], [aria-label*='avorit']").first()).toBeAttached();
+  });
+});
+
+test.describe("Mobil kabinet (PRD 26.3)", () => {
+  test.skip(!authFixturesEnabled, "auth fixture-ları yoxdur (staging run)");
+
+  test("elanlar, müraciətlər, bildirişlər və statistika mobil ekrandan əlçatandır", async ({ page, context, baseURL }) => {
+    await signInAsLister(context, baseURL!);
+    for (const path of ["/az/kabinet", "/az/kabinet/elanlar", "/az/kabinet/muracietler", "/az/kabinet/bildirisler", "/az/kabinet/analitika"]) {
+      await visit(page, path);
+      await page.waitForLoadState("load");
+      await expect(page.locator("h1").first(), path).toBeVisible();
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow, `${path}: üfüqi daşma`).toBeLessThanOrEqual(2);
+    }
   });
 });
