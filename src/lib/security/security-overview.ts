@@ -22,7 +22,11 @@ export async function getSecurityOverview(input: { kind?: SecurityEventKind; pag
   const [failedLogins, successfulLogins, rateLimited, lockedAccounts, newDevice, forbidden, csrf, topIps, events, total] = await Promise.all([
     prisma.loginAttempt.count({ where: { success: false, createdAt: { gte: since } } }),
     prisma.loginAttempt.count({ where: { success: true, createdAt: { gte: since } } }),
-    prisma.loginAttempt.count({ where: { reason: "RATE_LIMITED", createdAt: { gte: since } } }),
+    // Giriş limiti `LoginAttempt`-də, panel/kabinet yazma limiti isə yalnız `SecurityEvent`-dədir — ikisi də sayılır.
+    Promise.all([
+      prisma.loginAttempt.count({ where: { reason: "RATE_LIMITED", createdAt: { gte: since } } }),
+      countKind(SECURITY_EVENT_KINDS.RATE_LIMITED),
+    ]).then(([logins, writes]) => logins + writes),
     prisma.user.count({ where: { lockedUntil: { gt: now } } }),
     countKind(SECURITY_EVENT_KINDS.NEW_DEVICE_LOGIN),
     countKind(SECURITY_EVENT_KINDS.FORBIDDEN),

@@ -24,23 +24,21 @@ describe("cihaz qiymətləndirməsi", () => {
     expect(deviceLabel(null)).toBeNull();
   });
 
-  it("ilk giriş, tanış IP və ya tanış cihaz xəbərdarlıq vermir", () => {
-    expect(isNewDeviceLogin({ ip: "1.1.1.1", userAgent: CHROME_WIN }, [])).toBe(false);
-    expect(isNewDeviceLogin({ ip: "1.1.1.1", userAgent: SAFARI_IOS }, [{ ip: "1.1.1.1", userAgent: CHROME_WIN }])).toBe(false);
-    expect(isNewDeviceLogin({ ip: "2.2.2.2", userAgent: CHROME_WIN_NEWER }, [{ ip: "1.1.1.1", userAgent: CHROME_WIN }])).toBe(false);
-    expect(isNewDeviceLogin({ ip: "2.2.2.2", userAgent: SAFARI_IOS }, [{ ip: "1.1.1.1", userAgent: CHROME_WIN }])).toBe(true);
-    // Naməlum IP heç vaxt «tanış» sayılmır.
-    expect(isNewDeviceLogin({ ip: "unknown", userAgent: SAFARI_IOS }, [{ ip: "unknown", userAgent: CHROME_WIN }])).toBe(true);
+  it("ilk giriş, tanış IP və ya tanış cihaz xəbərdarlıq vermir; fasilədən sonrakı yad giriş verir", () => {
+    const known = { hasHistory: true, devices: ["Chrome · Windows"], ipHashes: ["ip-a"] };
+    expect(isNewDeviceLogin({ device: "Chrome · Windows", ipHash: "ip-a" }, { hasHistory: false, devices: [], ipHashes: [] })).toBe(false);
+    expect(isNewDeviceLogin({ device: "Safari · iOS", ipHash: "ip-a" }, known)).toBe(false);
+    expect(isNewDeviceLogin({ device: deviceLabel(CHROME_WIN_NEWER), ipHash: "ip-b" }, known)).toBe(false);
+    expect(isNewDeviceLogin({ device: "Safari · iOS", ipHash: "ip-b" }, known)).toBe(true);
+    expect(isNewDeviceLogin({ device: "Safari · iOS", ipHash: null }, known)).toBe(true);
+    // Tarixçə var, amma pəncərədə heç nə yoxdur (uzun fasilə) — giriş yeni sayılır.
+    expect(isNewDeviceLogin({ device: "Chrome · Windows", ipHash: "ip-a" }, { hasHistory: true, devices: [], ipHashes: [] })).toBe(true);
   });
 });
 
 beforeAll(async () => {
-  const session = DB.prepare(`INSERT INTO "Session" ("id", "userId", "createdAt", "expiresAt", "lastSeenAt", "ip", "userAgent", "authKind") VALUES (?, 'se-user', ?, ?, ?, ?, ?, 'PUBLIC')`);
-  const future = new Date(now.getTime() + DAY).toISOString();
   await DB.batch([
     DB.prepare(`INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "accountType", "createdAt", "updatedAt") VALUES ('se-user', 'Təhlükəsiz', 'se@example.test', 'disabled', 'EDITOR', 'OWNER', ?, ?)`).bind(iso, iso),
-    session.bind("se-old", iso, future, iso, "1.1.1.1", CHROME_WIN),
-    session.bind("se-new", iso, future, iso, "9.9.9.9", SAFARI_IOS),
     DB.prepare(`INSERT INTO "LoginAttempt" ("id", "email", "ip", "success", "reason", "createdAt") VALUES ('se-la-old', 'se@example.test', '5.5.5.5', 0, 'BAD_PASSWORD', ?)`).bind(new Date(now.getTime() - (LOGIN_ATTEMPT_RETENTION_DAYS + 1) * DAY).toISOString()),
     DB.prepare(`INSERT INTO "LoginAttempt" ("id", "email", "ip", "success", "reason", "createdAt") VALUES ('se-la-new', 'se@example.test', '5.5.5.5', 0, 'BAD_PASSWORD', ?)`).bind(iso),
     DB.prepare(`INSERT INTO "SecurityEvent" ("id", "kind", "createdAt") VALUES ('se-ev-old', 'FORBIDDEN', ?)`).bind(new Date(now.getTime() - (SECURITY_EVENT_RETENTION_DAYS + 1) * DAY).toISOString()),
@@ -49,11 +47,14 @@ beforeAll(async () => {
 
 describe("yeni cihaz xəbərdarlığı və jurnal", () => {
   it("tanınmayan cihaz və IP hadisə və təhlükəsizlik bildirişi yaradır, tanış IP yaratmır", async () => {
+    // İlk giriş — tarixçə qurulur, xəbərdarlıq yoxdur; sessiya sətri silinsə də tarixçə qalır.
+    expect(await alertOnNewDevice({ userId: "se-user", sessionId: "se-old", ip: "1.1.1.1", userAgent: CHROME_WIN, now })).toBe(false);
     expect(await alertOnNewDevice({ userId: "se-user", sessionId: "se-new", ip: "9.9.9.9", userAgent: SAFARI_IOS, now })).toBe(true);
-    // Köhnə Chrome IP-sindən yeni sessiya — IP tanışdır.
-    await DB.prepare(`INSERT INTO "Session" ("id", "userId", "createdAt", "expiresAt", "lastSeenAt", "ip", "userAgent", "authKind") VALUES ('se-known', 'se-user', ?, ?, ?, '1.1.1.1', ?, 'PUBLIC')`)
-      .bind(iso, new Date(now.getTime() + DAY).toISOString(), iso, "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0").run();
+    // Köhnə Chrome IP-sindən yeni cihaz — IP tanışdır.
     expect(await alertOnNewDevice({ userId: "se-user", sessionId: "se-known", ip: "1.1.1.1", userAgent: "Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0", now })).toBe(false);
+    // Xam IP saxlanmır.
+    const stored = await DB.prepare(`SELECT "value" FROM "KnownLoginDevice" WHERE "kind" = 'IP'`).all<{ value: string }>();
+    expect(stored.results.some((row) => row.value.includes("1.1.1.1"))).toBe(false);
     const events = await DB.prepare(`SELECT "kind", "ip" FROM "SecurityEvent" WHERE "userId" = 'se-user'`).all<{ kind: string; ip: string }>();
     expect(events.results).toEqual([{ kind: "NEW_DEVICE_LOGIN", ip: "9.9.9.9" }]);
     const notice = await DB.prepare(`SELECT "type", "dedupeKey" FROM "Notification" WHERE "userId" = 'se-user'`).first<{ type: string; dedupeKey: string }>();
@@ -67,7 +68,10 @@ describe("yeni cihaz xəbərdarlığı və jurnal", () => {
   });
 
   it("icmal 24 saatlıq göstəriciləri və növ filtrini verir", async () => {
+    // Yazma limiti yalnız hadisə jurnalındadır — göstəriciyə də düşməlidir.
+    await recordSecurityEvent(SECURITY_EVENT_KINDS.RATE_LIMITED, { userId: "se-user", ip: null, userAgent: null, detail: { scope: "admin" } });
     const data = await getSecurityOverview({ now });
+    expect(data.stats.rateLimited).toBe(1);
     expect(data.stats.failedLogins).toBeGreaterThanOrEqual(1);
     expect(data.stats.newDevice).toBe(1);
     expect(data.topIps[0]).toEqual({ ip: "5.5.5.5", count: 1 });

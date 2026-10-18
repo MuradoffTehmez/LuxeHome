@@ -3690,6 +3690,7 @@
           "sessionAbsolute": "Sessiya (mütləq)",
           "loginAttempts": "Giriş cəhdləri",
           "securityEvents": "Təhlükəsizlik hadisələri",
+          "knownDevices": "Tanınmış giriş cihazları",
           "domainEvents": "Sistem hadisələri",
           "uniqueViews": "Unikal baxış açarları",
           "propertyDocuments": "Sənəd şəkilləri (qərardan sonra)",
