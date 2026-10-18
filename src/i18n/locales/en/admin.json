@@ -332,7 +332,10 @@
       "AGENCY_TASK": "Agency task",
       "REVIEW_REPORT": "Review report",
       "VIP": "VIP listing",
-      "PROMOTION": "Promotion"
+      "PROMOTION": "Promotion",
+      "REVIEW": "New review",
+      "SUBSCRIPTION": "Subscription",
+      "SECURITY": "Security"
     },
     "partnershipType": {
       "BROKER": "Broker",

@@ -708,6 +708,63 @@
       "submit": "Save preferences",
       "saved": "Notification preferences saved.",
       "failed": "Notification preferences were not saved. Please try again."
+    },
+    "center": {
+      "title": "Notification center",
+      "description": "Choose which events you want to be notified about and through which channels.",
+      "category": "Event",
+      "soon": "coming soon",
+      "locked": "Cannot be disabled",
+      "save": "Save",
+      "securityNote": "Security notifications (e.g. a password change) are always sent to protect your account.",
+      "channels": {
+        "inApp": "Website",
+        "email": "Email",
+        "sms": "SMS",
+        "telegram": "Telegram"
+      },
+      "categories": {
+        "LEADS": {
+          "label": "Inquiries",
+          "hint": "New inquiries, reservations and viewings"
+        },
+        "REPORTS": {
+          "label": "Reports",
+          "hint": "Responses to your reports"
+        },
+        "MODERATION": {
+          "label": "Listing moderation",
+          "hint": "Approval, rejection and change requests"
+        },
+        "VIP_PROMOTION": {
+          "label": "VIP and promotion",
+          "hint": "Request outcomes"
+        },
+        "SUBSCRIPTION": {
+          "label": "Subscriptions and packages",
+          "hint": "Subscription status and package orders"
+        },
+        "AGENCY": {
+          "label": "Agency",
+          "hint": "Invitations, team changes, approvals and tasks"
+        },
+        "LISTING_EXPIRY": {
+          "label": "Listing freshness",
+          "hint": "Expiry reminders"
+        },
+        "MATCHES": {
+          "label": "Matching listings",
+          "hint": "Saved searches, price drops and recommendations"
+        },
+        "REVIEWS": {
+          "label": "New review",
+          "hint": "Reviews written about you and published"
+        },
+        "SECURITY": {
+          "label": "Security",
+          "hint": "Critical alerts about your account"
+        }
+      }
     }
   },
   "recentlyViewed": {

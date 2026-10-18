@@ -22,6 +22,7 @@ import { assertSameOrigin } from "@/lib/admin/guard";
 import { redirect } from "next/navigation";
 import { revalidatePublicContent } from "@/lib/revalidate-public";
 import { requestAccountDeletion } from "@/lib/account-deletion";
+import { noticePasswordChanged } from "@/lib/accounts/account-notices";
 
 /**
  * Kabinet profili.
@@ -332,6 +333,8 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
 
     // Parol dəyişəndə digər cihazlardakı sessiyalar bağlanır; cari sessiya qalır
     await revokeAllSessions(user.id, (await currentSessionId()) ?? undefined);
+    // Kritik təhlükəsizlik bildirişi (#252) — istifadəçi söndürə bilmir, heç vaxt atmır.
+    await noticePasswordChanged({ userId: user.id, changedAt: new Date() });
 
     return success(t("actions.passwordChanged"));
   } catch (error) {

@@ -708,6 +708,63 @@
       "submit": "Seçimləri yadda saxla",
       "saved": "Bildiriş seçimləri yadda saxlanıldı.",
       "failed": "Bildiriş seçimləri saxlanılmadı. Yenidən cəhd edin."
+    },
+    "center": {
+      "title": "Bildiriş mərkəzi",
+      "description": "Hansı hadisələr barədə və hansı kanallardan bildiriş almaq istədiyinizi seçin.",
+      "category": "Hadisə",
+      "soon": "tezliklə",
+      "locked": "Söndürülə bilməz",
+      "save": "Yadda saxla",
+      "securityNote": "Təhlükəsizlik bildirişləri (məs. parol dəyişikliyi) hesabınızı qorumaq üçün həmişə göndərilir.",
+      "channels": {
+        "inApp": "Sayt",
+        "email": "E-poçt",
+        "sms": "SMS",
+        "telegram": "Telegram"
+      },
+      "categories": {
+        "LEADS": {
+          "label": "Müraciətlər",
+          "hint": "Yeni müraciət, rezervasiya və görüş"
+        },
+        "REPORTS": {
+          "label": "Şikayətlər",
+          "hint": "Şikayətlərinizə cavab"
+        },
+        "MODERATION": {
+          "label": "Elan moderasiyası",
+          "hint": "Elanın təsdiqi, rədd edilməsi və düzəliş tələbi"
+        },
+        "VIP_PROMOTION": {
+          "label": "VIP və irəli çəkmə",
+          "hint": "Sorğuların nəticəsi"
+        },
+        "SUBSCRIPTION": {
+          "label": "Abunə və paketlər",
+          "hint": "Abunə statusu və paket sifarişləri"
+        },
+        "AGENCY": {
+          "label": "Agentlik",
+          "hint": "Dəvət, komanda dəyişiklikləri, təsdiq və tapşırıqlar"
+        },
+        "LISTING_EXPIRY": {
+          "label": "Elan aktuallığı",
+          "hint": "Müddətin bitməsi barədə xatırlatma"
+        },
+        "MATCHES": {
+          "label": "Uyğun elanlar",
+          "hint": "Saxlanmış axtarış, qiymət endirimi və tövsiyələr"
+        },
+        "REVIEWS": {
+          "label": "Yeni rəy",
+          "hint": "Sizə yazılan və dərc olunan rəylər"
+        },
+        "SECURITY": {
+          "label": "Təhlükəsizlik",
+          "hint": "Hesabınızla bağlı kritik xəbərdarlıqlar"
+        }
+      }
     }
   },
   "recentlyViewed": {

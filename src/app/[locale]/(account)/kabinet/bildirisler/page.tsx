@@ -12,6 +12,8 @@ import { resolveNotificationPreferences } from "@/lib/notification-preferences";
 import { NotificationList, type NotificationListItem } from "./notification-list";
 import { NotificationPreferences } from "./notification-preferences";
 import { PushPreferences } from "./push-preferences";
+import { CategoryPreferences } from "./category-preferences";
+import { parseCategoryChannels } from "@/lib/notification-categories";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -50,6 +52,7 @@ export default async function NotificationsPage() {
 
       <div className="mt-8">
         <PushPreferences />
+        <CategoryPreferences values={parseCategoryChannels(storedPreference?.categoryChannels)} />
         <NotificationPreferences values={preferences} />
         {items.length > 0 ? (
           <NotificationList items={items} />

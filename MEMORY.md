@@ -772,3 +772,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   ana səhifə VIP bölməsi, «Premium» nişanı «VIP» oldu. **Modul 12 tamamlandı.** Növbəti — Modul 13 (irəli çəkmə).
 - #250 (Modul 13): `PromotionCampaign`, `promotedUntil` sıralaması, «İrəli çəkilib» nişanı, kabinet «İrəli çək», `/admin/irelicekme`,
   fasilə qaydası, cron bitməsi. **Modul 13 tamamlandı — Faza 4 (12, 13, 14, 23) bitdi.** Növbəti — Faza 5: Modul 15 (bildiriş mərkəzi).
+- #252 (Modul 15): kateqoriya × kanal seçimi, kritik təhlükəsizlik bildirişi, yeni rəy / abunə / parol hadisələri.
+  **Modul 15 tamamlandı.** Növbəti — Modul 16 (axtarış və ağıllı tövsiyələr).

@@ -13,6 +13,12 @@ import {
 } from "@/lib/notification-preferences";
 import { localizePath } from "@/i18n/path-locale";
 import { prisma } from "@/lib/prisma";
+import {
+  NOTIFICATION_CATEGORIES,
+  NOTIFICATION_CHANNELS,
+  defaultCategoryChannels,
+  serializeCategoryChannels,
+} from "@/lib/notification-categories";
 
 const LIST_PATH = "/kabinet/bildirisler";
 
@@ -64,5 +70,37 @@ export async function saveNotificationPreferences(
     return success(t("preferences.saved"));
   } catch (error) {
     return unexpected("bildiriş seçimləri saxlanılmadı", error, t("preferences.failed"));
+  }
+}
+
+/**
+ * Bildiriş mərkəzi (#252, PRD 17.4): kateqoriya × kanal seçimi. İşarələnməmiş checkbox göndərilmir — yoxluq
+ * «söndürülüb» deməkdir. Kritik təhlükəsizlik kateqoriyası saxlanmır (həmişə açıqdır).
+ */
+export async function saveCategoryChannels(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations({ locale, namespace: "account.notifications" });
+  let user;
+  try {
+    user = await requirePublicAction("preferences", locale);
+  } catch (error) {
+    if (error instanceof AdminGuardError) return failure(error.message);
+    throw error;
+  }
+  const values = defaultCategoryChannels();
+  for (const category of NOTIFICATION_CATEGORIES) {
+    for (const channel of NOTIFICATION_CHANNELS) values[category][channel] = formData.get(`${category}.${channel}`) === "on";
+  }
+  try {
+    const categoryChannels = serializeCategoryChannels(values);
+    await prisma.notificationPreference.upsert({
+      where: { userId: user.id },
+      create: { userId: user.id, categoryChannels },
+      update: { categoryChannels },
+    });
+    revalidatePath(localizePath(LIST_PATH, locale));
+    return success(t("preferences.saved"));
+  } catch (error) {
+    return unexpected("bildiriş kateqoriyaları saxlanılmadı", error, t("preferences.failed"));
   }
 }

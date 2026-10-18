@@ -332,7 +332,10 @@
       "AGENCY_TASK": "Задача агентства",
       "REVIEW_REPORT": "Жалоба на отзыв",
       "VIP": "VIP-объявление",
-      "PROMOTION": "Поднятие"
+      "PROMOTION": "Поднятие",
+      "REVIEW": "Новый отзыв",
+      "SUBSCRIPTION": "Подписка",
+      "SECURITY": "Безопасность"
     },
     "partnershipType": {
       "BROKER": "Брокер",

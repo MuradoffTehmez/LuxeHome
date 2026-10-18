@@ -972,6 +972,12 @@ export const NOTIFICATION_TYPES = {
   VIP: "VIP",
   /** İrəli çəkmə kampaniyasının qərarı (#250). */
   PROMOTION: "PROMOTION",
+  /** Agentə/agentliyə yeni təsdiqlənmiş rəy (#252). */
+  REVIEW: "REVIEW",
+  /** Abunə statusunun dəyişməsi (#252). */
+  SUBSCRIPTION: "SUBSCRIPTION",
+  /** Kritik təhlükəsizlik xəbərdarlığı (#252) — istifadəçi söndürə bilmir. */
+  SECURITY: "SECURITY",
 } as const;
 
 export type NotificationType =
@@ -996,6 +1002,9 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   REVIEW_REPORT: "Rəydən şikayət",
   VIP: "VIP elan",
   PROMOTION: "İrəli çəkmə",
+  REVIEW: "Yeni rəy",
+  SUBSCRIPTION: "Abunə",
+  SECURITY: "Təhlükəsizlik",
 };
 
 // ---------------------------------------------------------------------------
