@@ -546,7 +546,7 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   hesabla eyni uzun təsvir, şübhəli rəylər → `User.trustScore`/`trustFlags` (gündəlik baxım fəal hesabları yeniləyir).
   **Bal yalnız tövsiyədir** — tədbiri (`AccountRestriction`, `0083`) moderator `/admin/etibarliliq`-də əsaslandırma ilə tətbiq
   edir; `BLOCK` yalnız `user:manage`. Qapılar: `TEMP_SUSPENSION`/`BLOCK` `requirePublicAction`-da yazmanı bağlayır
-  (`accountWriteBlock`, `preferences` istisna), yeni elan `postingGate()`-dən keçir (limit, əlavə təsdiq, moderator yoxlaması →
+  (`accountWriteBlock`; yalnız `preferences` və `appeal` scope-ları istisnadır, telefon təsdiqi `profile`-dadır; `requirePublicAction`-dan keçməyən `updateProfile` `accountRestrictionBlock()` çağırır), yeni elan `postingGate()`-dən keçir (limit, əlavə təsdiq, moderator yoxlaması →
   `PENDING`). Tədbir silinmir (`liftedAt`), bildiriş `ACCOUNT_RESTRICTION` (təhlükəsizlik kateqoriyası). İstifadəçi
   `/kabinet/mehdudiyyetler`-dən etiraz edir (blokdan keçən ayrıca action); **etirazı tədbiri verəndən başqa əməkdaş həll edir**
   (`sameReviewer`), qəbul tədbiri götürür.
@@ -556,6 +556,15 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   `/admin/emlaklar?gorunus=subheli|vip|irelicekilmis|arxiv` görünüşləri (silinmişlər `?silinmis=1`). Menyuda «Təhlükəsizlik»
   qrupu: şikayətlər, hesab etibarlılığı, sənəd yoxlaması, etirazlar və `/admin/moderasiya-tarixcesi` (moderator status
   keçidləri + son hesab tədbirləri). Qalan PRD 21 bölmələri (istifadəçilər, agentliklər, analitika, monetizasiya, SEO, sistem) əvvəldən var.
+- **Hesabatlar və biznes analitikası (#262, PRD Modul 20)** `/admin/hesabatlar` (`billing:manage`, menyuda «Analitika»
+  altında), `lib/admin/business-reports.ts` + saf `business-reports-math.ts`. Ay sərhədləri **Bakı vaxtı** ilədir
+  (`monthWindows`), dövr `REPORT_MONTHS` (6). DAU/WAU/MAU ictimai sessiyaların `lastSeenAt`-ındandır (təxminidir — sessiya
+  yalnız son aktivliyi saxlayır). Təsdiqlənmiş saxta elan = `RESOLVED` + `NO_ACTION` olmayan `resolution` (`resolvedAt` ayı).
+  Demo qeydlər sayılmır. **Gəlir yalnız `pricingMode().checkout` açıqdırsa hesablanır** — əks halda `revenueActive = false`
+  və panel «aktiv deyil» yazır (MRR = aktiv ödənişli abunənin son uğurlu ödənişi ÷ ay, ARR = MRR × 12); VIP/irəli çəkmə
+  hələ ödənişsizdir, gəliri `0`. Axtarılan ərazilər saxlanılmış axtarışların `citySlug`/`districtSlug`-ındandır, növ marağı
+  `PropertyDailyStat` baxışlarından, qiymət trendi satış (AZN) elanlarının yaradıldığı ay üzrə m² medianıdır
+  (`PRICE_TREND_MIN_SAMPLES`-dən az nümunədə «—»). Kataloq namespace-i `pages.businessReports`-dur (`pages.reports` şikayətlərdir).
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 

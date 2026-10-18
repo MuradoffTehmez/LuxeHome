@@ -149,7 +149,16 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "seoNotFound", href: "/admin/redirects#not-found" },
         ],
       },
-      { labelKey: "analytics", href: "/admin/analitika", icon: "BarChart3" },
+      {
+        // Analitika (#262, PRD Modul 20): trafik və hesabatlar/biznes analitikası.
+        labelKey: "analytics",
+        href: "/admin/analitika",
+        icon: "BarChart3",
+        children: [
+          { labelKey: "traffic", href: "/admin/analitika" },
+          { labelKey: "businessReports", href: "/admin/hesabatlar" },
+        ],
+      },
       { labelKey: "aiAssistant", href: "/admin/ai-komekci", icon: "BrainCircuit" },
     ],
   },

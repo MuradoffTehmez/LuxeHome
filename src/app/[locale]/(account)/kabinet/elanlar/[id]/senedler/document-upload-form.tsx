@@ -5,12 +5,13 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/field";
 import { IDLE_STATE } from "@/lib/admin/action-state";
-import { PROPERTY_DOCUMENT_MAX_BYTES, PROPERTY_DOCUMENT_MAX_FILES } from "@/lib/constants";
+import { PROPERTY_DOCUMENT_MAX_BYTES, PROPERTY_DOCUMENT_MAX_FILES, PROPERTY_DOCUMENT_UPLOAD_BUDGET } from "@/lib/constants";
 import { prepareImageForUpload } from "@/components/admin/image-prepare";
 import { uploadDocumentsAction } from "./actions";
 
 /**
- * Sənəd şəkli yükləmə (#256): brauzer şəkli ≤ `PROPERTY_DOCUMENT_MAX_BYTES` WebP-yə kiçildir (action gövdəsi 1 MB).
+ * Sənəd şəkli yükləmə (#256): brauzer hər şəkli WebP-yə kiçildir; fayl başına hədd seçilmiş fayl sayına bölünmüş
+ * ümumi büdcədir (`PROPERTY_DOCUMENT_UPLOAD_BUDGET`, ən çox `PROPERTY_DOCUMENT_MAX_BYTES`) — action gövdəsi 1 MB-ı keçməsin.
  * Şəxsi nömrələri (FİN, şəxsiyyət vəsiqəsi) örtmək tövsiyə olunur — lazımsız şəxsi məlumat toplanmır.
  */
 export function DocumentUploadForm({ propertyId, kinds }: { propertyId: string; kinds: { value: string; label: string }[] }) {
@@ -26,7 +27,8 @@ export function DocumentUploadForm({ propertyId, kinds }: { propertyId: string; 
     if (files.length > PROPERTY_DOCUMENT_MAX_FILES) return setError(t("errors.limit"));
     setPreparing(true);
     try {
-      const prepared = await Promise.all(files.map((file) => prepareImageForUpload(file, PROPERTY_DOCUMENT_MAX_BYTES, { maxDimension: 1800 })));
+      const perFile = Math.min(PROPERTY_DOCUMENT_MAX_BYTES, Math.floor(PROPERTY_DOCUMENT_UPLOAD_BUDGET / files.length));
+      const prepared = await Promise.all(files.map((file) => prepareImageForUpload(file, perFile, { maxDimension: 1800 })));
       formData.delete("files");
       for (const file of prepared) formData.append("files", file);
     } catch {

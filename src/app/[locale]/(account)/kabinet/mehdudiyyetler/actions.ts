@@ -3,26 +3,25 @@
 import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
-import { requireAccount } from "@/lib/auth/guard";
-import { assertSameOrigin, SameOriginError } from "@/lib/request-origin";
+import { AdminGuardError, requirePublicAction } from "@/lib/admin/guard";
 import { localizePath } from "@/i18n/path-locale";
 import type { Locale } from "@/lib/constants";
 import { appealRestriction } from "@/lib/account-trust";
 
 /**
- * Tədbirə etiraz (#258, PRD 20.4). Məhdudiyyətli hesab da etiraz edə bilməlidir, ona görə `requirePublicAction`
- * (blok qapısı) əvəzinə same-origin + `requireAccount` işlədilir.
+ * Tədbirə etiraz (#258, PRD 20.4). `appeal` scope-u same-origin, sistem rejimi və yazma limitini tətbiq edir, amma
+ * hesab tədbiri qapısından azaddır — məhdudiyyətli hesab da etiraz edə bilməlidir.
  */
 export async function appealRestrictionAction(_state: ActionState, formData: FormData): Promise<ActionState> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("account.restrictions");
+  let user;
   try {
-    await assertSameOrigin();
+    user = await requirePublicAction("appeal", locale);
   } catch (error) {
-    if (error instanceof SameOriginError) return failure(t("errors.notFound"));
+    if (error instanceof AdminGuardError) return failure(error.message);
     throw error;
   }
-  const user = await requireAccount(locale);
   try {
     const result = await appealRestriction({
       userId: user.id,

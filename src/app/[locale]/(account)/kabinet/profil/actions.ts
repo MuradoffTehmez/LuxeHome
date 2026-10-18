@@ -10,7 +10,7 @@ import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { composeName, isPhoneLike, normalizeTaxId, parseBirthDate, profileRequirements } from "@/lib/accounts/profile-fields";
 import { isAgencyTaxIdTaken } from "@/lib/accounts/agency-tax-id";
 import { requireAccount, currentSessionId } from "@/lib/auth/guard";
-import { systemModeBlock } from "@/lib/admin/guard";
+import { accountRestrictionBlock, systemModeBlock } from "@/lib/admin/guard";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { revokeAllSessions } from "@/lib/auth/session";
 import { uniqueSlug } from "@/lib/admin/slug";
@@ -38,6 +38,9 @@ export async function updateProfile(_prev: ActionState, formData: FormData): Pro
   // Profil `User`, `Agency` və `AgentProfile` sətirlərini yazır — `READ_ONLY` rejimində bağlıdır.
   const blocked = await systemModeBlock();
   if (blocked) return blocked;
+  // Müvəqqəti məhdudiyyət və ya blok (#258) ictimai profil/agentlik məlumatının dəyişməsini də bağlayır.
+  const restricted = await accountRestrictionBlock(user.id, locale);
+  if (restricted) return restricted;
   const requirements = profileRequirements(user.accountType);
   const optionalUrl = z
     .string()

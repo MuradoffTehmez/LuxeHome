@@ -69,7 +69,7 @@
       "seoLinks": "Internal and broken links",
       "seoNotFound": "404 log",
       "redirects": "Redirects",
-      "analytics": "Traffic analytics",
+      "analytics": "Analytics",
       "leads": "Enquiries",
       "reservations": "Reservations",
       "email": "Corporate email",
@@ -101,7 +101,9 @@
       "promotion": "Promotion",
       "verification": "Document check",
       "trust": "Account trust",
-      "moderationHistory": "Moderation history"
+      "moderationHistory": "Moderation history",
+      "traffic": "Traffic analytics",
+      "businessReports": "Reports"
     }
   },
   "actions": {
@@ -3588,6 +3590,64 @@
       "system": "system",
       "prev": "← Previous",
       "next": "Next →"
+    },
+    "businessReports": {
+      "title": "Reports and business analytics",
+      "description": "Platform activity, subscription and revenue indicators, geographic market interest — only from the site's own records.",
+      "empty": "No data yet.",
+      "platform": {
+        "title": "Platform analytics",
+        "description": "Active users and the last 6 months (Baku time).",
+        "dau": "Daily active (DAU)",
+        "wau": "Weekly active (WAU)",
+        "mau": "Monthly active (MAU)",
+        "stickiness": "DAU/MAU: {value}",
+        "totalUsers": "Users (total)",
+        "activeListings": "Active listings",
+        "verifiedAgencies": "Verified agencies",
+        "chart": "Monthly registrations, new listings and leads",
+        "table": "Monthly indicators",
+        "month": "Month",
+        "metrics": {
+          "registrations": "Registrations",
+          "newListings": "New listings",
+          "leads": "Leads",
+          "reports": "Reports",
+          "confirmedFakes": "Confirmed fake listings",
+          "newAgencies": "New agencies",
+          "vipGrants": "VIP usage"
+        }
+      },
+      "business": {
+        "title": "Business indicators",
+        "description": "Active subscriptions by plan, paid conversion, renewals and revenue.",
+        "inactive": "not active",
+        "promoNote": "Launch phase: paid subscriptions are off, revenue is not calculated.",
+        "checkoutNote": "Online checkout is disabled — revenue is not calculated.",
+        "trialing": "On trial",
+        "conversion": "Paid conversion",
+        "renewal": "Renewals",
+        "activeVip": "Active VIP",
+        "activePromotions": "Active promotions",
+        "revenueMonth": "Revenue this month",
+        "vipRevenue": "VIP and promotion revenue"
+      },
+      "geo": {
+        "title": "Geographic reports",
+        "description": "Active listings, search interest and approximate price trend.",
+        "cities": "Most active cities/districts",
+        "districts": "Areas with most listings",
+        "searched": "Most searched areas",
+        "searchedHint": "From saved searches ({count} searches).",
+        "typeInterest": "Interest by property type",
+        "typeInterestHint": "Listing views over the last 30 days.",
+        "saleRent": "Sale / rent ratio",
+        "sale": "Sale",
+        "rent": "Rent",
+        "priceTrend": "Approximate price trend",
+        "priceTrendHint": "Median price per m² of sale listings (AZN, by month created); months with fewer than 5 listings show «—».",
+        "samples": "{count} listings"
+      }
     }
   },
   "server": {

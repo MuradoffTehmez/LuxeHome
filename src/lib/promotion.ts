@@ -177,14 +177,27 @@ export async function revokePromotion(input: { actorId: string; campaignId: stri
   const now = input.now ?? new Date();
   const note = cleanNote(input.note);
   if (!note || note.length < 5) return { ok: false, reason: "note" };
-  const campaign = await prisma.promotionCampaign.findUnique({ where: { id: input.campaignId }, select: { id: true, propertyId: true } });
+  const campaign = await prisma.promotionCampaign.findUnique({
+    where: { id: input.campaignId },
+    select: { id: true, propertyId: true, endsAt: true, decisionNote: true, decidedById: true },
+  });
   if (!campaign) return { ok: false, reason: "notFound" };
   const claimed = await prisma.promotionCampaign.updateMany({
     where: { id: campaign.id, status: PROMOTION_STATUSES.ACTIVE },
     data: { status: PROMOTION_STATUSES.REVOKED, decisionNote: note, decidedById: input.actorId, endsAt: now },
   });
   if (claimed.count === 0) return { ok: false, reason: "notFound" };
-  await prisma.property.update({ where: { id: campaign.propertyId }, data: { promotedUntil: null } });
+  try {
+    await prisma.property.update({ where: { id: campaign.propertyId }, data: { promotedUntil: null } });
+  } catch (error) {
+    // D1-də tranzaksiya yoxdur: elan yazılmasa kampaniya `ACTIVE`-ə qayıdır ki, dayandırma yenidən sınanıla bilsin
+    // (əks halda `REVOKED` kampaniya ilə elan ilkin bitmə tarixinə qədər irəlidə qalardı).
+    await prisma.promotionCampaign.updateMany({
+      where: { id: campaign.id, status: PROMOTION_STATUSES.REVOKED, decidedById: input.actorId, endsAt: now },
+      data: { status: PROMOTION_STATUSES.ACTIVE, endsAt: campaign.endsAt, decisionNote: campaign.decisionNote, decidedById: campaign.decidedById },
+    }).catch(() => undefined);
+    throw error;
+  }
   const property = await prisma.property.findUnique({ where: { id: campaign.propertyId }, select: { title: true } });
   return { ok: true, title: property?.title ?? "—" };
 }

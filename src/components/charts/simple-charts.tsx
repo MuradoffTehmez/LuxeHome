@@ -39,7 +39,7 @@ export function LineChart({
           </g>
         ))}
         {points.map((point, index) => index % labelEvery === 0 && (
-          <text key={point.day} x={x(index)} y={height - 6} textAnchor="middle" className="fill-ink-muted text-[10px]">{formatDay(point.day)}</text>
+          <text key={point.day} x={x(index)} y={height - 6} textAnchor={index === points.length - 1 && points.length > 1 ? "end" : "middle"} className="fill-ink-muted text-[10px]">{formatDay(point.day)}</text>
         ))}
         {series.map((item) => (
           <polyline

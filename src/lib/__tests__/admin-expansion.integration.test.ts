@@ -31,6 +31,9 @@ describe("admin görünüşləri və göstəricilər", () => {
     expect(await ids("irelicekilmis")).toEqual(["ae-promo"]);
     expect(await ids("arxiv")).toEqual(["ae-archive"]);
     expect((await getAdminProperties({ cityId: "ae-city" })).rows).toHaveLength(4);
+    // VIP görünüşü mətn axtarışını əvəz etmir — uyğun gəlməyən sorğu boş nəticə verir.
+    expect((await getAdminProperties({ cityId: "ae-city", view: "vip", q: "uyğunsuz-söz" })).rows).toHaveLength(0);
+    expect((await getAdminProperties({ cityId: "ae-city", view: "vip", q: "VIP" })).rows.map((row) => row.id)).toEqual(["ae-vip"]);
   });
 
   it("platforma göstəriciləri riskli elan və hesabları sayır", async () => {

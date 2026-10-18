@@ -783,3 +783,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   **Modul 18 tamamlandı — Faza 5 (15–18) bitdi.** Növbəti — Modul 19 (admin panelinin genişləndirilməsi).
 - #260 (Modul 19): dashboard risk göstəriciləri, elan görünüşləri, «Təhlükəsizlik» menyu qrupu, moderasiya tarixçəsi.
   **Modul 19 tamamlandı.** Növbəti — Modul 20 (hesabatlar və biznes analitikası).
+- #262 (Modul 20): `/admin/hesabatlar` — platforma analitikası (DAU/WAU/MAU, 6 aylıq dinamika), biznes göstəriciləri
+  (ödəniş söndürülüdürsə gəlir «aktiv deyil»), coğrafi hesabatlar. **Modul 20 tamamlandı.** Növbəti — Modul 21 (təhlükəsizlik/audit).

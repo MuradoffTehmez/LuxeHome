@@ -23,7 +23,7 @@ export type PhoneVerifyState = { step: "phone" | "code"; phone?: string; error?:
 
 async function account(locale: Locale) {
   try {
-    return await requirePublicAction("preferences", locale);
+    return await requirePublicAction("profile", locale);
   } catch (error) {
     if (error instanceof AdminGuardError) return null;
     throw error;

@@ -159,7 +159,7 @@ export async function requireAdminAction(
 
 /** İctimai kabinet yazıları üçün CSRF, hesab növü və ayrıca sürət limiti qapısı. */
 export async function requirePublicAction(
-  scope: "media" | "avatar" | "property" | "review" | "reservation" | "preferences" | "push" | "team" | "lead" | "transfer",
+  scope: "media" | "avatar" | "property" | "review" | "reservation" | "preferences" | "profile" | "appeal" | "push" | "team" | "lead" | "transfer",
   locale: Locale = DEFAULT_LOCALE,
 ): Promise<AuthUser> {
   await assertSameOrigin();
@@ -171,12 +171,24 @@ export async function requirePublicAction(
   // İctimai hesab heç vaxt super admin deyil — rejim bağlıdırsa yazma da bağlıdır.
   await assertWritableMode(user.role);
   await assertWriteLimit(user.id, `public:${scope}`);
-  // Hesab tədbiri (#258, PRD 20.3): müvəqqəti məhdudiyyət və ya blok yazmanı bağlayır (bildiriş seçimi açıq qalır).
-  if (scope !== "preferences") {
+  // Hesab tədbiri (#258, PRD 20.3): müvəqqəti məhdudiyyət və ya blok yazmanı bağlayır — yalnız bildiriş seçimi və
+  // tədbirə etiraz açıq qalır (telefon təsdiqi `profile` scope-dadır və bağlanır).
+  if (!RESTRICTION_EXEMPT_SCOPES.has(scope)) {
     const blocked = await accountWriteBlock(user.id, locale);
     if (blocked) throw new AdminGuardError(blocked);
   }
   return user;
+}
+
+const RESTRICTION_EXEMPT_SCOPES = new Set(["preferences", "appeal"]);
+
+/**
+ * `requirePublicAction`-dan keçməyən ictimai yazılar üçün eyni hesab tədbiri qapısı (profil və agentlik məlumatı).
+ * Bloklanmış hesab parolunu dəyişə, hesabını silə və bildirişlərini idarə edə bilər — bunlar qəsdən açıq qalır.
+ */
+export async function accountRestrictionBlock(userId: string, locale: Locale): Promise<ActionState | null> {
+  const blocked = await accountWriteBlock(userId, locale);
+  return blocked ? failure(blocked) : null;
 }
 
 /** Yalnız oxuma əməliyyatları üçün — sürət limiti və CSRF yoxlaması olmadan. */
