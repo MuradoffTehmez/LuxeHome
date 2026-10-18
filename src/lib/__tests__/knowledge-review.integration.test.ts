@@ -30,7 +30,7 @@ describe("təsdiq keçidləri", () => {
   });
 
   it("dərc olunmuş məqalənin redaktəsi yenidən təsdiq tələb etmir", () => {
-    expect(knowledgeTransition({ ...base, actorId: "editor-a", from: "PUBLISHED", to: "PUBLISHED" })).toEqual({ ok: true, submit: false, approve: false });
+    expect(knowledgeTransition({ ...base, actorId: "editor-a", from: "PUBLISHED", to: "PUBLISHED" })).toEqual({ ok: true, submit: false, approve: false, refresh: true });
   });
 
   it("növbəti yoxlama tarixi və «yenilənməli» qaydası", () => {
@@ -58,10 +58,18 @@ describe("redaktor növbələri", () => {
   it("miqrasiya beh bölməsini və təsdiq gözləyən (ictimai olmayan) bələdçini yaradır", async () => {
     const category = await DB.prepare(`SELECT "name" FROM "KnowledgeCategory" WHERE "slug" = 'beh-ilkin-odenis'`).first<{ name: string }>();
     expect(category?.name).toBe("Beh və ilkin ödəniş");
+    // Generatorun toplu dərc seçicisinə düşməməlidir.
+    expect(await DB.prepare(`SELECT "id" FROM "KnowledgeArticle" WHERE "id" LIKE 'knowledge_article_%' AND "slug" = 'beh-ve-ilkin-odenis-tehlukesiz-nece-verilir'`).first()).toBeNull();
     const guide = await DB.prepare(`SELECT "status", "riskLevel", "legalReviewedAt" FROM "KnowledgeArticle" WHERE "slug" = 'beh-ve-ilkin-odenis-tehlukesiz-nece-verilir'`).first();
     expect(guide).toEqual({ status: "IN_REVIEW", riskLevel: "LEGAL_REVIEW", legalReviewedAt: null });
     const publicResult = await getKnowledgeArticles({ categorySlug: "beh-ilkin-odenis" });
     expect(publicResult.items).toHaveLength(0);
+  });
+
+  it("miqrasiya mövcud dərc olunmuş məqalələrə yoxlama tarixi yazır", async () => {
+    const seeded = await DB.prepare(`SELECT COUNT(*) AS total, SUM(CASE WHEN "reviewAfter" IS NULL THEN 1 ELSE 0 END) AS missing FROM "KnowledgeArticle" WHERE "status" = 'PUBLISHED' AND "id" NOT LIKE 'kr-%'`).first<{ total: number; missing: number }>();
+    expect(seeded?.total).toBeGreaterThan(0);
+    expect(seeded?.missing).toBe(0);
   });
 
   it("«yenilənməli» filtri və sayğaclar", async () => {
