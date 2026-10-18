@@ -19,7 +19,9 @@
     "searchEmpty": "No matching section found",
     "expandSection": "Expand the {section} submenu",
     "collapseSection": "Collapse the {section} submenu",
-    "breadcrumbs": "Breadcrumb"
+    "breadcrumbs": "Breadcrumb",
+    "sectionTabs": "{section} sections",
+    "moduleTools": "{section} tools"
   },
   "nav": {
     "groups": {

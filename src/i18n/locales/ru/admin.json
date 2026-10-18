@@ -19,7 +19,9 @@
     "searchEmpty": "Подходящий раздел не найден",
     "expandSection": "Открыть подменю «{section}»",
     "collapseSection": "Закрыть подменю «{section}»",
-    "breadcrumbs": "Навигационная цепочка"
+    "breadcrumbs": "Навигационная цепочка",
+    "sectionTabs": "Разделы: {section}",
+    "moduleTools": "Инструменты: {section}"
   },
   "nav": {
     "groups": {

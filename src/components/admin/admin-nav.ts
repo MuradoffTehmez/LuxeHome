@@ -41,6 +41,7 @@ export type AdminNavChild = {
 };
 
 export type AdminNavSectionKey = AdminNavSectionKeyFromCatalog;
+export type AdminNavItemKeyOf = AdminNavItemKey;
 
 export type AdminNavGroup = {
   /** `admin.nav.groups` altındakı açar. */
