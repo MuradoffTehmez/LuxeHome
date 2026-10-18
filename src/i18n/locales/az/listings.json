@@ -189,7 +189,9 @@
     "seller": "Satıcı",
     "sellerOwner": "Mülkiyyətçi",
     "sellerAgency": "Agentlik / agent",
-    "sellerCompany": "Luxe Home Estate"
+    "sellerCompany": "Luxe Home Estate",
+    "postedWithin": "Yerləşdirilmə tarixi",
+    "postedWithinOption": "Son {count} gün"
   },
   "agencyProfile": {
     "eyebrow": "Daşınmaz əmlak agentliyi",

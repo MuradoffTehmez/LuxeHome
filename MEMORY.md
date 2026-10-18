@@ -774,3 +774,6 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   fasilə qaydası, cron bitməsi. **Modul 13 tamamlandı — Faza 4 (12, 13, 14, 23) bitdi.** Növbəti — Faza 5: Modul 15 (bildiriş mərkəzi).
 - #252 (Modul 15): kateqoriya × kanal seçimi, kritik təhlükəsizlik bildirişi, yeni rəy / abunə / parol hadisələri.
   **Modul 15 tamamlandı.** Növbəti — Modul 16 (axtarış və ağıllı tövsiyələr).
+- #254 (Modul 16): `?tarix=` filtri (çip, saxlanmış axtarış, boş nəticə təklifi), balla oxşar elanlar. Qabaqcıl filtrlərin qalanı,
+  saxlanmış axtarış bildirişi və qiymət müqayisəsi («rəsmi qiymətləndirmə deyil») əvvəldən var. **Modul 16 tamamlandı.**
+  Növbəti — Modul 17 (əmlak və profil doğrulaması).

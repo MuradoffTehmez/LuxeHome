@@ -1943,3 +1943,9 @@ export const PROMOTION_SOURCES = { OWNER: "OWNER", ADMIN: "ADMIN", SELF_SERVICE:
 export const PROMOTION_DURATIONS_DAYS = [1, 3, 7, 14] as const;
 /** Təkrar irəli çəkmə qaydası: kampaniya bitəndən sonra bu qədər gün yeni sorğu qəbul olunmur. */
 export const PROMOTION_COOLDOWN_DAYS = 3;
+
+/** «Yerləşdirilmə tarixi» filtri (#254, PRD 18.1): son N gündə dərc olunanlar (`?tarix=`). */
+export const POSTED_WITHIN_DAYS = [1, 3, 7, 30] as const;
+export function isPostedWithinDays(value: unknown): value is (typeof POSTED_WITHIN_DAYS)[number] {
+  return typeof value === "number" && (POSTED_WITHIN_DAYS as readonly number[]).includes(value);
+}

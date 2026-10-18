@@ -42,6 +42,8 @@ export const PROPERTY_SEARCH_KEYS = [
   "sahe",
   // Satıcı növü: OWNER | AGENCY | COMPANY (`SELLER_FILTERS`).
   "satici",
+  // Yerləşdirilmə tarixi: son 1 | 3 | 7 | 30 gün (`POSTED_WITHIN_DAYS`, #254).
+  "tarix",
 ] as const;
 
 export type PropertySearchKey = (typeof PROPERTY_SEARCH_KEYS)[number];
@@ -197,6 +199,7 @@ export function buildActivePropertyFilters(
   if (state.withImagesOnly) add("sekilli", "Yalnız şəkilli elanlar");
   if (state.nearMetro) add("metro_yaxin", "Metroya 1 km-dən yaxın");
   if (values.sahe) add("sahe", "Xəritədə seçilmiş sahə");
+  if (values.tarix) add("tarix", `Son ${values.tarix} gün`);
   if (values.satici) {
     add("satici", values.satici === "OWNER" ? "Mülkiyyətçi" : values.satici === "AGENCY" ? "Agentlik / agent" : values.satici === "COMPANY" ? "Luxe Home Estate" : values.satici);
   }

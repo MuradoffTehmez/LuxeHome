@@ -108,9 +108,11 @@ export const getCachedPropertyBySlug = cachedQuery(
  * obyektini arqument vermə, `unstable_cache` onu açara serializə edir.
  */
 export const getCachedSimilarProperties = cachedQuery(
-  async (property: { id: string; cityId: string; typeId: string; listingType: string }, take: number) =>
-    getSimilarProperties(property, take),
-  ["public-similar-properties-v1"],
+  async (
+    property: { id: string; cityId: string; typeId: string; listingType: string; districtId: string | null; price: number; area: number | null; rooms: number | null; currency: string },
+    take: number,
+  ) => getSimilarProperties(property, take),
+  ["public-similar-properties-v2"],
   { tags: [PUBLIC_CACHE_TAGS.properties], revalidate: FIVE_MINUTES },
 );
 

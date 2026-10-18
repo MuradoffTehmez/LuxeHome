@@ -189,7 +189,9 @@
     "seller": "Seller",
     "sellerOwner": "Owner",
     "sellerAgency": "Agency / agent",
-    "sellerCompany": "Luxe Home Estate"
+    "sellerCompany": "Luxe Home Estate",
+    "postedWithin": "Date listed",
+    "postedWithinOption": "Last {count, plural, one {# day} other {# days}}"
   },
   "agencyProfile": {
     "eyebrow": "Real estate agency",

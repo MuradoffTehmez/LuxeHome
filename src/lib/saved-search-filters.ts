@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { PropertyFilters } from "@/lib/queries";
+import { isPostedWithinDays } from "@/lib/constants";
 
 /**
  * Saxlanmış axtarışın filtr JSON-u üçün sxem.
@@ -52,6 +53,7 @@ export const savedSearchFiltersSchema = z
     mortgageOnly: z.boolean().optional(),
     installmentOnly: z.boolean().optional(),
     seller: z.string().trim().max(20).optional(),
+    postedWithinDays: z.number().int().refine(isPostedWithinDays).optional(),
   })
   .strip();
 

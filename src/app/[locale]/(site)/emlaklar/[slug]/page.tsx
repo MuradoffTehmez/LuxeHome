@@ -172,6 +172,12 @@ export default async function PropertyDetailPage({ params }: Props) {
       cityId: sourceProperty.cityId,
       typeId: sourceProperty.typeId,
       listingType: sourceProperty.listingType,
+      // Oxşarlıq balı (#254, PRD 18.3): ərazi, qiymət, otaq, sahə, növ.
+      districtId: sourceProperty.districtId,
+      price: sourceProperty.price,
+      area: sourceProperty.area,
+      rooms: sourceProperty.rooms,
+      currency: sourceProperty.currency,
     },
     4,
   );
