@@ -120,7 +120,7 @@ Slug-lar taksonomiyadan gəlir (`prisma/taxonomy-data.ts`, `locations-data.ts`);
 | `/kabinet/paketler` | Premium paket sifarişi və tarixçə |
 | `/kabinet/rezervasiyalar` | Rezervasiyalar |
 | `/kabinet/axtarislarim` | Saxlanmış axtarışlar və tezlik |
-| `/kabinet/bildirisler` | Bildirişlər, kanal seçimləri, sakit saatlar |
+| `/kabinet/bildirisler` | Bildiriş siyahısı (hamısı / `?status=oxunmamis` / `oxunmus`, `?kateqoriya=`); kanal seçimləri, push və sakit saatlar ayrıca tabda (`?gorunus=parametrler`) |
 | `/kabinet/musteriler`, `/yeni`, `/[id]` | Mini CRM: müştəri kartları, ehtiyaclar, daxili qeydlər, müraciət tarixçəsi, uyğun elanlar, ehtimal olunan dublikatlar (təsdiqli birləşdirmə); agentlikdə sahib/menecer hamısını görür |
 | `/kabinet/muracietler/[id]` | Müraciət kartı: mərhələ, növbəti əlaqə, qeydlər, fəaliyyət tarixçəsi (yalnız aidiyyəti olan şəxs) |
 | `/kabinet/sikayetlerim` | Göndərilmiş elan şikayətləri, mərhələ və nəticə (moderator qeydləri görünmür) |
@@ -217,6 +217,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/hesabim` | Profil, avatar, panel dili, tema, parol, backup kod, passkey, ICS tokeni, sessiyalar | Hər staff |
 | `/admin/parametrler` | Əlaqə, bildiriş, sayt şəkilləri, tema | `settings:manage` |
 | `/admin/maliyye` | Maliyyə və Monetizasiya: abunə planları, tariflər, imkanlar, limitlər (#244) | `billing:manage` |
+| `/admin/tesviq` | Elanların təşviqi — ümumi baxış: VIP/irəli çəkmə növbələri, aktiv təşviqlər, birgə qərar tarixçəsi, paket sifarişləri (`billing:manage` ilə); yalnız oxu | `property:manage` |
 | `/admin/vip` | VIP sorğuları: təsdiq/rədd (səbəb), uzatma, dayandırma, sorğusuz verilmə, performans (#248) | `property:manage` |
 | `/admin/irelicekme` | İrəli çəkmə kampaniyaları: başlatma/rədd/dayandırma, statistika, fasilə qaydası (#250) | `property:manage` |
 | `/admin/tehlukesizlik` | Təhlükəsizlik mərkəzi: 24 saatlıq giriş göstəriciləri, uğursuz cəhdlərin IP-ləri, hadisə jurnalı (növ filtri), saxlama siyasəti (#264) | `user:manage` |

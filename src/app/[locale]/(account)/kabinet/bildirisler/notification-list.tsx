@@ -125,11 +125,11 @@ function NotificationRow({ item }: { item: NotificationListItem }) {
   );
 }
 
-export function NotificationList({ items }: { items: NotificationListItem[] }) {
+export function NotificationList({ items, hasUnread: anyUnread }: { items: NotificationListItem[]; /** Filtrdən asılı olmayaraq oxunmamış bildiriş varmı. */ hasUnread?: boolean }) {
   const t = useTranslations("account.notifications");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const hasUnread = items.some((item) => !item.isRead);
+  const hasUnread = anyUnread ?? items.some((item) => !item.isRead);
 
   function handleMarkAll() {
     startTransition(async () => {
@@ -141,7 +141,7 @@ export function NotificationList({ items }: { items: NotificationListItem[] }) {
   return (
     <div className="min-w-0">
       {hasUnread && (
-        <div className="mb-4 flex justify-end">
+        <div className="mb-3 flex justify-end">
           <Button type="button" variant="ghost" size="sm" onClick={handleMarkAll} loading={pending}>
             <CheckCheck className="size-4" aria-hidden="true" />
             {t("markAllRead")}

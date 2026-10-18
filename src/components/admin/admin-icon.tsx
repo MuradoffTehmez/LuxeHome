@@ -15,6 +15,7 @@ import {
   Languages,
   Mail,
   MapPinned,
+  Megaphone,
   Newspaper,
   Route,
   SearchCheck,
@@ -62,6 +63,7 @@ const ICONS: Record<string, LucideIcon> = {
   Handshake,
   Mail,
   MapPinned,
+  Megaphone,
   Languages,
   UserRoundCheck,
 };

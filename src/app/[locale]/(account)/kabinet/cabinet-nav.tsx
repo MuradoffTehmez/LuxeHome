@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { ArrowLeftRight, BarChart3, Bell, CalendarCheck, ClipboardList, Contact, Crown, Flag, Gauge, History, LayoutGrid, ListChecks, LogOut, MessageSquare, Plus, ScrollText, Search, ShieldAlert, Sparkles, Star, UserCog, UserRound, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { getCabinetItems, isCabinetItemActive, type CabinetNavItem } from "@/lib/accounts/cabinet-navigation";
+import { activeCabinetHref, getCabinetItems, groupCabinetItems, type CabinetNavItem } from "@/lib/accounts/cabinet-navigation";
 import { signOutAccount } from "../hesab/actions";
 
 /**
@@ -24,6 +24,8 @@ type CabinetNavProps = {
   canAssignListings?: boolean;
   canViewAnalytics?: boolean;
   hiddenItems?: readonly CabinetNavItem["id"][];
+  /** Oxunmamış bildiriş sayı — «Bildirişlər» bəndində nişan. */
+  unreadNotifications?: number;
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
 };
@@ -105,44 +107,62 @@ export function CabinetNav({
   canAssignListings = false,
   canViewAnalytics = false,
   hiddenItems = [],
+  unreadNotifications = 0,
   variant = "desktop",
   onNavigate,
 }: CabinetNavProps) {
   const pathname = usePathname();
   const t = useTranslations("auth.cabinet");
   const items = getCabinetItems(canList, canManageTeam, canTransfer, canAssignListings, canViewAnalytics, hiddenItems);
+  const activeHref = activeCabinetHref(pathname, items);
 
   return (
-    <nav aria-label={t("menu")} className="flex flex-col gap-4">
+    <nav aria-label={t("menu")} className="flex flex-col gap-5">
       <div className={cn("rounded-xl border border-line bg-paper p-4 shadow-xs", variant === "mobile" && "bg-beige/45")}>
         <p className="text-xs font-semibold text-gold-deep">{accountLabel}</p>
         <p className="mt-1 truncate font-medium text-ink">{name}</p>
       </div>
 
-      <ul className="flex flex-col gap-0.5">
-        {items.map((item) => {
-          const active = isCabinetItemActive(pathname, item.href);
-          const Icon = ICONS[item.id];
-          return (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                onClick={onNavigate}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "group/nav inline-flex min-h-11 w-full items-center gap-2.5 rounded-md border px-3 text-sm transition-colors",
-                  active
-                    ? "border-line bg-paper font-semibold text-ink shadow-xs"
-                    : "border-transparent text-ink-soft hover:bg-beige/60 hover:text-ink",
-                )}
-              >
-                <Icon className={cn("size-4 shrink-0", active ? "text-gold-deep" : "text-ink-muted group-hover/nav:text-ink")} aria-hidden="true" />
-                {t(LABEL_KEYS[item.id])}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="flex flex-col gap-4">
+        {groupCabinetItems(items).map((group) => (
+          <div key={group.section} role="group" aria-labelledby={`cabinet-nav-${variant}-${group.section}`}>
+            <p id={`cabinet-nav-${variant}-${group.section}`} className="px-3 pb-1 text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">
+              {t(`sections.${group.section}`)}
+            </p>
+            <ul className="flex flex-col gap-0.5">
+              {group.items.map((item) => {
+                const active = item.href === activeHref;
+                const Icon = ICONS[item.id];
+                const badge = item.id === "notifications" ? unreadNotifications : 0;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={onNavigate}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "group/nav inline-flex min-h-11 w-full items-center gap-2.5 rounded-md border px-3 text-sm transition-colors lg:min-h-10",
+                        active
+                          ? "border-line bg-paper font-semibold text-ink shadow-xs"
+                          : "border-transparent text-ink-soft hover:bg-beige/60 hover:text-ink",
+                      )}
+                    >
+                      <Icon className={cn("size-4 shrink-0", active ? "text-gold-deep" : "text-ink-muted group-hover/nav:text-ink")} aria-hidden="true" />
+                      <span className="min-w-0 flex-1 truncate">{t(LABEL_KEYS[item.id])}</span>
+                      {badge > 0 && (
+                        <span className="inline-flex min-w-5 justify-center rounded-full bg-gold px-1.5 text-[11px] font-semibold text-on-gold tabular-nums">
+                          {badge > 99 ? "99+" : badge}
+                          <span className="sr-only"> {t("unreadBadge")}</span>
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
 
       <form action={signOutAccount} className="border-t border-line pt-2">
         <SignOutButton />

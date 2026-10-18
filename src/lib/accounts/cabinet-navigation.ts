@@ -94,8 +94,60 @@ export function getCabinetItems(
   return hiddenItems.length ? items.filter((item) => !hiddenItems.includes(item.id)) : items;
 }
 
+/**
+ * Menyu bölmələri (UX auditi): 20-dən çox bənd bir siyahıda idi və agentlik sahibində əsas bəndlər
+ * ekranın altına düşürdü. Bənd dəsti və icazə qaydası dəyişmir — `getCabinetItems()` nəticəsi yalnız
+ * məntiqi qruplara bölünür, boş bölmə göstərilmir.
+ */
+export const CABINET_SECTIONS = ["overview", "listings", "work", "personal", "account"] as const;
+export type CabinetSection = (typeof CABINET_SECTIONS)[number];
+
+export const CABINET_ITEM_SECTION: Record<CabinetNavItem["id"], CabinetSection> = {
+  overview: "overview",
+  "agency-dashboard": "overview",
+  "agency-analytics": "overview",
+  listings: "listings",
+  "new-listing": "listings",
+  analytics: "listings",
+  packages: "listings",
+  assignments: "listings",
+  transfers: "listings",
+  leads: "work",
+  clients: "work",
+  reservations: "work",
+  tasks: "work",
+  reviews: "work",
+  team: "work",
+  activity: "work",
+  "saved-searches": "personal",
+  recommendations: "personal",
+  "recently-viewed": "personal",
+  reports: "personal",
+  notifications: "account",
+  restrictions: "account",
+  profile: "account",
+};
+
+export function groupCabinetItems(items: readonly CabinetNavItem[]): { section: CabinetSection; items: CabinetNavItem[] }[] {
+  return CABINET_SECTIONS.map((section) => ({ section, items: items.filter((item) => CABINET_ITEM_SECTION[item.id] === section) }))
+    .filter((group) => group.items.length > 0);
+}
+
 export function isCabinetItemActive(pathname: string, href: string): boolean {
   return pathname === href;
+}
+
+/**
+ * Aktiv menyu bəndi: ən uzun prefiksi uyğun gələn bənd. `/kabinet/muracietler/<id>` «Müraciətlər»i,
+ * `/kabinet/elanlar/yeni` isə yalnız «Yeni elan»ı işıqlandırır; «Ümumi baxış» yalnız dəqiq ünvanda aktivdir.
+ */
+export function activeCabinetHref(pathname: string, items: readonly Pick<CabinetNavItem, "href">[]): string | null {
+  let best: string | null = null;
+  for (const { href } of items) {
+    const matches = pathname === href || (href !== "/kabinet" && pathname.startsWith(`${href}/`));
+    if (matches && (!best || href.length > best.length)) best = href;
+  }
+  return best;
 }
 
 export type CabinetCrumb = {

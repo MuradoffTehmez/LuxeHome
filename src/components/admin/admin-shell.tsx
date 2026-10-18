@@ -13,7 +13,7 @@ import type { Locale } from "@/lib/constants";
 import { siteConfig } from "@/config/site";
 import type { AuthUser } from "@/lib/auth/types";
 import { signOut } from "@/app/[locale]/giris/actions";
-import { adminNav, type AdminNavBadgeKey } from "./admin-nav";
+import { adminNav, adminRouteIsActive, type AdminNavBadgeKey } from "./admin-nav";
 import { AdminIcon } from "./admin-icon";
 import { AdminCommandMenu } from "./admin-command-menu";
 
@@ -122,7 +122,9 @@ export function AdminShell({ user, counters = {}, children }: AdminShellProps) {
         </header>
 
         <main className="min-w-0 flex-1 pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))] sm:pr-[max(1.5rem,var(--safe-right))] sm:pl-[max(1.5rem,var(--safe-left))] lg:px-8 py-6 pb-[calc(1.5rem+var(--safe-bottom))] sm:py-8">
-          <div className="mx-auto w-full max-w-[1600px]">{children}</div>
+          <div className="mx-auto w-full max-w-[1600px]">
+            {children}
+          </div>
         </main>
       </div>
     </div>
@@ -215,11 +217,17 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
 
                     {hasChildren && expanded && (
                       <ul id={submenuId} className={cn("mt-1 ml-5 grid gap-0.5 border-l py-1 pl-3", dark ? "border-white/12" : "border-line-strong")}>
-                        {item.children?.map((child) => {
+                        {item.children?.map((child, index, all) => {
                           const active = child.href.split("#", 1)[0] === activeChildHref;
                           const childBadge = child.badgeKey ? counters[child.badgeKey] : undefined;
+                          const sectionStart = child.section && child.section !== all[index - 1]?.section;
                           return (
                             <li key={child.href}>
+                              {sectionStart && (
+                                <p className={cn("px-3 pt-2 pb-1 text-[10px] font-semibold tracking-[0.14em] uppercase", dark ? "text-white/40" : "text-ink-muted")}>
+                                  {t(`nav.sections.${child.section!}`)}
+                                </p>
+                              )}
                               <Link
                                 href={child.href}
                                 onClick={onNavigate}
@@ -273,9 +281,7 @@ function SidebarContent({ pathname, user, counters, tone, onNavigate }: SidebarC
 
 function routeIsActive(href: string, pathname: string): boolean {
   if (href.includes("#")) return false;
-  const cleanHref = href.split("?", 1)[0];
-  if (cleanHref === "/admin") return pathname === "/admin";
-  return pathname === cleanHref || pathname.startsWith(`${cleanHref}/`);
+  return adminRouteIsActive(href.split("?", 1)[0], pathname);
 }
 
 function getActiveChildHref(children: { href: string }[], pathname: string): string | undefined {

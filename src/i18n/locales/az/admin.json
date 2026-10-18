@@ -18,22 +18,24 @@
     "searchHint": "Sürətli keçid",
     "searchEmpty": "Uyğun bölmə tapılmadı",
     "expandSection": "{section} alt menyusunu aç",
-    "collapseSection": "{section} alt menyusunu bağla"
+    "collapseSection": "{section} alt menyusunu bağla",
+    "breadcrumbs": "Naviqasiya yolu"
   },
   "nav": {
     "groups": {
       "general": "Ümumi",
       "content": "Əsas iş axınları",
-      "growth": "Böyümə və görünürlük",
+      "growth": "Məzmun və böyümə",
       "sales": "Satış",
-      "system": "Sistem"
+      "system": "Maliyyə və sistem",
+      "operations": "Əməliyyatlar"
     },
     "items": {
       "dashboard": "İdarə paneli",
-      "portfolio": "Əmlak portfeli",
-      "contentHub": "Kontent və media",
-      "crm": "Müştərilər və komanda",
-      "administration": "Sistem idarəetməsi",
+      "portfolio": "Elanlar və portfel",
+      "contentHub": "Məzmun idarəetməsi",
+      "crm": "CRM və müraciətlər",
+      "administration": "Sistem parametrləri",
       "properties": "Əmlaklar",
       "moderation": "Moderasiya",
       "taxonomy": "Taksonomiya",
@@ -49,7 +51,7 @@
       "publicAmenities": "İctimai imkanlar",
       "aiAssistant": "AI köməkçi",
       "partners": "Tərəfdaşlar",
-      "serp": "SERP və SEO",
+      "serp": "Marketinq və SEO",
       "seoOverview": "Ümumi baxış",
       "seoSettings": "Qlobal və lokal SEO",
       "seoMetadata": "Metadata",
@@ -69,29 +71,29 @@
       "seoLinks": "Daxili və qırıq linklər",
       "seoNotFound": "404 jurnalı",
       "redirects": "Yönləndirmələr",
-      "analytics": "Analitika",
+      "analytics": "Analitika və hesabatlar",
       "leads": "Müraciətlər",
       "reservations": "Rezervasiyalar",
       "email": "Korporativ e-poçt",
-      "users": "İstifadəçilər",
-      "accounts": "Hesablar",
+      "users": "Panel istifadəçiləri",
+      "accounts": "İctimai hesablar",
       "security": "Təhlükəsizlik",
       "audit": "Audit jurnalı",
       "profile": "Hesabım",
-      "settings": "Parametrlər",
+      "settings": "Ümumi parametrlər",
       "demoContent": "Nümunə məzmun",
       "systemMode": "Sistem ayarları",
       "leadBoard": "Müraciət lövhəsi",
       "funnel": "Konversiya hunisi",
       "calendar": "Təqvim",
-      "packages": "Paketlər və ödənişlər",
-      "agencyHub": "Agentliklər və agentlər",
+      "packages": "Premium paketlər",
+      "agencyHub": "İstifadəçilər və agentliklər",
       "approvals": "Təsdiq növbəsi",
       "reports": "Şikayətlər",
       "appeals": "Etirazlar",
       "transfers": "Köçürmələr",
       "featureFlags": "Funksiyalar",
-      "finance": "Maliyyə və Monetizasiya",
+      "finance": "Maliyyə və abunəliklər",
       "subscriptionPlans": "Abunə planları",
       "subscriptions": "Abunə hesabatları",
       "discounts": "Endirim kodları",
@@ -104,7 +106,16 @@
       "moderationHistory": "Moderasiya tarixçəsi",
       "traffic": "Trafik analitikası",
       "businessReports": "Hesabatlar",
-      "securityCenter": "Təhlükəsizlik mərkəzi"
+      "securityCenter": "Təhlükəsizlik mərkəzi",
+      "promotionHub": "Elanların təşviqi",
+      "promotionOverview": "Ümumi baxış",
+      "trustHub": "Təhlükəsizlik və moderasiya",
+      "botProtection": "Bot müdafiəsi"
+    },
+    "sections": {
+      "seoDaily": "Monitorinq",
+      "seoContentGroup": "Məzmun SEO-su",
+      "seoTechnical": "Texniki konfiqurasiya"
     }
   },
   "actions": {
@@ -3715,6 +3726,48 @@
         "CSRF_BLOCKED": "Kənar sorğu rədd edildi",
         "RATE_LIMITED": "Yazma limiti",
         "PASSWORD_CHANGED": "Parol dəyişdi"
+      }
+    },
+    "promotionHub": {
+      "title": "Elanların təşviqi",
+      "description": "VIP, irəli çəkmə və premium paketlərin növbələri, aktiv təşviqlər və son qərarlar bir yerdə. Hər modulun öz qaydaları və təsdiq axını qorunur.",
+      "stats": {
+        "pending": "Təsdiq gözləyən sorğular",
+        "pendingHint": "VIP + irəli çəkmə",
+        "activeVip": "Aktiv VIP elanlar",
+        "activePromotions": "Aktiv irəli çəkmələr",
+        "pendingOrders": "Gözləyən paket sifarişləri"
+      },
+      "modulesTitle": "Təşviq modulları",
+      "modulesDescription": "Qərar və idarəetmə hər modulun öz səhifəsində aparılır.",
+      "modules": {
+        "vip": {
+          "title": "VIP elanlar",
+          "hint": "Sorğular, müddət, uzatma və dayandırma",
+          "pending": "{count} gözləyir",
+          "active": "{count} aktiv"
+        },
+        "promotion": {
+          "title": "İrəli çəkmə",
+          "hint": "Kampaniyalar, fasilə qaydası və statistika",
+          "pending": "{count} gözləyir",
+          "active": "{count} aktiv"
+        },
+        "packages": {
+          "title": "Premium paketlər",
+          "hint": "Paket kataloqu, sifarişlər və ödəniş uçotu",
+          "pending": "{count} ödəniş gözləyir",
+          "active": "{count} aktivləşdirilməyib"
+        }
+      },
+      "settingsHint": "Özünəxidmət və admin təsdiqi açarları:",
+      "settingsLink": "Funksiyalar",
+      "historyTitle": "Təşviq tarixçəsi",
+      "historyDescription": "VIP və irəli çəkmə üzrə son qərarlar.",
+      "historyEmpty": "Hələ qərar yoxdur.",
+      "kind": {
+        "vip": "VIP",
+        "promotion": "İrəli çəkmə"
       }
     }
   },

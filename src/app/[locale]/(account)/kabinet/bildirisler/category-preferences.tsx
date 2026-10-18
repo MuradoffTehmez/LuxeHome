@@ -23,7 +23,7 @@ export function CategoryPreferences({ values }: { values: CategoryChannels }) {
   const [state, action, pending] = useActionState(saveCategoryChannels, IDLE_STATE);
 
   return (
-    <section aria-labelledby="notification-center-title" className="mb-8 rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">
+    <section aria-labelledby="notification-center-title" className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">
       <h2 id="notification-center-title" className="font-sans text-lg font-semibold text-ink">{t("title")}</h2>
       <p className="mt-1 text-sm text-ink-soft">{t("description")}</p>
       <form action={action} className="mt-5">

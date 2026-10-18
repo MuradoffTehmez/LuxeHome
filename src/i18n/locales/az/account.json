@@ -728,8 +728,8 @@
       "failed": "Push seçimi saxlanılmadı. Yenidən cəhd edin."
     },
     "preferences": {
-      "title": "Bildiriş seçimləri",
-      "description": "Hansı bildirişi hansı kanalda almaq istədiyinizi seçin.",
+      "title": "Axtarış, qiymət və rezervasiya",
+      "description": "Saxlanmış axtarış, qiymət endirimi və rezervasiya bildirişlərinin kanallarını və sakit saatları seçin.",
       "rows": {
         "savedSearch": "Saxlanmış axtarış",
         "priceDrop": "Qiymət endirimi",
@@ -751,7 +751,7 @@
       "failed": "Bildiriş seçimləri saxlanılmadı. Yenidən cəhd edin."
     },
     "center": {
-      "title": "Bildiriş mərkəzi",
+      "title": "Kateqoriyalar və kanallar",
       "description": "Hansı hadisələr barədə və hansı kanallardan bildiriş almaq istədiyinizi seçin.",
       "category": "Hadisə",
       "soon": "tezliklə",
@@ -806,7 +806,26 @@
           "hint": "Hesabınızla bağlı kritik xəbərdarlıqlar"
         }
       }
-    }
+    },
+    "summaryUnread": "{count} bildiriş · {unread} oxunmamış",
+    "tabs": {
+      "label": "Bildiriş bölmələri",
+      "list": "Bildirişlər",
+      "settings": "Parametrlər"
+    },
+    "filters": {
+      "readLabel": "Oxunma vəziyyəti",
+      "read": {
+        "all": "Hamısı",
+        "unread": "Oxunmamış",
+        "read": "Oxunmuş"
+      },
+      "categoryLabel": "Kateqoriya",
+      "allCategories": "Bütün kateqoriyalar",
+      "reset": "Filtrləri sıfırla"
+    },
+    "filteredEmptyTitle": "Bu filtrə uyğun bildiriş yoxdur",
+    "filteredEmptyDescription": "Başqa kateqoriya və ya vəziyyət seçin."
   },
   "recentlyViewed": {
     "metaTitle": "Son baxılanlar",
