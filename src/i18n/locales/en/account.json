@@ -157,6 +157,17 @@
         "storage": "The file was not saved. Please try again later.",
         "disabled": "Document verification is currently turned off."
       }
+    },
+    "groups": {
+      "label": "Listing status",
+      "all": "All",
+      "active": "Active",
+      "review": "In review",
+      "attention": "Needs attention",
+      "closed": "Closed",
+      "emptyTitle": "No listings with this status",
+      "emptyDescription": "Choose another tab.",
+      "showAll": "All listings"
     }
   },
   "newProperty": {

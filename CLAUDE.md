@@ -297,10 +297,20 @@ Panel öz yolunu işlədir:
   Maliyyə və sistem). **Hər səhifənin bir giriş nöqtəsi var** — eyni `href`-i iki modula yazma; `admin-nav.test.ts` həm təkrarı,
   həm də konsolidasiyadan əvvəlki marşrutların menyuda qaldığını yoxlayır. Uzun alt menyuda `section` sahəsi bölmə başlığı verir
   (SERP: monitorinq / məzmun / texniki). Breadcrumb `findAdminNavLocation()`-dan qurulur (`AdminShell`). Marşrutlar dəyişməyib.
+- **Menyu rola görə süzülür** (`adminNavForRole`): hər alt bəndin `permission` sahəsi səhifənin guard-ı ilə eyni olmalıdır —
+  `scripts/__tests__/admin-nav-permissions.test.ts` mənbədə `requireAdminRead(PERMISSIONS.X)`-i (səhifə və ya layout) yoxlayır.
+  Modul linki ilk icazəli alt bəndə yönəlir; breadcrumb da süzülmüş menyudan qurulur. Dashboard blokları (`/admin`) eyni
+  icazələrə tabedir — müraciət məlumatını `lead:manage`-siz, elanları `property:manage`-siz göstərmə.
+- **Modul tab zolağı** `AdminSectionTabs` (`serp/layout.tsx`, `seo/` və `redirects/` layout-ları, `maliyye/layout.tsx`) menyudan
+  qurulur; yeni alət menyuya yazılanda zolaqda da görünür.
 - **Elanların təşviqi** `/admin/tesviq` yalnız oxuyan ümumi baxışdır (VIP, irəli çəkmə, paketlər); qərar modulların öz
   səhifəsindədir — VIP/irəli çəkmə/paket məntiqini birləşdirmə.
 - **Kabinet menyusu** bölmələrdədir (`groupCabinetItems()` → `CABINET_ITEM_SECTION`); yeni bənd əlavə edəndə bölməsini də yaz
   (`Record` typecheck-də yıxılır). Aktiv bənd ən uzun prefiksdir (`activeCabinetHref`). «Bildirişlər»də oxunmamış sayğac var.
+  `CABINET_COLLAPSE_THRESHOLD`-dan çox bənddə passiv bölmələr qatlanmış başlayır (`defaultOpenCabinetSections`).
+- **Əməkdaş ictimai saytda:** kabinet yalnız ictimai sessiyanı qəbul edir — header-in «Elan yerləşdir» və mobil alt
+  naviqasiyanın «Hesab» düyməsi əməkdaşı panelə (`<a>`, tam yükləmə) aparır. Kabinetə link yazanda bunu nəzərə al.
+- «Elanlarım» status tabları `lib/accounts/listing-status-groups.ts`-dədir (`?status=aktiv|yoxlamada|diqqet|baglanmis`).
 - **Telegram bildiriş kanalı** (`lib/telegram-notifications.ts`, saf qaydalar `telegram-link-policy.ts`): istifadəçi kabinetdə
   «Telegram-ı qoş» → birdəfəlik 15 dəqiqəlik token (bazada yalnız SHA-256) → `t.me/<bot>?start=<token>` → bot
   `POST /api/telegram/webhook`-a `/start <token>` göndərir (başlıq `X-Telegram-Bot-Api-Secret-Token` yoxlanır, yalnız

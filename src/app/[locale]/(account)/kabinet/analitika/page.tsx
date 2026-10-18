@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SegmentedTabs } from "@/components/ui/segmented-tabs";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Eye, Heart, MessageSquare, Phone, Tag, TrendingDown, TrendingUp, Users } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
@@ -50,11 +51,6 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
     if (data.agentUserId) params.set("agent", data.agentUserId);
     return `/api/hesab/hesabat/elanlar?${params.toString()}`;
   };
-  const chip = (active: boolean) =>
-    cn(
-      "inline-flex min-h-11 items-center rounded-full border px-4 text-sm transition-colors",
-      active ? "border-gold bg-gold/10 font-medium text-ink" : "border-line bg-paper text-ink-soft hover:border-gold",
-    );
   const tiles = [
     { key: "views", icon: Eye, label: t("views"), value: data.totals.views },
     { key: "unique", icon: Users, label: t("uniqueViews"), value: data.totals.uniqueViews },
@@ -71,21 +67,13 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <PageHeader contained compact eyebrow={t("eyebrow")} title={t("title")} description={data.isAgency ? t("agencyDescription") : t("description")} />
-      {/* Hesabat ixracı (#238, PRD 11.6) — eyni dövr və agent filtri ilə. */}
-      <ExportControls
-        csvHref={exportHref("csv")}
-        xlsxHref={exportHref("xlsx")}
-        labels={{ title: t("export.title"), csv: t("export.csv"), xlsx: t("export.xlsx"), pdf: t("export.pdf"), pdfHint: t("export.pdfHint") }}
-      />
 
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <nav aria-label={t("periodLabel")} className="flex flex-wrap gap-2">
-          {ANALYTICS_PERIODS.map((value) => (
-            <Link key={value} href={href({ dovr: value === 30 ? undefined : String(value) })} className={chip(period === value)} aria-current={period === value ? "page" : undefined}>
-              {t("period", { days: value })}
-            </Link>
-          ))}
-        </nav>
+        <SegmentedTabs
+          label={t("periodLabel")}
+          variant="pills"
+          items={ANALYTICS_PERIODS.map((value) => ({ href: href({ dovr: value === 30 ? undefined : String(value) }), label: t("period", { days: value }), active: period === value }))}
+        />
         {data.isAgency && data.team.length > 1 && (
           <form method="get" className="flex items-end gap-2">
             {period !== 30 && <input type="hidden" name="dovr" value={period} />}
@@ -102,9 +90,10 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
         )}
       </div>
 
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      {/* 7 göstərici: əvvəl 6 sütunda sonuncu kart tək sətrə düşürdü. */}
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 2xl:grid-cols-7">
         {tiles.map((tile) => (
-          <li key={tile.key} className="rounded-xl border border-line bg-paper p-4 shadow-xs">
+          <li key={tile.key} className="rounded-lg border border-line bg-paper p-3 shadow-xs">
             <p className="flex items-center gap-1.5 text-xs text-ink-muted">
               <tile.icon className="size-3.5 text-gold-deep" aria-hidden="true" />
               {tile.label}
@@ -199,6 +188,12 @@ export default async function CabinetAnalyticsPage({ searchParams }: Props) {
           </div>
         </section>
       )}
+      {/* Hesabat ixracı (#238, PRD 11.6) — eyni dövr və agent filtri ilə. */}
+      <ExportControls
+        csvHref={exportHref("csv")}
+        xlsxHref={exportHref("xlsx")}
+        labels={{ title: t("export.title"), csv: t("export.csv"), xlsx: t("export.xlsx"), pdf: t("export.pdf"), pdfHint: t("export.pdfHint") }}
+      />
     </div>
   );
 }

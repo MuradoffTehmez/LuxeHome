@@ -157,6 +157,17 @@
         "storage": "Fayl saxlanılmadı. Bir az sonra yenidən cəhd edin.",
         "disabled": "Sənəd yoxlaması hazırda söndürülüb."
       }
+    },
+    "groups": {
+      "label": "Elanların statusu",
+      "all": "Hamısı",
+      "active": "Aktiv",
+      "review": "Yoxlamada",
+      "attention": "Diqqət tələb edir",
+      "closed": "Bağlanmış",
+      "emptyTitle": "Bu statusda elan yoxdur",
+      "emptyDescription": "Başqa tab seçin.",
+      "showAll": "Bütün elanlar"
     }
   },
   "newProperty": {
