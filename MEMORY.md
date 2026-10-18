@@ -794,3 +794,7 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   **Modul 22 tamamlandı.** Növbəti — Modul 23 (modul idarəetmə və konfiqurasiya).
 - #268 (Modul 23): mərkəzi açarlar #242-də idi; çatışmayan `EXTRA_VERIFICATION` tətbiqi əlavə olundu (sənəd yükləmə, kabinet səhifəsi,
   sənəd/məlumat nişanları). `PAYMENTS` asılı checkout açarı ilə tətbiq olunur. **Modul 23 tamamlandı.** Növbəti — Modul 24 (mobil).
+- #271 (Modul 24): responsiv audit (~40 səhifə × 4 ölçü) — daşma yoxdur; toxunma sahələri (toplu seçim checkbox-ları, bildiriş
+  matrisi, kabinet paket linki) 44px; mobil E2E genişləndi. **Modul 24 tamamlandı — PRD v2 modulları (1–24) bitdi.** Növbəti — Faza 6
+  (real ödəniş provayderi) yalnız biznes təsdiqi ilə. Açıq araşdırma: lokal workerd-də çox sorğudan sonra D1 isolate ilişməsi
+  (main-də də var) — ayrıca sessiyada.

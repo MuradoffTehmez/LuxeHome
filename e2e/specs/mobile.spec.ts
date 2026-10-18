@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { ListingsPage } from "../pages/listings.page";
 import { propertyCardLinks, visit } from "../support/helpers";
+import { authFixturesEnabled, signInAsLister } from "../support/auth";
 
 /**
  * Mobil axınlar.
@@ -29,7 +30,8 @@ test.describe("Mobil naviqasiya", () => {
 });
 
 test.describe("Mobil layout", () => {
-  const paths = ["/az", "/az/emlaklar", "/az/blog", "/az/elaqe"];
+  // PRD Modul 24 (#270): yeni modulların ictimai səhifələri də daxildir.
+  const paths = ["/az", "/az/emlaklar", "/az/blog", "/az/elaqe", "/az/bilik-merkezi", "/az/agentlikler", "/az/paketler"];
 
   for (const path of paths) {
     /**
@@ -135,5 +137,50 @@ test.describe("Mobil detal səhifəsi", () => {
       clientWidth: document.documentElement.clientWidth,
     }));
     expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 2);
+  });
+});
+
+test.describe("Mobil elan səhifəsinin əsas elementləri (PRD 26.2)", () => {
+  test("qiymət, əlaqə, şikayət, seçilmişlər və təhlükəsizlik xəbərdarlığı görünür", async ({ page }) => {
+    const listings = new ListingsPage(page);
+    await listings.open();
+    await page.waitForLoadState("load");
+    // Kataloqda satılmış/kirayəyə verilmiş elanlar da var və onların detalında əlaqə paneli qəsdən yoxdur —
+    // ilk kartlardan əlaqə paneli (təhlükəsizlik xəbərdarlığı ilə) olan aktiv elan seçilir.
+    const hrefs = (await propertyCardLinks(page).evaluateAll((links) => links.map((link) => link.getAttribute("href")))).filter(Boolean).slice(0, 6) as string[];
+    test.skip(hrefs.length === 0, "kataloqda elan yoxdur");
+    let active: string | null = null;
+    for (const href of hrefs) {
+      await visit(page, href);
+      await page.waitForLoadState("load");
+      if ((await page.getByRole("note").filter({ has: page.locator("svg") }).count()) > 0) {
+        active = href;
+        break;
+      }
+    }
+    test.skip(!active, "ilk kartlar arasında aktiv (əlaqəsi açıq) elan yoxdur");
+
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.getByText(/₼|AZN|USD|EUR/).first()).toBeVisible();
+    // Təhlükəsizlik xəbərdarlığı (ContactSafetyWarning, role="note") əlaqə düymələrinin üstündədir.
+    await expect(page.getByRole("note").first()).toBeAttached();
+    await expect(page.getByRole("link", { name: /Zəng et/ }).or(page.getByRole("button", { name: /Nömrəni göstər|Zəng et/ })).first()).toBeAttached();
+    await expect(page.getByRole("button", { name: /Elandan şikayət et/ })).toBeAttached();
+    await expect(page.locator("[aria-label*='eçilmiş'], [aria-label*='avorit']").first()).toBeAttached();
+  });
+});
+
+test.describe("Mobil kabinet (PRD 26.3)", () => {
+  test.skip(!authFixturesEnabled, "auth fixture-ları yoxdur (staging run)");
+
+  test("elanlar, müraciətlər, bildirişlər və statistika mobil ekrandan əlçatandır", async ({ page, context, baseURL }) => {
+    await signInAsLister(context, baseURL!);
+    for (const path of ["/az/kabinet", "/az/kabinet/elanlar", "/az/kabinet/muracietler", "/az/kabinet/bildirisler", "/az/kabinet/analitika"]) {
+      await visit(page, path);
+      await page.waitForLoadState("load");
+      await expect(page.locator("h1").first(), path).toBeVisible();
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow, `${path}: üfüqi daşma`).toBeLessThanOrEqual(2);
+    }
   });
 });

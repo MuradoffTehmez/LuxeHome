@@ -227,15 +227,17 @@ export function BulkSelectionForm({
 export function BulkRowCheckbox({ id, label }: { id: string; label: string }) {
   const formId = useContext(BulkFormContext);
   if (!formId) return null;
+  // Label 44px toxunma sahəsi verir (PRD 26.4); mənfi kənar boşluq vizual yeri 16px checkbox qədər saxlayır.
   return (
-    <input
-      type="checkbox"
-      form={formId}
-      name="ids"
-      value={id}
-      aria-label={label}
-      onClick={(event) => event.stopPropagation()}
-      className="size-4 shrink-0 cursor-pointer rounded-sm border-line-strong accent-gold"
-    />
+    <label className="-m-3.5 inline-grid size-11 shrink-0 cursor-pointer place-items-center" onClick={(event) => event.stopPropagation()}>
+      <input
+        type="checkbox"
+        form={formId}
+        name="ids"
+        value={id}
+        aria-label={label}
+        className="size-4 shrink-0 cursor-pointer rounded-sm border-line-strong accent-gold"
+      />
+    </label>
   );
 }

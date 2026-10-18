@@ -100,6 +100,8 @@ Turnstile üçün test bypass-ı **qəsdən yoxdur**. Admin stage cookie ilə TO
 | `chromium` | Desktop Chrome | `mobile.spec.ts` xaric hamısı |
 | `mobile` | Pixel 7 | `mobile.spec.ts`, `smoke.spec.ts` |
 
+`mobile.spec.ts` (#271, PRD Modul 24): üfüqi daşma (o cümlədən Bilik Mərkəzi, agentliklər, paketlər), 44px toxunma hədəfləri, elan səhifəsinin əsas elementləri (qiymət, əlaqə, şikayət, seçilmişlər) və auth fixture olduqda mobil kabinet bölmələri.
+
 Spec-lər: `smoke`, `listings`, `property-detail`, `favorites-compare`, `content`, `i18n`, `api`, `seo`, `security`, `performance`, `a11y`, `mobile`, `admin-panel`, `kabinet-listing`, `projects-section`.
 
 E2E dəsti ilk qurulanda iki real baq tapdı: `not-found.tsx` AZ üçün locale prefiksi vermirdi və `--color-ink-muted` ivory fonda 4.47:1 kontrastda idi (WCAG AA 4.5:1).

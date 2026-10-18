@@ -83,7 +83,7 @@ export default async function CabinetPackagesPage({ searchParams }: { searchPara
           <Info className="mt-0.5 size-5 shrink-0 text-gold-deep" aria-hidden="true" />
           <div className="min-w-0 text-sm">
             <p className="font-medium text-ink">{plansT("promo")}</p>
-            <Link href="/paketler" className="mt-1 inline-block font-medium text-gold-deep underline-offset-4 hover:underline">{t("subscriptionPlans")}</Link>
+            <Link href="/paketler" className="relative mt-1 inline-block font-medium text-gold-deep underline-offset-4 after:absolute after:inset-x-0 after:-inset-y-3 after:content-[''] hover:underline">{t("subscriptionPlans")}</Link>
           </div>
         </div>
       )}

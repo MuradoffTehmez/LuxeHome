@@ -55,20 +55,25 @@ export function CategoryPreferences({ values }: { values: CategoryChannels }) {
                       <span className="block text-xs text-ink-muted">{t(`categories.${category}.hint`)}</span>
                     </th>
                     {NOTIFICATION_CHANNELS.map((channel) => (
-                      <td key={channel} className="px-2 py-3 text-center">
-                        <input
-                          type="checkbox"
-                          name={`${category}.${channel}`}
-                          defaultChecked={values[category][channel]}
-                          disabled={locked}
-                          aria-label={`${t(`categories.${category}.label`)} — ${t(`channels.${channel}`)}`}
-                          className="size-5 accent-gold disabled:opacity-60"
-                        />
+                      <td key={channel} className="px-1 py-1 text-center">
+                        {/* Toxunma sahəsi ≥44px (PRD 26.4): checkbox 20px-dir, onu əhatə edən label bütün xananı tutur. */}
+                        <label className="inline-grid size-11 cursor-pointer place-items-center has-[:disabled]:cursor-not-allowed">
+                          <input
+                            type="checkbox"
+                            name={`${category}.${channel}`}
+                            defaultChecked={values[category][channel]}
+                            disabled={locked}
+                            aria-label={`${t(`categories.${category}.label`)} — ${t(`channels.${channel}`)}`}
+                            className="size-5 accent-gold disabled:opacity-60"
+                          />
+                        </label>
                       </td>
                     ))}
                     {FUTURE_NOTIFICATION_CHANNELS.map((channel) => (
-                      <td key={channel} className="px-2 py-3 text-center">
-                        <input type="checkbox" disabled aria-label={`${t(`categories.${category}.label`)} — ${t(`channels.${channel}`)}`} className="size-5 opacity-40" />
+                      <td key={channel} className="px-1 py-1 text-center">
+                        <span className="inline-grid size-11 place-items-center">
+                          <input type="checkbox" disabled aria-label={`${t(`categories.${category}.label`)} — ${t(`channels.${channel}`)}`} className="size-5 opacity-40" />
+                        </span>
                       </td>
                     ))}
                   </tr>
