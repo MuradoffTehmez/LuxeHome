@@ -291,6 +291,19 @@ Panel öz yolunu işlədir:
 - Paneldən ictimai sayta gedən keçidlər `localizePath(path, locale)` ilə qurulur ki,
   redaktor öz panel dilindəki səhifəni açsın.
 
+### Naviqasiya strukturu (UX konsolidasiyası, 2026-10)
+
+- **Admin menyusu** `components/admin/admin-nav.ts`: 11 modul dörd qrupda (Ümumi · Əməliyyatlar · Məzmun və böyümə ·
+  Maliyyə və sistem). **Hər səhifənin bir giriş nöqtəsi var** — eyni `href`-i iki modula yazma; `admin-nav.test.ts` həm təkrarı,
+  həm də konsolidasiyadan əvvəlki marşrutların menyuda qaldığını yoxlayır. Uzun alt menyuda `section` sahəsi bölmə başlığı verir
+  (SERP: monitorinq / məzmun / texniki). Breadcrumb `findAdminNavLocation()`-dan qurulur (`AdminShell`). Marşrutlar dəyişməyib.
+- **Elanların təşviqi** `/admin/tesviq` yalnız oxuyan ümumi baxışdır (VIP, irəli çəkmə, paketlər); qərar modulların öz
+  səhifəsindədir — VIP/irəli çəkmə/paket məntiqini birləşdirmə.
+- **Kabinet menyusu** bölmələrdədir (`groupCabinetItems()` → `CABINET_ITEM_SECTION`); yeni bənd əlavə edəndə bölməsini də yaz
+  (`Record` typecheck-də yıxılır). Aktiv bənd ən uzun prefiksdir (`activeCabinetHref`). «Bildirişlər»də oxunmamış sayğac var.
+- **Bildiriş mərkəzi** `/kabinet/bildirisler`: əsas görünüş siyahıdır, seçimlər `?gorunus=parametrler` tabındadır; filtr
+  vəziyyəti URL-dədir (`lib/notification-filters.ts`, saf). Link əsaslı tab/seqment üçün `components/ui/segmented-tabs.tsx`.
+
 ### Admin siyahıları: silmə və toplu seçim
 
 - Toplu seçim `components/admin/bulk-selection.tsx`-dir: `BulkSelectionForm` (zolaq, say, təsdiq

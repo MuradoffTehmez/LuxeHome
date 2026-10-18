@@ -728,8 +728,8 @@
       "failed": "The push preference was not saved. Please try again."
     },
     "preferences": {
-      "title": "Notification preferences",
-      "description": "Choose which notification reaches you on which channel.",
+      "title": "Searches, prices and reservations",
+      "description": "Choose channels and quiet hours for saved search, price drop and reservation notifications.",
       "rows": {
         "savedSearch": "Saved search",
         "priceDrop": "Price drop",
@@ -751,8 +751,8 @@
       "failed": "Notification preferences were not saved. Please try again."
     },
     "center": {
-      "title": "Notification center",
-      "description": "Choose which events you want to be notified about and through which channels.",
+      "title": "Categories and channels",
+      "description": "Choose which events you want to hear about and through which channels.",
       "category": "Event",
       "soon": "coming soon",
       "locked": "Cannot be disabled",
@@ -806,7 +806,26 @@
           "hint": "Critical alerts about your account"
         }
       }
-    }
+    },
+    "summaryUnread": "{count} notifications · {unread} unread",
+    "tabs": {
+      "label": "Notification sections",
+      "list": "Notifications",
+      "settings": "Settings"
+    },
+    "filters": {
+      "readLabel": "Read status",
+      "read": {
+        "all": "All",
+        "unread": "Unread",
+        "read": "Read"
+      },
+      "categoryLabel": "Category",
+      "allCategories": "All categories",
+      "reset": "Reset filters"
+    },
+    "filteredEmptyTitle": "No notifications match this filter",
+    "filteredEmptyDescription": "Choose another category or status."
   },
   "recentlyViewed": {
     "metaTitle": "Recently viewed",

@@ -72,7 +72,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ToastProvider>
         <ThemeSync preference={user.themePreference} />
-        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration, pendingApprovals: approvals.total, openReports, openAppeals, pendingTransfers, pendingVip, pendingPromotions }}>
+        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration, pendingApprovals: approvals.total, openReports, openAppeals, pendingTransfers, pendingVip, pendingPromotions, pendingPromotionHub: pendingVip + pendingPromotions }}>
           {children}
         </AdminShell>
       </ToastProvider>

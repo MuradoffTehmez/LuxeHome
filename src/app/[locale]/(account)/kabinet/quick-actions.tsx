@@ -32,26 +32,30 @@ export async function CabinetQuickActions({ canList }: { canList: boolean }) {
   ];
 
   return (
-    <section aria-labelledby="cabinet-quick-actions" className="flex flex-col gap-3">
+    <section aria-labelledby="cabinet-quick-actions" className="flex min-w-0 flex-col gap-3">
       <div>
-        <h2 id="cabinet-quick-actions" className="font-sans text-lg font-semibold text-ink">
+        <h2 id="cabinet-quick-actions" className="font-sans text-base font-semibold text-ink">
           {t("quickActions")}
         </h2>
         <p className="text-sm text-ink-muted">{t("quickActionsDescription")}</p>
       </div>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {actions.map(({ key, href, icon: Icon, primary }) => (
           <li key={key}>
             <Link
               href={href}
               className={cn(
-                "card-surface flex h-full min-h-24 flex-col gap-2 rounded-xl border p-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
+                "flex h-full min-h-14 items-center gap-3 rounded-lg border px-3.5 py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold",
                 primary ? "border-gold bg-gold/10" : "border-line bg-paper hover:border-gold",
               )}
             >
-              <Icon className={cn("size-5", primary ? "text-gold-deep" : "text-ink-soft")} aria-hidden="true" />
-              <span className="text-sm font-semibold text-ink">{t(`quick.${key}`)}</span>
-              <span className="text-xs text-ink-muted">{t(`quick.${key}Hint`)}</span>
+              <span className={cn("grid size-9 shrink-0 place-items-center rounded-full", primary ? "bg-gold/20 text-gold-deep" : "bg-beige text-ink-soft")}>
+                <Icon className="size-4" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-ink">{t(`quick.${key}`)}</span>
+                <span className="block truncate text-xs text-ink-muted">{t(`quick.${key}Hint`)}</span>
+              </span>
             </Link>
           </li>
         ))}

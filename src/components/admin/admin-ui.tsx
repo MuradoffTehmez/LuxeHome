@@ -3,6 +3,8 @@ import { ChevronRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { getAdminT } from "@/lib/admin-i18n";
+import { headers } from "next/headers";
+import { adminNavBreadcrumbs } from "./admin-nav";
 
 // ---------------------------------------------------------------------------
 // SƏHİFƏ BAŞLIĞI
@@ -22,6 +24,15 @@ export async function AdminPageHeader({
   actions?: React.ReactNode;
 }) {
   const t = await getAdminT();
+  // Səhifə öz zəncirini vermirsə, breadcrumb menyudan qurulur (UX auditi) — aktiv menyu bəndi,
+  // breadcrumb və başlıq eyni terminologiyanı işlədir. Marşrut middleware-in `x-pathname` başlığındandır.
+  if (breadcrumbs.length === 0) {
+    const pathname = (await headers()).get("x-pathname") ?? "";
+    breadcrumbs = adminNavBreadcrumbs(pathname).map((crumb) => ({
+      label: crumb.kind === "group" ? t(`nav.groups.${crumb.key}`) : t(`nav.items.${crumb.key}`),
+      href: crumb.href,
+    }));
+  }
 
   return (
     <div className="mb-6 flex flex-col gap-4 sm:mb-8">
