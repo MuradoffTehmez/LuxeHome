@@ -175,12 +175,25 @@ test.describe("Mobil kabinet (PRD 26.3)", () => {
 
   test("elanlar, müraciətlər, bildirişlər və statistika mobil ekrandan əlçatandır", async ({ page, context, baseURL }) => {
     await signInAsLister(context, baseURL!);
-    for (const path of ["/az/kabinet", "/az/kabinet/elanlar", "/az/kabinet/muracietler", "/az/kabinet/bildirisler", "/az/kabinet/analitika"]) {
+    for (const path of ["/az/kabinet", "/az/kabinet/elanlar", "/az/kabinet/muracietler", "/az/kabinet/bildirisler", "/az/kabinet/bildirisler?gorunus=parametrler", "/az/kabinet/analitika"]) {
       await visit(page, path);
       await page.waitForLoadState("load");
       await expect(page.locator("h1").first(), path).toBeVisible();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, `${path}: üfüqi daşma`).toBeLessThanOrEqual(2);
     }
+  });
+
+  test("bildiriş mərkəzi əvvəlcə siyahını göstərir, seçimlər ayrıca tabdadır", async ({ page, context, baseURL }) => {
+    await signInAsLister(context, baseURL!);
+    await visit(page, "/az/kabinet/bildirisler");
+    const tabs = page.getByRole("navigation", { name: "Bildiriş bölmələri" });
+    await expect(tabs.getByRole("link", { name: /Bildirişlər/ })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("heading", { name: "Kateqoriyalar və kanallar" })).toHaveCount(0);
+
+    await tabs.getByRole("link", { name: "Parametrlər" }).click();
+    await expect(page).toHaveURL(/gorunus=parametrler/);
+    await expect(page.getByRole("heading", { name: "Kateqoriyalar və kanallar" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Seçimləri yadda saxla" })).toBeVisible();
   });
 });

@@ -17,6 +17,7 @@ import {
   NOTIFICATION_CATEGORIES,
   NOTIFICATION_CHANNELS,
   defaultCategoryChannels,
+  parseCategoryChannels,
   serializeCategoryChannels,
 } from "@/lib/notification-categories";
 
@@ -92,6 +93,15 @@ export async function saveCategoryChannels(_previous: ActionState, formData: For
     for (const channel of NOTIFICATION_CHANNELS) values[category][channel] = formData.get(`${category}.${channel}`) === "on";
   }
   try {
+    // Telegram sütunu hesab bota bağlanmayınca deaktivdir və göndərilmir — saxlanmış seçim itməsin.
+    const [account, stored] = await Promise.all([
+      prisma.telegramAccount.findUnique({ where: { userId: user.id }, select: { id: true } }),
+      prisma.notificationPreference.findUnique({ where: { userId: user.id }, select: { categoryChannels: true } }),
+    ]);
+    if (!account) {
+      const previous = parseCategoryChannels(stored?.categoryChannels);
+      for (const category of NOTIFICATION_CATEGORIES) values[category].telegram = previous[category].telegram;
+    }
     const categoryChannels = serializeCategoryChannels(values);
     await prisma.notificationPreference.upsert({
       where: { userId: user.id },

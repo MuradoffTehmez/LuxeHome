@@ -11,10 +11,10 @@ bölməsindədir.
 
 | Fayl | Məzmun |
 |---|---|
-| `migrations/0087_telegram_integration.sql` | `TelegramAccount`, `TelegramLinkToken`, `TelegramChat`, `TelegramUpdate`, `TelegramDelivery`, `SupportTicket`, `SupportMessage` |
-| `migrations/0088_social_identities.sql` | `AuthIdentity` (Apple/Facebook), `OAuthSignupToken` |
+| `migrations/0088_telegram_integration.sql` | `TelegramAccount`, `TelegramChat`, `TelegramUpdate`, `TelegramDelivery`, `SupportTicket`, `SupportMessage`; `0087`-nin `TelegramLinkToken`-i itkisiz yenidən qurulur, `User.telegramChatId` bağlantıları `TelegramAccount`-a köçürülüb sütunlar silinir |
+| `migrations/0089_social_identities.sql` | `AuthIdentity` (Apple/Facebook), `OAuthSignupToken` |
 
-Hər ikisi yalnız yeni cədvəl yaradır, mövcud sətirlərə toxunmur. CI `main`-ə push-da miqrasiyanı bundle-dan **əvvəl**
+`0089` yalnız yeni cədvəl yaradır. `0088` #277-nin sadə Telegram kanalını (`0087`) köçürür: bağlı çatlar `TelegramAccount`-a keçir (razılıq açıq qalır), aktiv bağlama tokenləri saxlanılır, sonra `User.telegramChatId`/`telegramLinkedAt` silinir. CI `main`-ə push-da miqrasiyanı bundle-dan **əvvəl**
 tətbiq edir. Əl ilə:
 
 ```bash
@@ -160,7 +160,7 @@ Sonra secret-lər (2), BotFather/Apple/Meta ayarları (3, 5, 6), panel → «Web
 | Bot sorğuları xəta verir | Panel → «Webhook-u sil» (və ya `deleteWebhook` ilə `drop_pending_updates=false`). Update-lər Telegram-da 24 saat gözləyir |
 | Telegram/Apple/Facebook girişi problemlidir | Müvafiq `*_CLIENT_ID`/`APP_ID` secret-ini silin — düymə dərhal itir, marşrut 404 olur. Mövcud sessiyalara toxunulmur |
 | İstifadəçi bildirişləri dayandırılmalıdır | `TELEGRAM_BOT_TOKEN`-i silin — `notifyAccount` Telegram addımını səssizcə buraxır, e-poçt/saytdaxili kanallar işləyir |
-| Kod geri qaytarılır | Əvvəlki worker versiyasına `wrangler rollback`. `0087`/`0088` yalnız yeni cədvəl əlavə edib — köhnə kod onları görmür, sxemi geri almaq lazım deyil |
+| Kod geri qaytarılır | Əvvəlki worker versiyasına `wrangler rollback`. `0089` yalnız yeni cədvəldir. `0088` `User.telegramChatId` sütununu silir — #277 koduna qayıtmaq lazım olsa, bağlantılar `TelegramAccount`-dan geri yazılmalıdır (çat ID = `chatId`); D1 Time Travel ilə miqrasiyadan əvvəlki vəziyyətə bərpa da mümkündür |
 
 ## 9. Məlumat saxlama
 

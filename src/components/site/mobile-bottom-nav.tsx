@@ -7,6 +7,7 @@ import { Heart, Home, Map, Search, UserRound } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useFavorites } from "@/lib/favorites";
 import { cn } from "@/lib/utils";
+import { useSessionState } from "./use-session-state";
 
 /** Detal səhifəsinin öz sabit əməl paneli var — alt naviqasiya orada göstərilmir. */
 export function isBottomNavHidden(pathname: string): boolean {
@@ -37,6 +38,9 @@ export function MobileBottomNav() {
   // `?gorunus=` ayrıca, Suspense içindəki kiçik izləyicidən gəlir: panel özü SSR-da
   // render olunur, yalnız aktiv bənd query dəyişəndə (siyahı ↔ xəritə) yenilənir.
   const [mapView, setMapView] = useState(false);
+  // Əməkdaş sessiyası kabinetə düşmür (`requireAccount` onu giriş səhifəsinə atırdı) — «Hesab» panelə aparır.
+  const session = useSessionState("");
+  const staff = session.status === "signed-in" && session.isStaff;
 
   if (isBottomNavHidden(pathname)) return null;
 
@@ -62,22 +66,31 @@ export function MobileBottomNav() {
           const Icon = item.icon;
           return (
             <li key={item.key}>
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "relative flex h-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors",
-                  active ? "text-gold-deep" : "text-ink-muted hover:text-ink",
-                )}
-              >
-                <Icon className={cn("size-5", active && item.key === "favorites" && "fill-current")} aria-hidden="true" />
-                <span>{t(item.key)}</span>
-                {item.key === "favorites" && ready && ids.length > 0 ? (
-                  <span className="tabular absolute top-2 left-1/2 ml-1.5 grid min-w-4 place-items-center rounded-full bg-gold px-1 text-[0.625rem] leading-4 font-semibold text-on-gold">
-                    {ids.length > 99 ? "99+" : ids.length}
-                  </span>
-                ) : null}
-              </Link>
+              {item.key === "account" && staff ? (
+                // Panelə tam sənəd yükləməsi — hesab menyusundakı panel linki ilə eyni qayda (CSP, GTM).
+                // eslint-disable-next-line @next/next/no-html-link-for-pages -- tam sənəd yükləməsi qəsdlidir
+                <a href="/admin" className="relative flex h-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium text-ink-muted transition-colors hover:text-ink">
+                  <Icon className="size-5" aria-hidden="true" />
+                  <span>{t(item.key)}</span>
+                </a>
+              ) : (
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative flex h-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors",
+                    active ? "text-gold-deep" : "text-ink-muted hover:text-ink",
+                  )}
+                >
+                  <Icon className={cn("size-5", active && item.key === "favorites" && "fill-current")} aria-hidden="true" />
+                  <span>{t(item.key)}</span>
+                  {item.key === "favorites" && ready && ids.length > 0 ? (
+                    <span className="tabular absolute top-2 left-1/2 ml-1.5 grid min-w-4 place-items-center rounded-full bg-gold px-1 text-[0.625rem] leading-4 font-semibold text-on-gold">
+                      {ids.length > 99 ? "99+" : ids.length}
+                    </span>
+                  ) : null}
+                </Link>
+              )}
             </li>
           );
         })}

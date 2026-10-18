@@ -157,6 +157,17 @@
         "storage": "Fayl saxlanılmadı. Bir az sonra yenidən cəhd edin.",
         "disabled": "Sənəd yoxlaması hazırda söndürülüb."
       }
+    },
+    "groups": {
+      "label": "Elanların statusu",
+      "all": "Hamısı",
+      "active": "Aktiv",
+      "review": "Yoxlamada",
+      "attention": "Diqqət tələb edir",
+      "closed": "Bağlanmış",
+      "emptyTitle": "Bu statusda elan yoxdur",
+      "emptyDescription": "Başqa tab seçin.",
+      "showAll": "Bütün elanlar"
     }
   },
   "newProperty": {
@@ -750,8 +761,8 @@
       "failed": "Push seçimi saxlanılmadı. Yenidən cəhd edin."
     },
     "preferences": {
-      "title": "Bildiriş seçimləri",
-      "description": "Hansı bildirişi hansı kanalda almaq istədiyinizi seçin.",
+      "title": "Axtarış, qiymət və rezervasiya",
+      "description": "Saxlanmış axtarış, qiymət endirimi və rezervasiya bildirişlərinin kanallarını və sakit saatları seçin.",
       "rows": {
         "savedSearch": "Saxlanmış axtarış",
         "priceDrop": "Qiymət endirimi",
@@ -773,7 +784,7 @@
       "failed": "Bildiriş seçimləri saxlanılmadı. Yenidən cəhd edin."
     },
     "center": {
-      "title": "Bildiriş mərkəzi",
+      "title": "Kateqoriyalar və kanallar",
       "description": "Hansı hadisələr barədə və hansı kanallardan bildiriş almaq istədiyinizi seçin.",
       "category": "Hadisə",
       "soon": "tezliklə",
@@ -828,12 +839,43 @@
           "hint": "Hesabınızla bağlı kritik xəbərdarlıqlar"
         }
       },
+      "notLinked": "qoşulmayıb",
       "telegramNote": "Telegram sütunu yalnız Telegram hesabı bağlı və bildirişlər aktiv olduqda işləyir."
     },
+    "summaryUnread": "{count} bildiriş · {unread} oxunmamış",
+    "tabs": {
+      "label": "Bildiriş bölmələri",
+      "list": "Bildirişlər",
+      "settings": "Parametrlər"
+    },
+    "filters": {
+      "readLabel": "Oxunma vəziyyəti",
+      "read": {
+        "all": "Hamısı",
+        "unread": "Oxunmamış",
+        "read": "Oxunmuş"
+      },
+      "categoryLabel": "Kateqoriya",
+      "allCategories": "Bütün kateqoriyalar",
+      "reset": "Filtrləri sıfırla"
+    },
+    "filteredEmptyTitle": "Bu filtrə uyğun bildiriş yoxdur",
+    "filteredEmptyDescription": "Başqa kateqoriya və ya vəziyyət seçin.",
     "telegram": {
-      "title": "Telegram",
-      "description": "Hesabınızı Telegram botuna (@luxehomeestatebot) bağlayın — müraciət, elan və təhlükəsizlik bildirişləri Telegram-a da gəlsin.",
-      "linkedDescription": "Telegram hesabınız bağlıdır. Hansı bildirişlərin gələcəyini aşağıdakı cədvəldə seçin.",
+      "title": "Telegram bildirişləri",
+      "description": "Hesabınızı botumuza qoşun — seçdiyiniz kateqoriyalar üzrə bildirişlər Telegram-a da gələcək.",
+      "linkedDescription": "Telegram qoşulub. Hansı bildirişlərin gələcəyini aşağıdakı cədvəldə seçin.",
+      "unavailableDescription": "Telegram kanalı hələ aktiv deyil.",
+      "connect": "Telegram-ı qoş",
+      "disconnect": "Ayır",
+      "check": "Yoxla",
+      "soon": "Tezliklə",
+      "openHint": "Telegram açılmadısa:",
+      "openLink": "botu aç",
+      "linkReady": "Telegram-da «Start» düyməsini basın, sonra «Yoxla».",
+      "disconnected": "Telegram ayrıldı.",
+      "unavailable": "Telegram kanalı hələ aktiv deyil.",
+      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin.",
       "link": "Telegram-ı bağla",
       "linkPending": "Botda «Start» düyməsini seçin. Link 10 dəqiqə etibarlıdır və yalnız bir dəfə işləyir. Sonra bu səhifəyə qayıdın.",
       "openBot": "Botu aç",
@@ -858,9 +900,7 @@
       "test": "Test bildirişi göndər",
       "activeHint": "Telegram bildirişləri aktivdir.",
       "blockedHint": "Bot sizə yaza bilmir — botu bloklamısınız və ya hələ başlatmamısınız. Botu açıb «Start» seçin.",
-      "unavailable": "Telegram inteqrasiyası hazırda aktiv deyil.",
       "rateLimited": "Çox tez-tez cəhd edildi. Bir az sonra yenidən yoxlayın.",
-      "failed": "Əməliyyat alınmadı. Bir az sonra yenidən cəhd edin.",
       "unlinked": "Telegram hesabı ayrıldı.",
       "notLinked": "Telegram hesabı bağlı deyil.",
       "enabled": "Telegram bildirişləri aktivləşdirildi.",

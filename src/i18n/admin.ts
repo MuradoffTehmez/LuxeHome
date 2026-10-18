@@ -26,6 +26,7 @@ export type AdminMessages = {
 /** Naviqasiya açarları kataloqdan törəyir: menyuya yeni sətir yalnız tərcümə ilə birlikdə əlavə olunur. */
 export type AdminNavGroupKey = keyof typeof adminCatalog.nav.groups;
 export type AdminNavItemKey = keyof typeof adminCatalog.nav.items;
+export type AdminNavSectionKey = keyof typeof adminCatalog.nav.sections;
 
 /** Naməlum dəyəri (məs. bazadakı köhnə sətri) dəstəklənən dilə gətirir. */
 export function resolveAdminLocale(value: string | null | undefined): Locale {

@@ -55,7 +55,7 @@ export function TelegramCard({ configured, status, botUrl }: { configured: boole
 
   if (!configured) {
     return (
-      <section className="mb-6 rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5" aria-labelledby="telegram-card-title">
+      <section className="rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5" aria-labelledby="telegram-card-title">
         <h2 id="telegram-card-title" className="font-sans text-base font-semibold text-ink">{t("title")}</h2>
         <p className="mt-1 text-sm text-ink-muted">{t("unavailable")}</p>
       </section>
@@ -63,7 +63,7 @@ export function TelegramCard({ configured, status, botUrl }: { configured: boole
   }
 
   return (
-    <section className="mb-6 rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5" aria-labelledby="telegram-card-title" data-testid="telegram-card">
+    <section className="rounded-xl border border-line bg-paper p-4 shadow-xs sm:p-5" aria-labelledby="telegram-card-title" data-testid="telegram-card">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <span className="grid size-10 shrink-0 place-items-center rounded-full bg-info/15 text-info">

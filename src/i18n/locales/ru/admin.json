@@ -18,22 +18,26 @@
     "searchHint": "Быстрый переход",
     "searchEmpty": "Подходящий раздел не найден",
     "expandSection": "Открыть подменю «{section}»",
-    "collapseSection": "Закрыть подменю «{section}»"
+    "collapseSection": "Закрыть подменю «{section}»",
+    "breadcrumbs": "Навигационная цепочка",
+    "sectionTabs": "Разделы: {section}",
+    "moduleTools": "Инструменты: {section}"
   },
   "nav": {
     "groups": {
       "general": "Общее",
       "content": "Основные процессы",
-      "growth": "Рост и видимость",
+      "growth": "Контент и рост",
       "sales": "Продажи",
-      "system": "Система"
+      "system": "Финансы и система",
+      "operations": "Операции"
     },
     "items": {
       "dashboard": "Панель управления",
-      "portfolio": "Портфель недвижимости",
-      "contentHub": "Контент и медиа",
-      "crm": "Клиенты и команда",
-      "administration": "Управление системой",
+      "portfolio": "Объявления и портфель",
+      "contentHub": "Управление контентом",
+      "crm": "CRM и заявки",
+      "administration": "Настройки системы",
       "properties": "Объекты",
       "moderation": "Модерация",
       "taxonomy": "Таксономия",
@@ -49,7 +53,7 @@
       "publicAmenities": "Городская инфраструктура",
       "aiAssistant": "ИИ-помощник",
       "partners": "Партнёры",
-      "serp": "SERP и SEO",
+      "serp": "Маркетинг и SEO",
       "seoOverview": "Обзор",
       "seoSettings": "Глобальное и локальное SEO",
       "seoMetadata": "Метаданные",
@@ -69,29 +73,29 @@
       "seoLinks": "Внутренние и битые ссылки",
       "seoNotFound": "Журнал 404",
       "redirects": "Переадресации",
-      "analytics": "Аналитика",
+      "analytics": "Аналитика и отчёты",
       "leads": "Заявки",
       "reservations": "Бронирования",
       "email": "Корпоративная почта",
-      "users": "Пользователи",
-      "accounts": "Аккаунты",
+      "users": "Пользователи панели",
+      "accounts": "Публичные аккаунты",
       "security": "Безопасность",
       "audit": "Журнал аудита",
       "profile": "Мой профиль",
-      "settings": "Настройки",
+      "settings": "Общие настройки",
       "demoContent": "Демоконтент",
       "systemMode": "Системные настройки",
       "leadBoard": "Доска заявок",
       "funnel": "Воронка конверсии",
       "calendar": "Календарь",
-      "packages": "Пакеты и оплаты",
-      "agencyHub": "Агентства и агенты",
+      "packages": "Премиум-пакеты",
+      "agencyHub": "Пользователи и агентства",
       "approvals": "Очередь проверки",
       "reports": "Жалобы",
       "appeals": "Апелляции",
       "transfers": "Передачи",
       "featureFlags": "Функции",
-      "finance": "Финансы и монетизация",
+      "finance": "Финансы и подписки",
       "subscriptionPlans": "Тарифные планы",
       "subscriptions": "Отчёты по подпискам",
       "discounts": "Промокоды",
@@ -105,8 +109,17 @@
       "traffic": "Аналитика трафика",
       "businessReports": "Отчёты",
       "securityCenter": "Центр безопасности",
+      "promotionHub": "Продвижение объявлений",
+      "promotionOverview": "Обзор",
+      "trustHub": "Безопасность и модерация",
+      "botProtection": "Защита от ботов",
       "telegram": "Telegram",
       "support": "Поддержка (Telegram)"
+    },
+    "sections": {
+      "seoDaily": "Мониторинг",
+      "seoContentGroup": "SEO контента",
+      "seoTechnical": "Техническая настройка"
     }
   },
   "actions": {
@@ -3725,6 +3738,48 @@
         "TELEGRAM_UNLINKED": "Telegram отвязан",
         "LOGIN_METHOD_LINKED": "Способ входа привязан",
         "LOGIN_METHOD_UNLINKED": "Способ входа отвязан"
+      }
+    },
+    "promotionHub": {
+      "title": "Продвижение объявлений",
+      "description": "Очереди, активные продвижения и последние решения по VIP, поднятию и премиум-пакетам в одном месте. Правила и согласование каждого модуля сохраняются.",
+      "stats": {
+        "pending": "Заявки на согласовании",
+        "pendingHint": "VIP + поднятие",
+        "activeVip": "Активные VIP",
+        "activePromotions": "Активные поднятия",
+        "pendingOrders": "Ожидающие заказы пакетов"
+      },
+      "modulesTitle": "Модули продвижения",
+      "modulesDescription": "Решения и управление — на странице каждого модуля.",
+      "modules": {
+        "vip": {
+          "title": "VIP-объявления",
+          "hint": "Заявки, срок, продление и отзыв",
+          "pending": "Ожидает: {count}",
+          "active": "Активно: {count}"
+        },
+        "promotion": {
+          "title": "Поднятие",
+          "hint": "Кампании, пауза и статистика",
+          "pending": "Ожидает: {count}",
+          "active": "Активно: {count}"
+        },
+        "packages": {
+          "title": "Премиум-пакеты",
+          "hint": "Каталог пакетов, заказы и учёт оплат",
+          "pending": "Ждут оплаты: {count}",
+          "active": "Не активировано: {count}"
+        }
+      },
+      "settingsHint": "Переключатели самообслуживания и согласования:",
+      "settingsLink": "Функции",
+      "historyTitle": "История продвижения",
+      "historyDescription": "Последние решения по VIP и поднятию.",
+      "historyEmpty": "Решений пока нет.",
+      "kind": {
+        "vip": "VIP",
+        "promotion": "Поднятие"
       }
     },
     "telegram": {

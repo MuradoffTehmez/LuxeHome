@@ -149,6 +149,9 @@ hesab köməkçi endpoint-ləri üçündür.
   paylaşılan klient yarımçıq kəsilmiş sorğuda ilişəndə sonrakı bütün sorğular workerd
   tərəfindən «hung» kimi 500-ə çevrilirdi (#96) — modul səviyyəsində klient/promise saxlama.
   Modul səviyyəsində `new PrismaClient()` yazmaq olmaz — build zamanı çökür.
+  **Sorğu bitəndə klient `$disconnect()` ilə bağlanır** (#270): hər klient ortaq wasm yaddaşında ~1,6 MB engine
+  qurur və workerd onu özü azad etmir — ~2 500 klientdən sonra yaddaş 4 GB-a çatır, `RuntimeError: unreachable` ilə
+  bütün D1 marşrutları 500 verir. Sonu `worker.ts` (`trackRequestLifetime`) müəyyən edir; sarğını yan keçmə.
 - Prisma klienti `@prisma/client/wasm.js`-dən idxal olunur. Sadəcə `@prisma/client` yazılsa,
   esbuild `node` şərtini seçir və Workers-də mövcud olmayan binary engine-i yükləməyə çalışır.
 - D1-dən oxuyan hər səhifədə `export const dynamic = "force-dynamic"` var — binding build
@@ -316,6 +319,33 @@ Panel öz yolunu işlədir:
   edəndə kataloqu da yenilə.
 - Paneldən ictimai sayta gedən keçidlər `localizePath(path, locale)` ilə qurulur ki,
   redaktor öz panel dilindəki səhifəni açsın.
+
+### Naviqasiya strukturu (UX konsolidasiyası, 2026-10)
+
+- **Admin menyusu** `components/admin/admin-nav.ts`: 11 modul dörd qrupda (Ümumi · Əməliyyatlar · Məzmun və böyümə ·
+  Maliyyə və sistem). **Hər səhifənin bir giriş nöqtəsi var** — eyni `href`-i iki modula yazma; `admin-nav.test.ts` həm təkrarı,
+  həm də konsolidasiyadan əvvəlki marşrutların menyuda qaldığını yoxlayır. Uzun alt menyuda `section` sahəsi bölmə başlığı verir
+  (SERP: monitorinq / məzmun / texniki). Breadcrumb `findAdminNavLocation()`-dan qurulur (`AdminShell`). Marşrutlar dəyişməyib.
+- **Menyu rola görə süzülür** (`adminNavForRole`): hər alt bəndin `permission` sahəsi səhifənin guard-ı ilə eyni olmalıdır —
+  `scripts/__tests__/admin-nav-permissions.test.ts` mənbədə `requireAdminRead(PERMISSIONS.X)`-i (səhifə və ya layout) yoxlayır.
+  Modul linki ilk icazəli alt bəndə yönəlir; breadcrumb da süzülmüş menyudan qurulur. Dashboard blokları (`/admin`) eyni
+  icazələrə tabedir — müraciət məlumatını `lead:manage`-siz, elanları `property:manage`-siz göstərmə.
+- **Modul tab zolağı** `AdminSectionTabs` (`serp/layout.tsx`, `seo/` və `redirects/` layout-ları, `maliyye/layout.tsx`) menyudan
+  qurulur; yeni alət menyuya yazılanda zolaqda da görünür.
+- **Elanların təşviqi** `/admin/tesviq` yalnız oxuyan ümumi baxışdır (VIP, irəli çəkmə, paketlər); qərar modulların öz
+  səhifəsindədir — VIP/irəli çəkmə/paket məntiqini birləşdirmə.
+- **Kabinet menyusu** bölmələrdədir (`groupCabinetItems()` → `CABINET_ITEM_SECTION`); yeni bənd əlavə edəndə bölməsini də yaz
+  (`Record` typecheck-də yıxılır). Aktiv bənd ən uzun prefiksdir (`activeCabinetHref`). «Bildirişlər»də oxunmamış sayğac var.
+  `CABINET_COLLAPSE_THRESHOLD`-dan çox bənddə passiv bölmələr qatlanmış başlayır (`defaultOpenCabinetSections`).
+- **Əməkdaş ictimai saytda:** kabinet yalnız ictimai sessiyanı qəbul edir — header-in «Elan yerləşdir» və mobil alt
+  naviqasiyanın «Hesab» düyməsi əməkdaşı panelə (`<a>`, tam yükləmə) aparır. Kabinetə link yazanda bunu nəzərə al.
+- «Elanlarım» status tabları `lib/accounts/listing-status-groups.ts`-dədir (`?status=aktiv|yoxlamada|diqqet|baglanmis`).
+- **Telegram bildiriş kanalı** — `src/lib/telegram-bot/` (bax «Telegram inteqrasiyası və sosial giriş»). #277-dəki sadə
+  `User.telegramChatId` kanalı `0088`-də `TelegramAccount`-a köçürülüb (razılıq açıq qalıb) və sütunlar silinib — bir
+  kimlik mənbəyi var. Kabinetin «Parametrlər» tabında `TelegramCard`; bağlanmamış hesabda Telegram sütunu deaktivdir və
+  saxlanmış seçim üzərinə yazılmır. Webhook-u panel → Telegram → «Webhook-u qur» quraşdırır (`docs/telegram-and-social-login.md`).
+- **Bildiriş mərkəzi** `/kabinet/bildirisler`: əsas görünüş siyahıdır, seçimlər `?gorunus=parametrler` tabındadır; filtr
+  vəziyyəti URL-dədir (`lib/notification-filters.ts`, saf). Link əsaslı tab/seqment üçün `components/ui/segmented-tabs.tsx`.
 
 ### Admin siyahıları: silmə və toplu seçim
 

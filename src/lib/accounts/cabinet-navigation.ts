@@ -94,8 +94,78 @@ export function getCabinetItems(
   return hiddenItems.length ? items.filter((item) => !hiddenItems.includes(item.id)) : items;
 }
 
+/**
+ * Menyu bölmələri (UX auditi): 20-dən çox bənd bir siyahıda idi və agentlik sahibində əsas bəndlər
+ * ekranın altına düşürdü. Bənd dəsti və icazə qaydası dəyişmir — `getCabinetItems()` nəticəsi yalnız
+ * məntiqi qruplara bölünür, boş bölmə göstərilmir.
+ */
+export const CABINET_SECTIONS = ["overview", "listings", "work", "personal", "account"] as const;
+export type CabinetSection = (typeof CABINET_SECTIONS)[number];
+
+export const CABINET_ITEM_SECTION: Record<CabinetNavItem["id"], CabinetSection> = {
+  overview: "overview",
+  "agency-dashboard": "overview",
+  "agency-analytics": "overview",
+  listings: "listings",
+  "new-listing": "listings",
+  analytics: "listings",
+  packages: "listings",
+  assignments: "listings",
+  transfers: "listings",
+  leads: "work",
+  clients: "work",
+  reservations: "work",
+  tasks: "work",
+  reviews: "work",
+  team: "work",
+  activity: "work",
+  "saved-searches": "personal",
+  recommendations: "personal",
+  "recently-viewed": "personal",
+  reports: "personal",
+  notifications: "account",
+  restrictions: "account",
+  profile: "account",
+};
+
+export function groupCabinetItems(items: readonly CabinetNavItem[]): { section: CabinetSection; items: CabinetNavItem[] }[] {
+  return CABINET_SECTIONS.map((section) => ({ section, items: items.filter((item) => CABINET_ITEM_SECTION[item.id] === section) }))
+    .filter((group) => group.items.length > 0);
+}
+
 export function isCabinetItemActive(pathname: string, href: string): boolean {
   return pathname === href;
+}
+
+/** Bundan çox bənd olanda (agentlik sahibi ~23) passiv bölmələr bağlı başlayır ki, menyu ekrana sığsın. */
+export const CABINET_COLLAPSE_THRESHOLD = 16;
+
+/**
+ * İlk açıq bölmələr: qısa menyuda hamısı; uzun menyuda «Ümumi baxış», «Hesab» və aktiv bəndin bölməsi.
+ * Bağlı bölmə yalnız vizual qatlanmadır — bəndlər itmir, başlığa basmaqla açılır.
+ */
+export function defaultOpenCabinetSections(
+  groups: readonly { section: CabinetSection; items: readonly Pick<CabinetNavItem, "href">[] }[],
+  activeHref: string | null,
+): CabinetSection[] {
+  const total = groups.reduce((sum, group) => sum + group.items.length, 0);
+  if (total <= CABINET_COLLAPSE_THRESHOLD) return groups.map((group) => group.section);
+  return groups
+    .filter((group) => group.section === "overview" || group.section === "account" || group.items.some((item) => item.href === activeHref))
+    .map((group) => group.section);
+}
+
+/**
+ * Aktiv menyu bəndi: ən uzun prefiksi uyğun gələn bənd. `/kabinet/muracietler/<id>` «Müraciətlər»i,
+ * `/kabinet/elanlar/yeni` isə yalnız «Yeni elan»ı işıqlandırır; «Ümumi baxış» yalnız dəqiq ünvanda aktivdir.
+ */
+export function activeCabinetHref(pathname: string, items: readonly Pick<CabinetNavItem, "href">[]): string | null {
+  let best: string | null = null;
+  for (const { href } of items) {
+    const matches = pathname === href || (href !== "/kabinet" && pathname.startsWith(`${href}/`));
+    if (matches && (!best || href.length > best.length)) best = href;
+  }
+  return best;
 }
 
 export type CabinetCrumb = {
@@ -108,6 +178,11 @@ export type CabinetCrumb = {
     | "listings"
     | "newListing"
     | "editListing"
+    | "listingDocuments"
+    | "leadCard"
+    | "newClient"
+    | "clientCard"
+    | "listingPerformance"
     | "leads"
     | "clients"
     | "analytics"
@@ -165,8 +240,14 @@ export function cabinetBreadcrumbTrail(pathname: string): CabinetCrumb[] {
   trail.push({ href: `/kabinet/${section}`, labelKey: sectionKey });
   const child = segments[2];
   if (section === "elanlar" && child) {
-    trail.push({ href: pathname, labelKey: child === "yeni" ? "newListing" : "editListing" });
+    trail.push({ href: `/kabinet/elanlar/${child}`, labelKey: child === "yeni" ? "newListing" : "editListing" });
+    // Sənəd yükləmə səhifəsi (#256) əvvəl «Redaktə» kimi görünürdü.
+    if (child !== "yeni" && segments[3] === "senedler") trail.push({ href: pathname, labelKey: "listingDocuments" });
   }
+  // Detal səhifələri: müraciət kartı (#222), müştəri kartı (#226), elan performansı (#236).
+  if (section === "muracietler" && child) trail.push({ href: pathname, labelKey: "leadCard" });
+  if (section === "musteriler" && child) trail.push({ href: pathname, labelKey: child === "yeni" ? "newClient" : "clientCard" });
+  if (section === "analitika" && child) trail.push({ href: pathname, labelKey: "listingPerformance" });
   if (section === "agentlik" && child === "elanlar") trail.push({ href: pathname, labelKey: "assignments" });
   if (section === "agentlik" && child === "analitika") trail.push({ href: pathname, labelKey: "agencyAnalytics" });
   return trail;

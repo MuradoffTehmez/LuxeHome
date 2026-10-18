@@ -157,6 +157,17 @@
         "storage": "The file was not saved. Please try again later.",
         "disabled": "Document verification is currently turned off."
       }
+    },
+    "groups": {
+      "label": "Listing status",
+      "all": "All",
+      "active": "Active",
+      "review": "In review",
+      "attention": "Needs attention",
+      "closed": "Closed",
+      "emptyTitle": "No listings with this status",
+      "emptyDescription": "Choose another tab.",
+      "showAll": "All listings"
     }
   },
   "newProperty": {
@@ -750,8 +761,8 @@
       "failed": "The push preference was not saved. Please try again."
     },
     "preferences": {
-      "title": "Notification preferences",
-      "description": "Choose which notification reaches you on which channel.",
+      "title": "Searches, prices and reservations",
+      "description": "Choose channels and quiet hours for saved search, price drop and reservation notifications.",
       "rows": {
         "savedSearch": "Saved search",
         "priceDrop": "Price drop",
@@ -773,8 +784,8 @@
       "failed": "Notification preferences were not saved. Please try again."
     },
     "center": {
-      "title": "Notification center",
-      "description": "Choose which events you want to be notified about and through which channels.",
+      "title": "Categories and channels",
+      "description": "Choose which events you want to hear about and through which channels.",
       "category": "Event",
       "soon": "coming soon",
       "locked": "Cannot be disabled",
@@ -828,12 +839,43 @@
           "hint": "Critical alerts about your account"
         }
       },
+      "notLinked": "not connected",
       "telegramNote": "The Telegram column only works when a Telegram account is linked and notifications are enabled."
     },
+    "summaryUnread": "{count} notifications · {unread} unread",
+    "tabs": {
+      "label": "Notification sections",
+      "list": "Notifications",
+      "settings": "Settings"
+    },
+    "filters": {
+      "readLabel": "Read status",
+      "read": {
+        "all": "All",
+        "unread": "Unread",
+        "read": "Read"
+      },
+      "categoryLabel": "Category",
+      "allCategories": "All categories",
+      "reset": "Reset filters"
+    },
+    "filteredEmptyTitle": "No notifications match this filter",
+    "filteredEmptyDescription": "Choose another category or status.",
     "telegram": {
-      "title": "Telegram",
-      "description": "Link your account to the Telegram bot (@luxehomeestatebot) to receive enquiry, listing and security notifications in Telegram.",
-      "linkedDescription": "Your Telegram account is linked. Choose which notifications to receive in the table below.",
+      "title": "Telegram notifications",
+      "description": "Connect your account to our bot — notifications for the categories you choose will also arrive in Telegram.",
+      "linkedDescription": "Telegram is connected. Choose which notifications to receive in the table below.",
+      "unavailableDescription": "The Telegram channel is not active yet.",
+      "connect": "Connect Telegram",
+      "disconnect": "Disconnect",
+      "check": "Check",
+      "soon": "Coming soon",
+      "openHint": "If Telegram did not open:",
+      "openLink": "open the bot",
+      "linkReady": "Press «Start» in Telegram, then «Check».",
+      "disconnected": "Telegram disconnected.",
+      "unavailable": "The Telegram channel is not active yet.",
+      "failed": "Something went wrong. Please try again.",
       "link": "Link Telegram",
       "linkPending": "Tap «Start» in the bot. The link is valid for 10 minutes and works only once. Then come back to this page.",
       "openBot": "Open bot",
@@ -858,9 +900,7 @@
       "test": "Send test notification",
       "activeHint": "Telegram notifications are on.",
       "blockedHint": "The bot cannot message you — you blocked it or have not started it yet. Open the bot and tap «Start».",
-      "unavailable": "The Telegram integration is not active at the moment.",
       "rateLimited": "Too many attempts. Please try again shortly.",
-      "failed": "Something went wrong. Please try again later.",
       "unlinked": "Telegram account unlinked.",
       "notLinked": "No Telegram account is linked.",
       "enabled": "Telegram notifications enabled.",

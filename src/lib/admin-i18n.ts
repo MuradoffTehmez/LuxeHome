@@ -6,13 +6,15 @@ import {
   resolveAdminLocale,
   type AdminMessages,
 } from "@/i18n/admin";
-import { AUTH_KINDS, type Locale } from "@/lib/constants";
+import { AUTH_KINDS, type Locale, type Role } from "@/lib/constants";
 import { getOptionalUser, requireStaff } from "@/lib/auth/guard";
 
 type AdminI18n = {
   locale: Locale;
   messages: AdminMessages;
   t: ReturnType<typeof createAdminTranslator>;
+  /** Panel istifadəçisinin rolu — breadcrumb kimi naviqasiya elementləri yalnız icazəli linkləri göstərsin. */
+  role: Role;
 };
 
 /**
@@ -27,7 +29,7 @@ export const getAdminI18n = cache(async (): Promise<AdminI18n> => {
   const locale = resolveAdminLocale(user.locale);
   const messages = await loadAdminMessages(locale);
 
-  return { locale, messages, t: createAdminTranslator(locale, messages) };
+  return { locale, messages, t: createAdminTranslator(locale, messages), role: user.role };
 });
 
 /** Qısa forma — səhifələrin əksəriyyətinə yalnız tərcüməçi lazımdır. */

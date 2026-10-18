@@ -6,6 +6,7 @@ import { requireAccount } from "@/lib/auth/guard";
 import { accountTypeKey as accountTypeKeyOf, ACCOUNT_TYPES, AGENCY_MEMBER_PERMISSIONS, type Locale } from "@/lib/constants";
 import { getAgencyAccess, hasAgencyPermission } from "@/lib/accounts/agency-access";
 import { getFeatureFlags } from "@/lib/feature-flags";
+import { prisma } from "@/lib/prisma";
 import type { CabinetNavItem } from "@/lib/accounts/cabinet-navigation";
 import { CabinetShell } from "./cabinet-shell";
 
@@ -37,6 +38,8 @@ export default async function CabinetLayout({ children }: { children: React.Reac
   if (!flags.CRM) hiddenItems.push("clients");
   if (!flags.AGENCY_ANALYTICS) hiddenItems.push("agency-analytics");
   if (!flags.RATINGS) hiddenItems.push("reviews");
+  // Menyudakı «Bildirişlər» nişanı — bir `count` sorğusu; xəta kabineti sındırmamalıdır.
+  const unreadNotifications = await prisma.notification.count({ where: { userId: user.id, readAt: null } }).catch(() => 0);
 
   return (
     <Section spacing="cozy">
@@ -51,6 +54,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
           canAssignListings={canAssignListings}
           canViewAnalytics={canViewAnalytics}
           hiddenItems={hiddenItems}
+          unreadNotifications={unreadNotifications}
         >
           {children}
         </CabinetShell>

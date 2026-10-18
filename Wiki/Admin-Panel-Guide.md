@@ -15,6 +15,34 @@ Bu səhifə `/admin` panelində gündəlik iş axınlarını izah edir: kim nəy
 
 Qısa yol: **Ctrl/⌘ + K** əmr menyusunu açır (bölmələr arası sürətli keçid).
 
+### Menyu strukturu (2026-10 UX konsolidasiyası)
+
+11 əsas modul dörd qrupdadır; hər səhifənin **bir** giriş nöqtəsi var (`admin-nav.test.ts` təkrarı və itən marşrutu yoxlayır).
+Səhifənin yuxarısındakı breadcrumb («Qrup › Modul › Səhifə») menyudan qurulur, aktiv bəndlə eyni adları işlədir.
+
+| Qrup | Modul | Alt bölmələr |
+|---|---|---|
+| Ümumi | İdarə paneli | — |
+| Əməliyyatlar | Elanlar və portfel | Əmlaklar, Moderasiya, Köçürmələr, Layihələr, Taksonomiya, İctimai imkanlar |
+| | Elanların təşviqi | Ümumi baxış (`/admin/tesviq`), VIP elanlar, İrəli çəkmə, Premium paketlər |
+| | İstifadəçilər və agentliklər | Təsdiq növbəsi, Agentliklər, Agentlər və rəylər, İctimai hesablar, Panel istifadəçiləri |
+| | CRM və müraciətlər | Müraciətlər, Lövhə, Huni, Rezervasiyalar, Təqvim, Korporativ e-poçt |
+| | Təhlükəsizlik və moderasiya | Şikayətlər, Etirazlar, Hesab etibarlılığı, Sənəd yoxlaması, Moderasiya tarixçəsi, Təhlükəsizlik mərkəzi, Audit jurnalı |
+| Məzmun və böyümə | Məzmun idarəetməsi | Bloq, Bilik Mərkəzi, Xidmətlər, Tərəfdaşlar, Media, Tərcümələr, Xəbərdarlıq mətnləri, AI köməkçi |
+| | Marketinq və SEO | Monitorinq · Məzmun SEO-su · Texniki konfiqurasiya (19 alət, bölmə başlıqları ilə) |
+| | Analitika və hesabatlar | Trafik, Hesabatlar |
+| Maliyyə və sistem | Maliyyə və abunəliklər | Planlar, Abunələr, Endirimlər, Kampaniyalar, Ödənişlər |
+| | Sistem parametrləri | Ümumi parametrlər, Funksiyalar, Sistem ayarları, Bot müdafiəsi (`/admin/security`), Nümunə məzmun |
+| | Hesabım | — |
+
+Menyu rola görə süzülür: Redaktor yalnız Məzmun idarəetməsi, Marketinq və SEO (baxış) və Hesabım bölmələrini, Admin isə
+parametrlər, istifadəçilər və trafik analitikası xaric qalanları görür. «Marketinq və SEO» və «Maliyyə» modullarının
+səhifələrində yuxarıda tab zolağı var (SERP-də əvvəlcə bölmə seçilir: Monitorinq · Məzmun SEO-su · Texniki konfiqurasiya).
+
+Marşrutlar dəyişməyib — yalnız qruplaşma; köhnə linklər və əlfəcinlər işləyir. «Elanların təşviqi → Ümumi baxış» yalnız
+oxuyur: növbə sayları, aktiv təşviqlər və VIP/irəli çəkmə qərarlarının birgə tarixçəsi; qərar hər modulun öz səhifəsindədir
+(VIP, irəli çəkmə və paket qaydaları backend-də ayrı qalır). Paket bloku yalnız `billing:manage` icazəsi ilə görünür.
+
 ## Rollar
 
 | Rol | Nə edə bilər |

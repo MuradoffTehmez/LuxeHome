@@ -82,12 +82,13 @@ test.describe("Kabinet: Telegram bölməsi", () => {
   test("bölmə görünür, mobil ekranda üfüqi daşma yoxdur", async ({ page, context, baseURL }) => {
     await signInAsLister(context, baseURL!);
     await page.setViewportSize({ width: 375, height: 812 });
-    await visit(page, "/az/kabinet/bildirisler");
+    // Kanal seçimləri bildiriş mərkəzinin «Parametrlər» tabındadır (#277).
+    await visit(page, "/az/kabinet/bildirisler?gorunus=parametrler");
     const card = page.locator('section[aria-labelledby="telegram-card-title"]');
     await expect(card).toBeVisible();
-    await expect(card.locator("h2")).toHaveText("Telegram");
-    // Bildiriş mərkəzində Telegram sütunu aktivdir (artıq «tezliklə» deyil).
-    await expect(page.locator('input[name="LEADS.telegram"]')).toBeEnabled();
+    await expect(card.locator("h2")).toContainText("Telegram");
+    // Telegram sütunu mövcuddur; bağlanmamış hesabda deaktivdir.
+    await expect(page.locator('input[name="LEADS.telegram"]')).toHaveCount(1);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
   });

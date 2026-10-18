@@ -19,69 +19,82 @@ import { saveCategoryChannels } from "./preference-actions";
  * Telegram sütunu yalnız bağlı hesab və açıq razılıqla işləyir (yuxarıdakı Telegram bölməsi). Təhlükəsizlik
  * bildirişləri kilidlidir (həmişə gedir).
  */
-export function CategoryPreferences({ values }: { values: CategoryChannels }) {
+/** `unavailable` — bot konfiqurasiya olunmayıb; `unlinked` — hesab bota bağlanmayıb; `linked` — işləyir. */
+export type TelegramChannelState = "unavailable" | "unlinked" | "linked";
+
+export function CategoryPreferences({ values, telegram }: { values: CategoryChannels; telegram: TelegramChannelState }) {
   const t = useTranslations("account.notifications.center");
   const [state, action, pending] = useActionState(saveCategoryChannels, IDLE_STATE);
 
   return (
-    <section aria-labelledby="notification-center-title" className="mb-8 rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">
+    <section aria-labelledby="notification-center-title" className="rounded-xl border border-line bg-paper p-5 shadow-xs sm:p-6">
       <h2 id="notification-center-title" className="font-sans text-lg font-semibold text-ink">{t("title")}</h2>
       <p className="mt-1 text-sm text-ink-soft">{t("description")}</p>
       <form action={action} className="mt-5">
-        <div className="relative overflow-x-auto">
-          <table className="w-full min-w-[34rem] text-sm">
-            <caption className="sr-only">{t("title")}</caption>
-            <thead>
-              <tr className="border-b border-line text-left">
-                <th scope="col" className="py-2 pr-3 font-medium text-ink-muted">{t("category")}</th>
-                {NOTIFICATION_CHANNELS.map((channel) => <th key={channel} scope="col" className="px-2 py-2 text-center font-medium text-ink">{t(`channels.${channel}`)}</th>)}
-                {FUTURE_NOTIFICATION_CHANNELS.map((channel) => (
-                  <th key={channel} scope="col" className="px-2 py-2 text-center font-medium text-ink-muted">
-                    {t(`channels.${channel}`)}
-                    <span className="block text-[0.7rem] font-normal">{t("soon")}</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {NOTIFICATION_CATEGORIES.map((category) => {
-                const locked = CRITICAL_NOTIFICATION_CATEGORIES.includes(category);
-                return (
-                  <tr key={category} className="border-b border-line last:border-0">
-                    <th scope="row" className="py-3 pr-3 text-left font-normal">
-                      <span className="flex items-center gap-1.5 font-medium text-ink">
-                        {t(`categories.${category}.label`)}
-                        {locked && <Lock className="size-3.5 text-ink-muted" aria-label={t("locked")} />}
-                      </span>
-                      <span className="block text-xs text-ink-muted">{t(`categories.${category}.hint`)}</span>
-                    </th>
+        {/*
+          Bir işarələmə, iki düzülüş: desktopda cədvəl kimi sütunlar (başlıq sətri görünür), mobil ekranda
+          hər kateqoriya ayrıca blokdur və kanal adı checkbox-un yanında yazılır — əvvəl 34rem-lik cədvəl
+          375px-də kanal sütunlarını ekrandan çıxarırdı. Hər input DOM-da bir dəfədir (forma dəyəri dəyişmir).
+        */}
+        <div className="min-w-0">
+          <div aria-hidden="true" className="hidden grid-cols-[minmax(0,1fr)_repeat(4,4.5rem)] items-end gap-1 border-b border-line pb-2 text-sm sm:grid">
+            <span className="pr-3 font-medium text-ink-muted">{t("category")}</span>
+            {NOTIFICATION_CHANNELS.map((channel) => {
+              const inactive = channel === "telegram" && telegram !== "linked";
+              return (
+                <span key={channel} className={inactive ? "text-center font-medium text-ink-muted" : "text-center font-medium text-ink"}>
+                  {t(`channels.${channel}`)}
+                  {inactive && <span className="block text-[0.7rem] font-normal">{t(telegram === "unavailable" ? "soon" : "notLinked")}</span>}
+                </span>
+              );
+            })}
+            {FUTURE_NOTIFICATION_CHANNELS.map((channel) => (
+              <span key={channel} className="text-center font-medium text-ink-muted">
+                {t(`channels.${channel}`)}
+                <span className="block text-[0.7rem] font-normal">{t("soon")}</span>
+              </span>
+            ))}
+          </div>
+          <ul className="divide-y divide-line">
+            {NOTIFICATION_CATEGORIES.map((category) => {
+              const locked = CRITICAL_NOTIFICATION_CATEGORIES.includes(category);
+              const label = t(`categories.${category}.label`);
+              return (
+                <li key={category} className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[minmax(0,1fr)_repeat(4,4.5rem)] sm:items-center sm:py-1">
+                  <div className="min-w-0 pr-3">
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
+                      {label}
+                      {locked && <Lock className="size-3.5 text-ink-muted" aria-label={t("locked")} />}
+                    </span>
+                    <span className="block text-xs text-ink-muted">{t(`categories.${category}.hint`)}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 sm:contents">
                     {NOTIFICATION_CHANNELS.map((channel) => (
-                      <td key={channel} className="px-1 py-1 text-center">
-                        {/* Toxunma sahəsi ≥44px (PRD 26.4): checkbox 20px-dir, onu əhatə edən label bütün xananı tutur. */}
-                        <label className="inline-grid size-11 cursor-pointer place-items-center has-[:disabled]:cursor-not-allowed">
-                          <input
-                            type="checkbox"
-                            name={`${category}.${channel}`}
-                            defaultChecked={values[category][channel]}
-                            disabled={locked}
-                            aria-label={`${t(`categories.${category}.label`)} — ${t(`channels.${channel}`)}`}
-                            className="size-5 accent-gold disabled:opacity-60"
-                          />
-                        </label>
-                      </td>
+                      // Toxunma sahəsi ≥44px (PRD 26.4): checkbox 20px-dir, onu əhatə edən label bütün xananı tutur.
+                      <label key={channel} className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-sm text-ink-soft has-[:disabled]:cursor-not-allowed sm:justify-center">
+                        <input
+                          type="checkbox"
+                          name={`${category}.${channel}`}
+                          defaultChecked={values[category][channel]}
+                          // Bağlanmamış Telegram sütunu deaktivdir; server saxlanmış seçimi qoruyur.
+                          disabled={locked || (channel === "telegram" && telegram !== "linked")}
+                          aria-label={`${label} — ${t(`channels.${channel}`)}`}
+                          className="size-5 accent-gold disabled:opacity-60"
+                        />
+                        <span aria-hidden="true" className="sm:hidden">{t(`channels.${channel}`)}</span>
+                      </label>
                     ))}
                     {FUTURE_NOTIFICATION_CHANNELS.map((channel) => (
-                      <td key={channel} className="px-1 py-1 text-center">
-                        <span className="inline-grid size-11 place-items-center">
-                          <input type="checkbox" disabled aria-label={`${t(`categories.${category}.label`)} — ${t(`channels.${channel}`)}`} className="size-5 opacity-40" />
-                        </span>
-                      </td>
+                      <span key={channel} className="inline-flex min-h-11 items-center gap-2 text-sm text-ink-muted sm:justify-center">
+                        <input type="checkbox" disabled aria-label={`${label} — ${t(`channels.${channel}`)} (${t("soon")})`} className="size-5 opacity-40" />
+                        <span aria-hidden="true" className="sm:hidden">{t(`channels.${channel}`)}</span>
+                      </span>
                     ))}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </div>
         <p className="mt-3 text-xs text-ink-muted">{t("securityNote")}</p>
         <p className="mt-1 text-xs text-ink-muted">{t("telegramNote")}</p>

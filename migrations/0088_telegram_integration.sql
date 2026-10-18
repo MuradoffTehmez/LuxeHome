@@ -1,5 +1,9 @@
 -- Telegram inteqrasiyası: təsdiqlənmiş Telegram kimliyi, birdəfəlik bağlama/qeydiyyat tokenləri, çatlar (qrup/kanal),
--- webhook idempotentliyi, çatdırılma növbəsi və dəstək müraciətləri. Yalnız yeni cədvəllər — mövcud sətirlərə toxunulmur.
+-- webhook idempotentliyi, çatdırılma növbəsi və dəstək müraciətləri.
+--
+-- `0087_telegram_notifications` (#277) sadə kanal qurmuşdu: `User.telegramChatId` + öz `TelegramLinkToken`-i. Bu miqrasiya
+-- onu itkisiz bu modelə köçürür: bağlı çatlar `TelegramAccount`-a (yalnız şəxsi çat bağlanırdı — çat ID = Telegram ID,
+-- razılıq açıq qalır), token sətirləri yeni cədvələ (`purpose = LINK`), sonra köhnə sütunlar silinir.
 CREATE TABLE "TelegramAccount" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "userId" TEXT NOT NULL,
@@ -21,7 +25,15 @@ CREATE UNIQUE INDEX "TelegramAccount_userId_key" ON "TelegramAccount"("userId");
 CREATE UNIQUE INDEX "TelegramAccount_telegramUserId_key" ON "TelegramAccount"("telegramUserId");
 CREATE UNIQUE INDEX "TelegramAccount_oidcSub_key" ON "TelegramAccount"("oidcSub");
 
-CREATE TABLE "TelegramLinkToken" (
+INSERT INTO "TelegramAccount" ("id", "userId", "telegramUserId", "chatId", "botAccess", "notificationsEnabled", "linkedAt", "updatedAt")
+SELECT lower(hex(randomblob(12))), "id", "telegramChatId", "telegramChatId", true, true, COALESCE("telegramLinkedAt", CURRENT_TIMESTAMP), CURRENT_TIMESTAMP
+FROM "User" WHERE "telegramChatId" IS NOT NULL;
+
+DROP INDEX "User_telegramChatId_key";
+ALTER TABLE "User" DROP COLUMN "telegramChatId";
+ALTER TABLE "User" DROP COLUMN "telegramLinkedAt";
+
+CREATE TABLE "new_TelegramLinkToken" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "tokenHash" TEXT NOT NULL,
     "purpose" TEXT NOT NULL,
@@ -32,6 +44,12 @@ CREATE TABLE "TelegramLinkToken" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "TelegramLinkToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
+INSERT INTO "new_TelegramLinkToken" ("id", "tokenHash", "purpose", "userId", "expiresAt", "createdAt")
+SELECT "id", "tokenHash", 'LINK', "userId", "expiresAt", "createdAt" FROM "TelegramLinkToken"
+-- Köhnə cədvəldə FK yox idi: silinmiş hesabın tokeni yeni FK-ni pozmasın.
+WHERE "userId" IN (SELECT "id" FROM "User");
+DROP TABLE "TelegramLinkToken";
+ALTER TABLE "new_TelegramLinkToken" RENAME TO "TelegramLinkToken";
 CREATE UNIQUE INDEX "TelegramLinkToken_tokenHash_key" ON "TelegramLinkToken"("tokenHash");
 CREATE INDEX "TelegramLinkToken_userId_purpose_idx" ON "TelegramLinkToken"("userId", "purpose");
 CREATE INDEX "TelegramLinkToken_expiresAt_idx" ON "TelegramLinkToken"("expiresAt");

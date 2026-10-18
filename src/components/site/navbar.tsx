@@ -110,6 +110,9 @@ export function Navbar({
   // Qonaq üçün düymə qalır: kabinet onu əvvəlcə giriş səhifəsinə yönləndirir.
   const session = useSessionState("");
   const showListProperty = !(session.status === "signed-in" && !session.isStaff && !session.canPostListing);
+  // Əməkdaş sessiyası kabinetə düşmür (`requireAccount` yalnız ictimai sessiyanı qəbul edir) — düymə
+  // onu giriş səhifəsinə atırdı. Əməkdaş elanı paneldə yaradır.
+  const isStaff = session.status === "signed-in" && session.isStaff;
 
   return (
     <header
@@ -293,8 +296,8 @@ export function Navbar({
           </div>
 
           {showListProperty ? (
-            <Link
-              href="/kabinet/elanlar/yeni"
+            <ListPropertyLink
+              staff={isStaff}
               aria-label={t("listProperty")}
               className={buttonClassName("primary", "sm", false, "inline-flex min-w-11 px-2.5 sm:px-3 xl:px-4")}
             >
@@ -302,7 +305,7 @@ export function Navbar({
               <span className="max-sm:hidden [@media(min-width:1440px)_and_(max-width:1799px)]:sr-only">
                 {t("listProperty")}
               </span>
-            </Link>
+            </ListPropertyLink>
           ) : null}
 
           <IconButton
@@ -340,14 +343,14 @@ export function Navbar({
               {t("searchProperties")}
             </Link>
             {showListProperty ? (
-              <Link
-                href="/kabinet/elanlar/yeni"
+              <ListPropertyLink
+                staff={isStaff}
                 onClick={() => setMenuOpen(false)}
                 className={buttonClassName("outline", "lg", true)}
               >
                 <Plus className="size-4" aria-hidden="true" />
                 {t("listProperty")}
-              </Link>
+              </ListPropertyLink>
             ) : null}
           </div>
         </section>
@@ -421,5 +424,38 @@ export function Navbar({
         </section>
       </Overlay>
     </header>
+  );
+}
+
+/**
+ * «Elan yerləşdir» keçidi: ictimai hesab kabinetin sehrbazına, əməkdaş panelin elan formasına gedir.
+ * Panelə keçid tam sənəd yükləməsidir (`<a>`) — hesab menyusundakı panel linki ilə eyni səbəbdən
+ * (panelin CSP-si tətbiq olunsun, ictimai GTM sökülsün).
+ */
+function ListPropertyLink({
+  staff,
+  className,
+  onClick,
+  children,
+  ...rest
+}: {
+  staff: boolean;
+  className?: string;
+  onClick?: () => void;
+  children: React.ReactNode;
+  "aria-label"?: string;
+}) {
+  if (staff) {
+    return (
+      // eslint-disable-next-line @next/next/no-html-link-for-pages -- tam sənəd yükləməsi qəsdlidir (yuxarıdakı şərhə bax)
+      <a href="/admin/emlaklar/yeni" className={className} onClick={onClick} {...rest}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href="/kabinet/elanlar/yeni" className={className} onClick={onClick} {...rest}>
+      {children}
+    </Link>
   );
 }
