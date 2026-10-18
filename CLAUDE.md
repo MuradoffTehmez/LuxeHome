@@ -569,8 +569,10 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   security-events.ts`) **heç vaxt atmır**; növlər saf `security-event-kinds.ts`-dədir (auth qatı dövri asılılıqsız yazsın deyə
   `registerFailure` kilidi birbaşa yazır). Yazılan hadisələr: yeni cihazdan giriş, hesab kilidi, `requirePermission` rəddi,
   `assertSameOrigin` rəddi, yazma limiti, parol dəyişikliyi. **Yeni cihaz xəbərdarlığı** `alertOnNewDevice()` hər sessiya
-  açan axında (`openPublicSession`, əməkdaşın 2FA addımı) çağırılır: son `KNOWN_DEVICE_WINDOW_DAYS` günün sessiyaları ilə
-  cihaz (brauzer + OS, `deviceLabel`) və IP müqayisəsi, ikisi də yenidirsə hadisə + ictimai hesaba `SECURITY` bildirişi
+  açan axında (`openPublicSession`, əməkdaşın 2FA addımı) çağırılır: tarixçə **sessiyalardan ayrı** `KnownLoginDevice`-dadır
+  (`0086`; sessiya sətirləri təmizlənir) — cihaz etiketi (brauzer + OS, `deviceLabel`) və `AUTH_SECRET` ilə duzlanmış IP heşi,
+  `KNOWN_DEVICE_RETENTION_DAYS` (365) saxlanılır. Son `KNOWN_DEVICE_WINDOW_DAYS` (90) gündə ikisi də tanınmırsa hadisə; heç
+  tarixçə yoxdursa ilk giriş sayılır (xəbərdarlıqsız), tarixçə var, amma pəncərədə boşdursa giriş yenidir + ictimai hesaba `SECURITY` bildirişi
   (`noticeNewDeviceLogin`), əməkdaşa birbaşa e-poçt. Sessiya açan yeni axın da onu çağırmalıdır. Saxlama müddətləri
   `lib/security/retention-policy.ts`-dədir (panel cədvəli də oradan qurulur); `purgeSecurityLogs()` gündəlik baxımdadır.
   `/admin/tehlukesizlik` (`user:manage`, «Təhlükəsizlik» qrupu). D1 Time Travel bərpa proseduru Wiki-dədir.

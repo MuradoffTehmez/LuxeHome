@@ -3681,6 +3681,7 @@
           "sessionAbsolute": "Session (absolute)",
           "loginAttempts": "Sign-in attempts",
           "securityEvents": "Security events",
+          "knownDevices": "Known sign-in devices",
           "domainEvents": "System events",
           "uniqueViews": "Unique view keys",
           "propertyDocuments": "Document images (after decision)",
