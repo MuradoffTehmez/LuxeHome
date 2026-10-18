@@ -1241,6 +1241,8 @@ export const KNOWLEDGE_LEVEL_LABELS: Record<KnowledgeLevel, string> = {
 /** Bələdçi və lüğət statusu — bloq ilə eyni dəyər dəsti qəsdən saxlanılır. */
 export const KNOWLEDGE_STATUSES = {
   DRAFT: "DRAFT",
+  /** Redaktor təsdiqinə göndərilib (#266, PRD 24.2) — ictimai deyil; yalnız məqalələr bu mərhələdən keçir. */
+  IN_REVIEW: "IN_REVIEW",
   PUBLISHED: "PUBLISHED",
 } as const;
 
@@ -1248,8 +1250,15 @@ export type KnowledgeStatus = (typeof KNOWLEDGE_STATUSES)[keyof typeof KNOWLEDGE
 
 export const KNOWLEDGE_STATUS_LABELS: Record<KnowledgeStatus, string> = {
   DRAFT: "Qaralama",
+  IN_REVIEW: "Təsdiq gözləyir",
   PUBLISHED: "Dərc edilib",
 };
+
+/** Lüğət termini və FAQ təsdiq mərhələsi olmadan işləyir. */
+export const KNOWLEDGE_SIMPLE_STATUSES = { DRAFT: KNOWLEDGE_STATUSES.DRAFT, PUBLISHED: KNOWLEDGE_STATUSES.PUBLISHED } as const;
+
+/** Dərc olunan məqalənin növbəti yoxlama tarixi (gün) — dəyişən hüquqi mövzular mütəmadi yenilənsin (PRD 24.2). */
+export const KNOWLEDGE_REVIEW_INTERVAL_DAYS = 180;
 
 /** Qüvvədə olan hüquq norması ilə qanun layihəsi/təşəbbüsü qarışdırılmır. */
 export const LEGAL_CONTENT_STATUSES = {

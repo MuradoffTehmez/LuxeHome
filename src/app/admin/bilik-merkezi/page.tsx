@@ -17,12 +17,15 @@ import {
 import { ConfirmAction } from "@/components/admin/confirm-action";
 import { formatNumber, formatRelative } from "@/lib/utils";
 import {
+  KNOWLEDGE_STATUSES,
   PERMISSIONS,
   type KnowledgeAudience,
   type KnowledgeStatus,
 } from "@/lib/constants";
+import { Badge } from "@/components/ui/badge";
+import { isKnowledgeReviewDue } from "@/lib/knowledge-review";
 import { requireAdminRead } from "@/lib/admin/guard";
-import { getAdminKnowledgeArticles } from "@/lib/knowledge";
+import { getAdminKnowledgeArticles, getKnowledgeReviewCounts, KNOWLEDGE_STALE_FILTER } from "@/lib/knowledge";
 import { deleteKnowledgeArticle } from "./actions";
 import { getAdminT } from "@/lib/admin-i18n";
 
@@ -54,7 +57,10 @@ export default async function AdminKnowledgePage({
   const search = typeof params.q === "string" ? params.q : "";
   const status = typeof params.status === "string" ? params.status : "";
 
-  const articles = await getAdminKnowledgeArticles({ search, status });
+  const now = new Date();
+  const [articles, reviewCounts] = await Promise.all([getAdminKnowledgeArticles({ search, status, now }), getKnowledgeReviewCounts(now)]);
+  // Təsdiq gözləyən «PENDING» tonu ilə; yoxlama tarixi keçmiş dərc olunmuş məqalə ayrıca nişan alır.
+  const badgeStatus = (value: string) => (value === KNOWLEDGE_STATUSES.IN_REVIEW ? "PENDING" : (value as "DRAFT" | "PUBLISHED"));
 
   return (
     <>
@@ -83,6 +89,24 @@ export default async function AdminKnowledgePage({
         ))}
       </nav>
 
+      {/* Redaktor növbələri (#266, PRD 24.2): təsdiq gözləyən və yoxlama tarixi keçmiş məqalələr. */}
+      <nav aria-label={t("pages.knowledge.review.label")} className="mb-4 flex flex-wrap gap-2">
+        {[
+          { key: "all", value: "", label: t("pages.knowledge.review.all") },
+          { key: "inReview", value: KNOWLEDGE_STATUSES.IN_REVIEW, label: t("pages.knowledge.review.inReview", { count: reviewCounts.inReview }) },
+          { key: "stale", value: KNOWLEDGE_STALE_FILTER, label: t("pages.knowledge.review.stale", { count: reviewCounts.stale }) },
+        ].map((item) => (
+          <Link
+            key={item.key}
+            href={item.value ? `${LIST_PATH}?status=${item.value}` : LIST_PATH}
+            aria-current={status === item.value ? "page" : undefined}
+            className={`rounded-full border px-3 py-1.5 text-sm ${status === item.value ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft hover:border-gold"}`}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
       <AdminCard bodyClassName="p-4 lg:p-0">
         <AdminResponsiveList
           ariaLabel={t("pages.knowledge.beledciler")}
@@ -98,10 +122,13 @@ export default async function AdminKnowledgePage({
               title={article.title}
               meta={`/bilik-merkezi/${article.slug}`}
               status={
-                <StatusBadge
-                  status={article.status as "DRAFT" | "PUBLISHED"}
-                  label={t(`labels.knowledgeStatus.${article.status as KnowledgeStatus}`) ?? article.status}
-                />
+                <span className="flex flex-wrap gap-1">
+                  <StatusBadge
+                    status={badgeStatus(article.status)}
+                    label={t(`labels.knowledgeStatus.${article.status as KnowledgeStatus}`) ?? article.status}
+                  />
+                  {isKnowledgeReviewDue(article, now) && <Badge tone="warning">{t("pages.knowledge.review.due")}</Badge>}
+                </span>
               }
               actions={
                 <>
@@ -176,12 +203,15 @@ export default async function AdminKnowledgePage({
                       article.audience}
                   </AdminTableCell>
                   <AdminTableCell>
-                    <StatusBadge
-                      status={article.status as "DRAFT" | "PUBLISHED"}
-                      label={
-                        t(`labels.knowledgeStatus.${article.status as KnowledgeStatus}`) ?? article.status
-                      }
-                    />
+                    <span className="flex flex-wrap gap-1">
+                      <StatusBadge
+                        status={badgeStatus(article.status)}
+                        label={
+                          t(`labels.knowledgeStatus.${article.status as KnowledgeStatus}`) ?? article.status
+                        }
+                      />
+                      {isKnowledgeReviewDue(article, now) && <Badge tone="warning">{t("pages.knowledge.review.due")}</Badge>}
+                    </span>
                   </AdminTableCell>
                   <AdminTableCell align="right" className="tabular text-sm text-ink-soft">
                     {formatNumber(article.viewCount)}

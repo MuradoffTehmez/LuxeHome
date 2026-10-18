@@ -70,6 +70,7 @@ export function KnowledgeArticleForm({
         <AdminSelect
           name="status"
           label={t("pages.knowledge.status")}
+          hint={t("pages.knowledge.review.hint")}
           required
           defaultValue={initial.status}
           options={Object.values(KNOWLEDGE_STATUSES).map((value) => ({

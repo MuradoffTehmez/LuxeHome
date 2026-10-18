@@ -3,7 +3,7 @@
 import { ContentEditor } from "@/components/admin/content-editor";
 import { AdminInput, AdminSelect, FullWidth } from "@/components/admin/form-fields";
 import { AdminForm, FormSection } from "@/components/admin/form-shell";
-import { FAQ_CATEGORIES, KNOWLEDGE_STATUSES } from "@/lib/constants";
+import { FAQ_CATEGORIES, KNOWLEDGE_SIMPLE_STATUSES } from "@/lib/constants";
 import { saveFaqEntry } from "./actions";
 import type { FaqFormValues } from "./form-values";
 import { useTranslations } from "next-intl";
@@ -16,7 +16,7 @@ export function FaqForm({ initial }: { initial: FaqFormValues }) {
       <FormSection title={initial.id ? t("pages.misc.sualiRedakteEt") : "Yeni sual"}>
         <FullWidth><AdminInput name="question" label={t("pages.knowledge.sual")} required maxLength={300} defaultValue={initial.question} /></FullWidth>
         <AdminSelect name="category" label={t("pages.knowledge.kateqoriya")} required defaultValue={initial.category} options={Object.values(FAQ_CATEGORIES).map((value) => ({ value, label: t(`labels.faqCategory.${value}`) }))} />
-        <AdminSelect name="status" label={t("pages.knowledge.status")} required defaultValue={initial.status} options={Object.values(KNOWLEDGE_STATUSES).map((value) => ({ value, label: t(`labels.knowledgeStatus.${value}`) }))} />
+        <AdminSelect name="status" label={t("pages.knowledge.status")} required defaultValue={initial.status} options={Object.values(KNOWLEDGE_SIMPLE_STATUSES).map((value) => ({ value, label: t(`labels.knowledgeStatus.${value}`) }))} />
         <AdminInput name="order" label={t("pages.knowledge.sira")} type="number" min={0} max={9999} defaultValue={String(initial.order)} />
         <FullWidth><ContentEditor name="answer" label={t("pages.knowledge.cavab")} defaultValue={initial.answer} /></FullWidth>
       </FormSection>
