@@ -7,6 +7,7 @@ describe("adminNav", () => {
     expect(parentLabels).toEqual([
       "dashboard",
       "portfolio",
+      "security",
       "contentHub",
       "crm",
       "agencyHub",

@@ -781,3 +781,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   **Modul 17 tamamlandı.** Növbəti — Modul 18 (istifadəçi etibarlılığı və davranış analizi).
 - #258 (Modul 18): davranış siqnalları və hesab balı, tədbirlər (xəbərdarlıq → blok), qapılar, etiraz (başqa əməkdaş).
   **Modul 18 tamamlandı — Faza 5 (15–18) bitdi.** Növbəti — Modul 19 (admin panelinin genişləndirilməsi).
+- #260 (Modul 19): dashboard risk göstəriciləri, elan görünüşləri, «Təhlükəsizlik» menyu qrupu, moderasiya tarixçəsi.
+  **Modul 19 tamamlandı.** Növbəti — Modul 20 (hesabatlar və biznes analitikası).

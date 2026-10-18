@@ -13,6 +13,7 @@ import {
   DEFAULT_LOCALE,
   LOCALES,
   NOTIFICATION_TYPES,
+  LISTING_RISK_THRESHOLDS,
   isPostedWithinDays,
   PAGE_SIZE,
   PARTNER_STATUSES,
@@ -2005,6 +2006,8 @@ export type AdminPropertyFilters = {
   cityId?: string;
   /** `true` — yalnız silinmiş elanlar (zibil qutusu görünüşü). */
   deleted?: boolean;
+  /** Görünüş (#260): `subheli` | `vip` | `irelicekilmis` | `arxiv`. */
+  view?: string;
   page?: number;
 };
 
@@ -2057,6 +2060,12 @@ export async function getAdminProperties(filters: AdminPropertyFilters = {}) {
         }
       : {}),
   };
+  // Görünüşlər (#260, PRD Modul 19 «Elanlar»): şübhəli (risk ≥ hold), VIP, irəli çəkilmiş və arxiv.
+  const now = new Date();
+  if (filters.view === "subheli") where.riskScore = { gte: LISTING_RISK_THRESHOLDS.hold };
+  if (filters.view === "vip") Object.assign(where, { isFeatured: true, OR: [{ featuredUntil: null }, { featuredUntil: { gt: now } }] });
+  if (filters.view === "irelicekilmis") where.promotedUntil = { gt: now };
+  if (filters.view === "arxiv") where.status = { in: [PROPERTY_STATUSES.ARCHIVED, PROPERTY_STATUSES.EXPIRED] };
 
   const [rows, total] = await Promise.all([
     prisma.property.findMany({

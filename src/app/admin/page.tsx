@@ -44,6 +44,7 @@ import {
   getTopViewedProperties,
 } from "@/lib/queries";
 import { SETTING_KEYS, getSetting } from "@/lib/settings";
+import { PlatformIndicatorsCard } from "./platform-indicators-card";
 
 export default async function AdminDashboardPage() {
   const t = await getAdminT();
@@ -152,6 +153,9 @@ export default async function AdminDashboardPage() {
           tone="success"
         />
       </div>
+
+      {/* Platforma və risk göstəriciləri (#260, PRD Modul 19). */}
+      <PlatformIndicatorsCard />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.15fr_1fr]">
         {/* --- Son müraciətlər --- */}

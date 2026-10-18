@@ -100,7 +100,8 @@
       "vip": "VIP listings",
       "promotion": "Promotion",
       "verification": "Document check",
-      "trust": "Account trust"
+      "trust": "Account trust",
+      "moderationHistory": "Moderation history"
     }
   },
   "actions": {
@@ -194,6 +195,23 @@
       "leadBoard": "Lead board",
       "aiAssistant": "AI assistant (SEO, ALT)",
       "importListings": "Import from CSV"
+    },
+    "platform": {
+      "title": "Platform and risk indicators",
+      "description": "Last 7 days and open queues — each indicator links to its section.",
+      "items": {
+        "newUsers": "New users (7 days)",
+        "newListings": "New listings (7 days)",
+        "activeAgencies": "Verified agencies",
+        "openReports": "Open reports",
+        "riskyListings": "Suspicious listings",
+        "riskyAccounts": "Risky accounts",
+        "activeRestrictions": "Active restrictions",
+        "openAppeals": "Open appeals",
+        "pendingVip": "VIP requests",
+        "pendingPromotions": "Promotion requests",
+        "pendingDocuments": "Document checks"
+      }
     }
   },
   "labels": {
@@ -853,6 +871,14 @@
         "description": "Every status transition and price change of the listing: who, when and from which source. Moderator interventions are marked “Moderation”.",
         "empty": "No changes recorded yet.",
         "created": "Created"
+      },
+      "views": {
+        "label": "Listing views",
+        "all": "All",
+        "subheli": "Suspicious",
+        "vip": "VIP",
+        "irelicekilmis": "Promoted",
+        "arxiv": "Archive"
       }
     },
     "leads": {
@@ -3551,6 +3577,17 @@
         "CROSS_PROFILE_CONTENT": "Same content as other profiles: {value}",
         "REVIEW_BURST": "Suspicious reviews: {value}"
       }
+    },
+    "moderationHistory": {
+      "title": "Moderation history",
+      "description": "Listing status changes made by moderators and account measures.",
+      "restrictions": "Recent account measures",
+      "decisions": "Listing decisions",
+      "total": "{count} decisions in total",
+      "empty": "No moderation decisions yet.",
+      "system": "system",
+      "prev": "← Previous",
+      "next": "Next →"
     }
   },
   "server": {

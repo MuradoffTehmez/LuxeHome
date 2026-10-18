@@ -52,17 +52,27 @@ export const adminNav: AdminNavGroup[] = [
         children: [
           { labelKey: "properties", href: "/admin/emlaklar" },
           { labelKey: "moderation", href: "/admin/moderation", badgeKey: "pendingModeration" },
-          { labelKey: "reports", href: "/admin/sikayetler", badgeKey: "openReports" },
-          { labelKey: "appeals", href: "/admin/etirazlar", badgeKey: "openAppeals" },
           { labelKey: "transfers", href: "/admin/kocurmeler", badgeKey: "pendingTransfers" },
           { labelKey: "vip", href: "/admin/vip", badgeKey: "pendingVip" },
           { labelKey: "promotion", href: "/admin/irelicekme", badgeKey: "pendingPromotions" },
-          { labelKey: "verification", href: "/admin/senedler" },
-          { labelKey: "trust", href: "/admin/etibarliliq" },
           { labelKey: "projects", href: "/admin/layiheler" },
           { labelKey: "taxonomy", href: "/admin/taksonomiya" },
           { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar" },
           { labelKey: "packages", href: "/admin/paketler" },
+        ],
+      },
+      {
+        // Təhlükəsizlik (#260, PRD Modul 19): şikayətlər, riskli hesablar, sənəd yoxlaması, apellyasiyalar, moderasiya tarixçəsi.
+        labelKey: "security",
+        href: "/admin/sikayetler",
+        icon: "ShieldAlert",
+        badgeKey: "openReports",
+        children: [
+          { labelKey: "reports", href: "/admin/sikayetler", badgeKey: "openReports" },
+          { labelKey: "trust", href: "/admin/etibarliliq" },
+          { labelKey: "verification", href: "/admin/senedler" },
+          { labelKey: "appeals", href: "/admin/etirazlar", badgeKey: "openAppeals" },
+          { labelKey: "moderationHistory", href: "/admin/moderasiya-tarixcesi" },
         ],
       },
       {
