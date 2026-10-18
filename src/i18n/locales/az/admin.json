@@ -97,7 +97,8 @@
       "discounts": "Endirim kodları",
       "campaigns": "Tanıtım kampaniyaları",
       "payments": "Ödəniş əməliyyatları",
-      "vip": "VIP elanlar"
+      "vip": "VIP elanlar",
+      "promotion": "İrəli çəkmə"
     }
   },
   "actions": {
@@ -330,7 +331,8 @@
       "LISTING_TRANSFER": "Elan köçürməsi",
       "AGENCY_TASK": "Agentlik tapşırığı",
       "REVIEW_REPORT": "Rəydən şikayət",
-      "VIP": "VIP elan"
+      "VIP": "VIP elan",
+      "PROMOTION": "İrəli çəkmə"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3415,6 +3417,52 @@
         "REVOKED": "Dayandırılıb",
         "EXPIRED": "Bitib"
       }
+    },
+    "promotion": {
+      "title": "İrəli çəkmə kampaniyaları",
+      "description": "Sorğular, aktiv kampaniyalar, tarixçə və statistika. Ödənişsizdir; kampaniya bitəndən sonra {days} gün fasilə.",
+      "pending": "Gözləyən sorğular",
+      "active": "Aktiv kampaniyalar",
+      "past": "Tarixçə",
+      "emptyPending": "Gözləyən sorğu yoxdur.",
+      "emptyActive": "Aktiv kampaniya yoxdur.",
+      "emptyPast": "Hələ tarixçə yoxdur.",
+      "grantTitle": "Sorğusuz irəli çək",
+      "grantDescription": "Dərc olunmuş elanın linki və ya slug-ı ilə.",
+      "listing": "Elan linki və ya slug",
+      "listingHint": "Məs.: https://luxehomeestate.az/az/emlaklar/<slug>",
+      "duration": "Müddət",
+      "days": "{count} gün",
+      "note": "Qeyd (istəyə bağlı)",
+      "approve": "Başlat",
+      "grant": "İrəli çək",
+      "reject": "Rədd et",
+      "revoke": "Dayandır",
+      "rejectTitle": "Sorğu rədd edilsin?",
+      "rejectDescription": "Səbəb elan sahibinə bildiriş kimi göndəriləcək.",
+      "revokeTitle": "Kampaniya dayandırılsın?",
+      "revokeDescription": "Elanın siyahıdakı üstünlüyü dərhal götürülür.",
+      "decidedBy": "Qərar: {name}",
+      "system": "avtomatik",
+      "metrics": {
+        "views": "Baxış",
+        "uniqueViews": "Unikal baxış",
+        "contactReveals": "Nömrə açılması",
+        "leads": "Müraciət"
+      },
+      "source": {
+        "OWNER": "Sahibin sorğusu",
+        "ADMIN": "Administrator",
+        "SELF_SERVICE": "Özünəxidmət"
+      },
+      "status": {
+        "PENDING": "Gözləyir",
+        "ACTIVE": "Aktiv",
+        "REJECTED": "Rədd edilib",
+        "CANCELLED": "Ləğv edilib",
+        "REVOKED": "Dayandırılıb",
+        "EXPIRED": "Bitib"
+      }
     }
   },
   "server": {
@@ -3899,6 +3947,19 @@
       "duration": "Müddət düzgün deyil.",
       "note": "Səbəb ən azı 5 simvol olmalıdır.",
       "listing": "Dərc olunmuş elan tapılmadı."
+    },
+    "promotion": {
+      "approved": "Kampaniya başladı.",
+      "rejected": "Sorğu rədd edildi.",
+      "revoked": "Kampaniya dayandırıldı.",
+      "notFound": "Sorğu tapılmadı və ya artıq baxılıb.",
+      "duration": "Müddət düzgün deyil.",
+      "note": "Səbəb ən azı 5 simvol olmalıdır.",
+      "listing": "Dərc olunmuş elan tapılmadı.",
+      "active": "Elanın artıq aktiv kampaniyası var.",
+      "pending": "Bu elan üçün sorğu yoxlanılır.",
+      "cooldown": "Təkrar irəli çəkmə fasiləsi hələ bitməyib.",
+      "disabled": "İrəli çəkmə modulu söndürülüb."
     }
   }
 }

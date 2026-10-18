@@ -97,7 +97,8 @@
       "discounts": "Discount codes",
       "campaigns": "Promo campaigns",
       "payments": "Payment transactions",
-      "vip": "VIP listings"
+      "vip": "VIP listings",
+      "promotion": "Promotion"
     }
   },
   "actions": {
@@ -330,7 +331,8 @@
       "LISTING_TRANSFER": "Listing transfer",
       "AGENCY_TASK": "Agency task",
       "REVIEW_REPORT": "Review report",
-      "VIP": "VIP listing"
+      "VIP": "VIP listing",
+      "PROMOTION": "Promotion"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3415,6 +3417,52 @@
         "REVOKED": "Ended",
         "EXPIRED": "Expired"
       }
+    },
+    "promotion": {
+      "title": "Promotion campaigns",
+      "description": "Requests, active campaigns, history and statistics. Free; {days}-day cooldown after a campaign ends.",
+      "pending": "Pending requests",
+      "active": "Active campaigns",
+      "past": "History",
+      "emptyPending": "No pending requests.",
+      "emptyActive": "No active campaigns.",
+      "emptyPast": "No history yet.",
+      "grantTitle": "Promote without a request",
+      "grantDescription": "Using the link or slug of a published listing.",
+      "listing": "Listing link or slug",
+      "listingHint": "E.g.: https://luxehomeestate.az/en/emlaklar/<slug>",
+      "duration": "Duration",
+      "days": "{count} days",
+      "note": "Note (optional)",
+      "approve": "Start",
+      "grant": "Promote",
+      "reject": "Decline",
+      "revoke": "Stop",
+      "rejectTitle": "Decline the request?",
+      "rejectDescription": "The reason will be sent to the listing owner as a notification.",
+      "revokeTitle": "Stop the campaign?",
+      "revokeDescription": "The listing loses its ranking boost immediately.",
+      "decidedBy": "Decision: {name}",
+      "system": "automatic",
+      "metrics": {
+        "views": "Views",
+        "uniqueViews": "Unique views",
+        "contactReveals": "Phone reveals",
+        "leads": "Inquiries"
+      },
+      "source": {
+        "OWNER": "Owner request",
+        "ADMIN": "Administrator",
+        "SELF_SERVICE": "Self-service"
+      },
+      "status": {
+        "PENDING": "Pending",
+        "ACTIVE": "Active",
+        "REJECTED": "Declined",
+        "CANCELLED": "Cancelled",
+        "REVOKED": "Stopped",
+        "EXPIRED": "Ended"
+      }
     }
   },
   "server": {
@@ -3899,6 +3947,19 @@
       "duration": "Invalid duration.",
       "note": "The reason must be at least 5 characters.",
       "listing": "Published listing not found."
+    },
+    "promotion": {
+      "approved": "Campaign started.",
+      "rejected": "Request declined.",
+      "revoked": "Campaign stopped.",
+      "notFound": "Request not found or already reviewed.",
+      "duration": "Invalid duration.",
+      "note": "The reason must be at least 5 characters.",
+      "listing": "Published listing not found.",
+      "active": "The listing already has an active campaign.",
+      "pending": "A request for this listing is pending.",
+      "cooldown": "The repeat-promotion cooldown has not ended yet.",
+      "disabled": "The promotion module is disabled."
     }
   }
 }

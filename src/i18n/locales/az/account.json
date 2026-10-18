@@ -94,6 +94,33 @@
         "pending": "Bu elan üçün sorğu artıq yoxlanılır.",
         "failed": "Sorğu göndərilmədi. Bir az sonra yenidən cəhd edin."
       }
+    },
+    "promotion": {
+      "button": "İrəli çək",
+      "label": "«{title}» elanını irəli çək",
+      "title": "Elanı irəli çək",
+      "description": "«{title}» elanı seçdiyiniz müddətdə siyahılarda yuxarıda göstəriləcək və «İrəli çəkilib» kimi işarələnəcək.",
+      "duration": "Müddət",
+      "days": "{count} gün",
+      "messageLabel": "Qeyd (istəyə bağlı)",
+      "free": "Tanıtım mərhələsində irəli çəkmə ödənişsizdir və kart məlumatı tələb olunmur; sorğunu administrator təsdiqləyir.",
+      "cancel": "Bağla",
+      "submit": "Sorğu göndər",
+      "sent": "İrəli çəkmə sorğusu göndərildi.",
+      "startedNow": "Elan irəli çəkildi.",
+      "pending": "İrəli çəkmə yoxlanılır",
+      "activeUntil": "İrəli çəkilib · {date}-dək",
+      "cooldown": "Növbəti irəli çəkmə {date} tarixindən",
+      "rejectedNote": "Əvvəlki sorğu rədd edildi: {note}",
+      "errors": {
+        "disabled": "İrəli çəkmə hazırda əlçatan deyil.",
+        "duration": "Müddət düzgün deyil.",
+        "listing": "Yalnız dərc olunmuş öz elanınızı irəli çəkə bilərsiniz.",
+        "active": "Elan artıq irəli çəkilib.",
+        "pending": "Bu elan üçün sorğu artıq yoxlanılır.",
+        "cooldown": "Təkrar irəli çəkmə üçün fasilə hələ bitməyib.",
+        "failed": "Sorğu göndərilmədi. Bir az sonra yenidən cəhd edin."
+      }
     }
   },
   "newProperty": {

@@ -770,3 +770,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   **Modul 14 tamamlandı.** Növbəti — Modul 12 (VIP elanlar), sonra Modul 13 (irəli çəkmə).
 - #248 (Modul 12): `VipRequest`, kabinet «VIP et», `/admin/vip` (gözləyən/aktiv/tarixçə, performans, uzatma, ləğv),
   ana səhifə VIP bölməsi, «Premium» nişanı «VIP» oldu. **Modul 12 tamamlandı.** Növbəti — Modul 13 (irəli çəkmə).
+- #250 (Modul 13): `PromotionCampaign`, `promotedUntil` sıralaması, «İrəli çəkilib» nişanı, kabinet «İrəli çək», `/admin/irelicekme`,
+  fasilə qaydası, cron bitməsi. **Modul 13 tamamlandı — Faza 4 (12, 13, 14, 23) bitdi.** Növbəti — Faza 5: Modul 15 (bildiriş mərkəzi).

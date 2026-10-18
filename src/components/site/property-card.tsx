@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { BadgePercent, BedDouble, Building2, Camera, Crown, Home, Layers, Maximize, MapPin, ShieldCheck, Sparkles, TrendingDown, UserRound } from "lucide-react";
+import { BadgePercent, BedDouble, Building2, Camera, Crown, Home, Layers, Maximize, MapPin, ShieldCheck, Sparkles, TrendingDown, TrendingUp, UserRound } from "lucide-react";
 import { cn, isUnoptimizedImage } from "@/lib/utils";
 import {
   LISTING_TYPES,
@@ -107,6 +107,8 @@ export function PropertyCard({
   const isClosed =
     status === PROPERTY_STATUSES.SOLD || status === PROPERTY_STATUSES.RENTED;
   const isPremium = property.isFeatured && (!property.featuredUntil || new Date(property.featuredUntil).getTime() >= Date.now());
+  // İrəli çəkilmiş elan açıq işarələnir (#250, PRD 15.3) — sıralamadakı üstünlük ziyarətçini çaşdırmasın.
+  const isPromoted = Boolean(property.promotedUntil && new Date(property.promotedUntil).getTime() > Date.now());
 
   const signals = cardSignals(sourceProperty);
   // Elanı kim yerləşdirib: agentlik adı, mülkiyyətçi və ya agent. Şirkət elanında nişan yoxdur.
@@ -178,6 +180,7 @@ export function PropertyCard({
             siyahıda bütün kartların qiymət sətri eyni hündürlükdə başlayır. */}
         <div className="pointer-events-none absolute top-3 left-3 flex max-w-[calc(100%-7.5rem)] flex-wrap gap-1.5">
           {isPremium && <Badge tone="gold"><Crown className="size-3" aria-hidden="true" />{contentT("premium")}</Badge>}
+          {isPromoted && <Badge tone="overlay"><TrendingUp className="size-3" aria-hidden="true" />{contentT("promoted")}</Badge>}
           <Badge tone="overlay">
             {isSale ? t("listingType.sale") : t("listingType.rent")}
           </Badge>

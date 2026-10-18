@@ -91,6 +91,7 @@ export const propertyCardSelect = {
   totalFloors: true,
   isFeatured: true,
   featuredUntil: true,
+  promotedUntil: true,
   publishedAt: true,
   createdAt: true,
   // Qiymət göstəricisi (#105) müqayisə açarını bu ID-lərdən qurur.
@@ -524,7 +525,9 @@ function buildPropertyOrderBy(
     case "featured":
       return [{ isFeatured: "desc" }, { publishedAt: "desc" }];
     default:
-      return [{ publishedAt: "desc" }, { createdAt: "desc" }];
+      // Aktuallıq sıralaması: təsdiqlənmiş irəli çəkmə (#250, PRD 15.3) əvvəl, sonra dərc tarixi.
+      // `promotedUntil` bitəndə cron onu təmizləyir, ona görə köhnə kampaniya üstünlük saxlamır.
+      return [{ promotedUntil: { sort: "desc", nulls: "last" } }, { publishedAt: "desc" }, { createdAt: "desc" }];
   }
 }
 

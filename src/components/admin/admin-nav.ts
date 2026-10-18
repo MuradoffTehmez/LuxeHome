@@ -21,7 +21,7 @@ export type AdminNavItem = {
   children?: AdminNavChild[];
 };
 
-export type AdminNavBadgeKey = "newLeads" | "draftProperties" | "pendingModeration" | "pendingApprovals" | "openReports" | "openAppeals" | "pendingTransfers" | "pendingVip";
+export type AdminNavBadgeKey = "newLeads" | "draftProperties" | "pendingModeration" | "pendingApprovals" | "openReports" | "openAppeals" | "pendingTransfers" | "pendingVip" | "pendingPromotions";
 
 export type AdminNavChild = {
   labelKey: AdminNavItemKey;
@@ -56,6 +56,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "appeals", href: "/admin/etirazlar", badgeKey: "openAppeals" },
           { labelKey: "transfers", href: "/admin/kocurmeler", badgeKey: "pendingTransfers" },
           { labelKey: "vip", href: "/admin/vip", badgeKey: "pendingVip" },
+          { labelKey: "promotion", href: "/admin/irelicekme", badgeKey: "pendingPromotions" },
           { labelKey: "projects", href: "/admin/layiheler" },
           { labelKey: "taxonomy", href: "/admin/taksonomiya" },
           { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar" },

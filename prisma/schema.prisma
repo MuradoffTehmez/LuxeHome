@@ -773,6 +773,8 @@ model Property {
   isFeatured         Boolean   @default(false)
   /// Premium boost yalnız bu tarix gələcəkdədirsə aktivdir; null köhnə müddətsiz featured qeydlər üçündür.
   featuredUntil      DateTime?
+  /// İrəli çəkmə kampaniyası (#250, PRD Modul 13) aktivdirsə bitmə anı — defolt siyahı sıralamasında üstündür.
+  promotedUntil      DateTime?
   /// Rezervasiya CTA-sı yalnız açıq şəkildə aktiv edilən elanlarda göstərilir.
   reservationEnabled Boolean   @default(false)
   /// Nümunə/demo qeydi — real məlumatla əvəzlənəndə false olur.
@@ -874,6 +876,7 @@ model Property {
   @@index([price])
   @@index([isFeatured])
   @@index([featuredUntil])
+  @@index([promotedUntil])
   @@index([importKey])
   @@index([status, listingExpiresAt])
   @@index([reservationEnabled, status])
@@ -2661,4 +2664,28 @@ model VipRequest {
   @@index([status, createdAt])
   @@index([propertyId, status])
   @@index([requesterId, createdAt])
+}
+
+/// İrəli çəkmə kampaniyası (#250, PRD Modul 13). Tanıtım mərhələsində ödənişsizdir və admin idarə edir.
+/// Aktiv kampaniya elanın `promotedUntil` sahəsinə yazılır; bitəndə cron onu təmizləyir.
+model PromotionCampaign {
+  id           String    @id @default(cuid())
+  propertyId   String
+  requesterId  String?
+  /// `PENDING` | `ACTIVE` | `REJECTED` | `CANCELLED` | `REVOKED` | `EXPIRED` (`PROMOTION_STATUSES`).
+  status       String    @default("PENDING")
+  /// `OWNER` | `ADMIN` | `SELF_SERVICE`.
+  source       String
+  days         Int
+  message      String?
+  decidedById  String?
+  decidedAt    DateTime?
+  decisionNote String?
+  startsAt     DateTime?
+  endsAt       DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([propertyId, status])
 }

@@ -68,7 +68,8 @@
       "restaurant": "Restaurant",
       "park": "Park",
       "shoppingCenter": "Shopping centre"
-    }
+    },
+    "promoted": "Promoted"
   },
   "propertyDetail": {
     "notFound": "Property not found",

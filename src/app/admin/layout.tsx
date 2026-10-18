@@ -8,7 +8,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { requireStaff } from "@/lib/auth/guard";
 import { getAdminI18n, getAdminMetadataT } from "@/lib/admin-i18n";
 import { prisma } from "@/lib/prisma";
-import { ACTIVE_REPORT_STATUSES, LEAD_STATUSES, PROPERTY_STATUSES, VIP_REQUEST_STATUSES } from "@/lib/constants";
+import { ACTIVE_REPORT_STATUSES, LEAD_STATUSES, PROMOTION_STATUSES, PROPERTY_STATUSES, VIP_REQUEST_STATUSES } from "@/lib/constants";
 import { countOpenAppeals } from "@/lib/listing-appeals";
 import { countPendingAdminTransfers } from "@/lib/listing-transfers";
 import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
@@ -56,7 +56,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/admin/hesabim?parol=deyis");
   }
 
-  const [newLeads, draftProperties, pendingModeration, approvals, openReports, openAppeals, pendingTransfers, pendingVip] = await Promise.all([
+  const [newLeads, draftProperties, pendingModeration, approvals, openReports, openAppeals, pendingTransfers, pendingVip, pendingPromotions] = await Promise.all([
     prisma.lead.count({ where: { ...OFFICE_LEAD_WHERE, status: LEAD_STATUSES.NEW } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.DRAFT, deletedAt: null } }),
     prisma.property.count({ where: { status: PROPERTY_STATUSES.PENDING, deletedAt: null } }),
@@ -65,13 +65,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     countOpenAppeals(),
     countPendingAdminTransfers(),
     prisma.vipRequest.count({ where: { status: VIP_REQUEST_STATUSES.PENDING } }),
+    prisma.promotionCampaign.count({ where: { status: PROMOTION_STATUSES.PENDING } }),
   ]);
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ToastProvider>
         <ThemeSync preference={user.themePreference} />
-        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration, pendingApprovals: approvals.total, openReports, openAppeals, pendingTransfers, pendingVip }}>
+        <AdminShell user={user} counters={{ newLeads, draftProperties, pendingModeration, pendingApprovals: approvals.total, openReports, openAppeals, pendingTransfers, pendingVip, pendingPromotions }}>
           {children}
         </AdminShell>
       </ToastProvider>

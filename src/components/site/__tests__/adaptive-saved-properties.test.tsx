@@ -28,6 +28,7 @@ const cardProperty = {
   totalFloors: 14,
   isFeatured: false,
   featuredUntil: null,
+  promotedUntil: null,
   publishedAt: new Date("2026-08-20T10:00:00Z"),
   createdAt: new Date("2026-08-20T10:00:00Z"),
   type: { name: "Mənzil", slug: "menzil" },

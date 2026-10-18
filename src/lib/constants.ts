@@ -970,6 +970,8 @@ export const NOTIFICATION_TYPES = {
   REVIEW_REPORT: "REVIEW_REPORT",
   /** VIP sorğusunun qərarı və VIP dövrünün dəyişməsi (#248). */
   VIP: "VIP",
+  /** İrəli çəkmə kampaniyasının qərarı (#250). */
+  PROMOTION: "PROMOTION",
 } as const;
 
 export type NotificationType =
@@ -993,6 +995,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   AGENCY_TASK: "Agentlik tapşırığı",
   REVIEW_REPORT: "Rəydən şikayət",
   VIP: "VIP elan",
+  PROMOTION: "İrəli çəkmə",
 };
 
 // ---------------------------------------------------------------------------
@@ -1916,3 +1919,18 @@ export const VIP_REQUEST_SOURCES = { OWNER: "OWNER", ADMIN: "ADMIN", SELF_SERVIC
 /** VIP müddətləri (gün). Self-service və sorğu bu dəstdən seçir; admin uzadanda da. */
 export const VIP_DURATIONS_DAYS = [7, 14, 30, 60, 90] as const;
 export const VIP_DECISION_NOTE_MAX = 500;
+
+/** İrəli çəkmə kampaniyası (#250, PRD Modul 13). */
+export const PROMOTION_STATUSES = {
+  PENDING: "PENDING",
+  ACTIVE: "ACTIVE",
+  REJECTED: "REJECTED",
+  CANCELLED: "CANCELLED",
+  REVOKED: "REVOKED",
+  EXPIRED: "EXPIRED",
+} as const;
+export const PROMOTION_SOURCES = { OWNER: "OWNER", ADMIN: "ADMIN", SELF_SERVICE: "SELF_SERVICE" } as const;
+/** Kampaniya müddətləri (gün). */
+export const PROMOTION_DURATIONS_DAYS = [1, 3, 7, 14] as const;
+/** Təkrar irəli çəkmə qaydası: kampaniya bitəndən sonra bu qədər gün yeni sorğu qəbul olunmur. */
+export const PROMOTION_COOLDOWN_DAYS = 3;

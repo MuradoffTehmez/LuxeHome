@@ -3,6 +3,7 @@ import { timingSafeEqual } from "@/lib/auth/crypto";
 import { CRON_JOBS, internalCronToken, type CronJob } from "@/lib/cron-auth";
 import { runtimeEnv } from "@/lib/runtime-env";
 import { processUnansweredLeads, refreshResponseStats } from "@/lib/accounts/lead-jobs";
+import { expirePromotions } from "@/lib/promotion";
 
 /**
  * Müraciət işləri (#161): `?is=escalate` — cavabsız agentlik müraciətləri üçün xəbərdarlıq
@@ -35,7 +36,12 @@ export async function POST(request: Request) {
   const job = (Object.values(CRON_JOBS) as CronJob[]).find((name) => name === requested);
   if (!job) return NextResponse.json({ error: "unknown_job" }, { status: 400 });
   try {
-    return NextResponse.json(job === "escalate" ? await processUnansweredLeads() : await refreshResponseStats());
+    if (job === "escalate") {
+      // İrəli çəkmə kampaniyalarının bitməsi (#250) də 10 dəqiqəlik işdədir — sıralama üstünlüyü gecikməsin.
+      const [leads, promotions] = await Promise.all([processUnansweredLeads(), expirePromotions()]);
+      return NextResponse.json({ ...leads, promotions });
+    }
+    return NextResponse.json(await refreshResponseStats());
   } catch (error) {
     console.error("[cron] müraciət işi alınmadı:", job, error);
     return NextResponse.json({ error: "failed" }, { status: 500 });

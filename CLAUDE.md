@@ -519,6 +519,13 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   `VIP_REQUESTS` bağlıdırsa sorğu qəbul olunmur; `VIP_SELF_SERVICE_ENABLED` açıq və `ADMIN_APPROVAL_FOR_VIP` bağlıdırsa
   dərhal təsdiqlənir. Bitən dövr gündəlik baxımda `EXPIRED` olur (`expireVipGrants`). Panel performansı dövr günləri üzrə
   `PropertyDailyStat` + müraciətlərdən toplu oxuyur (dövr başına sorğu yazma — subrequest limiti).
+- **Elanı irəli çəkmə (#250, PRD Modul 13):** `PromotionCampaign` (`0080`, `lib/promotion.ts`) + `Property.promotedUntil`.
+  Defolt (aktuallıq) sıralaması `promotedUntil desc nulls last`, sonra `publishedAt` — irəli çəkilmiş elan kartda «İrəli
+  çəkilib» nişanı ilə işarələnir (`propertyCardSelect`-də sahə var). Ödənişsizdir, kart məlumatı istənmir: sahib kabinetdən
+  sorğu göndərir, admin `/admin/irelicekme`-də (`property:manage`) başladır/rədd edir (səbəb)/dayandırır və ya sorğusuz
+  başladır; `PROMOTION_SELF_SERVICE_ENABLED` açıqdırsa sorğu dərhal başlayır. Təkrar qaydası: elan başına bir açıq
+  sorğu/aktiv kampaniya, bitəndən sonra `PROMOTION_COOLDOWN_DAYS` fasilə. Bitmə 10 dəqiqəlik cron-dadır (`expirePromotions`
+  — `escalate` işi) ki, sıralama üstünlüyü gecikməsin. Statistika VIP kimi dövr günləri üzrə toplu oxunur.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 
