@@ -33,6 +33,7 @@ import { cn, formatPrice } from "@/lib/utils";
 import { localizePath } from "@/i18n/path-locale";
 import { Link } from "@/i18n/navigation";
 import { localizeKnownContent, localizeLocation } from "@/i18n/dynamic-content";
+import { isPostedWithinDays } from "@/lib/constants";
 
 // Məlumat Cloudflare D1 binding-i üzərindən oxunur; binding yalnız sorğu
 // kontekstində əlçatandır, ona görə səhifə build zamanı deyil, sorğu anında render olunur.
@@ -169,6 +170,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
     polygon: parsePolygon(raw.sahe) ?? undefined,
     // Naməlum dəyər filtr sayılmır — URL-dən gələn sətir allowlist-dən keçir.
     seller: isSellerFilter(raw.satici) ? raw.satici : undefined,
+    postedWithinDays: isPostedWithinDays(Number(raw.tarix)) ? Number(raw.tarix) : undefined,
     featureSlugs: searchState.featureSlugs,
     sort,
     page: searchState.page,
@@ -275,6 +277,7 @@ export default async function PropertiesPage({ params: routeParams, searchParams
       if (key === "sekilli") return t("search.withPhotos");
       if (key === "metro_yaxin") return t("search.nearMetro");
       if (key === "sahe") return t("search.drawnArea");
+      if (key === "tarix" && raw.tarix) return t("search.postedWithinOption", { count: Number(raw.tarix) });
       if (key === "satici" && raw.satici) {
         const labels: Record<string, string> = { OWNER: t("search.sellerOwner"), AGENCY: t("search.sellerAgency"), COMPANY: t("search.sellerCompany") };
         return labels[raw.satici] ?? fallback;

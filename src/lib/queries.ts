@@ -13,6 +13,7 @@ import {
   DEFAULT_LOCALE,
   LOCALES,
   NOTIFICATION_TYPES,
+  isPostedWithinDays,
   PAGE_SIZE,
   PARTNER_STATUSES,
   POST_STATUSES,
@@ -47,6 +48,7 @@ import { landingCanBeIndexed } from "@/lib/serp";
 import { parseJsonArray } from "@/lib/utils";
 import { OFFICE_LEAD_WHERE } from "@/lib/admin/office-leads";
 import { categoryChannelsFor, categoryChannelsForEmail } from "@/lib/notification-channels";
+import { rankSimilar } from "@/lib/similarity";
 import type { NotificationType } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
@@ -300,6 +302,8 @@ export type PropertyFilters = {
   installmentOnly?: boolean;
   /** Satıcı növü (`?satici=`): mülkiyyətçi, agentlik/agent və ya şirkətin portfeli. */
   seller?: string;
+  /** Son N gündə dərc olunanlar (`?tarix=`, `POSTED_WITHIN_DAYS`, #254). */
+  postedWithinDays?: number;
 };
 
 /**
@@ -404,6 +408,10 @@ export async function buildPropertyWhere(
   if (filters.documentStatus) where.documentStatus = filters.documentStatus;
   const sellerCondition = sellerWhere(filters.seller);
   if (sellerCondition) andWhere(where, sellerCondition);
+  // Yerləşdirilmə tarixi (#254, PRD 18.1): yalnız icazəli dəyər — URL-dən gələn ixtiyari rəqəm sorğuya düşmür.
+  if (isPostedWithinDays(filters.postedWithinDays)) {
+    andWhere(where, { publishedAt: { gte: new Date(Date.now() - filters.postedWithinDays * 86_400_000) } });
+  }
 
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
     where.price = {
@@ -820,20 +828,49 @@ export async function getPropertyPublisherContact(propertyId: string) {
 }
 
 /** Eyni şəhər/tipdə oxşar əmlaklar. */
+/** Namizəd hovuzu — bal JS-də hesablanır (`rankSimilar`); hovuz kiçik saxlanılır ki, D1 sorğusu yüngül qalsın. */
+const SIMILAR_CANDIDATES = 60;
+
+/**
+ * Oxşar elanlar (#254, PRD 18.3): eyni elan tipi və şəhərdəki aktiv elanlar ərazi, növ, qiymət, otaq və sahə
+ * üzrə ballanır. Şəhərdə namizəd azdırsa eyni növ üzrə başqa şəhərlərdən tamamlanır.
+ */
 export async function getSimilarProperties(
-  property: { id: string; cityId: string; typeId: string; listingType: string },
+  property: { id: string; cityId: string; typeId: string; listingType: string; districtId?: string | null; price?: number; area?: number | null; rooms?: number | null; currency?: string },
   take = 4,
 ) {
-  return findPropertyCards({
-    where: {
-      ...(await publicPropertyWhere()),
-      id: { not: property.id },
-      listingType: property.listingType,
-      OR: [{ cityId: property.cityId }, { typeId: property.typeId }],
-    },
-    orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
-    take,
+  const base = {
+    id: property.id,
+    typeId: property.typeId,
+    cityId: property.cityId,
+    districtId: property.districtId ?? null,
+    price: property.price ?? 0,
+    area: property.area ?? null,
+    rooms: property.rooms ?? null,
+    currency: property.currency ?? "AZN",
+  };
+  const publicWhere = await publicPropertyWhere();
+  const select = { id: true, typeId: true, cityId: true, districtId: true, price: true, area: true, rooms: true, currency: true } as const;
+  const inCity = await prisma.property.findMany({
+    where: { ...publicWhere, id: { not: property.id }, listingType: property.listingType, status: { in: ACTIVE_OFFER_STATUSES }, cityId: property.cityId },
+    select,
+    orderBy: { publishedAt: "desc" },
+    take: SIMILAR_CANDIDATES,
   });
+  const pool = inCity.length >= take ? inCity : [
+    ...inCity,
+    ...(await prisma.property.findMany({
+      where: { ...publicWhere, id: { notIn: [property.id, ...inCity.map((row) => row.id)] }, listingType: property.listingType, status: { in: ACTIVE_OFFER_STATUSES }, typeId: property.typeId },
+      select,
+      orderBy: { publishedAt: "desc" },
+      take: SIMILAR_CANDIDATES,
+    })),
+  ];
+  const ranked = rankSimilar(base, pool, take);
+  if (ranked.length === 0) return [];
+  const cards = await findPropertyCards({ where: { id: { in: ranked.map((row) => row.id) } } });
+  const byId = new Map(cards.map((card) => [card.id, card]));
+  return ranked.map((row) => byId.get(row.id)).filter((card): card is (typeof cards)[number] => Boolean(card));
 }
 
 export async function getPropertiesByIds(ids: string[]) {

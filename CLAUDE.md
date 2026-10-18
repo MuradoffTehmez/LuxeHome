@@ -1049,7 +1049,10 @@ build dəyişəni olanda ictimai səhifələrə əlavə olunur (`analytics-provi
 
 URL query parametrləri filtr vəziyyətinin yeganə mənbəyidir. `SearchPanel` göndərdiyi adlarla
 `emlaklar/page.tsx` oxuduğu adlar **eyni olmalıdır**: `elan`, `axtaris`, `tip`, `seher`, `rayon`,
-`metro`, `nisangah`, `otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `siralama`, `sehife`.
+`metro`, `nisangah`, `otaq`, `min`, `max`, `sahe_min`, `sahe_max`, `temir`, `sened`, `tarix`, `siralama`, `sehife`.
+`tarix` — yerləşdirilmə tarixi (#254, `POSTED_WITHIN_DAYS` 1/3/7/30 gün, `publishedAt` üzrə; saxlanmış axtarışda `postedWithinDays`).
+**Oxşar elanlar** (#254, PRD 18.3) `getSimilarProperties()` — eyni elan tipi + şəhərdəki aktiv elanlardan (çatmasa eyni növ) ən çox
+60 namizəd, bal `lib/similarity.ts`-də (rayon 25, növ 25, qiymət 25, otaq 15, sahə 10; fərqli valyutada qiymət müqayisə olunmur).
 `elan` dəyəri `LISTING_TYPES` sabitindən gəlir (`SALE` / `RENT`) — azərbaycanca mətn deyil.
 
 Boş nəticədə `EmptySearchSuggestions` hər aktiv çipi çıxaranda neçə elan qaldığını göstərir

@@ -189,7 +189,9 @@
     "seller": "Продавец",
     "sellerOwner": "Собственник",
     "sellerAgency": "Агентство / агент",
-    "sellerCompany": "Luxe Home Estate"
+    "sellerCompany": "Luxe Home Estate",
+    "postedWithin": "Дата размещения",
+    "postedWithinOption": "За {count, plural, one {# день} few {# дня} many {# дней} other {# дня}}"
   },
   "agencyProfile": {
     "eyebrow": "Агентство недвижимости",

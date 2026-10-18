@@ -37,6 +37,7 @@ const CHIP_FIELDS: Record<string, FilterField[]> = {
   metro_yaxin: ["nearMetro"],
   sahe: ["polygon"],
   satici: ["seller"],
+  tarix: ["postedWithinDays"],
 };
 
 const FEATURE_PREFIX = "xususiyyet:";

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Combobox } from "@/components/ui/combobox";
 import { SEARCHABLE_MIN_OPTIONS } from "@/components/ui/field";
 import {
+  POSTED_WITHIN_DAYS,
   BUILDING_TYPES,
   SELLER_FILTERS,
   DOCUMENT_STATUSES,
@@ -56,6 +57,7 @@ export type SearchPanelInitial = {
   sened?: string;
   tikili?: string;
   satici?: string;
+  tarix?: string;
   dovr?: string;
   mertebe_min?: string;
   mertebe_max?: string;
@@ -277,6 +279,7 @@ export function PropertyFilterFields({
     { value: SELLER_FILTERS.AGENCY, label: t("sellerAgency") },
     { value: SELLER_FILTERS.COMPANY, label: t("sellerCompany") },
   ];
+  const postedOptions = POSTED_WITHIN_DAYS.map((days) => ({ value: String(days), label: t("postedWithinOption", { count: days }) }));
   const periodOptions = Object.values(PRICE_PERIODS).map((value) => ({ value, label: value === PRICE_PERIODS.MONTH ? t("monthly") : t("daily") }));
   const [listingType, setListingType] = useState(initial.elan ?? LISTING_TYPES.SALE);
   const [citySlug, setCitySlug] = useState(initial.seher ?? "");
@@ -452,6 +455,14 @@ export function PropertyFilterFields({
             placeholder={t("any")}
             defaultValue={initial.tikili}
             options={buildingOptions}
+          />
+          <SelectField
+            id={`${id}-posted`}
+            name="tarix"
+            label={t("postedWithin")}
+            placeholder={t("any")}
+            defaultValue={initial.tarix}
+            options={postedOptions}
           />
           <SelectField
             id={`${id}-seller`}
