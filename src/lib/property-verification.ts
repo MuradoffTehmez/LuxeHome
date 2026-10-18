@@ -139,7 +139,7 @@ export async function decideDocuments(input: { staffId: string; propertyId: stri
   });
   if (pending.length === 0) return { ok: false, reason: "notFound" };
   const purgeAfter = new Date(now.getTime() + PROPERTY_DOCUMENT_RETENTION_DAYS * DAY);
-  await prisma.propertyDocument.updateMany({
+  const claimed = await prisma.propertyDocument.updateMany({
     where: { id: { in: pending.map((row) => row.id) }, status: PROPERTY_DOCUMENT_STATUSES.PENDING },
     data: {
       status: input.verified ? PROPERTY_DOCUMENT_STATUSES.VERIFIED : PROPERTY_DOCUMENT_STATUSES.REJECTED,
@@ -149,6 +149,8 @@ export async function decideDocuments(input: { staffId: string; propertyId: stri
       purgeAfter,
     },
   });
+  // Eyni anda iki moderator: yalnız sənədləri həqiqətən götürən qərar elanı və tarixçəni yazır.
+  if (claimed.count === 0) return { ok: false, reason: "notFound" };
   await prisma.property.update({
     where: { id: input.propertyId },
     data: input.verified ? { documentsVerifiedAt: now, documentsVerifiedById: input.staffId } : { documentsVerifiedAt: null, documentsVerifiedById: null },
@@ -171,9 +173,31 @@ export async function setDataVerified(input: { staffId: string; propertyId: stri
 /** Gündəlik baxım: saxlama müddəti bitmiş sənəd faylları silinir (sətir də — giriş tarixçəsi qalır). */
 export async function purgeReviewedDocuments(now = new Date()): Promise<number> {
   const expired = await prisma.propertyDocument.findMany({ where: { purgeAfter: { lte: now } }, select: { id: true, key: true }, take: 200 });
-  for (const document of expired) {
-    await deletePrivateImage(document.key).catch(() => undefined);
+  return deleteDocumentFiles(expired);
+}
+
+/**
+ * Faylı R2-dən silir, yalnız uğurlu olanda sətri silir — keçici R2 xətasında sətir (yeganə açar) qalır və
+ * növbəti baxım yenidən sınayır; məxfi şəkil saxlama müddətindən sonra yaddaşda qalmır.
+ */
+async function deleteDocumentFiles(documents: { id: string; key: string }[]): Promise<number> {
+  let deleted = 0;
+  for (const document of documents) {
+    try {
+      await deletePrivateImage(document.key);
+    } catch (error) {
+      console.error("[documents] fayl silinmədi, növbəti cəhdə qalır:", error instanceof Error ? error.message : error);
+      continue;
+    }
     await prisma.propertyDocument.deleteMany({ where: { id: document.id } });
+    deleted += 1;
   }
-  return expired.length;
+  return deleted;
+}
+
+/** Hesab silinəndə (#256): istifadəçinin yüklədiyi bütün sənəd faylları və sətirləri. Xəta silinməni saxlayır (retry). */
+export async function purgeUserDocuments(userId: string): Promise<void> {
+  const documents = await prisma.propertyDocument.findMany({ where: { uploaderId: userId }, select: { id: true, key: true } });
+  const deleted = await deleteDocumentFiles(documents);
+  if (deleted < documents.length) throw new Error("Sənəd faylları silinmədi.");
 }

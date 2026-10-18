@@ -5,6 +5,7 @@ import { recordDomainEvent } from "@/lib/admin/events";
 import { handOverListings } from "@/lib/accounts/agency-listings";
 import { releaseAgentClients } from "@/lib/accounts/crm";
 import { chunkForD1 } from "@/lib/d1-chunks";
+import { purgeUserDocuments } from "@/lib/property-verification";
 
 /**
  * D1 transaction dəstəkləmir. Ona görə silinmənin ilk atomik addımı hesabı
@@ -36,6 +37,9 @@ export async function finalizeAccountDeletion(userId: string, now = new Date()):
   if (account.isActive || !account.deletionRequestedAt) {
     throw new Error("Hesab silinmə üçün işarələnməyib.");
   }
+
+  // Məxfi sənəd şəkilləri (#256) hesabla birlikdə gedir — alınmasa xəta silinməni saxlayır və baxım yenidən sınayır.
+  await purgeUserDocuments(userId);
 
   const listings = await prisma.property.findMany({
     where: { authorId: userId, deletedAt: null },
