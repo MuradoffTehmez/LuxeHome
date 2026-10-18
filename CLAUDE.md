@@ -195,6 +195,14 @@ Modulun public sorğuları `src/lib/knowledge.ts`, admin yazmaları
   düzəlişinin üzərinə yazmır. Mənbə URL-ləri yalnız `src/lib/official-sources.ts`-dəki yoxlanmış
   siyahıdan olmalıdır; daxili keçidlərin 404 verməməsini `prisma/__tests__/knowledge-guides.test.ts`
   yoxlayır. Məzmun HTML-i sanitizer-in ağ siyahısına uyğun olmalıdır (məs. `<ol start>` atılır).
+- **Redaktor təsdiq axını (#266, PRD 24.2):** məqalə `DRAFT` → `IN_REVIEW` («Təsdiq gözləyir», `submittedById`) →
+  `PUBLISHED` (`approvedById`). Qaydalar saf `lib/knowledge-review.ts`-dədir (`knowledgeTransition`): təsdiqə göndərən özü dərc
+  edə bilməz (Super Admin istisnadır — tək işçili rejim, yenə `approvedById` yazılır); `riskLevel = LEGAL_REVIEW` məqalə
+  `legalReviewedAt` olmadan **heç kim** tərəfindən dərc olunmur; dərc olunmuş məqalənin redaktəsi yenidən təsdiq tələb etmir.
+  Təsdiqdə `reviewAfter` `KNOWLEDGE_REVIEW_INTERVAL_DAYS` (180) sonraya qoyulur (gələcəkdədirsə saxlanılır); admin siyahısında
+  «Təsdiq gözləyir» və «Yenilənməli» (`KNOWLEDGE_STALE_FILTER`) növbələri. Termin və FAQ təsdiq mərhələsiz işləyir
+  (`KNOWLEDGE_SIMPLE_STATUSES`). «Beh və ilkin ödəniş» bölməsi və bələdçisi `0085`-dədir — bələdçi hüquqi yoxlamadan keçmədiyi
+  üçün `IN_REVIEW` + `LEGAL_REVIEW` yaranır; hub dərc olunmuş məzmunu olmayan bölməni göstərmir.
 - `docs/Real Estate Knowledge Hub/Real Estate Knowledge Hub.md` hüquqi mənbə materialıdır,
   avtomatik dərc müqaviləsi deyil. `prisma/build-knowledge-hub-sql.ts` qeydləri DRAFT yaradır;
   hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilməməlidir.

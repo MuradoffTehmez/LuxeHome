@@ -2179,6 +2179,11 @@ model KnowledgeArticle {
   reviewerName       String?
   reviewedAt         DateTime?
   reviewAfter        DateTime?
+  /// Redaktor təsdiq axını (#266): təsdiqə göndərən və dərc edən (təsdiqləyən) əməkdaş.
+  submittedById      String?
+  submittedAt        DateTime?
+  approvedById       String?
+  approvedAt         DateTime?
   /// JSON massivləri: mövzu etiketləri və əlaqəli content/entity ID-ləri.
   tags               String?
   relatedPropertyIds String?

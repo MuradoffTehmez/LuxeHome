@@ -453,9 +453,15 @@ export async function getKnowledgeSitemapEntries() {
 // ADMIN SORĞULARI
 // ---------------------------------------------------------------------------
 
-export async function getAdminKnowledgeArticles(filters: { search?: string; status?: string } = {}) {
+/** Admin siyahısının xüsusi filtri: dərc olunmuş, yoxlama tarixi keçmiş məqalələr (#266). */
+export const KNOWLEDGE_STALE_FILTER = "STALE";
+
+export async function getAdminKnowledgeArticles(filters: { search?: string; status?: string; now?: Date } = {}) {
   const where: Record<string, unknown> = { deletedAt: null };
-  if (filters.status) where.status = filters.status;
+  if (filters.status === KNOWLEDGE_STALE_FILTER) {
+    where.status = KNOWLEDGE_STATUSES.PUBLISHED;
+    where.reviewAfter = { lte: filters.now ?? new Date() };
+  } else if (filters.status) where.status = filters.status;
   if (filters.search?.trim()) {
     where.searchText = { contains: normalizeSearchText(filters.search) };
   }
@@ -474,9 +480,19 @@ export async function getAdminKnowledgeArticles(filters: { search?: string; stat
       viewCount: true,
       isFeatured: true,
       updatedAt: true,
+      reviewAfter: true,
       category: { select: { name: true } },
     },
   });
+}
+
+/** Redaktor növbələri (#266): təsdiq gözləyən və yenilənməli məqalələrin sayı. */
+export async function getKnowledgeReviewCounts(now = new Date()) {
+  const [inReview, stale] = await Promise.all([
+    prisma.knowledgeArticle.count({ where: { deletedAt: null, status: KNOWLEDGE_STATUSES.IN_REVIEW } }),
+    prisma.knowledgeArticle.count({ where: { deletedAt: null, status: KNOWLEDGE_STATUSES.PUBLISHED, reviewAfter: { lte: now } } }),
+  ]);
+  return { inReview, stale };
 }
 
 export async function getAdminKnowledgeCategories() {

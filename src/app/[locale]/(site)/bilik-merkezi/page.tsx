@@ -67,7 +67,7 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
   const page = rawPage && /^\d+$/.test(rawPage) ? Number(rawPage) : 1;
   if (page < 1) notFound();
 
-  const [result, categories, tagCounts, terms, faqEntries] = await Promise.all([
+  const [result, allCategories, tagCounts, terms, faqEntries] = await Promise.all([
     getCachedKnowledgeArticles({ search, audience, categorySlug, tag, page }),
     getCachedKnowledgeCategories(),
     getCachedKnowledgeTagCounts(),
@@ -75,6 +75,8 @@ export default async function KnowledgeHubPage({ params, searchParams }: Props) 
     search ? getCachedFaqEntries() : Promise.resolve([]),
   ]);
   if (page > result.totalPages) notFound();
+  // Dərc olunmuş məzmunu olmayan bölmə (məs. bələdçisi hələ təsdiq gözləyən) hub-da göstərilmir (#266).
+  const categories = allCategories.filter((category) => category._count.articles + category._count.terms > 0 || category.slug === categorySlug);
 
   const activeCategory = categories.find((category) => category.slug === categorySlug);
   const activeTag = tag ? tagCounts.find((item) => item.slug === knowledgeTagSlug(tag)) : undefined;

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { KNOWLEDGE_STATUSES, PERMISSIONS } from "@/lib/constants";
+import { knowledgeTransition, nextReviewAfter } from "@/lib/knowledge-review";
 import { readingMinutes } from "@/lib/utils";
 import { type ActionState, failure, invalid, success, unexpected } from "@/lib/admin/action-state";
 import { recordAudit } from "@/lib/admin/audit";
@@ -83,6 +84,30 @@ function readArticleForm(formData: FormData) {
   };
 }
 
+/** Təsdiq axınının yazacağı sahələr (#266) — keçid icazəsizdirsə `failure` mesajı. */
+function reviewFields(
+  transition: ReturnType<typeof knowledgeTransition>,
+  actorId: string,
+  reviewAfter: Date | null,
+  now: Date,
+) {
+  if (!transition.ok) {
+    const error = transition.reason === "legalReview"
+      ? msg("server.bilikMerkezi.review.legalReview")
+      : transition.reason === "sameReviewer"
+        ? msg("server.bilikMerkezi.review.sameReviewer")
+        : msg("server.bilikMerkezi.review.needsReview");
+    return { ok: false as const, error };
+  }
+  return {
+    ok: true as const,
+    data: {
+      ...(transition.submit ? { submittedById: actorId, submittedAt: now } : {}),
+      ...(transition.approve ? { approvedById: actorId, approvedAt: now, reviewAfter: nextReviewAfter(reviewAfter, now) } : {}),
+    },
+  };
+}
+
 async function sanitizeOptional(value: string | null): Promise<string | null> {
   return value ? sanitizeRichText(value) : null;
 }
@@ -155,6 +180,22 @@ export async function createKnowledgeArticle(
 
   const parsed = knowledgeArticleSchema.safeParse(readArticleForm(formData));
   if (!parsed.success) return invalid(parsed.error, msg("server.common.formInvalid"));
+  const now = new Date();
+  const review = reviewFields(
+    knowledgeTransition({
+      from: null,
+      to: parsed.data.status,
+      actorId: user.id,
+      actorRole: user.role,
+      submittedById: user.id,
+      riskLevel: parsed.data.riskLevel,
+      legalReviewedAt: parsed.data.legalReviewedAt,
+    }),
+    user.id,
+    null,
+    now,
+  );
+  if (!review.ok) return failure(review.error);
 
   let articleId: string;
   try {
@@ -183,7 +224,8 @@ export async function createKnowledgeArticle(
         isDemo: false,
         readMinutes: readingMinutes(stripTags(content)),
         authorId: user.id,
-        publishedAt: parsed.data.status === KNOWLEDGE_STATUSES.PUBLISHED ? new Date() : null,
+        ...review.data,
+        publishedAt: parsed.data.status === KNOWLEDGE_STATUSES.PUBLISHED ? now : null,
         metaTitle: parsed.data.metaTitle,
         metaDescription: parsed.data.metaDescription,
         noIndex: parsed.data.noIndex,
@@ -226,9 +268,25 @@ export async function updateKnowledgeArticle(
   try {
     const existing = await prisma.knowledgeArticle.findFirst({
       where: { id, deletedAt: null },
-      select: { id: true, publishedAt: true, coverUrl: true, slug: true },
+      select: { id: true, publishedAt: true, coverUrl: true, slug: true, status: true, submittedById: true, reviewAfter: true },
     });
     if (!existing) return failure(msg("server.bilikMerkezi.beledciTapilmadiVeYaSilinib"));
+    const now = new Date();
+    const review = reviewFields(
+      knowledgeTransition({
+        from: existing.status,
+        to: parsed.data.status,
+        actorId: user.id,
+        actorRole: user.role,
+        submittedById: existing.submittedById,
+        riskLevel: parsed.data.riskLevel,
+        legalReviewedAt: parsed.data.legalReviewedAt,
+      }),
+      user.id,
+      existing.reviewAfter,
+      now,
+    );
+    if (!review.ok) return failure(review.error);
 
     const content = await sanitizeRichText(parsed.data.content);
     const cover = parseSingleImage(formData, "cover");
@@ -257,11 +315,12 @@ export async function updateKnowledgeArticle(
         isFeatured: parsed.data.isFeatured,
         ...(await legalArticleData(parsed.data)),
         readMinutes: readingMinutes(stripTags(content)),
+        ...review.data,
         // Dərc tarixi bir dəfə qoyulur: sonradan qaralamaya çevrilsə də ilk
         // dərc anı struktur datada saxlanılmalıdır.
         publishedAt:
           parsed.data.status === KNOWLEDGE_STATUSES.PUBLISHED
-            ? (existing.publishedAt ?? new Date())
+            ? (existing.publishedAt ?? now)
             : existing.publishedAt,
         metaTitle: parsed.data.metaTitle,
         metaDescription: parsed.data.metaDescription,

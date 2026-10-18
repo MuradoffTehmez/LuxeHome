@@ -187,7 +187,7 @@ Siyahıları əl ilə yazmaq olmaz: `PUBLIC_ACCOUNT_TYPES`, `LISTING_ACCOUNT_TYP
 | `/admin/layiheler/[id]/menziller` | Mənzil şahmatı generatoru (blok/mərtəbə/nömrə) | `project:manage` |
 | `/admin/xidmetler`, `/yeni`, `/[id]` | Xidmət CRUD | `service:manage` |
 | `/admin/blog`, `/yeni`, `/[id]`, `/kateqoriyalar` | Bloq və kateqoriyalar | `blog:manage` |
-| `/admin/bilik-merkezi` (+ `/yeni`, `/[id]`, `/kateqoriyalar`, `/lugat`, `/suallar`) | Bilik Mərkəzi CMS-i | `knowledge:manage` |
+| `/admin/bilik-merkezi` (+ `/yeni`, `/[id]`, `/kateqoriyalar`, `/lugat`, `/suallar`) | Bilik Mərkəzi CMS-i; redaktor növbələri «Təsdiq gözləyir» (`?status=IN_REVIEW`) və «Yenilənməli» (`?status=STALE`) (#266) | `knowledge:manage` |
 | `/admin/etirazlar` | Moderasiya qərarlarına etirazlar: müstəqil baxış (qərarverən öz qərarına baxa bilmir), qəbul/rədd | `property:manage` |
 | `/admin/kocurmeler` | Agentliklər arası elan köçürmələri: elanın agentliyi təsdiqləyəndən sonra son qərar | `property:manage` |
 | `/admin/xeberdarliqlar` | Əlaqə panelinin beh xəbərdarlığı (AZ/EN/RU) | `knowledge:manage` |
