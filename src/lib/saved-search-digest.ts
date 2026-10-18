@@ -64,7 +64,8 @@ export type DigestStore = {
     frequency: "DAILY" | "WEEKLY";
     properties: DigestProperty[];
     totalCount: number;
-  }): Promise<void>;
+    /** `false` — kateqoriya kanalı (#252) e-poçtu söndürüb, məktub getmədi; uyğunluqlar möhürlənməməlidir. */
+  }): Promise<boolean | void>;
   /** Göndərilmiş uyğunluqları möhürləyir və axtarışın vaxt damgalarını yeniləyir. */
   markNotified(savedSearchId: string, propertyIds: string[], at: Date): Promise<void>;
   /** Yeni nəticə yoxdursa yalnız «yoxlandı» damgası yenilənir. */
@@ -140,7 +141,7 @@ export async function runSavedSearchDigest(
 
       const totalCount = await store.countPendingMatches(search.id);
 
-      await store.sendDigestEmail({
+      const delivered = await store.sendDigestEmail({
         email: search.user.email,
         locale: search.user.locale,
         searchName: search.name,
@@ -149,6 +150,12 @@ export async function runSavedSearchDigest(
         properties,
         totalCount,
       });
+      // Bildiriş mərkəzində e-poçt söndürülübsə məktub getmədi — uyğunluqlar «yeni» qalır.
+      if (delivered === false) {
+        await store.markChecked(search.id, now);
+        result.skipped += 1;
+        continue;
+      }
 
       await store.markNotified(
         search.id,

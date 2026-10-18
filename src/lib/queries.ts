@@ -2063,7 +2063,12 @@ export async function getAdminProperties(filters: AdminPropertyFilters = {}) {
   // Görünüşlər (#260, PRD Modul 19 «Elanlar»): şübhəli (risk ≥ hold), VIP, irəli çəkilmiş və arxiv.
   const now = new Date();
   if (filters.view === "subheli") where.riskScore = { gte: LISTING_RISK_THRESHOLDS.hold };
-  if (filters.view === "vip") Object.assign(where, { isFeatured: true, OR: [{ featuredUntil: null }, { featuredUntil: { gt: now } }] });
+  if (filters.view === "vip") {
+    // Mətn axtarışı `where.OR`-dadır — müddət şərti onu əvəz etməsin, `AND` ilə birləşir.
+    where.isFeatured = true;
+    const existing = where.AND ? (Array.isArray(where.AND) ? where.AND : [where.AND]) : [];
+    where.AND = [...existing, { OR: [{ featuredUntil: null }, { featuredUntil: { gt: now } }] }];
+  }
   if (filters.view === "irelicekilmis") where.promotedUntil = { gt: now };
   if (filters.view === "arxiv") where.status = { in: [PROPERTY_STATUSES.ARCHIVED, PROPERTY_STATUSES.EXPIRED] };
 
@@ -2935,7 +2940,7 @@ export const savedSearchDigestStore: DigestStore = {
 
   async sendDigestEmail({ email, locale, searchName, frequency, properties, totalCount }) {
     // Dinamik import: `resend` paketi bu modulu yükləyən unit testlərə düşməsin
-    if (!(await categoryChannelsForEmail(email, NOTIFICATION_TYPES.SAVED_SEARCH_MATCH)).email) return;
+    if (!(await categoryChannelsForEmail(email, NOTIFICATION_TYPES.SAVED_SEARCH_MATCH)).email) return false;
     const { sendSavedSearchDigestEmail } = await import("@/lib/email");
     await sendSavedSearchDigestEmail({
       userEmail: email,
@@ -2945,6 +2950,7 @@ export const savedSearchDigestStore: DigestStore = {
       properties,
       totalCount,
     });
+    return true;
   },
 
   async markNotified(savedSearchId, propertyIds, at) {

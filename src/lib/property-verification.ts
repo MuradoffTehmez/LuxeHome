@@ -138,6 +138,8 @@ export async function decideDocuments(input: { staffId: string; propertyId: stri
     select: { id: true },
   });
   if (pending.length === 0) return { ok: false, reason: "notFound" };
+  // Kompensasiya üçün nişanın əvvəlki dəyəri (yarımçıq qərarda bərpa olunur).
+  const before = await prisma.property.findUnique({ where: { id: input.propertyId }, select: { documentsVerifiedAt: true, documentsVerifiedById: true } });
   const purgeAfter = new Date(now.getTime() + PROPERTY_DOCUMENT_RETENTION_DAYS * DAY);
   const claimed = await prisma.propertyDocument.updateMany({
     where: { id: { in: pending.map((row) => row.id) }, status: PROPERTY_DOCUMENT_STATUSES.PENDING },
@@ -161,7 +163,13 @@ export async function decideDocuments(input: { staffId: string; propertyId: stri
     });
   } catch (error) {
     // D1-də tranzaksiya yoxdur: nişan və ya tarixçə yazılmasa bu qərarın götürdüyü sənədlər `PENDING`-ə qayıdır
-    // ki, qərar yenidən verilə bilsin (nişan/tarixçə yarımçıq qalmasın).
+    // və nişan əvvəlki dəyərinə bərpa olunur ki, qərar yenidən verilə bilsin (gözləyən sənəddə «yoxlanılıb» qalmasın).
+    if (before) {
+      await prisma.property.update({
+        where: { id: input.propertyId },
+        data: { documentsVerifiedAt: before.documentsVerifiedAt, documentsVerifiedById: before.documentsVerifiedById },
+      }).catch(() => undefined);
+    }
     await prisma.propertyDocument.updateMany({
       where: { id: { in: pending.map((row) => row.id) }, reviewedById: input.staffId, reviewedAt: now },
       data: { status: PROPERTY_DOCUMENT_STATUSES.PENDING, reviewedById: null, reviewedAt: null, note: null, purgeAfter: null },

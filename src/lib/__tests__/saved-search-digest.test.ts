@@ -168,6 +168,19 @@ describe("runSavedSearchDigest", () => {
     expect(calls.sendDigestEmail[0]).toMatchObject({ locale: "ru", frequency: "WEEKLY" });
   });
 
+  it("kateqoriya kanalı e-poçtu söndürübsə (göndərici false) uyğunluqlar möhürlənmir", async () => {
+    const { store, calls } = createFakeStore({
+      findDigestSavedSearches: async () => [search()],
+      sendDigestEmail: async () => false,
+    });
+
+    const result = await runSavedSearchDigest(store, NOW);
+
+    expect(result).toEqual({ checked: 1, sent: 0, failed: 0, skipped: 1 });
+    expect(calls.markNotified).toHaveLength(0);
+    expect(calls.markChecked).toEqual([{ savedSearchId: "search-1", at: NOW }]);
+  });
+
   it("bir göndərişin çökməsi qalan axtarışları dayandırmır", async () => {
     let attempt = 0;
     const { store, calls } = createFakeStore({

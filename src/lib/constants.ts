@@ -1959,6 +1959,8 @@ export const PROPERTY_DOCUMENT_STATUSES = { PENDING: "PENDING", VERIFIED: "VERIF
 export const PROPERTY_DOCUMENT_MAX_FILES = 5;
 /** Brauzer şəkli bu ölçüyə kiçildir (action gövdəsi 1 MB). */
 export const PROPERTY_DOCUMENT_MAX_BYTES = 400 * 1024;
+/** Bir göndərişdəki bütün sənəd şəkillərinin cəmi — Server Action gövdəsinin 1 MB defolt limitindən aşağı. */
+export const PROPERTY_DOCUMENT_UPLOAD_BUDGET = 900 * 1024;
 /** Qərardan sonra faylın saxlanma müddəti (gün) — sonra gündəlik baxım silir. */
 export const PROPERTY_DOCUMENT_RETENTION_DAYS = 30;
 /** Doğrulama nişanları — hər biri ayrı yoxlama səviyyəsidir (PRD 19.3). */

@@ -546,7 +546,7 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   hesabla eyni uzun təsvir, şübhəli rəylər → `User.trustScore`/`trustFlags` (gündəlik baxım fəal hesabları yeniləyir).
   **Bal yalnız tövsiyədir** — tədbiri (`AccountRestriction`, `0083`) moderator `/admin/etibarliliq`-də əsaslandırma ilə tətbiq
   edir; `BLOCK` yalnız `user:manage`. Qapılar: `TEMP_SUSPENSION`/`BLOCK` `requirePublicAction`-da yazmanı bağlayır
-  (`accountWriteBlock`, `preferences` istisna), yeni elan `postingGate()`-dən keçir (limit, əlavə təsdiq, moderator yoxlaması →
+  (`accountWriteBlock`; yalnız `preferences` və `appeal` scope-ları istisnadır, telefon təsdiqi `profile`-dadır; `requirePublicAction`-dan keçməyən `updateProfile` `accountRestrictionBlock()` çağırır), yeni elan `postingGate()`-dən keçir (limit, əlavə təsdiq, moderator yoxlaması →
   `PENDING`). Tədbir silinmir (`liftedAt`), bildiriş `ACCOUNT_RESTRICTION` (təhlükəsizlik kateqoriyası). İstifadəçi
   `/kabinet/mehdudiyyetler`-dən etiraz edir (blokdan keçən ayrıca action); **etirazı tədbiri verəndən başqa əməkdaş həll edir**
   (`sameReviewer`), qəbul tədbiri götürür.
