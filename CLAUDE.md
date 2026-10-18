@@ -149,6 +149,9 @@ hesab köməkçi endpoint-ləri üçündür.
   paylaşılan klient yarımçıq kəsilmiş sorğuda ilişəndə sonrakı bütün sorğular workerd
   tərəfindən «hung» kimi 500-ə çevrilirdi (#96) — modul səviyyəsində klient/promise saxlama.
   Modul səviyyəsində `new PrismaClient()` yazmaq olmaz — build zamanı çökür.
+  **Sorğu bitəndə klient `$disconnect()` ilə bağlanır** (#270): hər klient ortaq wasm yaddaşında ~1,6 MB engine
+  qurur və workerd onu özü azad etmir — ~2 500 klientdən sonra yaddaş 4 GB-a çatır, `RuntimeError: unreachable` ilə
+  bütün D1 marşrutları 500 verir. Sonu `worker.ts` (`trackRequestLifetime`) müəyyən edir; sarğını yan keçmə.
 - Prisma klienti `@prisma/client/wasm.js`-dən idxal olunur. Sadəcə `@prisma/client` yazılsa,
   esbuild `node` şərtini seçir və Workers-də mövcud olmayan binary engine-i yükləməyə çalışır.
 - D1-dən oxuyan hər səhifədə `export const dynamic = "force-dynamic"` var — binding build
