@@ -550,6 +550,12 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   `PENDING`). Tədbir silinmir (`liftedAt`), bildiriş `ACCOUNT_RESTRICTION` (təhlükəsizlik kateqoriyası). İstifadəçi
   `/kabinet/mehdudiyyetler`-dən etiraz edir (blokdan keçən ayrıca action); **etirazı tədbiri verəndən başqa əməkdaş həll edir**
   (`sameReviewer`), qəbul tədbiri götürür.
+- **Admin panelinin genişləndirilməsi (#260, PRD Modul 19):** dashboard-da platforma/risk göstəriciləri
+  (`getPlatformIndicators()` — yeni istifadəçi və elan 7 gün, təsdiqlənmiş agentlik, açıq şikayət/etiraz, şübhəli elan
+  `riskScore ≥ hold`, riskli hesab `trustScore ≥ 60`, VIP/irəli çəkmə/sənəd növbələri; hər göstərici öz bölməsinə aparır).
+  `/admin/emlaklar?gorunus=subheli|vip|irelicekilmis|arxiv` görünüşləri (silinmişlər `?silinmis=1`). Menyuda «Təhlükəsizlik»
+  qrupu: şikayətlər, hesab etibarlılığı, sənəd yoxlaması, etirazlar və `/admin/moderasiya-tarixcesi` (moderator status
+  keçidləri + son hesab tədbirləri). Qalan PRD 21 bölmələri (istifadəçilər, agentliklər, analitika, monetizasiya, SEO, sistem) əvvəldən var.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 

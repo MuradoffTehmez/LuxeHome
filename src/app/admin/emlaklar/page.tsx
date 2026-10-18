@@ -32,6 +32,8 @@ import { localizePath } from "@/i18n/path-locale";
 import { getAdminI18n } from "@/lib/admin-i18n";
 import { getAdminT } from "@/lib/admin-i18n";
 
+const ADMIN_PROPERTY_VIEWS = ["subheli", "vip", "irelicekilmis", "arxiv"] as const;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminT();
   return { title: t("pages.properties.emlaklar") };
@@ -64,6 +66,7 @@ export default async function AdminPropertiesPage({
     typeId: one(params, "tip"),
     cityId: one(params, "seher"),
     deleted,
+    view: ADMIN_PROPERTY_VIEWS.find((value) => value === one(params, "gorunus")),
     page: Number(one(params, "sehife")) || 1,
   };
 
@@ -82,6 +85,7 @@ export default async function AdminPropertiesPage({
       tip: filters.typeId,
       seher: filters.cityId,
       silinmis: deleted ? "1" : "",
+      gorunus: filters.view ?? "",
     })) {
       if (value) query.set(key, value);
     }
@@ -175,13 +179,29 @@ export default async function AdminPropertiesPage({
         }
       />
 
+      {/* Görünüşlər (#260, PRD Modul 19 «Elanlar»): hamısı, şübhəli, VIP, irəli çəkilmiş, arxiv, silinmiş. */}
+      {!deleted && (
+        <nav aria-label={t("pages.properties.views.label")} className="mb-4 flex flex-wrap gap-2">
+          {[undefined, ...ADMIN_PROPERTY_VIEWS].map((view) => (
+            <Link
+              key={view ?? "all"}
+              href={view ? `${LIST_PATH}?gorunus=${view}` : LIST_PATH}
+              aria-current={filters.view === view ? "page" : undefined}
+              className={`rounded-full border px-3 py-1.5 text-sm ${filters.view === view ? "border-gold bg-gold/10 text-ink" : "border-line text-ink-soft hover:border-gold"}`}
+            >
+              {t(`pages.properties.views.${view ?? "all"}`)}
+            </Link>
+          ))}
+        </nav>
+      )}
+
       <AdminCard bodyClassName="p-0">
         <AdminFilterBar
           action={LIST_PATH}
           searchValue={filters.q}
           searchPlaceholder={t("pages.properties.basliqUnvanVeYa")}
           resultLabel={t("pages.common.elanTapildi", { p0: total })}
-          hidden={deleted ? { silinmis: "1" } : {}}
+          hidden={deleted ? { silinmis: "1" } : filters.view ? { gorunus: filters.view } : {}}
           selects={[
             {
               name: "status",

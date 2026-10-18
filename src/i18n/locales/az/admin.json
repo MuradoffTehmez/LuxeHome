@@ -100,7 +100,8 @@
       "vip": "VIP elanlar",
       "promotion": "İrəli çəkmə",
       "verification": "Sənəd yoxlaması",
-      "trust": "Hesab etibarlılığı"
+      "trust": "Hesab etibarlılığı",
+      "moderationHistory": "Moderasiya tarixçəsi"
     }
   },
   "actions": {
@@ -194,6 +195,23 @@
       "leadBoard": "Müraciət lövhəsi",
       "aiAssistant": "AI köməkçi (SEO, ALT)",
       "importListings": "CSV ilə idxal"
+    },
+    "platform": {
+      "title": "Platforma və risk göstəriciləri",
+      "description": "Son 7 gün və açıq növbələr — hər göstərici öz bölməsinə aparır.",
+      "items": {
+        "newUsers": "Yeni istifadəçi (7 gün)",
+        "newListings": "Yeni elan (7 gün)",
+        "activeAgencies": "Təsdiqlənmiş agentlik",
+        "openReports": "Açıq şikayət",
+        "riskyListings": "Şübhəli elan",
+        "riskyAccounts": "Riskli hesab",
+        "activeRestrictions": "Aktiv məhdudiyyət",
+        "openAppeals": "Açıq etiraz",
+        "pendingVip": "VIP sorğusu",
+        "pendingPromotions": "İrəli çəkmə sorğusu",
+        "pendingDocuments": "Sənəd yoxlaması"
+      }
     }
   },
   "labels": {
@@ -853,6 +871,14 @@
         "description": "Elanın bütün status keçidləri və qiymət dəyişiklikləri: kim, nə vaxt, hansı mənbədən. Moderator müdaxilələri «Moderasiya» kimi işarələnir.",
         "empty": "Hələ dəyişiklik qeydə alınmayıb.",
         "created": "Yaradıldı"
+      },
+      "views": {
+        "label": "Elan görünüşləri",
+        "all": "Hamısı",
+        "subheli": "Şübhəli",
+        "vip": "VIP",
+        "irelicekilmis": "İrəli çəkilmiş",
+        "arxiv": "Arxiv"
       }
     },
     "leads": {
@@ -3551,6 +3577,17 @@
         "CROSS_PROFILE_CONTENT": "Başqa profillə eyni məzmun: {value}",
         "REVIEW_BURST": "Şübhəli rəy: {value}"
       }
+    },
+    "moderationHistory": {
+      "title": "Moderasiya tarixçəsi",
+      "description": "Moderator qərarları ilə elan status keçidləri və hesab tədbirləri.",
+      "restrictions": "Son hesab tədbirləri",
+      "decisions": "Elan qərarları",
+      "total": "Cəmi {count} qərar",
+      "empty": "Hələ moderasiya qərarı yoxdur.",
+      "system": "sistem",
+      "prev": "← Əvvəlki",
+      "next": "Növbəti →"
     }
   },
   "server": {
