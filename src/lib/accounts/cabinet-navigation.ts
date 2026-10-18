@@ -137,6 +137,24 @@ export function isCabinetItemActive(pathname: string, href: string): boolean {
   return pathname === href;
 }
 
+/** Bundan çox bənd olanda (agentlik sahibi ~23) passiv bölmələr bağlı başlayır ki, menyu ekrana sığsın. */
+export const CABINET_COLLAPSE_THRESHOLD = 16;
+
+/**
+ * İlk açıq bölmələr: qısa menyuda hamısı; uzun menyuda «Ümumi baxış», «Hesab» və aktiv bəndin bölməsi.
+ * Bağlı bölmə yalnız vizual qatlanmadır — bəndlər itmir, başlığa basmaqla açılır.
+ */
+export function defaultOpenCabinetSections(
+  groups: readonly { section: CabinetSection; items: readonly Pick<CabinetNavItem, "href">[] }[],
+  activeHref: string | null,
+): CabinetSection[] {
+  const total = groups.reduce((sum, group) => sum + group.items.length, 0);
+  if (total <= CABINET_COLLAPSE_THRESHOLD) return groups.map((group) => group.section);
+  return groups
+    .filter((group) => group.section === "overview" || group.section === "account" || group.items.some((item) => item.href === activeHref))
+    .map((group) => group.section);
+}
+
 /**
  * Aktiv menyu bəndi: ən uzun prefiksi uyğun gələn bənd. `/kabinet/muracietler/<id>` «Müraciətlər»i,
  * `/kabinet/elanlar/yeni` isə yalnız «Yeni elan»ı işıqlandırır; «Ümumi baxış» yalnız dəqiq ünvanda aktivdir.

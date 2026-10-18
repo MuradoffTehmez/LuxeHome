@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeCabinetHref, getCabinetItems, groupCabinetItems, isCabinetItemActive } from "../cabinet-navigation";
+import { activeCabinetHref, defaultOpenCabinetSections, getCabinetItems, groupCabinetItems, isCabinetItemActive } from "../cabinet-navigation";
 
 describe("kabinet naviqasiyası", () => {
   it("yeni elan səhifəsində yalnız ən spesifik bəndi aktiv edir", () => {
@@ -52,5 +52,19 @@ describe("kabinet menyusunun bölmələri", () => {
     expect(activeCabinetHref("/kabinet/agentlik/analitika", items)).toBe("/kabinet/agentlik/analitika");
     expect(activeCabinetHref("/kabinet", items)).toBe("/kabinet");
     expect(activeCabinetHref("/kabinet/naməlum", items)).toBeNull();
+  });
+});
+
+describe("kabinet menyusunun qatlanması", () => {
+  it("qısa menyuda bütün bölmələr açıqdır", () => {
+    const groups = groupCabinetItems(getCabinetItems(true));
+    expect(defaultOpenCabinetSections(groups, "/kabinet")).toEqual(groups.map((group) => group.section));
+  });
+
+  it("agentlik sahibinin uzun menyusunda yalnız əsas və aktiv bölmələr açıq başlayır", () => {
+    const items = getCabinetItems(true, true, true, true, true);
+    const groups = groupCabinetItems(items);
+    expect(defaultOpenCabinetSections(groups, "/kabinet")).toEqual(["overview", "account"]);
+    expect(defaultOpenCabinetSections(groups, activeCabinetHref("/kabinet/muracietler/x", items))).toEqual(["overview", "work", "account"]);
   });
 });

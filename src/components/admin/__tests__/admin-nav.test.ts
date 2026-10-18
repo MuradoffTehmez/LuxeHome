@@ -128,3 +128,13 @@ describe("adminNavForRole", () => {
     expect(analytics?.href).toBe("/admin/hesabatlar");
   });
 });
+
+describe("rol üzrə breadcrumb", () => {
+  it("modul linki icazəli ilk alt bəndə aparır", () => {
+    expect(adminNavBreadcrumbs("/admin/hesabatlar", "ADMIN")).toEqual([
+      { kind: "group", key: "growth" },
+      { kind: "item", key: "analytics", href: undefined },
+    ]);
+    expect(adminNavBreadcrumbs("/admin/hesabatlar", "SUPER_ADMIN")[1]).toEqual({ kind: "item", key: "analytics", href: "/admin/analitika" });
+  });
+});

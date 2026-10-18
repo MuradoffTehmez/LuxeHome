@@ -243,9 +243,9 @@ export type AdminNavLocation = {
  * Cari ünvanın naviqasiyadakı yeri: ən uzun prefiksli bənd qalib gəlir
  * (`/admin/rezervasiyalar/teqvim` «Təqvim»dir, «Rezervasiyalar» deyil). Breadcrumb buradan qurulur.
  */
-export function findAdminNavLocation(pathname: string): AdminNavLocation | null {
+export function findAdminNavLocation(pathname: string, nav: readonly AdminNavGroup[] = adminNav): AdminNavLocation | null {
   let best: (AdminNavLocation & { length: number }) | null = null;
-  for (const group of adminNav) {
+  for (const group of nav) {
     for (const item of group.items) {
       const candidates: { child: AdminNavChild | null; href: string }[] = item.children?.length
         ? item.children.map((child) => ({ child, href: child.href }))
@@ -268,9 +268,10 @@ export type AdminNavCrumb =
  * Menyudan breadcrumb zənciri: «Qrup › Modul › Səhifə». Cari səhifənin özü link deyil; menyudakı bəndin
  * alt səhifəsində (məs. redaktə) son bənd onun siyahısına aparır. İdarə panelinin özündə boşdur.
  */
-export function adminNavBreadcrumbs(pathname: string): AdminNavCrumb[] {
+export function adminNavBreadcrumbs(pathname: string, role?: Role): AdminNavCrumb[] {
   if (pathname === "/admin") return [];
-  const location = findAdminNavLocation(pathname);
+  // Rol verilibsə zəncir süzülmüş menyudan qurulur: modul linki icazəsiz səhifəyə (403) aparmasın.
+  const location = findAdminNavLocation(pathname, role ? adminNavForRole(role) : adminNav);
   if (!location) return [];
   const { group, item, child } = location;
   const crumbs: AdminNavCrumb[] = [{ kind: "group", key: group.titleKey }];
