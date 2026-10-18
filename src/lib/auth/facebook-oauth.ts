@@ -27,7 +27,7 @@ export function isFacebookLoginConfigured(): boolean {
   return Boolean(runtimeEnv("FACEBOOK_APP_ID") && runtimeEnv("FACEBOOK_APP_SECRET"));
 }
 
-export async function beginFacebookFlow(input: { next?: string; locale: string }): Promise<string> {
+export async function beginFacebookFlow(input: { next?: string; locale: string; linkUserId?: string }): Promise<string> {
   const flow = await beginOAuthFlow(COOKIE, input);
   const url = new URL(AUTHORIZE_URL);
   url.search = new URLSearchParams({

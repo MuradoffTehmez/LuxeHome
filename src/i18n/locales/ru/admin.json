@@ -3722,7 +3722,9 @@
         "RATE_LIMITED": "Лимит записи",
         "PASSWORD_CHANGED": "Пароль изменён",
         "TELEGRAM_LINKED": "Telegram привязан",
-        "TELEGRAM_UNLINKED": "Telegram отвязан"
+        "TELEGRAM_UNLINKED": "Telegram отвязан",
+        "LOGIN_METHOD_LINKED": "Способ входа привязан",
+        "LOGIN_METHOD_UNLINKED": "Способ входа отвязан"
       }
     },
     "telegram": {

@@ -5,6 +5,7 @@ import { beginGoogleFlow, isGoogleLoginConfigured } from "@/lib/auth/google-oaut
 import { safePublicTarget } from "@/lib/auth/public-account-policy";
 import { localizePath } from "@/i18n/path-locale";
 import { LOCALES, type Locale } from "@/lib/constants";
+import { linkingUserForStart } from "@/lib/auth/linked-login-session";
 
 /** Google ilə girişi başladır (#109). Açarlar yoxdursa marşrut mövcud deyilmiş kimi 404. */
 export const dynamic = "force-dynamic";
@@ -18,6 +19,15 @@ export async function GET(request: Request) {
   if (!(await checkLoginLimit(clientIp(await headers())))) {
     return NextResponse.redirect(new URL(localizePath("/daxil-ol?google=limit", locale), request.url), 303);
   }
-  const target = await beginGoogleFlow({ next: safePublicTarget(url.searchParams.get("davam")), locale });
+  // `?bagla=1` — kabinetdən giriş üsulunu bağlama: yalnız cari sessiyanın hesabına.
+  const linking = await linkingUserForStart(url);
+  if (linking.linking && !linking.userId) {
+    return NextResponse.redirect(new URL(localizePath(`/daxil-ol?davam=${encodeURIComponent(localizePath("/kabinet/profil", locale))}`, locale), request.url), 303);
+  }
+  const target = await beginGoogleFlow({
+    next: linking.linking ? undefined : safePublicTarget(url.searchParams.get("davam")),
+    locale,
+    ...(linking.linking && linking.userId ? { linkUserId: linking.userId } : {}),
+  });
   return NextResponse.redirect(target, 303);
 }

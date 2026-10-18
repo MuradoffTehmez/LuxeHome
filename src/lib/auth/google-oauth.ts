@@ -44,10 +44,11 @@ async function pkceChallenge(verifier: string): Promise<string> {
   return toBase64Url(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier))));
 }
 
-export type OAuthFlow = { state: string; verifier: string; nonce: string; next?: string; locale: string };
+/** `linkUserId` — kabinetdən «Google-u bağla»: callback giriş yox, bu hesaba bağlama edir. */
+export type OAuthFlow = { state: string; verifier: string; nonce: string; next?: string; locale: string; linkUserId?: string };
 
 /** Axını başladır: cookie-ni yazır və Google-un icazə ünvanını qaytarır. */
-export async function beginGoogleFlow(input: { next?: string; locale: string }): Promise<string> {
+export async function beginGoogleFlow(input: { next?: string; locale: string; linkUserId?: string }): Promise<string> {
   const flow: OAuthFlow = { state: randomToken(), verifier: randomToken(), nonce: randomToken(), ...input };
   const token = await new SignJWT({ ...flow })
     .setProtectedHeader({ alg: "HS256" })
@@ -85,7 +86,14 @@ export async function consumeGoogleFlow(state: string | null): Promise<OAuthFlow
     const flow = payload as unknown as OAuthFlow;
     if (typeof flow.state !== "string" || flow.state !== state) return null;
     if (typeof flow.verifier !== "string" || typeof flow.nonce !== "string") return null;
-    return { state: flow.state, verifier: flow.verifier, nonce: flow.nonce, locale: String(flow.locale ?? "az"), next: typeof flow.next === "string" ? flow.next : undefined };
+    return {
+      state: flow.state,
+      verifier: flow.verifier,
+      nonce: flow.nonce,
+      locale: String(flow.locale ?? "az"),
+      next: typeof flow.next === "string" ? flow.next : undefined,
+      linkUserId: typeof flow.linkUserId === "string" ? flow.linkUserId : undefined,
+    };
   } catch {
     return null;
   }

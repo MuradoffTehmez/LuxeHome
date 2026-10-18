@@ -655,6 +655,28 @@
         "left": "özü ayrılıb",
         "removed": "əməkdaşlıq dayandırılıb"
       }
+    },
+    "linkedLogins": {
+      "title": "Bağlı giriş üsulları",
+      "description": "Hesabınıza Google, Apple və ya Facebook ilə də daxil ola bilərsiniz. Bağlama yalnız bu sessiyadan başlayır — kimlik sizin hesabınıza bağlanır.",
+      "link": "Bağla",
+      "unlink": "Ayır",
+      "linked": "Bağlıdır",
+      "notLinked": "Bağlı deyil",
+      "unavailable": "Bu giriş üsulu hazırda aktiv deyil",
+      "lastMethod": "Bu, hesabınızın yeganə giriş yoludur. Ayırmazdan əvvəl parol qurun və ya başqa üsul bağlayın.",
+      "unlinkTitle": "{provider} ayrılsın?",
+      "unlinkDescription": "Bu üsulla artıq daxil ola bilməyəcəksiniz. İstənilən vaxt yenidən bağlaya bilərsiniz.",
+      "cancel": "Ləğv et",
+      "unlinked": "Giriş üsulu ayrıldı.",
+      "results": {
+        "linked": "{provider} hesabınıza bağlandı.",
+        "already": "{provider} artıq hesabınıza bağlıdır.",
+        "taken": "Bu {provider} hesabı başqa Luxe Home Estate hesabına bağlıdır.",
+        "other": "Hesabınıza artıq başqa {provider} hesabı bağlıdır — əvvəl onu ayırın.",
+        "mismatch": "Sessiya dəyişib — bağlama ləğv edildi. Yenidən daxil olub cəhd edin.",
+        "failed": "Bağlama alınmadı. Yenidən cəhd edin."
+      }
     }
   },
   "savedSearches": {

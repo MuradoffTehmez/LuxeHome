@@ -266,6 +266,10 @@ başlayan marşrutlar qəbul edilir (açıq yönləndirmə qorunması).
   (Google qaydası: bağlama, təsdiqsiz hesabın parolu ləğv olunur); Facebook təsdiq bayrağı vermir — mövcud e-poçta bağlanmır, yeni
   hesab `/hesab/sosial-tesdiq` linkindən sonra yaranır. Apple callback `form_post` POST-dur, flow cookie-si `SameSite=None`.
   Yeni sosial provayder əlavə edəndə də e-poçt təsdiq vəziyyətinə görə bu iki yoldan birini seç; GET linki token istifadə etməməlidir.
+- **Bağlı giriş üsulları** (kabinet → Profil, `linked-logins*.ts`, sessiya köməkçiləri `linked-login-session.ts`): bağlama
+  `start?bagla=1` ilə, hədəf hesab imzalı flow cookie-sindədir və callback-də cari sessiya ilə yoxlanılır — sorğudan gələn
+  id-yə etibar etmə. Apple bağlaması POST → imzalı nəticə cookie-si → GET (`?bagla=tamamla`), çünki sessiya cookie-si `Lax`-dır.
+  Son giriş yolu ayrılmır (`canUnlinkLogin`).
 - **Webhook** `POST /api/telegram/webhook` (`webhook.ts`): secret başlığı sabit vaxtla, 64 KB limit, Zod sxemi, `TelegramUpdate`
   idempotentliyi (emal xətasında qeyd silinir → Telegram təkrarlayır), göndərən üzrə limit. Bot komandaları `bot.ts`, mətnlər `copy.ts`.
 - **Bildirişlər:** `notifyAccount` Telegram kanalını da çağırır (`notifyTelegramUser`); qiymət endirimi və «dərhal» saxlanmış axtarış

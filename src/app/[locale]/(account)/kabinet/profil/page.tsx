@@ -22,6 +22,12 @@ import { getAgencyOffices, getOfficeCityOptions } from "@/lib/accounts/agency-of
 import { getUserMembershipHistory } from "@/lib/accounts/agency-ownership";
 import { agencyCompleteness, agentCompleteness } from "@/lib/accounts/profile-completeness";
 import { AlertTriangle } from "lucide-react";
+import { LinkedLogins, type LinkedLoginRow } from "./linked-logins";
+import { getLoginMethods } from "@/lib/auth/linked-logins";
+import { canUnlinkLogin, LINKABLE_PROVIDERS } from "@/lib/auth/linked-logins-policy";
+import { isGoogleLoginConfigured } from "@/lib/auth/google-oauth";
+import { isAppleLoginConfigured } from "@/lib/auth/apple-oauth";
+import { isFacebookLoginConfigured } from "@/lib/auth/facebook-oauth";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -31,8 +37,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const dynamic = "force-dynamic";
 
-export default async function CabinetProfilePage() {
+export default async function CabinetProfilePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const locale = await getLocale() as Locale;
+  const query = await searchParams;
   const user = await requireAccount(locale);
   const t = await getTranslations("account.profile");
   const accountT = await getTranslations("auth.accountTypes");
@@ -165,6 +172,21 @@ export default async function CabinetProfilePage() {
     : agent?.isPublic
       ? `/agentler/${agent.slug}`
       : null;
+  // «Bağlı giriş üsulları»: OAuth bağlamasından qayıdışda `?bagla=<provayder>&netice=<nəticə>` göstərilir.
+  const loginMethods = await getLoginMethods(user.id);
+  const configured = { GOOGLE: isGoogleLoginConfigured(), APPLE: isAppleLoginConfigured(), FACEBOOK: isFacebookLoginConfigured() };
+  const linkedFlags = { GOOGLE: loginMethods.methods.google, APPLE: loginMethods.methods.apple, FACEBOOK: loginMethods.methods.facebook };
+  const loginRows: LinkedLoginRow[] = LINKABLE_PROVIDERS.filter((provider) => configured[provider] || linkedFlags[provider]).map((provider) => {
+    const identity = provider === "GOOGLE" ? null : loginMethods.identities[provider];
+    return {
+      provider,
+      available: configured[provider],
+      linked: linkedFlags[provider],
+      detail: identity ? [identity.email, formatLocalizedDate(identity.createdAt, locale, "short")].filter(Boolean).join(" · ") : null,
+      canUnlink: canUnlinkLogin(loginMethods.methods, provider),
+    };
+  });
+  const linkResult = typeof query.bagla === "string" && typeof query.netice === "string" ? { provider: query.bagla, outcome: query.netice } : null;
   const initials = `${names.firstName.charAt(0)}${names.lastName.charAt(0)}`.toLocaleUpperCase("az-AZ") || "LH";
 
   return (
@@ -324,6 +346,13 @@ export default async function CabinetProfilePage() {
         <section className="rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
           <h2 className="mb-3 font-display text-lg text-ink">{t("phoneSection")}</h2>
           <PhoneVerification verifiedPhone={profile.verifiedPhone} currentPhone={profile.phone ?? ""} />
+        </section>
+      ) : null}
+
+      {loginRows.length > 0 ? (
+        <section id="giris-usullari" className="scroll-mt-24 rounded-xl border border-line bg-paper p-4 sm:p-6 shadow-xs">
+          <h2 className="mb-3 font-display text-lg text-ink">{t("linkedLogins.title")}</h2>
+          <LinkedLogins rows={loginRows} result={linkResult} />
         </section>
       ) : null}
 

@@ -3722,7 +3722,9 @@
         "RATE_LIMITED": "Write rate limit",
         "PASSWORD_CHANGED": "Password changed",
         "TELEGRAM_LINKED": "Telegram linked",
-        "TELEGRAM_UNLINKED": "Telegram unlinked"
+        "TELEGRAM_UNLINKED": "Telegram unlinked",
+        "LOGIN_METHOD_LINKED": "Sign-in method linked",
+        "LOGIN_METHOD_UNLINKED": "Sign-in method unlinked"
       }
     },
     "telegram": {

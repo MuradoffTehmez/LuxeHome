@@ -30,6 +30,15 @@ test.describe("Sosial giriş düymələri", () => {
     });
   }
 
+  for (const provider of ["google", "apple", "facebook"] as const) {
+    test(`${provider}: anonim «bağla» girişə yönləndirir və ya marşrut gizlidir`, async ({ request }) => {
+      const response = await request.get(`/api/auth/${provider}/start?bagla=1&l=az`, { maxRedirects: 0 });
+      if (response.status() === 404) return;
+      expect(response.status()).toBe(303);
+      expect(response.headers().location).toContain("/daxil-ol");
+    });
+  }
+
   test("`davam` parametri kənar ünvana yönləndirmir", async ({ page }) => {
     await visit(page, "/az/daxil-ol?davam=//evil.example");
     for (const provider of PROVIDERS) {
@@ -81,5 +90,15 @@ test.describe("Kabinet: Telegram bölməsi", () => {
     await expect(page.locator('input[name="LEADS.telegram"]')).toBeEnabled();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(2);
+  });
+
+  test("profil: bağlı giriş üsulları yalnız öz sessiyasından bağlanır", async ({ page, context, baseURL }) => {
+    await signInAsLister(context, baseURL!);
+    await visit(page, "/az/kabinet/profil?bagla=apple&netice=taken");
+    const section = page.locator("#giris-usullari");
+    // Provayder qurulmayıbsa bölmə yoxdur; varsa bağlama linkləri `bagla=1` daşıyır və nəticə mesajı göstərilir.
+    if ((await section.count()) === 0) return;
+    for (const link of await section.locator('a[href*="/api/auth/"]').all()) expect(await link.getAttribute("href")).toContain("bagla=1");
+    await expect(section.getByRole("alert")).toBeVisible();
   });
 });

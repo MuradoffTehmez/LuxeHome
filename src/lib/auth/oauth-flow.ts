@@ -13,7 +13,8 @@ import { TOKEN_ISSUER } from "./cookie-names";
 
 const FLOW_SECONDS = 10 * 60;
 
-export type OAuthFlowState = { state: string; verifier: string; nonce: string; next?: string; locale: string };
+/** `linkUserId` — kabinetdən «bağla» axını: callback giriş yox, bu hesaba bağlama edir (cari sessiya ilə yenidən yoxlanılır). */
+export type OAuthFlowState = { state: string; verifier: string; nonce: string; next?: string; locale: string; linkUserId?: string };
 
 export type FlowCookie = { name: string; subject: string; path: string; sameSite: "lax" | "none" };
 
@@ -29,7 +30,7 @@ export async function pkceS256(verifier: string): Promise<string> {
   return toBase64Url(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier))));
 }
 
-export async function beginOAuthFlow(cookie: FlowCookie, input: { next?: string; locale: string }): Promise<OAuthFlowState> {
+export async function beginOAuthFlow(cookie: FlowCookie, input: { next?: string; locale: string; linkUserId?: string }): Promise<OAuthFlowState> {
   const flow: OAuthFlowState = { state: randomOAuthToken(), verifier: randomOAuthToken(), nonce: randomOAuthToken(), ...input };
   const token = await new SignJWT({ ...flow })
     .setProtectedHeader({ alg: "HS256" })
@@ -52,7 +53,49 @@ export async function consumeOAuthFlow(cookie: FlowCookie, state: string | null)
     const flow = payload as unknown as OAuthFlowState;
     if (typeof flow.state !== "string" || flow.state !== state) return null;
     if (typeof flow.verifier !== "string" || typeof flow.nonce !== "string") return null;
-    return { state: flow.state, verifier: flow.verifier, nonce: flow.nonce, locale: String(flow.locale ?? "az"), next: typeof flow.next === "string" ? flow.next : undefined };
+    return {
+      state: flow.state,
+      verifier: flow.verifier,
+      nonce: flow.nonce,
+      locale: String(flow.locale ?? "az"),
+      next: typeof flow.next === "string" ? flow.next : undefined,
+      linkUserId: typeof flow.linkUserId === "string" ? flow.linkUserId : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Apple bağlama axını: `form_post` callback-i kənar saytdan POST-dur və `SameSite=Lax` sessiya cookie-si orada gəlmir.
+ * POST kodu dəyişib yoxlanılmış iddiaları bu qısaömürlü (2 dəq) imzalı cookie-yə yazır və eyni sayta GET-ə yönləndirir;
+ * top-level GET-də sessiya görünür və bağlama orada cari sessiya ilə yoxlanılır.
+ */
+const LINK_RESULT_SECONDS = 2 * 60;
+
+export type LinkResultPayload = { linkUserId: string; subject: string; email: string | null; emailVerified: boolean; locale: string };
+
+export async function writeLinkResult(cookie: FlowCookie, payload: LinkResultPayload): Promise<void> {
+  const token = await new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(TOKEN_ISSUER)
+    .setSubject(`${cookie.subject}-link`)
+    .setIssuedAt()
+    .setExpirationTime(Math.floor(Date.now() / 1000) + LINK_RESULT_SECONDS)
+    .sign(secretKey());
+  (await cookies()).set(`${cookie.name}_link`, token, { httpOnly: true, secure: true, sameSite: "lax", path: cookie.path, maxAge: LINK_RESULT_SECONDS });
+}
+
+export async function readLinkResult(cookie: FlowCookie): Promise<LinkResultPayload | null> {
+  const store = await cookies();
+  const token = store.get(`${cookie.name}_link`)?.value;
+  store.delete({ name: `${cookie.name}_link`, path: cookie.path });
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, secretKey(), { issuer: TOKEN_ISSUER, subject: `${cookie.subject}-link` });
+    const value = payload as unknown as LinkResultPayload;
+    if (typeof value.linkUserId !== "string" || typeof value.subject !== "string") return null;
+    return { linkUserId: value.linkUserId, subject: value.subject, email: typeof value.email === "string" ? value.email : null, emailVerified: value.emailVerified === true, locale: String(value.locale ?? "az") };
   } catch {
     return null;
   }

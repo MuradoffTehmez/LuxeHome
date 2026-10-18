@@ -655,6 +655,28 @@
         "left": "left",
         "removed": "collaboration ended"
       }
+    },
+    "linkedLogins": {
+      "title": "Linked sign-in methods",
+      "description": "You can also sign in with Google, Apple or Facebook. Linking starts only from this session — the identity is added to your account.",
+      "link": "Link",
+      "unlink": "Unlink",
+      "linked": "Linked",
+      "notLinked": "Not linked",
+      "unavailable": "This sign-in method is not active at the moment",
+      "lastMethod": "This is your account's only sign-in method. Set a password or link another method before unlinking.",
+      "unlinkTitle": "Unlink {provider}?",
+      "unlinkDescription": "You will no longer be able to sign in with this method. You can link it again at any time.",
+      "cancel": "Cancel",
+      "unlinked": "Sign-in method unlinked.",
+      "results": {
+        "linked": "{provider} has been linked to your account.",
+        "already": "{provider} is already linked to your account.",
+        "taken": "This {provider} account is linked to another Luxe Home Estate account.",
+        "other": "Another {provider} account is already linked — unlink it first.",
+        "mismatch": "Your session changed — linking was cancelled. Sign in and try again.",
+        "failed": "Linking failed. Please try again."
+      }
     }
   },
   "savedSearches": {

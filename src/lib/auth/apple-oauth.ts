@@ -5,7 +5,7 @@ import { importPKCS8 } from "jose/key/import";
 import { runtimeEnv } from "@/lib/runtime-env";
 import { siteUrl } from "@/config/site";
 import { APPLE_OAUTH_COOKIE, APPLE_OAUTH_SUBJECT } from "./cookie-names";
-import { beginOAuthFlow, consumeOAuthFlow, type FlowCookie, type OAuthFlowState } from "./oauth-flow";
+import { beginOAuthFlow, consumeOAuthFlow, readLinkResult, writeLinkResult, type FlowCookie, type LinkResultPayload, type OAuthFlowState } from "./oauth-flow";
 import { appleClaimsFromPayload, type SocialClaims } from "./social-login-policy";
 
 /**
@@ -30,7 +30,7 @@ export function isAppleLoginConfigured(): boolean {
   return Boolean(runtimeEnv("APPLE_CLIENT_ID") && runtimeEnv("APPLE_TEAM_ID") && runtimeEnv("APPLE_KEY_ID") && runtimeEnv("APPLE_PRIVATE_KEY"));
 }
 
-export async function beginAppleFlow(input: { next?: string; locale: string }): Promise<string> {
+export async function beginAppleFlow(input: { next?: string; locale: string; linkUserId?: string }): Promise<string> {
   const flow = await beginOAuthFlow(COOKIE, input);
   const url = new URL(AUTHORIZE_URL);
   url.search = new URLSearchParams({
@@ -47,6 +47,14 @@ export async function beginAppleFlow(input: { next?: string; locale: string }): 
 
 export function consumeAppleFlow(state: string | null): Promise<OAuthFlowState | null> {
   return consumeOAuthFlow(COOKIE, state);
+}
+
+export function storeAppleLinkResult(payload: LinkResultPayload): Promise<void> {
+  return writeLinkResult(COOKIE, payload);
+}
+
+export function takeAppleLinkResult(): Promise<LinkResultPayload | null> {
+  return readLinkResult(COOKIE);
 }
 
 /** Secret-də `\n` mətn kimi saxlanıla bilər (Wrangler secret bir sətirdir) — PEM bərpa olunur. */

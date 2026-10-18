@@ -127,6 +127,16 @@ Meta for Developers → App → **Facebook Login → Settings**:
 Facebook e-poçtun təsdiq vəziyyətini vermir, ona görə: mövcud e-poçta avtomatik bağlanmır, yeni hesab isə yalnız e-poçta
 göndərilən təsdiq linkindən sonra yaranır.
 
+## 6a. Kabinetdə «Bağlı giriş üsulları»
+
+Kabinet → Profil → «Bağlı giriş üsulları» Google, Apple və Facebook-u mövcud hesaba bağlayır/ayırır
+(`src/lib/auth/linked-logins*.ts`). Bağlama `GET /api/auth/<provayder>/start?bagla=1` ilə yalnız giriş etmiş istifadəçi
+üçün başlayır: hədəf hesab imzalı flow cookie-sinə yazılır və callback-də cari sessiya ilə yenidən müqayisə olunur
+(sessiya dəyişibsə — `netice=mismatch`). Apple-ın `form_post` POST-unda `Lax` sessiya cookie-si gəlmədiyi üçün nəticə
+2 dəqiqəlik imzalı cookie-yə yazılır və bağlama eyni sayta GET-də (`?bagla=tamamla`) tamamlanır. Kimlik başqa hesabdadırsa
+bağlanmır; son giriş yolu (parol, provayder, Telegram, SMS) ayrılmır. Hər bağlama/ayırma `LOGIN_METHOD_LINKED` /
+`LOGIN_METHOD_UNLINKED` təhlükəsizlik hadisəsidir. Əlavə konsol ayarı tələb olunmur — callback ünvanları eynidir.
+
 ## 7. Yayım ardıcıllığı
 
 Staging → production, hər mühit öz əmrləri ilə (`CLAUDE.md` qaydası):
