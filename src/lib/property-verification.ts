@@ -151,13 +151,23 @@ export async function decideDocuments(input: { staffId: string; propertyId: stri
   });
   // Eyni anda iki moderator: yalnız sənədləri həqiqətən götürən qərar elanı və tarixçəni yazır.
   if (claimed.count === 0) return { ok: false, reason: "notFound" };
-  await prisma.property.update({
-    where: { id: input.propertyId },
-    data: input.verified ? { documentsVerifiedAt: now, documentsVerifiedById: input.staffId } : { documentsVerifiedAt: null, documentsVerifiedById: null },
-  });
-  await prisma.documentAccessLog.createMany({
-    data: pending.map((row) => ({ documentId: row.id, propertyId: input.propertyId, userId: input.staffId, action: "DECISION" })),
-  });
+  try {
+    await prisma.property.update({
+      where: { id: input.propertyId },
+      data: input.verified ? { documentsVerifiedAt: now, documentsVerifiedById: input.staffId } : { documentsVerifiedAt: null, documentsVerifiedById: null },
+    });
+    await prisma.documentAccessLog.createMany({
+      data: pending.map((row) => ({ documentId: row.id, propertyId: input.propertyId, userId: input.staffId, action: "DECISION" })),
+    });
+  } catch (error) {
+    // D1-də tranzaksiya yoxdur: nişan və ya tarixçə yazılmasa bu qərarın götürdüyü sənədlər `PENDING`-ə qayıdır
+    // ki, qərar yenidən verilə bilsin (nişan/tarixçə yarımçıq qalmasın).
+    await prisma.propertyDocument.updateMany({
+      where: { id: { in: pending.map((row) => row.id) }, reviewedById: input.staffId, reviewedAt: now },
+      data: { status: PROPERTY_DOCUMENT_STATUSES.PENDING, reviewedById: null, reviewedAt: null, note: null, purgeAfter: null },
+    }).catch(() => undefined);
+    throw error;
+  }
   return { ok: true };
 }
 

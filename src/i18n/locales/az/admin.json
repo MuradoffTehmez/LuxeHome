@@ -99,7 +99,8 @@
       "payments": "Ödəniş əməliyyatları",
       "vip": "VIP elanlar",
       "promotion": "İrəli çəkmə",
-      "verification": "Sənəd yoxlaması"
+      "verification": "Sənəd yoxlaması",
+      "trust": "Hesab etibarlılığı"
     }
   },
   "actions": {
@@ -336,7 +337,8 @@
       "PROMOTION": "İrəli çəkmə",
       "REVIEW": "Yeni rəy",
       "SUBSCRIPTION": "Abunə",
-      "SECURITY": "Təhlükəsizlik"
+      "SECURITY": "Təhlükəsizlik",
+      "ACCOUNT_RESTRICTION": "Hesab məhdudiyyəti"
     },
     "partnershipType": {
       "BROKER": "Broker",
@@ -3501,6 +3503,54 @@
         "POWER_OF_ATTORNEY": "Etibarnamə",
         "EXTRACT_COMMERCIAL": "Kommersiya çıxarışı"
       }
+    },
+    "trust": {
+      "title": "Hesab etibarlılığı",
+      "description": "Davranış siqnalları üzrə riskli hesablar, tədbirlər və etirazlar. Tədbiri həmişə insan tətbiq edir və əsaslandırır.",
+      "appeals": "Etirazlar",
+      "appealsDescription": "Tədbiri tətbiq edən əməkdaş öz qərarına baxa bilməz.",
+      "emptyAppeals": "Açıq etiraz yoxdur.",
+      "risky": "Riskli hesablar",
+      "riskyDescription": "Bal ≥ 30; siqnallar gündəlik yenilənir. Tövsiyə olunan tədbir əvvəlcədən seçilib.",
+      "emptyRisky": "Riskli hesab yoxdur.",
+      "history": "Tədbir tarixçəsi",
+      "historyDescription": "Son 50 tədbir; götürülən tədbir də tarixçədə qalır.",
+      "emptyHistory": "Hələ tədbir yoxdur.",
+      "score": "Bal: {score}",
+      "recalculate": "Yenidən hesabla",
+      "apply": "Tətbiq et",
+      "kind": "Tədbir",
+      "endsAt": "Bitmə tarixi (istəyə bağlı)",
+      "reason": "Əsaslandırma",
+      "appliedBy": "Tətbiq edən: {name}",
+      "liftedBy": "Götürən: {name}",
+      "active": "Aktiv",
+      "inactive": "Bitib",
+      "lift": "Götür",
+      "liftTitle": "Tədbir götürülsün?",
+      "liftDescription": "Səbəb istifadəçiyə bildiriləcək.",
+      "accept": "Qəbul et",
+      "acceptTitle": "Etiraz qəbul edilsin?",
+      "acceptDescription": "Tədbir götürüləcək; qeyd istifadəçiyə göstərilir.",
+      "reject": "Rədd et",
+      "rejectTitle": "Etiraz rədd edilsin?",
+      "rejectDescription": "Tədbir qüvvədə qalır; səbəb istifadəçiyə göstərilir.",
+      "kinds": {
+        "WARNING": "Xəbərdarlıq",
+        "EXTRA_VERIFICATION": "Əlavə təsdiq",
+        "POSTING_LIMIT": "Paylaşım limiti",
+        "MODERATION_REVIEW": "Moderator yoxlaması",
+        "TEMP_SUSPENSION": "Müvəqqəti məhdudiyyət",
+        "BLOCK": "Bloklama"
+      },
+      "signals": {
+        "DUPLICATE_BURST": "Eyni elanlar: {value}",
+        "REJECTION_STREAK": "Rədd edilən elanlar: {value}",
+        "CONFIRMED_REPORTS": "Təsdiqlənmiş şikayət: {value}",
+        "AUTOMATION": "Saatda elan: {value}",
+        "CROSS_PROFILE_CONTENT": "Başqa profillə eyni məzmun: {value}",
+        "REVIEW_BURST": "Şübhəli rəy: {value}"
+      }
     }
   },
   "server": {
@@ -4005,6 +4055,21 @@
       "dataToggled": "Məlumat yoxlaması dəyişdi.",
       "notFound": "Gözləyən sənəd tapılmadı.",
       "note": "Səbəb ən azı 5 simvol olmalıdır."
+    },
+    "trust": {
+      "applied": "Tədbir tətbiq olundu.",
+      "lifted": "Tədbir götürüldü.",
+      "appealAccepted": "Etiraz qəbul olundu.",
+      "appealRejected": "Etiraz rədd edildi.",
+      "recalculated": "Bal yeniləndi.",
+      "user": "Hesab tapılmadı.",
+      "kind": "Tədbir növü düzgün deyil.",
+      "reason": "Əsaslandırma ən azı 10 simvol olmalıdır.",
+      "dates": "Bitmə tarixi gələcəkdə olmalıdır.",
+      "notFound": "Qeyd tapılmadı və ya artıq baxılıb.",
+      "sameReviewer": "Tədbiri tətbiq edən əməkdaş etirazı həll edə bilməz.",
+      "note": "Səbəb ən azı 5 simvol olmalıdır.",
+      "blockPermission": "Bloklama yalnız istifadəçi idarəetmə icazəsi olan administratora açıqdır."
     }
   }
 }

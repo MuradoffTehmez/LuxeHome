@@ -104,6 +104,9 @@ const COPY = {
       : `«${title}» elanı üçün VIP sorğusu rədd edildi${note ? `: ${note}` : "."}`,
     vipRevokedTitle: "VIP statusu dayandırıldı",
     vipRevoked: (title: string, note: string | null) => `«${title}» elanının VIP statusu dayandırıldı${note ? `: ${note}` : "."}`,
+    restrictionTitle: (lifted: boolean) => lifted ? "Hesab məhdudiyyəti götürüldü" : "Hesabınıza məhdudiyyət tətbiq olundu",
+    restriction: (kind: string, reason: string, lifted: boolean) => lifted ? `«${kind}» məhdudiyyəti götürüldü: ${reason}` : `Tədbir: «${kind}». Səbəb: ${reason}. Kabinetdəki «Məhdudiyyətlər» bölməsindən etiraz edə bilərsiniz.`,
+    restrictionKinds: { WARNING: "Xəbərdarlıq", EXTRA_VERIFICATION: "Əlavə təsdiq", POSTING_LIMIT: "Paylaşım limiti", MODERATION_REVIEW: "Moderator yoxlaması", TEMP_SUSPENSION: "Müvəqqəti məhdudiyyət", BLOCK: "Bloklama" } as Record<string, string>,
     newReviewTitle: "Sizə yeni rəy yazıldı",
     newReview: (target: string, rating: number) => `«${target}» haqqında ${rating} ulduzlu yeni rəy dərc olundu.`,
     subscriptionTitle: "Abunə statusu dəyişdi",
@@ -205,6 +208,9 @@ const COPY = {
       : `The VIP request for «${title}» was declined${note ? `: ${note}` : "."}`,
     vipRevokedTitle: "VIP status ended",
     vipRevoked: (title: string, note: string | null) => `VIP status for «${title}» was ended${note ? `: ${note}` : "."}`,
+    restrictionTitle: (lifted: boolean) => lifted ? "Account restriction lifted" : "A restriction was applied to your account",
+    restriction: (kind: string, reason: string, lifted: boolean) => lifted ? `The «${kind}» restriction was lifted: ${reason}` : `Measure: «${kind}». Reason: ${reason}. You can appeal in “Restrictions” in your account.`,
+    restrictionKinds: { WARNING: "Warning", EXTRA_VERIFICATION: "Extra verification", POSTING_LIMIT: "Posting limit", MODERATION_REVIEW: "Moderator review", TEMP_SUSPENSION: "Temporary restriction", BLOCK: "Block" } as Record<string, string>,
     newReviewTitle: "You received a new review",
     newReview: (target: string, rating: number) => `A new ${rating}-star review about «${target}» was published.`,
     subscriptionTitle: "Subscription status changed",
@@ -306,6 +312,9 @@ const COPY = {
       : `VIP-запрос для «${title}» отклонён${note ? `: ${note}` : "."}`,
     vipRevokedTitle: "VIP-статус прекращён",
     vipRevoked: (title: string, note: string | null) => `VIP-статус объявления «${title}» прекращён${note ? `: ${note}` : "."}`,
+    restrictionTitle: (lifted: boolean) => lifted ? "Ограничение аккаунта снято" : "К аккаунту применено ограничение",
+    restriction: (kind: string, reason: string, lifted: boolean) => lifted ? `Ограничение «${kind}» снято: ${reason}` : `Мера: «${kind}». Причина: ${reason}. Обжаловать можно в разделе «Ограничения» кабинета.`,
+    restrictionKinds: { WARNING: "Предупреждение", EXTRA_VERIFICATION: "Доп. подтверждение", POSTING_LIMIT: "Лимит размещений", MODERATION_REVIEW: "Проверка модератором", TEMP_SUSPENSION: "Временное ограничение", BLOCK: "Блокировка" } as Record<string, string>,
     newReviewTitle: "Вам оставили новый отзыв",
     newReview: (target: string, rating: number) => `Опубликован новый отзыв о «${target}» с оценкой ${rating}.`,
     subscriptionTitle: "Статус подписки изменился",
@@ -884,5 +893,16 @@ export async function noticePasswordChanged(input: { userId: string; changedAt: 
     "/kabinet/profil",
     `security:password:${input.userId}:${input.changedAt.getTime()}`,
     (copy) => ({ title: copy.securityPasswordTitle, content: copy.securityPassword }),
+  );
+}
+
+/** Hesaba tədbir tətbiq olundu və ya götürüldü (#258) — təhlükəsizlik kateqoriyası, söndürülmür. */
+export async function noticeAccountRestriction(input: { userId: string; restrictionId: string; kind: string; reason: string; lifted: boolean }): Promise<void> {
+  await notifyAccount(
+    input.userId,
+    NOTIFICATION_TYPES.ACCOUNT_RESTRICTION,
+    "/kabinet/mehdudiyyetler",
+    `restriction:${input.restrictionId}:${input.lifted ? "lifted" : "applied"}`,
+    (copy) => ({ title: copy.restrictionTitle(input.lifted), content: copy.restriction(copy.restrictionKinds[input.kind] ?? input.kind, input.reason, input.lifted) }),
   );
 }

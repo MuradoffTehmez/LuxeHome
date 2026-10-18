@@ -43,6 +43,7 @@ const ICONS: Record<NotificationType, typeof Bookmark> = {
   REVIEW: Star,
   SUBSCRIPTION: Layers,
   SECURITY: ShieldAlert,
+  ACCOUNT_RESTRICTION: ShieldAlert,
 };
 
 function NotificationRow({ item }: { item: NotificationListItem }) {

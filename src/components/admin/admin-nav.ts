@@ -58,6 +58,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "vip", href: "/admin/vip", badgeKey: "pendingVip" },
           { labelKey: "promotion", href: "/admin/irelicekme", badgeKey: "pendingPromotions" },
           { labelKey: "verification", href: "/admin/senedler" },
+          { labelKey: "trust", href: "/admin/etibarliliq" },
           { labelKey: "projects", href: "/admin/layiheler" },
           { labelKey: "taxonomy", href: "/admin/taksonomiya" },
           { labelKey: "publicAmenities", href: "/admin/ictimai-imkanlar" },

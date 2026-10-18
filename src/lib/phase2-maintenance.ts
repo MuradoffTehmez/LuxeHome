@@ -9,6 +9,7 @@ import { isFeatureEnabled } from "@/lib/feature-flags";
 import { sendOpenHouseReminders } from "@/lib/open-house";
 import { expireVipGrants } from "@/lib/vip";
 import { purgeReviewedDocuments } from "@/lib/property-verification";
+import { refreshActiveAccountsTrust } from "@/lib/account-trust";
 
 const DOMAIN_EVENT_RETENTION_DAYS = 180;
 
@@ -57,6 +58,8 @@ export async function runPhase2Maintenance(now = new Date()) {
   const uniqueViewKeys = await pruneUniqueViews(now);
   // Saxlama müddəti bitmiş sənəd faylları (#256, PRD 19.4).
   const purgedDocuments = await purgeReviewedDocuments(now);
+  // Hesab etibarlılığı (#258): son 7 gündə fəal hesabların davranış balı yenilənir.
+  const trustRefreshed = await refreshActiveAccountsTrust(now).catch(() => 0);
 
   return {
     expiredPremium: premium.count,
@@ -69,5 +72,6 @@ export async function runPhase2Maintenance(now = new Date()) {
     deletedDomainEvents: domainEvents.count,
     prunedUniqueViews: uniqueViewKeys,
     purgedDocuments,
+    trustRefreshed,
   };
 }

@@ -541,6 +541,15 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   yazılır. Qərar elanın `documentsVerifiedAt`-ını qoyur/götürür; «Məlumatlar yoxlanılıb» (`dataVerifiedAt`) ayrıca açardır.
   Qərardan `PROPERTY_DOCUMENT_RETENTION_DAYS` sonra gündəlik baxım faylı və sətri silir (tarixçə qalır). İctimai səhifəyə
   sənədin özü və növü çıxmır.
+- **Hesab etibarlılığı (#258, PRD Modul 18):** davranış siqnalları (`lib/moderation/trust-signals.ts` saf, `lib/account-trust.ts`
+  D1): 24 saatda eyni başlıqlı elanlar, 30 gündə rədd/dayandırma, 90 gündə təsdiqlənmiş şikayət, saatda ≥15 elan, başqa
+  hesabla eyni uzun təsvir, şübhəli rəylər → `User.trustScore`/`trustFlags` (gündəlik baxım fəal hesabları yeniləyir).
+  **Bal yalnız tövsiyədir** — tədbiri (`AccountRestriction`, `0083`) moderator `/admin/etibarliliq`-də əsaslandırma ilə tətbiq
+  edir; `BLOCK` yalnız `user:manage`. Qapılar: `TEMP_SUSPENSION`/`BLOCK` `requirePublicAction`-da yazmanı bağlayır
+  (`accountWriteBlock`, `preferences` istisna), yeni elan `postingGate()`-dən keçir (limit, əlavə təsdiq, moderator yoxlaması →
+  `PENDING`). Tədbir silinmir (`liftedAt`), bildiriş `ACCOUNT_RESTRICTION` (təhlükəsizlik kateqoriyası). İstifadəçi
+  `/kabinet/mehdudiyyetler`-dən etiraz edir (blokdan keçən ayrıca action); **etirazı tədbiri verəndən başqa əməkdaş həll edir**
+  (`sameReviewer`), qəbul tədbiri götürür.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
 

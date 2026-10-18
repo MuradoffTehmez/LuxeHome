@@ -553,7 +553,12 @@
     "agencyRequestCancelled": "Sorğu ləğv edildi.",
     "employeeOtherAgency": "Bu şəxs artıq başqa agentliyin əməkdaşıdır və ya agentlik hesabıdır.",
     "invalidInstagram": "Instagram istifadəçi adını yazın (hərf, rəqəm, nöqtə, alt xətt).",
-    "taxIdTaken": "Bu VÖEN ilə artıq agentlik qeydiyyatdan keçib. Səhv olduğunu düşünürsünüzsə, bizimlə əlaqə saxlayın."
+    "taxIdTaken": "Bu VÖEN ilə artıq agentlik qeydiyyatdan keçib. Səhv olduğunu düşünürsünüzsə, bizimlə əlaqə saxlayın.",
+    "posting": {
+      "limit": "Paylaşım limiti: 24 saatda ən çox 2 yeni elan.",
+      "verification": "Elan yerləşdirmək üçün əvvəlcə telefon nömrənizi təsdiqləyin.",
+      "blocked": "Hesabınıza məhdudiyyət tətbiq olunub."
+    }
   },
   "profile": {
     "metaTitle": "Profil",
@@ -1732,5 +1737,57 @@
     "notFound": "Rəy tapılmadı.",
     "invalid": "Cavab 2–1000 simvol olmalıdır.",
     "failed": "Əməliyyat alınmadı. Bir az sonra yenidən cəhd edin."
+  },
+  "restrictions": {
+    "eyebrow": "Hesab",
+    "title": "Məhdudiyyətlər",
+    "description": "Hesabınıza tətbiq olunan tədbirlər, səbəbləri və etiraz imkanı.",
+    "emptyTitle": "Məhdudiyyət yoxdur",
+    "emptyDescription": "Hesabınıza heç bir tədbir tətbiq olunmayıb.",
+    "active": "Aktiv",
+    "inactive": "Bitib",
+    "reason": "Səbəb: {reason}",
+    "lifted": "Götürüldü: {reason}",
+    "appealLabel": "Etiraz",
+    "appealHint": "Qərarla razı deyilsinizsə, səbəbini yazın — etirazı başqa səlahiyyətli əməkdaş yoxlayır.",
+    "appealSubmit": "Etiraz göndər",
+    "appealSent": "Etiraz göndərildi.",
+    "appeal": {
+      "OPEN": "Etirazınız yoxlanılır",
+      "ACCEPTED": "Etirazınız qəbul olundu",
+      "REJECTED": "Etirazınız rədd edildi"
+    },
+    "errors": {
+      "notFound": "Tədbir tapılmadı.",
+      "message": "Etiraz ən azı 10 simvol olmalıdır.",
+      "open": "Bu tədbirə etirazınız artıq yoxlanılır.",
+      "failed": "Etiraz göndərilmədi."
+    },
+    "kinds": {
+      "WARNING": {
+        "label": "Xəbərdarlıq",
+        "hint": "Qaydalara diqqət yetirin; hesab fəaliyyəti məhdudlaşdırılmayıb."
+      },
+      "EXTRA_VERIFICATION": {
+        "label": "Əlavə təsdiq",
+        "hint": "Elan yerləşdirmək üçün telefon nömrənizi təsdiqləyin."
+      },
+      "POSTING_LIMIT": {
+        "label": "Paylaşım limiti",
+        "hint": "24 saatda ən çox 2 yeni elan yerləşdirə bilərsiniz."
+      },
+      "MODERATION_REVIEW": {
+        "label": "Moderator yoxlaması",
+        "hint": "Yeni elanlarınız moderator təsdiqindən sonra dərc olunur."
+      },
+      "TEMP_SUSPENSION": {
+        "label": "Müvəqqəti məhdudiyyət",
+        "hint": "Müddət bitənə qədər elan, müraciət və digər yazma əməliyyatları bağlıdır."
+      },
+      "BLOCK": {
+        "label": "Bloklama",
+        "hint": "Hesabın yazma əməliyyatları administrator qərarı ilə bağlanıb."
+      }
+    }
   }
 }

@@ -779,3 +779,5 @@ Sayt təhlilindən sonra 48 bəndlik tövsiyə siyahısı 4 mərhələyə bölü
   Növbəti — Modul 17 (əmlak və profil doğrulaması).
 - #256 (Modul 17): doğrulama nişanları, məxfi sənəd yükləmə, `/admin/senedler`, giriş tarixçəsi, saxlama/silinmə.
   **Modul 17 tamamlandı.** Növbəti — Modul 18 (istifadəçi etibarlılığı və davranış analizi).
+- #258 (Modul 18): davranış siqnalları və hesab balı, tədbirlər (xəbərdarlıq → blok), qapılar, etiraz (başqa əməkdaş).
+  **Modul 18 tamamlandı — Faza 5 (15–18) bitdi.** Növbəti — Modul 19 (admin panelinin genişləndirilməsi).

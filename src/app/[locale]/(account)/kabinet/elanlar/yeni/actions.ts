@@ -31,6 +31,7 @@ import { refreshListingRisk } from "@/lib/moderation/listing-risk";
 import { resolveNewListingAgencyId } from "@/lib/accounts/agency-ownership";
 import { recordAgencyActivity } from "@/lib/accounts/agency-activity";
 import { queueListingEnrichment } from "@/lib/listing-enrichment";
+import { postingGate } from "@/lib/account-trust";
 
 const LIST_PATH = "/kabinet/elanlar";
 
@@ -77,6 +78,9 @@ export async function createPublicProperty(
     if (error instanceof AdminGuardError) return failure(t("actions.actionUnavailable"));
     throw error;
   }
+  // Hesab tədbirləri (#258, PRD 20.3): paylaşım limiti, əlavə təsdiq, moderator yoxlaması.
+  const gate = await postingGate(user.id);
+  if (!gate.ok) return failure(t(`actions.posting.${gate.reason}`));
   const parsed = publicPropertySchema.safeParse(readPublicPropertyForm(formData));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -175,7 +179,7 @@ export async function createPublicProperty(
     );
 
     const risk = await refreshListingRisk(created.id);
-    if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED && risk.level === "hold") {
+    if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED && (risk.level === "hold" || gate.review)) {
       await prisma.property.update({
         where: { id: created.id },
         data: { status: PROPERTY_STATUSES.PENDING, publishedAt: null },
@@ -188,7 +192,7 @@ export async function createPublicProperty(
       to: heldForReview || finalPolicy.status !== PROPERTY_STATUSES.PUBLISHED ? PROPERTY_STATUSES.PENDING : PROPERTY_STATUSES.PUBLISHED,
       source: PROPERTY_STATUS_SOURCES.OWNER,
       changedById: user.id,
-      note: heldForReview ? "Avtomatik moderasiya: yüksək risk" : null,
+      note: heldForReview ? (gate.review ? "Hesab tədbiri: moderator yoxlaması" : "Avtomatik moderasiya: yüksək risk") : null,
     });
 
     if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED && !heldForReview) {
