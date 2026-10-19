@@ -133,7 +133,7 @@ Kabinet → Profil → «Bağlı giriş üsulları» Google, Apple və Facebook-
 (`src/lib/auth/linked-logins*.ts`). Bağlama `GET /api/auth/<provayder>/start?bagla=1` ilə yalnız giriş etmiş istifadəçi
 üçün başlayır: hədəf hesab imzalı flow cookie-sinə yazılır və callback-də cari sessiya ilə yenidən müqayisə olunur
 (sessiya dəyişibsə — `netice=mismatch`). Apple-ın `form_post` POST-unda `Lax` sessiya cookie-si gəlmədiyi üçün nəticə
-2 dəqiqəlik imzalı cookie-yə yazılır və bağlama eyni sayta GET-də (`?bagla=tamamla`) tamamlanır. Kimlik başqa hesabdadırsa
+2 dəqiqəlik imzalı cookie-yə yazılır və bağlama eyni sayta GET-də (`/api/auth/apple/link`) tamamlanır. Kimlik başqa hesabdadırsa
 bağlanmır; son giriş yolu (parol, provayder, Telegram, SMS) ayrılmır. Hər bağlama/ayırma `LOGIN_METHOD_LINKED` /
 `LOGIN_METHOD_UNLINKED` təhlükəsizlik hadisəsidir. Əlavə konsol ayarı tələb olunmur — callback ünvanları eynidir.
 

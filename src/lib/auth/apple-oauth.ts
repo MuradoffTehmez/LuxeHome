@@ -24,6 +24,8 @@ const ISSUER = "https://appleid.apple.com";
 const TIMEOUT_MS = 8000;
 
 export const APPLE_CALLBACK_PATH = "/api/auth/apple/callback";
+/** Bağlamanın ikinci addımı (eyni saytda GET — `Lax` sessiya cookie-si burada görünür). */
+export const APPLE_LINK_PATH = "/api/auth/apple/link";
 const COOKIE: FlowCookie = { name: APPLE_OAUTH_COOKIE, subject: APPLE_OAUTH_SUBJECT, path: "/api/auth/apple", sameSite: "none" };
 
 export function isAppleLoginConfigured(): boolean {
