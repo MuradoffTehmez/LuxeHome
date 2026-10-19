@@ -112,7 +112,9 @@
       "promotionHub": "Продвижение объявлений",
       "promotionOverview": "Обзор",
       "trustHub": "Безопасность и модерация",
-      "botProtection": "Защита от ботов"
+      "botProtection": "Защита от ботов",
+      "telegram": "Telegram",
+      "support": "Поддержка (Telegram)"
     },
     "sections": {
       "seoDaily": "Мониторинг",
@@ -2659,7 +2661,11 @@
       "integrationTelegram": "Telegram-уведомления о заявках",
       "integrationPush": "Push-уведомления",
       "integrationGoogleLogin": "Вход через Google",
-      "integrationPhoneLogin": "Вход по SMS-коду"
+      "integrationPhoneLogin": "Вход по SMS-коду",
+      "integrationTelegramBot": "Telegram-бот (webhook)",
+      "integrationTelegramLogin": "Вход через Telegram",
+      "integrationAppleLogin": "Вход через Apple",
+      "integrationFacebookLogin": "Вход через Facebook"
     },
     "propertyImport": {
       "title": "Массовый импорт CSV",
@@ -3727,7 +3733,11 @@
         "FORBIDDEN": "Запрос без прав",
         "CSRF_BLOCKED": "Сторонний запрос отклонён",
         "RATE_LIMITED": "Лимит записи",
-        "PASSWORD_CHANGED": "Пароль изменён"
+        "PASSWORD_CHANGED": "Пароль изменён",
+        "TELEGRAM_LINKED": "Telegram привязан",
+        "TELEGRAM_UNLINKED": "Telegram отвязан",
+        "LOGIN_METHOD_LINKED": "Способ входа привязан",
+        "LOGIN_METHOD_UNLINKED": "Способ входа отвязан"
       }
     },
     "promotionHub": {
@@ -3771,6 +3781,146 @@
         "vip": "VIP",
         "promotion": "Поднятие"
       }
+    },
+    "telegram": {
+      "title": "Интеграция с Telegram",
+      "description": "Бот, webhook, уведомления администраторов, группы/каналы и статистика доставки. Секретные значения здесь не показываются.",
+      "configured": "Настроено",
+      "missing": "Не настроено",
+      "envTitle": "Переменные окружения",
+      "envDescription": "Секреты Cloudflare — показывается только наличие.",
+      "botUsername": "Имя бота",
+      "secretInvalid": "Неверный формат TELEGRAM_WEBHOOK_SECRET: 16–256 символов, только A–Z, a–z, 0–9, «_» и «-».",
+      "healthTitle": "Состояние бота и webhook",
+      "notConfigured": "TELEGRAM_BOT_TOKEN не настроен.",
+      "bot": "Бот",
+      "apiError": "Ошибка Telegram {code}",
+      "privacyModeOff": "Privacy Mode бота выключен — он получает все сообщения групп. Включите его в BotFather, если это не нужно.",
+      "webhookUrl": "Адрес webhook",
+      "webhookNone": "Webhook не установлен",
+      "expectedUrl": "Адрес этого окружения: {url}",
+      "webhookOk": "Направлен на это окружение",
+      "webhookMismatch": "Направлен на другой адрес",
+      "pending": "Ожидающие обновления",
+      "lastError": "Последняя ошибка",
+      "noErrors": "Ошибок нет",
+      "setupTitle": "Настройка",
+      "setupDescription": "Устанавливайте webhook только на адрес этого окружения. Два окружения не могут делить webhook одного токена.",
+      "setWebhook": "Установить webhook",
+      "setWebhookHint": "setWebhook: secret_token, allowed_updates (message, callback_query, my_chat_member); ожидающие обновления сохраняются.",
+      "overrideOther": "Бот сейчас направлен на другой адрес. Подтверждаю замену.",
+      "syncCommands": "Синхронизировать команды",
+      "syncCommandsHint": "setMyCommands: /start, /help, /account, /notifications, /settings, /stop, /support, /language — AZ (по умолчанию), EN, RU.",
+      "deleteWebhook": "Удалить webhook",
+      "deleteWebhookHint": "Откат: webhook удаляется, ожидающие обновления хранятся в Telegram 24 часа.",
+      "deleteConfirm": "Подтверждаю удаление webhook",
+      "configTitle": "Уведомления администраторов",
+      "alertsLegend": "Уведомления в офисный чат и одобренные группы",
+      "alerts": {
+        "LEAD": {
+          "label": "Новая заявка",
+          "hint": "Форма контакта и заявки по объявлениям."
+        },
+        "RESERVATION": {
+          "label": "Запрос на просмотр",
+          "hint": "Бронирования и регистрации на день открытых дверей."
+        },
+        "MODERATION": {
+          "label": "Очередь модерации",
+          "hint": "Новые или повторно отправленные объявления."
+        },
+        "REPORT": {
+          "label": "Жалоба на объявление",
+          "hint": "Только причины и заголовок — без данных заявителя."
+        },
+        "SUPPORT": {
+          "label": "Обращение в поддержку",
+          "hint": "Сообщения Telegram /support."
+        },
+        "SYSTEM": {
+          "label": "Системная ошибка",
+          "hint": "Если cron-задача не выполнилась (раз в час)."
+        }
+      },
+      "leadContact": "Показывать имя, телефон и e-mail в уведомлении о заявке",
+      "leadContactHint": "Если выключено, в чат уходит только маскированный номер и ссылка на панель; полные данные открываются в панели после проверки роли.",
+      "stats": {
+        "linked": "Привязанные аккаунты",
+        "consenting": "Получают уведомления",
+        "sent": "Отправлено",
+        "failed": "Ошибки / в очереди",
+        "last7": "За 7 дней",
+        "failedHint": "В очереди: {pending}"
+      },
+      "failuresTitle": "Последние неудачные доставки",
+      "noFailures": "За 7 дней неудачных доставок нет.",
+      "failureLine": "Ошибка {error} · {attempts} попыток · {date}",
+      "chatsTitle": "Группы и каналы",
+      "chatsDescription": "Когда бота добавляют в группу или канал (как администратора), он появляется здесь со статусом «Ожидает». Пока не одобрено, туда ничего не отправляется.",
+      "noChats": "Групп и каналов пока нет.",
+      "cannotPost": "Не может писать",
+      "chatTypes": {
+        "group": "Группа",
+        "channel": "Канал"
+      },
+      "chatStatus": {
+        "PENDING": "Ожидает",
+        "APPROVED": "Одобрено",
+        "DISABLED": "Отключено"
+      },
+      "categories": {
+        "ADMIN_ALERTS": "Уведомления администраторов",
+        "LISTINGS": "Публикация объявлений",
+        "BROADCAST": "Рассылка"
+      },
+      "broadcastTitle": "Рассылка и публикация объявлений",
+      "broadcastDescription": "Отправляется только одобренным адресатам с подходящей категорией. Личные уведомления пользователей в группы не попадают.",
+      "targets": "Адресаты",
+      "noBroadcastTargets": "Нет одобренных адресатов с категорией «Рассылка».",
+      "noListingTargets": "Нет одобренных адресатов с категорией «Публикация объявлений».",
+      "broadcastText": "Текст сообщения",
+      "send": "Отправить",
+      "listing": "Объявление (slug, ID или ссылка)",
+      "listingHint": "Можно публиковать только опубликованные объявления.",
+      "share": "Опубликовать"
+    },
+    "support": {
+      "title": "Обращения в поддержку",
+      "description": "Обращения через Telegram /support. Открыто: {open}.",
+      "filter": "Фильтр статуса",
+      "tabs": {
+        "active": "Активные"
+      },
+      "status": {
+        "OPEN": "Открыто",
+        "ANSWERED": "Отвечено",
+        "CLOSED": "Закрыто"
+      },
+      "empty": "Обращений нет.",
+      "columns": {
+        "who": "Заявитель",
+        "status": "Статус",
+        "messages": "Сообщения",
+        "updated": "Обновлено"
+      },
+      "anonymous": "Пользователь Telegram",
+      "linked": "Привязан к аккаунту",
+      "notLinked": "Не привязан",
+      "pagination": "Страницы",
+      "prev": "← Назад",
+      "next": "Далее →",
+      "ticketTitle": "Обращение № {id}",
+      "thread": "Переписка",
+      "operator": "Оператор",
+      "customer": "Пользователь",
+      "replyTitle": "Ответ",
+      "closedHint": "Обращение закрыто.",
+      "send": "Отправить ответ",
+      "reply": "Текст ответа",
+      "replyHint": "Ответ будет отправлен пользователю в Telegram.",
+      "noChat": "У обращения нет чата Telegram — ответ будет только сохранён.",
+      "close": "Закрыть обращение",
+      "closeHint": "Пользователь получит уведомление о закрытии. Сообщения закрытых обращений удаляются через 90 дней."
     }
   },
   "server": {
@@ -4295,6 +4445,33 @@
       "sameReviewer": "Сотрудник, применивший меру, не может решать обжалование.",
       "note": "Причина — не менее 5 символов.",
       "blockPermission": "Блокировка доступна только администраторам с правом управления пользователями."
+    },
+    "telegram": {
+      "saved": "Настройки Telegram сохранены.",
+      "otherUrl": "Бот сейчас направлен на другой адрес ({url}). Отметьте подтверждение, чтобы заменить.",
+      "invalidSecret": "TELEGRAM_WEBHOOK_SECRET не задан или имеет неверный формат.",
+      "notHttps": "Webhook можно установить только на HTTPS-адрес.",
+      "notConfigured": "TELEGRAM_BOT_TOKEN не настроен.",
+      "apiError": "Ошибка Telegram API: {code}.",
+      "webhookSet": "Webhook установлен.",
+      "webhookDeleted": "Webhook удалён.",
+      "confirmRequired": "Отметьте подтверждение.",
+      "commandsSynced": "Команды бота обновлены.",
+      "commandsFailed": "Не все наборы команд обновлены: {list}.",
+      "chatNotFound": "Чат не найден.",
+      "chatSaved": "Чат обновлён.",
+      "broadcastInvalid": "Выберите адресатов и введите текст.",
+      "broadcastSent": "Отправлено адресатам: {count}.",
+      "noTargets": "Ничего не отправлено — нет одобренных адресатов или Telegram не ответил.",
+      "listingNotFound": "Опубликованное объявление не найдено."
+    },
+    "support": {
+      "closed": "Обращение закрыто.",
+      "notFound": "Обращение не найдено.",
+      "invalid": "Ответ пустой или слишком длинный.",
+      "sent": "Ответ отправлен.",
+      "savedNotDelivered": "Ответ сохранён, но не доставлен в Telegram.",
+      "closedDone": "Обращение закрыто."
     }
   }
 }

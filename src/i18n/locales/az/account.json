@@ -666,6 +666,28 @@
         "left": "özü ayrılıb",
         "removed": "əməkdaşlıq dayandırılıb"
       }
+    },
+    "linkedLogins": {
+      "title": "Bağlı giriş üsulları",
+      "description": "Hesabınıza Google, Apple və ya Facebook ilə də daxil ola bilərsiniz. Bağlama yalnız bu sessiyadan başlayır — kimlik sizin hesabınıza bağlanır.",
+      "link": "Bağla",
+      "unlink": "Ayır",
+      "linked": "Bağlıdır",
+      "notLinked": "Bağlı deyil",
+      "unavailable": "Bu giriş üsulu hazırda aktiv deyil",
+      "lastMethod": "Bu, hesabınızın yeganə giriş yoludur. Ayırmazdan əvvəl parol qurun və ya başqa üsul bağlayın.",
+      "unlinkTitle": "{provider} ayrılsın?",
+      "unlinkDescription": "Bu üsulla artıq daxil ola bilməyəcəksiniz. İstənilən vaxt yenidən bağlaya bilərsiniz.",
+      "cancel": "Ləğv et",
+      "unlinked": "Giriş üsulu ayrıldı.",
+      "results": {
+        "linked": "{provider} hesabınıza bağlandı.",
+        "already": "{provider} artıq hesabınıza bağlıdır.",
+        "taken": "Bu {provider} hesabı başqa Luxe Home Estate hesabına bağlıdır.",
+        "other": "Hesabınıza artıq başqa {provider} hesabı bağlıdır — əvvəl onu ayırın.",
+        "mismatch": "Sessiya dəyişib — bağlama ləğv edildi. Yenidən daxil olub cəhd edin.",
+        "failed": "Bağlama alınmadı. Yenidən cəhd edin."
+      }
     }
   },
   "savedSearches": {
@@ -817,7 +839,8 @@
           "hint": "Hesabınızla bağlı kritik xəbərdarlıqlar"
         }
       },
-      "notLinked": "qoşulmayıb"
+      "notLinked": "qoşulmayıb",
+      "telegramNote": "Telegram sütunu yalnız Telegram hesabı bağlı və bildirişlər aktiv olduqda işləyir."
     },
     "summaryUnread": "{count} bildiriş · {unread} oxunmamış",
     "tabs": {
@@ -852,7 +875,41 @@
       "linkReady": "Telegram-da «Start» düyməsini basın, sonra «Yoxla».",
       "disconnected": "Telegram ayrıldı.",
       "unavailable": "Telegram kanalı hələ aktiv deyil.",
-      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin."
+      "failed": "Əməliyyat alınmadı. Yenidən cəhd edin.",
+      "link": "Telegram-ı bağla",
+      "linkPending": "Botda «Start» düyməsini seçin. Link 10 dəqiqə etibarlıdır və yalnız bir dəfə işləyir. Sonra bu səhifəyə qayıdın.",
+      "openBot": "Botu aç",
+      "refresh": "Statusu yenilə",
+      "unlink": "Ayır",
+      "unlinkTitle": "Telegram ayrılsın?",
+      "unlinkDescription": "Bu Telegram hesabına bildiriş getməyəcək və Telegram ilə giriş bu hesabda işləməyəcək. İstənilən vaxt yenidən bağlaya bilərsiniz.",
+      "unlinkConfirm": "Telegram-ı ayır",
+      "cancel": "Ləğv et",
+      "account": "Telegram hesabı",
+      "unnamed": "Adsız hesab",
+      "linkedAt": "Bağlanıb: {date}",
+      "lastDelivery": "Son çatdırılma",
+      "never": "Hələ göndərilməyib",
+      "deliveryStatus": {
+        "SENT": "Çatdırıldı",
+        "FAILED": "Alınmadı",
+        "BLOCKED": "Bot bloklanıb"
+      },
+      "consent": "Telegram bildirişlərini al",
+      "consentHint": "Telegram ilə giriş özü-özlüyündə razılıq deyil. Sakit saatlarda mesajlar səssiz gəlir; təhlükəsizlik bildirişləri istisnadır.",
+      "test": "Test bildirişi göndər",
+      "activeHint": "Telegram bildirişləri aktivdir.",
+      "blockedHint": "Bot sizə yaza bilmir — botu bloklamısınız və ya hələ başlatmamısınız. Botu açıb «Start» seçin.",
+      "rateLimited": "Çox tez-tez cəhd edildi. Bir az sonra yenidən yoxlayın.",
+      "unlinked": "Telegram hesabı ayrıldı.",
+      "notLinked": "Telegram hesabı bağlı deyil.",
+      "enabled": "Telegram bildirişləri aktivləşdirildi.",
+      "disabled": "Telegram bildirişləri söndürüldü.",
+      "testSent": "Test bildirişi göndərildi.",
+      "testQueued": "Telegram hazırda cavab vermir — bildiriş növbəyə alındı.",
+      "testFailed": "Test bildirişi göndərilmədi.",
+      "testUnavailable": "Əvvəlcə Telegram bildirişlərini aktivləşdirin.",
+      "blocked": "Bot bloklanıb — botda «Start» seçin."
     }
   },
   "recentlyViewed": {

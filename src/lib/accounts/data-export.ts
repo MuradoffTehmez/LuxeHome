@@ -48,6 +48,12 @@ export async function buildAccountExport(userId: string) {
   });
   if (!user) return null;
 
+  // Bağlı kənar kimliklər: Telegram istifadəçi adı və razılıq, sosial provayderlər — çat ID-si, OIDC `sub` və tokenlər yox.
+  const [telegramAccount, authIdentities] = await Promise.all([
+    prisma.telegramAccount.findUnique({ where: { userId }, select: { username: true, firstName: true, notificationsEnabled: true, linkedAt: true } }),
+    prisma.authIdentity.findMany({ where: { userId }, select: { provider: true, email: true, createdAt: true, lastUsedAt: true } }),
+  ]);
+
   const [
     agency,
     agentProfile,
@@ -275,6 +281,8 @@ export async function buildAccountExport(userId: string) {
     version: DATA_EXPORT_VERSION,
     exportedAt: new Date().toISOString(),
     profile: { ...profile, googleLinked: googleSub != null },
+    telegram: telegramAccount,
+    linkedLogins: authIdentities,
     agency: agency
       ? {
           ...agency,

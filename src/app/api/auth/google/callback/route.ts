@@ -9,6 +9,8 @@ import { openPublicSession } from "@/lib/auth/public-session";
 import { safePublicTarget } from "@/lib/auth/public-account-policy";
 import { revokeAllSessions } from "@/lib/auth/session";
 import { localizePath } from "@/i18n/path-locale";
+import { linkGoogleToUser, linkReturnPath } from "@/lib/auth/linked-logins";
+import { currentLinkingUser } from "@/lib/auth/linked-login-session";
 
 /**
  * Google OAuth callback (#109). Hesab bağlama qaydaları `googleLinkDecision()`-dadır;
@@ -40,6 +42,12 @@ export async function GET(request: Request) {
   if (!(await checkLoginLimit(clientIp(await headers())))) return fail("limit");
 
   const profile = await exchangeGoogleCode(code, flow).catch(() => null);
+  if (flow.linkUserId) {
+    // Kabinetdən «Google-u bağla»: giriş yox, cari sessiyanın hesabına `googleSub` yazılır.
+    const user = await currentLinkingUser(flow.linkUserId);
+    const outcome = !user ? "mismatch" : !profile ? "failed" : await linkGoogleToUser(user.id, profile.sub);
+    return NextResponse.redirect(new URL(linkReturnPath("GOOGLE", outcome, locale), request.url), 303);
+  }
   if (!profile) return fail("xeta");
 
   const [bySub, byEmail] = await Promise.all([

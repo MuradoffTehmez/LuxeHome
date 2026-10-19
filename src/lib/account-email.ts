@@ -15,6 +15,10 @@ const COPY = {
     resetText: "Parolunuzu yeniləmək üçün aşağıdakı düymədən istifadə edin. Link 1 saat etibarlıdır.",
     resetButton: "Parolu yenilə",
     ignore: "Bu sorğunu siz etməmisinizsə, məktubu nəzərə almayın.",
+    telegramSubject: "Telegram ilə qeydiyyatı tamamlayın",
+    telegramTitle: "E-poçtunuzu təsdiqləyin",
+    telegramText: "Luxe Home Estate hesabınızı Telegram ilə yaratmaq üçün aşağıdakı düyməni seçin. Link 30 dəqiqə etibarlıdır.",
+    telegramButton: "Qeydiyyatı tamamla",
   },
   en: {
     verifySubject: "Verify your Luxe Home Estate account",
@@ -26,6 +30,10 @@ const COPY = {
     resetText: "Use the button below to update your password. The link is valid for 1 hour.",
     resetButton: "Reset password",
     ignore: "If you did not request this, you can ignore this email.",
+    telegramSubject: "Complete your Telegram sign-up",
+    telegramTitle: "Confirm your email",
+    telegramText: "Use the button below to create your Luxe Home Estate account with Telegram. The link is valid for 30 minutes.",
+    telegramButton: "Complete sign-up",
   },
   ru: {
     verifySubject: "Подтвердите аккаунт Luxe Home Estate",
@@ -37,6 +45,10 @@ const COPY = {
     resetText: "Нажмите кнопку ниже, чтобы изменить пароль. Ссылка действует 1 час.",
     resetButton: "Изменить пароль",
     ignore: "Если вы не отправляли этот запрос, проигнорируйте письмо.",
+    telegramSubject: "Завершите регистрацию через Telegram",
+    telegramTitle: "Подтвердите электронную почту",
+    telegramText: "Нажмите кнопку ниже, чтобы создать аккаунт Luxe Home Estate через Telegram. Ссылка действует 30 минут.",
+    telegramButton: "Завершить регистрацию",
   },
 } satisfies Record<Locale, Record<string, string>>;
 
@@ -67,5 +79,17 @@ export async function sendPasswordResetEmail(email: string, token: string, local
     to: email,
     subject: copy.resetSubject,
     html: emailHtml(copy.resetTitle, copy.resetText, copy.resetButton, url, copy.ignore),
+  });
+}
+
+/** Telegram ilə qeydiyyat: link təsdiq səhifəsini açır, hesab yalnız orada düymə ilə yaranır. */
+export async function sendTelegramSignupEmail(email: string, token: string, localeValue?: string | null) {
+  const locale = resolvedLocale(localeValue);
+  const copy = COPY[locale];
+  const url = siteUrl(`${localizePath("/hesab/telegram-tesdiqi", locale)}?token=${encodeURIComponent(token)}`);
+  return sendEmail({
+    to: email,
+    subject: copy.telegramSubject,
+    html: emailHtml(copy.telegramTitle, copy.telegramText, copy.telegramButton, url, copy.ignore),
   });
 }

@@ -13,6 +13,8 @@ import { refreshActiveAccountsTrust } from "@/lib/account-trust";
 import { purgeSecurityLogs } from "@/lib/security/security-events";
 import { purgeKnownDevices } from "@/lib/security/login-alerts";
 import { DOMAIN_EVENT_RETENTION_DAYS } from "@/lib/security/retention-policy";
+import { purgeTelegramData } from "@/lib/telegram-bot/maintenance";
+import { purgeOAuthSignupTokens } from "@/lib/auth/social-login";
 
 
 /** Gündəlik cron üçün idempotent premium və rezervasiya müddəti təmizliyi. */
@@ -65,6 +67,9 @@ export async function runPhase2Maintenance(now = new Date()) {
   // Saxlama müddəti (#264, PRD 23.4): köhnə təhlükəsizlik hadisələri və giriş cəhdləri silinir.
   const securityLogs = await purgeSecurityLogs(now).catch(() => ({ events: 0, loginAttempts: 0 }));
   const knownDevices = await purgeKnownDevices(now).catch(() => 0);
+  // Telegram: idempotentlik qeydləri, köhnə çatdırılma jurnalı, istifadə olunmuş tokenlər, bağlı dəstək müraciətləri.
+  const telegram = await purgeTelegramData(now);
+  const socialSignupTokens = await purgeOAuthSignupTokens(now).catch(() => 0);
 
   return {
     expiredPremium: premium.count,
@@ -80,5 +85,7 @@ export async function runPhase2Maintenance(now = new Date()) {
     trustRefreshed,
     securityLogs,
     knownDevices,
+    telegram,
+    socialSignupTokens,
   };
 }

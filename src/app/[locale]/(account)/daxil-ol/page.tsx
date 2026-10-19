@@ -7,7 +7,7 @@ import { buildManagedMetadata } from "@/lib/seo";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { LoginForm } from "./login-form";
-import { GoogleSignIn } from "@/components/auth/google-sign-in";
+import { SocialSignIn } from "@/components/auth/social-sign-in";
 import { PhoneLogin } from "./phone-login";
 import { isSmsConfigured } from "@/lib/sms";
 import { localizePath } from "@/i18n/path-locale";
@@ -47,7 +47,13 @@ export default async function LoginPage({
     >
       <div className="flex flex-col gap-5">
         <LoginForm next={next} />
-        <GoogleSignIn next={next} error={typeof params.google === "string" ? params.google : undefined} />
+        <SocialSignIn
+          next={next}
+          googleError={typeof params.google === "string" ? params.google : undefined}
+          telegramError={typeof params.telegram === "string" ? params.telegram : undefined}
+          appleError={typeof params.apple === "string" ? params.apple : undefined}
+          facebookError={typeof params.facebook === "string" ? params.facebook : undefined}
+        />
         {isSmsConfigured() ? <PhoneLogin next={next} /> : null}
       </div>
     </AuthShell>

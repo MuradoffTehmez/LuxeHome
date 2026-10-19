@@ -1,5 +1,6 @@
 "use server";
 
+import { alertModerationQueued } from "@/lib/telegram-bot/admin-alerts";
 import { revalidatePath } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { type ActionState, failure, success, unexpected } from "@/lib/admin/action-state";
@@ -244,6 +245,10 @@ export async function updatePublicProperty(
       propertyId: id, from: nextStatus, to: PROPERTY_STATUSES.PENDING, source: PROPERTY_STATUS_SOURCES.SYSTEM,
       note: "Avtomatik moderasiya: yüksək risk",
     });
+  }
+  if (heldForReview || (nextStatus === PROPERTY_STATUSES.PENDING && property.status !== PROPERTY_STATUSES.PENDING)) {
+    // Moderasiya növbəsinə (yenidən) düşdü — admin Telegram xəbərdarlığı (heç vaxt atmır).
+    await alertModerationQueued({ propertyId: id, title: parsed.data.title, reason: heldForReview ? "risk" : "edit" });
   }
   queuePropertyVectorSync([id]);
   queueListingEnrichment(id);

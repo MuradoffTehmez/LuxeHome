@@ -10,7 +10,7 @@ import { type Locale } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { buildManagedMetadata } from "@/lib/seo";
 import { localizePath } from "@/i18n/path-locale";
-import { formatLocalizedRelative } from "@/i18n/date";
+import { formatLocalizedDateTime, formatLocalizedRelative } from "@/i18n/date";
 import { resolveNotificationPreferences } from "@/lib/notification-preferences";
 import { NOTIFICATION_CATEGORIES, parseCategoryChannels } from "@/lib/notification-categories";
 import {
@@ -24,8 +24,9 @@ import { MarkAllReadButton, NotificationList, type NotificationListItem } from "
 import { NotificationPreferences } from "./notification-preferences";
 import { PushPreferences } from "./push-preferences";
 import { CategoryPreferences, type TelegramChannelState } from "./category-preferences";
-import { TelegramConnect } from "./telegram-connect";
-import { isTelegramNotificationsConfigured } from "@/lib/telegram-notifications";
+import { TelegramCard, type TelegramCardStatus } from "./telegram-card";
+import { isTelegramBotConfigured } from "@/lib/telegram-bot/api";
+import { telegramBotUrl } from "@/lib/telegram-bot/linking";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -72,7 +73,7 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
       />
       {tabs}
       <div className="mt-6">
-        {filters.view === "settings" ? <SettingsView userId={user.id} /> : <ListView userId={user.id} filters={filters} locale={locale} unread={unread} total={total} />}
+        {filters.view === "settings" ? <SettingsView userId={user.id} locale={locale} /> : <ListView userId={user.id} filters={filters} locale={locale} unread={unread} total={total} />}
       </div>
     </div>
   );
@@ -153,17 +154,34 @@ async function ListView({ userId, filters, locale, unread, total }: { userId: st
   );
 }
 
-async function SettingsView({ userId }: { userId: string }) {
-  const [storedPreference, account] = await Promise.all([
+async function SettingsView({ userId, locale }: { userId: string; locale: Locale }) {
+  const [storedPreference, telegramAccount] = await Promise.all([
     prisma.notificationPreference.findUnique({ where: { userId } }),
-    prisma.user.findUnique({ where: { id: userId }, select: { telegramChatId: true } }),
+    prisma.telegramAccount.findUnique({
+      where: { userId },
+      select: { username: true, firstName: true, notificationsEnabled: true, botAccess: true, blockedAt: true, linkedAt: true, lastDeliveryAt: true, lastDeliveryStatus: true },
+    }),
   ]);
   const preferences = resolveNotificationPreferences(storedPreference);
-  const telegram: TelegramChannelState = !isTelegramNotificationsConfigured() ? "unavailable" : account?.telegramChatId ? "linked" : "unlinked";
+  const configured = isTelegramBotConfigured();
+  // Kateqoriya sütunu hesab bağlanınca aktivdir; göndəriş yenə ayrıca razılığa (`notificationsEnabled`) tabedir.
+  const telegram: TelegramChannelState = !configured ? "unavailable" : telegramAccount ? "linked" : "unlinked";
+  const telegramStatus: TelegramCardStatus = {
+    linked: Boolean(telegramAccount),
+    username: telegramAccount?.username ?? null,
+    firstName: telegramAccount?.firstName ?? null,
+    notificationsEnabled: telegramAccount?.notificationsEnabled ?? false,
+    botAccess: telegramAccount?.botAccess ?? false,
+    blocked: Boolean(telegramAccount?.blockedAt),
+    linkedAt: telegramAccount ? formatLocalizedDateTime(telegramAccount.linkedAt, locale, "short") ?? null : null,
+    lastDelivery: telegramAccount?.lastDeliveryAt && telegramAccount.lastDeliveryStatus
+      ? { status: telegramAccount.lastDeliveryStatus, at: formatLocalizedDateTime(telegramAccount.lastDeliveryAt, locale, "short") ?? "" }
+      : null,
+  };
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <PushPreferences />
-      <TelegramConnect state={telegram} />
+      <TelegramCard configured={configured} status={telegramStatus} botUrl={telegramBotUrl()} />
       <CategoryPreferences values={parseCategoryChannels(storedPreference?.categoryChannels)} telegram={telegram} />
       <NotificationPreferences values={preferences} />
     </div>

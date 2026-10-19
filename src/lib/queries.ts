@@ -2623,6 +2623,8 @@ export type SavedSearchMatchStore = {
     searchName: string,
   ): Promise<void>;
   sendPush?(userId: string, title: string, property: SavedSearchMatchProperty, locale: string): Promise<void>;
+  /** Telegram nüsxəsi — hesab razılığı və kateqoriya seçimi `notifyTelegramUser`-dədir. */
+  sendTelegram?(input: { userId: string; title: string; property: SavedSearchMatchProperty; dedupeKey: string }): Promise<void>;
 };
 
 export async function runSavedSearchMatching(
@@ -2693,6 +2695,15 @@ async function matchOneSavedSearch(
       await store.sendPush(search.userId, copy.title, property, search.user.locale);
     } catch (error) {
       console.error("[saved-search] push göndərilmədi:", error);
+    }
+  }
+
+  // Telegram ani kanaldır: yalnız «dərhal» tezliyində göndərilir, gündəlik/həftəlik seçim e-poçt digest-inə qalır.
+  if (search.frequency === SAVED_SEARCH_FREQUENCIES.IMMEDIATE && store.sendTelegram) {
+    try {
+      await store.sendTelegram({ userId: search.userId, title: copy.title, property, dedupeKey: `saved-search:${search.id}:${propertyId}` });
+    } catch (error) {
+      console.error("[saved-search] Telegram bildirişi göndərilmədi:", error instanceof Error ? error.name : "unknown");
     }
   }
 
@@ -2811,6 +2822,11 @@ export const savedSearchMatchStore: SavedSearchMatchStore = {
     const { sendPushToUser } = await import("@/lib/push");
     const safeLocale = (LOCALE_VALUES as readonly string[]).includes(locale) ? locale as Locale : DEFAULT_LOCALE;
     await sendPushToUser(userId, { title, body: property.title, url: localizePath(`/emlaklar/${property.slug}`, safeLocale), tag: `saved-search-${property.slug}` });
+  },
+
+  async sendTelegram({ userId, title, property, dedupeKey }) {
+    const { notifyTelegramUser } = await import("@/lib/telegram-bot/delivery");
+    await notifyTelegramUser({ userId, type: NOTIFICATION_TYPES.SAVED_SEARCH_MATCH, title, content: property.title, path: `/emlaklar/${property.slug}`, dedupeKey });
   },
 
   async notificationCopy(locale, searchName) {

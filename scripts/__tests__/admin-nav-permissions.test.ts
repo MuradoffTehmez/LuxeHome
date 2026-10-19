@@ -1,8 +1,11 @@
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { posix } from "node:path";
 import { describe, expect, it } from "vitest";
 import { adminNav } from "../../src/components/admin/admin-nav";
 import { PERMISSIONS } from "../../src/lib/constants";
+
+// `posix`: Windows-da `join` əks xətt qaytarır və aşağıdakı `src/app/admin` müqayisəsi layout-u heç tapmırdı.
+const { dirname, join } = posix;
 
 /**
  * Admin menyusu rola görə süzülür (`adminNavForRole`). Bəndin icazəsi səhifənin öz guard-ı ilə eyni

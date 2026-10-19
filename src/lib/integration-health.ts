@@ -15,6 +15,10 @@ export type IntegrationHealthId =
   | "push"
   | "telegram"
   | "googleLogin"
+  | "telegramBot"
+  | "telegramLogin"
+  | "appleLogin"
+  | "facebookLogin"
   | "phoneLogin";
 
 export type IntegrationHealthItem = {
@@ -82,6 +86,12 @@ export function getIntegrationHealth(): IntegrationHealthItem[] {
     envHealth("telegram", ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"], true),
     // İctimai hesab üçün Google ilə giriş (#109) — açarlar olmayanda düymə görünmür.
     envHealth("googleLogin", ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"], true),
+    // Telegram bot webhook-u (komandalar, hesab bağlama, istifadəçi bildirişləri) və Telegram Login (OIDC).
+    envHealth("telegramBot", ["TELEGRAM_BOT_TOKEN", "TELEGRAM_WEBHOOK_SECRET"], true),
+    envHealth("telegramLogin", ["TELEGRAM_CLIENT_ID", "TELEGRAM_CLIENT_SECRET"], true),
+    // Apple və Facebook ilə giriş — açarlar olmayanda düymə görünmür, marşrut 404 verir.
+    envHealth("appleLogin", ["APPLE_CLIENT_ID", "APPLE_TEAM_ID", "APPLE_KEY_ID", "APPLE_PRIVATE_KEY"], true),
+    envHealth("facebookLogin", ["FACEBOOK_APP_ID", "FACEBOOK_APP_SECRET"], true),
     // Telefonla OTP girişi (#109) — SMS provayderi qurulana qədər söndürülüdür.
     envHealth("phoneLogin", ["SMS_PROVIDER_URL", "SMS_PROVIDER_TOKEN"], true),
     {

@@ -112,7 +112,9 @@
       "promotionHub": "Listing promotion",
       "promotionOverview": "Overview",
       "trustHub": "Security and moderation",
-      "botProtection": "Bot protection"
+      "botProtection": "Bot protection",
+      "telegram": "Telegram",
+      "support": "Support (Telegram)"
     },
     "sections": {
       "seoDaily": "Monitoring",
@@ -2659,7 +2661,11 @@
       "integrationTelegram": "Telegram lead alerts",
       "integrationPush": "Push notifications",
       "integrationGoogleLogin": "Sign in with Google",
-      "integrationPhoneLogin": "Phone OTP sign-in (SMS)"
+      "integrationPhoneLogin": "Phone OTP sign-in (SMS)",
+      "integrationTelegramBot": "Telegram bot (webhook)",
+      "integrationTelegramLogin": "Sign in with Telegram",
+      "integrationAppleLogin": "Sign in with Apple",
+      "integrationFacebookLogin": "Sign in with Facebook"
     },
     "propertyImport": {
       "title": "Bulk CSV import",
@@ -3727,7 +3733,11 @@
         "FORBIDDEN": "Forbidden request",
         "CSRF_BLOCKED": "Cross-site request rejected",
         "RATE_LIMITED": "Write rate limit",
-        "PASSWORD_CHANGED": "Password changed"
+        "PASSWORD_CHANGED": "Password changed",
+        "TELEGRAM_LINKED": "Telegram linked",
+        "TELEGRAM_UNLINKED": "Telegram unlinked",
+        "LOGIN_METHOD_LINKED": "Sign-in method linked",
+        "LOGIN_METHOD_UNLINKED": "Sign-in method unlinked"
       }
     },
     "promotionHub": {
@@ -3771,6 +3781,146 @@
         "vip": "VIP",
         "promotion": "Promotion"
       }
+    },
+    "telegram": {
+      "title": "Telegram integration",
+      "description": "Bot, webhook, admin alerts, groups/channels and delivery statistics. Secret values are never shown here.",
+      "configured": "Configured",
+      "missing": "Missing",
+      "envTitle": "Environment variables",
+      "envDescription": "Cloudflare secrets — only presence is shown.",
+      "botUsername": "Bot username",
+      "secretInvalid": "TELEGRAM_WEBHOOK_SECRET has an invalid format: 16–256 characters, only A–Z, a–z, 0–9, «_» and «-».",
+      "healthTitle": "Bot and webhook status",
+      "notConfigured": "TELEGRAM_BOT_TOKEN is not configured.",
+      "bot": "Bot",
+      "apiError": "Telegram error {code}",
+      "privacyModeOff": "The bot's Privacy Mode is off — it receives every group message. Turn it back on in BotFather if not needed.",
+      "webhookUrl": "Webhook URL",
+      "webhookNone": "No webhook set",
+      "expectedUrl": "This environment's URL: {url}",
+      "webhookOk": "Points to this environment",
+      "webhookMismatch": "Points to another URL",
+      "pending": "Pending updates",
+      "lastError": "Last error",
+      "noErrors": "No errors",
+      "setupTitle": "Setup",
+      "setupDescription": "Set the webhook only to this environment's URL. Two environments cannot share one bot token's webhook.",
+      "setWebhook": "Set webhook",
+      "setWebhookHint": "setWebhook: secret_token, allowed_updates (message, callback_query, my_chat_member); pending updates are kept.",
+      "overrideOther": "The bot currently points to another URL. I confirm replacing it.",
+      "syncCommands": "Sync commands",
+      "syncCommandsHint": "setMyCommands: /start, /help, /account, /notifications, /settings, /stop, /support, /language — AZ (default), EN, RU.",
+      "deleteWebhook": "Delete webhook",
+      "deleteWebhookHint": "Rollback: the webhook is removed, pending updates stay in Telegram for 24 hours.",
+      "deleteConfirm": "I confirm deleting the webhook",
+      "configTitle": "Admin alerts",
+      "alertsLegend": "Alerts sent to the office chat and approved groups",
+      "alerts": {
+        "LEAD": {
+          "label": "New enquiry",
+          "hint": "Contact form and listing enquiries."
+        },
+        "RESERVATION": {
+          "label": "Viewing request",
+          "hint": "Reservations and open-house registrations."
+        },
+        "MODERATION": {
+          "label": "Moderation queue",
+          "hint": "New or re-submitted listings awaiting review."
+        },
+        "REPORT": {
+          "label": "Listing report",
+          "hint": "Only reasons and listing title — no reporter data."
+        },
+        "SUPPORT": {
+          "label": "Support request",
+          "hint": "Telegram /support messages."
+        },
+        "SYSTEM": {
+          "label": "System failure",
+          "hint": "When a cron job fails (once per hour)."
+        }
+      },
+      "leadContact": "Show name, phone and email in enquiry alerts",
+      "leadContactHint": "When off, only a masked number and a panel link are sent; full details open in the panel after the role check.",
+      "stats": {
+        "linked": "Linked accounts",
+        "consenting": "Receiving notifications",
+        "sent": "Sent",
+        "failed": "Failed / queued",
+        "last7": "Last 7 days",
+        "failedHint": "Queued: {pending}"
+      },
+      "failuresTitle": "Recent failed deliveries",
+      "noFailures": "No failed deliveries in the last 7 days.",
+      "failureLine": "Error {error} · {attempts} attempts · {date}",
+      "chatsTitle": "Groups and channels",
+      "chatsDescription": "When the bot is added to a group or channel (as admin) it appears here as «Pending». Nothing is sent there until approved.",
+      "noChats": "No groups or channels yet.",
+      "cannotPost": "Cannot post",
+      "chatTypes": {
+        "group": "Group",
+        "channel": "Channel"
+      },
+      "chatStatus": {
+        "PENDING": "Pending",
+        "APPROVED": "Approved",
+        "DISABLED": "Disabled"
+      },
+      "categories": {
+        "ADMIN_ALERTS": "Admin alerts",
+        "LISTINGS": "Listing sharing",
+        "BROADCAST": "Broadcast"
+      },
+      "broadcastTitle": "Broadcast and listing sharing",
+      "broadcastDescription": "Sent only to approved targets with the matching category. Users' personal notifications never go to groups.",
+      "targets": "Targets",
+      "noBroadcastTargets": "No approved targets with the «Broadcast» category.",
+      "noListingTargets": "No approved targets with the «Listing sharing» category.",
+      "broadcastText": "Message text",
+      "send": "Send",
+      "listing": "Listing (slug, ID or link)",
+      "listingHint": "Only published listings can be shared.",
+      "share": "Share"
+    },
+    "support": {
+      "title": "Support requests",
+      "description": "Requests received via Telegram /support. Open: {open}.",
+      "filter": "Status filter",
+      "tabs": {
+        "active": "Active"
+      },
+      "status": {
+        "OPEN": "Open",
+        "ANSWERED": "Answered",
+        "CLOSED": "Closed"
+      },
+      "empty": "No requests.",
+      "columns": {
+        "who": "Requester",
+        "status": "Status",
+        "messages": "Messages",
+        "updated": "Updated"
+      },
+      "anonymous": "Telegram user",
+      "linked": "Linked to account",
+      "notLinked": "Not linked",
+      "pagination": "Pages",
+      "prev": "← Previous",
+      "next": "Next →",
+      "ticketTitle": "Request No. {id}",
+      "thread": "Conversation",
+      "operator": "Operator",
+      "customer": "User",
+      "replyTitle": "Reply",
+      "closedHint": "The request is closed.",
+      "send": "Send reply",
+      "reply": "Reply text",
+      "replyHint": "The reply will be sent to the user in Telegram.",
+      "noChat": "This request has no Telegram chat — the reply will only be stored.",
+      "close": "Close request",
+      "closeHint": "The user is told the request was closed. Messages of closed requests are deleted after 90 days."
     }
   },
   "server": {
@@ -4295,6 +4445,33 @@
       "sameReviewer": "The staff member who applied the measure cannot resolve the appeal.",
       "note": "The reason must be at least 5 characters.",
       "blockPermission": "Blocking is only available to administrators with user management permission."
+    },
+    "telegram": {
+      "saved": "Telegram settings saved.",
+      "otherUrl": "The bot currently points to another URL ({url}). Tick the confirmation box to replace it.",
+      "invalidSecret": "TELEGRAM_WEBHOOK_SECRET is missing or has an invalid format.",
+      "notHttps": "The webhook can only be set to an HTTPS URL.",
+      "notConfigured": "TELEGRAM_BOT_TOKEN is not configured.",
+      "apiError": "Telegram API error: {code}.",
+      "webhookSet": "Webhook set.",
+      "webhookDeleted": "Webhook deleted.",
+      "confirmRequired": "Tick the confirmation box.",
+      "commandsSynced": "Bot commands updated.",
+      "commandsFailed": "Some command sets were not updated: {list}.",
+      "chatNotFound": "Chat not found.",
+      "chatSaved": "Chat updated.",
+      "broadcastInvalid": "Choose targets and enter text.",
+      "broadcastSent": "Sent to {count} targets.",
+      "noTargets": "Nothing was sent — no approved targets or Telegram did not respond.",
+      "listingNotFound": "Published listing not found."
+    },
+    "support": {
+      "closed": "The request is closed.",
+      "notFound": "Request not found.",
+      "invalid": "The reply is empty or too long.",
+      "sent": "Reply sent.",
+      "savedNotDelivered": "Reply saved but not delivered to Telegram.",
+      "closedDone": "Request closed."
     }
   }
 }
