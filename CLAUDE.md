@@ -255,6 +255,35 @@ Aralıq mərhələ ayrıca `subject`-li cookie ilə işarələnir, ona görə ik
 düşmək mümkün deyil. `?davam=` parametri bu cookie-nin içində daşınır və yalnız `/admin` ilə
 başlayan marşrutlar qəbul edilir (açıq yönləndirmə qorunması).
 
+### Telegram inteqrasiyası və sosial giriş (Telegram, Apple, Facebook)
+
+Əməliyyat (secret-lər, BotFather/Apple/Meta, webhook, rollback): `docs/telegram-and-social-login.md`. Kod `src/lib/telegram-bot/`-dadır
+(`src/lib/telegram.ts` köhnə `notifyLeadOnTelegram`/`sendTelegramMessage` imzasını saxlayır və oraya ötürür).
+
+- **Kimlik `User.telegram` deyil.** O, profil əlaqəsidir (istifadəçi adı). Təsdiqlənmiş kimlik `TelegramAccount.telegramUserId`-dir
+  (webhook `from.id` = OIDC `id`, mətn kimi); OIDC `sub` ayrıca. İstifadəçi adı/ad/şəkil ilə hesab birləşdirmə yazma.
+- **Telegram Login** OIDC + PKCE + state + nonce (`auth/telegram-oidc.ts`, qərarlar saf `telegram-login-policy.ts`). Telegram e-poçt
+  vermir: tanınmayan kimlik `/qeydiyyat/telegram` → e-poçt linki → `/hesab/telegram-tesdiqi` (POST) ilə hesab yaranır; mövcud hesab
+  Telegram-ı kabinetdən deep-link ilə bağlayır (`linking.ts`: 10 dəq, birdəfəlik, yalnız heş, kimlik webhook hadisəsindən).
+- **Apple/Facebook** `AuthIdentity` (provayder + `sub`) üzərindədir, qərarlar `social-login-policy.ts`. Apple e-poçtu təsdiqli sayılır
+  (Google qaydası: bağlama, təsdiqsiz hesabın parolu ləğv olunur); Facebook təsdiq bayrağı vermir — mövcud e-poçta bağlanmır, yeni
+  hesab `/hesab/sosial-tesdiq` linkindən sonra yaranır. Apple callback `form_post` POST-dur, flow cookie-si `SameSite=None`.
+  Yeni sosial provayder əlavə edəndə də e-poçt təsdiq vəziyyətinə görə bu iki yoldan birini seç; GET linki token istifadə etməməlidir.
+- **Bağlı giriş üsulları** (kabinet → Profil, `linked-logins*.ts`, sessiya köməkçiləri `linked-login-session.ts`): bağlama
+  `start?bagla=1` ilə, hədəf hesab imzalı flow cookie-sindədir və callback-də cari sessiya ilə yoxlanılır — sorğudan gələn
+  id-yə etibar etmə. Apple bağlaması POST → imzalı nəticə cookie-si → GET `/api/auth/apple/link`, çünki sessiya cookie-si `Lax`-dır.
+  Son giriş yolu ayrılmır (`canUnlinkLogin`).
+- **Webhook** `POST /api/telegram/webhook` (`webhook.ts`): secret başlığı sabit vaxtla, 64 KB limit, Zod sxemi, `TelegramUpdate`
+  idempotentliyi (emal xətasında qeyd silinir → Telegram təkrarlayır), göndərən üzrə limit. Bot komandaları `bot.ts`, mətnlər `copy.ts`.
+- **Bildirişlər:** `notifyAccount` Telegram kanalını da çağırır (`notifyTelegramUser`); qiymət endirimi və «dərhal» saxlanmış axtarış
+  da. Göndəriş üç şərtə tabedir: bağlı hesab + `notificationsEnabled` (açıq razılıq; Telegram ilə giriş razılıq deyil) + kateqoriya
+  `telegram` sütunu. `SECURITY` kateqoriyadan və sakit saatdan azaddır, razılıqdan yox. Sakit saatda mesaj **səssiz** gedir.
+  Çatdırılma `TelegramDelivery` növbəsidir: 429/5xx → `PENDING` + 10 dəqiqəlik cron retry, 403/«chat not found» → hədəf bağlanır.
+- **Admin xəbərdarlıqları** `admin-alerts.ts` (ofis çatı + təsdiqlənmiş «ADMIN_ALERTS» qrupları), növlər paneldə ayrıca söndürülür
+  (`SETTING_KEYS.TELEGRAM_CONFIG`). Xəbərdarlıqda şikayətçi/dəstək mətni olmur; link panelə aparır, rol yoxlamasını keçmir.
+- **Qrup/kanal** yalnız `my_chat_member` hadisəsindən `PENDING` qeydə alınır; admin təsdiqləyib kateqoriya seçmədən göndəriş yoxdur.
+  Şəxsi bildirişi qrupa göndərmə. Panel `/admin/telegram` (`settings:manage`), dəstək `/admin/destek` (`lead:manage`).
+
 ### Klientə gedən mesajlar (#183)
 
 Kök layout `NextIntlClientProvider`-ə bütün kataloqu deyil, yalnız `src/i18n/client-messages.ts`-dəki
@@ -311,14 +340,10 @@ Panel öz yolunu işlədir:
 - **Əməkdaş ictimai saytda:** kabinet yalnız ictimai sessiyanı qəbul edir — header-in «Elan yerləşdir» və mobil alt
   naviqasiyanın «Hesab» düyməsi əməkdaşı panelə (`<a>`, tam yükləmə) aparır. Kabinetə link yazanda bunu nəzərə al.
 - «Elanlarım» status tabları `lib/accounts/listing-status-groups.ts`-dədir (`?status=aktiv|yoxlamada|diqqet|baglanmis`).
-- **Telegram bildiriş kanalı** (`lib/telegram-notifications.ts`, saf qaydalar `telegram-link-policy.ts`): istifadəçi kabinetdə
-  «Telegram-ı qoş» → birdəfəlik 15 dəqiqəlik token (bazada yalnız SHA-256) → `t.me/<bot>?start=<token>` → bot
-  `POST /api/telegram/webhook`-a `/start <token>` göndərir (başlıq `X-Telegram-Bot-Api-Secret-Token` yoxlanır, yalnız
-  şəxsi çat) → `User.telegramChatId` (`0087`). `notifyAccount` kateqoriyada `telegram` seçilibsə və çat bağlıdırsa göndərir;
-  bot bloklananda (403) bağlantı silinir. Üç dəyərdən biri (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`,
-  `TELEGRAM_WEBHOOK_SECRET`) yoxdursa kanal «tezliklə» qalır. Webhook bir dəfə qurulur:
-  `https://api.telegram.org/bot<TOKEN>/setWebhook?url=<SITE_URL>/api/telegram/webhook&secret_token=<SECRET>`.
-  Bağlanmamış hesabda Telegram sütunu deaktivdir və saxlanmış seçim üzərinə yazılmır.
+- **Telegram bildiriş kanalı** — `src/lib/telegram-bot/` (bax «Telegram inteqrasiyası və sosial giriş»). #277-dəki sadə
+  `User.telegramChatId` kanalı `0088`-də `TelegramAccount`-a köçürülüb (razılıq açıq qalıb) və sütunlar silinib — bir
+  kimlik mənbəyi var. Kabinetin «Parametrlər» tabında `TelegramCard`; bağlanmamış hesabda Telegram sütunu deaktivdir və
+  saxlanmış seçim üzərinə yazılmır. Webhook-u panel → Telegram → «Webhook-u qur» quraşdırır (`docs/telegram-and-social-login.md`).
 - **Bildiriş mərkəzi** `/kabinet/bildirisler`: əsas görünüş siyahıdır, seçimlər `?gorunus=parametrler` tabındadır; filtr
   vəziyyəti URL-dədir (`lib/notification-filters.ts`, saf). Link əsaslı tab/seqment üçün `components/ui/segmented-tabs.tsx`.
 
@@ -1222,6 +1247,13 @@ Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur 
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
 
+### Hüquqi səhifələr (#285)
+
+Məxfilik siyasəti, İstifadə şərtləri və Cookie siyasəti `src/i18n/legal/` altındadır (`az.ts` təsdiqlənmiş əsas mətn,
+`en.ts`/`ru.ts` tərcümə, rekvizitlər `siteConfig`-dən). Bölmə əlavə edəndə üç dilə də yaz — `legal-documents.test.ts`
+strukturu müqayisə edir. Lövbərlər `LEGAL_ANCHORS`-dadır: `#hesabin-silinmesi` Meta-nın «Data Deletion Instructions URL»-i
+kimi işlənir, adını dəyişmə. Yeni cookie, yaddaş açarı və ya xidmət təminatçısı əlavə edəndə cookie/məxfilik cədvəllərini də yenilə.
+
 ### Nümunə (demo) məzmun
 
 `Property`, `Project`, `BlogPost`, `Agency`, `AgentProfile` və `Partner` modellərində
@@ -1374,8 +1406,9 @@ uyğun Wiki səhifəsi, README, AGENTS.md və MEMORY.md eyni PR-da yenilənir. Q
 - Gizli dəyərlər `.env`-də deyil, Cloudflare secret-lərindədir:
   `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFICATION_EMAIL`,
   `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; istəyə bağlı `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
-  `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` (#109); şəxsi Telegram bildirişləri üçün `TELEGRAM_BOT_USERNAME`
-  və `TELEGRAM_WEBHOOK_SECRET`. Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
+  `SMS_PROVIDER_URL`, `SMS_PROVIDER_TOKEN`, `SMS_SENDER` (#109); Telegram bot/Login `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CLIENT_ID`,
+  `TELEGRAM_CLIENT_SECRET`, `TELEGRAM_BOT_USERNAME`; Apple `APPLE_CLIENT_ID`, `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`;
+  Facebook `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` (`docs/telegram-and-social-login.md`). Yenisi `npx wrangler secret put <AD>` ilə əlavə olunur.
 - **Telegram lead bildirişi** (`src/lib/telegram.ts`, #103): əlaqə müraciəti və baxış
   sorğusu ofis çatına gedir. Secret yoxdursa səssizcə buraxılır, `notifyLeadOnTelegram()`
   heç vaxt atmır — müraciət artıq yazılıb, bildiriş xətası onu uğursuz göstərməməlidir.

@@ -32,7 +32,7 @@ describe("kateqoriya qaydaları", () => {
   it("pozulmuş JSON defolta qayıdır; təhlükəsizlik söndürülə bilmir və saxlanmır", () => {
     expect(parseCategoryChannels("{pozuq")).toEqual(defaultCategoryChannels());
     const parsed = parseCategoryChannels(JSON.stringify({ LEADS: { inApp: false, email: true }, SECURITY: { inApp: false, email: false }, NAMELUM: { inApp: false } }));
-    // Köhnə saxlanmış seçimdə `telegram` yoxdur — defolt (açıq) qalır, bot bağlanmayınca göndərilmir.
+    // Köhnə JSON-da Telegram açarı yoxdur — defolt (açıq) qalır; göndəriş yenə hesab razılığına tabedir.
     expect(parsed.LEADS).toEqual({ inApp: false, email: true, telegram: true });
     expect(parsed.SECURITY).toEqual({ inApp: true, email: true, telegram: true });
     expect(channelsForType("SECURITY", { ...parsed, SECURITY: { inApp: false, email: false, telegram: false } })).toEqual({ inApp: true, email: true, telegram: true });

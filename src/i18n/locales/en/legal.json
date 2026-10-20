@@ -4,5 +4,10 @@
   "terms": "Terms of use",
   "cookies": "Cookie policy",
   "updated": "Last updated: {date}",
-  "contact": "Contact"
+  "contact": "Contact",
+  "documents": "Legal documents",
+  "toc": "Contents",
+  "voen": "TIN",
+  "address": "Address",
+  "contactCta": "Contact us"
 }

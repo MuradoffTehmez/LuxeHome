@@ -6,7 +6,7 @@ import { AuthAside } from "@/components/auth/auth-aside";
 import { getOptionalUser } from "@/lib/auth/guard";
 import { ACCOUNT_TYPES, type Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
-import { GoogleSignIn } from "@/components/auth/google-sign-in";
+import { SocialSignIn } from "@/components/auth/social-sign-in";
 import { RegisterForm } from "./register-form";
 import { localizePath } from "@/i18n/path-locale";
 import { getAgencyDirectory } from "@/lib/queries";
@@ -51,7 +51,7 @@ export default async function RegisterPage({
       aside={<AuthAside eyebrow={t("asideEyebrow")} title={t("asideTitle")} items={benefits} />}
     >
       <div className="flex flex-col gap-5">
-        <GoogleSignIn next={next} placement="before" />
+        <SocialSignIn next={next} placement="before" />
         <RegisterForm
           next={next}
           agencies={agencies}

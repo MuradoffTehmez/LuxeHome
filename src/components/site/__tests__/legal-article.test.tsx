@@ -18,7 +18,7 @@ describe("LegalArticle", () => {
 
     expect(html).toContain('aria-label="Naviqasiya yolu"');
     expect(html).toContain('href="/"');
-    expect(html).toContain("max-w-[68ch]");
+    expect(html).toContain("max-w-[72ch]");
     expect(html).toContain("overflow-wrap:anywhere");
     expect(html).toContain("scroll-mt-28");
   });

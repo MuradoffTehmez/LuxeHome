@@ -666,6 +666,28 @@
         "left": "left",
         "removed": "collaboration ended"
       }
+    },
+    "linkedLogins": {
+      "title": "Linked sign-in methods",
+      "description": "You can also sign in with Google, Apple or Facebook. Linking starts only from this session — the identity is added to your account.",
+      "link": "Link",
+      "unlink": "Unlink",
+      "linked": "Linked",
+      "notLinked": "Not linked",
+      "unavailable": "This sign-in method is not active at the moment",
+      "lastMethod": "This is your account's only sign-in method. Set a password or link another method before unlinking.",
+      "unlinkTitle": "Unlink {provider}?",
+      "unlinkDescription": "You will no longer be able to sign in with this method. You can link it again at any time.",
+      "cancel": "Cancel",
+      "unlinked": "Sign-in method unlinked.",
+      "results": {
+        "linked": "{provider} has been linked to your account.",
+        "already": "{provider} is already linked to your account.",
+        "taken": "This {provider} account is linked to another Luxe Home Estate account.",
+        "other": "Another {provider} account is already linked — unlink it first.",
+        "mismatch": "Your session changed — linking was cancelled. Sign in and try again.",
+        "failed": "Linking failed. Please try again."
+      }
     }
   },
   "savedSearches": {
@@ -817,7 +839,8 @@
           "hint": "Critical alerts about your account"
         }
       },
-      "notLinked": "not connected"
+      "notLinked": "not connected",
+      "telegramNote": "The Telegram column only works when a Telegram account is linked and notifications are enabled."
     },
     "summaryUnread": "{count} notifications · {unread} unread",
     "tabs": {
@@ -852,7 +875,41 @@
       "linkReady": "Press «Start» in Telegram, then «Check».",
       "disconnected": "Telegram disconnected.",
       "unavailable": "The Telegram channel is not active yet.",
-      "failed": "Something went wrong. Please try again."
+      "failed": "Something went wrong. Please try again.",
+      "link": "Link Telegram",
+      "linkPending": "Tap «Start» in the bot. The link is valid for 10 minutes and works only once. Then come back to this page.",
+      "openBot": "Open bot",
+      "refresh": "Refresh status",
+      "unlink": "Unlink",
+      "unlinkTitle": "Unlink Telegram?",
+      "unlinkDescription": "Notifications will no longer be sent to this Telegram account and Telegram sign-in will stop working for this account. You can link it again at any time.",
+      "unlinkConfirm": "Unlink Telegram",
+      "cancel": "Cancel",
+      "account": "Telegram account",
+      "unnamed": "Unnamed account",
+      "linkedAt": "Linked: {date}",
+      "lastDelivery": "Last delivery",
+      "never": "Nothing sent yet",
+      "deliveryStatus": {
+        "SENT": "Delivered",
+        "FAILED": "Failed",
+        "BLOCKED": "Bot blocked"
+      },
+      "consent": "Receive Telegram notifications",
+      "consentHint": "Signing in with Telegram is not consent by itself. During quiet hours messages arrive silently; security notices are the exception.",
+      "test": "Send test notification",
+      "activeHint": "Telegram notifications are on.",
+      "blockedHint": "The bot cannot message you — you blocked it or have not started it yet. Open the bot and tap «Start».",
+      "rateLimited": "Too many attempts. Please try again shortly.",
+      "unlinked": "Telegram account unlinked.",
+      "notLinked": "No Telegram account is linked.",
+      "enabled": "Telegram notifications enabled.",
+      "disabled": "Telegram notifications disabled.",
+      "testSent": "Test notification sent.",
+      "testQueued": "Telegram is not responding right now — the notification was queued.",
+      "testFailed": "The test notification was not sent.",
+      "testUnavailable": "Enable Telegram notifications first.",
+      "blocked": "The bot is blocked — tap «Start» in the bot."
     }
   },
   "recentlyViewed": {

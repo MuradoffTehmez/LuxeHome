@@ -1,5 +1,6 @@
 "use server";
 
+import { alertModerationQueued } from "@/lib/telegram-bot/admin-alerts";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -195,6 +196,10 @@ export async function createPublicProperty(
       note: heldForReview ? (gate.review ? "Hesab tədbiri: moderator yoxlaması" : "Avtomatik moderasiya: yüksək risk") : null,
     });
 
+    if (heldForReview || finalPolicy.status !== PROPERTY_STATUSES.PUBLISHED) {
+      // Moderasiya növbəsinə düşdü — admin Telegram xəbərdarlığı (heç vaxt atmır).
+      await alertModerationQueued({ propertyId: created.id, title: parsed.data.title, reason: heldForReview && !gate.review ? "risk" : "new" });
+    }
     if (finalPolicy.status === PROPERTY_STATUSES.PUBLISHED && !heldForReview) {
       await notifyMatchingSavedSearches(created.id);
       queuePropertyVectorSync([created.id]);

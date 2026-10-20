@@ -95,10 +95,10 @@ export async function saveCategoryChannels(_previous: ActionState, formData: For
   try {
     // Telegram sütunu hesab bota bağlanmayınca deaktivdir və göndərilmir — saxlanmış seçim itməsin.
     const [account, stored] = await Promise.all([
-      prisma.user.findUnique({ where: { id: user.id }, select: { telegramChatId: true } }),
+      prisma.telegramAccount.findUnique({ where: { userId: user.id }, select: { id: true } }),
       prisma.notificationPreference.findUnique({ where: { userId: user.id }, select: { categoryChannels: true } }),
     ]);
-    if (!account?.telegramChatId) {
+    if (!account) {
       const previous = parseCategoryChannels(stored?.categoryChannels);
       for (const category of NOTIFICATION_CATEGORIES) values[category].telegram = previous[category].telegram;
     }

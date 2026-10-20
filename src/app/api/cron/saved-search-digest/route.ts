@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { alertSystemFailure } from "@/lib/telegram-bot/admin-alerts";
 import { timingSafeEqual } from "@/lib/auth/crypto";
 import { runSavedSearchDigest } from "@/lib/saved-search-digest";
 import { savedSearchDigestStore } from "@/lib/queries";
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("[cron] saxlanmış axtarış digest-i işləmədi:", error);
+    await alertSystemFailure({ job: "cron:daily-maintenance" }).catch(() => undefined);
     return NextResponse.json({ error: "digest failed" }, { status: 500 });
   }
 }

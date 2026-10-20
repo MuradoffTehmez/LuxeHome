@@ -69,7 +69,9 @@ export type AuditEntity =
   | "PromoCampaign"
   | "VipRequest"
   | "PromotionCampaign"
-  | "AccountRestriction";
+  | "AccountRestriction"
+  | "TelegramChat"
+  | "SupportTicket";
 
 export async function recordAudit(
   user: Pick<AuthUser, "id" | "email">,

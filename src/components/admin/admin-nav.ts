@@ -116,6 +116,8 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "reservations", href: "/admin/rezervasiyalar", permission: PERMISSIONS.LEAD_MANAGE },
           { labelKey: "calendar", href: "/admin/rezervasiyalar/teqvim", permission: PERMISSIONS.LEAD_MANAGE },
           { labelKey: "email", href: "/admin/e-poct", permission: PERMISSIONS.LEAD_MANAGE },
+          // Telegram `/support` müraciətləri — operator cavabı Telegram-a gedir.
+          { labelKey: "support", href: "/admin/destek", permission: PERMISSIONS.LEAD_MANAGE },
         ],
       },
       {
@@ -218,6 +220,7 @@ export const adminNav: AdminNavGroup[] = [
           { labelKey: "settings", href: "/admin/parametrler", permission: PERMISSIONS.SETTINGS_MANAGE },
           { labelKey: "featureFlags", href: "/admin/funksiyalar", permission: PERMISSIONS.SETTINGS_MANAGE },
           { labelKey: "systemMode", href: "/admin/sistem", permission: PERMISSIONS.SETTINGS_MANAGE },
+          { labelKey: "telegram", href: "/admin/telegram", permission: PERMISSIONS.SETTINGS_MANAGE },
           { labelKey: "botProtection", href: "/admin/security", permission: PERMISSIONS.USER_MANAGE },
           { labelKey: "demoContent", href: "/admin/demo-mezmun", permission: PERMISSIONS.SETTINGS_MANAGE },
         ],

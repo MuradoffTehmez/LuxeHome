@@ -2,7 +2,7 @@
  * Kənar HTTP cavabını ölçü limiti ilə oxuyur (#103 CSV idxalı). `Content-Length` olmaya
  * və ya yalan ola bilər, ona görə limit axın oxunarkən yoxlanır.
  */
-export async function readLimited(response: Response, limit: number): Promise<ArrayBuffer | null> {
+export async function readLimited(response: Pick<Response, "body">, limit: number): Promise<ArrayBuffer | null> {
   const reader = response.body?.getReader();
   if (!reader) return null;
   const chunks: Uint8Array[] = [];
