@@ -320,7 +320,7 @@ Beşi də işlədilmədən dəyişiklik tamamlanmış sayılmır. **`npm run bui
 
 ### Asılılıq yeniləmələri
 
-Dependabot həftəlik qruplaşdırılmış PR açır (production/development minor+patch, GitHub Actions). Aşağıdakı major-lar upstream uyğunsuzluğuna görə `.github/dependabot.yml`-də ignore edilib: `typescript >=7` (typescript-eslint), `eslint >=10` (eslint-plugin-react), `vitest >=5` (`@cloudflare/vitest-plugin`).
+Dependabot həftəlik qruplaşdırılmış PR açır (production/development minor+patch, GitHub Actions). Aşağıdakı major-lar upstream uyğunsuzluğuna görə `.github/dependabot.yml`-də ignore edilib: `typescript >=7` (typescript-eslint), `eslint >=10` (eslint-plugin-react), `vitest >=5` (`@cloudflare/vitest-plugin`), `prisma`/`@prisma/client >=7` (yeni generator, `@prisma/client/wasm.js` idxalı sınır).
 
 ### Bundler: webpack
 

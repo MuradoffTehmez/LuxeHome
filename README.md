@@ -494,7 +494,7 @@ npm major versiyasına görə fərqlənməsindən yaranan `npm ci` `EUSAGE` xət
   post-deploy brauzer smoke hələ manualdır (`npm run test:seo:routes` / `test:seo:live` var).
 - Real ödəniş provayderi qəsdən yoxdur: premium paket ödənişi ofisdə/köçürmə ilə alınır və paneldə qeyd olunur.
 - Google və telefonla giriş, Telegram bildirişi və Web Analytics secret/token verilənə qədər söndürülüdür.
-- TypeScript 7, ESLint 10 və Vitest 5 upstream uyğunsuzluğuna görə `dependabot.yml`-də ignore edilib.
+- TypeScript 7, ESLint 10, Vitest 5 və Prisma 7 upstream uyğunsuzluğuna görə `dependabot.yml`-də ignore edilib.
 - Avtomatlaşdırılmış D1 backup/restore drill hələ qurulmayıb.
 - Bilik Mərkəzinin idxal paketi DRAFT yaradır; hüquqşünas/redaktor təsdiqi olmadan PUBLISHED edilmir.
 - Korporativ e-poçt hadisələri yalnız `RESEND_WEBHOOK_SECRET` və Resend endpoint abunəliyi qurulduqdan sonra dolur; məzmun deyil, metadata saxlanılır.
