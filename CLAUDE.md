@@ -1248,6 +1248,13 @@ Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur 
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
 
+### Hüquqi səhifələr (#285)
+
+Məxfilik siyasəti, İstifadə şərtləri və Cookie siyasəti `src/i18n/legal/` altındadır (`az.ts` təsdiqlənmiş əsas mətn,
+`en.ts`/`ru.ts` tərcümə, rekvizitlər `siteConfig`-dən). Bölmə əlavə edəndə üç dilə də yaz — `legal-documents.test.ts`
+strukturu müqayisə edir. Lövbərlər `LEGAL_ANCHORS`-dadır: `#hesabin-silinmesi` Meta-nın «Data Deletion Instructions URL»-i
+kimi işlənir, adını dəyişmə. Yeni cookie, yaddaş açarı və ya xidmət təminatçısı əlavə edəndə cookie/məxfilik cədvəllərini də yenilə.
+
 ### Nümunə (demo) məzmun
 
 `Property`, `Project`, `BlogPost`, `Agency`, `AgentProfile` və `Partner` modellərində
