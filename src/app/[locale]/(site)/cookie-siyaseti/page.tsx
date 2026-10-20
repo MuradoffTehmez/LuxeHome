@@ -1,22 +1,14 @@
 import type { Metadata } from "next";
 import { CookiePreferencesButton } from "@/components/analytics/cookie-preferences-button";
 import { LocalizedLegalPage } from "@/components/site/localized-legal-page";
-import { siteConfig } from "@/config/site";
-import { getLegalDocuments } from "@/i18n/public-content";
+import { LEGAL_ANCHORS, getLegalDocuments } from "@/i18n/legal";
 import type { Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
 function documents(locale: Locale) {
-  return getLegalDocuments(locale, {
-    name: siteConfig.name,
-    legalName: siteConfig.legalName,
-    ownerName: siteConfig.owner.name,
-    email: siteConfig.email,
-    phone: siteConfig.phone,
-    address: siteConfig.addressFull,
-  });
+  return getLegalDocuments(locale);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,12 +27,10 @@ export default async function CookiePage({ params }: PageProps) {
   return (
     <LocalizedLegalPage
       document={documents(locale as Locale).cookies}
+      documentKey="cookies"
       path="/cookie-siyaseti"
-      email={siteConfig.email}
-      phone={siteConfig.phone}
-      phoneHref={siteConfig.phoneHref}
-      // 2-ci bölmə «İdarə etmək / Managing your choices»: düymə seçimin dəyişdirilməsini izah edən mətnin altındadır.
-      actionAfterSection={{ index: 1, node: <CookiePreferencesButton variant="page" /> }}
+      // «Razılığın idarə edilməsi» bölməsi: düymə seçimin dəyişdirilməsini izah edən mətnin altındadır.
+      actionAfterSection={{ id: LEGAL_ANCHORS.consent, node: <CookiePreferencesButton variant="page" /> }}
     />
   );
 }
