@@ -19,6 +19,9 @@ updates:
     # - eslint 10: eslint-config-next-in eslint-plugin-react-ı ESLint 10-da
     #   `context.getFilename` olmadığı üçün çökür.
     # - vitest 5: @cloudflare/vitest-plugin peer olaraq yalnız vitest ^4 qəbul edir.
+    # - prisma / @prisma/client 7: yeni `prisma-client` generatoru tələb edir,
+    #   `@prisma/client/wasm.js` idxalı (src/lib/prisma.ts, OpenNext bundle) sınır.
+    #   Miqrasiya ayrıca tapşırıqdır (#280, #126 bağlandı).
     # Yalnız sınan versiyalar bağlanır (məs. TS 6.0 hələ təklif oluna bilər).
     # Plugin/konfiq yeni major-u dəstəkləyəndə uyğun sətri sil.
     ignore:
@@ -31,6 +34,12 @@ updates:
       - dependency-name: vitest
         versions:
           - ">=5"
+      - dependency-name: prisma
+        versions:
+          - ">=7"
+      - dependency-name: "@prisma/client"
+        versions:
+          - ">=7"
     groups:
       production-dependencies:
         dependency-type: production
