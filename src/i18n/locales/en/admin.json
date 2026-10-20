@@ -3703,6 +3703,7 @@
         "description": "The daily maintenance job deletes expired records.",
         "hours": "{count} hours",
         "days": "{count} days",
+        "years": "{count} years",
         "forever": "not deleted",
         "items": {
           "sessionSliding": "Session (inactivity)",
@@ -3710,6 +3711,7 @@
           "loginAttempts": "Sign-in attempts",
           "securityEvents": "Security events",
           "knownDevices": "Known sign-in devices",
+          "leads": "Enquiries, reservations and open house registrations",
           "domainEvents": "System events",
           "uniqueViews": "Unique view keys",
           "propertyDocuments": "Document images (after decision)",

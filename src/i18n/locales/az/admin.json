@@ -3703,6 +3703,7 @@
         "description": "Gündəlik baxım işi müddəti bitmiş qeydləri silir.",
         "hours": "{count} saat",
         "days": "{count} gün",
+        "years": "{count} il",
         "forever": "silinmir",
         "items": {
           "sessionSliding": "Sessiya (fəaliyyətsizlik)",
@@ -3710,6 +3711,7 @@
           "loginAttempts": "Giriş cəhdləri",
           "securityEvents": "Təhlükəsizlik hadisələri",
           "knownDevices": "Tanınmış giriş cihazları",
+          "leads": "Müraciət, rezervasiya və açıq qapı qeydiyyatı",
           "domainEvents": "Sistem hadisələri",
           "uniqueViews": "Unikal baxış açarları",
           "propertyDocuments": "Sənəd şəkilləri (qərardan sonra)",
