@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { siteConfig } from "@/config/site";
 
 type LogoProps = {
   tone?: "light" | "dark";
@@ -42,7 +41,6 @@ export function Logo({
   return (
     <Link
       href="/"
-      aria-label={t("logoHome", { brand: siteConfig.name })}
       className={cn("group inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 sm:gap-3", className)}
     >
       {!markless && (
@@ -85,6 +83,10 @@ export function Logo({
             </span>
           </span>
         )}
+
+        {/* Linkin adı məzmundan qurulur, `aria-label` yazılmır: WCAG 2.5.3 (label in name)
+            görünən mətnin (alt yazı daxil) adda olmasını tələb edir — axe 4.14 bunu yoxlayır. */}
+        <span className="sr-only"> — {t("logoHome")}</span>
       </span>
     </Link>
   );
