@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
 import { LocalizedLegalPage } from "@/components/site/localized-legal-page";
-import { siteConfig } from "@/config/site";
-import { getLegalDocuments } from "@/i18n/public-content";
+import { getLegalDocuments } from "@/i18n/legal";
 import type { Locale } from "@/lib/constants";
 import { buildManagedMetadata } from "@/lib/seo";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
 function documents(locale: Locale) {
-  return getLegalDocuments(locale, {
-    name: siteConfig.name,
-    legalName: siteConfig.legalName,
-    ownerName: siteConfig.owner.name,
-    email: siteConfig.email,
-    phone: siteConfig.phone,
-    address: siteConfig.addressFull,
-  });
+  return getLegalDocuments(locale);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -34,10 +26,8 @@ export default async function TermsPage({ params }: PageProps) {
   return (
     <LocalizedLegalPage
       document={documents(locale as Locale).terms}
+      documentKey="terms"
       path="/istifade-sertleri"
-      email={siteConfig.email}
-      phone={siteConfig.phone}
-      phoneHref={siteConfig.phoneHref}
     />
   );
 }

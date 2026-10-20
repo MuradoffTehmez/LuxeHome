@@ -71,9 +71,10 @@ Bu beşlikdən **ayrı** olaraq CI `npm run audit:gate` işlədir (`npm audit --
 `package.json`/`package-lock.json` dəyişdikdə işlətmək lazımdır. Yamağı olmayan advisory yalnız
 səbəb və bitmə tarixi ilə istisnaya yazılır; müddət bitəndə qapı yenidən yıxılır.
 
-`.github/dependabot.yml` üç major-u upstream uyğunsuzluğuna görə `versions` ilə saxlayır:
+`.github/dependabot.yml` dörd major-u upstream uyğunsuzluğuna görə `versions` ilə saxlayır:
 `typescript >=7` (typescript-eslint TS `<6.1` tələb edir), `eslint >=10` (`eslint-plugin-react`
-çökür), `vitest >=5` (`@cloudflare/vitest-plugin` peer `^4`). Plugin dəstək verəndə sətri sil.
+çökür), `vitest >=5` (`@cloudflare/vitest-plugin` peer `^4`), `prisma`/`@prisma/client >=7`
+(yeni generator, `@prisma/client/wasm.js` idxalı sınır — miqrasiya ayrıca). Plugin dəstək verəndə sətri sil.
 CI build-də `next/font` Google Fonts-dan keçici xəta verə bilər — job-u bir dəfə yenidən işlət.
 
 **Bundler webpack-dır.** Next 16 defolt olaraq Turbopack işlədir, lakin `build` və `dev`
@@ -1246,6 +1247,13 @@ kimi dəyərlər komponentlərdə hardcode edilmir.
 Sayt, «Luxe Home Estate» brendi və markası hüquqi şəxs **Əmiyev Bahadur Qafar oğlu**-na məxsusdur
 (`siteConfig.owner`). Bu ad footer-dəki müəllif hüququ bildirişində və `organizationSchema()`
 struktur datasında göstərilir — dəyişdirilməməlidir.
+
+### Hüquqi səhifələr (#285)
+
+Məxfilik siyasəti, İstifadə şərtləri və Cookie siyasəti `src/i18n/legal/` altındadır (`az.ts` təsdiqlənmiş əsas mətn,
+`en.ts`/`ru.ts` tərcümə, rekvizitlər `siteConfig`-dən). Bölmə əlavə edəndə üç dilə də yaz — `legal-documents.test.ts`
+strukturu müqayisə edir. Lövbərlər `LEGAL_ANCHORS`-dadır: `#hesabin-silinmesi` Meta-nın «Data Deletion Instructions URL»-i
+kimi işlənir, adını dəyişmə. Yeni cookie, yaddaş açarı və ya xidmət təminatçısı əlavə edəndə cookie/məxfilik cədvəllərini də yenilə.
 
 ### Nümunə (demo) məzmun
 
