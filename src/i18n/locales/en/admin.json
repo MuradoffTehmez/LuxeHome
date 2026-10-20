@@ -3710,6 +3710,7 @@
           "loginAttempts": "Sign-in attempts",
           "securityEvents": "Security events",
           "knownDevices": "Known sign-in devices",
+          "leads": "Enquiries, reservations and open house registrations",
           "domainEvents": "System events",
           "uniqueViews": "Unique view keys",
           "propertyDocuments": "Document images (after decision)",

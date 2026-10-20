@@ -34,6 +34,7 @@ export type DomainEventType =
   | "reservation.requested"
   | "reservation.status_changed"
   | "lead.created"
+  | "lead.retention_purged"
   | "partner.expired"
   | "account.deletion_requested"
   | "account.data_exported";

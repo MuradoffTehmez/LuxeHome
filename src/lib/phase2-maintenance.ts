@@ -15,6 +15,7 @@ import { purgeKnownDevices } from "@/lib/security/login-alerts";
 import { DOMAIN_EVENT_RETENTION_DAYS } from "@/lib/security/retention-policy";
 import { purgeTelegramData } from "@/lib/telegram-bot/maintenance";
 import { purgeOAuthSignupTokens } from "@/lib/auth/social-login";
+import { purgeExpiredLeads } from "@/lib/lead-retention";
 
 
 /** Gündəlik cron üçün idempotent premium və rezervasiya müddəti təmizliyi. */
@@ -70,6 +71,8 @@ export async function runPhase2Maintenance(now = new Date()) {
   // Telegram: idempotentlik qeydləri, köhnə çatdırılma jurnalı, istifadə olunmuş tokenlər, bağlı dəstək müraciətləri.
   const telegram = await purgeTelegramData(now);
   const socialSignupTokens = await purgeOAuthSignupTokens(now).catch(() => 0);
+  // Müraciət saxlama müddəti (#287): Məxfilik siyasətindəki «ən çoxu 3 il» — müraciət, rezervasiya, açıq qapı qeydiyyatı.
+  const expiredLeads = await purgeExpiredLeads(now).catch(() => ({ leads: 0, reservations: 0, openHouseRegistrations: 0 }));
 
   return {
     expiredPremium: premium.count,
@@ -87,5 +90,6 @@ export async function runPhase2Maintenance(now = new Date()) {
     knownDevices,
     telegram,
     socialSignupTokens,
+    expiredLeads,
   };
 }

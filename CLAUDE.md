@@ -646,7 +646,7 @@ və elanı olan əlaqəli ərazilər (rayonun sayına birbaşa uşaqları da dü
   `KNOWN_DEVICE_RETENTION_DAYS` (365) saxlanılır. Son `KNOWN_DEVICE_WINDOW_DAYS` (90) gündə ikisi də tanınmırsa hadisə; heç
   tarixçə yoxdursa ilk giriş sayılır (xəbərdarlıqsız), tarixçə var, amma pəncərədə boşdursa giriş yenidir + ictimai hesaba `SECURITY` bildirişi
   (`noticeNewDeviceLogin`), əməkdaşa birbaşa e-poçt. Sessiya açan yeni axın da onu çağırmalıdır. Saxlama müddətləri
-  `lib/security/retention-policy.ts`-dədir (panel cədvəli də oradan qurulur); `purgeSecurityLogs()` gündəlik baxımdadır.
+  `lib/security/retention-policy.ts`-dədir (panel cədvəli də oradan qurulur); `purgeSecurityLogs()` gündəlik baxımdadır. Müraciət, rezervasiya və açıq qapı qeydiyyatı `LEAD_RETENTION_DAYS` (3 il — Məxfilik siyasətinin vədi, #287) sonra `purgeExpiredLeads()` ilə silinir; müddəti dəyişəndə siyasət mətnini də yenilə.
   `/admin/tehlukesizlik` (`user:manage`, «Təhlükəsizlik» qrupu). D1 Time Travel bərpa proseduru Wiki-dədir.
 - Panel `/admin/funksiyalar` (`settings:manage`): kritik açar (ödəniş, abunə, monetizasiya, avtomatik moderasiya) dəyişəndə
   təsdiq qutusu məcburidir (server də yoxlayır); dəyişiklik audit jurnalına əvvəl/sonra dəyəri ilə yazılır.
