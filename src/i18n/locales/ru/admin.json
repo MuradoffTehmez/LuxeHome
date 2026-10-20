@@ -3703,6 +3703,7 @@
         "description": "Ежедневное обслуживание удаляет устаревшие записи.",
         "hours": "{count} ч",
         "days": "{count} дн.",
+        "years": "{count} г.",
         "forever": "не удаляется",
         "items": {
           "sessionSliding": "Сессия (бездействие)",

@@ -10,11 +10,12 @@ export const SECURITY_EVENT_RETENTION_DAYS = 180;
 export const LOGIN_ATTEMPT_RETENTION_DAYS = 90;
 /**
  * Müraciət, baxış sorğusu, rezervasiya və açıq qapı qeydiyyatı (#287) — Məxfilik siyasətindəki «ən çoxu 3 il» vədi.
- * Yaradılandan bu qədər gün sonra `purgeExpiredLeads()` (gündəlik baxım) onları silir.
+ * Yaradılandan bu qədər **təqvim ili** sonra `purgeExpiredLeads()` (gündəlik baxım) onları silir. Gün sayı (3 × 365)
+ * yazılmır: 29 fevral düşən dövrdə qeyd vəd ediləndən bir gün artıq qalardı.
  */
-export const LEAD_RETENTION_DAYS = 3 * 365;
+export const LEAD_RETENTION_YEARS = 3;
 
-export type RetentionItem = { key: string; value: number; unit: "hours" | "days" | "forever" };
+export type RetentionItem = { key: string; value: number; unit: "hours" | "days" | "years" | "forever" };
 
 /**
  * Məlumat saxlama siyasəti (PRD 23.4) — `/admin/tehlukesizlik` cədvəli və sənəd bu siyahıdan qurulur, rəqəmlər
@@ -27,7 +28,7 @@ export const RETENTION_POLICY: RetentionItem[] = [
   { key: "securityEvents", value: SECURITY_EVENT_RETENTION_DAYS, unit: "days" },
   { key: "knownDevices", value: KNOWN_DEVICE_RETENTION_DAYS, unit: "days" },
   { key: "domainEvents", value: DOMAIN_EVENT_RETENTION_DAYS, unit: "days" },
-  { key: "leads", value: LEAD_RETENTION_DAYS, unit: "days" },
+  { key: "leads", value: LEAD_RETENTION_YEARS, unit: "years" },
   { key: "uniqueViews", value: UNIQUE_VIEW_RETENTION_DAYS, unit: "days" },
   { key: "propertyDocuments", value: PROPERTY_DOCUMENT_RETENTION_DAYS, unit: "days" },
   { key: "auditLog", value: 0, unit: "forever" },

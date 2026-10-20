@@ -3703,6 +3703,7 @@
         "description": "The daily maintenance job deletes expired records.",
         "hours": "{count} hours",
         "days": "{count} days",
+        "years": "{count} years",
         "forever": "not deleted",
         "items": {
           "sessionSliding": "Session (inactivity)",

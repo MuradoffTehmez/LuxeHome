@@ -3703,6 +3703,7 @@
         "description": "Gündəlik baxım işi müddəti bitmiş qeydləri silir.",
         "hours": "{count} saat",
         "days": "{count} gün",
+        "years": "{count} il",
         "forever": "silinmir",
         "items": {
           "sessionSliding": "Sessiya (fəaliyyətsizlik)",

@@ -72,7 +72,7 @@ export async function runPhase2Maintenance(now = new Date()) {
   const telegram = await purgeTelegramData(now);
   const socialSignupTokens = await purgeOAuthSignupTokens(now).catch(() => 0);
   // Müraciət saxlama müddəti (#287): Məxfilik siyasətindəki «ən çoxu 3 il» — müraciət, rezervasiya, açıq qapı qeydiyyatı.
-  const expiredLeads = await purgeExpiredLeads(now).catch(() => ({ leads: 0, reservations: 0, openHouseRegistrations: 0 }));
+  const expiredLeads = await purgeExpiredLeads(now).catch(() => ({ leads: 0, reservations: 0, openHouseRegistrations: 0, notifications: 0 }));
 
   return {
     expiredPremium: premium.count,
