@@ -5,11 +5,13 @@ import {
   buildMetadata,
   faqSchema,
   jsonLd,
+  knowledgeArticleSchema,
   organizationSchema,
   propertySchema,
   serializeJsonLd,
   serviceSchema,
   truncateAtWord,
+  webPageSchema,
 } from "@/lib/seo";
 import { resolveSiteBaseUrl, siteUrl } from "@/config/site";
 import { getCanonicalHostRedirect } from "@/lib/seo-host";
@@ -129,7 +131,14 @@ describe("buildMetadata", () => {
         "x-default": siteUrl("/az/emlaklar"),
       },
     });
-    expect(metadata.robots).toBeUndefined();
+    // İndekslənən səhifə AI önizləməsini məhdudlaşdırmır (#289)
+    expect(metadata.robots).toMatchObject({
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      googleBot: { "max-snippet": -1, "max-video-preview": -1 },
+    });
     expect(metadata.openGraph).toMatchObject({ locale: "ru_RU" });
   });
 });
@@ -249,5 +258,24 @@ describe("structured data kontraktı", () => {
       "@type": "FAQPage",
       "@id": `${siteUrl("/az/suallar")}#faq`,
     });
+  });
+});
+
+describe("GEO sxem əlavələri (#289)", () => {
+  it("Haqqımızda və Əlaqə səhifə tipini daşıyır və Organization-a bağlanır", () => {
+    const schema = webPageSchema({ type: "ContactPage", path: "/elaqe", name: "Əlaqə", description: "Ofis" });
+    expect(schema["@type"]).toBe("ContactPage");
+    expect(schema.about).toEqual({ "@id": `${siteUrl()}/#organization` });
+    expect(webPageSchema({ path: "/x", name: "X", description: "Y" })["@type"]).toBe("WebPage");
+  });
+
+  it("hüquqi yoxlanmış məqalə lastReviewed/reviewedBy daşıyır, yoxlanmamış daşımır", () => {
+    const reviewed = knowledgeArticleSchema({ title: "T", description: "D", slug: "s", legalReviewedAt: "2026-10-01T00:00:00.000Z" });
+    expect(reviewed.mainEntityOfPage).toMatchObject({
+      lastReviewed: "2026-10-01T00:00:00.000Z",
+      reviewedBy: { "@id": `${siteUrl()}/#organization` },
+    });
+    const draft = knowledgeArticleSchema({ title: "T", description: "D", slug: "s" });
+    expect(draft.mainEntityOfPage).not.toHaveProperty("lastReviewed");
   });
 });

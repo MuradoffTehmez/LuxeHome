@@ -187,6 +187,11 @@ propu ilə alır — bu, ana səhifənin statik render olunmasını qoruyur.
 `getSitemapEntries()` (`queries.ts`) `app/sitemap.ts` və parçalanmış sitemap feed-ləri tərəfindən
 istifadə olunur.
 
+**GEO (#289):** AI axtarış botları `robots.txt`-də ayrıca qrupdadır (`lib/ai-crawlers.ts`, qadağalar `*` ilə eyni),
+indekslənən səhifə `max-snippet:-1` daşıyır, `revalidatePublicContent()` dəyişən yolları IndexNow-a göndərir
+(`lib/indexnow.ts`, `/indexnow.txt`), `llms.txt`/`llms-full.txt` mətni `lib/llms-txt.ts`-dədir. Cloudflare-in AI bot
+bloku kənarda ayrıca 403 verir — onu paneldən açmaq lazımdır.
+
 ### Şirkət məlumatları
 
 Bütün əlaqə, brend və naviqasiya məlumatları `src/config/site.ts`-dədir (`siteConfig`,

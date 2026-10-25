@@ -158,6 +158,7 @@ export default async function KnowledgeArticlePage({ params }: Props) {
               updatedAt: article.updatedAt,
               authorName: article.author?.name,
               section: article.category?.name,
+              legalReviewedAt: article.legalReviewedAt,
             },
             locale as Locale,
           ),

@@ -17,7 +17,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { buttonClassName } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { siteConfig } from "@/config/site";
-import { buildManagedMetadata } from "@/lib/seo";
+import { buildManagedMetadata, jsonLd, webPageSchema } from "@/lib/seo";
 import { BusinessTrustPanel } from "@/components/site/business-trust-panel";
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -40,6 +40,19 @@ export default async function AboutPage({ params }: PageProps) {
   const nav = await getTranslations({ locale, namespace: "navigation" });
   return (
     <>
+      <script
+        {...jsonLd(
+          webPageSchema(
+            {
+              type: "AboutPage",
+              path: "/haqqimizda",
+              name: t("about.metaTitle"),
+              description: t("about.metaDescription", { legalName: siteConfig.legalName }),
+            },
+            locale as Locale,
+          ),
+        )}
+      />
       <PageHeader
         compact
         eyebrow={t("about.overline")}

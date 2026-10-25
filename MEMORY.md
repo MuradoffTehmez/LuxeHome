@@ -70,6 +70,7 @@ düzgün 404 statusunu qorumaq üçün public route səviyyəli `loading.tsx` q�
 | Kabinet moderasiyası | Kabinet elanına koordinat əlavə olundu, lakin moderator baxışında xəritə önizləməsi yoxdur. |
 | Browser axınları | Playwright dəsti staging-də CI qapısıdır; production-a ayrıca post-deploy browser smoke hələ yoxdur. |
 | Phase 3 / AI | Public AI sorğu parser-i, deterministik fallback, Match Score və «Mənə əmlak tap» axını hazırdır. Cari “semantic” uyğunluq embedding/vector deyil, normallaşdırılmış mətn terminləri ilə leksik axtarışdır; chatbot və xəritədə sərbəst sahə çəkmə (map draw) yoxdur. Admin AI təsvir/foto köməkçisi Workers AI JSON mode ilə işləyir. |
+| GEO / AI görünürlüyü (#289) | Kod tərəfi hazırdır (AI bot robots qrupu, `max-snippet:-1`, IndexNow, `llms*.txt`, AboutPage/ContactPage). Sahibin addımları açıqdır: Cloudflare AI Crawl Control-da GPTBot «Block Crawler» açıq idi (25.10.2026; OAI-SearchBot/ChatGPT-User açıq) — Anthropic/Perplexity sətirləri də yoxlanmalıdır, saxta UA ilə `curl` testi həmişə 403 verir, Bing Webmaster təsdiqi (`NEXT_PUBLIC_BING_SITE_VERIFICATION` və ya GSC idxalı), Cloudflare HSTS 6 ay → 1 il. |
 | Finance / statik CMS | Knowledge Hub üçün domen CMS-i hazırdır; paket, ödəniş və ümumi statik səhifə redaktoru hələ yoxdur (Admin PRD). |
 
 Azərbaycan hərfləri ilə registrsiz axtarış 28 avqustda `searchText` / `searchName`

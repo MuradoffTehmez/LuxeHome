@@ -68,9 +68,18 @@ export const metadata: Metadata = {
   creator: siteConfig.legalName,
   publisher: siteConfig.legalName,
   formatDetection: { telephone: true, address: true, email: true },
-  verification: process.env.GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
-    : undefined,
+  // Bing Webmaster təsdiqi (#289): ChatGPT axtarışı Bing indeksinə söykənir. Bu obyekt modul
+  // səviyyəsindədir, Workers-də isə `process.env` yalnız sorğuda dolur — ona görə Bing
+  // tokeni build vaxtı yerləşən `NEXT_PUBLIC_` dəyişəndir (token onsuz da HTML-də açıqdır).
+  verification:
+    process.env.GOOGLE_SITE_VERIFICATION || process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? {
+          ...(process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : {}),
+          ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+            ? { other: { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } }
+            : {}),
+        }
+      : undefined,
   other: {
     seobility: "915a7ee78cdfc3bf8b2b272351e8ac86",
   },

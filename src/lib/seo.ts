@@ -50,6 +50,25 @@ type PageMetaInput = {
   alternateLocales?: Locale[];
 };
 
+/**
+ * İndekslənən səhifənin önizləmə direktivləri (GEO, #289).
+ *
+ * AI axtarış sistemləri cavabda sitat gətirdiyi parçanı önizləmədən götürür;
+ * məhdud `max-snippet` sitatı kəsir. Limitsiz mətn, böyük şəkil və tam video önizləməsi.
+ */
+const PREVIEW_DIRECTIVES = {
+  "max-snippet": -1,
+  "max-image-preview": "large",
+  "max-video-preview": -1,
+} as const;
+
+const INDEXABLE_ROBOTS: Metadata["robots"] = {
+  index: true,
+  follow: true,
+  ...PREVIEW_DIRECTIVES,
+  googleBot: { index: true, follow: true, ...PREVIEW_DIRECTIVES },
+};
+
 /** Səhifə üçün tam metadata (canonical + Open Graph + Twitter) qurur. */
 export function buildMetadata({
   title,
@@ -111,10 +130,15 @@ export function buildMetadata({
       ? {
           index: robotsOverride.index,
           follow: robotsOverride.follow,
-          googleBot: { index: robotsOverride.index, follow: robotsOverride.follow, "max-image-preview": "large" },
+          ...(robotsOverride.index ? PREVIEW_DIRECTIVES : {}),
+          googleBot: {
+            index: robotsOverride.index,
+            follow: robotsOverride.follow,
+            ...(robotsOverride.index ? PREVIEW_DIRECTIVES : { "max-image-preview": "large" }),
+          },
         }
       : effectivePolicy === "index"
-      ? undefined
+      ? INDEXABLE_ROBOTS
       : effectivePolicy === "noindex-follow"
         ? {
             index: false,
@@ -429,11 +453,18 @@ export function propertySchema(property: PropertySchemaInput, locale: Locale = D
   };
 }
 
-export function webPageSchema(input: { path: string; name: string; description: string }, locale: Locale = DEFAULT_LOCALE) {
+/**
+ * Səhifə sxemi. `AboutPage` / `ContactPage` (#289) şirkət haqqında suala cavab verən
+ * AI sisteminə hansı səhifənin kanonik mənbə olduğunu göstərir; ikisi də Organization-a bağlıdır.
+ */
+export function webPageSchema(
+  input: { path: string; name: string; description: string; type?: "WebPage" | "AboutPage" | "ContactPage" },
+  locale: Locale = DEFAULT_LOCALE,
+) {
   const url = siteUrl(localizePath(input.path, locale));
   return {
     "@context": "https://schema.org",
-    "@type": "WebPage",
+    "@type": input.type ?? "WebPage",
     "@id": `${url}#webpage`,
     url,
     name: input.name,
@@ -549,6 +580,8 @@ export function knowledgeArticleSchema(
     updatedAt?: Date | string | null;
     authorName?: string | null;
     section?: string | null;
+    /** Hüquqi yoxlama tarixi — `lastReviewed` + `reviewedBy` E-E-A-T siqnalıdır (#289). */
+    legalReviewedAt?: Date | string | null;
   },
   locale: Locale = DEFAULT_LOCALE,
 ) {
@@ -569,7 +602,16 @@ export function knowledgeArticleSchema(
       "@id": `${siteUrl()}/#organization`,
       logo: { "@type": "ImageObject", url: siteUrl("/logo-full.png") },
     },
-    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+      ...(article.legalReviewedAt
+        ? {
+            lastReviewed: new Date(article.legalReviewedAt).toISOString(),
+            reviewedBy: { "@id": `${siteUrl()}/#organization` },
+          }
+        : {}),
+    },
     inLanguage: { az: "az-AZ", en: "en-US", ru: "ru-RU" }[locale],
   };
 }
