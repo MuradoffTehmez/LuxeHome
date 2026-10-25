@@ -6,7 +6,7 @@ import { Container, Section } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { GoogleIcon, InstagramIcon, WhatsAppIcon } from "@/components/site/brand-icons";
-import { buildManagedMetadata } from "@/lib/seo";
+import { buildManagedMetadata, jsonLd, webPageSchema } from "@/lib/seo";
 import { googleBusinessProfileUrl, siteConfig } from "@/config/site";
 import { getOperationalSiteConfig } from "@/lib/settings";
 import { PlaceMap } from "@/components/map/place-map";
@@ -42,6 +42,19 @@ export default async function ContactPage({ params }: PageProps) {
   ];
   return (
     <>
+      <script
+        {...jsonLd(
+          webPageSchema(
+            {
+              type: "ContactPage",
+              path: "/elaqe",
+              name: t("eyebrow"),
+              description: t("metaDescription", { legalName: siteConfig.legalName, address: operational.addressFull, phone: operational.phone }),
+            },
+            locale as Locale,
+          ),
+        )}
+      />
       <PageHeader
         compact
         eyebrow={t("eyebrow")}

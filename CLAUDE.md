@@ -1196,6 +1196,12 @@ JPEG-ə çevrilib data URI kimi yerləşir, nəticə də JPEG-ə çevrilir (PNG 
 WhatsApp ~300 KB-dan böyük önizləməni göstərmir). OG şrifti (Geist) «₼» daşımır — valyuta
 kodu `formatOgPrice()` ilə yazılır. Marşrut `/api` altındadır ki, locale middleware-i keçməsin.
 
+**GEO (#289):** `robots.txt` AI axtarış botlarını ayrıca qrupda eyni qadağalarla buraxır (`lib/ai-crawlers.ts` — adla yazılan
+qrup `*`-ı tam əvəz edir, qadağaları təkrarla); indekslənən səhifə `max-snippet:-1` + böyük şəkil/video önizləməsi daşıyır;
+`revalidatePublicContent()` dəyişən yolları IndexNow-a göndərir (`lib/indexnow.ts`, açar `AUTH_SECRET`-dən, `/indexnow.txt`,
+yalnız production, heç vaxt atmır) — ictimai məzmun yazan yeni axın da o funksiyadan keçsin. `llms.txt`/`llms-full.txt`
+`lib/llms-txt.ts`-dədir və yalnız `siteConfig` faktlarını yazır. Cloudflare-in AI bot bloku kənarda ayrıca 403 verir — kod onu açmır.
+
 `app/sitemap.ts` `getSitemapEntries()`-i çağırır və `force-dynamic`-dir (D1-dən oxuyur).
 `app/robots.ts` `/admin`, `/giris` və `/favoritler` marşrutlarını indeksdən kənarlaşdırır.
 

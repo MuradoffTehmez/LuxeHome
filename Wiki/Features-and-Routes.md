@@ -260,7 +260,7 @@ Toplu seçim `components/admin/bulk-selection.tsx` + `lib/admin/bulk.ts`-dir: h�
 | `POST /api/emlaklar/[id]/klik` | Elanın WhatsApp, `?kanal=telegram` ilə Telegram klikini analitikaya yazır (həmişə 204) | Same-origin, IP limiti, bot filtri |
 | `POST /api/webhooks/resend` | Resend/Svix event qəbulu | `RESEND_WEBHOOK_SECRET` imzası |
 | `GET /media/[...key]` | R2 obyektinin delivery-si | Key parser + cache metadata |
-| `GET /llms.txt`, `/sitemap-index.xml`, `/sitemaps/[feed]` | Maşın oxunaqlı xəritə və sitemap feed-ləri | Public |
+| `GET /llms.txt`, `/llms-full.txt`, `/indexnow.txt`, `/sitemap-index.xml`, `/sitemaps/[feed]` | Maşın oxunaqlı xəritə, IndexNow açarı və sitemap feed-ləri (#289) | Public |
 
 Cəmi 26 Route Handler (14 oktyabr 2026, #161): `src/app/api` altında 22, üstəgəl `media/[...key]`, `llms.txt`, `sitemap-index.xml` və `sitemaps/[feed]`. Rəsmi küçə siyahıları Route Handler deyil — `public/data/kuceler/<officialCode>.json` statik fayllarıdır.
 
@@ -269,7 +269,7 @@ Cəmi 26 Route Handler (14 oktyabr 2026, #161): `src/app/api` altında 22, üst�
 | Marşrut | Davranış |
 |---|---|
 | `/sitemap.xml`, `/sitemap-index.xml`, `/sitemaps/[feed]` | D1-dən indekslənə bilən qeydlər (`isDemo: false`), yeni ictimai səhifələr və bazar hesabatları daxil |
-| `/robots.txt` | `/admin`, `/giris`, `/favoritler` bloklanır; staging-də tam `Disallow: /` |
+| `/robots.txt` | `/admin`, `/giris`, `/favoritler` bloklanır; AI axtarış botlarına ayrıca qrup, `Bytespider` blok (#289); staging-də tam `Disallow: /` |
 | `/sitemap.xml` | Middleware daxildə `/sitemap-index.xml`-ə rewrite edir |
 | `manifest.webmanifest` | PWA manifesti |
 | `not-found.tsx`, `error.tsx`, `forbidden.tsx` | Brendli 404, xəta sərhədi və 403 |

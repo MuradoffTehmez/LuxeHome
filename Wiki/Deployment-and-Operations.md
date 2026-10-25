@@ -343,6 +343,24 @@ Production `robots.txt` Cloudflare Managed Content Signals blokundan sonra tətb
 
 Staging `IS_STAGING=true` olduqda tətbiq bütün route-ları disallow edir.
 
+### GEO — AI axtarış görünürlüyü (#289)
+
+- `robots.txt` AI axtarış botlarına (`OAI-SearchBot`, `ChatGPT-User`, `GPTBot`, `ClaudeBot`, `PerplexityBot`,
+  `Google-Extended` və s. — `src/lib/ai-crawlers.ts`) `*` ilə eyni allow/disallow siyahısını ayrıca qrup kimi verir,
+  `Bytespider` bloklanır. Admin paneldəki robots parametri də eyni qruplara düşür.
+- **Cloudflare kənarı ayrıca qapıdır:** AI Crawl Control → Security-də botun «Block Crawler» açarı açıqdırsa, `robots.txt`-dən
+  asılı olmayaraq kənarda bloklanır (25 oktyabr 2026: GPTBot bloklu idi, OAI-SearchBot və ChatGPT-User açıq). Yoxlama həmin
+  cədvəlin «Allowed / Unsuccessful» qrafikidir — `curl -A "GPTBot"` etibarlı deyil, çünki Cloudflare botun IP-sindən gəlməyən
+  saxta user-agent-i hər halda 403 ilə rədd edir.
+- İndekslənən səhifələr `max-snippet:-1`, `max-image-preview:large`, `max-video-preview:-1` daşıyır (`buildMetadata`).
+- **IndexNow:** `revalidatePublicContent()` dəyişən locale-li yolları fonda `api.indexnow.org`-a göndərir; açar `AUTH_SECRET`-dən
+  törədilir və `/indexnow.txt`-də verilir (yalnız production). Bing Webmaster Tools-da sayt təsdiqlənməlidir —
+  `NEXT_PUBLIC_BING_SITE_VERIFICATION` (build dəyişəni) `msvalidate.01` meta teqini yazır, alternativ Search Console idxalıdır.
+- `llms.txt` / `llms-full.txt` (`src/lib/llms-txt.ts`): yalnız `siteConfig`-dəki təsdiqlənmiş faktlar; geniş versiya dərc olunmuş
+  Bilik Mərkəzi məqalələrini və son bloq yazılarını əlavə edir. Sitat amili deyil, yanlış faktın qarşısını alır.
+- HSTS kodda `max-age=31536000; includeSubDomains; preload`-dur; canlı cavabdakı fərqli dəyər Cloudflare-in Edge Certificates → HSTS
+  ayarından gəlir.
+
 Sitemap D1-dən public property, project, service, blog, agency, partner, Bilik Mərkəzi və idarə
 olunan SEO landing qeydlərini oxuyur; AZ/EN/RU alternativləri ilə statik SEO səhifələrini də daxil
 edir. `/sitemap.xml`-dən əlavə locale və entity üzrə bölünmüş `/sitemap-index.xml` və
